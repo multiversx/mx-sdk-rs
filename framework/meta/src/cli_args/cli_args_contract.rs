@@ -72,6 +72,11 @@ pub enum ContractCliAction {
         about = "Generates a proxy, based on the contract ABI."
     )]
     GenerateProxies,
+    #[command(
+        name = "compare",
+        about = "Compares a newly generated proxy with the proxies already on disk."
+    )]
+    Compare
 }
 
 impl CliArgsToRaw for ContractCliAction {
@@ -105,6 +110,9 @@ impl CliArgsToRaw for ContractCliAction {
             },
             ContractCliAction::GenerateProxies => {
                 raw.push("proxy".to_string());
+            },
+            ContractCliAction::Compare => {
+                raw.push("compare".to_string());
             },
         }
         raw

@@ -34,6 +34,7 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
             meta_config_opt.generate_proxy()
         },
         ContractCliAction::GenerateProxies => meta_config_opt.generate_proxy(),
+        ContractCliAction::Compare => meta_config_opt.compare_proxy(),
     }
 }
 

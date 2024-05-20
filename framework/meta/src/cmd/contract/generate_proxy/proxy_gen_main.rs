@@ -1,3 +1,6 @@
+use colored::Colorize;
+use std::fs;
+
 use multiversx_sc::abi::ContractAbi;
 
 use crate::cmd::contract::sc_config::ProxyConfigSerde;
@@ -14,6 +17,33 @@ impl MetaConfig {
             write_proxy_with_explicit_path(&proxy_config, self);
         }
     }
+
+    pub fn compare_proxy(&mut self) {
+        for proxy_config in self.sc_config.proxy_configs.clone() {
+            compare_proxy_explicit_path(&proxy_config, self);
+        }
+    }
+}
+
+fn compare_proxy_explicit_path(proxy_config: &ProxyConfigSerde, meta_config: &MetaConfig) {
+    let contract_abi = extract_contract_abi(proxy_config, meta_config);
+    let mut temp = create_file("temp");
+    let mut proxy_generator =
+        ProxyGenerator::new(meta_config, &mut temp, proxy_config, contract_abi);
+    proxy_generator.write_proxy_to_file();
+
+    let existent_proxy_path = format!("../{}", proxy_config.path);
+    let temp_path = "../temp";
+
+    let existent_proxy = fs::read_to_string(existent_proxy_path).unwrap();
+    let temp = fs::read_to_string(temp_path).unwrap();
+
+    if existent_proxy != temp {
+        fs::remove_file(temp_path).unwrap();
+        panic!("{}", format!("Contract has been modified and proxies have not been updated. Regenerate proxies to avoid inconsistencies.").red());
+    }
+
+    fs::remove_file(temp_path).unwrap();
 }
 
 fn write_proxy_with_explicit_path(proxy_config: &ProxyConfigSerde, meta_config: &MetaConfig) {
