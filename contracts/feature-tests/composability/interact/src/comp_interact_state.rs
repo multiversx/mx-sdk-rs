@@ -1,19 +1,11 @@
-use crate::{ContractInfo, StaticApi};
 use serde::{Deserialize, Serialize};
 use std::{
     io::{Read, Write},
     path::Path,
 };
 
-/// Default contract address
-const DEFAULT_CONTRACT_ADDRESS: &str =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
-
 /// State file
 const STATE_FILE: &str = "state.toml";
-
-pub type VaultContract = ContractInfo<vault::Proxy<StaticApi>>;
-pub type ForwarderQueueContract = ContractInfo<forwarder_queue::Proxy<StaticApi>>;
 
 /// Composability Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -34,21 +26,6 @@ impl State {
         } else {
             Self::default()
         }
-    }
-
-    /// Returns the forwarder-queue contract
-    pub fn forwarder_queue_from_addr(&self, address: &str) -> ForwarderQueueContract {
-        ForwarderQueueContract::new(address)
-    }
-
-    /// Returns the vault contract with default address
-    pub fn default_vault_address(&self) -> VaultContract {
-        VaultContract::new(DEFAULT_CONTRACT_ADDRESS)
-    }
-
-    /// Returns the forwarder-queue contract with default address
-    pub fn default_forwarder_queue_address(&self) -> ForwarderQueueContract {
-        ForwarderQueueContract::new(DEFAULT_CONTRACT_ADDRESS)
     }
 }
 
