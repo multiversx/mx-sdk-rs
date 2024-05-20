@@ -5,7 +5,8 @@ use num_bigint::BigUint;
 
 use crate::{
     call_tree::{CallNode, CallState, ForwarderQueueTarget},
-    comp_interact_controller::ComposabilityInteract, forwarder_queue_proxy::{self, QueuedCallType},
+    comp_interact_controller::ComposabilityInteract,
+    forwarder_queue_proxy::{self, QueuedCallType},
 };
 
 const FORWARD_QUEUED_CALLS_ENDPOINT: &str = "forward_queued_calls";
@@ -119,6 +120,7 @@ impl ComposabilityInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
+            .gas(70_000_000u64)
             .to(&root_addr)
             .typed(forwarder_queue_proxy::ForwarderQueueProxy)
             .forward_queued_calls()
