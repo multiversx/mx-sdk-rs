@@ -2026,7 +2026,6 @@ dependencies = [
  "log",
  "multiversx-sc-scenario",
  "multiversx-sdk",
- "rand 0.8.5",
  "tokio",
 ]
 
