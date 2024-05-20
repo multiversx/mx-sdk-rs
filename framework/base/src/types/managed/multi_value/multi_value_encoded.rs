@@ -244,7 +244,11 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
+    #[cfg(feature = "alloc")]
     type Unmanaged = MultiValueVec<T::Unmanaged>;
+
+    #[cfg(not(feature = "alloc"))]
+    type Unmanaged = Self;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
