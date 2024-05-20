@@ -1,4 +1,9 @@
-use alloc::{alloc::{alloc, Layout, realloc}, boxed::Box, vec, vec::Vec};
+use alloc::{
+    alloc::{alloc, realloc, Layout},
+    boxed::Box,
+    vec,
+    vec::Vec,
+};
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
