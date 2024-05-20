@@ -15,7 +15,7 @@ where
 
 #[cfg(feature = "alloc")]
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
-    type Unmanaged = Self;
+    type Unmanaged = crate::codec::multi_types::MultiValueVec<T::Unmanaged>;
 
     fn type_name() -> TypeName {
         super::type_name_variadic::<T>()
@@ -52,10 +52,10 @@ impl TypeAbi for IgnoreValue {
     }
 }
 
-impl<T, U> TypeAbiFrom<OptionalValue<T>> for OptionalValue<U> where T: TypeAbiFrom<U> {}
+impl<T, U> TypeAbiFrom<OptionalValue<U>> for OptionalValue<T> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
-    type Unmanaged = Self;
+    type Unmanaged = OptionalValue<T::Unmanaged>;
 
     fn type_name() -> TypeName {
         super::type_name_optional::<T>()

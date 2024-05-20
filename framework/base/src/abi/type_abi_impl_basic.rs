@@ -22,7 +22,7 @@ impl TypeAbi for () {
 impl<T, U> TypeAbiFrom<&U> for &T where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for &T {
-    type Unmanaged = Self;
+    type Unmanaged = T::Unmanaged;
 
     fn type_name() -> TypeName {
         T::type_name()
@@ -58,7 +58,7 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
 impl<T, U> TypeAbiFrom<&[T]> for &[U] where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for &[T] {
-    type Unmanaged = Self;
+    type Unmanaged = Vec<T::Unmanaged>;
 
     fn type_name() -> TypeName {
         let t_name = T::type_name();
@@ -84,7 +84,7 @@ impl<T: TypeAbi> TypeAbi for &[T] {
 impl<T, U> TypeAbiFrom<Vec<T>> for Vec<U> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
-    type Unmanaged = Self;
+    type Unmanaged = Vec<T::Unmanaged>;
 
     fn type_name() -> TypeName {
         <&[T]>::type_name()
@@ -209,6 +209,7 @@ type_abi_name_only!(i64, "i64");
 
 type_abi_name_only!(core::num::NonZeroUsize, "NonZeroUsize");
 type_abi_name_only!(bool, "bool");
+type_abi_name_only!(f64, "f64");
 
 // Unsigned integer types: the contract can return a smaller capacity result and and we can interpret it as a larger capacity type.
 
@@ -244,10 +245,13 @@ impl TypeAbiFrom<i8> for isize {}
 
 impl TypeAbiFrom<i8> for i16 {}
 
-impl<T, U> TypeAbiFrom<Option<T>> for Option<U> where T: TypeAbiFrom<U> {}
+impl<T, U> TypeAbiFrom<Option<U>> for Option<T> where T: TypeAbiFrom<U> {}
 
-impl<T: TypeAbi> TypeAbi for Option<T> {
-    type Unmanaged = Self;
+impl<T> TypeAbi for Option<T>
+where
+    T: TypeAbi,
+{
+    type Unmanaged = Option<T::Unmanaged>;
 
     fn type_name() -> TypeName {
         format!("Option<{}>", T::type_name())
@@ -262,10 +266,10 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
     }
 }
 
-impl<T, U, E> TypeAbiFrom<Result<T, E>> for Result<U, E> where T: TypeAbiFrom<U> {}
+impl<T: TypeAbi, E> TypeAbiFrom<Self> for Result<T, E> {}
 
 impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
-    type Unmanaged = Self;
+    type Unmanaged = Result<T::Unmanaged, E>;
 
     fn type_name() -> TypeName {
         T::type_name()
@@ -301,7 +305,7 @@ macro_rules! tuple_impls {
             where
                 $($name: TypeAbi,)+
             {
-                type Unmanaged = Self;
+                type Unmanaged = ($($name::Unmanaged,)+);
 
                 fn type_name() -> TypeName {
                     let mut repr = TypeName::from("tuple<");
@@ -356,10 +360,10 @@ tuple_impls! {
     16 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
 }
 
-impl<T, U, const N: usize> TypeAbiFrom<[T; N]> for [U; N] where T: TypeAbiFrom<U> {}
+impl<T, U, const N: usize> TypeAbiFrom<[U; N]> for [T; N] where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
-    type Unmanaged = Self;
+    type Unmanaged = [T::Unmanaged; N];
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("array");
