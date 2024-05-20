@@ -4,15 +4,15 @@ use multiversx_sc_scenario::{
     scenario_model::TransferStep,
 };
 
-use super::{InteractorExecEnv, InteractorExecStep, InteractorPrepareAsync};
+use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
 
 impl<'w, From, To, Payment, Gas> InteractorPrepareAsync
-    for Tx<InteractorExecEnv<'w>, From, To, Payment, Gas, (), ()>
+    for Tx<InteractorEnvExec<'w>, From, To, Payment, Gas, (), ()>
 where
-    From: TxFromSpecified<InteractorExecEnv<'w>>,
-    To: TxToSpecified<InteractorExecEnv<'w>>,
-    Payment: TxPayment<InteractorExecEnv<'w>>,
-    Gas: TxGas<InteractorExecEnv<'w>>,
+    From: TxFromSpecified<InteractorEnvExec<'w>>,
+    To: TxToSpecified<InteractorEnvExec<'w>>,
+    Payment: TxPayment<InteractorEnvExec<'w>>,
+    Gas: TxGas<InteractorEnvExec<'w>>,
 {
     type Exec = InteractorExecStep<'w, TransferStep, ()>;
 
