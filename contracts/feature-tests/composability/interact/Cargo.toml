@@ -14,18 +14,9 @@ clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8.6"
 
-[dependencies.vault]
-path = "../vault"
-
-[dependencies.forwarder-queue]
-path = "../forwarder-queue"
-
-[dependencies.promises-features]
-path = "../promises-features"
-
-[dependencies.multiversx-sc-modules]
+[dependencies.multiversx-sc]
 version = "0.50.1"
-path = "../../../../contracts/modules"
+path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-snippets]
 version = "0.50.1"

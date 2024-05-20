@@ -46,11 +46,7 @@ impl PriceAggregatorTestState {
         world.account(OWNER_ADDRESS).nonce(1);
         world.current_block().block_timestamp(100);
 
-        world.set_state_step(SetStateStep::new()).new_address(
-            OWNER_ADDRESS,
-            1,
-            PRICE_AGGREGATOR_ADDRESS,
-        );
+        world.new_address(OWNER_ADDRESS, 1, PRICE_AGGREGATOR_ADDRESS);
 
         let mut oracles = Vec::new();
         for i in 1..=NR_ORACLES {
