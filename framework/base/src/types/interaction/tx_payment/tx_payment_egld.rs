@@ -15,6 +15,12 @@ pub struct Egld<EgldValue>(pub EgldValue);
 
 pub type EgldPayment<Api> = Egld<BigUint<Api>>;
 
+impl<EgldValue: Clone> Clone for Egld<EgldValue> {
+    fn clone(&self) -> Self {
+        Egld(self.0.clone())
+    }
+}
+
 impl<Env, EgldValue> TxPayment<Env> for Egld<EgldValue>
 where
     Env: TxEnv,
