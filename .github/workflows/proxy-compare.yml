@@ -34,4 +34,4 @@ jobs:
       - name: Run proxy compare
         run: |
           cd framework/meta
-          sc-meta all compare
+          sc-meta all proxy --compare
