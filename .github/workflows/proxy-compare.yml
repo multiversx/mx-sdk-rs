@@ -23,13 +23,7 @@ jobs:
 
       - name: Install prerequisites
         run: |
-          cargo install wasm-opt
           cargo install --path framework/meta
-          sc-meta install mx-scenario-go --tag v2.0.0
-
-          which wasm-opt
-          which mx-scenario-go
-          mx-scenario-go --version
 
       - name: Run proxy compare
         run: |
