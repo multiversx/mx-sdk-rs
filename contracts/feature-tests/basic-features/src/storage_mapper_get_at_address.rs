@@ -86,6 +86,22 @@ pub trait StorageMapperGetAtAddress {
         mapper.values().collect()
     }
 
+    #[endpoint]
+    fn contains_unordered_at_address(&self, item: u32) -> bool {
+        let address = self.contract_address().get();
+        let mapper: UnorderedSetMapper<u32, _> =
+            UnorderedSetMapper::new_from_address(address, StorageKey::from("unordered_set_mapper"));
+        mapper.contains(&item)
+    }
+
+    #[endpoint]
+    fn get_by_index(&self, index: usize) -> u32 {
+        let address = self.contract_address().get();
+        let mapper: UnorderedSetMapper<u32, _> =
+            UnorderedSetMapper::new_from_address(address, StorageKey::from("unordered_set_mapper"));
+        mapper.get_by_index(index)
+    }
+
     /// Storage to be called. For testing, this contract is deployed twice,
     /// and this module acts both as caller and receiver
     #[storage_mapper("set_mapper")]
@@ -93,6 +109,9 @@ pub trait StorageMapperGetAtAddress {
 
     #[storage_mapper("map_mapper")]
     fn map_mapper(&self) -> MapMapper<u32, u32>;
+
+    #[storage_mapper("unordered_set_mapper")]
+    fn unordered_set_mapper(&self) -> UnorderedSetMapper<u32>;
 
     #[endpoint]
     fn fill_set_mapper(&self, value: u32) {
@@ -106,6 +125,13 @@ pub trait StorageMapperGetAtAddress {
         for item in 1u32..=value {
             let key = 10_000u32 + item;
             self.map_mapper().insert(key, item);
+        }
+    }
+
+    #[endpoint]
+    fn fill_unordered_set_mapper(&self, value: u32) {
+        for item in 1u32..=value {
+            self.unordered_set_mapper().insert(item);
         }
     }
 }
