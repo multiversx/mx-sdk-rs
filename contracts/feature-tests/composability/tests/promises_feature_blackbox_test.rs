@@ -20,7 +20,6 @@ type VaultContract = ContractInfo<vault::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
         PROMISES_FEATURES_PATH_EXPR,
