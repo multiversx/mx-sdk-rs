@@ -51,7 +51,6 @@ pub struct CallActionDataRaw {
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
     blockchain.register_contract(MULTISIG_PATH_EXPR, multisig::ContractBuilder);
     blockchain
