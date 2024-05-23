@@ -4,7 +4,6 @@ const PF_PATH_EXPR: &str = "mxsc:output/payable-features.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/payable-features");
 
     blockchain.register_contract(PF_PATH_EXPR, payable_features::ContractBuilder);
     blockchain

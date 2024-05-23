@@ -18,7 +18,6 @@ const QUORUM_SIZE: usize = 1;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
     blockchain.register_contract(MULTISIG_CODE_PATH, multisig::ContractBuilder);
     blockchain.register_contract(ADDER_CODE_PATH, adder::ContractBuilder);
