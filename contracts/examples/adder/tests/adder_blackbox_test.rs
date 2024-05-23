@@ -63,5 +63,18 @@ fn adder_blackbox() {
         .check_account(ADDER_ADDRESS)
         .check_storage("str:sum", "6");
 
+    world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ADDER_ADDRESS)
+        .typed(adder_proxy::AdderProxy)
+        .upgrade(100u64)
+        .code(CODE_PATH)
+        .run();
+
+    world
+        .check_account(ADDER_ADDRESS)
+        .check_storage("str:sum", "100");
+
     world.write_scenario_trace("trace1.scen.json");
 }
