@@ -1,14 +1,15 @@
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        heap::H256, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv,
-        TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFromSpecified, TxGas, TxPayment,
-        TxToSpecified,
+        heap::H256, Code, FunctionCall, ManagedAddress, ManagedBuffer, NotPayable, RHListExec, Tx,
+        TxBaseWithEnv, TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFromSpecified, TxGas,
+        TxPayment, TxToSpecified, UpgradeCall,
     },
 };
 
 use crate::{
     api::StaticApi,
+    imports::MxscPath,
     scenario::tx_to_step::{address_annotated, TxToStep},
     scenario_model::{SetStateStep, TxExpect, TxResponse},
     ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
@@ -77,6 +78,32 @@ where
     To: TxToSpecified<ScenarioEnvExec<'w>>,
     Payment: TxPayment<ScenarioEnvExec<'w>>,
     Gas: TxGas<ScenarioEnvExec<'w>>,
+    RH: RHListExec<TxResponse, ScenarioEnvExec<'w>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn run(self) -> Self::Returns {
+        let mut step_wrapper = self.tx_to_step();
+        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
+        step_wrapper.env.world.sc_call(&mut step_wrapper.step);
+        step_wrapper.process_result()
+    }
+}
+
+impl<'w, From, To, RH> ScenarioTxRun
+    for Tx<
+        ScenarioEnvExec<'w>,
+        From,
+        To,
+        NotPayable,
+        (),
+        UpgradeCall<ScenarioEnvExec<'w>, Code<MxscPath<'w>>>,
+        RH,
+    >
+where
+    From: TxFromSpecified<ScenarioEnvExec<'w>>,
+    To: TxToSpecified<ScenarioEnvExec<'w>>,
     RH: RHListExec<TxResponse, ScenarioEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
