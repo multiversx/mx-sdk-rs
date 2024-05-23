@@ -1,4 +1,4 @@
-use std::{fmt::Display, fs::File, io::Write};
+use std::fmt::Display;
 
 use multiversx_sc::abi::{
     ContractAbi, EndpointAbi, EnumVariantDescription, InputAbi, OutputAbi, StructFieldDescription,
@@ -41,7 +41,7 @@ const TYPES_FROM_FRAMEWORK: &[&str] = &[
 
 pub struct ProxyGenerator<'a> {
     pub meta_config: &'a MetaConfig,
-    pub file: Option<&'a mut File>,
+    pub file: Option<&'a mut dyn std::io::Write>,
     pub proxy_config: &'a ProxyConfigSerde,
     pub contract_abi: &'a ContractAbi,
 }
@@ -49,7 +49,7 @@ pub struct ProxyGenerator<'a> {
 impl<'a> ProxyGenerator<'a> {
     pub fn new(
         meta_config: &'a MetaConfig,
-        file: &'a mut File,
+        file: &'a mut dyn std::io::Write,
         proxy_config: &'a ProxyConfigSerde,
         contract_abi: &'a ContractAbi,
     ) -> Self {
@@ -62,8 +62,8 @@ impl<'a> ProxyGenerator<'a> {
     }
 
     fn write(&mut self, s: impl Display) {
-        let file = self.file.as_mut().expect("output not configured");
-        write!(*file, "{s}").unwrap();
+        let file = self.file.as_mut().unwrap();
+        file.write_all(s.to_string().as_bytes()).unwrap();
     }
 
     fn writeln(&mut self, s: impl Display) {
