@@ -33,7 +33,13 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
             meta_config_opt.generate_rust_snippets(&gs_arg);
             meta_config_opt.generate_proxy()
         },
-        ContractCliAction::GenerateProxies => meta_config_opt.generate_proxy(),
+        ContractCliAction::GenerateProxies(proxy_args) => {
+            if proxy_args.compare {
+                meta_config_opt.compare_proxy()
+            } else {
+                meta_config_opt.generate_proxy()
+            }
+        },
     }
 }
 
