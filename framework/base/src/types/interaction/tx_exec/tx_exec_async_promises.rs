@@ -257,7 +257,11 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Callback: TxPromisesCallback<Api>,
 {
-    /// Backwards compatibility only.
+    /// Backwards compatibility only.   
+    #[deprecated(
+        since = "0.50.2",
+        note = "Backwards compatibility only, does nothing. Just delete. Use `register_promise` to launch asynchronous calls."
+    )]
     #[inline]
     pub fn async_call_promise(self) -> Self {
         self
