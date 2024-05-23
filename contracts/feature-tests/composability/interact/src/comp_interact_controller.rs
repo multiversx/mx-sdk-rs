@@ -9,6 +9,7 @@ pub struct ComposabilityInteract {
     pub wallet_address: Address,
     pub forw_queue_code: BytesValue,
     pub vault_code: BytesValue,
+    #[allow(dead_code)]
     pub state: State,
 }
 

@@ -40,6 +40,7 @@ const TYPES_FROM_FRAMEWORK: &[&str] = &[
 ];
 
 pub struct ProxyGenerator<'a> {
+    #[allow(dead_code)]
     pub meta_config: &'a MetaConfig,
     pub file: Option<&'a mut dyn std::io::Write>,
     pub proxy_config: &'a ProxyConfigSerde,
