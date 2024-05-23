@@ -3,7 +3,7 @@
 use multiversx_sc::types::BigUint;
 use multiversx_sc_scenario::imports::*;
 
-use promises_features::call_sync_bt::ProxyTrait;
+use promises_features::fwd_call_sync_bt::ProxyTrait;
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const PROMISES_FEATURE_ADDRESS_EXPR: &str = "sc:promises-feature";
