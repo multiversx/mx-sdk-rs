@@ -1,4 +1,4 @@
-use forwarder_legacy::nft_legacy::{Color, ForwarderNftModule};
+use forwarder_legacy::fwd_nft_legacy::{Color, ForwarderNftModule};
 use multiversx_sc::{contract_base::ContractBase, types::Address};
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_token_id,

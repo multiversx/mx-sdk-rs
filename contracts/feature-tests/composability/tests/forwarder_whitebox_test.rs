@@ -1,4 +1,4 @@
-use forwarder::nft::{Color, ForwarderNftModule};
+use forwarder::fwd_nft::{Color, ForwarderNftModule};
 use multiversx_sc_scenario::imports::*;
 
 const USER_ADDRESS_EXPR: &str = "address:user";

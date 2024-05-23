@@ -1,9 +1,9 @@
 multiversx_sc::imports!();
 
-use super::storage_legacy;
+use super::fwd_storage;
 
 #[multiversx_sc::module]
-pub trait ForwarderSftModule: storage_legacy::ForwarderStorageModule {
+pub trait ForwarderSftModule: fwd_storage::ForwarderStorageModule {
     #[payable("EGLD")]
     #[endpoint]
     fn sft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
@@ -47,7 +47,7 @@ pub trait ForwarderSftModule: storage_legacy::ForwarderStorageModule {
                 let (token_identifier, returned_tokens) =
                     self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens);
+                    self.tx().to(caller).egld(&returned_tokens).transfer();
                 }
 
                 self.last_error_message().set(&message.err_msg);

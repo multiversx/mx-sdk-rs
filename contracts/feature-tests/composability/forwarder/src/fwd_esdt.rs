@@ -1,6 +1,6 @@
 multiversx_sc::imports!();
 
-use super::storage;
+use super::fwd_storage;
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
@@ -17,7 +17,7 @@ pub type EsdtTokenDataMultiValue<M> = MultiValue9<
 >;
 
 #[multiversx_sc::module]
-pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
+pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
     fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
         self.blockchain()
