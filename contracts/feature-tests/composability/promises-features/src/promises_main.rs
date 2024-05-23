@@ -1,11 +1,11 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
+mod common;
 mod fwd_call_promise_direct;
 mod fwd_call_promises;
 mod fwd_call_promises_bt;
 pub mod fwd_call_sync_bt;
-mod common;
 pub mod vault_proxy;
 
 multiversx_sc::imports!();

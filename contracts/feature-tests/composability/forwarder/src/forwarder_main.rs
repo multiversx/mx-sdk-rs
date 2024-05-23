@@ -1,18 +1,18 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
+pub mod forwarder_proxy;
 pub mod fwd_call_async;
 pub mod fwd_call_sync;
 pub mod fwd_call_transf_exec;
 pub mod fwd_change_owner;
 pub mod fwd_deploy;
-pub mod fwd_upgrade;
 pub mod fwd_esdt;
-pub mod forwarder_proxy;
 pub mod fwd_nft;
 pub mod fwd_roles;
 pub mod fwd_sft;
 pub mod fwd_storage;
+pub mod fwd_upgrade;
 pub mod vault_proxy;
 
 multiversx_sc::imports!();
