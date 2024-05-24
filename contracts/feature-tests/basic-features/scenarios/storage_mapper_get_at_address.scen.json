@@ -303,6 +303,71 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "id": "fill unordered set mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:to-be-called",
+                "function": "fill_unordered_set_mapper",
+                "arguments": [
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "contains unordered at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "contains_unordered_at_address",
+                "arguments": ["5"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get by index at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "get_by_index",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "5"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }

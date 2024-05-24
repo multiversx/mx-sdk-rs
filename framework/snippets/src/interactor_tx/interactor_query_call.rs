@@ -11,14 +11,14 @@ use multiversx_sc_scenario::{
 
 use crate::Interactor;
 
-use super::{InteractorPrepareAsync, InteractorQueryEnv, InteractorQueryStep};
+use super::{InteractorEnvQuery, InteractorPrepareAsync, InteractorQueryStep};
 
 impl<'w, To, Payment, RH> InteractorPrepareAsync
-    for Tx<InteractorQueryEnv<'w>, (), To, Payment, (), FunctionCall<StaticApi>, RH>
+    for Tx<InteractorEnvQuery<'w>, (), To, Payment, (), FunctionCall<StaticApi>, RH>
 where
-    To: TxToSpecified<InteractorQueryEnv<'w>>,
-    Payment: TxNoPayment<InteractorQueryEnv<'w>>,
-    RH: RHListExec<TxResponse, InteractorQueryEnv<'w>>,
+    To: TxToSpecified<InteractorEnvQuery<'w>>,
+    Payment: TxNoPayment<InteractorEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Exec = InteractorQueryStep<'w, RH>;
@@ -32,7 +32,7 @@ where
 
 impl<'w, RH> InteractorQueryStep<'w, RH>
 where
-    RH: RHListExec<TxResponse, InteractorQueryEnv<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(mut self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {

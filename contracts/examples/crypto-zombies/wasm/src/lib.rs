@@ -26,7 +26,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         is_ready => is_ready
         feed_on_kitty => feed_on_kitty
         dna_digits => dna_digits
-        zombies_count => zombies_count
+        zombie_last_index => zombie_last_index
         zombies => zombies
         zombie_owner => zombie_owner
         crypto_kitties_sc_address => crypto_kitties_sc_address

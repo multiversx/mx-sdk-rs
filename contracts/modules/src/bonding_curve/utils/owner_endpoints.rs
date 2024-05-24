@@ -25,8 +25,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(unsetLocalRoles)]
@@ -39,8 +38,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     fn set_bonding_curve<T>(

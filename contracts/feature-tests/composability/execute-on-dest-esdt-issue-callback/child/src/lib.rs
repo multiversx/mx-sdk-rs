@@ -37,9 +37,8 @@ pub trait Child {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().esdt_issue_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     // callbacks
