@@ -1,6 +1,7 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 #![allow(clippy::let_unit_value)]
+#![allow(deprecated)]
 
 pub mod fwd_call_async_legacy;
 pub mod fwd_call_sync_legacy;

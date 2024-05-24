@@ -157,6 +157,10 @@ where
     RH: TxResultHandler<Env>,
 {
     /// Backwards compatibility only.
+    #[deprecated(
+        since = "0.50.2",
+        note = "Backwards compatibility only, does nothing. Just delete. Use `async_call_and_exit` to launch asynchronous calls."
+    )]
     #[inline]
     pub fn async_call(self) -> Tx<Env, From, To, Payment, Gas, Data, RH> {
         Tx {

@@ -14,9 +14,8 @@ pub trait ForwarderRolesModule: fwd_storage::ForwarderStorageModule {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
             .with_callback(self.callbacks().change_roles_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(unsetLocalRoles)]
@@ -29,9 +28,8 @@ pub trait ForwarderRolesModule: fwd_storage::ForwarderStorageModule {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
             .with_callback(self.callbacks().change_roles_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[callback]

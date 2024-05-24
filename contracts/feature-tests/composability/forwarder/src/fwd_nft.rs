@@ -71,9 +71,8 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[callback]

@@ -222,7 +222,9 @@ where
     ///
     /// This version of the method must never be called. It is only here to provide a more readable error.
     pub unsafe fn register_promise(self) {
-        ErrorHelper::<Api>::signal_error_with_message("register_promise requires explicit gas and function call");
+        ErrorHelper::<Api>::signal_error_with_message(
+            "register_promise requires explicit gas and function call",
+        );
     }
 }
 
@@ -257,7 +259,11 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Callback: TxPromisesCallback<Api>,
 {
-    /// Backwards compatibility only.
+    /// Backwards compatibility only.   
+    #[deprecated(
+        since = "0.50.2",
+        note = "Backwards compatibility only, does nothing. Just delete. Use `register_promise` to launch asynchronous calls."
+    )]
     #[inline]
     pub fn async_call_promise(self) -> Self {
         self

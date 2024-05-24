@@ -48,9 +48,8 @@ pub trait LocalEsdtAndEsdtNft {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().esdt_issue_callback(&caller))
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(localMint)]
@@ -87,9 +86,8 @@ pub trait LocalEsdtAndEsdtNft {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(nftCreate)]
@@ -194,9 +192,8 @@ pub trait LocalEsdtAndEsdtNft {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     // common
@@ -211,9 +208,8 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
             .with_callback(self.callbacks().change_roles_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(unsetLocalRoles)]
@@ -226,9 +222,8 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
             .with_callback(self.callbacks().change_roles_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(controlChanges)]
@@ -242,8 +237,7 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .control_changes(&token, &property_arguments)
-            .async_call()
-            .call_and_exit();
+            .async_call_and_exit();
     }
 
     // views

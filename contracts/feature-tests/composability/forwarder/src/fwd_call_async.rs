@@ -62,8 +62,7 @@ pub trait ForwarderAsyncCallModule {
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
             .payment(payment)
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint]
@@ -80,8 +79,7 @@ pub trait ForwarderAsyncCallModule {
                 payment.token_nonce,
                 &half_payment,
             )
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[payable("*")]
@@ -115,9 +113,8 @@ pub trait ForwarderAsyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .async_call()
             .callback(self.callbacks().retrieve_funds_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[callback]
@@ -196,8 +193,7 @@ pub trait ForwarderAsyncCallModule {
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
             .payment(all_token_payments)
-            .async_call()
-            .call_and_exit();
+            .async_call_and_exit();
     }
 
     #[view]
