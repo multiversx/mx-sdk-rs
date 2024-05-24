@@ -1,6 +1,6 @@
 use crate::{
     api::{const_handles, CallTypeApi},
-    contract_base::SendRawWrapper,
+    contract_base::{ErrorHelper, SendRawWrapper},
     types::{
         interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
         FunctionCall, ManagedBuffer, ManagedType, OriginalResultMarker, Tx, TxGas, TxGasValue,
@@ -143,6 +143,20 @@ where
     GasValue: TxGasValue<TxScEnv<Api>>,
     Callback: TxPromisesCallback<Api>,
 {
+    /// Launches a transaction as an asynchronous promise (async v2 mechanism).
+    ///
+    /// Several such transactions can be launched from a single transaction.
+    ///
+    /// Must set:
+    /// - to
+    /// - gas
+    /// - a function call, ideally via a proxy.
+    ///
+    /// Value-only promises are not supported.
+    ///
+    /// Optionally, can add:
+    /// - any payment
+    /// - a promise callback, which also needs explicit gas for callback.
     pub fn register_promise(self) {
         let callback_name = self.result_handler.callback_name();
         let mut cb_closure_args_serialized =
@@ -171,6 +185,65 @@ where
                 )
             },
         )
+    }
+}
+
+impl<Api, To, Payment, Callback> Tx<TxScEnv<Api>, (), To, Payment, (), FunctionCall<Api>, Callback>
+where
+    Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    Callback: TxPromisesCallback<Api>,
+{
+    /// ## Incorrect call
+    ///
+    /// Must set **gas** in order to call `register_promise`.
+    ///
+    /// ## Safety
+    ///
+    /// This version of the method must never be called. It is only here to provide a more readable error.
+    pub unsafe fn register_promise(self) {
+        ErrorHelper::<Api>::signal_error_with_message("register_promise requires explicit gas");
+    }
+}
+
+impl<Api, To, Payment, Callback> Tx<TxScEnv<Api>, (), To, Payment, (), (), Callback>
+where
+    Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    Callback: TxPromisesCallback<Api>,
+{
+    /// ## Incorrect call
+    ///
+    /// Must set **gas** and **function call** in order to call `register_promise`.
+    ///
+    /// ## Safety
+    ///
+    /// This version of the method must never be called. It is only here to provide a more readable error.
+    pub unsafe fn register_promise(self) {
+        ErrorHelper::<Api>::signal_error_with_message("register_promise requires explicit gas and function call");
+    }
+}
+
+impl<Api, To, Payment, GasValue, Callback>
+    Tx<TxScEnv<Api>, (), To, Payment, ExplicitGas<GasValue>, (), Callback>
+where
+    Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    GasValue: TxGasValue<TxScEnv<Api>>,
+    Callback: TxPromisesCallback<Api>,
+{
+    /// ## Incorrect call
+    ///
+    /// Must set **function call** in order to call `register_promise`.
+    ///
+    /// ## Safety
+    ///
+    /// This version of the method must never be called. It is only here to provide a more readable error.
+    pub unsafe fn register_promise(self) {
+        ErrorHelper::<Api>::signal_error_with_message("register_promise requires function call");
     }
 }
 

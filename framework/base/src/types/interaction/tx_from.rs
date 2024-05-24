@@ -13,6 +13,11 @@ where
 /// Marks the non-empty sender of a transaction.
 ///
 /// Enforces the reciipent to be explicitly specified.
+#[diagnostic::on_unimplemented(
+    message = "Type `{Self}` cannot be used as a sender value (does not implement `TxFromSpecified<{Env}>`)",
+    label = "sender needs to be explicit",
+    note = "there are multiple ways to specify the sender value for a transaction, but `{Self}` is not one of them"
+)]
 pub trait TxFromSpecified<Env>:
     TxFrom<Env> + AnnotatedValue<Env, ManagedAddress<Env::Api>>
 where

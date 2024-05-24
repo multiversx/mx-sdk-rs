@@ -16,6 +16,7 @@ const CARGO_HOME: &str = env!("CARGO_HOME");
 
 #[derive(Clone, Debug)]
 pub struct ScenarioGoRelease {
+    #[allow(dead_code)]
     pub tag_name: String,
     pub download_url: String,
 }

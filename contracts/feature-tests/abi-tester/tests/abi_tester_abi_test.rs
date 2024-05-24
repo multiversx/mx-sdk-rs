@@ -70,7 +70,7 @@ fn abi_tester_esdt_attr_abi_generated_ok() {
 
 #[test]
 fn check_multi_contract_config() {
-    let mut blockchain = ScenarioWorld::new();
+    let blockchain = ScenarioWorld::new();
 
     let multi_contract_config = multiversx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
         blockchain.current_dir().as_path(),

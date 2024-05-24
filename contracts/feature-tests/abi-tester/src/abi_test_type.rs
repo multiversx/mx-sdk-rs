@@ -39,5 +39,6 @@ pub struct AbiManagedVecItem {
 
 #[type_abi]
 pub struct OnlyShowsUpInEsdtAttr {
+    #[allow(dead_code)]
     pub field: OnlyShowsUpAsNested10,
 }

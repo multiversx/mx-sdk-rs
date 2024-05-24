@@ -13,7 +13,12 @@ impl<Env> TxTo<Env> for () where Env: TxEnv {}
 
 /// Marks the non-empty recipient of a transaction.
 ///
-/// Enforces the reciipent to be explicitly specified.
+/// Enforces the recipient to be explicitly specified.
+#[diagnostic::on_unimplemented(
+    message = "Type `{Self}` cannot be used as recipient value (does not implement `TxToSpecified<{Env}>`)",
+    label = "recipient needs to be explicit",
+    note = "there are multiple ways to specify the recipient value for a transaction, but `{Self}` is not one of them"
+)]
 pub trait TxToSpecified<Env>: TxTo<Env> + AnnotatedValue<Env, ManagedAddress<Env::Api>>
 where
     Env: TxEnv,
