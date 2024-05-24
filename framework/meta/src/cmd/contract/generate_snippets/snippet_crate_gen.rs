@@ -1,9 +1,15 @@
+use colored::Colorize;
 use std::{
-    fs::{self, File},
+    fs::{self, File, OpenOptions},
     io::Write,
 };
 
 static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
+static SC_CONFIG_PATH: &str = "../sc-config.toml";
+static FULL_PROXY_ENTRY: &str = r#"[[proxy]]
+path = "interact-rs/src/proxy.rs"
+ "#;
+static PROXY_PATH: &str = "interact-rs/src/proxy.rs";
 
 pub(crate) fn create_snippets_folder(snippets_folder_path: &str) {
     // returns error if folder already exists, so we ignore the result
@@ -72,7 +78,7 @@ path = ".."
 version = "0.50.1"
 
 [dependencies.multiversx-sc]
-version = "0.49.0"
+version = "0.50.1"
 
 [dependencies]
 clap = {{ version = "4.4.7", features = ["derive"] }}
@@ -80,7 +86,6 @@ serde = {{ version = "1.0", features = ["derive"] }}
 toml = "0.8.6"
 
 # [workspace]
-
 "#
     )
     .unwrap();
@@ -100,31 +105,48 @@ pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: boo
     } else {
         match File::options().create_new(true).write(true).open(&lib_path) {
             Ok(f) => f,
-            Err(_) => panic!("{lib_path} file already exists, --overwrite option was not provided"),
+            Err(_) => {
+                println!(
+                    "{}",
+                    format!("{lib_path} file already exists, --overwrite option was not provided",)
+                        .yellow()
+                );
+                File::options().write(true).open(&lib_path).unwrap()
+            },
         }
     }
 }
 
 pub(crate) fn create_sc_config_file(overwrite: bool) {
-    let sc_config_path = "../sc-config.toml";
-    let mut file = if overwrite {
-        File::create(sc_config_path).unwrap()
+    // check if the file should be overwritten or if it already exists
+    let mut file = if overwrite || !file_exists(SC_CONFIG_PATH) {
+        File::create(SC_CONFIG_PATH).unwrap()
     } else {
-        match File::options()
-            .create_new(true)
-            .write(true)
-            .open(sc_config_path)
-        {
-            Ok(f) => f,
-            Err(_) => return,
+        // file already exists
+        let file = OpenOptions::new()
+            .read(true)
+            .append(true)
+            .open(SC_CONFIG_PATH)
+            .unwrap();
+
+        if file_contains_proxy_path(SC_CONFIG_PATH).unwrap_or(false) {
+            return;
         }
+
+        file
     };
 
-    writeln!(
-        &mut file,
-        r#"[[proxy]]
-path = "interact-rs/src/proxy.rs"
- "#
-    )
-    .unwrap();
+    // write full proxy toml entry to the file
+    writeln!(&mut file, "\n{FULL_PROXY_ENTRY}").unwrap();
+}
+
+fn file_exists(path: &str) -> bool {
+    fs::metadata(path).is_ok()
+}
+
+fn file_contains_proxy_path(file_path: &str) -> std::io::Result<bool> {
+    let file_content = fs::read_to_string(file_path)?;
+    let proxy_entry = format!("path = \"{}\"", PROXY_PATH);
+
+    Ok(file_content.contains(&proxy_entry))
 }
