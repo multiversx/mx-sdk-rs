@@ -3,6 +3,8 @@ use std::{
     io::Write,
 };
 
+use crate::version_history;
+
 static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
 
 pub(crate) fn create_snippets_folder(snippets_folder_path: &str) {
@@ -52,6 +54,8 @@ pub(crate) fn create_snippets_cargo_toml(
         }
     };
 
+    let last_release_version = &version_history::VERSIONS.last().unwrap().version;
+
     writeln!(
         &mut file,
         r#"[package]
@@ -69,10 +73,10 @@ path = "src/{SNIPPETS_SOURCE_FILE_NAME}"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.50.1"
+version = "{last_release_version}"
 
 [dependencies.multiversx-sc]
-version = "0.49.0"
+version = "{last_release_version}"
 
 [dependencies]
 clap = {{ version = "4.4.7", features = ["derive"] }}
