@@ -26,6 +26,17 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+
+## [sc 0.50.2] - 2024-05-24
+- Unified transaction syntax:
+	- Better compilation error messages for malformed transactions;
+	- Deprecated methods `async_call` and `async_call_promises`, which are kept for backwards compatibility, but causing confusion among developers;
+	- Contract upgrade available in tests.
+- `sc-meta` proxy compare option, which checks that proxies are up to date. Useful for CI.
+- `TypeAbi` - removed `Unmanaged` associated type trait bounds, and implemented it for more types.
+- Removed jitter from interactor transaction fetch.
+- Fixed an issue in the snippets generator.
+
 ## [sc 0.50.1] - 2024-05-16
 - `sc-meta all snippets` generates unified syntax.
 - Proxy generator can reference multi-contract variant.
