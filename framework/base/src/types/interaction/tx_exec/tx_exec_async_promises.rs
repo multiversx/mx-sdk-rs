@@ -222,7 +222,9 @@ where
     ///
     /// This version of the method must never be called. It is only here to provide a more readable error.
     pub unsafe fn register_promise(self) {
-        ErrorHelper::<Api>::signal_error_with_message("register_promise requires explicit gas and function call");
+        ErrorHelper::<Api>::signal_error_with_message(
+            "register_promise requires explicit gas and function call",
+        );
     }
 }
 

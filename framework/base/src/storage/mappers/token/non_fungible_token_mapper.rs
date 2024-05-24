@@ -145,9 +145,7 @@ where
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
-        contract_call
-            .with_callback(callback)
-            .async_call_and_exit();
+        contract_call.with_callback(callback).async_call_and_exit();
     }
 
     /// Important: If you use custom callback, remember to save the token ID in the callback and clear the mapper in case of error! Clear is unusable outside this specific case.
