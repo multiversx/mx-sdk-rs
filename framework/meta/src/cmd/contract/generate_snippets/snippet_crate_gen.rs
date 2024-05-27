@@ -4,6 +4,8 @@ use std::{
     io::Write,
 };
 
+use crate::version_history;
+
 static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
 static SC_CONFIG_PATH: &str = "../sc-config.toml";
 static FULL_PROXY_ENTRY: &str = r#"[[proxy]]
@@ -58,6 +60,8 @@ pub(crate) fn create_snippets_cargo_toml(
         }
     };
 
+    let last_release_version = &version_history::LAST_VERSION;
+
     writeln!(
         &mut file,
         r#"[package]
@@ -75,10 +79,10 @@ path = "src/{SNIPPETS_SOURCE_FILE_NAME}"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.50.3"
+version = "{last_release_version}"
 
 [dependencies.multiversx-sc]
-version = "0.50.3"
+version = "{last_release_version}"
 
 [dependencies]
 clap = {{ version = "4.4.7", features = ["derive"] }}
