@@ -60,7 +60,7 @@ pub(crate) fn create_snippets_cargo_toml(
         }
     };
 
-    let last_release_version = &version_history::VERSIONS.last().unwrap().version;
+    let last_release_version = &version_history::LAST_VERSION;
 
     writeln!(
         &mut file,
