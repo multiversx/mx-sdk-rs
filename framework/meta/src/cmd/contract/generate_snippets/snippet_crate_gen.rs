@@ -75,10 +75,10 @@ path = "src/{SNIPPETS_SOURCE_FILE_NAME}"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.50.1"
+version = "0.50.3"
 
 [dependencies.multiversx-sc]
-version = "0.50.1"
+version = "0.50.3"
 
 [dependencies]
 clap = {{ version = "4.4.7", features = ["derive"] }}
