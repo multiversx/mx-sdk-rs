@@ -7,6 +7,7 @@ mod fwd_call_promises;
 mod fwd_call_promises_bt;
 pub mod fwd_call_sync_bt;
 pub mod vault_proxy;
+pub mod promises_feature_proxy;
 
 multiversx_sc::imports!();
 
