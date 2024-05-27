@@ -27,6 +27,9 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
+## [sc 0.50.3] - 2024-05-25
+- Dependency update and fix. There was an issue with the `zip` dependency in sc-meta.
+
 ## [sc 0.50.2] - 2024-05-24
 - Unified transaction syntax:
 	- Better compilation error messages for malformed transactions;
