@@ -17,7 +17,7 @@ name = "abi-tester"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",
 ]
 
@@ -1978,7 +1978,7 @@ dependencies = [
  "hex",
  "lazy_static",
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "pathdiff",
  "reqwest",
  "ruplacer",
@@ -1990,6 +1990,25 @@ dependencies = [
  "wasmparser",
  "wasmprinter",
  "zip",
+]
+
+[[package]]
+name = "multiversx-sc-meta-lib"
+version = "0.50.3"
+dependencies = [
+ "clap",
+ "colored",
+ "convert_case",
+ "hex",
+ "lazy_static",
+ "multiversx-sc",
+ "rustc_version",
+ "semver",
+ "serde",
+ "serde_json",
+ "toml",
+ "wasmparser",
+ "wasmprinter",
 ]
 
 [[package]]
@@ -2014,7 +2033,7 @@ dependencies = [
  "multiversx-chain-vm",
  "multiversx-chain-vm-executor",
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "multiversx-sdk",
  "num-bigint",
  "num-traits",
