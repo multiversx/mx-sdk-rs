@@ -1,0 +1,5 @@
+[[proxy]]
+path = "src/linked_list_repeat_proxy.rs"
+[[proxy.path-rename]]
+from = "benchmark_common::example_struct"
+to = "benchmark_common"

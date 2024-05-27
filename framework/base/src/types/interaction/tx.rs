@@ -818,7 +818,7 @@ where
     ///
     /// Whenever possible, use proxies instead.
     ///
-    /// Doesa not serialize, does not enforce type safety.
+    /// Does not serialize, does not enforce type safety.
     #[inline]
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;
