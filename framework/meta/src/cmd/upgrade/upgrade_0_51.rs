@@ -43,10 +43,8 @@ fn v_0_51_prepare_meta(sc_crate_path: &Path) {
         .remove("multiversx-sc-meta")
         .expect("multiversx-sc-meta dependency not found in meta crate");
 
-    if let Some(path) = meta_value.get_mut("path") {
-        if let Value::String(s) = path {
-            s.push_str("-lib");
-        }
+    if let Some(Value::String(path)) = meta_value.get_mut("path") {
+        path.push_str("-lib");
     }
 
     print_cargo_dep_add(cargo_toml_path.as_path(), "multiversx-sc-meta");
