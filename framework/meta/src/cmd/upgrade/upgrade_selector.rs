@@ -12,6 +12,7 @@ use super::{
     upgrade_0_32::upgrade_to_32_0,
     upgrade_0_39::{postprocessing_after_39_0, upgrade_to_39_0},
     upgrade_0_45::upgrade_to_45_0,
+    upgrade_0_51::upgrade_to_51_0,
     upgrade_common::{cargo_check, version_bump_in_cargo_toml},
     upgrade_print::*,
 };
@@ -86,6 +87,8 @@ fn upgrade_function_selector(dir: &RelevantDirectory) {
             upgrade_to_39_0(dir)
         } else if framework_version!(0.45.0) == *to_version {
             upgrade_to_45_0(dir)
+        } else if framework_version!(0.51.0) == *to_version {
+            upgrade_to_51_0(dir)
         } else {
             version_bump_in_cargo_toml(&dir.path, from_version, to_version)
         }

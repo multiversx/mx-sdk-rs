@@ -73,6 +73,7 @@ pub const VERSIONS: &[FrameworkVersion] = framework_versions![
     0.50.1,
     0.50.2,
     0.50.3,
+    0.51.0,
 ];
 
 #[rustfmt::skip]
@@ -95,6 +96,9 @@ pub const CHECK_AFTER_UPGRADE_TO: &[FrameworkVersion] = framework_versions![
     0.45.2,
     0.46.0,
     0.47.0,
+    0.49.0,
+    0.50.3,
+    0.51.0,
 ];
 
 pub const LOWER_VERSION_WITH_TEMPLATE_TAG: FrameworkVersion = framework_version!(0.43.0);
