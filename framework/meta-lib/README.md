@@ -1,9 +1,14 @@
-# Smart contract meta-programming
+# Smart contract `meta` crate support
 
 [![crates.io](https://img.shields.io/crates/v/multiversx-sc-meta.svg)](https://crates.io/crates/multiversx-sc-meta)
 
-A meta-programming utility that works with smart contract code metadata.
+The library that provides all the functionality of the individual contracts `meta` crates.
 
-It is responsible with creating the smart contract ABIs, generating the wasm crates, and, ultimately, building the contract binaries
+The purpose of the contract `meta` crates is to produce the contract ABI. Because of their access to the ABI, they have other ABI-based responsibilities, such as:
+- generatinc the `wasm` crates,
+- building the contracts,
+- performing validations not possible otherwise,
+- generating snippets,
+- etc.
 
 For more about the build process, see https://docs.multiversx.com/developers/developer-reference/sc-build-reference/
