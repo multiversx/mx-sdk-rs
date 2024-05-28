@@ -45,9 +45,9 @@ version = "=0.50.3"
 features = ["alloc", "num-bigint"]
 path = "../base"
 
-[dependencies.multiversx-sc-meta]
+[dependencies.multiversx-sc-meta-lib]
 version = "=0.50.3"
-path = "../meta"
+path = "../meta-lib"
 
 [dependencies.multiversx-chain-scenario-format]
 version = "0.22.2"

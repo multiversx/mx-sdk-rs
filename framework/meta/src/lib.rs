@@ -1,21 +1,21 @@
-pub mod abi_json;
-mod cargo_toml_contents;
-pub mod cli_args;
+pub mod cli;
 pub mod cmd;
-pub mod ei;
-mod ei_check_json;
-pub mod esdt_attr_file_json;
 pub mod folder_structure;
-mod mxsc_file_json;
-mod print_util;
-mod report_info_json;
-mod tools;
-pub use tools::find_workspace;
-pub mod version;
-pub mod version_history;
 
-#[macro_use]
-extern crate lazy_static;
+pub use multiversx_sc_meta_lib::abi_json;
+pub use multiversx_sc_meta_lib::ei;
+pub use multiversx_sc_meta_lib::ei_check_json;
+pub use multiversx_sc_meta_lib::version;
+pub use multiversx_sc_meta_lib::version_history;
 
-pub use cargo_toml_contents::CargoTomlContents;
-pub use cmd::contract::{cli_main, multi_contract_config};
+/// Backwards compatibility, please use `multiversx_sc_meta_lib::cli_main::<AbiObj>()`.
+pub fn cli_main<AbiObj: multiversx_sc::contract_base::ContractAbiProvider>() {
+    multiversx_sc_meta_lib::cli_main::<AbiObj>()
+}
+
+/// Backwards compatibility, please use `multiversx_sc_meta_lib::multi_contract_config::<AbiObj>(contract_crate_path)`.
+pub fn multi_contract_config<AbiObj: multiversx_sc::contract_base::ContractAbiProvider>(
+    contract_crate_path: &std::path::Path,
+) -> multiversx_sc_meta_lib::contract::sc_config::ScConfig {
+    multiversx_sc_meta_lib::multi_contract_config::<AbiObj>(contract_crate_path)
+}

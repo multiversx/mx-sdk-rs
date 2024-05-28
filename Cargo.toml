@@ -8,6 +8,7 @@ members = [
   "framework/base",
   "framework/derive",
   "framework/meta",
+  "framework/meta-lib",
   "framework/scenario",
   "framework/snippets",
   "framework/wasm-adapter",
