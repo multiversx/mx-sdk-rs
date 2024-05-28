@@ -6,8 +6,7 @@ const USER_ADDRESS: TestAddress = TestAddress::new("user");
 const FORWARDER_ADDRESS: TestSCAddress = TestSCAddress::new("forwarder");
 const FORWARDER_PATH: MxscPath = MxscPath::new("output/forwarder.mxsc.json");
 
-const NFT_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("COOL-123456");
-const NFT_TOKEN: &[u8] = b"COOL-123456";
+const NFT_TOKEN: TestTokenIdentifier = TestTokenIdentifier::new("COOL-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -34,7 +33,7 @@ impl ForwarderTestState {
             .account(FORWARDER_ADDRESS)
             .nonce(1)
             .code(FORWARDER_PATH)
-            .esdt_roles(NFT_TOKEN_ID, roles);
+            .esdt_roles(NFT_TOKEN, roles);
 
         Self { world }
     }
@@ -52,20 +51,20 @@ fn test_nft_update_attributes_and_send() {
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
         .typed(forwarder_proxy::ForwarderProxy)
-        .nft_create_compact(NFT_TOKEN_ID, 1u64, original_attributes)
+        .nft_create_compact(NFT_TOKEN, 1u64, original_attributes)
         .run();
 
     state.world.transfer_step(
         TransferStep::new()
             .from(FORWARDER_ADDRESS.eval_to_expr().as_str())
             .to(USER_ADDRESS.eval_to_expr().as_str())
-            .esdt_transfer(NFT_TOKEN, 1, "1"),
+            .esdt_transfer(NFT_TOKEN.eval_to_array(), 1, "1"),
     );
 
     state
         .world
         .check_account(USER_ADDRESS)
-        .esdt_nft_balance_and_attributes(NFT_TOKEN_ID, 1, 1, original_attributes);
+        .esdt_nft_balance_and_attributes(NFT_TOKEN, 1, 1, original_attributes);
 
     let new_attributes = forwarder_proxy::Color {
         r: 255,
@@ -77,7 +76,7 @@ fn test_nft_update_attributes_and_send() {
         TransferStep::new()
             .from(USER_ADDRESS.eval_to_expr().as_str())
             .to(FORWARDER_ADDRESS.eval_to_expr().as_str())
-            .esdt_transfer(NFT_TOKEN, 1, "1"),
+            .esdt_transfer(NFT_TOKEN.eval_to_array(), 1, "1"),
     );
 
     state
@@ -86,18 +85,18 @@ fn test_nft_update_attributes_and_send() {
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
         .typed(forwarder_proxy::ForwarderProxy)
-        .nft_update_attributes(NFT_TOKEN_ID, 1u64, new_attributes)
+        .nft_update_attributes(NFT_TOKEN, 1u64, new_attributes)
         .run();
 
     state.world.transfer_step(
         TransferStep::new()
             .from(FORWARDER_ADDRESS.eval_to_expr().as_str())
             .to(USER_ADDRESS.eval_to_expr().as_str())
-            .esdt_transfer(NFT_TOKEN, 1, "1"),
+            .esdt_transfer(NFT_TOKEN.eval_to_array(), 1, "1"),
     );
 
     state
         .world
         .check_account(USER_ADDRESS)
-        .esdt_nft_balance_and_attributes(NFT_TOKEN_ID, 1, 1, new_attributes);
+        .esdt_nft_balance_and_attributes(NFT_TOKEN, 1, 1, new_attributes);
 }

@@ -10,8 +10,7 @@ const PROMISES_FEATURES_PATH: MxscPath =
 const VAULT_ADDRESS: TestSCAddress = TestSCAddress::new("vault");
 const VAULT_PATH: MxscPath = MxscPath::new("../vault/output/vault.mxsc.json");
 
-const TOKEN_IDD: TestTokenIdentifier = TestTokenIdentifier::new("TOKEN-123456");
-const TOKEN_ID: &[u8] = b"TOKEN-123456";
+const TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("TOKEN-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -39,7 +38,7 @@ impl PromisesFeaturesTestState {
             .account(VAULT_ADDRESS)
             .nonce(1)
             .code(VAULT_PATH)
-            .esdt_balance(TOKEN_IDD, 1000);
+            .esdt_balance(TOKEN_ID, 1000);
 
         Self { world }
     }
@@ -56,13 +55,18 @@ fn test_back_transfers() {
         .from(USER_ADDRESS)
         .to(PROMISES_FEATURE_ADDRESS)
         .typed(promises_feature_proxy::PromisesFeaturesProxy)
-        .forward_sync_retrieve_funds_bt(VAULT_ADDRESS, TOKEN_ID, 0u64, &token_amount)
+        .forward_sync_retrieve_funds_bt(
+            VAULT_ADDRESS,
+            TOKEN_ID.eval_to_array(),
+            0u64,
+            &token_amount,
+        )
         .run();
 
     state
         .world
         .check_account(PROMISES_FEATURE_ADDRESS)
-        .esdt_balance(TOKEN_IDD, token_amount);
+        .esdt_balance(TOKEN_ID, token_amount);
 }
 
 #[test]
@@ -77,11 +81,16 @@ fn test_multi_call_back_transfers() {
         .from(USER_ADDRESS)
         .to(PROMISES_FEATURE_ADDRESS)
         .typed(promises_feature_proxy::PromisesFeaturesProxy)
-        .forward_sync_retrieve_funds_bt_twice(VAULT_ADDRESS, TOKEN_ID, 0u64, &half_token_amount)
+        .forward_sync_retrieve_funds_bt_twice(
+            VAULT_ADDRESS,
+            TOKEN_ID.eval_to_array(),
+            0u64,
+            &half_token_amount,
+        )
         .run();
 
     state
         .world
         .check_account(PROMISES_FEATURE_ADDRESS)
-        .esdt_balance(TOKEN_IDD, token_amount);
+        .esdt_balance(TOKEN_ID, token_amount);
 }
