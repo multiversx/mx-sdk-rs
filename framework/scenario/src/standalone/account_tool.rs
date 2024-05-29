@@ -71,7 +71,7 @@ fn set_account(
         .nonce(account.nonce)
         .balance(account.balance.as_str())
         .code(account.code);
-    account_state.username = Some(account.username.as_str().into());
+    account_state.username = Some(format!("str:{}", account.username.as_str()).into());
     account_state.storage = convert_storage(account_storage);
 
     for (_, esdt_balance) in account_esdt.iter() {
