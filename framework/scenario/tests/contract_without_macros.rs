@@ -7,11 +7,10 @@
 // and maintenance.
 
 #![allow(unused)]
-#![allow(deprecated)] // TODO: unified syntax
 
 use multiversx_sc::{
     contract_base::ProxyObjNew,
-    types::{BigInt, ManagedAddress},
+    types::{BigInt, BigUint, ManagedAddress},
 };
 use multiversx_sc_scenario::api::{SingleTxApi, StaticApi};
 
@@ -59,14 +58,18 @@ mod module_1 {
     pub trait EndpointWrappers: VersionModule + multiversx_sc::contract_base::ContractBase {
         #[inline]
         fn call_version(&self) {
+            <Self::Api as multiversx_sc::api::VMApi>::init_static();
             multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
+            let () = multiversx_sc::io::load_endpoint_args::<Self::Api, ()>(());
             let result = self.version();
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&result)
+            multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
         }
 
         fn call_some_async(&self) {
+            <Self::Api as multiversx_sc::api::VMApi>::init_static();
+            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
+            let () = multiversx_sc::io::load_endpoint_args::<Self::Api, ()>(());
             self.some_async();
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&())
         }
 
         fn call(&self, fn_name: &str) -> bool {
@@ -105,14 +108,26 @@ mod module_1 {
     pub trait ProxyTrait: multiversx_sc::contract_base::ProxyObjBase + Sized {
         fn version(
             &mut self,
-        ) -> multiversx_sc::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
-            let ___address___ = self.extract_address();
-            multiversx_sc::types::ContractCallNoPayment::new(___address___, "version")
+        ) -> multiversx_sc::types::Tx<
+            multiversx_sc::types::TxScEnv<Self::Api>,
+            (),
+            Self::To,
+            (),
+            (),
+            multiversx_sc::types::FunctionCall<Self::Api>,
+            multiversx_sc::types::OriginalResultMarker<BigInt<Self::Api>>,
+        > {
+            multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
+                .to(self.extract_proxy_to())
+                .original_result()
+                .raw_call("version")
         }
     }
 }
 
 mod sample_adder {
+    use multiversx_sc::storage::StorageKey;
+
     multiversx_sc::imports!();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,21 +136,16 @@ mod sample_adder {
     pub trait Adder:
         super::module_1::VersionModule + multiversx_sc::contract_base::ContractBase + Sized
     {
-        fn init(&self, initial_value: &BigInt<Self::Api>) {
-            self.set_sum(initial_value);
+        fn init(&self, initial_value: BigUint<Self::Api>) {
+            self.sum().set(initial_value);
         }
-        fn add(&self, value: BigInt<Self::Api>) {
-            let mut sum = self.get_sum();
-            sum.add_assign(value);
-            self.set_sum(&sum);
+        fn upgrade(&self, initial_value: BigUint<Self::Api>) {
+            self.init(initial_value);
         }
-        fn get_sum(&self) -> BigInt<Self::Api>;
-        fn set_sum(&self, sum: &BigInt<Self::Api>);
-        fn add_version(&self) {
-            self.add(self.version())
+        fn add(&self, value: BigUint<Self::Api>) {
+            self.sum().update(|sum| *sum += value);
         }
-        fn callback(&self);
-        fn callbacks(&self) -> self::CallbackProxyObj<Self::Api>;
+        fn sum(&self) -> SingleValueMapper<Self::Api, BigUint<Self::Api>>;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,17 +159,11 @@ mod sample_adder {
     where
         C: AutoImpl + super::module_1::AutoImpl,
     {
-        fn get_sum(&self) -> BigInt<Self::Api> {
-            let mut ___key___ = multiversx_sc::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
-            multiversx_sc::storage_get(multiversx_sc::types::ManagedRef::new(&___key___))
-        }
-        fn set_sum(&self, sum: &BigInt<Self::Api>) {
-            let mut ___key___ = multiversx_sc::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
-            multiversx_sc::storage_set(multiversx_sc::types::ManagedRef::new(&___key___), &sum);
-        }
-        fn callback(&self) {}
-        fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
-            <self::CallbackProxyObj::<Self::Api> as multiversx_sc::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj()
+        fn sum(&self) -> SingleValueMapper<Self::Api, BigUint<Self::Api>> {
+            let mut ___key___ = StorageKey::<Self::Api>::new(&b"sum"[..]);
+            <SingleValueMapper<Self::Api, BigUint<Self::Api>> as StorageMapper<Self::Api>>::new(
+                ___key___,
+            )
         }
     }
 
@@ -172,11 +176,11 @@ mod sample_adder {
         Adder + multiversx_sc::contract_base::ContractBase + super::module_1::EndpointWrappers
     {
         #[inline]
-        fn call_get_sum(&self) {
+        fn call_sum(&self) {
             <Self::Api as multiversx_sc::api::VMApi>::init_static();
             multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
             let () = multiversx_sc::io::load_endpoint_args::<Self::Api, ()>(());
-            let result = self.get_sum();
+            let result = self.sum();
             multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
         }
         #[inline]
@@ -185,9 +189,19 @@ mod sample_adder {
             multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
             let (initial_value, ()) = multiversx_sc::io::load_endpoint_args::<
                 Self::Api,
-                (multiversx_sc::types::BigInt<Self::Api>, ()),
+                (multiversx_sc::types::BigUint<Self::Api>, ()),
             >(("initial_value", ()));
-            self.init(&initial_value);
+            self.init(initial_value);
+        }
+        #[inline]
+        fn call_upgrade(&self) {
+            <Self::Api as multiversx_sc::api::VMApi>::init_static();
+            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
+            let (initial_value, ()) = multiversx_sc::io::load_endpoint_args::<
+                Self::Api,
+                (multiversx_sc::types::BigUint<Self::Api>, ()),
+            >(("initial_value", ()));
+            self.upgrade(initial_value);
         }
         #[inline]
         fn call_add(&self) {
@@ -195,7 +209,7 @@ mod sample_adder {
             multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
             let (value, ()) = multiversx_sc::io::load_endpoint_args::<
                 Self::Api,
-                (multiversx_sc::types::BigInt<Self::Api>, ()),
+                (multiversx_sc::types::BigUint<Self::Api>, ()),
             >(("value", ()));
             self.add(value);
         }
@@ -203,30 +217,48 @@ mod sample_adder {
         fn call(&self, fn_name: &str) -> bool {
             if match fn_name {
                 "callBack" => {
-                    Adder::callback(self);
+                    EndpointWrappers::callback(self);
+                    return true;
+                },
+                "init"
+                    if <Self::Api as multiversx_sc::api::VMApi>::external_view_init_override() =>
+                {
+                    multiversx_sc::external_view_contract::external_view_contract_constructor::<
+                        Self::Api,
+                    >();
                     return true;
                 },
                 "getSum" => {
-                    self.call_get_sum();
+                    self.call_sum();
                     true
                 },
-                "init" => {
+                "init"
+                    if !<Self::Api as multiversx_sc::api::VMApi>::external_view_init_override() =>
+                {
                     self.call_init();
+                    true
+                },
+                "upgrade" => {
+                    self.call_upgrade();
                     true
                 },
                 "add" => {
                     self.call_add();
                     true
                 },
-                _other => false,
+                other => false,
             } {
-                return true;
-            }
-            if super::module_1::EndpointWrappers::call(self, fn_name) {
                 return true;
             }
             false
         }
+        fn callback_selector(
+            &self,
+            mut ___cb_closure___: multiversx_sc::types::CallbackClosureForDeser<Self::Api>,
+        ) -> multiversx_sc::types::CallbackSelectorResult<Self::Api> {
+            multiversx_sc::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
+        }
+        fn callback(&self) {}
     }
 
     impl<A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<A> where
@@ -237,21 +269,87 @@ mod sample_adder {
     pub trait ProxyTrait:
         multiversx_sc::contract_base::ProxyObjBase + super::module_1::ProxyTrait
     {
-        fn get_sum(
+        #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
+        fn sum(
             &mut self,
-        ) -> multiversx_sc::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
-            let ___address___ = self.extract_address();
-            multiversx_sc::types::ContractCallNoPayment::new(___address___, "get_sum")
+        ) -> multiversx_sc::types::Tx<
+            multiversx_sc::types::TxScEnv<Self::Api>,
+            (),
+            Self::To,
+            (),
+            (),
+            multiversx_sc::types::FunctionCall<Self::Api>,
+            multiversx_sc::types::OriginalResultMarker<
+                SingleValueMapper<Self::Api, multiversx_sc::types::BigUint<Self::Api>>,
+            >,
+        > {
+            multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
+                .to(self.extract_proxy_to())
+                .original_result()
+                .raw_call("getSum")
         }
-        fn add(
+        #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
+        fn init<Arg0: multiversx_sc::types::ProxyArg<multiversx_sc::types::BigUint<Self::Api>>>(
             &mut self,
-            amount: &BigInt<Self::Api>,
-        ) -> multiversx_sc::types::ContractCallNoPayment<Self::Api, ()> {
-            let ___address___ = self.extract_address();
-            let mut ___contract_call___ =
-                multiversx_sc::types::ContractCallNoPayment::new(___address___, "add");
-            multiversx_sc::types::ContractCall::proxy_arg(&mut ___contract_call___, amount);
-            ___contract_call___
+            initial_value: Arg0,
+        ) -> multiversx_sc::types::Tx<
+            multiversx_sc::types::TxScEnv<Self::Api>,
+            (),
+            Self::To,
+            (),
+            (),
+            multiversx_sc::types::DeployCall<multiversx_sc::types::TxScEnv<Self::Api>, ()>,
+            multiversx_sc::types::OriginalResultMarker<()>,
+        > {
+            multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
+                .raw_deploy()
+                .argument(&initial_value)
+                .original_result()
+                .to(self.extract_proxy_to())
+        }
+        #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
+        fn upgrade<
+            Arg0: multiversx_sc::types::ProxyArg<multiversx_sc::types::BigUint<Self::Api>>,
+        >(
+            &mut self,
+            initial_value: Arg0,
+        ) -> multiversx_sc::types::Tx<
+            multiversx_sc::types::TxScEnv<Self::Api>,
+            (),
+            Self::To,
+            (),
+            (),
+            multiversx_sc::types::FunctionCall<Self::Api>,
+            multiversx_sc::types::OriginalResultMarker<()>,
+        > {
+            multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
+                .to(self.extract_proxy_to())
+                .original_result()
+                .raw_call("upgrade")
+                .argument(&initial_value)
+        }
+        #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::type_complexity)]
+        fn add<Arg0: multiversx_sc::types::ProxyArg<multiversx_sc::types::BigUint<Self::Api>>>(
+            &mut self,
+            value: Arg0,
+        ) -> multiversx_sc::types::Tx<
+            multiversx_sc::types::TxScEnv<Self::Api>,
+            (),
+            Self::To,
+            (),
+            (),
+            multiversx_sc::types::FunctionCall<Self::Api>,
+            multiversx_sc::types::OriginalResultMarker<()>,
+        > {
+            multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
+                .to(self.extract_proxy_to())
+                .original_result()
+                .raw_call("add")
+                .argument(&value)
         }
     }
 
@@ -288,17 +386,14 @@ mod sample_adder {
         A: multiversx_sc::api::VMApi,
     {
         fn call(&self, fn_name: &str) -> bool {
-            EndpointWrappers::call(
-                &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
-                fn_name,
-            )
+            EndpointWrappers::call(self, fn_name)
         }
     }
 
     pub struct ContractBuilder;
 
     impl multiversx_sc::contract_base::CallableContractBuilder for ContractBuilder {
-        fn new_contract_obj<A: multiversx_sc::api::VMApi>(
+        fn new_contract_obj<A: multiversx_sc::api::VMApi + Send + Sync>(
             &self,
         ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract>
         {
@@ -314,7 +409,89 @@ mod sample_adder {
         type Api = multiversx_sc::api::uncallable::UncallableApi;
 
         fn abi() -> multiversx_sc::abi::ContractAbi {
-            multiversx_sc::abi::ContractAbi::default()
+            let mut contract_abi = multiversx_sc::abi::ContractAbi::new(
+                multiversx_sc::abi::BuildInfoAbi {
+                    contract_crate: multiversx_sc::abi::ContractCrateBuildAbi {
+                        name: "adder",
+                        version: "0.0.0",
+                        git_version: "",
+                    },
+                    framework: multiversx_sc::abi::FrameworkBuildAbi::create(),
+                },
+                &[
+                    "One of the simplest smart contracts possible,",
+                    "it holds a single variable in storage, which anyone can increment.",
+                ],
+                "Adder",
+                false,
+            );
+            let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
+                &[],
+                "getSum",
+                "sum",
+                false,
+                false,
+                multiversx_sc::abi::EndpointMutabilityAbi::Readonly,
+                multiversx_sc::abi::EndpointTypeAbi::Endpoint,
+                &[],
+                &[],
+                false,
+            );
+            endpoint_abi
+                .add_output::<
+                    SingleValueMapper<Self::Api, multiversx_sc::types::BigUint<Self::Api>>,
+                >(&[]);
+            contract_abi
+                .add_type_descriptions::<
+                    SingleValueMapper<Self::Api, multiversx_sc::types::BigUint<Self::Api>>,
+                >();
+            contract_abi.endpoints.push(endpoint_abi);
+            let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
+                &[],
+                "init",
+                "init",
+                false,
+                false,
+                multiversx_sc::abi::EndpointMutabilityAbi::Mutable,
+                multiversx_sc::abi::EndpointTypeAbi::Init,
+                &[],
+                &[],
+                false,
+            );
+            endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("initial_value");
+            contract_abi.add_type_descriptions::<multiversx_sc::types::BigUint<Self::Api>>();
+            contract_abi.constructors.push(endpoint_abi);
+            let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
+                &[],
+                "upgrade",
+                "upgrade",
+                false,
+                false,
+                multiversx_sc::abi::EndpointMutabilityAbi::Mutable,
+                multiversx_sc::abi::EndpointTypeAbi::Upgrade,
+                &[],
+                &[],
+                false,
+            );
+            endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("initial_value");
+            contract_abi.add_type_descriptions::<multiversx_sc::types::BigUint<Self::Api>>();
+            contract_abi.upgrade_constructors.push(endpoint_abi);
+            let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
+                &["Add desired amount to the storage variable."],
+                "add",
+                "add",
+                false,
+                false,
+                multiversx_sc::abi::EndpointMutabilityAbi::Mutable,
+                multiversx_sc::abi::EndpointTypeAbi::Endpoint,
+                &[],
+                &[],
+                false,
+            );
+            endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("value");
+            contract_abi.add_type_descriptions::<multiversx_sc::types::BigUint<Self::Api>>();
+            contract_abi.endpoints.push(endpoint_abi);
+            contract_abi
         }
     }
 
@@ -339,6 +516,7 @@ mod sample_adder {
         A: multiversx_sc::api::VMApi + 'static,
     {
         type Api = A;
+
         type To = ();
 
         fn extract_opt_address(
@@ -356,7 +534,6 @@ mod sample_adder {
                 multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET.as_bytes(),
             )
         }
-
         fn extract_proxy_to(&mut self) -> Self::To {}
     }
 
@@ -365,7 +542,6 @@ mod sample_adder {
         A: multiversx_sc::api::VMApi + 'static,
     {
         type ProxyTo = ProxyTo<A>;
-
         fn new_proxy_obj() -> Self {
             Proxy {
                 _phantom: core::marker::PhantomData,
@@ -381,7 +557,6 @@ mod sample_adder {
             }
         }
     }
-
     pub struct ProxyTo<A>
     where
         A: multiversx_sc::api::VMApi + 'static,
@@ -396,7 +571,6 @@ mod sample_adder {
     {
         type Api = A;
         type To = multiversx_sc::types::ManagedAddress<A>;
-
         fn extract_opt_address(
             &mut self,
         ) -> multiversx_sc::types::ManagedOption<
@@ -408,7 +582,6 @@ mod sample_adder {
                 multiversx_sc::types::ManagedOption::none(),
             )
         }
-
         fn extract_address(&mut self) -> multiversx_sc::types::ManagedAddress<Self::Api> {
             let address = core::mem::replace(
                 &mut self.address,
@@ -416,7 +589,6 @@ mod sample_adder {
             );
             address.unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
         }
-
         fn extract_proxy_to(&mut self) -> Self::To {
             self.extract_address()
         }
@@ -427,36 +599,6 @@ mod sample_adder {
 
     impl<A> ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
     impl<A> ProxyTrait for ProxyTo<A> where A: multiversx_sc::api::VMApi {}
-
-    pub struct CallbackProxyObj<A>
-    where
-        A: multiversx_sc::api::VMApi + 'static,
-    {
-        _phantom: core::marker::PhantomData<A>,
-    }
-
-    impl<A> multiversx_sc::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
-    where
-        A: multiversx_sc::api::VMApi + 'static,
-    {
-        type Api = A;
-
-        fn new_cb_proxy_obj() -> Self {
-            CallbackProxyObj {
-                _phantom: core::marker::PhantomData,
-            }
-        }
-    }
-
-    pub trait CallbackProxy: multiversx_sc::contract_base::CallbackProxyObjBase + Sized {
-        fn my_callback(self, caller: &Address) -> multiversx_sc::types::CallbackClosure<Self::Api> {
-            let mut ___callback_call___ =
-                multiversx_sc::types::new_callback_call::<Self::Api>("my_callback");
-            ___callback_call___.push_endpoint_arg(caller);
-            ___callback_call___
-        }
-    }
-    impl<A> self::CallbackProxy for CallbackProxyObj<A> where A: multiversx_sc::api::VMApi + 'static {}
 }
 
 #[test]
@@ -465,27 +607,24 @@ fn contract_without_macros_basic() {
 
     let adder = sample_adder::contract_obj::<SingleTxApi>();
 
-    adder.init(&BigInt::from(5));
-    assert_eq!(BigInt::from(5), adder.get_sum());
+    adder.init(BigUint::from(5u32));
+    assert_eq!(BigUint::from(5u32), adder.sum().get());
 
-    adder.add(BigInt::from(7));
-    assert_eq!(BigInt::from(12), adder.get_sum());
+    adder.add(BigUint::from(7u32));
+    assert_eq!(BigUint::from(12u32), adder.sum().get());
 
-    adder.add(BigInt::from(-1));
-    assert_eq!(BigInt::from(11), adder.get_sum());
+    // adder.add(BigUint::from(-1i32));
+    // assert_eq!(BigUint::from(11i32), adder.sum().get());
 
     assert_eq!(BigInt::from(100), adder.version());
 
-    adder.add_version();
-    assert_eq!(BigInt::from(111), adder.get_sum());
-
     assert!(!adder.call("invalid_endpoint"));
 
-    assert!(adder.call("version"));
+    assert!(adder.call("getSum"));
 
     let mut own_proxy =
         sample_adder::Proxy::<StaticApi>::new_proxy_obj().contract(ManagedAddress::zero());
-    let _ = own_proxy.get_sum();
+    let _ = own_proxy.sum();
 
     let _ = multiversx_sc_meta::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
