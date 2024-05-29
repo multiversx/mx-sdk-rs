@@ -1,5 +1,5 @@
 use super::interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs};
-use crate::{tx_response_from_network, Interactor, InteractorStep, StepBuffer};
+use crate::{network_response, Interactor, InteractorStep, StepBuffer};
 use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
@@ -15,7 +15,7 @@ impl Interactor {
         let results = self.process_txs(txs).await;
 
         for (i, sc_call_step) in buffer.refs.iter_mut().enumerate() {
-            sc_call_step.set_response(tx_response_from_network::parse_tx_response(
+            sc_call_step.set_response(network_response::parse_tx_response(
                 results.get(i).unwrap().clone(),
             ));
         }
