@@ -10,7 +10,7 @@ use multiversx_sdk::{
 use std::collections::{BTreeMap, HashMap};
 
 /// Called directly from CLI, from `sc-meta`.
-/// 
+///
 /// Retrieves an account data via the API,
 /// then formats it as a scenario set state step.
 pub async fn print_account_as_scenario_set_state(

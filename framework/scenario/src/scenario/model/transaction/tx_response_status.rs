@@ -9,7 +9,7 @@ pub struct TxResponseStatus {
 
 impl TxResponseStatus {
     /// Creates a [`TxResponseStatus`]
-    pub(crate) fn new(status: u64, message: &str) -> Self {
+    pub fn new(status: u64, message: &str) -> Self {
         Self {
             status,
             message: message.to_string(),
@@ -17,7 +17,7 @@ impl TxResponseStatus {
     }
 
     /// Creates a [`TxResponseStatus`] that signals an error.
-    pub(crate) fn signal_error(message: &str) -> Self {
+    pub fn signal_error(message: &str) -> Self {
         Self::new(4, message)
     }
 

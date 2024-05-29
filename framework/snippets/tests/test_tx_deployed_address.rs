@@ -1,5 +1,5 @@
-use multiversx_sc::types::Address;
-use multiversx_sc_scenario::scenario_model::TxResponse;
+use multiversx_sc_scenario::imports::Address;
+use multiversx_sc_snippets::tx_response_from_network;
 use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
 #[test]
@@ -53,7 +53,7 @@ fn test_deployed_address() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = TxResponse::from_network_tx(tx_on_network);
+    let tx_response = tx_response_from_network::from_network_tx(tx_on_network);
     let opt_address = tx_response.new_deployed_address.map(|e| {
         multiversx_sdk::data::address::Address::from_bytes(*e.as_array())
             .to_bech32_string()
@@ -124,7 +124,7 @@ fn test_deployed_address_should_be_none_if_not_a_sc_deployment_tx() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = TxResponse::from_network_tx(tx_on_network);
+    let tx_response = tx_response_from_network::from_network_tx(tx_on_network);
     let opt_address = tx_response.new_deployed_address;
 
     let expected: Option<Address> = None;
