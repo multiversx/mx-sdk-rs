@@ -20,7 +20,6 @@ pub use crate::{
         ScenarioRunner,
     },
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-    test_wallets,
     whitebox_legacy::*,
     ScenarioTxRun,
 };

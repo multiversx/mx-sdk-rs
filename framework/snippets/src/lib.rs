@@ -6,6 +6,7 @@ mod interactor_scenario;
 mod interactor_sender;
 mod interactor_tx;
 mod multi;
+pub mod test_wallets;
 
 pub use env_logger;
 pub use hex;

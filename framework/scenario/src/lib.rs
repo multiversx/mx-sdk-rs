@@ -8,7 +8,6 @@ mod facade;
 pub mod managed_test_util;
 pub mod scenario;
 pub mod scenario_macros;
-pub mod test_wallets;
 mod vm_go_tool;
 
 pub mod whitebox_legacy;
