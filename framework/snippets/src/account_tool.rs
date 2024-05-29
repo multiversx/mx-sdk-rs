@@ -1,20 +1,25 @@
-use crate::{
-    imports::Bech32Address,
-    scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep},
-};
-
 use multiversx_chain_scenario_format::interpret_trait::IntoRaw;
+use multiversx_sc_scenario::{
+    imports::Bech32Address,
+    scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
+};
 use multiversx_sdk::{
     blockchain::CommunicationProxy,
     data::{address::Address, esdt::EsdtBalance},
 };
 use std::collections::{BTreeMap, HashMap};
 
+/// Called directly from CLI, from `sc-meta`.
+/// 
+/// Retrieves an account data via the API,
+/// then formats it as a scenario set state step.
 pub async fn print_account_as_scenario_set_state(
-    api: &CommunicationProxy,
-    address: &Bech32Address,
+    api_string: String,
+    address_bech32_string: String,
 ) {
-    let set_state = retrieve_account_as_scenario_set_state(api, address).await;
+    let api = CommunicationProxy::new(api_string);
+    let address = Bech32Address::from_bech32_string(address_bech32_string);
+    let set_state = retrieve_account_as_scenario_set_state(&api, &address).await;
     let scenario = build_scenario(set_state);
     println!("{}", scenario.into_raw().to_json_string());
 }
@@ -24,7 +29,7 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
         name: None,
         comment: None,
         check_gas: None,
-        steps: vec![crate::scenario_model::Step::SetState(set_state)],
+        steps: vec![Step::SetState(set_state)],
     }
 }
 
@@ -61,7 +66,7 @@ pub async fn retrieve_account_as_scenario_set_state(
     set_state_step.put_account(address, account_state)
 }
 
-pub fn set_account(
+fn set_account(
     account: multiversx_sdk::data::account::Account,
     account_storage: HashMap<String, String>,
     account_esdt: HashMap<String, EsdtBalance>,
@@ -71,7 +76,7 @@ pub fn set_account(
         .nonce(account.nonce)
         .balance(account.balance.as_str())
         .code(account.code);
-    account_state.username = Some(account.username.as_str().into());
+    account_state.username = Some(format!("str:{}", account.username.as_str()).into());
     account_state.storage = convert_storage(account_storage);
 
     for (_, esdt_balance) in account_esdt.iter() {

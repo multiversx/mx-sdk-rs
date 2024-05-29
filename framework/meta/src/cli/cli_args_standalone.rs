@@ -29,6 +29,9 @@ pub struct StandaloneCliArgs {
 
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum StandaloneCliAction {
+    #[command(name = "install", about = "Installs framework dependencies")]
+    Install(InstallArgs),
+
     #[command(
         about = "General info about the contract an libraries residing in the targetted directory.."
     )]
@@ -43,12 +46,6 @@ pub enum StandaloneCliAction {
         about = "Upgrades a contract to the latest version. Multiple contract crates are allowed."
     )]
     Upgrade(UpgradeArgs),
-
-    #[command(
-        name = "local-deps",
-        about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
-    )]
-    LocalDeps(LocalDepsArgs),
 
     #[command(name = "new", about = "Creates a contract by a pre-existing template")]
     Template(TemplateArgs),
@@ -68,8 +65,16 @@ pub enum StandaloneCliAction {
     #[command(name = "test-coverage", about = "Run test coverage and output report")]
     TestCoverage(TestCoverageArgs),
 
-    #[command(name = "install", about = "Installs framework dependencies")]
-    Install(InstallArgs),
+    #[command(
+        about = "Generates a scenario test initialized with real data fetched from the blockchain."
+    )]
+    Account(AccountArgs),
+
+    #[command(
+        name = "local-deps",
+        about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
+    )]
+    LocalDeps(LocalDepsArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -326,3 +331,15 @@ pub struct InstallWasm32Args {}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct InstallWasmOptArgs {}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct AccountArgs {
+    /// Provide the target API you want the real data to come from
+    #[arg(long = "api")]
+    #[clap(global = true)]
+    pub api: Option<String>,
+
+    /// Provide the address you want to retrieve data from
+    #[arg(long = "address", verbatim_doc_comment)]
+    pub address: String,
+}
