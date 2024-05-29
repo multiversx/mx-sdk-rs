@@ -1,4 +1,5 @@
 use crate::cli::{StandaloneCliAction, StandaloneCliArgs};
+use crate::cmd::retrieve_address::retrieve_address;
 use clap::Parser;
 
 use crate::cmd::all::call_all_meta;
@@ -12,16 +13,14 @@ use crate::cmd::test_coverage::test_coverage;
 use crate::cmd::upgrade::upgrade_sc;
 
 /// Entry point in the program when calling it as a standalone tool.
-pub fn cli_main_standalone() {
+pub async fn cli_main_standalone() {
     let cli_args = StandaloneCliArgs::parse();
     match &cli_args.command {
         Some(StandaloneCliAction::Info(args)) => call_info(args),
+        Some(StandaloneCliAction::Install(args)) => install(args),
         Some(StandaloneCliAction::All(args)) => call_all_meta(args),
         Some(StandaloneCliAction::Upgrade(args)) => {
             upgrade_sc(args);
-        },
-        Some(StandaloneCliAction::LocalDeps(args)) => {
-            local_deps(args);
         },
         Some(StandaloneCliAction::Template(args)) => {
             create_contract(args);
@@ -36,7 +35,12 @@ pub fn cli_main_standalone() {
         Some(StandaloneCliAction::TestCoverage(args)) => {
             test_coverage(args);
         },
-        Some(StandaloneCliAction::Install(args)) => install(args),
+        Some(StandaloneCliAction::Account(args)) => {
+            retrieve_address(args).await;
+        },
+        Some(StandaloneCliAction::LocalDeps(args)) => {
+            local_deps(args);
+        },
         None => {},
     }
 }

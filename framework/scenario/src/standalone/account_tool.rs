@@ -61,7 +61,7 @@ pub async fn retrieve_account_as_scenario_set_state(
     set_state_step.put_account(address, account_state)
 }
 
-pub fn set_account(
+fn set_account(
     account: multiversx_sdk::data::account::Account,
     account_storage: HashMap<String, String>,
     account_esdt: HashMap<String, EsdtBalance>,
