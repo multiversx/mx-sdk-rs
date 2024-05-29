@@ -1,6 +1,6 @@
 use multiversx_sdk::{
-    blockchain::{GatewayProxy, DEVNET_GATEWAY},
     data::address::Address,
+    gateway::{GatewayProxy, DEVNET_GATEWAY},
 };
 
 #[tokio::main]

@@ -5,8 +5,8 @@ use multiversx_sc_scenario::{
     scenario_model::AddressValue,
 };
 use multiversx_sdk::{
-    blockchain::GatewayProxy,
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
+    gateway::GatewayProxy,
     wallet::Wallet,
 };
 use std::{

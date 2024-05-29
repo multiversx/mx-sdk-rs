@@ -4,8 +4,8 @@ use multiversx_sc_scenario::{
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
 use multiversx_sdk::{
-    blockchain::GatewayProxy,
     data::{address::Address, esdt::EsdtBalance},
+    gateway::GatewayProxy,
 };
 use std::collections::{BTreeMap, HashMap};
 

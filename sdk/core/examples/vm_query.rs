@@ -1,6 +1,6 @@
 use multiversx_sdk::{
-    blockchain::{GatewayProxy, DEVNET_GATEWAY},
     data::{address::Address, vm::VmValueRequest},
+    gateway::{GatewayProxy, DEVNET_GATEWAY},
     wallet::Wallet,
 };
 
