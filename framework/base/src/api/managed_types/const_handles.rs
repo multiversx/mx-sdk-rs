@@ -28,6 +28,8 @@ pub const NEW_HANDLE_START_FROM: RawHandle = -200; // > -100 reserved for APIs
 // Vec of 64 entries of 1 bit
 pub const SCALING_FACTOR_START: RawHandle = -100;
 pub const SCALING_FACTOR_LENGTH: usize = 64;
+pub const ADDRESS_CALLER: RawHandle = -30;
+pub const ADDRESS_SELF: RawHandle = -31;
 
 /// Used as a flag. Do not use as a regular handle.
 pub const MANAGED_OPTION_NONE: RawHandle = i32::MAX - 1;

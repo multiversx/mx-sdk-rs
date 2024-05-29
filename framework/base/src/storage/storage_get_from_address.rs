@@ -10,6 +10,7 @@ use crate::{
     },
 };
 use alloc::boxed::Box;
+use unwrap_infallible::UnwrapInfallible;
 
 use super::{StorageGetErrorHandler, StorageKey};
 
@@ -92,6 +93,27 @@ where
     }
 
     #[inline]
+    fn into_max_size_buffer_align_right<H, const MAX_LEN: usize>(
+        self,
+        buffer: &mut [u8; MAX_LEN],
+        h: H,
+    ) -> Result<usize, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.to_managed_buffer()
+            .into_max_size_buffer_align_right(buffer, h)
+    }
+
+    #[inline]
+    fn into_i64<H>(self, h: H) -> Result<i64, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.to_managed_buffer().into_i64(h)
+    }
+
+    #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BigUint<A>>() || T::type_eq::<BigInt<A>>()
     }
@@ -126,11 +148,11 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    let Ok(value) = T::top_decode_or_handle_err(
+    T::top_decode_or_handle_err(
         StorageGetFromAddressInput::new(addr, key),
         StorageGetErrorHandler::<A>::default(),
-    );
-    value
+    )
+    .unwrap_infallible()
 }
 
 /// Useful for storage mappers.

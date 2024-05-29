@@ -1,19 +1,7 @@
-use multiversx_sc::{
-    arrayvec::ArrayVec,
-    codec::{test_util::top_encode_to_vec_u8_or_panic, Empty},
-    contract_base::ContractBase,
-    storage::mappers::StorageTokenWrapper,
-    types::{Address, EsdtTokenPayment, ManagedVec},
-};
+use multiversx_sc_scenario::imports::*;
+
 use multiversx_sc_modules::token_merge::{
     merged_token_instances::MergedTokenInstances, merged_token_setup::MergedTokenSetupModule,
-};
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep, TxESDT,
-    },
-    ScenarioWorld, WhiteboxContract,
 };
 use use_module::token_merge_mod_impl::{CustomAttributes, TokenMergeModImpl};
 
@@ -45,8 +33,6 @@ const SECOND_URIS: &[&[u8]] = &[b"cool.com/safe_file.exe"];
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/features-tests/use-module");
-
     blockchain.register_contract(USE_MODULE_PATH_EXPR, use_module::ContractBuilder);
     blockchain
 }
@@ -78,7 +64,7 @@ fn test_token_merge() {
                         NFT_AMOUNT,
                         Some(FIRST_ATTRIBUTES),
                         FIRST_ROYALTIES,
-                        None,
+                        None::<AddressValue>,
                         None,
                         Vec::from(FIRST_URIS),
                     )
@@ -88,7 +74,7 @@ fn test_token_merge() {
                         NFT_AMOUNT,
                         Some(SECOND_ATTRIBUTES),
                         SECOND_ROYALTIES,
-                        None,
+                        None::<AddressValue>,
                         None,
                         Vec::from(SECOND_URIS),
                     ),
@@ -466,7 +452,7 @@ fn test_partial_split() {
                         NFT_AMOUNT,
                         Some(FIRST_ATTRIBUTES),
                         FIRST_ROYALTIES,
-                        None,
+                        None::<AddressValue>,
                         None,
                         Vec::from(FIRST_URIS),
                     )
@@ -476,7 +462,7 @@ fn test_partial_split() {
                         NFT_AMOUNT,
                         Some(SECOND_ATTRIBUTES),
                         SECOND_ROYALTIES,
-                        None,
+                        None::<AddressValue>,
                         None,
                         Vec::from(SECOND_URIS),
                     ),
@@ -684,7 +670,7 @@ fn test_custom_attributes() {
                         NFT_AMOUNT,
                         Some(FIRST_ATTRIBUTES),
                         FIRST_ROYALTIES,
-                        None,
+                        None::<AddressValue>,
                         None,
                         Vec::from(FIRST_URIS),
                     )
@@ -694,7 +680,7 @@ fn test_custom_attributes() {
                         NFT_AMOUNT,
                         Some(SECOND_ATTRIBUTES),
                         SECOND_ROYALTIES,
-                        None,
+                        None::<AddressValue>,
                         None,
                         Vec::from(SECOND_URIS),
                     ),

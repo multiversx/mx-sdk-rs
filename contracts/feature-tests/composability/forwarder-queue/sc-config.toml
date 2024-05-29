@@ -8,3 +8,6 @@ name = "forwarder-queue"
 name = "forwarder-queue-promises"
 add-labels = ["promises-callback"]
 ei = "1.3"
+
+[[proxy]]
+path = "../interact/src/forwarder_queue_proxy.rs"

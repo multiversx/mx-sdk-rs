@@ -1,5 +1,4 @@
-use multiversx_sc::types::{EgldOrEsdtTokenIdentifier, ManagedBuffer, TokenIdentifier};
-use multiversx_sc_scenario::{api::StaticApi, *};
+use multiversx_sc_scenario::imports::*;
 
 use basic_features::token_identifier_features::TokenIdentifierFeatures;
 

@@ -5,13 +5,12 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           16
+// Upgrade:                              1
+// Endpoints:                           15
 // Async Callback (empty):               1
 // Total number of exported functions:  18
 
 #![no_std]
-#![allow(internal_features)]
-#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -20,6 +19,7 @@ multiversx_sc_wasm_adapter::endpoints! {
     vault
     (
         init => init
+        upgrade => upgrade
         echo_arguments => echo_arguments
         echo_arguments_without_storage => echo_arguments_without_storage
         echo_caller => echo_caller
@@ -30,12 +30,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         retrieve_funds_with_transfer_exec => retrieve_funds_with_transfer_exec
         retrieve_funds => retrieve_funds
         retrieve_multi_funds_async => retrieve_multi_funds_async
-        burn_and_create_retrive_async => burn_and_create_retrive_async
+        burn_and_create_retrieve_async => burn_and_create_retrieve_async
         get_owner_address => get_owner_address
         call_counts => call_counts
         num_called_retrieve_funds_promises => num_called_retrieve_funds_promises
         num_async_calls_sent_from_child => num_async_calls_sent_from_child
-        upgrade => upgrade
     )
 }
 

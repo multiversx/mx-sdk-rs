@@ -2,6 +2,7 @@
 #![allow(clippy::type_complexity)]
 
 multiversx_sc::imports!();
+pub mod transfer_role_proxy;
 
 #[multiversx_sc::contract]
 pub trait TransferRoleFeatures:
@@ -30,7 +31,7 @@ pub trait TransferRoleFeatures:
         }
 
         if !self.blockchain().is_smart_contract(&dest) {
-            self.transfer_to_user(original_caller, dest, payments.clone_value(), endpoint_name);
+            self.transfer_to_user(original_caller, dest, &payments, endpoint_name);
         } else {
             let mut args_buffer = ManagedArgBuffer::new();
             for arg in args {
@@ -40,7 +41,7 @@ pub trait TransferRoleFeatures:
             self.transfer_to_contract_raw(
                 original_caller,
                 dest,
-                payments.clone_value(),
+                &payments,
                 endpoint_name,
                 args_buffer,
                 None,

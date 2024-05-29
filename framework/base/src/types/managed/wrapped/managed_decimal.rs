@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, ManagedTypeApi,
         StaticVarApiImpl,
@@ -363,6 +363,20 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, 
     }
 }
 
+impl<M, D> TypeAbiFrom<Self> for ManagedDecimal<M, D>
+where
+    M: ManagedTypeApi,
+    D: Decimals,
+{
+}
+
+impl<M, D> TypeAbiFrom<&Self> for ManagedDecimal<M, D>
+where
+    M: ManagedTypeApi,
+    D: Decimals,
+{
+}
+
 impl<M: ManagedTypeApi> TypeAbi for ManagedDecimal<M, NumDecimals> {
     fn type_name() -> TypeName {
         TypeName::from("ManagedDecimal<usize>")
@@ -371,6 +385,8 @@ impl<M: ManagedTypeApi> TypeAbi for ManagedDecimal<M, NumDecimals> {
     fn is_variadic() -> bool {
         false
     }
+
+    type Unmanaged = Self;
 }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
@@ -383,4 +399,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
     fn is_variadic() -> bool {
         false
     }
+
+    type Unmanaged = Self;
 }

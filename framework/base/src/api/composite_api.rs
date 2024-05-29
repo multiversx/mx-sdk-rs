@@ -2,7 +2,7 @@ use super::{ErrorApi, ManagedTypeApi, SendApi, StorageReadApi, StorageWriteApi};
 
 /// Provided for convenience.
 /// Designed to be used in any types that send tokens or calls.
-pub trait CallTypeApi: SendApi + ManagedTypeApi + ErrorApi {}
+pub trait CallTypeApi: SendApi + ManagedTypeApi + StorageWriteApi + ErrorApi {}
 
 /// Provided for convenience.
 /// Designed to be used in storage mappers.

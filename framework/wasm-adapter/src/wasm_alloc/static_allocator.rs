@@ -25,6 +25,7 @@ pub struct StaticAllocator<const SIZE: usize> {
 }
 
 impl<const SIZE: usize> StaticAllocator<SIZE> {
+    #[allow(clippy::new_without_default)]
     pub const fn new() -> Self {
         StaticAllocator {
             arena: UnsafeCell::new([0; SIZE]),

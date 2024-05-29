@@ -3,7 +3,8 @@ multiversx_sc::derive_imports!();
 
 use crate::price_aggregator_data::{TimestampedPrice, TokenPair};
 
-#[derive(TypeAbi, TopEncode)]
+#[type_abi]
+#[derive(TopEncode)]
 pub struct NewRoundEvent<M: ManagedTypeApi> {
     price: BigUint<M>,
     timestamp: u64,

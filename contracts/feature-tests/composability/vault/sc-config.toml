@@ -15,3 +15,15 @@ add-labels = ["promises-endpoint"]
 name = "vault-upgrade"
 add-unlabelled = false
 add-labels = ["upgrade"]
+
+[[proxy]]
+path = "../forwarder/src/vault_proxy.rs"
+
+[[proxy]]
+path = "../promises-features/src/vault_proxy.rs"
+
+[[proxy]]
+path = "../recursive-caller/src/vault_proxy.rs"
+
+[[proxy]]
+path = "../interact/src/vault_proxy.rs"

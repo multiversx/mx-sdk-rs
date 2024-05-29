@@ -23,7 +23,7 @@ impl TxCacheSource for TxCache {
 
 impl TxCacheSource for BlockchainState {
     fn load_account(&self, address: &VMAddress) -> Option<AccountData> {
-        self.accounts.get(address).map(AccountData::clone)
+        self.accounts.get(address).cloned()
     }
 
     fn blockchain_ref(&self) -> &BlockchainState {

@@ -3,11 +3,11 @@ use super::{
     StorageClearable, StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, StorageMapperApi},
     codec::{
-        multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopDecode, TopEncode,
-        TopEncodeMulti, TopEncodeMultiOutput,
+        multi_encode_iter_or_handle_err, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti,
+        TopEncodeMultiOutput,
     },
     storage::{storage_clear, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
@@ -202,7 +202,7 @@ where
 
     /// Set item at index in storage.
     /// Index must be valid (1 <= index <= count).
-    pub fn set(&self, index: usize, item: &T) {
+    pub fn set(&mut self, index: usize, item: &T) {
         if index == 0 || index > self.len() {
             SA::error_api_impl().signal_error(&b"index out of range"[..]);
         }
@@ -344,7 +344,14 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<VecMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
+impl<SA, T> TypeAbiFrom<VecMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
+}
+
+impl<SA, T> TypeAbiFrom<Self> for VecMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -357,8 +364,14 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

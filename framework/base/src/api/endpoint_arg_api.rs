@@ -59,7 +59,7 @@ pub trait EndpointArgumentApiImpl: ErrorApi + ManagedTypeApi {
         if let Some(value) = Self::managed_type_impl().bi_to_i64(big_int_temp_1) {
             value as u64
         } else {
-            Self::error_api_impl().signal_error(err_msg::ARG_OUT_OF_RANGE)
+            Self::error_api_impl().signal_error(err_msg::ARG_OUT_OF_RANGE.as_bytes())
         }
     }
 
@@ -69,7 +69,7 @@ pub trait EndpointArgumentApiImpl: ErrorApi + ManagedTypeApi {
         if let Some(value) = Self::managed_type_impl().bi_to_i64(big_int_temp_1) {
             value
         } else {
-            Self::error_api_impl().signal_error(err_msg::ARG_OUT_OF_RANGE)
+            Self::error_api_impl().signal_error(err_msg::ARG_OUT_OF_RANGE.as_bytes())
         }
     }
 

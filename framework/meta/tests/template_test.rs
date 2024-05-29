@@ -2,12 +2,12 @@ use std::{fs, process::Command};
 
 use convert_case::{Case, Casing};
 use multiversx_sc_meta::{
-    cmd::standalone::template::{
+    cmd::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
-    find_workspace::find_current_workspace,
     version_history::{self, LAST_TEMPLATE_VERSION},
 };
+use multiversx_sc_meta_lib::tools::find_current_workspace;
 
 const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
 const BUILD_CONTRACTS: bool = true;
@@ -33,6 +33,8 @@ fn test_template_list() {
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_adder() {
     template_test_current("adder", "examples", "new-adder");
+
+    cargo_check_interactor("examples", "new-adder");
 }
 
 #[test]
@@ -96,6 +98,8 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
 fn template_released_adder() {
     template_test_released("adder", "released-adder");
+
+    cargo_check_interactor("", "released-adder");
 }
 
 #[test]
@@ -197,4 +201,23 @@ pub fn build_contract(target: &ContractCreatorTarget) {
         .expect("contract test process was not running");
 
     assert!(exit_status.success(), "contract build process failed");
+}
+
+fn cargo_check_interactor(sub_path: &str, new_name: &str) {
+    let workspace_path = find_current_workspace().unwrap();
+    let target_path = workspace_path
+        .join(TEMPLATE_TEMP_DIR_NAME)
+        .join(sub_path)
+        .join(new_name)
+        .join("interact");
+
+    let exit_status = Command::new("cargo")
+        .arg("check")
+        .current_dir(target_path)
+        .spawn()
+        .expect("failed to spawn contract clean process")
+        .wait()
+        .expect("contract test process was not running");
+
+    assert!(exit_status.success(), "contract test process failed");
 }

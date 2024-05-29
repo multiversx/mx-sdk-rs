@@ -1,7 +1,7 @@
 use alloc::string::ToString;
 
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{ErrorApi, ErrorApiImpl, HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
     codec::*,
     err_msg,
@@ -98,6 +98,12 @@ impl<M: ManagedTypeApi> From<&str> for TokenIdentifier<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<&crate::types::heap::String> for TokenIdentifier<M> {
+    fn from(s: &crate::types::heap::String) -> Self {
+        TokenIdentifier::from(s.as_bytes())
+    }
+}
+
 impl<M: ManagedTypeApi> PartialEq for TokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -111,8 +117,9 @@ impl<M: ManagedTypeApi> PartialEq<EgldOrEsdtTokenIdentifier<M>> for TokenIdentif
     #[inline]
     fn eq(&self, other: &EgldOrEsdtTokenIdentifier<M>) -> bool {
         other.map_ref_or_else(
-            || false,
-            |esdt_token_identifier| esdt_token_identifier == self,
+            (),
+            |()| false,
+            |(), esdt_token_identifier| esdt_token_identifier == self,
         )
     }
 }
@@ -163,15 +170,21 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
     }
 }
 
-impl<M> CodecFromSelf for TokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
 
-impl<M> CodecFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
-
-impl<M> CodecFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M: ManagedTypeApi> TypeAbiFrom<Self> for TokenIdentifier<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for TokenIdentifier<M> {}
 
 impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "TokenIdentifier".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "TokenIdentifier<$API>".into()
     }
 }
 

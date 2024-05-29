@@ -1,49 +1,35 @@
-use multiversx_sc::types::{
-    BigUint, ConstDecimals, ContractCallWithEgld, ManagedAddress, ManagedDecimal,
-};
-use multiversx_sc_scenario::{api::StaticApi, scenario_model::*, *};
+use imports::{MxscPath, ReturnsResult, TestAddress, TestSCAddress};
+use multiversx_sc::types::{BigUint, ConstDecimals, ManagedDecimal};
+use multiversx_sc_scenario::{api::StaticApi, imports, ScenarioTxRun, ScenarioWorld};
+mod proxy;
 
-const BASIC_FEATURES_PATH_EXPR: &str = "file:../output/basic-features.wasm";
-const OWNER_ADDRESS_EXPR: &str = "address:owner";
-const BASIC_FEATURES_ADDRESS_EXPR: &str = "sc:basic-features";
-
-type BasicFeatures = ContractInfo<basic_features::Proxy<StaticApi>>;
+const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
+const BASIC_FEATURES_ADDRESS: TestSCAddress = TestSCAddress::new("basic-features");
+const BASIC_FEATURES_PATH: MxscPath = MxscPath::new("output/basic-features.mxsc.json");
 
 struct BasicFeaturesState {
     world: ScenarioWorld,
-    basic_features: BasicFeatures,
 }
 
 impl BasicFeaturesState {
     fn new() -> Self {
         let mut world = world();
-        let basic_features_code = world.code_expression(BASIC_FEATURES_PATH_EXPR);
+        let basic_features_code =
+            world.code_expression(BASIC_FEATURES_PATH.eval_to_expr().as_str());
 
-        world.set_state_step(
-            SetStateStep::new()
-                .put_account(
-                    OWNER_ADDRESS_EXPR,
-                    Account::new().nonce(1).balance(BigUintValue::from(100u64)),
-                )
-                .put_account(
-                    BASIC_FEATURES_ADDRESS_EXPR,
-                    Account::new().nonce(1).code(basic_features_code),
-                ),
-        );
+        world.account(OWNER_ADDRESS).nonce(1).balance(100);
+        world
+            .account(BASIC_FEATURES_ADDRESS)
+            .nonce(1)
+            .code(basic_features_code);
 
-        let basic_features = BasicFeatures::new(BASIC_FEATURES_ADDRESS_EXPR);
-
-        Self {
-            world,
-            basic_features,
-        }
+        Self { world }
     }
 }
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
-    blockchain.register_contract(BASIC_FEATURES_PATH_EXPR, basic_features::ContractBuilder);
+    blockchain.register_contract(BASIC_FEATURES_PATH, basic_features::ContractBuilder);
     blockchain
 }
 
@@ -51,19 +37,19 @@ fn world() -> ScenarioWorld {
 fn egld_decimal_blackbox_test() {
     let mut state = BasicFeaturesState::new();
 
-    let sc_call =
-        ContractCallWithEgld::<StaticApi, ManagedDecimal<StaticApi, ConstDecimals<18>>>::new(
-            ManagedAddress::from(state.basic_features.to_address()),
-            "returns_egld_decimal",
-            BigUint::from(5u64),
-        );
-
-    let egld_decimal: ManagedDecimal<StaticApi, ConstDecimals<18>> = state
+    let egld_decimal_result = state
         .world
-        .sc_call_get_result(ScCallStep::new().call(sc_call).from("address:owner"));
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(BASIC_FEATURES_ADDRESS)
+        .typed(proxy::BasicFeaturesProxy)
+        .returns_egld_decimal()
+        .egld(5)
+        .returns(ReturnsResult)
+        .run();
 
     assert_eq!(
-        egld_decimal,
+        egld_decimal_result,
         ManagedDecimal::<StaticApi, ConstDecimals<18>>::const_decimals_from_raw(BigUint::from(
             5u64
         ))

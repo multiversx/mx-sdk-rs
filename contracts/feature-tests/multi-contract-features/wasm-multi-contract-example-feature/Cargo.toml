@@ -21,12 +21,15 @@ debug = false
 panic = "abort"
 overflow-checks = false
 
+[profile.dev]
+panic = "abort"
+
 [dependencies.multi-contract-features]
 path = ".."
 features = ["example_feature"]
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.47.5"
+version = "0.50.3"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]

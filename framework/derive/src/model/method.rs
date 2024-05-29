@@ -77,6 +77,7 @@ impl Method {
     pub fn is_payable(&self) -> bool {
         match &self.public_role {
             PublicRole::Init(init_metadata) => init_metadata.payable.is_payable(),
+            PublicRole::Upgrade(upgrade_metadata) => upgrade_metadata.payable.is_payable(),
             PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.payable.is_payable(),
             PublicRole::Callback(_) | PublicRole::CallbackRaw | PublicRole::CallbackPromise(_) => {
                 true
@@ -88,6 +89,7 @@ impl Method {
     pub fn payable_metadata(&self) -> MethodPayableMetadata {
         match &self.public_role {
             PublicRole::Init(init_metadata) => init_metadata.payable.clone(),
+            PublicRole::Upgrade(upgrade_metadata) => upgrade_metadata.payable.clone(),
             PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.payable.clone(),
             PublicRole::Callback(_) | PublicRole::CallbackRaw | PublicRole::CallbackPromise(_) => {
                 MethodPayableMetadata::AnyToken
@@ -99,6 +101,7 @@ impl Method {
     pub fn is_allow_multiple_var_args(&self) -> bool {
         match &self.public_role {
             PublicRole::Init(init_metadata) => init_metadata.allow_multiple_var_args,
+            PublicRole::Upgrade(upgrade_metadata) => upgrade_metadata.allow_multiple_var_args,
             PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.allow_multiple_var_args,
             PublicRole::Callback(callback_metadata)
             | PublicRole::CallbackPromise(callback_metadata) => {

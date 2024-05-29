@@ -1,10 +1,10 @@
 #![no_std]
-#![feature(trait_alias)]
 
 pub mod bonding_curve;
 pub mod claim_developer_rewards;
 pub mod default_issue_callbacks;
 pub mod dns;
+pub mod dns_proxy;
 pub mod esdt;
 pub mod features;
 pub mod governance;

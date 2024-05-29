@@ -5,7 +5,7 @@ use super::{
     StorageClearable, StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
         self,
@@ -13,8 +13,8 @@ use crate::{
             NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
             TopEncodeOrDefault,
         },
-        CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, NestedDecode, NestedEncode,
-        TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        DecodeDefault, EncodeDefault, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
+        TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
     storage::{storage_set, StorageKey},
     types::{heap::BoxedBytes, ManagedAddress, ManagedType, MultiValueEncoded},
@@ -612,11 +612,18 @@ where
     }
 }
 
-impl<SA, T, U> CodecFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, U>
+impl<SA, T, U> TypeAbiFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, U>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
-    U: CodecFrom<T>,
+    U: TypeAbiFrom<T>,
+{
+}
+
+impl<SA, T> TypeAbiFrom<Self> for LinkedListMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
 }
 
@@ -625,8 +632,14 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
