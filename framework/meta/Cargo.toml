@@ -49,6 +49,10 @@ version = "=0.50.3"
 path = "../base"
 features = ["alloc", "num-bigint"]
 
+[dependencies.multiversx-sc-snippets]
+version = "=0.50.3"
+path = "../snippets"
+
 [dependencies.multiversx-sc-scenario]
 version = "=0.50.3"
 path = "../scenario"

@@ -25,6 +25,10 @@ futures = "0.3"
 version = "=0.50.3"
 path = "../scenario"
 
+[dependencies.multiversx-chain-scenario-format]
+version = "0.22.2"
+path = "../../sdk/scenario-format"
+
 [dependencies.multiversx-sdk]
 version = "=0.4.1"
 path = "../../sdk/core"

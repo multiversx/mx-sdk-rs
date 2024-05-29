@@ -1,9 +1,8 @@
-use crate::{
-    imports::Bech32Address,
-    scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep},
-};
-
 use multiversx_chain_scenario_format::interpret_trait::IntoRaw;
+use multiversx_sc_scenario::{
+    imports::Bech32Address,
+    scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
+};
 use multiversx_sdk::{
     blockchain::CommunicationProxy,
     data::{address::Address, esdt::EsdtBalance},
@@ -24,7 +23,7 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
         name: None,
         comment: None,
         check_gas: None,
-        steps: vec![crate::scenario_model::Step::SetState(set_state)],
+        steps: vec![Step::SetState(set_state)],
     }
 }
 

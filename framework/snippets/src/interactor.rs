@@ -1,5 +1,5 @@
 use multiversx_sc_scenario::{
-    imports::{retrieve_account_as_scenario_set_state, Bech32Address, ScenarioRunner},
+    imports::{Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
     scenario_model::AddressValue,
@@ -15,7 +15,7 @@ use std::{
     time::Duration,
 };
 
-use crate::Sender;
+use crate::{account_tool::retrieve_account_as_scenario_set_state, Sender};
 
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 

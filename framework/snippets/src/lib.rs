@@ -1,3 +1,4 @@
+pub mod account_tool;
 mod interactor;
 mod interactor_dns;
 mod interactor_retrieve;

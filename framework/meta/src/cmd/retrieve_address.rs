@@ -1,4 +1,5 @@
-use multiversx_sc_scenario::{imports::Bech32Address, standalone::account_tool};
+use multiversx_sc_scenario::imports::Bech32Address;
+use multiversx_sc_snippets::account_tool;
 use multiversx_sdk::blockchain::CommunicationProxy;
 
 use crate::cli::AccountArgs;
