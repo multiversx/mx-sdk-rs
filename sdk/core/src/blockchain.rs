@@ -1,3 +1,5 @@
+mod gateway_tx_retrieve;
+
 use std::collections::HashMap;
 
 use crate::data::{
