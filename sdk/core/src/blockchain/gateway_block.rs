@@ -4,14 +4,14 @@ use crate::data::{
 };
 use anyhow::{anyhow, Result};
 
-use super::CommunicationProxy;
+use super::GatewayProxy;
 use super::METACHAIN_SHARD_ID;
 
 const GET_HYPER_BLOCK_BY_NONCE_ENDPOINT: &str = "hyperblock/by-nonce/";
 const GET_HYPER_BLOCK_BY_HASH_ENDPOINT: &str = "hyperblock/by-hash/";
 const GET_NETWORK_STATUS_ENDPOINT: &str = "network/status";
 
-impl CommunicationProxy {
+impl GatewayProxy {
     async fn get_hyper_block(&self, endpoint: &str) -> Result<HyperBlock> {
         let endpoint = self.get_endpoint(endpoint);
         let resp = self

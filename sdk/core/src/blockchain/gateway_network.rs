@@ -4,12 +4,12 @@ use crate::data::{
 };
 use anyhow::{anyhow, Result};
 
-use super::CommunicationProxy;
+use super::GatewayProxy;
 
 const NETWORK_CONFIG_ENDPOINT: &str = "network/config";
 const NETWORK_ECONOMICS_ENDPOINT: &str = "network/economics";
 
-impl CommunicationProxy {
+impl GatewayProxy {
     // get_network_config retrieves the network configuration from the proxy
     pub async fn get_network_config(&self) -> Result<NetworkConfig> {
         let endpoint = self.get_endpoint(NETWORK_CONFIG_ENDPOINT);

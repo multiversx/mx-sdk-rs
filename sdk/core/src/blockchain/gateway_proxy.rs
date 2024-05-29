@@ -1,12 +1,13 @@
 use reqwest::Client;
 
+/// Allows communication with the MultiversX gateway API.
 #[derive(Clone, Debug)]
-pub struct CommunicationProxy {
+pub struct GatewayProxy {
     pub(crate) proxy_url: String,
     pub(crate) client: Client,
 }
 
-impl CommunicationProxy {
+impl GatewayProxy {
     pub fn new(proxy_url: String) -> Self {
         Self {
             proxy_url,

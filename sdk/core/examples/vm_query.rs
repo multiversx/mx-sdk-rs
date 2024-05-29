@@ -1,5 +1,5 @@
 use multiversx_sdk::{
-    blockchain::{CommunicationProxy, DEVNET_GATEWAY},
+    blockchain::{GatewayProxy, DEVNET_GATEWAY},
     data::{address::Address, vm::VmValueRequest},
     wallet::Wallet,
 };
@@ -11,7 +11,7 @@ async fn main() {
     )
     .unwrap();
     let addr = wl.address();
-    let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string());
     let req = VmValueRequest {
         sc_address: Address::from_bech32_string(
             "erd1qqqqqqqqqqqqqpgqhn3ae8dpc957t7jadn7kywtg503dy7pnj9ts3umqxx",

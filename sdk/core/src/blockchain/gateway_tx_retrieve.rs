@@ -2,13 +2,13 @@ use crate::data::transaction::TransactionOnNetwork;
 use log::info;
 use std::time::{Duration, Instant};
 
-use super::CommunicationProxy;
+use super::GatewayProxy;
 
 const INITIAL_BACKOFF_DELAY: f32 = 1.4;
 const MAX_RETRIES: usize = 8;
 const MAX_BACKOFF_DELAY: Duration = Duration::from_secs(6);
 
-impl CommunicationProxy {
+impl GatewayProxy {
     /// Retrieves a transaction from the network.
     pub async fn retrieve_tx_on_network(&self, tx_hash: String) -> TransactionOnNetwork {
         let mut retries = 0;

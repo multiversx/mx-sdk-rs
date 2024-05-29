@@ -5,7 +5,7 @@ mod gateway_proxy;
 mod gateway_tx;
 mod gateway_tx_retrieve;
 
-pub use gateway_proxy::CommunicationProxy;
+pub use gateway_proxy::GatewayProxy;
 
 pub const MAINNET_GATEWAY: &str = "https://gateway.multiversx.com";
 pub const TESTNET_GATEWAY: &str = "https://testnet-gateway.multiversx.com";
