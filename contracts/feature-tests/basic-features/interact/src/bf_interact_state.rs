@@ -1,4 +1,3 @@
-use crate::{ContractInfo, StaticApi};
 use multiversx_sc_snippets::imports::Bech32Address;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -6,13 +5,8 @@ use std::{
     path::Path,
 };
 
-const DEFAULT_CONTRACT_ADDRESS: &str =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
-
 /// State file
 const STATE_FILE: &str = "state.toml";
-
-pub type BasicFeaturesContract = ContractInfo<basic_features::Proxy<StaticApi>>;
 
 /// Multisig Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -43,11 +37,6 @@ impl State {
         self.bf_address
             .as_ref()
             .expect("basic-features contract not yet deployed")
-    }
-
-    /// Returns the adder contract with default address
-    pub fn default_contract(&self) -> BasicFeaturesContract {
-        BasicFeaturesContract::new(DEFAULT_CONTRACT_ADDRESS)
     }
 }
 
