@@ -16,7 +16,7 @@ impl Interactor {
         let tx_hash = self.launch_sc_call(sc_call_step).await;
         let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
-        sc_call_step.save_response(tx_response_from_network::from_network_tx(tx));
+        sc_call_step.save_response(tx_response_from_network::parse_tx_response(tx));
 
         if let Some(token_identifier) = sc_call_step.response().new_issued_token_identifier.clone()
         {

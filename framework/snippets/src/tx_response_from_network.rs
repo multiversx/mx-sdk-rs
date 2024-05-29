@@ -12,7 +12,7 @@ const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
 /// Creates a [`TxResponse`] from a [`TransactionOnNetwork`].
-pub fn from_network_tx(tx: TransactionOnNetwork) -> TxResponse {
+pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
     let mut response = TxResponse {
         api_scrs: tx.smart_contract_results.unwrap_or_default(),
         api_logs: tx.logs,
@@ -25,11 +25,13 @@ pub fn from_network_tx(tx: TransactionOnNetwork) -> TxResponse {
     }
 
     process(
-        response,
+        &mut response,
         tx.sender.to_bytes(),
         tx.nonce,
         tx.processing_type_on_destination,
-    )
+    );
+
+    response
 }
 
 fn process_signal_error(tx_response: &TxResponse) -> TxResponseStatus {
@@ -48,33 +50,29 @@ fn process_signal_error(tx_response: &TxResponse) -> TxResponseStatus {
 }
 
 fn process(
-    mut tx_response: TxResponse,
+    tx_response: &mut TxResponse,
     sender_address: [u8; 32],
     nonce: u64,
     processing_type_on_destination: String,
-) -> TxResponse {
-    tx_response = process_out(tx_response);
-
-    tx_response = process_new_deployed_address(
+) {
+    process_out(tx_response);
+    process_new_deployed_address(
         tx_response,
         sender_address,
         nonce,
         processing_type_on_destination,
     );
-    tx_response = process_new_issued_token_identifier(tx_response);
-    tx_response
+    process_new_issued_token_identifier(tx_response);
 }
 
-fn process_out(mut tx_response: TxResponse) -> TxResponse {
+fn process_out(tx_response: &mut TxResponse) {
     let out_scr = tx_response.api_scrs.iter().find(is_out_scr);
 
     if let Some(out_scr) = out_scr {
         tx_response.out = decode_scr_data_or_panic(&out_scr.data);
-    } else if let Some(data) = process_out_from_log(&tx_response) {
+    } else if let Some(data) = process_out_from_log(tx_response) {
         tx_response.out = data
     }
-
-    tx_response
 }
 
 fn process_out_from_log(tx_response: &TxResponse) -> Option<Vec<Vec<u8>>> {
@@ -99,13 +97,13 @@ fn process_out_from_log(tx_response: &TxResponse) -> Option<Vec<Vec<u8>>> {
 }
 
 fn process_new_deployed_address(
-    mut tx_response: TxResponse,
+    tx_response: &mut TxResponse,
     sender_address_bytes: [u8; 32],
     nonce: u64,
     processing_type_on_destination: String,
-) -> TxResponse {
+) {
     if processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
-        return tx_response;
+        return;
     }
 
     let sender_nonce_bytes = nonce.to_le_bytes();
@@ -123,11 +121,9 @@ fn process_new_deployed_address(
     address[30..32].copy_from_slice(&sender_address_bytes[30..32]);
 
     tx_response.new_deployed_address = Some(Address::from(address));
-
-    tx_response
 }
 
-fn process_new_issued_token_identifier(mut tx_response: TxResponse) -> TxResponse {
+fn process_new_issued_token_identifier(tx_response: &mut TxResponse) {
     for scr in tx_response.api_scrs.iter() {
         if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
             continue;
@@ -160,7 +156,7 @@ fn process_new_issued_token_identifier(mut tx_response: TxResponse) -> TxRespons
         if scr.data.starts_with("ESDTTransfer@") {
             let encoded_tid = scr.data.split('@').nth(1);
             if encoded_tid.is_none() {
-                return tx_response;
+                return;
             }
 
             tx_response.new_issued_token_identifier =
@@ -170,7 +166,7 @@ fn process_new_issued_token_identifier(mut tx_response: TxResponse) -> TxRespons
         } else if scr.data.starts_with("@00@") {
             let encoded_tid = scr.data.split('@').nth(2);
             if encoded_tid.is_none() {
-                return tx_response;
+                return;
             }
 
             tx_response.new_issued_token_identifier =
@@ -179,8 +175,6 @@ fn process_new_issued_token_identifier(mut tx_response: TxResponse) -> TxRespons
             break;
         }
     }
-
-    tx_response
 }
 
 fn find_log<'a>(tx_response: &'a TxResponse, log_identifier: &str) -> Option<&'a Events> {

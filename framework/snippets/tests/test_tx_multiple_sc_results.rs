@@ -281,7 +281,7 @@ fn test_transaction_multiple_sc_results() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = tx_response_from_network::from_network_tx(tx_on_network);
+    let tx_response = tx_response_from_network::parse_tx_response(tx_on_network);
     assert_eq!(tx_response.api_scrs.len(), 4usize);
     assert!(is_out_scr(&tx_response.api_scrs.get(2).unwrap()));
 }
