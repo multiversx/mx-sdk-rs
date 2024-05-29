@@ -9,11 +9,17 @@ use multiversx_sdk::{
 };
 use std::collections::{BTreeMap, HashMap};
 
+/// Called directly from CLI, from `sc-meta`.
+/// 
+/// Retrieves an account data via the API,
+/// then formats it as a scenario set state step.
 pub async fn print_account_as_scenario_set_state(
-    api: &CommunicationProxy,
-    address: &Bech32Address,
+    api_string: String,
+    address_bech32_string: String,
 ) {
-    let set_state = retrieve_account_as_scenario_set_state(api, address).await;
+    let api = CommunicationProxy::new(api_string);
+    let address = Bech32Address::from_bech32_string(address_bech32_string);
+    let set_state = retrieve_account_as_scenario_set_state(&api, &address).await;
     let scenario = build_scenario(set_state);
     println!("{}", scenario.into_raw().to_json_string());
 }
