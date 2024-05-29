@@ -586,7 +586,7 @@ fn contract_without_macros_basic() {
         sample_adder::Proxy::<StaticApi>::new_proxy_obj().contract(ManagedAddress::zero());
     let _ = own_proxy.sum();
 
-    let _ = multiversx_sc_meta::abi_json::contract_abi::<sample_adder::AbiProvider>();
+    let _ = multiversx_sc_meta_lib::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
 fn world() -> multiversx_sc_scenario::ScenarioWorld {

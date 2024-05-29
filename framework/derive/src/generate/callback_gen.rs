@@ -51,7 +51,7 @@ pub fn generate_callback_selector_and_main(
                         self::EndpointWrappers::callback_selector(self, ___cb_closure___) {
                         multiversx_sc::api::ErrorApiImpl::signal_error(
                             &<Self::Api as multiversx_sc::api::ErrorApi>::error_api_impl(),
-                            err_msg::CALLBACK_BAD_FUNC,
+                            err_msg::CALLBACK_BAD_FUNC.as_bytes(),
                         );
                     }
                 }
