@@ -91,6 +91,21 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     contract_abi.constructors.push(endpoint_abi);
                 })
             },
+            PublicRole::Upgrade(_) => {
+                let endpoint_def = generate_endpoint_snippet(
+                    m,
+                    "upgrade",
+                    false,
+                    false,
+                    EndpointMutabilityMetadata::Mutable,
+                    EndpointTypeMetadata::Upgrade,
+                    m.is_allow_multiple_var_args(),
+                );
+                Some(quote! {
+                    #endpoint_def
+                    contract_abi.upgrade_constructors.push(endpoint_abi);
+                })
+            },
             PublicRole::Endpoint(endpoint_metadata) => {
                 let endpoint_def = generate_endpoint_snippet(
                     m,
@@ -182,15 +197,15 @@ fn has_callback(contract: &ContractTrait) -> bool {
 
 fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
     contract
-			.supertraits
-			.iter()
-			.map(|supertrait| {
-				let module_path = &supertrait.module_path;
-				quote! {
-					contract_abi.coalesce(<#module_path AbiProvider as multiversx_sc::contract_base::ContractAbiProvider>::abi());
-				}
-			})
-			.collect()
+            .supertraits
+            .iter()
+            .map(|supertrait| {
+                let module_path = &supertrait.module_path;
+                quote! {
+                    contract_abi.coalesce(<#module_path AbiProvider as multiversx_sc::contract_base::ContractAbiProvider>::abi());
+                }
+            })
+            .collect()
 }
 
 fn generate_esdt_attribute_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {

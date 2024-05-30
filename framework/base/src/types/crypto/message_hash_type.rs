@@ -1,7 +1,9 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
-    codec,
-    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    codec::{
+        self,
+        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    },
 };
 
 /// Message hash type for the `verifyCustomSecp256k1` CryptoApi function
@@ -38,7 +40,11 @@ impl From<u8> for MessageHashType {
     }
 }
 
+impl TypeAbiFrom<Self> for MessageHashType {}
+
 impl TypeAbi for MessageHashType {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "MessageHashType".into()
     }

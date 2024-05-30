@@ -107,16 +107,12 @@ pub trait Vault {
         let caller = self.blockchain().get_caller();
         let func_name = opt_receive_func.into_option().unwrap_or_default();
 
-        self.send_raw()
-            .transfer_esdt_execute(
-                &caller,
-                &token,
-                &amount,
-                50_000_000,
-                &func_name,
-                &ManagedArgBuffer::new(),
-            )
-            .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
+        self.tx()
+            .to(&caller)
+            .gas(50_000_000u64)
+            .raw_call(func_name)
+            .single_esdt(&token, 0u64, &amount)
+            .transfer_execute();
     }
 
     #[allow_multiple_var_args]
@@ -150,10 +146,11 @@ pub trait Vault {
         for _ in 0..nr_callbacks {
             self.num_async_calls_sent_from_child().update(|c| *c += 1);
 
-            self.send()
-                .contract_call::<()>(caller.clone(), endpoint_name.clone())
-                .with_egld_or_single_esdt_transfer(return_payment.clone())
-                .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            self.tx()
+                .to(&caller)
+                .raw_call(endpoint_name.clone())
+                .payment(&return_payment)
+                .gas(self.blockchain().get_gas_left() / 2)
                 .transfer_execute()
         }
     }
@@ -164,10 +161,12 @@ pub trait Vault {
         let caller = self.blockchain().get_caller();
 
         if let Some(esdt_token_id) = token.into_esdt_option() {
-            self.send()
-                .direct_esdt(&caller, &esdt_token_id, nonce, &amount);
+            self.tx()
+                .to(caller)
+                .esdt((esdt_token_id, nonce, amount))
+                .transfer();
         } else {
-            self.send().direct_egld(&caller, &amount);
+            self.tx().to(caller).egld(amount).transfer();
         }
     }
 
@@ -185,12 +184,12 @@ pub trait Vault {
             all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
         }
 
-        self.send().direct_multi(&caller, &all_payments);
+        self.tx().to(caller).payment(all_payments).transfer();
     }
 
     #[payable("*")]
     #[endpoint]
-    fn burn_and_create_retrive_async(&self) {
+    fn burn_and_create_retrieve_async(&self) {
         let payments = self.call_value().all_esdt_transfers();
         let mut uris = ManagedVec::new();
         uris.push(ManagedBuffer::new());
@@ -223,8 +222,7 @@ pub trait Vault {
             ));
         }
 
-        self.send()
-            .direct_multi(&self.blockchain().get_caller(), &new_tokens);
+        self.tx().to(ToCaller).payment(new_tokens).transfer();
     }
 
     #[event("accept_funds")]

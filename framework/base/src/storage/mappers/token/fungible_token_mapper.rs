@@ -1,8 +1,12 @@
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeAbiFrom},
     api::ErrorApiImpl,
-    codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
+    codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     storage_clear, storage_get, storage_set,
+    types::{
+        system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
+        ESDTSystemSCAddress, Tx,
+    },
 };
 
 use super::{
@@ -14,11 +18,10 @@ use crate::{
     abi::TypeName,
     api::{CallTypeApi, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
-    esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, ContractCall, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedType, TokenIdentifier,
+        BigUint, CallbackClosure, EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer,
+        ManagedType, TokenIdentifier,
     },
 };
 
@@ -113,7 +116,6 @@ where
     ) -> ! {
         check_not_set(self);
 
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
             Some(cb) => cb,
             None => self.default_callback_closure_obj(&initial_supply),
@@ -124,7 +126,9 @@ where
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
-        system_sc_proxy
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -132,9 +136,8 @@ where
                 &initial_supply,
                 properties,
             )
-            .async_call()
-            .with_callback(callback)
-            .call_and_exit();
+            .callback(callback)
+            .async_call_and_exit()
     }
 
     /// Important: If you use custom callback, remember to save the token ID in the callback and clear the mapper in case of error! Clear is unusable outside this specific case.
@@ -165,14 +168,15 @@ where
     ) -> ! {
         check_not_set(self);
 
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
             Some(cb) => cb,
             None => self.default_callback_closure_obj(&BigUint::zero()),
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
-        system_sc_proxy
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .issue_and_set_all_roles(
                 issue_cost,
                 token_display_name,
@@ -180,9 +184,8 @@ where
                 EsdtTokenType::Fungible,
                 num_decimals,
             )
-            .async_call()
-            .with_callback(callback)
-            .call_and_exit();
+            .callback(callback)
+            .async_call_and_exit();
     }
 
     pub fn clear(&mut self) {
@@ -243,8 +246,10 @@ where
     }
 
     fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
-        let send_wrapper = SendWrapper::<SA>::new();
-        send_wrapper.direct_esdt(to, &payment.token_identifier, 0, &payment.amount);
+        Tx::new_tx_from_sc()
+            .to(to)
+            .single_esdt(&payment.token_identifier, 0, &payment.amount)
+            .transfer();
     }
 }
 
@@ -265,17 +270,25 @@ where
     }
 }
 
-impl<SA> CodecFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+impl<SA> TypeAbiFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
+
+impl<SA> TypeAbiFrom<Self> for FungibleTokenMapper<SA> where SA: StorageMapperApi + CallTypeApi {}
 
 impl<SA> TypeAbi for FungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TokenIdentifier::<SA>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        TokenIdentifier::<SA>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {

@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     codec::*,
 };
 use alloc::vec::Vec;
@@ -136,7 +136,11 @@ impl<T: NestedDecode> TopDecode for Queue<T> {
     }
 }
 
+impl<T: TypeAbi> TypeAbiFrom<Self> for Queue<T> {}
+
 impl<T: TypeAbi> TypeAbi for Queue<T> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("Queue<");
         repr.push_str(T::type_name().as_str());

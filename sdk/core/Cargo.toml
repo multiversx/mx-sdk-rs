@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk"
-version = "0.3.2"
+version = "0.4.1"
 edition = "2021"
 
 authors = [
@@ -17,7 +17,7 @@ keywords = ["multiversx", "blockchain", "sdk", "api"]
 
 [dependencies]
 tokio = { version = "1.24", features = ["full"] }
-reqwest = { version = "0.11.4", features = ["blocking", "json"] }
+reqwest = { version = "0.12", features = ["blocking", "json"] }
 serde = { version = "1.0.130", features = ["derive"] }
 serde_json = { version = "1.0.68", features = ["preserve_order"] }
 serde_repr = "0.1.8"
@@ -28,9 +28,10 @@ sha2 = "0.10.8"
 sha3 = "0.10.8"
 hmac = { version = "0.12.1", features = ["std"] }
 hex = "0.4.3"
-base64 = "0.21.5"
+base64 = "0.22"
 pbkdf2 = { version = "0.12.2", default-features = false }
 zeroize = "1.4.2"
 bech32 = "0.9"
 itertools = "0.12.0"
 pem = "3.0.2"
+log = "0.4.17"

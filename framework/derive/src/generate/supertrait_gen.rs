@@ -135,6 +135,7 @@ pub fn function_selector_module_calls(supertraits: &[Supertrait]) -> Vec<proc_ma
 fn impl_proxy_trait(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
         impl<A> #module_path ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+        impl<A> #module_path ProxyTrait for ProxyTo<A> where A: multiversx_sc::api::VMApi {}
     }
 }
 

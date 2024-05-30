@@ -3,33 +3,15 @@ mod multisig_interact_config;
 mod multisig_interact_nfts;
 mod multisig_interact_state;
 mod multisig_interact_wegld;
+mod wegld_proxy;
 
 use clap::Parser;
-use multisig::{
-    multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
-    multisig_state::ProxyTrait as _, ProxyTrait as _,
-};
+use multisig::multisig_proxy;
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
-use multiversx_sc_modules::dns::ProxyTrait as _;
-use multiversx_sc_scenario::{
-    mandos_system::ScenarioRunner, multiversx_sc::codec::multi_types::IgnoreValue,
-    scenario_format::interpret_trait::InterpretableFrom,
-    standalone::retrieve_account_as_scenario_set_state, test_wallets,
-};
-use multiversx_sc_snippets::{
-    dns_address_for_name, env_logger,
-    multiversx_sc::{
-        codec::multi_types::MultiValueVec, storage::mappers::SingleValue, types::Address,
-    },
-    multiversx_sc_scenario::{
-        api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::*, ContractInfo,
-    },
-    tokio, Interactor, StepBuffer,
-};
 
-const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
+use multiversx_sc_snippets::imports::*;
+
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
@@ -94,17 +76,17 @@ async fn main() {
 
 struct MultisigInteract {
     interactor: Interactor,
-    wallet_address: Address,
-    system_sc_address: Address,
+    wallet_address: Bech32Address,
     collection_token_identifier: String,
     multisig_code: BytesValue,
+    config: Config,
     state: State,
 }
 
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway())
+        let mut interactor = Interactor::new(&config.gateway)
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
@@ -116,10 +98,10 @@ impl MultisigInteract {
 
         Self {
             interactor,
-            wallet_address,
-            system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
+            wallet_address: wallet_address.into(),
             collection_token_identifier: String::new(),
             multisig_code,
+            config,
             state: State::load_state(),
         }
     }
@@ -140,17 +122,9 @@ impl MultisigInteract {
                 "board member address: {}",
                 bech32::encode(board_member_address)
             );
-            let scenario_raw = retrieve_account_as_scenario_set_state(
-                Config::load_config().gateway().to_string(),
-                bech32::encode(board_member_address),
-                true,
-            )
-            .await;
-
-            let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-
-            self.interactor.pre_runners.run_scenario(&scenario);
-            self.interactor.post_runners.run_scenario(&scenario);
+            self.interactor
+                .retrieve_account(&board_member_address.into())
+                .await;
         }
 
         self.wegld_swap_set_state().await;
@@ -160,27 +134,24 @@ impl MultisigInteract {
         self.set_state().await;
 
         let board = self.board();
-        let (new_address, _) = self
+
+        let quorum = self.config.quorum;
+        let new_address = self
             .interactor
-            .sc_deploy_get_result::<_, IgnoreValue>(
-                ScDeployStep::new()
-                    .call(
-                        self.state
-                            .default_multisig()
-                            .init(Config::load_config().quorum(), board),
-                    )
-                    .from(&self.wallet_address)
-                    .code(&self.multisig_code)
-                    .gas_limit("100,000,000")
-                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .typed(multisig_proxy::MultisigProxy)
+            .init(quorum, board)
+            .code(&self.multisig_code)
+            .gas(NumExpr("100,000,000"))
+            .returns(ReturnsNewBech32Address)
+            .prepare_async()
+            .run()
             .await;
 
-        let new_address_bech32 = bech32::encode(&new_address);
-        println!("new address: {new_address_bech32}");
+        println!("new address: {new_address}");
 
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_multisig_address(&new_address_expr);
+        self.state.set_multisig_address(new_address);
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
@@ -192,40 +163,23 @@ impl MultisigInteract {
         println!("deploying {count} contracts...");
 
         let board = self.board();
-        let mut steps = Vec::new();
+        let quorum = Config::load_config().quorum;
+        let mut buffer = self.interactor.homogenous_call_buffer();
         for _ in 0..*count {
-            let typed_sc_deploy = ScDeployStep::new()
-                .call(
-                    self.state
-                        .default_multisig()
-                        .init(Config::load_config().quorum(), board.clone()),
-                )
-                .from(&self.wallet_address)
-                .code(&self.multisig_code)
-                .gas_limit("70,000,000");
-
-            steps.push(typed_sc_deploy);
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .typed(multisig_proxy::MultisigProxy)
+                    .init(quorum, board.clone())
+                    .code(&self.multisig_code)
+                    .gas(NumExpr("70,000,000"))
+                    .returns(ReturnsNewBech32Address)
+            });
         }
 
-        self.interactor
-            .multi_sc_exec(StepBuffer::from_sc_deploy_vec(&mut steps))
-            .await;
-
-        for step in steps.iter() {
-            // warning: multi deploy not yet fully supported
-            // only works with last deployed address
-            // will be addressed in future versions
-            let new_deployed_address = step.response().new_deployed_address.clone();
-            if let Some(new_address) = new_deployed_address {
-                let new_address_bech32 = bech32::encode(&new_address);
-                println!("new address: {new_address_bech32}");
-
-                let new_address_expr = format!("bech32:{new_address_bech32}");
-                self.state.set_multisig_address(&new_address_expr);
-            } else {
-                println!("deploy failed");
-                return;
-            }
+        let results = buffer.run().await;
+        for new_address in results {
+            println!("new address: {new_address}");
+            self.state.set_multisig_address(new_address);
         }
     }
 
@@ -235,7 +189,7 @@ impl MultisigInteract {
         let eve = test_wallets::eve();
 
         MultiValueVec::from([
-            self.wallet_address.clone(),
+            self.wallet_address.to_address(),
             carol.address().to_bytes().into(),
             dan.address().to_bytes().into(),
             eve.address().to_bytes().into(),
@@ -243,151 +197,183 @@ impl MultisigInteract {
     }
 
     async fn feed_contract_egld(&mut self) {
-        let _ = self
-            .interactor
-            .transfer(
-                TransferStep::new()
-                    .from(&self.wallet_address)
-                    .to(self.state.multisig())
-                    .egld_value("0,050000000000000000"),
-            )
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_multisig_address())
+            .egld(BigUint::from(50_000_000_000_000_000u64)) // 0,05 or 5 * 10^16
+            .prepare_async()
+            .run()
             .await;
     }
 
-    async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
-        if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
-            return;
+    async fn perform_action(&mut self, action_id: usize, gas_expr: u64) {
+        if !self.quorum_reached(action_id).await {
+            self.sign(&[action_id]).await
         }
         println!("quorum reached for action `{action_id}`");
 
         self.interactor
-            .sc_call(
-                ScCallStep::new()
-                    .call(self.state.multisig().perform_action_endpoint(action_id))
-                    .from(&self.wallet_address)
-                    .gas_limit(gas_expr)
-                    .expect(TxExpect::ok().additional_error_message(format!(
-                        "perform action `{action_id}` failed with: "
-                    ))),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_multisig_address())
+            .gas(gas_expr)
+            .typed(multisig_proxy::MultisigProxy)
+            .perform_action_endpoint(action_id)
+            .prepare_async()
+            .run()
             .await;
 
         println!("successfully performed action `{action_id}`");
     }
 
-    async fn perform_actions(&mut self, actions: Vec<usize>, gas_expr: &str) {
-        let mut steps = Vec::new();
-        for action_id in actions.iter() {
-            if !self.quorum_reached(*action_id).await && !self.sign(*action_id).await {
-                continue;
+    async fn perform_actions(&mut self, action_ids: Vec<usize>, gas_expr: u64) {
+        let mut actions_no_quorum_reached = Vec::new();
+        for &action_id in &action_ids {
+            if self.quorum_reached(action_id).await {
+                println!("quorum reached for action `{action_id}`");
+            } else {
+                actions_no_quorum_reached.push(action_id)
             }
-            println!("quorum reached for action `{action_id}`");
-
-            let typed_sc_call = ScCallStep::new()
-                .call(self.state.multisig().perform_action_endpoint(action_id))
-                .from(&self.wallet_address)
-                .gas_limit(gas_expr);
-
-            steps.push(typed_sc_call);
         }
 
-        self.interactor
-            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
-            .await;
+        self.sign(&actions_no_quorum_reached).await;
 
-        for (i, action_id) in actions.iter().enumerate() {
-            if !steps[i].response().is_success() {
-                println!(
-                    "perform action `{action_id}` failed with: {}",
-                    steps[i].response().tx_error
-                );
-                continue;
-            }
+        let from = &self.wallet_address;
+        let mut buffer = self.interactor.homogenous_call_buffer();
+        let multisig_address = self.state.current_multisig_address();
+        for action_id in action_ids {
+            buffer.push_tx(|tx| {
+                tx.from(from)
+                    .to(multisig_address)
+                    .gas(gas_expr)
+                    .typed(multisig_proxy::MultisigProxy)
+                    .perform_action_endpoint(action_id)
+                    .returns(ReturnsResult)
+            });
+        }
 
+        let deployed_addresses = buffer.run().await;
+
+        for (action_id, address) in deployed_addresses.iter().enumerate() {
             println!("successfully performed action `{action_id}`");
+            if address.is_some() {
+                println!(
+                    "new deployed address for action `{action_id}: {:#?}`",
+                    address.clone().into_option().unwrap()
+                )
+            }
         }
     }
 
     async fn quorum_reached(&mut self, action_id: usize) -> bool {
         self.interactor
-            .quick_query(self.state.multisig().quorum_reached(action_id))
+            .query()
+            .to(self.state.current_multisig_address())
+            .typed(multisig_proxy::MultisigProxy)
+            .quorum_reached(action_id)
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
             .await
     }
 
     async fn signed(&mut self, signer: &Address, action_id: usize) -> bool {
         self.interactor
-            .quick_query(self.state.multisig().signed(signer, action_id))
+            .query()
+            .to(self.state.current_multisig_address())
+            .typed(multisig_proxy::MultisigProxy)
+            .signed(signer, action_id)
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
             .await
     }
 
-    async fn sign(&mut self, action_id: usize) -> bool {
-        println!("signing action `{action_id}`...");
-        let mut steps = Vec::new();
-        for signer in self.board().iter() {
-            if self.signed(signer, action_id).await {
-                println!(
-                    "{} - already signed action `{action_id}`",
-                    bech32::encode(signer)
-                );
-                continue;
-            }
+    async fn sign(&mut self, action_ids: &[usize]) {
+        println!("signing actions `{action_ids:?}`...");
 
-            let typed_sc_call = ScCallStep::new()
-                .call(self.state.multisig().sign(action_id))
-                .from(signer)
-                .gas_limit("15,000,000");
-
-            steps.push(typed_sc_call);
-        }
-
-        self.interactor
-            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
-            .await;
-
-        for step in steps.iter() {
-            if !step.response().is_success() {
-                println!(
-                    "perform sign `{action_id}` failed with: {}",
-                    step.response().tx_error
-                );
-                return false;
+        let mut pending_signers = Vec::<(Address, usize)>::new();
+        for &action_id in action_ids {
+            for signer in self.board().iter() {
+                if self.signed(signer, action_id).await {
+                    println!(
+                        "{} - already signed action `{action_id}`",
+                        bech32::encode(signer)
+                    );
+                } else {
+                    pending_signers.push((signer.clone(), action_id));
+                }
             }
         }
 
-        println!("successfully performed sign action `{action_id}`");
-        true
+        let mut buffer = self.interactor.homogenous_call_buffer();
+        let multisig_address = self.state.current_multisig_address();
+        for (signer, action_id) in pending_signers {
+            buffer.push_tx(|tx| {
+                tx.from(signer)
+                    .to(multisig_address)
+                    .gas(15_000_000u64)
+                    .typed(multisig_proxy::MultisigProxy)
+                    .sign(action_id)
+            });
+        }
+
+        buffer.run().await;
+
+        println!("successfully performed sign action `{action_ids:?}`");
+    }
+
+    async fn sign_if_quorum_not_reached(&mut self, action_id: usize) {
+        if !self.quorum_reached(action_id).await {
+            self.sign(&[action_id]).await;
+        }
+        println!("quorum reached for action `{action_id}`");
     }
 
     async fn dns_register(&mut self, name: &str) {
         let dns_address = dns_address_for_name(name);
         self.interactor
-            .sc_call(
-                ScCallStep::new()
-                    .call(self.state.multisig().dns_register(dns_address, name))
-                    .from(&self.wallet_address)
-                    .gas_limit("30,000,000")
-                    .expect(TxExpect::ok().additional_error_message("dns register failed with: ")),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_multisig_address())
+            .gas(NumExpr("30,000,000"))
+            .typed(multisig_proxy::MultisigProxy)
+            .dns_register(dns_address, name)
+            .prepare_async()
+            .run()
             .await;
 
         println!("successfully registered dns");
     }
 
     async fn print_quorum(&mut self) {
-        let quorum: SingleValue<usize> = self
+        let quorum = self
             .interactor
-            .quick_query(self.state.multisig().quorum())
+            .query()
+            .to(self.state.current_multisig_address())
+            .typed(multisig_proxy::MultisigProxy)
+            .quorum()
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
             .await;
 
-        println!("quorum: {}", quorum.into());
+        println!("quorum: {}", quorum);
     }
 
     async fn print_board(&mut self) {
-        let board: SingleValue<usize> = self
+        let board = self
             .interactor
-            .quick_query(self.state.multisig().num_board_members())
+            .query()
+            .to(self.state.current_multisig_address())
+            .typed(multisig_proxy::MultisigProxy)
+            .num_board_members()
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
             .await;
 
-        println!("board: {}", board.into());
+        println!("board: {}", board);
     }
 }

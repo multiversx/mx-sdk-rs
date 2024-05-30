@@ -1,6 +1,3 @@
-#![feature(generic_const_exprs)]
-#![allow(incomplete_features)]
-
 use multiversx_sc::{
     codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
     types::{BigFloat, BigUint, ConstDecimals, ManagedDecimal, NumDecimals},

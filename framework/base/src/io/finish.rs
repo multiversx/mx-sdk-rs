@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
@@ -8,8 +10,8 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
-        BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
-        SCError, StaticSCError,
+        BigInt, BigUint, ManagedBuffer, ManagedBufferBuilder, ManagedSCError, ManagedType, SCError,
+        StaticSCError,
     },
 };
 
@@ -20,7 +22,8 @@ where
 {
     let h = ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR);
     let mut output = ApiOutputAdapter::<FA>::default();
-    let Ok(()) = item.multi_encode_or_handle_err(&mut output, h);
+    item.multi_encode_or_handle_err(&mut output, h)
+        .unwrap_infallible()
 }
 
 #[derive(Clone)]
@@ -47,7 +50,7 @@ impl<FA> TopEncodeOutput for ApiOutputAdapter<FA>
 where
     FA: ManagedTypeApi + EndpointFinishApi,
 {
-    type NestedBuffer = ManagedBufferCachedBuilder<FA>;
+    type NestedBuffer = ManagedBufferBuilder<FA>;
 
     fn set_slice_u8(self, bytes: &[u8]) {
         FA::finish_api_impl().finish_slice_u8(bytes);
@@ -94,7 +97,7 @@ where
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer {
-        ManagedBufferCachedBuilder::new_from_slice(&[])
+        ManagedBufferBuilder::new_from_slice(&[])
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {

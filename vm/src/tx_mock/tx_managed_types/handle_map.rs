@@ -34,14 +34,14 @@ impl<V> HandleMap<V> {
         // TODO: consider simulating the actual error from the VM
         self.map
             .get(&handle)
-            .unwrap_or_else(|| panic!("handle not found"))
+            .unwrap_or_else(|| panic!("handle not found: {handle}"))
     }
 
     pub fn get_mut(&mut self, handle: RawHandle) -> &mut V {
         // TODO: consider simulating the actual error from the VM
         self.map
             .get_mut(&handle)
-            .unwrap_or_else(|| panic!("handle not found"))
+            .unwrap_or_else(|| panic!("handle not found: {handle}"))
     }
 
     pub fn insert(&mut self, handle: RawHandle, value: V) {

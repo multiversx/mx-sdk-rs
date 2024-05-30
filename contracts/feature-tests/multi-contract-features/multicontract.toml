@@ -17,7 +17,7 @@ features = []
 
 [contracts.multi-contract-main.profile]
 # these are just the defaults, checking that parsing works fine
-codegen-units = 1  
+codegen-units = 1
 opt-level = "z"
 lto = true
 debug = false
@@ -31,9 +31,18 @@ add-unlabelled = false
 add-labels = ["mcs-external-view"]
 
 [contracts.multi-contract-example-feature]
-add-unlabelled = true # optional here, since the default is true
+add-unlabelled = true          # optional here, since the default is true
 features = ["example_feature"]
 
 [contracts.multi-contract-alt-impl]
 add-unlabelled = false
 add-labels = ["alt-impl"]
+
+[[proxy]]
+variant = "multi_contract_example_feature"
+path = "src/multi_contract_example_feature_proxy.rs"
+
+
+[[proxy]]
+variant = "multi_contract_alt_impl"
+path = "src/multi_contract_alt_impl_proxy.rs"

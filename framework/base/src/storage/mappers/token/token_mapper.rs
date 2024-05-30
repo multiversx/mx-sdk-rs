@@ -1,12 +1,11 @@
 use crate::{
     api::{CallTypeApi, ErrorApiImpl, StorageMapperApi},
     contract_base::BlockchainWrapper,
-    esdt::ESDTSystemSmartContractProxy,
     storage::StorageKey,
     storage_get, storage_get_len, storage_set,
     types::{
-        CallbackClosure, ContractCall, EsdtLocalRole, EsdtTokenPayment, ManagedAddress, ManagedRef,
-        ManagedVec, TokenIdentifier,
+        system_proxy::ESDTSystemSCProxy, CallbackClosure, ESDTSystemSCAddress, EsdtLocalRole,
+        EsdtTokenPayment, ManagedAddress, ManagedRef, ManagedVec, TokenIdentifier, Tx,
     },
 };
 
@@ -81,17 +80,13 @@ where
     ) -> ! {
         self.require_issued_or_set();
 
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let token_id = self.get_token_id_ref();
-        let mut async_call = system_sc_proxy
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .set_special_roles(address, token_id, roles[..].iter().cloned())
-            .async_call();
-
-        if let Some(cb) = opt_callback {
-            async_call = async_call.with_callback(cb);
-        }
-
-        async_call.call_and_exit()
+            .callback(opt_callback)
+            .async_call_and_exit()
     }
 
     fn get_sc_address() -> ManagedAddress<SA> {

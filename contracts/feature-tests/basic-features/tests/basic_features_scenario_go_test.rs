@@ -256,11 +256,6 @@ fn managed_vec_address_push_go() {
 }
 
 #[test]
-fn managed_vec_array_push_go() {
-    world().run("scenarios/managed_vec_array_push.scen.json");
-}
-
-#[test]
 fn managed_vec_biguint_push_go() {
     world().run("scenarios/managed_vec_biguint_push.scen.json");
 }

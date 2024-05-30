@@ -6,7 +6,25 @@ fn world() -> ScenarioWorld {
         "mxsc:output/str-repeat.mxsc.json",
         str_repeat::ContractBuilder,
     );
+    blockchain.register_contract(
+        "mxsc:output/str-repeat-mb-builder-basic.mxsc.json",
+        str_repeat::ContractBuilder,
+    );
+    blockchain.register_contract(
+        "mxsc:output/str-repeat-mb-builder-cached.mxsc.json",
+        str_repeat::ContractBuilder,
+    );
     blockchain
+}
+
+#[test]
+fn mb_builder_basic_rs() {
+    world().run("scenarios/mb_builder_basic.scen.json");
+}
+
+#[test]
+fn mb_builder_cached_rs() {
+    world().run("scenarios/mb_builder_cached.scen.json");
 }
 
 #[test]

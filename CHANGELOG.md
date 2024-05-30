@@ -26,6 +26,77 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+
+## [sc 0.50.3] - 2024-05-25
+- Dependency update and fix. There was an issue with the `zip` dependency in sc-meta.
+
+## [sc 0.50.2] - 2024-05-24
+- Unified transaction syntax:
+	- Better compilation error messages for malformed transactions;
+	- Deprecated methods `async_call` and `async_call_promises`, which are kept for backwards compatibility, but causing confusion among developers;
+	- Contract upgrade available in tests.
+- `sc-meta` proxy compare option, which checks that proxies are up to date. Useful for CI.
+- `TypeAbi` - removed `Unmanaged` associated type trait bounds, and implemented it for more types.
+- Removed jitter from interactor transaction fetch.
+- Fixed an issue in the snippets generator.
+
+## [sc 0.50.1] - 2024-05-16
+- `sc-meta all snippets` generates unified syntax.
+- Proxy generator can reference multi-contract variant.
+- Fixes:
+	- `BoxedBytes` - fixed memory leak.
+	- `ManagedVecItem` - allowing larger payloads (up to 128 bytes).
+
+## [sc 0.50.0, codec 0.19.0, vm 0.8.4, sdk 0.4.1] - 2024-05-10
+- Framework now runs on **stable** Rust. All unstable features were removed. The most important changes enabling this:
+	- `CodecFrom` completely removed, `TypeAbiFrom` was used instead since 0.49.0.
+	- `ManagedVecItem` payload redesigned.
+	- Contract panic message mechanism improved.
+- Unified syntax:
+	- `NotPayable` marker type in proxies, which prevents callers to add payment to a non-payable endpoint.
+
+## [sc 0.49.0, codec 0.18.8, sdk 0.4.0] - 2024-05-07
+- Unified transaction syntax
+	- new syntax for sending transactions from contracts
+	- new syntax for integration tests: tx, set state, check state, etc.
+	- new syntax for interactors
+	- new proxies, generated from sc-meta
+	- support for upgrade in new proxies
+- Improved interactor tx result polling performance.
+
+## [sc 0.48.1, codec 0.18.7] - 2024-04-30
+- Simplified decoding of small numbers (i64/u64).
+- Manual reset of the `StaticApi`, in order to free memory for long-running tasks.
+
+## [sc 0.49.0-alpha.4, sdk 0.4.0-alpha.4] - 2024-04-23
+Fourth pre-release, contains many interactor improvements, including improved tx polling.
+
+## [sc 0.49.0-alpha.3] - 2024-04-13
+Third pre-release of the unified syntax, includes backwards compatibility fixes and testing set state/check state.
+
+## [sc 0.49.0-alpha.2] - 2024-04-09
+Second pre-release of the unified syntax. Most features done, including fully featured interactors.
+Still missing: set state/check state in tests.
+
+## [sc 0.48.0] - 2024-04-09
+- When serializing to a managed buffer, static buffer caching is disabled by default.
+- `sc-meta:` - installers for wasm32 target and wasm-opt.
+- Integrated traits for token management: `FixedSupplyToken`, `Mergeable`.
+
+## [sc 0.48.0-alpha.1] - 2024-03-27 (actually alpha release of 0.49.0)
+First pre-release of the unified syntax. Syntax not yet stabilized, should only be used for experimenting with various smart contracts.
+
+## [sc 0.47.8] - 2024-03-22
+- Test coverage functionality in sc-meta.
+- Removed deprecation from legacy whitebox testing framework, since it is still used extensively.
+
+## [sc 0.47.7] - 2024-03-15
+- Template bugfix (concerning the interactor).
+
+## [sc 0.47.6] - 2024-03-14
+- Template naming bugfix, regarding numbers in the project name.
+- Added the interactor to the adder template.
+
 ## [sc 0.47.5] - 2024-03-08
 - Fixed an issue with `MapMapper` when reading from another contract.
 - Got rid of nightly feature `maybe_uninit_uninit_array`/`maybe_uninit_array_assume_init`.

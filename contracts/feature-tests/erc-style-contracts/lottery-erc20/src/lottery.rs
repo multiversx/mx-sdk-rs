@@ -2,6 +2,7 @@
 
 multiversx_sc::imports!();
 
+mod erc20_proxy;
 mod lottery_info;
 mod random;
 mod status;
@@ -15,9 +16,6 @@ const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 
 #[multiversx_sc::contract]
 pub trait Lottery {
-    #[proxy]
-    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;
-
     #[init]
     fn init(&self, erc20_contract_address: ManagedAddress) {
         self.set_erc20_contract_address(&erc20_contract_address);
@@ -212,14 +210,15 @@ pub trait Lottery {
 
         let erc20_address = self.get_erc20_contract_address();
         let lottery_contract_address = self.blockchain().get_sc_address();
-        self.erc20_proxy(erc20_address)
+        self.tx()
+            .to(&erc20_address)
+            .typed(erc20_proxy::SimpleErc20TokenProxy)
             .transfer_from(caller.clone(), lottery_contract_address, token_amount)
-            .async_call()
-            .with_callback(
+            .callback(
                 self.callbacks()
                     .transfer_from_callback(lottery_name, &caller),
             )
-            .call_and_exit()
+            .async_call_and_exit();
     }
 
     fn reserve_ticket(&self, lottery_name: &BoxedBytes) {
@@ -282,11 +281,12 @@ pub trait Lottery {
 
         let erc20_address = self.get_erc20_contract_address();
 
-        self.erc20_proxy(erc20_address)
+        self.tx()
+            .to(&erc20_address)
+            .typed(erc20_proxy::SimpleErc20TokenProxy)
             .transfer(winner_address, prize)
-            .async_call()
-            .with_callback(self.callbacks().distribute_prizes_callback(lottery_name))
-            .call_and_exit()
+            .callback(self.callbacks().distribute_prizes_callback(lottery_name))
+            .async_call_and_exit();
     }
 
     fn get_random_winning_ticket_id(&self, prev_winners: &[u32], total_tickets: u32) -> u32 {

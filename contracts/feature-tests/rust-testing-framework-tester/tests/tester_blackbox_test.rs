@@ -1,13 +1,10 @@
-use multiversx_sc_scenario::{api::StaticApi, scenario_model::*, *};
-use rust_testing_framework_tester::*; // TODO: clean up imports
+use multiversx_sc_scenario::imports::*;
+use rust_testing_framework_tester::*;
 
 const WASM_PATH_EXPR: &str = "mxsc:output/rust-testing-framework-tester.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain
-        .set_current_dir_from_workspace("contracts/feature_tests/rust-testing-framework-tester");
-
     blockchain.register_contract(
         WASM_PATH_EXPR,
         rust_testing_framework_tester::ContractBuilder,
@@ -16,6 +13,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+#[allow(deprecated)]
 fn tester_deploy_test() {
     let mut world = world();
     let code = world.code_expression(WASM_PATH_EXPR);
@@ -45,6 +43,7 @@ fn tester_deploy_test() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn tester_deploy_test_spawned_thread() {
     let handler = std::thread::spawn(|| {
         let mut world = world();

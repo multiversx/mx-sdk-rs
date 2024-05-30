@@ -48,9 +48,8 @@ pub trait LocalEsdtAndEsdtNft {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().esdt_issue_callback(&caller))
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(localMint)]
@@ -87,9 +86,8 @@ pub trait LocalEsdtAndEsdtNft {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(nftCreate)]
@@ -138,8 +136,10 @@ pub trait LocalEsdtAndEsdtNft {
         nonce: u64,
         amount: BigUint,
     ) {
-        self.send()
-            .transfer_esdt_via_async_call(to, token_identifier, nonce, amount);
+        self.tx()
+            .to(to)
+            .esdt((token_identifier, nonce, amount))
+            .async_call_and_exit();
     }
 
     #[endpoint]
@@ -157,15 +157,15 @@ pub trait LocalEsdtAndEsdtNft {
             arg_buffer.push_arg_raw(arg);
         }
 
-        let _ = self.send_raw().transfer_esdt_nft_execute(
-            &to,
-            &token_identifier,
-            nonce,
-            &amount,
-            self.blockchain().get_gas_left(),
-            &function,
-            &arg_buffer,
-        );
+        let gas_left = self.blockchain().get_gas_left();
+
+        self.tx()
+            .to(&to)
+            .gas(gas_left)
+            .raw_call(function)
+            .arguments_raw(arg_buffer)
+            .single_esdt(&token_identifier, nonce, &amount)
+            .transfer_execute();
     }
 
     // Semi-Fungible
@@ -192,9 +192,8 @@ pub trait LocalEsdtAndEsdtNft {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().nft_issue_callback(&caller))
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     // common
@@ -209,9 +208,8 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
             .with_callback(self.callbacks().change_roles_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(unsetLocalRoles)]
@@ -224,9 +222,8 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
             .with_callback(self.callbacks().change_roles_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(controlChanges)]
@@ -240,8 +237,7 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .control_changes(&token, &property_arguments)
-            .async_call()
-            .call_and_exit();
+            .async_call_and_exit();
     }
 
     // views
@@ -287,7 +283,7 @@ pub trait LocalEsdtAndEsdtNft {
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens);
+                    self.tx().to(caller).egld(&returned_tokens).transfer();
                 }
 
                 self.last_error_message().set(&message.err_msg);
@@ -311,7 +307,7 @@ pub trait LocalEsdtAndEsdtNft {
                 let (token_identifier, returned_tokens) =
                     self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens);
+                    self.tx().to(caller).egld(&returned_tokens).transfer();
                 }
 
                 self.last_error_message().set(&message.err_msg);

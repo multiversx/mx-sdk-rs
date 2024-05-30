@@ -63,7 +63,7 @@ macro_rules! require_old {
 macro_rules! sc_panic {
     ($msg:tt, $($arg:expr),+ $(,)?) => {{
         let mut ___buffer___ =
-            multiversx_sc::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+            multiversx_sc::types::ManagedBufferBuilder::<Self::Api>::new_from_slice(&[]);
         multiversx_sc::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
         multiversx_sc::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message(___buffer___.into_managed_buffer());
     }};
@@ -123,7 +123,7 @@ macro_rules! sc_print {
 macro_rules! sc_format {
     ($msg:tt, $($arg:expr),+ $(,)?) => {{
         let mut ___buffer___ =
-            multiversx_sc::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+            multiversx_sc::types::ManagedBufferBuilder::<Self::Api>::new_from_slice(&[]);
         multiversx_sc::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
         ___buffer___.into_managed_buffer()
     }};

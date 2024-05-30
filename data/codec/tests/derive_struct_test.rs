@@ -26,14 +26,14 @@ fn struct_named_fields_test() {
     };
 
     #[rustfmt::skip]
-	let bytes_1 = &[
-		/* int */ 0, 0x42, 
-		/* seq length */ 0, 0, 0, 5, 
-		/* seq contents */ 1, 2, 3, 4, 5,
-		/* another_byte */ 6,
-		/* uint_32 */ 0x00, 0x01, 0x23, 0x45,
-		/* uint_64 */ 0x00, 0x00, 0x00, 0x01, 0x23, 0x45, 0x67, 0x89,
-	];
+    let bytes_1 = &[
+        /* int */ 0, 0x42, 
+        /* seq length */ 0, 0, 0, 5, 
+        /* seq contents */ 1, 2, 3, 4, 5,
+        /* another_byte */ 6,
+        /* uint_32 */ 0x00, 0x01, 0x23, 0x45,
+        /* uint_64 */ 0x00, 0x00, 0x00, 0x01, 0x23, 0x45, 0x67, 0x89,
+    ];
 
     check_top_encode_decode(s.clone(), bytes_1);
     check_dep_encode_decode(s, bytes_1);
