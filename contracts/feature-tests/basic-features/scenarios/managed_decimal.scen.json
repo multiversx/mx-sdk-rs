@@ -1,0 +1,146 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_addition",
+                "arguments": [
+                    "4",
+                    "5"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "9"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_subtraction",
+                "arguments": [
+                    "9",
+                    "4"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "5"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_subtraction",
+                "arguments": [
+                    "2",
+                    "8"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:cannot subtract because result would be negative",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "3",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_eq",
+                "arguments": [
+                    "13",
+                    "13"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "4",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_trunc",
+                "arguments": [],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "313"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "5",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_into_raw_units",
+                "arguments": [],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "12345"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
