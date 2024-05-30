@@ -2076,6 +2076,7 @@ dependencies = [
  "hex",
  "hmac",
  "itertools",
+ "log",
  "pbkdf2",
  "pem",
  "rand 0.8.5",

@@ -53,7 +53,7 @@ impl Interactor {
     {
         let sc_deploy_step = sc_deploy_step.as_mut();
         let tx_hash = self.launch_sc_deploy(sc_deploy_step).await;
-        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
+        let tx = self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
 
         let addr = sc_deploy_step.tx.from.clone();
         let nonce = tx.nonce;
