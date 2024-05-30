@@ -3,6 +3,7 @@
 multiversx_sc::imports!();
 
 mod abi_enum;
+pub mod abi_proxy;
 mod abi_test_type;
 mod only_nested;
 
@@ -31,6 +32,12 @@ pub trait AbiTester {
     #[init]
     #[payable("EGLD")]
     fn init(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {}
+
+    /// Upgrade constructor.
+    #[upgrade]
+    fn upgrade(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {
+        self.init(_constructor_arg_1, _constructor_arg_2)
+    }
 
     /// Example endpoint docs.
     #[endpoint]
@@ -158,6 +165,11 @@ pub trait AbiTester {
     #[view]
     fn item_for_option(&self) -> Option<OnlyShowsUpAsNestedInOption> {
         None
+    }
+
+    #[view]
+    fn operation_completion_status(&self) -> OperationCompletionStatus {
+        OperationCompletionStatus::Completed
     }
 
     #[endpoint]

@@ -4,46 +4,14 @@ multiversx_sc::imports!();
 
 use hex_literal::hex;
 
+pub mod message_me_proxy;
+pub mod pay_me_proxy;
+
 static HARDCODED_ADDRESS: [u8; 32] =
     hex!("fefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe");
 
-mod pay_me_proxy {
-    multiversx_sc::imports!();
-
-    #[multiversx_sc::proxy]
-    pub trait PayMe {
-        #[payable("EGLD")]
-        #[endpoint(payMe)]
-        fn pay_me(&self, arg1: i64);
-
-        #[payable("EGLD")]
-        #[endpoint(payMeWithResult)]
-        fn pay_me_with_result(&self, arg1: i64);
-    }
-}
-
-mod message_me_proxy {
-    multiversx_sc::imports!();
-
-    #[multiversx_sc::proxy]
-    pub trait MessageMe {
-        #[init]
-        #[payable("EGLD")]
-        fn init(&self, init_arg: i32) -> i32;
-
-        #[endpoint(messageMe)]
-        fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &ManagedAddress);
-    }
-}
-
 #[multiversx_sc::contract]
 pub trait ProxyTestFirst {
-    #[proxy]
-    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::Api>;
-
-    #[proxy]
-    fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::Api>;
-
     #[storage_get("other_contract")]
     fn get_other_contract(&self) -> ManagedAddress;
 
@@ -62,11 +30,18 @@ pub trait ProxyTestFirst {
     #[endpoint(deploySecondContract)]
     fn deploy_second_contract(&self, code: ManagedBuffer) -> i32 {
         let payment = self.call_value().egld_value();
+
         let (address, init_result) = self
-            .message_me_proxy()
+            .tx()
+            .typed(message_me_proxy::MessageMeProxy)
             .init(123)
-            .with_egld_transfer(payment.clone_value())
-            .deploy_contract::<i32>(&code, CodeMetadata::UPGRADEABLE);
+            .code(code)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .returns(ReturnsNewManagedAddress)
+            .returns(ReturnsResult)
+            .egld(payment)
+            .sync_call();
+
         self.set_other_contract(&address);
         init_result + 1
     }
@@ -77,11 +52,15 @@ pub trait ProxyTestFirst {
         let payment = self.call_value().egld_value();
         let other_contract = self.get_other_contract();
 
-        self.message_me_proxy()
-            .contract(other_contract)
-            .init(456) // TODO: upgrade proxy
-            .with_egld_transfer(payment.clone_value())
-            .upgrade_contract(&code, CodeMetadata::UPGRADEABLE);
+        self.tx()
+            .to(other_contract)
+            .typed(pay_me_proxy::PayMeProxy)
+            .upgrade()
+            .argument(&456)
+            .egld(payment)
+            .code(code)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .upgrade_async_call_and_exit();
     }
 
     #[payable("EGLD")]
@@ -89,12 +68,12 @@ pub trait ProxyTestFirst {
     fn forward_to_other_contract(&self) {
         let payment = self.call_value().egld_value();
         let other_contract = self.get_other_contract();
-        self.pay_me_proxy()
-            .contract(other_contract)
+        self.tx()
+            .to(&other_contract)
+            .typed(pay_me_proxy::PayMeProxy)
             .pay_me(0x56)
-            .with_egld_transfer(payment.clone_value())
-            .async_call()
-            .call_and_exit()
+            .egld(payment)
+            .async_call_and_exit();
     }
 
     #[payable("EGLD")]
@@ -102,44 +81,44 @@ pub trait ProxyTestFirst {
     fn forward_to_other_contract_with_callback(&self) {
         let payment = self.call_value().egld_value();
         let other_contract = self.get_other_contract();
-        self.pay_me_proxy()
-            .contract(other_contract)
+        self.tx()
+            .to(&other_contract)
+            .typed(pay_me_proxy::PayMeProxy)
             .pay_me_with_result(0x56)
-            .with_egld_transfer(payment.clone_value())
-            .async_call()
-            .with_callback(self.callbacks().pay_callback())
-            .call_and_exit()
+            .egld(payment)
+            .callback(self.callbacks().pay_callback())
+            .async_call_and_exit();
     }
 
     #[endpoint(messageOtherContract)]
     fn message_other_contract(&self) {
         let other_contract = self.get_other_contract();
-        self.message_me_proxy()
-            .contract(other_contract)
+        self.tx()
+            .to(&other_contract)
+            .typed(message_me_proxy::MessageMeProxy)
             .message_me(
                 0x01,
                 &BigUint::from(2u32),
                 [3u8; 3].to_vec(),
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(messageOtherContractWithCallback)]
     fn message_other_contract_with_callback(&self) {
         let other_contract = self.get_other_contract();
-        self.message_me_proxy()
-            .contract(other_contract)
+        self.tx()
+            .to(&other_contract)
+            .typed(message_me_proxy::MessageMeProxy)
             .message_me(
                 0x01,
                 &BigUint::from(2u32),
                 [3u8; 3].to_vec(),
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
-            .async_call()
-            .with_callback(self.callbacks().message_callback())
-            .call_and_exit()
+            .callback(self.callbacks().message_callback())
+            .async_call_and_exit()
     }
 
     #[callback(payCallback)] // although uncommon, custom callback names are possible

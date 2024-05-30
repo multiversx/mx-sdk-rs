@@ -1,14 +1,6 @@
 use crate::{call_tree::CallState, comp_interact_config::Config, comp_interact_state::State};
 
-use multiversx_sc_snippets::{
-    multiversx_sc::types::Address,
-    multiversx_sc_scenario::{
-        scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::BytesValue,
-        test_wallets::judy,
-    },
-    Interactor,
-};
+use multiversx_sc_snippets::imports::*;
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "comp_interact_trace.scen.json";
 
@@ -17,6 +9,7 @@ pub struct ComposabilityInteract {
     pub wallet_address: Address,
     pub forw_queue_code: BytesValue,
     pub vault_code: BytesValue,
+    #[allow(dead_code)]
     pub state: State,
 }
 
@@ -27,7 +20,7 @@ impl ComposabilityInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(judy());
+        let wallet_address = interactor.register_wallet(test_wallets::judy());
         let forw_queue_code = BytesValue::interpret_from(
             "mxsc:../forwarder-queue/output/forwarder-queue.mxsc.json",
             &InterpreterContext::default(),

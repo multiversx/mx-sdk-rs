@@ -1,8 +1,13 @@
+#![allow(deprecated)]
+
 use std::marker::PhantomData;
 
-use multiversx_sc::codec::PanicErrorHandler;
+use multiversx_sc::{
+    abi::TypeAbiFrom,
+    codec::{PanicErrorHandler, TopDecodeMulti},
+};
 
-use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
+use crate::multiversx_sc::codec::TopEncodeMulti;
 
 use crate::{
     scenario::model::{AddressValue, U64Value},
@@ -12,6 +17,10 @@ use crate::{
 use super::{format_expect, ScCallStep};
 
 /// `SCCallStep` with explicit return type.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[derive(Default, Debug)]
 pub struct TypedScCall<OriginalResult> {
     pub sc_call_step: ScCallStep,
@@ -22,7 +31,7 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
     pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxResponseStatus>
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let mut raw_result = self.response().out.clone();
         Ok(
@@ -109,7 +118,7 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
     pub fn expect_value<ExpectedResult>(self, expected_value: ExpectedResult) -> Self
     where
         OriginalResult: TopEncodeMulti,
-        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+        ExpectedResult: TypeAbiFrom<OriginalResult> + TopEncodeMulti,
     {
         self.expect(format_expect(expected_value))
     }
@@ -144,14 +153,22 @@ impl<OriginalResult> From<ScCallStep> for TypedScCall<OriginalResult> {
 /// Helps with syntax. Allows the `TypedScCall` to call the `execute` operation directly.
 ///
 /// The trait defines the connection to the executor.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 pub trait TypedScCallExecutor {
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     fn execute_typed_sc_call<OriginalResult, RequestedResult>(
         &mut self,
         typed_sc_call: TypedScCall<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>;
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>;
 }
 
 impl<OriginalResult> TypedScCall<OriginalResult>
@@ -164,7 +181,7 @@ where
         executor: &mut E,
     ) -> RequestedResult
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         executor.execute_typed_sc_call(self)
     }

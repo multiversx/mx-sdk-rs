@@ -60,7 +60,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
-                "function": "result_err_from_bytes_1",
+                "function": "result_err_from_bytes",
                 "arguments": [
                     "str:test error message"
                 ],
@@ -82,7 +82,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
-                "function": "result_err_from_bytes_2",
+                "function": "result_err_from_bytes",
                 "arguments": [
                     "str:test error message"
                 ],
@@ -104,7 +104,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
-                "function": "result_err_from_bytes_3",
+                "function": "result_err_from_bytes",
                 "arguments": [
                     "str:test error message"
                 ],

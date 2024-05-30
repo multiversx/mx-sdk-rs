@@ -5,13 +5,11 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          384
+// Endpoints:                          389
 // Async Callback:                       1
-// Total number of exported functions: 386
+// Total number of exported functions: 391
 
 #![no_std]
-#![allow(internal_features)]
-#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -218,7 +216,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         managed_vec_remove => managed_vec_remove
         managed_vec_find => managed_vec_find
         managed_vec_contains => managed_vec_contains
-        managed_vec_array_push => managed_vec_array_push
         managed_ref_explicit => managed_ref_explicit
         storage_read_raw => storage_read_raw
         storage_write_raw => storage_write_raw
@@ -406,6 +403,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         back_at_address => back_at_address
         keys_at_address => keys_at_address
         values_at_address => values_at_address
+        contains_unordered_at_address => contains_unordered_at_address
+        get_by_index => get_by_index
         fill_set_mapper => fill_set_mapper
         managed_decimal_addition => managed_decimal_addition
         managed_decimal_subtraction => managed_decimal_subtraction
@@ -413,6 +412,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         managed_decimal_trunc => managed_decimal_trunc
         managed_decimal_into_raw_units => managed_decimal_into_raw_units
         fill_map_mapper => fill_map_mapper
+        fill_unordered_set_mapper => fill_unordered_set_mapper
     )
 }
 

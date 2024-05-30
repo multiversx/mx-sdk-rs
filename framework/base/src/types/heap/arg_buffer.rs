@@ -1,6 +1,8 @@
 use crate::{
+    abi::{TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     codec::TopEncodeOutput,
+    proxy_imports::TypeAbi,
     types::{heap::BoxedBytes, ManagedArgBuffer},
 };
 use alloc::vec::Vec;
@@ -108,6 +110,21 @@ impl Clone for ArgBuffer {
             arg_lengths: self.arg_lengths.clone(),
             arg_data: self.arg_data.clone(),
         }
+    }
+}
+
+impl TypeAbiFrom<Self> for ArgBuffer {}
+
+impl TypeAbi for ArgBuffer {
+    type Unmanaged = Self;
+
+    /// It is semantically equivalent to any list of `T`.
+    fn type_name() -> TypeName {
+        <&[Vec<u8>] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "ArgBuffer".into()
     }
 }
 

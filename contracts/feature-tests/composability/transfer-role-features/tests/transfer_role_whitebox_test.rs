@@ -1,14 +1,5 @@
-use multiversx_sc::types::{
-    Address, EsdtTokenPayment, ManagedArgBuffer, ManagedVec, MultiValueEncoded,
-};
 use multiversx_sc_modules::transfer_role_proxy::TransferRoleProxyModule;
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_buffer, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
-    },
-    ScenarioWorld, WhiteboxContract,
-};
+use multiversx_sc_scenario::imports::*;
 use transfer_role_features::TransferRoleFeatures;
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
@@ -25,10 +16,6 @@ const REJECT_FUNDS_FUNC_NAME: &[u8] = b"reject_funds";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace(
-        "contracts/composability/feature-tests/transfer-role-features",
-    );
-
     blockchain.register_contract(
         TRANSFER_ROLE_FEATURES_PATH_EXPR,
         transfer_role_features::ContractBuilder,
@@ -104,7 +91,7 @@ fn test_transfer_role() {
             sc.transfer_to_user(
                 managed_address!(&address_expr_to_address(USER_ADDRESS_EXPR)),
                 managed_address!(&address_expr_to_address(OWNER_ADDRESS_EXPR)),
-                payments,
+                &payments,
                 managed_buffer!(b"enjoy"),
             );
         },
@@ -135,7 +122,7 @@ fn test_transfer_role() {
             sc.transfer_to_user(
                 managed_address!(&address_expr_to_address(USER_ADDRESS_EXPR)),
                 managed_address!(&Address::zero()),
-                payments,
+                &payments,
                 managed_buffer!(b"enjoy"),
             );
         },
@@ -159,7 +146,7 @@ fn test_transfer_role() {
             sc.transfer_to_contract_raw(
                 managed_address!(&address_expr_to_address(USER_ADDRESS_EXPR)),
                 managed_address!(&address_expr_to_address(VAULT_ADDRESS_EXPR)),
-                payments,
+                &payments,
                 managed_buffer!(ACCEPT_FUNDS_FUNC_NAME),
                 ManagedArgBuffer::new(),
                 None,
@@ -191,7 +178,7 @@ fn test_transfer_role() {
             sc.transfer_to_contract_raw(
                 managed_address!(&address_expr_to_address(USER_ADDRESS_EXPR)),
                 managed_address!(&address_expr_to_address(VAULT_ADDRESS_EXPR)),
-                payments,
+                &payments,
                 managed_buffer!(REJECT_FUNDS_FUNC_NAME),
                 ManagedArgBuffer::new(),
                 None,

@@ -28,9 +28,6 @@ macro_rules! panic_handler {
         fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::panic::PanicInfo) -> ! {
             multiversx_sc_wasm_adapter::panic::panic_fmt(panic_info)
         }
-
-        #[lang = "eh_personality"]
-        fn eh_personality() {}
     };
 }
 
@@ -41,9 +38,6 @@ macro_rules! panic_handler_with_message {
         fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::panic::PanicInfo) -> ! {
             multiversx_sc_wasm_adapter::panic::panic_fmt_with_message(panic_info)
         }
-
-        #[lang = "eh_personality"]
-        fn eh_personality() {}
     };
 }
 

@@ -16,7 +16,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           default: true
-          toolchain: nightly-2023-12-11
+          toolchain: stable
 
       - name: Download vscode-lldb
         uses: robinraju/release-downloader@v1.5

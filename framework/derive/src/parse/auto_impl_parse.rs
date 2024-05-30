@@ -4,17 +4,17 @@ use super::attributes::*;
 
 fn assert_no_other_auto_impl(method: &Method) {
     assert!(
-		method.implementation.is_no_implementation(),
-		"Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}",
-		"`#[storage_get]`, ",
-		"`#[storage_set]`, ",
-		"`#[storage_mapper]`, ",
-		"`#[storage_is_empty]`, ",
-		"`#[storage_clear]`, ",
-		"`#[proxy]`, ",
-		"`#[module]`, ",
-		"`#[event]`."
-	)
+        method.implementation.is_no_implementation(),
+        "Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}",
+        "`#[storage_get]`, ",
+        "`#[storage_set]`, ",
+        "`#[storage_mapper]`, ",
+        "`#[storage_is_empty]`, ",
+        "`#[storage_clear]`, ",
+        "`#[proxy]`, ",
+        "`#[module]`, ",
+        "`#[event]`."
+    )
 }
 
 pub fn process_event_attribute(attr: &syn::Attribute, method: &mut Method) -> bool {

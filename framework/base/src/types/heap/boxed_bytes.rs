@@ -1,11 +1,13 @@
-use crate::{
-    abi::{TypeAbi, TypeName},
-    codec::*,
-};
 use alloc::{
-    alloc::{alloc, alloc_zeroed, realloc, Layout},
+    alloc::{alloc, realloc, Layout},
     boxed::Box,
+    vec,
     vec::Vec,
+};
+
+use crate::{
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    codec::*,
 };
 
 /// Simple wrapper around a boxed byte slice,
@@ -20,23 +22,7 @@ impl BoxedBytes {
     }
 
     pub fn zeros(len: usize) -> Self {
-        unsafe {
-            let layout = Layout::from_size_align(len, core::mem::align_of::<u8>()).unwrap();
-            let bytes_ptr = alloc_zeroed(layout);
-            let bytes_box = Box::from_raw(core::slice::from_raw_parts_mut(bytes_ptr, len));
-            BoxedBytes(bytes_box)
-        }
-    }
-
-    /// Allocates an uninitialized BoxedBytes to heap.
-    ///
-    /// # Safety
-    ///
-    /// Should only be called if the contents are initialized immediately afterwards, e.g. via a FFI call.
-    pub unsafe fn allocate(len: usize) -> Self {
-        let layout = Layout::from_size_align(len, core::mem::align_of::<u8>()).unwrap();
-        let bytes_ptr = alloc(layout);
-        let bytes_box = Box::from_raw(core::slice::from_raw_parts_mut(bytes_ptr, len));
+        let bytes_box = Box::from(vec![0u8; len]);
         BoxedBytes(bytes_box)
     }
 
@@ -222,11 +208,9 @@ impl NestedDecode for BoxedBytes {
         H: DecodeErrorHandler,
     {
         let size = usize::dep_decode_or_handle_err(input, h)?;
-        unsafe {
-            let mut result = BoxedBytes::allocate(size);
-            input.read_into(result.as_mut_slice(), h)?;
-            Ok(result)
-        }
+        let mut result = BoxedBytes::zeros(size);
+        input.read_into(result.as_mut_slice(), h)?;
+        Ok(result)
     }
 }
 
@@ -240,9 +224,17 @@ impl TopDecode for BoxedBytes {
     }
 }
 
+impl TypeAbiFrom<Self> for BoxedBytes {}
+
 impl TypeAbi for BoxedBytes {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "bytes".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "BoxedBytes".into()
     }
 }
 

@@ -1,5 +1,4 @@
 #![allow(clippy::type_complexity)]
-#![feature(exhaustive_patterns)]
 
 pub mod api;
 pub mod bech32;
@@ -8,20 +7,13 @@ pub mod display_util;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;
-mod scenario_macros;
-pub mod standalone;
-pub mod test_wallets;
+pub mod scenario_macros;
 mod vm_go_tool;
 
-#[deprecated(
-    since = "0.42.0",
-    note = "Use the blackbox testing framework instead. If needed, it also supports whitebox calls."
-)]
 pub mod whitebox_legacy;
 
 /// Keeping this for backwards compatibility.
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
-#[allow(deprecated)]
 pub use whitebox_legacy as testing_framework;
 
 pub use api::DebugApi;
@@ -32,7 +24,7 @@ pub use num_bigint;
 
 pub use multiversx_sc;
 
-pub use multiversx_sc_meta as meta;
+pub use multiversx_sc_meta_lib as meta;
 
 /// Exposing the scenario model. Might be moved in the future,
 /// but the export will hopefully remain the same.
@@ -44,9 +36,12 @@ pub use crate::scenario as mandos_system;
 // Re-exporting the whole mandos crate for easier use in tests.
 pub use multiversx_chain_scenario_format as scenario_format;
 
-pub use facade::{ContractInfo, ScenarioWorld, WhiteboxContract};
+pub use facade::{result_handlers::*, world_tx::*, ContractInfo, ScenarioWorld, WhiteboxContract};
 
 use std::path::Path;
+
+/// Imports normally needed in integration tests, grouped together.
+pub mod imports;
 
 /// Legacy function for running a scenario test using the Go VM tool.
 ///

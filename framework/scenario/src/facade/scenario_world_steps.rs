@@ -1,9 +1,15 @@
-use multiversx_sc::types::{heap::Address, ContractCall};
+#![allow(deprecated)]
+
+use multiversx_sc::{
+    abi::TypeAbiFrom,
+    codec::TopDecodeMulti,
+    types::{heap::Address, ContractCall},
+};
 
 use crate::{
     api::StaticApi,
     facade::ScenarioWorld,
-    multiversx_sc::codec::{CodecFrom, TopEncodeMulti},
+    multiversx_sc::codec::TopEncodeMulti,
     scenario::{model::*, ScenarioRunner},
 };
 
@@ -29,6 +35,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_call_use_raw_response<S, F>(&mut self, mut step: S, use_raw_response: F) -> &mut Self
     where
         S: AsMut<ScCallStep>,
@@ -40,6 +50,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_call_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScCall<OriginalResult>,
@@ -47,7 +61,7 @@ impl ScenarioWorld {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(TypedResponse<RequestedResult>),
     {
         self.sc_call_use_raw_response(step, |response| {
@@ -56,13 +70,17 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScCall<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.run_sc_call_step(&mut step.sc_call_step);
         let response = unwrap_response(&step.sc_call_step.response);
@@ -79,6 +97,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_query_use_raw_response<S, F>(&mut self, mut step: S, use_raw_response: F) -> &mut Self
     where
         S: AsMut<ScQueryStep>,
@@ -91,6 +113,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_query_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScQuery<OriginalResult>,
@@ -98,7 +124,7 @@ impl ScenarioWorld {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(TypedResponse<RequestedResult>),
     {
         self.sc_query_use_raw_response(step, |response| {
@@ -107,13 +133,17 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_query_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScQuery<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.run_sc_query_step(&mut step.sc_query_step);
         let response = unwrap_response(&step.sc_query_step.response);
@@ -129,7 +159,7 @@ impl ScenarioWorld {
     pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
         CC: ContractCall<StaticApi>,
-        RequestedResult: CodecFrom<CC::OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<CC::OriginalResult>,
     {
         self.sc_query_get_result(ScQueryStep::new().call(contract_call))
     }
@@ -143,6 +173,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_deploy_use_raw_response<S, F>(
         &mut self,
         mut step: S,
@@ -159,6 +193,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_deploy_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScDeploy<OriginalResult>,
@@ -166,7 +204,7 @@ impl ScenarioWorld {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(Address, TypedResponse<RequestedResult>),
     {
         self.sc_deploy_use_raw_response(step, |response| {
@@ -176,13 +214,17 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_deploy_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScDeploy<OriginalResult>,
     ) -> (Address, RequestedResult)
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.run_sc_deploy_step(&mut step.sc_deploy_step);
         let response = unwrap_response(&step.sc_deploy_step.response);
@@ -223,7 +265,7 @@ impl TypedScCallExecutor for ScenarioWorld {
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_call_get_result(typed_sc_call)
     }
@@ -236,7 +278,7 @@ impl TypedScDeployExecutor for ScenarioWorld {
     ) -> (Address, RequestedResult)
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_deploy_get_result(typed_sc_call)
     }
@@ -254,7 +296,7 @@ impl TypedScQueryExecutor for ScenarioWorld {
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_query_get_result(typed_sc_query)
     }

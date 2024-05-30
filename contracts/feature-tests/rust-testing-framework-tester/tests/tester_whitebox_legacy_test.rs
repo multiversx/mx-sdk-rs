@@ -1,20 +1,9 @@
-#![allow(deprecated)] // TODO: migrate tests
-
-use adder::*;
-use forwarder::call_sync::*;
+use multiversx_sc_scenario::imports::*;
 use num_traits::ToPrimitive;
 
+use adder::*;
 use basic_features::BasicFeatures;
-use multiversx_sc::{
-    codec::Empty,
-    contract_base::ContractBase,
-    err_msg,
-    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
-};
-use multiversx_sc_scenario::{
-    api::DebugApi, assert_values_eq, managed_address, managed_biguint, managed_buffer,
-    managed_token_id, rust_biguint, testing_framework::*,
-};
+use forwarder::fwd_call_sync::*;
 use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
 const TEST_OUTPUT_PATH: &str = "test.scen.json";

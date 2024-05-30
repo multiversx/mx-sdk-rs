@@ -1,10 +1,10 @@
 use std::{fs, fs::File, io::Write};
 
 use multiversx_sc::{
-    abi::{EnumVariantDescription, TypeContents},
+    abi::{EnumVariantDescription, TypeContents, TypeNames},
     contract_base::ContractAbiProvider,
 };
-use multiversx_sc_meta::{
+use multiversx_sc_meta_lib::{
     abi_json::{self, EsdtAttributeAbiJson},
     esdt_attr_file_json::serialize_esdt_attribute_json,
 };
@@ -12,13 +12,12 @@ use multiversx_sc_scenario::ScenarioWorld;
 
 #[test]
 fn abi_tester_abi_generated_ok() {
-    let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
+    let blockchain = ScenarioWorld::new();
 
     // generate ABI
-    let multi_contract_config = multiversx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
-        blockchain.current_dir().as_path(),
-    );
+    let multi_contract_config = multiversx_sc_meta_lib::multi_contract_config::<
+        abi_tester::AbiProvider,
+    >(blockchain.current_dir().as_path());
 
     let main_contract = multi_contract_config.find_contract("abi-tester");
     assert!(!main_contract.settings.external_view);
@@ -71,12 +70,11 @@ fn abi_tester_esdt_attr_abi_generated_ok() {
 
 #[test]
 fn check_multi_contract_config() {
-    let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
+    let blockchain = ScenarioWorld::new();
 
-    let multi_contract_config = multiversx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
-        blockchain.current_dir().as_path(),
-    );
+    let multi_contract_config = multiversx_sc_meta_lib::multi_contract_config::<
+        abi_tester::AbiProvider,
+    >(blockchain.current_dir().as_path());
 
     let ev_contract = multi_contract_config.find_contract("abi-tester-ev");
     assert!(ev_contract.settings.external_view);
@@ -89,12 +87,15 @@ fn check_multi_contract_config() {
 #[test]
 fn abi_deserialization_check() {
     let main_json = fs::read_to_string("./abi_tester_expected_main.abi.json").unwrap();
-    let main_abi = multiversx_sc_meta::abi_json::deserialize_abi_from_json(&main_json).unwrap();
+    let main_abi = multiversx_sc_meta_lib::abi_json::deserialize_abi_from_json(&main_json).unwrap();
     let abi_enum_type = main_abi
         .types
         .get("AbiEnum")
         .unwrap()
-        .to_type_description("AbiEnum");
+        .to_type_description(TypeNames {
+            abi: "AbiEnum".to_string(),
+            rust: "Enum".to_string(),
+        });
     if let TypeContents::Enum(variants) = abi_enum_type.contents {
         assert_eq!(variants.len(), 4);
         assert_eq!(

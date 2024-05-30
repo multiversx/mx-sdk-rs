@@ -2,14 +2,11 @@ use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
     PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
-use multiversx_sc::types::{EgldOrEsdtTokenIdentifier, MultiValueEncoded};
 use multiversx_sc_modules::{
     pause::EndpointWrappers as PauseEndpointWrappers,
     staking::EndpointWrappers as StakingEndpointWrappers,
 };
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_buffer, scenario_model::*, WhiteboxContract, *,
-};
+use multiversx_sc_scenario::imports::*;
 
 pub const DECIMALS: u8 = 0;
 pub const EGLD_TICKER: &[u8] = b"EGLD";
@@ -27,7 +24,6 @@ const PRICE_AGGREGATOR_PATH_EXPR: &str = "mxsc:output/multiversx-price-aggregato
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
-    blockchain.set_current_dir_from_workspace("contracts/core/price-aggregator");
     blockchain.register_contract(
         PRICE_AGGREGATOR_PATH_EXPR,
         multiversx_price_aggregator_sc::ContractBuilder,

@@ -23,6 +23,9 @@ pub const CALLBACK_CLOSURE_ARGS_BUFFER: RawHandle = -23;
 pub const MBUF_TEMPORARY_1: RawHandle = -25;
 pub const MBUF_TEMPORARY_2: RawHandle = -26;
 
+pub const ADDRESS_CALLER: RawHandle = -30;
+pub const ADDRESS_SELF: RawHandle = -31;
+
 pub const NEW_HANDLE_START_FROM: RawHandle = -200; // > -100 reserved for APIs
 
 // Vec of 64 entries of 1 bit

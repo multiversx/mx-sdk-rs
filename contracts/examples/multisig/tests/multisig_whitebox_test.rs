@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use multiversx_sc_scenario::imports::*;
 use std::borrow::Borrow;
 
 use adder::Adder;
@@ -7,26 +8,6 @@ use factorial::Factorial;
 use multisig::{
     multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
     user_role::UserRole, Multisig,
-};
-use multiversx_sc::{
-    api::ManagedTypeApi,
-    codec::multi_types::OptionalValue,
-    storage::mappers::SingleValue,
-    types::{
-        Address, BigUint, BoxedBytes, CodeMetadata, FunctionCall, ManagedAddress, ManagedBuffer,
-        ManagedVec,
-    },
-};
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint,
-    multiversx_chain_vm::types::VMAddress,
-    rust_biguint,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
-        SetStateStep, TxExpect, TypedScQuery,
-    },
-    testing_framework::TxResult,
-    DebugApi, ScenarioWorld, WhiteboxContract,
 };
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
@@ -70,7 +51,6 @@ pub struct CallActionDataRaw {
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
     blockchain.register_contract(MULTISIG_PATH_EXPR, multisig::ContractBuilder);
     blockchain

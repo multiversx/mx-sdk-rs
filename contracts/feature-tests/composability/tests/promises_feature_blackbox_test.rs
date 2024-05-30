@@ -1,11 +1,9 @@
-use multiversx_sc::types::BigUint;
-use multiversx_sc_scenario::{
-    api::StaticApi,
-    scenario_model::{Account, CheckAccount, CheckStateStep, ScCallStep, SetStateStep},
-    ContractInfo, ScenarioWorld,
-};
+#![allow(deprecated)] // TODO: unified syntax
 
-use promises_features::call_sync_bt::ProxyTrait;
+use multiversx_sc::types::BigUint;
+use multiversx_sc_scenario::imports::*;
+
+use promises_features::fwd_call_sync_bt::ProxyTrait;
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const PROMISES_FEATURE_ADDRESS_EXPR: &str = "sc:promises-feature";
@@ -22,7 +20,6 @@ type VaultContract = ContractInfo<vault::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
         PROMISES_FEATURES_PATH_EXPR,
