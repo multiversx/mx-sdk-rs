@@ -1,9 +1,9 @@
-use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor};
+use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, network_response, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
     scenario::ScenarioRunner,
-    scenario_model::{ScCallStep, SetStateStep, TxCall, TxResponse},
+    scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
 use multiversx_sdk::{data::transaction::Transaction, utils::base64_encode};
 
@@ -16,7 +16,7 @@ impl Interactor {
         let tx_hash = self.launch_sc_call(sc_call_step).await;
         let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
-        sc_call_step.save_response(TxResponse::from_network_tx(tx));
+        sc_call_step.save_response(network_response::parse_tx_response(tx));
 
         if let Some(token_identifier) = sc_call_step.response().new_issued_token_identifier.clone()
         {

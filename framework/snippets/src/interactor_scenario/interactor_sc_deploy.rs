@@ -1,9 +1,9 @@
-use crate::{mandos_to_erdrs_address, Interactor};
+use crate::{mandos_to_erdrs_address, network_response, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     mandos_system::ScenarioRunner,
-    scenario_model::{ScDeployStep, SetStateStep, TxResponse},
+    scenario_model::{ScDeployStep, SetStateStep},
 };
 use multiversx_sdk::{
     data::{address::Address as ErdrsAddress, transaction::Transaction},
@@ -57,7 +57,7 @@ impl Interactor {
 
         let addr = sc_deploy_step.tx.from.clone();
         let nonce = tx.nonce;
-        sc_deploy_step.save_response(TxResponse::from_network_tx(tx));
+        sc_deploy_step.save_response(network_response::parse_tx_response(tx));
 
         let deploy_address = sc_deploy_step
             .response()
