@@ -391,6 +391,13 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
         TypeName::from(alloc::format!("ManagedDecimal<{}>", DECIMALS))
     }
 
+    fn type_name_rust() -> TypeName {
+        TypeName::from(alloc::format!(
+            "ManagedDecimal<$API, ConstDecimals<{}>>",
+            DECIMALS
+        ))
+    }
+
     fn is_variadic() -> bool {
         false
     }
