@@ -1,12 +1,8 @@
-#![allow(deprecated)] // TODO: unified syntax
-
 mod bf_interact_cli;
 mod bf_interact_config;
 mod bf_interact_state;
 
-use basic_features::{
-    storage_direct_load::ProxyTrait as _, storage_direct_store::ProxyTrait as _, ProxyTrait,
-};
+use basic_features::basic_features_proxy;
 use bf_interact_config::Config;
 use bf_interact_state::State;
 use clap::Parser;
@@ -36,7 +32,7 @@ async fn main() {
 #[allow(unused)]
 struct BasicFeaturesInteract {
     interactor: Interactor,
-    wallet_address: Address,
+    wallet_address: Bech32Address,
     code_expr: BytesValue,
     state: State,
     large_storage_payload: Vec<u8>,
@@ -57,7 +53,7 @@ impl BasicFeaturesInteract {
 
         Self {
             interactor,
-            wallet_address,
+            wallet_address: wallet_address.into(),
             code_expr,
             state: State::load_state(),
             large_storage_payload: Vec::new(),
@@ -74,56 +70,60 @@ impl BasicFeaturesInteract {
     }
 
     async fn set_state(&mut self) {
-        println!("wallet address: {}", bech32::encode(&self.wallet_address));
-        self.interactor
-            .retrieve_account(&Bech32Address::from(&self.wallet_address))
-            .await;
+        println!("wallet address: {}", self.wallet_address);
+        self.interactor.retrieve_account(&self.wallet_address).await;
     }
 
     async fn deploy(&mut self) {
         self.set_state().await;
 
-        let (new_address, _) = self
+        let new_address = self
             .interactor
-            .sc_deploy_get_result::<_, IgnoreValue>(
-                ScDeployStep::new()
-                    .call(self.state.default_contract().init())
-                    .from(&self.wallet_address)
-                    .code(&self.code_expr)
-                    .gas_limit("4,000,000")
-                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .typed(basic_features_proxy::BasicFeaturesProxy)
+            .init()
+            .code(&self.code_expr)
+            .gas(NumExpr("4,000,000"))
+            .returns(ReturnsNewBech32Address)
+            .prepare_async()
+            .run()
             .await;
 
-        let new_address_bech32 = bech32::encode(&new_address);
-        println!("new address: {new_address_bech32}");
+        println!("new address: {new_address}");
 
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_bf_address(&new_address_expr);
+        self.state.set_bf_address(new_address);
     }
 
     async fn set_large_storage(&mut self, value: &[u8]) {
         self.interactor
-            .sc_call(
-                ScCallStep::new()
-                    .call(self.state.bf_contract().store_bytes(value))
-                    .from(&self.wallet_address)
-                    .gas_limit("600,000,000")
-                    .expect(
-                        TxExpect::ok()
-                            .additional_error_message("performing store_bytes failed with: "),
-                    ),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.bf_contract())
+            .gas(NumExpr("600,000,000"))
+            .typed(basic_features_proxy::BasicFeaturesProxy)
+            .store_bytes(value)
+            .prepare_async()
+            .run()
             .await;
 
         println!("successfully performed store_bytes");
     }
 
     async fn print_length(&mut self) {
-        let data: Vec<u8> = self
+        let data_raw = self
             .interactor
-            .quick_query(self.state.bf_contract().load_bytes())
+            .query()
+            .to(self.state.bf_contract())
+            .typed(basic_features_proxy::BasicFeaturesProxy)
+            .load_bytes()
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
             .await;
+
+        let data = data_raw.to_vec();
+
         println!("retrieved data length: {}", data.len());
         if data != self.large_storage_payload {
             println!("WARNING! Payload mismatch!");

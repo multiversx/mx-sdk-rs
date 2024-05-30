@@ -2,6 +2,7 @@
 
 multiversx_sc::imports!();
 
+pub mod basic_features_proxy;
 pub mod big_num_methods;
 pub mod big_num_operators;
 pub mod block_info_features;
