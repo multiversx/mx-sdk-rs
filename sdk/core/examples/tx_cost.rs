@@ -1,6 +1,6 @@
 use multiversx_sdk::{
-    blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::{address::Address, transaction::Transaction},
+    gateway::{GatewayProxy, DEVNET_GATEWAY},
     utils::base64_encode,
 };
 
@@ -26,7 +26,7 @@ async fn main() {
         signature: None,
     };
 
-    let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string());
     let cost = blockchain.request_transaction_cost(&tx).await.unwrap();
 
     println!("tx cost: {cost:#?}");
