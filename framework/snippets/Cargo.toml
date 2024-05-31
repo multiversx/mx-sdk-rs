@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.50.0"
+version = "0.50.3"
 edition = "2021"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -20,10 +20,9 @@ base64 = "0.22"
 log = "0.4.17"
 env_logger = "0.11"
 futures = "0.3"
-rand = "0.8.5"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.50.0"
+version = "=0.50.3"
 path = "../scenario"
 
 [dependencies.multiversx-sdk]

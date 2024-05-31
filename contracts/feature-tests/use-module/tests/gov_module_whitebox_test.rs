@@ -31,7 +31,6 @@ pub struct Payment {
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/features-tests/use-module");
 
     blockchain.register_contract(USE_MODULE_PATH_EXPR, use_module::ContractBuilder);
     blockchain

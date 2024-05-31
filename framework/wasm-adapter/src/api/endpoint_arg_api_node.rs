@@ -56,7 +56,7 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
         let len = self.get_argument_len(arg_index);
         unsafe {
-            let mut res = BoxedBytes::allocate(len);
+            let mut res = BoxedBytes::zeros(len);
             if len > 0 {
                 getArgument(arg_index, res.as_mut_ptr());
             }

@@ -4,7 +4,6 @@ const EXCHANGE_FEATURES_PATH_EXPR: &str = "mxsc:output/exchange-features.mxsc.js
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/exchange-features");
 
     blockchain.register_contract(
         EXCHANGE_FEATURES_PATH_EXPR,

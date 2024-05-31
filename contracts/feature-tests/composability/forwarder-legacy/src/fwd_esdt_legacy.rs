@@ -1,6 +1,6 @@
 multiversx_sc::imports!();
 
-use super::storage;
+use super::fwd_storage_legacy;
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
@@ -17,7 +17,7 @@ pub type EsdtTokenDataMultiValue<M> = MultiValue9<
 >;
 
 #[multiversx_sc::module]
-pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
+pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
     fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
         self.blockchain()
@@ -32,10 +32,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
     #[endpoint]
     fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BigUint) {
-        self.tx()
-            .to(to)
-            .single_esdt(&token_id, 0, amount)
-            .transfer();
+        self.send().direct_esdt(to, &token_id, 0, amount);
     }
 
     #[payable("*")]
@@ -45,10 +42,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
-        self.tx()
-            .to(&to)
-            .single_esdt(&token_id, 0, &amount_to_send)
-            .transfer();
+        self.send().direct_esdt(&to, &token_id, 0, &amount_to_send);
     }
 
     #[endpoint]
@@ -59,14 +53,9 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         amount_first_time: &BigUint,
         amount_second_time: &BigUint,
     ) {
-        self.tx()
-            .to(to)
-            .single_esdt(&token_id, 0, amount_first_time)
-            .transfer();
-        self.tx()
-            .to(to)
-            .single_esdt(&token_id, 0, amount_second_time)
-            .transfer();
+        self.send().direct_esdt(to, &token_id, 0, amount_first_time);
+        self.send()
+            .direct_esdt(to, &token_id, 0, amount_second_time);
     }
 
     #[endpoint]
@@ -84,7 +73,13 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             all_token_payments.push(payment);
         }
 
-        self.tx().to(&to).payment(all_token_payments).transfer();
+        let _ = self.send_raw().multi_esdt_transfer_execute(
+            &to,
+            &all_token_payments,
+            self.blockchain().get_gas_left(),
+            &ManagedBuffer::new(),
+            &ManagedArgBuffer::new(),
+        );
     }
 
     #[payable("EGLD")]
@@ -140,7 +135,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.tx().to(caller).egld(&returned_tokens).transfer();
+                    self.send().direct_egld(caller, &returned_tokens);
                 }
 
                 self.last_error_message().set(&message.err_msg);

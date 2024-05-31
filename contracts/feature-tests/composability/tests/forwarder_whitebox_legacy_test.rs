@@ -1,4 +1,4 @@
-use forwarder_legacy::nft_legacy::{Color, ForwarderNftModule};
+use forwarder_legacy::fwd_nft_legacy::{Color, ForwarderNftModule};
 use multiversx_sc::{contract_base::ContractBase, types::Address};
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_token_id,
@@ -17,7 +17,6 @@ const NFT_TOKEN_ID: &[u8] = b"COOL-123456";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/composability/forwarder_legacy");
 
     blockchain.register_contract(FORWARDER_PATH_EXPR, forwarder_legacy::ContractBuilder);
     blockchain

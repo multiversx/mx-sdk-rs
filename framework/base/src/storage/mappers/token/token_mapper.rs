@@ -86,7 +86,7 @@ where
             .typed(ESDTSystemSCProxy)
             .set_special_roles(address, token_id, roles[..].iter().cloned())
             .callback(opt_callback)
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     fn get_sc_address() -> ManagedAddress<SA> {

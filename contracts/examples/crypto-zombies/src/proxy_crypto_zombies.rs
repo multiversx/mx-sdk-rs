@@ -154,12 +154,12 @@ where
             .original_result()
     }
 
-    pub fn zombies_count(
+    pub fn zombie_last_index(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("zombies_count")
+            .raw_call("zombie_last_index")
             .original_result()
     }
 

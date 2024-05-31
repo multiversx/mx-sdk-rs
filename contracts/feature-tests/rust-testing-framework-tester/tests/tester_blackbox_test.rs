@@ -5,9 +5,6 @@ const WASM_PATH_EXPR: &str = "mxsc:output/rust-testing-framework-tester.mxsc.jso
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain
-        .set_current_dir_from_workspace("contracts/feature_tests/rust-testing-framework-tester");
-
     blockchain.register_contract(
         WASM_PATH_EXPR,
         rust_testing_framework_tester::ContractBuilder,

@@ -1,9 +1,9 @@
 multiversx_sc::imports!();
 
-use super::storage_legacy;
+use super::fwd_storage_legacy;
 
 #[multiversx_sc::module]
-pub trait ForwarderRolesModule: storage_legacy::ForwarderStorageModule {
+pub trait ForwarderRolesModule: fwd_storage_legacy::ForwarderStorageModule {
     #[endpoint(setLocalRoles)]
     fn set_local_roles(
         &self,

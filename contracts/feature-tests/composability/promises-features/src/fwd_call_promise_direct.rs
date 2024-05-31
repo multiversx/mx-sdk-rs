@@ -20,7 +20,6 @@ pub trait CallPromisesDirectModule {
             .payment(payment)
             .arguments_raw(args.to_arg_buffer())
             .gas(gas_limit)
-            .async_call_promise()
             .callback(self.callbacks().the_one_callback(1001, 1002u32.into()))
             .gas_for_callback(extra_gas_for_callback)
             .register_promise();
@@ -46,7 +45,6 @@ pub trait CallPromisesDirectModule {
             .raw_call(endpoint_name)
             .payment(EgldOrMultiEsdtPayment::MultiEsdt(token_payments_vec))
             .gas(gas_limit)
-            .async_call_promise()
             .callback(self.callbacks().the_one_callback(2001, 2002u32.into()))
             .gas_for_callback(extra_gas_for_callback)
             .register_promise();

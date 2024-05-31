@@ -8,10 +8,10 @@ use multiversx_sc_scenario::{
     ScenarioTxEnvData,
 };
 
-use crate::{Interactor, InteractorExecEnv, InteractorStep, StepBuffer};
+use crate::{Interactor, InteractorEnvExec, InteractorStep, StepBuffer};
 
 pub struct HomogenousTxBuffer<'w, Step, RH> {
-    env: InteractorExecEnv<'w>,
+    env: InteractorEnvExec<'w>,
     steps: Vec<StepWrapper<ScenarioTxEnvData, Step, RH>>,
 }
 
@@ -22,7 +22,7 @@ impl Interactor {
     /// Therefore, after execution, all results will have the same type.
     pub fn homogenous_call_buffer<Step, RH>(&mut self) -> HomogenousTxBuffer<'_, Step, RH> {
         let data = self.new_env_data();
-        let env = InteractorExecEnv { world: self, data };
+        let env = InteractorEnvExec { world: self, data };
         HomogenousTxBuffer {
             env,
             steps: Vec::new(),

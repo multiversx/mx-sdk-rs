@@ -3,7 +3,7 @@ use num_traits::ToPrimitive;
 
 use adder::*;
 use basic_features::BasicFeatures;
-use forwarder::call_sync::*;
+use forwarder::fwd_call_sync::*;
 use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
 const TEST_OUTPUT_PATH: &str = "test.scen.json";

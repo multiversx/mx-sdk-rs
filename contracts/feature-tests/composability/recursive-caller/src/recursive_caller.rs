@@ -51,8 +51,7 @@ pub trait RecursiveCaller {
                 .to(&self_address)
                 .typed(self_proxy::RecursiveCallerProxy)
                 .recursive_send_funds(to, token_identifier, amount, counter - 1)
-                .async_call()
-                .call_and_exit()
+                .async_call_and_exit()
         }
     }
 

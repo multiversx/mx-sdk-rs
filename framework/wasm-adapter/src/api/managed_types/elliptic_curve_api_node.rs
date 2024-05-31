@@ -314,7 +314,7 @@ impl EllipticCurveApiImpl for crate::api::VmApiImpl {
     ) -> BoxedBytes {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
-            let mut result = BoxedBytes::allocate(1 + 2 * byte_length as usize);
+            let mut result = BoxedBytes::zeros(1 + 2 * byte_length as usize);
             marshalEC(x_pair_handle, y_pair_handle, ec_handle, result.as_mut_ptr());
             result
         }
@@ -340,7 +340,7 @@ impl EllipticCurveApiImpl for crate::api::VmApiImpl {
     ) -> BoxedBytes {
         unsafe {
             let byte_length = (getCurveLengthEC(ec_handle) + 7) / 8;
-            let mut result = BoxedBytes::allocate(1 + byte_length as usize);
+            let mut result = BoxedBytes::zeros(1 + byte_length as usize);
             marshalCompressedEC(x_pair_handle, y_pair_handle, ec_handle, result.as_mut_ptr());
             result
         }
@@ -426,7 +426,7 @@ impl EllipticCurveApiImpl for crate::api::VmApiImpl {
     ) -> BoxedBytes {
         unsafe {
             let priv_key_length = getPrivKeyByteLengthEC(ec_handle);
-            let mut private_key = BoxedBytes::allocate(priv_key_length as usize);
+            let mut private_key = BoxedBytes::zeros(priv_key_length as usize);
             generateKeyEC(
                 x_pub_key_handle,
                 y_pub_key_handle,

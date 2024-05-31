@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-use forwarder_legacy::nft_legacy::{Color, ProxyTrait as _};
+use forwarder_legacy::fwd_nft_legacy::{Color, ProxyTrait as _};
 
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -21,7 +21,6 @@ type ForwarderContract = ContractInfo<forwarder_legacy::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/composability/");
 
     blockchain.register_contract(FORWARDER_PATH_EXPR, forwarder_legacy::ContractBuilder);
     blockchain

@@ -21,7 +21,6 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
             .gas(gas_limit)
-            .async_call()
             .callback(self.callbacks().retrieve_funds_back_transfers_callback())
             .gas_for_callback(10_000_000)
             .register_promise();
