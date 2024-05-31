@@ -73,8 +73,7 @@ pub trait ProxyTestFirst {
             .typed(pay_me_proxy::PayMeProxy)
             .pay_me(0x56)
             .egld(payment)
-            .async_call()
-            .call_and_exit();
+            .async_call_and_exit();
     }
 
     #[payable("EGLD")]
@@ -103,8 +102,7 @@ pub trait ProxyTestFirst {
                 [3u8; 3].to_vec(),
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(messageOtherContractWithCallback)]

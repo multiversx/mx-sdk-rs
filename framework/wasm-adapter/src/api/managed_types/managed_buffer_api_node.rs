@@ -58,7 +58,7 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
     fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         unsafe {
             let len = mBufferGetLength(handle);
-            let mut res = BoxedBytes::allocate(len as usize);
+            let mut res = BoxedBytes::zeros(len as usize);
             if len > 0 {
                 let _ = mBufferGetBytes(handle, res.as_mut_ptr());
             }

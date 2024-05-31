@@ -15,7 +15,6 @@ const NFT_ID: TestTokenIdentifier = TestTokenIdentifier::new("NFT-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/scenario-tester");
 
     blockchain.register_contract(
         SC_SCENARIO_TESTER_PATH_EXPR,
@@ -94,6 +93,36 @@ fn st_blackbox() {
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .add(1u32)
         .run();
+
+    world
+        .tx()
+        .from(OTHER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .multi_param(MultiValue2((1u32, 1u16)))
+        .run();
+
+    world
+        .tx()
+        .from(OTHER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .multi_return(1u32)
+        .returns(ExpectValue(MultiValue2((1u32, 2u32))))
+        .run();
+
+    let value = world
+        .tx()
+        .from(OTHER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .multi_return(1u32)
+        .returns(ReturnsResultUnmanaged)
+        .run();
+    assert_eq!(
+        value,
+        MultiValue2((RustBigUint::from(1u32), RustBigUint::from(2u32)))
+    );
 
     world.write_scenario_trace("trace1.scen.json");
 }

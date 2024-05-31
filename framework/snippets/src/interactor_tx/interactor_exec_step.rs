@@ -4,12 +4,12 @@ use multiversx_sc_scenario::{
     scenario_model::TxResponse,
 };
 
-use super::InteractorExecEnv;
+use super::InteractorEnvExec;
 
 pub struct InteractorExecStep<'w, Step, RH>
 where
-    RH: RHListExec<TxResponse, InteractorExecEnv<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    pub(crate) step_wrapper: StepWrapper<InteractorExecEnv<'w>, Step, RH>,
+    pub(crate) step_wrapper: StepWrapper<InteractorEnvExec<'w>, Step, RH>,
 }

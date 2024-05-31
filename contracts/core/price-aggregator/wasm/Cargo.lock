@@ -74,9 +74,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.154"
+version = "0.2.155"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae743338b92ff9146ce83992f766a31066a91a8c84a45e0e9f21e7cf6de6d346"
+checksum = "97b3888a4aecf77e811145cadf6eef5901f4782c53886191b2f693f24761847c"
 
 [[package]]
 name = "log"
@@ -86,7 +86,7 @@ checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.50.0"
+version = "0.50.3"
 dependencies = [
  "arrayvec",
  "getrandom",
@@ -105,7 +105,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.50.0"
+version = "0.50.3"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -136,7 +136,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.50.0"
+version = "0.50.3"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -147,14 +147,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.50.0"
+version = "0.50.3"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.50.0"
+version = "0.50.3"
 dependencies = [
  "multiversx-sc",
 ]

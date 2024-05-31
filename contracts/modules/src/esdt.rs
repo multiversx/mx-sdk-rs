@@ -49,9 +49,8 @@ pub trait EsdtModule {
                 token_type,
                 num_decimals,
             )
-            .async_call()
             .with_callback(self.callbacks().issue_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[callback]

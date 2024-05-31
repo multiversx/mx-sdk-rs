@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc"
-version = "0.50.0"
+version = "0.50.3"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
@@ -29,7 +29,7 @@ num-traits = { version = "=0.2.19", default-features = false }
 unwrap-infallible = "0.1.5"
 
 [dependencies.multiversx-sc-derive]
-version = "=0.50.0"
+version = "=0.50.3"
 path = "../derive"
 
 [dependencies.multiversx-sc-codec]

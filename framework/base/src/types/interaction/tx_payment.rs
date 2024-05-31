@@ -24,6 +24,11 @@ use crate::{
 use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};
 
 /// Describes a payment that is part of a transaction.
+#[diagnostic::on_unimplemented(
+    message = "Type `{Self}` cannot be used as payment (does not implement `TxPayment<{Env}>`)",
+    label = "not a valid payment type",
+    note = "there are multiple ways to specify the transaction payment, but `{Self}` is not one of them"
+)]
 pub trait TxPayment<Env>
 where
     Env: TxEnv,
@@ -73,6 +78,7 @@ pub trait TxPaymentEgldOnly<Env>: TxPayment<Env> + AnnotatedValue<Env, BigUint<E
 where
     Env: TxEnv,
 {
+    #[inline]
     fn with_egld_value<F, R>(&self, env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,

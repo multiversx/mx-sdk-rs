@@ -4,7 +4,8 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub enum QueuedCallType {
     Sync,
     LegacyAsync,
@@ -12,7 +13,8 @@ pub enum QueuedCallType {
     Promise,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct QueuedCall<M: ManagedTypeApi> {
     pub call_type: QueuedCallType,
     pub to: ManagedAddress<M>,

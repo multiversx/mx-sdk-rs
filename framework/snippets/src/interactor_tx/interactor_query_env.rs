@@ -8,19 +8,19 @@ use multiversx_sc_scenario::{
 use crate::Interactor;
 
 impl Interactor {
-    pub fn query(&mut self) -> TxBaseWithEnv<InteractorQueryEnv<'_>> {
+    pub fn query(&mut self) -> TxBaseWithEnv<InteractorEnvQuery<'_>> {
         let data = self.new_env_data();
-        let env = InteractorQueryEnv { world: self, data };
+        let env = InteractorEnvQuery { world: self, data };
         Tx::new_with_env(env)
     }
 }
 
-pub struct InteractorQueryEnv<'w> {
+pub struct InteractorEnvQuery<'w> {
     pub world: &'w mut Interactor,
     pub data: ScenarioTxEnvData,
 }
 
-impl<'w> TxEnv for InteractorQueryEnv<'w> {
+impl<'w> TxEnv for InteractorEnvQuery<'w> {
     type Api = StaticApi;
 
     type RHExpect = TxExpect;
@@ -38,7 +38,7 @@ impl<'w> TxEnv for InteractorQueryEnv<'w> {
     }
 }
 
-impl<'w> ScenarioTxEnv for InteractorQueryEnv<'w> {
+impl<'w> ScenarioTxEnv for InteractorEnvQuery<'w> {
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
     }
