@@ -95,11 +95,10 @@ impl ContractVariant {
         let mut abi = ContractAbiJson::from(&self.abi);
         let build_info = core::mem::take(&mut abi.build_info).unwrap();
         let ei_check_json = EiCheckJson::new(&self.settings.check_ei, wasm_info.ei_check);
-        let report = ReportInfoJson::new(&wasm_info, ei_check_json);
+        let report = ReportInfoJson::new(&wasm_info, ei_check_json, compiled_bytes.len());
         let mxsc_file_json = MxscFileJson {
             build_info,
             abi,
-            size: compiled_bytes.len(),
             code: hex::encode(compiled_bytes),
             report,
         };
