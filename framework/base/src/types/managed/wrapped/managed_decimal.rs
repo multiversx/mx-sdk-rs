@@ -142,6 +142,45 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
             num_decimals,
         )
     }
+
+    // pub fn log<T: Decimals>(self, target_base: f64, precision: T) -> ManagedDecimal<M, T> {
+    //     let num_decimals = f64::from(precision.num_decimals() as u32);
+    //     let number = f64::from(self.data.to_u64().unwrap() as u32);
+
+    //     assert!(number >= 1f64 && target_base >= 1f64, "wrong input");
+
+    //     let precise = (number.log10() * num_decimals / target_base.log10())
+    //         .trunc()
+    //         .round() as u64;
+
+    //     ManagedDecimal::from_raw_units(BigUint::<M>::from(precise), precision)
+    // }
+
+    pub fn ln(self, decimals: D) -> ManagedDecimal<M, NumDecimals> {
+        // find the highest power of 2 less than or equal to self
+        let log2 = self.data.log2(); // most significant bit
+        let divisor = 1 << log2;
+        let x = self.to_big_float() / BigFloat::from(divisor); // normalize to [1.0, 2.0]
+
+        let ln_of_2 = BigFloat::from_frac(69314718i64, 1_000_000_000i64);
+        let first = BigFloat::from_frac(17417939i64, 10_000_000i64); // 1.7417939, 7 decimals
+        let second = BigFloat::from_frac(28212026i64, 10_000_000i64); // 2.8212026, 7 decimals
+        let third = BigFloat::from_frac(14699568i64, 10_000_000i64); // 1.4699568, 7 decimals
+        let fourth = BigFloat::from_frac(44717955i64, 1_000_000_000i64); // 0.44717955, 9 decimals
+        let fifth = BigFloat::from_frac(56570851i64, 1_000_000_000i64); // 0.056570851, 9 decimals
+
+        // approximating polynom for getting the result
+        let result =
+            (((fourth - fifth * x.clone()) * x.clone() - third) * x.clone() + second) * x - first;
+        let add_member = BigFloat::from_big_uint(&BigUint::from(log2)) * ln_of_2;
+        let final_result = result + add_member;
+
+        final_result.to_managed_decimal(decimals.num_decimals())
+    }
+
+    pub fn nth_root(self, _root: ManagedDecimal<M, D>, _precision: D) -> ManagedDecimal<M, D> {
+        todo!()
+    }
 }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
@@ -336,6 +375,24 @@ where
             data: self.data / other.data,
             decimals: self.decimals - other.decimals,
         }
+    }
+}
+
+impl<M: ManagedTypeApi> Add<ManagedDecimal<M, NumDecimals>> for ManagedDecimal<M, NumDecimals> {
+    type Output = Self;
+
+    fn add(self, other: ManagedDecimal<M, NumDecimals>) -> Self::Output {
+        let scaled = other.rescale(self.scale());
+        ManagedDecimal::from_raw_units(&self.data + &scaled.data, scaled.decimals)
+    }
+}
+
+impl<M: ManagedTypeApi> Sub<ManagedDecimal<M, NumDecimals>> for ManagedDecimal<M, NumDecimals> {
+    type Output = Self;
+
+    fn sub(self, other: ManagedDecimal<M, NumDecimals>) -> Self::Output {
+        let scaled = other.rescale(self.scale());
+        ManagedDecimal::from_raw_units(&self.data - &scaled.data, scaled.decimals)
     }
 }
 
