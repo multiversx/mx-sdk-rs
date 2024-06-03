@@ -45,10 +45,7 @@ pub trait TestAdder {
         self.adder_address().set(&adder);
 
         // check the initial sum value
-        let sum_as_bytes = self
-            .test_raw()
-            .get_storage(&adder, &ManagedBuffer::from(b"sum"));
-        let sum = BigUint::from(sum_as_bytes);
+        let sum: BigUint = self.storage_raw().read_from_address(&adder, "sum");
         self.test_raw().assert(sum == INIT_SUM);
     }
 
@@ -62,10 +59,7 @@ pub trait TestAdder {
         self.call_add(&value);
 
         // check the sum value
-        let sum_as_bytes = self
-            .test_raw()
-            .get_storage(&adder, &ManagedBuffer::from(b"sum"));
-        let sum = BigUint::from(sum_as_bytes);
+        let sum: BigUint = self.storage_raw().read_from_address(&adder, "sum");
         self.test_raw().assert(sum == (value + INIT_SUM));
     }
 
@@ -80,10 +74,7 @@ pub trait TestAdder {
         self.call_add(&value2);
 
         // check the sum value
-        let sum_as_bytes = self
-            .test_raw()
-            .get_storage(&adder, &ManagedBuffer::from(b"sum"));
-        let sum = BigUint::from(sum_as_bytes);
+        let sum: BigUint = self.storage_raw().read_from_address(&adder, "sum");
         self.test_raw().assert(sum == (value1 + value2 + INIT_SUM));
     }
 

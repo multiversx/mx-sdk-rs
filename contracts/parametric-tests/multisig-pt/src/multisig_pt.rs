@@ -52,17 +52,11 @@ pub trait TestMultisigContract {
     }
 
     fn get_quorum(&self, multisig: &ManagedAddress) -> BigUint {
-        let bs = self
-            .test_raw()
-            .get_storage(multisig, &ManagedBuffer::from(b"quorum"));
-        BigUint::from(bs)
+        self.storage_raw().read_from_address(multisig, "quorum")
     }
 
     fn get_num_board_members(&self, multisig: &ManagedAddress) -> BigUint {
-        let bs = self
-            .test_raw()
-            .get_storage(multisig, &ManagedBuffer::from(b"num_board_members"));
-        BigUint::from(bs)
+        self.storage_raw().read_from_address(multisig, "num_board_members")
     }
 
     #[endpoint(test_change_quorum)]
