@@ -10,14 +10,12 @@
 // Total number of exported functions:   4
 
 #![no_std]
-#![allow(internal_features)]
-#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
-    adder_caller_pt
+    addercaller
     (
         init => init
         call_adder => call_adder
