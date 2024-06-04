@@ -15,6 +15,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use multiversx_sc_codec::TopEncodeMulti;
+use unwrap_infallible::UnwrapInfallible;
 
 #[derive(Debug, Default, Clone)]
 #[repr(transparent)]
@@ -184,16 +185,17 @@ where
 {
     pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
         let mut encoded_buffer = ManagedBuffer::new();
-        let Ok(()) = arg.top_encode_or_handle_err(
+        arg.top_encode_or_handle_err(
             &mut encoded_buffer,
             ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR),
-        );
+        )
+        .unwrap_infallible();
         self.push_arg_raw(encoded_buffer);
     }
 
     pub fn push_multi_arg<T: TopEncodeMulti>(&mut self, arg: &T) {
         let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-        let Ok(()) = arg.multi_encode_or_handle_err(self, h);
+        arg.multi_encode_or_handle_err(self, h).unwrap_infallible();
     }
 }
 
@@ -283,7 +285,7 @@ where
     pub fn serialize_overwrite(&self, dest: &mut ManagedBuffer<M>) {
         dest.overwrite(&[]);
         let h = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR);
-        let Ok(()) = self.top_encode_or_handle_err(dest, h);
+        self.top_encode_or_handle_err(dest, h).unwrap_infallible()
     }
 
     /// Deserializes self from a managed buffer in-place, without creating a new handle.
@@ -293,7 +295,8 @@ where
         self.clear();
         let mut nested_de_input = ManagedBufferNestedDecodeInput::new(source);
         while nested_de_input.remaining_len() > 0 {
-            let Ok(item) = ManagedBuffer::dep_decode_or_handle_err(&mut nested_de_input, h);
+            let item = ManagedBuffer::dep_decode_or_handle_err(&mut nested_de_input, h)
+                .unwrap_infallible();
             self.push_arg_raw(item);
         }
     }
@@ -316,6 +319,6 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        "ManagedArgBufer<$API>".into()
+        "ManagedArgBuffer<$API>".into()
     }
 }

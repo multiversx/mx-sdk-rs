@@ -5,9 +5,9 @@ use crate::{
         ManagedTypeApi, StaticVarApiImpl,
     },
     codec::{
-        CodecFrom, CodecFromSelf, DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode,
-        NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-        TopEncodeOutput, TryStaticCast,
+        DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+        NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+        TryStaticCast,
     },
     formatter::{
         hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay,
@@ -413,23 +413,12 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     }
 }
 
-impl<M> CodecFromSelf for ManagedBuffer<M> where M: ManagedTypeApi {}
-
-impl<M> CodecFrom<&[u8]> for ManagedBuffer<M> where M: ManagedTypeApi {}
-impl<M> CodecFrom<&str> for ManagedBuffer<M> where M: ManagedTypeApi {}
-impl<M, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<M> where M: ManagedTypeApi {}
-
 impl<M> TypeAbiFrom<&[u8]> for ManagedBuffer<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&str> for ManagedBuffer<M> where M: ManagedTypeApi {}
 impl<M, const N: usize> TypeAbiFrom<&[u8; N]> for ManagedBuffer<M> where M: ManagedTypeApi {}
 
 macro_rules! managed_buffer_codec_from_impl_bi_di {
     ($other_ty:ty) => {
-        impl<M: ManagedTypeApi> CodecFrom<$other_ty> for ManagedBuffer<M> {}
-        impl<M: ManagedTypeApi> CodecFrom<&$other_ty> for ManagedBuffer<M> {}
-        impl<M: ManagedTypeApi> CodecFrom<ManagedBuffer<M>> for $other_ty {}
-        impl<M: ManagedTypeApi> CodecFrom<&ManagedBuffer<M>> for $other_ty {}
-
         impl<M: ManagedTypeApi> TypeAbiFrom<$other_ty> for ManagedBuffer<M> {}
         impl<M: ManagedTypeApi> TypeAbiFrom<&$other_ty> for ManagedBuffer<M> {}
         impl<M: ManagedTypeApi> TypeAbiFrom<ManagedBuffer<M>> for $other_ty {}

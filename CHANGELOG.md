@@ -26,6 +26,35 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+
+## [sc 0.50.3] - 2024-05-25
+- Dependency update and fix. There was an issue with the `zip` dependency in sc-meta.
+
+## [sc 0.50.2] - 2024-05-24
+- Unified transaction syntax:
+	- Better compilation error messages for malformed transactions;
+	- Deprecated methods `async_call` and `async_call_promises`, which are kept for backwards compatibility, but causing confusion among developers;
+	- Contract upgrade available in tests.
+- `sc-meta` proxy compare option, which checks that proxies are up to date. Useful for CI.
+- `TypeAbi` - removed `Unmanaged` associated type trait bounds, and implemented it for more types.
+- Removed jitter from interactor transaction fetch.
+- Fixed an issue in the snippets generator.
+
+## [sc 0.50.1] - 2024-05-16
+- `sc-meta all snippets` generates unified syntax.
+- Proxy generator can reference multi-contract variant.
+- Fixes:
+	- `BoxedBytes` - fixed memory leak.
+	- `ManagedVecItem` - allowing larger payloads (up to 128 bytes).
+
+## [sc 0.50.0, codec 0.19.0, vm 0.8.4, sdk 0.4.1] - 2024-05-10
+- Framework now runs on **stable** Rust. All unstable features were removed. The most important changes enabling this:
+	- `CodecFrom` completely removed, `TypeAbiFrom` was used instead since 0.49.0.
+	- `ManagedVecItem` payload redesigned.
+	- Contract panic message mechanism improved.
+- Unified syntax:
+	- `NotPayable` marker type in proxies, which prevents callers to add payment to a non-payable endpoint.
+
 ## [sc 0.49.0, codec 0.18.8, sdk 0.4.0] - 2024-05-07
 - Unified transaction syntax
 	- new syntax for sending transactions from contracts

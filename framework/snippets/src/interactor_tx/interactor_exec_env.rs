@@ -8,20 +8,20 @@ use multiversx_sc_scenario::{
 use crate::Interactor;
 
 impl Interactor {
-    pub fn tx(&mut self) -> TxBaseWithEnv<InteractorExecEnv<'_>> {
+    pub fn tx(&mut self) -> TxBaseWithEnv<InteractorEnvExec<'_>> {
         let data = self.new_env_data();
-        let env = InteractorExecEnv { world: self, data };
+        let env = InteractorEnvExec { world: self, data };
         Tx::new_with_env(env)
     }
 }
 
 /// Environment for executing transactions.
-pub struct InteractorExecEnv<'w> {
+pub struct InteractorEnvExec<'w> {
     pub world: &'w mut Interactor,
     pub data: ScenarioTxEnvData,
 }
 
-impl<'w> TxEnv for InteractorExecEnv<'w> {
+impl<'w> TxEnv for InteractorEnvExec<'w> {
     type Api = StaticApi;
 
     type RHExpect = TxExpect;
@@ -39,7 +39,7 @@ impl<'w> TxEnv for InteractorExecEnv<'w> {
     }
 }
 
-impl<'w> ScenarioTxEnv for InteractorExecEnv<'w> {
+impl<'w> ScenarioTxEnv for InteractorEnvExec<'w> {
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
     }

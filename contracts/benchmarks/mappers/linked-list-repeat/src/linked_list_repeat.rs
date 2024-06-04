@@ -3,6 +3,7 @@
 multiversx_sc::imports!();
 
 use benchmark_common::ExampleStruct;
+pub mod linked_list_repeat_proxy;
 
 #[multiversx_sc::contract]
 pub trait LinkedListRepeat: benchmark_common::BenchmarkCommon {

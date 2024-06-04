@@ -1,15 +1,19 @@
 use crate::types::{BigUint, ManagedAddress, TxFrom, TxToSpecified};
 
-use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment, TxPaymentEgldOnly};
+use super::{
+    Egld, FullPaymentData, FunctionCall, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly,
+};
 
 impl<Env> TxPayment<Env> for ()
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
         true
     }
 
+    #[inline]
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -17,9 +21,10 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        Egld(BigUint::zero()).perform_transfer_execute(env, to, gas_limit, fc);
+        Egld(BigUint::zero_ref()).perform_transfer_execute(env, to, gas_limit, fc);
     }
 
+    #[inline]
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
@@ -31,14 +36,16 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
-        to.with_address_ref(env, |to_addr| f(to_addr, &BigUint::zero(), &fc))
+        to.with_address_ref(env, |to_addr| f(to_addr, &*BigUint::zero_ref(), fc))
     }
 
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData::default()
     }
 }
+
+impl<Env> TxNoPayment<Env> for () where Env: TxEnv {}
 
 impl<Env> TxPaymentEgldOnly<Env> for () where Env: TxEnv {}

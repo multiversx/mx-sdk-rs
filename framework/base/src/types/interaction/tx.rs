@@ -452,6 +452,62 @@ where
     }
 }
 
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxToSpecified<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Produces the normalized function call, i.e. with builtin function calls for ESDT transfers.
+    ///
+    /// The resulting transaction can differ from the input in several ways:
+    /// - the recipient is changed (some builtin functions are called with recipient = sender),
+    /// - the function call becomes a builtin function call.
+    ///
+    /// ## Important
+    ///
+    /// Do not call this before sending transactions! Normalization is don automatically whenever necessary.
+    /// Only use when you need the normalized data, e.g. for a multisig.
+    ///
+    /// ## Warning
+    ///
+    /// To produce owned values, some clones are performed.
+    /// It is not optimized for contracts, but can be used nonetheless.
+    #[allow(clippy::type_complexity)]
+    pub fn normalize(
+        self,
+    ) -> Tx<
+        Env,
+        From,
+        ManagedAddress<Env::Api>,
+        EgldPayment<Env::Api>,
+        Gas,
+        FunctionCall<Env::Api>,
+        RH,
+    > {
+        let (norm_to, norm_egld, norm_fc) = self.payment.with_normalized(
+            &self.env,
+            &self.from,
+            self.to,
+            self.data,
+            |norm_to, norm_egld, norm_fc| (norm_to.clone(), norm_egld.clone(), norm_fc),
+        );
+
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: norm_to,
+            payment: Egld(norm_egld),
+            gas: self.gas,
+            data: norm_fc,
+            result_handler: self.result_handler,
+        }
+    }
+}
+
 impl<Env, From, Payment, Gas> Tx<Env, From, (), Payment, Gas, (), ()>
 where
     Env: TxEnv,
@@ -762,7 +818,7 @@ where
     ///
     /// Whenever possible, use proxies instead.
     ///
-    /// Doesa not serialize, does not enforce type safety.
+    /// Does not serialize, does not enforce type safety.
     #[inline]
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;

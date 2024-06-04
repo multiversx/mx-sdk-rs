@@ -8,7 +8,6 @@ const CODE_EXPR: &str = "mxsc:output/panic-message-features.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/adder");
 
     blockchain.register_contract(CODE_EXPR, panic_message_features::ContractBuilder);
     blockchain

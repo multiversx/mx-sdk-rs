@@ -4,8 +4,6 @@ use multiversx_sc_snippets::imports::*;
 
 use super::*;
 
-const WEGLD_SWAP_SC_BECH32: &str = "erd1qqqqqqqqqqqqqpgqcy2wua5cq59y6sxqj2ka3scayh5e5ms7cthqht8xtp";
-const WEGLD_TOKEN_IDENTIFIER: &str = "WEGLD-6cf38e";
 const WRAP_AMOUNT: u64 = 50000000000000000; // 0.05 EGLD
 const UNWRAP_AMOUNT: u64 = 25000000000000000; // 0.025 WEGLD
 
@@ -36,13 +34,19 @@ impl MultisigInteract {
 
     pub async fn wegld_swap_set_state(&mut self) {
         self.interactor
-            .retrieve_account(&Bech32Address::from_bech32_string(
-                WEGLD_SWAP_SC_BECH32.to_owned(),
-            ))
+            .retrieve_account(&self.config.wegld_address)
             .await;
     }
 
     async fn propose_wrap_egld(&mut self) -> usize {
+        let function_call = self
+            .interactor
+            .tx()
+            .to(&self.config.wegld_address)
+            .typed(wegld_proxy::EgldEsdtSwapProxy)
+            .wrap_egld()
+            .into_function_call();
+
         let action_id = self
             .interactor
             .tx()
@@ -50,11 +54,7 @@ impl MultisigInteract {
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
-            .propose_async_call(
-                bech32::decode(WEGLD_SWAP_SC_BECH32),
-                WRAP_AMOUNT,
-                FunctionCall::new("wrapEgld"),
-            )
+            .propose_async_call(&self.config.wegld_address, WRAP_AMOUNT, function_call)
             .returns(ReturnsResult)
             .prepare_async()
             .run()
@@ -64,14 +64,36 @@ impl MultisigInteract {
         action_id
     }
 
+    pub async fn query_wegld_token_identifier(&mut self) -> TokenIdentifier<StaticApi> {
+        let wegld_token_id = self
+            .interactor
+            .query()
+            .to(&self.config.wegld_address)
+            .typed(wegld_proxy::EgldEsdtSwapProxy)
+            .wrapped_egld_token_id()
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
+
+        println!("WEGLD token identifier: {wegld_token_id}");
+
+        wegld_token_id
+    }
+
     async fn propose_unwrap_egld(&mut self) -> usize {
-        let to = ManagedAddress::<StaticApi>::from(bech32::decode(WEGLD_SWAP_SC_BECH32));
-        let payment = EsdtTokenPayment::new(
-            TokenIdentifier::from(WEGLD_TOKEN_IDENTIFIER),
-            0u64,
-            UNWRAP_AMOUNT.into(),
-        );
-        let function_call = FunctionCall::new("unwrapEgld");
+        let wegld_token_id = self.query_wegld_token_identifier().await;
+
+        let normalized_tx = self
+            .interactor
+            .tx()
+            .to(&self.config.wegld_address)
+            .typed(wegld_proxy::EgldEsdtSwapProxy)
+            .unwrap_egld()
+            .single_esdt(&wegld_token_id, 0u64, &UNWRAP_AMOUNT.into())
+            .normalize();
+        let normalized_to = normalized_tx.to;
+        let normalized_data = normalized_tx.data;
 
         let action_id = self
             .interactor
@@ -80,8 +102,7 @@ impl MultisigInteract {
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
-            .propose_async_call(to, 0u64, function_call)
-            .esdt(payment)
+            .propose_async_call(normalized_to, 0u64, normalized_data)
             .returns(ReturnsResult)
             .prepare_async()
             .run()

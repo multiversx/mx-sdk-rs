@@ -2,7 +2,7 @@ use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
         FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv, TxEnv,
-        TxToSpecified,
+        TxNoPayment, TxToSpecified,
     },
 };
 
@@ -42,10 +42,11 @@ impl<'w> ScenarioTxEnv for ScenarioEnvQuery<'w> {
     }
 }
 
-impl<'w, To, RH> ScenarioTxRun
-    for Tx<ScenarioEnvQuery<'w>, (), To, (), (), FunctionCall<StaticApi>, RH>
+impl<'w, To, Payment, RH> ScenarioTxRun
+    for Tx<ScenarioEnvQuery<'w>, (), To, Payment, (), FunctionCall<StaticApi>, RH>
 where
     To: TxToSpecified<ScenarioEnvQuery<'w>>,
+    Payment: TxNoPayment<ScenarioEnvQuery<'w>>,
     RH: RHListExec<TxResponse, ScenarioEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
@@ -65,13 +66,15 @@ impl ScenarioWorld {
         Tx::new_with_env(env)
     }
 
-    pub fn chain_query<To, RH, F>(&mut self, f: F) -> &mut Self
+    pub fn chain_query<To, Payment, RH, F>(&mut self, f: F) -> &mut Self
     where
         To: TxToSpecified<ScenarioTxEnvData>,
+        Payment: TxNoPayment<ScenarioTxEnvData>,
         RH: RHListExec<TxResponse, ScenarioTxEnvData, ListReturns = ()>,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
-        ) -> Tx<ScenarioTxEnvData, (), To, (), (), FunctionCall<StaticApi>, RH>,
+        )
+            -> Tx<ScenarioTxEnvData, (), To, Payment, (), FunctionCall<StaticApi>, RH>,
     {
         let env = self.new_env_data();
         let tx_base = TxBaseWithEnv::new_with_env(env);

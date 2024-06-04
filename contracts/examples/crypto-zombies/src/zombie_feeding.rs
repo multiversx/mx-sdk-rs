@@ -1,6 +1,6 @@
 use multiversx_sc::imports::*;
 
-use crate::{kitty_ownership_proxy, storage, zombie_factory, zombie_helper};
+use crate::{kitty_obj::Kitty, kitty_ownership_proxy, storage, zombie_factory, zombie_helper};
 
 #[multiversx_sc::module]
 pub trait ZombieFeeding:
@@ -38,7 +38,7 @@ pub trait ZombieFeeding:
     #[callback]
     fn get_kitty_callback(
         &self,
-        #[call_result] result: ManagedAsyncCallResult<crate::kitty_obj::Kitty>,
+        #[call_result] result: ManagedAsyncCallResult<Kitty>,
         zombie_id: usize,
     ) {
         match result {

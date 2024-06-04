@@ -40,6 +40,10 @@ impl MetaConfig {
         }
     }
 
+    pub fn reload_sc_config(&mut self) {
+        self.sc_config = ScConfig::load_from_crate_or_default("..", &self.original_contract_abi);
+    }
+
     /// Generates all code for the wasm crate(s).
     pub fn generate_wasm_crates(&mut self) {
         self.remove_unexpected_wasm_crates();
@@ -201,11 +205,14 @@ debug = false
 panic = \"abort\"
 overflow-checks = false
 
+[profile.dev]
+panic = \"abort\"
+
 [dependencies.test-crate-name]
 path = \"..\"
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = \"0.49.0\"
+version = \"x.y.z\"
 path = \"../../../../framework/wasm-adapter\"
 
 [workspace]
@@ -218,7 +225,7 @@ members = [\".\"]
             name: "test".to_string(),
             edition: "2021".to_string(),
             profile: ContractVariantProfile::default(),
-            framework_version: "0.49.0".to_string(),
+            framework_version: "x.y.z".to_string(),
             framework_path: Option::Some("../../../framework/base".to_string()),
             contract_features: Vec::<String>::new(),
         };

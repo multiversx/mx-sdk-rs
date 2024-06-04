@@ -56,14 +56,14 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         match self.len() {
             0 => ().with_normalized(env, from, to, fc, f),
             1 => self.get(0).as_refs().with_normalized(env, from, to, fc, f),
             _ => to.with_address_ref(env, |to_addr| {
                 let fc_conv = fc.convert_to_multi_transfer_esdt_call(to_addr, self);
-                f(&from.resolve_address(env), &BigUint::zero(), &fc_conv)
+                f(&from.resolve_address(env), &*BigUint::zero_ref(), fc_conv)
             }),
         }
     }
@@ -80,10 +80,12 @@ impl<'a, Env> TxPayment<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
         self.deref().is_empty()
     }
 
+    #[inline]
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -95,6 +97,7 @@ where
             .perform_transfer_execute(env, to, gas_limit, fc)
     }
 
+    #[inline]
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
@@ -106,7 +109,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.deref().with_normalized(env, from, to, fc, f)
     }
@@ -120,10 +123,12 @@ impl<Env> TxPayment<Env> for MultiEsdtPayment<Env::Api>
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
         self.is_empty()
     }
 
+    #[inline]
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -134,6 +139,7 @@ where
         (&self).perform_transfer_execute(env, to, gas_limit, fc);
     }
 
+    #[inline]
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
@@ -145,7 +151,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         (&self).with_normalized(env, from, to, fc, f)
     }

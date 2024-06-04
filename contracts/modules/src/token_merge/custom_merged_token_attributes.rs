@@ -6,9 +6,19 @@ use multiversx_sc::codec::Empty;
 
 use super::merged_token_instances::MergedTokenInstances;
 
-pub trait AllMergeScTraits = super::merged_token_setup::MergedTokenSetupModule
+pub trait AllMergeScTraits:
+    super::merged_token_setup::MergedTokenSetupModule
     + crate::default_issue_callbacks::DefaultIssueCallbacksModule
-    + crate::pause::PauseModule;
+    + crate::pause::PauseModule
+{
+}
+
+impl<T> AllMergeScTraits for T where
+    T: super::merged_token_setup::MergedTokenSetupModule
+        + crate::default_issue_callbacks::DefaultIssueCallbacksModule
+        + crate::pause::PauseModule
+{
+}
 
 pub trait MergedTokenAttributesCreator {
     type ScType: AllMergeScTraits;

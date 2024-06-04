@@ -2,7 +2,7 @@ use multiversx_sc_scenario::{
     api::StaticApi,
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
-        types::{FunctionCall, RHListExec, Tx, TxBaseWithEnv, TxToSpecified},
+        types::{FunctionCall, RHListExec, Tx, TxBaseWithEnv, TxNoPayment, TxToSpecified},
     },
     scenario::tx_to_step::TxToQueryStep,
     scenario_model::TxResponse,
@@ -11,13 +11,14 @@ use multiversx_sc_scenario::{
 
 use crate::Interactor;
 
-use super::{InteractorPrepareAsync, InteractorQueryEnv, InteractorQueryStep};
+use super::{InteractorEnvQuery, InteractorPrepareAsync, InteractorQueryStep};
 
-impl<'w, To, RH> InteractorPrepareAsync
-    for Tx<InteractorQueryEnv<'w>, (), To, (), (), FunctionCall<StaticApi>, RH>
+impl<'w, To, Payment, RH> InteractorPrepareAsync
+    for Tx<InteractorEnvQuery<'w>, (), To, Payment, (), FunctionCall<StaticApi>, RH>
 where
-    To: TxToSpecified<InteractorQueryEnv<'w>>,
-    RH: RHListExec<TxResponse, InteractorQueryEnv<'w>>,
+    To: TxToSpecified<InteractorEnvQuery<'w>>,
+    Payment: TxNoPayment<InteractorEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Exec = InteractorQueryStep<'w, RH>;
@@ -31,7 +32,7 @@ where
 
 impl<'w, RH> InteractorQueryStep<'w, RH>
 where
-    RH: RHListExec<TxResponse, InteractorQueryEnv<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(mut self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
@@ -45,13 +46,15 @@ where
 }
 
 impl Interactor {
-    pub async fn chain_query<To, RH, F>(&mut self, f: F) -> &mut Self
+    pub async fn chain_query<To, Payment, RH, F>(&mut self, f: F) -> &mut Self
     where
         To: TxToSpecified<ScenarioTxEnvData>,
+        Payment: TxNoPayment<ScenarioTxEnvData>,
         RH: RHListExec<TxResponse, ScenarioTxEnvData, ListReturns = ()>,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
-        ) -> Tx<ScenarioTxEnvData, (), To, (), (), FunctionCall<StaticApi>, RH>,
+        )
+            -> Tx<ScenarioTxEnvData, (), To, Payment, (), FunctionCall<StaticApi>, RH>,
     {
         let env = self.new_env_data();
         let tx_base = TxBaseWithEnv::new_with_env(env);

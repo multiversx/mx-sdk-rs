@@ -37,9 +37,8 @@ pub trait NftModule {
                     can_add_special_roles: true,
                 },
             )
-            .async_call()
             .with_callback(self.callbacks().issue_callback())
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[only_owner]
@@ -54,8 +53,7 @@ pub trait NftModule {
                 &self.nft_token_id().get(),
                 [EsdtLocalRole::NftCreate][..].iter().cloned(),
             )
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     // endpoints

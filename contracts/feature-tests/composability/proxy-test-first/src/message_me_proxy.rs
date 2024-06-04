@@ -48,7 +48,7 @@ where
     >(
         self,
         init_arg: Arg0,
-    ) -> TxProxyDeploy<Env, From, Gas, i32> {
+    ) -> TxTypedDeploy<Env, From, (), Gas, i32> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&init_arg)
@@ -67,7 +67,7 @@ where
 {
     pub fn upgrade(
         self,
-    ) -> TxProxyUpgrade<Env, From, To, Gas, ()> {
+    ) -> TxTypedUpgrade<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_upgrade()
             .original_result()
@@ -94,7 +94,7 @@ where
         arg2: Arg1,
         arg3: Arg2,
         arg4: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("messageMe")
             .argument(&arg1)

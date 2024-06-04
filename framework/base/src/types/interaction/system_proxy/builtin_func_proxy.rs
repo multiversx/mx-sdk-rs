@@ -1,8 +1,8 @@
 use multiversx_sc_codec::{Empty, TopEncode};
 
 use crate::types::{
-    BigUint, ManagedAddress, ManagedBuffer, ManagedVec, ProxyArg, TokenIdentifier, Tx, TxEnv,
-    TxFrom, TxGas, TxProxyCall, TxProxyTrait, TxTo,
+    BigUint, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg, TokenIdentifier, Tx,
+    TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 use super::builtin_func_names::{
@@ -49,21 +49,24 @@ where
     pub fn set_user_name<Arg0: ProxyArg<ManagedBuffer<Env::Api>>>(
         self,
         name: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call(SET_USERNAME_FUNC_NAME)
             .argument(&name)
             .original_result()
     }
 
-    pub fn delete_user_name(self) -> TxProxyCall<Env, From, To, Gas, ()> {
+    pub fn delete_user_name(self) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call(DELETE_USERNAME_FUNC_NAME)
             .original_result()
     }
 
-    pub fn claim_developer_rewards(self) -> TxProxyCall<Env, From, To, Gas, ()> {
+    pub fn claim_developer_rewards(self) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call(CLAIM_DEVELOPER_REWARDS_FUNC_NAME)
             .original_result()
     }
@@ -71,8 +74,9 @@ where
     pub fn change_owner_address(
         self,
         new_owner: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call(CHANGE_OWNER_BUILTIN_FUNC_NAME)
             .argument(new_owner)
             .original_result()
@@ -83,10 +87,11 @@ where
         token: &TokenIdentifier<Env::Api>,
         nonce: u64,
         amount: &BigUint<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         if nonce == 0 {
             return self
                 .wrapped_tx
+                .payment(NotPayable)
                 .raw_call(ESDT_LOCAL_BURN_FUNC_NAME)
                 .argument(token)
                 .argument(amount)
@@ -94,6 +99,7 @@ where
         }
 
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call(ESDT_NFT_BURN_FUNC_NAME)
             .argument(token)
             .argument(&nonce)
@@ -106,16 +112,18 @@ where
         token: &TokenIdentifier<Env::Api>,
         nonce: u64,
         amount: &BigUint<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         if nonce == 0 {
             return self
                 .wrapped_tx
+                .payment(NotPayable)
                 .raw_call(ESDT_LOCAL_MINT_FUNC_NAME)
                 .argument(token)
                 .argument(amount)
                 .original_result();
         }
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call(ESDT_NFT_ADD_QUANTITY_FUNC_NAME)
             .argument(token)
             .argument(&nonce)
@@ -128,9 +136,10 @@ where
         token_id: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
         new_uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self
             .wrapped_tx
+            .payment(NotPayable)
             .raw_call(ESDT_NFT_ADD_URI_FUNC_NAME)
             .argument(token_id)
             .argument(&nft_nonce);
@@ -147,8 +156,9 @@ where
         token_id: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
         new_attributes: &T,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call(ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME)
             .argument(token_id)
             .argument(&nft_nonce)
@@ -166,9 +176,10 @@ where
         hash: &ManagedBuffer<Env::Api>,
         attributes: &T,
         uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         let mut tx = self
             .wrapped_tx
+            .payment(NotPayable)
             .raw_call(ESDT_NFT_CREATE_FUNC_NAME)
             .argument(token)
             .argument(amount)

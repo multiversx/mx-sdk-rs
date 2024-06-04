@@ -14,6 +14,11 @@ where
 {
 }
 
+#[diagnostic::on_unimplemented(
+    message = "Type `{Self}` cannot be used as code (does not implement `TxCodeValue<{Env}>`)",
+    label = "not a valid smart contract byte code",
+    note = "there are multiple ways to specify SC byte code, but `{Self}` is not one of them"
+)]
 pub trait TxCodeValue<Env>: AnnotatedValue<Env, ManagedBuffer<Env::Api>>
 where
     Env: TxEnv,
@@ -39,6 +44,11 @@ where
 {
 }
 
+#[diagnostic::on_unimplemented(
+    message = "Type `{Self}` cannot be used as code source value (does not implement `TxFromSourceValue<{Env}>`)",
+    label = "not an address from where to copy the code",
+    note = "there are multiple ways to specify a code source address, but `{Self}` is not one of them"
+)]
 pub trait TxFromSourceValue<Env>: AnnotatedValue<Env, ManagedAddress<Env::Api>>
 where
     Env: TxEnv,

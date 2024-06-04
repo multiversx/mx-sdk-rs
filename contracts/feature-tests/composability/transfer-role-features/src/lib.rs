@@ -2,6 +2,7 @@
 #![allow(clippy::type_complexity)]
 
 multiversx_sc::imports!();
+pub mod transfer_role_proxy;
 
 #[multiversx_sc::contract]
 pub trait TransferRoleFeatures:

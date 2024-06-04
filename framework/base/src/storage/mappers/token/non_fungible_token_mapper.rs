@@ -1,8 +1,6 @@
 use crate::{
     abi::TypeAbiFrom,
-    codec::{
-        CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
-    },
+    codec::{EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput},
     storage_clear, storage_get, storage_set,
     types::{
         system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
@@ -147,10 +145,7 @@ where
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
-        contract_call
-            .async_call()
-            .with_callback(callback)
-            .call_and_exit();
+        contract_call.with_callback(callback).async_call_and_exit();
     }
 
     /// Important: If you use custom callback, remember to save the token ID in the callback and clear the mapper in case of error! Clear is unusable outside this specific case.
@@ -202,9 +197,8 @@ where
                 token_type,
                 num_decimals,
             )
-            .async_call()
             .callback(callback)
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     pub fn clear(&mut self) {
@@ -409,11 +403,6 @@ where
             output.push_single_value(&self.get_token_id(), h)
         }
     }
-}
-
-impl<SA> CodecFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
-    SA: StorageMapperApi + CallTypeApi
-{
 }
 
 impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where

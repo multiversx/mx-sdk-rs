@@ -1,17 +1,22 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
-    CodecFrom, PanicErrorHandler, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
+    PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
+/// Little experiment: conversion using the codec.
+///
+/// Not used anywhere.
 pub fn codec_convert_or_panic<From, To, Medium>(from: From) -> To
 where
     From: TopEncodeMulti,
-    To: CodecFrom<From>,
+    To: TopDecodeMulti,
     Medium: Default + TopDecodeMultiInput + TopEncodeMultiOutput,
 {
     let mut medium: Medium = Default::default();
-    let Ok(()) = from.multi_encode_or_handle_err(&mut medium, PanicErrorHandler);
-    let Ok(result) = To::multi_decode_or_handle_err(&mut medium, PanicErrorHandler);
-    result
+    from.multi_encode_or_handle_err(&mut medium, PanicErrorHandler)
+        .unwrap_infallible();
+    To::multi_decode_or_handle_err(&mut medium, PanicErrorHandler).unwrap_infallible()
 }
 
 #[allow(unused)]
@@ -32,9 +37,7 @@ mod test {
     where
         T1: TopEncodeMulti,
         T2: TopEncodeMulti,
-        u32: CodecFrom<T1>,
-        u32: CodecFrom<T2>,
-        R: CodecFrom<u32>,
+        R: TopDecodeMulti,
     {
         let conv_x = codec_convert_or_panic::<T1, u32, Vec<Vec<u8>>>(x);
         let conv_y = codec_convert_or_panic::<T2, u32, Vec<Vec<u8>>>(y);

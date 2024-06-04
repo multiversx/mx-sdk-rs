@@ -45,8 +45,9 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .original_result()
     }
@@ -75,8 +76,9 @@ where
         type_id: Arg2,
         value: Arg3,
         data: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("safeTransferFrom")
             .argument(&from)
             .argument(&to)
@@ -100,8 +102,9 @@ where
         type_ids: Arg2,
         values: Arg3,
         data: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("safeBatchTransferFrom")
             .argument(&from)
             .argument(&to)
@@ -118,8 +121,9 @@ where
         self,
         operator: Arg0,
         approved: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setApprovalForAll")
             .argument(&operator)
             .argument(&approved)
@@ -135,8 +139,9 @@ where
         uri: Arg0,
         initial_supply: Arg1,
         is_fungible: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("createToken")
             .argument(&uri)
             .argument(&initial_supply)
@@ -151,8 +156,9 @@ where
         self,
         type_id: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("mint")
             .argument(&type_id)
             .argument(&amount)
@@ -166,8 +172,9 @@ where
         self,
         type_id: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("burn")
             .argument(&type_id)
             .argument(&amount)
@@ -181,8 +188,9 @@ where
         self,
         owner: Arg0,
         type_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("balanceOf")
             .argument(&owner)
             .argument(&type_id)
@@ -194,8 +202,9 @@ where
     >(
         self,
         owner_type_id_pairs: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, BigUint<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, BigUint<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("balanceOfBatch")
             .argument(&owner_type_id_pairs)
             .original_result()
@@ -208,8 +217,9 @@ where
         self,
         type_id: Arg0,
         nft_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getTokenOwner")
             .argument(&type_id)
             .argument(&nft_id)
@@ -221,8 +231,9 @@ where
     >(
         self,
         type_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getTokenTypeCreator")
             .argument(&type_id)
             .original_result()
@@ -233,8 +244,9 @@ where
     >(
         self,
         type_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, BoxedBytes> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BoxedBytes> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getTokenTypeUri")
             .argument(&type_id)
             .original_result()
@@ -245,8 +257,9 @@ where
     >(
         self,
         type_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("isFungible")
             .argument(&type_id)
             .original_result()
@@ -259,8 +272,9 @@ where
         self,
         operator: Arg0,
         owner: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("isApprovedForAll")
             .argument(&operator)
             .argument(&owner)

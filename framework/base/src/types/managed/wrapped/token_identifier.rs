@@ -96,6 +96,12 @@ impl<M: ManagedTypeApi> From<&str> for TokenIdentifier<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<&crate::types::heap::String> for TokenIdentifier<M> {
+    fn from(s: &crate::types::heap::String) -> Self {
+        TokenIdentifier::from(s.as_bytes())
+    }
+}
+
 impl<M: ManagedTypeApi> PartialEq for TokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -161,11 +167,6 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
         ))
     }
 }
-
-impl<M> CodecFromSelf for TokenIdentifier<M> where M: ManagedTypeApi {}
-
-impl<M> CodecFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
-impl<M> CodecFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M> TypeAbiFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}

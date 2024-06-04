@@ -1,5 +1,5 @@
 use hex_literal::hex;
-use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
     abi::TypeAbiFrom,
@@ -61,7 +61,6 @@ impl TopEncode for ESDTSystemSCAddress {
     }
 }
 
-impl<M> CodecFrom<ESDTSystemSCAddress> for ManagedAddress<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<ESDTSystemSCAddress> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 impl core::fmt::Display for ESDTSystemSCAddress {

@@ -1,8 +1,10 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
-        try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
+        try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
         TopDecodeMulti, TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti,
         TopEncodeMultiOutput,
     },
@@ -68,10 +70,11 @@ where
     T: TopEncodeMulti,
 {
     pub fn push(&mut self, item: T) {
-        let Ok(()) = item.multi_encode_or_handle_err(
+        item.multi_encode_or_handle_err(
             &mut self.raw_buffers,
             ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        );
+        )
+        .unwrap_infallible()
     }
 }
 
@@ -241,6 +244,10 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
+    #[cfg(feature = "alloc")]
+    type Unmanaged = MultiValueVec<T::Unmanaged>;
+
+    #[cfg(not(feature = "alloc"))]
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
@@ -260,19 +267,8 @@ where
     }
 }
 
-impl<M, T> CodecFromSelf for MultiValueEncoded<M, T> where M: ManagedTypeApi {}
-
 #[cfg(feature = "alloc")]
-use crate::codec::{multi_types::MultiValueVec, CodecFrom};
-
-#[cfg(feature = "alloc")]
-impl<M, T, U> CodecFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
-where
-    M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti,
-    U: CodecFrom<T>,
-{
-}
+use crate::codec::multi_types::MultiValueVec;
 
 #[cfg(feature = "alloc")]
 impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
@@ -280,15 +276,6 @@ where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
     U: TypeAbiFrom<T>,
-{
-}
-
-#[cfg(feature = "alloc")]
-impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
-where
-    M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti,
-    U: CodecFrom<T>,
 {
 }
 

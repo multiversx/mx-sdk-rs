@@ -44,7 +44,7 @@ where
         token_id: Arg0,
         token_nonce: Arg1,
         claim_destination: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("claimTokens")
             .argument(&token_id)

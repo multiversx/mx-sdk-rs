@@ -50,8 +50,9 @@ where
         self,
         quorum: Arg0,
         board: Arg1,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&quorum)
             .argument(&board)
@@ -75,8 +76,9 @@ where
         self,
         quorum: Arg0,
         board: Arg1,
-    ) -> TxProxyUpgrade<Env, From, To, Gas, ()> {
+    ) -> TxTypedUpgrade<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_upgrade()
             .argument(&quorum)
             .argument(&board)
@@ -96,7 +98,7 @@ where
     /// Allows the contract to receive funds even if it is marked as unpayable in the protocol. 
     pub fn deposit(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("deposit")
             .original_result()
@@ -109,8 +111,9 @@ where
     /// - (number of signers followed by) list of signer addresses. 
     pub fn get_pending_action_full_info(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getPendingActionFullInfo")
             .original_result()
     }
@@ -124,8 +127,9 @@ where
         self,
         user: Arg0,
         action_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("signed")
             .argument(&user)
             .argument(&action_id)
@@ -141,8 +145,9 @@ where
     >(
         self,
         user: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, UserRole> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, UserRole> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("userRole")
             .argument(&user)
             .original_result()
@@ -151,8 +156,9 @@ where
     /// Lists all users that can sign actions. 
     pub fn get_all_board_members(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getAllBoardMembers")
             .original_result()
     }
@@ -160,8 +166,9 @@ where
     /// Lists all proposers that are not board members. 
     pub fn get_all_proposers(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getAllProposers")
             .original_result()
     }
@@ -172,8 +179,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("sign")
             .argument(&action_id)
             .original_result()
@@ -186,8 +194,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unsign")
             .argument(&action_id)
             .original_result()
@@ -201,8 +210,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("discardAction")
             .argument(&action_id)
             .original_result()
@@ -211,8 +221,9 @@ where
     /// Minimum number of signatures needed to perform any action. 
     pub fn quorum(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getQuorum")
             .original_result()
     }
@@ -221,8 +232,9 @@ where
     /// It is kept in sync with the user list by the contract. 
     pub fn num_board_members(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNumBoardMembers")
             .original_result()
     }
@@ -231,8 +243,9 @@ where
     /// It is kept in sync with the user list by the contract. 
     pub fn num_proposers(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNumProposers")
             .original_result()
     }
@@ -241,8 +254,9 @@ where
     /// 0 means that no action was ever proposed yet. 
     pub fn get_action_last_index(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionLastIndex")
             .original_result()
     }
@@ -253,8 +267,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, Action<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Action<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionData")
             .argument(&action_id)
             .original_result()
@@ -268,8 +283,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedVec<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionSigners")
             .argument(&action_id)
             .original_result()
@@ -282,8 +298,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionSignerCount")
             .argument(&action_id)
             .original_result()
@@ -299,8 +316,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionValidSignerCount")
             .argument(&action_id)
             .original_result()
@@ -313,8 +331,9 @@ where
     >(
         self,
         board_member_address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeAddBoardMember")
             .argument(&board_member_address)
             .original_result()
@@ -327,8 +346,9 @@ where
     >(
         self,
         proposer_address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeAddProposer")
             .argument(&proposer_address)
             .original_result()
@@ -340,8 +360,9 @@ where
     >(
         self,
         user_address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeRemoveUser")
             .argument(&user_address)
             .original_result()
@@ -352,8 +373,9 @@ where
     >(
         self,
         new_quorum: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeChangeQuorum")
             .argument(&new_quorum)
             .original_result()
@@ -372,8 +394,9 @@ where
         to: Arg0,
         egld_amount: Arg1,
         function_call: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeTransferExecute")
             .argument(&to)
             .argument(&egld_amount)
@@ -395,8 +418,9 @@ where
         to: Arg0,
         egld_amount: Arg1,
         function_call: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeAsyncCall")
             .argument(&to)
             .argument(&egld_amount)
@@ -415,8 +439,9 @@ where
         source: Arg1,
         code_metadata: Arg2,
         arguments: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeSCDeployFromSource")
             .argument(&amount)
             .argument(&source)
@@ -438,8 +463,9 @@ where
         source: Arg2,
         code_metadata: Arg3,
         arguments: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeSCUpgradeFromSource")
             .argument(&sc_address)
             .argument(&amount)
@@ -455,8 +481,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("quorumReached")
             .argument(&action_id)
             .original_result()
@@ -468,8 +495,9 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, OptionalValue<ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OptionalValue<ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("performAction")
             .argument(&action_id)
             .original_result()
@@ -482,7 +510,7 @@ where
         self,
         dns_address: Arg0,
         name: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("dnsRegister")
             .argument(&dns_address)

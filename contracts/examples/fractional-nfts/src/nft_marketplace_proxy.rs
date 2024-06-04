@@ -46,7 +46,7 @@ where
         claim_destination: Arg0,
         token_id: Arg1,
         token_nonce: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<BigUint<Env::Api>, ManagedVec<Env::Api, EsdtTokenPayment<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, ManagedVec<Env::Api, EsdtTokenPayment<Env::Api>>>> {
         self.wrapped_tx
             .raw_call("claimTokens")
             .argument(&claim_destination)

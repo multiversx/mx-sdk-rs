@@ -75,14 +75,14 @@ pub fn set_account(
     account_state.storage = convert_storage(account_storage);
 
     for (_, esdt_balance) in account_esdt.iter() {
-        account_state = account_state.esdt_balance(
-            format!("str:{}", esdt_balance.token_identifier).as_str(),
-            esdt_balance.balance.as_str(),
-        );
+        let token_id_expr = format!("str:{}", esdt_balance.token_identifier);
+        account_state =
+            account_state.esdt_balance(token_id_expr.as_str(), esdt_balance.balance.as_str());
     }
 
     for (token_id, esdt_roles) in account_esdt_roles {
-        account_state = account_state.esdt_roles(token_id.as_str(), esdt_roles);
+        let token_id_expr = format!("str:{token_id}");
+        account_state = account_state.esdt_roles(token_id_expr.as_str(), esdt_roles);
     }
 
     account_state

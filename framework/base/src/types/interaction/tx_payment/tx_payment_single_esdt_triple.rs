@@ -12,6 +12,7 @@ where
         self.2 == 0u32
     }
 
+    #[inline]
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -22,6 +23,7 @@ where
         EsdtTokenPayment::from(self).perform_transfer_execute(env, to, gas_limit, fc)
     }
 
+    #[inline]
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
@@ -33,11 +35,12 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         EsdtTokenPayment::from(self).with_normalized(env, from, to, fc, f)
     }
 
+    #[inline]
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
         EsdtTokenPayment::from(self).into_full_payment_data(env)
     }

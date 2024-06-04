@@ -1,6 +1,6 @@
 use crate::{
-    CodecFrom, CodecFromSelf, DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler,
-    TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
+    DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, TopDecodeMulti,
+    TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 /// Temporary value used for any kind of templates.
@@ -19,9 +19,6 @@ impl TopEncodeMulti for PlaceholderInput {
     }
 }
 
-impl !CodecFromSelf for PlaceholderInput {}
-impl<T> CodecFrom<PlaceholderInput> for T where T: TopDecodeMulti + CodecFromSelf {}
-
 /// Temporary value used for any kind of templates.
 ///
 /// Can be used for compiling example code, in which it decodes from anything, but will always fail at runtime.
@@ -37,6 +34,3 @@ impl TopDecodeMulti for PlaceholderOutput {
         Err(h.handle_error(DecodeError::from("placeholder only, cannot decode")))
     }
 }
-
-impl !CodecFromSelf for PlaceholderOutput {}
-impl<T> CodecFrom<T> for PlaceholderOutput where T: TopEncodeMulti + CodecFromSelf {}
