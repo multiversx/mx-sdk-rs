@@ -21,8 +21,6 @@ pub use crate::{
         ScenarioRunner,
     },
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-    standalone::retrieve_account_as_scenario_set_state,
-    test_wallets,
     whitebox_legacy::*,
     ScenarioTxRun,
 };

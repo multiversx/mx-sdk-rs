@@ -12,5 +12,5 @@ where
 {
     value
         .try_into()
-        .unwrap_or_else(|_| M::error_api_impl().signal_error(err_msg::CAST_TO_I64_ERROR))
+        .unwrap_or_else(|_| M::error_api_impl().signal_error(err_msg::CAST_TO_I64_ERROR.as_bytes()))
 }

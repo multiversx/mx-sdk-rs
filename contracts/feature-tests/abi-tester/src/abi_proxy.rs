@@ -578,3 +578,12 @@ pub enum ExplicitDiscriminantMixed {
         b: u16,
     },
 }
+
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
+pub struct ManagedDecimalWrapper<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub field: ManagedDecimal<Api, ConstDecimals<2>>,
+}

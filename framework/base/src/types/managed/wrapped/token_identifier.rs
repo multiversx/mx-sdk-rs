@@ -1,3 +1,5 @@
+use alloc::string::ToString;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{ErrorApi, ErrorApiImpl, HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
@@ -69,9 +71,9 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     pub fn ticker(&self) -> ManagedBuffer<M> {
         let token_id_len = self.buffer.len();
         let ticker_len = M::managed_type_impl().get_token_ticker_len(token_id_len);
-        self.buffer
-            .copy_slice(0, ticker_len)
-            .unwrap_or_else(|| M::error_api_impl().signal_error(err_msg::BAD_TOKEN_TICKER_FORMAT))
+        self.buffer.copy_slice(0, ticker_len).unwrap_or_else(|| {
+            M::error_api_impl().signal_error(err_msg::BAD_TOKEN_TICKER_FORMAT.as_bytes())
+        })
     }
 }
 
@@ -212,7 +214,6 @@ impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> core::fmt::Debug for TokenIdentifier<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        use crate::alloc::string::ToString;
         f.debug_tuple("TokenIdentifier")
             .field(&self.to_string())
             .finish()

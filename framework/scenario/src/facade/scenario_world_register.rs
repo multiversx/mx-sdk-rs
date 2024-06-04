@@ -11,7 +11,7 @@ use crate::{
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 
-use multiversx_sc_meta::cmd::contract::sc_config::ContractVariant;
+use multiversx_sc_meta_lib::contract::sc_config::ContractVariant;
 
 use super::expr::RegisterCodeSource;
 
@@ -78,7 +78,7 @@ impl ScenarioWorld {
         B: CallableContractBuilder,
     {
         let multi_contract_config =
-            multiversx_sc_meta::multi_contract_config::<Abi>(self.current_dir.as_path());
+            multiversx_sc_meta_lib::multi_contract_config::<Abi>(self.current_dir.as_path());
         let contract_variant = multi_contract_config.find_contract(sub_contract_name);
         self.register_contract_variant(expression, contract_builder, contract_variant);
     }

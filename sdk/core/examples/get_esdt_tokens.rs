@@ -1,6 +1,6 @@
 use multiversx_sdk::{
-    blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::address::Address,
+    gateway::{GatewayProxy, DEVNET_GATEWAY},
 };
 
 #[tokio::main]
@@ -10,7 +10,7 @@ async fn main() {
     )
     .unwrap();
 
-    let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string());
     let balances = blockchain.get_account_esdt_tokens(&addr).await.unwrap();
 
     println!("{balances:#?}");

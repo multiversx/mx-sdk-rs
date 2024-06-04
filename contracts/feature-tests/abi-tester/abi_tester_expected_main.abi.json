@@ -480,6 +480,14 @@
         {
             "ticker": "ExplicitDiscriminantMixed",
             "type": "ExplicitDiscriminantMixed"
+        },
+        {
+            "ticker": "ManagedDecimalVar",
+            "type": "ManagedDecimal<usize>"
+        },
+        {
+            "ticker": "ManagedDecimalConst",
+            "type": "ManagedDecimalWrapper"
         }
     ],
     "hasCallback": false,
@@ -793,6 +801,15 @@
                             "type": "u16"
                         }
                     ]
+                }
+            ]
+        },
+        "ManagedDecimalWrapper": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "field",
+                    "type": "ManagedDecimal<2>"
                 }
             ]
         },

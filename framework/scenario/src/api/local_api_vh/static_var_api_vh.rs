@@ -80,4 +80,14 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
             use_raw_handle(data.static_vars_cell.borrow().call_value_multi_esdt_handle)
         })
     }
+
+    fn is_scaling_factor_cached(&self, decimals: usize) -> bool {
+        self.with_static_data(|data| data.static_vars_cell.borrow().scaling_factor_init[decimals])
+    }
+
+    fn set_scaling_factor_cached(&self, decimals: usize) {
+        self.with_static_data(|data| {
+            data.static_vars_cell.borrow_mut().scaling_factor_init[decimals] = true
+        })
+    }
 }

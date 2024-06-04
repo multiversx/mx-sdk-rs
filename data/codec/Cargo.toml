@@ -15,7 +15,6 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 derive = ["multiversx-sc-codec-derive"]
-alloc = []
 
 [dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"

@@ -37,7 +37,7 @@ pub trait BigIntApiImpl: HandleTypeInfo + ErrorApi {
     ) {
         self.bi_sub(dest.clone(), x, y);
         if self.bi_sign(dest) == Sign::Minus {
-            Self::error_api_impl().signal_error(err_msg::BIG_UINT_SUB_NEGATIVE);
+            Self::error_api_impl().signal_error(err_msg::BIG_UINT_SUB_NEGATIVE.as_bytes());
         }
     }
 

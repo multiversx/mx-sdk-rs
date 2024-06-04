@@ -42,6 +42,7 @@ impl Interactor {
         info!("{:#?}", result);
 
         let raw_results: Vec<Vec<u8>> = result.data.return_data.iter().map(base64_decode).collect();
+
         step.save_response(TxResponse::from_raw_results(raw_results));
 
         self.pre_runners.run_sc_query_step(step);

@@ -56,4 +56,12 @@ impl StaticVarApiImpl for UncallableApi {
     fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
         unreachable!()
     }
+
+    fn is_scaling_factor_cached(&self, _decimals: usize) -> bool {
+        unreachable!()
+    }
+
+    fn set_scaling_factor_cached(&self, _decimals: usize) {
+        unreachable!()
+    }
 }

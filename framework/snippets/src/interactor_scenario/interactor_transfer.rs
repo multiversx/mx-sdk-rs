@@ -14,7 +14,7 @@ impl Interactor {
         println!("transfer tx hash: {tx_hash}");
         info!("transfer tx hash: {}", tx_hash);
 
-        self.retrieve_tx_on_network(tx_hash.clone()).await;
+        self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
 
         self.post_runners.run_transfer_step(&transfer_step);
 

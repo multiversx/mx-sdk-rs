@@ -2,12 +2,12 @@ use std::{fs, process::Command};
 
 use convert_case::{Case, Casing};
 use multiversx_sc_meta::{
-    cmd::standalone::template::{
+    cmd::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
-    find_workspace::find_current_workspace,
     version_history::{self, LAST_TEMPLATE_VERSION},
 };
+use multiversx_sc_meta_lib::tools::find_current_workspace;
 
 const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
 const BUILD_CONTRACTS: bool = true;

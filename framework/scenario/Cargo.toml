@@ -33,10 +33,6 @@ clap = { version = "4.4.7", features = ["derive"] }
 tokio = { version = "1.24", features = ["full"] }
 unwrap-infallible = "0.1.5"
 
-[[bin]]
-name = "sc-scenario"
-path = "src/main.rs"
-
 [features]
 run-go-tests = []
 
@@ -45,9 +41,9 @@ version = "=0.50.3"
 features = ["alloc", "num-bigint"]
 path = "../base"
 
-[dependencies.multiversx-sc-meta]
+[dependencies.multiversx-sc-meta-lib]
 version = "=0.50.3"
-path = "../meta"
+path = "../meta-lib"
 
 [dependencies.multiversx-chain-scenario-format]
 version = "0.22.2"
