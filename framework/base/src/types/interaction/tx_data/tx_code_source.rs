@@ -86,6 +86,7 @@ where
 }
 
 impl<Env> TxCodePathValue<Env> for ManagedBuffer<Env::Api> where Env: TxEnv {}
+impl<Env> TxCodePathValue<Env> for &ManagedBuffer<Env::Api> where Env: TxEnv {}
 
 /// Contains code for a deploy or upgrade.
 pub struct CodePath<CodePathValue>(pub CodePathValue);
