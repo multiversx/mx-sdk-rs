@@ -104,20 +104,6 @@ where
             .original_result()
     }
 
-    /// Iterates through all actions and retrieves those that are still pending. 
-    /// Serialized full action data: 
-    /// - the action id 
-    /// - the serialized action data 
-    /// - (number of signers followed by) list of signer addresses. 
-    pub fn get_pending_action_full_info(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getPendingActionFullInfo")
-            .original_result()
-    }
-
     /// Returns `true` (`1`) if the user has signed the action. 
     /// Does not check whether or not the user is still a board member and the signature valid. 
     pub fn signed<
@@ -133,43 +119,6 @@ where
             .raw_call("signed")
             .argument(&user)
             .argument(&action_id)
-            .original_result()
-    }
-
-    /// Indicates user rights. 
-    /// `0` = no rights, 
-    /// `1` = can propose, but not sign, 
-    /// `2` = can propose and sign. 
-    pub fn user_role<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-    >(
-        self,
-        user: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, UserRole> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("userRole")
-            .argument(&user)
-            .original_result()
-    }
-
-    /// Lists all users that can sign actions. 
-    pub fn get_all_board_members(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getAllBoardMembers")
-            .original_result()
-    }
-
-    /// Lists all proposers that are not board members. 
-    pub fn get_all_proposers(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getAllProposers")
             .original_result()
     }
 
@@ -258,69 +207,6 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getActionLastIndex")
-            .original_result()
-    }
-
-    /// Serialized action data of an action with index. 
-    pub fn get_action_data<
-        Arg0: ProxyArg<usize>,
-    >(
-        self,
-        action_id: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Action<Env::Api>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getActionData")
-            .argument(&action_id)
-            .original_result()
-    }
-
-    /// Gets addresses of all users who signed an action. 
-    /// Does not check if those users are still board members or not, 
-    /// so the result may contain invalid signers. 
-    pub fn get_action_signers<
-        Arg0: ProxyArg<usize>,
-    >(
-        self,
-        action_id: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, ManagedAddress<Env::Api>>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getActionSigners")
-            .argument(&action_id)
-            .original_result()
-    }
-
-    /// Gets addresses of all users who signed an action and are still board members. 
-    /// All these signatures are currently valid. 
-    pub fn get_action_signer_count<
-        Arg0: ProxyArg<usize>,
-    >(
-        self,
-        action_id: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getActionSignerCount")
-            .argument(&action_id)
-            .original_result()
-    }
-
-    /// It is possible for board members to lose their role. 
-    /// They are not automatically removed from all actions when doing so, 
-    /// therefore the contract needs to re-check every time when actions are performed. 
-    /// This function is used to validate the signers before performing an action. 
-    /// It also makes it easy to check before performing an action. 
-    pub fn get_action_valid_signer_count<
-        Arg0: ProxyArg<usize>,
-    >(
-        self,
-        action_id: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getActionValidSignerCount")
-            .argument(&action_id)
             .original_result()
     }
 

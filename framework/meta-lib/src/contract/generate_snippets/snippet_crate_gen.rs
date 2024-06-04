@@ -9,9 +9,9 @@ use crate::version_history;
 static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
 static SC_CONFIG_PATH: &str = "../sc-config.toml";
 static FULL_PROXY_ENTRY: &str = r#"[[proxy]]
-path = "interact-rs/src/proxy.rs"
+path = "interactor/src/proxy.rs"
  "#;
-static PROXY_PATH: &str = "interact-rs/src/proxy.rs";
+static PROXY_PATH: &str = "interactor/src/proxy.rs";
 
 pub(crate) fn create_snippets_folder(snippets_folder_path: &str) {
     // returns error if folder already exists, so we ignore the result
