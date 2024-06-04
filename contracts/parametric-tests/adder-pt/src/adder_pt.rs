@@ -28,18 +28,15 @@ pub trait TestAdder {
         let adder = ManagedAddress::from(b"adder___________________________");
         self.test_raw().register_new_address(&owner, 1, &adder);
 
-        // deploy the adder contract
-        let mut adder_init_args = ManagedArgBuffer::new();
-        adder_init_args.push_arg(INIT_SUM); // initial sum
-
-        // deploy a contract from `owner`
-        let adder = self.test_raw().deploy_contract(
-            &owner,
-            5000000000000,
-            &BigUint::zero(),
-            &code_path,
-            &adder_init_args,
-        );
+        let adder = self
+            .tx()
+            .from(&owner)
+            .typed(adder_proxy::AdderProxy)
+            .init(INIT_SUM)
+            .code_path(code_path)
+            .gas(5000000000000)
+            .returns(ReturnsNewManagedAddress)
+            .test_deploy();
 
         // save the deployed contract's address
         self.adder_address().set(&adder);
