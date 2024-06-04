@@ -13,7 +13,7 @@ use super::{
 };
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
-const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
+const SNIPPETS_RELATIVE_PATH: &str = "../interactor";
 const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
 const WASM_NO_MANAGED_EI: &str = "wasm-no-managed-ei";
 const WASM_NO_MANAGED_EI_LIB_PATH: &str = "../wasm-no-managed-ei/src/lib.rs";
