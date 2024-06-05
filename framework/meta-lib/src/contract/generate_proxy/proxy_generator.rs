@@ -534,7 +534,7 @@ where
 
         let processed_rust_type = process_rust_type(rust_type.to_string(), paths, processed_paths);
 
-        self.rename_path_with_custome_config(&processed_rust_type)
+        self.rename_path_with_custom_config(&processed_rust_type)
     }
 
     fn start_write_type(
@@ -589,7 +589,7 @@ where
         self.writeln("    }");
     }
 
-    fn rename_path_with_custome_config(&self, processed_type: &str) -> String {
+    fn rename_path_with_custom_config(&self, processed_type: &str) -> String {
         let mut renamed_processed_type = processed_type.to_owned();
 
         if let Some(paths_rename) = &self.proxy_config.path_rename {
