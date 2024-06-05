@@ -163,15 +163,15 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         let x = self.to_big_float() / divisor; // normalize to [1.0, 2.0]
 
         let ln_of_2 = BigFloat::from_frac(69314718i64, 100_000_000i64); // 0.69314718 8 decimals
-        let first = BigFloat::from_frac(-17417939i64, 10_000_000i64); // 1.7417939, 7 decimals
+        let first = BigFloat::from_frac(17417939i64, 10_000_000i64); // 1.7417939, 7 decimals
         let second = BigFloat::from_frac(28212026i64, 10_000_000i64); // 2.8212026, 7 decimals
-        let third = BigFloat::from_frac(-14699568i64, 10_000_000i64); // 1.4699568, 7 decimals
+        let third = BigFloat::from_frac(14699568i64, 10_000_000i64); // 1.4699568, 7 decimals
         let fourth = BigFloat::from_frac(44717955i64, 100_000_000i64); // 0.44717955, 8 decimals
-        let fifth = BigFloat::from_frac(-56570851i64, 1_000_000_000i64); // 0.056570851, 9 decimals
+        let fifth = BigFloat::from_frac(56570851i64, 1_000_000_000i64); // 0.056570851, 9 decimals
 
         // approximating polynom for getting the result
         let result =
-            (((fourth + fifth * x.clone()) * x.clone() + third) * x.clone() + second) * x + first;
+            (((fourth - fifth * x.clone()) * x.clone() - third) * x.clone() + second) * x - first;
         let add_member = BigFloat::from_big_uint(&BigUint::from(log2)) * ln_of_2;
         let final_result = result + add_member;
 
