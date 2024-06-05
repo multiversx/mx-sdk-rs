@@ -136,7 +136,7 @@ fn test_managed_decimal_ln() {
     assert_eq!(
         ln_fixed,
         ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(
-            BigUint::from(313549421u64),
+            BigUint::from(31355146488u64),
             10usize
         )
     );
