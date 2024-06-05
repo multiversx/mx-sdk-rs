@@ -50,6 +50,7 @@ fn generate_endpoint_snippet(
     };
 
     let label_names = &m.label_names;
+    // let custome_proxy = &m.custome_proxy;
     let mutability_tokens = mutability.to_tokens();
     let endpoint_type_tokens = endpoint_type.to_tokens();
 

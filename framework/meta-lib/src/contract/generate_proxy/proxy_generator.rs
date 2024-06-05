@@ -144,7 +144,7 @@ where
         }
 
         if !self.contract_abi.endpoints.is_empty() {
-            self.write_endpoints();
+            self.write_endpoints(&self.proxy_config.custome_proxy_endpoints);
         }
     }
 
@@ -210,11 +210,15 @@ where
         self.writeln("}");
     }
 
-    fn write_endpoints(&mut self) {
+    fn write_endpoints(&mut self, custome_endpoints: &[String]) {
         let endpoints: Vec<EndpointAbi> = self.contract_abi.endpoints.clone();
 
         self.write_header_impl_endpoints();
         for (i, endpoint_abi) in endpoints.into_iter().enumerate() {
+            if !custome_endpoints.is_empty() && !custome_endpoints.contains(&endpoint_abi.name) {
+                continue;
+            }
+
             if i > 0 {
                 self.writeln("");
             }
