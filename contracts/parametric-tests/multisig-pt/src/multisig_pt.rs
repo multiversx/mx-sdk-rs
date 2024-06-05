@@ -49,22 +49,22 @@ pub trait TestMultisigContract {
             .returns(ReturnsNewManagedAddress)
             .test_deploy();
 
-        self.test_raw().assert(self.get_quorum(&multisig) == 2u32);
+        self.test_raw().assert(self.get_quorum(&multisig) == 2usize);
         self.test_raw()
-            .assert(self.get_num_board_members(&multisig) == 3u32);
+            .assert(self.get_num_board_members(&multisig) == 3usize);
     }
 
-    fn get_quorum(&self, multisig: &ManagedAddress) -> BigUint {
+    fn get_quorum(&self, multisig: &ManagedAddress) -> usize {
         self.storage_raw().read_from_address(multisig, "quorum")
     }
 
-    fn get_num_board_members(&self, multisig: &ManagedAddress) -> BigUint {
+    fn get_num_board_members(&self, multisig: &ManagedAddress) -> usize {
         self.storage_raw()
             .read_from_address(multisig, "num_board_members")
     }
 
     #[endpoint(test_change_quorum)]
-    fn test_change_quorum(&self, value: BigUint) {
+    fn test_change_quorum(&self, value: usize) {
         let multisig = ManagedAddress::from(MULTISIG);
         let alice = ManagedAddress::from(ALICE);
         let bob = ManagedAddress::from(BOB);
@@ -73,7 +73,7 @@ pub trait TestMultisigContract {
         self.test_raw()
             .assume(value <= self.get_num_board_members(&multisig));
 
-        self.change_quorum_propose(&multisig, &alice, &value);
+        self.change_quorum_propose(&multisig, &alice, value);
         self.change_quorum_sign(&multisig, &bob);
         self.perform_action(&multisig, &alice);
 
@@ -85,17 +85,13 @@ pub trait TestMultisigContract {
         &self,
         multisig: &ManagedAddress,
         proposer: &ManagedAddress,
-        value: &BigUint,
+        value: usize,
     ) {
-        let quorum_u64 = value
-            .to_u64()
-            .unwrap_or_else(|| sc_panic!("quorum too large"));
-
         self.tx()
             .from(proposer)
             .to(multisig)
             .typed(multisig_proxy::MultisigProxy)
-            .propose_change_quorum(quorum_u64 as usize)
+            .propose_change_quorum(value)
             .gas(5000000)
             .test_call();
     }
