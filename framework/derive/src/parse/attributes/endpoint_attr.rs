@@ -32,6 +32,10 @@ pub fn is_upgrade(attr: &syn::Attribute) -> bool {
     is_attribute_with_no_args(attr, ATTR_UPGRADE)
 }
 
+pub fn is_custom_proxy(attr: &syn::Attribute) -> bool {
+    is_attribute_with_no_args(attr, ATTR_CUSTOM_PROXY)
+}
+
 #[derive(Clone, Debug)]
 pub struct EndpointAttribute {
     pub endpoint_name: Option<syn::Ident>,

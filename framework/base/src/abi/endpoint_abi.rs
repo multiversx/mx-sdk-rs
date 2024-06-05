@@ -51,6 +51,7 @@ pub struct EndpointAbi {
     pub inputs: Vec<InputAbi>,
     pub outputs: OutputAbis,
     pub allow_multiple_var_args: bool,
+    pub custom_proxy: bool,
 }
 
 impl EndpointAbi {
@@ -69,6 +70,7 @@ impl EndpointAbi {
         payable_in_tokens: &[&str],
         labels: &[&str],
         allow_multiple_var_args: bool,
+        custom_proxy: bool,
     ) -> Self {
         EndpointAbi {
             docs: docs.iter().map(|s| s.to_string()).collect(),
@@ -83,6 +85,7 @@ impl EndpointAbi {
             inputs: Vec::new(),
             outputs: Vec::new(),
             allow_multiple_var_args,
+            custom_proxy,
         }
     }
 

@@ -5,6 +5,7 @@ use crate::types::*;
 /// Storage tests: direct store.
 #[multiversx_sc::module]
 pub trait StorageStoreFeatures {
+    #[custom_proxy]
     #[endpoint]
     #[storage_set("storage_bytes")]
     fn store_bytes(&self, bi: ManagedBuffer);

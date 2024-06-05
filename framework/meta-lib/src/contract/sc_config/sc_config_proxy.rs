@@ -20,8 +20,8 @@ pub struct ProxyConfigSerde {
     pub variant: Option<String>,
 
     #[serde(default)]
-    #[serde(rename = "custome-endpoints")]
-    pub custome_proxy_endpoints: Vec<String>,
+    #[serde(rename = "custom-endpoints")]
+    pub custom_proxy_endpoints: Vec<String>,
 }
 
 impl ProxyConfigSerde {
@@ -31,7 +31,7 @@ impl ProxyConfigSerde {
             override_import: None,
             path_rename: None,
             variant: None,
-            custome_proxy_endpoints: Vec::new(),
+            custom_proxy_endpoints: Vec::new(),
         }
     }
 }

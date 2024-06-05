@@ -397,6 +397,7 @@ mod sample_adder {
                 &[],
                 &[],
                 false,
+                false,
             );
             endpoint_abi
             .add_output::<
@@ -418,6 +419,7 @@ mod sample_adder {
                 &[],
                 &[],
                 false,
+                false,
             );
             endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("initial_value");
             contract_abi.add_type_descriptions::<multiversx_sc::types::BigUint<Self::Api>>();
@@ -433,6 +435,7 @@ mod sample_adder {
                 &[],
                 &[],
                 false,
+                false,
             );
             endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("initial_value");
             contract_abi.add_type_descriptions::<multiversx_sc::types::BigUint<Self::Api>>();
@@ -447,6 +450,7 @@ mod sample_adder {
                 multiversx_sc::abi::EndpointTypeAbi::Endpoint,
                 &[],
                 &[],
+                false,
                 false,
             );
             endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("value");

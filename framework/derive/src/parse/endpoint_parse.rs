@@ -5,8 +5,8 @@ use crate::model::{
 
 use super::{
     attributes::{
-        is_allow_multiple_var_args, is_callback_raw, is_init, is_only_admin, is_only_owner,
-        is_only_user_account, is_upgrade, CallbackAttribute, EndpointAttribute,
+        is_allow_multiple_var_args, is_callback_raw, is_custom_proxy, is_init, is_only_admin,
+        is_only_owner, is_only_user_account, is_upgrade, CallbackAttribute, EndpointAttribute,
         ExternalViewAttribute, LabelAttribute, OutputNameAttribute, PromisesCallbackAttribute,
         ViewAttribute,
     },
@@ -66,6 +66,18 @@ pub fn process_allow_multiple_var_args_attribute(
     is_allow_multiple_var_args
 }
 
+pub fn process_custom_proxy_attribute(
+    attr: &syn::Attribute,
+    pass_1_data: &mut MethodAttributesPass1,
+) -> bool {
+    let is_custom_proxy = is_custom_proxy(attr);
+    if is_custom_proxy {
+        pass_1_data.custom_proxy = true;
+    }
+
+    is_custom_proxy
+}
+
 pub fn process_only_owner_attribute(
     attr: &syn::Attribute,
     pass_1_data: &mut MethodAttributesPass1,
@@ -119,6 +131,7 @@ pub fn process_endpoint_attribute(
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Mutable,
                 allow_multiple_var_args: pass_1_data.allow_multiple_var_args,
+                custom_proxy: pass_1_data.custom_proxy,
             });
         })
         .is_some()
@@ -144,6 +157,7 @@ pub fn process_view_attribute(
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
                 allow_multiple_var_args: pass_1_data.allow_multiple_var_args,
+                custom_proxy: pass_1_data.custom_proxy,
             });
         })
         .is_some()
@@ -169,6 +183,7 @@ pub fn process_external_view_attribute(
                 only_user_account: pass_1_data.only_user_account,
                 mutability: EndpointMutabilityMetadata::Readonly,
                 allow_multiple_var_args: pass_1_data.allow_multiple_var_args,
+                custom_proxy: pass_1_data.custom_proxy,
             });
         })
         .is_some()
@@ -195,6 +210,7 @@ pub fn process_callback_attribute(attr: &syn::Attribute, method: &mut Method) ->
             method.public_role = PublicRole::Callback(CallbackMetadata {
                 callback_name: callback_ident,
                 allow_multiple_var_args: method.is_allow_multiple_var_args(),
+                custom_proxy: method.is_custom_proxy(),
             });
         })
         .is_some()
@@ -211,6 +227,7 @@ pub fn process_promises_callback_attribute(attr: &syn::Attribute, method: &mut M
             method.public_role = PublicRole::CallbackPromise(CallbackMetadata {
                 callback_name: callback_ident,
                 allow_multiple_var_args: method.is_allow_multiple_var_args(),
+                custom_proxy: method.is_custom_proxy(),
             });
         })
         .is_some()

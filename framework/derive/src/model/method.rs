@@ -41,7 +41,6 @@ pub struct Method {
     pub method_args: Vec<MethodArgument>,
     pub output_names: Vec<String>,
     pub label_names: Vec<String>,
-    // pub custome_proxy: Vec<String>,
     pub return_type: syn::ReturnType,
     pub implementation: MethodImpl,
 }
@@ -96,6 +95,18 @@ impl Method {
                 MethodPayableMetadata::AnyToken
             },
             PublicRole::Private => MethodPayableMetadata::NotPayable,
+        }
+    }
+
+    pub fn is_custom_proxy(&self) -> bool {
+        match &self.public_role {
+            PublicRole::Init(_init_metadata) => false,
+            PublicRole::Upgrade(_upgrade_metadata) => false,
+            PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.custom_proxy,
+            PublicRole::Callback(callback_metadata)
+            | PublicRole::CallbackPromise(callback_metadata) => callback_metadata.custom_proxy,
+            PublicRole::CallbackRaw => false,
+            PublicRole::Private => false,
         }
     }
 

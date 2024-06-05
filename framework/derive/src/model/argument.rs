@@ -63,4 +63,5 @@ pub struct TraitProperties {
     pub only_user_account: bool,
     pub allow_multiple_var_args: bool,
     pub esdt_attribute: Vec<EsdtAttribute>,
+    pub custom_proxy: bool,
 }

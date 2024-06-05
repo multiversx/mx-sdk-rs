@@ -45,6 +45,7 @@ pub fn external_view_contract_constructor_abi() -> EndpointAbi {
         EndpointTypeAbi::Init,
         &[],
         &[],
+        false,
         false
     );
     endpoint_abi.inputs.push(InputAbi {

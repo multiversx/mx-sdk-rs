@@ -143,9 +143,21 @@ where
             self.write_upgrades();
         }
 
+        let custom_endpoints = self.collect_custom_endpoints();
+
         if !self.contract_abi.endpoints.is_empty() {
-            self.write_endpoints(&self.proxy_config.custome_proxy_endpoints);
+            self.write_endpoints(&custom_endpoints);
         }
+    }
+
+    fn collect_custom_endpoints(&mut self) -> Vec<String> {
+        let mut custom_endpoints = self.proxy_config.custom_proxy_endpoints.clone();
+        for endpoint_abi in self.contract_abi.endpoints.clone() {
+            if endpoint_abi.custom_proxy && !custom_endpoints.contains(&endpoint_abi.name) {
+                custom_endpoints.push(endpoint_abi.name)
+            }
+        }
+        custom_endpoints
     }
 
     fn write_types(&mut self) {
@@ -210,12 +222,12 @@ where
         self.writeln("}");
     }
 
-    fn write_endpoints(&mut self, custome_endpoints: &[String]) {
+    fn write_endpoints(&mut self, custom_endpoints: &[String]) {
         let endpoints: Vec<EndpointAbi> = self.contract_abi.endpoints.clone();
 
         self.write_header_impl_endpoints();
         for (i, endpoint_abi) in endpoints.into_iter().enumerate() {
-            if !custome_endpoints.is_empty() && !custome_endpoints.contains(&endpoint_abi.name) {
+            if !custom_endpoints.is_empty() && !custom_endpoints.contains(&endpoint_abi.name) {
                 continue;
             }
 

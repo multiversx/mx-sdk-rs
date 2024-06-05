@@ -4,6 +4,7 @@ use crate::model::{
     PublicRole,
 };
 
+#[allow(clippy::too_many_arguments)]
 fn generate_endpoint_snippet(
     m: &Method,
     endpoint_name: &str,
@@ -12,6 +13,7 @@ fn generate_endpoint_snippet(
     mutability: EndpointMutabilityMetadata,
     endpoint_type: EndpointTypeMetadata,
     allow_multiple_var_args: bool,
+    custom_proxy: bool,
 ) -> proc_macro2::TokenStream {
     let endpoint_docs = &m.docs;
     let rust_method_name = m.name.to_string();
@@ -50,10 +52,8 @@ fn generate_endpoint_snippet(
     };
 
     let label_names = &m.label_names;
-    // let custome_proxy = &m.custome_proxy;
     let mutability_tokens = mutability.to_tokens();
     let endpoint_type_tokens = endpoint_type.to_tokens();
-
     quote! {
         let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
             &[ #(#endpoint_docs),* ],
@@ -66,6 +66,7 @@ fn generate_endpoint_snippet(
             &[ #(#payable_in_tokens),* ],
             &[ #(#label_names),* ],
             #allow_multiple_var_args,
+            #custom_proxy
         );
         #(#input_snippets)*
         #output_snippet
@@ -86,6 +87,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     EndpointMutabilityMetadata::Mutable,
                     EndpointTypeMetadata::Init,
                     m.is_allow_multiple_var_args(),
+                    m.is_custom_proxy(),
                 );
                 Some(quote! {
                     #endpoint_def
@@ -101,6 +103,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     EndpointMutabilityMetadata::Mutable,
                     EndpointTypeMetadata::Upgrade,
                     m.is_allow_multiple_var_args(),
+                    m.is_custom_proxy(),
                 );
                 Some(quote! {
                     #endpoint_def
@@ -116,6 +119,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     endpoint_metadata.mutability.clone(),
                     EndpointTypeMetadata::Endpoint,
                     endpoint_metadata.allow_multiple_var_args,
+                    endpoint_metadata.custom_proxy,
                 );
                 Some(quote! {
                     #endpoint_def
@@ -131,6 +135,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     EndpointMutabilityMetadata::Mutable,
                     EndpointTypeMetadata::PromisesCallback,
                     m.is_allow_multiple_var_args(),
+                    m.is_custom_proxy(),
                 );
                 Some(quote! {
                     #endpoint_def

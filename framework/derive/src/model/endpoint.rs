@@ -15,12 +15,14 @@ pub struct EndpointMetadata {
     pub only_user_account: bool,
     pub mutability: EndpointMutabilityMetadata,
     pub allow_multiple_var_args: bool,
+    pub custom_proxy: bool,
 }
 
 #[derive(Clone, Debug)]
 pub struct CallbackMetadata {
     pub callback_name: syn::Ident,
     pub allow_multiple_var_args: bool,
+    pub custom_proxy: bool,
 }
 
 /// Method visibility from the point of view of the smart contract
