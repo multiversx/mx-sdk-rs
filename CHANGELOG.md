@@ -27,6 +27,10 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
+## [sc 0.50.4] - 2024-06-06
+- Compiler version requirement (1.78).
+- Minor imports fix.
+
 ## [sc 0.50.3] - 2024-05-25
 - Dependency update and fix. There was an issue with the `zip` dependency in sc-meta.
 
