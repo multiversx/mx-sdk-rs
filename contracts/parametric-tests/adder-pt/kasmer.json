@@ -1,0 +1,5 @@
+{
+  "contract_paths": [
+    "../../examples/adder/output/adder.wasm"
+  ]
+}

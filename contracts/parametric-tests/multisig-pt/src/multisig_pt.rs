@@ -1,5 +1,7 @@
 #![no_std]
 
+mod multisig_proxy;
+
 multiversx_sc::imports!();
 
 static OWNER: &[u8; 32] = b"owner___________________________";
@@ -32,41 +34,37 @@ pub trait TestMultisigContract {
     }
 
     fn deploy(&self, code_path: &ManagedBuffer) {
-        let mut init_args = ManagedArgBuffer::new();
-        init_args.push_arg(2); // quorum        = 2
-        init_args.push_arg(ManagedAddress::from(ALICE)); // board members = alice, bob, charlie
-        init_args.push_arg(ManagedAddress::from(BOB));
-        init_args.push_arg(ManagedAddress::from(CHARLIE));
+        let mut board = MultiValueEncoded::new();
+        board.push(ManagedAddress::from(ALICE)); // board members = alice, bob, charlie
+        board.push(ManagedAddress::from(BOB));
+        board.push(ManagedAddress::from(CHARLIE));
 
-        let multisig = self.test_raw().deploy_contract(
-            &ManagedAddress::from(OWNER),
-            5000000000000,
-            &BigUint::zero(),
-            code_path,
-            &init_args,
-        );
+        let multisig = self
+            .tx()
+            .from(ManagedAddress::from(OWNER))
+            .typed(multisig_proxy::MultisigProxy)
+            .init(2usize, board)
+            .code_path(code_path)
+            .gas(5000000000000)
+            .returns(ReturnsNewManagedAddress)
+            .test_deploy();
 
-        self.test_raw().assert(self.get_quorum(&multisig) == 2u32);
+        self.test_raw().assert(self.get_quorum(&multisig) == 2usize);
         self.test_raw()
-            .assert(self.get_num_board_members(&multisig) == 3u32);
+            .assert(self.get_num_board_members(&multisig) == 3usize);
     }
 
-    fn get_quorum(&self, multisig: &ManagedAddress) -> BigUint {
-        let bs = self
-            .test_raw()
-            .get_storage(multisig, &ManagedBuffer::from(b"quorum"));
-        BigUint::from(bs)
+    fn get_quorum(&self, multisig: &ManagedAddress) -> usize {
+        self.storage_raw().read_from_address(multisig, "quorum")
     }
 
-    fn get_num_board_members(&self, multisig: &ManagedAddress) -> BigUint {
-        let bs = self
-            .test_raw()
-            .get_storage(multisig, &ManagedBuffer::from(b"num_board_members"));
-        BigUint::from(bs)
+    fn get_num_board_members(&self, multisig: &ManagedAddress) -> usize {
+        self.storage_raw()
+            .read_from_address(multisig, "num_board_members")
     }
 
     #[endpoint(test_change_quorum)]
-    fn test_change_quorum(&self, value: BigUint) {
+    fn test_change_quorum(&self, value: usize) {
         let multisig = ManagedAddress::from(MULTISIG);
         let alice = ManagedAddress::from(ALICE);
         let bob = ManagedAddress::from(BOB);
@@ -75,7 +73,7 @@ pub trait TestMultisigContract {
         self.test_raw()
             .assume(value <= self.get_num_board_members(&multisig));
 
-        self.change_quorum_propose(&multisig, &alice, &value);
+        self.change_quorum_propose(&multisig, &alice, value);
         self.change_quorum_sign(&multisig, &bob);
         self.perform_action(&multisig, &alice);
 
@@ -87,49 +85,34 @@ pub trait TestMultisigContract {
         &self,
         multisig: &ManagedAddress,
         proposer: &ManagedAddress,
-        value: &BigUint,
+        value: usize,
     ) {
-        let mut args = ManagedArgBuffer::new();
-        args.push_arg(value);
-
-        self.test_raw().start_prank(proposer);
-        let _ = self.send_raw().direct_egld_execute(
-            multisig,
-            &BigUint::from(0u32),
-            5000000,
-            &ManagedBuffer::from(b"proposeChangeQuorum"),
-            &args,
-        );
-        self.test_raw().stop_prank();
+        self.tx()
+            .from(proposer)
+            .to(multisig)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_change_quorum(value)
+            .gas(5000000)
+            .test_call();
     }
 
     fn change_quorum_sign(&self, multisig: &ManagedAddress, signer: &ManagedAddress) {
-        let mut args = ManagedArgBuffer::new();
-        args.push_arg(1u32);
-
-        self.test_raw().start_prank(signer);
-        let _ = self.send_raw().direct_egld_execute(
-            multisig,
-            &BigUint::from(0u32),
-            5000000,
-            &ManagedBuffer::from(b"sign"),
-            &args,
-        );
-        self.test_raw().stop_prank();
+        self.tx()
+            .from(signer)
+            .to(multisig)
+            .typed(multisig_proxy::MultisigProxy)
+            .sign(1usize)
+            .gas(5000000)
+            .test_call();
     }
 
     fn perform_action(&self, multisig: &ManagedAddress, performer: &ManagedAddress) {
-        let mut args = ManagedArgBuffer::new();
-        args.push_arg(1u32);
-
-        self.test_raw().start_prank(performer);
-        let _ = self.send_raw().direct_egld_execute(
-            multisig,
-            &BigUint::from(0u32),
-            5000000,
-            &ManagedBuffer::from(b"performAction"),
-            &args,
-        );
-        self.test_raw().stop_prank();
+        self.tx()
+            .from(performer)
+            .to(multisig)
+            .typed(multisig_proxy::MultisigProxy)
+            .perform_action_endpoint(1usize)
+            .gas(5000000)
+            .test_call();
     }
 }

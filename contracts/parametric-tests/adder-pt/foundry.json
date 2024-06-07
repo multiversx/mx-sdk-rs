@@ -1,5 +1,0 @@
-{
-  "contract_paths": [
-    "../../../deps/mx-sdk-rs/contracts/examples/adder/output/adder.wasm"
-  ]
-}

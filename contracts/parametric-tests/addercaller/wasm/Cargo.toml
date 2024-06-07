@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "adder-caller-pt-wasm"
+name = "addercaller-wasm"
 version = "0.0.0"
 edition = "2018"
 publish = false
@@ -21,7 +21,10 @@ debug = false
 panic = "abort"
 overflow-checks = false
 
-[dependencies.adder-caller-pt]
+[profile.dev]
+panic = "abort"
+
+[dependencies.addercaller]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]

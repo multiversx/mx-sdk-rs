@@ -21,6 +21,9 @@ debug = false
 panic = "abort"
 overflow-checks = false
 
+[profile.dev]
+panic = "abort"
+
 [dependencies.test-testapi]
 path = ".."
 

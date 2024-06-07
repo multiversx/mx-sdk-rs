@@ -175,10 +175,16 @@ fn print_ei_check(wasm_data: &WasmInfo, check_ei: &Option<EIVersion>) {
             return;
         }
 
+        let mut has_warning = false;
         for import_name in &wasm_data.imports {
             if !ei.contains_vm_hook(import_name.as_str()) {
+                has_warning = true;
                 print_invalid_vm_hook(import_name.as_str(), ei.name());
             }
+        }
+
+        if has_warning {
+            println!();
         }
     } else {
         print_ignore_ei_check();
