@@ -52,13 +52,17 @@ impl<'a> ProxyGenerator<'a> {
         meta_config: &'a MetaConfig,
         file: &'a mut dyn std::io::Write,
         proxy_config: &'a ProxyConfigSerde,
-        contract_abi: &'a ContractAbi,
     ) -> Self {
         Self {
             meta_config,
             file: Some(file),
             proxy_config,
-            contract_abi,
+            contract_abi: &meta_config
+                .sc_config
+                .proxy_configs
+                .get(proxy_config)
+                .unwrap()
+                .abi,
         }
     }
 

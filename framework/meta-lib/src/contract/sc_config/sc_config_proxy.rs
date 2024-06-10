@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 const DEFAULT_PATH: &str = "/output/proxy.rs";
 
-#[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ProxyConfigSerde {
     #[serde(default)]
@@ -18,6 +18,17 @@ pub struct ProxyConfigSerde {
 
     #[serde(default)]
     pub variant: Option<String>,
+
+    #[serde(rename = "add-unlabelled")]
+    pub add_unlabelled: Option<bool>,
+
+    #[serde(default)]
+    #[serde(rename = "add-labels")]
+    pub add_labels: Vec<String>,
+
+    #[serde(default)]
+    #[serde(rename = "add-endpoints")]
+    pub add_endpoints: Vec<String>,
 }
 
 impl ProxyConfigSerde {
@@ -27,11 +38,14 @@ impl ProxyConfigSerde {
             override_import: None,
             path_rename: None,
             variant: None,
+            add_unlabelled: None,
+            add_labels: Vec::new(),
+            add_endpoints: Vec::new(),
         }
     }
 }
 
-#[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PathRename {
     #[serde(default)]
     pub from: String,

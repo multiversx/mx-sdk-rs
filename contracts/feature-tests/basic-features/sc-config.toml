@@ -8,3 +8,8 @@ overflow-checks = true # needed for overflow tests
 add-unlabelled = false
 add-endpoints = ["init", "load_bytes", "store_bytes"]
 kill_legacy_callback = true
+
+[[proxy]]
+path = "src/basic_features_proxy.rs"
+add-unlabelled = false
+add-endpoints = ["init", "store_bytes", "load_bytes", "returns_egld_decimal"]
