@@ -46,3 +46,5 @@ path = "src/multi_contract_example_feature_proxy.rs"
 [[proxy]]
 variant = "multi-contract-alt-impl"
 path = "src/multi_contract_alt_impl_proxy.rs"
+add-unlabelled = false
+add-labels = ["alt-impl"]
