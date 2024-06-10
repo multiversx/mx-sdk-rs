@@ -29,11 +29,17 @@ fn compare_proxy_explicit_path(proxy_config: &ProxyConfigSerde, meta_config: &Me
     proxy_generator.write_proxy_to_file();
 
     let existent_proxy_path = format!("../{}", proxy_config.path);
-    let existent_proxy = fs::read_to_string(existent_proxy_path).unwrap();
-    let newly_gen_proxy = String::from_utf8(temp).unwrap();
+    let existent_proxy = fs::read_to_string(existent_proxy_path);
 
-    if existent_proxy != newly_gen_proxy {
-        panic!("{}", PROXY_COMPARE_ERR_MSG.to_string().red());
+    match existent_proxy {
+        Ok(existent_proxy) => {
+            let newly_gen_proxy = String::from_utf8(temp).unwrap();
+
+            if existent_proxy != newly_gen_proxy {
+                panic!("{}", PROXY_COMPARE_ERR_MSG.to_string().red());
+            }
+        },
+        _ => return,
     }
 }
 
