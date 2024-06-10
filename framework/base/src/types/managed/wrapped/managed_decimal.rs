@@ -4,12 +4,14 @@ use crate::{
         const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, ManagedTypeApi,
         StaticVarApiImpl,
     },
+    const_managed_decimal,
     types::{BigFloat, BigUint},
 };
 
 use multiversx_sc_codec::{
-    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    num_bigint::ToBigUint, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput,
 };
 
 use core::{
@@ -94,7 +96,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         self.decimals.num_decimals()
     }
 
-    pub fn rescale<T: Decimals>(self, scale_to: T) -> ManagedDecimal<M, T>
+    pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimal<M, T>
     where
         M: ManagedTypeApi,
     {
@@ -107,7 +109,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
                 ManagedDecimal::from_raw_units(&self.data * scaling_factor, scale_to)
             },
-            Ordering::Equal => ManagedDecimal::from_raw_units(self.data, scale_to),
+            Ordering::Equal => ManagedDecimal::from_raw_units(self.data.clone(), scale_to),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
@@ -143,41 +145,6 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         )
     }
 
-    // pub fn log<T: Decimals>(self, target_base: f64, precision: T) -> ManagedDecimal<M, T> {
-    //     let num_decimals = f64::from(precision.num_decimals() as u32);
-    //     let number = f64::from(self.data.to_u64().unwrap() as u32);
-
-    //     assert!(number >= 1f64 && target_base >= 1f64, "wrong input");
-
-    //     let precise = (number.log10() * num_decimals / target_base.log10())
-    //         .trunc()
-    //         .round() as u64;
-
-    //     ManagedDecimal::from_raw_units(BigUint::<M>::from(precise), precision)
-    // }
-
-    pub fn ln(self, decimals: D) -> ManagedDecimal<M, NumDecimals> {
-        // find the highest power of 2 less than or equal to self
-        let log2 = self.data.log2(); // most significant bit
-        let divisor = BigFloat::from(1 << log2);
-        let x = self.to_big_float() / divisor; // normalize to [1.0, 2.0]
-
-        let ln_of_2 = BigFloat::from_frac(69314718i64, 100_000_000i64); // 0.69314718 8 decimals
-        let first = BigFloat::from_frac(17417939i64, 10_000_000i64); // 1.7417939, 7 decimals
-        let second = BigFloat::from_frac(28212026i64, 10_000_000i64); // 2.8212026, 7 decimals
-        let third = BigFloat::from_frac(14699568i64, 10_000_000i64); // 1.4699568, 7 decimals
-        let fourth = BigFloat::from_frac(44717955i64, 100_000_000i64); // 0.44717955, 8 decimals
-        let fifth = BigFloat::from_frac(56570851i64, 1_000_000_000i64); // 0.056570851, 9 decimals
-
-        // approximating polynom for getting the result
-        let result =
-            (((fourth - fifth * x.clone()) * x.clone() - third) * x.clone() + second) * x - first;
-        let add_member = BigFloat::from_big_uint(&BigUint::from(log2)) * ln_of_2;
-        let final_result = result + add_member;
-
-        final_result.to_managed_decimal(decimals.num_decimals())
-    }
-
     pub fn nth_root(self, _root: ManagedDecimal<M, D>, _precision: D) -> ManagedDecimal<M, D> {
         todo!()
     }
@@ -189,6 +156,82 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
             data,
             decimals: ConstDecimals,
         }
+    }
+
+    // pub fn log(
+    //     &self,
+    //     target_base: &ManagedDecimal<M, D>,
+    //     precision: D,
+    // ) -> ManagedDecimal<M, NumDecimals> {
+    //     let num_decimals = precision.num_decimals();
+    //     // should verify >= 1
+    //     let one = ManagedDecimal::from_raw_units(BigUint::from(1u64), 0usize);
+    //     one.rescale(self.scale());
+    //     assert!(self >= &one, "wrong input for self");
+    //     one.rescale(target_base.scale());
+    //     assert!(target_base >= &one, "wrong input for target base");
+
+    //     self.ln(&precision)
+    //         * ManagedDecimal::from_raw_units(BigUint::from(num_decimals), num_decimals)
+    //         / target_base.ln(&precision)
+    //     //this should be done with precision
+    // }
+
+    pub fn ln<const PREC: usize>(
+        self,
+        precision: ConstDecimals<PREC>,
+    ) -> ManagedDecimal<M, ConstDecimals<PREC>> {
+        let num_decimals = BigUint::<M>::from(self.decimals.num_decimals());
+        // find the highest power of 2 less than or equal to self
+        let log2 = self.data.log2() - num_decimals.log2(); // most significant bit for the actual number
+        let divisor = 1 << log2;
+        let divisor_scaled = BigUint::<M>::from(divisor.to_biguint().unwrap())
+            * self.decimals.scaling_factor().clone_value();
+        let _normalized = self.data / divisor_scaled; // normalize to [1.0, 2.0]
+        let x_dec = const_managed_decimal!(_normalized);
+
+        // const values we need for the polynom
+        let ln_of_2_dec = ManagedDecimal::<M, ConstDecimals<8>>::const_decimals_from_raw(
+            BigUint::from(69314718u64),
+        ); // 0.69314718 8 decimals
+        let first_dec = ManagedDecimal::<M, ConstDecimals<7>>::const_decimals_from_raw(
+            BigUint::from(17417939u64),
+        ); // 1.7417939, 7 decimals
+        let second_dec = ManagedDecimal::<M, ConstDecimals<7>>::const_decimals_from_raw(
+            BigUint::from(28212026u64),
+        ); // 2.8212026, 7 decimals
+        let third_dec = ManagedDecimal::<M, ConstDecimals<7>>::const_decimals_from_raw(
+            BigUint::from(14699568u64),
+        ); // 1.4699568, 7 decimals
+        let fourth_dec = ManagedDecimal::<M, ConstDecimals<8>>::const_decimals_from_raw(
+            BigUint::from(44717955u64),
+        ); // 0.44717955, 8 decimals
+        let fifth_dec = ManagedDecimal::<M, ConstDecimals<9>>::const_decimals_from_raw(
+            BigUint::from(56570851u64),
+        ); // 0.056570851, 9 decimals
+
+        // rescale everything to precision
+        let x = x_dec.rescale(precision.clone());
+        let ln_of_2 = ln_of_2_dec.rescale(precision.clone());
+        let first = first_dec.rescale(precision.clone());
+        let second = second_dec.rescale(precision.clone());
+        let third = third_dec.rescale(precision.clone());
+        let fourth = fourth_dec.rescale(precision.clone());
+        let fifth = fifth_dec.rescale(precision.clone());
+
+        // approximating polynom to get the result
+        let result = (((fourth - fifth.mul_with_precision(x.clone(), precision.clone()))
+            .mul_with_precision(x.clone(), precision.clone())
+            - third)
+            .mul_with_precision(x.clone(), precision.clone())
+            + second)
+            .mul_with_precision(x, precision.clone())
+            - first;
+
+        let log_2 = const_managed_decimal!(log2);
+
+        let add_member = log_2.mul_with_precision(ln_of_2, precision.clone());
+        result + add_member
     }
 }
 
@@ -346,38 +389,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<ManagedDecimal<M, Const
     }
 }
 
-impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> Mul<ManagedDecimal<M, D2>>
-    for ManagedDecimal<M, D1>
-where
-    D1: Add<D2>,
-    <D1 as Add<D2>>::Output: Decimals,
-{
-    type Output = ManagedDecimal<M, <D1 as Add<D2>>::Output>;
-
-    fn mul(self, other: ManagedDecimal<M, D2>) -> Self::Output {
-        ManagedDecimal {
-            data: self.data * other.data,
-            decimals: self.decimals + other.decimals,
-        }
-    }
-}
-
-impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> Div<ManagedDecimal<M, D2>>
-    for ManagedDecimal<M, D1>
-where
-    D1: Sub<D2>,
-    <D1 as Sub<D2>>::Output: Decimals,
-{
-    type Output = ManagedDecimal<M, <D1 as Sub<D2>>::Output>;
-
-    fn div(self, other: ManagedDecimal<M, D2>) -> Self::Output {
-        ManagedDecimal {
-            data: self.data / other.data,
-            decimals: self.decimals - other.decimals,
-        }
-    }
-}
-
 impl<M: ManagedTypeApi> Add<ManagedDecimal<M, NumDecimals>> for ManagedDecimal<M, NumDecimals> {
     type Output = Self;
 
@@ -396,6 +407,169 @@ impl<M: ManagedTypeApi> Sub<ManagedDecimal<M, NumDecimals>> for ManagedDecimal<M
     }
 }
 
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> Mul<ManagedDecimal<M, D2>>
+    for ManagedDecimal<M, D1>
+where
+    D1: Add<D2>,
+    <D1 as Add<D2>>::Output: Decimals,
+{
+    type Output = ManagedDecimal<M, <D1 as Add<D2>>::Output>;
+
+    fn mul(self, other: ManagedDecimal<M, D2>) -> Self::Output {
+        ManagedDecimal {
+            data: self.data * other.data,
+            decimals: self.decimals + other.decimals,
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> MulToPrecision<M, D2>
+    for ManagedDecimal<M, D1>
+{
+    fn mul_with_precision<T: Decimals>(
+        self,
+        other: ManagedDecimal<M, D2>,
+        precision: T,
+    ) -> ManagedDecimal<M, T> {
+        let scaled;
+        let new_data;
+        if self.decimals.num_decimals() >= other.decimals.num_decimals() {
+            scaled = other.rescale(self.scale());
+            new_data = self.data * scaled.data;
+        } else {
+            scaled = self.rescale(other.scale());
+            new_data = scaled.data * other.data;
+        }
+        ManagedDecimal {
+            data: new_data,
+            decimals: precision,
+        }
+    }
+}
+
+pub trait MulToPrecision<M: ManagedTypeApi, D: Decimals> {
+    fn mul_with_precision<T: Decimals>(
+        self,
+        other: ManagedDecimal<M, D>,
+        precision: T,
+    ) -> ManagedDecimal<M, T>;
+}
+
+impl<const DECIMALS: usize, M: ManagedTypeApi> Sub<ManagedDecimal<M, NumDecimals>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+{
+    type Output = ManagedDecimal<M, NumDecimals>;
+
+    fn sub(self, rhs: ManagedDecimal<M, NumDecimals>) -> Self::Output {
+        if DECIMALS >= rhs.decimals {
+            let scaled = rhs.rescale(self.scale());
+            ManagedDecimal {
+                data: self.data - scaled.data,
+                decimals: DECIMALS,
+            }
+        } else {
+            let scaled = self.rescale(rhs.scale());
+            ManagedDecimal {
+                data: scaled.data - rhs.data,
+                decimals: rhs.decimals,
+            }
+        }
+    }
+}
+
+impl<const DECIMALS: usize, M: ManagedTypeApi> Sub<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+    for ManagedDecimal<M, NumDecimals>
+{
+    type Output = Self;
+
+    fn sub(self, rhs: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
+        if DECIMALS >= self.decimals {
+            let scaled = self.rescale(rhs.scale());
+            ManagedDecimal {
+                data: self.data - scaled.data,
+                decimals: DECIMALS,
+            }
+        } else {
+            let scaled = rhs.rescale(self.scale());
+            ManagedDecimal {
+                data: scaled.data - rhs.data,
+                decimals: self.decimals,
+            }
+        }
+    }
+}
+
+impl<const DECIMALS: usize, M: ManagedTypeApi> Add<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+    for ManagedDecimal<M, NumDecimals>
+{
+    type Output = Self;
+
+    fn add(self, other: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
+        if DECIMALS >= self.decimals {
+            let scaled = self.rescale(other.scale());
+            ManagedDecimal {
+                data: self.data + scaled.data,
+                decimals: DECIMALS,
+            }
+        } else {
+            let scaled = other.rescale(self.scale());
+            ManagedDecimal {
+                data: scaled.data + other.data,
+                decimals: self.decimals,
+            }
+        }
+    }
+}
+
+impl<const DECIMALS: usize, M: ManagedTypeApi> Add<ManagedDecimal<M, NumDecimals>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+{
+    type Output = ManagedDecimal<M, NumDecimals>;
+
+    fn add(self, other: ManagedDecimal<M, NumDecimals>) -> Self::Output {
+        if DECIMALS >= other.decimals {
+            let scaled = other.rescale(self.scale());
+            ManagedDecimal {
+                data: self.data + scaled.data,
+                decimals: self.decimals.num_decimals(),
+            }
+        } else {
+            let scaled = self.rescale(other.scale());
+            ManagedDecimal {
+                data: scaled.data + other.data,
+                decimals: scaled.decimals,
+            }
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, D: Decimals> Div<NumDecimals> for ManagedDecimal<M, D> {
+    type Output = Self;
+
+    fn div(self, other: NumDecimals) -> Self::Output {
+        ManagedDecimal {
+            data: self.data / BigUint::from(other),
+            decimals: self.decimals,
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> Div<ManagedDecimal<M, D2>>
+    for ManagedDecimal<M, D1>
+where
+    D1: Sub<D2>,
+    <D1 as Sub<D2>>::Output: Decimals,
+{
+    type Output = ManagedDecimal<M, <D1 as Sub<D2>>::Output>;
+
+    // maybe rescale to highest first
+    fn div(self, other: ManagedDecimal<M, D2>) -> Self::Output {
+        ManagedDecimal {
+            data: self.data / other.data,
+            decimals: self.decimals - other.decimals,
+        }
+    }
+}
 impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, D2>>
     for ManagedDecimal<M, D1>
 {
@@ -415,6 +589,31 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, 
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
                 &other.data * scaling_factor == self.data
+            },
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialOrd<ManagedDecimal<M, D2>>
+    for ManagedDecimal<M, D1>
+{
+    fn partial_cmp(&self, other: &ManagedDecimal<M, D2>) -> Option<Ordering> {
+        match self
+            .decimals
+            .num_decimals()
+            .cmp(&other.decimals.num_decimals())
+        {
+            Ordering::Less => {
+                let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
+                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
+
+                Some((&self.data * scaling_factor).cmp(&other.data))
+            },
+            Ordering::Equal => Some((self.data).cmp(&other.data)),
+            Ordering::Greater => {
+                let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
+                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
+                Some((&other.data * scaling_factor).cmp(&self.data))
             },
         }
     }
