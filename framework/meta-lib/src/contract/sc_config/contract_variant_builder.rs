@@ -10,6 +10,7 @@ use crate::ei::parse_check_ei;
 
 use super::{
     contract_variant_settings::{parse_allocator, parse_stack_size},
+    proxy_config::ProxyConfig,
     sc_config_model::SC_CONFIG_FILE_NAMES,
     ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
     ProxyConfigSerde, ScConfig, ScConfigSerde,
@@ -281,18 +282,15 @@ fn process_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<
     contracts
 }
 
-fn process_proxy_contracts(
-    config: &ScConfigSerde,
-    original_abi: &ContractAbi,
-) -> HashMap<ProxyConfigSerde, ContractVariant> {
-    let mut proxy_contracts = HashMap::new();
+fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<ProxyConfig> {
+    let mut proxy_contracts = Vec::new();
 
     let main_contract = process_contracts(config, original_abi)
         .into_iter()
         .find(|contract| contract.main)
         .unwrap();
 
-    proxy_contracts.insert(ProxyConfigSerde::new(), main_contract);
+    proxy_contracts.push(ProxyConfig::new_with_default_path(main_contract.abi));
 
     for proxy_config in &config.proxy {
         let mut contract_builders = HashMap::new();
@@ -326,7 +324,12 @@ fn process_proxy_contracts(
         if let Some((_, builder)) = contract_builders.into_iter().next() {
             let contract = build_contract(builder, original_abi);
 
-            proxy_contracts.insert(proxy_config.clone(), contract);
+            proxy_contracts.push(ProxyConfig::new(
+                proxy_config.path.to_owned(),
+                proxy_config.override_import.to_owned(),
+                proxy_config.path_rename.to_owned(),
+                contract.abi,
+            ));
         }
     }
 
@@ -388,7 +391,7 @@ impl ScConfig {
                 wasm_crate_name,
                 abi: original_abi.clone(),
             }],
-            proxy_configs: HashMap::new(),
+            proxy_configs: Vec::new(),
         }
     }
 

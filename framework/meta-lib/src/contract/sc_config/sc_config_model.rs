@@ -1,7 +1,5 @@
-use std::collections::HashMap;
-
 use super::{
-    contract_variant_validate::validate_contract_variant, sc_config_proxy::ProxyConfigSerde,
+    contract_variant_validate::validate_contract_variant, proxy_config::ProxyConfig,
     ContractVariant,
 };
 
@@ -20,7 +18,7 @@ pub const SC_CONFIG_FILE_NAMES: &[&str] = &["sc-config.toml", "multicontract.tom
 pub struct ScConfig {
     pub default_contract_config_name: String,
     pub contracts: Vec<ContractVariant>,
-    pub proxy_configs: HashMap<ProxyConfigSerde, ContractVariant>,
+    pub proxy_configs: Vec<ProxyConfig>,
 }
 
 impl ScConfig {
