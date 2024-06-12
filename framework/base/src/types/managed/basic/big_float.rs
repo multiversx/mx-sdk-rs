@@ -189,18 +189,20 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         debug_assert!(x >= 1);
         debug_assert!(x <= 2);
 
-        let ln_of_2 = BigFloat::from_frac(69314718i64, 100_000_000i64); // 0.69314718 8 decimals
-        let first = BigFloat::from_frac(-17417939i64, 10_000_000i64); // -1.7417939, 7 decimals
-        let second = BigFloat::from_frac(28212026i64, 10_000_000i64); // 2.8212026, 7 decimals
-        let third = BigFloat::from_frac(-14699568i64, 10_000_000i64); // -1.4699568, 7 decimals
-        let fourth = BigFloat::from_frac(44717955i64, 100_000_000i64); // 0.44717955, 8 decimals
-        let fifth = BigFloat::from_frac(-56570851i64, 1_000_000_000i64); // -0.056570851, 9 decimals
+        let mut result = BigFloat::from_frac(-56570851i64, 1_000_000_000i64); // -0.056570851, 9 decimals;
+        result *= &x;
+        result += BigFloat::from_frac(44717955i64, 100_000_000i64); // 0.44717955, 8 decimals;
+        result *= &x;
+        result += BigFloat::from_frac(-14699568i64, 10_000_000i64); // -1.4699568, 7 decimals;
+        result *= &x;
+        result += BigFloat::from_frac(28212026i64, 10_000_000i64); // 2.8212026, 7 decimals;
+        result *= &x;
+        result += BigFloat::from_frac(-17417939i64, 10_000_000i64); // -1.7417939, 7 decimals;
 
-        // approximating polynom to get the result
-        let result =
-            (((fourth + fifth * x.clone()) * x.clone() + third) * x.clone() + second) * x + first;
-        let add_member = BigFloat::from_big_uint(&BigUint::from(bit_log2)) * ln_of_2;
-        result + add_member
+        let ln_of_2 = BigFloat::from_frac(69314718i64, 100_000_000i64); // 0.69314718 8 decimals
+        result += BigFloat::from(bit_log2 as i32) * ln_of_2;
+
+        result
     }
 }
 
