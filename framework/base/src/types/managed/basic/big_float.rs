@@ -93,7 +93,6 @@ big_float_conv_num! {i16}
 big_float_conv_num! {i8}
 
 impl<M: ManagedTypeApi> BigFloat<M> {
-    #[inline]
     pub fn neg(&self) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
@@ -101,7 +100,13 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         BigFloat::from_handle(new_bf_handle)
     }
 
-    #[inline]
+    pub fn abs(&self) -> Self {
+        let new_bf_handle: M::BigFloatHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
+        M::managed_type_impl().bf_abs(new_bf_handle.clone(), self.handle.clone());
+        BigFloat::from_handle(new_bf_handle)
+    }
+
     pub fn from_big_uint(big_uint: &BigUint<M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
@@ -109,7 +114,6 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         BigFloat::from_handle(new_bf_handle)
     }
 
-    #[inline]
     pub fn from_big_int(big_int: &BigInt<M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
@@ -169,31 +173,33 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     pub fn to_managed_decimal<T: Decimals>(&self, decimals: T) -> ManagedDecimal<M, T> {
-        ManagedDecimal::<M, T>::from_big_float(&self, decimals)
+        ManagedDecimal::<M, T>::from_big_float(self, decimals)
     }
 
-    pub fn ln(&self, precision: BigUint<M>) -> Self {
+    pub fn ln(&self) -> Self {
         // find the highest power of 2 less than or equal to self
-        let mng_dec = self
-            .to_fixed_point(&BigFloat::from(precision))
+        let trunc_val = self.trunc();
+        let trunc_val_unsigned = trunc_val
             .into_big_uint()
-            .unwrap_or_sc_panic("can't calculate ln for this number");
-
-        let log2 = mng_dec.log2(); // most significant bit
-        let divisor = BigFloat::from(1 << log2);
+            .unwrap_or_sc_panic("log argument must be positive");
+        let bit_log2 = trunc_val_unsigned.log2(); // aproximate, based on position of the most significant bit
+        let divisor = BigFloat::from(1 << bit_log2);
         let x = self / &divisor; // normalize to [1.0, 2.0]
 
+        debug_assert!(x >= 1);
+        debug_assert!(x <= 2);
+
         let ln_of_2 = BigFloat::from_frac(69314718i64, 100_000_000i64); // 0.69314718 8 decimals
-        let first = BigFloat::from_frac(17417939i64, 10_000_000i64); // 1.7417939, 7 decimals
+        let first = BigFloat::from_frac(-17417939i64, 10_000_000i64); // -1.7417939, 7 decimals
         let second = BigFloat::from_frac(28212026i64, 10_000_000i64); // 2.8212026, 7 decimals
-        let third = BigFloat::from_frac(14699568i64, 10_000_000i64); // 1.4699568, 7 decimals
+        let third = BigFloat::from_frac(-14699568i64, 10_000_000i64); // -1.4699568, 7 decimals
         let fourth = BigFloat::from_frac(44717955i64, 100_000_000i64); // 0.44717955, 8 decimals
-        let fifth = BigFloat::from_frac(56570851i64, 1_000_000_000i64); // 0.056570851, 9 decimals
+        let fifth = BigFloat::from_frac(-56570851i64, 1_000_000_000i64); // -0.056570851, 9 decimals
 
         // approximating polynom to get the result
         let result =
-            (((fourth - fifth * x.clone()) * x.clone() - third) * x.clone() + second) * x - first;
-        let add_member = BigFloat::from_big_uint(&BigUint::from(log2)) * ln_of_2;
+            (((fourth + fifth * x.clone()) * x.clone() + third) * x.clone() + second) * x + first;
+        let add_member = BigFloat::from_big_uint(&BigUint::from(bit_log2)) * ln_of_2;
         result + add_member
     }
 }

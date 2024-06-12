@@ -58,15 +58,13 @@ fn big_float_overflow_test_rs() {
 
 #[test]
 fn big_float_ln_test_rs() {
-    let fixed = BigFloat::<StaticApi>::from_frac(23i64, 2i64);
-
-    let ln_fixed = fixed.ln(BigUint::from(10u64)); // precision of 10 decimal points
-
-    println!("{ln_fixed:?}");
-    assert_eq!(
-        ln_fixed,
-        BigFloat::from_frac(31355146488i64, 10_000_000_000i64)
-    );
+    let x = BigFloat::<StaticApi>::from(23i64);
+    let ln_x = x.ln();
+    assert_eq!(ln_x.to_managed_decimal(9usize).to_string(), "3.135514648");
+    assert!(ln_x.is_close(
+        &BigFloat::from_frac(3135514648, 1_000_000_000), // 3.135514648
+        &BigFloat::from_frac(1, 1_000_000_000)
+    ));
 }
 
 #[test]
