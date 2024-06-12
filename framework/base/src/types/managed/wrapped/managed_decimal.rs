@@ -126,7 +126,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     }
 
     pub fn from_big_float<T: Decimals>(
-        big_float: BigFloat<M>,
+        big_float: &BigFloat<M>,
         num_decimals: T,
     ) -> ManagedDecimal<M, T> {
         let scaling_factor: &BigUint<M> = &num_decimals.scaling_factor();

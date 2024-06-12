@@ -64,10 +64,10 @@ pub fn test_managed_decimal() {
 
     let float_1 = BigFloat::<StaticApi>::from_frac(3i64, 2i64);
     let fixed_float_1 = ManagedDecimal::<StaticApi, ConstDecimals<1>>::from_big_float(
-        float_1.clone(),
+        &float_1,
         ConstDecimals::<1>,
     );
-    let fixed_float_2 = ManagedDecimal::<StaticApi, NumDecimals>::from_big_float(float_1, 1usize);
+    let fixed_float_2 = ManagedDecimal::<StaticApi, NumDecimals>::from_big_float(&float_1, 1usize);
 
     assert_eq!(
         fixed_float_1,
