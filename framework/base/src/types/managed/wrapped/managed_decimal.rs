@@ -4,9 +4,11 @@ use crate::{
         const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, ManagedTypeApi,
         StaticVarApiImpl,
     },
+    formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
     types::{BigFloat, BigUint},
 };
 
+use alloc::string::ToString;
 use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -17,7 +19,7 @@ use core::{
     ops::{Add, Deref, Div, Mul, Sub},
 };
 
-use super::ManagedRef;
+use super::{ManagedBufferCachedBuilder, ManagedRef};
 
 fn scaling_factor<M: ManagedTypeApi>(
     num_decimals: NumDecimals,
@@ -71,7 +73,7 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
     data: BigUint<M>,
     decimals: D,
@@ -400,5 +402,32 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
 
     fn is_variadic() -> bool {
         false
+    }
+}
+impl<M: ManagedTypeApi, D: Decimals> SCDisplay for ManagedDecimal<M, D> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let sf = self.decimals.scaling_factor();
+        let temp = &self.data / sf.deref();
+        temp.fmt(f);
+        f.append_bytes(b".");
+        let temp = &self.data % sf.deref();
+        temp.fmt(f);
+    }
+}
+
+impl<M: ManagedTypeApi, D: Decimals> core::fmt::Display for ManagedDecimal<M, D> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut result = ManagedBufferCachedBuilder::<M>::new_from_slice(&[]);
+        result.append_display(self);
+        core::fmt::Display::fmt(&result.into_managed_buffer(), f)
+    }
+}
+
+impl<M: ManagedTypeApi, D: Decimals> core::fmt::Debug for ManagedDecimal<M, D> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("ManagedDecimal")
+            .field("handle", &self.data.handle.clone())
+            .field("number", &self.to_string())
+            .finish()
     }
 }
