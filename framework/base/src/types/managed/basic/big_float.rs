@@ -177,6 +177,10 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     pub fn ln(&self) -> Self {
+        if *self == BigFloat::from(1i64) {
+            return BigFloat::from(0i64);
+        }
+
         // find the highest power of 2 less than or equal to self
         let trunc_val = self.trunc();
         let trunc_val_unsigned = trunc_val

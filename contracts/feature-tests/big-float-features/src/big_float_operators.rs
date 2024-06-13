@@ -85,4 +85,8 @@ pub trait BigFloatOperators {
         r /= b;
         r
     }
+    #[endpoint]
+    fn ln_big_float_ref(&self, a: &BigFloat) -> BigFloat {
+        a.ln()
+    }
 }
