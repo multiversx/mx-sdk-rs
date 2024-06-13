@@ -3,7 +3,7 @@ mod bi_di_mapper;
 mod linked_list_mapper;
 mod map_mapper;
 mod map_storage_mapper;
-mod mapper;
+pub mod mapper;
 mod ordered_binary_tree_mapper;
 mod queue_mapper;
 mod set_mapper;

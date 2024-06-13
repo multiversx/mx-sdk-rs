@@ -12,6 +12,9 @@ pub trait Adder {
     #[storage_mapper("sum")]
     fn sum(&self) -> SingleValueMapper<BigUint>;
 
+    #[storage_mapper_from_address("sum")]
+    fn sum_with_address(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
+
     #[init]
     fn init(&self, initial_value: BigUint) {
         self.sum().set(initial_value);
