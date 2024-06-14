@@ -177,7 +177,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     pub fn ln(&self) -> Self {
-        if *self == BigFloat::from(1i64) {
+        if self == &BigFloat::from(1i64) {
             return BigFloat::from(0i64);
         }
 
