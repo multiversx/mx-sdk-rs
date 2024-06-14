@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use super::{
     set_mapper::{CurrentStorage, StorageAddress},
-    StorageClearable, StorageMapper,
+    StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -86,6 +86,20 @@ where
         QueueMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
+            base_key,
+            _phantom_item: PhantomData,
+        }
+    }
+}
+impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T, ManagedAddress<SA>>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
+    fn new(base_key: StorageKey<SA>) -> Self {
+        QueueMapper {
+            _phantom_api: PhantomData,
+            address: ManagedAddress::default(),
             base_key,
             _phantom_item: PhantomData,
         }
@@ -271,12 +285,12 @@ where
     }
 }
 
-impl<SA, T> QueueMapper<SA, T, ManagedAddress<SA>>
+impl<SA, T> StorageMapperFromAddress<SA> for QueueMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         QueueMapper {
             _phantom_api: PhantomData::<SA>,
             address,

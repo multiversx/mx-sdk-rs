@@ -13,7 +13,10 @@ pub trait Adder {
     fn sum(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper_from_address("sum")]
-    fn sum_with_address(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
+    fn sum_with_address(
+        &self,
+        address: &ManagedAddress,
+    ) -> SingleValueMapper<BigUint, ManagedAddress>;
 
     #[init]
     fn init(&self, initial_value: BigUint) {

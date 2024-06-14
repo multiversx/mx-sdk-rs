@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 pub use super::vec_mapper::Iter;
 use super::{
     set_mapper::{CurrentStorage, StorageAddress},
-    StorageClearable, StorageMapper, VecMapper,
+    StorageClearable, StorageMapper, StorageMapperFromAddress, VecMapper,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -47,12 +47,27 @@ where
     }
 }
 
-impl<SA, T> UnorderedSetMapper<SA, T, ManagedAddress<SA>>
+impl<SA, T> StorageMapper<SA> for UnorderedSetMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
+        UnorderedSetMapper {
+            _phantom_api: PhantomData,
+            address: ManagedAddress::default(),
+            base_key: base_key.clone(),
+            vec_mapper: VecMapper::<SA, T, ManagedAddress<SA>>::new(base_key),
+        }
+    }
+}
+
+impl<SA, T> StorageMapperFromAddress<SA> for UnorderedSetMapper<SA, T, ManagedAddress<SA>>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+{
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         UnorderedSetMapper {
             _phantom_api: PhantomData,
             address: address.clone(),

@@ -1,7 +1,6 @@
 use super::{
-    mapper::StorageMapperFromAddress,
     set_mapper::{CurrentStorage, StorageAddress},
-    StorageClearable, StorageMapper,
+    StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},

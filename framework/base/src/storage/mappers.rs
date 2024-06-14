@@ -3,7 +3,7 @@ mod bi_di_mapper;
 mod linked_list_mapper;
 mod map_mapper;
 mod map_storage_mapper;
-pub mod mapper;
+mod mapper;
 mod ordered_binary_tree_mapper;
 mod queue_mapper;
 mod set_mapper;
@@ -20,7 +20,7 @@ pub use bi_di_mapper::BiDiMapper;
 pub use linked_list_mapper::{LinkedListMapper, LinkedListNode};
 pub use map_mapper::MapMapper;
 pub use map_storage_mapper::MapStorageMapper;
-pub use mapper::{StorageClearable, StorageMapper};
+pub use mapper::{StorageClearable, StorageMapper, StorageMapperFromAddress};
 pub use ordered_binary_tree_mapper::{
     NodeId, OrderedBinaryTreeMapper, OrderedBinaryTreeNode, NULL_NODE_ID,
 };

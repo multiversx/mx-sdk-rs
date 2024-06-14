@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use super::{
     set_mapper::{self, CurrentStorage, StorageAddress},
-    SetMapper, StorageClearable, StorageMapper,
+    SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -42,6 +42,23 @@ where
         MapMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
+            base_key: base_key.clone(),
+            keys_set: SetMapper::new(base_key),
+            _phantom_value: PhantomData,
+        }
+    }
+}
+
+impl<SA, K, V> StorageMapper<SA> for MapMapper<SA, K, V, ManagedAddress<SA>>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    V: TopEncode + TopDecode,
+{
+    fn new(base_key: StorageKey<SA>) -> Self {
+        MapMapper {
+            _phantom_api: PhantomData,
+            address: ManagedAddress::default(),
             base_key: base_key.clone(),
             keys_set: SetMapper::new(base_key),
             _phantom_value: PhantomData,
@@ -99,13 +116,13 @@ where
     }
 }
 
-impl<SA, K, V> MapMapper<SA, K, V, ManagedAddress<SA>>
+impl<SA, K, V> StorageMapperFromAddress<SA> for MapMapper<SA, K, V, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         MapMapper {
             _phantom_api: PhantomData,
             address: address.clone(),

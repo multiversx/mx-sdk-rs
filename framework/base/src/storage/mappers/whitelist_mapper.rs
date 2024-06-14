@@ -4,7 +4,7 @@ use multiversx_sc_codec::{TopDecode, TopEncode};
 
 use super::{
     set_mapper::{CurrentStorage, StorageAddress},
-    SingleValueMapper, StorageMapper,
+    SingleValueMapper, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     api::{ErrorApiImpl, StorageMapperApi},
@@ -45,12 +45,26 @@ where
     }
 }
 
-impl<SA, T> WhitelistMapper<SA, T, ManagedAddress<SA>>
+impl<SA, T> StorageMapper<SA> for WhitelistMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     T: NestedEncode + 'static,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
+        Self {
+            address: ManagedAddress::default(),
+            base_key,
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<SA, T> StorageMapperFromAddress<SA> for WhitelistMapper<SA, T, ManagedAddress<SA>>
+where
+    SA: StorageMapperApi,
+    T: NestedEncode + 'static,
+{
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         Self {
             address,
             base_key,
