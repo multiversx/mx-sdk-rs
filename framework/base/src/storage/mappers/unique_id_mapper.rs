@@ -47,19 +47,6 @@ where
     }
 }
 
-impl<SA> StorageMapper<SA> for UniqueIdMapper<SA, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-{
-    fn new(base_key: StorageKey<SA>) -> Self {
-        Self {
-            _address: ManagedAddress::default(),
-            base_key: base_key.clone(),
-            vec_mapper: VecMapper::new(base_key),
-        }
-    }
-}
-
 impl<SA> StorageMapperFromAddress<SA> for UniqueIdMapper<SA, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,

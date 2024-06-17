@@ -15,31 +15,31 @@ pub trait StorageMapperGetAtAddress {
     #[endpoint]
     fn is_empty_at_address(&self) -> bool {
         let address = self.contract_address().get();
-        self.set_mapper_from_address(&address).is_empty()
+        self.set_mapper_from_address(address).is_empty()
     }
 
     #[endpoint]
     fn contains_at_address(&self, item: u32) -> bool {
         let address = self.contract_address().get();
-        self.set_mapper_from_address(&address).contains(&item)
+        self.set_mapper_from_address(address).contains(&item)
     }
 
     #[endpoint]
     fn len_at_address(&self) -> usize {
         let address = self.contract_address().get();
-        self.set_mapper_from_address(&address).len()
+        self.set_mapper_from_address(address).len()
     }
 
     #[endpoint]
     fn next_at_address(&self, item: u32) -> u32 {
         let address = self.contract_address().get();
-        self.set_mapper_from_address(&address).next(&item).unwrap()
+        self.set_mapper_from_address(address).next(&item).unwrap()
     }
 
     #[endpoint]
     fn previous_at_address(&self, item: u32) -> u32 {
         let address = self.contract_address().get();
-        self.set_mapper_from_address(&address)
+        self.set_mapper_from_address(address)
             .previous(&item)
             .unwrap()
     }
@@ -47,38 +47,38 @@ pub trait StorageMapperGetAtAddress {
     #[endpoint]
     fn front_at_address(&self) -> u32 {
         let address = self.contract_address().get();
-        self.set_mapper_from_address(&address).front().unwrap()
+        self.set_mapper_from_address(address).front().unwrap()
     }
 
     #[endpoint]
     fn back_at_address(&self) -> u32 {
         let address = self.contract_address().get();
-        self.set_mapper_from_address(&address).back().unwrap()
+        self.set_mapper_from_address(address).back().unwrap()
     }
 
     #[endpoint]
     fn keys_at_address(&self) -> ManagedVec<u32> {
         let address = self.contract_address().get();
-        self.map_mapper_from_address(&address).keys().collect()
+        self.map_mapper_from_address(address).keys().collect()
     }
 
     #[endpoint]
     fn values_at_address(&self) -> ManagedVec<u32> {
         let address = self.contract_address().get();
-        self.map_mapper_from_address(&address).values().collect()
+        self.map_mapper_from_address(address).values().collect()
     }
 
     #[endpoint]
     fn contains_unordered_at_address(&self, item: u32) -> bool {
         let address = self.contract_address().get();
-        self.unordered_set_mapper_from_address(&address)
+        self.unordered_set_mapper_from_address(address)
             .contains(&item)
     }
 
     #[endpoint]
     fn get_by_index(&self, index: usize) -> u32 {
         let address = self.contract_address().get();
-        self.unordered_set_mapper_from_address(&address)
+        self.unordered_set_mapper_from_address(address)
             .get_by_index(index)
     }
 
@@ -88,7 +88,7 @@ pub trait StorageMapperGetAtAddress {
     fn set_mapper(&self) -> SetMapper<u32>;
 
     #[storage_mapper_from_address("set_mapper")]
-    fn set_mapper_from_address(&self, address: &ManagedAddress) -> SetMapper<u32, ManagedAddress>;
+    fn set_mapper_from_address(&self, address: ManagedAddress) -> SetMapper<u32, ManagedAddress>;
 
     #[storage_mapper("map_mapper")]
     fn map_mapper(&self) -> MapMapper<u32, u32>;
@@ -96,7 +96,7 @@ pub trait StorageMapperGetAtAddress {
     #[storage_mapper_from_address("map_mapper")]
     fn map_mapper_from_address(
         &self,
-        address: &ManagedAddress,
+        address: ManagedAddress,
     ) -> MapMapper<u32, u32, ManagedAddress>;
 
     #[storage_mapper("unordered_set_mapper")]
@@ -105,7 +105,7 @@ pub trait StorageMapperGetAtAddress {
     #[storage_mapper_from_address("unordered_set_mapper")]
     fn unordered_set_mapper_from_address(
         &self,
-        address: &ManagedAddress,
+        address: ManagedAddress,
     ) -> UnorderedSetMapper<u32, ManagedAddress>;
 
     #[endpoint]

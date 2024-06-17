@@ -91,20 +91,6 @@ where
         }
     }
 }
-impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
-{
-    fn new(base_key: StorageKey<SA>) -> Self {
-        QueueMapper {
-            _phantom_api: PhantomData,
-            address: ManagedAddress::default(),
-            base_key,
-            _phantom_item: PhantomData,
-        }
-    }
-}
 
 impl<SA, T> StorageClearable for QueueMapper<SA, T, CurrentStorage>
 where

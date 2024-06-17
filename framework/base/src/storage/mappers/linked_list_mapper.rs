@@ -118,21 +118,6 @@ where
     }
 }
 
-impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
-{
-    fn new(base_key: StorageKey<SA>) -> Self {
-        LinkedListMapper {
-            _phantom_api: PhantomData,
-            address: ManagedAddress::default(),
-            base_key,
-            _phantom_item: PhantomData,
-        }
-    }
-}
-
 impl<SA, T> StorageMapperFromAddress<SA> for LinkedListMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,

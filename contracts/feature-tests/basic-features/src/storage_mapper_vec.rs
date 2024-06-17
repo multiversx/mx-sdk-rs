@@ -8,7 +8,7 @@ pub trait VecMapperFeatures {
     fn vec_mapper(&self) -> VecMapper<u32>;
 
     #[storage_mapper_from_address("vec_mapper")]
-    fn vec_mapper_from_address(&self, address: &ManagedAddress) -> VecMapper<u32, ManagedAddress>;
+    fn vec_mapper_from_address(&self, address: ManagedAddress) -> VecMapper<u32, ManagedAddress>;
 
     #[endpoint]
     fn vec_mapper_push(&self, item: u32) {
@@ -23,7 +23,7 @@ pub trait VecMapperFeatures {
 
     #[view]
     fn vec_mapper_get_at_address(&self, address: ManagedAddress, index: usize) -> u32 {
-        self.vec_mapper_from_address(&address).get(index)
+        self.vec_mapper_from_address(address).get(index)
     }
 
     #[view]
@@ -33,6 +33,6 @@ pub trait VecMapperFeatures {
 
     #[view]
     fn vec_mapper_len_at_address(&self, address: ManagedAddress) -> usize {
-        self.vec_mapper_from_address(&address).len()
+        self.vec_mapper_from_address(address).len()
     }
 }

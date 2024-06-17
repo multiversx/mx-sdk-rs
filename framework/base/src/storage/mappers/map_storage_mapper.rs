@@ -44,22 +44,6 @@ where
     }
 }
 
-impl<SA, K, V> StorageMapper<SA> for MapStorageMapper<SA, K, V, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
-    V: StorageMapper<SA> + StorageClearable,
-{
-    fn new(base_key: StorageKey<SA>) -> Self {
-        Self {
-            _phantom_api: PhantomData,
-            base_key: base_key.clone(),
-            keys_set: SetMapper::new(base_key),
-            _phantom_value: PhantomData,
-        }
-    }
-}
-
 impl<SA, K, V> StorageClearable for MapStorageMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,

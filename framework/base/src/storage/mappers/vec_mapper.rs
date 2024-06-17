@@ -56,25 +56,6 @@ where
     }
 }
 
-impl<SA, T> StorageMapper<SA> for VecMapper<SA, T, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
-{
-    fn new(base_key: StorageKey<SA>) -> Self {
-        let mut len_key = base_key.clone();
-        len_key.append_bytes(LEN_SUFFIX);
-
-        VecMapper {
-            _phantom_api: PhantomData,
-            address: ManagedAddress::default(),
-            base_key,
-            len_key,
-            _phantom_item: PhantomData,
-        }
-    }
-}
-
 impl<SA, T> StorageMapperFromAddress<SA> for VecMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,

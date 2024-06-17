@@ -45,20 +45,6 @@ where
     }
 }
 
-impl<SA, T> StorageMapper<SA> for WhitelistMapper<SA, T, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-    T: NestedEncode + 'static,
-{
-    fn new(base_key: StorageKey<SA>) -> Self {
-        Self {
-            address: ManagedAddress::default(),
-            base_key,
-            _phantom: PhantomData,
-        }
-    }
-}
-
 impl<SA, T> StorageMapperFromAddress<SA> for WhitelistMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,

@@ -42,19 +42,6 @@ where
     }
 }
 
-impl<SA> StorageMapper<SA> for AddressToIdMapper<SA, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-{
-    fn new(base_key: StorageKey<SA>) -> Self {
-        AddressToIdMapper {
-            _phantom_api: PhantomData,
-            address: ManagedAddress::default(),
-            base_key,
-        }
-    }
-}
-
 impl<SA> StorageMapperFromAddress<SA> for AddressToIdMapper<SA, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,

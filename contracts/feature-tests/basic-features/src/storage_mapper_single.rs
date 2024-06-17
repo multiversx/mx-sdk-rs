@@ -10,7 +10,7 @@ pub trait SingleValueMapperFeatures {
     #[storage_mapper_from_address("my_single_value_mapper")]
     fn map_my_single_value_mapper_from_address(
         &self,
-        address: &ManagedAddress,
+        address: ManagedAddress,
     ) -> SingleValueMapper<BigUint, ManagedAddress>;
 
     #[endpoint]
@@ -59,7 +59,7 @@ pub trait SingleValueMapperFeatures {
 
     #[endpoint]
     fn is_empty_at_address_single_value_mapper(&self, address: ManagedAddress) -> bool {
-        self.map_my_single_value_mapper_from_address(&address)
+        self.map_my_single_value_mapper_from_address(address)
             .is_empty()
     }
 

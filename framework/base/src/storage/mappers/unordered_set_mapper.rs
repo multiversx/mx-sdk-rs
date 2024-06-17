@@ -47,21 +47,6 @@ where
     }
 }
 
-impl<SA, T> StorageMapper<SA> for UnorderedSetMapper<SA, T, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
-{
-    fn new(base_key: StorageKey<SA>) -> Self {
-        UnorderedSetMapper {
-            _phantom_api: PhantomData,
-            address: ManagedAddress::default(),
-            base_key: base_key.clone(),
-            vec_mapper: VecMapper::<SA, T, ManagedAddress<SA>>::new(base_key),
-        }
-    }
-}
-
 impl<SA, T> StorageMapperFromAddress<SA> for UnorderedSetMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,

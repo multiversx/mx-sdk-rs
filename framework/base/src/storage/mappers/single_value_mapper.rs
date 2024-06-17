@@ -44,22 +44,6 @@ where
     }
 }
 
-impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T, ManagedAddress<SA>>
-where
-    SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
-{
-    #[inline]
-    fn new(base_key: StorageKey<SA>) -> Self {
-        SingleValueMapper {
-            address: ManagedAddress::default(),
-            key: base_key,
-            _phantom_api: PhantomData,
-            _phantom_item: PhantomData,
-        }
-    }
-}
-
 impl<SA, T> StorageMapperFromAddress<SA> for SingleValueMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
