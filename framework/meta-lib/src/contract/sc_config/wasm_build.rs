@@ -93,6 +93,11 @@ impl ContractVariant {
         print_pack_mxsc_file(&output_mxsc_path);
         print_contract_size(compiled_bytes.len());
         let mut abi = ContractAbiJson::from(&self.abi);
+        for endpoint in &abi.endpoints {
+            if endpoint.name.contains("__view") {
+                println!("analyze this via wasm");
+            }
+        }
         let build_info = core::mem::take(&mut abi.build_info).unwrap();
         let ei_check_json = EiCheckJson::new(&self.settings.check_ei, wasm_info.ei_check);
         let report = ReportInfoJson::new(&wasm_info, ei_check_json, compiled_bytes.len());

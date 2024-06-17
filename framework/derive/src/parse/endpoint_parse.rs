@@ -133,8 +133,12 @@ pub fn process_view_attribute(
         .map(|view_attribute| {
             check_single_role(&*method);
             let view_ident = match view_attribute.view_name {
-                Some(ident) => ident,
-                None => method.name.clone(),
+                Some(ident) => {
+                    format_ident!("{}___view", ident)
+                },
+                None => {
+                    format_ident!("{}___view", method.name.clone())
+                },
             };
             method.public_role = PublicRole::Endpoint(EndpointMetadata {
                 public_name: view_ident,

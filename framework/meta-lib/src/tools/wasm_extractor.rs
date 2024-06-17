@@ -1,7 +1,9 @@
 use colored::Colorize;
-use std::fs;
+use semver::Op;
+use std::{collections::HashMap, fs};
 use wasmparser::{
-    BinaryReaderError, DataSectionReader, FunctionBody, ImportSectionReader, Parser, Payload,
+    BinaryReaderError, DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader,
+    Operator, Parser, Payload,
 };
 
 use crate::ei::EIVersion;
@@ -12,6 +14,12 @@ const PANIC_WITH_MESSAGE: &[u8; 16] = b"panic occurred: ";
 const PANIC_WITHOUT_MESSAGE: &[u8; 14] = b"panic occurred";
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
 const MEMORY_GROW_OPCODE: u8 = 0x40;
+const WRITE_OP: [&str; 1] = [
+    // "mBufferAppend",
+    // "mBufferAppendBytes",
+    // "mBufferSetBytes",
+    "mBufferStorageStore",
+];
 
 pub struct WasmInfo {
     pub imports: Vec<String>,
@@ -50,12 +58,15 @@ fn populate_wasm_info(
     let mut ei_check = false;
     let mut memory_grow_flag = false;
     let mut has_panic = "none";
+    let mut function_names: HashMap<u32, String> = HashMap::new();
+    let mut read_functions: Vec<bool> = Vec::new();
 
-    let parser = Parser::new(0);
+    let mut parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
         match payload? {
             Payload::ImportSection(import_section) => {
-                imports = extract_imports(import_section, extract_imports_enabled);
+                imports =
+                    extract_imports(import_section, extract_imports_enabled, &mut read_functions);
                 ei_check = is_ei_valid(imports.clone(), check_ei);
             },
             Payload::DataSection(data_section) => {
@@ -67,9 +78,35 @@ fn populate_wasm_info(
                 }
             },
             Payload::CodeSectionEntry(code_section) => {
-                memory_grow_flag = is_mem_grow(code_section);
+                memory_grow_flag = is_mem_grow(code_section.clone());
+            },
+            Payload::ExportSection(export_section) => {
+                parse_export_section(export_section, &mut function_names);
+                // println!("{:#?}", function_names);
             },
             _ => (),
+        }
+    }
+
+    parser = Parser::new(0);
+    for payload in parser.parse_all(&wasm_data) {
+        if let Payload::CodeSectionEntry(body) = payload? {
+            analyze_function_body(body, &mut read_functions);
+        }
+    }
+
+    // println!("{:#?}", read_functions);
+    for (index, name) in function_names {
+        let i: usize = index.try_into().unwrap();
+        if !read_functions[i] {
+            println!(
+                "{} >> {}",
+                "Write storage in VIEW endpoint entitled "
+                    .to_string()
+                    .red()
+                    .bold(),
+                name.red().bold()
+            );
         }
     }
 
@@ -86,6 +123,63 @@ fn populate_wasm_info(
         has_format: true,
         report,
     })
+}
+
+fn parse_export_section(
+    export_section: ExportSectionReader,
+    function_names: &mut HashMap<u32, String>,
+) {
+    for export in export_section {
+        let export = export.expect("Failed to read export section");
+        if let wasmparser::ExternalKind::Func = export.kind {
+            if export.name.to_string().ends_with("__view") {
+                function_names.insert(export.index, export.name.to_string());
+            }
+        }
+    }
+}
+
+fn analyze_function_body(body: FunctionBody, functions: &mut Vec<bool>) {
+    // Implement your function body analysis here
+    // For example, you can parse the locals and instructions
+    // let locals_reader = body
+    // .get_locals_reader()
+    // .expect("Failed to get locals reader");
+    let mut instructions_reader = body
+        .get_operators_reader()
+        .expect("Failed to get operators reader");
+
+    // println!("Function has {} locals", locals_reader.get_count());
+
+    let mut value = true;
+    while let Ok(op) = instructions_reader.read() {
+        match op {
+            Operator::Call { function_index } => {
+                let function_usize: usize = function_index.try_into().unwrap();
+                if function_usize >= functions.len() {
+                    functions.push(true);
+                    return;
+                }
+
+                value &= functions[function_usize];
+
+                if !value {
+                    functions.push(value);
+                    return;
+                }
+            },
+            Operator::I32Load { memarg } => {
+                if memarg.offset > 0 {
+                    functions.push(false);
+                    return;
+                }
+            },
+            _ => (),
+        }
+    }
+
+    functions.push(value);
+    // println!("====================");
 }
 
 fn is_fail_allocator_triggered(data_section: DataSectionReader) -> bool {
@@ -140,6 +234,7 @@ fn is_panic_without_message_triggered(data_section: DataSectionReader) -> bool {
 pub fn extract_imports(
     import_section: ImportSectionReader,
     import_extraction_enabled: bool,
+    write_or_read_functions: &mut Vec<bool>,
 ) -> Vec<String> {
     if !import_extraction_enabled {
         return Vec::new();
@@ -148,6 +243,11 @@ pub fn extract_imports(
     let mut import_names = Vec::new();
     for import in import_section.into_iter().flatten() {
         import_names.push(import.name.to_string());
+        if WRITE_OP.contains(&import.name) {
+            write_or_read_functions.push(false);
+        } else {
+            write_or_read_functions.push(true);
+        }
     }
 
     import_names.sort();
