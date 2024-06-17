@@ -21,11 +21,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         add => add
         count => count
         remove => remove
-        bench => bench
-        add_struct => add_struct
+        bench___view => bench
+        add_struct___view => add_struct
         count_struct => count_struct
         remove_struct => remove_struct
-        bench_struct => bench_struct
+        bench_struct___view => bench_struct
     )
 }
 
