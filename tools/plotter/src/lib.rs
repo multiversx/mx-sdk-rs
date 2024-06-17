@@ -4,6 +4,7 @@ use web_sys::HtmlCanvasElement;
 mod func_plot;
 mod mandelbrot;
 mod plot3d;
+mod logarithm;
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -31,6 +32,13 @@ impl Chart {
     /// Return `Chart` struct suitable for coordinate conversion.
     pub fn power(canvas_id: &str, power: i32) -> Result<Chart, JsValue> {
         let map_coord = func_plot::draw(canvas_id, power).map_err(|err| err.to_string())?;
+        Ok(Chart {
+            convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
+        })
+    }
+
+    pub fn logarithm(canvas_id: &str) -> Result<Chart, JsValue> {
+        let map_coord = logarithm::draw(canvas_id).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })

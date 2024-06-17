@@ -89,13 +89,18 @@ function updatePlot() {
 			control.classList.add("hide");
 			chart = Chart.mandelbrot(canvas);
 			break;
+		case "logarithm": 
+			control.classList.add("hide");
+			chart = Chart.logarithm("canvas");
+			break;
 		case "3d-plot": 
 			control.classList.remove("hide");
 			updatePlot3d();
 			break;
 		default:
 			control.classList.add("hide");
-			chart = Chart.power("canvas", Number(selected.value))
+			chart = Chart.power("canvas", Number(selected.value));
+			// chart = null;
 	}
 	
     const end = performance.now();
