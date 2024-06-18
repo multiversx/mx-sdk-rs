@@ -80,7 +80,8 @@ pub struct TransactionOnNetwork {
     pub status: String,
     pub hyperblock_nonce: Option<u64>,
     pub hyperblock_hash: Option<String>,
-    pub smart_contract_results: Option<Vec<ApiSmartContractResult>>,
+    #[serde(default)]
+    pub smart_contract_results: Vec<ApiSmartContractResult>,
     pub logs: Option<ApiLogs>,
 }
 

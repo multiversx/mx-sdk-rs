@@ -13,29 +13,21 @@ const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
 /// Creates a [`TxResponse`] from a [`TransactionOnNetwork`].
 pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
-    let mut response = TxResponse {
-        api_scrs: tx.smart_contract_results.unwrap_or_default(),
-        api_logs: tx.logs,
-        ..Default::default()
-    };
-
-    response.tx_error = process_signal_error(&response);
-    if !response.tx_error.is_success() {
-        return response;
+    let tx_error = process_signal_error(&tx);
+    if !tx_error.is_success() {
+        TxResponse {
+            tx_error,
+            ..Default::default()
+        };
     }
 
-    process(
-        &mut response,
-        tx.sender.to_bytes(),
-        tx.nonce,
-        tx.processing_type_on_destination,
-    );
-
+    let mut response = TxResponse::default();
+    process(&mut response, &tx);
     response
 }
 
-fn process_signal_error(tx_response: &TxResponse) -> TxResponseStatus {
-    if let Some(event) = find_log(tx_response, LOG_IDENTIFIER_SIGNAL_ERROR) {
+fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
+    if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR) {
         let topics = event.topics.as_ref();
         if let Some(error) = process_topics_error(topics) {
             return TxResponseStatus::signal_error(&error);
@@ -49,34 +41,29 @@ fn process_signal_error(tx_response: &TxResponse) -> TxResponseStatus {
     TxResponseStatus::default()
 }
 
-fn process(
-    tx_response: &mut TxResponse,
-    sender_address: [u8; 32],
-    nonce: u64,
-    processing_type_on_destination: String,
-) {
-    process_out(tx_response);
+fn process(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
+    process_out(tx_response, tx);
     process_new_deployed_address(
         tx_response,
-        sender_address,
-        nonce,
-        processing_type_on_destination,
+        tx.sender.to_bytes(),
+        tx.nonce,
+        tx.processing_type_on_destination.clone(),
     );
-    process_new_issued_token_identifier(tx_response);
+    process_new_issued_token_identifier(tx_response, tx);
 }
 
-fn process_out(tx_response: &mut TxResponse) {
-    let out_scr = tx_response.api_scrs.iter().find(is_out_scr);
+fn process_out(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
+    let out_scr = tx.smart_contract_results.iter().find(is_out_scr);
 
     if let Some(out_scr) = out_scr {
         tx_response.out = decode_scr_data_or_panic(&out_scr.data);
-    } else if let Some(data) = process_out_from_log(tx_response) {
+    } else if let Some(data) = process_out_from_log(tx) {
         tx_response.out = data
     }
 }
 
-fn process_out_from_log(tx_response: &TxResponse) -> Option<Vec<Vec<u8>>> {
-    if let Some(logs) = &tx_response.api_logs {
+fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
+    if let Some(logs) = &tx.logs {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
                 if let Some(data) = &event.data {
@@ -123,14 +110,18 @@ fn process_new_deployed_address(
     tx_response.new_deployed_address = Some(Address::from(address));
 }
 
-fn process_new_issued_token_identifier(tx_response: &mut TxResponse) {
-    for scr in tx_response.api_scrs.iter() {
+fn process_new_issued_token_identifier(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
+    // let api_scrs = tx
+    //     .smart_contract_results
+    //     .as_ref()
+    //     .expect("missing smart contract results");
+    for scr in tx.smart_contract_results.iter() {
         if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
             continue;
         }
 
-        let Some(prev_tx) = tx_response
-            .api_scrs
+        let Some(prev_tx) = tx
+            .smart_contract_results
             .iter()
             .find(|e| e.hash == scr.prev_tx_hash)
         else {
@@ -177,8 +168,8 @@ fn process_new_issued_token_identifier(tx_response: &mut TxResponse) {
     }
 }
 
-fn find_log<'a>(tx_response: &'a TxResponse, log_identifier: &str) -> Option<&'a Events> {
-    if let Some(logs) = &tx_response.api_logs {
+fn find_log<'a>(tx: &'a TransactionOnNetwork, log_identifier: &str) -> Option<&'a Events> {
+    if let Some(logs) = &tx.logs {
         logs.events
             .iter()
             .find(|event| event.identifier == log_identifier)
