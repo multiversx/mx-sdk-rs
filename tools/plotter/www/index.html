@@ -3,14 +3,14 @@
     <head>
 	<meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Plotters WebAssembly Demo</title>
+	<title>MultiversX SC function plots</title>
 	<link rel="stylesheet" href="./style.css">
     </head>
     <body>
         <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
         <script src="./bootstrap.js"></script>
 	<main>
-	    <h1>Plotters WebAssembly Demo</h1>
+	    <h1>MultiversX SC function plots</h1>
 	    <div id="coord"></div>
         <canvas id="canvas" width="600" height="400"></canvas>
 	    <div id="status">Loading WebAssembly...</div>
@@ -23,7 +23,8 @@
 				<option value="3">Graph of y=x^3</option>
 				<option value="4">Graph of y=x^4</option>
 				<option value="5">Graph of y=x^5</option>
-				<option value="logarithm">Logarithms</option>
+				<option value="logarithm">Logarithms (BigUint)</option>
+				<option value="logarithm-error">Logarithm (BigUint) Error</option>
 				<option value="3d-plot">3D Plot Demo</option>
 			</select>
 			<div id="3d-control" class="hide">
@@ -35,7 +36,7 @@
 			</div>
 	    </div>
 	</main>
-	<footer>
+	<footer class="hide">
 	    <a href="https://github.com/plotters-rs/plotters-wasm-demo" target="a">Source</a> |
 	    <a href="https://github.com/plotters-rs/plotters" target="a">Repo</a> |
 	    <a href="https://crates.io/crates/plotters" target="a">Crates</a> |
