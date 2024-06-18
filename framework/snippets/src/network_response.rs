@@ -21,9 +21,7 @@ pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
         };
     }
 
-    let mut response = TxResponse::default();
-    process(&mut response, &tx);
-    response
+    process_success(&tx)
 }
 
 fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
@@ -41,10 +39,13 @@ fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
     TxResponseStatus::default()
 }
 
-fn process(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
-    tx_response.out = process_out(tx);
-    tx_response.new_deployed_address = process_new_deployed_address(tx);
-    tx_response.new_issued_token_identifier = process_new_issued_token_identifier(tx);
+fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
+    TxResponse {
+        out: process_out(tx),
+        new_deployed_address: process_new_deployed_address(tx),
+        new_issued_token_identifier: process_new_issued_token_identifier(tx),
+        ..Default::default()
+    }
 }
 
 fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
