@@ -1,5 +1,6 @@
 use multiversx_sc::{
     codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
+    derive::{debug_const_managed_decimal, debug_managed_decimal},
     types::{BigFloat, BigUint, ConstDecimals, ManagedDecimal, NumDecimals},
 };
 use multiversx_sc_scenario::api::StaticApi;
@@ -81,14 +82,27 @@ pub fn test_managed_decimal() {
     );
 }
 
-// #[test]
-// fn test_managed_decimal_macros() {
-//     let three = const_managed_decimal!("1.654");
-//     assert_eq!(three.scale(), 3usize);
+#[test]
+fn test_managed_decimal_macros() {
+    let small = debug_managed_decimal!("3.1");
+    assert_eq!(small.scale(), 1usize);
+    assert_eq!(small.into_raw_units(), &BigUint::from(31u64));
+    assert_eq!(&small.trunc(), &BigUint::from(3u64));
 
-//     let four = managed_decimal!("89632.2223");
-//     assert_eq!(four.scale(), 4usize);
-// }
+    let three = debug_const_managed_decimal!("1.654");
+    assert_eq!(three.scale(), 3usize);
+
+    let four = debug_managed_decimal!("89632.2223");
+    assert_eq!(four.scale(), 4usize);
+
+    let huge = debug_const_managed_decimal!("8723.283764652365232");
+    assert_eq!(huge.scale(), 15usize);
+    assert_eq!(
+        huge.into_raw_units(),
+        &BigUint::from(8723283764652365232u64)
+    );
+    assert_eq!(&huge.trunc(), &BigUint::from(8723u64));
+}
 
 #[test]
 fn test_managed_decimal_conversion() {

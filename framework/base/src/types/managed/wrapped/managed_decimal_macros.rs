@@ -1,63 +1,6 @@
 use crate::types::ConstDecimals;
 use core::ops::{Add, Sub};
 
-pub const fn _count_decimals(s: &str) -> usize {
-    let bytes = s.as_bytes();
-    let mut count = 0;
-    let mut dot_found = false;
-
-    let mut i = 0;
-    while i < bytes.len() {
-        if dot_found {
-            count += 1;
-        }
-        if bytes[i] == b'.' {
-            dot_found = true;
-        }
-        i += 1;
-    }
-    count
-}
-
-pub const fn _remove_dot(s: &str) -> u64 {
-    let bytes = s.as_bytes();
-    let mut result = 0u64;
-    let mut i = 0;
-
-    while i < bytes.len() {
-        let b = bytes[i];
-        if b != b'.' && b >= b'0' && b <= b'9' {
-            result = result * 10 + (b - b'0') as u64;
-        }
-        i += 1;
-    }
-    result
-}
-
-#[macro_export]
-macro_rules! const_managed_decimal {
-    ($val:expr) => {{
-        use $crate::types::managed::wrapped::managed_decimal_macros::{count_decimals, remove_dot};
-
-        const STR: &str = stringify!($val);
-        const DECIMALS: usize = _count_decimals(STR);
-        const RAW: u64 = _remove_dot(STR);
-        ManagedDecimal::<_, ConstDecimals<DECIMALS>>::const_decimals_from_raw(BigUint::from(RAW))
-    }};
-}
-
-#[macro_export]
-macro_rules! managed_decimal {
-    ($val:expr) => {{
-        use $crate::types::managed::wrapped::managed_decimal_macros::{count_decimals, remove_dot};
-
-        const STR: &str = stringify!($val);
-        const DECIMALS: usize = _count_decimals(STR);
-        const RAW: u64 = _remove_dot(STR);
-        ManagedDecimal::<_, NumDecimals>::from_raw_units(BigUint::from(RAW), DECIMALS)
-    }};
-}
-
 macro_rules! add_sub_const_decimals {
     ($dec1:expr, $dec2:expr, $result_add:expr, $result_sub:expr) => {
         impl Add<ConstDecimals<$dec2>> for ConstDecimals<$dec1> {
