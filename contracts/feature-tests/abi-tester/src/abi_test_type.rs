@@ -45,5 +45,6 @@ pub struct OnlyShowsUpInEsdtAttr {
 
 #[derive(TypeAbi)]
 pub struct ManagedDecimalWrapper<M: ManagedTypeApi> {
+    #[allow(dead_code)]
     pub field: ManagedDecimal<M, ConstDecimals<2>>,
 }

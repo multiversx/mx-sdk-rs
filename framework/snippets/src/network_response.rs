@@ -15,7 +15,7 @@ const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
     let tx_error = process_signal_error(&tx);
     if !tx_error.is_success() {
-        TxResponse {
+        return TxResponse {
             tx_error,
             ..Default::default()
         };
@@ -43,8 +43,7 @@ fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
 
 fn process(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
     tx_response.out = process_out(tx);
-    process_new_deployed_address(
-        tx_response,
+    tx_response.new_deployed_address = process_new_deployed_address(
         tx.sender.to_bytes(),
         tx.nonce,
         tx.processing_type_on_destination.clone(),
@@ -57,10 +56,8 @@ fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
 
     if let Some(out_scr) = out_scr {
         decode_scr_data_or_panic(&out_scr.data)
-    } else if let Some(data) = process_out_from_log(tx) {
-        data
     } else {
-        Vec::new()
+        process_out_from_log(tx).unwrap_or_default()
     }
 }
 
@@ -86,13 +83,12 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
 }
 
 fn process_new_deployed_address(
-    tx_response: &mut TxResponse,
     sender_address_bytes: [u8; 32],
     nonce: u64,
     processing_type_on_destination: String,
-) {
+) -> Option<Address> {
     if processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
-        return;
+        return None;
     }
 
     let sender_nonce_bytes = nonce.to_le_bytes();
@@ -109,7 +105,7 @@ fn process_new_deployed_address(
     address[10..30].copy_from_slice(&address_keccak[10..30]);
     address[30..32].copy_from_slice(&sender_address_bytes[30..32]);
 
-    tx_response.new_deployed_address = Some(Address::from(address));
+    Some(Address::from(address))
 }
 
 fn process_new_issued_token_identifier(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
