@@ -7,7 +7,9 @@ const coord = document.getElementById("coord");
 const plotType = document.getElementById("plot-type");
 const pitch = document.getElementById("pitch");
 const yaw = document.getElementById("yaw");
+const logMax = document.getElementById("logMax");
 const control = document.getElementById("3d-control");
+const logControl = document.getElementById("logControl");
 const status = document.getElementById("status");
 
 let chart = null;
@@ -37,6 +39,7 @@ function setupUI() {
 	pitch.addEventListener("change", updatePlot);
 	yaw.addEventListener("input", updatePlot);
 	pitch.addEventListener("input", updatePlot);
+	logMax.addEventListener("input", updatePlot);
     window.addEventListener("resize", setupCanvas);
     window.addEventListener("mousemove", onMouseMove);
 }
@@ -78,6 +81,9 @@ function updatePlot3d() {
 	coord.innerText = `Pitch:${pitch_value}, Yaw:${yaw_value}`
 }
 
+function updateLogarithm() {
+}
+
 /** Redraw currently selected plot. */
 function updatePlot() {
     const selected = plotType.selectedOptions[0];
@@ -87,18 +93,24 @@ function updatePlot() {
 	switch(selected.value) {
 		case "logarithm": 
 			control.classList.add("hide");
-			chart = Chart.logarithm("canvas");
+			logControl.classList.remove("hide");
+			updateLogarithm();
+			let logMaxValue = Number(logMax.value);
+			status.innerText = `Updated log: ${logMaxValue}`
+			chart = Chart.logarithm(canvas, Number(logMaxValue));
+			coord.innerText = `Updated log: ${logMaxValue}`
 			break;
 		case "3d-plot": 
 			control.classList.remove("hide");
+			logControl.classList.add("hide");
 			updatePlot3d();
 			break;
 		default:
 			control.classList.add("hide");
+			logControl.classList.add("hide");
 			chart = Chart.power("canvas", Number(selected.value));
-			// chart = null;
 	}
 	
     const end = performance.now();
-    status.innerText = `Rendered ${selected.innerText} in ${Math.ceil(end - start)}ms`;
+    // status.innerText = `Rendered ${selected.innerText} in ${Math.ceil(end - start)}ms`;
 }

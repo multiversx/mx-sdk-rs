@@ -36,8 +36,8 @@ impl Chart {
         })
     }
 
-    pub fn logarithm(canvas_id: &str) -> Result<Chart, JsValue> {
-        let map_coord = logarithm::draw(canvas_id).map_err(|err| err.to_string())?;
+    pub fn logarithm(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
+        let map_coord = logarithm::draw(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
