@@ -5,10 +5,7 @@ class Chart { }
 const canvas = document.getElementById("canvas");
 const coord = document.getElementById("coord");
 const plotType = document.getElementById("plot-type");
-const pitch = document.getElementById("pitch");
-const yaw = document.getElementById("yaw");
 const logMax = document.getElementById("logMax");
-const control = document.getElementById("3d-control");
 const logControl = document.getElementById("logControl");
 const status = document.getElementById("status");
 
@@ -35,10 +32,6 @@ export function setup(WasmChart) {
 function setupUI() {
 	status.innerText = "WebAssembly loaded!";
 	plotType.addEventListener("change", updatePlot);
-	yaw.addEventListener("change", updatePlot);
-	pitch.addEventListener("change", updatePlot);
-	yaw.addEventListener("input", updatePlot);
-	pitch.addEventListener("input", updatePlot);
 	logMax.addEventListener("input", updatePlot);
 	window.addEventListener("resize", setupCanvas);
 	window.addEventListener("mousemove", onMouseMove);
@@ -74,13 +67,6 @@ function onMouseMove(event) {
 	}
 }
 
-function updatePlot3d() {
-	let yaw_value = Number(yaw.value) / 100.0;
-	let pitch_value = Number(pitch.value) / 100.0;
-	Chart.plot3d(canvas, pitch_value, yaw_value);
-	coord.innerText = `Pitch:${pitch_value}, Yaw:${yaw_value}`
-}
-
 /** Redraw currently selected plot. */
 function updatePlot() {
 	const selected = plotType.selectedOptions[0];
@@ -89,24 +75,15 @@ function updatePlot() {
 	const start = performance.now();
 	switch (selected.value) {
 		case "logarithm":
-			control.classList.add("hide");
 			logControl.classList.remove("hide");
 			chart = Chart.logarithm(canvas, Number(logMax.value));
 			break;
 		case "logarithm-error":
-			control.classList.add("hide");
 			logControl.classList.remove("hide");
 			chart = Chart.logarithm_error(canvas, Number(logMax.value));
 			break;
-		case "3d-plot":
-			control.classList.remove("hide");
-			logControl.classList.add("hide");
-			updatePlot3d();
-			break;
 		default:
-			control.classList.add("hide");
 			logControl.classList.add("hide");
-			chart = Chart.power("canvas", Number(selected.value));
 	}
 
 	const end = performance.now();

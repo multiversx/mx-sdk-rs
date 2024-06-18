@@ -3,9 +3,7 @@
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 
-mod func_plot;
 pub mod logarithm;
-mod plot3d;
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -29,15 +27,8 @@ pub struct Point {
 
 #[wasm_bindgen]
 impl Chart {
-    /// Draw provided power function on the canvas element using it's id.
+    /// Draw provided functions on the canvas.
     /// Return `Chart` struct suitable for coordinate conversion.
-    pub fn power(canvas_id: &str, power: i32) -> Result<Chart, JsValue> {
-        let map_coord = func_plot::draw(canvas_id, power).map_err(|err| err.to_string())?;
-        Ok(Chart {
-            convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
-        })
-    }
-
     pub fn logarithm(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
         let map_coord = logarithm::draw_logs(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
@@ -50,11 +41,6 @@ impl Chart {
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
-    }
-
-    pub fn plot3d(canvas: HtmlCanvasElement, pitch: f64, yaw: f64) -> Result<(), JsValue> {
-        plot3d::draw(canvas, pitch, yaw).map_err(|err| err.to_string())?;
-        Ok(())
     }
 
     /// This function can be used to convert screen coordinates to

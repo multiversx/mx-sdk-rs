@@ -37,7 +37,7 @@ pub fn draw_logs(
     chart.draw_series(LineSeries::new(
         (0..=RANGE_MAX)
             .map(|x| x as f32 * max_x / RANGE_MAX as f32)
-            .map(|x| (x, sc_ln(x))),
+            .map(|x| (x, big_uint_ln(x))),
         &GREEN,
     ))?;
 
@@ -70,7 +70,7 @@ pub fn draw_error(
     chart.draw_series(LineSeries::new(
         (0..=RANGE_MAX)
             .map(|x| x as f32 * max_x / RANGE_MAX as f32)
-            .map(|x| (x, sc_ln(x) - x.ln())),
+            .map(|x| (x, big_uint_ln(x) - x.ln())),
         &RED,
     ))?;
 
@@ -78,7 +78,7 @@ pub fn draw_error(
     return Ok(chart.into_coord_trans());
 }
 
-pub fn sc_ln(x: f32) -> f32 {
+fn big_uint_ln(x: f32) -> f32 {
     let bu = BigUint::<StaticApi>::from(x as u32);
     if let Some(ln_dec) = bu.ln() {
         let ln_units = ln_dec.into_raw_units().to_u64().unwrap();
@@ -93,9 +93,9 @@ pub fn sc_ln(x: f32) -> f32 {
 mod test {
     #[test]
     fn sc_ln_test() {
-        assert_eq!(super::sc_ln(0.0), 0.0);
-        assert!(super::sc_ln(1.0) > 0.0);
-        assert!(super::sc_ln(1.0) < 0.01);
-        assert!(super::sc_ln(2.0) > 0.6);
+        assert_eq!(super::big_uint_ln(0.0), 0.0);
+        assert!(super::big_uint_ln(1.0) > 0.0);
+        assert!(super::big_uint_ln(1.0) < 0.01);
+        assert!(super::big_uint_ln(2.0) > 0.6);
     }
 }
