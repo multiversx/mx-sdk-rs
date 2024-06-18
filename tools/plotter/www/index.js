@@ -81,9 +81,6 @@ function updatePlot3d() {
 	coord.innerText = `Pitch:${pitch_value}, Yaw:${yaw_value}`
 }
 
-function updateLogarithm() {
-}
-
 /** Redraw currently selected plot. */
 function updatePlot() {
     const selected = plotType.selectedOptions[0];
@@ -94,11 +91,8 @@ function updatePlot() {
 		case "logarithm": 
 			control.classList.add("hide");
 			logControl.classList.remove("hide");
-			updateLogarithm();
 			let logMaxValue = Number(logMax.value);
-			status.innerText = `Updated log: ${logMaxValue}`
 			chart = Chart.logarithm(canvas, Number(logMaxValue));
-			coord.innerText = `Updated log: ${logMaxValue}`
 			break;
 		case "3d-plot": 
 			control.classList.remove("hide");
@@ -112,5 +106,5 @@ function updatePlot() {
 	}
 	
     const end = performance.now();
-    // status.innerText = `Rendered ${selected.innerText} in ${Math.ceil(end - start)}ms`;
+    status.innerText = `Rendered ${selected.innerText} in ${Math.ceil(end - start)}ms`;
 }

@@ -1,9 +1,11 @@
+#![allow(clippy::type_complexity)]
+
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 
 mod func_plot;
+pub mod logarithm;
 mod plot3d;
-mod logarithm;
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;

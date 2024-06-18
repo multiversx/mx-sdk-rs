@@ -25,7 +25,7 @@ pub fn draw(canvas: HtmlCanvasElement, pitch: f64, yaw: f64) -> DrawResult<()> {
     chart.configure_axes().draw()?;
 
     chart.draw_series(
-        SurfaceSeries::xoz(x_axis.values(), z_axis.values(), |x:f64, z:f64| {
+        SurfaceSeries::xoz(x_axis.values(), z_axis.values(), |x: f64, z: f64| {
             (x * x + z * z).cos()
         })
         .style(&BLUE.mix(0.2)),

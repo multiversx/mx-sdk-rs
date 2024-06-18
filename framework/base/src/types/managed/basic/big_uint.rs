@@ -240,10 +240,17 @@ impl<M: ManagedTypeApi> BigUint<M> {
         api.bi_log2(self.handle.clone())
     }
 
-    pub fn ln(&self) -> ManagedDecimal<M, ConstDecimals<9>> {
+    /// Natural logarithm of a number.
+    ///
+    /// Returns `None` for 0.
+    pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
+        if self == &0u32 {
+            return None;
+        }
+
         let bit_log2 = self.log2(); // aproximate, based on position of the most significant bit
         let scaling_factor_9 = ConstDecimals::<9>.scaling_factor();
-        let divisor = BigUint::from(1u64 << bit_log2);
+        let divisor = BigUint::from(1u64) << bit_log2 as usize;
         let normalized = self * &*scaling_factor_9 / divisor;
 
         let x = normalized
@@ -279,7 +286,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         let mut result_bi = normalized; // reuse handle
         result_bi.overwrite_u64(result as u64);
 
-        ManagedDecimal::const_decimals_from_raw(result_bi)
+        Some(ManagedDecimal::const_decimals_from_raw(result_bi))
     }
 }
 

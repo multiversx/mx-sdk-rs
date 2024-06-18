@@ -1,8 +1,9 @@
 [package]
-name = "wasm-demo"
+name = "sc-plotter-wasm"
 version = "0.1.0"
 authors = ["Hao Hou <haohou302@gmail.com>"]
 edition = "2018"
+publish = false
 
 [lib]
 crate-type=["cdylib"]
