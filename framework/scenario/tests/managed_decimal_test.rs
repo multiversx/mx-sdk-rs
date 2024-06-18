@@ -81,6 +81,15 @@ pub fn test_managed_decimal() {
     );
 }
 
+// #[test]
+// fn test_managed_decimal_macros() {
+//     let three = const_managed_decimal!("1.654");
+//     assert_eq!(three.scale(), 3usize);
+
+//     let four = managed_decimal!("89632.2223");
+//     assert_eq!(four.scale(), 4usize);
+// }
+
 #[test]
 fn test_managed_decimal_conversion() {
     let fixed: ManagedDecimal<StaticApi, NumDecimals> =
