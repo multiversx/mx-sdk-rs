@@ -42,7 +42,7 @@ fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
 }
 
 fn process(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
-    process_out(tx_response, tx);
+    tx_response.out = process_out(tx);
     process_new_deployed_address(
         tx_response,
         tx.sender.to_bytes(),
@@ -52,13 +52,15 @@ fn process(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
     process_new_issued_token_identifier(tx_response, tx);
 }
 
-fn process_out(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
+fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
     let out_scr = tx.smart_contract_results.iter().find(is_out_scr);
 
     if let Some(out_scr) = out_scr {
-        tx_response.out = decode_scr_data_or_panic(&out_scr.data);
+        decode_scr_data_or_panic(&out_scr.data)
     } else if let Some(data) = process_out_from_log(tx) {
-        tx_response.out = data
+        data
+    } else {
+        Vec::new()
     }
 }
 
