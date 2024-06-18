@@ -1,7 +1,8 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl, StaticVarApiImpl
+        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
+        ManagedTypeApi, StaticVarApiImpl,
     },
     codec::{
         DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -351,7 +352,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
     fn drop(&mut self) {
-        M::managed_type_impl().drop_managed_buffer(self.get_handle());
+        let _ = core::mem::replace(&mut self.get_handle(), unsafe { core::mem::zeroed() });
     }
 }
 
