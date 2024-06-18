@@ -43,7 +43,8 @@ pub struct OnlyShowsUpInEsdtAttr {
     pub field: OnlyShowsUpAsNested10,
 }
 
-#[derive(TypeAbi)]
+#[type_abi]
 pub struct ManagedDecimalWrapper<M: ManagedTypeApi> {
+    #[allow(dead_code)]
     pub field: ManagedDecimal<M, ConstDecimals<2>>,
 }

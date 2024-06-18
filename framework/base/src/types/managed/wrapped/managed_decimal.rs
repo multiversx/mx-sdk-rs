@@ -8,9 +8,8 @@ use crate::{
 };
 
 use multiversx_sc_codec::{
-    num_bigint::ToBigUint, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 use core::{cmp::Ordering, ops::Deref};
@@ -181,8 +180,8 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
         // find the highest power of 2 less than or equal to self
         let log2 = self.data.log2() - num_decimals * BigUint::<M>::from(10u64).log2(); // most significant bit for the actual number
         let divisor = 1 << log2;
-        let divisor_scaled = BigUint::<M>::from(divisor.to_biguint().unwrap())
-            * self.decimals.scaling_factor().clone_value();
+        let divisor_scaled =
+            BigUint::<M>::from(divisor as u64) * self.decimals.scaling_factor().clone_value();
         let _normalized = self.data / divisor_scaled; // normalize to [1.0, 2.0]
         let x_dec = ManagedDecimal::<M, ConstDecimals<0>>::const_decimals_from_raw(_normalized);
         let x = x_dec.rescale(precision.clone());
