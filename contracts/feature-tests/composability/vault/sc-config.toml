@@ -20,6 +20,11 @@ add-labels = ["upgrade"]
 path = "../forwarder/src/vault_proxy.rs"
 
 [[proxy]]
+path = "../forwarder/src/vault_upgrade_proxy.rs"
+add-unlabelled = false
+add-labels = ["upgrade"]
+
+[[proxy]]
 path = "../promises-features/src/vault_proxy.rs"
 
 [[proxy]]

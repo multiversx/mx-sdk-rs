@@ -55,7 +55,3 @@ version = "0.2.0"
 [dependencies.multiversx-chain-vm]
 version = "=0.8.4"
 path = "../../vm"
-
-[dependencies.multiversx-sdk]
-version = "=0.4.1"
-path = "../../sdk/core"

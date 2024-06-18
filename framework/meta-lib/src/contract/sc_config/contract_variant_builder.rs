@@ -1,3 +1,4 @@
+use core::panic;
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
@@ -9,9 +10,10 @@ use crate::ei::parse_check_ei;
 
 use super::{
     contract_variant_settings::{parse_allocator, parse_stack_size},
+    proxy_config::ProxyConfig,
     sc_config_model::SC_CONFIG_FILE_NAMES,
     ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
-    ScConfig, ScConfigSerde,
+    ProxyConfigSerde, ScConfig, ScConfigSerde,
 };
 
 /// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.
@@ -253,38 +255,112 @@ fn validate_contract_variants(contracts: &[ContractVariant]) {
     }
 }
 
-impl ScConfig {
-    /// Assembles an `ContractVariantConfig` from a raw config object that was loaded via Serde.
-    ///
-    /// In most cases the config will be loaded from a .toml file, use `load_from_file` for that.
-    pub fn load_from_config(config: &ScConfigSerde, original_abi: &ContractAbi) -> Self {
-        let mut contract_builders: HashMap<String, ContractVariantBuilder> = config
-            .contracts
-            .iter()
-            .map(ContractVariantBuilder::map_from_config)
-            .collect();
+fn process_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<ContractVariant> {
+    let mut contract_builders: HashMap<String, ContractVariantBuilder> = config
+        .contracts
+        .iter()
+        .map(ContractVariantBuilder::map_from_config)
+        .collect();
+
+    collect_and_process_endpoints(
+        &mut contract_builders,
+        original_abi,
+        &config.labels_for_contracts,
+    );
+
+    let mut contracts: Vec<ContractVariant> = contract_builders
+        .into_values()
+        .map(|builder| build_contract(builder, original_abi))
+        .collect();
+
+    if contracts.is_empty() {
+        contracts.push(ContractVariant::default_from_abi(original_abi));
+    }
+    set_main_contract_flag(&mut contracts, &config.settings.main);
+    validate_contract_variants(&contracts);
+
+    contracts
+}
+
+fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<ProxyConfig> {
+    let mut proxy_contracts = Vec::new();
+
+    let main_contract = process_contracts(config, original_abi)
+        .into_iter()
+        .find(|contract| contract.main)
+        .unwrap();
+
+    proxy_contracts.push(ProxyConfig::new_with_default_path(main_contract.abi));
+
+    for proxy_config in &config.proxy {
+        let mut contract_builders = HashMap::new();
+
+        match &proxy_config.variant {
+            Some(variant) => {
+                let setting_contract = config
+                    .contracts
+                    .iter()
+                    .find(|setting| setting.0.eq(variant))
+                    .unwrap_or_else(|| panic!("No contact with this name"));
+                let (contract_id, mut contract_builder) =
+                    ContractVariantBuilder::map_from_config(setting_contract);
+                alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
+
+                contract_builders = HashMap::from([(contract_id, contract_builder)]);
+            },
+            None => {
+                let mut contract_builder = ContractVariantBuilder::default();
+                alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
+
+                contract_builders.insert(proxy_config.path.clone(), contract_builder);
+            },
+        }
+
         collect_and_process_endpoints(
             &mut contract_builders,
             original_abi,
             &config.labels_for_contracts,
         );
+        if let Some((_, builder)) = contract_builders.into_iter().next() {
+            let contract = build_contract(builder, original_abi);
 
-        let mut contracts: Vec<ContractVariant> = contract_builders
-            .into_values()
-            .map(|builder| build_contract(builder, original_abi))
-            .collect();
-        if contracts.is_empty() {
-            contracts.push(ContractVariant::default_from_abi(original_abi));
+            proxy_contracts.push(ProxyConfig::new(
+                proxy_config.path.to_owned(),
+                proxy_config.override_import.to_owned(),
+                proxy_config.path_rename.to_owned(),
+                contract.abi,
+            ));
         }
-        set_main_contract_flag(&mut contracts, &config.settings.main);
-        validate_contract_variants(&contracts);
+    }
+
+    proxy_contracts
+}
+
+impl ScConfig {
+    /// Assembles an `ContractVariantConfig` from a raw config object that was loaded via Serde.
+    ///
+    /// In most cases the config will be loaded from a .toml file, use `load_from_file` for that.
+    pub fn load_from_config(config: &ScConfigSerde, original_abi: &ContractAbi) -> Self {
         let default_contract_config_name = config.settings.main.clone().unwrap_or_default();
         ScConfig {
             default_contract_config_name,
-            contracts,
-            proxy_configs: config.proxy.clone(),
+            contracts: process_contracts(config, original_abi),
+            proxy_configs: process_proxy_contracts(config, original_abi),
         }
     }
+}
+
+fn alter_builder_with_proxy_config(
+    proxy_config: &ProxyConfigSerde,
+    contract_builder: &mut ContractVariantBuilder,
+) {
+    let default = ContractVariantBuilder::default();
+
+    contract_builder.add_unlabelled = proxy_config
+        .add_unlabelled
+        .unwrap_or(default.add_unlabelled);
+    contract_builder.add_endpoints = proxy_config.add_endpoints.iter().cloned().collect();
+    contract_builder.add_labels = proxy_config.add_labels.iter().cloned().collect();
 }
 
 fn collect_and_process_endpoints(
