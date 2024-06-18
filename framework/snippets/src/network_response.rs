@@ -44,7 +44,7 @@ fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
 fn process(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
     tx_response.out = process_out(tx);
     tx_response.new_deployed_address = process_new_deployed_address(tx);
-    process_new_issued_token_identifier(tx_response, tx);
+    tx_response.new_issued_token_identifier = process_new_issued_token_identifier(tx);
 }
 
 fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
@@ -79,7 +79,7 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
 }
 
 fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
-    if &tx.processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
+    if tx.processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
         return None;
     }
 
@@ -101,11 +101,7 @@ fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
     Some(Address::from(address))
 }
 
-fn process_new_issued_token_identifier(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
-    // let api_scrs = tx
-    //     .smart_contract_results
-    //     .as_ref()
-    //     .expect("missing smart contract results");
+fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<String> {
     for scr in tx.smart_contract_results.iter() {
         if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
             continue;
@@ -137,26 +133,14 @@ fn process_new_issued_token_identifier(tx_response: &mut TxResponse, tx: &Transa
 
         if scr.data.starts_with("ESDTTransfer@") {
             let encoded_tid = scr.data.split('@').nth(1);
-            if encoded_tid.is_none() {
-                return;
-            }
-
-            tx_response.new_issued_token_identifier =
-                Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
-
-            break;
+            return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
         } else if scr.data.starts_with("@00@") {
             let encoded_tid = scr.data.split('@').nth(2);
-            if encoded_tid.is_none() {
-                return;
-            }
-
-            tx_response.new_issued_token_identifier =
-                Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
-
-            break;
+            return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
         }
     }
+
+    None
 }
 
 fn find_log<'a>(tx: &'a TransactionOnNetwork, log_identifier: &str) -> Option<&'a Events> {
