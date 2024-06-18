@@ -29,6 +29,13 @@ pub fn draw(canvas: HtmlCanvasElement, max_x: f32) -> DrawResult<impl Fn((i32, i
         &RED,
     ))?;
 
+    chart.draw_series(LineSeries::new(
+        (0..=RANGE_MAX)
+            .map(|x| x as f32 * max_x / RANGE_MAX as f32)
+            .map(|x| (x, x.log2())),
+        &GREEN,
+    ))?;
+
     root.present()?;
     return Ok(chart.into_coord_trans());
 }
