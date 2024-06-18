@@ -43,11 +43,7 @@ fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
 
 fn process(tx_response: &mut TxResponse, tx: &TransactionOnNetwork) {
     tx_response.out = process_out(tx);
-    tx_response.new_deployed_address = process_new_deployed_address(
-        tx.sender.to_bytes(),
-        tx.nonce,
-        tx.processing_type_on_destination.clone(),
-    );
+    tx_response.new_deployed_address = process_new_deployed_address(tx);
     process_new_issued_token_identifier(tx_response, tx);
 }
 
@@ -82,16 +78,13 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     }
 }
 
-fn process_new_deployed_address(
-    sender_address_bytes: [u8; 32],
-    nonce: u64,
-    processing_type_on_destination: String,
-) -> Option<Address> {
-    if processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
+fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
+    if &tx.processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
         return None;
     }
 
-    let sender_nonce_bytes = nonce.to_le_bytes();
+    let sender_address_bytes = tx.sender.to_bytes();
+    let sender_nonce_bytes = tx.nonce.to_le_bytes();
     let mut bytes_to_hash: Vec<u8> = Vec::new();
     bytes_to_hash.extend_from_slice(&sender_address_bytes);
     bytes_to_hash.extend_from_slice(&sender_nonce_bytes);
