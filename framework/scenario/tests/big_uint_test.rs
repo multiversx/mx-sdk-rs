@@ -4,7 +4,7 @@ use multiversx_sc_scenario::api::StaticApi;
 fn assert_big_uint_ln(x: u32, ln_str: &str) {
     let x = BigUint::<StaticApi>::from(x);
     let ln_x = x.ln();
-    assert_eq!(ln_x.to_string(), ln_str);
+    assert_eq!(ln_x.unwrap().to_string(), ln_str);
 }
 
 #[test]

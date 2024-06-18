@@ -60,7 +60,9 @@ pub fn sc_ln(x: f32) -> f32 {
 mod test {
     #[test]
     fn sc_ln_test() {
-        let y = super::sc_ln(0.0);
-        println!("{y}");
+        assert_eq!(super::sc_ln(0.0), 0.0);
+        assert!(super::sc_ln(1.0) > 0.0);
+        assert!(super::sc_ln(1.0) < 0.01);
+        assert!(super::sc_ln(2.0) > 0.6);
     }
 }
