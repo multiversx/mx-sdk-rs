@@ -2,7 +2,6 @@ use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 
 mod func_plot;
-mod mandelbrot;
 mod plot3d;
 mod logarithm;
 
@@ -41,15 +40,6 @@ impl Chart {
         let map_coord = logarithm::draw(canvas_id).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
-        })
-    }
-
-    /// Draw Mandelbrot set on the provided canvas element.
-    /// Return `Chart` struct suitable for coordinate conversion.
-    pub fn mandelbrot(canvas: HtmlCanvasElement) -> Result<Chart, JsValue> {
-        let map_coord = mandelbrot::draw(canvas).map_err(|err| err.to_string())?;
-        Ok(Chart {
-            convert: Box::new(map_coord),
         })
     }
 

@@ -85,10 +85,6 @@ function updatePlot() {
     chart = null;
     const start = performance.now();
 	switch(selected.value) {
-		case "mandelbrot":
-			control.classList.add("hide");
-			chart = Chart.mandelbrot(canvas);
-			break;
 		case "logarithm": 
 			control.classList.add("hide");
 			chart = Chart.logarithm("canvas");
