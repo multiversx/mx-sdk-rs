@@ -70,16 +70,8 @@ pub trait ManagedTypeApiImpl:
         drop(handle)
     }
 
-    fn drop_big_float(&self, handle: Self::BigFloatHandle) {
-        drop(handle)
-    }
-    fn drop_big_int(&self, handle: Self::BigIntHandle) {
-        drop(handle)
-    }
-    fn drop_elliptic_curve(&self, handle: Self::EllipticCurveHandle) {
-        drop(handle)
-    }
-    fn drop_managed_map(&self, handle: Self::ManagedMapHandle) {
-        drop(handle)
-    }
+    fn drop_big_float(&self, _handle: Self::BigFloatHandle) {}
+    fn drop_big_int(&self, _handle: Self::BigIntHandle) {}
+    fn drop_elliptic_curve(&self, _handle: Self::EllipticCurveHandle) {}
+    fn drop_managed_map(&self, _handle: Self::ManagedMapHandle) {}
 }
