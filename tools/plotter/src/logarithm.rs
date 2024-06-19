@@ -61,7 +61,7 @@ pub fn draw_error(
         .margin(20u32)
         .caption(format!("y=logarithm error, x=1..{max_x}"), font)
         .x_label_area_size(30u32)
-        .y_label_area_size(30u32)
+        .y_label_area_size(50u32)
         .build_cartesian_2d(0f32..max_x, -0.0001f32..0.0001f32)?;
 
     chart.configure_mesh().x_labels(3).y_labels(3).draw()?;
