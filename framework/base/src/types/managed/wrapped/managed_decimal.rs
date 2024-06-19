@@ -96,6 +96,10 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         self.decimals.num_decimals()
     }
 
+    pub fn scaling_factor(&self) -> ManagedRef<'static, M, BigUint<M>> {
+        self.decimals.scaling_factor()
+    }
+
     pub fn rescale<T: Decimals>(self, scale_to: T) -> ManagedDecimal<M, T>
     where
         M: ManagedTypeApi,

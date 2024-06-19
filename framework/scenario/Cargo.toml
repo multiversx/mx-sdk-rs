@@ -29,11 +29,11 @@ serde_json = "1.0"
 pathdiff = "0.2.1"
 itertools = "0.12.0"
 colored = "2.0"
-clap = { version = "4.4.7", features = ["derive"] }
-tokio = { version = "1.24", features = ["full"] }
 unwrap-infallible = "0.1.5"
 
 [features]
+default = ["wasm-incopatible"]
+wasm-incopatible = ["multiversx-chain-vm/wasm-incopatible"]
 run-go-tests = []
 
 [dependencies.multiversx-sc]
@@ -55,7 +55,3 @@ version = "0.2.0"
 [dependencies.multiversx-chain-vm]
 version = "=0.8.4"
 path = "../../vm"
-
-[dependencies.multiversx-sdk]
-version = "=0.4.1"
-path = "../../sdk/core"

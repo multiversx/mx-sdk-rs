@@ -48,7 +48,7 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn biguint_overwrite_u64(&self, bu: BigUint, small: u64) -> BigUint {
+    fn biguint_overwrite_u64(&self, mut bu: BigUint, small: u64) -> BigUint {
         bu.overwrite_u64(small);
         bu
     }
