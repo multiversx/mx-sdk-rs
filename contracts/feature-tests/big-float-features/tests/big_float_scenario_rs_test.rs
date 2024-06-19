@@ -57,6 +57,17 @@ fn big_float_overflow_test_rs() {
 }
 
 #[test]
+fn big_float_ln_test_rs() {
+    let x = BigFloat::<StaticApi>::from(23i64);
+    let ln_x = x.ln();
+    assert_eq!(ln_x.to_managed_decimal(9usize).to_string(), "3.135514648");
+    assert!(ln_x.is_close(
+        &BigFloat::from_frac(3135514648, 1_000_000_000), // 3.135514648
+        &BigFloat::from_frac(1, 1_000_000_000)
+    ));
+}
+
+#[test]
 fn big_float_new_from_big_int_rs() {
     world().run("scenarios/big_float_new_from_big_int.scen.json");
 }

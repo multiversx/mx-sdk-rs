@@ -93,7 +93,6 @@ big_float_conv_num! {i16}
 big_float_conv_num! {i8}
 
 impl<M: ManagedTypeApi> BigFloat<M> {
-    #[inline]
     pub fn neg(&self) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
@@ -101,7 +100,13 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         BigFloat::from_handle(new_bf_handle)
     }
 
-    #[inline]
+    pub fn abs(&self) -> Self {
+        let new_bf_handle: M::BigFloatHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
+        M::managed_type_impl().bf_abs(new_bf_handle.clone(), self.handle.clone());
+        BigFloat::from_handle(new_bf_handle)
+    }
+
     pub fn from_big_uint(big_uint: &BigUint<M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
@@ -109,7 +114,6 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         BigFloat::from_handle(new_bf_handle)
     }
 
-    #[inline]
     pub fn from_big_int(big_int: &BigInt<M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
@@ -168,8 +172,39 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         (self * denominator).trunc()
     }
 
-    pub fn to_managed_decimal<T: Decimals>(self, decimals: T) -> ManagedDecimal<M, T> {
+    pub fn to_managed_decimal<T: Decimals>(&self, decimals: T) -> ManagedDecimal<M, T> {
         ManagedDecimal::<M, T>::from_big_float(self, decimals)
+    }
+
+    pub fn ln(&self) -> Self {
+        // find the highest power of 2 less than or equal to self
+        let trunc_val = self.trunc();
+        let trunc_val_unsigned = trunc_val
+            .into_big_uint()
+            .unwrap_or_sc_panic("log argument must be positive");
+        let bit_log2 = trunc_val_unsigned.log2(); // aproximate, based on position of the most significant bit
+        let divisor = BigFloat::from(1 << bit_log2);
+        let x = self / &divisor; // normalize to [1.0, 2.0]
+
+        debug_assert!(x >= 1);
+        debug_assert!(x <= 2);
+
+        const DENOMINATOR: i64 = 1_000_000_000;
+
+        let mut result = BigFloat::from_frac(-56570851, DENOMINATOR); // -0.056570851
+        result *= &x;
+        result += BigFloat::from_frac(447179550, DENOMINATOR); // 0.44717955
+        result *= &x;
+        result += BigFloat::from_frac(-1469956800, DENOMINATOR); // -1.4699568
+        result *= &x;
+        result += BigFloat::from_frac(2821202600, DENOMINATOR); // 2.8212026
+        result *= &x;
+        result += BigFloat::from_frac(-1741793900, DENOMINATOR); // -1.7417939
+
+        let ln_of_2 = BigFloat::from_frac(693147180, DENOMINATOR); // 0.69314718
+        result += BigFloat::from(bit_log2 as i32) * ln_of_2;
+
+        result
     }
 }
 

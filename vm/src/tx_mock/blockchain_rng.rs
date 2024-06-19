@@ -31,7 +31,7 @@ impl BlockchainRng {
         }
     }
 
-    pub fn fill<T: Fill + ?Sized>(&mut self, dest: &mut T) {
+    fn fill<T: Fill + ?Sized>(&mut self, dest: &mut T) {
         self.rng.fill(dest);
     }
 
