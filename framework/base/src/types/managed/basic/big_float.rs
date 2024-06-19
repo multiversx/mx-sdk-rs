@@ -14,6 +14,9 @@ use crate::codec::{
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
+/// Denomiator used for initializing BigFloats from constants.
+const DENOMINATOR: i64 = 1_000_000_000;
+
 #[derive(Debug)]
 #[repr(transparent)]
 pub struct BigFloat<M: ManagedTypeApi> {
@@ -177,33 +180,53 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     pub fn ln(&self) -> Self {
-        if self == &BigFloat::from(1i64) {
-            return BigFloat::from(0i64);
+        let one = BigFloat::from(1i64);
+        match self.cmp(&one) {
+            core::cmp::Ordering::Less => {
+                let inv = &one / self;
+                debug_assert!(inv > one);
+                inv.ln_gt_one().neg()
+            },
+            core::cmp::Ordering::Equal => BigFloat::from(0i64),
+            core::cmp::Ordering::Greater => self.ln_gt_one(),
         }
+    }
 
+    /// Computes the natural logarithm for values between 1 and 2. Performs very poorly outside of this interval.
+    fn ln_between_one_and_two(&self) -> Self {
+        let mut result = BigFloat::from_frac(-56570851, DENOMINATOR); // -0.056570851
+        result *= self;
+        result += BigFloat::from_frac(447179550, DENOMINATOR); // 0.44717955
+        result *= self;
+        result += BigFloat::from_frac(-1469956800, DENOMINATOR); // -1.4699568
+        result *= self;
+        result += BigFloat::from_frac(2821202600, DENOMINATOR); // 2.8212026
+        result *= self;
+        result += BigFloat::from_frac(-1741793900, DENOMINATOR); // -1.7417939
+
+        result
+    }
+
+    /// Computes the natural logarithm for values > 1.
+    fn ln_gt_one(&self) -> Self {
         // find the highest power of 2 less than or equal to self
         let trunc_val = self.trunc();
         let trunc_val_unsigned = trunc_val
             .into_big_uint()
             .unwrap_or_sc_panic("log argument must be positive");
-        let bit_log2 = trunc_val_unsigned.log2(); // aproximate, based on position of the most significant bit
+        let bit_log2 = trunc_val_unsigned.log2(); // approximate, based on position of the most significant bit
+        if bit_log2 == u32::MAX {
+            // means the input was zero, TODO: change log2 return type
+            return BigFloat::from(0i64);
+            // return None;
+        }
         let divisor = BigFloat::from(1 << bit_log2);
         let x = self / &divisor; // normalize to [1.0, 2.0]
 
         debug_assert!(x >= 1);
         debug_assert!(x <= 2);
 
-        const DENOMINATOR: i64 = 1_000_000_000;
-
-        let mut result = BigFloat::from_frac(-56570851, DENOMINATOR); // -0.056570851
-        result *= &x;
-        result += BigFloat::from_frac(447179550, DENOMINATOR); // 0.44717955
-        result *= &x;
-        result += BigFloat::from_frac(-1469956800, DENOMINATOR); // -1.4699568
-        result *= &x;
-        result += BigFloat::from_frac(2821202600, DENOMINATOR); // 2.8212026
-        result *= &x;
-        result += BigFloat::from_frac(-1741793900, DENOMINATOR); // -1.7417939
+        let mut result = x.ln_between_one_and_two();
 
         let ln_of_2 = BigFloat::from_frac(693147180, DENOMINATOR); // 0.69314718
         result += BigFloat::from(bit_log2 as i32) * ln_of_2;

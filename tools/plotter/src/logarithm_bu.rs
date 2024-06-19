@@ -5,7 +5,7 @@ use plotters::prelude::*;
 use plotters_canvas::CanvasBackend;
 use web_sys::HtmlCanvasElement;
 
-pub fn draw_logs(
+pub fn draw_bu_logs(
     canvas: HtmlCanvasElement,
     max_x: f32,
 ) -> DrawResult<impl Fn((i32, i32)) -> Option<(f32, f32)>> {
@@ -45,7 +45,7 @@ pub fn draw_logs(
     return Ok(chart.into_coord_trans());
 }
 
-pub fn draw_error(
+pub fn draw_bu_error(
     canvas: HtmlCanvasElement,
     max_x: f32,
 ) -> DrawResult<impl Fn((i32, i32)) -> Option<(f32, f32)>> {

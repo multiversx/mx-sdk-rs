@@ -74,13 +74,21 @@ function updatePlot() {
 	chart = null;
 	const start = performance.now();
 	switch (selected.value) {
-		case "logarithm":
+		case "ln-bu":
 			logControl.classList.remove("hide");
-			chart = Chart.logarithm(canvas, Number(logMax.value));
+			chart = Chart.ln_big_uint(canvas, Number(logMax.value));
 			break;
-		case "logarithm-error":
+		case "ln-bu-error":
 			logControl.classList.remove("hide");
-			chart = Chart.logarithm_error(canvas, Number(logMax.value));
+			chart = Chart.ln_big_uint_error(canvas, Number(logMax.value));
+			break;
+		case "ln-bf":
+			logControl.classList.remove("hide");
+			chart = Chart.ln_big_float(canvas, Number(logMax.value));
+			break;
+		case "ln-bf-error":
+			logControl.classList.remove("hide");
+			chart = Chart.ln_big_float_error(canvas, Number(logMax.value));
 			break;
 		default:
 			logControl.classList.add("hide");
