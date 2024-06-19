@@ -180,9 +180,9 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     /// Computes the natural logarithm of the current number.
-    /// 
+    ///
     /// The error is around +/- 0.00006, for all inputs.
-    /// 
+    ///
     /// Will return `None` for zero or negative numbers.
     pub fn ln(&self) -> Option<Self> {
         if self <= &0i64 {

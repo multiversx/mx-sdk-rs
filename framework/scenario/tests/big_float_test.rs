@@ -48,7 +48,7 @@ fn big_float_overflow_test_rs() {
 #[test]
 fn big_float_ln_test_rs() {
     let x = BigFloat::<StaticApi>::from(23i64);
-    let ln_x = x.ln();
+    let ln_x = x.ln().unwrap();
     assert_eq!(ln_x.to_managed_decimal(9usize).to_string(), "3.135514648");
     assert!(ln_x.is_close(
         &BigFloat::from_frac(3135514648, 1_000_000_000), // 3.135514648
@@ -56,7 +56,7 @@ fn big_float_ln_test_rs() {
     ));
 
     let big = BigFloat::<StaticApi>::from(382747812i64);
-    let ln_big = big.ln();
+    let ln_big = big.ln().unwrap();
     assert_eq!(
         ln_big.to_managed_decimal(9usize).to_string(),
         "19.762913880"
@@ -67,7 +67,7 @@ fn big_float_ln_test_rs() {
     ));
 
     let biggest = BigFloat::<StaticApi>::from(999999999i64);
-    let ln_biggest = biggest.ln();
+    let ln_biggest = biggest.ln().unwrap();
     assert_eq!(
         ln_biggest.to_managed_decimal(9usize).to_string(),
         "20.723319778"
@@ -78,7 +78,7 @@ fn big_float_ln_test_rs() {
     ));
 
     let small = BigFloat::<StaticApi>::from_frac(3i64, 2i64);
-    let ln_small = small.ln();
+    let ln_small = small.ln().unwrap();
     assert_eq!(
         ln_small.to_managed_decimal(9usize).to_string(),
         "0.405448248"
@@ -89,19 +89,21 @@ fn big_float_ln_test_rs() {
     ));
 
     let smallest = BigFloat::<StaticApi>::from(1i64);
-    let ln_smallest = smallest.ln();
-    assert_eq!(ln_smallest.to_managed_decimal(9usize).to_string(), "0.0");
+    let ln_smallest = smallest.ln().unwrap();
+    assert_eq!(
+        ln_smallest.to_managed_decimal(9usize).to_string(),
+        "0.000000000"
+    );
     assert!(ln_smallest.is_close(
         &BigFloat::from(0i64), // 0.0
         &BigFloat::from_frac(1, 100_000_000)
     ));
 
-    // fails for now, accuracy is not great around 1.1
-    // let y = BigFloat::<StaticApi>::from_frac(11i64, 10i64);
-    // let ln_y = y.ln();
-    // assert_eq!(ln_y.to_managed_decimal(9usize).to_string(), "0.095310179");
-    // assert!(ln_y.is_close(
-    //     &BigFloat::from_frac(95310179, 1_000_000_000), // 0.095310179
-    //     &BigFloat::from_frac(1, 1_000_000_000)
-    // ));
+    let y = BigFloat::<StaticApi>::from_frac(11i64, 10i64);
+    let ln_y = y.ln().unwrap();
+    assert_eq!(ln_y.to_managed_decimal(9usize).to_string(), "0.095251830");
+    assert!(ln_y.is_close(
+        &BigFloat::from_frac(95251830, 1_000_000_000), // 0.095310179
+        &BigFloat::from_frac(1, 1_000_000_000)
+    ));
 }

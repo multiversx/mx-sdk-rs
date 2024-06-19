@@ -291,13 +291,6 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 }
 
-// impl<M: ManagedTypeApi, D: Decimals>
-//      ManagedDecimal<M, D>
-// {
-//     pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
-//     }
-// }
-
 impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
