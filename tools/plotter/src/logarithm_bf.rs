@@ -81,22 +81,27 @@ pub fn draw_bf_error(
 fn big_float_ln(x: f32) -> f32 {
     const PREC: i64 = 1_000_000;
     let bf = BigFloat::<StaticApi>::from_frac((x * PREC as f32) as i64, PREC);
-    let ln_dec = bf.ln();
-    let ln_units = (ln_dec * PREC.into()).trunc().to_i64().unwrap();
-    (ln_units as f64 / PREC as f64) as f32
+    if let Some(ln_dec) = bf.ln() {
+        let ln_units = (ln_dec * PREC.into()).trunc().to_i64().unwrap();
+        (ln_units as f64 / PREC as f64) as f32
+    } else {
+        0.0
+    }
 }
 
 fn ln_baseline(x: f32) -> f32 {
     x.ln()
 }
 
-// #[cfg(test)]
-// mod test {
-//     #[test]
-//     fn sc_ln_test() {
-//         assert_eq!(logarithm_bu::big_uint_ln(0.0), 0.0);
-//         assert!(logarithm_bu::big_uint_ln(1.0) > 0.0);
-//         assert!(logarithm_bu::big_uint_ln(1.0) < 0.01);
-//         assert!(logarithm_bu::big_uint_ln(2.0) > 0.6);
-//     }
-// }
+#[cfg(test)]
+mod test {
+    #[test]
+    fn sc_ln_test() {
+        assert_eq!(super::big_float_ln(0.0), 0.0);
+        assert_eq!(super::big_float_ln(1.0), 0.0);
+        assert!(super::big_float_ln(0.5) < -0.693);
+        assert!(super::big_float_ln(0.5) > -0.694);
+        assert!(super::big_float_ln(1.0) < 0.01);
+        assert!(super::big_float_ln(2.0) > 0.6);
+    }
+}

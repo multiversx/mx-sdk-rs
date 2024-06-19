@@ -179,16 +179,25 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         ManagedDecimal::<M, T>::from_big_float(self, decimals)
     }
 
-    pub fn ln(&self) -> Self {
+    /// Computes the natural logarithm of the current number.
+    /// 
+    /// The error is around +/- 0.00006, for all inputs.
+    /// 
+    /// Will return `None` for zero or negative numbers.
+    pub fn ln(&self) -> Option<Self> {
+        if self <= &0i64 {
+            return None;
+        }
+
         let one = BigFloat::from(1i64);
         match self.cmp(&one) {
             core::cmp::Ordering::Less => {
                 let inv = &one / self;
                 debug_assert!(inv > one);
-                inv.ln_gt_one().neg()
+                Some(inv.ln_gt_one().neg())
             },
-            core::cmp::Ordering::Equal => BigFloat::from(0i64),
-            core::cmp::Ordering::Greater => self.ln_gt_one(),
+            core::cmp::Ordering::Equal => Some(BigFloat::from(0i64)),
+            core::cmp::Ordering::Greater => Some(self.ln_gt_one()),
         }
     }
 

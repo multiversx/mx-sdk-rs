@@ -103,7 +103,7 @@ mod test {
     #[test]
     fn sc_ln_test() {
         assert_eq!(super::big_uint_ln(0.0), 0.0);
-        assert!(super::big_uint_ln(1.0) > 0.0);
+        assert!(super::big_uint_ln(1.0) >= 0.0);
         assert!(super::big_uint_ln(1.0) < 0.01);
         assert!(super::big_uint_ln(2.0) > 0.6);
     }
