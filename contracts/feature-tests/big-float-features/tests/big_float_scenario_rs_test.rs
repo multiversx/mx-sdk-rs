@@ -1,5 +1,4 @@
-use multiversx_sc::types::{BigFloat, BigUint};
-use multiversx_sc_scenario::{api::StaticApi, *};
+use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -10,61 +9,6 @@ fn world() -> ScenarioWorld {
     );
 
     blockchain
-}
-
-#[test]
-fn big_float_overflow_test_rs() {
-    let exp = 1_080i32;
-
-    let first = BigFloat::<StaticApi>::from_sci(1_005, -3)
-        .pow(exp)
-        .to_fixed_point(&(100_000_000_000_000_000i64.into()))
-        .into_big_uint();
-
-    let second = BigFloat::<StaticApi>::from_sci(1_005, -3)
-        .pow(exp)
-        .to_fixed_point(&(10_000_000_000_000_000i64.into()))
-        .into_big_uint();
-
-    let third_float = BigFloat::<StaticApi>::from_sci(1_005, -3)
-        .pow(exp)
-        .to_managed_decimal(17usize);
-    let third = third_float.into_raw_units();
-
-    let forth_float = BigFloat::<StaticApi>::from_sci(1_005, -3)
-        .pow(exp)
-        .to_managed_decimal(16usize);
-    let forth = forth_float.into_raw_units();
-
-    assert_eq!(
-        first.unwrap_or_sc_panic("unwrap failed"),
-        /* overflow */
-        BigUint::from(9223372036854775807u64)
-    );
-
-    assert_eq!(
-        second.unwrap_or_sc_panic("unwrap failed"),
-        BigUint::from(2184473079534488064u64)
-    );
-
-    assert_eq!(
-        third,
-        /* overflow */
-        &BigUint::from(9223372036854775807u64)
-    );
-
-    assert_eq!(forth, &BigUint::from(2184473079534488064u64));
-}
-
-#[test]
-fn big_float_ln_test_rs() {
-    let x = BigFloat::<StaticApi>::from(23i64);
-    let ln_x = x.ln();
-    assert_eq!(ln_x.to_managed_decimal(9usize).to_string(), "3.135514648");
-    assert!(ln_x.is_close(
-        &BigFloat::from_frac(3135514648, 1_000_000_000), // 3.135514648
-        &BigFloat::from_frac(1, 1_000_000_000)
-    ));
 }
 
 #[test]

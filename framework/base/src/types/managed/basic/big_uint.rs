@@ -244,11 +244,12 @@ impl<M: ManagedTypeApi> BigUint<M> {
     ///
     /// Returns `None` for 0.
     pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
-        if self == &0u32 {
+        let bit_log2 = self.log2(); // aproximate, based on position of the most significant bit
+        if bit_log2 == u32::MAX {
+            // means the input was zero, TODO: change log2 return type
             return None;
         }
 
-        let bit_log2 = self.log2(); // aproximate, based on position of the most significant bit
         let scaling_factor_9 = ConstDecimals::<9>.scaling_factor();
         let divisor = BigUint::from(1u64) << bit_log2 as usize;
         let normalized = self * &*scaling_factor_9 / divisor;

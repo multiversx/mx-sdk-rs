@@ -3,7 +3,8 @@
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 
-pub mod logarithm;
+pub mod logarithm_bf;
+pub mod logarithm_bu;
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -29,15 +30,31 @@ pub struct Point {
 impl Chart {
     /// Draw provided functions on the canvas.
     /// Return `Chart` struct suitable for coordinate conversion.
-    pub fn logarithm(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
-        let map_coord = logarithm::draw_logs(canvas, max_x).map_err(|err| err.to_string())?;
+    pub fn ln_big_uint(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
+        let map_coord = logarithm_bu::draw_bu_logs(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
     }
 
-    pub fn logarithm_error(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
-        let map_coord = logarithm::draw_error(canvas, max_x).map_err(|err| err.to_string())?;
+    pub fn ln_big_uint_error(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
+        let map_coord =
+            logarithm_bu::draw_bu_error(canvas, max_x).map_err(|err| err.to_string())?;
+        Ok(Chart {
+            convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
+        })
+    }
+
+    pub fn ln_big_float(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
+        let map_coord = logarithm_bf::draw_bf_logs(canvas, max_x).map_err(|err| err.to_string())?;
+        Ok(Chart {
+            convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
+        })
+    }
+
+    pub fn ln_big_float_error(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
+        let map_coord =
+            logarithm_bf::draw_bf_error(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })

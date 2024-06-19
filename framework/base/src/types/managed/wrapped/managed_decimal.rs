@@ -1,10 +1,11 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, ManagedTypeApi,
-        StaticVarApiImpl,
+        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, HandleConstraints,
+        ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl,
     },
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
+    proxy_imports::{ManagedBuffer, ManagedType},
     types::{BigFloat, BigUint},
 };
 
@@ -410,12 +411,43 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
 }
 impl<M: ManagedTypeApi, D: Decimals> SCDisplay for ManagedDecimal<M, D> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let sf = self.decimals.scaling_factor();
-        let temp = &self.data / sf.deref();
-        temp.fmt(f);
-        f.append_bytes(b".");
-        let temp = &self.data % sf.deref();
-        temp.fmt(f);
+        let full_str_handle: M::ManagedBufferHandle =
+            use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        M::managed_type_impl().bi_to_string(self.data.handle.clone(), full_str_handle.clone());
+        let len = M::managed_type_impl().mb_len(full_str_handle.clone());
+        let nr_dec = self.decimals.num_decimals();
+
+        if len > nr_dec {
+            let temp_str_handle: M::ManagedBufferHandle =
+                use_raw_handle(const_handles::MBUF_TEMPORARY_2);
+            let _ = M::managed_type_impl().mb_copy_slice(
+                full_str_handle.clone(),
+                0,
+                len - nr_dec,
+                temp_str_handle.clone(),
+            );
+            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
+                temp_str_handle.get_raw_handle(),
+            ));
+            f.append_bytes(b".");
+            let _ = M::managed_type_impl().mb_copy_slice(
+                full_str_handle.clone(),
+                len - nr_dec,
+                nr_dec,
+                temp_str_handle.clone(),
+            );
+            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
+                temp_str_handle.get_raw_handle(),
+            ));
+        } else {
+            f.append_bytes(b"0.");
+            for _ in len..nr_dec {
+                f.append_bytes(b"0");
+            }
+            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
+                full_str_handle.get_raw_handle(),
+            ));
+        }
     }
 }
 
