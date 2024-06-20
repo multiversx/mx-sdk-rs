@@ -20,8 +20,8 @@ multiversx_sc_wasm_adapter::endpoints! {
     (
         init => init
         upgrade => upgrade
-        getSum___view => sum
-        add___view => add
+        getSum => sum
+        add => add
     )
 }
 

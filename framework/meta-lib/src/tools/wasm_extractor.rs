@@ -1,5 +1,4 @@
 use colored::Colorize;
-use semver::Op;
 use std::{collections::HashMap, fs};
 use wasmparser::{
     BinaryReaderError, DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader,
@@ -14,12 +13,7 @@ const PANIC_WITH_MESSAGE: &[u8; 16] = b"panic occurred: ";
 const PANIC_WITHOUT_MESSAGE: &[u8; 14] = b"panic occurred";
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
 const MEMORY_GROW_OPCODE: u8 = 0x40;
-const WRITE_OP: [&str; 1] = [
-    // "mBufferAppend",
-    // "mBufferAppendBytes",
-    // "mBufferSetBytes",
-    "mBufferStorageStore",
-];
+const WRITE_OP: [&str; 1] = ["mBufferStorageStore"];
 
 pub struct WasmInfo {
     pub imports: Vec<String>,
@@ -34,6 +28,7 @@ impl WasmInfo {
         output_wasm_path: &str,
         extract_imports_enabled: bool,
         check_ei: &Option<EIVersion>,
+        view_endpoints: Vec<String>,
     ) -> Result<WasmInfo, BinaryReaderError> {
         let wasm_data = fs::read(output_wasm_path)
             .expect("error occured while extracting information from .wasm: file not found");
@@ -43,6 +38,7 @@ impl WasmInfo {
             wasm_data,
             extract_imports_enabled,
             check_ei,
+            view_endpoints,
         )
     }
 }
@@ -52,6 +48,7 @@ fn populate_wasm_info(
     wasm_data: Vec<u8>,
     extract_imports_enabled: bool,
     check_ei: &Option<EIVersion>,
+    view_endpoints: Vec<String>,
 ) -> Result<WasmInfo, BinaryReaderError> {
     let mut imports = Vec::new();
     let mut allocator_trigger = false;
@@ -81,8 +78,7 @@ fn populate_wasm_info(
                 memory_grow_flag = is_mem_grow(code_section.clone());
             },
             Payload::ExportSection(export_section) => {
-                parse_export_section(export_section, &mut function_names);
-                // println!("{:#?}", function_names);
+                parse_export_section(export_section, &mut function_names, view_endpoints.clone());
             },
             _ => (),
         }
@@ -95,13 +91,12 @@ fn populate_wasm_info(
         }
     }
 
-    // println!("{:#?}", read_functions);
     for (index, name) in function_names {
         let i: usize = index.try_into().unwrap();
         if !read_functions[i] {
             println!(
-                "{} >> {}",
-                "Write storage in VIEW endpoint entitled "
+                "{} {}",
+                "Write storage operation in VIEW endpoint:"
                     .to_string()
                     .red()
                     .bold(),
@@ -128,11 +123,12 @@ fn populate_wasm_info(
 fn parse_export_section(
     export_section: ExportSectionReader,
     function_names: &mut HashMap<u32, String>,
+    view_endpoints: Vec<String>,
 ) {
     for export in export_section {
         let export = export.expect("Failed to read export section");
         if let wasmparser::ExternalKind::Func = export.kind {
-            if export.name.to_string().ends_with("__view") {
+            if view_endpoints.contains(&export.name.to_string()) {
                 function_names.insert(export.index, export.name.to_string());
             }
         }

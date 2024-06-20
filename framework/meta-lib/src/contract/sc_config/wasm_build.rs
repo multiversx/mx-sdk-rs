@@ -93,9 +93,14 @@ impl ContractVariant {
         print_pack_mxsc_file(&output_mxsc_path);
         print_contract_size(compiled_bytes.len());
         let mut abi = ContractAbiJson::from(&self.abi);
+        let mut view_endpoints = Vec::new();
         for endpoint in &abi.endpoints {
-            if endpoint.name.contains("__view") {
-                println!("analyze this via wasm");
+            match endpoint.mutability {
+                crate::abi_json::EndpointMutabilityAbiJson::Readonly => {
+                    view_endpoints.push(&endpoint.name)
+                },
+                crate::abi_json::EndpointMutabilityAbiJson::Mutable => (),
+                crate::abi_json::EndpointMutabilityAbiJson::Pure => (),
             }
         }
         let build_info = core::mem::take(&mut abi.build_info).unwrap();
@@ -135,11 +140,24 @@ impl ContractVariant {
     fn extract_wasm_info(&self, build_args: &BuildArgs, output_path: &str) -> WasmInfo {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
 
+        let abi = ContractAbiJson::from(&self.abi);
+        let mut view_endpoints = Vec::new();
+        for endpoint in &abi.endpoints {
+            match endpoint.mutability {
+                crate::abi_json::EndpointMutabilityAbiJson::Readonly => {
+                    view_endpoints.push(endpoint.name.clone())
+                },
+                crate::abi_json::EndpointMutabilityAbiJson::Mutable => (),
+                crate::abi_json::EndpointMutabilityAbiJson::Pure => (),
+            }
+        }
+
         if !build_args.extract_imports {
             return WasmInfo::extract_wasm_info(
                 &output_wasm_path,
                 build_args.extract_imports,
                 &self.settings.check_ei,
+                view_endpoints,
             )
             .expect("error occured while extracting imports from .wasm ");
         }
@@ -151,9 +169,13 @@ impl ContractVariant {
         );
         print_extract_imports(&output_imports_json_path);
 
-        let wasm_data =
-            WasmInfo::extract_wasm_info(&output_wasm_path, true, &self.settings.check_ei)
-                .expect("error occured while extracting imports from .wasm ");
+        let wasm_data = WasmInfo::extract_wasm_info(
+            &output_wasm_path,
+            true,
+            &self.settings.check_ei,
+            view_endpoints,
+        )
+        .expect("error occured while extracting imports from .wasm ");
 
         write_imports_output(
             output_imports_json_path.as_str(),
