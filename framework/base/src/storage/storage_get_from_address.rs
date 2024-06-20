@@ -148,9 +148,10 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
+    let handle = key.get_raw_handle();
     T::top_decode_or_handle_err(
         StorageGetFromAddressInput::new(addr, key),
-        StorageGetErrorHandler::<A>::default(),
+        StorageGetErrorHandler::<A>::new(handle),
     )
     .unwrap_infallible()
 }
