@@ -7,13 +7,6 @@ pub trait StorageMapperGetAtAddress {
     #[storage_mapper("contract_address")]
     fn contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 
-    #[storage_mapper_from_address("contract_address")]
-    fn set_single_value_from_address_with_keys(
-        &self,
-        address: ManagedAddress,
-        address2: ManagedAddress,
-    ) -> SingleValueMapper<ManagedAddress, ManagedAddress>;
-
     #[endpoint]
     fn set_contract_address(&self, address: ManagedAddress) {
         self.contract_address().set(address)
@@ -135,5 +128,22 @@ pub trait StorageMapperGetAtAddress {
         for item in 1u32..=value {
             self.unordered_set_mapper().insert(item);
         }
+    }
+
+    #[storage_mapper_from_address("single_value_mapper_with_key")]
+    fn single_value_from_address_with_keys(
+        &self,
+        address: ManagedAddress,
+        extra_key: usize,
+    ) -> SingleValueMapper<ManagedBuffer, ManagedAddress>;
+
+    #[view]
+    fn get_value_from_address_with_keys(
+        &self,
+        address: ManagedAddress,
+        extra_key: usize,
+    ) -> ManagedBuffer {
+        self.single_value_from_address_with_keys(address, extra_key)
+            .get()
     }
 }

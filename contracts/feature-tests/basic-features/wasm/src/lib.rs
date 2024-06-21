@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          390
+// Endpoints:                          395
 // Async Callback:                       1
-// Total number of exported functions: 392
+// Total number of exported functions: 397
 
 #![no_std]
 
@@ -322,6 +322,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         is_empty_single_value_mapper => is_empty_single_value_mapper
         is_empty_at_address_single_value_mapper => is_empty_at_address_single_value_mapper
         raw_byte_length_single_value_mapper => raw_byte_length_single_value_mapper
+        set_single_value_mapper_with_key => set_single_value_mapper_with_key
         vec_mapper => vec_mapper
         vec_mapper_push => vec_mapper_push
         vec_mapper_get => vec_mapper_get
@@ -366,6 +367,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         unique_id_mapper_swap_remove => unique_id_mapper_swap_remove
         unique_id_mapper_set => unique_id_mapper_set
         unique_id_mapper => unique_id_mapper
+        unordered_set_mapper => unordered_set_mapper
+        unordered_set_mapper_insert => unordered_set_mapper_insert
+        unordered_set_mapper_contains => unordered_set_mapper_contains
+        unordered_set_mapper_remove => unordered_set_mapper_remove
         managed_struct_eq => managed_struct_eq
         no_overflow_usize => no_overflow_usize
         no_overflow_u8 => no_overflow_u8
@@ -394,7 +399,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         non_zero_usize_macro => non_zero_usize_macro
         set_contract_address => set_contract_address
         is_empty_at_address => is_empty_at_address
-        len_at_addresses => len_at_addresses
         contains_at_address => contains_at_address
         len_at_address => len_at_address
         next_at_address => next_at_address
@@ -408,6 +412,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         fill_set_mapper => fill_set_mapper
         fill_map_mapper => fill_map_mapper
         fill_unordered_set_mapper => fill_unordered_set_mapper
+        get_value_from_address_with_keys => get_value_from_address_with_keys
     )
 }
 
