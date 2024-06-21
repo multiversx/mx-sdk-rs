@@ -9,9 +9,9 @@ publish = false
 path = "src/large_storage.rs"
 
 [dependencies.multiversx-sc]
-version = "0.50.4"
+version = "0.50.5"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.50.4"
+version = "0.50.5"
 path = "../../../framework/scenario"
