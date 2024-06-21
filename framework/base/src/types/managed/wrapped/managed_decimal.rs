@@ -1,12 +1,15 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, ManagedTypeApi,
-        StaticVarApiImpl,
+        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, HandleConstraints,
+        ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl,
     },
+    formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
+    proxy_imports::{ManagedBuffer, ManagedType},
     types::{BigFloat, BigUint},
 };
 
+use alloc::string::ToString;
 use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -14,7 +17,7 @@ use multiversx_sc_codec::{
 
 use core::{cmp::Ordering, ops::Deref};
 
-use super::{ManagedRef, MulToPrecision};
+use super::{ManagedBufferCachedBuilder, ManagedRef, MulToPrecision};
 
 fn scaling_factor<M: ManagedTypeApi>(
     num_decimals: NumDecimals,
@@ -68,7 +71,7 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
     pub(crate) data: BigUint<M>,
     pub(crate) decimals: D,
@@ -89,6 +92,10 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
 
     pub fn scale(&self) -> usize {
         self.decimals.num_decimals()
+    }
+
+    pub fn scaling_factor(&self) -> ManagedRef<'static, M, BigUint<M>> {
+        self.decimals.scaling_factor()
     }
 
     pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimal<M, T>
@@ -123,7 +130,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     }
 
     pub fn from_big_float<T: Decimals>(
-        big_float: BigFloat<M>,
+        big_float: &BigFloat<M>,
         num_decimals: T,
     ) -> ManagedDecimal<M, T> {
         let scaling_factor: &BigUint<M> = &num_decimals.scaling_factor();
@@ -393,5 +400,63 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
 
     fn is_variadic() -> bool {
         false
+    }
+}
+impl<M: ManagedTypeApi, D: Decimals> SCDisplay for ManagedDecimal<M, D> {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let full_str_handle: M::ManagedBufferHandle =
+            use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        M::managed_type_impl().bi_to_string(self.data.handle.clone(), full_str_handle.clone());
+        let len = M::managed_type_impl().mb_len(full_str_handle.clone());
+        let nr_dec = self.decimals.num_decimals();
+
+        if len > nr_dec {
+            let temp_str_handle: M::ManagedBufferHandle =
+                use_raw_handle(const_handles::MBUF_TEMPORARY_2);
+            let _ = M::managed_type_impl().mb_copy_slice(
+                full_str_handle.clone(),
+                0,
+                len - nr_dec,
+                temp_str_handle.clone(),
+            );
+            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
+                temp_str_handle.get_raw_handle(),
+            ));
+            f.append_bytes(b".");
+            let _ = M::managed_type_impl().mb_copy_slice(
+                full_str_handle.clone(),
+                len - nr_dec,
+                nr_dec,
+                temp_str_handle.clone(),
+            );
+            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
+                temp_str_handle.get_raw_handle(),
+            ));
+        } else {
+            f.append_bytes(b"0.");
+            for _ in len..nr_dec {
+                f.append_bytes(b"0");
+            }
+            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
+                full_str_handle.get_raw_handle(),
+            ));
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, D: Decimals> core::fmt::Display for ManagedDecimal<M, D> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut result = ManagedBufferCachedBuilder::<M>::new_from_slice(&[]);
+        result.append_display(self);
+        core::fmt::Display::fmt(&result.into_managed_buffer(), f)
+    }
+}
+
+impl<M: ManagedTypeApi, D: Decimals> core::fmt::Debug for ManagedDecimal<M, D> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("ManagedDecimal")
+            .field("handle", &self.data.handle.clone())
+            .field("number", &self.to_string())
+            .finish()
     }
 }

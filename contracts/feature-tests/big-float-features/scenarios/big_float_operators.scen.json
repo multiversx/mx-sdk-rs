@@ -820,6 +820,26 @@
                     "-1"
                 ]
             }
+        },
+        {
+            "step": "scCall",
+            "id": "LnBigFloatRef - 1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "ln_big_float_ref_wrapped",
+                "arguments": [
+                    "23",
+                    "9"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x00000004bae4281800000009"
+                ]
+            }
         }
     ]
 }

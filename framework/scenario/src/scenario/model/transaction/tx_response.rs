@@ -1,6 +1,5 @@
 use multiversx_chain_vm::tx_mock::TxResult;
 use multiversx_sc::types::Address;
-use multiversx_sdk::data::transaction::{ApiLogs, ApiSmartContractResult};
 
 use super::{Log, TxExpect, TxResponseStatus};
 
@@ -21,10 +20,6 @@ pub struct TxResponse {
     pub gas: u64,
     /// The refund of the transaction.
     pub refund: u64,
-    /// The smart contract results of the transaction.
-    pub api_scrs: Vec<ApiSmartContractResult>,
-    /// The api logs of the transaction.
-    pub api_logs: Option<ApiLogs>,
 }
 
 impl TxResponse {

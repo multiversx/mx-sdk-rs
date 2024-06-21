@@ -12,7 +12,7 @@ use crate::{
     storage::{storage_clear, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
-use core::{marker::PhantomData, usize};
+use core::marker::PhantomData;
 
 const ITEM_SUFFIX: &[u8] = b".item";
 const LEN_SUFFIX: &[u8] = b".len";

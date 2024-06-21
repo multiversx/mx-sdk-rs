@@ -11,7 +11,6 @@ use crate::{
 pub struct MxscFileJson {
     pub build_info: BuildInfoAbiJson,
     pub abi: ContractAbiJson,
-    pub size: usize,
     pub code: String,
     pub report: ReportInfoJson,
 }

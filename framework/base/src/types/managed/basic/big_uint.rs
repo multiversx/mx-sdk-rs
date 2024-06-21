@@ -10,9 +10,12 @@ use crate::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
+    contract_base::ErrorHelper,
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
-    proxy_imports::ManagedRef,
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
+    types::{
+        heap::BoxedBytes, ConstDecimals, Decimals, ManagedBuffer, ManagedBufferCachedBuilder,
+        ManagedDecimal, ManagedRef, ManagedType,
+    },
 };
 
 use super::cast_to_i64::cast_to_i64;
@@ -176,7 +179,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 
     #[inline]
-    pub fn overwrite_u64(&self, value: u64) {
+    pub fn overwrite_u64(&mut self, value: u64) {
         Self::set_value(self.handle.clone(), value);
     }
 
@@ -235,6 +238,56 @@ impl<M: ManagedTypeApi> BigUint<M> {
     pub fn log2(&self) -> u32 {
         let api = M::managed_type_impl();
         api.bi_log2(self.handle.clone())
+    }
+
+    /// Natural logarithm of a number.
+    ///
+    /// Returns `None` for 0.
+    pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
+        let bit_log2 = self.log2(); // aproximate, based on position of the most significant bit
+        if bit_log2 == u32::MAX {
+            // means the input was zero, TODO: change log2 return type
+            return None;
+        }
+
+        let scaling_factor_9 = ConstDecimals::<9>.scaling_factor();
+        let divisor = BigUint::from(1u64) << bit_log2 as usize;
+        let normalized = self * &*scaling_factor_9 / divisor;
+
+        let x = normalized
+            .to_u64()
+            .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("ln internal error"))
+            as i64;
+
+        const DENOMINATOR: i64 = 1_000_000_000;
+
+        // x normalized to [1.0, 2.0]
+        debug_assert!(x >= DENOMINATOR);
+        debug_assert!(x <= 2 * DENOMINATOR);
+
+        let mut result: i64 = -56570851; // -0.056570851
+        result *= x;
+        result /= DENOMINATOR;
+        result += 447179550; // 0.44717955
+        result *= x;
+        result /= DENOMINATOR;
+        result += -1469956800; // -1.4699568
+        result *= x;
+        result /= DENOMINATOR;
+        result += 2821202600; // 2.8212026
+        result *= x;
+        result /= DENOMINATOR;
+        result += -1741793900; // -1.7417939
+
+        const LN_OF_2_SCALE_9: i64 = 693147180; // 0.69314718
+        result += bit_log2 as i64 * LN_OF_2_SCALE_9;
+
+        debug_assert!(result > 0);
+
+        let mut result_bi = normalized; // reuse handle
+        result_bi.overwrite_u64(result as u64);
+
+        Some(ManagedDecimal::const_decimals_from_raw(result_bi))
     }
 }
 

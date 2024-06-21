@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           70
+// Endpoints:                           72
 // Async Callback (empty):               1
-// Total number of exported functions:  72
+// Total number of exported functions:  74
 
 #![no_std]
 
@@ -54,6 +54,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         mul_assign_big_float_ref => mul_assign_big_float_ref
         div_assign_big_float => div_assign_big_float
         div_assign_big_float_ref => div_assign_big_float_ref
+        ln_big_float_ref => ln_big_float_ref
         new_from_parts_big_float_wrapped => new_from_parts_big_float_wrapped
         new_from_frac_big_float_wrapped => new_from_frac_big_float_wrapped
         new_from_sci_big_float_wrapped => new_from_sci_big_float_wrapped
@@ -88,6 +89,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         mul_assign_big_float_ref_wrapped => mul_assign_big_float_ref_wrapped
         div_assign_big_float_wrapped => div_assign_big_float_wrapped
         div_assign_big_float_ref_wrapped => div_assign_big_float_ref_wrapped
+        ln_big_float_ref_wrapped => ln_big_float_ref_wrapped
     )
 }
 
