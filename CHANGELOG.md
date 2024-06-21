@@ -27,6 +27,10 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
+## [sc 0.50.5] - 2024-06-21
+- `#[storage_mapper_from_address] annotation.
+- Added missing equality operator for test addresses (`TestAddress`, `TestSCAddress`).
+
 ## [sc 0.50.4] - 2024-06-06
 - Compiler version requirement (1.78).
 - Minor imports fix.
