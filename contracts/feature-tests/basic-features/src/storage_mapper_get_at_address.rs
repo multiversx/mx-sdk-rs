@@ -129,4 +129,21 @@ pub trait StorageMapperGetAtAddress {
             self.unordered_set_mapper().insert(item);
         }
     }
+
+    #[storage_mapper_from_address("single_value_mapper_with_key")]
+    fn single_value_from_address_with_keys(
+        &self,
+        address: ManagedAddress,
+        extra_key: usize,
+    ) -> SingleValueMapper<ManagedBuffer, ManagedAddress>;
+
+    #[view]
+    fn get_value_from_address_with_keys(
+        &self,
+        address: ManagedAddress,
+        extra_key: usize,
+    ) -> ManagedBuffer {
+        self.single_value_from_address_with_keys(address, extra_key)
+            .get()
+    }
 }

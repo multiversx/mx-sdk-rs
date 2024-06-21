@@ -372,6 +372,11 @@ fn storage_mapper_get_at_address_go() {
 }
 
 #[test]
+fn storage_mapper_get_at_address_extra_key_go() {
+    world().run("scenarios/storage_mapper_get_at_address_extra_key.scen.json");
+}
+
+#[test]
 fn storage_mapper_linked_list_go() {
     world().run("scenarios/storage_mapper_linked_list.scen.json");
 }

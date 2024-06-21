@@ -13,6 +13,9 @@ pub trait SingleValueMapperFeatures {
         address: ManagedAddress,
     ) -> SingleValueMapper<BigUint, ManagedAddress>;
 
+    #[storage_mapper("single_value_mapper_with_key")]
+    fn single_value_mapper_with_key(&self, extra_key: usize) -> SingleValueMapper<ManagedBuffer>;
+
     #[endpoint]
     fn my_single_value_mapper_increment_1(&self, amount: BigInt) {
         let my_single_value_mapper = self.map_my_single_value_mapper();
@@ -66,5 +69,10 @@ pub trait SingleValueMapperFeatures {
     #[endpoint]
     fn raw_byte_length_single_value_mapper(&self) -> usize {
         self.map_my_single_value_mapper().raw_byte_length()
+    }
+
+    #[endpoint]
+    fn set_single_value_mapper_with_key(&self, key: usize, value: ManagedBuffer) {
+        self.single_value_mapper_with_key(key).set(value);
     }
 }
