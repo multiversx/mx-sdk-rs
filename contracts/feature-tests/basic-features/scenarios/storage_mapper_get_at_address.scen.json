@@ -155,6 +155,29 @@
         },
         {
             "step": "scCall",
+            "id": "len at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "len_at_addresses",
+                "arguments": [
+                    "sc:to-be-called"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
             "id": "next at address",
             "tx": {
                 "from": "address:an_account",
@@ -332,7 +355,9 @@
                 "from": "address:an_account",
                 "to": "sc:caller",
                 "function": "contains_unordered_at_address",
-                "arguments": ["5"],
+                "arguments": [
+                    "5"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
