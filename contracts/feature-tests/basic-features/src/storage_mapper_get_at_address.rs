@@ -7,6 +7,13 @@ pub trait StorageMapperGetAtAddress {
     #[storage_mapper("contract_address")]
     fn contract_address(&self) -> SingleValueMapper<ManagedAddress>;
 
+    #[storage_mapper_from_address("contract_address")]
+    fn set_single_value_from_address_with_keys(
+        &self,
+        address: ManagedAddress,
+        address2: ManagedAddress,
+    ) -> SingleValueMapper<ManagedAddress, ManagedAddress>;
+
     #[endpoint]
     fn set_contract_address(&self, address: ManagedAddress) {
         self.contract_address().set(address)
@@ -16,13 +23,6 @@ pub trait StorageMapperGetAtAddress {
     fn is_empty_at_address(&self) -> bool {
         let address = self.contract_address().get();
         self.set_mapper_from_address(address).is_empty()
-    }
-
-    #[endpoint]
-    fn len_at_addresses(&self, address: ManagedAddress) -> usize {
-        let contract_address = self.contract_address().get();
-        self.set_mapper_from_address_with_keys(contract_address, address)
-            .len()
     }
 
     #[endpoint]
@@ -96,13 +96,6 @@ pub trait StorageMapperGetAtAddress {
 
     #[storage_mapper_from_address("set_mapper")]
     fn set_mapper_from_address(&self, address: ManagedAddress) -> SetMapper<u32, ManagedAddress>;
-
-    #[storage_mapper_from_address("set_mapper")]
-    fn set_mapper_from_address_with_keys(
-        &self,
-        address1: ManagedAddress,
-        address2: ManagedAddress,
-    ) -> SetMapper<u32, ManagedAddress>;
 
     #[storage_mapper("map_mapper")]
     fn map_mapper(&self) -> MapMapper<u32, u32>;

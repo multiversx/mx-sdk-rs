@@ -15,6 +15,11 @@
                     "balance": "0",
                     "code": "mxsc:../output/basic-features.mxsc.json"
                 },
+                "sc:second-to-be-called": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
                 "address:an_account": {
                     "nonce": "0",
                     "balance": "0"
@@ -64,6 +69,27 @@
             }
         },
         {
+            "step": "scCall",
+            "id": "fill set mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:second-to-be-called",
+                "function": "fill_set_mapper",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "checkState",
             "accounts": {
                 "sc:caller": {
@@ -75,6 +101,12 @@
                     "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "sc:to-be-called": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": "*",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "sc:second-to-be-called": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": "*",
@@ -146,29 +178,6 @@
             "expect": {
                 "out": [
                     "10"
-                ],
-                "status": "",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "len at address",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:caller",
-                "function": "len_at_addresses",
-                "arguments": [
-                    "sc:to-be-called"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "0"
                 ],
                 "status": "",
                 "logs": "*",
