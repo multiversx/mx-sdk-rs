@@ -4,8 +4,8 @@ use super::{
     auto_impl_event::generate_event_impl,
     auto_impl_proxy::generate_proxy_getter_impl,
     auto_impl_storage::{
-        generate_clear_impl, generate_getter_impl, generate_is_empty_impl, generate_mapper_impl,
-        generate_setter_impl,
+        generate_clear_impl, generate_getter_impl, generate_is_empty_impl,
+        generate_mapper_from_address_impl, generate_mapper_impl, generate_setter_impl,
     },
 };
 
@@ -33,6 +33,9 @@ fn generate_auto_impl(m: &Method, auto_impl: &AutoImpl) -> proc_macro2::TokenStr
         AutoImpl::StorageGetter { identifier } => generate_getter_impl(m, identifier),
         AutoImpl::StorageSetter { identifier } => generate_setter_impl(m, identifier),
         AutoImpl::StorageMapper { identifier } => generate_mapper_impl(m, identifier),
+        AutoImpl::StorageMapperFromAddress { identifier } => {
+            generate_mapper_from_address_impl(m, identifier)
+        },
         AutoImpl::StorageIsEmpty { identifier } => generate_is_empty_impl(m, identifier),
         AutoImpl::StorageClear { identifier } => generate_clear_impl(m, identifier),
         AutoImpl::ProxyGetter => generate_proxy_getter_impl(m),

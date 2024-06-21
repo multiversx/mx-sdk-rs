@@ -5,7 +5,8 @@ use super::{
     auto_impl_parse::{
         process_event_attribute, process_proxy_attribute, process_storage_clear_attribute,
         process_storage_get_attribute, process_storage_is_empty_attribute,
-        process_storage_mapper_attribute, process_storage_set_attribute,
+        process_storage_mapper_attribute, process_storage_mapper_from_address_attribute,
+        process_storage_set_attribute,
     },
     extract_method_args, process_allow_multiple_var_args_attribute, process_callback_attribute,
     process_callback_raw_attribute, process_endpoint_attribute, process_external_view_attribute,
@@ -127,6 +128,7 @@ fn process_attribute_second_pass(
         || process_storage_get_attribute(attr, method)
         || process_storage_set_attribute(attr, method)
         || process_storage_mapper_attribute(attr, method)
+        || process_storage_mapper_from_address_attribute(attr, method)
         || process_storage_is_empty_attribute(attr, method)
         || process_storage_clear_attribute(attr, method)
         || process_output_names_attribute(attr, method)

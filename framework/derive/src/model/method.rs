@@ -7,6 +7,7 @@ pub enum AutoImpl {
     StorageGetter { identifier: String },
     StorageSetter { identifier: String },
     StorageMapper { identifier: String },
+    StorageMapperFromAddress { identifier: String },
     StorageIsEmpty { identifier: String },
     StorageClear { identifier: String },
     ProxyGetter,
