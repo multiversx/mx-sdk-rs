@@ -259,28 +259,8 @@ impl<M: ManagedTypeApi> BigUint<M> {
             .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("ln internal error"))
             as i64;
 
-        const DENOMINATOR: i64 = 1_000_000_000;
-
-        // x normalized to [1.0, 2.0]
-        debug_assert!(x >= DENOMINATOR);
-        debug_assert!(x <= 2 * DENOMINATOR);
-
-        let mut result: i64 = -56570851; // -0.056570851
-        result *= x;
-        result /= DENOMINATOR;
-        result += 447179550; // 0.44717955
-        result *= x;
-        result /= DENOMINATOR;
-        result += -1469956800; // -1.4699568
-        result *= x;
-        result /= DENOMINATOR;
-        result += 2821202600; // 2.8212026
-        result *= x;
-        result /= DENOMINATOR;
-        result += -1741793900; // -1.7417939
-
-        const LN_OF_2_SCALE_9: i64 = 693147180; // 0.69314718
-        result += bit_log2 as i64 * LN_OF_2_SCALE_9;
+        let result =
+            crate::types::math_util::logarithm_i64::ln_from_bits_and_normalized(bit_log2, x);
 
         debug_assert!(result > 0);
 
