@@ -1,3 +1,9 @@
+mod managed_decimal_cmp;
+mod managed_decimal_macros;
+mod managed_decimal_operators;
+
+pub use managed_decimal_operators::MulToPrecision;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
@@ -17,7 +23,7 @@ use multiversx_sc_codec::{
 
 use core::{cmp::Ordering, ops::Deref};
 
-use super::{ManagedBufferCachedBuilder, ManagedRef, MulToPrecision};
+use super::{ManagedBufferCachedBuilder, ManagedRef};
 
 fn scaling_factor<M: ManagedTypeApi>(
     num_decimals: NumDecimals,
@@ -159,6 +165,14 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
             decimals: ConstDecimals,
         }
     }
+
+    /// Natural logarithm of a number.
+    ///
+    /// Returns `None` for 0.
+    // pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
+    //     let data_ln = self.data.ln()?;
+
+    // }
 
     // pub fn log(
     //     &self,
