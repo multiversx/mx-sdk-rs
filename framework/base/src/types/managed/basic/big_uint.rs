@@ -259,8 +259,8 @@ impl<M: ManagedTypeApi> BigUint<M> {
             .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("ln internal error"))
             as i64;
 
-        let result =
-            crate::types::math_util::logarithm_i64::ln_from_bits_and_normalized(bit_log2, x);
+        let mut result = crate::types::math_util::logarithm_i64::ln_polynomial(x);
+        crate::types::math_util::logarithm_i64::ln_add_bit_log2(&mut result, bit_log2);
 
         debug_assert!(result > 0);
 

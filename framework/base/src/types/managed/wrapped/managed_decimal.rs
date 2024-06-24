@@ -12,6 +12,7 @@ use crate::{
         const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, HandleConstraints,
         ManagedBufferApiImpl, ManagedTypeApi,
     },
+    contract_base::ErrorHelper,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
     proxy_imports::{ManagedBuffer, ManagedType},
     types::{BigFloat, BigUint},
@@ -106,6 +107,38 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     pub fn nth_root(self, _root: ManagedDecimal<M, D>, _precision: D) -> ManagedDecimal<M, D> {
         todo!()
     }
+
+    /// Natural logarithm of a number.
+    ///
+    /// Returns `None` for 0.
+    ///
+    /// TODO: TEMP impl.
+    pub fn ln(&self) -> Option<i64> {
+        let bit_log2 = self.data.log2(); // aproximate, based on position of the most significant bit
+        if bit_log2 == u32::MAX {
+            // means the input was zero, TODO: change log2 return type
+            return None;
+        }
+
+        let scaling_factor_9 = ConstDecimals::<9>.scaling_factor();
+        let divisor = BigUint::from(1u64) << bit_log2 as usize;
+        let normalized = &self.data * &*scaling_factor_9 / divisor;
+
+        let x = normalized
+            .to_u64()
+            .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("ln internal error"))
+            as i64;
+
+        let mut result = crate::types::math_util::logarithm_i64::ln_polynomial(x);
+        crate::types::math_util::logarithm_i64::ln_add_bit_log2(&mut result, bit_log2);
+
+        debug_assert!(result > 0);
+
+        crate::types::math_util::logarithm_i64::ln_sub_decimals(&mut result, self.decimals.num_decimals());
+
+        Some(result)
+    }
+
 }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
@@ -115,14 +148,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
             decimals: ConstDecimals,
         }
     }
-
-    /// Natural logarithm of a number.
-    ///
-    /// Returns `None` for 0.
-    // pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
-    //     let data_ln = self.data.ln()?;
-
-    // }
 
     // pub fn log(
     //     &self,
@@ -143,7 +168,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
     //     //this should be done with precision
     // }
 
-    pub fn ln<const PREC: usize>(
+    pub fn ln_temp<const PREC: usize>(
         self,
         precision: ConstDecimals<PREC>,
     ) -> ManagedDecimal<M, ConstDecimals<PREC>> {

@@ -1,11 +1,12 @@
 const DENOMINATOR: i64 = 1_000_000_000;
 
 const LN_OF_2_SCALE_9: I64Decimal9 = 693147180; // 0.69314718
+const LN_OF_10_SCALE_9: I64Decimal9 = 2302585093; // 2.3025850929940456840...
 
 /// Indicates that a number is interpreted as a decimal number with 9 decimals.
 pub type I64Decimal9 = i64;
 
-fn ln_polynomial(x: I64Decimal9) -> I64Decimal9 {
+pub fn ln_polynomial(x: I64Decimal9) -> I64Decimal9 {
     // x normalized to [1.0, 2.0]
     debug_assert!(x >= DENOMINATOR);
     debug_assert!(x <= 2 * DENOMINATOR);
@@ -27,10 +28,10 @@ fn ln_polynomial(x: I64Decimal9) -> I64Decimal9 {
     result
 }
 
-pub fn ln_from_bits_and_normalized(bit_log2: u32, x: I64Decimal9) -> I64Decimal9 {
-    let mut result = ln_polynomial(x);
+pub fn ln_add_bit_log2(result: &mut I64Decimal9, bit_log2: u32) {
+    *result += bit_log2 as i64 * LN_OF_2_SCALE_9;
+}
 
-    result += bit_log2 as i64 * LN_OF_2_SCALE_9;
-
-    result
+pub fn ln_sub_decimals(result: &mut I64Decimal9, num_decimals: usize) {
+    *result -= num_decimals as i64 * LN_OF_10_SCALE_9;
 }
