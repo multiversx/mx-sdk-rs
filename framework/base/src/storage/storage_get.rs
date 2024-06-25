@@ -2,8 +2,8 @@ use core::{convert::Infallible, marker::PhantomData};
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
-        ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, HandleConstraints,
+        ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
     codec::*,
     err_msg,
@@ -135,7 +135,7 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    let handle = key.get_raw_handle();
+    let handle = key.get_handle().get_raw_handle_unchecked();
     T::top_decode_or_handle_err(
         StorageGetInput::new(key),
         StorageGetErrorHandler::<A>::new(handle),
