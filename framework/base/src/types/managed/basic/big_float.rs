@@ -113,7 +113,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     pub fn from_big_uint(big_uint: &BigUint<M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), big_uint.handle.clone());
+        M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), big_uint.value.handle.clone());
         BigFloat::from_handle(new_bf_handle)
     }
 
