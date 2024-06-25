@@ -217,9 +217,9 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_biguint(sign: Sign, unsigned: BigUint<M>) -> Self {
         let api = M::managed_type_impl();
         if sign.is_minus() {
-            api.bi_neg(unsigned.handle.clone(), unsigned.handle.clone());
+            api.bi_neg(unsigned.value.handle.clone(), unsigned.value.handle.clone());
         }
-        BigInt::from_handle(unsigned.handle)
+        BigInt::from_handle(unsigned.value.handle)
     }
 
     /// Returns the sign of the `BigInt` as a `Sign`.

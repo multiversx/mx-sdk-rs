@@ -14,11 +14,11 @@ macro_rules! binary_operator {
 
             fn $method(self, other: BigUint<M>) -> BigUint<M> {
                 M::managed_type_impl().$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
+                    other.value.handle.clone(),
                 );
-                BigUint::from_handle(self.handle.clone())
+                BigUint::from_handle(self.value.handle.clone())
             }
         }
 
@@ -30,8 +30,8 @@ macro_rules! binary_operator {
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 M::managed_type_impl().$api_func(
                     result_handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    self.value.handle.clone(),
+                    other.value.handle.clone(),
                 );
                 BigUint::from_handle(result_handle)
             }
@@ -42,11 +42,11 @@ macro_rules! binary_operator {
 
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 M::managed_type_impl().$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
+                    other.value.handle.clone(),
                 );
-                BigUint::from_handle(self.handle.clone())
+                BigUint::from_handle(self.value.handle.clone())
             }
         }
 
@@ -56,11 +56,11 @@ macro_rules! binary_operator {
             fn $method(self, other: u32) -> BigUint<M> {
                 let big_int_temp_1 = Self::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 M::managed_type_impl().$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(self.handle.clone())
+                BigUint::from_handle(self.value.handle.clone())
             }
         }
 
@@ -74,7 +74,7 @@ macro_rules! binary_operator {
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 M::managed_type_impl().$api_func(
                     result_handle.clone(),
-                    self.handle.clone(),
+                    self.value.handle.clone(),
                     big_int_temp_1,
                 );
                 BigUint::from_handle(result_handle)
@@ -87,11 +87,11 @@ macro_rules! binary_operator {
             fn $method(self, other: u64) -> BigUint<M> {
                 let big_int_temp_1 = Self::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 M::managed_type_impl().$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(self.handle.clone())
+                BigUint::from_handle(self.value.handle.clone())
             }
         }
 
@@ -105,7 +105,7 @@ macro_rules! binary_operator {
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 M::managed_type_impl().$api_func(
                     result_handle.clone(),
-                    self.handle.clone(),
+                    self.value.handle.clone(),
                     big_int_temp_1,
                 );
                 BigUint::from_handle(result_handle)
@@ -129,9 +129,9 @@ macro_rules! binary_assign_operator {
             #[inline]
             fn $method(&mut self, other: Self) {
                 M::managed_type_impl().$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
+                    other.value.handle.clone(),
                 );
             }
         }
@@ -140,9 +140,9 @@ macro_rules! binary_assign_operator {
             #[inline]
             fn $method(&mut self, other: &BigUint<M>) {
                 M::managed_type_impl().$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
+                    other.value.handle.clone(),
                 );
             }
         }
@@ -151,8 +151,8 @@ macro_rules! binary_assign_operator {
             fn $method(&mut self, other: u32) {
                 let big_int_temp_1 = Self::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 M::managed_type_impl().$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
                     big_int_temp_1,
                 );
             }
@@ -162,8 +162,8 @@ macro_rules! binary_assign_operator {
             fn $method(&mut self, other: u64) {
                 let big_int_temp_1 = Self::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 M::managed_type_impl().$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
                     big_int_temp_1,
                 );
             }
@@ -187,7 +187,11 @@ macro_rules! shift_traits {
 
             #[inline]
             fn $method(self, rhs: usize) -> BigUint<M> {
-                M::managed_type_impl().$api_func(self.handle.clone(), self.handle.clone(), rhs);
+                M::managed_type_impl().$api_func(
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
+                    rhs,
+                );
                 self
             }
         }
@@ -198,7 +202,11 @@ macro_rules! shift_traits {
             fn $method(self, rhs: usize) -> BigUint<M> {
                 let result_handle: M::BigIntHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
-                M::managed_type_impl().$api_func(result_handle.clone(), self.handle.clone(), rhs);
+                M::managed_type_impl().$api_func(
+                    result_handle.clone(),
+                    self.value.handle.clone(),
+                    rhs,
+                );
                 BigUint::from_handle(result_handle)
             }
         }
@@ -213,7 +221,11 @@ macro_rules! shift_assign_traits {
         impl<M: ManagedTypeApi> $shift_assign_trait<usize> for BigUint<M> {
             #[inline]
             fn $method(&mut self, rhs: usize) {
-                M::managed_type_impl().$api_func(self.handle.clone(), self.handle.clone(), rhs);
+                M::managed_type_impl().$api_func(
+                    self.value.handle.clone(),
+                    self.value.handle.clone(),
+                    rhs,
+                );
             }
         }
     };

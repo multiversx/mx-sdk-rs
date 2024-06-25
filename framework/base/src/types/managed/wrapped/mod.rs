@@ -1,3 +1,6 @@
+mod big_uint;
+mod big_uint_cmp;
+mod big_uint_operators;
 mod builder;
 mod egld_or_esdt_token_identifier;
 mod egld_or_esdt_token_payment;
@@ -22,6 +25,7 @@ mod randomness_source;
 mod token_identifier;
 mod traits;
 
+pub use big_uint::BigUint;
 pub use builder::*;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::{EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs};
