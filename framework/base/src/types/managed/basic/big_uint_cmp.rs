@@ -9,7 +9,7 @@ impl<M: ManagedTypeApi> PartialEq for BigUint<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         M::managed_type_impl()
-            .bi_cmp(self.handle.clone(), other.handle.clone())
+            .bi_cmp(self.data.handle.clone(), other.data.handle.clone())
             .is_eq()
     }
 }
@@ -26,7 +26,7 @@ impl<M: ManagedTypeApi> PartialOrd for BigUint<M> {
 impl<M: ManagedTypeApi> Ord for BigUint<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        M::managed_type_impl().bi_cmp(self.handle.clone(), other.handle.clone())
+        M::managed_type_impl().bi_cmp(self.data.handle.clone(), other.data.handle.clone())
     }
 }
 
