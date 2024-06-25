@@ -19,13 +19,13 @@ NUM_BIG_UINT_TYPE = "num_bigint::biguint::BigUint"
 MOD_PATH = "multiversx_sc::types::managed::basic"
 
 BIG_INT_TYPE = f"{MOD_PATH}::big_int::BigInt<{DEBUG_API_TYPE}>"
-BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE}>"
 BIG_FLOAT_TYPE = f"{MOD_PATH}::big_float::BigFloat<{DEBUG_API_TYPE}>"
 MANAGED_BUFFER_TYPE = f"{MOD_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE}>"
 
 # 3. SC wasm - Managed wrapped types
 MOD_PATH = "multiversx_sc::types::managed::wrapped"
 
+BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE}>"
 TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE}>"
 MANAGED_ADDRESS_TYPE = f"{MOD_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE}>"
 MANAGED_BYTE_ARRAY_TYPE = f"{MOD_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE}, {ANY_NUMBER}>"
@@ -320,6 +320,17 @@ class ManagedBuffer(PlainManagedVecItem, ManagedType):
         return format_buffer_hex(buffer)
 
 
+class BigUint(PlainManagedVecItem, ManagedType):
+    def map_picker(self) -> Callable:
+        return pick_big_int
+    
+    def lookup(self, big_uint: lldb.value) -> lldb.value:
+        return big_uint.data
+
+    def value_summary(self, big_uint: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+        return big_uint.sbvalue.GetSummary()
+
+
 class TokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, token_identifier: lldb.value) -> lldb.value:
         return token_identifier.buffer
@@ -462,10 +473,10 @@ ELROND_WASM_TYPE_HANDLERS = [
     (NUM_BIG_UINT_TYPE, NumBigUint),
     # 2. SC wasm - Managed basic types
     (BIG_INT_TYPE, BigInt),
-    (BIG_UINT_TYPE, BigInt),
     (BIG_FLOAT_TYPE, BigFloat),
     (MANAGED_BUFFER_TYPE, ManagedBuffer),
     # 3. SC wasm - Managed wrapped types
+    (BIG_UINT_TYPE, BigUint),
     (TOKEN_IDENTIFIER_TYPE, TokenIdentifier),
     (MANAGED_ADDRESS_TYPE, ManagedAddress),
     (MANAGED_BYTE_ARRAY_TYPE, ManagedByteArray),
