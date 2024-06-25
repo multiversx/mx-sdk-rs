@@ -350,6 +350,12 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     }
 }
 
+impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
+    fn drop(&mut self) {
+        let _ = core::mem::replace(&mut self.get_handle(), unsafe { core::mem::zeroed() });
+    }
+}
+
 impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
