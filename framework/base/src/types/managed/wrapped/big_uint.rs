@@ -13,12 +13,10 @@ use crate::{
     contract_base::ErrorHelper,
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
     types::{
-        heap::BoxedBytes, ConstDecimals, Decimals, ManagedBuffer, ManagedBufferCachedBuilder,
-        ManagedDecimal, ManagedRef, ManagedType,
+        heap::BoxedBytes, BigInt, ConstDecimals, Decimals, ManagedBuffer,
+        ManagedBufferCachedBuilder, ManagedDecimal, ManagedRef, ManagedType,
     },
 };
-
-use super::{cast_to_i64::cast_to_i64, BigInt};
 
 #[repr(transparent)]
 pub struct BigUint<M: ManagedTypeApi> {
@@ -68,7 +66,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     where
         T: TryInto<i64> + num_traits::Unsigned,
     {
-        M::managed_type_impl().bi_set_int64(handle, cast_to_i64::<M, _>(value));
+        BigInt::<M>::set_value(handle, value);
     }
 
     pub(crate) fn new_from_num<T>(value: T) -> Self
