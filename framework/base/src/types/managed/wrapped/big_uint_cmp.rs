@@ -10,7 +10,7 @@ impl<M: ManagedTypeApi> PartialEq for BigUint<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         M::managed_type_impl()
-            .bi_cmp(self.data.handle.clone(), other.data.handle.clone())
+            .bi_cmp(self.value.handle.clone(), other.value.handle.clone())
             .is_eq()
     }
 }
@@ -27,7 +27,7 @@ impl<M: ManagedTypeApi> PartialOrd for BigUint<M> {
 impl<M: ManagedTypeApi> Ord for BigUint<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        M::managed_type_impl().bi_cmp(self.data.handle.clone(), other.data.handle.clone())
+        M::managed_type_impl().bi_cmp(self.value.handle.clone(), other.value.handle.clone())
     }
 }
 
@@ -36,14 +36,14 @@ macro_rules! partial_eq_and_ord {
         impl<M: ManagedTypeApi> PartialEq<$small_int_type> for BigUint<M> {
             #[inline]
             fn eq(&self, other: &$small_int_type) -> bool {
-                self.data.eq(&cast_to_i64::<M, _>(*other))
+                self.value.eq(&cast_to_i64::<M, _>(*other))
             }
         }
 
         impl<M: ManagedTypeApi> PartialOrd<$small_int_type> for BigUint<M> {
             #[inline]
             fn partial_cmp(&self, other: &$small_int_type) -> Option<Ordering> {
-                self.data.partial_cmp(&cast_to_i64::<M, _>(*other))
+                self.value.partial_cmp(&cast_to_i64::<M, _>(*other))
             }
         }
     };

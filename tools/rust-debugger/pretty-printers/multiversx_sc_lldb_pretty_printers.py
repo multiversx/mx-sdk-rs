@@ -325,7 +325,7 @@ class BigUint(PlainManagedVecItem, ManagedType):
         return pick_big_int
     
     def lookup(self, big_uint: lldb.value) -> lldb.value:
-        return big_uint.data
+        return big_uint.value
 
     def value_summary(self, big_uint: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
         return big_uint.sbvalue.GetSummary()

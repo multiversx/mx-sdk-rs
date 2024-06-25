@@ -413,7 +413,8 @@ impl<M: ManagedTypeApi, D: Decimals> SCDisplay for ManagedDecimal<M, D> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let full_str_handle: M::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        M::managed_type_impl().bi_to_string(self.data.data.handle.clone(), full_str_handle.clone());
+        M::managed_type_impl()
+            .bi_to_string(self.data.value.handle.clone(), full_str_handle.clone());
         let len = M::managed_type_impl().mb_len(full_str_handle.clone());
         let nr_dec = self.decimals.num_decimals();
 
@@ -462,7 +463,7 @@ impl<M: ManagedTypeApi, D: Decimals> core::fmt::Display for ManagedDecimal<M, D>
 impl<M: ManagedTypeApi, D: Decimals> core::fmt::Debug for ManagedDecimal<M, D> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ManagedDecimal")
-            .field("handle", &self.data.data.handle.clone())
+            .field("handle", &self.data.value.handle.clone())
             .field("number", &self.to_string())
             .finish()
     }
