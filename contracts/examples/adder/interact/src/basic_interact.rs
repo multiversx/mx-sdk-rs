@@ -34,6 +34,9 @@ async fn main() {
         Some(basic_interact_cli::InteractCliCommand::Sum) => {
             basic_interact.print_sum().await;
         },
+        Some(basic_interact_cli::InteractCliCommand::Upgrade(args)) => {
+            basic_interact.upgrade(args.value).await
+        },
         None => {},
     }
 }
@@ -166,4 +169,42 @@ impl AdderInteract {
 
         println!("sum: {sum}");
     }
+
+    async fn upgrade(&mut self, new_value: u32) {
+        let response = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .typed(adder_proxy::AdderProxy)
+            .upgrade(new_value)
+            .code(&self.adder_code)
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+
+        let sum = self
+            .interactor
+            .query()
+            .to(self.state.current_adder_address())
+            .typed(adder_proxy::AdderProxy)
+            .sum()
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+        assert_eq!(sum, RustBigUint::from(new_value));
+
+        println!("response: {response:?}");
+    }
 }
+
+// #[tokio::test]
+// async fn test() {
+//     let mut basic_interact = AdderInteract::init().await;
+
+//     basic_interact.deploy().await;
+//     basic_interact.add(1u64).await;
+
+//     basic_interact.upgrade(7u32).await;
+// }
