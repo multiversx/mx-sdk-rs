@@ -2,19 +2,17 @@ mod decimals;
 mod managed_decimal_cmp;
 mod managed_decimal_macros;
 mod managed_decimal_operators;
+mod managed_decimal_signed;
 
 pub use decimals::{ConstDecimals, Decimals, NumDecimals};
 pub use managed_decimal_operators::MulToPrecision;
+pub use managed_decimal_signed::ManagedDecimalSigned;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{
-        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, HandleConstraints,
-        ManagedBufferApiImpl, ManagedTypeApi,
-    },
+    api::{const_handles, use_raw_handle, BigFloatApiImpl, ManagedTypeApi},
     contract_base::ErrorHelper,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    proxy_imports::{ManagedBuffer, ManagedType},
     types::{BigFloat, BigUint},
 };
 
@@ -134,11 +132,13 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
 
         debug_assert!(result > 0);
 
-        crate::types::math_util::logarithm_i64::ln_sub_decimals(&mut result, self.decimals.num_decimals());
+        crate::types::math_util::logarithm_i64::ln_sub_decimals(
+            &mut result,
+            self.decimals.num_decimals(),
+        );
 
         Some(result)
     }
-
 }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
@@ -393,44 +393,11 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
 }
 impl<M: ManagedTypeApi, D: Decimals> SCDisplay for ManagedDecimal<M, D> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let full_str_handle: M::ManagedBufferHandle =
-            use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        M::managed_type_impl()
-            .bi_to_string(self.data.value.handle.clone(), full_str_handle.clone());
-        let len = M::managed_type_impl().mb_len(full_str_handle.clone());
-        let nr_dec = self.decimals.num_decimals();
-
-        if len > nr_dec {
-            let temp_str_handle: M::ManagedBufferHandle =
-                use_raw_handle(const_handles::MBUF_TEMPORARY_2);
-            let _ = M::managed_type_impl().mb_copy_slice(
-                full_str_handle.clone(),
-                0,
-                len - nr_dec,
-                temp_str_handle.clone(),
-            );
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                temp_str_handle.get_raw_handle(),
-            ));
-            f.append_bytes(b".");
-            let _ = M::managed_type_impl().mb_copy_slice(
-                full_str_handle.clone(),
-                len - nr_dec,
-                nr_dec,
-                temp_str_handle.clone(),
-            );
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                temp_str_handle.get_raw_handle(),
-            ));
-        } else {
-            f.append_bytes(b"0.");
-            for _ in len..nr_dec {
-                f.append_bytes(b"0");
-            }
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                full_str_handle.get_raw_handle(),
-            ));
-        }
+        managed_decimal_signed::managed_decimal_fmt(
+            &self.data.value,
+            self.decimals.num_decimals(),
+            f,
+        );
     }
 }
 

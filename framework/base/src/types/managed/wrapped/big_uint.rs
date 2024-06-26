@@ -86,6 +86,10 @@ impl<M: ManagedTypeApi> BigUint<M> {
         Self::set_value(temp.clone(), value);
         temp
     }
+
+    pub fn as_big_int(&self) -> &BigInt<M> {
+        &self.value
+    }
 }
 
 macro_rules! big_uint_conv_num {

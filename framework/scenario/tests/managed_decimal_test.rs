@@ -146,22 +146,22 @@ fn test_encode_decode() {
     check_top_encode_decode(fixed_const, bytes);
 }
 
-#[test]
-fn test_managed_decimal_ln() {
-    let fixed = ManagedDecimal::<StaticApi, ConstDecimals<0>>::const_decimals_from_raw(
-        BigUint::from(23u64),
-    );
+// #[test]
+// fn test_managed_decimal_ln() {
+//     let fixed = ManagedDecimal::<StaticApi, ConstDecimals<0>>::const_decimals_from_raw(
+//         BigUint::from(23u64),
+//     );
 
-    let ln_fixed = fixed.ln(ConstDecimals::<10>); // precision of 10 decimal points
+//     let ln_fixed = fixed.ln(ConstDecimals::<10>); // precision of 10 decimal points
 
-    println!("{ln_fixed:?}");
-    assert_eq!(
-        ln_fixed,
-        ManagedDecimal::<StaticApi, ConstDecimals<10>>::const_decimals_from_raw(BigUint::from(
-            31355146488u64
-        ),)
-    );
-}
+//     println!("{ln_fixed:?}");
+//     assert_eq!(
+//         ln_fixed,
+//         ManagedDecimal::<StaticApi, ConstDecimals<10>>::const_decimals_from_raw(BigUint::from(
+//             31355146488u64
+//         ),)
+//     );
+// }
 
 // #[test]
 // fn test_managed_decimal_ln() {

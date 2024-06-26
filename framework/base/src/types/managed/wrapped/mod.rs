@@ -36,7 +36,9 @@ pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPa
 pub use managed_address::ManagedAddress;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;
-pub use managed_decimal::{ConstDecimals, Decimals, ManagedDecimal, NumDecimals};
+pub use managed_decimal::{
+    ConstDecimals, Decimals, ManagedDecimal, ManagedDecimalSigned, NumDecimals,
+};
 pub use managed_option::ManagedOption;
 pub use managed_ref::ManagedRef;
 pub use managed_vec::ManagedVec;
