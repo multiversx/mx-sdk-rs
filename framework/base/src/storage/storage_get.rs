@@ -188,10 +188,10 @@ where
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer =
-            ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR.as_bytes());
-        message_buffer.append_bytes(err.message_bytes());
-        message_buffer.append_bytes(b"at key: ");
+            ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR_1.as_bytes());
         M::managed_type_impl().mb_append(message_buffer.get_handle(), self.key.into());
+        message_buffer.append_bytes(err_msg::STORAGE_DECODE_ERROR_2.as_bytes());
+        message_buffer.append_bytes(err.message_bytes());
         M::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
     }
 }
