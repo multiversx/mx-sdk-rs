@@ -53,7 +53,10 @@ impl Chart {
         })
     }
 
-    pub fn ln_managed_decimal_error(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
+    pub fn ln_managed_decimal_error(
+        canvas: HtmlCanvasElement,
+        max_x: f32,
+    ) -> Result<Chart, JsValue> {
         let map_coord =
             logarithm_md::draw_md_error(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {

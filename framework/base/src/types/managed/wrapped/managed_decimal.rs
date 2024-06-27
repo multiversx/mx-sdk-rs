@@ -1,11 +1,13 @@
 mod decimals;
 mod managed_decimal_cmp;
 mod managed_decimal_macros;
-mod managed_decimal_operators;
+mod managed_decimal_op_add;
+mod managed_decimal_op_div;
+mod managed_decimal_op_mul;
+mod managed_decimal_op_sub;
 mod managed_decimal_signed;
 
 pub use decimals::{ConstDecimals, Decimals, NumDecimals};
-pub use managed_decimal_operators::MulToPrecision;
 pub use managed_decimal_signed::ManagedDecimalSigned;
 
 use crate::{
@@ -53,26 +55,30 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         self.decimals.scaling_factor()
     }
 
-    pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimal<M, T>
-    where
-        M: ManagedTypeApi,
-    {
+    pub(crate) fn rescale_data(&self, scale_to_num_decimals: NumDecimals) -> BigUint<M> {
         let from_num_decimals = self.decimals.num_decimals();
-        let scale_to_num_decimals = scale_to.num_decimals();
 
         match from_num_decimals.cmp(&scale_to_num_decimals) {
             Ordering::Less => {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                ManagedDecimal::from_raw_units(&self.data * scaling_factor, scale_to)
+                &self.data * scaling_factor
             },
-            Ordering::Equal => ManagedDecimal::from_raw_units(self.data.clone(), scale_to),
+            Ordering::Equal => self.data.clone(),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                ManagedDecimal::from_raw_units(&self.data * scaling_factor, scale_to)
+                &self.data * scaling_factor
             },
         }
+    }
+
+    pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimal<M, T>
+    where
+        M: ManagedTypeApi,
+    {
+        let scale_to_num_decimals = scale_to.num_decimals();
+        ManagedDecimal::from_raw_units(self.rescale_data(scale_to_num_decimals), scale_to)
     }
 
     pub fn to_big_float(&self) -> BigFloat<M> {
@@ -146,6 +152,14 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
         ManagedDecimal {
             data,
             decimals: ConstDecimals,
+        }
+    }
+
+    /// Converts from constant (compile-time) number of decimals to a variable number of decimals.
+    pub fn into_var_decimals(self) -> ManagedDecimal<M, NumDecimals> {
+        ManagedDecimal {
+            data: self.data,
+            decimals: DECIMALS,
         }
     }
 
