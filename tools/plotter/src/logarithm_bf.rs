@@ -79,11 +79,8 @@ pub fn draw_bf_error(
 }
 
 fn big_float_ln(x: f32) -> f32 {
-    const PREC: i64 = 1_000_000;
-    let bf = BigFloat::<StaticApi>::from_frac((x * PREC as f32) as i64, PREC);
-    if let Some(ln_dec) = bf.ln() {
-        let ln_units = (ln_dec * PREC.into()).trunc().to_i64().unwrap();
-        (ln_units as f64 / PREC as f64) as f32
+    if let Some(ln) = BigFloat::<StaticApi>::from(x).ln() {
+        ln.to_f64() as f32
     } else {
         0.0
     }

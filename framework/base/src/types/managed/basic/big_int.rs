@@ -3,13 +3,14 @@ use core::{convert::TryInto, marker::PhantomData};
 use crate::{
     abi::{TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        const_handles, use_raw_handle, BigIntApiImpl, ErrorApiImpl, HandleConstraints,
+        ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
+    err_msg,
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
@@ -246,13 +247,34 @@ impl<M: ManagedTypeApi> BigInt<M> {
         (self.sign(), self.magnitude())
     }
 
+    /// Converts to an unsigned `BigUint`, without performing any checks.
+    ///
+    /// # Safety
+    ///
+    /// If the number is negative, undefined behavior might occur further down the execution.
+    pub unsafe fn into_big_uint_unchecked(self) -> BigUint<M> {
+        BigUint::from_handle(self.handle)
+    }
+
     /// Converts this `BigInt` into a `BigUint`, if it's not negative.
     pub fn into_big_uint(self) -> ManagedOption<M, BigUint<M>> {
         if let Sign::Minus = self.sign() {
             ManagedOption::none()
         } else {
-            ManagedOption::some(BigUint::from_handle(self.handle))
+            ManagedOption::some(unsafe { self.into_big_uint_unchecked() })
         }
+    }
+
+    fn check_non_negative(&self) {
+        if M::managed_type_impl().bi_sign(self.handle.clone()) == crate::api::Sign::Minus {
+            M::error_api_impl().signal_error(err_msg::BIG_UINT_SUB_NEGATIVE.as_bytes());
+        }
+    }
+
+    /// Converts to an unsigned `BigUint`. Stops execution if number is negative.
+    pub fn into_big_uint_or_fail(self) -> BigUint<M> {
+        self.check_non_negative();
+        unsafe { self.into_big_uint_unchecked() }
     }
 }
 

@@ -90,6 +90,10 @@ impl<M: ManagedTypeApi> BigUint<M> {
     pub fn as_big_int(&self) -> &BigInt<M> {
         &self.value
     }
+
+    pub fn into_big_int(self) -> BigInt<M> {
+        self.value
+    }
 }
 
 macro_rules! big_uint_conv_num {

@@ -17,9 +17,9 @@ pub use managed_decimal_signed::ManagedDecimalSigned;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{const_handles, use_raw_handle, BigFloatApiImpl, ManagedTypeApi},
+    api::ManagedTypeApi,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    types::{BigFloat, BigUint},
+    types::BigUint,
 };
 
 use alloc::string::ToString;
@@ -85,31 +85,24 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal::from_raw_units(self.rescale_data(scale_to_num_decimals), scale_to)
     }
 
-    pub fn to_big_float(&self) -> BigFloat<M> {
-        let result = BigFloat::from_big_uint(&self.data);
-        let temp_handle: M::BigFloatHandle = use_raw_handle(const_handles::BIG_FLOAT_TEMPORARY);
-        let denominator = self.decimals.scaling_factor::<M>();
-        M::managed_type_impl().bf_set_bi(temp_handle.clone(), denominator.handle);
-        M::managed_type_impl().bf_div(result.handle.clone(), result.handle.clone(), temp_handle);
-        result
+    pub fn into_signed(self) -> ManagedDecimalSigned<M, D> {
+        ManagedDecimalSigned {
+            data: self.data.into_big_int(),
+            decimals: self.decimals,
+        }
     }
+}
 
-    pub fn from_big_float<T: Decimals>(
-        big_float: &BigFloat<M>,
-        num_decimals: T,
-    ) -> ManagedDecimal<M, T> {
-        let scaling_factor: &BigUint<M> = &num_decimals.scaling_factor();
-        let magnitude = big_float.magnitude();
-
-        let scaled = &BigFloat::from(scaling_factor) * &magnitude;
-        let fixed_big_int = scaled.trunc();
-
-        ManagedDecimal::from_raw_units(
-            fixed_big_int
-                .into_big_uint()
-                .unwrap_or_sc_panic("failed to cast BigInt to BigUint"),
-            num_decimals,
-        )
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+{
+    fn from(mut value: BigUint<M>) -> Self {
+        let decimals = ConstDecimals;
+        value *= decimals.scaling_factor().deref();
+        ManagedDecimal {
+            data: value,
+            decimals,
+        }
     }
 }
 
@@ -248,19 +241,6 @@ impl<M: ManagedTypeApi> TopDecode for ManagedDecimal<M, NumDecimals> {
             return Result::Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
         Result::Ok(result)
-    }
-}
-
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
-{
-    fn from(mut value: BigUint<M>) -> Self {
-        let decimals = ConstDecimals;
-        value *= decimals.scaling_factor().deref();
-        ManagedDecimal {
-            data: value,
-            decimals,
-        }
     }
 }
 

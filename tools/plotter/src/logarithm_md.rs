@@ -1,5 +1,5 @@
 use crate::DrawResult;
-use multiversx_sc::types::{BigUint, ConstDecimals, ManagedDecimal};
+use multiversx_sc::types::{ConstDecimals, ManagedDecimalSigned};
 use multiversx_sc_scenario::api::StaticApi;
 use plotters::prelude::*;
 use plotters_canvas::CanvasBackend;
@@ -79,13 +79,9 @@ pub fn draw_md_error(
 }
 
 fn managed_decimal_ln(x: f32) -> f32 {
-    let bu = BigUint::<StaticApi>::from((x * 1_000_000_000.0) as u64);
-    let dec = ManagedDecimal::<StaticApi, ConstDecimals<9>>::const_decimals_from_raw(bu);
+    let dec = ManagedDecimalSigned::<StaticApi, ConstDecimals<9>>::from(x);
     if let Some(ln_dec) = dec.ln() {
-        //     let ln_units = ln_dec;
-        //     let ln_sf = ln_dec.scaling_factor().to_u64().unwrap();
-        //     (ln_units as f64 / ln_sf as f64) as f32
-        (ln_dec as f64 / 1_000_000_000f64) as f32
+        ln_dec.to_big_float().to_f64() as f32
     } else {
         0.0
     }

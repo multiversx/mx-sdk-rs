@@ -5,7 +5,7 @@ use crate::{
         ManagedBufferApiImpl, ManagedTypeApi,
     },
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    types::{BigFloat, BigInt, BigUint, ManagedBuffer, ManagedType},
+    types::{BigFloat, BigInt, BigUint, ManagedBuffer, ManagedType, Sign},
 };
 
 use alloc::string::ToString;
@@ -16,7 +16,10 @@ use multiversx_sc_codec::{
 
 use core::{cmp::Ordering, ops::Deref};
 
-use super::decimals::{ConstDecimals, Decimals, NumDecimals};
+use super::{
+    decimals::{ConstDecimals, Decimals, NumDecimals},
+    ManagedDecimal,
+};
 use super::{ManagedBufferCachedBuilder, ManagedRef};
 
 #[derive(Clone)]
@@ -64,14 +67,64 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
         }
     }
 
-    pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimalSigned<M, T>
-    where
-        M: ManagedTypeApi,
-    {
+    pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimalSigned<M, T> {
         let scale_to_num_decimals = scale_to.num_decimals();
         ManagedDecimalSigned::from_raw_units(self.rescale_data(scale_to_num_decimals), scale_to)
     }
 
+    pub fn into_unsigned_or_fail(self) -> ManagedDecimal<M, D> {
+        ManagedDecimal {
+            data: self.data.into_big_uint_or_fail(),
+            decimals: self.decimals,
+        }
+    }
+
+    pub fn sign(&self) -> Sign {
+        self.data.sign()
+    }
+}
+
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
+    ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
+{
+    pub fn const_decimals_from_raw(data: BigInt<M>) -> Self {
+        ManagedDecimalSigned {
+            data,
+            decimals: ConstDecimals,
+        }
+    }
+
+    /// Converts from constant (compile-time) number of decimals to a variable number of decimals.
+    pub fn into_var_decimals(self) -> ManagedDecimalSigned<M, NumDecimals> {
+        ManagedDecimalSigned {
+            data: self.data,
+            decimals: DECIMALS,
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigInt<M>>
+    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
+{
+    fn from(mut value: BigInt<M>) -> Self {
+        let decimals = ConstDecimals;
+        value *= decimals.scaling_factor().as_big_int();
+        ManagedDecimalSigned {
+            data: value,
+            decimals,
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<i64>
+    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
+{
+    fn from(value: i64) -> Self {
+        Self::from(BigInt::from(value))
+    }
+}
+
+impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     pub fn to_big_float(&self) -> BigFloat<M> {
         let result = BigFloat::from_big_int(&self.data);
         let temp_handle: M::BigFloatHandle = use_raw_handle(const_handles::BIG_FLOAT_TEMPORARY);
@@ -95,22 +148,36 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
-    ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<&BigFloat<M>>
+    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
-    pub fn const_decimals_from_raw(data: BigInt<M>) -> Self {
-        ManagedDecimalSigned {
-            data,
-            decimals: ConstDecimals,
-        }
+    fn from(value: &BigFloat<M>) -> Self {
+        Self::from_big_float(value, ConstDecimals)
     }
+}
 
-    /// Converts from constant (compile-time) number of decimals to a variable number of decimals.
-    pub fn into_var_decimals(self) -> ManagedDecimalSigned<M, NumDecimals> {
-        ManagedDecimalSigned {
-            data: self.data,
-            decimals: DECIMALS,
-        }
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigFloat<M>>
+    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
+{
+    #[inline]
+    fn from(value: BigFloat<M>) -> Self {
+        Self::from(&value)
+    }
+}
+
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<f64>
+    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
+{
+    fn from(x: f64) -> Self {
+        Self::from(BigFloat::from(x))
+    }
+}
+
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<f32>
+    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
+{
+    fn from(x: f32) -> Self {
+        Self::from(x as f64)
     }
 }
 
@@ -232,19 +299,6 @@ impl<M: ManagedTypeApi> TopDecode for ManagedDecimalSigned<M, NumDecimals> {
             return Result::Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
         Result::Ok(result)
-    }
-}
-
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigInt<M>>
-    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
-{
-    fn from(mut value: BigInt<M>) -> Self {
-        let decimals = ConstDecimals;
-        value *= decimals.scaling_factor().deref().as_big_int();
-        ManagedDecimalSigned {
-            data: value,
-            decimals,
-        }
     }
 }
 

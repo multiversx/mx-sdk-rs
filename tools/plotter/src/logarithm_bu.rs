@@ -81,9 +81,7 @@ pub fn draw_bu_error(
 fn big_uint_ln(x: f32) -> f32 {
     let bu = BigUint::<StaticApi>::from(x as u32);
     if let Some(ln_dec) = bu.ln() {
-        let ln_units = ln_dec.into_raw_units().to_u64().unwrap();
-        let ln_sf = ln_dec.scaling_factor().to_u64().unwrap();
-        (ln_units as f64 / ln_sf as f64) as f32
+        ln_dec.into_signed().to_big_float().to_f64() as f32
     } else {
         0.0
     }

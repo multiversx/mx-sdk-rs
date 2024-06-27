@@ -5,7 +5,8 @@ use crate::{
     api::{
         use_raw_handle, BigFloatApiImpl, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl,
     },
-    types::{BigInt, BigUint, Decimals, ManagedDecimal, ManagedType},
+    contract_base::ErrorHelper,
+    types::{BigInt, BigUint, Decimals, ManagedDecimalSigned, ManagedType},
 };
 use alloc::string::String;
 
@@ -175,8 +176,8 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         (self * denominator).trunc()
     }
 
-    pub fn to_managed_decimal<T: Decimals>(&self, decimals: T) -> ManagedDecimal<M, T> {
-        ManagedDecimal::<M, T>::from_big_float(self, decimals)
+    pub fn to_managed_decimal<T: Decimals>(&self, decimals: T) -> ManagedDecimalSigned<M, T> {
+        ManagedDecimalSigned::<M, T>::from_big_float(self, decimals)
     }
 
     /// Computes the natural logarithm of the current number.
@@ -242,9 +243,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
 
         result
     }
-}
 
-impl<M: ManagedTypeApi> BigFloat<M> {
     #[inline]
     pub fn zero() -> Self {
         BigFloat::from_handle(M::managed_type_impl().bf_new_zero())
@@ -301,6 +300,34 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     /// the reverse of `BigInt::from_biguint`.
     pub fn to_parts(self) -> (Sign, BigFloat<M>) {
         (self.sign(), self.magnitude())
+    }
+}
+
+impl<M: ManagedTypeApi> From<f64> for BigFloat<M> {
+    fn from(x: f64) -> Self {
+        const PREC: i64 = 1_000_000_000;
+        Self::from_frac((x * PREC as f64) as i64, PREC)
+    }
+}
+
+impl<M: ManagedTypeApi> From<f32> for BigFloat<M> {
+    fn from(x: f32) -> Self {
+        Self::from(x as f64)
+    }
+}
+
+impl<M: ManagedTypeApi> BigFloat<M> {
+    /// Warning: cannot be used in contracts. It is only meant to simplify certain tests.
+    ///
+    /// It might also not be optimal with respect to precision.
+    pub fn to_f64(&self) -> f64 {
+        const PREC: i64 = 1_000_000_000;
+        let mut rescaled = Self::from(PREC);
+        rescaled *= self;
+        let ln_units = rescaled.trunc().to_i64().unwrap_or_else(|| {
+            ErrorHelper::<M>::signal_error_with_message("BigFloat out of precision range")
+        });
+        ln_units as f64 / PREC as f64
     }
 }
 

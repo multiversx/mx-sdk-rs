@@ -164,7 +164,7 @@ pub trait BigFloatWrappedOperators: big_float_operators::BigFloatOperators {
         &self,
         a: BigInt,
         precision: usize,
-    ) -> ManagedDecimal<Self::Api, usize> {
+    ) -> ManagedDecimalSigned<Self::Api, usize> {
         let number = self.ln_big_float_ref(&BigFloat::from(a));
         number.to_managed_decimal(precision)
     }
