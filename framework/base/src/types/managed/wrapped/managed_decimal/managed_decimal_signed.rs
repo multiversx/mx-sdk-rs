@@ -46,26 +46,30 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
         self.decimals.scaling_factor()
     }
 
-    pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimalSigned<M, T>
-    where
-        M: ManagedTypeApi,
-    {
+    pub(crate) fn rescale_data(&self, scale_to_num_decimals: NumDecimals) -> BigInt<M> {
         let from_num_decimals = self.decimals.num_decimals();
-        let scale_to_num_decimals = scale_to.num_decimals();
 
         match from_num_decimals.cmp(&scale_to_num_decimals) {
             Ordering::Less => {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                ManagedDecimalSigned::from_raw_units(&self.data * scaling_factor, scale_to)
+                &self.data * &scaling_factor.value
             },
-            Ordering::Equal => ManagedDecimalSigned::from_raw_units(self.data.clone(), scale_to),
+            Ordering::Equal => self.data.clone(),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                ManagedDecimalSigned::from_raw_units(&self.data * scaling_factor, scale_to)
+                &self.data * &scaling_factor.value
             },
         }
+    }
+
+    pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimalSigned<M, T>
+    where
+        M: ManagedTypeApi,
+    {
+        let scale_to_num_decimals = scale_to.num_decimals();
+        ManagedDecimalSigned::from_raw_units(self.rescale_data(scale_to_num_decimals), scale_to)
     }
 
     pub fn to_big_float(&self) -> BigFloat<M> {
@@ -98,6 +102,14 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
         ManagedDecimalSigned {
             data,
             decimals: ConstDecimals,
+        }
+    }
+
+    /// Converts from constant (compile-time) number of decimals to a variable number of decimals.
+    pub fn into_var_decimals(self) -> ManagedDecimalSigned<M, NumDecimals> {
+        ManagedDecimalSigned {
+            data: self.data,
+            decimals: DECIMALS,
         }
     }
 }

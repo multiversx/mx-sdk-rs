@@ -2,9 +2,13 @@ mod decimals;
 mod managed_decimal_cmp;
 mod managed_decimal_macros;
 mod managed_decimal_op_add;
+mod managed_decimal_op_add_signed;
 mod managed_decimal_op_div;
+mod managed_decimal_op_div_signed;
 mod managed_decimal_op_mul;
+mod managed_decimal_op_mul_signed;
 mod managed_decimal_op_sub;
+mod managed_decimal_op_sub_signed;
 mod managed_decimal_signed;
 
 pub use decimals::{ConstDecimals, Decimals, NumDecimals};

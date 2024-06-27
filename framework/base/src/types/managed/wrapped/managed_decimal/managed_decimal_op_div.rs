@@ -42,7 +42,6 @@ where
 {
     type Output = ManagedDecimal<M, <D1 as Sub<D2>>::Output>;
 
-    // maybe rescale to highest first
     fn div(self, other: ManagedDecimal<M, D2>) -> Self::Output {
         ManagedDecimal {
             data: self.data / other.data,
