@@ -9,7 +9,7 @@ pub type I64Decimal9 = i64;
 
 /// Approximates the logarithm between 1 and 2 with a polynomial.
 ///
-/// The polynomial is: `-1.7417939 + (2.8212026 + (-1.4699568 + (0.44717955 - 0.056570851 * x) * x) * x) * x`
+/// The polynomial is: `-1.7417939 + x * (2.8212026 + (-1.4699568 + (0.44717955 - 0.056570851 * x) * x) * x)`
 pub fn ln_polynomial(x: I64Decimal9) -> I64Decimal9 {
     // x normalized to [1.0, 2.0]
     debug_assert!(x >= DENOMINATOR);
@@ -32,9 +32,27 @@ pub fn ln_polynomial(x: I64Decimal9) -> I64Decimal9 {
     result
 }
 
-// log2(x) = ln(x) / ln(2)
+/// Just took the coeficients from ln and dividem them all by ln(2).
 pub fn log2_polynomial(x: I64Decimal9) -> I64Decimal9 {
-    ln_polynomial(x) * DENOMINATOR / LN_OF_2_SCALE_9
+    // x normalized to [1.0, 2.0]
+    debug_assert!(x >= DENOMINATOR);
+    debug_assert!(x <= 2 * DENOMINATOR);
+
+    let mut result: i64 = -81614486; // -0.08161448626
+    result *= x;
+    result /= DENOMINATOR;
+    result += 645143719; // 0.645143719
+    result *= x;
+    result /= DENOMINATOR;
+    result += -2120699387; // -2.120699387
+    result *= x;
+    result /= DENOMINATOR;
+    result += 4070135003; //  4.070135003
+    result *= x;
+    result /= DENOMINATOR;
+    result += -2512877423; // -2.512877423
+
+    result
 }
 
 pub fn ln_add_bit_log2(result: &mut I64Decimal9, bit_log2: u32) {

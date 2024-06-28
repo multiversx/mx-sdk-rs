@@ -37,13 +37,6 @@ pub fn draw_md_log2(
     chart.draw_series(LineSeries::new(
         (0..=RANGE_MAX)
             .map(|x| x as f32 * max_x / RANGE_MAX as f32)
-            .map(|x| (x, x.ln())),
-        &YELLOW,
-    ))?;
-
-    chart.draw_series(LineSeries::new(
-        (0..=RANGE_MAX)
-            .map(|x| x as f32 * max_x / RANGE_MAX as f32)
             .map(|x| (x, managed_decimal_log2(x))),
         &GREEN,
     ))?;
