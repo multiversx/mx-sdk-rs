@@ -294,6 +294,7 @@ fn test_esdt_balance() {
         })
         .assert_ok();
 
+    wrapper.add_mandos_set_account(sc_wrapper.address_ref());
     wrapper.add_mandos_check_account(sc_wrapper.address_ref());
     wrapper.write_mandos_output(TEST_ESDT_OUTPUT_PATH);
 }
