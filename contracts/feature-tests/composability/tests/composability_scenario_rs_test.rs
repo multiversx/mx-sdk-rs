@@ -488,6 +488,12 @@ fn promises_call_callback_directly_rs() {
 }
 
 #[test]
+#[ignore = "VM does not support this"]
+fn promises_call_transfer_callback_rs() {
+    world().run("scenarios/promises_call_transfer_callback.scen.json");
+}
+
+#[test]
 fn promises_multi_transfer_rs() {
     world().run("scenarios/promises_multi_transfer.scen.json");
 }
