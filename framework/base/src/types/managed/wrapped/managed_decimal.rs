@@ -144,7 +144,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
-    #[inline]
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -159,7 +158,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
-    #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -174,7 +172,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedDecode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
-    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -200,7 +197,6 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedDecimal<M, NumDecimals> {
 }
 
 impl<M: ManagedTypeApi> TopEncode for ManagedDecimal<M, NumDecimals> {
-    #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -217,7 +213,6 @@ impl<M: ManagedTypeApi> TopEncode for ManagedDecimal<M, NumDecimals> {
 }
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedDecimal<M, NumDecimals> {
-    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -231,7 +226,6 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedDecimal<M, NumDecimals> {
 }
 
 impl<M: ManagedTypeApi> TopDecode for ManagedDecimal<M, NumDecimals> {
-    #[inline]
     fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
