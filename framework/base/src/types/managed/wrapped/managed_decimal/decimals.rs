@@ -3,11 +3,15 @@ use crate::{
     types::{BigUint, ManagedRef},
 };
 
+/// Decimals are represented as usize. This type is also used as variable decimals.
 pub type NumDecimals = usize;
 
+/// Implemented by all decimal types usable in `ManagedDecimal`.
 pub trait Decimals {
+    /// Number of decimals as variable.
     fn num_decimals(&self) -> NumDecimals;
 
+    /// 10^num_decimals, represented as a `BigUint`.
     fn scaling_factor<M: ManagedTypeApi>(&self) -> ManagedRef<'static, M, BigUint<M>> {
         scaling_factor(self.num_decimals())
     }
@@ -19,6 +23,9 @@ impl Decimals for NumDecimals {
     }
 }
 
+/// Zero-sized constant number of decimals.
+///
+/// Ideal if the number of decimals is known at compile time.
 #[derive(Clone, Debug)]
 pub struct ConstDecimals<const DECIMALS: NumDecimals>;
 

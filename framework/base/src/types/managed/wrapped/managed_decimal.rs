@@ -33,6 +33,10 @@ use core::{cmp::Ordering, ops::Deref};
 
 use super::{ManagedBufferCachedBuilder, ManagedRef};
 
+/// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
+///
+/// Negative numbers are not allowed. It is especially designed for denominated token amounts.
+/// If negative numbers are needed, use `ManagedDecimalSigned` instead.
 #[derive(Clone)]
 pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
     pub(crate) data: BigUint<M>,
