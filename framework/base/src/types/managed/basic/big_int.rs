@@ -3,14 +3,13 @@ use core::{convert::TryInto, marker::PhantomData};
 use crate::{
     abi::{TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, ErrorApiImpl, HandleConstraints,
-        ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
+        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
-    err_msg,
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
@@ -263,18 +262,6 @@ impl<M: ManagedTypeApi> BigInt<M> {
         } else {
             ManagedOption::some(unsafe { self.into_big_uint_unchecked() })
         }
-    }
-
-    fn check_non_negative(&self) {
-        if M::managed_type_impl().bi_sign(self.handle.clone()) == crate::api::Sign::Minus {
-            M::error_api_impl().signal_error(err_msg::BIG_UINT_SUB_NEGATIVE.as_bytes());
-        }
-    }
-
-    /// Converts to an unsigned `BigUint`. Stops execution if number is negative.
-    pub fn into_big_uint_or_fail(self) -> BigUint<M> {
-        self.check_non_negative();
-        unsafe { self.into_big_uint_unchecked() }
     }
 }
 

@@ -38,7 +38,7 @@ pub const VALUE_EXCEEDS_SLICE: &str = "value exceeds target slice";
 pub const CAST_TO_I64_ERROR: &str = "cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &str = "big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &str = "cannot subtract because result would be negative";
-pub const BIG_UINT_NEGATIVE: &str = "cannot convert to unsigned, number is negative";
+pub const UNSIGNED_NEGATIVE: &str = "cannot convert to unsigned, number is negative";
 
 pub const DESERIALIZATION_INVALID_BYTE: &str = "call data deserialization error: not a valid byte";
 pub const DESERIALIZATION_NOT_32_BYTES: &str =

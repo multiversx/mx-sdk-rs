@@ -4,6 +4,7 @@ use crate::{
         const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, HandleConstraints,
         ManagedBufferApiImpl, ManagedTypeApi,
     },
+    err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
     types::{BigFloat, BigInt, BigUint, ManagedBuffer, ManagedType, Sign},
 };
@@ -77,7 +78,10 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
 
     pub fn into_unsigned_or_fail(self) -> ManagedDecimal<M, D> {
         ManagedDecimal {
-            data: self.data.into_big_uint_or_fail(),
+            data: self
+                .data
+                .into_big_uint()
+                .unwrap_or_sc_panic(err_msg::UNSIGNED_NEGATIVE),
             decimals: self.decimals,
         }
     }
