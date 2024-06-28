@@ -224,13 +224,14 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         let trunc_val_unsigned = trunc_val
             .into_big_uint()
             .unwrap_or_sc_panic("log argument must be positive");
-        let bit_log2 = trunc_val_unsigned.log2(); // approximate, based on position of the most significant bit
-        if bit_log2 == u32::MAX {
-            // means the input was zero, TODO: change log2 return type
+
+        // start with aproximation, based on position of the most significant bit
+        let Some(log2_floor) = trunc_val_unsigned.log2_floor() else {
+            // means the input was zero, practically unreachable
             return BigFloat::from(0i64);
-            // return None;
-        }
-        let divisor = BigFloat::from(1 << bit_log2);
+        };
+
+        let divisor = BigFloat::from(1 << log2_floor);
         let x = self / &divisor; // normalize to [1.0, 2.0]
 
         debug_assert!(x >= 1);
@@ -239,7 +240,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         let mut result = x.ln_between_one_and_two();
 
         let ln_of_2 = BigFloat::from_frac(693147180, DENOMINATOR); // 0.69314718
-        result += BigFloat::from(bit_log2 as i32) * ln_of_2;
+        result += BigFloat::from(log2_floor as i32) * ln_of_2;
 
         result
     }

@@ -1,7 +1,9 @@
 use multiversx_sc::{
     codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
     derive::{debug_const_managed_decimal, debug_managed_decimal},
-    types::{BigFloat, BigUint, ConstDecimals, ManagedDecimal, NumDecimals},
+    types::{
+        BigFloat, BigInt, BigUint, ConstDecimals, ManagedDecimal, ManagedDecimalSigned, NumDecimals,
+    },
 };
 use multiversx_sc_scenario::api::StaticApi;
 
@@ -64,19 +66,22 @@ pub fn test_managed_decimal() {
     );
 
     let float_1 = BigFloat::<StaticApi>::from_frac(3i64, 2i64);
-    let fixed_float_1 =
-        ManagedDecimal::<StaticApi, ConstDecimals<1>>::from_big_float(&float_1, ConstDecimals::<1>);
-    let fixed_float_2 = ManagedDecimal::<StaticApi, NumDecimals>::from_big_float(&float_1, 1usize);
+    let fixed_float_1 = ManagedDecimalSigned::<StaticApi, ConstDecimals<1>>::from_big_float(
+        &float_1,
+        ConstDecimals::<1>,
+    );
+    let fixed_float_2 =
+        ManagedDecimalSigned::<StaticApi, NumDecimals>::from_big_float(&float_1, 1usize);
 
     assert_eq!(
         fixed_float_1,
-        ManagedDecimal::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(BigUint::from(
-            15u64
+        ManagedDecimalSigned::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(BigInt::from(
+            15
         ))
     );
     assert_eq!(
         fixed_float_2,
-        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(15u64), 1usize)
+        ManagedDecimalSigned::<StaticApi, NumDecimals>::from_raw_units(BigInt::from(15), 1usize)
     );
 }
 
@@ -104,8 +109,8 @@ fn test_managed_decimal_macros() {
 
 #[test]
 fn test_managed_decimal_conversion() {
-    let fixed: ManagedDecimal<StaticApi, NumDecimals> =
-        ManagedDecimal::from_raw_units(BigUint::from(123456789123456789u64), 15usize); //123,45....
+    let fixed: ManagedDecimalSigned<StaticApi, NumDecimals> =
+        ManagedDecimalSigned::from_raw_units(BigInt::from(123456789123456789i64), 15usize); //123,45....
 
     let float_coresp = fixed.to_big_float();
 

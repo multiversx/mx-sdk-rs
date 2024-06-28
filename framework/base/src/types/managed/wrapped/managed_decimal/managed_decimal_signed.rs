@@ -22,6 +22,9 @@ use super::{
 };
 use super::{ManagedBufferCachedBuilder, ManagedRef};
 
+/// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
+///
+/// Unlike for `ManagedDecimal`, ngative numbers are also allowed.
 #[derive(Clone)]
 pub struct ManagedDecimalSigned<M: ManagedTypeApi, D: Decimals> {
     pub(crate) data: BigInt<M>,

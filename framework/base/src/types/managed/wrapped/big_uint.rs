@@ -248,24 +248,35 @@ impl<M: ManagedTypeApi> BigUint<M> {
         BigUint::from_handle(result_handle)
     }
 
+    /// The whole part of the base-2 logarithm.
+    ///
+    /// Obtained by counting the significant bits.
+    /// More specifically, the log2 floor is the position of the most significant bit minus one.
+    ///
+    /// Will return `None` for the number zero (the logarithm in this case would approach -inf).
     #[inline]
-    pub fn log2(&self) -> u32 {
+    pub fn log2_floor(&self) -> Option<u32> {
         let api = M::managed_type_impl();
-        api.bi_log2(self.value.handle.clone())
+        let result = api.bi_log2(self.value.handle.clone());
+        if result < 0 {
+            None
+        } else {
+            Some(result as u32)
+        }
     }
 
     /// Natural logarithm of a number.
     ///
     /// Returns `None` for 0.
     pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
-        let bit_log2 = self.log2(); // aproximate, based on position of the most significant bit
-        if bit_log2 == u32::MAX {
-            // means the input was zero, TODO: change log2 return type
+        // start with aproximation, based on position of the most significant bit
+        let Some(log2_floor) = self.log2_floor() else {
+            // means the input was zero
             return None;
-        }
+        };
 
         let scaling_factor_9 = ConstDecimals::<9>.scaling_factor();
-        let divisor = BigUint::from(1u64) << bit_log2 as usize;
+        let divisor = BigUint::from(1u64) << log2_floor as usize;
         let normalized = self * &*scaling_factor_9 / divisor;
 
         let x = normalized
@@ -274,7 +285,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
             as i64;
 
         let mut result = crate::types::math_util::logarithm_i64::ln_polynomial(x);
-        crate::types::math_util::logarithm_i64::ln_add_bit_log2(&mut result, bit_log2);
+        crate::types::math_util::logarithm_i64::ln_add_bit_log2(&mut result, log2_floor);
 
         debug_assert!(result > 0);
 

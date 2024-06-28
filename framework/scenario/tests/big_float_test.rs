@@ -1,4 +1,4 @@
-use multiversx_sc::types::{BigFloat, BigUint};
+use multiversx_sc::types::{BigFloat, BigInt, BigUint};
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
@@ -39,10 +39,10 @@ fn big_float_overflow_test_rs() {
     assert_eq!(
         third,
         /* overflow */
-        &BigUint::from(9223372036854775807u64)
+        &BigInt::from(9223372036854775807i64)
     );
 
-    assert_eq!(forth, &BigUint::from(2184473079534488064u64));
+    assert_eq!(forth, &BigInt::from(2184473079534488064i64));
 }
 
 #[test]

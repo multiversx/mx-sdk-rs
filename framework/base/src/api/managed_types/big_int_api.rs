@@ -52,7 +52,7 @@ pub trait BigIntApiImpl: HandleTypeInfo + ErrorApi {
 
     fn bi_sqrt(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle);
     fn bi_pow(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
-    fn bi_log2(&self, x: Self::BigIntHandle) -> u32;
+    fn bi_log2(&self, x: Self::BigIntHandle) -> i32;
 
     fn bi_and(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
     fn bi_or(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
