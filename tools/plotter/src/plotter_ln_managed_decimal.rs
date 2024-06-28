@@ -1,11 +1,11 @@
 use crate::DrawResult;
-use multiversx_sc::types::BigFloat;
+use multiversx_sc::types::{ConstDecimals, ManagedDecimalSigned};
 use multiversx_sc_scenario::api::StaticApi;
 use plotters::prelude::*;
 use plotters_canvas::CanvasBackend;
 use web_sys::HtmlCanvasElement;
 
-pub fn draw_bf_logs(
+pub fn draw_md_ln(
     canvas: HtmlCanvasElement,
     max_x: f32,
 ) -> DrawResult<impl Fn((i32, i32)) -> Option<(f32, f32)>> {
@@ -37,7 +37,7 @@ pub fn draw_bf_logs(
     chart.draw_series(LineSeries::new(
         (0..=RANGE_MAX)
             .map(|x| x as f32 * max_x / RANGE_MAX as f32)
-            .map(|x| (x, big_float_ln(x))),
+            .map(|x| (x, managed_decimal_ln(x))),
         &GREEN,
     ))?;
 
@@ -45,7 +45,7 @@ pub fn draw_bf_logs(
     return Ok(chart.into_coord_trans());
 }
 
-pub fn draw_bf_error(
+pub fn draw_md_ln_error(
     canvas: HtmlCanvasElement,
     max_x: f32,
 ) -> DrawResult<impl Fn((i32, i32)) -> Option<(f32, f32)>> {
@@ -70,7 +70,7 @@ pub fn draw_bf_error(
     chart.draw_series(LineSeries::new(
         (0..=RANGE_MAX)
             .map(|x| x as f32 * max_x / RANGE_MAX as f32)
-            .map(|x| (x, big_float_ln(x) - ln_baseline(x))),
+            .map(|x| (x, managed_decimal_ln(x) - ln_baseline(x))),
         &RED,
     ))?;
 
@@ -78,9 +78,10 @@ pub fn draw_bf_error(
     return Ok(chart.into_coord_trans());
 }
 
-fn big_float_ln(x: f32) -> f32 {
-    if let Some(ln) = BigFloat::<StaticApi>::from(x).ln() {
-        ln.to_f64() as f32
+fn managed_decimal_ln(x: f32) -> f32 {
+    let dec = ManagedDecimalSigned::<StaticApi, ConstDecimals<9>>::from(x);
+    if let Some(ln_dec) = dec.ln() {
+        ln_dec.to_big_float().to_f64() as f32
     } else {
         0.0
     }
@@ -94,11 +95,11 @@ fn ln_baseline(x: f32) -> f32 {
 mod test {
     #[test]
     fn sc_ln_test() {
-        assert_eq!(super::big_float_ln(0.0), 0.0);
-        assert_eq!(super::big_float_ln(1.0), 0.0);
-        assert!(super::big_float_ln(0.5) < -0.693);
-        assert!(super::big_float_ln(0.5) > -0.694);
-        assert!(super::big_float_ln(1.0) < 0.01);
-        assert!(super::big_float_ln(2.0) > 0.6);
+        assert_eq!(super::managed_decimal_ln(0.0), 0.0);
+        println!("{}", super::managed_decimal_ln(1.0));
+        println!("{}", super::managed_decimal_ln(2.0));
+        // assert!(super::big_uint_ln(1.0) >= 0.0);
+        // assert!(super::big_uint_ln(1.0) < 0.01);
+        // assert!(super::big_uint_ln(2.0) > 0.6);
     }
 }

@@ -3,9 +3,10 @@
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 
-pub mod logarithm_bf;
-pub mod logarithm_bu;
-pub mod logarithm_md;
+pub mod plotter_ln_big_float;
+pub mod plotter_ln_big_uint;
+pub mod plotter_ln_managed_decimal;
+mod plotter_log2_managed_decimal;
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -32,7 +33,8 @@ impl Chart {
     /// Draw provided functions on the canvas.
     /// Return `Chart` struct suitable for coordinate conversion.
     pub fn ln_big_uint(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
-        let map_coord = logarithm_bu::draw_bu_logs(canvas, max_x).map_err(|err| err.to_string())?;
+        let map_coord =
+            plotter_ln_big_uint::draw_bu_ln(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
@@ -40,14 +42,15 @@ impl Chart {
 
     pub fn ln_big_uint_error(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
         let map_coord =
-            logarithm_bu::draw_bu_error(canvas, max_x).map_err(|err| err.to_string())?;
+            plotter_ln_big_uint::draw_bu_ln_error(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
     }
 
     pub fn ln_managed_decimal(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
-        let map_coord = logarithm_md::draw_md_logs(canvas, max_x).map_err(|err| err.to_string())?;
+        let map_coord =
+            plotter_ln_managed_decimal::draw_md_ln(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
@@ -57,15 +60,35 @@ impl Chart {
         canvas: HtmlCanvasElement,
         max_x: f32,
     ) -> Result<Chart, JsValue> {
-        let map_coord =
-            logarithm_md::draw_md_error(canvas, max_x).map_err(|err| err.to_string())?;
+        let map_coord = plotter_ln_managed_decimal::draw_md_ln_error(canvas, max_x)
+            .map_err(|err| err.to_string())?;
+        Ok(Chart {
+            convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
+        })
+    }
+
+    pub fn log2_managed_decimal(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
+        let map_coord = plotter_log2_managed_decimal::draw_md_log2(canvas, max_x)
+            .map_err(|err| err.to_string())?;
+        Ok(Chart {
+            convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
+        })
+    }
+
+    pub fn log2_managed_decimal_error(
+        canvas: HtmlCanvasElement,
+        max_x: f32,
+    ) -> Result<Chart, JsValue> {
+        let map_coord = plotter_log2_managed_decimal::draw_md_log2_error(canvas, max_x)
+            .map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
     }
 
     pub fn ln_big_float(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
-        let map_coord = logarithm_bf::draw_bf_logs(canvas, max_x).map_err(|err| err.to_string())?;
+        let map_coord =
+            plotter_ln_big_float::draw_bf_ln(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
@@ -73,7 +96,7 @@ impl Chart {
 
     pub fn ln_big_float_error(canvas: HtmlCanvasElement, max_x: f32) -> Result<Chart, JsValue> {
         let map_coord =
-            logarithm_bf::draw_bf_error(canvas, max_x).map_err(|err| err.to_string())?;
+            plotter_ln_big_float::draw_bf_ln_error(canvas, max_x).map_err(|err| err.to_string())?;
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
