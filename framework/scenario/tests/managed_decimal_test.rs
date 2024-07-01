@@ -151,38 +151,91 @@ fn test_encode_decode() {
     check_top_encode_decode(fixed_const, bytes);
 }
 
+#[test]
+fn test_managed_decimal_ln() {
+    let fixed =
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(23u64), 0usize);
+    let ln_fixed = fixed.ln().unwrap(); // precision of 9 decimal points
+
+    assert_eq!(ln_fixed.to_string(), "3.135514649");
+
+    let const_dec = ManagedDecimal::<StaticApi, ConstDecimals<0>>::const_decimals_from_raw(
+        BigUint::from(29299837u64),
+    );
+    let ln_const = const_dec.ln().unwrap();
+
+    assert_eq!(ln_const.to_string(), "17.193072541");
+
+    let small =
+        ManagedDecimal::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(BigUint::from(1u64)); // 0.1
+    let ln_small = small.ln().unwrap();
+
+    assert_eq!(ln_small.to_string(), "-2.302524494");
+
+    let v_small =
+        ManagedDecimal::<StaticApi, ConstDecimals<2>>::const_decimals_from_raw(BigUint::from(1u64));
+    // 0.01
+    let ln_v_small = v_small.ln().unwrap();
+
+    assert_eq!(ln_v_small.to_string(), "-4.605109587");
+
+    let smallest =
+        ManagedDecimal::<StaticApi, ConstDecimals<6>>::const_decimals_from_raw(BigUint::from(1u64));
+    // 0.000001
+    let ln_smallest = smallest.ln().unwrap();
+
+    assert_eq!(ln_smallest.to_string(), "-13.815449959");
+
+    let frac = ManagedDecimal::<StaticApi, ConstDecimals<2>>::const_decimals_from_raw(
+        BigUint::from(322u64),
+    );
+    // 3.22
+    let ln_frac = frac.ln().unwrap();
+
+    assert_eq!(ln_frac.to_string(), "1.169428520");
+
+    let frac =
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(288221u64), 3usize);
+    // 288.221
+    let ln_frac = frac.ln().unwrap();
+
+    assert_eq!(ln_frac.to_string(), "5.663669039");
+}
+
 // #[test]
-// fn test_managed_decimal_ln() {
-//     let fixed = ManagedDecimal::<StaticApi, ConstDecimals<0>>::const_decimals_from_raw(
-//         BigUint::from(23u64),
-//     );
-
-//     let ln_fixed = fixed.ln(ConstDecimals::<10>); // precision of 10 decimal points
-
-//     println!("{ln_fixed:?}");
-//     assert_eq!(
-//         ln_fixed,
-//         ManagedDecimal::<StaticApi, ConstDecimals<10>>::const_decimals_from_raw(BigUint::from(
-//             31355146488u64
-//         ),)
-//     );
-// }
-
-// #[test]
-// fn test_managed_decimal_ln() {
+// fn test_managed_decimal_log2() {
 //     let fixed =
-//         ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(23u64), 0usize);
+//         ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(5u64), 0usize);
+//     let ln_fixed = fixed.log2().unwrap();
 
-//     let ln_fixed = fixed.ln(&10usize); // precision of 10 decimal points
+//     assert_eq!(ln_fixed.to_string(), "3.135514649");
 
-//     println!("{ln_fixed:?}");
-//     assert_eq!(
-//         ln_fixed,
-//         ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(
-//             BigUint::from(31355146488u64),
-//             10usize
-//         )
+//     let const_dec = ManagedDecimal::<StaticApi, ConstDecimals<0>>::const_decimals_from_raw(
+//         BigUint::from(29299837u64),
 //     );
+//     let ln_const = const_dec.log2().unwrap();
+
+//     assert_eq!(ln_const.to_string(), "17.193072541");
+
+//     let small =
+//         ManagedDecimal::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(BigUint::from(1u64)); // 0.1
+//     let ln_small = small.log2().unwrap();
+
+//     assert_eq!(ln_small.to_string(), "-2.302524494");
+
+//     let v_small =
+//         ManagedDecimal::<StaticApi, ConstDecimals<2>>::const_decimals_from_raw(BigUint::from(1u64));
+//     // 0.01
+//     let ln_v_small = v_small.log2().unwrap();
+
+//     assert_eq!(ln_v_small.to_string(), "-4.605109587");
+
+//     let smallest =
+//         ManagedDecimal::<StaticApi, ConstDecimals<6>>::const_decimals_from_raw(BigUint::from(1u64));
+//     // 0.000001
+//     let ln_smallest = smallest.log2().unwrap();
+
+//     assert_eq!(ln_smallest.to_string(), "-13.815510557");
 // }
 
 // #[test]
@@ -226,36 +279,4 @@ fn test_encode_decode() {
 //             BigUint::from(26324u64)
 //         )
 //     );
-// }
-
-// #[test]
-// fn test_managed_decimal_log_any_base() {
-// let fixed = ManagedDecimal::from_raw_units(BigUint::from(10000u64), 1usize);
-// let log2_fixed = fixed.log(
-//     &ManagedDecimal::from_raw_units(BigUint::from(2u64), 1usize),
-//     4usize,
-// );
-// assert_eq!(
-//     log2_fixed,
-//     ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(
-//         BigUint::from(33219u64),
-//         4usize
-//     )
-// );
-
-// let fixed_const = ManagedDecimal::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(
-//     BigUint::from(10u64),
-// );
-// let log2_const = fixed_const.log(
-//     &ManagedDecimal::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(BigUint::from(
-//         2u64,
-//     )),
-//     &ConstDecimals::<10_000>,
-// );
-// assert_eq!(
-//     log2_const,
-//     ManagedDecimal::<StaticApi, ConstDecimals::<10_000>>::const_decimals_from_raw(
-//         BigUint::from(33219u64)
-//     )
-// );
 // }
