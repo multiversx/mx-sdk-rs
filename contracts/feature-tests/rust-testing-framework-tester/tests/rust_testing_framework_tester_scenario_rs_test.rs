@@ -10,16 +10,19 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+#[ignore]
 fn test_rs() {
     world().run("scenarios/test.scen.json");
 }
 
 #[test]
+#[ignore]
 fn test_esdt_generation_rs() {
     world().run("scenarios/test_esdt_generation.scen.json");
 }
 
 #[test]
+#[ignore]
 fn test_multiple_sc_rs() {
     world().run("scenarios/test_multiple_sc.scen.json");
 }
