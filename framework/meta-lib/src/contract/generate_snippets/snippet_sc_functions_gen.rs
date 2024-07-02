@@ -35,6 +35,10 @@ pub(crate) fn write_interact_struct_impl(
 
     write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
 
+    for upgrade_abi in &abi.upgrade_constructors {
+        write_endpoint_impl(file, upgrade_abi, &abi.name);
+    }
+
     for endpoint_abi in &abi.endpoints {
         write_endpoint_impl(file, endpoint_abi, &abi.name);
     }
