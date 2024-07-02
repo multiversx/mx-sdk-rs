@@ -1,12 +1,26 @@
+mod decimals;
+mod managed_decimal_cmp;
+mod managed_decimal_cmp_signed;
+mod managed_decimal_logarithm;
+mod managed_decimal_macros;
+mod managed_decimal_op_add;
+mod managed_decimal_op_add_signed;
+mod managed_decimal_op_div;
+mod managed_decimal_op_div_signed;
+mod managed_decimal_op_mul;
+mod managed_decimal_op_mul_signed;
+mod managed_decimal_op_sub;
+mod managed_decimal_op_sub_signed;
+mod managed_decimal_signed;
+
+pub use decimals::{ConstDecimals, Decimals, NumDecimals};
+pub use managed_decimal_signed::ManagedDecimalSigned;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{
-        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, HandleConstraints,
-        ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl,
-    },
+    api::ManagedTypeApi,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    proxy_imports::{ManagedBuffer, ManagedType},
-    types::{BigFloat, BigUint},
+    types::BigUint,
 };
 
 use alloc::string::ToString;
@@ -15,69 +29,18 @@ use multiversx_sc_codec::{
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
-use core::{
-    cmp::Ordering,
-    ops::{Add, Deref, Div, Mul, Sub},
-};
+use core::{cmp::Ordering, ops::Deref};
 
 use super::{ManagedBufferCachedBuilder, ManagedRef};
 
-fn scaling_factor<M: ManagedTypeApi>(
-    num_decimals: NumDecimals,
-) -> ManagedRef<'static, M, BigUint<M>> {
-    let handle: M::BigIntHandle =
-        use_raw_handle(const_handles::get_scaling_factor_handle(num_decimals));
-
-    if !M::static_var_api_impl().is_scaling_factor_cached(num_decimals) {
-        cache_scaling_factor::<M>(handle.clone(), num_decimals);
-        M::static_var_api_impl().set_scaling_factor_cached(num_decimals);
-    }
-
-    unsafe { ManagedRef::<'static, M, BigUint<M>>::wrap_handle(handle) }
-}
-
-fn cache_scaling_factor<M: ManagedTypeApi>(handle: M::BigIntHandle, num_decimals: NumDecimals) {
-    let temp1: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-    let temp2: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_2);
-    let api = M::managed_type_impl();
-    api.bi_set_int64(temp1.clone(), 10);
-    api.bi_set_int64(temp2.clone(), num_decimals as i64);
-    api.bi_pow(handle, temp1, temp2);
-}
-
-pub trait Decimals {
-    fn num_decimals(&self) -> NumDecimals;
-
-    fn scaling_factor<M: ManagedTypeApi>(&self) -> ManagedRef<'static, M, BigUint<M>> {
-        scaling_factor(self.num_decimals())
-    }
-}
-
-impl Decimals for NumDecimals {
-    fn num_decimals(&self) -> NumDecimals {
-        *self
-    }
-}
-
-pub type NumDecimals = usize;
-
-#[derive(Clone, Debug)]
-pub struct ConstDecimals<const DECIMALS: NumDecimals>;
-
-impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
-    fn num_decimals(&self) -> NumDecimals {
-        DECIMALS
-    }
-
-    fn scaling_factor<M: ManagedTypeApi>(&self) -> ManagedRef<'static, M, BigUint<M>> {
-        scaling_factor(self.num_decimals())
-    }
-}
-
+/// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
+///
+/// Negative numbers are not allowed. It is especially designed for denominated token amounts.
+/// If negative numbers are needed, use `ManagedDecimalSigned` instead.
 #[derive(Clone)]
 pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
-    data: BigUint<M>,
-    decimals: D,
+    pub(crate) data: BigUint<M>,
+    pub(crate) decimals: D,
 }
 
 impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
@@ -101,53 +64,50 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         self.decimals.scaling_factor()
     }
 
-    pub fn rescale<T: Decimals>(self, scale_to: T) -> ManagedDecimal<M, T>
-    where
-        M: ManagedTypeApi,
-    {
+    pub(crate) fn rescale_data(&self, scale_to_num_decimals: NumDecimals) -> BigUint<M> {
         let from_num_decimals = self.decimals.num_decimals();
-        let scale_to_num_decimals = scale_to.num_decimals();
 
         match from_num_decimals.cmp(&scale_to_num_decimals) {
             Ordering::Less => {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                ManagedDecimal::from_raw_units(&self.data * scaling_factor, scale_to)
+                &self.data * scaling_factor
             },
-            Ordering::Equal => ManagedDecimal::from_raw_units(self.data, scale_to),
+            Ordering::Equal => self.data.clone(),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                ManagedDecimal::from_raw_units(&self.data * scaling_factor, scale_to)
+                &self.data * scaling_factor
             },
         }
     }
 
-    pub fn to_big_float(&self) -> BigFloat<M> {
-        let result = BigFloat::from_big_uint(&self.data);
-        let temp_handle: M::BigFloatHandle = use_raw_handle(const_handles::BIG_FLOAT_TEMPORARY);
-        let denominator = self.decimals.scaling_factor::<M>();
-        M::managed_type_impl().bf_set_bi(temp_handle.clone(), denominator.handle);
-        M::managed_type_impl().bf_div(result.handle.clone(), result.handle.clone(), temp_handle);
-        result
+    pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimal<M, T>
+    where
+        M: ManagedTypeApi,
+    {
+        let scale_to_num_decimals = scale_to.num_decimals();
+        ManagedDecimal::from_raw_units(self.rescale_data(scale_to_num_decimals), scale_to)
     }
 
-    pub fn from_big_float<T: Decimals>(
-        big_float: &BigFloat<M>,
-        num_decimals: T,
-    ) -> ManagedDecimal<M, T> {
-        let scaling_factor: &BigUint<M> = &num_decimals.scaling_factor();
-        let magnitude = big_float.magnitude();
+    pub fn into_signed(self) -> ManagedDecimalSigned<M, D> {
+        ManagedDecimalSigned {
+            data: self.data.into_big_int(),
+            decimals: self.decimals,
+        }
+    }
+}
 
-        let scaled = &BigFloat::from(scaling_factor) * &magnitude;
-        let fixed_big_int = scaled.trunc();
-
-        ManagedDecimal::from_raw_units(
-            fixed_big_int
-                .into_big_uint()
-                .unwrap_or_sc_panic("failed to cast BigInt to BigUint"),
-            num_decimals,
-        )
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+{
+    fn from(mut value: BigUint<M>) -> Self {
+        let decimals = ConstDecimals;
+        value *= decimals.scaling_factor().deref();
+        ManagedDecimal {
+            data: value,
+            decimals,
+        }
     }
 }
 
@@ -156,6 +116,14 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
         ManagedDecimal {
             data,
             decimals: ConstDecimals,
+        }
+    }
+
+    /// Converts from constant (compile-time) number of decimals to a variable number of decimals.
+    pub fn into_var_decimals(self) -> ManagedDecimal<M, NumDecimals> {
+        ManagedDecimal {
+            data: self.data,
+            decimals: DECIMALS,
         }
     }
 }
@@ -176,7 +144,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
-    #[inline]
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -191,7 +158,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
-    #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -206,7 +172,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedDecode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
-    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -232,7 +197,6 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedDecimal<M, NumDecimals> {
 }
 
 impl<M: ManagedTypeApi> TopEncode for ManagedDecimal<M, NumDecimals> {
-    #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -249,7 +213,6 @@ impl<M: ManagedTypeApi> TopEncode for ManagedDecimal<M, NumDecimals> {
 }
 
 impl<M: ManagedTypeApi> NestedDecode for ManagedDecimal<M, NumDecimals> {
-    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -263,7 +226,6 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedDecimal<M, NumDecimals> {
 }
 
 impl<M: ManagedTypeApi> TopDecode for ManagedDecimal<M, NumDecimals> {
-    #[inline]
     fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -278,95 +240,6 @@ impl<M: ManagedTypeApi> TopDecode for ManagedDecimal<M, NumDecimals> {
             return Result::Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
         Result::Ok(result)
-    }
-}
-
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
-{
-    fn from(mut value: BigUint<M>) -> Self {
-        let decimals = ConstDecimals;
-        value *= decimals.scaling_factor().deref();
-        ManagedDecimal {
-            data: value,
-            decimals,
-        }
-    }
-}
-
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Add<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
-{
-    type Output = Self;
-
-    fn add(self, other: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
-        ManagedDecimal::const_decimals_from_raw(self.data + other.data)
-    }
-}
-
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
-{
-    type Output = Self;
-
-    fn sub(self, other: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
-        ManagedDecimal::const_decimals_from_raw(self.data - other.data)
-    }
-}
-
-impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> Mul<ManagedDecimal<M, D2>>
-    for ManagedDecimal<M, D1>
-where
-    D1: Add<D2>,
-    <D1 as Add<D2>>::Output: Decimals,
-{
-    type Output = ManagedDecimal<M, <D1 as Add<D2>>::Output>;
-
-    fn mul(self, other: ManagedDecimal<M, D2>) -> Self::Output {
-        ManagedDecimal {
-            data: self.data * other.data,
-            decimals: self.decimals + other.decimals,
-        }
-    }
-}
-
-impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> Div<ManagedDecimal<M, D2>>
-    for ManagedDecimal<M, D1>
-where
-    D1: Sub<D2>,
-    <D1 as Sub<D2>>::Output: Decimals,
-{
-    type Output = ManagedDecimal<M, <D1 as Sub<D2>>::Output>;
-
-    fn div(self, other: ManagedDecimal<M, D2>) -> Self::Output {
-        ManagedDecimal {
-            data: self.data / other.data,
-            decimals: self.decimals - other.decimals,
-        }
-    }
-}
-
-impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, D2>>
-    for ManagedDecimal<M, D1>
-{
-    fn eq(&self, other: &ManagedDecimal<M, D2>) -> bool {
-        match self
-            .decimals
-            .num_decimals()
-            .cmp(&other.decimals.num_decimals())
-        {
-            Ordering::Less => {
-                let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
-                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
-                &self.data * scaling_factor == other.data
-            },
-            Ordering::Equal => self.data == other.data,
-            Ordering::Greater => {
-                let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
-                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
-                &other.data * scaling_factor == self.data
-            },
-        }
     }
 }
 
@@ -411,44 +284,11 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
 }
 impl<M: ManagedTypeApi, D: Decimals> SCDisplay for ManagedDecimal<M, D> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let full_str_handle: M::ManagedBufferHandle =
-            use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        M::managed_type_impl()
-            .bi_to_string(self.data.value.handle.clone(), full_str_handle.clone());
-        let len = M::managed_type_impl().mb_len(full_str_handle.clone());
-        let nr_dec = self.decimals.num_decimals();
-
-        if len > nr_dec {
-            let temp_str_handle: M::ManagedBufferHandle =
-                use_raw_handle(const_handles::MBUF_TEMPORARY_2);
-            let _ = M::managed_type_impl().mb_copy_slice(
-                full_str_handle.clone(),
-                0,
-                len - nr_dec,
-                temp_str_handle.clone(),
-            );
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                temp_str_handle.get_raw_handle(),
-            ));
-            f.append_bytes(b".");
-            let _ = M::managed_type_impl().mb_copy_slice(
-                full_str_handle.clone(),
-                len - nr_dec,
-                nr_dec,
-                temp_str_handle.clone(),
-            );
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                temp_str_handle.get_raw_handle(),
-            ));
-        } else {
-            f.append_bytes(b"0.");
-            for _ in len..nr_dec {
-                f.append_bytes(b"0");
-            }
-            f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-                full_str_handle.get_raw_handle(),
-            ));
-        }
+        managed_decimal_signed::managed_decimal_fmt(
+            &self.data.value,
+            self.decimals.num_decimals(),
+            f,
+        );
     }
 }
 

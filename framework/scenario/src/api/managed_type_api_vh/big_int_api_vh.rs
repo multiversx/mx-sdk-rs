@@ -88,8 +88,8 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     unary_op_method! {bi_sqrt, big_int_sqrt}
     binary_op_method! {bi_pow, big_int_pow}
 
-    fn bi_log2(&self, x: Self::BigIntHandle) -> u32 {
-        self.with_vm_hooks_ctx_1(&x, |vh| vh.big_int_log2(x.get_raw_handle_unchecked())) as u32
+    fn bi_log2(&self, x: Self::BigIntHandle) -> i32 {
+        self.with_vm_hooks_ctx_1(&x, |vh| vh.big_int_log2(x.get_raw_handle_unchecked()))
     }
 
     binary_op_method! {bi_and, big_int_and}

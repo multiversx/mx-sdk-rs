@@ -59,7 +59,7 @@ impl BigIntApiImpl for super::UncallableApi {
         unreachable!()
     }
 
-    fn bi_log2(&self, _x: Self::BigIntHandle) -> u32 {
+    fn bi_log2(&self, _x: Self::BigIntHandle) -> i32 {
         unreachable!()
     }
 

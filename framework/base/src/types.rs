@@ -4,6 +4,7 @@ pub mod heap;
 mod interaction;
 mod io;
 mod managed;
+pub(crate) mod math_util;
 mod static_buffer;
 
 pub use crypto::*;
