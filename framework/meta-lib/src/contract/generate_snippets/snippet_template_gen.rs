@@ -55,6 +55,15 @@ async fn main() {{
     // all contracts have a deploy snippet
     writeln!(file, r#"        "deploy" => interact.deploy().await,"#).unwrap();
 
+    for upgrade_endpoint in &abi.upgrade_constructors {
+        writeln!(
+            file,
+            r#"        "{}" => interact.{}().await,"#,
+            upgrade_endpoint.name, upgrade_endpoint.rust_method_name
+        )
+        .unwrap();
+    }
+
     for endpoint in &abi.endpoints {
         writeln!(
             file,
