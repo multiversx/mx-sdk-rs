@@ -1,7 +1,7 @@
 mod decimals;
 mod managed_decimal_cmp;
 mod managed_decimal_cmp_signed;
-mod managed_decimal_ln;
+mod managed_decimal_logarithm;
 mod managed_decimal_macros;
 mod managed_decimal_op_add;
 mod managed_decimal_op_add_signed;
