@@ -200,6 +200,15 @@ fn test_managed_decimal_ln() {
     let ln_frac = frac.ln().unwrap();
 
     assert_eq!(ln_frac.to_string(), "5.663669039");
+
+    let frac = ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(
+        BigUint::from(288211000000u64),
+        9usize,
+    );
+    // 288.211000000
+    let ln_frac = frac.ln().unwrap();
+
+    assert_eq!(ln_frac.to_string(), "5.663649649");
 }
 
 // #[test]
