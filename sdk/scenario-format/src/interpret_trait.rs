@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use crate::value_interpreter::VMIdentifier;
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct InterpreterContext {
     pub context_path: PathBuf,
     pub vm_type: VMIdentifier,
