@@ -1,5 +1,6 @@
 use multiversx_sc::{
     codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
+    derive::{debug_const_managed_decimal, debug_managed_decimal},
     types::{
         BigFloat, BigInt, BigUint, ConstDecimals, ManagedDecimal, ManagedDecimalSigned, NumDecimals,
     },
@@ -81,6 +82,47 @@ pub fn test_managed_decimal() {
     assert_eq!(
         fixed_float_2,
         ManagedDecimalSigned::<StaticApi, NumDecimals>::from_raw_units(BigInt::from(15), 1usize)
+    );
+}
+
+#[test]
+fn test_managed_decimal_macros() {
+    let small = debug_managed_decimal!("3.1");
+    assert_eq!(small.scale(), 1usize);
+    assert_eq!(small.into_raw_units(), &BigUint::from(31u64));
+    assert_eq!(&small.trunc(), &BigUint::from(3u64));
+
+    let three = debug_const_managed_decimal!("1.654");
+    assert_eq!(three.scale(), 3usize);
+
+    let four = debug_managed_decimal!("89632.2223");
+    assert_eq!(four.scale(), 4usize);
+
+    let huge = debug_const_managed_decimal!("8723.283764652365232");
+    assert_eq!(huge.scale(), 15usize);
+    assert_eq!(
+        huge.into_raw_units(),
+        &BigUint::from(8723283764652365232u64)
+    );
+    assert_eq!(&huge.trunc(), &BigUint::from(8723u64));
+}
+
+#[test]
+fn test_managed_decimal_conversion() {
+    let fixed: ManagedDecimalSigned<StaticApi, NumDecimals> =
+        ManagedDecimalSigned::from_raw_units(BigInt::from(123456789123456789i64), 15usize);
+    //123,45....
+    let float_coresp = fixed.to_big_float();
+
+    // hook not available yet, uncomment when available
+    // assert_eq!(
+    //     float_coresp.to_buffer(),
+    //     ManagedBuffer::from("123.456789123456789")
+    // );
+
+    assert_eq!(
+        float_coresp,
+        BigFloat::from_frac(123456789123456789i64, 1_000_000_000_000_000i64),
     );
 }
 

@@ -146,9 +146,8 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
         num_decimals: T,
     ) -> ManagedDecimalSigned<M, T> {
         let scaling_factor: &BigUint<M> = &num_decimals.scaling_factor();
-        let magnitude = big_float.magnitude();
 
-        let scaled = &BigFloat::from(scaling_factor) * &magnitude;
+        let scaled = &BigFloat::from(scaling_factor) * &big_float;
         let fixed_big_int = scaled.trunc();
 
         ManagedDecimalSigned::from_raw_units(fixed_big_int, num_decimals)
