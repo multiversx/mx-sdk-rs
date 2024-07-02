@@ -176,7 +176,10 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         (self * denominator).trunc()
     }
 
-    pub fn to_managed_decimal_signed<T: Decimals>(&self, decimals: T) -> ManagedDecimalSigned<M, T> {
+    pub fn to_managed_decimal_signed<T: Decimals>(
+        &self,
+        decimals: T,
+    ) -> ManagedDecimalSigned<M, T> {
         ManagedDecimalSigned::<M, T>::from_big_float(self, decimals)
     }
 

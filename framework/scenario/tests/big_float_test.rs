@@ -49,7 +49,10 @@ fn big_float_overflow_test_rs() {
 fn big_float_ln_test_rs() {
     let x = BigFloat::<StaticApi>::from(23i64);
     let ln_x = x.ln().unwrap();
-    assert_eq!(ln_x.to_managed_decimal_signed(9usize).to_string(), "3.135514648");
+    assert_eq!(
+        ln_x.to_managed_decimal_signed(9usize).to_string(),
+        "3.135514648"
+    );
     assert!(ln_x.is_close(
         &BigFloat::from_frac(3135514648, 1_000_000_000), // 3.135514648
         &BigFloat::from_frac(1, 1_000_000_000)
@@ -101,7 +104,10 @@ fn big_float_ln_test_rs() {
 
     let y = BigFloat::<StaticApi>::from_frac(11i64, 10i64);
     let ln_y = y.ln().unwrap();
-    assert_eq!(ln_y.to_managed_decimal_signed(9usize).to_string(), "0.095251830");
+    assert_eq!(
+        ln_y.to_managed_decimal_signed(9usize).to_string(),
+        "0.095251830"
+    );
     assert!(ln_y.is_close(
         &BigFloat::from_frac(95251830, 1_000_000_000), // 0.095310179
         &BigFloat::from_frac(1, 1_000_000_000)
