@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use multiversx_chain_scenario_format::interpret_trait::InterpreterContext;
 use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv, H256};
 
@@ -13,7 +11,7 @@ pub trait ScenarioTxEnv: TxEnv {
 /// The actual data required to run a scenario locally. This is the minimal environment needed to run txs.
 #[derive(Default, Debug, Clone)]
 pub struct ScenarioTxEnvData {
-    pub context_path: PathBuf,
+    pub interpreter_context: InterpreterContext,
     pub tx_hash: Option<H256>,
 }
 
@@ -37,9 +35,7 @@ impl TxEnv for ScenarioTxEnvData {
 
 impl ScenarioTxEnvData {
     pub fn interpreter_context(&self) -> InterpreterContext {
-        InterpreterContext::default()
-            .with_dir(self.context_path.clone())
-            .with_allowed_missing_files()
+        self.interpreter_context.clone()
     }
 }
 
@@ -52,7 +48,9 @@ impl ScenarioTxEnv for ScenarioTxEnvData {
 impl ScenarioWorld {
     pub(crate) fn new_env_data(&self) -> ScenarioTxEnvData {
         ScenarioTxEnvData {
-            context_path: self.current_dir.clone(),
+            interpreter_context: InterpreterContext::new()
+                .with_dir(self.current_dir.clone())
+                .with_allowed_missing_files(),
             tx_hash: None,
         }
     }
