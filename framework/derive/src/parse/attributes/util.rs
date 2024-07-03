@@ -4,7 +4,7 @@ pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bo
     if let Some(first_seg) = attr.path().segments.first() {
         if first_seg.ident == name {
             assert!(
-                attr.path().segments.len() == 1,
+                attr.meta.require_path_only().is_ok(),
                 "no arguments allowed for attribute `{name}`"
             );
             return true;
@@ -103,11 +103,31 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
             let mut iter = list.tokens.into_iter();
             let arg_token_tree = match iter.next() {
                 Some(proc_macro2::TokenTree::Literal(literal)) => {
+                    let clean = literal
+                        .to_string()
+                        .trim_matches('\"')
+                        .trim_matches('"')
+                        .trim()
+                        .to_string();
+
                     assert!(
-                        !literal.to_string().trim_matches('"').trim().is_empty(),
+                        !clean.chars().next().is_some_and(|s| s.is_numeric()),
+                        "argument can not be a number"
+                    );
+
+                    assert!(
+                        !clean
+                            .chars()
+                            .next()
+                            .is_some_and(|s| s.is_ascii_punctuation()),
+                        "argument can not start with punctuation"
+                    );
+
+                    assert!(
+                        !clean.is_empty(),
                         "the argument can not be an empty string or whitespace"
                     );
-                    literal.to_string().trim_matches('\"').to_string()
+                    clean
                 },
                 Some(_) => {
                     panic!("unexpected attribute argument tokens: attribute has to be a string")
