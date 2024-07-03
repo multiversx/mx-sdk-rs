@@ -81,6 +81,7 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
+            .gas(NumExpr("30,000,000"))
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(ADDER_CODE_PATH)
@@ -137,11 +138,12 @@ impl AdderInteract {
             .await;
     }
 
-    async fn add(&mut self, value: u64) {
+    async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
+            .gas(NumExpr("30,000,000"))
             .typed(adder_proxy::AdderProxy)
             .add(value)
             .prepare_async()
@@ -171,9 +173,10 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
+            .gas(NumExpr("30,000,000"))
             .typed(adder_proxy::AdderProxy)
-            .upgrade(new_value)
-            .code(&self.adder_code)
+            .upgrade(BigUint::from(new_value))
+            .code(ADDER_CODE_PATH)
             .returns(ReturnsResultUnmanaged)
             .prepare_async()
             .run()
@@ -200,7 +203,7 @@ impl AdderInteract {
 //     let mut basic_interact = AdderInteract::init().await;
 
 //     basic_interact.deploy().await;
-//     basic_interact.add(1u64).await;
+//     basic_interact.add(1u32).await;
 
 //     basic_interact.upgrade(7u32).await;
 // }
