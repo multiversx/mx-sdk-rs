@@ -53,7 +53,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:storage decode error: deliberate top decode error"
+                "message": "str:storage decode error (key: load_with_value_err): deliberate top decode error"
             }
         },
         {

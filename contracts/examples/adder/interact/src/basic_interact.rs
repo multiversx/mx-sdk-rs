@@ -11,6 +11,8 @@ use multiversx_sc_snippets::imports::*;
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
+const ADDER_CODE_PATH: MxscPath = MxscPath::new("../output/adder.mxsc.json");
+
 #[tokio::main]
 async fn main() {
     env_logger::init();
@@ -45,7 +47,6 @@ async fn main() {
 struct AdderInteract {
     interactor: Interactor,
     wallet_address: Bech32Address,
-    adder_code: BytesValue,
     state: State,
 }
 
@@ -57,15 +58,10 @@ impl AdderInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
-        let adder_code = BytesValue::interpret_from(
-            "mxsc:../output/adder.mxsc.json",
-            &InterpreterContext::default(),
-        );
 
         Self {
             interactor,
             wallet_address: wallet_address.into(),
-            adder_code,
             state: State::load_state(),
         }
     }
@@ -87,7 +83,7 @@ impl AdderInteract {
             .from(&self.wallet_address)
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
-            .code(&self.adder_code)
+            .code(ADDER_CODE_PATH)
             .returns(ReturnsNewBech32Address)
             .prepare_async()
             .run()
@@ -112,7 +108,7 @@ impl AdderInteract {
                 tx.from(&self.wallet_address)
                     .typed(adder_proxy::AdderProxy)
                     .init(0u32)
-                    .code(&self.adder_code)
+                    .code(ADDER_CODE_PATH)
                     .gas(NumExpr("70,000,000"))
                     .returns(ReturnsNewBech32Address)
             });
