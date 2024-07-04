@@ -85,6 +85,7 @@ impl AdderInteract {
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(ADDER_CODE_PATH)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewBech32Address)
             .prepare_async()
             .run()
@@ -173,6 +174,7 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
             .gas(NumExpr("30,000,000"))
             .typed(adder_proxy::AdderProxy)
             .upgrade(BigUint::from(new_value))

@@ -7,7 +7,7 @@ use multiversx_sc_scenario::{
             TxPayment,
         },
     },
-    scenario::tx_to_step::{address_annotated, StepWrapper, TxToStep},
+    scenario::tx_to_step::{address_annotated, code_annotated, StepWrapper, TxToStep},
     scenario_model::{ScDeployStep, TxResponse},
     ScenarioTxEnvData,
 };
@@ -16,11 +16,11 @@ use crate::Interactor;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
 
-impl<'w, From, Gas, CodeValue, RH> InteractorPrepareAsync
+impl<'w, From, To, Gas, CodeValue, RH> InteractorPrepareAsync
     for Tx<
         InteractorEnvExec<'w>,
         From,
-        (),
+        To,
         NotPayable,
         Gas,
         UpgradeCall<InteractorEnvExec<'w>, Code<CodeValue>>,
@@ -28,6 +28,7 @@ impl<'w, From, Gas, CodeValue, RH> InteractorPrepareAsync
     >
 where
     From: TxFromSpecified<InteractorEnvExec<'w>>,
+    To: TxToSpecified<InteractorEnvExec<'w>>,
     Gas: TxGas<InteractorEnvExec<'w>>,
     CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
@@ -42,11 +43,11 @@ where
     }
 }
 
-impl<'w, From, Gas, RH, CodeValue> TxToStep<InteractorEnvExec<'w>, RH>
+impl<'w, From, To, Gas, RH, CodeValue> TxToStep<InteractorEnvExec<'w>, RH>
     for Tx<
         InteractorEnvExec<'w>,
         From,
-        (),
+        To,
         NotPayable,
         Gas,
         UpgradeCall<InteractorEnvExec<'w>, Code<CodeValue>>,
@@ -54,6 +55,7 @@ impl<'w, From, Gas, RH, CodeValue> TxToStep<InteractorEnvExec<'w>, RH>
     >
 where
     From: TxFromSpecified<InteractorEnvExec<'w>>,
+    To: TxToSpecified<InteractorEnvExec<'w>>,
     Gas: TxGas<InteractorEnvExec<'w>>,
     CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
@@ -62,7 +64,8 @@ where
     type Step = ScCallStep;
 
     fn tx_to_step(self) -> StepWrapper<InteractorEnvExec<'w>, Self::Step, RH> {
-        let mut step = tx_to_sc_call_upgrade_step(&self.env, self.from, self.gas, self.data);
+        let mut step =
+            tx_to_sc_call_upgrade_step(&self.env, self.from, self.to, self.gas, self.data);
         step.expect = Some(self.result_handler.list_tx_expect());
 
         StepWrapper {
@@ -73,21 +76,27 @@ where
     }
 }
 
-pub fn tx_to_sc_call_upgrade_step<'a, 'w: 'a, From, Gas, CodeValue>(
+pub fn tx_to_sc_call_upgrade_step<'a, 'w: 'a, From, To, Gas, CodeValue>(
     env: &'a InteractorEnvExec<'w>,
     from: From,
+    to: To,
     gas: Gas,
     data: UpgradeCall<InteractorEnvExec<'w>, Code<CodeValue>>,
 ) -> ScCallStep
 where
     From: TxFromSpecified<InteractorEnvExec<'w>>,
+    To: TxToSpecified<InteractorEnvExec<'w>>,
     Gas: TxGas<InteractorEnvExec<'w>>,
     CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
 {
     let mut step = ScCallStep::new()
         .from(address_annotated(env, &from))
-        .function("upgrade")
-        .gas_limit(gas.gas_value(env));
+        .to(address_annotated(env, &to))
+        .gas_limit(gas.gas_value(env))
+        .function("upgradeContract")
+        .argument(code_annotated(env, data.code_source))
+        .argument(data.code_metadata.to_byte_array().to_vec());
+
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());
     }
