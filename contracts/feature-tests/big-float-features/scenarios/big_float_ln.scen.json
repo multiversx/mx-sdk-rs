@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -26,7 +25,7 @@
                 "arguments": [
                     "23"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "2,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -47,7 +46,7 @@
                     "23",
                     "9"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "2,000,000",
                 "gasPrice": "0"
             },
             "expect": {
