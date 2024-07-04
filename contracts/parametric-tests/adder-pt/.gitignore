@@ -5,3 +5,7 @@
 
 # The mxpy output
 /output*/
+
+# Kasmer
+.property
+generated_claims

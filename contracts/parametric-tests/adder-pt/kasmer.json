@@ -1,5 +1,5 @@
 {
-  "contract_paths": [
-    "../../examples/adder/output/adder.wasm"
+  "contracts": [
+    "../../examples/adder"
   ]
 }

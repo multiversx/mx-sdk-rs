@@ -1,5 +1,8 @@
 {
-  "contract_paths": [
-    "../../examples/multisig/output/multisig-full.wasm"
+  "contracts": [
+    {
+      "path": "../../examples/multisig",
+      "name": "multisig"
+    }
   ]
 }
