@@ -178,6 +178,7 @@ impl AdderInteract {
             .gas(NumExpr("30,000,000"))
             .typed(adder_proxy::AdderProxy)
             .upgrade(BigUint::from(new_value))
+            .code_metadata(CodeMetadata::UPGRADEABLE)
             .code(ADDER_CODE_PATH)
             .returns(ReturnsResultUnmanaged)
             .prepare_async()
