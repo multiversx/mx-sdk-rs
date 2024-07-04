@@ -9,7 +9,16 @@ pub trait BigFloatWrappedLn {
     }
 
     #[endpoint]
-    fn ln_big_float_ref_wrapped(
+    fn ln_big_float_precision_9(
+        &self,
+        a: BigInt,
+    ) -> ManagedDecimalSigned<Self::Api, ConstDecimals<9>> {
+        let number = self.ln_big_float_ref(&BigFloat::from(a));
+        number.to_managed_decimal_signed(ConstDecimals)
+    }
+
+    #[endpoint]
+    fn ln_big_float_any_precision(
         &self,
         a: BigInt,
         precision: usize,
