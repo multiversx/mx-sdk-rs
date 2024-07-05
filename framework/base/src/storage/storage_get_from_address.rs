@@ -1,6 +1,7 @@
 use crate::{
     api::{
-        const_handles, use_raw_handle, ErrorApi, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl
+        const_handles, use_raw_handle, ErrorApi, HandleConstraints, ManagedBufferApiImpl,
+        ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
     codec::*,
     types::{

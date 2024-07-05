@@ -4,6 +4,8 @@ use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputA
 
 use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to_rust_type};
 
+const DEFAULT_GAS: &str = "30,000,000";
+
 pub(crate) fn write_interact_struct_impl(
     file: &mut File,
     abi: &ContractAbi,
@@ -35,6 +37,10 @@ pub(crate) fn write_interact_struct_impl(
 
     write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
 
+    for upgrade_abi in &abi.upgrade_constructors {
+        write_endpoint_impl(file, upgrade_abi, &abi.name);
+    }
+
     for endpoint_abi in &abi.endpoints {
         write_endpoint_impl(file, endpoint_abi, &abi.name);
     }
@@ -54,6 +60,7 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
             .interactor
             .tx()
             .from(&self.wallet_address)
+            .gas(NumExpr("{DEFAULT_GAS}"))
             .typed(proxy::{})
             .init({})
             .code(&self.contract_code)
@@ -170,6 +177,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
+            .gas(NumExpr("{DEFAULT_GAS}"))
             .typed(proxy::{}Proxy)
             .{}({}){}
             .returns(ReturnsResultUnmanaged)
