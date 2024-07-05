@@ -3,6 +3,7 @@ use multiversx_sc_codec::TopDecodeMulti;
 use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
+    proxy_imports::NotPayable,
     tuple_util::NestedTupleFlatten,
     types::{
         decode_result, BackTransfers, ManagedBuffer, ManagedVec, OriginalResultMarker, RHListExec,
@@ -94,6 +95,44 @@ where
 }
 
 impl<Api, To, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, (), Gas, FC, RH>
+where
+    Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    FC: TxDataFunctionCall<TxScEnv<Api>>,
+    RH: RHListExec<SyncCallRawResult<Api>, TxScEnv<Api>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    fn execute_sync_call_readonly_raw(self) -> (ManagedVec<Api, ManagedBuffer<Api>>, RH) {
+        let gas_limit = self.gas.gas_value(&self.env);
+        let function_call = self.data.into();
+
+        let raw_result = self.to.with_value_ref(&self.env, |to| {
+            SendRawWrapper::<Api>::new().execute_on_dest_context_readonly_raw(
+                gas_limit,
+                to,
+                &function_call.function_name,
+                &function_call.arg_buffer,
+            )
+        });
+
+        SendRawWrapper::<Api>::new().clean_return_data();
+
+        (raw_result, self.result_handler)
+    }
+
+    /// Executes transaction synchronously, in readonly mode (target contract cannot have its state altered).
+    ///
+    /// Only works with contracts from the same shard.
+    pub fn sync_call_readonly(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
+        let (raw_result, result_handler) = self.execute_sync_call_readonly_raw();
+        let sync_raw_result = SyncCallRawResult(raw_result);
+        let tuple_result = result_handler.list_process_result(&sync_raw_result);
+        tuple_result.flatten_unpack()
+    }
+}
+
+impl<Api, To, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, NotPayable, Gas, FC, RH>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
