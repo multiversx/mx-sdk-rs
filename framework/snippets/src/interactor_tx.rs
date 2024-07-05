@@ -9,6 +9,7 @@ mod interactor_prepare_async;
 mod interactor_query_call;
 mod interactor_query_env;
 mod interactor_query_step;
+mod interactor_exec_upgrade;
 
 pub use interactor_exec_env::InteractorEnvExec;
 pub use interactor_exec_step::InteractorExecStep;

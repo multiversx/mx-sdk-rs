@@ -36,6 +36,9 @@ async fn main() {
         Some(basic_interact_cli::InteractCliCommand::Sum) => {
             basic_interact.print_sum().await;
         },
+        Some(basic_interact_cli::InteractCliCommand::Upgrade(args)) => {
+            basic_interact.upgrade(args.value).await
+        },
         None => {},
     }
 }
@@ -78,9 +81,11 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
+            .gas(NumExpr("30,000,000"))
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(ADDER_CODE_PATH)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewBech32Address)
             .prepare_async()
             .run()
@@ -134,11 +139,12 @@ impl AdderInteract {
             .await;
     }
 
-    async fn add(&mut self, value: u64) {
+    async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
+            .gas(NumExpr("30,000,000"))
             .typed(adder_proxy::AdderProxy)
             .add(value)
             .prepare_async()
@@ -162,4 +168,46 @@ impl AdderInteract {
 
         println!("sum: {sum}");
     }
+
+    async fn upgrade(&mut self, new_value: u32) {
+        let response = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
+            .gas(NumExpr("30,000,000"))
+            .typed(adder_proxy::AdderProxy)
+            .upgrade(BigUint::from(new_value))
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .code(ADDER_CODE_PATH)
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+
+        let sum = self
+            .interactor
+            .query()
+            .to(self.state.current_adder_address())
+            .typed(adder_proxy::AdderProxy)
+            .sum()
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+        assert_eq!(sum, RustBigUint::from(new_value));
+
+        println!("response: {response:?}");
+    }
+}
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn test() {
+    let mut basic_interact = AdderInteract::init().await;
+
+    basic_interact.deploy().await;
+    basic_interact.add(1u32).await;
+
+    basic_interact.upgrade(7u32).await;
 }
