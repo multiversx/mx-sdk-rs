@@ -37,7 +37,7 @@ pub(super) fn get_attribute_with_one_type_arg(
                         },
                     };
 
-                    let ticker = first_literal.trim_matches('\"').to_string();
+                    let ticker = clean_string(first_literal);
 
                     let _ = match iter.next() {
                         Some(proc_macro2::TokenTree::Punct(punct)) => punct,
@@ -103,23 +103,15 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
             let mut iter = list.tokens.into_iter();
             let arg_token_tree = match iter.next() {
                 Some(proc_macro2::TokenTree::Literal(literal)) => {
-                    let clean = literal
-                        .to_string()
-                        .trim_matches('\"')
-                        .trim_matches('"')
-                        .trim()
-                        .to_string();
+                    let clean = clean_string(literal.to_string());
 
                     assert!(
-                        !clean.chars().next().is_some_and(|s| s.is_numeric()),
+                        !is_first_char_numeric(&clean),
                         "argument can not be a number"
                     );
 
                     assert!(
-                        !clean
-                            .chars()
-                            .next()
-                            .is_some_and(|s| s.is_ascii_punctuation()),
+                        !is_first_char_punctuation(&clean),
                         "argument can not start with punctuation"
                     );
 
@@ -213,4 +205,16 @@ pub(super) fn is_attr_with_one_opt_token_tree_arg(
     } else {
         None
     }
+}
+
+pub fn clean_string(s: String) -> String {
+    s.trim_matches('\"').trim_matches('"').trim().to_string()
+}
+
+pub fn is_first_char_numeric(s: &str) -> bool {
+    s.chars().next().is_some_and(|s| s.is_numeric())
+}
+
+pub fn is_first_char_punctuation(s: &str) -> bool {
+    s.chars().next().is_some_and(|s| s.is_ascii_punctuation())
 }
