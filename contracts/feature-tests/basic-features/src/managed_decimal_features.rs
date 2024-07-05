@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::module]
 pub trait ManagedDecimalFeatures {
@@ -39,5 +39,29 @@ pub trait ManagedDecimalFeatures {
     fn managed_decimal_into_raw_units(&self) -> BigUint {
         let dec = ManagedDecimal::from_raw_units(BigUint::from(12345u64), 2usize);
         dec.into_raw_units().clone()
+    }
+
+    #[endpoint]
+    fn managed_decimal_ln(&self) -> ManagedDecimalSigned<Self::Api, ConstDecimals<9>> {
+        let dec = ManagedDecimal::from_raw_units(BigUint::from(378298u64), 3usize);
+        dec.ln().unwrap()
+    }
+
+    #[endpoint]
+    fn managed_decimal_ln_high_prec(&self) -> ManagedDecimalSigned<Self::Api, ConstDecimals<9>> {
+        let dec = ManagedDecimal::from_raw_units(BigUint::from(378298000000u64), 9usize);
+        dec.ln().unwrap()
+    }
+
+    #[endpoint]
+    fn managed_decimal_log2(&self) -> ManagedDecimalSigned<Self::Api, ConstDecimals<9>> {
+        let dec = ManagedDecimal::from_raw_units(BigUint::from(218345u64), 3usize);
+        dec.log2().unwrap()
+    }
+
+    #[endpoint]
+    fn managed_decimal_log2_high_prec(&self) -> ManagedDecimalSigned<Self::Api, ConstDecimals<9>> {
+        let dec = ManagedDecimal::from_raw_units(BigUint::from(218345000000u64), 9usize);
+        dec.log2().unwrap()
     }
 }

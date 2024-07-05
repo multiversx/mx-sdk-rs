@@ -141,6 +141,90 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "id": "6",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_ln",
+                "arguments": [],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x0161cb95d7"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "7",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_ln_high_prec",
+                "arguments": [],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x0161cc16aa"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "8",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_log2",
+                "arguments": [],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01cf26a72a"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "9",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_log2_high_prec",
+                "arguments": [],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01cf26abaf"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }

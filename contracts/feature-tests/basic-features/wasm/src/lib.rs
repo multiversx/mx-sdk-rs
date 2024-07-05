@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          395
+// Endpoints:                          405
 // Async Callback:                       1
-// Total number of exported functions: 397
+// Total number of exported functions: 407
 
 #![no_std]
 
@@ -413,11 +413,16 @@ multiversx_sc_wasm_adapter::endpoints! {
         fill_set_mapper => fill_set_mapper
         fill_map_mapper => fill_map_mapper
         fill_unordered_set_mapper => fill_unordered_set_mapper
+        get_value_from_address_with_keys => get_value_from_address_with_keys
         managed_decimal_addition => managed_decimal_addition
         managed_decimal_subtraction => managed_decimal_subtraction
         managed_decimal_eq => managed_decimal_eq
         managed_decimal_trunc => managed_decimal_trunc
         managed_decimal_into_raw_units => managed_decimal_into_raw_units
+        managed_decimal_ln => managed_decimal_ln
+        managed_decimal_ln_high_prec => managed_decimal_ln_high_prec
+        managed_decimal_log2 => managed_decimal_log2
+        managed_decimal_log2_high_prec => managed_decimal_log2_high_prec
     )
 }
 
