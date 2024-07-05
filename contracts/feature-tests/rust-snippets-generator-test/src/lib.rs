@@ -13,7 +13,7 @@ multiversx_sc::derive_imports!();
 
 // Additionally, we also have to update the interactor snippets manually to add relative paths:
 // [dependencies.multiversx-sc-snippets]
-// version = "0.50.3"
+// version = "0.50.6"
 // path = "../../../../framework/snippets"
 
 #[derive(

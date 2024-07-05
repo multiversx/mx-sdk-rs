@@ -322,6 +322,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         is_empty_single_value_mapper => is_empty_single_value_mapper
         is_empty_at_address_single_value_mapper => is_empty_at_address_single_value_mapper
         raw_byte_length_single_value_mapper => raw_byte_length_single_value_mapper
+        set_single_value_mapper_with_key => set_single_value_mapper_with_key
         vec_mapper => vec_mapper
         vec_mapper_push => vec_mapper_push
         vec_mapper_get => vec_mapper_get
@@ -366,6 +367,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         unique_id_mapper_swap_remove => unique_id_mapper_swap_remove
         unique_id_mapper_set => unique_id_mapper_set
         unique_id_mapper => unique_id_mapper
+        unordered_set_mapper => unordered_set_mapper
+        unordered_set_mapper_insert => unordered_set_mapper_insert
+        unordered_set_mapper_contains => unordered_set_mapper_contains
+        unordered_set_mapper_remove => unordered_set_mapper_remove
         managed_struct_eq => managed_struct_eq
         no_overflow_usize => no_overflow_usize
         no_overflow_u8 => no_overflow_u8
