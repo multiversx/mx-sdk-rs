@@ -21,6 +21,7 @@ pub(super) static ATTR_CALLBACK_CALL_RESULT: &str = "call_result";
 pub(super) static ATTR_STORAGE_GET: &str = "storage_get";
 pub(super) static ATTR_STORAGE_SET: &str = "storage_set";
 pub(super) static ATTR_STORAGE_MAPPER: &str = "storage_mapper";
+pub(super) static ATTR_STORAGE_MAPPER_FROM_ADDRESS: &str = "storage_mapper_from_address";
 pub(super) static ATTR_STORAGE_IS_EMPTY: &str = "storage_is_empty";
 pub(super) static ATTR_STORAGE_CLEAR: &str = "storage_clear";
 pub(super) static ATTR_PROXY: &str = "proxy";

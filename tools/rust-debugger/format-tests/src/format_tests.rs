@@ -7,10 +7,7 @@ use multiversx_sc::{
         ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-use multiversx_sc_scenario::{
-    api::{DebugApi, DebugHandle},
-    num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
-};
+use multiversx_sc_scenario::imports::*;
 
 macro_rules! push {
     ($list: ident, $name:ident, $expected: expr ) => {{

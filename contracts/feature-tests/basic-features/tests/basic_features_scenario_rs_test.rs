@@ -389,6 +389,11 @@ fn storage_mapper_get_at_address_rs() {
 }
 
 #[test]
+fn storage_mapper_get_at_address_extra_key_rs() {
+    world().run("scenarios/storage_mapper_get_at_address_extra_key.scen.json");
+}
+
+#[test]
 fn storage_mapper_linked_list_rs() {
     world().run("scenarios/storage_mapper_linked_list.scen.json");
 }
