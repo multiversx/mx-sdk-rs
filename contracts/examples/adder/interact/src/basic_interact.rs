@@ -201,12 +201,13 @@ impl AdderInteract {
     }
 }
 
-// #[tokio::test]
-// async fn test() {
-//     let mut basic_interact = AdderInteract::init().await;
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn test() {
+    let mut basic_interact = AdderInteract::init().await;
 
-//     basic_interact.deploy().await;
-//     basic_interact.add(1u32).await;
+    basic_interact.deploy().await;
+    basic_interact.add(1u32).await;
 
-//     basic_interact.upgrade(7u32).await;
-// }
+    basic_interact.upgrade(7u32).await;
+}
