@@ -2,7 +2,6 @@
 name = "multiversx-sc"
 version = "0.50.5"
 edition = "2021"
-rust-version = "1.78"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
