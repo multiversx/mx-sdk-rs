@@ -1,8 +1,8 @@
 # Parametric test example for: Adder
 
-This is an exampel on how to write a basic parametric test contract.
+This is an example on how to write a basic parametric test contract.
 
-To run fuzzing on it using Kasmer, buld the contracts and simply run
+To run fuzzing on it using Kasmer, build the contracts and simply run
 
 ```
 kasmer fuzz
