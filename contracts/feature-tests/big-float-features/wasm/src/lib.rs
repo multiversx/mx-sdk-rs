@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           70
+// Endpoints:                           73
 // Async Callback (empty):               1
-// Total number of exported functions:  72
+// Total number of exported functions:  75
 
 #![no_std]
 
@@ -72,6 +72,9 @@ multiversx_sc_wasm_adapter::endpoints! {
         pow_big_float_ref_wrapped => pow_big_float_ref_wrapped
         big_float_zero_wrapped => big_float_zero_wrapped
         big_float_neg_wrapped => big_float_neg_wrapped
+        ln_big_float_ref => ln_big_float_ref
+        ln_big_float_precision_9 => ln_big_float_precision_9
+        ln_big_float_any_precision => ln_big_float_any_precision
         add_big_float_wrapped => add_big_float_wrapped
         add_big_float_ref_wrapped => add_big_float_ref_wrapped
         sub_big_float_wrapped => sub_big_float_wrapped

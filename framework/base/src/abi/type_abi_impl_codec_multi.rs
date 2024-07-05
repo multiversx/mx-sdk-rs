@@ -5,7 +5,6 @@ use crate::{
     codec::multi_types::{IgnoreValue, OptionalValue},
 };
 
-#[cfg(feature = "alloc")]
 impl<T, U> TypeAbiFrom<crate::codec::multi_types::MultiValueVec<U>>
     for crate::codec::multi_types::MultiValueVec<T>
 where
@@ -13,7 +12,6 @@ where
 {
 }
 
-#[cfg(feature = "alloc")]
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     type Unmanaged = crate::codec::multi_types::MultiValueVec<T::Unmanaged>;
 

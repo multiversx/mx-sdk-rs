@@ -397,33 +397,6 @@ where
             .raw_call("payable_any_token")
             .original_result()
     }
-
-    pub fn external_view(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("external_view")
-            .original_result()
-    }
-
-    pub fn label_a(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("label_a")
-            .original_result()
-    }
-
-    pub fn label_b(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("label_b")
-            .original_result()
-    }
 }
 
 #[type_abi]
@@ -577,4 +550,13 @@ pub enum ExplicitDiscriminantMixed {
         a: u8,
         b: u16,
     },
+}
+
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
+pub struct ManagedDecimalWrapper<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub field: ManagedDecimal<Api, ConstDecimals<2>>,
 }

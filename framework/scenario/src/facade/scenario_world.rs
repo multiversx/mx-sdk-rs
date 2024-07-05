@@ -4,7 +4,7 @@ use crate::{
     scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
     vm_go_tool::run_mx_scenario_go,
 };
-use multiversx_sc_meta::find_workspace::find_current_workspace;
+use multiversx_sc_meta_lib::tools::find_current_workspace;
 use std::path::{Path, PathBuf};
 
 use super::debugger_backend::DebuggerBackend;

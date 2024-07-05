@@ -1,3 +1,6 @@
+mod big_uint;
+mod big_uint_cmp;
+mod big_uint_operators;
 mod builder;
 mod egld_or_esdt_token_identifier;
 mod egld_or_esdt_token_payment;
@@ -7,6 +10,7 @@ mod esdt_token_data;
 mod esdt_token_payment;
 mod managed_address;
 mod managed_byte_array;
+mod managed_decimal;
 mod managed_option;
 mod managed_ref;
 mod managed_vec;
@@ -21,6 +25,7 @@ mod randomness_source;
 mod token_identifier;
 mod traits;
 
+pub use big_uint::BigUint;
 pub use builder::*;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::{EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs};
@@ -31,6 +36,9 @@ pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPa
 pub use managed_address::ManagedAddress;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;
+pub use managed_decimal::{
+    ConstDecimals, Decimals, ManagedDecimal, ManagedDecimalSigned, NumDecimals,
+};
 pub use managed_option::ManagedOption;
 pub use managed_ref::ManagedRef;
 pub use managed_vec::ManagedVec;

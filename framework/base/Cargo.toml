@@ -2,6 +2,7 @@
 name = "multiversx-sc"
 version = "0.50.6"
 edition = "2021"
+rust-version = "1.78"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
@@ -18,13 +19,13 @@ all-features = true
 
 [features]
 num-bigint = ["multiversx-sc-codec/num-bigint"]
-alloc = ["multiversx-sc-codec/alloc"]
+alloc = []
 managed-buffer-builder-cached = []
 esdt-token-payment-legacy-decode = []
 
 [dependencies]
 hex-literal = "=0.4.1"
-bitflags = "=2.5.0"
+bitflags = "=2.6.0"
 num-traits = { version = "=0.2.19", default-features = false }
 unwrap-infallible = "0.1.5"
 

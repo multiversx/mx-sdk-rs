@@ -514,7 +514,6 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
     }
 }
 
-#[cfg(feature = "alloc")]
 impl<M: ManagedTypeApi> core::fmt::Display for ManagedBuffer<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         use crate::contract_base::ErrorHelper;

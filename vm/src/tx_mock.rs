@@ -1,6 +1,5 @@
 #![allow(clippy::type_complexity)]
 
-mod blockchain_rng;
 mod blockchain_update;
 mod tx_async_call_data;
 mod tx_async_promise;
@@ -20,7 +19,6 @@ mod tx_panic;
 mod tx_result;
 mod tx_result_calls;
 
-pub use blockchain_rng::*;
 pub use blockchain_update::BlockchainUpdate;
 pub use tx_async_call_data::*;
 pub use tx_async_promise::*;
@@ -38,3 +36,13 @@ pub use tx_managed_types::*;
 pub use tx_panic::*;
 pub use tx_result::*;
 pub use tx_result_calls::*;
+
+#[cfg(feature = "wasm-incopatible")]
+mod blockchain_rng;
+#[cfg(feature = "wasm-incopatible")]
+pub use blockchain_rng::BlockchainRng;
+
+#[cfg(not(feature = "wasm-incopatible"))]
+mod blockchain_rng_unsupported;
+#[cfg(not(feature = "wasm-incopatible"))]
+pub use blockchain_rng_unsupported::BlockchainRng;

@@ -8,15 +8,6 @@ impl From<&'static str> for EncodeError {
     }
 }
 
-// TODO: convert to "from_bytes" deprecated method in next minor release.
-// Please avoid: it bloats the contract with an unnecessary utf8 validation.
-impl From<&'static [u8]> for EncodeError {
-    #[inline]
-    fn from(message_bytes: &'static [u8]) -> Self {
-        EncodeError(core::str::from_utf8(message_bytes).unwrap())
-    }
-}
-
 impl EncodeError {
     #[inline]
     pub fn message_bytes(&self) -> &'static [u8] {
@@ -38,15 +29,6 @@ impl From<&'static str> for DecodeError {
     #[inline]
     fn from(message_bytes: &'static str) -> Self {
         DecodeError(message_bytes)
-    }
-}
-
-// TODO: convert to "from_bytes" deprecated method in next minor release.
-// Please avoid: it bloats the contract with an unnecessary utf8 validation.
-impl From<&'static [u8]> for DecodeError {
-    #[inline]
-    fn from(message_bytes: &'static [u8]) -> Self {
-        DecodeError(core::str::from_utf8(message_bytes).unwrap())
     }
 }
 
@@ -72,35 +54,4 @@ impl DecodeError {
 
     pub const MULTI_TOO_FEW_ARGS: DecodeError = DecodeError("too few arguments");
     pub const MULTI_TOO_MANY_ARGS: DecodeError = DecodeError("too many arguments");
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn decode_error_from_bytes() {
-        let from_bytes = DecodeError::from(&b"error as bytes"[..]);
-        assert_eq!(from_bytes.message_bytes(), b"error as bytes");
-        assert_eq!(from_bytes.message_str(), "error as bytes");
-    }
-
-    #[test]
-    #[should_panic]
-    fn decode_error_from_bad_bytes() {
-        let _ = DecodeError::from(&[0, 159, 146, 150][..]);
-    }
-
-    #[test]
-    fn encode_error_from_bytes() {
-        let from_bytes = EncodeError::from(&b"error as bytes"[..]);
-        assert_eq!(from_bytes.message_bytes(), b"error as bytes");
-        assert_eq!(from_bytes.message_str(), "error as bytes");
-    }
-
-    #[test]
-    #[should_panic]
-    fn encode_error_from_bad_bytes() {
-        let _ = EncodeError::from(&[0, 159, 146, 150][..]);
-    }
 }

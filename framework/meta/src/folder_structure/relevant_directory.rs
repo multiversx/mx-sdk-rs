@@ -1,4 +1,5 @@
-use crate::{version::FrameworkVersion, CargoTomlContents};
+use crate::version::FrameworkVersion;
+use multiversx_sc_meta_lib::cargo_toml_contents::CargoTomlContents;
 use std::{
     fs::{self, DirEntry},
     path::{Path, PathBuf},

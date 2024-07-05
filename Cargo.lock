@@ -17,7 +17,7 @@ name = "abi-tester"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",
 ]
 
@@ -26,7 +26,7 @@ name = "abi-tester-meta"
 version = "0.0.0"
 dependencies = [
  "abi-tester",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -42,7 +42,7 @@ name = "adder-meta"
 version = "0.0.0"
 dependencies = [
  "adder",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -95,7 +95,7 @@ name = "alloc-features-meta"
 version = "0.0.0"
 dependencies = [
  "alloc-features",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -227,7 +227,7 @@ name = "basic-features-meta"
 version = "0.0.0"
 dependencies = [
  "basic-features",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -269,7 +269,7 @@ name = "big-float-features-meta"
 version = "0.0.0"
 dependencies = [
  "big-float-features",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -299,9 +299,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitflags"
-version = "2.5.0"
+version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf4b9d6a944f767f8e5e0db018570623c85f3d925ac718db4e06d0187adb21c1"
+checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
 
 [[package]]
 name = "block-buffer"
@@ -335,7 +335,7 @@ name = "bonding-curve-contract-meta"
 version = "0.0.0"
 dependencies = [
  "bonding-curve-contract",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -361,7 +361,7 @@ name = "builtin-func-features-meta"
 version = "0.0.0"
 dependencies = [
  "builtin-func-features",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -409,7 +409,7 @@ name = "check-pause-meta"
 version = "0.0.0"
 dependencies = [
  "check-pause",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -426,7 +426,7 @@ version = "0.0.0"
 dependencies = [
  "child",
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -600,7 +600,7 @@ name = "crowdfunding-erc20-meta"
 version = "0.0.0"
 dependencies = [
  "crowdfunding-erc20",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -619,7 +619,7 @@ name = "crowdfunding-esdt-meta"
 version = "0.0.0"
 dependencies = [
  "crowdfunding-esdt",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -635,7 +635,7 @@ name = "crypto-bubbles-meta"
 version = "0.0.0"
 dependencies = [
  "crypto-bubbles",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -661,7 +661,7 @@ name = "crypto-zombies-meta"
 version = "0.0.0"
 dependencies = [
  "crypto-zombies",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -721,7 +721,7 @@ name = "digital-cash-meta"
 version = "0.0.0"
 dependencies = [
  "digital-cash",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -778,7 +778,7 @@ name = "empty-meta"
 version = "0.0.0"
 dependencies = [
  "empty",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -848,7 +848,7 @@ name = "erc1155-marketplace-meta"
 version = "0.0.0"
 dependencies = [
  "erc1155-marketplace",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -856,7 +856,7 @@ name = "erc1155-meta"
 version = "0.0.0"
 dependencies = [
  "erc1155",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -872,7 +872,7 @@ name = "erc1155-user-mock-meta"
 version = "0.0.0"
 dependencies = [
  "erc1155-user-mock",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -888,7 +888,7 @@ name = "erc20-meta"
 version = "0.0.0"
 dependencies = [
  "erc20",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -904,7 +904,7 @@ name = "erc721-meta"
 version = "0.0.0"
 dependencies = [
  "erc721",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -940,7 +940,7 @@ name = "esdt-system-sc-mock-meta"
 version = "0.0.0"
 dependencies = [
  "esdt-system-sc-mock",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -956,7 +956,7 @@ name = "esdt-transfer-with-fee-meta"
 version = "0.0.0"
 dependencies = [
  "esdt-transfer-with-fee",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -972,7 +972,7 @@ name = "exchange-features-meta"
 version = "0.0.0"
 dependencies = [
  "exchange-features",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -988,14 +988,14 @@ name = "factorial-meta"
 version = "0.0.0"
 dependencies = [
  "factorial",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
 name = "factory-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "order-book-factory",
 ]
 
@@ -1019,7 +1019,7 @@ version = "0.0.0"
 dependencies = [
  "first-contract",
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1075,7 +1075,7 @@ name = "formatted-message-features-meta"
 version = "0.0.0"
 dependencies = [
  "formatted-message-features",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1100,7 +1100,7 @@ name = "forwarder-legacy-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder-legacy",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1108,7 +1108,7 @@ name = "forwarder-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1125,7 +1125,7 @@ name = "forwarder-queue-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder-queue",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1141,7 +1141,7 @@ name = "forwarder-raw-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder-raw",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1158,7 +1158,7 @@ name = "fractional-nfts-meta"
 version = "0.0.0"
 dependencies = [
  "fractional-nfts",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1546,9 +1546,9 @@ checksum = "f8478577c03552c21db0e2724ffb8986a5ce7af88107e6be5d2ee6e158c12800"
 
 [[package]]
 name = "itertools"
-version = "0.12.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
 ]
@@ -1600,7 +1600,7 @@ name = "kitty-auction-meta"
 version = "0.0.0"
 dependencies = [
  "kitty-auction",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1618,7 +1618,7 @@ name = "kitty-genetic-alg-meta"
 version = "0.0.0"
 dependencies = [
  "kitty-genetic-alg",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1637,7 +1637,7 @@ name = "kitty-ownership-meta"
 version = "0.0.0"
 dependencies = [
  "kitty-ownership",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1653,7 +1653,7 @@ name = "large-storage-meta"
 version = "0.0.0"
 dependencies = [
  "large-storage",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1682,7 +1682,7 @@ name = "linked-list-repeat-meta"
 version = "0.0.0"
 dependencies = [
  "linked-list-repeat",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1704,7 +1704,7 @@ name = "local-esdt-and-nft-meta"
 version = "0.0.0"
 dependencies = [
  "local-esdt-and-nft",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1743,7 +1743,7 @@ name = "lottery-erc20-meta"
 version = "0.0.0"
 dependencies = [
  "lottery-erc20",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1759,7 +1759,7 @@ name = "lottery-esdt-meta"
 version = "0.0.0"
 dependencies = [
  "lottery-esdt",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1776,7 +1776,7 @@ name = "managed-map-features-meta"
 version = "0.0.0"
 dependencies = [
  "managed-map-features",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1793,7 +1793,7 @@ name = "map-repeat-meta"
 version = "0.0.0"
 dependencies = [
  "map-repeat",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1841,7 +1841,7 @@ name = "multi-contract-features-meta"
 version = "0.0.0"
 dependencies = [
  "multi-contract-features",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1878,7 +1878,7 @@ name = "multisig-meta"
 version = "0.0.0"
 dependencies = [
  "multisig",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -1898,7 +1898,7 @@ dependencies = [
 name = "multiversx-chain-vm"
 version = "0.8.4"
 dependencies = [
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "colored",
  "ed25519-dalek",
  "hex",
@@ -1937,14 +1937,14 @@ version = "0.0.0"
 dependencies = [
  "multiversx-price-aggregator-sc",
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
 name = "multiversx-sc"
 version = "0.50.6"
 dependencies = [
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "hex-literal",
  "multiversx-sc-codec",
  "multiversx-sc-derive",
@@ -1992,13 +1992,30 @@ dependencies = [
  "common-path",
  "convert_case",
  "copy_dir",
- "hex",
- "lazy_static",
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
+ "multiversx-sc-snippets",
  "pathdiff",
  "reqwest",
  "ruplacer",
+ "semver",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml",
+ "zip",
+]
+
+[[package]]
+name = "multiversx-sc-meta-lib"
+version = "0.50.6"
+dependencies = [
+ "clap",
+ "colored",
+ "convert_case",
+ "hex",
+ "lazy_static",
+ "multiversx-sc",
  "rustc_version",
  "semver",
  "serde",
@@ -2006,7 +2023,6 @@ dependencies = [
  "toml",
  "wasmparser",
  "wasmprinter",
- "zip",
 ]
 
 [[package]]
@@ -2022,7 +2038,6 @@ version = "0.50.6"
 dependencies = [
  "base64",
  "bech32",
- "clap",
  "colored",
  "hex",
  "itertools",
@@ -2031,15 +2046,13 @@ dependencies = [
  "multiversx-chain-vm",
  "multiversx-chain-vm-executor",
  "multiversx-sc",
- "multiversx-sc-meta",
- "multiversx-sdk",
+ "multiversx-sc-meta-lib",
  "num-bigint",
  "num-traits",
  "pathdiff",
  "serde",
  "serde_json",
  "sha2 0.10.8",
- "tokio",
  "unwrap-infallible",
 ]
 
@@ -2052,8 +2065,10 @@ dependencies = [
  "futures",
  "hex",
  "log",
+ "multiversx-chain-scenario-format",
  "multiversx-sc-scenario",
  "multiversx-sdk",
+ "serde_json",
  "tokio",
 ]
 
@@ -2075,6 +2090,7 @@ dependencies = [
  "hex",
  "hmac",
  "itertools",
+ "log",
  "pbkdf2",
  "pem",
  "rand 0.8.5",
@@ -2102,7 +2118,7 @@ name = "multiversx-wegld-swap-sc-meta"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "multiversx-wegld-swap-sc",
 ]
 
@@ -2146,7 +2162,7 @@ dependencies = [
 name = "nft-minter-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "nft-minter",
 ]
 
@@ -2162,7 +2178,7 @@ dependencies = [
 name = "nft-storage-prepay-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "nft-storage-prepay",
 ]
 
@@ -2179,7 +2195,7 @@ dependencies = [
 name = "nft-subscription-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "nft-subscription",
 ]
 
@@ -2194,9 +2210,9 @@ dependencies = [
 
 [[package]]
 name = "num-bigint"
-version = "0.4.5"
+version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c165a9ab64cf766f73521c0dd2cfdff64f488b8f0b3e621face3462d3db536d7"
+checksum = "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9"
 dependencies = [
  "num-integer",
  "num-traits",
@@ -2257,7 +2273,7 @@ version = "0.10.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95a0481286a310808298130d22dd1fef0fa571e05a8f44ec801801e84b216b1f"
 dependencies = [
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "cfg-if",
  "foreign-types",
  "libc",
@@ -2315,7 +2331,7 @@ dependencies = [
 name = "pair-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "order-book-pair",
 ]
 
@@ -2331,7 +2347,7 @@ dependencies = [
 name = "panic-message-features-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "panic-message-features",
 ]
 
@@ -2348,7 +2364,7 @@ name = "parent-meta"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "parent",
 ]
 
@@ -2393,7 +2409,7 @@ dependencies = [
 name = "payable-features-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "payable-features",
 ]
 
@@ -2470,7 +2486,7 @@ dependencies = [
 name = "ping-pong-egld-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "ping-pong-egld",
 ]
 
@@ -2488,9 +2504,9 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.82"
+version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ad3d49ab951a01fbaafe34f2ec74122942fe18a3f9814c3268f1bb72042131b"
+checksum = "5e719e8df665df0d1c8fbfd238015744736151d4445ec0836b8e628aae103b77"
 dependencies = [
  "unicode-ident",
 ]
@@ -2506,7 +2522,7 @@ dependencies = [
 name = "promises-features-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "promises-features",
 ]
 
@@ -2523,7 +2539,7 @@ dependencies = [
 name = "proxy-pause-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "proxy-pause",
 ]
 
@@ -2540,7 +2556,7 @@ dependencies = [
 name = "proxy-test-first-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "proxy-test-first",
 ]
 
@@ -2556,7 +2572,7 @@ dependencies = [
 name = "proxy-test-second-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "proxy-test-second",
 ]
 
@@ -2573,7 +2589,7 @@ dependencies = [
 name = "queue-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "queue-repeat",
 ]
 
@@ -2696,7 +2712,7 @@ dependencies = [
 name = "recursive-caller-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "recursive-caller",
 ]
 
@@ -2706,7 +2722,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c82cf8cff14456045f55ec4241383baeff27af886adb72ffb2162f99911de0fd"
 dependencies = [
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
 ]
 
 [[package]]
@@ -2795,7 +2811,7 @@ dependencies = [
 name = "rewards-distribution-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "rewards-distribution",
 ]
 
@@ -2840,7 +2856,7 @@ dependencies = [
 name = "rust-snippets-generator-test-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "rust-snippets-generator-test",
 ]
 
@@ -2863,7 +2879,7 @@ dependencies = [
 name = "rust-testing-framework-tester-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "rust-testing-framework-tester",
 ]
 
@@ -2888,7 +2904,7 @@ version = "0.38.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "70dc5ec042f7a43c4a73241207cecc9873a06d45debb38b329f8541d85c2730f"
 dependencies = [
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "errno",
  "libc",
  "linux-raw-sys",
@@ -2962,7 +2978,7 @@ dependencies = [
 name = "scenario-tester-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "scenario-tester",
 ]
 
@@ -2994,7 +3010,7 @@ name = "second-contract-meta"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "second-contract",
 ]
 
@@ -3004,7 +3020,7 @@ version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c627723fd09706bacdb5cf41499e95098555af3c3c29d014dc3c458ef6be11c0"
 dependencies = [
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "core-foundation",
  "core-foundation-sys",
  "libc",
@@ -3034,7 +3050,7 @@ dependencies = [
 name = "seed-nft-minter-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "seed-nft-minter",
 ]
 
@@ -3056,7 +3072,7 @@ dependencies = [
 name = "send-tx-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "send-tx-repeat",
 ]
 
@@ -3137,7 +3153,7 @@ dependencies = [
 name = "set-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "set-repeat",
 ]
 
@@ -3209,7 +3225,7 @@ dependencies = [
 name = "single-value-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "single-value-repeat",
 ]
 
@@ -3256,7 +3272,7 @@ dependencies = [
 name = "str-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "str-repeat",
 ]
 
@@ -3274,9 +3290,9 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 
 [[package]]
 name = "syn"
-version = "2.0.61"
+version = "2.0.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c993ed8ccba56ae856363b1845da7266a7cb78e1d146c8a32d54b45a8b831fc9"
+checksum = "901fa70d88b9d6c98022e23b4136f9f3e54e4662c3bc1bd1d84a42a9a0f0c1e9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3320,6 +3336,15 @@ dependencies = [
  "fastrand",
  "rustix",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "termcolor"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
+dependencies = [
+ "winapi-util",
 ]
 
 [[package]]
@@ -3369,7 +3394,7 @@ dependencies = [
 name = "token-release-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "token-release",
 ]
 
@@ -3532,7 +3557,7 @@ dependencies = [
 name = "transfer-role-features-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "transfer-role-features",
 ]
 
@@ -3603,7 +3628,7 @@ name = "use-module"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "multiversx-sc-modules",
  "multiversx-sc-scenario",
 ]
@@ -3612,7 +3637,7 @@ dependencies = [
 name = "use-module-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "use-module",
 ]
 
@@ -3634,7 +3659,7 @@ dependencies = [
 name = "vault-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "vault",
 ]
 
@@ -3657,7 +3682,7 @@ dependencies = [
 name = "vec-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta",
+ "multiversx-sc-meta-lib",
  "vec-repeat",
 ]
 
@@ -3766,12 +3791,12 @@ checksum = "af190c94f2773fdb3729c55b007a722abb5384da03bc0986df4c289bf5567e96"
 
 [[package]]
 name = "wasmparser"
-version = "0.208.1"
+version = "0.212.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd921789c9dcc495f589cb37d200155dee65b4a4beeb853323b5e24e0a5f9c58"
+checksum = "8d28bc49ba1e5c5b61ffa7a2eace10820443c4b7d1c0b144109261d14570fdf8"
 dependencies = [
  "ahash",
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "hashbrown",
  "indexmap",
  "semver",
@@ -3780,11 +3805,12 @@ dependencies = [
 
 [[package]]
 name = "wasmprinter"
-version = "0.208.1"
+version = "0.212.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0700bdace4821e6c694617938500ae9999946df464bb13219c16570f8b6f202f"
+checksum = "dfac65326cc561112af88c3028f6dfdb140acff67ede33a8e86be2dc6b8956f7"
 dependencies = [
  "anyhow",
+ "termcolor",
  "wasmparser",
 ]
 

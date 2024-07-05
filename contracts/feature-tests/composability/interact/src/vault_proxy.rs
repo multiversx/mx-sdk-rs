@@ -66,29 +66,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn upgrade<
-        Arg0: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
-    >(
-        self,
-        opt_arg_to_echo: Arg0,
-    ) -> TxTypedUpgrade<Env, From, To, NotPayable, Gas, MultiValue2<&'static str, OptionalValue<ManagedBuffer<Env::Api>>>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_upgrade()
-            .argument(&opt_arg_to_echo)
-            .original_result()
-    }
-}
-
-#[rustfmt::skip]
-impl<Env, From, To, Gas> VaultProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
     pub fn echo_arguments<
         Arg0: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
@@ -171,21 +148,6 @@ where
             .argument(&token)
             .argument(&amount)
             .argument(&opt_receive_func)
-            .original_result()
-    }
-
-    pub fn retrieve_funds_promises<
-        Arg0: ProxyArg<OptionalValue<u64>>,
-        Arg1: ProxyArg<OptionalValue<BigUint<Env::Api>>>,
-    >(
-        self,
-        back_transfers: Arg0,
-        back_transfer_value: Arg1,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
-        self.wrapped_tx
-            .raw_call("retrieve_funds_promises")
-            .argument(&back_transfers)
-            .argument(&back_transfer_value)
             .original_result()
     }
 
