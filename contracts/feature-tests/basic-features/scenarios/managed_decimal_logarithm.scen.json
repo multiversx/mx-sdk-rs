@@ -16,83 +16,20 @@
         },
         {
             "step": "scCall",
-            "id": "1",
+            "id": "managed_decimal_ln(23)",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "managed_decimal_addition",
+                "function": "managed_decimal_ln",
                 "arguments": [
-                    "4",
-                    "5"
+                    "23,000000000"
                 ],
-                "gasLimit": "1,000,000,000,000",
+                "gasLimit": "9,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "9"
-                ]
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "1",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "managed_decimal_subtraction",
-                "arguments": [
-                    "9",
-                    "4"
-                ],
-                "gasLimit": "1,000,000,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "5"
-                ]
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "2",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "managed_decimal_subtraction",
-                "arguments": [
-                    "2",
-                    "8"
-                ],
-                "gasLimit": "1,000,000,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:cannot subtract because result would be negative",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "3",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "managed_decimal_eq",
-                "arguments": [
-                    "13",
-                    "13"
-                ],
-                "gasLimit": "1,000,000,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "0x01"
+                    "+3,135553845"
                 ],
                 "status": "",
                 "message": "*",
@@ -102,18 +39,20 @@
         },
         {
             "step": "scCall",
-            "id": "4",
+            "id": "managed_decimal_ln(378,298)",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "managed_decimal_trunc",
-                "arguments": [],
+                "function": "managed_decimal_ln",
+                "arguments": [
+                    "378,298000000"
+                ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "313"
+                    "0x0161cc16aa"
                 ],
                 "status": "",
                 "message": "*",
@@ -123,18 +62,43 @@
         },
         {
             "step": "scCall",
-            "id": "5",
+            "id": "managed_decimal_log2(23)",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "function": "managed_decimal_into_raw_units",
-                "arguments": [],
+                "function": "managed_decimal_log2",
+                "arguments": [
+                    "23,000000000"
+                ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "12345"
+                    "4,523648008"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "managed_decimal_log2(218,345)",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_log2",
+                "arguments": [
+                    "218,345000000"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "7,770385327"
                 ],
                 "status": "",
                 "message": "*",
