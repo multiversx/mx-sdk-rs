@@ -5,11 +5,11 @@ mod interactor_exec_deploy;
 mod interactor_exec_env;
 mod interactor_exec_step;
 mod interactor_exec_transf;
+mod interactor_exec_upgrade;
 mod interactor_prepare_async;
 mod interactor_query_call;
 mod interactor_query_env;
 mod interactor_query_step;
-mod interactor_exec_upgrade;
 
 pub use interactor_exec_env::InteractorEnvExec;
 pub use interactor_exec_step::InteractorExecStep;
