@@ -158,14 +158,4 @@ pub trait BigFloatWrappedOperators: big_float_operators::BigFloatOperators {
         let number = self.div_assign_big_float_ref(&BigFloat::from(a), &BigFloat::from(b));
         number.to_fixed_point(&BigFloat::from(fixed_point_denominator))
     }
-
-    #[endpoint]
-    fn ln_big_float_ref_wrapped(
-        &self,
-        a: BigInt,
-        precision: usize,
-    ) -> ManagedDecimal<Self::Api, usize> {
-        let number = self.ln_big_float_ref(&BigFloat::from(a));
-        number.to_managed_decimal(precision)
-    }
 }

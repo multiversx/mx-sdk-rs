@@ -82,6 +82,22 @@ function updatePlot() {
 			logControl.classList.remove("hide");
 			chart = Chart.ln_big_uint_error(canvas, Number(logMax.value));
 			break;
+		case "ln-dec":
+			logControl.classList.remove("hide");
+			chart = Chart.ln_managed_decimal(canvas, Number(logMax.value));
+			break;
+		case "ln-dec-error":
+			logControl.classList.remove("hide");
+			chart = Chart.ln_managed_decimal_error(canvas, Number(logMax.value));
+			break;
+		case "log2-dec":
+			logControl.classList.remove("hide");
+			chart = Chart.log2_managed_decimal(canvas, Number(logMax.value));
+			break;
+		case "log2-dec-error":
+			logControl.classList.remove("hide");
+			chart = Chart.log2_managed_decimal_error(canvas, Number(logMax.value));
+			break;
 		case "ln-bf":
 			logControl.classList.remove("hide");
 			chart = Chart.ln_big_float(canvas, Number(logMax.value));

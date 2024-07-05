@@ -246,12 +246,21 @@ impl<M: ManagedTypeApi> BigInt<M> {
         (self.sign(), self.magnitude())
     }
 
+    /// Converts to an unsigned `BigUint`, without performing any checks.
+    ///
+    /// # Safety
+    ///
+    /// If the number is negative, undefined behavior might occur further down the execution.
+    pub unsafe fn into_big_uint_unchecked(self) -> BigUint<M> {
+        BigUint::from_handle(self.handle)
+    }
+
     /// Converts this `BigInt` into a `BigUint`, if it's not negative.
     pub fn into_big_uint(self) -> ManagedOption<M, BigUint<M>> {
         if let Sign::Minus = self.sign() {
             ManagedOption::none()
         } else {
-            ManagedOption::some(BigUint::from_handle(self.handle))
+            ManagedOption::some(unsafe { self.into_big_uint_unchecked() })
         }
     }
 }

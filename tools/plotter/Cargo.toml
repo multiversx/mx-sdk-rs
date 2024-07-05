@@ -26,3 +26,6 @@ path = "../../framework/base"
 version = "=0.50.3"
 path = "../../framework/scenario"
 default-features = false
+
+[workspace]
+members = ["."]
