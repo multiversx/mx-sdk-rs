@@ -18,7 +18,7 @@ members = [
 
   "tools/mxpy-snippet-generator",
   "tools/payload-macro-generator",
-  "tools/plotter",
+  # "tools/plotter",
 
   "vm",
 
