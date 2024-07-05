@@ -266,6 +266,16 @@ fn managed_buffer_set_random_rs() {
 }
 
 #[test]
+fn managed_decimal_rs() {
+    world().run("scenarios/managed_decimal.scen.json");
+}
+
+#[test]
+fn managed_decimal_logarithm_rs() {
+    world().run("scenarios/managed_decimal_logarithm.scen.json");
+}
+
+#[test]
 fn managed_vec_address_push_rs() {
     world().run("scenarios/managed_vec_address_push.scen.json");
 }
