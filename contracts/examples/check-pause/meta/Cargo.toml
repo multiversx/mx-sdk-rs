@@ -9,6 +9,6 @@ authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
 path = ".."
 
 [dependencies.multiversx-sc-meta]
-version = "0.50.5"
+version = "0.50.6"
 path = "../../../../framework/meta"
 default-features = false

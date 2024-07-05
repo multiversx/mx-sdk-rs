@@ -27,6 +27,9 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
+## [sc 0.50.6] - 2024-07-05
+- Temporarily removed dependency to rustc 1.78, to ease transition from older versions. Will be re-enabled in 0.51.0.
+
 ## [sc 0.50.5] - 2024-06-21
 - `#[storage_mapper_from_address] annotation.
 - Added missing equality operator for test addresses (`TestAddress`, `TestSCAddress`).
