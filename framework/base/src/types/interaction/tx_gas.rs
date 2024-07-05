@@ -33,11 +33,6 @@ where
     }
 }
 
-#[diagnostic::on_unimplemented(
-    message = "Type `{Self}` cannot be used as gas value (does not implement `TxGasValue<{Env}>`)",
-    label = "not a valid value for gas",
-    note = "there are multiple ways to specify the gas value for a transaction, but `{Self}` is not one of them"
-)]
 pub trait TxGasValue<Env>: AnnotatedValue<Env, u64>
 where
     Env: TxEnv,
