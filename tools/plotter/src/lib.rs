@@ -8,9 +8,6 @@ pub mod plotter_ln_big_uint;
 pub mod plotter_ln_managed_decimal;
 mod plotter_log2_managed_decimal;
 
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
 /// Type alias for the result of a drawing function.
 pub type DrawResult<T> = Result<T, Box<dyn std::error::Error>>;
 
