@@ -86,7 +86,7 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.51.0"
+version = "0.51.1"
 dependencies = [
  "arrayvec",
  "getrandom",
@@ -105,7 +105,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.51.0"
+version = "0.51.1"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -136,7 +136,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.51.0"
+version = "0.51.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -147,14 +147,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.51.0"
+version = "0.51.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.51.0"
+version = "0.51.1"
 dependencies = [
  "multiversx-sc",
 ]
