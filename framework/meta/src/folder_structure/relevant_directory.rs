@@ -12,7 +12,9 @@ use super::version_req::VersionReq;
 pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
     "multiversx-sc",
     "multiversx-sc-meta",
+    "multiversx-sc-meta-lib",
     "multiversx-sc-scenario",
+    "multiversx-sc-snippets",
     "multiversx-sc-wasm-adapter",
     "multiversx-sc-modules",
     "elrond-wasm",
