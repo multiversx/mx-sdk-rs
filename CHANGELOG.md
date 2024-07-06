@@ -26,6 +26,9 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.51.1]
+- `sc-meta upgrade` bugfix.
+
 ## [sc 0.51.0, codec 0.20.0, vm 0.9.0, sdk 0.5.0, scenario-format 0.22.3] - 2024-07-06
 - Major refactoring of `multiversx-sc-meta`
 	- Crate `multiversx-sc-meta` split in 2:
