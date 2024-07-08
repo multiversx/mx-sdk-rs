@@ -251,6 +251,16 @@ fn managed_buffer_set_random_go() {
 }
 
 #[test]
+fn managed_decimal_go() {
+    world().run("scenarios/managed_decimal.scen.json");
+}
+
+#[test]
+fn managed_decimal_logarithm_go() {
+    world().run("scenarios/managed_decimal_logarithm.scen.json");
+}
+
+#[test]
 fn managed_vec_address_push_go() {
     world().run("scenarios/managed_vec_address_push.scen.json");
 }

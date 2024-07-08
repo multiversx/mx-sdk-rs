@@ -1,8 +1,11 @@
 [package]
 name = "sc-plotter-wasm"
-version = "0.1.0"
-authors = ["Hao Hou <haohou302@gmail.com>"]
-edition = "2018"
+version = "0.0.0"
+authors = ["MultiversX <contact@multiversx.com>"]
+license = "GPL-3.0-only"
+repository = "https://github.com/multiversx/mx-sdk-rs"
+description = "Web app for displaying function graphs from the framework"
+edition = "2021"
 publish = false
 
 [lib]
@@ -11,7 +14,6 @@ crate-type=["cdylib"]
 [dependencies]
 plotters = "^0.3.2"
 wasm-bindgen = "0.2.78"
-wee_alloc = "0.4.5"
 web-sys = { version = "0.3.39", features = ["HtmlCanvasElement"] }
 plotters-canvas = "^0.3.0"
 
@@ -19,11 +21,11 @@ plotters-canvas = "^0.3.0"
 lto = true
 
 [dependencies.multiversx-sc]
-version = "=0.50.6"
+version = "=0.51.1"
 path = "../../framework/base"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.50.6"
+version = "=0.51.1"
 path = "../../framework/scenario"
 default-features = false
 

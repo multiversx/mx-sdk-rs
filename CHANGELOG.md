@@ -9,10 +9,11 @@ The `mx-sdk-rs` repo contains many crates, grouped into several families. Crates
 For brevity, the changelog will only mention a short version of their name.
 
 They are:
-- `multiversx-sc`, in short `sc`, the smart contract framework, 6 crates + 3 for contracts/modules:
+- `multiversx-sc`, in short `sc`, the smart contract framework, 7 crates + 3 for contracts/modules:
 	- `multiversx-sc`
     - `multiversx-sc-derive`
     - `multiversx-sc-meta`
+    - `multiversx-sc-meta-lib`
     - `multiversx-sc-scenario`
     - `multiversx-sc-snippets`
     - `multiversx-sc-wasm-adapter`
@@ -25,6 +26,39 @@ They are:
 - `multiversx-chain-vm`, in short `vm`, a Rust VM implementation, 1 crate.
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
+
+## [sc 0.51.1]
+- `sc-meta upgrade` bugfix.
+
+## [sc 0.51.0, codec 0.20.0, vm 0.9.0, sdk 0.5.0, scenario-format 0.22.3] - 2024-07-06
+- Major refactoring of `multiversx-sc-meta`
+	- Crate `multiversx-sc-meta` split in 2:
+		1. `multiversx-sc-meta` remains the standalone tool. For backwards compatibility, it can still be used in contract meta crates, but a warning will be issued.
+		2. `multiversx-sc-meta-lib` is the contract-only library to contract meta crates.
+	- The refactoring came with few code changes, but dependencies were disentangled and cleaned up.
+	- Account retrieval tool was merged into `sc-meta` standalone. Previously little known feature, it enables downloading the full state of an account and formatting it as a mandos set state step. Very useful for generating tests and investigating state.
+	- `multiversx-sdk` was also refactored, especially the gateway proxy.
+- A new code report is available in the `.mxsc.json` build output. The report analyzes the wasm code after build and always offers the following information:
+	- `imports`: what VM hooks are used;
+	- `eiCheck`: if the used imports comply with the environment interface (EI, allowed VM hooks);
+	- `hasAllocator`: is it allocates on the heap;
+	- `hasPanic`: whether it produces Rust panics and formats error messages using the standard Rust formatter (a source of code bloat).
+- `ManagedDecimal` and `ManagedDecimalSigned`:
+	- New types that encapulate a managed `BigUint` and `BigInt` respectively, but treat them as base 10 fixed point rational numbers.
+	- Two flavors are allowed: the number of decimals is known at compile time (e.g. EGLD always has 18 decimals), or only at runtime.
+		- Type `ConstDecimals` is able to resolve conversions at compile time, reducing code size and making encoding and decoding easier, since the number of decimals does not need to be encoded.
+		- Regular `usize` number of decimals is resolved at runtime.
+	- All basic arithmetic operations are implemented for these types, just like for the big integers.
+- Implemented logarithms:
+	- Natural logarithm `ln` for `ManagedDecimal`, `BigFloat`, and `BigInt`.
+	- Base 2 logarithm `log2` for `ManagedDecimal`.
+	- Precision is about 5 decimals, largely irrespective of input.
+	- The operation is cheap, `ln` costs 44980 gas for managed decimals and 153772 for big floats, largely irrespective of input.
+- Smart contract code on the front-end:
+	- Framework and contract code, together with the Rust VM as a backend, can now be compiled to WebAssembly for front-end, using `wasm-bindgen`.
+	- A few incompatible Rust VM features needed to be made optional for this to work.
+- Reverted changes in `sc 0.50.6` (`diagnostic::on_unimplemented` & rustc 1.78 dependency).
+- Bugfix: `sync_call_readonly` can now be used with proxies.
 
 
 ## [sc 0.50.6] - 2024-07-05

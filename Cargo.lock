@@ -1883,7 +1883,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-scenario-format"
-version = "0.22.2"
+version = "0.22.3"
 dependencies = [
  "bech32",
  "hex",
@@ -1896,7 +1896,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm"
-version = "0.8.4"
+version = "0.9.0"
 dependencies = [
  "bitflags 2.6.0",
  "colored",
@@ -1921,7 +1921,7 @@ checksum = "b59072fa0624b55ae5ae3fa6bfa91515bbeb4ac440214bc4a509e2c8806d6e9f"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "arrayvec",
  "getrandom 0.2.15",
@@ -1942,7 +1942,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "bitflags 2.6.0",
  "hex-literal",
@@ -1954,7 +1954,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.19.0"
+version = "0.20.0"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
@@ -1964,7 +1964,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.19.0"
+version = "0.20.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -1974,7 +1974,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -1985,7 +1985,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "clap",
  "colored",
@@ -2008,7 +2008,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta-lib"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "clap",
  "colored",
@@ -2027,14 +2027,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "base64",
  "bech32",
@@ -2058,7 +2058,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "base64",
  "env_logger",
@@ -2074,14 +2074,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sdk"
-version = "0.4.1"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "base64",
@@ -2106,7 +2106,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.50.6"
+version = "0.51.1"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -3369,9 +3369,9 @@ dependencies = [
 
 [[package]]
 name = "tinyvec"
-version = "1.6.1"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c55115c6fbe2d2bef26eb09ad74bde02d8255476fc0c7b515ef09fbb35742d82"
+checksum = "ce6b6a2fb3a985e99cebfaefa9faa3024743da73304ca1c683a36429613d3d22"
 dependencies = [
  "tinyvec_macros",
 ]
