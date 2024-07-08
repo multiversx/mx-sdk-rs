@@ -9,10 +9,11 @@ The `mx-sdk-rs` repo contains many crates, grouped into several families. Crates
 For brevity, the changelog will only mention a short version of their name.
 
 They are:
-- `multiversx-sc`, in short `sc`, the smart contract framework, 6 crates + 3 for contracts/modules:
+- `multiversx-sc`, in short `sc`, the smart contract framework, 7 crates + 3 for contracts/modules:
 	- `multiversx-sc`
     - `multiversx-sc-derive`
     - `multiversx-sc-meta`
+    - `multiversx-sc-meta-lib`
     - `multiversx-sc-scenario`
     - `multiversx-sc-snippets`
     - `multiversx-sc-wasm-adapter`
