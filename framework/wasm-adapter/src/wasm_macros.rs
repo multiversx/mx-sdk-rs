@@ -46,14 +46,14 @@ macro_rules! endpoints_old {
     ($mod_name:ident ( $($endpoint_name:ident)* ) ) => {
         #[no_mangle]
         fn init() {
-            $mod_name::endpoints::init::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
+            $mod_name::__wasm__endpoints__::init::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
         }
 
         $(
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$endpoint_name::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
+                $mod_name::__wasm__endpoints__::$endpoint_name::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
             }
         )*
     };
@@ -66,7 +66,7 @@ macro_rules! endpoints {
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$method_name::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
+                $mod_name::__wasm__endpoints__::$method_name::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
             }
         )*
     };
@@ -79,7 +79,7 @@ macro_rules! external_view_endpoints {
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$method_name::<multiversx_sc_wasm_adapter::multiversx_sc::api::ExternalViewApi<multiversx_sc_wasm_adapter::api::VmApiImpl>>();
+                $mod_name::__wasm__endpoints__::$method_name::<multiversx_sc_wasm_adapter::multiversx_sc::api::ExternalViewApi<multiversx_sc_wasm_adapter::api::VmApiImpl>>();
             }
         )*
     };
@@ -97,7 +97,7 @@ macro_rules! external_view_endpoints_old {
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$endpoint_name::<multiversx_sc_wasm_adapter::multiversx_sc::api::ExternalViewApi<multiversx_sc_wasm_adapter::api::VmApiImpl>>();
+                $mod_name::__wasm__endpoints__::$endpoint_name::<multiversx_sc_wasm_adapter::multiversx_sc::api::ExternalViewApi<multiversx_sc_wasm_adapter::api::VmApiImpl>>();
             }
         )*
     };
@@ -119,7 +119,8 @@ macro_rules! async_callback {
         #[allow(non_snake_case)]
         #[no_mangle]
         fn callBack() {
-            $mod_name::endpoints::callBack::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
+            $mod_name::__wasm__endpoints__::callBack::<multiversx_sc_wasm_adapter::api::VmApiImpl>(
+            );
         }
     };
 }
