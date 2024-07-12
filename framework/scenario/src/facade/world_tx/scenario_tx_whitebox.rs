@@ -1,10 +1,7 @@
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::ScenarioEnvQuery;
 use crate::{
-    imports::StaticApi,
-    scenario::{run_vm::ScenarioVMRunner, tx_to_step::TxToStep},
-    scenario_model::TxResponse,
-    ScenarioEnvExec,
+    imports::StaticApi, scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec,
 };
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
@@ -21,13 +18,6 @@ pub trait ScenarioTxWhitebox {
         contract_obj: ContractObj,
         f: F,
     ) -> Self::Returns;
-}
-
-pub struct ContractObj<A>
-where
-    A: multiversx_sc::api::VMApi,
-{
-    _phantom: core::marker::PhantomData<A>,
 }
 
 impl<'w, From, Payment, CodeValue, RH> ScenarioTxWhitebox
@@ -55,10 +45,12 @@ where
         f: F,
     ) -> Self::Returns {
         let step_wrapper = self.tx_to_step();
-
-        let mut scenario_vm_runner = ScenarioVMRunner::new();
-        let (_new_addr, _tx_result) =
-            scenario_vm_runner.perform_sc_deploy_lambda(&step_wrapper.step, || f(contract_obj));
+        let (_new_addr, _tx_result) = step_wrapper
+            .env
+            .world
+            .get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_deploy_lambda(&step_wrapper.step, || f(contract_obj));
 
         step_wrapper.process_result()
     }
@@ -81,7 +73,7 @@ where
         f: F,
     ) -> Self::Returns {
         let step_wrapper = self.tx_to_step();
-        let _tx_result = self
+        let _tx_result = step_wrapper
             .env
             .world
             .get_mut_debugger_backend()
@@ -109,9 +101,13 @@ where
     ) -> Self::Returns {
         let step_wrapper = self.tx_to_query_step();
 
-        let mut scenario_vm_runner = ScenarioVMRunner::new();
-        let _tx_result =
-            scenario_vm_runner.perform_sc_query_lambda(&step_wrapper.step, || f(contract_obj));
+        let _tx_result = step_wrapper
+            .env
+            .world
+            .get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_query_lambda(&step_wrapper.step, || f(contract_obj));
+
         step_wrapper.process_result()
     }
 }

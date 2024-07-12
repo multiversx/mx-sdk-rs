@@ -69,6 +69,8 @@ fn adder_whitebox_unified() {
             sc.init(5u32.into());
         });
 
+    assert_eq!(_new_address, ADDER_ADDRESS.to_address().into());
+
     world
         .tx()
         .from(OWNER)
@@ -88,6 +90,4 @@ fn adder_whitebox_unified() {
             let sum = sc.sum().get();
             assert_eq!(sum, BigUint::from(10u64));
         });
-
-    assert_eq!(new_address, ADDER_ADDRESS);
 }
