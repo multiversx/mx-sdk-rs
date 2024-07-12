@@ -457,7 +457,7 @@ mod sample_adder {
     }
 
     #[allow(non_snake_case)]
-    pub mod endpoints {
+    pub mod __wasm__endpoints__ {
         use super::EndpointWrappers;
         pub fn sum<A>()
         where
