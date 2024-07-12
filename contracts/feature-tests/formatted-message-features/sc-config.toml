@@ -1,0 +1,5 @@
+[settings]
+main = "formatted-message-features"
+
+[contracts.formatted-message-features]
+allocator = "static64k"
