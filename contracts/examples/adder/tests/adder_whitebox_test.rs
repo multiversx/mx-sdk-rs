@@ -2,11 +2,14 @@ use adder::*;
 use multiversx_sc_scenario::imports::*;
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
+const OWNER: TestAddress = TestAddress::new("owner");
+const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
+const CODE_PATH: MxscPath = MxscPath::new("mxsc:output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
-    blockchain.register_contract("mxsc:output/adder.mxsc.json", adder::ContractBuilder);
+    blockchain.register_contract(CODE_PATH, adder::ContractBuilder);
     blockchain
 }
 
@@ -46,4 +49,45 @@ fn adder_whitebox() {
                     CheckAccount::new().check_storage("str:sum", "8"),
                 ),
         );
+}
+
+#[test]
+fn adder_whitebox_unified() {
+    let mut world = world();
+
+    world.account(OWNER).nonce(1);
+
+    let _new_address = world
+        .tx()
+        .from(OWNER)
+        .raw_deploy()
+        .code(CODE_PATH)
+        .new_address(ADDER_ADDRESS)
+        .with_result(ExpectError(0, "ok"))
+        .returns(ReturnsNewBech32Address)
+        .whitebox(adder::contract_obj::<StaticApi>(), |sc| {
+            sc.init(5u32.into());
+        });
+
+    world
+        .tx()
+        .from(OWNER)
+        .to(ADDER_ADDRESS)
+        .raw_call("")
+        .returns(ExpectError(0u64, "ok"))
+        .whitebox(adder::contract_obj::<StaticApi>(), |sc| {
+            sc.add(5u32.into());
+        });
+
+    let _raw_response = world
+        .query()
+        .to(ADDER_ADDRESS)
+        .raw_call("")
+        .returns(ReturnsRawResult)
+        .whitebox(adder::contract_obj::<StaticApi>(), |sc| {
+            let sum = sc.sum().get();
+            assert_eq!(sum, BigUint::from(10u64));
+        });
+
+    assert_eq!(new_address, ADDER_ADDRESS);
 }
