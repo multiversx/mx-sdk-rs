@@ -11,6 +11,7 @@ path = "src/formatted_message_features.rs"
 [dependencies.multiversx-sc]
 version = "0.51.1"
 path = "../../../framework/base"
+features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.51.1"
