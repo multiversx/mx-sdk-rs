@@ -1,4 +1,8 @@
-use std::{fs::File, path::PathBuf, process::Command};
+use std::{
+    fs::{read_dir, File},
+    path::PathBuf,
+    process::Command,
+};
 
 use crate::folder_structure::RelevantDirectories;
 
@@ -29,10 +33,7 @@ fn build_contract(path: &PathBuf) {
         .arg("--path")
         .arg(path)
         .output()
-        .expect(&format!(
-            "Failed to build the contract for path: {}",
-            path.display()
-        ));
+        .unwrap_or_else(|_| panic!("Failed to build the contract for path: {}", path.display()));
 }
 
 fn clean_contract(path: &PathBuf) {
@@ -42,10 +43,7 @@ fn clean_contract(path: &PathBuf) {
         .arg("--path")
         .arg(path)
         .output()
-        .expect(&format!(
-            "Failed to clean the contract for path: {}",
-            path.display()
-        ));
+        .unwrap_or_else(|_| panic!("Failed to clean the contract for path: {}", path.display()));
 }
 
 fn extract_report(directors: RelevantDirectories) -> Vec<CodeReportJson> {
@@ -54,28 +52,37 @@ fn extract_report(directors: RelevantDirectories) -> Vec<CodeReportJson> {
     for director in directors.iter() {
         build_contract(&director.path);
 
-        // find only one wasm file
+        let output_path: PathBuf = director.path.join("output");
 
-        let contract_name = director.path.to_str().unwrap().split("/").last().unwrap();
-        println!(">> {contract_name}");
+        extract_reports(&output_path, &mut reports);
 
-        let mxsc_path = format!(
-            "{}/output/{contract_name}.mxsc.json",
-            director.path.display()
-        );
-        let mxsc_file = File::open(mxsc_path);
-
-        match mxsc_file {
-            Ok(f) => {
-                let data: MxscFileJson = serde_json::from_reader(f).unwrap();
-
-                reports.push(data.report.code_report);
-
-                clean_contract(&director.path);
-            },
-            Err(_) => continue,
-        }
+        clean_contract(&director.path);
     }
 
     reports
+}
+
+fn find_mxsc_files(path: &PathBuf) -> Vec<PathBuf> {
+    if !path.is_dir() {
+        return vec![];
+    }
+
+    let mut mxsc_files = Vec::new();
+    for entry in read_dir(path).unwrap() {
+        let file_path = entry.unwrap().path();
+        if file_path.to_str().unwrap().ends_with(".mxsc.json") {
+            mxsc_files.push(file_path);
+        }
+    }
+
+    mxsc_files
+}
+
+fn extract_reports(path: &PathBuf, reports: &mut Vec<CodeReportJson>) {
+    for mxsc_path in find_mxsc_files(path) {
+        let mxsc_file =
+            File::open(mxsc_path).unwrap_or_else(|_| panic!("Failed to open mxsc file"));
+        let data: MxscFileJson = serde_json::from_reader(mxsc_file).unwrap();
+        reports.push(data.report.code_report);
+    }
 }

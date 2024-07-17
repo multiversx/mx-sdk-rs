@@ -21,8 +21,8 @@ fn render_reports(output: &mut String, reports: &Vec<CodeReportJson>) {
         writeln_output_str(
             output,
             format!(
-                "|  - {} | {} | {} | {} |",
-                report.path.split("/").last().expect("no output path"),
+                "| {} | {} | {} | {} |",
+                report.path.split('/').last().expect("no output path"),
                 report.size,
                 report.has_allocator,
                 report.has_panic
