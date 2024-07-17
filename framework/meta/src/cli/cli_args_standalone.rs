@@ -144,9 +144,14 @@ pub struct TestCoverageArgs {
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct CodeReportArgs {
-    /// Output file path
+    /// Target directory where to generate code report.
+    /// Will be current directory if not specified.
     #[arg(short, long, verbatim_doc_comment)]
     pub path: Option<String>,
+
+    /// Output file path
+    #[arg(short, long, verbatim_doc_comment)]
+    pub output: String,
 
     /// Output format
     #[arg(short, long, verbatim_doc_comment)]
