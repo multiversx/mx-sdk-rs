@@ -65,6 +65,9 @@ pub enum StandaloneCliAction {
     #[command(name = "test-coverage", about = "Run test coverage and output report")]
     TestCoverage(TestCoverageArgs),
 
+    #[command(name = "code-report", about = "Generate code report")]
+    CodeReportGen(CodeReportArgs),
+
     #[command(
         about = "Generates a scenario test initialized with real data fetched from the blockchain."
     )]
@@ -115,7 +118,7 @@ pub struct TestArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, ValueEnum)]
-pub enum TestCoverageOutputFormat {
+pub enum OutputFormat {
     /// Markdown pretty-print summary
     #[default]
     Markdown,
@@ -132,11 +135,22 @@ pub struct TestCoverageArgs {
 
     /// Output format
     #[arg(short, long, verbatim_doc_comment)]
-    pub format: Option<TestCoverageOutputFormat>,
+    pub format: Option<OutputFormat>,
 
     /// Ignore files by path patterns
     #[arg(short = 'i', long = "ignore-filename-regex", verbatim_doc_comment)]
     pub ignore_filename_regex: Vec<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct CodeReportArgs {
+    /// Output file path
+    #[arg(short, long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Output format
+    #[arg(short, long, verbatim_doc_comment)]
+    pub format: Option<OutputFormat>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

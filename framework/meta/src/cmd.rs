@@ -1,4 +1,5 @@
 pub mod all;
+pub mod code_report;
 pub mod info;
 pub mod install;
 pub mod local_deps;
