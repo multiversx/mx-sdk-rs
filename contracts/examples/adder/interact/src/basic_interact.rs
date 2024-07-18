@@ -22,7 +22,11 @@ async fn main() {
     let cli = basic_interact_cli::InteractCli::parse();
     match &cli.command {
         Some(basic_interact_cli::InteractCliCommand::Add(args)) => {
-            basic_interact.add(args.value).await;
+            if args.count == 1 {
+                basic_interact.add(args.value).await;
+            } else {
+                basic_interact.multi_add(args.value, args.count).await;
+            }
         },
         Some(basic_interact_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
@@ -31,7 +35,7 @@ async fn main() {
             basic_interact.feed_contract_egld().await;
         },
         Some(basic_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
-            basic_interact.multi_deploy(&args.count).await;
+            basic_interact.multi_deploy(args.count).await;
         },
         Some(basic_interact_cli::InteractCliCommand::Sum) => {
             basic_interact.print_sum().await;
@@ -103,8 +107,8 @@ impl AdderInteract {
         self.state.set_adder_address(new_address);
     }
 
-    async fn multi_deploy(&mut self, count: &u8) {
-        if *count == 0 {
+    async fn multi_deploy(&mut self, count: usize) {
+        if count == 0 {
             println!("count must be greater than 0");
             return;
         }
@@ -113,13 +117,13 @@ impl AdderInteract {
         println!("deploying {count} contracts...");
 
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for _ in 0..*count {
+        for _ in 0..count {
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
                     .typed(adder_proxy::AdderProxy)
                     .init(0u32)
                     .code(ADDER_CODE_PATH)
-                    .gas(NumExpr("70,000,000"))
+                    .gas(3_000_000)
                     .returns(ReturnsNewBech32Address)
             });
         }
@@ -134,6 +138,26 @@ impl AdderInteract {
 
             self.state.set_adder_address(new_address);
         }
+    }
+
+    async fn multi_add(&mut self, value: u32, count: usize) {
+        self.set_state().await;
+        println!("calling contract {count} times...");
+
+        let mut buffer = self.interactor.homogenous_call_buffer();
+        for _ in 0..count {
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .to(self.state.current_adder_address())
+                    .typed(adder_proxy::AdderProxy)
+                    .add(value)
+                    .gas(3_000_000)
+            });
+        }
+
+        let _ = buffer.run().await;
+
+        println!("successfully performed add {count} times");
     }
 
     async fn feed_contract_egld(&mut self) {
