@@ -5,7 +5,7 @@ const INNER_TYPE_END: char = '>';
 pub static STATIC_API_SUFFIX: &str = "<StaticApi>";
 pub static PLACEHOLDER_INPUT_TYPE_NAME: &str = "PlaceholderInput";
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct RustTypeString {
     type_name: String,          // used for return types
     default_value_expr: String, // used for arguments
@@ -14,11 +14,7 @@ pub struct RustTypeString {
 
 impl RustTypeString {
     pub fn get_default_value_expr(&self) -> &str {
-        if !self.contains_custom_types {
-            &self.default_value_expr
-        } else {
-            PLACEHOLDER_INPUT_TYPE_NAME
-        }
+        &self.default_value_expr
     }
 }
 
@@ -184,7 +180,9 @@ pub fn handle_abi_type(type_string: &mut RustTypeString, abi_type_str: String) {
     match abi_type {
         AbiType::UserDefined(user_type) => {
             // most user-defined types contain managed types
-            type_string.type_name += &(user_type + STATIC_API_SUFFIX);
+            type_string.type_name += &format!("{}{}", user_type, STATIC_API_SUFFIX);
+            type_string.default_value_expr +=
+                &format!("{}::{}::default()", user_type, STATIC_API_SUFFIX);
             type_string.contains_custom_types = true;
         },
         AbiType::Basic(basic_type) => {
@@ -204,12 +202,24 @@ pub fn handle_abi_type(type_string: &mut RustTypeString, abi_type_str: String) {
 
 fn handle_variadic_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.type_name += "MultiValueVec<";
-    type_string.default_value_expr += "MultiValueVec::from(vec![";
+    let mut inner_type_string = RustTypeString::default();
 
-    handle_abi_type(type_string, inner_types);
+    handle_abi_type(&mut inner_type_string, inner_types);
 
+    type_string.type_name += &inner_type_string.type_name;
     type_string.type_name += ">";
-    type_string.default_value_expr += "])";
+
+    if inner_type_string.contains_custom_types {
+        type_string.default_value_expr += "MultiValueVec::<";
+        type_string.default_value_expr += &inner_type_string.type_name;
+        type_string.default_value_expr += ">::new()";
+    } else {
+        type_string.default_value_expr += "MultiValueVec::from(vec![";
+        type_string.default_value_expr += &inner_type_string.default_value_expr;
+        type_string.default_value_expr += "])";
+    }
+
+    type_string.contains_custom_types |= inner_type_string.contains_custom_types;
 }
 
 fn handle_optional_type(type_string: &mut RustTypeString, inner_types: String) {
@@ -224,40 +234,71 @@ fn handle_optional_type(type_string: &mut RustTypeString, inner_types: String) {
 
 fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String) {
     let multi_type_end_index = inner_types.find(INNER_TYPE_END).unwrap();
-    let mut inner_multi_types: Vec<&str> = inner_types[..multi_type_end_index].split(',').collect();
+    let inner_multi_types: Vec<&str> = inner_types[..multi_type_end_index].split(',').collect();
     let inner_multi_types_len = inner_multi_types.len();
 
-    type_string.type_name += "MultiValue";
-    type_string.type_name += &inner_multi_types_len.to_string();
-    type_string.type_name += "<";
+    // "MultiValueN::<types>::from((x, y, z))"
+    let mut type_name_parts = Vec::new();
+    let mut default_value_expr_parts = Vec::new();
+    let mut contains_custom_types = false;
 
-    // "MultiValueN::from((x, y, z))"
-    type_string.default_value_expr += "MultiValue";
-    type_string.default_value_expr += &inner_multi_types_len.to_string();
-    type_string.default_value_expr += "::from((";
-
-    for (i, multi_type) in inner_multi_types.iter_mut().enumerate() {
+    for (i, multi_type) in inner_multi_types.iter().enumerate() {
         let trimmed = multi_type.trim();
-        handle_abi_type(type_string, trimmed.to_string());
+        let mut inner_type_string = RustTypeString::default();
+
+        handle_abi_type(&mut inner_type_string, trimmed.to_string());
+
+        type_name_parts.push(inner_type_string.type_name.clone());
+
+        if inner_type_string.contains_custom_types {
+            contains_custom_types = true
+        }
+        default_value_expr_parts.push(inner_type_string.default_value_expr);
 
         if i < inner_multi_types_len - 1 {
-            type_string.type_name += ", ";
-            type_string.default_value_expr += ", ";
+            default_value_expr_parts.push(", ".to_string());
         }
     }
 
-    type_string.type_name += ">";
-    type_string.default_value_expr += "))";
+    // construct the type name
+    let type_name = format!(
+        "MultiValue{}::<{}>",
+        inner_multi_types_len,
+        type_name_parts.join(", ")
+    );
+
+    // construct the default value expression
+    let default_value_expr = format!(
+        "{}::from(({}))",
+        type_name,
+        default_value_expr_parts.join("")
+    );
+
+    type_string.type_name = type_name;
+    type_string.default_value_expr = default_value_expr;
+    type_string.contains_custom_types |= contains_custom_types;
 }
 
 fn handle_list_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.type_name += "ManagedVec<StaticApi, ";
-    type_string.default_value_expr += "ManagedVec::from_single_item(";
+    let mut inner_type_string = RustTypeString::default();
 
-    handle_abi_type(type_string, inner_types);
+    handle_abi_type(&mut inner_type_string, inner_types);
 
+    type_string.type_name += &inner_type_string.type_name;
     type_string.type_name += ">";
-    type_string.default_value_expr += ")";
+
+    if inner_type_string.contains_custom_types {
+        type_string.default_value_expr += "ManagedVec::<StaticApi, ";
+        type_string.default_value_expr += &inner_type_string.type_name;
+        type_string.default_value_expr += ">::new()";
+    } else {
+        type_string.default_value_expr += "ManagedVec::from_single_item(";
+        type_string.default_value_expr += &inner_type_string.default_value_expr;
+        type_string.default_value_expr += ")";
+    }
+
+    type_string.contains_custom_types |= inner_type_string.contains_custom_types;
 }
 
 fn handle_array_type(type_string: &mut RustTypeString, array_size: String, inner_types: String) {
