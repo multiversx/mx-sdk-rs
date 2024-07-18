@@ -35,4 +35,6 @@ rand_seeder = { version= "0.2.2", optional = true }
 ed25519-dalek = { version = "1.0.1" , optional = true }
 
 [dependencies.multiversx-chain-vm-executor]
-version = "0.2.0"
+# version = "0.2.0"
+git = "https://github.com/multiversx/mx-vm-executor-rs"
+branch = "rc/v1.7.next1"
