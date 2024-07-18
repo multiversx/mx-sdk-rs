@@ -46,6 +46,7 @@ async fn main() {
 #[allow(unused)]
 struct AdderInteract {
     interactor: Interactor,
+    adder_owner_address: Bech32Address,
     wallet_address: Bech32Address,
     state: State,
 }
@@ -57,10 +58,14 @@ impl AdderInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
+
+        let adder_owner_address =
+            interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
         let wallet_address = interactor.register_wallet(test_wallets::mike());
 
         Self {
             interactor,
+            adder_owner_address: adder_owner_address.into(),
             wallet_address: wallet_address.into(),
             state: State::load_state(),
         }
@@ -68,6 +73,9 @@ impl AdderInteract {
 
     async fn set_state(&mut self) {
         println!("wallet address: {}", self.wallet_address);
+        self.interactor
+            .retrieve_account(&self.adder_owner_address)
+            .await;
         self.interactor.retrieve_account(&self.wallet_address).await;
     }
 
@@ -80,8 +88,8 @@ impl AdderInteract {
         let new_address = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
-            .gas(NumExpr("30,000,000"))
+            .from(&self.adder_owner_address)
+            .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(ADDER_CODE_PATH)
@@ -144,7 +152,7 @@ impl AdderInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
-            .gas(NumExpr("30,000,000"))
+            .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)
             .add(value)
             .prepare_async()
@@ -175,7 +183,7 @@ impl AdderInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
-            .gas(NumExpr("30,000,000"))
+            .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)
             .upgrade(BigUint::from(new_value))
             .code_metadata(CodeMetadata::UPGRADEABLE)
