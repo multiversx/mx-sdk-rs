@@ -131,6 +131,16 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         call_value_handle: RawHandle,
     );
 
+    fn managed_multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        user_handle: RawHandle,
+        dst_handle: RawHandle,
+        token_transfer_handle: RawHandle,
+        gas_limit: i64,
+        function_name_handle: Self::ManagedBufferHandle,
+        arguments_handle: RawHandle,
+    ) -> RawHandle;
+
     fn check_esdt_frozen(
         &self,
         address_handle: Self::ManagedBufferHandle,

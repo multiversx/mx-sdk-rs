@@ -134,6 +134,18 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn managed_multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        _user_handle: RawHandle,
+        _dst_handle: RawHandle,
+        _token_transfer_handle: RawHandle,
+        _gas_limit: i64,
+        _function_name_handle: Self::ManagedBufferHandle,
+        _arguments_handle: RawHandle,
+    ) -> RawHandle {
+        unreachable!()
+    }
+
     fn check_esdt_frozen(
         &self,
         _address_handle: Self::ManagedBufferHandle,

@@ -78,6 +78,15 @@ extern "C" {
 
     fn managedGetBackTransfers(esdtTransfersValueHandle: i32, callValueHandle: i32);
 
+    fn managedMultiTransferESDTNFTExecuteByUser(
+        userHandle: i32,
+        dstHandle: i32,
+        tokenTransfersHandle: i32,
+        gasLimit: i64,
+        functionHandle: i32,
+        argumentsHandle: i32,
+    ) -> i32;
+
     fn managedIsESDTFrozen(addressHandle: i32, tokenIDHandle: i32, nonce: i64) -> i32;
     fn managedIsESDTPaused(tokenIDHandle: i32) -> i32;
     fn managedIsESDTLimitedTransfer(tokenIDHandle: i32) -> i32;
@@ -336,6 +345,27 @@ impl BlockchainApiImpl for VmApiImpl {
     ) {
         unsafe {
             managedGetBackTransfers(esdt_transfer_value_handle, call_value_handle);
+        }
+    }
+
+    fn managed_multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        user_handle: RawHandle,
+        dst_handle: RawHandle,
+        token_transfer_handle: RawHandle,
+        gas_limit: i64,
+        function_name_handle: Self::ManagedBufferHandle,
+        arguments_handle: RawHandle,
+    ) -> RawHandle {
+        unsafe {
+            managedMultiTransferESDTNFTExecuteByUser(
+                user_handle,
+                dst_handle,
+                token_transfer_handle,
+                gas_limit,
+                function_name_handle,
+                arguments_handle,
+            )
         }
     }
 

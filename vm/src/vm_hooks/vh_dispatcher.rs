@@ -702,6 +702,26 @@ impl VMHooks for VMHooksDispatcher {
             .managed_get_back_transfers(esdt_transfer_value_handle, call_value_handle);
     }
 
+    fn managed_multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        user_handle: i32,
+        dst_handle: i32,
+        token_transfer_handle: i32,
+        gas_limit: i64,
+        function_name_handle: i32,
+        arguments_handle: i32,
+    ) -> i32 {
+        self.handler
+            .managed_multi_transfer_esdt_nft_execute_by_user(
+                user_handle,
+                dst_handle,
+                token_transfer_handle,
+                gas_limit,
+                function_name_handle,
+                arguments_handle,
+            )
+    }
+
     fn managed_async_call(
         &self,
         dest_handle: i32,

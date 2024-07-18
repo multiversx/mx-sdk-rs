@@ -244,6 +244,18 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         );
     }
 
+    fn managed_multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        _user_handle: RawHandle,
+        _dst_handle: RawHandle,
+        _token_transfer_handle: RawHandle,
+        _gas_limit: i64,
+        _function_name_handle: RawHandle,
+        _arguments_handle: RawHandle,
+    ) -> RawHandle {
+        panic!("managed_multi_transfer_esdt_nft_execute_by_user not yet implemented in RustVM")
+    }
+
     fn check_esdt_frozen(
         &self,
         address_handle: RawHandle,

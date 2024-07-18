@@ -222,6 +222,27 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         });
     }
 
+    fn managed_multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        user_handle: RawHandle,
+        dst_handle: RawHandle,
+        token_transfer_handle: RawHandle,
+        gas_limit: i64,
+        function_name_handle: Self::ManagedBufferHandle,
+        arguments_handle: RawHandle,
+    ) -> RawHandle {
+        self.with_vm_hooks(|vh| {
+            vh.managed_multi_transfer_esdt_nft_execute_by_user(
+                user_handle,
+                dst_handle,
+                token_transfer_handle,
+                gas_limit,
+                function_name_handle,
+                arguments_handle,
+            )
+        })
+    }
+
     fn check_esdt_frozen(
         &self,
         address_handle: Self::ManagedBufferHandle,
