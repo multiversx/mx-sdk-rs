@@ -12,7 +12,7 @@ use multiversx_sc_meta_lib::{
 
 use super::render_code_report::render_report;
 
-pub fn run_code_report(path: &str, output_path: &str, output_format: &OutputFormat) {
+pub fn run_code_report(path: &str, output_path: &str, output_format: &OutputFormat, compare: &str) {
     let directors = RelevantDirectories::find_all(path, &["".to_owned()]);
 
     let reports = extract_report(directors);
@@ -20,15 +20,10 @@ pub fn run_code_report(path: &str, output_path: &str, output_format: &OutputForm
 
     match output_format {
         OutputFormat::Markdown => {
-            render_report(&mut output, &reports);
+            render_report(&mut output, &reports, compare);
         },
         OutputFormat::Json => {
-            for report in reports {
-                output.insert_str(
-                    output.len(),
-                    &serde_json::to_string_pretty(&report).unwrap(),
-                );
-            }
+            output = serde_json::to_string(&reports).unwrap();
         },
     };
 

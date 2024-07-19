@@ -151,11 +151,15 @@ pub struct CodeReportArgs {
 
     /// Output file path
     #[arg(short, long, verbatim_doc_comment)]
-    pub output: String,
+    pub output: Option<String>,
 
     /// Output format
     #[arg(short, long, verbatim_doc_comment)]
     pub format: Option<OutputFormat>,
+
+    /// Compare
+    #[arg(short, long, verbatim_doc_comment)]
+    pub compare: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

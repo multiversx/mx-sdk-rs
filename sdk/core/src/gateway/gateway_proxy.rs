@@ -18,4 +18,4 @@ impl GatewayProxy {
     pub(crate) fn get_endpoint(&self, endpoint: &str) -> String {
         format!("{}/{}", self.proxy_url, endpoint)
     }
-}
+} //http://api-multiversx.com/
