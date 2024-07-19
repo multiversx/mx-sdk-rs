@@ -40,11 +40,7 @@ fn render_reports(output: &mut String, reports: &Vec<CodeReportJson>) {
     }
 }
 
-fn render_and_compare(
-    output: &mut String,
-    reports: &Vec<CodeReportJson>,
-    compared_path_file: &str,
-) {
+fn render_and_compare(output: &mut String, reports: &[CodeReportJson], compared_path_file: &str) {
     let compared_file = File::open(compared_path_file).unwrap_or_else(|_| {
         panic!(
             "Failed to open compared file at path: {}",
@@ -85,11 +81,11 @@ fn render_and_compare(
 fn parse_into_code_report_json(compared_file: File) -> Vec<CodeReportJson> {
     let reader = BufReader::new(compared_file);
 
-    let mut lines = reader.lines().skip(2);
+    let lines = reader.lines().skip(2);
 
     let mut compared_reports: Vec<CodeReportJson> = Vec::new();
 
-    while let Some(line) = lines.next() {
+    for line in lines {
         match line {
             Ok(l) => {
                 let columns: Vec<String> = l
@@ -115,16 +111,10 @@ fn parse_into_code_report_json(compared_file: File) -> Vec<CodeReportJson> {
 }
 
 fn find_report_by_path<'a>(
-    reports: &'a Vec<CodeReportJson>,
+    reports: &'a [CodeReportJson],
     contract_path: &'a String,
 ) -> Option<&'a CodeReportJson> {
-    for report in reports {
-        if report.path == *contract_path {
-            return Some(report);
-        }
-    }
-
-    None
+    reports.iter().find(|&report| report.path == *contract_path)
 }
 
 fn print_compared_output(
@@ -132,17 +122,23 @@ fn print_compared_output(
     report: &CodeReportJson,
     compared_report: &CodeReportJson,
 ) {
-    let mut size_report;
-    if report.size == compared_report.size {
-        size_report = format!("{}", report.size);
-    } else {
-        size_report = format!("{} :arrow-right: {}", compared_report.size, report.size);
-        if report.size > compared_report.size {
-            size_report = format!("{size_report} :red-circle:");
-        } else if report.size < compared_report.size {
-            size_report = format!("{size_report} :green-circle:");
-        }
-    }
+    let size_report = match report.size.cmp(&compared_report.size) {
+        std::cmp::Ordering::Greater => {
+            format!(
+                "{} :arrow-right: {} :red-circle:",
+                compared_report.size, report.size
+            )
+        },
+        std::cmp::Ordering::Less => {
+            format!(
+                "{} :arrow-right: {} :green-circle:",
+                compared_report.size, report.size
+            )
+        },
+        std::cmp::Ordering::Equal => {
+            format!("{}", report.size)
+        },
+    };
 
     let mut has_allocator_report;
     if report.has_allocator == compared_report.has_allocator {

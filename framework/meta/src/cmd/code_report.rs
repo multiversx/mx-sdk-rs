@@ -1,7 +1,7 @@
-pub mod code_report;
+pub mod generate_report;
 pub mod render_code_report;
 
-use code_report::run_code_report;
+use generate_report::run_code_report;
 
 use crate::cli::{CodeReportArgs, OutputFormat};
 
@@ -16,6 +16,6 @@ pub fn code_report(args: &CodeReportArgs) {
         path,
         args.output.as_ref().unwrap_or(&"./report.md".to_string()),
         args.format.as_ref().unwrap_or(&OutputFormat::default()),
-        &args.compare.clone().unwrap_or(String::new()),
+        &args.compare.clone().unwrap_or_default(),
     );
 }
