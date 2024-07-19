@@ -10,7 +10,11 @@ pub use vh_managed_map::VMHooksManagedMap;
 
 use std::fmt::Debug;
 
-use crate::types::RawHandle;
+use crate::{
+    tx_mock::{big_int_signed_bytes, big_int_to_i64, big_uint_to_u64, big_uint_unsigned_bytes},
+    types::RawHandle,
+    vm_err_msg,
+};
 
 use super::VMHooksError;
 
@@ -40,6 +44,30 @@ pub trait VMHooksManagedTypes:
     fn mb_from_big_int_signed(&self, buffer_handle: RawHandle, bi_handle: RawHandle) {
         let bi_bytes = self.m_types_lock().bi_get_signed_bytes(bi_handle);
         self.m_types_lock().mb_set(buffer_handle, bi_bytes);
+    }
+
+    fn mb_to_small_int_unsigned(&self, buffer_handle: RawHandle) -> u64 {
+        let bytes = self.m_types_lock().mb_to_bytes(buffer_handle);
+        let bu = num_bigint::BigUint::from_bytes_be(&bytes);
+        big_uint_to_u64(&bu).unwrap_or_else(|| self.vm_error(vm_err_msg::ERROR_BYTES_EXCEED_UINT64))
+    }
+
+    fn mb_to_small_int_signed(&self, buffer_handle: RawHandle) -> i64 {
+        let bytes = self.m_types_lock().mb_to_bytes(buffer_handle);
+        let bi = num_bigint::BigInt::from_bytes_be(num_bigint::Sign::Plus, &bytes);
+        big_int_to_i64(&bi).unwrap_or_else(|| self.vm_error(vm_err_msg::ERROR_BYTES_EXCEED_INT64))
+    }
+
+    fn mb_from_small_int_unsigned(&self, buffer_handle: RawHandle, value: u64) {
+        let bu = num_bigint::BigUint::from(value);
+        let bytes = big_uint_unsigned_bytes(&bu);
+        self.m_types_lock().mb_set(buffer_handle, bytes);
+    }
+
+    fn mb_from_small_int_signed(&self, buffer_handle: RawHandle, value: i64) {
+        let bi = num_bigint::BigInt::from(value);
+        let bytes = big_int_signed_bytes(&bi);
+        self.m_types_lock().mb_set(buffer_handle, bytes);
     }
 
     fn bi_to_string(&self, bi_handle: RawHandle, str_handle: RawHandle) {
