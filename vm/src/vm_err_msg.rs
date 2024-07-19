@@ -14,3 +14,6 @@ pub const ERROR_SIGNALLED_BY_SMARTCONTRACT: &str = "error signalled by smartcont
 
 pub const ERROR_NO_CALLBACK_CLOSURE: &str =
     "no callback for closure, cannot call callback directly";
+
+pub const ERROR_BYTES_EXCEED_INT64: &str = "bytes cannot be parsed as int64";
+pub const ERROR_BYTES_EXCEED_UINT64: &str = "bytes cannot be parsed as uint64";
