@@ -1,3 +1,4 @@
+pub mod compare;
 pub mod generate_report;
 pub mod render_code_report;
 
@@ -14,8 +15,8 @@ pub fn code_report(args: &CodeReportArgs) {
 
     run_code_report(
         path,
-        args.output.as_ref().unwrap_or(&"./report.md".to_string()),
+        args.output.to_str().unwrap(),
         args.format.as_ref().unwrap_or(&OutputFormat::default()),
-        &args.compare.clone().unwrap_or_default(),
+        args.compare.clone().unwrap_or_default().to_str().unwrap(),
     );
 }

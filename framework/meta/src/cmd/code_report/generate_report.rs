@@ -1,5 +1,6 @@
 use std::{
-    fs::{self, read_dir, File},
+    fs::{read_dir, File},
+    io::Write,
     path::PathBuf,
     process::Command,
 };
@@ -10,25 +11,24 @@ use multiversx_sc_meta_lib::{
     self, code_report_json::CodeReportJson, mxsc_file_json::MxscFileJson,
 };
 
-use super::render_code_report::render_report;
+use super::render_code_report::CodeReportRender;
 
 pub fn run_code_report(path: &str, output_path: &str, output_format: &OutputFormat, compare: &str) {
     let directors = RelevantDirectories::find_all(path, &["".to_owned()]);
 
     let reports = extract_report(directors);
-    let mut output = String::new();
+
+    let mut file = create_file(output_path);
 
     match output_format {
         OutputFormat::Markdown => {
-            render_report(&mut output, &reports, compare);
+            let mut render_code_report = CodeReportRender::new(&mut file, compare, &reports);
+            render_code_report.render_report();
         },
         OutputFormat::Json => {
-            output = serde_json::to_string(&reports).unwrap();
+            let json_output = serde_json::to_string(&reports).unwrap();
+            file.write_all(json_output.as_bytes()).unwrap();
         },
-    };
-
-    let Ok(_) = fs::write(output_path, output) else {
-        return;
     };
 }
 
@@ -91,4 +91,8 @@ fn extract_reports(path: &PathBuf, reports: &mut Vec<CodeReportJson>) {
         let data: MxscFileJson = serde_json::from_reader(mxsc_file).unwrap();
         reports.push(data.report.code_report);
     }
+}
+
+fn create_file(file_path: &str) -> File {
+    File::create(file_path).expect("could not write report file")
 }

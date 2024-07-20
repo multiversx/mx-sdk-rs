@@ -1,183 +1,132 @@
-use std::{
-    fmt::Write,
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use core::panic;
+use std::{fmt::Display, fs::File, io::BufReader};
+
+pub struct CodeReportRender<'a> {
+    pub file: Option<&'a mut dyn std::io::Write>,
+    pub compared_path_file: &'a str,
+    pub reports: &'a [CodeReportJson],
+}
 
 use multiversx_sc_meta_lib::code_report_json::CodeReportJson;
 
-fn writeln_output_str<S: AsRef<str>>(output: &mut String, input: S) {
-    output.write_str(&format!("{}\n", input.as_ref())).ok();
-}
+use super::compare::{
+    allocator_status_after_comparing, panic_status_after_comparing, parse_into_code_report_json,
+    size_status_after_comparing,
+};
 
-pub fn render_report(output: &mut String, reports: &Vec<CodeReportJson>, compared_path_file: &str) {
-    render_header(output);
-
-    if compared_path_file.is_empty() {
-        render_reports(output, reports);
-    } else {
-        render_and_compare(output, reports, compared_path_file);
-    }
-}
-
-fn render_header(output: &mut String) {
-    writeln_output_str(output, "| Path                                                         |                                     size |                  has-allocator |                     has-format |");
-    writeln_output_str(output, "| :-- | --: | --: | --: |");
-}
-
-fn render_reports(output: &mut String, reports: &Vec<CodeReportJson>) {
-    for report in reports {
-        writeln_output_str(
-            output,
-            format!(
-                "| {} | {} | {} | {} |",
-                report.path.split('/').last().expect("no output path"),
-                report.size,
-                report.has_allocator,
-                report.has_panic
-            ),
-        );
-    }
-}
-
-fn render_and_compare(output: &mut String, reports: &[CodeReportJson], compared_path_file: &str) {
-    let compared_file = File::open(compared_path_file).unwrap_or_else(|_| {
-        panic!(
-            "Failed to open compared file at path: {}",
-            compared_path_file
-        )
-    });
-
-    let mut compared_reports = Vec::new();
-    if compared_path_file.ends_with("md") {
-        compared_reports = parse_into_code_report_json(compared_file);
-    } else {
-    }
-
-    for report in reports.iter() {
-        let path: String = report
-            .path
-            .split('/')
-            .last()
-            .expect("no output path")
-            .to_owned();
-        if compared_reports.is_empty() {
-            writeln_output_str(
-                output,
-                format!(
-                    "| {} | {} | {} | {} |",
-                    path, report.size, report.has_allocator, report.has_panic
-                ),
-            );
-            continue;
-        }
-
-        if let Some(compared_report) = find_report_by_path(&compared_reports, &path) {
-            print_compared_output(output, report, compared_report);
-        }
-    }
-}
-
-fn parse_into_code_report_json(compared_file: File) -> Vec<CodeReportJson> {
-    let reader = BufReader::new(compared_file);
-
-    let lines = reader.lines().skip(2);
-
-    let mut compared_reports: Vec<CodeReportJson> = Vec::new();
-
-    for line in lines {
-        match line {
-            Ok(l) => {
-                let columns: Vec<String> = l
-                    .split('|')
-                    .map(|s| s.trim().to_string())
-                    .filter(|s| !s.is_empty())
-                    .collect();
-
-                if columns.len() == 4 {
-                    compared_reports.push(CodeReportJson {
-                        path: columns[0].to_owned(),
-                        size: columns[1].parse::<usize>().unwrap(),
-                        has_allocator: columns[2].parse::<bool>().unwrap(),
-                        has_panic: columns[3].to_owned(),
-                    })
-                }
-            },
-            Err(_) => return compared_reports,
+impl<'a> CodeReportRender<'a> {
+    pub fn new(
+        file: &'a mut dyn std::io::Write,
+        compared_path_file: &'a str,
+        reports: &'a [CodeReportJson],
+    ) -> Self {
+        Self {
+            file: Some(file),
+            compared_path_file,
+            reports,
         }
     }
 
-    compared_reports
-}
+    pub fn render_report(&mut self) {
+        self.render_header();
 
-fn find_report_by_path<'a>(
-    reports: &'a [CodeReportJson],
-    contract_path: &'a String,
-) -> Option<&'a CodeReportJson> {
-    reports.iter().find(|&report| report.path == *contract_path)
-}
-
-fn print_compared_output(
-    output: &mut String,
-    report: &CodeReportJson,
-    compared_report: &CodeReportJson,
-) {
-    let size_report = match report.size.cmp(&compared_report.size) {
-        std::cmp::Ordering::Greater => {
-            format!(
-                "{} :arrow-right: {} :red-circle:",
-                compared_report.size, report.size
-            )
-        },
-        std::cmp::Ordering::Less => {
-            format!(
-                "{} :arrow-right: {} :green-circle:",
-                compared_report.size, report.size
-            )
-        },
-        std::cmp::Ordering::Equal => {
-            format!("{}", report.size)
-        },
-    };
-
-    let mut has_allocator_report;
-    if report.has_allocator == compared_report.has_allocator {
-        has_allocator_report = format!("{}", report.has_allocator);
-    } else {
-        has_allocator_report = format!(
-            "{} :arrow-right: {}",
-            compared_report.has_allocator, report.has_allocator
-        );
-
-        if !report.has_allocator {
-            has_allocator_report = format!("{has_allocator_report} :green-circle:");
+        if self.compared_path_file.is_empty() {
+            self.render_reports();
         } else {
-            has_allocator_report = format!("{has_allocator_report} :red-circle:");
+            self.render_reports_and_compare();
         }
     }
 
-    let mut has_panic_report;
-    if report.has_panic == compared_report.has_panic {
-        has_panic_report = format!("{}", report.has_allocator);
-    } else {
-        has_panic_report = format!(
-            "{} :arrow-right: {}",
-            compared_report.has_panic, report.has_panic
-        );
-
-        if report.has_panic == "none" {
-            has_panic_report = format!("{has_panic_report} :green-circle:");
-        }
+    fn writeln(&mut self, s: impl Display) {
+        let file = self.file.as_mut().unwrap();
+        file.write_all(s.to_string().as_bytes()).unwrap();
+        file.write_all(b"\n").unwrap();
     }
 
-    writeln_output_str(
-        output,
-        format!(
+    fn write_report_for_contract(
+        &mut self,
+        path: &String,
+        size: &String,
+        has_allocator: &String,
+        has_panic: &String,
+    ) {
+        self.writeln(format!(
             "| {} | {} | {} | {} |",
-            report.path.split('/').last().expect("no output path"),
-            size_report,
-            has_allocator_report,
-            has_panic_report
-        ),
-    );
+            path.split('/').last().unwrap_or_else(|| path),
+            size,
+            has_allocator,
+            has_panic
+        ));
+    }
+
+    fn render_header(&mut self) {
+        if !self.compared_path_file.is_empty() {
+            self.writeln(format!(
+                "Contract comparison with {}",
+                self.compared_path_file
+            ))
+        }
+
+        self.writeln("| Path                                                         |                                     size |                  has-allocator |                     has-format |");
+        self.writeln("| :-- | --: | --: | --: |");
+    }
+
+    fn render_reports(&mut self) {
+        for report in self.reports {
+            self.write_report_for_contract(
+                &report.path,
+                &report.size.to_string(),
+                &report.has_allocator.to_string(),
+                &report.has_panic,
+            );
+        }
+    }
+
+    fn render_reports_and_compare(&mut self) {
+        let compared_file = File::open(self.compared_path_file).unwrap_or_else(|_| {
+            panic!(
+                "Failed to open compared file at path: {}",
+                self.compared_path_file
+            )
+        });
+        let mut compared_file_reader = BufReader::new(compared_file);
+
+        let compared_reports = if self.compared_path_file.ends_with("md") {
+            // this is only one time compare. Decide weather to exist or not
+            parse_into_code_report_json(&mut compared_file_reader)
+        } else {
+            serde_json::from_reader(compared_file_reader)
+                .unwrap_or_else(|_| panic!("Cannot deserialize into code report structure."))
+        };
+
+        for report in self.reports.iter() {
+            if let Some(compared_report) = compared_reports.iter().find(|cr| {
+                cr.path
+                    == report
+                        .path
+                        .split('/')
+                        .last()
+                        .unwrap_or_else(|| &report.path)
+            }) {
+                self.print_compared_output(report, compared_report);
+            }
+        }
+    }
+
+    fn print_compared_output(&mut self, report: &CodeReportJson, compared_report: &CodeReportJson) {
+        let size_report = size_status_after_comparing(report.size, compared_report.size);
+
+        let has_allocator_report =
+            allocator_status_after_comparing(report.has_allocator, compared_report.has_allocator);
+
+        let has_panic_report =
+            panic_status_after_comparing(&report.has_panic, &compared_report.has_panic);
+
+        self.write_report_for_contract(
+            &report.path,
+            &size_report,
+            &has_allocator_report,
+            &has_panic_report,
+        );
+    }
 }
