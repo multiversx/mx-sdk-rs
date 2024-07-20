@@ -92,7 +92,7 @@ impl<'a> CodeReportRender<'a> {
         let mut compared_file_reader = BufReader::new(compared_file);
 
         let compared_reports = if self.compared_path_file.ends_with("md") {
-            // this is only one time compare. Decide weather to exist or not
+            // TODO this is only one time compared. Decide whether to exist or not
             parse_into_code_report_json(&mut compared_file_reader)
         } else {
             serde_json::from_reader(compared_file_reader)
