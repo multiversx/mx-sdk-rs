@@ -18,6 +18,7 @@ mod tx_managed_types;
 mod tx_panic;
 mod tx_result;
 mod tx_result_calls;
+mod tx_transfer_by_user_data;
 
 pub use blockchain_update::BlockchainUpdate;
 pub use tx_async_call_data::*;
@@ -36,6 +37,7 @@ pub use tx_managed_types::*;
 pub use tx_panic::*;
 pub use tx_result::*;
 pub use tx_result_calls::*;
+pub use tx_transfer_by_user_data::*;
 
 #[cfg(feature = "wasm-incopatible")]
 mod blockchain_rng;

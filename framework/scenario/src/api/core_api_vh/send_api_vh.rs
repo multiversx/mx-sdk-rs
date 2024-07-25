@@ -60,6 +60,32 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
         }
     }
 
+    fn multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        user_handle: RawHandle,
+        dst_handle: RawHandle,
+        token_transfer_handle: RawHandle,
+        gas_limit: u64,
+        function_name_handle: RawHandle,
+        arguments_handle: RawHandle,
+    ) -> Result<(), &'static [u8]> {
+        let result = self.with_vm_hooks(|vh| {
+            vh.managed_multi_transfer_esdt_nft_execute_by_user(
+                user_handle,
+                dst_handle,
+                token_transfer_handle,
+                gas_limit as i64,
+                function_name_handle,
+                arguments_handle,
+            )
+        });
+        if result == 0 {
+            Ok(())
+        } else {
+            Err(b"multiTransferESDTNFTExecuteByUser failed")
+        }
+    }
+
     fn async_call_raw(
         &self,
         to_handle: RawHandle,

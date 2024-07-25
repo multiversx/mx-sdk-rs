@@ -10,6 +10,15 @@ extern "C" {
         argumentsHandle: i32,
     ) -> i32;
 
+    fn managedMultiTransferESDTNFTExecuteByUser(
+        userHandle: i32,
+        dstHandle: i32,
+        tokenTransfersHandle: i32,
+        gasLimit: i64,
+        functionHandle: i32,
+        argumentsHandle: i32,
+    ) -> i32;
+
     fn managedTransferValueExecute(
         dstHandle: i32,
         valueHandle: i32,
@@ -167,6 +176,32 @@ impl SendApiImpl for VmApiImpl {
                 Ok(())
             } else {
                 Err(b"multiTransferESDTNFTExecute failed")
+            }
+        }
+    }
+
+    fn multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        user_handle: RawHandle,
+        dst_handle: RawHandle,
+        token_transfer_handle: RawHandle,
+        gas_limit: u64,
+        function_name_handle: RawHandle,
+        arguments_handle: RawHandle,
+    ) -> Result<(), &'static [u8]> {
+        unsafe {
+            let result = managedMultiTransferESDTNFTExecuteByUser(
+                user_handle,
+                dst_handle,
+                token_transfer_handle,
+                gas_limit as i64,
+                function_name_handle,
+                arguments_handle,
+            );
+            if result == 0 {
+                Ok(())
+            } else {
+                Err(b"multiTransferESDTNFTExecuteByUser failed")
             }
         }
     }

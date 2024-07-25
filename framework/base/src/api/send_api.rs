@@ -33,6 +33,16 @@ pub trait SendApiImpl: ManagedTypeApiImpl {
         arg_buffer_handle: RawHandle,
     ) -> Result<(), &'static [u8]>;
 
+    fn multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        user_handle: RawHandle,
+        dst_handle: RawHandle,
+        token_transfer_handle: RawHandle,
+        gas_limit: u64,
+        function_name_handle: RawHandle,
+        arguments_handle: RawHandle,
+    ) -> Result<(), &'static [u8]>;
+
     /// Sends an asynchronous call to another contract.
     /// Calling this method immediately terminates tx execution.
     /// Using it directly is generally discouraged.

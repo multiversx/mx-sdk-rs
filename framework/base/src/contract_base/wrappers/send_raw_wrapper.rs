@@ -124,6 +124,25 @@ where
         )
     }
 
+    pub fn multi_esdt_transfer_execute_by_user(
+        &self,
+        from: &ManagedAddress<A>,
+        to: &ManagedAddress<A>,
+        payments: &ManagedVec<A, EsdtTokenPayment<A>>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> Result<(), &'static [u8]> {
+        A::send_api_impl().multi_transfer_esdt_nft_execute_by_user(
+            from.get_handle().get_raw_handle(),
+            to.get_handle().get_raw_handle(),
+            payments.get_handle().get_raw_handle(),
+            gas_limit,
+            endpoint_name.get_handle().get_raw_handle(),
+            arg_buffer.get_handle().get_raw_handle(),
+        )
+    }
+
     pub fn async_call_raw(
         &self,
         to: &ManagedAddress<A>,

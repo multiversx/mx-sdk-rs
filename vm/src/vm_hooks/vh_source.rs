@@ -1,7 +1,9 @@
 use std::{fmt::Debug, sync::MutexGuard};
 
 use crate::{
-    tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
+    tx_mock::{
+        BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult, TxTokenTransfer,
+    },
     types::{VMAddress, VMCodeMetadata, H256},
     world_mock::{AccountData, BlockInfo},
 };
@@ -92,6 +94,15 @@ pub trait VMHooksHandlerSource: Debug {
         &self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
+    );
+
+    fn perform_transfer_execute_by_user(
+        &self,
+        from: VMAddress,
+        to: VMAddress,
+        token_transfers: Vec<TxTokenTransfer>,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     );
