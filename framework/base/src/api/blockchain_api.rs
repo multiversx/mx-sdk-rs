@@ -137,7 +137,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         dst_handle: RawHandle,
         token_transfer_handle: RawHandle,
         gas_limit: i64,
-        function_name_handle: Self::ManagedBufferHandle,
+        function_name_handle: RawHandle,
         arguments_handle: RawHandle,
     ) -> RawHandle;
 

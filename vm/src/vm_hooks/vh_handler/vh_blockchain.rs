@@ -253,7 +253,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         _function_name_handle: RawHandle,
         _arguments_handle: RawHandle,
     ) -> RawHandle {
-        panic!("managed_multi_transfer_esdt_nft_execute_by_user not yet implemented in RustVM")
+        todo!()
     }
 
     fn check_esdt_frozen(

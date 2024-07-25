@@ -140,7 +140,7 @@ impl BlockchainApiImpl for UncallableApi {
         _dst_handle: RawHandle,
         _token_transfer_handle: RawHandle,
         _gas_limit: i64,
-        _function_name_handle: Self::ManagedBufferHandle,
+        _function_name_handle: RawHandle,
         _arguments_handle: RawHandle,
     ) -> RawHandle {
         unreachable!()
