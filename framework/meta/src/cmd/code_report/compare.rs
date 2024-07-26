@@ -20,11 +20,7 @@ pub(crate) fn parse_into_code_report_json(
 
                 if columns.len() == 4 {
                     compared_reports.push(CodeReportJson {
-                        path: columns[0]
-                            .split('/')
-                            .last()
-                            .unwrap_or_else(|| &columns[0])
-                            .to_owned(),
+                        path: columns[0].to_owned(),
                         size: columns[1].parse::<usize>().unwrap(),
                         has_allocator: columns[2].parse::<bool>().unwrap(),
                         has_panic: columns[3].to_owned(),

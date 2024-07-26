@@ -42,6 +42,8 @@ fn extract_report(directors: RelevantDirectories) -> Vec<CodeReportJson> {
 
         extract_reports(&output_path, &mut reports);
 
+        sanitize_output_path_from_report(&mut reports);
+
         clean_contract(&director.path);
     }
 
@@ -95,4 +97,16 @@ fn extract_reports(path: &PathBuf, reports: &mut Vec<CodeReportJson>) {
 
 fn create_file(file_path: &str) -> File {
     File::create(file_path).expect("could not write report file")
+}
+
+fn sanitize_output_path_from_report(reports: &mut Vec<CodeReportJson>) {
+    for report in reports {
+        let new_path = report
+            .path
+            .split('/')
+            .last()
+            .unwrap_or_else(|| &report.path);
+
+        report.path = new_path.to_owned();
+    }
 }

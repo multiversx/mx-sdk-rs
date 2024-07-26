@@ -100,14 +100,8 @@ impl<'a> CodeReportRender<'a> {
         };
 
         for report in self.reports.iter() {
-            if let Some(compared_report) = compared_reports.iter().find(|cr| {
-                cr.path
-                    == report
-                        .path
-                        .split('/')
-                        .last()
-                        .unwrap_or_else(|| &report.path)
-            }) {
+            if let Some(compared_report) = compared_reports.iter().find(|cr| cr.path == report.path)
+            {
                 self.print_compared_output(report, compared_report);
             }
         }
