@@ -60,13 +60,6 @@ impl<'a> CodeReportRender<'a> {
     }
 
     fn render_header(&mut self) {
-        if !self.compared_path_file.is_empty() {
-            self.writeln(format!(
-                "Contract comparison with {}",
-                self.compared_path_file
-            ))
-        }
-
         self.writeln("| Path                                                         |                                     size |                  has-allocator |                     has-format |");
         self.writeln("| :-- | --: | --: | --: |");
     }
