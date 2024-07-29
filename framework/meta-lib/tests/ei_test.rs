@@ -75,6 +75,7 @@ pub const EI_1_3_ADDED_NAMES: &[&str] = &[
 ];
 
 pub const EI_1_4_ADDED_NAMES: &[&str] = &[
+    "isReservedFunctionName",
     "managedGetOriginalCallerAddr",
     "managedGetRelayerAddr",
     "managedMultiTransferESDTNFTExecuteByUser",
