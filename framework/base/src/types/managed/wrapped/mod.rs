@@ -9,9 +9,9 @@ mod encoded_managed_vec_item;
 mod esdt_token_data;
 mod esdt_token_payment;
 mod managed_address;
+mod managed_buffer_read_to_end;
 mod managed_byte_array;
 mod managed_decimal;
-mod managed_buffer_read_to_end;
 mod managed_option;
 mod managed_ref;
 mod managed_vec;
@@ -35,12 +35,12 @@ pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPayment};
 pub use managed_address::ManagedAddress;
+pub use managed_buffer_read_to_end::*;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;
 pub use managed_decimal::{
     ConstDecimals, Decimals, ManagedDecimal, ManagedDecimalSigned, NumDecimals,
 };
-pub use managed_buffer_read_to_end::*;
 pub use managed_option::ManagedOption;
 pub use managed_ref::ManagedRef;
 pub use managed_vec::ManagedVec;

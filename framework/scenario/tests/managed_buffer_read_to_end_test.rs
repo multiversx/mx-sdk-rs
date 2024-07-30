@@ -2,18 +2,14 @@ use multiversx_sc::{
     api::ManagedTypeApi,
     codec::{
         self,
-        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+        derive::{TopDecode, TopEncode},
     },
     contract_base::ManagedSerializer,
-    derive::ManagedVecItem,
-    types::{
-        BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferReadToEnd, ManagedByteArray,
-        ManagedType, TokenIdentifier,
-    },
+    types::{ManagedBuffer, ManagedBufferReadToEnd},
 };
 use multiversx_sc_scenario::api::StaticApi;
 
-#[derive(TopDecode, TopEncode, Clone)]
+#[derive(TopDecode, TopEncode, Clone, PartialEq, Debug)]
 pub struct CallData<M: ManagedTypeApi> {
     pub endpoint: ManagedBuffer<M>,
     pub gas_limit: u64,
@@ -21,7 +17,7 @@ pub struct CallData<M: ManagedTypeApi> {
 }
 
 #[test]
-fn read_To_end_codec_test() {
+fn read_to_end_codec_test() {
     let cd: CallData<_> = CallData::<StaticApi> {
         endpoint: ManagedBuffer::from("abc"),
         gas_limit: 0x100_0000,
@@ -38,4 +34,8 @@ fn read_To_end_codec_test() {
 
     let encoded = ManagedSerializer::<StaticApi>::new().top_encode_to_managed_buffer(&cd);
     assert_eq!(encoded.to_boxed_bytes().as_slice(), expected.as_slice());
+
+    let decoded: CallData<StaticApi> =
+        ManagedSerializer::<StaticApi>::new().top_decode_from_managed_buffer(&encoded);
+    assert_eq!(decoded, cd);
 }

@@ -7,7 +7,7 @@ use multiversx_sc_codec::{
 
 /// A wrapper over a ManagedBuffer with different decode properties. It reads until the end of the buffer.
 #[repr(transparent)]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ManagedBufferReadToEnd<M: ManagedTypeApi> {
     pub(crate) buffer: ManagedBuffer<M>,
 }
@@ -16,6 +16,16 @@ impl<M: ManagedTypeApi> ManagedBufferReadToEnd<M> {
     #[inline]
     pub fn new_from_buf(buf: ManagedBuffer<M>) -> Self {
         Self { buffer: buf }
+    }
+}
+
+impl<M: ManagedTypeApi> PartialEq for ManagedBufferReadToEnd<M> {
+    fn eq(&self, other: &Self) -> bool {
+        self.buffer == other.buffer
+    }
+
+    fn ne(&self, other: &Self) -> bool {
+        !self.eq(other)
     }
 }
 
