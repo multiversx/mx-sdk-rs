@@ -23,10 +23,6 @@ impl<M: ManagedTypeApi> PartialEq for ManagedBufferReadToEnd<M> {
     fn eq(&self, other: &Self) -> bool {
         self.buffer == other.buffer
     }
-
-    fn ne(&self, other: &Self) -> bool {
-        !self.eq(other)
-    }
 }
 
 impl<M> From<ManagedBuffer<M>> for ManagedBufferReadToEnd<M>
