@@ -9,7 +9,7 @@ use crate::{
     api::ManagedTypeApi,
     types::{
         managed::{preloaded_managed_buffer::PreloadedManagedBuffer, ManagedBufferSizeContext},
-        BigInt, BigUint, ManagedBuffer,
+        BigInt, BigUint, ManagedBuffer, ManagedNestedBuffer,
     },
 };
 
@@ -106,7 +106,10 @@ where
     }
 
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<M>>()
+            || T::type_eq::<ManagedNestedBuffer<M>>()
+            || T::type_eq::<BigUint<M>>()
+            || T::type_eq::<BigInt<M>>()
     }
 
     fn read_specialized<T, C, H>(&mut self, context: C, h: H) -> Result<T, H::HandledErr>
