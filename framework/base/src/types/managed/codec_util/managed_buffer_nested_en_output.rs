@@ -2,7 +2,7 @@ use crate::codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStati
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedNestedBuffer},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferReadToEnd},
 };
 
 impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
@@ -13,7 +13,7 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<M>>()
-            || T::type_eq::<ManagedNestedBuffer<M>>()
+            || T::type_eq::<ManagedBufferReadToEnd<M>>()
             || T::type_eq::<BigUint<M>>()
             || T::type_eq::<BigInt<M>>()
     }

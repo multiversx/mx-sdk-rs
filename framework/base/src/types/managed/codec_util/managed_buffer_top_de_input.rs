@@ -7,7 +7,7 @@ use crate::{
         try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
     },
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedNestedBuffer},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferReadToEnd},
 };
 use alloc::boxed::Box;
 
@@ -79,7 +79,7 @@ where
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<M>>()
-            || T::type_eq::<ManagedNestedBuffer<M>>()
+            || T::type_eq::<ManagedBufferReadToEnd<M>>()
             || T::type_eq::<BigUint<M>>()
             || T::type_eq::<BigInt<M>>()
     }
