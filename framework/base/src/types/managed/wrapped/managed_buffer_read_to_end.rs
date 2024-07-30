@@ -7,6 +7,7 @@ use multiversx_sc_codec::{
 
 /// A wrapper over a ManagedBuffer with different decode properties. It reads until the end of the buffer.
 #[repr(transparent)]
+#[derive(Clone)]
 pub struct ManagedBufferReadToEnd<M: ManagedTypeApi> {
     pub(crate) buffer: ManagedBuffer<M>,
 }
@@ -51,7 +52,7 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedBufferReadToEnd<M> {
         H: EncodeErrorHandler,
     {
         if O::supports_specialized_type::<Self>() {
-            dest.push_specialized((), self, h)
+            dest.push_specialized((), &self.buffer, h)
         } else {
             Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
         }
