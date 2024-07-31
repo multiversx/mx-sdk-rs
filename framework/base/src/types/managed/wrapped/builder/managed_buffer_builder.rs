@@ -8,7 +8,7 @@ use crate::{
         hex_util::{byte_to_binary_digits, byte_to_hex_digits},
         FormatBuffer, FormatByteReceiver, SCBinary, SCCodec, SCDisplay, SCLowerHex,
     },
-    types::ManagedBuffer,
+    types::{ManagedBuffer, ManagedBufferReadToEnd},
 };
 
 use super::{ManagedBufferBuilderImpl, ManagedBufferImplDefault};
@@ -107,7 +107,7 @@ where
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>()
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<ManagedBufferReadToEnd<M>>()
     }
 
     #[inline]

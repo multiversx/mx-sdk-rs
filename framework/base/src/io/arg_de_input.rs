@@ -9,7 +9,8 @@ use crate::{
         try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
     },
     types::{
-        heap::Box, BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
+        heap::Box, BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput,
+        ManagedBufferReadToEnd, ManagedType,
     },
 };
 
@@ -126,6 +127,7 @@ where
         T::type_eq::<ManagedBuffer<AA>>()
             || T::type_eq::<BigUint<AA>>()
             || T::type_eq::<BigInt<AA>>()
+            || T::type_eq::<ManagedBufferReadToEnd<AA>>()
     }
 
     #[inline]
