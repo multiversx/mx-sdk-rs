@@ -175,8 +175,9 @@ pub trait AbiTester {
     #[view]
     fn takes_object_with_managed_buffer_read_to_end(
         &self,
-        _arg: AbiWithManagedBufferReadToEnd<Self::Api>,
-    ) {
+        arg: AbiWithManagedBufferReadToEnd<Self::Api>,
+    ) -> ManagedBuffer {
+        arg.flush.to_managed_buffer()
     }
 
     #[endpoint]
