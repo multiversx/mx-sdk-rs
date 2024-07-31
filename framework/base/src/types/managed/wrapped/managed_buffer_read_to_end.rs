@@ -43,7 +43,7 @@ impl<M: ManagedTypeApi> TypeAbi for ManagedBufferReadToEnd<M> {
     type Unmanaged = multiversx_sc_codec::Vec<u8>;
 
     fn type_name() -> TypeName {
-        "bytes".into()
+        "bytes-read-to-end".into()
     }
 
     fn type_name_rust() -> TypeName {

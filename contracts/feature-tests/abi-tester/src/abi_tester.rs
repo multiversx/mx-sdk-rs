@@ -172,6 +172,13 @@ pub trait AbiTester {
         OperationCompletionStatus::Completed
     }
 
+    #[view]
+    fn takes_object_with_managed_buffer_read_to_end(
+        &self,
+        _arg: AbiWithManagedBufferReadToEnd<Self::Api>,
+    ) {
+    }
+
     #[endpoint]
     #[payable("EGLD")]
     fn payable_egld(&self) {}
