@@ -2,7 +2,7 @@ use crate::codec::{EncodeError, EncodeErrorHandler, TopEncodeOutput, TryStaticCa
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferReadToEnd},
+    types::{BigInt, BigUint, ManagedBuffer},
 };
 
 impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
@@ -14,10 +14,7 @@ impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>()
-            || T::type_eq::<ManagedBufferReadToEnd<M>>()
-            || T::type_eq::<BigUint<M>>()
-            || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
     #[inline]

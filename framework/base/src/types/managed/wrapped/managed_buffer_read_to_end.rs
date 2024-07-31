@@ -57,7 +57,7 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedBufferReadToEnd<M> {
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        if O::supports_specialized_type::<Self>() {
+        if O::supports_specialized_type::<ManagedBuffer<M>>() {
             dest.push_specialized((), &self.buffer, h)
         } else {
             Err(h.handle_error(EncodeError::UNSUPPORTED_OPERATION))
