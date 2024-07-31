@@ -394,11 +394,15 @@
             "mutability": "readonly",
             "inputs": [
                 {
-                    "name": "_arg",
+                    "name": "arg",
                     "type": "AbiWithManagedBufferReadToEnd"
                 }
             ],
-            "outputs": []
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
         },
         {
             "name": "payable_egld",

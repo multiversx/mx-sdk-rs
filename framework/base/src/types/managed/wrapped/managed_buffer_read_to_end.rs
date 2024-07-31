@@ -18,6 +18,11 @@ impl<M: ManagedTypeApi> ManagedBufferReadToEnd<M> {
     pub fn new_from_buf(buf: ManagedBuffer<M>) -> Self {
         Self { buffer: buf }
     }
+
+    #[inline]
+    pub fn to_managed_buffer(&self) -> ManagedBuffer<M> {
+        self.buffer.clone()
+    }
 }
 
 impl<M: ManagedTypeApi> PartialEq for ManagedBufferReadToEnd<M> {
