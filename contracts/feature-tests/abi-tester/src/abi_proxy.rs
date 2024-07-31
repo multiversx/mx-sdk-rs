@@ -378,12 +378,12 @@ where
         Arg0: ProxyArg<AbiWithManagedBufferReadToEnd<Env::Api>>,
     >(
         self,
-        _arg: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        arg: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("takes_object_with_managed_buffer_read_to_end")
-            .argument(&_arg)
+            .argument(&arg)
             .original_result()
     }
 
