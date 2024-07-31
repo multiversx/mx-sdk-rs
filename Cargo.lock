@@ -1955,7 +1955,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.20.0"
+version = "0.20.1"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
@@ -1965,7 +1965,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.20.0"
+version = "0.20.1"
 dependencies = [
  "hex",
  "proc-macro2",
