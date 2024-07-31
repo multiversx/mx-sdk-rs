@@ -27,6 +27,11 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.52.0] - 2024-07-31
+- ManagedBufferReadToEnd type, which flushed a nested data buffer.
+- Fixed hex and binary formatters for byte slices.
+- Added EI 1.4 and 1.5 configs.
+
 ## [sc 0.51.1]
 - `sc-meta upgrade` bugfix.
 
