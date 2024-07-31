@@ -1,5 +1,6 @@
-use crate::api::ManagedTypeApi;
+use crate::abi::{TypeAbi, TypeName};
 use crate::types::ManagedBuffer;
+use crate::{abi::TypeAbiFrom, api::ManagedTypeApi};
 use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
     NestedDecodeInput, NestedEncode, NestedEncodeOutput, TryStaticCast,
@@ -32,6 +33,21 @@ where
     #[inline]
     fn from(buf: ManagedBuffer<M>) -> Self {
         Self::new_from_buf(buf)
+    }
+}
+
+impl<M> TypeAbiFrom<Self> for ManagedBufferReadToEnd<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for ManagedBufferReadToEnd<M> where M: ManagedTypeApi {}
+
+impl<M: ManagedTypeApi> TypeAbi for ManagedBufferReadToEnd<M> {
+    type Unmanaged = multiversx_sc_codec::Vec<u8>;
+
+    fn type_name() -> TypeName {
+        "bytes".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "ManagedBufferReadToEnd<$API>".into()
     }
 }
 
