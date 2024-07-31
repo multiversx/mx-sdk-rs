@@ -5,10 +5,12 @@ use multiversx_sc::{
         derive::{TopDecode, TopEncode},
     },
     contract_base::ManagedSerializer,
+    derive::type_abi,
     types::{ManagedBuffer, ManagedBufferReadToEnd},
 };
 use multiversx_sc_scenario::api::StaticApi;
 
+#[type_abi]
 #[derive(TopDecode, TopEncode, Clone, PartialEq, Debug)]
 pub struct CallData<M: ManagedTypeApi> {
     pub endpoint: ManagedBuffer<M>,
