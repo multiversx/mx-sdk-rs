@@ -40,4 +40,13 @@ fn read_to_end_codec_test() {
     let decoded: CallData<StaticApi> =
         ManagedSerializer::<StaticApi>::new().top_decode_from_managed_buffer(&encoded);
     assert_eq!(decoded, cd);
+
+    assert_eq!(
+        decoded.data.as_managed_buffer(),
+        &ManagedBuffer::from("ddd")
+    );
+    assert_eq!(
+        decoded.data.into_managed_buffer(),
+        ManagedBuffer::from("ddd")
+    );
 }
