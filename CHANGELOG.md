@@ -28,6 +28,9 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
+## [sc 0.52.2] - 2024-08-01
+- `ManagedBufferReadToEnd` extract data methods.
+
 ## [sc 0.52.1] - 2024-07-31
 - `ManagedBufferReadToEnd` `TypeAbi` implementation.
 
