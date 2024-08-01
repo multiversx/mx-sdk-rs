@@ -20,8 +20,13 @@ impl<M: ManagedTypeApi> ManagedBufferReadToEnd<M> {
     }
 
     #[inline]
-    pub fn to_managed_buffer(&self) -> ManagedBuffer<M> {
-        self.buffer.clone()
+    pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
+        &self.buffer
+    }
+
+    #[inline]
+    pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
+        self.buffer
     }
 }
 

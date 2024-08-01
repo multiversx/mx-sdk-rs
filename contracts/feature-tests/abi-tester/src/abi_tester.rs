@@ -177,7 +177,7 @@ pub trait AbiTester {
         &self,
         arg: AbiWithManagedBufferReadToEnd<Self::Api>,
     ) -> ManagedBuffer {
-        arg.flush.to_managed_buffer()
+        arg.flush.into_managed_buffer()
     }
 
     #[endpoint]
