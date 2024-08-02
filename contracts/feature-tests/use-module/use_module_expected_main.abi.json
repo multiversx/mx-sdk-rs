@@ -1000,6 +1000,14 @@
                     "type": "EsdtTokenPayment"
                 }
             ]
+        },
+        {
+            "identifier": "pause_contract",
+            "inputs": []
+        },
+        {
+            "identifier": "unpause_contract",
+            "inputs": []
         }
     ],
     "esdtAttributes": [
