@@ -246,11 +246,11 @@
             ]
         },
         {
-            "identifier": "pause_contract",
+            "identifier": "pauseContract",
             "inputs": []
         },
         {
-            "identifier": "unpause_contract",
+            "identifier": "unpauseContract",
             "inputs": []
         }
     ],
