@@ -90,7 +90,7 @@ impl<'a> CodeReportRender<'a> {
         } else {
             serde_json::from_reader(compared_file_reader).unwrap_or_else(|_| {
                 self.render_reports();
-                self.writeln(":warning: Could not compare the 2 versions because the deserialization process into the code report structure failed. :warning:");
+                self.writeln("\n:warning: Could not compare the 2 versions because the deserialization process into the code report structure failed. :warning:");
                 
                 Vec::new()
             })
