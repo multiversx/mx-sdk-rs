@@ -48,10 +48,10 @@ pub trait PauseModule {
         require!(self.not_paused(), "Contract is paused");
     }
 
-    #[event("pause_contract")]
+    #[event("pauseContract")]
     fn pause_event(&self);
 
-    #[event("unpause_contract")]
+    #[event("unpauseContract")]
     fn unpause_event(&self);
 
     #[view(isPaused)]
