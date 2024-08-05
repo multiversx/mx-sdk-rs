@@ -1,6 +1,6 @@
 use std::{
     fs::{read_dir, File},
-    io::Write,
+    io::{BufReader, Write},
     path::PathBuf,
     process::Command,
 };
@@ -13,16 +13,31 @@ use multiversx_sc_meta_lib::{
 
 use super::render_code_report::CodeReportRender;
 
-pub fn run_code_report(path: &str, output_path: &str, output_format: &OutputFormat, compare: &str) {
-    let directors = RelevantDirectories::find_all(path, &["".to_owned()]);
+pub fn run_code_report(
+    path: &str,
+    output_path: &str,
+    output_format: &OutputFormat,
+    compare: Vec<String>,
+) {
+    let reports = if compare.is_empty() {
+        generate_new_report(path)
+    } else {
+        let file = File::open(&compare[0]).expect("file not found");
+        let reader = BufReader::new(file);
 
-    let reports = extract_report(directors);
+        serde_json::from_reader(reader).expect("Cannot deserialize")
+    };
+
+    let mut compared_to = String::new();
+    if compare.len() == 2 {
+        compare[1].clone_into(&mut compared_to);
+    }
 
     let mut file = create_file(output_path);
 
     match output_format {
         OutputFormat::Markdown => {
-            let mut render_code_report = CodeReportRender::new(&mut file, compare, &reports);
+            let mut render_code_report = CodeReportRender::new(&mut file, &compared_to, &reports);
             render_code_report.render_report();
         },
         OutputFormat::Json => {
@@ -30,6 +45,12 @@ pub fn run_code_report(path: &str, output_path: &str, output_format: &OutputForm
             file.write_all(json_output.as_bytes()).unwrap();
         },
     };
+}
+
+fn generate_new_report(path: &str) -> Vec<CodeReportJson> {
+    let directors = RelevantDirectories::find_all(path, &["".to_owned()]);
+
+    extract_report(directors)
 }
 
 fn extract_report(directors: RelevantDirectories) -> Vec<CodeReportJson> {
@@ -99,14 +120,13 @@ fn create_file(file_path: &str) -> File {
     File::create(file_path).expect("could not write report file")
 }
 
-fn sanitize_output_path_from_report(reports: &mut Vec<CodeReportJson>) {
-    for report in reports {
-        let new_path = report
+fn sanitize_output_path_from_report(reports: &mut [CodeReportJson]) {
+    reports.iter_mut().for_each(|report| {
+        report.path = report
             .path
             .split('/')
             .last()
-            .unwrap_or_else(|| &report.path);
-
-        report.path = new_path.to_owned();
-    }
+            .unwrap_or(&report.path)
+            .to_string();
+    })
 }

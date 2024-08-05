@@ -17,6 +17,10 @@ pub fn code_report(args: &CodeReportArgs) {
         path,
         args.output.to_str().unwrap(),
         args.format.as_ref().unwrap_or(&OutputFormat::default()),
-        args.compare.clone().unwrap_or_default().to_str().unwrap(),
+        args.compare
+            .clone()
+            .into_iter()
+            .map(|path| path.to_string_lossy().into_owned())
+            .collect(),
     );
 }

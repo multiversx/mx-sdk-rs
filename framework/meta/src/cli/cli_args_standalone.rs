@@ -157,9 +157,10 @@ pub struct CodeReportArgs {
     #[arg(short, long, verbatim_doc_comment)]
     pub format: Option<OutputFormat>,
 
-    /// Compare two reports. Output available only for Markdown format
+    /// Compares 2 reports in JSON format and the output is printed in Markdown format.
+    /// If one argument with JSON format is given then it compares with itself.
     #[arg(short, long, verbatim_doc_comment)]
-    pub compare: Option<PathBuf>,
+    pub compare: Vec<PathBuf>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
