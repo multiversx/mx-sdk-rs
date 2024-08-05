@@ -88,8 +88,12 @@ impl<'a> CodeReportRender<'a> {
             // TODO this is only one time compared. Decide whether to exist or not
             parse_into_code_report_json(&mut compared_file_reader)
         } else {
-            serde_json::from_reader(compared_file_reader)
-                .unwrap_or_else(|_| panic!("Cannot deserialize into code report structure."))
+            serde_json::from_reader(compared_file_reader).unwrap_or_else(|_| {
+                self.render_reports();
+                self.writeln(":warning: Could not compare the 2 versions because the deserialization process into the code report structure failed. :warning:");
+                
+                Vec::new()
+            })
         };
 
         for report in self.reports.iter() {
