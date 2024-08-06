@@ -25,13 +25,10 @@ pub struct TemplateAdjuster {
 }
 impl TemplateAdjuster {
     pub fn update_cargo_toml_files(&self, args_tag: FrameworkVersion) {
-        let author_as_str = if self.new_author.is_none() {
-            DEFAULT_AUTHOR.to_string()
-        } else {
-            self.new_author
-                .clone()
-                .unwrap_or_else(|| DEFAULT_AUTHOR.to_string())
-        };
+        let author_as_str = self
+            .new_author
+            .clone()
+            .unwrap_or_else(|| DEFAULT_AUTHOR.to_string());
         self.update_cargo_toml_root(author_as_str.clone());
         self.update_cargo_toml_meta();
         self.update_cargo_toml_wasm(args_tag);
