@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use super::{template_metadata::TemplateMetadata, ContractCreatorTarget};
 use crate::{
     cmd::upgrade::upgrade_common::{rename_files, replace_in_files},
@@ -23,7 +21,7 @@ pub struct TemplateAdjuster {
     pub metadata: TemplateMetadata,
     pub target: ContractCreatorTarget,
     pub keep_paths: bool,
-    pub new_author: Option<PathBuf>,
+    pub new_author: Option<String>,
 }
 impl TemplateAdjuster {
     pub fn update_cargo_toml_files(&self, args_tag: FrameworkVersion) {
@@ -32,10 +30,7 @@ impl TemplateAdjuster {
         } else {
             self.new_author
                 .clone()
-                .unwrap()
-                .into_os_string()
-                .into_string()
-                .unwrap_or(DEFAULT_AUTHOR.to_string())
+                .unwrap_or_else(|| DEFAULT_AUTHOR.to_string())
         };
         self.update_cargo_toml_root(author_as_str.clone());
         self.update_cargo_toml_meta();

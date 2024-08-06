@@ -269,7 +269,7 @@ pub struct TemplateArgs {
     /// The author of the contract.
     /// If missing, the default author will be considered.
     #[arg(long, verbatim_doc_comment)]
-    pub author: Option<PathBuf>,
+    pub author: Option<String>,
 }
 
 impl CliArgsToRaw for TemplateArgs {

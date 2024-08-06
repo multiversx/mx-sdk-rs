@@ -1,4 +1,4 @@
-use std::{fs, path::PathBuf, process::Command};
+use std::{fs, process::Command};
 
 use convert_case::{Case, Casing};
 use multiversx_sc_meta::{
@@ -88,7 +88,7 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, ne
     let author = if new_author.is_empty() {
         None
     } else {
-        Some(PathBuf::from(new_author))
+        Some(new_author.to_string())
     };
 
     ContractCreator::new(
@@ -156,7 +156,7 @@ fn template_test_released(template_name: &str, new_name: &str, new_author: &str)
     let author = if new_author.is_empty() {
         None
     } else {
-        Some(PathBuf::from(new_author))
+        Some(new_author.to_string())
     };
 
     ContractCreator::new(

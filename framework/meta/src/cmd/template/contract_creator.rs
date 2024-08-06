@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use convert_case::{Case, Casing};
 
 use crate::{
@@ -67,7 +65,7 @@ impl<'a> ContractCreator<'a> {
         template_name: String,
         target: ContractCreatorTarget,
         keep_paths: bool,
-        new_author: Option<PathBuf>,
+        new_author: Option<String>,
     ) -> Self {
         let template_sources = template_sources(repo_source);
         let template_source = template_sources
