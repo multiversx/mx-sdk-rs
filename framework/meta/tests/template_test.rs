@@ -85,12 +85,12 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, ne
 
     prepare_target_dir(&target);
 
-    let author;
-    if new_author.is_empty() {
-        author = PathBuf::new();
+    let author = if new_author.is_empty() {
+        PathBuf::new()
     } else {
-        author = PathBuf::from(new_author);
-    }
+        PathBuf::from(new_author)
+    };
+
     ContractCreator::new(
         &repo_source,
         template_name.to_string(),
@@ -152,12 +152,11 @@ fn template_test_released(template_name: &str, new_name: &str, new_author: &str)
 
     prepare_target_dir(&target);
 
-    let author;
-    if new_author.is_empty() {
-        author = PathBuf::new();
+    let author = if new_author.is_empty() {
+        PathBuf::new()
     } else {
-        author = PathBuf::from(new_author);
-    }
+        PathBuf::from(new_author)
+    };
 
     ContractCreator::new(
         &repo_source,
