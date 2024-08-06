@@ -20,9 +20,15 @@ pub fn create_contract(args: &TemplateArgs) {
     let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir());
     let target = target_from_args(args);
 
-    let creator = ContractCreator::new(&repo_temp_download, args.template.clone(), target, false);
+    let creator = ContractCreator::new(
+        &repo_temp_download,
+        args.template.clone(),
+        target,
+        false,
+        args.author.clone(),
+    );
 
-    creator.create_contract(version_tag, args.author.clone().unwrap_or_default());
+    creator.create_contract(version_tag);
 }
 
 fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
@@ -61,6 +67,7 @@ impl<'a> ContractCreator<'a> {
         template_name: String,
         target: ContractCreatorTarget,
         keep_paths: bool,
+        new_author: Option<PathBuf>,
     ) -> Self {
         let template_sources = template_sources(repo_source);
         let template_source = template_sources
@@ -77,13 +84,14 @@ impl<'a> ContractCreator<'a> {
                 metadata,
                 target,
                 keep_paths,
+                new_author,
             },
         }
     }
 
-    pub fn create_contract(&self, args_tag: FrameworkVersion, new_authors: PathBuf) {
+    pub fn create_contract(&self, args_tag: FrameworkVersion) {
         self.copy_template(args_tag.clone());
-        self.update_dependencies(args_tag, new_authors);
+        self.update_dependencies(args_tag);
         self.rename_template();
     }
 
@@ -92,8 +100,8 @@ impl<'a> ContractCreator<'a> {
             .copy_template(self.target.contract_dir(), args_tag);
     }
 
-    pub fn update_dependencies(&self, args_tag: FrameworkVersion, new_authors: PathBuf) {
-        self.adjuster.update_dependencies(args_tag, new_authors);
+    pub fn update_dependencies(&self, args_tag: FrameworkVersion) {
+        self.adjuster.update_cargo_toml_files(args_tag);
     }
 
     pub fn rename_template(&self) {

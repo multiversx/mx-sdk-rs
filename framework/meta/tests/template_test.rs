@@ -86,9 +86,9 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, ne
     prepare_target_dir(&target);
 
     let author = if new_author.is_empty() {
-        PathBuf::new()
+        None
     } else {
-        PathBuf::from(new_author)
+        Some(PathBuf::from(new_author))
     };
 
     ContractCreator::new(
@@ -96,8 +96,9 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, ne
         template_name.to_string(),
         target.clone(),
         true,
+        author,
     )
-    .create_contract(LAST_TEMPLATE_VERSION, author);
+    .create_contract(LAST_TEMPLATE_VERSION);
 
     if BUILD_CONTRACTS {
         build_contract(&target);
@@ -153,9 +154,9 @@ fn template_test_released(template_name: &str, new_name: &str, new_author: &str)
     prepare_target_dir(&target);
 
     let author = if new_author.is_empty() {
-        PathBuf::new()
+        None
     } else {
-        PathBuf::from(new_author)
+        Some(PathBuf::from(new_author))
     };
 
     ContractCreator::new(
@@ -163,8 +164,9 @@ fn template_test_released(template_name: &str, new_name: &str, new_author: &str)
         template_name.to_string(),
         target.clone(),
         false,
+        author,
     )
-    .create_contract(LAST_TEMPLATE_VERSION, author);
+    .create_contract(LAST_TEMPLATE_VERSION);
 
     if BUILD_CONTRACTS {
         build_contract(&target);

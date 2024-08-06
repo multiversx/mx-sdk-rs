@@ -17,21 +17,33 @@ const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
 const INTERACT_CARGO_TOML: &str = "./interact/Cargo.toml";
+const DEFAULT_AUTHOR: &str = "you";
 
 pub struct TemplateAdjuster {
     pub metadata: TemplateMetadata,
     pub target: ContractCreatorTarget,
     pub keep_paths: bool,
+    pub new_author: Option<PathBuf>,
 }
 impl TemplateAdjuster {
-    pub fn update_dependencies(&self, args_tag: FrameworkVersion, new_authors: PathBuf) {
-        self.update_cargo_toml_root(new_authors.clone());
+    pub fn update_cargo_toml_files(&self, args_tag: FrameworkVersion) {
+        let author_as_str = if self.new_author.is_none() {
+            DEFAULT_AUTHOR.to_string()
+        } else {
+            self.new_author
+                .clone()
+                .unwrap()
+                .into_os_string()
+                .into_string()
+                .unwrap_or(DEFAULT_AUTHOR.to_string())
+        };
+        self.update_cargo_toml_root(author_as_str.clone());
         self.update_cargo_toml_meta();
         self.update_cargo_toml_wasm(args_tag);
-        self.update_cargo_toml_interact(new_authors);
+        self.update_cargo_toml_interact(author_as_str);
     }
 
-    fn update_cargo_toml_root(&self, new_authors: PathBuf) {
+    fn update_cargo_toml_root(&self, author: String) {
         let cargo_toml_path = self.target.contract_dir().join(ROOT_CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
@@ -44,8 +56,7 @@ impl TemplateAdjuster {
         } else {
             toml.add_workspace(&[".", "meta"]);
         }
-
-        toml.change_author(new_authors);
+        toml.change_author(author);
         toml.save_to_file(&cargo_toml_path);
     }
 
@@ -75,7 +86,7 @@ impl TemplateAdjuster {
         toml.save_to_file(&cargo_toml_path);
     }
 
-    fn update_cargo_toml_interact(&self, new_authors: PathBuf) {
+    fn update_cargo_toml_interact(&self, author: String) {
         if !self.metadata.has_interactor {
             return;
         }
@@ -87,7 +98,7 @@ impl TemplateAdjuster {
             remove_paths_from_deps(&mut toml, &[&self.metadata.name]);
         }
 
-        toml.change_author(new_authors);
+        toml.change_author(author);
         toml.save_to_file(&cargo_toml_path);
     }
 

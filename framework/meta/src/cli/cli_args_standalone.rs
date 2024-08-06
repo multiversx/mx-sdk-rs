@@ -266,8 +266,8 @@ pub struct TemplateArgs {
     #[arg(long, verbatim_doc_comment)]
     pub path: Option<PathBuf>,
 
-    /// The author of the contract is to receive.
-    /// If missing, the template author will be considered.
+    /// The author of the contract.
+    /// If missing, the default author will be considered.
     #[arg(long, verbatim_doc_comment)]
     pub author: Option<PathBuf>,
 }
