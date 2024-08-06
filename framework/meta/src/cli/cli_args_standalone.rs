@@ -265,6 +265,11 @@ pub struct TemplateArgs {
     /// Will be current directory if not specified.
     #[arg(long, verbatim_doc_comment)]
     pub path: Option<PathBuf>,
+
+    /// The author of the contract is to receive.
+    /// If missing, the template author will be considered.
+    #[arg(long, verbatim_doc_comment)]
+    pub author: Option<PathBuf>,
 }
 
 impl CliArgsToRaw for TemplateArgs {

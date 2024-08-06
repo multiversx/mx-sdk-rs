@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use convert_case::{Case, Casing};
 
 use crate::{
@@ -20,7 +22,7 @@ pub fn create_contract(args: &TemplateArgs) {
 
     let creator = ContractCreator::new(&repo_temp_download, args.template.clone(), target, false);
 
-    creator.create_contract(version_tag);
+    creator.create_contract(version_tag, args.author.clone().unwrap_or_default());
 }
 
 fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
@@ -79,9 +81,9 @@ impl<'a> ContractCreator<'a> {
         }
     }
 
-    pub fn create_contract(&self, args_tag: FrameworkVersion) {
+    pub fn create_contract(&self, args_tag: FrameworkVersion, new_authors: PathBuf) {
         self.copy_template(args_tag.clone());
-        self.update_dependencies(args_tag);
+        self.update_dependencies(args_tag, new_authors);
         self.rename_template();
     }
 
@@ -90,8 +92,8 @@ impl<'a> ContractCreator<'a> {
             .copy_template(self.target.contract_dir(), args_tag);
     }
 
-    pub fn update_dependencies(&self, args_tag: FrameworkVersion) {
-        self.adjuster.update_dependencies(args_tag);
+    pub fn update_dependencies(&self, args_tag: FrameworkVersion, new_authors: PathBuf) {
+        self.adjuster.update_dependencies(args_tag, new_authors);
     }
 
     pub fn rename_template(&self) {
