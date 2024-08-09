@@ -6,7 +6,7 @@ mod run;
 mod util;
 
 use crate::{
-    cli::{TestCoverageArgs, TestCoverageOutputFormat},
+    cli::{OutputFormat, TestCoverageArgs},
     cmd::test_coverage::{cargo::get_workspace_root, run::run_test_coverage},
 };
 use std::process;
@@ -16,9 +16,7 @@ pub fn test_coverage(args: &TestCoverageArgs) {
     if let Err(err) = run_test_coverage(
         &root_path,
         &args.output,
-        args.format
-            .as_ref()
-            .unwrap_or(&TestCoverageOutputFormat::default()),
+        args.format.as_ref().unwrap_or(&OutputFormat::default()),
         &args.ignore_filename_regex,
     ) {
         eprintln!("{}", err);
