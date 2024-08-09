@@ -65,7 +65,7 @@ pub enum StandaloneCliAction {
     #[command(name = "test-coverage", about = "Run test coverage and output report")]
     TestCoverage(TestCoverageArgs),
 
-    #[command(name = "code-report", about = "Generate code report")]
+    #[command(name = "report", about = "Generate code report")]
     CodeReportGen(CodeReportArgs),
 
     #[command(
@@ -142,25 +142,64 @@ pub struct TestCoverageArgs {
     pub ignore_filename_regex: Vec<String>,
 }
 
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct CodeReportArgs {
-    /// Target directory where to generate code report.
-    /// Will be current directory if not specified.
-    #[arg(short, long, verbatim_doc_comment)]
-    pub path: Option<String>,
+    #[command(subcommand)]
+    pub command: CodeReportAction,
+}
 
-    /// Output file path
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum CodeReportAction {
+    #[command(name = "compile", about = "Generates the contract report.")]
+    Compile(CompileArgs),
+
+    #[command(name = "compare", about = "Compare two contract report.")]
+    Compare(CompareArgs),
+
+    #[command(
+        name = "convert",
+        about = "Converts a contract report to a Markdown file."
+    )]
+    Convert(ConvertArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct CompileArgs {
+    /// Target directory where to generate code report.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub path: PathBuf,
+
+    /// Path to the Markdown or JSON file where the report results will be written.
     #[arg(short, long, verbatim_doc_comment)]
     pub output: PathBuf,
+}
 
-    /// Output format
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct CompareArgs {
+    /// Path to the previous version of code report JSON file
+    /// that will be used for comparison.
     #[arg(short, long, verbatim_doc_comment)]
-    pub format: Option<OutputFormat>,
+    pub baseline: PathBuf,
 
-    /// Compares 2 reports in JSON format and the output is printed in Markdown format.
-    /// If one argument with JSON format is given then it compares with itself.
+    /// Path to the current version of the code report JSON file
+    /// that will be compared.
     #[arg(short, long, verbatim_doc_comment)]
-    pub compare: Vec<PathBuf>,
+    pub new: PathBuf,
+
+    /// Path to the Markdown file where the comparison results will be written.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub output: PathBuf,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct ConvertArgs {
+    /// Path to the JSON report file that needs to be converted to Markdown format.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub input: PathBuf,
+
+    /// Path to the Markdown file where the report results will be written.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub output: PathBuf,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

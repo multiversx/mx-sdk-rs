@@ -1,39 +1,3 @@
-use std::io::BufRead;
-
-use multiversx_sc_meta_lib::code_report_json::CodeReportJson;
-
-pub(crate) fn parse_into_code_report_json(
-    compared_file_reader: &mut dyn BufRead,
-) -> Vec<CodeReportJson> {
-    let lines = compared_file_reader.lines().skip(2);
-
-    let mut compared_reports: Vec<CodeReportJson> = Vec::new();
-
-    for line in lines {
-        match line {
-            Ok(l) => {
-                let columns: Vec<String> = l
-                    .split('|')
-                    .map(|s| s.trim().to_string())
-                    .filter(|s| !s.is_empty())
-                    .collect();
-
-                if columns.len() == 4 {
-                    compared_reports.push(CodeReportJson {
-                        path: columns[0].to_owned(),
-                        size: columns[1].parse::<usize>().unwrap(),
-                        has_allocator: columns[2].parse::<bool>().unwrap(),
-                        has_panic: columns[3].to_owned(),
-                    })
-                }
-            },
-            Err(_) => return compared_reports,
-        }
-    }
-
-    compared_reports
-}
-
 pub(crate) fn size_status_after_comparing(size: usize, compared_size: usize) -> String {
     match size.cmp(&compared_size) {
         std::cmp::Ordering::Greater => {

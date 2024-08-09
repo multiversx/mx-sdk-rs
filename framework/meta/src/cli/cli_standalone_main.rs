@@ -3,7 +3,7 @@ use crate::cmd::retrieve_address::retrieve_address;
 use clap::Parser;
 
 use crate::cmd::all::call_all_meta;
-use crate::cmd::code_report::code_report;
+use crate::cmd::code_report::report;
 use crate::cmd::info::call_info;
 use crate::cmd::install::install;
 use crate::cmd::local_deps::local_deps;
@@ -38,7 +38,7 @@ pub async fn cli_main_standalone() {
             test_coverage(args);
         },
         Some(StandaloneCliAction::CodeReportGen(args)) => {
-            code_report(args);
+            report(args);
         },
         Some(StandaloneCliAction::Account(args)) => {
             retrieve_address(args).await;
