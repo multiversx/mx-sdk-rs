@@ -47,7 +47,7 @@ impl<'a> CodeReportRender<'a> {
 
         if self.compared_reports.is_empty() {
             self.render_reports();
-            self.writeln("\n:warning: Could not compare the 2 versions because the baseline file was not found. :warning:");
+            self.writeln("\n:warning: Could not download the report for the base branch. Displaying only the report for the current branch. :warning:");
         } else {
             self.render_report_and_compare();
         }
