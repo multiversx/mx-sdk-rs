@@ -19,6 +19,7 @@
 #
 # 2. Mass replace previous version -> new version.
 # Be careful to not accidentally replace some of the other dependencies we have.
+# Make sure to exclude files with extensions: *.lock, *.md, *.wat, *.txt, *.sh.
 #
 # 3. Write release name, date and description in `CHANGELOG.md`.
 #

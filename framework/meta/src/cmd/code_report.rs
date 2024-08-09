@@ -2,21 +2,14 @@ pub mod compare;
 pub mod generate_report;
 pub mod render_code_report;
 
-use generate_report::run_code_report;
+use generate_report::{compare_report, convert_report, create_report};
 
-use crate::cli::{CodeReportArgs, OutputFormat};
+use crate::cli::{CodeReportAction, CodeReportArgs};
 
-pub fn code_report(args: &CodeReportArgs) {
-    let path: &str = if let Some(some_path) = &args.path {
-        some_path.as_str()
-    } else {
-        "./"
-    };
-
-    run_code_report(
-        path,
-        args.output.to_str().unwrap(),
-        args.format.as_ref().unwrap_or(&OutputFormat::default()),
-        args.compare.clone().unwrap_or_default().to_str().unwrap(),
-    );
+pub fn report(args: &CodeReportArgs) {
+    match &args.command {
+        CodeReportAction::Compile(compile_args) => create_report(compile_args),
+        CodeReportAction::Compare(compare_args) => compare_report(compare_args),
+        CodeReportAction::Convert(convert_args) => convert_report(convert_args),
+    }
 }
