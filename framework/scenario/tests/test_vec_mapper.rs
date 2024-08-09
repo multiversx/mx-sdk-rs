@@ -80,6 +80,20 @@ fn test_vec_swap_remove() {
 }
 
 #[test]
+fn test_vec_update() {
+    let mut vect = create_vec();
+
+    vect.extend_from_slice(&[42, 43, 44, 45, 46]);
+
+    assert_eq!(vect.len(), 5);
+    assert_eq!(vect.get(5), 46);
+    vect.update(5, |item| *item = 42);
+    assert_eq!(vect.len(), 5);
+    assert_eq!(vect.get(5), 42);
+    check_vec(&vect, vec![42, 43, 44, 45, 42]);
+}
+
+#[test]
 fn test_vec_iter_processing() {
     let mut vect = create_vec();
     let range = 40..45;
