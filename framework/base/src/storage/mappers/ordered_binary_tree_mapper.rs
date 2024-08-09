@@ -232,7 +232,7 @@ where
         opt_predecessor
     }
 
-    pub fn insert_element(&mut self, new_data: T) {
+    pub fn insert_element(&mut self, new_data: T) -> u64 {
         let new_node_id = self.get_and_increment_last_id();
         let mut new_node = OrderedBinaryTreeNode::new(new_node_id, new_data);
 
@@ -243,7 +243,7 @@ where
 
             let current_node = unsafe { opt_current_node.unwrap_unchecked() };
             if new_node.data == current_node.data {
-                return;
+                return 0u64;
             }
 
             if new_node.data < current_node.data {
@@ -266,7 +266,7 @@ where
             let root_key = self.build_root_key();
             storage_set(root_key.as_ref(), &new_node);
 
-            return;
+            return 0u64;
         }
 
         let mut new_node_parent = unsafe { opt_new_node_parent.unwrap_unchecked() };
@@ -278,6 +278,8 @@ where
 
         self.set_item(new_node_id, &new_node);
         self.set_item(new_node_parent.current_node_id, &new_node_parent);
+
+        new_node_id
     }
 
     pub fn delete_node(&mut self, data: T) {
