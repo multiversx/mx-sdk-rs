@@ -155,5 +155,5 @@ fn extract_reports_from_json(path: &PathBuf) -> Vec<CodeReportJson> {
         File::open(path).unwrap_or_else(|_| panic!("file with path {} not found", path.display()));
     let reader = BufReader::new(file);
 
-    serde_json::from_reader(reader).expect("Cannot deserialize")
+    serde_json::from_reader(reader).unwrap_or_else(|_| vec![])
 }
