@@ -151,7 +151,8 @@ fn is_path_ends_with(path: &Path, extension: &str) -> bool {
 }
 
 fn extract_reports_from_json(path: &PathBuf) -> Vec<CodeReportJson> {
-    let file = File::open(path).expect("file not found");
+    let file =
+        File::open(path).unwrap_or_else(|_| panic!("file with path {} not found", path.display()));
     let reader = BufReader::new(file);
 
     serde_json::from_reader(reader).expect("Cannot deserialize")
