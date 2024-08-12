@@ -2,6 +2,8 @@ mod basic_interact_cli;
 mod basic_interact_config;
 mod basic_interact_state;
 
+use core::str;
+
 use adder::adder_proxy;
 use basic_interact_config::Config;
 use basic_interact_state::State;
@@ -63,9 +65,21 @@ impl AdderInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
-        let adder_owner_address =
-            interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
+        let adder_owner_address = interactor.register_wallet(test_wallets::alice());
+
         let wallet_address = interactor.register_wallet(test_wallets::mike());
+
+        interactor
+            .proxy
+            .send_user_funds(&Bech32Address::from(&adder_owner_address).to_bech32_string())
+            .await;
+
+        interactor
+            .proxy
+            .send_user_funds(&Bech32Address::from(&wallet_address).to_bech32_string())
+            .await;
+
+        interactor.proxy.generate_blocks(20).await;
 
         Self {
             interactor,
@@ -75,19 +89,9 @@ impl AdderInteract {
         }
     }
 
-    async fn set_state(&mut self) {
-        println!("wallet address: {}", self.wallet_address);
-        self.interactor
-            .retrieve_account(&self.adder_owner_address)
-            .await;
-        self.interactor.retrieve_account(&self.wallet_address).await;
-    }
-
     async fn deploy(&mut self) {
         // warning: multi deploy not yet fully supported
         // only works with last deployed address
-
-        self.set_state().await;
 
         let new_address = self
             .interactor
@@ -104,7 +108,7 @@ impl AdderInteract {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_adder_address(new_address);
+        self.state.set_adder_address(new_address.clone());
     }
 
     async fn multi_deploy(&mut self, count: usize) {
@@ -113,7 +117,6 @@ impl AdderInteract {
             return;
         }
 
-        self.set_state().await;
         println!("deploying {count} contracts...");
 
         let mut buffer = self.interactor.homogenous_call_buffer();
@@ -141,7 +144,6 @@ impl AdderInteract {
     }
 
     async fn multi_add(&mut self, value: u32, count: usize) {
-        self.set_state().await;
         println!("calling contract {count} times...");
 
         let mut buffer = self.interactor.homogenous_call_buffer();
@@ -205,7 +207,7 @@ impl AdderInteract {
         let response = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.adder_owner_address)
             .to(self.state.current_adder_address())
             .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)
@@ -241,5 +243,5 @@ async fn test() {
     basic_interact.deploy().await;
     basic_interact.add(1u32).await;
 
-    basic_interact.upgrade(7u32).await;
+    basic_interact.upgrade(5u32).await;
 }

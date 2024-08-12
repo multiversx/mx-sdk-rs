@@ -1,1 +1,1 @@
-gateway = 'https://devnet-gateway.multiversx.com'
+gateway = 'http://localhost:8085'

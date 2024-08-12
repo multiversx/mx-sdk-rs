@@ -14,6 +14,7 @@ impl Interactor {
     {
         let sc_call_step = sc_call_step.as_mut();
         let tx_hash = self.launch_sc_call(sc_call_step).await;
+        // self.proxy.generate_blocks(20).await;
         let tx = self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
 
         sc_call_step.save_response(network_response::parse_tx_response(tx));
