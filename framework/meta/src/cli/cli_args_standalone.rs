@@ -364,20 +364,6 @@ pub enum WalletAction {
     Convert(WalletConvertArgs),
 }
 
-#[derive(Default, Clone, PartialEq, Eq, Debug, ValueEnum)]
-pub enum WalletFormat {
-    #[default]
-    Pem,
-}
-
-#[derive(Default, Clone, PartialEq, Eq, Debug, ValueEnum)]
-pub enum WalletConvertFormat {
-    #[default]
-    Bech32,
-
-    Hex,
-}
-
 #[derive(Default, Clone, PartialEq, Eq, Debug, Parser)]
 #[command(propagate_version = true)]
 pub struct WalletArgs {
@@ -389,20 +375,24 @@ pub struct WalletArgs {
 pub struct WalletNewArgs {
     /// The type of wallet to create.
     #[arg(long = "format", verbatim_doc_comment)]
-    pub wallet_format: Option<WalletFormat>,
+    pub wallet_format: Option<String>,
 
     /// The name of the wallet to create.
     #[arg(long = "outfile", verbatim_doc_comment)]
     pub outfile: Option<String>,
-    // #[arg(long = "address-hrp")]
-    // pub address_hrp: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct WalletConvertArgs {
-    #[arg(long = "from", verbatim_doc_comment)]
-    pub from: Option<WalletConvertFormat>,
+    #[arg(long = "in-format", verbatim_doc_comment)]
+    pub from: Option<String>,
 
-    #[arg(long = "to", verbatim_doc_comment)]
-    pub to: Option<WalletConvertFormat>,
+    #[arg(long = "out-format", verbatim_doc_comment)]
+    pub to: Option<String>,
+
+    #[arg(long = "infile", verbatim_doc_comment)]
+    pub infile: Option<String>,
+
+    #[arg(long = "outfile", verbatim_doc_comment)]
+    pub outfile: Option<String>,
 }
