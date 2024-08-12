@@ -75,6 +75,12 @@ pub enum StandaloneCliAction {
         about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
     )]
     LocalDeps(LocalDepsArgs),
+
+    #[command(
+        name = "wallet",
+        about = "Generates a new wallet or performs actions on an existing wallet."
+    )]
+    Wallet(WalletArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -347,4 +353,56 @@ pub struct AccountArgs {
     /// Provide the address you want to retrieve data from
     #[arg(long = "address", verbatim_doc_comment)]
     pub address: String,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum WalletAction {
+    #[command(name = "new", about = "Creates a new wallet")]
+    New(WalletNewArgs),
+
+    #[command(name = "convert", about = "Converts a wallet")]
+    Convert(WalletConvertArgs),
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, ValueEnum)]
+pub enum WalletFormat {
+    #[default]
+    Pem,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, ValueEnum)]
+pub enum WalletConvertFormat {
+    #[default]
+    Bech32,
+
+    Hex,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Parser)]
+#[command(propagate_version = true)]
+pub struct WalletArgs {
+    #[command(subcommand)]
+    pub command: Option<WalletAction>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletNewArgs {
+    /// The type of wallet to create.
+    #[arg(long = "format", verbatim_doc_comment)]
+    pub wallet_format: Option<WalletFormat>,
+
+    /// The name of the wallet to create.
+    #[arg(long = "outfile", verbatim_doc_comment)]
+    pub outfile: Option<String>,
+    // #[arg(long = "address-hrp")]
+    // pub address_hrp: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletConvertArgs {
+    #[arg(long = "from", verbatim_doc_comment)]
+    pub from: Option<WalletConvertFormat>,
+
+    #[arg(long = "to", verbatim_doc_comment)]
+    pub to: Option<WalletConvertFormat>,
 }
