@@ -153,7 +153,7 @@ pub enum CodeReportAction {
     #[command(name = "compile", about = "Generates the contract report.")]
     Compile(CompileArgs),
 
-    #[command(name = "compare", about = "Compare two contract report.")]
+    #[command(name = "compare", about = "Compare two contract reports.")]
     Compare(CompareArgs),
 
     #[command(

@@ -20,13 +20,13 @@ const MD: &str = ".md";
 
 pub fn compare_report(compare_args: &CompareArgs) {
     if !is_path_ends_with(&compare_args.output, MD) {
-        panic!("Compare output is available only for Markdown file extension.");
+        panic!("Compare output is only available for Markdown file extension.");
     }
 
     if !is_path_ends_with(&compare_args.baseline, JSON)
         && !is_path_ends_with(&compare_args.new, JSON)
     {
-        panic!("Compare baseline and new is available only for JSON file extension.");
+        panic!("Compare baseline and new are only available for JSON file extension.");
     }
 
     let mut output_file = create_file(&compare_args.output);
@@ -45,11 +45,11 @@ pub fn compare_report(compare_args: &CompareArgs) {
 
 pub fn convert_report(convert_args: &ConvertArgs) {
     if !is_path_ends_with(&convert_args.output, MD) {
-        panic!("Conversion output is available only for Markdown file extension");
+        panic!("Conversion output is only available for Markdown file extension");
     }
 
     if !is_path_ends_with(&convert_args.input, JSON) {
-        panic!("Conversion available only from JSON file extension");
+        panic!("Conversion only available from JSON file extension");
     }
 
     let mut output_file = create_file(&convert_args.output);
@@ -65,7 +65,7 @@ pub fn create_report(compile_args: &CompileArgs) {
     if !is_path_ends_with(&compile_args.output, JSON)
         && !is_path_ends_with(&compile_args.output, MD)
     {
-        panic!("Create report is available only for Markdown or JSON output file.")
+        panic!("Create report is only available for Markdown or JSON output file.")
     }
 
     let reports = generate_new_report(&compile_args.path);
