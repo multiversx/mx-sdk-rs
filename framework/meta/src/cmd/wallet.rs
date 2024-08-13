@@ -7,10 +7,10 @@ use std::{
 
 use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
 use bip39::Mnemonic;
-use multiversx_sc_snippets::{hex, imports::Bech32Address};
-use multiversx_sdk::{
+use multiversx_sc_snippets::sdk::{
     crypto::public_key::PublicKey, data::address::Address, utils::base64_encode, wallet::Wallet,
 };
+use multiversx_sc_snippets::{hex, imports::Bech32Address};
 pub fn wallet(args: &WalletArgs) {
     let command = &args.command;
     match command {
