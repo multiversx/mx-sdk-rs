@@ -57,26 +57,24 @@ fn adder_whitebox_unified() {
 
     world.account(OWNER).nonce(1);
 
-    let _new_address = world
+    let new_address = world
         .tx()
         .from(OWNER)
         .raw_deploy()
         .code(CODE_PATH)
         .new_address(ADDER_ADDRESS)
-        .with_result(ExpectError(0, "ok"))
         .returns(ReturnsNewBech32Address)
         .whitebox(adder::contract_obj::<DebugApi>(), |sc| {
-            sc.init(BigUint::from(5u64));
+            sc.init(BigUint::from(3u64));
         });
 
-    assert_eq!(_new_address, ADDER_ADDRESS.to_address().into());
+    assert_eq!(new_address, ADDER_ADDRESS.to_address().into());
 
     world
         .tx()
         .from(OWNER)
         .to(ADDER_ADDRESS)
         .raw_call("")
-        .returns(ExpectError(0u64, "ok"))
         .whitebox(adder::contract_obj::<DebugApi>(), |sc| {
             sc.add(BigUint::from(5u64));
         });
@@ -88,6 +86,6 @@ fn adder_whitebox_unified() {
         .returns(ReturnsRawResult)
         .whitebox(adder::contract_obj::<DebugApi>(), |sc| {
             let sum = sc.sum().get();
-            assert_eq!(sum, BigUint::from(10u64));
+            assert_eq!(sum, BigUint::from(8u64));
         });
 }
