@@ -28,7 +28,7 @@ use std::{{
 pub(crate) fn write_snippet_constants(file: &mut File) {
     writeln!(
         file,
-        "const GATEWAY: &str = sdk::blockchain::DEVNET_GATEWAY;
+        "const GATEWAY: &str = sdk::gateway::DEVNET_GATEWAY;
 const STATE_FILE: &str = \"state.toml\";
 "
     )
