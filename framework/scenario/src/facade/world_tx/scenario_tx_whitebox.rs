@@ -1,10 +1,11 @@
 use crate::debug_executor::contract_instance_wrapped_execution;
 use crate::scenario::tx_to_step::TxToQueryStep;
-use crate::ScenarioEnvQuery;
 use crate::{
     imports::StaticApi, scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec,
 };
+use crate::{DebugApi, ScenarioEnvQuery};
 use multiversx_chain_vm::tx_mock::TxFunctionName;
+use multiversx_sc::contract_base::ContractBase;
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
@@ -15,11 +16,10 @@ use multiversx_sc::{
 
 pub trait ScenarioTxWhitebox {
     type Returns;
-    fn whitebox<ContractObj, F: FnOnce(ContractObj)>(
-        self,
-        contract_obj: ContractObj,
-        f: F,
-    ) -> Self::Returns;
+    fn whitebox<ContractObj, F>(self, contract_obj: fn() -> ContractObj, f: F) -> Self::Returns
+    where
+        ContractObj: ContractBase<Api = DebugApi> + 'static,
+        F: FnOnce(ContractObj);
 }
 
 impl<'w, From, Payment, CodeValue, RH> ScenarioTxWhitebox
@@ -41,11 +41,17 @@ where
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn whitebox<ContractObj, F: FnOnce(ContractObj)>(
+    fn whitebox<ContractObj, F>(
         self,
-        contract_obj: ContractObj,
+        contract_obj_builder: fn() -> ContractObj,
         f: F,
-    ) -> Self::Returns {
+    ) -> Self::Returns
+    where
+        ContractObj: ContractBase<Api = DebugApi> + 'static,
+        F: FnOnce(ContractObj),
+    {
+        let contract_obj = contract_obj_builder();
+
         let mut step_wrapper = self.tx_to_step();
         let (new_address, tx_result) = step_wrapper
             .env
@@ -77,11 +83,17 @@ where
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn whitebox<ContractObj, F: FnOnce(ContractObj)>(
+    fn whitebox<ContractObj, F>(
         self,
-        contract_obj: ContractObj,
+        contract_obj_builder: fn() -> ContractObj,
         f: F,
-    ) -> Self::Returns {
+    ) -> Self::Returns
+    where
+        ContractObj: ContractBase<Api = DebugApi> + 'static,
+        F: FnOnce(ContractObj),
+    {
+        let contract_obj = contract_obj_builder();
+
         let mut step_wrapper = self.tx_to_step();
 
         // no endpoint is called per se, but if it is empty, the VM thinks it is a simple transfer of value
@@ -117,11 +129,17 @@ where
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn whitebox<ContractObj, F: FnOnce(ContractObj)>(
+    fn whitebox<ContractObj, F>(
         self,
-        contract_obj: ContractObj,
+        contract_obj_builder: fn() -> ContractObj,
         f: F,
-    ) -> Self::Returns {
+    ) -> Self::Returns
+    where
+        ContractObj: ContractBase<Api = DebugApi> + 'static,
+        F: FnOnce(ContractObj),
+    {
+        let contract_obj = contract_obj_builder();
+
         let mut step_wrapper = self.tx_to_query_step();
 
         // no endpoint is called per se, but if it is empty, the VM thinks it is a simple transfer of value

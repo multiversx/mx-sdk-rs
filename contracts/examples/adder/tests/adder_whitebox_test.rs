@@ -64,7 +64,7 @@ fn adder_whitebox_unified() {
         .code(CODE_PATH)
         .new_address(ADDER_ADDRESS)
         .returns(ReturnsNewBech32Address)
-        .whitebox(adder::contract_obj::<DebugApi>(), |sc| {
+        .whitebox(adder::contract_obj, |sc| {
             sc.init(BigUint::from(3u64));
         });
 
@@ -75,7 +75,7 @@ fn adder_whitebox_unified() {
         .from(OWNER)
         .to(ADDER_ADDRESS)
         .raw_call("")
-        .whitebox(adder::contract_obj::<DebugApi>(), |sc| {
+        .whitebox(adder::contract_obj, |sc| {
             sc.add(BigUint::from(5u64));
         });
 
@@ -84,7 +84,7 @@ fn adder_whitebox_unified() {
         .to(ADDER_ADDRESS)
         .raw_call("")
         .returns(ReturnsRawResult)
-        .whitebox(adder::contract_obj::<DebugApi>(), |sc| {
+        .whitebox(adder::contract_obj, |sc| {
             let sum = sc.sum().get();
             assert_eq!(sum, BigUint::from(8u64));
         });
