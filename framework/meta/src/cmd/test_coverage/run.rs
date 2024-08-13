@@ -1,7 +1,7 @@
 use std::fs;
 
 use crate::{
-    cli::TestCoverageOutputFormat,
+    cli::OutputFormat,
     cmd::test_coverage::{
         cargo::{get_instrumented_test_binaries_paths, run_instrumented_tests},
         error::TestCoverageError,
@@ -16,7 +16,7 @@ use crate::{
 pub fn run_test_coverage(
     root_path: &str,
     output_path: &str,
-    output_format: &TestCoverageOutputFormat,
+    output_format: &OutputFormat,
     ignore_filename_regex: &[String],
 ) -> Result<(), TestCoverageError> {
     ensure_dependencies_in_path()?;
@@ -43,10 +43,10 @@ pub fn run_test_coverage(
     let mut output = String::new();
 
     match output_format {
-        TestCoverageOutputFormat::Markdown => {
+        OutputFormat::Markdown => {
             render_coverage(&mut output, &coverage, root_path);
         },
-        TestCoverageOutputFormat::Json => {
+        OutputFormat::Json => {
             output = serde_json::to_string_pretty(&coverage).unwrap();
         },
     };
