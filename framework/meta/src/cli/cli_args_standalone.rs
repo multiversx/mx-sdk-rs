@@ -385,10 +385,10 @@ pub struct WalletNewArgs {
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct WalletConvertArgs {
     #[arg(long = "in-format", verbatim_doc_comment)]
-    pub from: Option<String>,
+    pub from: String,
 
     #[arg(long = "out-format", verbatim_doc_comment)]
-    pub to: Option<String>,
+    pub to: String,
 
     #[arg(long = "infile", verbatim_doc_comment)]
     pub infile: Option<String>,
