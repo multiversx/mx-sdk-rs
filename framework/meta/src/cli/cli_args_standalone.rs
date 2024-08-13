@@ -360,15 +360,20 @@ pub enum WalletAction {
     #[command(name = "new", about = "Creates a new wallet")]
     New(WalletNewArgs),
 
+    #[command(
+        name = "bech32",
+        about = "Encodes/decodes a bech32 address to/from hex"
+    )]
+    Bech32(WalletBech32Args),
     #[command(name = "convert", about = "Converts a wallet")]
     Convert(WalletConvertArgs),
 }
 
-#[derive(Default, Clone, PartialEq, Eq, Debug, Parser)]
+#[derive(Clone, PartialEq, Eq, Debug, Parser)]
 #[command(propagate_version = true)]
 pub struct WalletArgs {
     #[command(subcommand)]
-    pub command: Option<WalletAction>,
+    pub command: WalletAction,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -395,4 +400,12 @@ pub struct WalletConvertArgs {
 
     #[arg(long = "outfile", verbatim_doc_comment)]
     pub outfile: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletBech32Args {
+    #[arg(long = "encode", verbatim_doc_comment)]
+    pub hex_address: Option<String>,
+    #[arg(long = "decode", verbatim_doc_comment)]
+    pub bech32_address: Option<String>,
 }
