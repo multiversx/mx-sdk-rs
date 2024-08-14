@@ -2013,10 +2013,7 @@ dependencies = [
 name = "multiversx-sc-meta"
 version = "0.52.3"
 dependencies = [
-<<<<<<< Updated upstream
-=======
  "bip39",
->>>>>>> Stashed changes
  "clap",
  "colored",
  "common-path",
