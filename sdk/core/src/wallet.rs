@@ -1,11 +1,18 @@
 extern crate rand;
 
+use core::str;
+use std::{
+    fs::{self, File},
+    io::{self, Read},
+};
+
 use anyhow::Result;
 use bip39::{Language, Mnemonic};
 use hmac::{Hmac, Mac};
 use pbkdf2::pbkdf2;
-use serde_json::json;
-use sha2::{Digest, Sha512};
+use scrypt::{scrypt, Params};
+use serde_json::{json, Value};
+use sha2::{Digest, Sha256, Sha512};
 use sha3::Keccak256;
 use zeroize::Zeroize;
 
@@ -20,7 +27,8 @@ use crate::{
 const EGLD_COIN_TYPE: u32 = 508;
 const HARDENED: u32 = 0x80000000;
 
-type HmacSha521 = Hmac<Sha512>;
+type HmacSha512 = Hmac<Sha512>;
+type HmacSha256 = Hmac<Sha256>;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Wallet {
@@ -63,7 +71,7 @@ impl Wallet {
         let hardened_child_padding: u8 = 0;
 
         let mut digest =
-            HmacSha521::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
+            HmacSha512::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
         digest.update(&seed);
         let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
         let mut key = intermediary[..serialized_key_len].to_vec();
@@ -83,7 +91,7 @@ impl Wallet {
             buff.push(child_idx as u8);
 
             digest =
-                HmacSha521::new_from_slice(&chain_code).expect("HMAC can take key of any size");
+                HmacSha512::new_from_slice(&chain_code).expect("HMAC can take key of any size");
             digest.update(&buff);
             let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
             key = intermediary[..serialized_key_len].to_vec();
@@ -130,5 +138,62 @@ impl Wallet {
         }
 
         self.priv_key.sign(tx_bytes)
+    }
+
+    pub fn validate_keystore_password(path: &str) {
+        println!(
+            "Insert password. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
+        );
+        let mut password = String::new();
+        _ = io::stdin().read_to_string(&mut password).unwrap();
+        password = password.replace('\n', "");
+        print!("{:?}", password);
+
+        let keystore_file = File::open(path);
+        match keystore_file {
+            Ok(_) => {
+                let json_body = fs::read_to_string(path).unwrap();
+                let keystore: Value = serde_json::from_str(&json_body).unwrap();
+                let ciphertext = keystore["crypto"]["ciphertext"]
+                    .as_str()
+                    .unwrap()
+                    .as_bytes();
+                let _iv = keystore["crypto"]["cipherparams"]["iv"]
+                    .as_str()
+                    .unwrap()
+                    .as_bytes();
+                let salt = keystore["crypto"]["kdfparams"]["salt"]
+                    .as_str()
+                    .unwrap()
+                    .as_bytes();
+
+                let json_mac: &[u8] = keystore["crypto"]["mac"].as_str().unwrap().as_bytes();
+                let kdfparams = &keystore["crypto"]["kdfparams"];
+                let n = kdfparams["n"].as_f64().unwrap();
+                let r = kdfparams["r"].as_u64().unwrap();
+                let p = kdfparams["p"].as_u64().unwrap();
+                let dklen = kdfparams["dklen"].as_u64().unwrap() as usize;
+                let params = Params::new(n.log2() as u8, r as u32, p as u32, dklen).unwrap();
+
+                let mut derived_key = vec![0u8; 32];
+
+                _ = scrypt(password.as_bytes(), salt, &params, &mut derived_key).unwrap();
+
+                let _derived_key_first_half = &derived_key[0..16];
+                let derived_key_second_half = &derived_key[16..32];
+
+                let mut input_mac = HmacSha256::new_from_slice(derived_key_second_half).unwrap();
+                input_mac.update(ciphertext);
+                let computed_mac = input_mac.finalize();
+                let mac_bytes = computed_mac.into_bytes();
+                let hex_mac = hex::encode(mac_bytes);
+
+                println!("{:?}", hex_mac.as_bytes());
+                println!("{:?}", json_mac);
+            },
+            Err(e) => {
+                println!("Error: {}", e);
+            },
+        }
     }
 }
