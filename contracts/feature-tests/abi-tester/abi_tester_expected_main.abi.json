@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.50.4"
+            "version": "0.52.3"
         }
     },
     "docs": [
@@ -390,6 +390,21 @@
             ]
         },
         {
+            "name": "takes_object_with_managed_buffer_read_to_end",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "arg",
+                    "type": "AbiWithManagedBufferReadToEnd"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
             "name": "payable_egld",
             "mutability": "mutable",
             "payableInTokens": [
@@ -480,6 +495,14 @@
         {
             "ticker": "ExplicitDiscriminantMixed",
             "type": "ExplicitDiscriminantMixed"
+        },
+        {
+            "ticker": "ManagedDecimalVar",
+            "type": "ManagedDecimal<usize>"
+        },
+        {
+            "ticker": "ManagedDecimalConst",
+            "type": "ManagedDecimalWrapper"
         }
     ],
     "hasCallback": false,
@@ -597,6 +620,26 @@
                     ],
                     "name": "tuple_madness",
                     "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                }
+            ]
+        },
+        "AbiWithManagedBufferReadToEnd": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "name": "endpoint",
+                    "type": "bytes"
+                },
+                {
+                    "name": "gas",
+                    "type": "u64"
+                },
+                {
+                    "name": "flush",
+                    "type": "bytes-read-to-end"
                 }
             ]
         },
@@ -793,6 +836,15 @@
                             "type": "u16"
                         }
                     ]
+                }
+            ]
+        },
+        "ManagedDecimalWrapper": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "field",
+                    "type": "ManagedDecimal<2>"
                 }
             ]
         },

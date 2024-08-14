@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use storage_get_from_address::storage_get_len_from_address;
 
 pub use super::queue_mapper::Iter;
-use super::{QueueMapper, StorageClearable, StorageMapper};
+use super::{QueueMapper, StorageClearable, StorageMapper, StorageMapperFromAddress};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
@@ -95,12 +95,12 @@ where
     }
 }
 
-impl<SA, T> SetMapper<SA, T, ManagedAddress<SA>>
+impl<SA, T> StorageMapperFromAddress<SA> for SetMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         SetMapper {
             _phantom_api: PhantomData,
             address: address.clone(),

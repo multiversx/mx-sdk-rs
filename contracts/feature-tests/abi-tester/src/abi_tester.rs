@@ -23,8 +23,10 @@ use only_nested::*;
 #[esdt_attribute("STRUCT1", AbiEnum)]
 #[esdt_attribute("STRUCT2", AbiManagedType<Self::Api>)]
 #[esdt_attribute("OnlyInEsdt", OnlyShowsUpInEsdtAttr)]
-#[esdt_attribute["ExplicitDiscriminant", ExplicitDiscriminant]]
-#[esdt_attribute["ExplicitDiscriminantMixed", ExplicitDiscriminantMixed]]
+#[esdt_attribute("ExplicitDiscriminant", ExplicitDiscriminant)]
+#[esdt_attribute("ExplicitDiscriminantMixed", ExplicitDiscriminantMixed)]
+#[esdt_attribute("ManagedDecimalVar", ManagedDecimal<Self::Api, NumDecimals>)]
+#[esdt_attribute("ManagedDecimalConst", ManagedDecimalWrapper<Self::Api>)]
 pub trait AbiTester {
     /// Contract constructor.
     #[init]
@@ -168,6 +170,14 @@ pub trait AbiTester {
     #[view]
     fn operation_completion_status(&self) -> OperationCompletionStatus {
         OperationCompletionStatus::Completed
+    }
+
+    #[view]
+    fn takes_object_with_managed_buffer_read_to_end(
+        &self,
+        arg: AbiWithManagedBufferReadToEnd<Self::Api>,
+    ) -> ManagedBuffer {
+        arg.flush.into_managed_buffer()
     }
 
     #[endpoint]

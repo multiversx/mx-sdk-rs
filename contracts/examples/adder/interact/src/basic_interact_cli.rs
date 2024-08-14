@@ -22,18 +22,31 @@ pub enum InteractCliCommand {
     MultiDeploy(MultiDeployArgs),
     #[command(name = "sum", about = "Print sum")]
     Sum,
+    #[command(name = "upgrade", about = "Upgrade contract")]
+    Upgrade(UpgradeArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct AddArgs {
     /// The value to add
-    #[arg(short = 'v', long = "value", verbatim_doc_comment)]
-    pub value: u64,
+    #[arg(short = 'v', long = "value")]
+    pub value: u32,
+
+    /// Repeat this number of times
+    #[arg(short = 'c', long = "count", default_value = "1")]
+    pub count: usize,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct UpgradeArgs {
+    /// The value to add
+    #[arg(short = 'v', long = "value")]
+    pub value: u32,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct MultiDeployArgs {
     /// The number of contracts to deploy
-    #[arg(short = 'c', long = "count", verbatim_doc_comment)]
-    pub count: u8,
+    #[arg(short = 'c', long = "count")]
+    pub count: usize,
 }

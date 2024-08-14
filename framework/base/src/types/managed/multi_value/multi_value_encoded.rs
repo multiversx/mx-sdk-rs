@@ -1,5 +1,6 @@
 use unwrap_infallible::UnwrapInfallible;
 
+use crate::codec::multi_types::MultiValueVec;
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
@@ -244,11 +245,7 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
-    #[cfg(feature = "alloc")]
     type Unmanaged = MultiValueVec<T::Unmanaged>;
-
-    #[cfg(not(feature = "alloc"))]
-    type Unmanaged = Self;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
@@ -267,10 +264,6 @@ where
     }
 }
 
-#[cfg(feature = "alloc")]
-use crate::codec::multi_types::MultiValueVec;
-
-#[cfg(feature = "alloc")]
 impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
 where
     M: ManagedTypeApi + ErrorApi,
@@ -279,7 +272,6 @@ where
 {
 }
 
-#[cfg(feature = "alloc")]
 impl<M, T, U> TypeAbiFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,

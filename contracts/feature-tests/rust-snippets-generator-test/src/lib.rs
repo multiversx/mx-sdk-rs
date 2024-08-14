@@ -11,9 +11,9 @@ multiversx_sc::derive_imports!();
 // cargo run snippets
 // Add --overwrite if you want to overwrite existing snippets
 
-// Additionally, we also have to update the interact-rs snippets manually to add relative paths:
+// Additionally, we also have to update the interactor snippets manually to add relative paths:
 // [dependencies.multiversx-sc-snippets]
-// version = "0.50.4"
+// version = "0.52.3"
 // path = "../../../../framework/snippets"
 
 #[derive(

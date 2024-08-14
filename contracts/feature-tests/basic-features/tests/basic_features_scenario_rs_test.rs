@@ -266,6 +266,16 @@ fn managed_buffer_set_random_rs() {
 }
 
 #[test]
+fn managed_decimal_rs() {
+    world().run("scenarios/managed_decimal.scen.json");
+}
+
+#[test]
+fn managed_decimal_logarithm_rs() {
+    world().run("scenarios/managed_decimal_logarithm.scen.json");
+}
+
+#[test]
 fn managed_vec_address_push_rs() {
     world().run("scenarios/managed_vec_address_push.scen.json");
 }
@@ -386,6 +396,11 @@ fn storage_mapper_fungible_token_rs() {
 #[test]
 fn storage_mapper_get_at_address_rs() {
     world().run("scenarios/storage_mapper_get_at_address.scen.json");
+}
+
+#[test]
+fn storage_mapper_get_at_address_extra_key_rs() {
+    world().run("scenarios/storage_mapper_get_at_address_extra_key.scen.json");
 }
 
 #[test]
