@@ -139,7 +139,7 @@ impl Wallet {
 
         self.priv_key.sign(tx_bytes)
     }
-
+    // fd56d1c4d149ac397af292796100f347f0f47a8f52b9683741d8a90db872450e
     pub fn validate_keystore_password(path: &str) {
         println!(
             "Insert password. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
@@ -147,49 +147,45 @@ impl Wallet {
         let mut password = String::new();
         _ = io::stdin().read_to_string(&mut password).unwrap();
         password = password.replace('\n', "");
-        print!("{:?}", password);
 
         let keystore_file = File::open(path);
         match keystore_file {
             Ok(_) => {
                 let json_body = fs::read_to_string(path).unwrap();
                 let keystore: Value = serde_json::from_str(&json_body).unwrap();
-                let ciphertext = keystore["crypto"]["ciphertext"]
-                    .as_str()
-                    .unwrap()
-                    .as_bytes();
-                let _iv = keystore["crypto"]["cipherparams"]["iv"]
-                    .as_str()
-                    .unwrap()
-                    .as_bytes();
-                let salt = keystore["crypto"]["kdfparams"]["salt"]
-                    .as_str()
-                    .unwrap()
-                    .as_bytes();
 
-                let json_mac: &[u8] = keystore["crypto"]["mac"].as_str().unwrap().as_bytes();
+                let ciphertext =
+                    hex::decode(keystore["crypto"]["ciphertext"].as_str().unwrap()).unwrap();
+                let _iv = hex::decode(keystore["crypto"]["cipherparams"]["iv"].as_str().unwrap())
+                    .unwrap();
+                let salt =
+                    hex::decode(keystore["crypto"]["kdfparams"]["salt"].as_str().unwrap()).unwrap();
+
+                let json_mac = hex::decode(keystore["crypto"]["mac"].as_str().unwrap()).unwrap();
+
                 let kdfparams = &keystore["crypto"]["kdfparams"];
                 let n = kdfparams["n"].as_f64().unwrap();
                 let r = kdfparams["r"].as_u64().unwrap();
                 let p = kdfparams["p"].as_u64().unwrap();
                 let dklen = kdfparams["dklen"].as_u64().unwrap() as usize;
+
                 let params = Params::new(n.log2() as u8, r as u32, p as u32, dklen).unwrap();
 
                 let mut derived_key = vec![0u8; 32];
-
-                _ = scrypt(password.as_bytes(), salt, &params, &mut derived_key).unwrap();
+                _ = scrypt(password.as_bytes(), &salt, &params, &mut derived_key).unwrap();
 
                 let _derived_key_first_half = &derived_key[0..16];
                 let derived_key_second_half = &derived_key[16..32];
 
                 let mut input_mac = HmacSha256::new_from_slice(derived_key_second_half).unwrap();
-                input_mac.update(ciphertext);
-                let computed_mac = input_mac.finalize();
-                let mac_bytes = computed_mac.into_bytes();
-                let hex_mac = hex::encode(mac_bytes);
+                input_mac.update(&ciphertext);
+                let computed_mac = input_mac.finalize().into_bytes();
 
-                println!("{:?}", hex_mac.as_bytes());
-                println!("{:?}", json_mac);
+                if computed_mac.as_slice() == json_mac.as_slice() {
+                    println!("Password is correct");
+                } else {
+                    println!("Password is incorrect");
+                }
             },
             Err(e) => {
                 println!("Error: {}", e);
