@@ -16,6 +16,8 @@ use multiversx_sc::{
 
 pub trait ScenarioTxWhitebox {
     type Returns;
+
+    /// Runs a lambda function in the name of a smart contract, with the configured transaction context.
     fn whitebox<ContractObj, F>(self, contract_obj: fn() -> ContractObj, f: F) -> Self::Returns
     where
         ContractObj: ContractBase<Api = DebugApi> + 'static,
@@ -73,6 +75,31 @@ where
 }
 
 impl<'w, From, To, Payment, RH> ScenarioTxWhitebox
+    for Tx<ScenarioEnvExec<'w>, From, To, Payment, (), (), RH>
+where
+    From: TxFromSpecified<ScenarioEnvExec<'w>>,
+    To: TxToSpecified<ScenarioEnvExec<'w>>,
+    Payment: TxPayment<ScenarioEnvExec<'w>>,
+    RH: RHListExec<TxResponse, ScenarioEnvExec<'w>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn whitebox<ContractObj, F>(
+        self,
+        contract_obj_builder: fn() -> ContractObj,
+        f: F,
+    ) -> Self::Returns
+    where
+        ContractObj: ContractBase<Api = DebugApi> + 'static,
+        F: FnOnce(ContractObj),
+    {
+        self.raw_call(TxFunctionName::WHITEBOX_CALL.as_str())
+            .whitebox(contract_obj_builder, f)
+    }
+}
+
+impl<'w, From, To, Payment, RH> ScenarioTxWhitebox
     for Tx<ScenarioEnvExec<'w>, From, To, Payment, (), FunctionCall<StaticApi>, RH>
 where
     From: TxFromSpecified<ScenarioEnvExec<'w>>,
@@ -116,6 +143,30 @@ where
         let response = TxResponse::from_tx_result(tx_result);
         step_wrapper.step.save_response(response);
         step_wrapper.process_result()
+    }
+}
+
+impl<'w, To, Payment, RH> ScenarioTxWhitebox
+    for Tx<ScenarioEnvQuery<'w>, (), To, Payment, (), (), RH>
+where
+    To: TxToSpecified<ScenarioEnvQuery<'w>>,
+    Payment: TxNoPayment<ScenarioEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, ScenarioEnvQuery<'w>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn whitebox<ContractObj, F>(
+        self,
+        contract_obj_builder: fn() -> ContractObj,
+        f: F,
+    ) -> Self::Returns
+    where
+        ContractObj: ContractBase<Api = DebugApi> + 'static,
+        F: FnOnce(ContractObj),
+    {
+        self.raw_call(TxFunctionName::WHITEBOX_CALL.as_str())
+            .whitebox(contract_obj_builder, f)
     }
 }
 

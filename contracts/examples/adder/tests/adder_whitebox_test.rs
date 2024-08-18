@@ -74,7 +74,6 @@ fn adder_whitebox_unified() {
         .tx()
         .from(OWNER)
         .to(ADDER_ADDRESS)
-        .raw_call("")
         .whitebox(adder::contract_obj, |sc| {
             sc.add(BigUint::from(5u64));
         });
@@ -82,7 +81,6 @@ fn adder_whitebox_unified() {
     let _raw_response = world
         .query()
         .to(ADDER_ADDRESS)
-        .raw_call("")
         .returns(ReturnsRawResult)
         .whitebox(adder::contract_obj, |sc| {
             let sum = sc.sum().get();
