@@ -46,31 +46,6 @@ fn tester_deploy_test() {
 }
 
 #[test]
-fn tester_managed_option_test() {
-    let mut world = world();
-
-    world.start_trace();
-
-    let (_, contract_address) = deploy(&mut world);
-
-    let type_number: BigUint<StaticApi> = BigUint::zero();
-    let expected_type_managed_option: ManagedOption<StaticApi, BigUint<StaticApi>> =
-        ManagedOption::some(type_number);
-
-    let output = world
-        .tx()
-        .from(OWNER_ADDRESS)
-        .to(contract_address)
-        .typed(rust_testing_framework_tester_proxy::RustTestingFrameworkTesterProxy)
-        .type_managed_option(expected_type_managed_option.clone())
-        .returns(ReturnsResult)
-        .run();
-
-    assert_eq!(output, expected_type_managed_option);
-    world.write_scenario_trace("scenarios/trace-deploy.scen.json");
-}
-
-#[test]
 fn tester_deploy_test_spawned_thread() {
     let handler = std::thread::spawn(|| {
         let mut world = world();

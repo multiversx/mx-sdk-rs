@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           27
+// Endpoints:                           26
 // Async Callback:                       1
-// Total number of exported functions:  29
+// Total number of exported functions:  28
 
 #![no_std]
 
@@ -44,7 +44,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         execute_on_dest_add_value => execute_on_dest_add_value
         addValue => add
         panic => panic
-        type_managed_option => type_managed_option
     )
 }
 

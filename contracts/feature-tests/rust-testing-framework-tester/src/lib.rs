@@ -229,15 +229,6 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         sc_panic!("Oh no!");
     }
 
-    /// Tests how is generated type name in proxy
-    #[endpoint]
-    fn type_managed_option(
-        &self,
-        managed_option: ManagedOption<BigUint>,
-    ) -> ManagedOption<BigUint> {
-        managed_option
-    }
-
     fn get_val(&self) -> BigUint {
         self.total_value().get()
     }

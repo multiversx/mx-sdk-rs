@@ -62,6 +62,20 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    /// This tests how is generated type name in proxy 
+    pub fn echo_managed_option<
+        Arg0: ProxyArg<ManagedOption<Env::Api, BigUint<Env::Api>>>,
+    >(
+        self,
+        mo: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedOption<Env::Api, BigUint<Env::Api>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("echo_managed_option")
+            .argument(&mo)
+            .original_result()
+    }
+
     pub fn load_bytes(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {

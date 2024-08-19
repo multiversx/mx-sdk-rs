@@ -385,19 +385,6 @@ where
             .raw_call("panic")
             .original_result()
     }
-
-    pub fn type_managed_option<
-        Arg0: ProxyArg<ManagedOption<Env::Api, BigUint<Env::Api>>>,
-    >(
-        self,
-        managed_option: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedOption<Env::Api, BigUint<Env::Api>>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("type_managed_option")
-            .argument(&managed_option)
-            .original_result()
-    }
 }
 
 #[type_abi]
