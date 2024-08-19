@@ -1,76 +1,87 @@
 use multiversx_sc_scenario::imports::*;
 use rust_testing_framework_tester::*;
 
-const WASM_PATH_EXPR: &str = "mxsc:output/rust-testing-framework-tester.mxsc.json";
+const CODE_PATH: MxscPath = MxscPath::new("output/rust-testing-framework-tester.mxsc.json");
+const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
+const RUST_TESTING_FRAMEWORK_TESTER_ADDRESS: TestSCAddress =
+    TestSCAddress::new("rust-testing-framework-tester");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.register_contract(
-        WASM_PATH_EXPR,
-        rust_testing_framework_tester::ContractBuilder,
-    );
+    blockchain.register_contract(CODE_PATH, rust_testing_framework_tester::ContractBuilder);
     blockchain
 }
 
-#[test]
-#[allow(deprecated)]
-fn tester_deploy_test() {
-    let mut world = world();
-    let code = world.code_expression(WASM_PATH_EXPR);
-
-    let owner_address = "address:owner";
-    let mut adder_contract =
-        ContractInfo::<rust_testing_framework_tester::Proxy<StaticApi>>::new("sc:contract");
+fn deploy(world: &mut ScenarioWorld) -> (ManagedBuffer<StaticApi>, Address) {
+    world.account(OWNER_ADDRESS).new_address(
+        OWNER_ADDRESS,
+        0,
+        RUST_TESTING_FRAMEWORK_TESTER_ADDRESS,
+    );
 
     world
-        .start_trace()
-        .set_state_step(
-            SetStateStep::new()
-                .put_account(owner_address, Account::new())
-                .new_address(owner_address, 0, &adder_contract),
-        )
-        .sc_deploy_use_result(
-            ScDeployStep::new()
-                .from(owner_address)
-                .code(code)
-                .call(adder_contract.init()),
-            |address, tr: TypedResponse<String>| {
-                assert_eq!(address, adder_contract.to_address());
-                assert_eq!(tr.result.unwrap(), "constructor-result");
-            },
-        )
-        .write_scenario_trace("scenarios/trace-deploy.scen.json");
+        .tx()
+        .from(OWNER_ADDRESS)
+        .typed(rust_testing_framework_tester_proxy::RustTestingFrameworkTesterProxy)
+        .init()
+        .code(CODE_PATH)
+        .returns(ReturnsResult)
+        .new_address(RUST_TESTING_FRAMEWORK_TESTER_ADDRESS)
+        .returns(ReturnsNewAddress)
+        .run()
 }
 
 #[test]
-#[allow(deprecated)]
+fn tester_deploy_test() {
+    let mut world = world();
+
+    world.start_trace();
+
+    let (returned_value, contract_address) = deploy(&mut world);
+
+    assert_eq!(returned_value.to_string(), "constructor-result");
+    assert_eq!(contract_address, RUST_TESTING_FRAMEWORK_TESTER_ADDRESS);
+
+    world.write_scenario_trace("scenarios/trace-deploy.scen.json");
+}
+
+#[test]
+fn tester_managed_option_test() {
+    let mut world = world();
+
+    world.start_trace();
+
+    let (_, contract_address) = deploy(&mut world);
+
+    let type_number: BigUint<StaticApi> = BigUint::zero();
+    let expected_type_managed_option: ManagedOption<StaticApi, BigUint<StaticApi>> =
+        ManagedOption::some(type_number);
+
+    let output = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(contract_address)
+        .typed(rust_testing_framework_tester_proxy::RustTestingFrameworkTesterProxy)
+        .type_managed_option(expected_type_managed_option.clone())
+        .returns(ReturnsResult)
+        .run();
+
+    assert_eq!(output, expected_type_managed_option);
+    world.write_scenario_trace("scenarios/trace-deploy.scen.json");
+}
+
+#[test]
 fn tester_deploy_test_spawned_thread() {
     let handler = std::thread::spawn(|| {
         let mut world = world();
-        let code = world.code_expression(WASM_PATH_EXPR);
 
-        let owner_address = "address:owner";
-        let mut adder_contract =
-            ContractInfo::<rust_testing_framework_tester::Proxy<StaticApi>>::new("sc:contract");
+        world.start_trace();
+        let (returned_value, contract_address) = deploy(&mut world);
 
-        world
-            .start_trace()
-            .set_state_step(
-                SetStateStep::new()
-                    .put_account(owner_address, Account::new())
-                    .new_address(owner_address, 0, &adder_contract),
-            )
-            .sc_deploy_use_result(
-                ScDeployStep::new()
-                    .from(owner_address)
-                    .code(code)
-                    .call(adder_contract.init()),
-                |address, tr: TypedResponse<String>| {
-                    assert_eq!(address, adder_contract.to_address());
-                    assert_eq!(tr.result.unwrap(), "constructor-result");
-                },
-            )
-            .write_scenario_trace("scenarios/trace-deploy.scen.json");
+        assert_eq!(returned_value.to_string(), "constructor-result");
+        assert_eq!(contract_address, RUST_TESTING_FRAMEWORK_TESTER_ADDRESS);
+
+        world.write_scenario_trace("scenarios/trace-deploy.scen.json");
     });
 
     handler.join().unwrap();
