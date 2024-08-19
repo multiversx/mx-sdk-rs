@@ -96,6 +96,25 @@ impl GatewayProxy {
         }
     }
 
+    // get_transaction_process_status retrieves a transaction's status from the network using process-status API
+    pub async fn get_transaction_process_status(&self, hash: &str) -> Result<String> {
+        let endpoint = format!("transaction/{hash}/process-status");
+        let endpoint = self.get_endpoint(endpoint.as_str());
+
+        let resp = self
+            .client
+            .get(endpoint)
+            .send()
+            .await?
+            .json::<TransactionStatus>()
+            .await?;
+
+        match resp.data {
+            None => Err(anyhow!("{}", resp.error)),
+            Some(b) => Ok(b.status),
+        }
+    }
+
     // get_default_transaction_arguments will prepare the transaction creation argument by querying the account's info
     pub async fn get_default_transaction_arguments(
         &self,

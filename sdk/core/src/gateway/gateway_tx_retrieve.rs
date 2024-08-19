@@ -16,7 +16,7 @@ impl GatewayProxy {
         let start_time = Instant::now();
 
         loop {
-            match self.get_transaction_status(&tx_hash).await {
+            match self.get_transaction_process_status(&tx_hash).await {
                 Ok(status) => {
                     // checks if transaction status is final
                     match status.as_str() {
