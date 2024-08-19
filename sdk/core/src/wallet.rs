@@ -42,6 +42,20 @@ pub struct Wallet {
     priv_key: PrivateKey,
 }
 
+#[derive(Clone, Debug)]
+pub struct DecryptionParams {
+    pub derived_key_first_half: Vec<u8>,
+    pub iv: Vec<u8>,
+    pub ciphertext: Vec<u8>,
+}
+
+#[derive(Debug)]
+pub enum WalletError {
+    InvalidPassword,
+    InvalidKdf,
+    InvalidCipher,
+}
+
 impl Wallet {
     // GenerateMnemonic will generate a new mnemonic value using the bip39 implementation
     pub fn generate_mnemonic() -> Mnemonic {
