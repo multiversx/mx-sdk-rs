@@ -1,7 +1,7 @@
 extern crate rand;
 
 use std::{
-    fs::{self, File},
+    fs::{self},
     io::{self, Read},
 };
 
@@ -27,6 +27,8 @@ use crate::{
 
 const EGLD_COIN_TYPE: u32 = 508;
 const HARDENED: u32 = 0x80000000;
+const CIPHER_ALGORITHM_AES_128_CTR: &str = "aes-128-ctr";
+const KDF_SCRYPT: &str = "scrypt";
 
 type HmacSha512 = Hmac<Sha512>;
 type HmacSha256 = Hmac<Sha256>;
@@ -34,6 +36,20 @@ type HmacSha256 = Hmac<Sha256>;
 #[derive(Copy, Clone, Debug)]
 pub struct Wallet {
     priv_key: PrivateKey,
+}
+
+#[derive(Clone, Debug)]
+pub struct DecryptionParams {
+    pub derived_key_first_half: Vec<u8>,
+    pub iv: Vec<u8>,
+    pub ciphertext: Vec<u8>,
+}
+
+#[derive(Debug)]
+pub enum WalletError {
+    InvalidPassword,
+    InvalidKdf,
+    InvalidCipher,
 }
 
 impl Wallet {
@@ -120,11 +136,13 @@ impl Wallet {
         Ok(Self { priv_key: pri_key })
     }
 
-    // HeadCanon
     pub fn from_keystore_secret(file_path: &str) -> Result<Self> {
-        let (x, y, z) = Self::validate_keystore_password(file_path).unwrap();
-        let priv_key = PrivateKey::from_hex_str(Self::decrypt_secret_key(&x, &y,& z).as_str())?;
-        Ok(Self {priv_key: priv_key})
+        let decyption_params = Self::validate_keystore_password(file_path).unwrap_or_else(|e| {
+            panic!("Error: {:?}", e);
+        });
+        let priv_key =
+            PrivateKey::from_hex_str(Self::decrypt_secret_key(decyption_params).as_str())?;
+        Ok(Self { priv_key })
     }
 
     pub fn address(&self) -> Address {
@@ -148,69 +166,69 @@ impl Wallet {
         self.priv_key.sign(tx_bytes)
     }
 
-    pub fn validate_keystore_password(path: &str) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), ()> {
+    pub fn validate_keystore_password(path: &str) -> Result<DecryptionParams, WalletError> {
         println!(
             "Insert password. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
         );
         let mut password = String::new();
-        io::stdin().read_to_string(&mut password).map_err(|_| ())?;
+        io::stdin().read_to_string(&mut password).unwrap();
         password = password.trim().to_string();
-    
-        let _ = File::open(path).map_err(|e| {
-            println!("Error: {}", e);
-            ()
-        })?;
-    
-        let json_body = fs::read_to_string(path).map_err(|_| ())?;
-        let keystore: Keystore = serde_json::from_str(&json_body).map_err(|_| ())?;
-    
-        let ciphertext = hex::decode(&keystore.crypto.ciphertext).map_err(|_| ())?;
-        let iv = hex::decode(&keystore.crypto.cipherparams.iv).map_err(|_| ())?;
-        let salt = hex::decode(&keystore.crypto.kdfparams.salt).map_err(|_| ())?;
-        let json_mac = hex::decode(&keystore.crypto.mac).map_err(|_| ())?;
-    
+
+        let json_body = fs::read_to_string(path).unwrap();
+        let keystore: Keystore = serde_json::from_str(&json_body).unwrap();
+        let ciphertext = hex::decode(&keystore.crypto.ciphertext).unwrap();
+
+        let cipher = &keystore.crypto.cipher;
+        if cipher != CIPHER_ALGORITHM_AES_128_CTR {
+            return Err(WalletError::InvalidCipher);
+        }
+
+        let iv = hex::decode(&keystore.crypto.cipherparams.iv).unwrap();
+        let salt = hex::decode(&keystore.crypto.kdfparams.salt).unwrap();
+        let json_mac = hex::decode(&keystore.crypto.mac).unwrap();
+
+        let kdf = &keystore.crypto.kdf;
+        if kdf != KDF_SCRYPT {
+            return Err(WalletError::InvalidKdf);
+        }
         let n = keystore.crypto.kdfparams.n as f64;
         let r = keystore.crypto.kdfparams.r as u64;
         let p = keystore.crypto.kdfparams.p as u64;
         let dklen = keystore.crypto.kdfparams.dklen as usize;
-    
-        let params = Params::new(n.log2() as u8, r as u32, p as u32, dklen).map_err(|_| ())?;
-    
+
+        let params = Params::new(n.log2() as u8, r as u32, p as u32, dklen).unwrap();
+
         let mut derived_key = vec![0u8; 32];
-        scrypt(password.as_bytes(), &salt, &params, &mut derived_key).map_err(|_| ())?;
-    
+        scrypt(password.as_bytes(), &salt, &params, &mut derived_key).unwrap();
+
         let derived_key_first_half = derived_key[0..16].to_vec();
         let derived_key_second_half = derived_key[16..32].to_vec();
-    
-        let mut input_mac = HmacSha256::new_from_slice(&derived_key_second_half).map_err(|_| ())?;
+
+        let mut input_mac = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
         input_mac.update(&ciphertext);
         let computed_mac = input_mac.finalize().into_bytes();
-    
+
         if computed_mac.as_slice() == json_mac.as_slice() {
             println!("Password is correct");
-            Self::decrypt_secret_key(&derived_key_first_half, &iv, &ciphertext);
-            Ok((derived_key_first_half, iv, ciphertext))
+            Ok(DecryptionParams {
+                derived_key_first_half,
+                iv,
+                ciphertext,
+            })
         } else {
             println!("Password is incorrect");
-            Err(())
+            Err(WalletError::InvalidPassword)
         }
     }
-    
 
-    // MjNhZjk1NTY4MmQxNmRiNDZhZjY1ZjkwOTY2NjZjMWU1N2Y4NTY2MDBlMzAyMzhlNTFmMDMyZTZjYjVlOWQyODkwYTQ5YzQ1OGMyMTU5NDUzMTQxZDU0YWM0YWE0M2FmZjhiZWUwMDJhMzQyM2E3NTkyNWY0NjUyOGVkYmQxYmM=
-    // MjNhZjk1NTY4MmQxNmRiNDZhZjY1ZjkwOTY2NjZjMWU1N2Y4NTY2MDBlMzAyMzhlNTFmMDMyZTZjYjVlOWQyODkwYTQ5YzQ1OGMyMTU5NDUzMTQxZDU0YWM0YWE0M2FmZjhiZWUwMDJhMzQyM2E3NTkyNWY0NjUyOGVkYmQxYmM=
-    pub fn decrypt_secret_key(
-        key_first_half: &Vec<u8>,
-        iv: &Vec<u8>,
-        ciphertext: &Vec<u8>,
-    ) ->  String {
-        let mut cipher = Ctr128BE::<Aes128>::new(key_first_half.as_slice().into(), iv.as_slice().into());
-        let mut decrypted = ciphertext.to_vec();
+    pub fn decrypt_secret_key(decryption_params: DecryptionParams) -> String {
+        let mut cipher = Ctr128BE::<Aes128>::new(
+            decryption_params.derived_key_first_half.as_slice().into(),
+            decryption_params.iv.as_slice().into(),
+        );
+        let mut decrypted = decryption_params.ciphertext.to_vec();
         cipher.apply_keystream(&mut decrypted);
-        // This is the secret key from the pem -> base64::encode(hex::encode(decrypted));
-        // println!("MBLAC PV_KEY: {}", base64::encode(hex::encode(decrypted)));
-        "ok".to_string()
+
+        hex::encode(decrypted).to_string()
     }
-
-
 }
