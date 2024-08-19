@@ -308,7 +308,10 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        Option::<T>::type_name_rust()
+        TypeName::from(alloc::format!(
+            "ManagedOption<$API, {}>",
+            T::type_name_rust()
+        ))
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

@@ -4,6 +4,7 @@ use crate::cmd::wallet::wallet;
 use clap::Parser;
 
 use crate::cmd::all::call_all_meta;
+use crate::cmd::code_report::report;
 use crate::cmd::info::call_info;
 use crate::cmd::install::install;
 use crate::cmd::local_deps::local_deps;
@@ -11,6 +12,7 @@ use crate::cmd::scen_test_gen::test_gen_tool;
 use crate::cmd::template::{create_contract, print_template_names};
 use crate::cmd::test::test;
 use crate::cmd::test_coverage::test_coverage;
+
 use crate::cmd::upgrade::upgrade_sc;
 
 /// Entry point in the program when calling it as a standalone tool.
@@ -35,6 +37,9 @@ pub async fn cli_main_standalone() {
         Some(StandaloneCliAction::Test(args)) => test(args),
         Some(StandaloneCliAction::TestCoverage(args)) => {
             test_coverage(args);
+        },
+        Some(StandaloneCliAction::CodeReportGen(args)) => {
+            report(args);
         },
         Some(StandaloneCliAction::Account(args)) => {
             retrieve_address(args).await;
