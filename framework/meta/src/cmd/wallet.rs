@@ -27,16 +27,31 @@ fn convert(convert_args: &WalletConvertArgs) {
     let out_format = &convert_args.to;
 
     let mut mnemonic_str = String::new();
+    let mut private_key_str = String::new();
+    let mut public_key_str = String::new();
 
     match (in_format.as_str(), out_format.as_str()) {
         ("mnemonic", "pem") => match infile {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
                 mnemonic_str = mnemonic_str.replace('\n', "");
+                let mnemonic = Mnemonic::parse(mnemonic_str).unwrap();
+                (private_key_str, public_key_str) = get_wallet_keys_mnemonic(mnemonic);
             },
             None => {
                 println!("Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.");
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap()
+            },
+        },
+        ("keystore-secret", "pem") => match infile {
+            Some(file) => {
+                let private_key = Wallet::get_private_key_from_keystore_secret(file).unwrap();
+                private_key_str = private_key.to_string();
+                let public_key = PublicKey::from(&private_key);
+                public_key_str = public_key.to_string();
+            },
+            None => {
+                panic!("Input file is required for keystore-secret format");
             },
         },
         _ => {
@@ -44,9 +59,6 @@ fn convert(convert_args: &WalletConvertArgs) {
         },
     }
 
-    let mnemonic = Mnemonic::parse(mnemonic_str).unwrap();
-
-    let (private_key_str, public_key_str) = get_wallet_keys(mnemonic);
     let address = get_wallet_address(private_key_str.as_str());
 
     match outfile {
@@ -90,7 +102,7 @@ fn bech32_conversion(bech32_args: &WalletBech32Args) {
     }
 }
 
-fn get_wallet_keys(mnemonic: Mnemonic) -> (String, String) {
+fn get_wallet_keys_mnemonic(mnemonic: Mnemonic) -> (String, String) {
     let private_key = Wallet::get_private_key_from_mnemonic(mnemonic, 0u32, 0u32);
     let public_key = PublicKey::from(&private_key);
 
@@ -111,7 +123,7 @@ fn new(new_args: &WalletNewArgs) {
     let mnemonic = Wallet::generate_mnemonic();
     println!("Mnemonic: {}", mnemonic);
 
-    let (private_key_str, public_key_str) = get_wallet_keys(mnemonic);
+    let (private_key_str, public_key_str) = get_wallet_keys_mnemonic(mnemonic);
     let address = get_wallet_address(private_key_str.as_str());
 
     println!("Wallet address: {}", address);
