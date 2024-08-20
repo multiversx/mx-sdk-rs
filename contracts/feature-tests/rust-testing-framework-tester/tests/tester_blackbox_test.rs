@@ -44,7 +44,7 @@ fn tester_deploy_test() {
 
 #[test]
 fn tester_deploy_test_spawned_thread() {
-    let handler = std::thread::spawn(|| tester_deploy_test());
+    let handler = std::thread::spawn(tester_deploy_test);
 
     handler.join().unwrap();
 }
