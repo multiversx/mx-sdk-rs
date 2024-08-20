@@ -4,3 +4,8 @@ main = "rust-testing-framework-tester"
 # the only purpose of this config is to specify the allocator
 [contracts.rust-testing-framework-tester]
 allocator = "static64k"
+
+[[proxy]]
+path = "src/rust_testing_framework_tester_proxy.rs"
+add-unlabelled = false
+add-endpoints = ["init"]
