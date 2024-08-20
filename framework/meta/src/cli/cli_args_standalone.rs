@@ -78,6 +78,12 @@ pub enum StandaloneCliAction {
         about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
     )]
     LocalDeps(LocalDepsArgs),
+
+    #[command(
+        name = "wallet",
+        about = "Generates a new wallet or performs actions on an existing wallet."
+    )]
+    Wallet(WalletArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -410,4 +416,59 @@ pub struct AccountArgs {
     /// Provide the address you want to retrieve data from
     #[arg(long = "address", verbatim_doc_comment)]
     pub address: String,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum WalletAction {
+    #[command(name = "new", about = "Creates a new wallet")]
+    New(WalletNewArgs),
+
+    #[command(
+        name = "bech32",
+        about = "Encodes/decodes a bech32 address to/from hex"
+    )]
+    Bech32(WalletBech32Args),
+    #[command(name = "convert", about = "Converts a wallet")]
+    Convert(WalletConvertArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Parser)]
+#[command(propagate_version = true)]
+pub struct WalletArgs {
+    #[command(subcommand)]
+    pub command: WalletAction,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletNewArgs {
+    /// The type of wallet to create.
+    #[arg(long = "format", verbatim_doc_comment)]
+    pub wallet_format: Option<String>,
+
+    /// The name of the wallet to create.
+    #[arg(long = "outfile", verbatim_doc_comment)]
+    pub outfile: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletConvertArgs {
+    #[arg(long = "in-format", verbatim_doc_comment)]
+    pub from: String,
+
+    #[arg(long = "out-format", verbatim_doc_comment)]
+    pub to: String,
+
+    #[arg(long = "infile", verbatim_doc_comment)]
+    pub infile: Option<String>,
+
+    #[arg(long = "outfile", verbatim_doc_comment)]
+    pub outfile: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletBech32Args {
+    #[arg(long = "encode", verbatim_doc_comment)]
+    pub hex_address: Option<String>,
+    #[arg(long = "decode", verbatim_doc_comment)]
+    pub bech32_address: Option<String>,
 }
