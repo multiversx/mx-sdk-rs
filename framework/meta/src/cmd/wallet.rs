@@ -1,5 +1,8 @@
 use core::str;
-use multiversx_sc::types;
+use multiversx_sc::{
+    api::{uncallable::UncallableApi, BigIntApiImpl, ExternalViewApi, ManagedTypeApi},
+    types::{self, ManagedBuffer},
+};
 use std::{
     fs::{self, File},
     io::{self, Read, Write},
@@ -8,9 +11,13 @@ use std::{
 use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
 use bip39::Mnemonic;
 use multiversx_sc_snippets::sdk::{
-    crypto::public_key::PublicKey, data::address::Address, utils::base64_encode, wallet::Wallet,
+    crypto::public_key::PublicKey,
+    data::address::Address,
+    utils::{base64_decode, base64_encode},
+    wallet::Wallet,
 };
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
+
 pub fn wallet(args: &WalletArgs) {
     let command = &args.command;
     match command {
@@ -19,7 +26,6 @@ pub fn wallet(args: &WalletArgs) {
         WalletAction::Convert(convert_args) => convert(convert_args),
     }
 }
-
 fn convert(convert_args: &WalletConvertArgs) {
     let infile = convert_args.infile.as_ref();
     let outfile = convert_args.outfile.as_ref();
@@ -34,13 +40,14 @@ fn convert(convert_args: &WalletConvertArgs) {
         ("mnemonic", "pem") => match infile {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
-                mnemonic_str = mnemonic_str.replace('\n', "");
-                let mnemonic = Mnemonic::parse(mnemonic_str).unwrap();
-                (private_key_str, public_key_str) = get_wallet_keys_mnemonic(mnemonic);
+                (private_key_str, public_key_str) = get_wallet_keys_mnemonic(mnemonic_str);
+                write_resulted_wallet(&public_key_str, &private_key_str, out_format, outfile);
             },
             None => {
                 println!("Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.");
-                _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap()
+                _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
+                (private_key_str, public_key_str) = get_wallet_keys_mnemonic(mnemonic_str);
+                write_resulted_wallet(&public_key_str, &private_key_str, out_format, outfile);
             },
         },
         ("keystore-secret", "pem") => match infile {
@@ -49,32 +56,65 @@ fn convert(convert_args: &WalletConvertArgs) {
                 private_key_str = private_key.to_string();
                 let public_key = PublicKey::from(&private_key);
                 public_key_str = public_key.to_string();
+                write_resulted_wallet(&public_key_str, &private_key_str, out_format, outfile);
             },
             None => {
                 panic!("Input file is required for keystore-secret format");
+            },
+        },
+        ("pem", "keystore-secret") => match infile {
+            Some(file) => {
+                let pem_content = fs::read_to_string(file).unwrap();
+                let lines: Vec<&str> = pem_content.split("\n").collect();
+                let pem_encoded_keys = format!("{}{}{}", lines[1], lines[2], lines[3]);
+                let pem_decoded_keys = base64_decode(pem_encoded_keys);
+                let (private_key, public_key) =
+                    pem_decoded_keys.split_at(pem_decoded_keys.len() / 2);
+                private_key_str = String::from_utf8(private_key.to_vec()).unwrap();
+                public_key_str = String::from_utf8(public_key.to_vec()).unwrap();
+
+                let address = get_wallet_address(&private_key_str);
+                let hex_decoded_keys = hex::decode(&private_key_str).unwrap();
+
+                Wallet::encrypt_keystore(
+                    hex_decoded_keys.as_slice(),
+                    &address,
+                    &public_key_str,
+                    &Wallet::get_keystore_password(),
+                );
+            },
+            None => {
+                panic!("Input file is required for pem format");
             },
         },
         _ => {
             println!("Unsupported conversion");
         },
     }
+}
 
-    let address = get_wallet_address(private_key_str.as_str());
-
-    match outfile {
-        Some(outfile) => {
-            generate_pem(
-                &address,
-                private_key_str.as_str(),
-                public_key_str.as_str(),
-                outfile,
-            );
+fn write_resulted_wallet(
+    public_key: &str,
+    private_key: &str,
+    format: &str,
+    outfile: Option<&String>,
+) {
+    let address = get_wallet_address(private_key);
+    match format {
+        "pem" => match outfile {
+            Some(outfile) => {
+                generate_pem(&address, private_key, public_key, outfile);
+            },
+            None => {
+                let pem_content = generate_pem_content(&address, private_key, public_key);
+                print!("{}", pem_content);
+            },
         },
-        None => {
-            let pem_content =
-                generate_pem_content(&address, private_key_str.as_str(), public_key_str.as_str());
-            print!("{}", pem_content);
+        "keystore-secret" => match outfile {
+            Some(outfile) => {},
+            None => {},
         },
+        _ => {},
     }
 }
 
@@ -102,7 +142,8 @@ fn bech32_conversion(bech32_args: &WalletBech32Args) {
     }
 }
 
-fn get_wallet_keys_mnemonic(mnemonic: Mnemonic) -> (String, String) {
+fn get_wallet_keys_mnemonic(mnemonic_str: String) -> (String, String) {
+    let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', "")).unwrap();
     let private_key = Wallet::get_private_key_from_mnemonic(mnemonic, 0u32, 0u32);
     let public_key = PublicKey::from(&private_key);
 
@@ -123,7 +164,7 @@ fn new(new_args: &WalletNewArgs) {
     let mnemonic = Wallet::generate_mnemonic();
     println!("Mnemonic: {}", mnemonic);
 
-    let (private_key_str, public_key_str) = get_wallet_keys_mnemonic(mnemonic);
+    let (private_key_str, public_key_str) = get_wallet_keys_mnemonic(mnemonic.to_string());
     let address = get_wallet_address(private_key_str.as_str());
 
     println!("Wallet address: {}", address);
