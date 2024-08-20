@@ -1,5 +1,11 @@
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug)]
+pub enum WalletError {
+    InvalidPassword,
+    InvalidKdf,
+    InvalidCipher,
+}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CryptoParams {
     pub iv: String,
@@ -32,4 +38,11 @@ pub struct Keystore {
     pub address: String,
     pub bech32: String,
     pub crypto: Crypto,
+}
+
+#[derive(Clone, Debug)]
+pub struct DecryptionParams {
+    pub derived_key_first_half: Vec<u8>,
+    pub iv: Vec<u8>,
+    pub ciphertext: Vec<u8>,
 }

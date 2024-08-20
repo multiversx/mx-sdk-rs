@@ -22,7 +22,11 @@ use crate::{
         private_key::{PrivateKey, PRIVATE_KEY_LENGTH},
         public_key::PublicKey,
     },
-    data::{address::Address, keystore::Keystore, transaction::Transaction},
+    data::{
+        address::Address,
+        keystore::{DecryptionParams, Keystore, WalletError},
+        transaction::Transaction,
+    },
 };
 
 const EGLD_COIN_TYPE: u32 = 508;
@@ -36,20 +40,6 @@ type HmacSha256 = Hmac<Sha256>;
 #[derive(Copy, Clone, Debug)]
 pub struct Wallet {
     priv_key: PrivateKey,
-}
-
-#[derive(Clone, Debug)]
-pub struct DecryptionParams {
-    pub derived_key_first_half: Vec<u8>,
-    pub iv: Vec<u8>,
-    pub ciphertext: Vec<u8>,
-}
-
-#[derive(Debug)]
-pub enum WalletError {
-    InvalidPassword,
-    InvalidKdf,
-    InvalidCipher,
 }
 
 impl Wallet {
@@ -137,12 +127,25 @@ impl Wallet {
     }
 
     pub fn from_keystore_secret(file_path: &str) -> Result<Self> {
-        let decyption_params = Self::validate_keystore_password(file_path).unwrap_or_else(|e| {
-            panic!("Error: {:?}", e);
-        });
+        let decyption_params =
+            Self::validate_keystore_password(file_path, Self::get_keystore_password())
+                .unwrap_or_else(|e| {
+                    panic!("Error: {:?}", e);
+                });
         let priv_key =
             PrivateKey::from_hex_str(Self::decrypt_secret_key(decyption_params).as_str())?;
         Ok(Self { priv_key })
+    }
+
+    pub fn get_private_key_from_keystore_secret(file_path: &str) -> Result<PrivateKey> {
+        let decyption_params =
+            Self::validate_keystore_password(file_path, Self::get_keystore_password())
+                .unwrap_or_else(|e| {
+                    panic!("Error: {:?}", e);
+                });
+        let priv_key =
+            PrivateKey::from_hex_str(Self::decrypt_secret_key(decyption_params).as_str())?;
+        Ok(priv_key)
     }
 
     pub fn address(&self) -> Address {
@@ -166,14 +169,20 @@ impl Wallet {
         self.priv_key.sign(tx_bytes)
     }
 
-    pub fn validate_keystore_password(path: &str) -> Result<DecryptionParams, WalletError> {
+    fn get_keystore_password() -> String {
         println!(
             "Insert password. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
         );
         let mut password = String::new();
         io::stdin().read_to_string(&mut password).unwrap();
         password = password.trim().to_string();
+        password
+    }
 
+    pub fn validate_keystore_password(
+        path: &str,
+        password: String,
+    ) -> Result<DecryptionParams, WalletError> {
         let json_body = fs::read_to_string(path).unwrap();
         let keystore: Keystore = serde_json::from_str(&json_body).unwrap();
         let ciphertext = hex::decode(&keystore.crypto.ciphertext).unwrap();
