@@ -1,9 +1,9 @@
 extern crate rand;
 
+use core::str;
 use std::{
     fs::{self},
     io::{self, Read},
-    ops::Add,
 };
 
 use aes::{cipher::KeyIvInit, Aes128};
@@ -12,8 +12,8 @@ use bip39::{Language, Mnemonic};
 use ctr::{cipher::StreamCipher, Ctr128BE};
 use hmac::{Hmac, Mac};
 use pbkdf2::pbkdf2;
-use rand::{CryptoRng, RngCore};
-use scrypt::{scrypt, Params, Scrypt};
+use rand::RngCore;
+use scrypt::{scrypt, Params};
 use serde_json::json;
 use sha2::{Digest, Sha256, Sha512};
 use sha3::Keccak256;
@@ -21,8 +21,8 @@ use zeroize::Zeroize;
 
 use crate::{
     crypto::{
-        private_key::{self, PrivateKey, PRIVATE_KEY_LENGTH},
-        public_key::{self, PublicKey},
+        private_key::{PrivateKey, PRIVATE_KEY_LENGTH},
+        public_key::PublicKey,
     },
     data::{address::Address, keystore::*, transaction::Transaction},
 };
@@ -243,7 +243,12 @@ impl Wallet {
         decrypted
     }
 
-    pub fn encrypt_keystore(data: &[u8], address: &Address, public_key: &str, password: &str) {
+    pub fn encrypt_keystore(
+        data: &[u8],
+        address: &Address,
+        public_key: &str,
+        password: &str,
+    ) -> String {
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P, KDF_DKLEN).unwrap();
         let mut rand_salt: [u8; 32] = [0u8; 32];
         rand::thread_rng().fill_bytes(&mut rand_salt);
@@ -266,12 +271,10 @@ impl Wallet {
         };
 
         let ciphertext = Self::decrypt_secret_key(decryption_params);
-        println!("Ciphertext: {:?}", ciphertext);
 
         let mut h = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
         h.update(&ciphertext);
         let mac = h.finalize().into_bytes();
-
         let keystore = Keystore {
             crypto: Crypto {
                 cipher: CIPHER_ALGORITHM_AES_128_CTR.to_string(),
@@ -294,7 +297,8 @@ impl Wallet {
             bech32: address.to_string(),
         };
 
-        let keystore_json = serde_json::to_string_pretty(&keystore).unwrap();
-        println!("{}", keystore_json);
+        let mut keystore_json = serde_json::to_string_pretty(&keystore).unwrap();
+        keystore_json.push('\n');
+        keystore_json
     }
 }
