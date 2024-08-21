@@ -25,6 +25,7 @@ use crate::{
         public_key::PublicKey,
     },
     data::{address::Address, keystore::*, transaction::Transaction},
+    utils::base64_decode,
 };
 
 use uuid::Uuid;
@@ -108,9 +109,20 @@ impl Wallet {
         PrivateKey::from_bytes(key.as_slice()).unwrap()
     }
 
+    pub fn get_wallet_keys_mnemonic(mnemonic_str: String) -> (String, String) {
+        let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', "")).unwrap();
+        let private_key = Self::get_private_key_from_mnemonic(mnemonic, 0u32, 0u32);
+        let public_key = PublicKey::from(&private_key);
+
+        let public_key_str: &str = &public_key.to_string();
+        let private_key_str: &str = &private_key.to_string();
+
+        (private_key_str.to_string(), public_key_str.to_string())
+    }
+
     pub fn from_private_key(priv_key: &str) -> Result<Self> {
-        let pri_key = PrivateKey::from_hex_str(priv_key)?;
-        Ok(Self { priv_key: pri_key })
+        let priv_key = PrivateKey::from_hex_str(priv_key)?;
+        Ok(Self { priv_key })
     }
 
     pub fn from_pem_file(file_path: &str) -> Result<Self> {
@@ -126,6 +138,22 @@ impl Wallet {
         Ok(Self { priv_key: pri_key })
     }
 
+    pub fn get_pem_decoded_content(file: &str) -> Vec<u8> {
+        let pem_content = fs::read_to_string(file).unwrap();
+        let lines: Vec<&str> = pem_content.split('\n').collect();
+        let pem_encoded_keys = format!("{}{}{}", lines[1], lines[2], lines[3]);
+        base64_decode(pem_encoded_keys)
+    }
+
+    pub fn get_wallet_keys_pem(file: &str) -> (String, String) {
+        let pem_decoded_keys = Self::get_pem_decoded_content(file);
+        let (private_key, public_key) = pem_decoded_keys.split_at(pem_decoded_keys.len() / 2);
+        let private_key_str = String::from_utf8(private_key.to_vec()).unwrap();
+        let public_key_str = String::from_utf8(public_key.to_vec()).unwrap();
+
+        (private_key_str, public_key_str)
+    }
+
     pub fn from_keystore_secret(file_path: &str) -> Result<Self> {
         let decyption_params =
             Self::validate_keystore_password(file_path, Self::get_keystore_password())
@@ -138,12 +166,14 @@ impl Wallet {
         Ok(Self { priv_key })
     }
 
-    pub fn get_private_key_from_keystore_secret(file_path: &str) -> Result<PrivateKey> {
-        let decyption_params =
-            Self::validate_keystore_password(file_path, Self::get_keystore_password())
-                .unwrap_or_else(|e| {
-                    panic!("Error: {:?}", e);
-                });
+    pub fn get_private_key_from_keystore_secret(
+        file_path: &str,
+        password: &str,
+    ) -> Result<PrivateKey> {
+        let decyption_params = Self::validate_keystore_password(file_path, password.to_string())
+            .unwrap_or_else(|e| {
+                panic!("Error: {:?}", e);
+            });
         let priv_key = PrivateKey::from_hex_str(
             hex::encode(Self::decrypt_secret_key(decyption_params)).as_str(),
         )?;
@@ -297,7 +327,7 @@ impl Wallet {
             bech32: address.to_string(),
         };
 
-        let mut keystore_json = serde_json::to_string_pretty(&keystore).unwrap();
+        let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
         keystore_json.push('\n');
         keystore_json
     }
