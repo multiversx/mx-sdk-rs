@@ -11,6 +11,13 @@ const PROXY_COMPARE_ERR_MSG: &str = "Contract has been modified and proxies have
 
 impl MetaConfig {
     pub fn generate_proxy(&mut self) {
+        if self.sc_config.proxy_configs.is_empty() {
+            let proxy_config_default =
+                ProxyConfig::new_with_default_path(self.original_contract_abi.clone());
+            write_proxy_with_explicit_path(&proxy_config_default, self);
+            return;
+        }
+
         for proxy_config in &self.sc_config.proxy_configs {
             write_proxy_with_explicit_path(proxy_config, self);
         }
