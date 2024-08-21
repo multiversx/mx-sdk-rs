@@ -11,6 +11,8 @@ use multiversx_sc_snippets::imports::*;
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
+const ADDER_CODE_PATH: MxscPath = MxscPath::new("../output/adder.mxsc.json");
+
 #[tokio::main]
 async fn main() {
     env_logger::init();
@@ -20,7 +22,11 @@ async fn main() {
     let cli = basic_interact_cli::InteractCli::parse();
     match &cli.command {
         Some(basic_interact_cli::InteractCliCommand::Add(args)) => {
-            basic_interact.add(args.value).await;
+            if args.count == 1 {
+                basic_interact.add(args.value).await;
+            } else {
+                basic_interact.multi_add(args.value, args.count).await;
+            }
         },
         Some(basic_interact_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
@@ -29,10 +35,13 @@ async fn main() {
             basic_interact.feed_contract_egld().await;
         },
         Some(basic_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
-            basic_interact.multi_deploy(&args.count).await;
+            basic_interact.multi_deploy(args.count).await;
         },
         Some(basic_interact_cli::InteractCliCommand::Sum) => {
             basic_interact.print_sum().await;
+        },
+        Some(basic_interact_cli::InteractCliCommand::Upgrade(args)) => {
+            basic_interact.upgrade(args.value).await
         },
         None => {},
     }
@@ -41,8 +50,8 @@ async fn main() {
 #[allow(unused)]
 struct AdderInteract {
     interactor: Interactor,
+    adder_owner_address: Bech32Address,
     wallet_address: Bech32Address,
-    adder_code: BytesValue,
     state: State,
 }
 
@@ -53,22 +62,24 @@ impl AdderInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
+
+        let adder_owner_address =
+            interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
         let wallet_address = interactor.register_wallet(test_wallets::mike());
-        let adder_code = BytesValue::interpret_from(
-            "mxsc:../output/adder.mxsc.json",
-            &InterpreterContext::default(),
-        );
 
         Self {
             interactor,
+            adder_owner_address: adder_owner_address.into(),
             wallet_address: wallet_address.into(),
-            adder_code,
             state: State::load_state(),
         }
     }
 
     async fn set_state(&mut self) {
         println!("wallet address: {}", self.wallet_address);
+        self.interactor
+            .retrieve_account(&self.adder_owner_address)
+            .await;
         self.interactor.retrieve_account(&self.wallet_address).await;
     }
 
@@ -81,10 +92,12 @@ impl AdderInteract {
         let new_address = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.adder_owner_address)
+            .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
-            .code(&self.adder_code)
+            .code(ADDER_CODE_PATH)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewBech32Address)
             .prepare_async()
             .run()
@@ -94,8 +107,8 @@ impl AdderInteract {
         self.state.set_adder_address(new_address);
     }
 
-    async fn multi_deploy(&mut self, count: &u8) {
-        if *count == 0 {
+    async fn multi_deploy(&mut self, count: usize) {
+        if count == 0 {
             println!("count must be greater than 0");
             return;
         }
@@ -104,13 +117,13 @@ impl AdderInteract {
         println!("deploying {count} contracts...");
 
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for _ in 0..*count {
+        for _ in 0..count {
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
                     .typed(adder_proxy::AdderProxy)
                     .init(0u32)
-                    .code(&self.adder_code)
-                    .gas(NumExpr("70,000,000"))
+                    .code(ADDER_CODE_PATH)
+                    .gas(3_000_000)
                     .returns(ReturnsNewBech32Address)
             });
         }
@@ -127,6 +140,26 @@ impl AdderInteract {
         }
     }
 
+    async fn multi_add(&mut self, value: u32, count: usize) {
+        self.set_state().await;
+        println!("calling contract {count} times...");
+
+        let mut buffer = self.interactor.homogenous_call_buffer();
+        for _ in 0..count {
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .to(self.state.current_adder_address())
+                    .typed(adder_proxy::AdderProxy)
+                    .add(value)
+                    .gas(3_000_000)
+            });
+        }
+
+        let _ = buffer.run().await;
+
+        println!("successfully performed add {count} times");
+    }
+
     async fn feed_contract_egld(&mut self) {
         self.interactor
             .tx()
@@ -138,11 +171,12 @@ impl AdderInteract {
             .await;
     }
 
-    async fn add(&mut self, value: u64) {
+    async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
+            .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)
             .add(value)
             .prepare_async()
@@ -166,4 +200,46 @@ impl AdderInteract {
 
         println!("sum: {sum}");
     }
+
+    async fn upgrade(&mut self, new_value: u32) {
+        let response = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
+            .gas(3_000_000)
+            .typed(adder_proxy::AdderProxy)
+            .upgrade(BigUint::from(new_value))
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .code(ADDER_CODE_PATH)
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+
+        let sum = self
+            .interactor
+            .query()
+            .to(self.state.current_adder_address())
+            .typed(adder_proxy::AdderProxy)
+            .sum()
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+        assert_eq!(sum, RustBigUint::from(new_value));
+
+        println!("response: {response:?}");
+    }
+}
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn test() {
+    let mut basic_interact = AdderInteract::init().await;
+
+    basic_interact.deploy().await;
+    basic_interact.add(1u32).await;
+
+    basic_interact.upgrade(7u32).await;
 }

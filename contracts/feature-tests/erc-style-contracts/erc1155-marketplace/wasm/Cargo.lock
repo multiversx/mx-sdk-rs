@@ -16,9 +16,9 @@ checksum = "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0"
 
 [[package]]
 name = "bitflags"
-version = "2.5.0"
+version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf4b9d6a944f767f8e5e0db018570623c85f3d925ac718db4e06d0187adb21c1"
+checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
 
 [[package]]
 name = "endian-type"
@@ -63,7 +63,7 @@ checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
 name = "multiversx-sc"
-version = "0.50.3"
+version = "0.52.3"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -75,7 +75,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.19.0"
+version = "0.20.1"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
@@ -84,7 +84,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.19.0"
+version = "0.20.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -94,7 +94,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.50.3"
+version = "0.52.3"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -105,7 +105,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.50.3"
+version = "0.52.3"
 dependencies = [
  "multiversx-sc",
 ]
@@ -130,9 +130,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.82"
+version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ad3d49ab951a01fbaafe34f2ec74122942fe18a3f9814c3268f1bb72042131b"
+checksum = "5e719e8df665df0d1c8fbfd238015744736151d4445ec0836b8e628aae103b77"
 dependencies = [
  "unicode-ident",
 ]
@@ -164,9 +164,9 @@ checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
 
 [[package]]
 name = "syn"
-version = "2.0.61"
+version = "2.0.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c993ed8ccba56ae856363b1845da7266a7cb78e1d146c8a32d54b45a8b831fc9"
+checksum = "dc4b9b9bf2add8093d3f2c0204471e951b2285580335de42f9d2534f3ae7a8af"
 dependencies = [
  "proc-macro2",
  "quote",

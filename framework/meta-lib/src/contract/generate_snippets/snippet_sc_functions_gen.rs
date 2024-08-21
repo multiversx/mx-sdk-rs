@@ -4,6 +4,8 @@ use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputA
 
 use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to_rust_type};
 
+const DEFAULT_GAS: &str = "30_000_000u64";
+
 pub(crate) fn write_interact_struct_impl(
     file: &mut File,
     abi: &ContractAbi,
@@ -35,6 +37,10 @@ pub(crate) fn write_interact_struct_impl(
 
     write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
 
+    for upgrade_abi in &abi.upgrade_constructors {
+        write_upgrade_endpoint_impl(file, upgrade_abi, &abi.name);
+    }
+
     for endpoint_abi in &abi.endpoints {
         write_endpoint_impl(file, endpoint_abi, &abi.name);
     }
@@ -54,6 +60,7 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
             .interactor
             .tx()
             .from(&self.wallet_address)
+            .gas({DEFAULT_GAS})
             .typed(proxy::{})
             .init({})
             .code(&self.contract_code)
@@ -68,6 +75,39 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
         println!("new address: {{new_address_bech32}}");"#,
         proxy_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
+    )
+    .unwrap();
+
+    // close method block brackets
+    writeln!(file, "    }}").unwrap();
+    write_newline(file);
+}
+
+fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name: &String) {
+    write_method_declaration(file, "upgrade");
+    write_endpoint_args_declaration(file, &upgrade_abi.inputs);
+    let proxy_name = format!("{}Proxy", name);
+
+    writeln!(
+        file,
+        r#"        let response = self
+            .interactor
+            .tx()
+            .to(self.state.current_address())
+            .from(&self.wallet_address)
+            .gas({DEFAULT_GAS})
+            .typed(proxy::{})
+            .upgrade({})
+            .code(&self.contract_code)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .returns(ReturnsNewAddress)
+            .prepare_async()
+            .run()
+            .await;
+
+        println!("Result: {{response:?}}");"#,
+        proxy_name,
+        endpoint_args_when_called(upgrade_abi.inputs.as_slice()),
     )
     .unwrap();
 
@@ -170,6 +210,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
+            .gas({DEFAULT_GAS})
             .typed(proxy::{}Proxy)
             .{}({}){}
             .returns(ReturnsResultUnmanaged)

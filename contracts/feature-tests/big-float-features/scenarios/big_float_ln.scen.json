@@ -1,0 +1,59 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/big-float-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "100000000000"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "ln_big_float_precision_9(23)", 
+            "comment": "ln(23) = 3.135514648 (9 decimals)",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "ln_big_float_precision_9",
+                "arguments": [
+                    "23"
+                ],
+                "gasLimit": "2,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "+3135514648"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "ln_big_float_any_precision(23, 9)", 
+            "comment": "ln(23) = 3.135514648 (9 decimals)",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "ln_big_float_any_precision",
+                "arguments": [
+                    "23",
+                    "9"
+                ],
+                "gasLimit": "2,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "u32:5|+3135514648|u32:9"
+                ]
+            }
+        }
+    ]
+}

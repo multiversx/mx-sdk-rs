@@ -1,4 +1,5 @@
 pub mod all;
+pub mod code_report;
 pub mod info;
 pub mod install;
 pub mod local_deps;
@@ -9,3 +10,4 @@ pub mod template;
 pub mod test;
 pub mod test_coverage;
 pub mod upgrade;
+pub mod wallet;

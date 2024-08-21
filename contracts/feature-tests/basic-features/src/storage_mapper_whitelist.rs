@@ -1,5 +1,3 @@
-use multiversx_sc::storage::StorageKey;
-
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
@@ -21,9 +19,7 @@ pub trait StorageMapperWhitelistFeatures {
 
     #[endpoint]
     fn check_contains_at_address(&self, address: ManagedAddress, item: ManagedBuffer) -> bool {
-        let mapper =
-            WhitelistMapper::new_from_address(address, StorageKey::from("whitelistMapper"));
-        mapper.contains(&item)
+        self.whitelist_mapper_from_address(address).contains(&item)
     }
 
     #[endpoint]
@@ -33,11 +29,16 @@ pub trait StorageMapperWhitelistFeatures {
 
     #[endpoint]
     fn require_contains_at_address(&self, address: ManagedAddress, item: ManagedBuffer) {
-        let mapper =
-            WhitelistMapper::new_from_address(address, StorageKey::from("whitelistMapper"));
-        mapper.require_whitelisted(&item)
+        self.whitelist_mapper_from_address(address)
+            .require_whitelisted(&item)
     }
 
     #[storage_mapper("whitelistMapper")]
     fn whitelist_mapper(&self) -> WhitelistMapper<ManagedBuffer>;
+
+    #[storage_mapper_from_address("whitelistMapper")]
+    fn whitelist_mapper_from_address(
+        &self,
+        address: ManagedAddress,
+    ) -> WhitelistMapper<ManagedBuffer, ManagedAddress>;
 }

@@ -65,6 +65,9 @@ pub enum StandaloneCliAction {
     #[command(name = "test-coverage", about = "Run test coverage and output report")]
     TestCoverage(TestCoverageArgs),
 
+    #[command(name = "report", about = "Generate code report")]
+    CodeReportGen(CodeReportArgs),
+
     #[command(
         about = "Generates a scenario test initialized with real data fetched from the blockchain."
     )]
@@ -75,6 +78,12 @@ pub enum StandaloneCliAction {
         about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
     )]
     LocalDeps(LocalDepsArgs),
+
+    #[command(
+        name = "wallet",
+        about = "Generates a new wallet or performs actions on an existing wallet."
+    )]
+    Wallet(WalletArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -115,7 +124,7 @@ pub struct TestArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, ValueEnum)]
-pub enum TestCoverageOutputFormat {
+pub enum OutputFormat {
     /// Markdown pretty-print summary
     #[default]
     Markdown,
@@ -132,11 +141,71 @@ pub struct TestCoverageArgs {
 
     /// Output format
     #[arg(short, long, verbatim_doc_comment)]
-    pub format: Option<TestCoverageOutputFormat>,
+    pub format: Option<OutputFormat>,
 
     /// Ignore files by path patterns
     #[arg(short = 'i', long = "ignore-filename-regex", verbatim_doc_comment)]
     pub ignore_filename_regex: Vec<String>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct CodeReportArgs {
+    #[command(subcommand)]
+    pub command: CodeReportAction,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum CodeReportAction {
+    #[command(name = "compile", about = "Generates the contract report.")]
+    Compile(CompileArgs),
+
+    #[command(name = "compare", about = "Compare two contract reports.")]
+    Compare(CompareArgs),
+
+    #[command(
+        name = "convert",
+        about = "Converts a contract report to a Markdown file."
+    )]
+    Convert(ConvertArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct CompileArgs {
+    /// Target directory where to generate code report.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub path: PathBuf,
+
+    /// Path to the Markdown or JSON file where the report results will be written.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub output: PathBuf,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct CompareArgs {
+    /// Path to the previous version of code report JSON file
+    /// that will be used for comparison.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub baseline: PathBuf,
+
+    /// Path to the current version of the code report JSON file
+    /// that will be compared.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub new: PathBuf,
+
+    /// Path to the Markdown file where the comparison results will be written.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub output: PathBuf,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct ConvertArgs {
+    /// Path to the JSON report file that needs to be converted to Markdown format.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub input: PathBuf,
+
+    /// Path to the Markdown file where the report results will be written.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub output: PathBuf,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -265,6 +334,11 @@ pub struct TemplateArgs {
     /// Will be current directory if not specified.
     #[arg(long, verbatim_doc_comment)]
     pub path: Option<PathBuf>,
+
+    /// The author of the contract.
+    /// If missing, the default author will be considered.
+    #[arg(long, verbatim_doc_comment)]
+    pub author: Option<String>,
 }
 
 impl CliArgsToRaw for TemplateArgs {
@@ -342,4 +416,59 @@ pub struct AccountArgs {
     /// Provide the address you want to retrieve data from
     #[arg(long = "address", verbatim_doc_comment)]
     pub address: String,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum WalletAction {
+    #[command(name = "new", about = "Creates a new wallet")]
+    New(WalletNewArgs),
+
+    #[command(
+        name = "bech32",
+        about = "Encodes/decodes a bech32 address to/from hex"
+    )]
+    Bech32(WalletBech32Args),
+    #[command(name = "convert", about = "Converts a wallet")]
+    Convert(WalletConvertArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Parser)]
+#[command(propagate_version = true)]
+pub struct WalletArgs {
+    #[command(subcommand)]
+    pub command: WalletAction,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletNewArgs {
+    /// The type of wallet to create.
+    #[arg(long = "format", verbatim_doc_comment)]
+    pub wallet_format: Option<String>,
+
+    /// The name of the wallet to create.
+    #[arg(long = "outfile", verbatim_doc_comment)]
+    pub outfile: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletConvertArgs {
+    #[arg(long = "in-format", verbatim_doc_comment)]
+    pub from: String,
+
+    #[arg(long = "out-format", verbatim_doc_comment)]
+    pub to: String,
+
+    #[arg(long = "infile", verbatim_doc_comment)]
+    pub infile: Option<String>,
+
+    #[arg(long = "outfile", verbatim_doc_comment)]
+    pub outfile: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletBech32Args {
+    #[arg(long = "encode", verbatim_doc_comment)]
+    pub hex_address: Option<String>,
+    #[arg(long = "decode", verbatim_doc_comment)]
+    pub bech32_address: Option<String>,
 }

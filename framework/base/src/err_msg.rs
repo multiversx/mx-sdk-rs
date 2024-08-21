@@ -22,7 +22,8 @@ pub const ARG_BAD_LENGTH_32: &str = "argument has wrong length: 32 bytes expecte
 pub const ARG_DECODE_ERROR_1: &str = "argument decode error (";
 pub const ARG_DECODE_ERROR_2: &str = "): ";
 pub const STORAGE_VALUE_OUT_OF_RANGE: &str = "storage value out of range";
-pub const STORAGE_DECODE_ERROR: &str = "storage decode error: ";
+pub const STORAGE_DECODE_ERROR_1: &str = "storage decode error (key: ";
+pub const STORAGE_DECODE_ERROR_2: &str = "): ";
 pub const STORAGE_ENCODE_ERROR: &str = "storage encode error: ";
 pub const STORAGE_KEY_ENCODE_ERROR: &str = "storage key encode error: ";
 pub const STORAGE_VALUE_EXCEEDS_BUFFER: &str = "storage value exceeds buffer";
@@ -38,6 +39,7 @@ pub const VALUE_EXCEEDS_SLICE: &str = "value exceeds target slice";
 pub const CAST_TO_I64_ERROR: &str = "cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &str = "big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &str = "cannot subtract because result would be negative";
+pub const UNSIGNED_NEGATIVE: &str = "cannot convert to unsigned, number is negative";
 
 pub const DESERIALIZATION_INVALID_BYTE: &str = "call data deserialization error: not a valid byte";
 pub const DESERIALIZATION_NOT_32_BYTES: &str =

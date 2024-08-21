@@ -332,7 +332,9 @@
                 "from": "address:an_account",
                 "to": "sc:caller",
                 "function": "contains_unordered_at_address",
-                "arguments": ["5"],
+                "arguments": [
+                    "5"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },

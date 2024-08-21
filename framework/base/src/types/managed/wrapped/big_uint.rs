@@ -10,27 +10,30 @@ use crate::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
+    contract_base::ErrorHelper,
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
-    proxy_imports::ManagedRef,
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
+    types::{
+        heap::BoxedBytes, BigInt, ConstDecimals, Decimals, ManagedBuffer,
+        ManagedBufferCachedBuilder, ManagedDecimal, ManagedRef, ManagedType,
+    },
 };
-
-use super::cast_to_i64::cast_to_i64;
 
 #[repr(transparent)]
 pub struct BigUint<M: ManagedTypeApi> {
-    pub(crate) handle: M::BigIntHandle,
+    pub(crate) value: BigInt<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     type OwnHandle = M::BigIntHandle;
 
     fn from_handle(handle: M::BigIntHandle) -> Self {
-        BigUint { handle }
+        BigUint {
+            value: BigInt::from_handle(handle),
+        }
     }
 
     fn get_handle(&self) -> M::BigIntHandle {
-        self.handle.clone()
+        self.value.handle.clone()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::BigIntHandle) -> &Self {
@@ -63,7 +66,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     where
         T: TryInto<i64> + num_traits::Unsigned,
     {
-        M::managed_type_impl().bi_set_int64(handle, cast_to_i64::<M, _>(value));
+        BigInt::<M>::set_value(handle, value);
     }
 
     pub(crate) fn new_from_num<T>(value: T) -> Self
@@ -82,6 +85,14 @@ impl<M: ManagedTypeApi> BigUint<M> {
         let temp: M::BigIntHandle = use_raw_handle(handle);
         Self::set_value(temp.clone(), value);
         temp
+    }
+
+    pub fn as_big_int(&self) -> &BigInt<M> {
+        &self.value
+    }
+
+    pub fn into_big_int(self) -> BigInt<M> {
+        self.value
     }
 }
 
@@ -172,12 +183,12 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn to_u64(&self) -> Option<u64> {
         let api = M::managed_type_impl();
-        api.bi_to_i64(self.handle.clone()).map(|bi| bi as u64)
+        api.bi_to_i64(self.value.handle.clone()).map(|bi| bi as u64)
     }
 
     #[inline]
-    pub fn overwrite_u64(&self, value: u64) {
-        Self::set_value(self.handle.clone(), value);
+    pub fn overwrite_u64(&mut self, value: u64) {
+        Self::set_value(self.value.handle.clone(), value);
     }
 
     #[inline]
@@ -192,7 +203,8 @@ impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn to_bytes_be(&self) -> BoxedBytes {
         let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        M::managed_type_impl().mb_from_big_int_unsigned(self.handle.clone(), mb_handle.clone());
+        M::managed_type_impl()
+            .mb_from_big_int_unsigned(self.value.handle.clone(), mb_handle.clone());
         M::managed_type_impl().mb_to_boxed_bytes(mb_handle)
     }
 
@@ -208,7 +220,8 @@ impl<M: ManagedTypeApi> BigUint<M> {
     pub fn to_bytes_be_buffer(&self) -> ManagedBuffer<M> {
         let mb_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_from_big_int_unsigned(self.handle.clone(), mb_handle.clone());
+        M::managed_type_impl()
+            .mb_from_big_int_unsigned(self.value.handle.clone(), mb_handle.clone());
         ManagedBuffer::from_handle(mb_handle)
     }
 }
@@ -219,7 +232,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     pub fn sqrt(&self) -> Self {
         let api = M::managed_type_impl();
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        api.bi_sqrt(result_handle.clone(), self.handle.clone());
+        api.bi_sqrt(result_handle.clone(), self.value.handle.clone());
         BigUint::from_handle(result_handle)
     }
 
@@ -227,14 +240,59 @@ impl<M: ManagedTypeApi> BigUint<M> {
     pub fn pow(&self, exp: u32) -> Self {
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let big_int_temp_1 = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
-        M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), big_int_temp_1);
+        M::managed_type_impl().bi_pow(
+            result_handle.clone(),
+            self.value.handle.clone(),
+            big_int_temp_1,
+        );
         BigUint::from_handle(result_handle)
     }
 
+    /// The whole part of the base-2 logarithm.
+    ///
+    /// Obtained by counting the significant bits.
+    /// More specifically, the log2 floor is the position of the most significant bit minus one.
+    ///
+    /// Will return `None` for the number zero (the logarithm in this case would approach -inf).
     #[inline]
-    pub fn log2(&self) -> u32 {
+    pub fn log2_floor(&self) -> Option<u32> {
         let api = M::managed_type_impl();
-        api.bi_log2(self.handle.clone())
+        let result = api.bi_log2(self.value.handle.clone());
+        if result < 0 {
+            None
+        } else {
+            Some(result as u32)
+        }
+    }
+
+    /// Natural logarithm of a number.
+    ///
+    /// Returns `None` for 0.
+    pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
+        // start with aproximation, based on position of the most significant bit
+        let Some(log2_floor) = self.log2_floor() else {
+            // means the input was zero
+            return None;
+        };
+
+        let scaling_factor_9 = ConstDecimals::<9>.scaling_factor();
+        let divisor = BigUint::from(1u64) << log2_floor as usize;
+        let normalized = self * &*scaling_factor_9 / divisor;
+
+        let x = normalized
+            .to_u64()
+            .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("ln internal error"))
+            as i64;
+
+        let mut result = crate::types::math_util::logarithm_i64::ln_polynomial(x);
+        crate::types::math_util::logarithm_i64::ln_add_bit_log2(&mut result, log2_floor);
+
+        debug_assert!(result > 0);
+
+        let mut result_bi = normalized; // reuse handle
+        result_bi.overwrite_u64(result as u64);
+
+        Some(ManagedDecimal::const_decimals_from_raw(result_bi))
     }
 }
 
@@ -246,7 +304,7 @@ impl<M: ManagedTypeApi> Clone for BigUint<M> {
         api.bi_add(
             clone_handle.clone(),
             clone_handle.clone(),
-            self.handle.clone(),
+            self.value.handle.clone(),
         );
         BigUint::from_handle(clone_handle)
     }
@@ -313,7 +371,7 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
 impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        M::managed_type_impl().bi_to_string(self.handle.clone(), str_handle.clone());
+        M::managed_type_impl().bi_to_string(self.value.handle.clone(), str_handle.clone());
         f.append_managed_buffer(&ManagedBuffer::from_handle(
             str_handle.cast_or_signal_error::<M, _>(),
         ));
@@ -332,7 +390,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
 impl<M: ManagedTypeApi> core::fmt::Debug for BigUint<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("BigUint")
-            .field("handle", &self.handle.clone())
+            .field("handle", &self.value.handle.clone())
             .field(
                 "hex-value-be",
                 &encode_bytes_as_hex(self.to_bytes_be().as_slice()),
