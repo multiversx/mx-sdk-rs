@@ -7,7 +7,8 @@ const CONFIG_FILE: &str = "config.toml";
 /// Adder Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    gateway: String,
+    gateway: Option<String>,
+    chain_type: String,
 }
 
 impl Config {
@@ -21,6 +22,10 @@ impl Config {
 
     // Returns the gateway
     pub fn gateway(&self) -> &str {
-        &self.gateway
+        match self.chain_type.as_str() {
+            "real" => self.gateway.as_deref().expect("Please provide gateway!"),
+            "simulator" => "http://localhost:8085",
+            _ => "",
+        }
     }
 }

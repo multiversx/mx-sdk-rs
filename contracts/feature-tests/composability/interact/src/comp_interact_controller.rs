@@ -20,7 +20,7 @@ impl ComposabilityInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(test_wallets::judy());
+        let wallet_address = interactor.register_wallet(test_wallets::judy()).await;
         let forw_queue_code = BytesValue::interpret_from(
             "mxsc:../forwarder-queue/output/forwarder-queue.mxsc.json",
             &InterpreterContext::default(),

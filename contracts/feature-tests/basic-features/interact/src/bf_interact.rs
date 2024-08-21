@@ -45,7 +45,7 @@ impl BasicFeaturesInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
         let code_expr = BytesValue::interpret_from(
             "mxsc:../output/basic-features-storage-bytes.mxsc.json",
             &InterpreterContext::default(),
