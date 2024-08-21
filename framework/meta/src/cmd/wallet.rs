@@ -156,12 +156,21 @@ fn new(new_args: &WalletNewArgs) {
         Some("pem") => {
             write_resulted_pem(public_key_str.as_str(), private_key_str.as_str(), outfile);
         },
+        Some("keystore-secret") => {
+            let concatenated_keys = format!("{}{}", private_key_str, public_key_str);
+            let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
+            let json_result = Wallet::encrypt_keystore(
+                hex_decoded_keys.as_slice(),
+                &address,
+                &public_key_str,
+                &Wallet::get_keystore_password(),
+            );
+            write_resulted_keystore(json_result, outfile);
+        },
         Some(_) => {
             println!("Unsupported format");
         },
-        None => {
-            println!("No format provided");
-        },
+        None => {},
     }
 }
 
