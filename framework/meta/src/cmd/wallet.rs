@@ -175,7 +175,7 @@ fn new(new_args: &WalletNewArgs) {
     }
 }
 
-fn generate_pem_content(address: &Address, private_key: &str, public_key: &str) -> String {
+pub fn generate_pem_content(address: &Address, private_key: &str, public_key: &str) -> String {
     let concat_keys = format!("{}{}", private_key, public_key);
     let concat_keys_b64 = base64_encode(concat_keys);
 
