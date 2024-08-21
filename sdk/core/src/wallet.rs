@@ -80,6 +80,7 @@ impl Wallet {
 
         let mut digest =
             HmacSha512::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
+        HmacSha512::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
         digest.update(&seed);
         let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
         let mut key = intermediary[..serialized_key_len].to_vec();
@@ -100,6 +101,7 @@ impl Wallet {
 
             digest =
                 HmacSha512::new_from_slice(&chain_code).expect("HMAC can take key of any size");
+            HmacSha512::new_from_slice(&chain_code).expect("HMAC can take key of any size");
             digest.update(&buff);
             let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
             key = intermediary[..serialized_key_len].to_vec();

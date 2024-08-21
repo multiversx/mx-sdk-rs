@@ -1,11 +1,12 @@
 #![no_std]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::proxy_imports::*;
 
 pub mod dummy_module;
+pub mod rust_testing_framework_tester_proxy;
 
-#[derive(TopEncode, TopDecode, TypeAbi, Clone, Debug, PartialEq, Eq)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, Clone, Debug, PartialEq, Eq)]
 pub struct NftDummyAttributes {
     pub creation_epoch: u64,
     pub cool_factor: u8,

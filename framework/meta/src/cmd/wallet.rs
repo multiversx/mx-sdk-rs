@@ -19,6 +19,7 @@ pub fn wallet(args: &WalletArgs) {
         WalletAction::Convert(convert_args) => convert(convert_args),
     }
 }
+
 fn convert(convert_args: &WalletConvertArgs) {
     let infile = convert_args.infile.as_ref();
     let outfile = convert_args.outfile.as_ref();
