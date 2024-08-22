@@ -25,6 +25,16 @@ extern "C" {
     ) -> i32;
 
     fn managedEncodeSecp256k1DerSignature(rHandle: i32, sHandle: i32, sigHandle: i32) -> i32;
+
+    fn managedVerifySecp256r1(keyHandle: i32, messageHandle: i32, sigHandle: i32) -> i32;
+
+    fn managedVerifyBLSSignatureShare(keyHandle: i32, messageHandle: i32, sigHandle: i32) -> i32;
+
+    fn managedVerifyBLSAggregatedSignature(
+        keyHandle: i32,
+        messageHandle: i32,
+        sigHandle: i32,
+    ) -> i32;
 }
 
 impl CryptoApi for VmApiImpl {
@@ -122,5 +132,32 @@ impl CryptoApiImpl for VmApiImpl {
         unsafe {
             let _ = managedEncodeSecp256k1DerSignature(r, s, dest_sig_handle);
         }
+    }
+
+    fn verify_secp256r1_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    ) -> bool {
+        unsafe { managedVerifySecp256r1(key, message, signature) == 0 }
+    }
+
+    fn verify_bls_signature_share_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    ) -> bool {
+        unsafe { managedVerifyBLSSignatureShare(key, message, signature) == 0 }
+    }
+
+    fn verify_bls_aggregated_signature_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    ) -> bool {
+        unsafe { managedVerifyBLSAggregatedSignature(key, message, signature) == 0 }
     }
 }
