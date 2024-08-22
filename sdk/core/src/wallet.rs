@@ -25,7 +25,7 @@ use crate::{
         public_key::PublicKey,
     },
     data::{address::Address, keystore::*, transaction::Transaction},
-    utils::base64_decode,
+    utils::*,
 };
 
 use uuid::Uuid;
@@ -332,5 +332,27 @@ impl Wallet {
         let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
         keystore_json.push('\n');
         keystore_json
+    }
+
+    pub fn generate_pem_content(address: &Address, private_key: &str, public_key: &str) -> String {
+        let concat_keys = format!("{}{}", private_key, public_key);
+        let concat_keys_b64 = base64_encode(concat_keys);
+
+        // Split the base64 string into 64-character lines
+        let formatted_key = concat_keys_b64
+            .as_bytes()
+            .chunks(64)
+            .map(|chunk| std::str::from_utf8(chunk).unwrap())
+            .collect::<Vec<&str>>()
+            .join("\n");
+
+        let pem_content = format!(
+            "-----BEGIN PRIVATE KEY for {}-----\n{}\n-----END PRIVATE KEY for {}-----\n",
+            address.to_bech32_string().unwrap(),
+            formatted_key,
+            address.to_bech32_string().unwrap()
+        );
+
+        pem_content
     }
 }

@@ -3,7 +3,7 @@ use core::str;
 use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
 use multiversx_sc::types::{self};
 use multiversx_sc_snippets::sdk::{
-    crypto::public_key::PublicKey, data::address::Address, utils::base64_encode, wallet::Wallet,
+    crypto::public_key::PublicKey, data::address::Address, wallet::Wallet,
 };
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
 use std::{
@@ -90,12 +90,12 @@ fn write_resulted_pem(public_key: &str, private_key: &str, outfile: Option<&Stri
     let address = get_wallet_address(private_key);
     match outfile {
         Some(outfile) => {
-            let pem_content = generate_pem_content(&address, private_key, public_key);
+            let pem_content = Wallet::generate_pem_content(&address, private_key, public_key);
             let mut file = File::create(outfile).unwrap();
             file.write_all(pem_content.as_bytes()).unwrap();
         },
         None => {
-            let pem_content = generate_pem_content(&address, private_key, public_key);
+            let pem_content = Wallet::generate_pem_content(&address, private_key, public_key);
             print!("{}", pem_content);
         },
     }
@@ -173,26 +173,4 @@ fn new(new_args: &WalletNewArgs) {
         },
         None => {},
     }
-}
-
-pub fn generate_pem_content(address: &Address, private_key: &str, public_key: &str) -> String {
-    let concat_keys = format!("{}{}", private_key, public_key);
-    let concat_keys_b64 = base64_encode(concat_keys);
-
-    // Split the base64 string into 64-character lines
-    let formatted_key = concat_keys_b64
-        .as_bytes()
-        .chunks(64)
-        .map(|chunk| std::str::from_utf8(chunk).unwrap())
-        .collect::<Vec<&str>>()
-        .join("\n");
-
-    let pem_content = format!(
-        "-----BEGIN PRIVATE KEY for {}-----\n{}\n-----END PRIVATE KEY for {}-----\n",
-        address.to_bech32_string().unwrap(),
-        formatted_key,
-        address.to_bech32_string().unwrap()
-    );
-
-    pem_content
 }
