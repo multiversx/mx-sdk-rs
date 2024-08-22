@@ -129,4 +129,43 @@ where
         );
         ManagedBuffer::from_handle(new_handle)
     }
+
+    pub fn verify_secp256r1(
+        &self,
+        key: &ManagedBuffer<A>,
+        message: &ManagedBuffer<A>,
+        signature: &ManagedBuffer<A>,
+    ) -> bool {
+        A::crypto_api_impl().verify_secp256r1_managed(
+            key.get_handle(),
+            message.get_handle(),
+            signature.get_handle(),
+        )
+    }
+
+    pub fn verify_bls_signature_share(
+        &self,
+        key: &ManagedBuffer<A>,
+        message: &ManagedBuffer<A>,
+        signature: &ManagedBuffer<A>,
+    ) -> bool {
+        A::crypto_api_impl().verify_bls_signature_share_managed(
+            key.get_handle(),
+            message.get_handle(),
+            signature.get_handle(),
+        )
+    }
+
+    pub fn verify_bls_aggregated_signature(
+        &self,
+        key: &ManagedBuffer<A>,
+        message: &ManagedBuffer<A>,
+        signature: &ManagedBuffer<A>,
+    ) -> bool {
+        A::crypto_api_impl().verify_bls_aggregated_signature_managed(
+            key.get_handle(),
+            message.get_handle(),
+            signature.get_handle(),
+        )
+    }
 }

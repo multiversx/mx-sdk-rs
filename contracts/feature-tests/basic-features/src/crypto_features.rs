@@ -64,4 +64,34 @@ pub trait CryptoFeatures {
     fn compute_secp256k1_der_signature(&self, r: ManagedBuffer, s: ManagedBuffer) -> ManagedBuffer {
         self.crypto().encode_secp256k1_der_signature(&r, &s)
     }
+
+    #[endpoint]
+    fn verify_secp256r1_signature(
+        &self,
+        key: ManagedBuffer,
+        message: ManagedBuffer,
+        signature: ManagedBuffer,
+    ) -> bool {
+        self.crypto().verify_secp256r1(&key, &message, &signature)
+    }
+    #[endpoint]
+    fn verify_bls_signature_share_managed(
+        &self,
+        key: ManagedBuffer,
+        message: ManagedBuffer,
+        signature: ManagedBuffer,
+    ) -> bool {
+        self.crypto()
+            .verify_bls_signature_share(&key, &message, &signature)
+    }
+    #[endpoint]
+    fn verify_bls_aggregated_signature_managed(
+        &self,
+        key: ManagedBuffer,
+        message: ManagedBuffer,
+        signature: ManagedBuffer,
+    ) -> bool {
+        self.crypto()
+            .verify_bls_aggregated_signature(&key, &message, &signature)
+    }
 }
