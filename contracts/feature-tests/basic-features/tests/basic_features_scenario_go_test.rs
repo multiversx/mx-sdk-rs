@@ -95,6 +95,11 @@ fn crypto_verify_secp_256_k_1_go() {
 }
 
 #[test]
+fn crypto_verify_secp_256_r_1_go() {
+    world().run("scenarios/crypto_verify_secp256r1.scen.json");
+}
+
+#[test]
 fn echo_array_u_8_go() {
     world().run("scenarios/echo_array_u8.scen.json");
 }

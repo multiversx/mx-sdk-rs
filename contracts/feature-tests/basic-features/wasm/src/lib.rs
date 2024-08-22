@@ -146,8 +146,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         verify_custom_secp256k1_signature => verify_custom_secp256k1_signature
         compute_secp256k1_der_signature => compute_secp256k1_der_signature
         verify_secp256r1_signature => verify_secp256r1_signature
-        verify_bls_signature_share_managed => verify_bls_signature_share_managed
-        verify_bls_aggregated_signature_managed => verify_bls_aggregated_signature_managed
+        verify_bls_signature_share => verify_bls_signature_share
+        verify_bls_aggregated_signature => verify_bls_aggregated_signature
         echo_u64 => echo_u64
         echo_i64 => echo_i64
         echo_i32 => echo_i32

@@ -110,6 +110,12 @@ fn crypto_verify_secp_256_k_1_rs() {
 }
 
 #[test]
+#[ignore]
+fn crypto_verify_secp_256_r_1_rs() {
+    world().run("scenarios/crypto_verify_secp256r1.scen.json");
+}
+
+#[test]
 fn echo_array_u_8_rs() {
     world().run("scenarios/echo_array_u8.scen.json");
 }

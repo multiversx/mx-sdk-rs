@@ -74,8 +74,9 @@ pub trait CryptoFeatures {
     ) -> bool {
         self.crypto().verify_secp256r1(&key, &message, &signature)
     }
+
     #[endpoint]
-    fn verify_bls_signature_share_managed(
+    fn verify_bls_signature_share(
         &self,
         key: ManagedBuffer,
         message: ManagedBuffer,
@@ -84,8 +85,9 @@ pub trait CryptoFeatures {
         self.crypto()
             .verify_bls_signature_share(&key, &message, &signature)
     }
+
     #[endpoint]
-    fn verify_bls_aggregated_signature_managed(
+    fn verify_bls_aggregated_signature(
         &self,
         key: ManagedBuffer,
         message: ManagedBuffer,
