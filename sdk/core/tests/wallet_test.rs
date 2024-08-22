@@ -4,11 +4,9 @@ use multiversx_sdk::{crypto::public_key::PublicKey, data::address::Address, wall
 use std::fs::{self, File};
 use std::io::Write;
 
-// use multiversx_sc_meta::cmd::wallet::generate_pem_content;
-// use multiversx_sc_snippets::{hex, imports::Wallet};
-
 const ALICE_PEM_PATH: &str = "tests/alice.pem";
-const ALICE_KEYSTORE_PATH_TEST: &str = "tests/alice.json";
+const ALICE_KEYSTORE_PATH_TEST_1: &str = "tests/alice1.json";
+const ALICE_KEYSTORE_PATH_TEST_2: &str = "tests/alice2.json";
 const ALICE_PEM_PATH_TEST: &str = "tests/alice_test.pem";
 const KEYSTORE_PASSWORD: &str = "abcd";
 const ALICE_PUBLIC_KEY: &str = "0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1";
@@ -66,7 +64,7 @@ fn write_to_file(content: &str, file: &str) {
     file.write_all(content.as_bytes()).unwrap();
 }
 
-fn create_keystore_file_from_scratch() -> Address {
+fn create_keystore_file_from_scratch(file: &str) -> Address {
     let wallet = Wallet::from_private_key(ALICE_PRIVATE_KEY).unwrap();
     let address = wallet.address();
 
@@ -78,29 +76,29 @@ fn create_keystore_file_from_scratch() -> Address {
         ALICE_PUBLIC_KEY,
         KEYSTORE_PASSWORD,
     );
-    write_to_file(&json_result, ALICE_KEYSTORE_PATH_TEST);
+    write_to_file(&json_result, file);
     address
 }
 
 #[test]
 fn test_wallet_convert_pem_to_keystore() {
-    let _ = create_keystore_file_from_scratch();
+    let _ = create_keystore_file_from_scratch(ALICE_KEYSTORE_PATH_TEST_1);
     let (private_key_pem, _public_key_pem) = Wallet::get_wallet_keys_pem(ALICE_PEM_PATH);
     assert_eq!(
-        Wallet::get_private_key_from_keystore_secret(ALICE_KEYSTORE_PATH_TEST, KEYSTORE_PASSWORD)
+        Wallet::get_private_key_from_keystore_secret(ALICE_KEYSTORE_PATH_TEST_1, KEYSTORE_PASSWORD)
             .unwrap()
             .to_string(),
         private_key_pem
     );
-    fs::remove_file(ALICE_KEYSTORE_PATH_TEST).unwrap();
+    fs::remove_file(ALICE_KEYSTORE_PATH_TEST_1).unwrap();
 }
 
 #[test]
 fn test_wallet_convert_keystore_to_pem() {
-    let address = create_keystore_file_from_scratch();
+    let address = create_keystore_file_from_scratch(ALICE_KEYSTORE_PATH_TEST_2);
 
     let private_key =
-        Wallet::get_private_key_from_keystore_secret(ALICE_KEYSTORE_PATH_TEST, KEYSTORE_PASSWORD)
+        Wallet::get_private_key_from_keystore_secret(ALICE_KEYSTORE_PATH_TEST_2, KEYSTORE_PASSWORD)
             .unwrap();
     let private_key_str = private_key.to_string();
     let public_key = PublicKey::from(&private_key);
@@ -114,5 +112,5 @@ fn test_wallet_convert_keystore_to_pem() {
     );
 
     fs::remove_file(ALICE_PEM_PATH_TEST).unwrap();
-    fs::remove_file(ALICE_KEYSTORE_PATH_TEST).unwrap();
+    fs::remove_file(ALICE_KEYSTORE_PATH_TEST_2).unwrap();
 }
