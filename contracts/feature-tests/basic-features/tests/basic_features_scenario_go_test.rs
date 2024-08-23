@@ -85,6 +85,16 @@ fn crypto_verify_bls_go() {
 }
 
 #[test]
+fn crypto_verify_bls_share_go() {
+    world().run("scenarios/crypto_verify_bls_share.scen.json");
+}
+
+#[test]
+fn crypto_verify_bls_aggregated_go() {
+    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
+}
+
+#[test]
 fn crypto_verify_ed_25519_go() {
     world().run("scenarios/crypto_verify_ed25519.scen.json");
 }

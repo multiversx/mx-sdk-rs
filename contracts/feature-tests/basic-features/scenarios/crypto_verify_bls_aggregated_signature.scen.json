@@ -1,6 +1,6 @@
 {
     "name": "crypto",
-    "comment": "",
+    "comment": "does not currently work with scenarios-rs, because verify_bls function is not yet mocked",
     "gasSchedule": "v3",
     "steps": [
         {
@@ -23,11 +23,11 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features-crypto",
-                "function": "verify_secp256r1_signature",
+                "function": "verify_bls_aggregated_signature",
                 "arguments": [
-                    "0x03e4d20902182b89cd5ed7984ebcf063f2fd2508d9f034e4109be487be9e2cf54d",
-                    "0xa607fab72e13d6b625942bd5c56cc32792c2c7c7f16053b2fb6d62dd9cf36fdacf9d5a8af3537eaf5eb93335b36cf8f1d6e5bb2dfffce9055a2608d5e1a5b839eacf36dd5dec6d2fa156133acf064cc26487d543873f3b3837a3c09b5f4cb509bbc6585d",
-                    "0xd5065c32582bf0bc8f96b34177cbf47f61d4705d64daaebff884693b6dd94afd50d3ac647aeb14d325c28bb00ab68b23280c1c480cac0e72b5a58176ac8cd1b9"
+                    "0x9cfb3532e21737e8f9eec99b04f000b27ec277d2477d881273ea07d3af96dc3e153878ed002bcd10e8320242caab49024b8c934b437b17e743b9706757f0e7b2e9fb28295d7f82af8875e0776ae8918c25206519b3f73dcbbd53cafeb5cec716",
+                    "0x6d65737361676530",
+                    "0x84737000b07fbce9b649449f9de6aae76347f5bb5eefcd017f53e874601ccf5f96c9b4ca5f85ea5f6ef6243c38c9ab99"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -48,11 +48,11 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features-crypto",
-                "function": "verify_secp256r1_signature",
+                "function": "verify_bls_aggregated_signature",
                 "arguments": [
-                    "0x04a673638cb9587cb68ea08dbef685c6f2d2a751a8b3c6f2a7e9a4999e6e4bfaf5ca1d22fe57c6103dbaac10cf15d15c0791cab8bb9a04f800e4d215276cb3e008",
-                    "0x00",
-                    "0x3045022100fab29dbcb623e7e96f44665f312b89ffdb9e4d2e2f53353236fbbcf57b2f49bf02203d6f9c63df8be43121042970a549a2d3baeca093fd37b726ddcc0924638409f5"
+                    "0x9cfb3532e21737e8f9eec99b04f000b27ec277d2477d881273ea07d3af96dc3e153878ed002bcd10e8320242caab49024b8c934b437b17e743b9706757f0e7b2e9fb28295d7f82af8875e0776ae8918c25206519b3f73dcbbd53cafeb5cec716",
+                    "0x6d657373616765323133",
+                    "0x84737000b07fbce9b649449f9de6aae76347f5bb5eefcd017f53e874601ccf5f96c9b4ca5f85ea5f6ef6243c38c9ab99"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

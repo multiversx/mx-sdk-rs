@@ -1,0 +1,96 @@
+{
+    "name": "crypto",
+    "comment": "does not currently work with scenarios-rs, because verify_bls function is not yet mocked",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features-crypto": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features-crypto.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features-crypto",
+                "function": "verify_bls_signature_share",
+                "arguments": [
+                    "0x3e886a4c6e109a151f4105aee65a5192d150ef1fa68d3cd76964a0b086006dbe4324c989deb0e4416c6d6706db1b1910eb2732f08842fb4886067b9ed191109ac2188d76002d2e11da80a3f0ea89fee6b59c834cc478a6bd49cb8a193b1abb16",
+                    "0xe96bd0f36b70c5ccc0c4396343bd7d8255b8a526c55fa1e218511fafe6539b8e",
+                    "0x04725db195e37aa237cdbbda76270d4a229b6e7a3651104dc58c4349c0388e8546976fe54a04240530b99064e434c90f"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features-crypto",
+                "function": "verify_bls_signature_share",
+                "arguments": [
+                    "0x2c9a358953f61d34401d7ee4175eec105c476b18baacab371e2f47270035b539d84ad79ba587552b7e38802be00ff7148fc2a9c7a7034ff1e63ee24602ee952235ad14ca7d36e2be617fb2c99ed22a7a2729d86ae9fbb4df06f957ba07fec50e",
+                    "0x1e46d9cbb995e30b82485525c29f80ac78aca295a6e88a11c3df8f9a445494bb",
+                    "0xbe8c460db180d6254c712ead3aa81935bc9be15b919dd45cb152b3dece04762569778c5e70e7af03fa1c66409d4f4711"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x00"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "verify_bls_aggregated_signature",
+                "arguments": [
+                    "0xb5823f6e564251cc03ce7bad3da83e72576e92795d3500bba1acb30ec9a94dce87bb8aa794d67b2d61d15c33f28f6c0c23ba1dfcbf21e8f8b46286ff871afabac925303ddcaddce6254fcff6d3155797db40b3d3b5865e8fc0bd770b3d79b381",
+                    "0x6d65737361676520746f206265207369676e6564",
+                    "0xaf32a2ddf341c08d1eb7232f05dc34e4454155e676b58c40fddf9a036562ac2c01533d2d557cb49d73aa9d7a89744696"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
