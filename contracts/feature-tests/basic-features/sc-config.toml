@@ -2,7 +2,6 @@
 main = "basic-features"
 
 [contracts.basic-features]
-ei = "1.4"
 
 [contracts.basic-features.profile]
 overflow-checks = true # needed for overflow tests
@@ -15,12 +14,8 @@ kill_legacy_callback = true
 [contracts.basic-features-crypto]
 ei = "1.4"
 add-unlabelled = false
-add-endpoints = [
-    "init",
-    "verify_secp256r1_signature",
-    "verify_bls_signature_share",
-    "verify_bls_aggregated_signature",
-]
+add-endpoints = ["init"]
+add-labels = ["crypto-ei-1.4"]
 kill_legacy_callback = true
 
 [[proxy]]

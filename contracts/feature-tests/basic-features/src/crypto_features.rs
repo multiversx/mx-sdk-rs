@@ -66,6 +66,7 @@ pub trait CryptoFeatures {
     }
 
     #[endpoint]
+    #[label("crypto-ei-1.4")]
     fn verify_secp256r1_signature(
         &self,
         key: ManagedBuffer,
@@ -76,6 +77,7 @@ pub trait CryptoFeatures {
     }
 
     #[endpoint]
+    #[label("crypto-ei-1.4")]
     fn verify_bls_signature_share(
         &self,
         key: ManagedBuffer,
@@ -87,6 +89,7 @@ pub trait CryptoFeatures {
     }
 
     #[endpoint]
+    #[label("crypto-ei-1.4")]
     fn verify_bls_aggregated_signature(
         &self,
         key: ManagedBuffer,
