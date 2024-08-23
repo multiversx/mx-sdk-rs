@@ -12,6 +12,17 @@ add-unlabelled = false
 add-endpoints = ["init", "load_bytes", "store_bytes"]
 kill_legacy_callback = true
 
+[contracts.basic-features-crypto]
+ei = "1.4"
+add-unlabelled = false
+add-endpoints = [
+    "init",
+    "verify_secp256r1_signature",
+    "verify_bls_signature_share",
+    "verify_bls_aggregated_signature",
+]
+kill_legacy_callback = true
+
 [[proxy]]
 path = "src/basic_features_proxy.rs"
 add-unlabelled = false
