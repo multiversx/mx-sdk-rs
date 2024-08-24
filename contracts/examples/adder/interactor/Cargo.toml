@@ -1,9 +1,9 @@
 [[bin]]
-name = "basic-interact-sys-calls"
+name = "basic-interactor"
 path = "src/basic_interact.rs"
 
 [package]
-name = "basic-interact-sys-calls"
+name = "basic-interactor"
 version = "0.0.0"
 publish = false
 edition = "2021"
@@ -20,6 +20,10 @@ features = ["derive"]
 version = "1.0"
 features = ["derive"]
 
+[dependencies.adder]
+path = ".."
+
 [dependencies.multiversx-sc-snippets]
 version = "=0.52.3"
 path = "../../../../framework/snippets"
+

@@ -19,6 +19,7 @@ members = [
   "tools/mxpy-snippet-generator",
   "tools/payload-macro-generator",
   # "tools/plotter",
+  "tools/interactor-system-func-calls/sys-func-calls/interact/",
 
   "vm",
 
@@ -52,6 +53,7 @@ members = [
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
   "contracts/examples/adder/interact",
+  "contracts/examples/adder/interactor",
   "contracts/examples/esdt-transfer-with-fee",
   "contracts/examples/esdt-transfer-with-fee/meta",
   "contracts/examples/bonding-curve-contract",

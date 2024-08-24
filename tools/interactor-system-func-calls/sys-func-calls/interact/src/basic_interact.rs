@@ -16,17 +16,30 @@ async fn main() {
 
     let cli = basic_interact_cli::InteractCli::parse();
     match &cli.command {
-        Some(basic_interact_cli::InteractCliCommand::Add(args)) => {},
         Some(basic_interact_cli::InteractCliCommand::IssueToken(args)) => {
-            basic_interact
-                .issue_token(
-                    args.cost.clone(),
-                    &args.display_name,
-                    &args.ticker,
-                    EsdtTokenType::from(args.token_type),
-                    args.num_decimals,
-                )
-                .await;
+            match EsdtTokenType::from(args.token_type) {
+                EsdtTokenType::Fungible => {
+                    basic_interact
+                        .issue_fungible_token(
+                            args.cost.clone(),
+                            &args.display_name,
+                            &args.ticker,
+                            args.num_decimals,
+                        )
+                        .await;
+                },
+                _ => {},
+            }
+        },
+        Some(basic_interact_cli::InteractCliCommand::Mint(args)) => {
+            basic_interact.mint_token(args.amount.clone()).await;
+        },
+        Some(basic_interact_cli::InteractCliCommand::SetRoles(args)) => {
+            // let parsed_args = SetRolesArgs::parse();
+            basic_interact.set_role(args.roles.clone()).await;
+        },
+        Some(basic_interact_cli::InteractCliCommand::Burn(args)) => {
+            basic_interact.burn_token(args.amount.clone()).await;
         },
 
         None => {},
@@ -38,6 +51,7 @@ struct SysFuncCallsInteract {
     interactor: Interactor,
     wallet_address: Bech32Address,
     state: State,
+    token_id: String,
 }
 
 impl SysFuncCallsInteract {
@@ -45,26 +59,22 @@ impl SysFuncCallsInteract {
         let config = Config::load_config();
         let mut interactor = Interactor::new(config.gateway()).await;
 
-        let wallet_address = interactor.register_wallet(test_wallets::alice());
+        let wallet_address =
+            interactor.register_wallet(Wallet::from_pem_file("wallet.pem").unwrap());
 
         Self {
             interactor,
             wallet_address: wallet_address.into(),
             state: State::load_state(),
+            token_id: String::new(),
         }
     }
 
-    async fn set_state(&mut self) {
-        println!("wallet address: {}", self.wallet_address);
-        self.interactor.retrieve_account(&self.wallet_address).await;
-    }
-
-    async fn issue_token(
+    async fn issue_fungible_token(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &str,
         token_ticker: &str,
-        token_type: EsdtTokenType,
         num_decimals: usize,
     ) {
         self.interactor
@@ -73,12 +83,81 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress.to_managed_address())
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .issue_and_set_all_roles(
+            .issue_fungible(
                 issue_cost.into(),
-                token_display_name.into(),
-                token_ticker.into(),
-                token_type,
-                num_decimals,
+                &token_display_name.into(),
+                &token_ticker.into(),
+                &BigUint::from(100000000000000000000u128),
+                FungibleTokenProperties {
+                    num_decimals: num_decimals,
+                    can_freeze: true,
+                    can_wipe: true,
+                    can_pause: true,
+                    can_mint: true,
+                    can_burn: true,
+                    can_change_owner: true,
+                    can_upgrade: true,
+                    can_add_special_roles: true,
+                },
+            )
+            .prepare_async()
+            .run()
+            .await;
+
+        // self.interactor.query().to(&self.wallet_address).
+    }
+
+    async fn set_role(&mut self, roles: Vec<u16>) {
+        let wallet_address = &self.wallet_address.clone().into_address();
+        let converted_roles: Vec<EsdtLocalRole> =
+            roles.into_iter().map(|r| EsdtLocalRole::from(r)).collect();
+
+        println!("ROLES: {:?}", converted_roles);
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress.to_managed_address())
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .set_special_roles::<std::vec::IntoIter<EsdtLocalRole>>(
+                &ManagedAddress::from_address(wallet_address),
+                &TokenIdentifier::from("AND-7d5237"),
+                converted_roles.into_iter(),
+            )
+            .prepare_async()
+            .run()
+            .await;
+    }
+
+    async fn mint_token(&mut self, amount: RustBigUint) {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.wallet_address)
+            .gas(100_000_000u64)
+            .typed(UserBuiltinProxy)
+            .esdt_local_mint(
+                &TokenIdentifier::from("AND-7d5237"),
+                0,
+                &BigUint::from(amount),
+            )
+            .prepare_async()
+            .run()
+            .await;
+    }
+
+    async fn burn_token(&mut self, amount: RustBigUint) {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.wallet_address)
+            .gas(100_000_000u64)
+            .typed(UserBuiltinProxy)
+            .esdt_local_burn(
+                &TokenIdentifier::from("AND-7d5237"),
+                0,
+                &BigUint::from(amount),
             )
             .prepare_async()
             .run()

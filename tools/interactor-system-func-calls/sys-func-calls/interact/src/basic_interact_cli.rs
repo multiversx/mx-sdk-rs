@@ -1,5 +1,5 @@
 use clap::{Args, Parser, Subcommand};
-use multiversx_sc_snippets::imports::{EsdtTokenType, RustBigUint};
+use multiversx_sc_snippets::imports::RustBigUint;
 
 /// SysFuncCalls Interact CLI
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -13,21 +13,14 @@ pub struct InteractCli {
 /// SysFuncCalls Interact CLI Commands
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum InteractCliCommand {
-    #[command(name = "add", about = "Add value")]
-    Add(AddArgs),
     #[command(name = "issue-token", about = "Issue a token")]
     IssueToken(IssueTokenArgs),
-}
-
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct AddArgs {
-    /// The value to add
-    #[arg(short = 'v', long = "value")]
-    pub value: u32,
-
-    /// Repeat this number of times
-    #[arg(short = 'c', long = "count", default_value = "1")]
-    pub count: usize,
+    #[command(name = "mint", about = "Mints fungible tokens")]
+    Mint(MintArgs),
+    #[command(name = "set-roles", about = "Set roles")]
+    SetRoles(SetRolesArgs),
+    #[command(name = "burn", about = "Burns fungible tokens")]
+    Burn(BurnArgs),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
@@ -42,4 +35,22 @@ pub struct IssueTokenArgs {
     pub token_type: u8,
     #[arg(long = "num-decimals")]
     pub num_decimals: usize,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct MintArgs {
+    #[arg(long = "amount")]
+    pub amount: RustBigUint,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Parser)]
+pub struct SetRolesArgs {
+    #[arg(long = "roles", value_delimiter = ',')]
+    pub roles: Vec<u16>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct BurnArgs {
+    #[arg(long = "amount")]
+    pub amount: RustBigUint,
 }
