@@ -4,8 +4,7 @@ use multiversx_sc_modules::governance::{
 };
 use multiversx_sc_scenario::imports::*;
 
-const GOV_TOKEN_ID_EXPR: TestTokenIdentifier = TestTokenIdentifier::new("GOV-123456");
-const GOV_TOKEN_ID: &[u8] = b"GOV-123456";
+const GOV_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("GOV-123456");
 const QUORUM: u64 = 1_500;
 const MIN_BALANCE_PROPOSAL: u64 = 500;
 const VOTING_DELAY_BLOCKS: u64 = 10;
@@ -42,19 +41,19 @@ fn setup() -> ScenarioWorld {
     world
         .account(OWNER_ADDRESS)
         .nonce(1)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE);
+        .esdt_balance(GOV_TOKEN_ID, INITIAL_GOV_TOKEN_BALANCE);
     world
         .account(FIRST_USER_ADDRESS)
         .nonce(1)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE);
+        .esdt_balance(GOV_TOKEN_ID, INITIAL_GOV_TOKEN_BALANCE);
     world
         .account(SECOND_USER_ADDRESS)
         .nonce(1)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE);
+        .esdt_balance(GOV_TOKEN_ID, INITIAL_GOV_TOKEN_BALANCE);
     world
         .account(THIRD_USER_ADDRESS)
         .nonce(1)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE);
+        .esdt_balance(GOV_TOKEN_ID, INITIAL_GOV_TOKEN_BALANCE);
 
     // init
     let new_address = world
@@ -66,7 +65,7 @@ fn setup() -> ScenarioWorld {
         .returns(ReturnsNewBech32Address)
         .whitebox(use_module::contract_obj, |sc| {
             sc.init_governance_module(
-                TokenIdentifier::from(GOV_TOKEN_ID_EXPR),
+                TokenIdentifier::from(GOV_TOKEN_ID),
                 BigUint::from(QUORUM),
                 BigUint::from(MIN_BALANCE_PROPOSAL),
                 VOTING_DELAY_BLOCKS,
@@ -96,11 +95,7 @@ pub fn propose(
         .tx()
         .from(proposer)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID_EXPR),
-            0,
-            &BigUint::from(gov_token_amount),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, gov_token_amount))
         .whitebox(use_module::contract_obj, |sc| {
             let mut args_managed = ManagedVec::new();
             for arg in args {
@@ -151,11 +146,7 @@ fn test_change_gov_config() {
         .tx()
         .from(SECOND_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(999u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 999))
         .returns(ExpectError(4u64, "Proposal is not active"))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
@@ -168,11 +159,7 @@ fn test_change_gov_config() {
         .tx()
         .from(SECOND_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(999u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 999))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         });
@@ -218,11 +205,7 @@ fn test_change_gov_config() {
         .tx()
         .from(FIRST_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(200u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         });
@@ -232,11 +215,7 @@ fn test_change_gov_config() {
         .tx()
         .from(OWNER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(200u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::DownVote);
         });
@@ -262,11 +241,7 @@ fn test_change_gov_config() {
         .tx()
         .from(FIRST_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(200u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
         .returns(ExpectError(4u64, "Already voted for this proposal"))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
@@ -277,11 +252,7 @@ fn test_change_gov_config() {
         .tx()
         .from(THIRD_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(200u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         });
@@ -330,16 +301,16 @@ fn test_change_gov_config() {
 
     world
         .check_account(FIRST_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(300u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(300u64));
     world
         .check_account(SECOND_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(1u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(1u64));
     world
         .check_account(THIRD_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(800u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(800u64));
     world
         .check_account(OWNER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(800u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(800u64));
 }
 
 #[test]
@@ -366,11 +337,7 @@ fn test_down_veto_gov_config() {
         .tx()
         .from(FIRST_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(300u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 300))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         });
@@ -382,11 +349,7 @@ fn test_down_veto_gov_config() {
         .tx()
         .from(SECOND_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(200u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         });
@@ -395,11 +358,7 @@ fn test_down_veto_gov_config() {
         .tx()
         .from(THIRD_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(200u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::DownVetoVote)
         });
@@ -419,15 +378,15 @@ fn test_down_veto_gov_config() {
 
     world
         .check_account(FIRST_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(200u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(200u64));
 
     world
         .check_account(SECOND_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(800u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(800u64));
 
     world
         .check_account(THIRD_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(800u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(800u64));
 }
 
 #[test]
@@ -454,11 +413,7 @@ fn test_abstain_vote_gov_config() {
         .tx()
         .from(FIRST_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(500u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 500))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         });
@@ -470,11 +425,7 @@ fn test_abstain_vote_gov_config() {
         .tx()
         .from(SECOND_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(400u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 400))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::DownVote);
         });
@@ -483,11 +434,7 @@ fn test_abstain_vote_gov_config() {
         .tx()
         .from(THIRD_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(600u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 600))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::AbstainVote);
         });
@@ -527,13 +474,13 @@ fn test_abstain_vote_gov_config() {
 
     world
         .check_account(FIRST_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::zero());
+        .esdt_balance(GOV_TOKEN_ID, BigUint::zero());
     world
         .check_account(SECOND_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(600u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(600u64));
     world
         .check_account(THIRD_USER_ADDRESS)
-        .esdt_balance(GOV_TOKEN_ID_EXPR, BigUint::from(400u64));
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(400u64));
 }
 
 #[test]
@@ -560,11 +507,7 @@ fn test_gov_cancel_defeated_proposal() {
         .tx()
         .from(SECOND_USER_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(GOV_TOKEN_ID),
-            0,
-            &BigUint::from(999u64),
-        )
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 999))
         .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::DownVote)
         });
