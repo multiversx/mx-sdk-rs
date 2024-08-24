@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate to unified syntax at some point
+
 use multiversx_sc_scenario::imports::*;
 
 use multiversx_sc_modules::token_merge::{
