@@ -91,6 +91,16 @@ async fn main() {
                 .unset_roles(&args.address, &args.token_id, args.roles.clone())
                 .await;
         },
+        Some(basic_interact_cli::InteractCliCommand::TransferOwnership(args)) => {
+            basic_interact
+                .transfer_ownership(&args.token_id, &args.new_owner)
+                .await;
+        },
+        Some(basic_interact_cli::InteractCliCommand::TransferNftCreateRole(args)) => {
+            basic_interact
+                .transfer_nft_create_role(&args.token_id, &args.old_owner, &args.new_owner)
+                .await;
+        },
 
         None => {},
     }
@@ -365,6 +375,50 @@ impl SysFuncCallsInteract {
                 &managed_addr,
                 &TokenIdentifier::from(token_id),
                 converted_roles.into_iter(),
+            )
+            .prepare_async()
+            .run()
+            .await;
+    }
+
+    async fn transfer_ownership(&mut self, token_id: &str, new_owner: &str) {
+        let bech32_addr = Bech32Address::from_bech32_string(new_owner.to_string());
+        let addr = bech32_addr.to_address();
+        let managed_addr: ManagedAddress<StaticApi> = ManagedAddress::from_address(&addr);
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress.to_managed_address())
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .transfer_ownership(&TokenIdentifier::from(token_id), &managed_addr)
+            .prepare_async()
+            .run()
+            .await;
+    }
+
+    async fn transfer_nft_create_role(&mut self, token_id: &str, old_owner: &str, new_owner: &str) {
+        let bech32_addr_new_owner = Bech32Address::from_bech32_string(new_owner.to_string());
+        let addr_new_owner = bech32_addr_new_owner.to_address();
+        let managed_addr_new_owner: ManagedAddress<StaticApi> =
+            ManagedAddress::from_address(&addr_new_owner);
+
+        let bech32_addr_old_owner = Bech32Address::from_bech32_string(old_owner.to_string());
+        let addr_old_owner = bech32_addr_old_owner.to_address();
+        let managed_addr_old_owner: ManagedAddress<StaticApi> =
+            ManagedAddress::from_address(&addr_old_owner);
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress.to_managed_address())
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .transfer_nft_create_role(
+                &TokenIdentifier::from(token_id),
+                &managed_addr_old_owner,
+                &managed_addr_new_owner,
             )
             .prepare_async()
             .run()

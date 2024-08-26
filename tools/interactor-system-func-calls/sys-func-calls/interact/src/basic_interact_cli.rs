@@ -36,6 +36,10 @@ pub enum InteractCliCommand {
     ChangeSftMetaEsdt(ChangeSftMetaEsdtArgs),
     #[command(name = "unset-roles", about = "Unsets the roles of a token")]
     UnsetRoles(UnsetRolesArgs),
+    #[command(name = "transfer-ownership", about = "Transfers ownership of a token")]
+    TransferOwnership(TransferOwnershipArgs),
+    #[command(name = "transfer-nft-create-role", about = "Transfers NFT create role")]
+    TransferNftCreateRole(TransferNftCreateRoleArgs),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
@@ -148,4 +152,23 @@ pub struct UnsetRolesArgs {
     pub token_id: String,
     #[arg(long = "roles", value_delimiter = ',')]
     pub roles: Vec<u16>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct TransferOwnershipArgs {
+    #[arg(long = "token-id")]
+    pub token_id: String,
+    #[arg(long = "new-owner")]
+    pub new_owner: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+
+pub struct TransferNftCreateRoleArgs {
+    #[arg(long = "token-id")]
+    pub token_id: String,
+    #[arg(long = "old-owner")]
+    pub old_owner: String,
+    #[arg(long = "new-owner")]
+    pub new_owner: String,
 }
