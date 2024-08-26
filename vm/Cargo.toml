@@ -31,7 +31,7 @@ hex-literal = "=0.4.1"
 bitflags = "=2.6.0"
 colored = "2.1.0"
 rand = { version= "0.8.5", optional = true }
-rand_seeder = { version= "0.2.2", optional = true }
+rand_seeder = { version= "0.3.0", optional = true }
 ed25519-dalek = { version = "2.1.0" , optional = true }
 
 [dependencies.multiversx-chain-vm-executor]
