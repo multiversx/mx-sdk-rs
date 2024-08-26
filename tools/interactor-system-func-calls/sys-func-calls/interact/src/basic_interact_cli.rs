@@ -21,6 +21,26 @@ pub enum InteractCliCommand {
     SetRoles(SetRolesArgs),
     #[command(name = "burn", about = "Burns fungible tokens")]
     Burn(BurnArgs),
+    #[command(name = "pause-token", about = "Pauses a fungible token")]
+    PauseToken(PauseTokenArgs),
+    #[command(name = "unpause-token", about = "Unpauses a fungible token")]
+    UnpauseToken(PauseTokenArgs),
+    #[command(name = "freeze-token", about = "Freezes a fungible token for an address")]
+    FreezeToken(FreezeTokenArgs),
+    #[command(name = "unfreeze-token", about = "Unfreezes a fungible token for an address")]
+    UnfreezeToken(FreezeTokenArgs),
+    #[command(name = "freeze-nft", about = "Freezes a non-fungible token for an address")]
+    FreezeNFT(FreezeNFTArgs),
+    #[command(name = "unfreeze-nft", about = "Unfreezes a non-fungible token for an address")]
+    UnfreezeNFT(FreezeNFTArgs),
+    #[command(name = "wipe-token", about = "Wipes a fungible token for an address")]
+    WipeToken(WipeTokenArgs),
+    #[command(name = "wipe-nft", about = "Freezes a non-fungible token for an address")]
+    WipeNFT(WipeNFTArgs),
+    #[command(name = "issue-non-fungible-token", about = "Create a NFT Collection")]
+    IssueNFT(IssueNFTArgs),
+    #[command(name = "create-nft", about = "Issue a NFT")]
+    CreateNFT(CreateNFTArgs),
     #[command(
         name = "issue-fungible",
         about = "Issues fungible tokens and sends them to your wallet"
@@ -92,6 +112,16 @@ pub struct IssueFungibleArgs {
     pub num_decimals: usize,
     #[arg(short = 's', long = "supply")]
     pub supply: RustBigUint,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct IssueNFTArgs {
+    #[arg(short = 'c', long = "cost", default_value = "50000000000000000")]
+    pub cost: RustBigUint,
+    #[arg(short = 'd', long = "display-name")]
+    pub display_name: String,
+    #[arg(long = "token-ticker")]
+    pub ticker: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
@@ -171,4 +201,65 @@ pub struct TransferNftCreateRoleArgs {
     pub old_owner: String,
     #[arg(long = "new-owner")]
     pub new_owner: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct PauseTokenArgs {
+    #[arg(long = "token-id", default_value = "")]
+    pub token_id: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct FreezeTokenArgs {
+    #[arg(long = "token-id", default_value = "")]
+    pub token_id: String,
+    #[arg(short = 'a', long = "address")]
+    pub address: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct FreezeNFTArgs {
+    #[arg(long = "token-id", default_value = "")]
+    pub token_id: String,
+    #[arg(long = "nonce")]
+    pub nft_nonce: u64,
+    #[arg(short = 'a', long = "address")]
+    pub address: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct WipeTokenArgs {
+    #[arg(long = "token-id", default_value = "")]
+    pub token_id: String,
+    #[arg(short = 'a', long = "address")]
+    pub address: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct WipeNFTArgs {
+    #[arg(long = "token-id", default_value = "")]
+    pub token_id: String,
+    #[arg(long = "nonce")]
+    pub nft_nonce: u64,
+    #[arg(short = 'a', long = "address")]
+    pub address: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct CreateNFTArgs {
+    // token amount name hash royalities attributes uris
+    #[arg(long = "token-id")]
+    pub token_id: String,
+    #[arg(short = 'a', long = "amount")]
+    pub amount: RustBigUint,
+    #[arg(short = 'n', long = "name")]
+    pub name: String,
+    #[arg(long = "hash")]
+    pub hash: String,
+    #[arg(short = 'r', long = "royalities")]
+    pub royalties: u64,
+    // #[long = "attributes")]
+    // pub attributes: String,
+    // #[arg(long = "uris")]
+    // pub uris: String,
 }
