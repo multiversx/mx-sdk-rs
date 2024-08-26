@@ -7,7 +7,7 @@ use basic_interact_config::Config;
 use basic_interact_state::State;
 use clap::Parser;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{hex, imports::*};
 
 #[tokio::main]
 async fn main() {
@@ -84,6 +84,11 @@ async fn main() {
         Some(basic_interact_cli::InteractCliCommand::ChangeSftMetaEsdt(args)) => {
             basic_interact
                 .change_sft_meta_esdt(&args.token_id, args.num_decimals)
+                .await;
+        },
+        Some(basic_interact_cli::InteractCliCommand::UnsetRoles(args)) => {
+            basic_interact
+                .unset_roles(&args.address, &args.token_id, args.roles.clone())
                 .await;
         },
 
@@ -335,6 +340,32 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_local_burn(&TokenIdentifier::from(token_id), 0, &BigUint::from(amount))
+            .prepare_async()
+            .run()
+            .await;
+    }
+
+    async fn unset_roles(&mut self, address: &str, token_id: &str, roles: Vec<u16>) {
+        let converted_roles: Vec<EsdtLocalRole> =
+            roles.into_iter().map(|r| EsdtLocalRole::from(r)).collect();
+
+        println!("ROLES: {:?}", converted_roles);
+
+        let bech32_addr = Bech32Address::from_bech32_string(address.to_string());
+        let addr = bech32_addr.to_address();
+        let managed_addr: ManagedAddress<StaticApi> = ManagedAddress::from_address(&addr);
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress.to_managed_address())
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .unset_special_roles(
+                &managed_addr,
+                &TokenIdentifier::from(token_id),
+                converted_roles.into_iter(),
+            )
             .prepare_async()
             .run()
             .await;

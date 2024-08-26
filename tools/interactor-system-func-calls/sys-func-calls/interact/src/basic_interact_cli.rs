@@ -34,6 +34,8 @@ pub enum InteractCliCommand {
     RegisterMetaEsdt(RegisterMetaEsdtArgs),
     #[command(name = "change-sft-meta-esdt", about = "Changes a SFT to a Meta ESDT")]
     ChangeSftMetaEsdt(ChangeSftMetaEsdtArgs),
+    #[command(name = "unset-roles", about = "Unsets the roles of a token")]
+    UnsetRoles(UnsetRolesArgs),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
@@ -136,4 +138,14 @@ pub struct ChangeSftMetaEsdtArgs {
     pub token_id: String,
     #[arg(long = "num-decimals")]
     pub num_decimals: usize,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Parser)]
+pub struct UnsetRolesArgs {
+    #[arg(short = 'a', long = "address")]
+    pub address: String,
+    #[arg(long = "token-id")]
+    pub token_id: String,
+    #[arg(long = "roles", value_delimiter = ',')]
+    pub roles: Vec<u16>,
 }
