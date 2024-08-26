@@ -16,7 +16,7 @@ pub fn keccak256(data: &[u8]) -> [u8; KECCAK256_RESULT_LEN] {
     hasher.finalize().into()
 }
 
-#[cfg(feature = "wasm-incopatible")]
+#[cfg(feature = "wasm-incompatible")]
 pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     use ed25519_dalek::{Signature, VerifyingKey, Verifier};
 
@@ -44,7 +44,7 @@ pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     result.is_ok()
 }
 
-#[cfg(not(feature = "wasm-incopatible"))]
+#[cfg(not(feature = "wasm-incompatible"))]
 pub fn verify_ed25519(_key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
-    panic!("verify_ed25519 not supported for wasm builds, feature `wasm-incopatible` needs to be enabled")
+    panic!("verify_ed25519 not supported for wasm builds, feature `wasm-incompatible` needs to be enabled")
 }

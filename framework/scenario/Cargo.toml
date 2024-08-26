@@ -32,8 +32,8 @@ colored = "2.0"
 unwrap-infallible = "0.1.5"
 
 [features]
-default = ["wasm-incopatible"]
-wasm-incopatible = ["multiversx-chain-vm/wasm-incopatible"]
+default = ["wasm-incompatible"]
+wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
 run-go-tests = []
 
 [dependencies.multiversx-sc]

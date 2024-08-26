@@ -18,7 +18,7 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [features]
 # not supported when compiling to wasm
-wasm-incopatible = ["rand", "rand_seeder", "ed25519-dalek"]
+wasm-incompatible = ["rand", "rand_seeder", "ed25519-dalek"]
 
 [dependencies]
 num-bigint = "0.4"
