@@ -51,6 +51,7 @@ async fn main() {
 struct AdderInteract {
     interactor: Interactor,
     adder_owner_address: Bech32Address,
+    wallet_address: Bech32Address,
     state: State,
 }
 
@@ -62,22 +63,26 @@ impl AdderInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
-        // PASSWORD: "alice"
         let adder_owner_address =
+            interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
+        // PASSWORD: alice
+        let wallet_address =
             interactor.register_wallet(Wallet::from_keystore_secret("alice.json").unwrap());
 
         Self {
             interactor,
             adder_owner_address: adder_owner_address.into(),
+            wallet_address: wallet_address.into(),
             state: State::load_state(),
         }
     }
 
     async fn set_state(&mut self) {
-        println!("wallet address: {}", self.adder_owner_address);
+        println!("wallet address: {}", self.wallet_address);
         self.interactor
             .retrieve_account(&self.adder_owner_address)
             .await;
+        self.interactor.retrieve_account(&self.wallet_address).await;
     }
 
     async fn deploy(&mut self) {
@@ -116,7 +121,7 @@ impl AdderInteract {
         let mut buffer = self.interactor.homogenous_call_buffer();
         for _ in 0..count {
             buffer.push_tx(|tx| {
-                tx.from(&self.adder_owner_address)
+                tx.from(&self.wallet_address)
                     .typed(adder_proxy::AdderProxy)
                     .init(0u32)
                     .code(ADDER_CODE_PATH)
@@ -144,7 +149,7 @@ impl AdderInteract {
         let mut buffer = self.interactor.homogenous_call_buffer();
         for _ in 0..count {
             buffer.push_tx(|tx| {
-                tx.from(&self.adder_owner_address)
+                tx.from(&self.wallet_address)
                     .to(self.state.current_adder_address())
                     .typed(adder_proxy::AdderProxy)
                     .add(value)
@@ -160,7 +165,7 @@ impl AdderInteract {
     async fn feed_contract_egld(&mut self) {
         self.interactor
             .tx()
-            .from(&self.adder_owner_address)
+            .from(&self.wallet_address)
             .to(self.state.current_adder_address())
             .egld(NumExpr("0,050000000000000000"))
             .prepare_async()
@@ -171,7 +176,7 @@ impl AdderInteract {
     async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
-            .from(&self.adder_owner_address)
+            .from(&self.wallet_address)
             .to(self.state.current_adder_address())
             .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)
@@ -202,7 +207,7 @@ impl AdderInteract {
         let response = self
             .interactor
             .tx()
-            .from(&self.adder_owner_address)
+            .from(&self.wallet_address)
             .to(self.state.current_adder_address())
             .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)

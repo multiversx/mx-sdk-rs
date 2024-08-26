@@ -275,17 +275,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "basic-interactor"
-version = "0.0.0"
-dependencies = [
- "adder",
- "clap",
- "multiversx-sc-snippets",
- "serde",
- "toml",
-]
-
-[[package]]
 name = "bech32"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
