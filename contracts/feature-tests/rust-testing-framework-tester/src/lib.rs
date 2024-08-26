@@ -21,7 +21,7 @@ pub struct StructWithManagedTypes<M: ManagedTypeApi> {
 pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[init]
     fn init(&self) -> ManagedBuffer {
-        self.total_value().set(&BigUint::from(1u32));
+        self.total_value().set(BigUint::from(1u32));
         b"constructor-result".into()
     }
 
