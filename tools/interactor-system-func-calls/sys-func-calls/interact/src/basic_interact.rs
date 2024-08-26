@@ -17,19 +17,15 @@ async fn main() {
     let cli = basic_interact_cli::InteractCli::parse();
     match &cli.command {
         Some(basic_interact_cli::InteractCliCommand::IssueToken(args)) => {
-            match EsdtTokenType::from(args.token_type) {
-                EsdtTokenType::Fungible => {
-                    basic_interact
-                        .issue_fungible_token(
-                            args.cost.clone(),
-                            &args.display_name,
-                            &args.ticker,
-                            args.num_decimals,
-                        )
-                        .await;
-                },
-                _ => {},
-            }
+            basic_interact
+                .issue_token(
+                    args.cost.clone(),
+                    &args.display_name,
+                    &args.ticker,
+                    args.num_decimals,
+                    args.token_type.into(),
+                )
+                .await;
         },
         Some(basic_interact_cli::InteractCliCommand::Mint(args)) => {
             basic_interact.mint_token(args.amount.clone()).await;
@@ -70,7 +66,7 @@ impl SysFuncCallsInteract {
         }
     }
 
-    async fn issue_fungible_token(
+    async fn _issue_fungible_token(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &str,
@@ -103,8 +99,37 @@ impl SysFuncCallsInteract {
             .prepare_async()
             .run()
             .await;
+    }
 
-        // self.interactor.query().to(&self.wallet_address).
+    async fn issue_token(
+        &mut self,
+        issue_cost: RustBigUint,
+        token_display_name: &str,
+        token_ticker: &str,
+        num_decimals: usize,
+        token_type: EsdtTokenType,
+    ) {
+        let token_id = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress.to_managed_address())
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .issue_and_set_all_roles(
+                issue_cost.into(),
+                token_display_name.into(),
+                token_ticker.into(),
+                token_type,
+                num_decimals,
+            )
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+
+        println!("TOKEN ID: {:?}", token_id.to_string());
+        self.token_id = token_id.to_string();
     }
 
     async fn set_role(&mut self, roles: Vec<u16>) {
@@ -122,7 +147,7 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .set_special_roles::<std::vec::IntoIter<EsdtLocalRole>>(
                 &ManagedAddress::from_address(wallet_address),
-                &TokenIdentifier::from("AND-7d5237"),
+                &TokenIdentifier::from(&self.token_id),
                 converted_roles.into_iter(),
             )
             .prepare_async()
@@ -138,7 +163,7 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_local_mint(
-                &TokenIdentifier::from("AND-7d5237"),
+                &TokenIdentifier::from(&self.token_id),
                 0,
                 &BigUint::from(amount),
             )
@@ -155,7 +180,7 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_local_burn(
-                &TokenIdentifier::from("AND-7d5237"),
+                &TokenIdentifier::from(&self.token_id),
                 0,
                 &BigUint::from(amount),
             )

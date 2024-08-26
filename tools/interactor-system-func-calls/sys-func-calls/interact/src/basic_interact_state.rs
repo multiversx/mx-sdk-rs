@@ -26,18 +26,6 @@ impl State {
             Self::default()
         }
     }
-
-    /// Sets the adder address
-    pub fn set_adder_address(&mut self, address: Bech32Address) {
-        self.adder_address = Some(address);
-    }
-
-    /// Returns the adder contract
-    pub fn current_adder_address(&self) -> &Bech32Address {
-        self.adder_address
-            .as_ref()
-            .expect("no known adder contract, deploy first")
-    }
 }
 
 impl Drop for State {
