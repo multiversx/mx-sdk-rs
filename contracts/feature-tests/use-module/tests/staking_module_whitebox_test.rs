@@ -1,8 +1,7 @@
 use multiversx_sc_modules::staking::StakingModule;
 use multiversx_sc_scenario::imports::*;
 
-const STAKING_TOKEN_ID_EXPR: TestTokenIdentifier = TestTokenIdentifier::new("STAKE-123456");
-const STAKING_TOKEN_ID: &[u8] = b"STAKE-123456";
+const STAKING_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("STAKE-123456");
 const INITIAL_BALANCE: u64 = 2_000_000;
 const REQUIRED_STAKE_AMOUNT: u64 = 1_000_000;
 const SLASH_AMOUNT: u64 = 600_000;
@@ -34,27 +33,27 @@ fn test_staking_module() {
     world
         .account(ALICE_ADDRESS)
         .nonce(1)
-        .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE);
+        .esdt_balance(STAKING_TOKEN_ID, INITIAL_BALANCE);
     world
         .account(BOB_ADDRESS)
         .nonce(1)
-        .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE);
+        .esdt_balance(STAKING_TOKEN_ID, INITIAL_BALANCE);
     world
         .account(CAROL_ADDRESS)
         .nonce(1)
-        .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE);
+        .esdt_balance(STAKING_TOKEN_ID, INITIAL_BALANCE);
     world
         .account(EVE_ADDRESS)
         .nonce(1)
-        .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE);
+        .esdt_balance(STAKING_TOKEN_ID, INITIAL_BALANCE);
     world
         .account(PAUL_ADDRESS)
         .nonce(1)
-        .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE);
+        .esdt_balance(STAKING_TOKEN_ID, INITIAL_BALANCE);
     world
         .account(SALLY_ADDRESS)
         .nonce(1)
-        .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE);
+        .esdt_balance(STAKING_TOKEN_ID, INITIAL_BALANCE);
 
     // init
     let new_address = world
@@ -73,7 +72,7 @@ fn test_staking_module() {
             whitelist.push(SALLY_ADDRESS.to_managed_address());
 
             sc.init_staking_module(
-                &EgldOrEsdtTokenIdentifier::esdt(STAKING_TOKEN_ID),
+                &EgldOrEsdtTokenIdentifier::esdt(STAKING_TOKEN_ID.to_token_identifier()),
                 &BigUint::from(REQUIRED_STAKE_AMOUNT),
                 &BigUint::from(SLASH_AMOUNT),
                 QUORUM,
@@ -88,11 +87,7 @@ fn test_staking_module() {
         .tx()
         .from(EVE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(STAKING_TOKEN_ID_EXPR),
-            0,
-            &BigUint::from(REQUIRED_STAKE_AMOUNT),
-        )
+        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
         .returns(ExpectError(4u64, "Only whitelisted members can stake"))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
@@ -103,11 +98,11 @@ fn test_staking_module() {
         .tx()
         .from(ALICE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(STAKING_TOKEN_ID_EXPR),
+        .payment(TestEsdtTransfer(
+            STAKING_TOKEN_ID,
             0,
-            &BigUint::from(REQUIRED_STAKE_AMOUNT / 2),
-        )
+            REQUIRED_STAKE_AMOUNT / 2,
+        ))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -126,11 +121,7 @@ fn test_staking_module() {
         .tx()
         .from(BOB_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(STAKING_TOKEN_ID),
-            0,
-            &BigUint::from(REQUIRED_STAKE_AMOUNT),
-        )
+        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -139,11 +130,7 @@ fn test_staking_module() {
         .tx()
         .from(CAROL_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(STAKING_TOKEN_ID),
-            0,
-            &BigUint::from(REQUIRED_STAKE_AMOUNT),
-        )
+        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -152,11 +139,7 @@ fn test_staking_module() {
         .tx()
         .from(PAUL_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(STAKING_TOKEN_ID),
-            0,
-            &BigUint::from(REQUIRED_STAKE_AMOUNT),
-        )
+        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -165,11 +148,7 @@ fn test_staking_module() {
         .tx()
         .from(SALLY_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(STAKING_TOKEN_ID),
-            0,
-            &BigUint::from(REQUIRED_STAKE_AMOUNT),
-        )
+        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -199,11 +178,7 @@ fn test_staking_module() {
         .tx()
         .from(ALICE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(STAKING_TOKEN_ID_EXPR),
-            0,
-            &BigUint::from(REQUIRED_STAKE_AMOUNT),
-        )
+        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
             let alice_staked_amount = sc.staked_amount(&ALICE_ADDRESS.to_managed_address()).get();
@@ -222,7 +197,7 @@ fn test_staking_module() {
 
     world
         .check_account(ALICE_ADDRESS)
-        .esdt_balance(STAKING_TOKEN_ID_EXPR, BigUint::from(1_000_000u64));
+        .esdt_balance(STAKING_TOKEN_ID, BigUint::from(1_000_000u64));
 
     // alice vote to slash bob
 
@@ -386,8 +361,7 @@ fn test_staking_module() {
             sc.unstake(BigUint::from(400_000u64));
         });
 
-    world.check_account(ALICE_ADDRESS).esdt_balance(
-        TokenIdentifier::from(STAKING_TOKEN_ID_EXPR),
-        BigUint::from(INITIAL_BALANCE - SLASH_AMOUNT),
-    );
+    world
+        .check_account(ALICE_ADDRESS)
+        .esdt_balance(STAKING_TOKEN_ID, INITIAL_BALANCE - SLASH_AMOUNT);
 }

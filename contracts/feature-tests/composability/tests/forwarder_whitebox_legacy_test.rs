@@ -63,7 +63,7 @@ fn test_nft_update_attributes_and_send() {
         .tx()
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
-        .single_esdt(&TokenIdentifier::from(NFT_TOKEN_ID), 1, &1u32.into())
+        .payment(TestEsdtTransfer(NFT_TOKEN_ID, 1, 1))
         .whitebox(forwarder_legacy::contract_obj, |sc| {
             sc.nft_update_attributes(NFT_TOKEN_ID.to_token_identifier(), 1, new_attributes);
 

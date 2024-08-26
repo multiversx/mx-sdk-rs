@@ -70,11 +70,7 @@ fn test_transfer_role() {
         .tx()
         .from(USER_ADDRESS)
         .to(TRANSFER_ROLE_FEATURES_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(TRANSFER_TOKEN_ID),
-            0,
-            &BigUint::from(100u64),
-        )
+        .payment(TestEsdtTransfer(TRANSFER_TOKEN_ID, 0, 100))
         .whitebox(transfer_role_features::contract_obj, |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID_EXPR),
@@ -101,11 +97,7 @@ fn test_transfer_role() {
         .tx()
         .from(USER_ADDRESS)
         .to(TRANSFER_ROLE_FEATURES_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(TRANSFER_TOKEN_ID),
-            0,
-            &BigUint::from(100u64),
-        )
+        .payment(TestEsdtTransfer(TRANSFER_TOKEN_ID, 0, 100))
         .returns(ExpectError(4u64, "Destination address not whitelisted"))
         .whitebox(transfer_role_features::contract_obj, |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
@@ -126,11 +118,7 @@ fn test_transfer_role() {
         .tx()
         .from(USER_ADDRESS)
         .to(TRANSFER_ROLE_FEATURES_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(TRANSFER_TOKEN_ID),
-            0,
-            &BigUint::from(100u64),
-        )
+        .payment(TestEsdtTransfer(TRANSFER_TOKEN_ID, 0, 100))
         .whitebox(transfer_role_features::contract_obj, |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID_EXPR),
@@ -159,11 +147,7 @@ fn test_transfer_role() {
         .tx()
         .from(USER_ADDRESS)
         .to(TRANSFER_ROLE_FEATURES_ADDRESS)
-        .single_esdt(
-            &TokenIdentifier::from(TRANSFER_TOKEN_ID),
-            0,
-            &BigUint::from(100u64),
-        )
+        .payment(TestEsdtTransfer(TRANSFER_TOKEN_ID, 0, 100))
         .whitebox(transfer_role_features::contract_obj, |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID_EXPR),
