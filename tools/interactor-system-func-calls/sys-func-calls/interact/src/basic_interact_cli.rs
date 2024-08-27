@@ -61,8 +61,8 @@ pub enum InteractCliCommand {
         about = "Issues fungible tokens and sends them to your wallet"
     )]
     IssueFungible(IssueFungibleArgs),
-    #[command(name = "issue-sft", about = "Issues a SFT")]
-    IssueSft(IssueSftArgs),
+    #[command(name = "issue-sft-collection", about = "Issues a SFT")]
+    IssueSftCollection(IssueSftArgs),
     #[command(name = "mint-sft", about = "Mints a SFT")]
     MintSft(MintSFTArgs),
     #[command(name = "register-meta-esdt", about = "Registers a meta ESDT")]
@@ -145,7 +145,7 @@ pub struct IssueNftCollectionArgs {
 pub struct IssueSftArgs {
     #[arg(short = 'c', long = "cost", default_value = "50000000000000000")]
     pub cost: RustBigUint,
-    #[arg(long = "display-name")]
+    #[arg(short = 'd', long = "display-name")]
     pub display_name: String,
     #[arg(long = "token-ticker")]
     pub ticker: String,
@@ -175,7 +175,7 @@ pub struct MintSFTArgs {
 pub struct RegisterMetaEsdtArgs {
     #[arg(short = 'c', long = "cost", default_value = "50000000000000000")]
     pub cost: RustBigUint,
-    #[arg(long = "display-name")]
+    #[arg(short = 'd', long = "display-name")]
     pub display_name: String,
     #[arg(long = "token-ticker")]
     pub ticker: String,
