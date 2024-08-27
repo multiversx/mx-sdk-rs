@@ -34,7 +34,6 @@ async fn main() {
                 .await;
         },
         Some(basic_interact_cli::InteractCliCommand::SetRoles(args)) => {
-            // let parsed_args = SetRolesArgs::parse();
             basic_interact
                 .set_role(&args.token_id, args.roles.clone())
                 .await;
@@ -80,9 +79,9 @@ async fn main() {
                 .wipe_nft(&args.token_id, args.nft_nonce, &args.address)
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::IssueNFT(args)) => {
+        Some(basic_interact_cli::InteractCliCommand::IssueNFTCollection(args)) => {
             basic_interact
-                .issue_non_fungible_token(args.cost.clone(), &args.display_name, &args.ticker)
+                .issue_non_fungible_collection(args.cost.clone(), &args.display_name, &args.ticker)
                 .await;
         },
         Some(basic_interact_cli::InteractCliCommand::CreateNFT(args)) => {
@@ -153,6 +152,9 @@ async fn main() {
                 .transfer_nft_create_role(&args.token_id, &args.old_owner, &args.new_owner)
                 .await;
         },
+        Some(basic_interact_cli::InteractCliCommand::ControlChanges(args)) => {
+            basic_interact.control_changes(&args.token_id).await;
+        },
 
         None => {},
     }
@@ -170,8 +172,7 @@ impl SysFuncCallsInteract {
         let config = Config::load_config();
         let mut interactor = Interactor::new(config.gateway()).await;
 
-        let wallet_address =
-            interactor.register_wallet(Wallet::from_pem_file("wallet.pem").unwrap());
+        let wallet_address = interactor.register_wallet(test_wallets::alice());
 
         Self {
             interactor,
@@ -216,7 +217,7 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    async fn issue_non_fungible_token(
+    async fn issue_non_fungible_collection(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &str,
@@ -310,7 +311,8 @@ impl SysFuncCallsInteract {
 
     async fn set_role(&mut self, token_id: &str, roles: Vec<u16>) {
         let wallet_address = &self.wallet_address.clone().into_address();
-        let converted_roles: Vec<EsdtLocalRole> = roles.into_iter().map(EsdtLocalRole::from).collect();
+        let converted_roles: Vec<EsdtLocalRole> =
+            roles.into_iter().map(EsdtLocalRole::from).collect();
 
         println!("ROLES: {:?}", converted_roles);
 
@@ -502,11 +504,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress.to_managed_address())
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .freeze_nft(
-                &TokenIdentifier::from(token_id),
-                nonce,
-                &managed_address,
-            )
+            .freeze_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
             .prepare_async()
             .run()
             .await;
@@ -521,11 +519,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress.to_managed_address())
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unfreeze_nft(
-                &TokenIdentifier::from(token_id),
-                nonce,
-                &managed_address,
-            )
+            .unfreeze_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
             .prepare_async()
             .run()
             .await;
@@ -555,11 +549,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress.to_managed_address())
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .wipe_nft(
-                &TokenIdentifier::from(token_id),
-                nonce,
-                &managed_address,
-            )
+            .wipe_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
             .prepare_async()
             .run()
             .await;
@@ -597,8 +587,8 @@ impl SysFuncCallsInteract {
     }
 
     async fn unset_roles(&mut self, address: &str, token_id: &str, roles: Vec<u16>) {
-        let converted_roles: Vec<EsdtLocalRole> = roles.into_iter().map(EsdtLocalRole::from).collect();
-
+        let converted_roles: Vec<EsdtLocalRole> =
+            roles.into_iter().map(EsdtLocalRole::from).collect();
 
         println!("ROLES: {:?}", converted_roles);
 
@@ -660,6 +650,32 @@ impl SysFuncCallsInteract {
                 &TokenIdentifier::from(token_id),
                 &managed_addr_old_owner,
                 &managed_addr_new_owner,
+            )
+            .prepare_async()
+            .run()
+            .await;
+    }
+
+    async fn control_changes(&mut self, token_id: &str) {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress.to_managed_address())
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .control_changes(
+                &TokenIdentifier::from(token_id),
+                &TokenPropertyArguments {
+                    can_freeze: Some(true),
+                    can_wipe: Some(true),
+                    can_pause: Some(true),
+                    can_transfer_create_role: Some(true),
+                    can_mint: Some(true),
+                    can_burn: Some(true),
+                    can_change_owner: Some(true),
+                    can_upgrade: Some(true),
+                    can_add_special_roles: Some(true),
+                },
             )
             .prepare_async()
             .run()

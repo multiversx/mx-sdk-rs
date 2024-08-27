@@ -25,20 +25,35 @@ pub enum InteractCliCommand {
     PauseToken(PauseTokenArgs),
     #[command(name = "unpause-token", about = "Unpauses a fungible token")]
     UnpauseToken(PauseTokenArgs),
-    #[command(name = "freeze-token", about = "Freezes a fungible token for an address")]
+    #[command(
+        name = "freeze-token",
+        about = "Freezes a fungible token for an address"
+    )]
     FreezeToken(FreezeTokenArgs),
-    #[command(name = "unfreeze-token", about = "Unfreezes a fungible token for an address")]
+    #[command(
+        name = "unfreeze-token",
+        about = "Unfreezes a fungible token for an address"
+    )]
     UnfreezeToken(FreezeTokenArgs),
-    #[command(name = "freeze-nft", about = "Freezes a non-fungible token for an address")]
+    #[command(
+        name = "freeze-nft",
+        about = "Freezes a non-fungible token for an address"
+    )]
     FreezeNFT(FreezeNFTArgs),
-    #[command(name = "unfreeze-nft", about = "Unfreezes a non-fungible token for an address")]
+    #[command(
+        name = "unfreeze-nft",
+        about = "Unfreezes a non-fungible token for an address"
+    )]
     UnfreezeNFT(FreezeNFTArgs),
     #[command(name = "wipe-token", about = "Wipes a fungible token for an address")]
     WipeToken(WipeTokenArgs),
-    #[command(name = "wipe-nft", about = "Freezes a non-fungible token for an address")]
+    #[command(
+        name = "wipe-nft",
+        about = "Freezes a non-fungible token for an address"
+    )]
     WipeNFT(WipeNFTArgs),
-    #[command(name = "issue-non-fungible-token", about = "Create a NFT Collection")]
-    IssueNFT(IssueNFTArgs),
+    #[command(name = "issue-nft-collection", about = "Create a NFT Collection")]
+    IssueNFTCollection(IssueNftCollectionArgs),
     #[command(name = "create-nft", about = "Issue a NFT")]
     CreateNFT(CreateNFTArgs),
     #[command(
@@ -60,6 +75,8 @@ pub enum InteractCliCommand {
     TransferOwnership(TransferOwnershipArgs),
     #[command(name = "transfer-nft-create-role", about = "Transfers NFT create role")]
     TransferNftCreateRole(TransferNftCreateRoleArgs),
+    #[command(name = "control-changes", about = "Controls changes")]
+    ControlChanges(ControlChangesArgs),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
@@ -115,7 +132,7 @@ pub struct IssueFungibleArgs {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
-pub struct IssueNFTArgs {
+pub struct IssueNftCollectionArgs {
     #[arg(short = 'c', long = "cost", default_value = "50000000000000000")]
     pub cost: RustBigUint,
     #[arg(short = 'd', long = "display-name")]
@@ -193,7 +210,6 @@ pub struct TransferOwnershipArgs {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
-
 pub struct TransferNftCreateRoleArgs {
     #[arg(long = "token-id")]
     pub token_id: String,
@@ -247,7 +263,6 @@ pub struct WipeNFTArgs {
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
 pub struct CreateNFTArgs {
-    // token amount name hash royalities attributes uris
     #[arg(long = "token-id")]
     pub token_id: String,
     #[arg(short = 'a', long = "amount")]
@@ -258,8 +273,10 @@ pub struct CreateNFTArgs {
     pub hash: String,
     #[arg(short = 'r', long = "royalities")]
     pub royalties: u64,
-    // #[long = "attributes")]
-    // pub attributes: String,
-    // #[arg(long = "uris")]
-    // pub uris: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Args)]
+pub struct ControlChangesArgs {
+    #[arg(long = "token-id")]
+    pub token_id: String,
 }
