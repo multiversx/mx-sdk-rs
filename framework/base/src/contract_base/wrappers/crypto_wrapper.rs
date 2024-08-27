@@ -5,7 +5,7 @@ use crate::{
         use_raw_handle, CryptoApi, CryptoApiImpl, StaticVarApiImpl, KECCAK256_RESULT_LEN,
         SHA256_RESULT_LEN,
     },
-    types::{ManagedBuffer, ManagedByteArray, ManagedType, MessageHashType},
+    types::{ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec, MessageHashType},
 };
 
 #[derive(Default)]
@@ -158,7 +158,7 @@ where
 
     pub fn verify_bls_aggregated_signature(
         &self,
-        key: &ManagedBuffer<A>,
+        key: &ManagedVec<A, ManagedBuffer<A>>,
         message: &ManagedBuffer<A>,
         signature: &ManagedBuffer<A>,
     ) -> bool {

@@ -92,7 +92,7 @@ pub trait CryptoFeatures {
     #[label("crypto-ei-1.4")]
     fn verify_bls_aggregated_signature(
         &self,
-        key: ManagedBuffer,
+        key: ManagedVec<ManagedBuffer>,
         message: ManagedBuffer,
         signature: ManagedBuffer,
     ) -> bool {
