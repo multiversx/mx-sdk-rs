@@ -1,0 +1,8 @@
+[settings]
+
+[[proxy]]
+path = "src/proxy_test_proxy.rs"
+
+[[proxy]]
+path = "interactor/src/proxy.rs"
+ 

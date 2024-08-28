@@ -104,6 +104,13 @@ members = [
   "contracts/examples/token-release",
   "contracts/examples/token-release/meta",
 
+  "contracts/examples/token-identifier-test/proxy-test",
+  "contracts/examples/token-identifier-test/proxy-test/meta",
+  "contracts/examples/token-identifier-test/proxy-test/interact",
+  "contracts/examples/token-identifier-test/returns-token-identifier-test",
+  "contracts/examples/token-identifier-test/returns-token-identifier-test/meta",
+  "contracts/examples/token-identifier-test/returns-token-identifier-test/interact",
+
   "contracts/feature-tests/abi-tester",
   "contracts/feature-tests/abi-tester/meta",
   "contracts/feature-tests/alloc-features",

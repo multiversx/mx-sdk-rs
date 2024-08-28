@@ -1,0 +1,17 @@
+[package]
+name = "returns-token-identifier-test"
+version = "0.0.0"
+publish = false
+edition = "2021"
+authors = ["you"]
+
+[lib]
+path = "src/returns_token_identifier_test.rs"
+
+[dependencies.multiversx-sc]
+version = "0.52.3"
+path = "../../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.52.3"
+path = "../../../../framework/scenario"

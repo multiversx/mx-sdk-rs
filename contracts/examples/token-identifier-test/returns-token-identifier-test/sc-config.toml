@@ -1,0 +1,4 @@
+[settings]
+
+[[proxy]]
+path = "src/returns_token_identifier_test_proxy.rs"

@@ -259,6 +259,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "basic-interact-proxy"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "multiversx-sc-snippets",
+ "proxy-test",
+ "serde",
+ "toml",
+]
+
+[[package]]
+name = "basic-interact-token"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "multiversx-sc-snippets",
+ "returns-token-identifier-test",
+ "serde",
+ "toml",
+]
+
+[[package]]
 name = "bech32"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2601,6 +2623,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "proxy-test"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
 name = "proxy-test-first"
 version = "0.0.0"
 dependencies = [
@@ -2615,6 +2645,14 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc-meta-lib",
  "proxy-test-first",
+]
+
+[[package]]
+name = "proxy-test-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+ "proxy-test",
 ]
 
 [[package]]
@@ -2853,6 +2891,22 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
+]
+
+[[package]]
+name = "returns-token-identifier-test"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "returns-token-identifier-test-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+ "returns-token-identifier-test",
 ]
 
 [[package]]
