@@ -97,6 +97,8 @@ pub struct IssueTokenArgs {
 pub struct MintArgs {
     #[arg(long = "token-id")]
     pub token_id: String,
+    #[arg(short = 'n', long = "nonce")]
+    pub nonce: u64,
     #[arg(long = "amount")]
     pub amount: RustBigUint,
 }
@@ -113,6 +115,8 @@ pub struct SetRolesArgs {
 pub struct BurnArgs {
     #[arg(long = "token-id")]
     pub token_id: String,
+    #[arg(short = 'n', long = "nonce")]
+    pub nonce: u64,
     #[arg(long = "amount")]
     pub amount: RustBigUint,
 }
@@ -166,7 +170,7 @@ pub struct MintSFTArgs {
     #[arg(short = 'n', long = "name")]
     pub name: String,
     #[arg(short = 'r', long = "royalties")]
-    pub royalties: RustBigUint,
+    pub royalties: u64,
     #[arg(long = "hash")]
     pub hash: String,
 }
