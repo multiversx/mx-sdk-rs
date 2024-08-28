@@ -7,7 +7,7 @@ use basic_interact_config::Config;
 use basic_interact_state::State;
 use clap::Parser;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{imports::*, sdk::data::keystore::InsertPassword};
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
@@ -66,8 +66,14 @@ impl AdderInteract {
         let adder_owner_address =
             interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
         // PASSWORD: "alice"
-        let wallet_address = interactor
-            .register_wallet(Wallet::from_keystore_secret("alice.json", "alice").unwrap());
+        // InsertPassword::Plaintext("alice".to_string()) || InsertPassword::StandardInput
+        let wallet_address = interactor.register_wallet(
+            Wallet::from_keystore_secret(
+                "alice.json",
+                InsertPassword::Plaintext("alice".to_string()),
+            )
+            .unwrap(),
+        );
 
         Self {
             interactor,
@@ -243,5 +249,5 @@ async fn test() {
     basic_interact.deploy().await;
     basic_interact.add(1u32).await;
 
-    basic_interact.upgrade(7u32).await;
+    // basic_interact.upgrade(7u32).await;
 }

@@ -12,6 +12,13 @@ pub enum WalletError {
     InvalidKdf,
     InvalidCipher,
 }
+
+#[derive(Debug)]
+pub enum InsertPassword {
+    Plaintext(String),
+    StandardInput,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CryptoParams {
     pub iv: String,
