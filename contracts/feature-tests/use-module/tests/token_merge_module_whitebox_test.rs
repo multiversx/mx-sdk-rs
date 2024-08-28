@@ -124,23 +124,21 @@ fn test_token_merge() {
                 &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
                 1,
             );
-            let expected_uri = [
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-            ];
+            let expected_uri = ArrayVec::from([
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    FIRST_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    SECOND_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+            ]);
 
             let actual_uri = MergedTokenInstances::decode_from_first_uri(&merged_token_data.uris);
-
-            for (expected, uri) in expected_uri.iter().zip(actual_uri.into_instances()) {
-                let token_identifier_string = uri.token_identifier.to_string();
-                let actual_transfer = TestEsdtTransfer(
-                    TestTokenIdentifier::new(&token_identifier_string),
-                    uri.token_nonce,
-                    uri.amount.to_u64().unwrap(),
-                );
-
-                assert_eq!(expected, &actual_transfer);
-            }
+            assert_eq!(expected_uri, *actual_uri.into_instances());
 
             assert_eq!(
                 merged_token_data.royalties,
@@ -228,22 +226,21 @@ fn test_token_merge() {
                 &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
                 2,
             );
-            let expected_uri = [
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(FUNGIBLE_TOKEN_ID_EXPR, 0, FUNGIBLE_AMOUNT),
-            ];
+            let expected_uri = ArrayVec::from([
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    FIRST_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+                EsdtTokenPayment::new(
+                    FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                    0,
+                    managed_biguint!(FUNGIBLE_AMOUNT),
+                ),
+            ]);
 
             let actual_uri = MergedTokenInstances::decode_from_first_uri(&merged_token_data.uris);
-            for (expected, uri) in expected_uri.iter().zip(actual_uri.into_instances()) {
-                let token_identifier_string = uri.token_identifier.to_string();
-                let actual_transfer = TestEsdtTransfer(
-                    TestTokenIdentifier::new(&token_identifier_string),
-                    uri.token_nonce,
-                    uri.amount.to_u64().unwrap(),
-                );
-
-                assert_eq!(expected, &actual_transfer);
-            }
+            assert_eq!(expected_uri, *actual_uri.into_instances());
 
             assert_eq!(
                 merged_token_data.royalties,
@@ -280,23 +277,26 @@ fn test_token_merge() {
                 &MERGED_TOKEN_ID_EXPR.into(),
                 3,
             );
-            let expected_uri = [
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(FUNGIBLE_TOKEN_ID_EXPR, 0, FUNGIBLE_AMOUNT),
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-            ];
+            let expected_uri = ArrayVec::from([
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    FIRST_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+                EsdtTokenPayment::new(
+                    FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                    0,
+                    managed_biguint!(FUNGIBLE_AMOUNT),
+                ),
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    SECOND_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+            ]);
 
             let actual_uri = MergedTokenInstances::decode_from_first_uri(&merged_token_data.uris);
-            for (expected, uri) in expected_uri.iter().zip(actual_uri.into_instances()) {
-                let token_identifier_string = uri.token_identifier.to_string();
-                let actual_transfer = TestEsdtTransfer(
-                    TestTokenIdentifier::new(&token_identifier_string),
-                    uri.token_nonce,
-                    uri.amount.to_u64().unwrap(),
-                );
-
-                assert_eq!(expected, &actual_transfer);
-            }
+            assert_eq!(expected_uri, *actual_uri.into_instances());
 
             assert_eq!(
                 merged_token_data.royalties,
@@ -436,23 +436,26 @@ fn test_partial_split() {
                 &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
                 1,
             );
-            let expected_uri = [
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(FUNGIBLE_TOKEN_ID_EXPR, 0, FUNGIBLE_AMOUNT),
-            ];
+            let expected_uri = ArrayVec::from([
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    FIRST_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    SECOND_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+                EsdtTokenPayment::new(
+                    FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                    0,
+                    managed_biguint!(FUNGIBLE_AMOUNT),
+                ),
+            ]);
 
             let actual_uri = MergedTokenInstances::decode_from_first_uri(&merged_token_data.uris);
-            for (expected, uri) in expected_uri.iter().zip(actual_uri.into_instances()) {
-                let token_identifier_string = uri.token_identifier.to_string();
-                let actual_transfer = TestEsdtTransfer(
-                    TestTokenIdentifier::new(&token_identifier_string),
-                    uri.token_nonce,
-                    uri.amount.to_u64().unwrap(),
-                );
-
-                assert_eq!(expected, &actual_transfer);
-            }
+            assert_eq!(expected_uri, *actual_uri.into_instances());
         });
 
     // split part of the fungible token
@@ -518,22 +521,21 @@ fn test_partial_split() {
                 &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
                 3,
             );
-            let expected_uri = [
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(FUNGIBLE_TOKEN_ID_EXPR, 0, FUNGIBLE_AMOUNT - 40),
-            ];
+            let expected_uri = ArrayVec::from([
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    SECOND_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+                EsdtTokenPayment::new(
+                    FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                    0,
+                    managed_biguint!(FUNGIBLE_AMOUNT - 40),
+                ),
+            ]);
 
             let actual_uri = MergedTokenInstances::decode_from_first_uri(&merged_token_data.uris);
-            for (expected, uri) in expected_uri.iter().zip(actual_uri.into_instances()) {
-                let token_identifier_string = uri.token_identifier.to_string();
-                let actual_transfer = TestEsdtTransfer(
-                    TestTokenIdentifier::new(&token_identifier_string),
-                    uri.token_nonce,
-                    uri.amount.to_u64().unwrap(),
-                );
-
-                assert_eq!(expected, &actual_transfer);
-            }
+            assert_eq!(expected_uri, *actual_uri.into_instances());
 
             assert_eq!(
                 merged_token_data.royalties,
@@ -636,22 +638,20 @@ fn test_custom_attributes() {
                 &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
                 1,
             );
-            let expected_uri = [
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-            ];
-
+            let expected_uri = ArrayVec::from([
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    FIRST_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    SECOND_NFT_NONCE,
+                    managed_biguint!(NFT_AMOUNT),
+                ),
+            ]);
             let actual_uri = MergedTokenInstances::decode_from_first_uri(&merged_token_data.uris);
-            for (expected, uri) in expected_uri.iter().zip(actual_uri.into_instances()) {
-                let token_identifier_string = uri.token_identifier.to_string();
-                let actual_transfer = TestEsdtTransfer(
-                    TestTokenIdentifier::new(&token_identifier_string),
-                    uri.token_nonce,
-                    uri.amount.to_u64().unwrap(),
-                );
-
-                assert_eq!(expected, &actual_transfer);
-            }
+            assert_eq!(expected_uri, *actual_uri.into_instances());
 
             let actual_attributes: CustomAttributes = merged_token_data.decode_attributes();
             assert_eq!(expected_attributes, actual_attributes);
