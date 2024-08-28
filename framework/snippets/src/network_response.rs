@@ -103,25 +103,31 @@ fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
 }
 
 fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<String> {
+    let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
+
     for scr in tx.smart_contract_results.iter() {
         if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
             continue;
         }
 
-        let Some(prev_tx) = tx
+        let prev_tx_data: &str = if let Some(prev_tx) = tx
             .smart_contract_results
             .iter()
             .find(|e| e.hash == scr.prev_tx_hash)
-        else {
+        {
+            prev_tx.data.as_ref()
+        } else if &scr.prev_tx_hash == tx.hash.as_ref().unwrap() {
+            &original_tx_data
+        } else {
             continue;
         };
 
-        let is_issue_fungible = prev_tx.data.starts_with("issue@");
-        let is_issue_semi_fungible = prev_tx.data.starts_with("issueSemiFungible@");
-        let is_issue_non_fungible = prev_tx.data.starts_with("issueNonFungible@");
-        let is_register_meta_esdt = prev_tx.data.starts_with("registerMetaESDT@");
+        let is_issue_fungible = prev_tx_data.starts_with("issue@");
+        let is_issue_semi_fungible = prev_tx_data.starts_with("issueSemiFungible@");
+        let is_issue_non_fungible = prev_tx_data.starts_with("issueNonFungible@");
+        let is_register_meta_esdt = prev_tx_data.starts_with("registerMetaESDT@");
         let is_register_and_set_all_roles_esdt =
-            prev_tx.data.starts_with("registerAndSetAllRoles@");
+            prev_tx_data.starts_with("registerAndSetAllRoles@");
 
         if !is_issue_fungible
             && !is_issue_semi_fungible
@@ -135,12 +141,11 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
         if scr.data.starts_with("ESDTTransfer@") {
             let encoded_tid = scr.data.split('@').nth(1);
             return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
-        } else if scr.data.starts_with("@00@") {
+        } else if scr.data.starts_with("@00@") || scr.data.starts_with("@6f6b@") {
             let encoded_tid = scr.data.split('@').nth(2);
             return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
         }
     }
-
     None
 }
 
