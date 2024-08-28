@@ -249,5 +249,5 @@ async fn test() {
     basic_interact.deploy().await;
     basic_interact.add(1u32).await;
 
-    // basic_interact.upgrade(7u32).await;
+    basic_interact.upgrade(7u32).await;
 }
