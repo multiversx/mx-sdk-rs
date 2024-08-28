@@ -65,7 +65,9 @@ impl AdderInteract {
 
         let adder_owner_address =
             interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        // PASSWORD: "alice"
+        let wallet_address = interactor
+            .register_wallet(Wallet::from_keystore_secret("alice.json", "alice").unwrap());
 
         Self {
             interactor,
