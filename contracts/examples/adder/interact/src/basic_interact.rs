@@ -209,13 +209,43 @@ impl AdderInteract {
         println!("sum: {sum}");
     }
 
+    async fn fail_upgrade(&mut self, new_value: u32) {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
+            .gas(6_000_000)
+            .typed(adder_proxy::AdderProxy)
+            .upgrade(BigUint::from(new_value))
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .code(ADDER_CODE_PATH)
+            .with_result(ExpectError(4, "upgrade is allowed only for owner"))
+            .prepare_async()
+            .run()
+            .await;
+
+        let sum = self
+            .interactor
+            .query()
+            .to(self.state.current_adder_address())
+            .typed(adder_proxy::AdderProxy)
+            .sum()
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+        assert_ne!(sum, RustBigUint::from(new_value));
+
+        println!("Upgrade failed: upgrade is allowed only for owner");
+    }
+
     async fn upgrade(&mut self, new_value: u32) {
         let response = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.adder_owner_address)
             .to(self.state.current_adder_address())
-            .gas(3_000_000)
+            .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .upgrade(BigUint::from(new_value))
             .code_metadata(CodeMetadata::UPGRADEABLE)
@@ -243,7 +273,18 @@ impl AdderInteract {
 
 #[tokio::test]
 #[ignore = "run on demand"]
-async fn test() {
+async fn fail_upgrade_test() {
+    let mut basic_interact = AdderInteract::init().await;
+
+    basic_interact.deploy().await;
+    basic_interact.add(1u32).await;
+
+    basic_interact.fail_upgrade(7u32).await;
+}
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn upgrade_test() {
     let mut basic_interact = AdderInteract::init().await;
 
     basic_interact.deploy().await;
