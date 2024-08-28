@@ -101,7 +101,7 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.adder_owner_address)
-            .gas(3_000_000)
+            .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(ADDER_CODE_PATH)
@@ -131,7 +131,7 @@ impl AdderInteract {
                     .typed(adder_proxy::AdderProxy)
                     .init(0u32)
                     .code(ADDER_CODE_PATH)
-                    .gas(3_000_000)
+                    .gas(6_000_000)
                     .returns(ReturnsNewBech32Address)
             });
         }
@@ -159,7 +159,7 @@ impl AdderInteract {
                     .to(self.state.current_adder_address())
                     .typed(adder_proxy::AdderProxy)
                     .add(value)
-                    .gas(3_000_000)
+                    .gas(6_000_000)
             });
         }
 
@@ -184,7 +184,7 @@ impl AdderInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
-            .gas(3_000_000)
+            .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .add(value)
             .prepare_async()
