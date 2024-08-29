@@ -41,7 +41,8 @@ async fn main() {
             basic_interact.print_sum().await;
         },
         Some(basic_interact_cli::InteractCliCommand::Upgrade(args)) => {
-            basic_interact.upgrade(args.value).await
+            let owner_address = basic_interact.adder_owner_address.clone();
+            basic_interact.upgrade(args.value, owner_address, ExpectError(0, "")).await
         },
         None => {},
     }
@@ -209,77 +210,24 @@ impl AdderInteract {
         println!("sum: {sum}");
     }
 
-    async fn fail_upgrade(&mut self, new_value: u32) {
-        self.interactor
-            .tx()
-            .from(&self.wallet_address)
-            .to(self.state.current_adder_address())
-            .gas(6_000_000)
-            .typed(adder_proxy::AdderProxy)
-            .upgrade(BigUint::from(new_value))
-            .code_metadata(CodeMetadata::UPGRADEABLE)
-            .code(ADDER_CODE_PATH)
-            .with_result(ExpectError(4, "upgrade is allowed only for owner"))
-            .prepare_async()
-            .run()
-            .await;
-
-        let sum = self
-            .interactor
-            .query()
-            .to(self.state.current_adder_address())
-            .typed(adder_proxy::AdderProxy)
-            .sum()
-            .returns(ReturnsResultUnmanaged)
-            .prepare_async()
-            .run()
-            .await;
-        assert_ne!(sum, RustBigUint::from(new_value));
-
-        println!("Upgrade failed: upgrade is allowed only for owner");
-    }
-
-    async fn upgrade(&mut self, new_value: u32) {
+    async fn upgrade(&mut self, new_value: u32, sender: Bech32Address, expected_result: ExpectError<'_>) {
         let response = self
             .interactor
             .tx()
-            .from(&self.adder_owner_address)
+            .from(sender)
             .to(self.state.current_adder_address())
             .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .upgrade(BigUint::from(new_value))
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .code(ADDER_CODE_PATH)
-            .returns(ReturnsResultUnmanaged)
+            .returns(expected_result)
             .prepare_async()
             .run()
             .await;
-
-        let sum = self
-            .interactor
-            .query()
-            .to(self.state.current_adder_address())
-            .typed(adder_proxy::AdderProxy)
-            .sum()
-            .returns(ReturnsResultUnmanaged)
-            .prepare_async()
-            .run()
-            .await;
-        assert_eq!(sum, RustBigUint::from(new_value));
 
         println!("response: {response:?}");
     }
-}
-
-#[tokio::test]
-#[ignore = "run on demand"]
-async fn fail_upgrade_test() {
-    let mut basic_interact = AdderInteract::init().await;
-
-    basic_interact.deploy().await;
-    basic_interact.add(1u32).await;
-
-    basic_interact.fail_upgrade(7u32).await;
 }
 
 #[tokio::test]
@@ -290,5 +238,16 @@ async fn upgrade_test() {
     basic_interact.deploy().await;
     basic_interact.add(1u32).await;
 
-    basic_interact.upgrade(7u32).await;
+    // Sum will be 1
+    basic_interact.print_sum().await;
+
+    basic_interact.upgrade(7u32, basic_interact.adder_owner_address.clone(), ExpectError(0, "")).await;
+
+    // Sum will be the updated value of 7
+    basic_interact.print_sum().await;
+
+    basic_interact.upgrade(10u32, basic_interact.wallet_address.clone(), ExpectError(4, "upgrade is allowed only for owner")).await;
+
+    // Sum will remain 7
+    basic_interact.print_sum().await;
 }
