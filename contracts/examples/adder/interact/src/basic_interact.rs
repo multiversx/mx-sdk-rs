@@ -7,7 +7,7 @@ use basic_interact_config::Config;
 use basic_interact_state::State;
 use clap::Parser;
 
-use multiversx_sc_snippets::{imports::*, sdk::data::keystore::InsertPassword};
+use multiversx_sc_snippets::imports::*;
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
@@ -227,7 +227,7 @@ impl AdderInteract {
                     .to(self.state.current_adder_address())
                     .gas(6_000_000)
                     .typed(adder_proxy::AdderProxy)
-                    .upgrade(BigUint::from(new_value))
+                    .upgrade(new_value)
                     .code_metadata(CodeMetadata::UPGRADEABLE)
                     .code(ADDER_CODE_PATH)
                     .returns(ExpectError(code, msg))
@@ -244,7 +244,7 @@ impl AdderInteract {
                     .to(self.state.current_adder_address())
                     .gas(6_000_000)
                     .typed(adder_proxy::AdderProxy)
-                    .upgrade(BigUint::from(new_value))
+                    .upgrade(new_value)
                     .code_metadata(CodeMetadata::UPGRADEABLE)
                     .code(ADDER_CODE_PATH)
                     .prepare_async()
