@@ -1,5 +1,5 @@
 use clap::{Args, Parser, Subcommand};
-use multiversx_sc_snippets::{imports::RustBigUint, multiversx_sc::proxy_imports::*};
+use multiversx_sc_snippets::{imports::*, multiversx_sc::proxy_imports::*};
 
 /// SysFuncCalls Interact CLI
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -155,7 +155,7 @@ pub struct IssueSftArgs {
     pub ticker: String,
 }
 
-#[derive(TopEncode, TopDecode, Clone, Debug, PartialEq, Eq)]
+#[derive(TopEncode, Clone, Debug, PartialEq, Eq)]
 pub struct NftDummyAttributes {
     pub creation_epoch: u64,
     pub cool_factor: u8,
