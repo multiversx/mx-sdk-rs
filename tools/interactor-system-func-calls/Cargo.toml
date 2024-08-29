@@ -1,9 +1,9 @@
 [[bin]]
-name = "basic-interact-sys-calls"
-path = "src/basic_interact.rs"
+name = "system-sc-interact"
+path = "src/system_sc_interact.rs"
 
 [package]
-name = "basic-interact-sys-calls"
+name = "system-sc-interact"
 version = "0.0.0"
 publish = false
 edition = "2021"
@@ -22,4 +22,4 @@ features = ["derive"]
 
 [dependencies.multiversx-sc-snippets]
 version = "=0.52.3"
-path = "../../../../framework/snippets"
+path = "../../framework/snippets"

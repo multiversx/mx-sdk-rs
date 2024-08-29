@@ -1,11 +1,11 @@
-mod basic_interact_cli;
-mod basic_interact_config;
-mod basic_interact_state;
+mod system_sc_interact_cli;
+mod system_sc_interact_config;
+mod system_sc_interact_state;
 
-use basic_interact_cli::NftDummyAttributes;
-use basic_interact_config::Config;
-use basic_interact_state::State;
 use clap::Parser;
+use system_sc_interact_cli::NftDummyAttributes;
+use system_sc_interact_config::Config;
+use system_sc_interact_state::State;
 
 use multiversx_sc_snippets::imports::*;
 
@@ -15,9 +15,9 @@ async fn main() {
 
     let mut basic_interact = SysFuncCallsInteract::init().await;
 
-    let cli = basic_interact_cli::InteractCli::parse();
+    let cli = system_sc_interact_cli::InteractCli::parse();
     match &cli.command {
-        Some(basic_interact_cli::InteractCliCommand::IssueToken(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::IssueToken(args)) => {
             basic_interact
                 .issue_token(
                     args.cost.clone(),
@@ -28,12 +28,12 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::Mint(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::Mint(args)) => {
             basic_interact
                 .mint_token(&args.token_id, args.nonce, args.amount.clone())
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::SetRoles(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::SetRoles(args)) => {
             basic_interact
                 .set_roles(
                     &args.token_id,
@@ -45,18 +45,18 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::Burn(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::Burn(args)) => {
             basic_interact
                 .burn_token(&args.token_id, args.nonce, args.amount.clone())
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::PauseToken(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::PauseToken(args)) => {
             basic_interact.pause_token(&args.token_id).await;
         },
-        Some(basic_interact_cli::InteractCliCommand::UnpauseToken(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::UnpauseToken(args)) => {
             basic_interact.unpause_token(&args.token_id).await;
         },
-        Some(basic_interact_cli::InteractCliCommand::FreezeToken(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::FreezeToken(args)) => {
             basic_interact
                 .freeze_token(
                     &args.token_id,
@@ -64,7 +64,7 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::UnfreezeToken(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::UnfreezeToken(args)) => {
             basic_interact
                 .unfreeze_token(
                     &args.token_id,
@@ -72,7 +72,7 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::FreezeNFT(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::FreezeNFT(args)) => {
             basic_interact
                 .freeze_nft(
                     &args.token_id,
@@ -81,7 +81,7 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::UnfreezeNFT(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::UnfreezeNFT(args)) => {
             basic_interact
                 .unfreeze_nft(
                     &args.token_id,
@@ -90,7 +90,7 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::WipeToken(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::WipeToken(args)) => {
             basic_interact
                 .wipe_token(
                     &args.token_id,
@@ -98,7 +98,7 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::WipeNFT(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::WipeNFT(args)) => {
             basic_interact
                 .wipe_nft(
                     &args.token_id,
@@ -107,12 +107,12 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::IssueNFTCollection(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::IssueNFTCollection(args)) => {
             basic_interact
                 .issue_non_fungible_collection(args.cost.clone(), &args.display_name, &args.ticker)
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::CreateNFT(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::CreateNFT(args)) => {
             basic_interact
                 .mint_nft(
                     &args.token_id,
@@ -123,7 +123,7 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::IssueFungible(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::IssueFungible(args)) => {
             basic_interact
                 .issue_fungible_token(
                     args.cost.clone(),
@@ -134,12 +134,12 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::IssueSftCollection(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::IssueSftCollection(args)) => {
             basic_interact
                 .issue_semi_fungible_collection(args.cost.clone(), &args.display_name, &args.ticker)
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::MintSft(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::MintSft(args)) => {
             basic_interact
                 .mint_sft(
                     &args.token_id,
@@ -150,7 +150,7 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::RegisterMetaEsdt(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::RegisterMetaEsdt(args)) => {
             basic_interact
                 .register_meta_esdt(
                     args.cost.clone(),
@@ -160,12 +160,12 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::ChangeSftMetaEsdt(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::ChangeSftMetaEsdt(args)) => {
             basic_interact
                 .change_sft_meta_esdt(&args.token_id, args.num_decimals)
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::UnsetRoles(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::UnsetRoles(args)) => {
             basic_interact
                 .unset_roles(
                     Bech32Address::from_bech32_string(args.address.clone()),
@@ -178,17 +178,17 @@ async fn main() {
                 )
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::TransferOwnership(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::TransferOwnership(args)) => {
             basic_interact
                 .transfer_ownership(&args.token_id, &args.new_owner)
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::TransferNftCreateRole(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::TransferNftCreateRole(args)) => {
             basic_interact
                 .transfer_nft_create_role(&args.token_id, &args.old_owner, &args.new_owner)
                 .await;
         },
-        Some(basic_interact_cli::InteractCliCommand::ControlChanges(args)) => {
+        Some(system_sc_interact_cli::InteractCliCommand::ControlChanges(args)) => {
             basic_interact.control_changes(&args.token_id).await;
         },
 
