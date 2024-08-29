@@ -43,6 +43,9 @@ async fn main() {
         Some(basic_interact_cli::InteractCliCommand::Upgrade(args)) => {
             basic_interact.upgrade(args.value).await
         },
+        Some(basic_interact_cli::InteractCliCommand::ContractCall) => {
+            basic_interact.call_contract().await;
+        },
         None => {},
     }
 }
@@ -64,8 +67,8 @@ impl ReturnsTokenIdentifierTestInteract {
             .await;
 
         let adder_owner_address =
-            interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+            interactor.register_wallet(test_wallets::alice());
+        let wallet_address = interactor.register_wallet(test_wallets::alice());
 
         Self {
             interactor,
@@ -93,7 +96,7 @@ impl ReturnsTokenIdentifierTestInteract {
             .interactor
             .tx()
             .from(&self.adder_owner_address)
-            .gas(3_000_000)
+            .gas(30_000_000)
             .typed(returns_token_identifier_test_proxy::ReturnsTokenIdentifierTestProxy)
             .init(0u32)
             .code(ADDER_CODE_PATH)
@@ -123,7 +126,7 @@ impl ReturnsTokenIdentifierTestInteract {
                     .typed(returns_token_identifier_test_proxy::ReturnsTokenIdentifierTestProxy)
                     .init(0u32)
                     .code(ADDER_CODE_PATH)
-                    .gas(3_000_000)
+                    .gas(30_000_000)
                     .returns(ReturnsNewBech32Address)
             });
         }
@@ -151,7 +154,7 @@ impl ReturnsTokenIdentifierTestInteract {
                     .to(self.state.current_adder_address())
                     .typed(returns_token_identifier_test_proxy::ReturnsTokenIdentifierTestProxy)
                     .add(value)
-                    .gas(3_000_000)
+                    .gas(30_000_000)
             });
         }
 
@@ -176,7 +179,7 @@ impl ReturnsTokenIdentifierTestInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
-            .gas(3_000_000)
+            .gas(30_000_000)
             .typed(returns_token_identifier_test_proxy::ReturnsTokenIdentifierTestProxy)
             .add(value)
             .prepare_async()
@@ -207,7 +210,7 @@ impl ReturnsTokenIdentifierTestInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
-            .gas(3_000_000)
+            .gas(30_000_000)
             .typed(returns_token_identifier_test_proxy::ReturnsTokenIdentifierTestProxy)
             .upgrade(BigUint::from(new_value))
             .code_metadata(CodeMetadata::UPGRADEABLE)
@@ -230,6 +233,32 @@ impl ReturnsTokenIdentifierTestInteract {
         assert_eq!(sum, RustBigUint::from(new_value));
 
         println!("response: {response:?}");
+    }
+
+    async fn call_contract(&mut self) {
+        let egld_amount = BigUint::<StaticApi>::from(50000000000000000u128);
+
+        let contract_address = Bech32Address::from_bech32_string("erd1qqqqqqqqqqqqqpgqyu0yylry6dyvynsqsmswqzvyewes38j0a4sqevrx55".to_string());
+
+        let token_display_name = ManagedBuffer::from("PROXYTOKEN");
+        let token_ticker = ManagedBuffer::from("PRXY");
+        let initial_supply = BigUint::<StaticApi>::from(100000000000000000000u128);
+
+        let response = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
+            .gas(30_000_000u64)
+            .typed(returns_token_identifier_test_proxy::ReturnsTokenIdentifierTestProxy)
+            .call_contract(contract_address, token_display_name, token_ticker, initial_supply)
+            //.egld(egld_amount)
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+
+        println!("Result: {response:?}");
     }
 }
 

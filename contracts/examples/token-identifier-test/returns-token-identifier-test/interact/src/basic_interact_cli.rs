@@ -24,6 +24,8 @@ pub enum InteractCliCommand {
     Sum,
     #[command(name = "upgrade", about = "Upgrade contract")]
     Upgrade(UpgradeArgs),
+    #[command(name = "contract-call", about = "Call Proxy")]
+    ContractCall,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

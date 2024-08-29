@@ -69,8 +69,8 @@ impl ProxyTestInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
-        let adder_owner_address = interactor.register_wallet(test_wallets::mike());
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let adder_owner_address = interactor.register_wallet(test_wallets::alice());
+        let wallet_address = interactor.register_wallet(test_wallets::alice());
 
         Self {
             interactor,
@@ -283,12 +283,12 @@ impl ProxyTestInteract {
             .typed(proxy_test_proxy::ProxyTestProxy)
             .issue_fungible_token(token_display_name, token_ticker, initial_supply)
             .egld(egld_amount)
-            .returns(ReturnsNewTokenIdentifier)
+            .returns(ReturnsResultUnmanaged)
             .prepare_async()
             .run()
             .await;
 
-        println!("Result: {response:?}");
+        println!("Papacioc: {response:?}"); // asta e gol
     }
 
     async fn send_egld(&mut self) {

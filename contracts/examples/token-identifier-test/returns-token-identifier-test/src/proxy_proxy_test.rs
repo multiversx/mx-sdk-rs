@@ -9,23 +9,23 @@
 
 use multiversx_sc::proxy_imports::*;
 
-pub struct ReturnsTokenIdentifierTestProxy;
+pub struct ProxyTestProxy;
 
-impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for ReturnsTokenIdentifierTestProxy
+impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for ProxyTestProxy
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    type TxProxyMethods = ReturnsTokenIdentifierTestProxyMethods<Env, From, To, Gas>;
+    type TxProxyMethods = ProxyTestProxyMethods<Env, From, To, Gas>;
 
     fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
-        ReturnsTokenIdentifierTestProxyMethods { wrapped_tx: tx }
+        ProxyTestProxyMethods { wrapped_tx: tx }
     }
 }
 
-pub struct ReturnsTokenIdentifierTestProxyMethods<Env, From, To, Gas>
+pub struct ProxyTestProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -36,7 +36,7 @@ where
 }
 
 #[rustfmt::skip]
-impl<Env, From, Gas> ReturnsTokenIdentifierTestProxyMethods<Env, From, (), Gas>
+impl<Env, From, Gas> ProxyTestProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -58,7 +58,7 @@ where
 }
 
 #[rustfmt::skip]
-impl<Env, From, To, Gas> ReturnsTokenIdentifierTestProxyMethods<Env, From, To, Gas>
+impl<Env, From, To, Gas> ProxyTestProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -81,7 +81,7 @@ where
 }
 
 #[rustfmt::skip]
-impl<Env, From, To, Gas> ReturnsTokenIdentifierTestProxyMethods<Env, From, To, Gas>
+impl<Env, From, To, Gas> ProxyTestProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -130,24 +130,37 @@ where
             .original_result()
     }
 
-    pub fn call_contract<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    pub fn issue_fungible_token<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
-        contract_address: Arg0,
-        token_display_name: Arg1,
-        token_ticker: Arg2,
-        initial_supply: Arg3,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
+        initial_supply: Arg2,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .raw_call("call_contract")
-            .argument(&contract_address)
+            .raw_call("issue_fungible_token")
             .argument(&token_display_name)
             .argument(&token_ticker)
             .argument(&initial_supply)
+            .original_result()
+    }
+
+    pub fn send_egld<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+        amount: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("send_egld")
+            .argument(&to)
+            .argument(&amount)
             .original_result()
     }
 }

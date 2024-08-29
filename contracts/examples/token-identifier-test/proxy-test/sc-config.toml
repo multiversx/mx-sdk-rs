@@ -4,5 +4,5 @@
 path = "src/proxy_test_proxy.rs"
 
 [[proxy]]
-path = "interactor/src/proxy.rs"
+path = "../returns-token-identifier-test/src/proxy_proxy_test.rs"
  

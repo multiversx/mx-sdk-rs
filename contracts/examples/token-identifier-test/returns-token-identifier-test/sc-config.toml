@@ -2,3 +2,7 @@
 
 [[proxy]]
 path = "src/returns_token_identifier_test_proxy.rs"
+
+[[proxy]]
+path = "interactor/src/proxy.rs"
+ 
