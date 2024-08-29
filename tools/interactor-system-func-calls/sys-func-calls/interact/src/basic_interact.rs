@@ -231,7 +231,7 @@ impl SysFuncCallsInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .issue_fungible(
@@ -270,7 +270,7 @@ impl SysFuncCallsInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .issue_non_fungible(
@@ -306,7 +306,7 @@ impl SysFuncCallsInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .issue_semi_fungible(
@@ -344,7 +344,7 @@ impl SysFuncCallsInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .issue_and_set_all_roles(
@@ -372,7 +372,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .set_special_roles(
@@ -430,7 +430,7 @@ impl SysFuncCallsInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .register_meta_esdt(
@@ -461,7 +461,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .change_sft_to_meta_esdt(&TokenIdentifier::from(token_id), num_decimals)
@@ -511,7 +511,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .pause(&TokenIdentifier::from(token_id))
@@ -525,7 +525,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .unpause(&TokenIdentifier::from(token_id))
@@ -541,7 +541,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .freeze(&TokenIdentifier::from(token_id), &managed_address)
@@ -557,7 +557,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .unfreeze(&TokenIdentifier::from(token_id), &managed_address)
@@ -573,7 +573,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .freeze_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
@@ -589,7 +589,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .unfreeze_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
@@ -605,7 +605,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .wipe(&TokenIdentifier::from(token_id), &managed_address)
@@ -621,7 +621,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .wipe_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
@@ -676,7 +676,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .unset_special_roles(
@@ -698,7 +698,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .transfer_ownership(&TokenIdentifier::from(token_id), &managed_addr)
@@ -722,7 +722,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .transfer_nft_create_role(
@@ -740,7 +740,7 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(ESDTSystemSCAddress.to_managed_address())
+            .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .control_changes(
