@@ -28,8 +28,10 @@ impl GatewayProxy {
                                 .await
                                 .unwrap();
 
-                            if transaction_info_with_results.smart_contract_results.len() > 0
-                                && issue_found == false
+                            if !transaction_info_with_results
+                                .smart_contract_results
+                                .is_empty()
+                                && !issue_found
                             {
                                 let first_scr =
                                     &transaction_info_with_results.smart_contract_results[0];
