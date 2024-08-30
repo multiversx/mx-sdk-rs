@@ -16,24 +16,29 @@ pub fn keccak256(data: &[u8]) -> [u8; KECCAK256_RESULT_LEN] {
     hasher.finalize().into()
 }
 
-#[cfg(feature = "wasm-incopatible")]
 pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-    use ed25519_dalek::*;
+    use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 
-    let public = PublicKey::from_bytes(key);
-    if public.is_err() {
+    let key_32: [u8; 32] = if let Ok(key_32) = key.try_into() {
+        key_32
+    } else {
         return false;
-    }
-
-    let sig = Signature::from_bytes(signature);
-    if sig.is_err() {
+    };
+    let signature_64: [u8; 64] = if let Ok(signature_64) = signature.try_into() {
+        signature_64
+    } else {
         return false;
-    }
+    };
 
-    public.unwrap().verify(message, &sig.unwrap()).is_ok()
-}
+    let verifying_key_result = VerifyingKey::from_bytes(&key_32);
+    let verifying_key = if let Ok(verifying_key) = verifying_key_result {
+        verifying_key
+    } else {
+        return false;
+    };
 
-#[cfg(not(feature = "wasm-incopatible"))]
-pub fn verify_ed25519(_key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
-    panic!("verify_ed25519 not supported for wasm builds, feature `wasm-incopatible` needs to be enabled")
+    let sig = Signature::from_bytes(&signature_64);
+
+    let result = verifying_key.verify(message, &sig);
+    result.is_ok()
 }
