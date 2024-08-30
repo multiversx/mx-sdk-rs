@@ -30,7 +30,7 @@ async fn main() {
         },
         Some(system_sc_interact_cli::InteractCliCommand::Mint(args)) => {
             basic_interact
-                .mint_token(&args.token_id, args.nonce, args.amount.clone())
+                .mint_token(args.token_id.clone().as_bytes(), args.nonce, args.amount)
                 .await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::SetRoles(args)) => {
@@ -215,7 +215,7 @@ impl SysFuncCallsInteract {
         let config = Config::load_config();
         let mut interactor = Interactor::new(config.gateway()).await;
 
-        let wallet_address = interactor.register_wallet(test_wallets::alice());
+        let wallet_address = interactor.register_wallet(Wallet::from_pem_file("../wallet.pem").unwrap());
 
         Self {
             interactor,
@@ -479,7 +479,7 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    async fn mint_token(&mut self, token_id: &str, nonce: u64, amount: RustBigUint) {
+    async fn mint_token(&mut self, token_id: &[u8], nonce: u64, amount: u64) {
         println!("Minting tokens...");
 
         self.interactor
@@ -488,11 +488,7 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_local_mint(
-                &TokenIdentifier::from(token_id),
-                nonce,
-                &BigUint::from(amount),
-            )
+            .esdt_local_mint(token_id, nonce, amount)
             .prepare_async()
             .run()
             .await;

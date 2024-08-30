@@ -107,27 +107,30 @@ where
             .original_result()
     }
 
-    pub fn esdt_local_mint(
+    pub fn esdt_local_mint<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
         self,
-        token: &TokenIdentifier<Env::Api>,
+        token: Arg0,
         nonce: u64,
-        amount: &BigUint<Env::Api>,
+        amount: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         if nonce == 0 {
             return self
                 .wrapped_tx
                 .payment(NotPayable)
                 .raw_call(ESDT_LOCAL_MINT_FUNC_NAME)
-                .argument(token)
-                .argument(amount)
+                .argument(&token)
+                .argument(&amount)
                 .original_result();
         }
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call(ESDT_NFT_ADD_QUANTITY_FUNC_NAME)
-            .argument(token)
+            .argument(&token)
             .argument(&nonce)
-            .argument(amount)
+            .argument(&amount)
             .original_result()
     }
 

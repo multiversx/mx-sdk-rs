@@ -211,7 +211,7 @@ impl AdderInteract {
             .to(self.state.current_adder_address())
             .gas(3_000_000)
             .typed(adder_proxy::AdderProxy)
-            .upgrade(BigUint::from(new_value))
+            .upgrade(new_value)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .code(ADDER_CODE_PATH)
             .returns(ReturnsResultUnmanaged)

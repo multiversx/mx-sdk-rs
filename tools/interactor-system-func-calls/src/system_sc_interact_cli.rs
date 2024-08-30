@@ -100,7 +100,7 @@ pub struct MintArgs {
     #[arg(short = 'n', long = "nonce")]
     pub nonce: u64,
     #[arg(long = "amount")]
-    pub amount: RustBigUint,
+    pub amount: u64,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Parser)]
