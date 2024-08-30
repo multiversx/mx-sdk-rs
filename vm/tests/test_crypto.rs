@@ -60,7 +60,7 @@ fn test_verify_bls_signature() {
     let success =
         crypto_functions::verify_bls_signature(&public_key_bytes, message, &signature_bytes);
 
-    assert_eq!(success, true, "BLS signature verification failed");
+    assert!(success, "BLS signature verification failed");
 }
 
 #[cfg(feature = "bls")]
@@ -99,8 +99,5 @@ fn test_verify_aggregated_signatures() {
         &final_agg_sig.to_bytes(),
     );
 
-    assert_eq!(
-        success, true,
-        "Aggregated BLS signature verification failed"
-    );
+    assert!(success, "Aggregated BLS signature verification failed");
 }
