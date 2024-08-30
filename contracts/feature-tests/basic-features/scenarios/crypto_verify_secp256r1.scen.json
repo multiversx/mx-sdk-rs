@@ -19,22 +19,22 @@
         },
         {
             "step": "scCall",
-            "id": "1",
+            "id": "secp256r1 - ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features-crypto",
                 "function": "verify_secp256r1_signature",
                 "arguments": [
-                    "0x03e4d20902182b89cd5ed7984ebcf063f2fd2508d9f034e4109be487be9e2cf54d",
-                    "0xa607fab72e13d6b625942bd5c56cc32792c2c7c7f16053b2fb6d62dd9cf36fdacf9d5a8af3537eaf5eb93335b36cf8f1d6e5bb2dfffce9055a2608d5e1a5b839eacf36dd5dec6d2fa156133acf064cc26487d543873f3b3837a3c09b5f4cb509bbc6585d",
-                    "0xd5065c32582bf0bc8f96b34177cbf47f61d4705d64daaebff884693b6dd94afd50d3ac647aeb14d325c28bb00ab68b23280c1c480cac0e72b5a58176ac8cd1b9"
+                    "0x02bc52274edebbef8878eacc4d1e0ed4fb213e5b0737389701ae8d59c403325720",
+                    "0xbf9facf48b2219db73b50c7ff59ceef2ada56632c71afc555d6bb4072d7634d1d9353acd53517ffb9a06935a89a6454fcaa40c69becf9f8029a271fd252ea55307d00d6e97a30719d48d6b7f993af24e9c54381cba02a113238eaee9d741cababeb21aaf",
+                    "0xc7877497444274267a4ea6f42deefde23a12e44f1ec1b437018e5c0e2834ce376dec1b81ebeacf5fbc6882e69af7cafad47bbb96cfb09e8d77d12afff7543052"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x01"
+                    "true"
                 ],
                 "status": "",
                 "logs": "*",
@@ -44,24 +44,23 @@
         },
         {
             "step": "scCall",
-            "id": "2",
+            "id": "secp256r1 - fail",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features-crypto",
                 "function": "verify_secp256r1_signature",
                 "arguments": [
-                    "0x04a673638cb9587cb68ea08dbef685c6f2d2a751a8b3c6f2a7e9a4999e6e4bfaf5ca1d22fe57c6103dbaac10cf15d15c0791cab8bb9a04f800e4d215276cb3e008",
-                    "0x00",
-                    "0x3045022100fab29dbcb623e7e96f44665f312b89ffdb9e4d2e2f53353236fbbcf57b2f49bf02203d6f9c63df8be43121042970a549a2d3baeca093fd37b726ddcc0924638409f5"
+                    "0x02bc52274edebbef8878eacc4d1e0ed4fb213e5b0737389701ae8d59c403325720",
+                    "0xbf9facf48b2219db73b50c7ff59ceef2ada56632c71afc555d6bb4072d7634d1d9353acd53517ffb9a06935a89a6454fcaa40c69becf9f8029a271fd252ea55307d00d6e97a30719d48d6b7f993af24e9c54381cba02a113238eaee9d741cababeb21aaf",
+                    "0x00877497444274267a4ea6f42deefde23a12e44f1ec1b437018e5c0e2834ce376dec1b81ebeacf5fbc6882e69af7cafad47bbb96cfb09e8d77d12afff7543052"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "0x00"
-                ],
-                "status": "",
+                "out": [],
+                "status": "10",
+                "message": "str:signature verification failed",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
