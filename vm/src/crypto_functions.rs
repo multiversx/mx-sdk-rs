@@ -51,10 +51,7 @@ pub fn verify_bls_signature(key: &[u8], message: &[u8], signature: &[u8]) -> boo
 
     let verify_response = sig.verify(true, message, BLS_DST_VALUE, &[], &public_key, true);
 
-    match verify_response {
-        BLST_ERROR::BLST_SUCCESS => true,
-        _ => false,
-    }
+    matches!(verify_response, BLST_ERROR::BLST_SUCCESS)
 }
 
 pub fn verify_multi_bls_signature(
@@ -92,8 +89,5 @@ pub fn verify_multi_bls_signature(
         true,
     );
 
-    match verify_response {
-        BLST_ERROR::BLST_SUCCESS => true,
-        _ => false,
-    }
+    matches!(verify_response, BLST_ERROR::BLST_SUCCESS)
 }
