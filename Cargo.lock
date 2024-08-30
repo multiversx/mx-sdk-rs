@@ -2124,6 +2124,7 @@ version = "0.52.3"
 dependencies = [
  "base64",
  "bech32",
+ "blst",
  "colored",
  "hex",
  "itertools",

@@ -1,8 +1,9 @@
+#[cfg(feature = "bls")]
 use blst::min_pk::{AggregateSignature, Signature};
+
 use hex::FromHex;
-use multiversx_chain_vm::crypto_functions::{
-    self, verify_bls_signature, verify_multi_bls_signature,
-};
+
+use multiversx_chain_vm::crypto_functions;
 
 #[test]
 fn test_verify_ed25519_basic() {
@@ -46,6 +47,7 @@ fn test_verify_ed25519_invalid_args() {
     assert!(!success);
 }
 
+#[cfg(feature = "bls")]
 #[test]
 fn test_verify_bls_signature() {
     let public_key_hex = b"82eb2ddfa71f1673fbfbd17952838cbca3816d5e60bf5cdb220d8cad6cb800e2ed18bb747ef45b17c9b8cbc971c6b980";
@@ -55,11 +57,13 @@ fn test_verify_bls_signature() {
     let public_key_bytes: Vec<u8> = FromHex::from_hex(public_key_hex).unwrap();
     let signature_bytes: Vec<u8> = FromHex::from_hex(signature_hex).unwrap();
 
-    let success = verify_bls_signature(&public_key_bytes, message, &signature_bytes);
+    let success =
+        crypto_functions::verify_bls_signature(&public_key_bytes, message, &signature_bytes);
 
     assert_eq!(success, true, "BLS signature verification failed");
 }
 
+#[cfg(feature = "bls")]
 #[test]
 fn test_verify_aggregated_signatures() {
     let message = b"hello";
@@ -89,7 +93,7 @@ fn test_verify_aggregated_signatures() {
     agg_sig.add_signature(&sig3_converted, true).unwrap();
     let final_agg_sig = agg_sig.to_signature();
 
-    let success = verify_multi_bls_signature(
+    let success = crypto_functions::verify_multi_bls_signature(
         vec![&pk1_bytes, &pk2_bytes, &pk3_bytes],
         message,
         &final_agg_sig.to_bytes(),

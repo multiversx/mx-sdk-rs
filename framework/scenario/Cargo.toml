@@ -30,11 +30,14 @@ pathdiff = "0.2.1"
 itertools = "0.13.0"
 colored = "2.0"
 unwrap-infallible = "0.1.5"
+blst = { version= "0.3.13", optional = true }
+
 
 [features]
 default = ["wasm-incompatible"]
 wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
 run-go-tests = []
+bls = ["blst"]
 
 [dependencies.multiversx-sc]
 version = "=0.52.3"
