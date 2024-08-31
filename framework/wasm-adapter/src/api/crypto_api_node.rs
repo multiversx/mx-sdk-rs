@@ -84,8 +84,10 @@ impl CryptoApiImpl for VmApiImpl {
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool {
-        unsafe { managedVerifyBLS(key, message, signature) == 0 }
+    ) {
+        unsafe {
+            let _ = managedVerifyBLS(key, message, signature);
+        }
     }
 
     #[inline]
@@ -139,8 +141,10 @@ impl CryptoApiImpl for VmApiImpl {
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool {
-        unsafe { managedVerifySecp256r1(key, message, signature) == 0 }
+    ) {
+        unsafe {
+            let _ = managedVerifySecp256r1(key, message, signature);
+        }
     }
 
     fn verify_bls_signature_share_managed(
@@ -148,8 +152,10 @@ impl CryptoApiImpl for VmApiImpl {
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool {
-        unsafe { managedVerifyBLSSignatureShare(key, message, signature) == 0 }
+    ) {
+        unsafe {
+            let _ = managedVerifyBLSSignatureShare(key, message, signature);
+        }
     }
 
     fn verify_bls_aggregated_signature_managed(
@@ -157,7 +163,9 @@ impl CryptoApiImpl for VmApiImpl {
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool {
-        unsafe { managedVerifyBLSAggregatedSignature(key, message, signature) == 0 }
+    ) {
+        unsafe {
+            let _ = managedVerifyBLSAggregatedSignature(key, message, signature);
+        }
     }
 }

@@ -42,7 +42,7 @@ impl CryptoApiImpl for UncallableApi {
         _key: Self::ManagedBufferHandle,
         _message: Self::ManagedBufferHandle,
         _signature: Self::ManagedBufferHandle,
-    ) -> bool {
+    ) {
         unreachable!()
     }
 
@@ -88,7 +88,7 @@ impl CryptoApiImpl for UncallableApi {
         _key: Self::ManagedBufferHandle,
         _message: Self::ManagedBufferHandle,
         _signature: Self::ManagedBufferHandle,
-    ) -> bool {
+    ) {
         unreachable!()
     }
 
@@ -97,7 +97,7 @@ impl CryptoApiImpl for UncallableApi {
         _key: Self::ManagedBufferHandle,
         _message: Self::ManagedBufferHandle,
         _signature: Self::ManagedBufferHandle,
-    ) -> bool {
+    ) {
         unreachable!()
     }
 
@@ -106,7 +106,7 @@ impl CryptoApiImpl for UncallableApi {
         _key: Self::ManagedBufferHandle,
         _message: Self::ManagedBufferHandle,
         _signature: Self::ManagedBufferHandle,
-    ) -> bool {
+    ) {
         unreachable!()
     }
 }

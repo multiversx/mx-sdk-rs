@@ -61,7 +61,7 @@ where
         key: &ManagedBuffer<A>,
         message: &ManagedBuffer<A>,
         signature: &ManagedBuffer<A>,
-    ) -> bool {
+    ) {
         A::crypto_api_impl().verify_bls_managed(
             key.get_handle(),
             message.get_handle(),
@@ -69,7 +69,9 @@ where
         )
     }
 
-    /// Will crash if the verification fails.
+    /// Calls the Vm to verify ed25519 signature.
+    ///
+    /// Does not return result, will fail tx directly!
     ///
     /// The error comes straight form the VM, the message is "invalid signature".
     pub fn verify_ed25519(
@@ -130,12 +132,15 @@ where
         ManagedBuffer::from_handle(new_handle)
     }
 
+    /// Calls the Vm to verify secp256r1 signature.
+    ///
+    /// Does not return result, will fail tx directly!
     pub fn verify_secp256r1(
         &self,
         key: &ManagedBuffer<A>,
         message: &ManagedBuffer<A>,
         signature: &ManagedBuffer<A>,
-    ) -> bool {
+    ) {
         A::crypto_api_impl().verify_secp256r1_managed(
             key.get_handle(),
             message.get_handle(),
@@ -143,12 +148,15 @@ where
         )
     }
 
+    /// Calls the Vm to verify BLS signature share.
+    ///
+    /// Does not return result, will fail tx directly!
     pub fn verify_bls_signature_share(
         &self,
         key: &ManagedBuffer<A>,
         message: &ManagedBuffer<A>,
         signature: &ManagedBuffer<A>,
-    ) -> bool {
+    ) {
         A::crypto_api_impl().verify_bls_signature_share_managed(
             key.get_handle(),
             message.get_handle(),
@@ -156,14 +164,17 @@ where
         )
     }
 
+    /// Calls the Vm to verify BLS aggregated signature.
+    ///
+    /// Does not return result, will fail tx directly!
     pub fn verify_bls_aggregated_signature(
         &self,
-        key: &ManagedVec<A, ManagedBuffer<A>>,
+        keys: &ManagedVec<A, ManagedBuffer<A>>,
         message: &ManagedBuffer<A>,
         signature: &ManagedBuffer<A>,
-    ) -> bool {
+    ) {
         A::crypto_api_impl().verify_bls_aggregated_signature_managed(
-            key.get_handle(),
+            keys.get_handle(),
             message.get_handle(),
             signature.get_handle(),
         )

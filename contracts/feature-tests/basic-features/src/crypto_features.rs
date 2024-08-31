@@ -24,7 +24,7 @@ pub trait CryptoFeatures {
         key: ManagedBuffer,
         message: ManagedBuffer,
         signature: ManagedBuffer,
-    ) -> bool {
+    ) {
         self.crypto().verify_bls(&key, &message, &signature)
     }
 
@@ -72,7 +72,7 @@ pub trait CryptoFeatures {
         key: ManagedBuffer,
         message: ManagedBuffer,
         signature: ManagedBuffer,
-    ) -> bool {
+    ) {
         self.crypto().verify_secp256r1(&key, &message, &signature)
     }
 
@@ -83,7 +83,7 @@ pub trait CryptoFeatures {
         key: ManagedBuffer,
         message: ManagedBuffer,
         signature: ManagedBuffer,
-    ) -> bool {
+    ) {
         self.crypto()
             .verify_bls_signature_share(&key, &message, &signature)
     }
@@ -95,7 +95,7 @@ pub trait CryptoFeatures {
         key: ManagedVec<ManagedBuffer>,
         message: ManagedBuffer,
         signature: ManagedBuffer,
-    ) -> bool {
+    ) {
         self.crypto()
             .verify_bls_aggregated_signature(&key, &message, &signature)
     }
