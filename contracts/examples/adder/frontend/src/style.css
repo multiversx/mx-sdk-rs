@@ -1,0 +1,54 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+p {
+    color: #666;
+    text-align: center;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Increased gap between buttons */
+    width: 250px; /* Slightly wider container */
+    margin: 0 auto;
+    margin-top: 50px;
+}
+
+button {
+    padding: 15px 25px; /* Increased padding for bigger buttons */
+    background-color: #1bca81;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px; /* Increased font size */
+}
+
+button:hover {
+    background-color: #00b368;
+}
+
+.add-container {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+#addInput {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    flex-grow: 1;
+    font-size: 18px; /* Match the font size of the buttons */
+}
