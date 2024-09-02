@@ -99,7 +99,6 @@ impl GatewayProxy {
 
     // get_transaction_process_status retrieves a transaction's status from the network using process-status API
     pub async fn get_transaction_process_status(&self, hash: &str) -> Result<(String, String)> {
-        println!("transaction process status");
         let endpoint = format!("transaction/{hash}/process-status");
         let endpoint = self.get_endpoint(endpoint.as_str());
 
