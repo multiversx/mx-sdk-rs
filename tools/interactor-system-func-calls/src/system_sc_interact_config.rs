@@ -2,7 +2,7 @@ use serde::Deserialize;
 use std::io::Read;
 
 /// Config file
-const CONFIG_FILE: &str = "../config.toml";
+const CONFIG_FILE: &str = "config.toml";
 
 /// SysFuncCalls Interact configuration
 #[derive(Debug, Deserialize)]

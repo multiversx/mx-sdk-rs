@@ -225,8 +225,7 @@ impl SysFuncCallsInteract {
         let config = Config::load_config();
         let mut interactor = Interactor::new(config.gateway()).await;
 
-        let wallet_address =
-            interactor.register_wallet(Wallet::from_pem_file("../wallet.pem").unwrap());
+        let wallet_address = interactor.register_wallet(test_wallets::alice());
 
         Self {
             interactor,
