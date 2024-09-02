@@ -21,8 +21,8 @@ async fn main() {
             basic_interact
                 .issue_token(
                     args.cost.clone(),
-                    &args.display_name,
-                    &args.ticker,
+                    args.display_name.as_bytes(),
+                    args.ticker.as_bytes(),
                     args.num_decimals,
                     args.token_type.into(),
                 )
@@ -30,13 +30,17 @@ async fn main() {
         },
         Some(system_sc_interact_cli::InteractCliCommand::Mint(args)) => {
             basic_interact
-                .mint_token(&args.token_id, args.nonce, args.amount.clone())
+                .mint_token(
+                    args.token_id.clone().as_bytes(),
+                    args.nonce,
+                    args.amount.clone(),
+                )
                 .await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::SetRoles(args)) => {
             basic_interact
                 .set_roles(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     args.roles
                         .clone()
                         .into_iter()
@@ -47,19 +51,19 @@ async fn main() {
         },
         Some(system_sc_interact_cli::InteractCliCommand::Burn(args)) => {
             basic_interact
-                .burn_token(&args.token_id, args.nonce, args.amount.clone())
+                .burn_token(args.token_id.as_bytes(), args.nonce, args.amount.clone())
                 .await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::PauseToken(args)) => {
-            basic_interact.pause_token(&args.token_id).await;
+            basic_interact.pause_token(args.token_id.as_bytes()).await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::UnpauseToken(args)) => {
-            basic_interact.unpause_token(&args.token_id).await;
+            basic_interact.unpause_token(args.token_id.as_bytes()).await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::FreezeToken(args)) => {
             basic_interact
                 .freeze_token(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
@@ -67,7 +71,7 @@ async fn main() {
         Some(system_sc_interact_cli::InteractCliCommand::UnfreezeToken(args)) => {
             basic_interact
                 .unfreeze_token(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
@@ -75,7 +79,7 @@ async fn main() {
         Some(system_sc_interact_cli::InteractCliCommand::FreezeNFT(args)) => {
             basic_interact
                 .freeze_nft(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     args.nft_nonce,
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
@@ -84,7 +88,7 @@ async fn main() {
         Some(system_sc_interact_cli::InteractCliCommand::UnfreezeNFT(args)) => {
             basic_interact
                 .unfreeze_nft(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     args.nft_nonce,
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
@@ -93,7 +97,7 @@ async fn main() {
         Some(system_sc_interact_cli::InteractCliCommand::WipeToken(args)) => {
             basic_interact
                 .wipe_token(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
@@ -101,7 +105,7 @@ async fn main() {
         Some(system_sc_interact_cli::InteractCliCommand::WipeNFT(args)) => {
             basic_interact
                 .wipe_nft(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     args.nft_nonce,
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
@@ -109,17 +113,21 @@ async fn main() {
         },
         Some(system_sc_interact_cli::InteractCliCommand::IssueNFTCollection(args)) => {
             basic_interact
-                .issue_non_fungible_collection(args.cost.clone(), &args.display_name, &args.ticker)
+                .issue_non_fungible_collection(
+                    args.cost.clone(),
+                    args.display_name.as_bytes(),
+                    args.ticker.as_bytes(),
+                )
                 .await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::CreateNFT(args)) => {
             basic_interact
                 .mint_nft(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     args.amount.clone(),
-                    &args.name,
+                    args.name.as_bytes(),
                     args.royalties,
-                    &args.hash,
+                    args.hash.as_bytes(),
                 )
                 .await;
         },
@@ -127,8 +135,8 @@ async fn main() {
             basic_interact
                 .issue_fungible_token(
                     args.cost.clone(),
-                    &args.display_name,
-                    &args.ticker,
+                    args.display_name.as_bytes(),
+                    args.ticker.as_bytes(),
                     args.supply.clone(),
                     args.num_decimals,
                 )
@@ -136,17 +144,21 @@ async fn main() {
         },
         Some(system_sc_interact_cli::InteractCliCommand::IssueSftCollection(args)) => {
             basic_interact
-                .issue_semi_fungible_collection(args.cost.clone(), &args.display_name, &args.ticker)
+                .issue_semi_fungible_collection(
+                    args.cost.clone(),
+                    args.display_name.as_bytes(),
+                    args.ticker.as_bytes(),
+                )
                 .await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::MintSft(args)) => {
             basic_interact
                 .mint_sft(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     args.amount.clone(),
-                    &args.name,
+                    args.name.as_bytes(),
                     args.royalties,
-                    &args.hash,
+                    args.hash.as_bytes(),
                 )
                 .await;
         },
@@ -154,22 +166,22 @@ async fn main() {
             basic_interact
                 .register_meta_esdt(
                     args.cost.clone(),
-                    &args.display_name,
-                    &args.ticker,
+                    args.display_name.as_bytes(),
+                    args.ticker.as_bytes(),
                     args.num_decimals,
                 )
                 .await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::ChangeSftMetaEsdt(args)) => {
             basic_interact
-                .change_sft_meta_esdt(&args.token_id, args.num_decimals)
+                .change_sft_meta_esdt(args.token_id.as_bytes(), args.num_decimals)
                 .await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::UnsetRoles(args)) => {
             basic_interact
                 .unset_roles(
                     &Bech32Address::from_bech32_string(args.address.clone()),
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     args.roles
                         .clone()
                         .into_iter()
@@ -181,7 +193,7 @@ async fn main() {
         Some(system_sc_interact_cli::InteractCliCommand::TransferOwnership(args)) => {
             basic_interact
                 .transfer_ownership(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     &Bech32Address::from_bech32_string(args.new_owner.clone()),
                 )
                 .await;
@@ -189,14 +201,16 @@ async fn main() {
         Some(system_sc_interact_cli::InteractCliCommand::TransferNftCreateRole(args)) => {
             basic_interact
                 .transfer_nft_create_role(
-                    &args.token_id,
+                    args.token_id.as_bytes(),
                     &Bech32Address::from_bech32_string(args.old_owner.clone()),
                     &Bech32Address::from_bech32_string(args.new_owner.clone()),
                 )
                 .await;
         },
         Some(system_sc_interact_cli::InteractCliCommand::ControlChanges(args)) => {
-            basic_interact.control_changes(&args.token_id).await;
+            basic_interact
+                .control_changes(args.token_id.as_bytes())
+                .await;
         },
 
         None => {},
@@ -227,8 +241,8 @@ impl SysFuncCallsInteract {
     async fn issue_fungible_token(
         &mut self,
         issue_cost: RustBigUint,
-        token_display_name: &str,
-        token_ticker: &str,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
         initial_supply: RustBigUint,
         num_decimals: usize,
     ) {
@@ -243,9 +257,9 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_fungible(
                 issue_cost.into(),
-                &token_display_name.into(),
-                &token_ticker.into(),
-                &initial_supply.into(),
+                &token_display_name,
+                &token_ticker,
+                &initial_supply,
                 FungibleTokenProperties {
                     num_decimals,
                     can_freeze: true,
@@ -269,8 +283,8 @@ impl SysFuncCallsInteract {
     async fn issue_non_fungible_collection(
         &mut self,
         issue_cost: RustBigUint,
-        token_display_name: &str,
-        token_ticker: &str,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
     ) {
         println!("Issuing NFT Collection...");
 
@@ -283,8 +297,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_non_fungible(
                 issue_cost.into(),
-                &token_display_name.into(),
-                &token_ticker.into(),
+                &token_display_name,
+                &token_ticker,
                 NonFungibleTokenProperties {
                     can_freeze: true,
                     can_wipe: true,
@@ -306,8 +320,8 @@ impl SysFuncCallsInteract {
     async fn issue_semi_fungible_collection(
         &mut self,
         issue_cost: RustBigUint,
-        token_display_name: &str,
-        token_ticker: &str,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
     ) {
         println!("Issuing SFT Collection...");
 
@@ -320,8 +334,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_semi_fungible(
                 issue_cost.into(),
-                &token_display_name.into(),
-                &token_ticker.into(),
+                &token_display_name,
+                &token_ticker,
                 SemiFungibleTokenProperties {
                     can_freeze: true,
                     can_wipe: true,
@@ -343,8 +357,8 @@ impl SysFuncCallsInteract {
     async fn issue_token(
         &mut self,
         issue_cost: RustBigUint,
-        token_display_name: &str,
-        token_ticker: &str,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
         num_decimals: usize,
         token_type: EsdtTokenType,
     ) {
@@ -359,8 +373,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_and_set_all_roles(
                 issue_cost.into(),
-                token_display_name.into(),
-                token_ticker.into(),
+                token_display_name,
+                token_ticker,
                 token_type,
                 num_decimals,
             )
@@ -372,7 +386,7 @@ impl SysFuncCallsInteract {
         println!("TOKEN ID: {:?}", token_id);
     }
 
-    async fn set_roles(&mut self, token_id: &str, roles: Vec<EsdtLocalRole>) {
+    async fn set_roles(&mut self, token_id: &[u8], roles: Vec<EsdtLocalRole>) {
         let wallet_address = &self.wallet_address.clone().into_address();
         println!("Setting the following roles: {:?}", roles);
 
@@ -394,11 +408,11 @@ impl SysFuncCallsInteract {
 
     async fn mint_sft(
         &mut self,
-        token_id: &str,
+        token_id: &[u8],
         amount: RustBigUint,
-        name: &str,
+        name: &[u8],
         royalties: u64,
-        hash: &str,
+        hash: &[u8],
     ) {
         println!("Minting SFT...");
 
@@ -409,11 +423,11 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_nft_create(
-                &TokenIdentifier::from(token_id),
-                &BigUint::from(amount),
-                &ManagedBuffer::from(name),
-                &royalties.into(),
-                &ManagedBuffer::from(hash),
+                &token_id,
+                &amount,
+                &name,
+                &royalties,
+                &hash,
                 &NftDummyAttributes {
                     creation_epoch: 2104,
                     cool_factor: 5,
@@ -428,8 +442,8 @@ impl SysFuncCallsInteract {
     async fn register_meta_esdt(
         &mut self,
         issue_cost: RustBigUint,
-        token_display_name: &str,
-        token_ticker: &str,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
         num_decimals: usize,
     ) {
         println!("Registering meta ESDT...");
@@ -443,8 +457,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .register_meta_esdt(
                 issue_cost.into(),
-                &token_display_name.into(),
-                &token_ticker.into(),
+                &token_display_name,
+                &token_ticker,
                 MetaTokenProperties {
                     num_decimals,
                     can_freeze: true,
@@ -464,7 +478,7 @@ impl SysFuncCallsInteract {
         println!("Meta-ESDT ID: {:?}", meta_esdt);
     }
 
-    async fn change_sft_meta_esdt(&mut self, token_id: &str, num_decimals: usize) {
+    async fn change_sft_meta_esdt(&mut self, token_id: &[u8], num_decimals: usize) {
         println!("Changing SFT to Meta-ESDT...");
 
         self.interactor
@@ -473,13 +487,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .change_sft_to_meta_esdt(&TokenIdentifier::from(token_id), num_decimals)
+            .change_sft_to_meta_esdt(&token_id, num_decimals)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn mint_token(&mut self, token_id: &str, nonce: u64, amount: RustBigUint) {
+    async fn mint_token(&mut self, token_id: &[u8], nonce: u64, amount: RustBigUint) {
         println!("Minting tokens...");
 
         self.interactor
@@ -488,17 +502,13 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_local_mint(
-                &TokenIdentifier::from(token_id),
-                nonce,
-                &BigUint::from(amount),
-            )
+            .esdt_local_mint(&token_id, nonce, &amount)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn burn_token(&mut self, token_id: &str, nonce: u64, amount: RustBigUint) {
+    async fn burn_token(&mut self, token_id: &[u8], nonce: u64, amount: RustBigUint) {
         println!("Burning tokens...");
 
         self.interactor
@@ -507,17 +517,13 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_local_burn(
-                &TokenIdentifier::from(token_id),
-                nonce,
-                &BigUint::from(amount),
-            )
+            .esdt_local_burn(&token_id, nonce, &amount)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn pause_token(&mut self, token_id: &str) {
+    async fn pause_token(&mut self, token_id: &[u8]) {
         println!("Pausing token...");
 
         self.interactor
@@ -526,13 +532,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .pause(&TokenIdentifier::from(token_id))
+            .pause(&token_id)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn unpause_token(&mut self, token_id: &str) {
+    async fn unpause_token(&mut self, token_id: &[u8]) {
         println!("Unpausing token...");
 
         self.interactor
@@ -541,15 +547,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unpause(&TokenIdentifier::from(token_id))
+            .unpause(&token_id)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn freeze_token(&mut self, token_id: &str, address: &Bech32Address) {
-        let managed_address: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&address.to_address());
+    async fn freeze_token(&mut self, token_id: &[u8], address: &Bech32Address) {
         println!("Freezing token...");
 
         self.interactor
@@ -558,15 +562,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .freeze(&TokenIdentifier::from(token_id), &managed_address)
+            .freeze(&token_id, &address)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn unfreeze_token(&mut self, token_id: &str, address: &Bech32Address) {
-        let managed_address: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&address.to_address());
+    async fn unfreeze_token(&mut self, token_id: &[u8], address: &Bech32Address) {
         println!("Unfreezing token...");
 
         self.interactor
@@ -575,15 +577,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unfreeze(&TokenIdentifier::from(token_id), &managed_address)
+            .unfreeze(&token_id, &address)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn freeze_nft(&mut self, token_id: &str, nonce: u64, address: &Bech32Address) {
-        let managed_address: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&address.to_address());
+    async fn freeze_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
         println!("Freezing NFT/SFT/Meta-ESDT...");
 
         self.interactor
@@ -592,15 +592,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .freeze_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
+            .freeze_nft(&token_id, nonce, &address)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn unfreeze_nft(&mut self, token_id: &str, nonce: u64, address: &Bech32Address) {
-        let managed_address: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&address.to_address());
+    async fn unfreeze_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
         println!("Unfreezing NFT/SFT/Meta-ESDT...");
 
         self.interactor
@@ -609,15 +607,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unfreeze_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
+            .unfreeze_nft(&token_id, nonce, &address)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn wipe_token(&mut self, token_id: &str, address: &Bech32Address) {
-        let managed_address: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&address.to_address());
+    async fn wipe_token(&mut self, token_id: &[u8], address: &Bech32Address) {
         println!("Wiping token...");
 
         self.interactor
@@ -626,15 +622,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .wipe(&TokenIdentifier::from(token_id), &managed_address)
+            .wipe(&token_id, &address)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn wipe_nft(&mut self, token_id: &str, nonce: u64, address: &Bech32Address) {
-        let managed_address: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&address.to_address());
+    async fn wipe_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
         println!("Wiping NFT/SFT/Meta-ESDT...");
 
         self.interactor
@@ -643,7 +637,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .wipe_nft(&TokenIdentifier::from(token_id), nonce, &managed_address)
+            .wipe_nft(&token_id, nonce, &address)
             .prepare_async()
             .run()
             .await;
@@ -651,11 +645,11 @@ impl SysFuncCallsInteract {
 
     async fn mint_nft(
         &mut self,
-        token_id: &str,
+        token_id: &[u8],
         amount: RustBigUint,
-        name: &str,
+        name: &[u8],
         royalties: u64,
-        hash: &str,
+        hash: &[u8],
     ) {
         println!("Minting NFT...");
 
@@ -666,11 +660,11 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_nft_create(
-                &TokenIdentifier::from(token_id),
-                &BigUint::from(amount),
-                &ManagedBuffer::from(name),
-                &BigUint::from(royalties),
-                &ManagedBuffer::from(hash),
+                &token_id,
+                &amount,
+                &name,
+                &royalties,
+                &hash,
                 &NftDummyAttributes {
                     creation_epoch: 2104,
                     cool_factor: 5,
@@ -685,11 +679,9 @@ impl SysFuncCallsInteract {
     async fn unset_roles(
         &mut self,
         address: &Bech32Address,
-        token_id: &str,
+        token_id: &[u8],
         roles: Vec<EsdtLocalRole>,
     ) {
-        let managed_address: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&address.to_address());
         println!("Unsetting the following roles: {:?}", roles);
 
         self.interactor
@@ -698,19 +690,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unset_special_roles(
-                &managed_address,
-                &TokenIdentifier::from(token_id),
-                roles.into_iter(),
-            )
+            .unset_special_roles(&address, &token_id, roles.into_iter())
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn transfer_ownership(&mut self, token_id: &str, new_owner: &Bech32Address) {
-        let managed_new_owner: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&new_owner.to_address());
+    async fn transfer_ownership(&mut self, token_id: &[u8], new_owner: &Bech32Address) {
         println!("Transferring token ownership...");
 
         self.interactor
@@ -719,7 +705,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .transfer_ownership(&TokenIdentifier::from(token_id), &managed_new_owner)
+            .transfer_ownership(&token_id, &new_owner)
             .prepare_async()
             .run()
             .await;
@@ -727,14 +713,10 @@ impl SysFuncCallsInteract {
 
     async fn transfer_nft_create_role(
         &mut self,
-        token_id: &str,
+        token_id: &[u8],
         old_owner: &Bech32Address,
         new_owner: &Bech32Address,
     ) {
-        let managed_old_owner: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&old_owner.to_address());
-        let managed_new_owner: ManagedAddress<StaticApi> =
-            ManagedAddress::from_address(&new_owner.to_address());
         println!("Transferring NFT create role...");
 
         self.interactor
@@ -743,17 +725,13 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .transfer_nft_create_role(
-                &TokenIdentifier::from(token_id),
-                &managed_old_owner,
-                &managed_new_owner,
-            )
+            .transfer_nft_create_role(&token_id, &old_owner, &new_owner)
             .prepare_async()
             .run()
             .await;
     }
 
-    async fn control_changes(&mut self, token_id: &str) {
+    async fn control_changes(&mut self, token_id: &[u8]) {
         println!("Control changes");
 
         self.interactor
@@ -763,7 +741,7 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .control_changes(
-                &TokenIdentifier::from(token_id),
+                &token_id,
                 &TokenPropertyArguments {
                     can_freeze: Some(true),
                     can_wipe: Some(true),
