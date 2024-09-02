@@ -1,6 +1,6 @@
 use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TokenPair},
-    ContractObj, PriceAggregator,
+    PriceAggregator,
 };
 
 use multiversx_sc_scenario::imports::*;
@@ -34,7 +34,6 @@ fn world() -> ScenarioWorld {
 struct PriceAggregatorTestState {
     world: ScenarioWorld,
     oracles: Vec<AddressValue>,
-    price_aggregator_whitebox: WhiteboxContract<ContractObj<DebugApi>>,
 }
 
 impl PriceAggregatorTestState {
@@ -60,16 +59,7 @@ impl PriceAggregatorTestState {
             oracles.push(address_value);
         }
 
-        let price_aggregator_whitebox = WhiteboxContract::new(
-            PRICE_AGGREGATOR_ADDRESS,
-            multiversx_price_aggregator_sc::contract_obj,
-        );
-
-        Self {
-            world,
-            oracles,
-            price_aggregator_whitebox,
-        }
+        Self { world, oracles }
     }
 
     fn deploy(&mut self) -> &mut Self {
@@ -170,9 +160,9 @@ fn test_price_aggregator_submit() {
     }
 
     let current_timestamp = 100;
-    state
-        .world
-        .whitebox_query(&state.price_aggregator_whitebox, |sc| {
+    state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
+        multiversx_price_aggregator_sc::contract_obj,
+        |sc| {
             let blockchain_timestamp = sc.blockchain().get_block_timestamp();
 
             let token_pair = TokenPair {
@@ -207,7 +197,8 @@ fn test_price_aggregator_submit() {
                     }
                 );
             }
-        });
+        },
+    );
 
     // submit last that resets the round
     state.submit(

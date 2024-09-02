@@ -11,6 +11,10 @@ fn world() -> ScenarioWorld {
         "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
         esdt_system_sc_mock::ContractBuilder,
     );
+    blockchain.register_contract(
+        "mxsc:output/basic-features-crypto.mxsc.json",
+        basic_features::ContractBuilder,
+    );
 
     blockchain
 }
@@ -99,6 +103,18 @@ fn crypto_verify_bls_rs() {
 }
 
 #[test]
+#[ignore]
+fn crypto_verify_bls_share_rs() {
+    world().run("scenarios/crypto_verify_bls_share.scen.json");
+}
+
+#[test]
+#[ignore]
+fn crypto_verify_bls_aggregated_rs() {
+    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
+}
+
+#[test]
 fn crypto_verify_ed_25519_rs() {
     world().run("scenarios/crypto_verify_ed25519.scen.json");
 }
@@ -107,6 +123,12 @@ fn crypto_verify_ed_25519_rs() {
 #[ignore]
 fn crypto_verify_secp_256_k_1_rs() {
     world().run("scenarios/crypto_verify_secp256k1.scen.json");
+}
+
+#[test]
+#[ignore]
+fn crypto_verify_secp_256_r_1_rs() {
+    world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }
 
 #[test]
