@@ -21,7 +21,7 @@ base64 = "0.22"
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
-bech32 = "0.9"
+bech32 = "0.11"
 log = "0.4.17"
 sha2 = "0.10.6"
 serde = "1.0"
@@ -32,8 +32,8 @@ colored = "2.0"
 unwrap-infallible = "0.1.5"
 
 [features]
-default = ["wasm-incopatible"]
-wasm-incopatible = ["multiversx-chain-vm/wasm-incopatible"]
+default = ["wasm-incompatible"]
+wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
 run-go-tests = []
 
 [dependencies.multiversx-sc]
