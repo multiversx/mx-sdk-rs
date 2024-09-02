@@ -14,40 +14,36 @@ impl GatewayProxy {
         let mut retries = 0;
         let mut backoff_delay = Duration::from_secs_f32(INITIAL_BACKOFF_DELAY);
         let start_time = Instant::now();
-        let mut issue_found = false;
 
         loop {
-            match self.get_transaction_status(&tx_hash).await {
-                Ok(status) => {
+            match self.get_transaction_process_status(&tx_hash).await {
+                Ok((status, reason)) => {
                     // checks if transaction status is final
                     match status.as_str() {
-                        "success" | "fail" => {
+                        "success" => {
                             // retrieve transaction info with results
                             let transaction_info_with_results = self
                                 .get_transaction_info_with_results(&tx_hash)
                                 .await
                                 .unwrap();
 
-                            if !transaction_info_with_results
-                                .smart_contract_results
-                                .is_empty()
-                                && !issue_found
-                            {
-                                let first_scr =
-                                    &transaction_info_with_results.smart_contract_results[0];
-
-                                if GatewayProxy::is_issue_tx(&first_scr.data) {
-                                    issue_found = true;
-                                    tokio::time::sleep(Duration::from_secs(30)).await;
-                                    continue;
-                                }
-                            }
-
                             info!(
                                 "Transaction retrieved successfully, with status {}: {:#?}",
                                 status, transaction_info_with_results
                             );
                             return transaction_info_with_results;
+                        },
+                        "fail" => {
+                            let result = parse_reason(&reason);
+
+                            match result {
+                                Ok((code, err)) => {
+                                    panic!("Transaction failed. Code: {code}, message: {err}")
+                                },
+                                Err(err) => {
+                                    panic!("Reason parsing error for failed transaction: {err}")
+                                },
+                            }
                         },
                         _ => {
                             continue;
@@ -77,12 +73,24 @@ impl GatewayProxy {
         );
         TransactionOnNetwork::default()
     }
+}
 
-    fn is_issue_tx(data: &str) -> bool {
-        data.starts_with("issue@")
-            || data.starts_with("issueSemiFungible@")
-            || data.starts_with("issueNonFungible@")
-            || data.starts_with("registerMetaESDT@")
-            || data.starts_with("registerAndSetAllRoles@")
+pub fn parse_reason(reason: &str) -> Result<(u64, String), String> {
+    let parts: Vec<&str> = reason.split('@').collect();
+
+    if parts.len() < 2 {
+        return Err("Invalid reason format".to_string());
     }
+
+    let error_code_hex = parts[1];
+    let error_message_hex = parts[2];
+
+    let error_code =
+        u64::from_str_radix(error_code_hex, 16).expect("Failed to decode error code as u64");
+
+    let error_message =
+        String::from_utf8(hex::decode(error_message_hex).expect("Failed to decode error message"))
+            .expect("Failed to decode error message as UTF-8");
+
+    Ok((error_code, error_message))
 }
