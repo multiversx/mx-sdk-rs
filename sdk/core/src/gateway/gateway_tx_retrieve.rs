@@ -34,13 +34,21 @@ impl GatewayProxy {
                             return transaction_info_with_results;
                         },
                         "fail" => {
+                            // status failed and no reason means invalid transaction
+                            if reason.is_empty() {
+                                info!("Transaction failed. Invalid transaction: {tx_hash}");
+                                panic!("Transaction failed. Invalid transaction: {tx_hash}");
+                            }
+
                             let result = parse_reason(&reason);
 
                             match result {
                                 Ok((code, err)) => {
+                                    info!("Transaction failed. Code: {code}, message: {err}");
                                     panic!("Transaction failed. Code: {code}, message: {err}")
                                 },
                                 Err(err) => {
+                                    info!("Reason parsing error for failed transaction: {err}");
                                     panic!("Reason parsing error for failed transaction: {err}")
                                 },
                             }
