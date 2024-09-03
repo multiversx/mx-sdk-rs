@@ -98,6 +98,8 @@ members = [
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/hello",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/ping-pong-egld/frontend",
+  "contracts/examples/ping-pong-egld/hello",
   "contracts/examples/rewards-distribution",
   "contracts/examples/rewards-distribution/meta",
   "contracts/examples/seed-nft-minter",
