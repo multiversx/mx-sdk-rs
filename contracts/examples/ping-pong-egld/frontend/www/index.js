@@ -1,20 +1,27 @@
-import {greet} from "../pkg";
-import './style.css';
+import { ping } from "../pkg";
 
 const pingButton = document.getElementById('pingButton');
 
-pingButton.addEventListener('click', function() {
-    const egldValue = document.getElementById("addInput").value.trim(); // Trim to remove unnecessary spaces
+async function handlePing(event) {
+    event.preventDefault();
 
-    if (!egldValue) { 
+    const egldValue = document.getElementById("addInput").value.trim();
+    if (!egldValue) {
         alert('No value entered');
         return;
-    } 
+    }
 
     console.log(`Entered value: ${egldValue} EGLD`);
-    greet(egldValue);
 
-    // Clear the input after processing
-    document.getElementById("addInput").value = '';
-});
+    try {
+        let res = await ping(egldValue);
+        console.log(`Response: ${res.response}`);
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while processing your request.");
+    } finally {
+        document.getElementById("addInput").value = '';
+    }
+}
 
+pingButton.addEventListener('click', handlePing);

@@ -1,8 +1,8 @@
 mod basic_interact_config;
 mod basic_interact_state;
 
-use basic_interact_state::State;
 use basic_interact_config::Config;
+use basic_interact_state::State;
 use ping_pong_egld::ping_pong_proxy;
 
 use multiversx_sc_snippets::imports::*;
@@ -26,8 +26,7 @@ impl RocketInteractor {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
-        let ping_pong_owner =
-            interactor.register_wallet(Wallet::from(test_wallets::alice()));
+        let ping_pong_owner = interactor.register_wallet(Wallet::from(test_wallets::alice()));
         let wallet_address = interactor.register_wallet(test_wallets::alice());
 
         Self {
@@ -52,14 +51,18 @@ impl RocketInteractor {
         let opt_activation_timestamp = Option::Some(0u64);
         let max_funds = OptionalValue::Some(BigUint::<StaticApi>::from(0u128));
 
-
         let new_address = self
             .interactor
             .tx()
             .from(&self.adder_owner_address)
             .gas(3_000_000)
             .typed(ping_pong_proxy::PingPongProxy)
-            .init(ping_amount, duration_in_seconds, opt_activation_timestamp, max_funds)
+            .init(
+                ping_amount,
+                duration_in_seconds,
+                opt_activation_timestamp,
+                max_funds,
+            )
             .code(PINGPONG_CODE_PATH)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewBech32Address)
@@ -67,8 +70,8 @@ impl RocketInteractor {
             .run()
             .await;
 
-            println!("new address: {new_address}");
-            self.state.set_contract_address(new_address);
+        println!("new address: {new_address}");
+        self.state.set_contract_address(new_address);
     }
 
     pub async fn deadline(&mut self) {
