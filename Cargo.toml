@@ -96,6 +96,7 @@ members = [
   "contracts/examples/proxy-pause",
   "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
+  "contracts/examples/ping-pong-egld/hello",
   "contracts/examples/ping-pong-egld/meta",
   "contracts/examples/rewards-distribution",
   "contracts/examples/rewards-distribution/meta",

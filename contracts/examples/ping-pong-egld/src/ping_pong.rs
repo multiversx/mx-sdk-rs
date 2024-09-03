@@ -6,6 +6,8 @@ mod user_status;
 
 use user_status::UserStatus;
 
+pub mod ping_pong_proxy;
+
 /// Derived empirically.
 const PONG_ALL_LOW_GAS_LIMIT: u64 = 3_000_000;
 
