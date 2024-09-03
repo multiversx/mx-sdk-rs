@@ -1,7 +1,7 @@
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress},
     multiversx_chain_vm::crypto_functions::keccak256,
-    scenario_model::{TxResponse, TxResponseStatus},
+    scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 use multiversx_sdk::{
     data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
@@ -44,6 +44,7 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
         out: process_out(tx),
         new_deployed_address: process_new_deployed_address(tx),
         new_issued_token_identifier: process_new_issued_token_identifier(tx),
+        logs: process_logs(tx),
         ..Default::default()
     }
 }
@@ -56,6 +57,23 @@ fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
     } else {
         process_out_from_log(tx).unwrap_or_default()
     }
+}
+
+fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
+    if let Some(api_logs) = &tx.logs {
+        return api_logs
+            .events
+            .iter()
+            .map(|event| Log {
+                address: event.address.to_string(),
+                endpoint: event.identifier.clone(),
+                topics: event.topics.clone().unwrap_or_default(),
+                data: event.data.clone().unwrap_or_default(),
+            })
+            .collect::<Vec<Log>>();
+    }
+
+    Vec::new()
 }
 
 fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
