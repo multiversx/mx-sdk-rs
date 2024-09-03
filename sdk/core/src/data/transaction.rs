@@ -92,7 +92,7 @@ pub struct Events {
     pub address: Address,
     pub identifier: String,
     pub topics: Option<Vec<String>>,
-    pub data: Option<String>,
+    pub data: Option<Vec<String>>,
 }
 
 // ApiLogs represents logs with changed fields' types in order to make it friendly for API's json

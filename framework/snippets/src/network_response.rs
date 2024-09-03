@@ -65,10 +65,22 @@ fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
             .events
             .iter()
             .map(|event| Log {
-                address: event.address.to_string(),
+                address: Address::from_slice(&event.address.to_bytes()),
                 endpoint: event.identifier.clone(),
-                topics: event.topics.clone().unwrap_or_default(),
-                data: event.data.clone().unwrap_or_default(),
+                topics: event
+                    .topics
+                    .clone()
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(|s| s.into_bytes())
+                    .collect(),
+                data: event
+                    .data
+                    .clone()
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(|s| s.into_bytes())
+                    .collect(),
             })
             .collect::<Vec<Log>>();
     }
@@ -81,12 +93,16 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
                 if let Some(data) = &event.data {
-                    let decoded_data = String::from_utf8(base64_decode(data)).unwrap();
+                    let mut out = Vec::new();
+                    for data_member in data.iter() {
+                        let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
 
-                    if decoded_data.starts_with('@') {
-                        let out = decode_scr_data_or_panic(decoded_data.as_str());
-                        return Some(out);
+                        if decoded_data.starts_with('@') {
+                            let out_content = decode_scr_data_or_panic(decoded_data.as_str());
+                            out.extend(out_content);
+                        }
                     }
+                    return Some(out);
                 }
             }
 
