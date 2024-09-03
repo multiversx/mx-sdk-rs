@@ -39,7 +39,7 @@ button:hover {
     background-color: #00b368;
 }
 
-.add-container {
+.ping-container {
     display: flex;
     gap: 15px;
     align-items: center;
