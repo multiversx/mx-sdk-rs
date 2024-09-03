@@ -1,20 +1,22 @@
-#![allow(non_snake_case)]
-
 mod controllers;
 mod models;
 mod views;
 
-use rocket::*;
+use actix_web::{web, App, HttpServer};
+use models::basic_interact;
 
-#[get("/")]
-fn default_route() -> &'static str {
-    "Placeholder instead of gateway error :)"
-}
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let mut interactor = basic_interact::ActixInteractor::init().await;
 
-#[launch]
-fn rocket() -> _ {
-    rocket::build()
-        .mount("/", routes![default_route]) // http://127.0.0.1:8000
-        .mount("/", routes![controllers::world_controller::world]) // http://127.0.0.1:8000/world
-        .mount("/", routes![controllers::timestamp_controller::timestamp]) // http://127.0.0.1:8000/timestamp
+    // interactor.deploy().await;
+
+    HttpServer::new(move || {
+        App::new()
+            .service(controllers::timestamp_controller::timestamp)
+            .service(controllers::world_controller::world)
+    })
+    .bind("127.0.0.1:8000")?
+    .run()
+    .await
 }

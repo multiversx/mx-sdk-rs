@@ -1,15 +1,19 @@
-use rocket::{get, response::content::RawText};
-// use crate::models::basic_interact::RocketInteractor;
+use actix_web::{get, post, web, HttpResponse, Responder};
+use crate::models::basic_interact::ActixInteractor;
 use crate::views::timestamp_view::timestamp_view;
 
 #[get("/timestamp")]
-pub async fn timestamp() -> RawText<String> {
-    // let mut basic_interact = RocketInteractor::init().await;
+async fn timestamp() -> impl Responder {
+    // Initialize ActixInteractor and call activation_timestamp()
+    let mut interactor = ActixInteractor::init().await;
 
-    // Call the model method to get the activation timestamp
-    // match basic_interact.activation_timestamp().await {
-    //     Ok(response) => timestamp_view(response),
-    //     Err(_) => RawText("I failed".to_string()), // Error handling
-    // }
-    timestamp_view(String::from("Hello"))
+    interactor.deploy().await;
+
+    println!("JAMBO");
+    // Call activation_timestamp and get the result
+    let response = interactor.activation_timestamp().await;
+
+    println!("MAmbo");
+    // Use the response to generate the HTTP response
+    HttpResponse::Ok().body(timestamp_view(response))
 }
