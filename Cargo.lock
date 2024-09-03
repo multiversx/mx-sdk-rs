@@ -3397,6 +3397,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "system-sc-interact"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "multiversx-sc-snippets",
+ "serde",
+ "toml",
+]
+
+[[package]]
 name = "tempfile"
 version = "3.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
