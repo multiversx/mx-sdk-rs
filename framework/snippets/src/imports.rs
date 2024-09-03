@@ -4,7 +4,10 @@ pub use crate::{
     dns_address_for_name, test_wallets, Interactor, InteractorPrepareAsync, StepBuffer,
 };
 
-pub use multiversx_sdk::wallet::Wallet;
+pub use multiversx_sdk::{
+    wallet::Wallet,
+    data::keystore::InsertPassword,
+};
 
 pub use env_logger;
 pub use tokio;
