@@ -1,22 +1,15 @@
 mod basic_interact_config;
 mod basic_interact_state;
 
-use ping_pong_egld::ping_pong_proxy;
-use basic_interact_config::Config;
 use basic_interact_state::State;
+use basic_interact_config::Config;
+use ping_pong_egld::ping_pong_proxy;
 
 use multiversx_sc_snippets::imports::*;
 
-const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json"; // wrong
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json"; // wrong - doesn't exist
 
 const PINGPONG_CODE_PATH: MxscPath = MxscPath::new("../output/ping-pong-egld.mxsc.json");
-
-#[tokio::main]
-async fn main() {
-    env_logger::init();
-    let mut basic_interact = RocketInteractor::init().await;
-}
-
 #[allow(unused)]
 pub struct RocketInteractor {
     interactor: Interactor,

@@ -1,33 +1,20 @@
 #![allow(non_snake_case)]
 
-mod basic_interact;
+mod controllers;
+mod models;
+mod views;
 
 use rocket::*;
 
-#[cfg(test)] mod tests;
-
-// Try visiting:
-//   http://127.0.0.1:8000/hello/timestamp
-#[get("/timestamp")]
-async fn timestamp() -> &'static str {
-    let mut basic_interact: basic_interact::RocketInteractor = basic_interact::RocketInteractor::init().await;
-
-    // Use the activation_timestamp() method and handle potential errors
-    //let aux = basic_interact.activation_timestamp().await;
-    //println!("{:?}", aux);
-    "Why"
-}
-
-// Try visiting:
-//   http://127.0.0.1:8000/world
-#[get("/world")]
-fn world() -> &'static str {
-    "Hello, world!"
+#[get("/")]
+fn default_route() -> &'static str {
+    "Placeholder instead of gateway error :)"
 }
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![world])
-        .mount("/", routes![timestamp])
+        .mount("/", routes![default_route]) // http://127.0.0.1:8000
+        .mount("/", routes![controllers::world_controller::world]) // http://127.0.0.1:8000/world
+        .mount("/", routes![controllers::timestamp_controller::timestamp]) // http://127.0.0.1:8000/timestamp
 }

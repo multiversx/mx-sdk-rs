@@ -8,7 +8,6 @@ use std::{
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-/// Multisig Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
     adder_address: Option<Bech32Address>,
@@ -27,12 +26,12 @@ impl State {
         }
     }
 
-    /// Sets the adder address
+    /// Sets the contract address
     pub fn set_contract_address(&mut self, address: Bech32Address) {
         self.adder_address = Some(address);
     }
 
-    /// Returns the adder contract
+    /// Returns the contract address
     pub fn current_contract_address(&self) -> &Bech32Address {
         self.adder_address
             .as_ref()
