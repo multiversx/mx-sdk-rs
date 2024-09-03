@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 use multiversx_sdk::{
-    data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
+    data::transaction::{ApiSmartContractResult, Data, Events, TransactionOnNetwork},
     utils::base64_decode,
 };
 
@@ -67,20 +67,8 @@ fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
             .map(|event| Log {
                 address: Address::from_slice(&event.address.to_bytes()),
                 endpoint: event.identifier.clone(),
-                topics: event
-                    .topics
-                    .clone()
-                    .unwrap_or_default()
-                    .into_iter()
-                    .map(|s| s.into_bytes())
-                    .collect(),
-                data: event
-                    .data
-                    .clone()
-                    .unwrap_or_default()
-                    .into_iter()
-                    .map(|s| s.into_bytes())
-                    .collect(),
+                topics: extract_topics(event),
+                data: extract_data(event),
             })
             .collect::<Vec<Log>>();
     }
@@ -88,21 +76,56 @@ fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
     Vec::new()
 }
 
+fn extract_data(event: &Events) -> Vec<Vec<u8>> {
+    let mut out: Vec<Vec<u8>> = Vec::new();
+    if let Some(data) = event.data.clone() {
+        match data {
+            Data::String(string) => out.push(string.into_bytes()),
+            Data::Vec(vec) => return vec.into_iter().map(|s| s.into_bytes()).collect(),
+        }
+    }
+
+    out
+}
+
+fn extract_topics(event: &Events) -> Vec<Vec<u8>> {
+    event
+        .topics
+        .clone()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|s| s.into_bytes())
+        .collect()
+}
+
 fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
                 if let Some(data) = &event.data {
-                    let mut out = Vec::new();
-                    for data_member in data.iter() {
-                        let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
+                    match data {
+                        Data::String(string) => {
+                            let decoded_data = String::from_utf8(base64_decode(string)).unwrap();
+                            if decoded_data.starts_with('@') {
+                                let out = decode_scr_data_or_panic(&decoded_data);
+                                return Some(out);
+                            }
+                        },
+                        Data::Vec(vec) => {
+                            let mut out = Vec::new();
+                            for data_member in vec.iter() {
+                                let decoded_data =
+                                    String::from_utf8(base64_decode(data_member)).unwrap();
 
-                        if decoded_data.starts_with('@') {
-                            let out_content = decode_scr_data_or_panic(decoded_data.as_str());
-                            out.extend(out_content);
-                        }
+                                if decoded_data.starts_with('@') {
+                                    let out_content =
+                                        decode_scr_data_or_panic(decoded_data.as_str());
+                                    out.extend(out_content);
+                                }
+                            }
+                            return Some(out);
+                        },
                     }
-                    return Some(out);
                 }
             }
 

@@ -92,7 +92,14 @@ pub struct Events {
     pub address: Address,
     pub identifier: String,
     pub topics: Option<Vec<String>>,
-    pub data: Option<Vec<String>>,
+    pub data: Option<Data>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum Data {
+    String(String),
+    Vec(Vec<String>),
 }
 
 // ApiLogs represents logs with changed fields' types in order to make it friendly for API's json
