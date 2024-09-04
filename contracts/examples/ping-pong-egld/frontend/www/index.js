@@ -12,7 +12,7 @@ async function handlePing(event) {
     }
 
     console.log(`Entered value: ${egldValue} EGLD`);
-    let body = {value: Number(egldValue)};
+    let body = {value: Number(egldValue) * Math.pow(10, 18)};
     console.log(body);
     try {
         let res = await ping(egldValue, JSON.stringify(body));
