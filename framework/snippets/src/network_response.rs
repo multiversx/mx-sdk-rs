@@ -78,9 +78,9 @@ fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
 
 fn extract_data(event: &Events) -> Vec<Vec<u8>> {
     let mut out: Vec<Vec<u8>> = Vec::new();
-    if let Some(data) = &event.data {
-        data.for_each(|data_field| out.push(data_field.clone().into_bytes()));
-    }
+    event
+        .data
+        .for_each(|data_field| out.push(data_field.clone().into_bytes()));
     out
 }
 
@@ -98,18 +98,16 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
-                if let Some(data) = &event.data {
-                    let mut out = Vec::new();
-                    data.for_each(|data_member| {
-                        let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
+                let mut out = Vec::new();
+                event.data.for_each(|data_member| {
+                    let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
 
-                        if decoded_data.starts_with('@') {
-                            let out_content = decode_scr_data_or_panic(decoded_data.as_str());
-                            out.extend(out_content);
-                        }
-                    });
-                    return Some(out);
-                }
+                    if decoded_data.starts_with('@') {
+                        let out_content = decode_scr_data_or_panic(decoded_data.as_str());
+                        out.extend(out_content);
+                    }
+                });
+                return Some(out);
             }
 
             None

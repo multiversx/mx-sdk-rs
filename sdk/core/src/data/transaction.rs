@@ -92,12 +92,15 @@ pub struct Events {
     pub address: Address,
     pub identifier: String,
     pub topics: Option<Vec<String>>,
-    pub data: Option<LogData>,
+    #[serde(default)]
+    pub data: LogData,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Default, Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum LogData {
+    #[default]
+    Empty,
     String(String),
     Vec(Vec<String>),
 }
@@ -105,6 +108,7 @@ pub enum LogData {
 impl LogData {
     pub fn for_each<F: FnMut(&String)>(&self, mut f: F) {
         match self {
+            LogData::Empty => {},
             LogData::String(s) => f(s),
             LogData::Vec(v) => v.iter().for_each(f),
         }
@@ -226,4 +230,63 @@ pub struct SendTransactionsResponse {
     pub error: String,
     pub code: String,
     pub data: Option<SendTransactionsResponseData>,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn parse_event_log_0() {
+        let data = r#"
+{
+    "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
+    "identifier": "completedTxEvent",
+    "topics": [],
+    "data": null,
+    "additionalData": null
+}
+        "#;
+
+        let event_log = serde_json::from_str::<Events>(data).unwrap();
+        assert_eq!(event_log.data, LogData::Empty);
+    }
+
+    #[test]
+    fn parse_event_log_1() {
+        let data = r#"
+{
+    "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
+    "identifier": "completedTxEvent",
+    "topics": [],
+    "data": "data-string",
+    "additionalData": null
+}
+        "#;
+
+        let event_log = serde_json::from_str::<Events>(data).unwrap();
+        assert_eq!(event_log.data, LogData::String("data-string".to_owned()));
+    }
+
+    #[test]
+    fn parse_event_log_2() {
+        let data = r#"
+{
+    "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
+    "identifier": "completedTxEvent",
+    "topics": [],
+    "data": [
+        "data1",
+        "data2"
+    ],
+    "additionalData": null
+}
+        "#;
+
+        let event_log = serde_json::from_str::<Events>(data).unwrap();
+        assert_eq!(
+            event_log.data,
+            LogData::Vec(vec!["data1".to_owned(), "data2".to_owned()])
+        );
+    }
 }
