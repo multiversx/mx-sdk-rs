@@ -13,9 +13,9 @@ path = "../benchmark-common"
 
 
 [dependencies.multiversx-sc]
-version = "0.52.3"
+version = "0.53.0"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.52.3"
+version = "0.53.0"
 path = "../../../../framework/scenario"
