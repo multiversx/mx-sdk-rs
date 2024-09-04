@@ -37,12 +37,12 @@ pub use tx_panic::*;
 pub use tx_result::*;
 pub use tx_result_calls::*;
 
-#[cfg(feature = "wasm-incopatible")]
+#[cfg(feature = "wasm-incompatible")]
 mod blockchain_rng;
-#[cfg(feature = "wasm-incopatible")]
+#[cfg(feature = "wasm-incompatible")]
 pub use blockchain_rng::BlockchainRng;
 
-#[cfg(not(feature = "wasm-incopatible"))]
+#[cfg(not(feature = "wasm-incompatible"))]
 mod blockchain_rng_unsupported;
-#[cfg(not(feature = "wasm-incopatible"))]
+#[cfg(not(feature = "wasm-incompatible"))]
 pub use blockchain_rng_unsupported::BlockchainRng;

@@ -13,3 +13,8 @@ fn world() -> ScenarioWorld {
 fn managed_decimal_test() {
     world().run("scenarios/managed_decimal.scen.json");
 }
+
+#[test]
+fn managed_decimal_logarithm_test() {
+    world().run("scenarios/managed_decimal_logarithm.scen.json");
+}

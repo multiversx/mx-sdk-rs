@@ -53,7 +53,7 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
         _key: Self::ManagedBufferHandle,
         _message: Self::ManagedBufferHandle,
         _signature: Self::ManagedBufferHandle,
-    ) -> bool {
+    ) {
         panic!("verify_bls not implemented yet!")
     }
 
@@ -98,5 +98,32 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
         _dest: Self::ManagedBufferHandle,
     ) {
         panic!("encode_secp256k1_signature not implemented yet!")
+    }
+
+    fn verify_secp256r1_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) {
+        panic!("verify_secp256r1 not implemented yet!")
+    }
+
+    fn verify_bls_signature_share_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) {
+        panic!("verify_bls_signature_share not implemented yet!")
+    }
+
+    fn verify_bls_aggregated_signature_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) {
+        panic!("verify_bls_aggregated_signature not implemented yet!")
     }
 }

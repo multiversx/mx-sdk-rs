@@ -1,7 +1,7 @@
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress},
     multiversx_chain_vm::crypto_functions::keccak256,
-    scenario_model::{TxResponse, TxResponseStatus},
+    scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 use multiversx_sdk::{
     data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
@@ -44,6 +44,7 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
         out: process_out(tx),
         new_deployed_address: process_new_deployed_address(tx),
         new_issued_token_identifier: process_new_issued_token_identifier(tx),
+        logs: process_logs(tx),
         ..Default::default()
     }
 }
@@ -58,18 +59,55 @@ fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
     }
 }
 
+fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
+    if let Some(api_logs) = &tx.logs {
+        return api_logs
+            .events
+            .iter()
+            .map(|event| Log {
+                address: Address::from_slice(&event.address.to_bytes()),
+                endpoint: event.identifier.clone(),
+                topics: extract_topics(event),
+                data: extract_data(event),
+            })
+            .collect::<Vec<Log>>();
+    }
+
+    Vec::new()
+}
+
+fn extract_data(event: &Events) -> Vec<Vec<u8>> {
+    let mut out: Vec<Vec<u8>> = Vec::new();
+    event
+        .data
+        .for_each(|data_field| out.push(data_field.clone().into_bytes()));
+    out
+}
+
+fn extract_topics(event: &Events) -> Vec<Vec<u8>> {
+    event
+        .topics
+        .clone()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|s| s.into_bytes())
+        .collect()
+}
+
 fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
-                if let Some(data) = &event.data {
-                    let decoded_data = String::from_utf8(base64_decode(data)).unwrap();
+                let mut out = Vec::new();
+                event.data.for_each(|data_member| {
+                    let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
 
                     if decoded_data.starts_with('@') {
-                        let out = decode_scr_data_or_panic(decoded_data.as_str());
-                        return Some(out);
+                        let out_content = decode_scr_data_or_panic(decoded_data.as_str());
+                        out.extend(out_content);
                     }
-                }
+                });
+                return Some(out);
             }
 
             None
@@ -103,25 +141,31 @@ fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
 }
 
 fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<String> {
+    let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
+
     for scr in tx.smart_contract_results.iter() {
         if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
             continue;
         }
 
-        let Some(prev_tx) = tx
+        let prev_tx_data: &str = if let Some(prev_tx) = tx
             .smart_contract_results
             .iter()
             .find(|e| e.hash == scr.prev_tx_hash)
-        else {
+        {
+            prev_tx.data.as_ref()
+        } else if &scr.prev_tx_hash == tx.hash.as_ref().unwrap() {
+            &original_tx_data
+        } else {
             continue;
         };
 
-        let is_issue_fungible = prev_tx.data.starts_with("issue@");
-        let is_issue_semi_fungible = prev_tx.data.starts_with("issueSemiFungible@");
-        let is_issue_non_fungible = prev_tx.data.starts_with("issueNonFungible@");
-        let is_register_meta_esdt = prev_tx.data.starts_with("registerMetaESDT@");
+        let is_issue_fungible = prev_tx_data.starts_with("issue@");
+        let is_issue_semi_fungible = prev_tx_data.starts_with("issueSemiFungible@");
+        let is_issue_non_fungible = prev_tx_data.starts_with("issueNonFungible@");
+        let is_register_meta_esdt = prev_tx_data.starts_with("registerMetaESDT@");
         let is_register_and_set_all_roles_esdt =
-            prev_tx.data.starts_with("registerAndSetAllRoles@");
+            prev_tx_data.starts_with("registerAndSetAllRoles@");
 
         if !is_issue_fungible
             && !is_issue_semi_fungible
@@ -135,12 +179,11 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
         if scr.data.starts_with("ESDTTransfer@") {
             let encoded_tid = scr.data.split('@').nth(1);
             return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
-        } else if scr.data.starts_with("@00@") {
+        } else if scr.data.starts_with("@00@") || scr.data.starts_with("@6f6b@") {
             let encoded_tid = scr.data.split('@').nth(2);
             return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
         }
     }
-
     None
 }
 

@@ -31,6 +31,16 @@ impl TxResponse {
                 status: tx_result.result_status,
                 message: tx_result.result_message,
             },
+            logs: tx_result
+                .result_logs
+                .iter()
+                .map(|tx_log| Log {
+                    address: Address::from_slice(tx_log.address.as_bytes()),
+                    endpoint: tx_log.endpoint.to_string(),
+                    topics: tx_log.topics.clone(),
+                    data: tx_log.data.clone(),
+                })
+                .collect(),
             ..Default::default()
         }
     }

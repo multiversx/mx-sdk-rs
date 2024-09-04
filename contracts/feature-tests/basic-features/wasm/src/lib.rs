@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          404
+// Endpoints:                          408
 // Async Callback:                       1
-// Total number of exported functions: 406
+// Total number of exported functions: 410
 
 #![no_std]
 
@@ -422,6 +422,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         managed_decimal_into_raw_units => managed_decimal_into_raw_units
         managed_decimal_ln => managed_decimal_ln
         managed_decimal_log2 => managed_decimal_log2
+        managed_decimal_addition_var => managed_decimal_addition_var
+        managed_decimal_subtraction_var => managed_decimal_subtraction_var
+        managed_decimal_eq_var => managed_decimal_eq_var
+        managed_decimal_ln_var => managed_decimal_ln_var
+        managed_decimal_log2_var => managed_decimal_log2_var
     )
 }
 
