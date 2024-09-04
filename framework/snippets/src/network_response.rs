@@ -1,7 +1,7 @@
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress},
     multiversx_chain_vm::crypto_functions::keccak256,
-    scenario_model::{TxResponse, TxResponseStatus},
+    scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 use multiversx_sdk::{
     data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
@@ -44,6 +44,7 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
         out: process_out(tx),
         new_deployed_address: process_new_deployed_address(tx),
         new_issued_token_identifier: process_new_issued_token_identifier(tx),
+        logs: process_logs(tx),
         ..Default::default()
     }
 }
@@ -58,18 +59,55 @@ fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
     }
 }
 
+fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
+    if let Some(api_logs) = &tx.logs {
+        return api_logs
+            .events
+            .iter()
+            .map(|event| Log {
+                address: Address::from_slice(&event.address.to_bytes()),
+                endpoint: event.identifier.clone(),
+                topics: extract_topics(event),
+                data: extract_data(event),
+            })
+            .collect::<Vec<Log>>();
+    }
+
+    Vec::new()
+}
+
+fn extract_data(event: &Events) -> Vec<Vec<u8>> {
+    let mut out: Vec<Vec<u8>> = Vec::new();
+    event
+        .data
+        .for_each(|data_field| out.push(data_field.clone().into_bytes()));
+    out
+}
+
+fn extract_topics(event: &Events) -> Vec<Vec<u8>> {
+    event
+        .topics
+        .clone()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|s| s.into_bytes())
+        .collect()
+}
+
 fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
-                if let Some(data) = &event.data {
-                    let decoded_data = String::from_utf8(base64_decode(data)).unwrap();
+                let mut out = Vec::new();
+                event.data.for_each(|data_member| {
+                    let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
 
                     if decoded_data.starts_with('@') {
-                        let out = decode_scr_data_or_panic(decoded_data.as_str());
-                        return Some(out);
+                        let out_content = decode_scr_data_or_panic(decoded_data.as_str());
+                        out.extend(out_content);
                     }
-                }
+                });
+                return Some(out);
             }
 
             None

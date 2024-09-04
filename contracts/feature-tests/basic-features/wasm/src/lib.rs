@@ -169,6 +169,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_big_int => echo_big_int
         echo_managed_buffer => echo_managed_buffer
         echo_managed_address => echo_managed_address
+        echo_managed_option => echo_managed_option
         echo_big_int_managed_vec => echo_big_int_managed_vec
         echo_big_int_tuple => echo_big_int_tuple
         echo_big_int_option => echo_big_int_option
