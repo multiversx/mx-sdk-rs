@@ -150,15 +150,15 @@
                 "to": "sc:basic-features",
                 "function": "managed_decimal_addition_var",
                 "arguments": [
-                    "0x000000010400000002",
-                    "0x000000010500000002"
+                    "biguint:4|u32:2",
+                    "biguint:5|u32:2"
                 ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x000000010900000002"
+                    "biguint:9|u32:2"
                 ]
             }
         },
@@ -170,15 +170,15 @@
                 "to": "sc:basic-features",
                 "function": "managed_decimal_subtraction_var",
                 "arguments": [
-                    "0x000000010900000002",
-                    "0x000000010400000002"
+                    "biguint:9|u32:2",
+                    "biguint:4|u32:2"
                 ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x000000010500000002"
+                    "biguint:5|u32:2"
                 ]
             }
         },
@@ -190,8 +190,8 @@
                 "to": "sc:basic-features",
                 "function": "managed_decimal_subtraction_var",
                 "arguments": [
-                    "0x000000010200000002",
-                    "0x000000010800000002"
+                    "biguint:2|u32:2",
+                    "biguint:8|u32:2"
                 ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"
@@ -212,15 +212,15 @@
                 "to": "sc:basic-features",
                 "function": "managed_decimal_eq_var",
                 "arguments": [
-                    "0x000000010d00000002",
-                    "0x000000010d00000002"
+                    "biguint:11|u32:2",
+                    "biguint:11|u32:2"
                 ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0x01"
+                    "true"
                 ],
                 "status": "",
                 "message": "*",
