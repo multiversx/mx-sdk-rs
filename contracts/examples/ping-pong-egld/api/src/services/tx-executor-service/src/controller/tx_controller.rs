@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use api::services::interactor::basic_interact::RocketInteractor;
+use api::services::interactor::basic_interact::ActixInteractor;
 use rocket::{get, post};
 use serde_json::*;
 

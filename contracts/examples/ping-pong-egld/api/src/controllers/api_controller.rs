@@ -16,3 +16,16 @@ pub async fn tx(tx_type: &str, body: &str) -> Value {
 
     res.json().await.unwrap()
 }
+
+#[get("/query/<query_type>")]
+pub async fn query(query_type: &str) -> Value {
+    let client = reqwest::Client::new();
+    let res = client
+        .get(format!("http://localhost:8001/{}", query_type))
+        .send()
+        .await
+        .unwrap();
+
+    res.json().await.unwrap()
+}
+

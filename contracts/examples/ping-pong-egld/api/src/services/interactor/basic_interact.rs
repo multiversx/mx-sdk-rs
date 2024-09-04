@@ -1,29 +1,22 @@
-mod basic_interact_config;
 mod basic_interact_state;
 
-use basic_interact_config::Config;
 use basic_interact_state::State;
 use ping_pong_egld::ping_pong_proxy;
 
 use multiversx_sc_snippets::imports::*;
 
-const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json"; // wrong - doesn't exist
-
 const PINGPONG_CODE_PATH: MxscPath = MxscPath::new("../output/ping-pong-egld.mxsc.json");
 #[allow(unused)]
-pub struct RocketInteractor {
+pub struct ActixInteractor {
     interactor: Interactor,
     adder_owner_address: Bech32Address,
     wallet_address: Bech32Address,
     state: State,
 }
 
-impl RocketInteractor {
+impl ActixInteractor {
     pub async fn init() -> Self {
-        let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway())
-            .await
-            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+        let mut interactor = Interactor::new("https://devnet-gateway.multiversx.com")
             .await;
 
         let ping_pong_owner = interactor.register_wallet(Wallet::from(test_wallets::alice()));
@@ -48,14 +41,14 @@ impl RocketInteractor {
     pub async fn deploy(&mut self) {
         let ping_amount = BigUint::<StaticApi>::from(0u128);
         let duration_in_seconds = 0u64;
-        let opt_activation_timestamp = Option::Some(0u64);
+        let opt_activation_timestamp = Option::Some(100u64);
         let max_funds = OptionalValue::Some(BigUint::<StaticApi>::from(0u128));
 
         let new_address = self
             .interactor
             .tx()
             .from(&self.adder_owner_address)
-            .gas(3_000_000)
+            .gas(30_000_000)
             .typed(ping_pong_proxy::PingPongProxy)
             .init(
                 ping_amount,

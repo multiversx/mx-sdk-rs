@@ -1,41 +1,27 @@
 #![allow(non_snake_case)]
 
-// mod controllers;
-// mod models;
-// mod views;
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
+use api::services::interactor::basic_interact::ActixInteractor;
+mod controller;
+mod view;
+mod model;
 
-use rocket::*;
-use rocket_cors::{AllowedOrigins, CorsOptions};
-
-#[get("/")]
-fn default_route() -> &'static str {
-    "Placeholder instead of gateway error :)"
+async fn default_route() -> impl Responder {
+    HttpResponse::Ok().body("Ee Aa Aa")
 }
 
-#[launch]
-fn rocket() -> _ {
-    // CORS config
-    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:8000"]);
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let mut itr = ActixInteractor::init().await;
 
-    let cors = CorsOptions {
-        allowed_origins,
-        allowed_methods: vec![rocket::http::Method::Get, rocket::http::Method::Post]
-            .into_iter()
-            .map(From::from)
-            .collect(),
-        allowed_headers: rocket_cors::AllowedHeaders::some(&[
-            "Authorization",
-            "Accept",
-            "Content-Type",
-        ]),
-        allow_credentials: true,
-        ..Default::default()
-    }
-    .to_cors()
-    .expect("Failed to create CORS fairing");
+    itr.deploy().await;
 
-    rocket::build()
-        .configure(config::Config::figment().merge(("port", 8001)))
-        .mount("/", routes![default_route]) // http://127.0.0.1:8001
-        .attach(cors)
+    HttpServer::new(move || {
+        App::new()
+            .service(controller::timestamp_controller::timestamp)
+            .route("/", web::get().to(default_route))
+    })
+    .bind("127.0.0.1:8001")?
+    .run()
+    .await
 }

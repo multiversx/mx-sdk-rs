@@ -34,5 +34,6 @@ fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![default_route]) // http://127.0.0.1:8000
         .mount("/", routes![controllers::api_controller::tx])
+        .mount("/", routes![controllers::api_controller::query])
         .attach(cors)
 }
