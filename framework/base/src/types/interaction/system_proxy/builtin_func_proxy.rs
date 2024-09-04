@@ -82,11 +82,14 @@ where
             .original_result()
     }
 
-    pub fn esdt_local_burn(
+    pub fn esdt_local_burn<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
         self,
-        token: &TokenIdentifier<Env::Api>,
+        token: &Arg0,
         nonce: u64,
-        amount: &BigUint<Env::Api>,
+        amount: &Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         if nonce == 0 {
             return self
@@ -107,11 +110,14 @@ where
             .original_result()
     }
 
-    pub fn esdt_local_mint(
+    pub fn esdt_local_mint<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
         self,
-        token: &TokenIdentifier<Env::Api>,
+        token: &Arg0,
         nonce: u64,
-        amount: &BigUint<Env::Api>,
+        amount: &Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         if nonce == 0 {
             return self
@@ -131,9 +137,9 @@ where
             .original_result()
     }
 
-    pub fn nft_add_multiple_uri(
+    pub fn nft_add_multiple_uri<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
-        token_id: &TokenIdentifier<Env::Api>,
+        token_id: &Arg0,
         nft_nonce: u64,
         new_uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -151,9 +157,9 @@ where
         tx.original_result()
     }
 
-    pub fn nft_update_attributes<T: TopEncode>(
+    pub fn nft_update_attributes<T: TopEncode, Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
-        token_id: &TokenIdentifier<Env::Api>,
+        token_id: &Arg0,
         nft_nonce: u64,
         new_attributes: &T,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -167,13 +173,20 @@ where
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_create<T: TopEncode>(
+    pub fn esdt_nft_create<
+        T: TopEncode,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
         self,
-        token: &TokenIdentifier<Env::Api>,
-        amount: &BigUint<Env::Api>,
-        name: &ManagedBuffer<Env::Api>,
-        royalties: &BigUint<Env::Api>,
-        hash: &ManagedBuffer<Env::Api>,
+        token: &Arg0,
+        amount: &Arg1,
+        name: &Arg2,
+        royalties: &Arg3,
+        hash: &Arg4,
         attributes: &T,
         uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {

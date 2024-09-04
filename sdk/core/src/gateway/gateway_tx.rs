@@ -3,7 +3,8 @@ use crate::data::{
     network_config::NetworkConfig,
     transaction::{
         ArgCreateTransaction, ResponseTxCost, SendTransactionResponse, SendTransactionsResponse,
-        Transaction, TransactionInfo, TransactionOnNetwork, TransactionStatus, TxCostResponseData,
+        Transaction, TransactionInfo, TransactionOnNetwork, TransactionProcessStatus,
+        TransactionStatus, TxCostResponseData,
     },
     vm::{ResponseVmValue, VmValueRequest, VmValuesResponseData},
 };
@@ -93,6 +94,25 @@ impl GatewayProxy {
         match resp.data {
             None => Err(anyhow!("{}", resp.error)),
             Some(b) => Ok(b.status),
+        }
+    }
+
+    // get_transaction_process_status retrieves a transaction's status from the network using process-status API
+    pub async fn get_transaction_process_status(&self, hash: &str) -> Result<(String, String)> {
+        let endpoint = format!("transaction/{hash}/process-status");
+        let endpoint = self.get_endpoint(endpoint.as_str());
+
+        let resp = self
+            .client
+            .get(endpoint)
+            .send()
+            .await?
+            .json::<TransactionProcessStatus>()
+            .await?;
+
+        match resp.data {
+            None => Err(anyhow!("{}", resp.error)),
+            Some(b) => Ok((b.status, b.reason)),
         }
     }
 

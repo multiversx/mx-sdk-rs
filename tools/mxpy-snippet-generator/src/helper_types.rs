@@ -1,4 +1,3 @@
-use bech32::FromBase32;
 use multiversx_sc::types::heap::Address;
 
 use crate::constants::*;
@@ -79,8 +78,7 @@ impl TransactionType {
 }
 
 pub fn bech32_to_bytes(bech32_address: &str) -> Address {
-    let (_, dest_address_bytes_u5, _) = bech32::decode(bech32_address).unwrap();
-    let dest_address_bytes = Vec::<u8>::from_base32(&dest_address_bytes_u5).unwrap();
+    let (_hrp, dest_address_bytes) = bech32::decode(bech32_address).unwrap();
     if dest_address_bytes.len() != ADDRESS_LEN {
         panic!("Invalid address length after decoding")
     }

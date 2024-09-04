@@ -19,7 +19,7 @@
         },
         {
             "step": "scCall",
-            "id": "3",
+            "id": "verify_bls_signature - Ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -33,10 +33,32 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "0x01"
-                ],
+                "out": [],
                 "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "verify_bls_signature - Fail",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "verify_bls_signature",
+                "arguments": [
+                    "0xb5823f6e564251cc03ce7bad3da83e72576e92795d3500bba1acb30ec9a94dce87bb8aa794d67b2d61d15c33f28f6c0c23ba1dfcbf21e8f8b46286ff871afabac925303ddcaddce6254fcff6d3155797db40b3d3b5865e8fc0bd770b3d79b381",
+                    "0x6d65737361676520746f206265207369676e6564",
+                    "0x0032a2ddf341c08d1eb7232f05dc34e4454155e676b58c40fddf9a036562ac2c01533d2d557cb49d73aa9d7a89744696"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:err blsSignatureDeserialize 0032a2ddf341c08d1eb7232f05dc34e4454155e676b58c40fddf9a036562ac2c01533d2d557cb49d73aa9d7a89744696",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

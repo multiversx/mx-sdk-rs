@@ -1,5 +1,6 @@
 use crate::cli::{StandaloneCliAction, StandaloneCliArgs};
 use crate::cmd::retrieve_address::retrieve_address;
+use crate::cmd::wallet::wallet;
 use clap::Parser;
 
 use crate::cmd::all::call_all_meta;
@@ -45,6 +46,9 @@ pub async fn cli_main_standalone() {
         },
         Some(StandaloneCliAction::LocalDeps(args)) => {
             local_deps(args);
+        },
+        Some(StandaloneCliAction::Wallet(args)) => {
+            wallet(args);
         },
         None => {},
     }

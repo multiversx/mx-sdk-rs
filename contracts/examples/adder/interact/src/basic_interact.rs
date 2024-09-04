@@ -41,7 +41,10 @@ async fn main() {
             basic_interact.print_sum().await;
         },
         Some(basic_interact_cli::InteractCliCommand::Upgrade(args)) => {
-            basic_interact.upgrade(args.value).await
+            let owner_address = basic_interact.adder_owner_address.clone();
+            basic_interact
+                .upgrade(args.value, &owner_address, None)
+                .await
         },
         None => {},
     }
@@ -65,7 +68,15 @@ impl AdderInteract {
 
         let adder_owner_address =
             interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        // PASSWORD: "alice"
+        // InsertPassword::Plaintext("alice".to_string()) || InsertPassword::StandardInput
+        let wallet_address = interactor.register_wallet(
+            Wallet::from_keystore_secret(
+                "alice.json",
+                InsertPassword::Plaintext("alice".to_string()),
+            )
+            .unwrap(),
+        );
 
         Self {
             interactor,
@@ -93,7 +104,7 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.adder_owner_address)
-            .gas(3_000_000)
+            .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(ADDER_CODE_PATH)
@@ -123,7 +134,7 @@ impl AdderInteract {
                     .typed(adder_proxy::AdderProxy)
                     .init(0u32)
                     .code(ADDER_CODE_PATH)
-                    .gas(3_000_000)
+                    .gas(6_000_000)
                     .returns(ReturnsNewBech32Address)
             });
         }
@@ -151,7 +162,7 @@ impl AdderInteract {
                     .to(self.state.current_adder_address())
                     .typed(adder_proxy::AdderProxy)
                     .add(value)
-                    .gas(3_000_000)
+                    .gas(6_000_000)
             });
         }
 
@@ -176,7 +187,7 @@ impl AdderInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
-            .gas(3_000_000)
+            .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .add(value)
             .prepare_async()
@@ -201,45 +212,87 @@ impl AdderInteract {
         println!("sum: {sum}");
     }
 
-    async fn upgrade(&mut self, new_value: u32) {
-        let response = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .to(self.state.current_adder_address())
-            .gas(3_000_000)
-            .typed(adder_proxy::AdderProxy)
-            .upgrade(BigUint::from(new_value))
-            .code_metadata(CodeMetadata::UPGRADEABLE)
-            .code(ADDER_CODE_PATH)
-            .returns(ReturnsResultUnmanaged)
-            .prepare_async()
-            .run()
-            .await;
+    async fn upgrade(
+        &mut self,
+        new_value: u32,
+        sender: &Bech32Address,
+        expected_result: Option<(u64, &str)>,
+    ) {
+        match expected_result {
+            Some((code, msg)) => {
+                let response = self
+                    .interactor
+                    .tx()
+                    .from(sender)
+                    .to(self.state.current_adder_address())
+                    .gas(6_000_000)
+                    .typed(adder_proxy::AdderProxy)
+                    .upgrade(new_value)
+                    .code_metadata(CodeMetadata::UPGRADEABLE)
+                    .code(ADDER_CODE_PATH)
+                    .returns(ExpectError(code, msg))
+                    .prepare_async()
+                    .run()
+                    .await;
 
-        let sum = self
-            .interactor
-            .query()
-            .to(self.state.current_adder_address())
-            .typed(adder_proxy::AdderProxy)
-            .sum()
-            .returns(ReturnsResultUnmanaged)
-            .prepare_async()
-            .run()
-            .await;
-        assert_eq!(sum, RustBigUint::from(new_value));
+                println!("response: {response:?}");
+            },
+            None => {
+                self.interactor
+                    .tx()
+                    .from(sender)
+                    .to(self.state.current_adder_address())
+                    .gas(6_000_000)
+                    .typed(adder_proxy::AdderProxy)
+                    .upgrade(new_value)
+                    .code_metadata(CodeMetadata::UPGRADEABLE)
+                    .code(ADDER_CODE_PATH)
+                    .prepare_async()
+                    .run()
+                    .await;
 
-        println!("response: {response:?}");
+                let sum = self
+                    .interactor
+                    .query()
+                    .to(self.state.current_adder_address())
+                    .typed(adder_proxy::AdderProxy)
+                    .sum()
+                    .returns(ReturnsResultUnmanaged)
+                    .prepare_async()
+                    .run()
+                    .await;
+
+                assert_eq!(sum, RustBigUint::from(new_value));
+            },
+        }
     }
 }
 
 #[tokio::test]
 #[ignore = "run on demand"]
-async fn test() {
+async fn upgrade_test() {
     let mut basic_interact = AdderInteract::init().await;
+    let wallet_address = basic_interact.wallet_address.clone();
+    let adder_owner_address = basic_interact.adder_owner_address.clone();
+    let error_not_owner = (4, "upgrade is allowed only for owner");
 
     basic_interact.deploy().await;
     basic_interact.add(1u32).await;
 
-    basic_interact.upgrade(7u32).await;
+    // Sum will be 1
+    basic_interact.print_sum().await;
+
+    basic_interact
+        .upgrade(7u32, &adder_owner_address, None)
+        .await;
+
+    // Sum will be the updated value of 7
+    basic_interact.print_sum().await;
+
+    basic_interact
+        .upgrade(10u32, &wallet_address, Some(error_not_owner))
+        .await;
+
+    // Sum will remain 7
+    basic_interact.print_sum().await;
 }

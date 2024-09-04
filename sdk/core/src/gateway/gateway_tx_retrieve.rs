@@ -16,21 +16,42 @@ impl GatewayProxy {
         let start_time = Instant::now();
 
         loop {
-            match self.get_transaction_status(&tx_hash).await {
-                Ok(status) => {
+            match self.get_transaction_process_status(&tx_hash).await {
+                Ok((status, reason)) => {
                     // checks if transaction status is final
                     match status.as_str() {
-                        "success" | "fail" => {
+                        "success" => {
                             // retrieve transaction info with results
                             let transaction_info_with_results = self
                                 .get_transaction_info_with_results(&tx_hash)
                                 .await
                                 .unwrap();
+
                             info!(
                                 "Transaction retrieved successfully, with status {}: {:#?}",
                                 status, transaction_info_with_results
                             );
                             return transaction_info_with_results;
+                        },
+                        "fail" => {
+                            // status failed and no reason means invalid transaction
+                            if reason.is_empty() {
+                                info!("Transaction failed. Invalid transaction: {tx_hash}");
+                                panic!("Transaction failed. Invalid transaction: {tx_hash}");
+                            }
+
+                            let result = parse_reason(&reason);
+
+                            match result {
+                                Ok((code, err)) => {
+                                    info!("Transaction failed. Code: {code}, message: {err}");
+                                    panic!("Transaction failed. Code: {code}, message: {err}")
+                                },
+                                Err(err) => {
+                                    info!("Reason parsing error for failed transaction: {err}");
+                                    panic!("Reason parsing error for failed transaction: {err}")
+                                },
+                            }
                         },
                         _ => {
                             continue;
@@ -60,4 +81,24 @@ impl GatewayProxy {
         );
         TransactionOnNetwork::default()
     }
+}
+
+pub fn parse_reason(reason: &str) -> Result<(u64, String), String> {
+    let parts: Vec<&str> = reason.split('@').collect();
+
+    if parts.len() < 2 {
+        return Err("Invalid reason format".to_string());
+    }
+
+    let error_code_hex = parts[1];
+    let error_message_hex = parts[2];
+
+    let error_code =
+        u64::from_str_radix(error_code_hex, 16).expect("Failed to decode error code as u64");
+
+    let error_message =
+        String::from_utf8(hex::decode(error_message_hex).expect("Failed to decode error message"))
+            .expect("Failed to decode error message as UTF-8");
+
+    Ok((error_code, error_message))
 }
