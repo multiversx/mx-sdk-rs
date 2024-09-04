@@ -266,7 +266,7 @@ pub trait Lottery {
             info.prize_distribution.len()
         };
 
-        self.total_winning_tickets(&lottery_name)
+        self.total_winning_tickets(lottery_name)
             .set(total_winning_tickets);
         self.index_last_winner(lottery_name).set(1);
     }
@@ -276,7 +276,7 @@ pub trait Lottery {
         let ticket_holders_mapper = self.ticket_holders(lottery_name);
         let total_tickets = ticket_holders_mapper.len();
 
-        let mut index_last_winner = self.index_last_winner(&lottery_name).get();
+        let mut index_last_winner = self.index_last_winner(lottery_name).get();
         let total_winning_tickets = self.total_winning_tickets(lottery_name).get();
         require!(
             index_last_winner <= total_winning_tickets,
@@ -322,7 +322,7 @@ pub trait Lottery {
             iterations += 1;
         }
         self.lottery_info(lottery_name).set(info);
-        self.index_last_winner(lottery_name).set(&index_last_winner);
+        self.index_last_winner(lottery_name).set(index_last_winner);
         if index_last_winner > total_winning_tickets {
             return AwardingStatus::Finished;
         }
@@ -409,7 +409,7 @@ pub trait Lottery {
         accumulated_egld_rewards: &mut BigUint,
         accumulated_esdt_rewards: &mut ManagedVec<Self::Api, EsdtTokenPayment>,
     ) {
-        let value = self.accumulated_rewards(&token_id, &caller).take();
+        let value = self.accumulated_rewards(&token_id, caller).take();
         if token_id.is_egld() {
             *accumulated_egld_rewards += value;
         } else {
