@@ -92,14 +92,23 @@ pub struct Events {
     pub address: Address,
     pub identifier: String,
     pub topics: Option<Vec<String>>,
-    pub data: Option<Data>,
+    pub data: Option<LogData>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(untagged)]
-pub enum Data {
+pub enum LogData {
     String(String),
     Vec(Vec<String>),
+}
+
+impl LogData {
+    pub fn for_each<F: FnMut(&String)>(&self, mut f: F) {
+        match self {
+            LogData::String(s) => f(s),
+            LogData::Vec(v) => v.iter().for_each(f),
+        }
+    }
 }
 
 // ApiLogs represents logs with changed fields' types in order to make it friendly for API's json

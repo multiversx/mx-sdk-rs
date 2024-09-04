@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 use multiversx_sdk::{
-    data::transaction::{ApiSmartContractResult, Data, Events, TransactionOnNetwork},
+    data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
     utils::base64_decode,
 };
 
@@ -78,13 +78,9 @@ fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
 
 fn extract_data(event: &Events) -> Vec<Vec<u8>> {
     let mut out: Vec<Vec<u8>> = Vec::new();
-    if let Some(data) = event.data.clone() {
-        match data {
-            Data::String(string) => out.push(string.into_bytes()),
-            Data::Vec(vec) => return vec.into_iter().map(|s| s.into_bytes()).collect(),
-        }
+    if let Some(data) = &event.data {
+        data.for_each(|data_field| out.push(data_field.clone().into_bytes()));
     }
-
     out
 }
 
@@ -103,29 +99,16 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
                 if let Some(data) = &event.data {
-                    match data {
-                        Data::String(string) => {
-                            let decoded_data = String::from_utf8(base64_decode(string)).unwrap();
-                            if decoded_data.starts_with('@') {
-                                let out = decode_scr_data_or_panic(&decoded_data);
-                                return Some(out);
-                            }
-                        },
-                        Data::Vec(vec) => {
-                            let mut out = Vec::new();
-                            for data_member in vec.iter() {
-                                let decoded_data =
-                                    String::from_utf8(base64_decode(data_member)).unwrap();
+                    let mut out = Vec::new();
+                    data.for_each(|data_member| {
+                        let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
 
-                                if decoded_data.starts_with('@') {
-                                    let out_content =
-                                        decode_scr_data_or_panic(decoded_data.as_str());
-                                    out.extend(out_content);
-                                }
-                            }
-                            return Some(out);
-                        },
-                    }
+                        if decoded_data.starts_with('@') {
+                            let out_content = decode_scr_data_or_panic(decoded_data.as_str());
+                            out.extend(out_content);
+                        }
+                    });
+                    return Some(out);
                 }
             }
 
