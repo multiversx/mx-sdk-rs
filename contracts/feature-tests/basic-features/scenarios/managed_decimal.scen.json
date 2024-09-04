@@ -141,6 +141,92 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "id": "6",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_addition_var",
+                "arguments": [
+                    "biguint:4|u32:2",
+                    "biguint:5|u32:2"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "biguint:9|u32:2"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "7",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_subtraction_var",
+                "arguments": [
+                    "biguint:9|u32:2",
+                    "biguint:4|u32:2"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "biguint:5|u32:2"
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "8",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_subtraction_var",
+                "arguments": [
+                    "biguint:2|u32:2",
+                    "biguint:8|u32:2"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:cannot subtract because result would be negative",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "9",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "managed_decimal_eq_var",
+                "arguments": [
+                    "biguint:11|u32:2",
+                    "biguint:11|u32:2"
+                ],
+                "gasLimit": "1,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }

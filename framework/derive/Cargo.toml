@@ -16,7 +16,7 @@ categories = ["cryptography::cryptocurrencies", "development-tools::procedural-m
 [dependencies]
 proc-macro2 = "=1.0.86"
 quote = "=1.0.37"
-syn = "=2.0.76"
+syn = "=2.0.77"
 hex = "=0.4.3"
 radix_trie = "=0.2.1"
 

@@ -56,4 +56,47 @@ pub trait ManagedDecimalFeatures {
     ) -> ManagedDecimalSigned<Self::Api, ConstDecimals<9>> {
         x.log2().unwrap_or_else(|| sc_panic!("cannot be zero"))
     }
+
+    #[endpoint]
+    fn managed_decimal_addition_var(
+        &self,
+        first: ManagedDecimal<Self::Api, NumDecimals>,
+        second: ManagedDecimal<Self::Api, NumDecimals>,
+    ) -> ManagedDecimal<Self::Api, NumDecimals> {
+        first + second
+    }
+
+    #[endpoint]
+    fn managed_decimal_subtraction_var(
+        &self,
+        first: ManagedDecimal<Self::Api, NumDecimals>,
+        second: ManagedDecimal<Self::Api, NumDecimals>,
+    ) -> ManagedDecimal<Self::Api, NumDecimals> {
+        first - second
+    }
+
+    #[endpoint]
+    fn managed_decimal_eq_var(
+        &self,
+        first: ManagedDecimal<Self::Api, NumDecimals>,
+        second: ManagedDecimal<Self::Api, NumDecimals>,
+    ) -> bool {
+        first.eq(&second)
+    }
+
+    #[endpoint]
+    fn managed_decimal_ln_var(
+        &self,
+        x: ManagedDecimal<Self::Api, NumDecimals>,
+    ) -> ManagedDecimalSigned<Self::Api, ConstDecimals<9>> {
+        x.ln().unwrap_or_else(|| sc_panic!("cannot be zero"))
+    }
+
+    #[endpoint]
+    fn managed_decimal_log2_var(
+        &self,
+        x: ManagedDecimal<Self::Api, NumDecimals>,
+    ) -> ManagedDecimalSigned<Self::Api, ConstDecimals<9>> {
+        x.log2().unwrap_or_else(|| sc_panic!("cannot be zero"))
+    }
 }
