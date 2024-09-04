@@ -12,9 +12,10 @@ async function handlePing(event) {
     }
 
     console.log(`Entered value: ${egldValue} EGLD`);
-
+    let body = {value: Number(egldValue)};
+    console.log(body);
     try {
-        let res = await ping(egldValue);
+        let res = await ping(egldValue, JSON.stringify(body));
         console.log(`Response: ${res.response}`);
     } catch (error) {
         console.error("Error:", error);

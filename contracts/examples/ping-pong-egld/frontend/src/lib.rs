@@ -8,13 +8,14 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub async fn ping(value: &str) -> Result<JsValue, JsValue> {
+pub async fn ping(value: &str, body: &str) -> Result<JsValue, JsValue> {
     alert(&format!("Hello, you pinged with {} EGLD!", value));
     let opts = RequestInit::new();
-    opts.set_method("GET");
+    opts.set_method("POST");
     opts.set_mode(RequestMode::Cors);
+    opts.set_body(&JsValue::from_str(body));
 
-    let url = "http://localhost:8000/endpoint/ping";
+    let url = "http://localhost:8000/tx/ping";
     let req = Request::new_with_str_and_init(url, &opts).unwrap();
 
     let window = web_sys::window().unwrap();

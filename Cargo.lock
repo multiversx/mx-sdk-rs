@@ -1567,6 +1567,7 @@ dependencies = [
  "clap",
  "multiversx-sc-snippets",
  "ping-pong-egld",
+ "reqwest",
  "rocket",
  "rocket_cors",
  "serde",
@@ -3537,6 +3538,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "sc-query-service"
+version = "0.1.0"
+dependencies = [
+ "rocket",
+ "rocket_cors",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "scenario-tester"
 version = "0.0.0"
 dependencies = [
@@ -4285,6 +4298,18 @@ name = "try-lock"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
+
+[[package]]
+name = "tx-executor-service"
+version = "0.1.0"
+dependencies = [
+ "rocket",
+ "rocket_cors",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml",
+]
 
 [[package]]
 name = "typenum"

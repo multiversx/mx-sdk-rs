@@ -1,8 +1,10 @@
 #![allow(non_snake_case)]
 
-mod controllers;
-mod models;
-mod views;
+// mod controllers;
+// mod models;
+// mod views;
+
+pub mod controller;
 
 use rocket::*;
 use rocket_cors::{AllowedOrigins, CorsOptions};
@@ -15,7 +17,7 @@ fn default_route() -> &'static str {
 #[launch]
 fn rocket() -> _ {
     // CORS config
-    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:8080"]);
+    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:8000"]);
 
     let cors = CorsOptions {
         allowed_origins,
@@ -35,12 +37,8 @@ fn rocket() -> _ {
     .expect("Failed to create CORS fairing");
 
     rocket::build()
-        .mount("/", routes![default_route]) // http://127.0.0.1:8000
-        .mount("/", routes![controllers::world_controller::world]) // http://127.0.0.1:8000/world
-        .mount("/", routes![controllers::timestamp_controller::timestamp]) // http://127.0.0.1:8000/timestamp
-        .mount(
-            "/endpoint",
-            routes![controllers::sc_endpoint_controller::ping],
-        ) // http://127.0.0.1:8000/endpoint/ping
+        .configure(config::Config::figment().merge(("port", 8002)))
+        .mount("/", routes![default_route]) // http://127.0.0.1:8002
+        .mount("/", routes![controller::tx_controller::ping])
         .attach(cors)
 }
