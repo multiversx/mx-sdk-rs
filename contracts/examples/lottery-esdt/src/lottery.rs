@@ -2,47 +2,23 @@
 
 use multiversx_sc::imports::*;
 
+mod awarding_status;
 mod lottery_info;
 mod status;
 
+use awarding_status::AwardingStatus;
 use lottery_info::LotteryInfo;
 use status::Status;
 
 const PERCENTAGE_TOTAL: u32 = 100;
 const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 const MAX_TICKETS: usize = 800;
+const MAX_OPERATIONS: usize = 50;
 
 #[multiversx_sc::contract]
 pub trait Lottery {
     #[init]
     fn init(&self) {}
-
-    #[allow_multiple_var_args]
-    #[endpoint]
-    fn start(
-        &self,
-        lottery_name: ManagedBuffer,
-        token_identifier: EgldOrEsdtTokenIdentifier,
-        ticket_price: BigUint,
-        opt_total_tickets: Option<usize>,
-        opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<usize>,
-        opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
-        opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
-        opt_burn_percentage: OptionalValue<BigUint>,
-    ) {
-        self.start_lottery(
-            lottery_name,
-            token_identifier,
-            ticket_price,
-            opt_total_tickets,
-            opt_deadline,
-            opt_max_entries_per_user,
-            opt_prize_distribution,
-            opt_whitelist,
-            opt_burn_percentage,
-        );
-    }
 
     #[allow_multiple_var_args]
     #[endpoint(createLotteryPool)]
@@ -95,10 +71,13 @@ pub trait Lottery {
             .unwrap_or_else(|| ManagedVec::from_single_item(PERCENTAGE_TOTAL as u8));
 
         require!(
+            total_tickets > prize_distribution.len(),
+            "Number of winners should be smaller than the number of available tickets"
+        );
+        require!(
             self.status(&lottery_name) == Status::Inactive,
             "Lottery is already active!"
         );
-        require!(!lottery_name.is_empty(), "Can't have empty lottery name!");
         require!(token_identifier.is_valid(), "Invalid token name provided!");
         require!(ticket_price > 0, "Ticket price must be higher than 0!");
         require!(
@@ -160,6 +139,7 @@ pub trait Lottery {
             max_entries_per_user,
             prize_distribution,
             prize_pool: BigUint::zero(),
+            unawarded_amount: BigUint::zero(),
         };
 
         self.lottery_info(&lottery_name).set(&info);
@@ -182,15 +162,21 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    fn determine_winner(&self, lottery_name: ManagedBuffer) {
+    fn determine_winner(&self, lottery_name: ManagedBuffer) -> AwardingStatus {
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is inactive!"),
             Status::Running => sc_panic!("Lottery is still running!"),
             Status::Ended => {
-                self.distribute_prizes(&lottery_name);
-                self.clear_storage(&lottery_name);
+                if self.total_winning_tickets(&lottery_name).is_empty() {
+                    self.prepare_awarding(&lottery_name);
+                }
+                if self.distribute_prizes(&lottery_name) == AwardingStatus::Finished {
+                    self.clear_storage(&lottery_name);
+                    return AwardingStatus::Finished;
+                }
+                AwardingStatus::Ongoing
             },
-        };
+        }
     }
 
     #[view]
@@ -240,12 +226,13 @@ pub trait Lottery {
         entries += 1;
         info.tickets_left -= 1;
         info.prize_pool += &info.ticket_price;
+        info.unawarded_amount += &info.ticket_price;
 
         entries_mapper.set(entries);
         info_mapper.set(&info);
     }
 
-    fn distribute_prizes(&self, lottery_name: &ManagedBuffer) {
+    fn prepare_awarding(&self, lottery_name: &ManagedBuffer) {
         let mut info = self.lottery_info(lottery_name).get();
         let ticket_holders_mapper = self.ticket_holders(lottery_name);
         let total_tickets = ticket_holders_mapper.len();
@@ -266,7 +253,8 @@ pub trait Lottery {
                 self.send().esdt_local_burn(&esdt_token_id, 0, &burn_amount);
             }
 
-            info.prize_pool -= burn_amount;
+            info.prize_pool -= &burn_amount;
+            info.unawarded_amount -= burn_amount;
         }
 
         // if there are less tickets than the distributed prize pool,
@@ -277,33 +265,156 @@ pub trait Lottery {
         } else {
             info.prize_distribution.len()
         };
-        let total_prize = info.prize_pool.clone();
-        let winning_tickets = self.get_distinct_random(1, total_tickets, total_winning_tickets);
 
-        // distribute to the first place last. Laws of probability say that order doesn't matter.
-        // this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
-        // 1st place will get the spare money instead.
-        for i in (1..total_winning_tickets).rev() {
-            let winning_ticket_id = winning_tickets[i];
-            let winner_address = ticket_holders_mapper.get(winning_ticket_id);
-            let prize = self.calculate_percentage_of(
-                &total_prize,
-                &BigUint::from(info.prize_distribution.get(i)),
-            );
+        self.total_winning_tickets(&lottery_name)
+            .set(total_winning_tickets);
+        self.index_last_winner(lottery_name).set(1);
+    }
 
+    fn distribute_prizes(&self, lottery_name: &ManagedBuffer) -> AwardingStatus {
+        let mut info = self.lottery_info(lottery_name).get();
+        let ticket_holders_mapper = self.ticket_holders(lottery_name);
+        let total_tickets = ticket_holders_mapper.len();
+
+        let mut index_last_winner = self.index_last_winner(&lottery_name).get();
+        let total_winning_tickets = self.total_winning_tickets(lottery_name).get();
+        require!(
+            index_last_winner <= total_winning_tickets,
+            "Awarding has ended"
+        );
+
+        let mut iterations = 0;
+        while index_last_winner <= total_winning_tickets && iterations < MAX_OPERATIONS {
+            let rand_index = self.get_distinct_random(index_last_winner, total_tickets, 1)[0];
+
+            // swap indexes of the winner addresses - we are basically bringing the winners in the first indexes of the mapper
+            let winner_address = self.ticket_holders(lottery_name).get(rand_index).clone();
+            let last_index_winner_address =
+                self.ticket_holders(lottery_name).get(index_last_winner);
+            self.ticket_holders(lottery_name)
+                .set(rand_index, &last_index_winner_address);
+            self.ticket_holders(lottery_name)
+                .set(index_last_winner, &winner_address);
+
+            // distribute to the first place last. Laws of probability say that order doesn't matter.
+            // this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
+            // 1st place will get the spare money instead.
+            if index_last_winner < total_winning_tickets {
+                let prize = self.calculate_percentage_of(
+                    &info.prize_pool,
+                    &BigUint::from(info.prize_distribution.get(index_last_winner)),
+                );
+
+                self.assign_prize_to_winner(info.token_identifier.clone(), &prize, &winner_address);
+
+                info.unawarded_amount -= prize;
+            } else {
+                // insert token in accumulated rewards first place
+                let first_place_winner = ticket_holders_mapper.get(index_last_winner);
+
+                self.assign_prize_to_winner(
+                    info.token_identifier.clone(),
+                    &info.unawarded_amount,
+                    &first_place_winner,
+                );
+            }
+            index_last_winner += 1;
+            iterations += 1;
+        }
+        self.lottery_info(lottery_name).set(info);
+        self.index_last_winner(lottery_name).set(&index_last_winner);
+        if index_last_winner > total_winning_tickets {
+            return AwardingStatus::Finished;
+        }
+        AwardingStatus::Ongoing
+    }
+
+    fn assign_prize_to_winner(
+        &self,
+        token_id: EgldOrEsdtTokenIdentifier,
+        amount: &BigUint,
+        winner: &ManagedAddress,
+    ) {
+        self.accumulated_rewards(&token_id, winner)
+            .update(|value| *value += amount);
+
+        self.user_accumulated_token_rewards(winner).insert(token_id);
+    }
+
+    #[endpoint]
+    fn claim_rewards(&self, tokens: MultiValueEncoded<EgldOrEsdtTokenIdentifier>) {
+        let caller = self.blockchain().get_caller();
+        require!(
+            !self.user_accumulated_token_rewards(&caller).is_empty(),
+            "You have no rewards to claim"
+        );
+
+        let mut accumulated_egld_rewards = BigUint::zero();
+        let mut accumulated_esdt_rewards = ManagedVec::<Self::Api, EsdtTokenPayment>::new();
+
+        // to save reviewers time, these 2 iterators have different generics, so it was not possible to make just 1 for loop
+
+        if tokens.is_empty() {
+            // if wanted tokens were not specified claim all, and clear user_accumulated_token_rewards storage mapper
+
+            for token_id in self.user_accumulated_token_rewards(&caller).iter() {
+                require!(
+                    !self.accumulated_rewards(&token_id, &caller).is_empty(),
+                    "Token requested not available for claim"
+                );
+
+                self.prepare_token_for_claim(
+                    token_id,
+                    &caller,
+                    &mut accumulated_egld_rewards,
+                    &mut accumulated_esdt_rewards,
+                );
+            }
+            self.user_accumulated_token_rewards(&caller).clear();
+        } else {
+            // otherwise claim just what was requested and remove those tokens from the user_accumulated_token_rewards storage mapper
+            for token_id in tokens {
+                let _ = &self
+                    .user_accumulated_token_rewards(&caller)
+                    .swap_remove(&token_id);
+
+                self.prepare_token_for_claim(
+                    token_id,
+                    &caller,
+                    &mut accumulated_egld_rewards,
+                    &mut accumulated_esdt_rewards,
+                );
+            }
+        };
+
+        if !accumulated_esdt_rewards.is_empty() {
             self.tx()
-                .to(&winner_address)
-                .egld_or_single_esdt(&info.token_identifier, 0, &prize)
+                .to(&caller)
+                .multi_esdt(accumulated_esdt_rewards)
                 .transfer();
-            info.prize_pool -= prize;
         }
 
-        // send leftover to first place
-        let first_place_winner = ticket_holders_mapper.get(winning_tickets[0]);
-        self.tx()
-            .to(&first_place_winner)
-            .egld_or_single_esdt(&info.token_identifier, 0, &info.prize_pool)
-            .transfer();
+        if accumulated_egld_rewards > 0u64 {
+            self.tx()
+                .to(&caller)
+                .egld(accumulated_egld_rewards)
+                .transfer();
+        }
+    }
+
+    fn prepare_token_for_claim(
+        &self,
+        token_id: EgldOrEsdtTokenIdentifier,
+        caller: &ManagedAddress,
+        accumulated_egld_rewards: &mut BigUint,
+        accumulated_esdt_rewards: &mut ManagedVec<Self::Api, EsdtTokenPayment>,
+    ) {
+        let value = self.accumulated_rewards(&token_id, &caller).take();
+        if token_id.is_egld() {
+            *accumulated_egld_rewards += value;
+        } else {
+            accumulated_esdt_rewards.push(EsdtTokenPayment::new(token_id.unwrap_esdt(), 0, value));
+        }
     }
 
     fn clear_storage(&self, lottery_name: &ManagedBuffer) {
@@ -318,6 +429,8 @@ pub trait Lottery {
         ticket_holders_mapper.clear();
         self.lottery_info(lottery_name).clear();
         self.lottery_whitelist(lottery_name).clear();
+        self.total_winning_tickets(lottery_name).clear();
+        self.index_last_winner(lottery_name).clear();
         self.burn_percentage_for_lottery(lottery_name).clear();
     }
 
@@ -348,7 +461,7 @@ pub trait Lottery {
         let mut rand = RandomnessSource::new();
 
         for i in 0..amount {
-            let rand_index = rand.next_usize_in_range(0, total_numbers);
+            let rand_index = rand.next_usize_in_range(i, total_numbers);
             rand_numbers.swap(i, rand_index);
         }
 
@@ -375,6 +488,25 @@ pub trait Lottery {
 
     #[storage_mapper("ticketHolder")]
     fn ticket_holders(&self, lottery_name: &ManagedBuffer) -> VecMapper<ManagedAddress>;
+
+    #[storage_mapper("accumulatedRewards")]
+    fn accumulated_rewards(
+        &self,
+        token_id: &EgldOrEsdtTokenIdentifier,
+        user: &ManagedAddress,
+    ) -> SingleValueMapper<BigUint>;
+
+    #[storage_mapper("totalWinning_tickets")]
+    fn total_winning_tickets(&self, lottery_name: &ManagedBuffer) -> SingleValueMapper<usize>;
+
+    #[storage_mapper("indexLastWinner")]
+    fn index_last_winner(&self, lottery_name: &ManagedBuffer) -> SingleValueMapper<usize>;
+
+    #[storage_mapper("accumulatedRewards")]
+    fn user_accumulated_token_rewards(
+        &self,
+        user: &ManagedAddress,
+    ) -> UnorderedSetMapper<EgldOrEsdtTokenIdentifier>;
 
     #[storage_mapper("numberOfEntriesForUser")]
     fn number_of_entries_for_user(
