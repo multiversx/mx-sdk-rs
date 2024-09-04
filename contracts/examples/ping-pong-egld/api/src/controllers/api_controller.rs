@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use crate::interactor::basic_interact::RocketInteractor;
 use reqwest::*;
 use rocket::{get, local::asynchronous::Client, post, response::content::RawText};
 use serde_json::*;

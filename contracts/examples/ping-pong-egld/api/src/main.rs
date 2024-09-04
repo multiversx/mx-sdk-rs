@@ -1,8 +1,6 @@
 #![allow(non_snake_case)]
 
 mod controllers;
-mod interactor;
-
 use rocket::*;
 use rocket_cors::{AllowedOrigins, CorsOptions};
 

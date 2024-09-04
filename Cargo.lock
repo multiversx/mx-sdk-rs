@@ -171,6 +171,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3d1d046238990b9cf5bcde22a3fb3584ee5cf65fb2765f454ed428c7a0063da"
 
 [[package]]
+name = "api"
+version = "0.0.1"
+dependencies = [
+ "clap",
+ "multiversx-sc-snippets",
+ "ping-pong-egld",
+ "reqwest",
+ "rocket",
+ "rocket_cors",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "arbitrary"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1559,22 +1575,6 @@ name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
-
-[[package]]
-name = "hello"
-version = "0.0.1"
-dependencies = [
- "clap",
- "multiversx-sc-snippets",
- "ping-pong-egld",
- "reqwest",
- "rocket",
- "rocket_cors",
- "serde",
- "serde_json",
- "tokio",
- "toml",
-]
 
 [[package]]
 name = "hermit-abi"
@@ -3541,6 +3541,7 @@ dependencies = [
 name = "sc-query-service"
 version = "0.1.0"
 dependencies = [
+ "api",
  "rocket",
  "rocket_cors",
  "serde",
@@ -4303,6 +4304,7 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 name = "tx-executor-service"
 version = "0.1.0"
 dependencies = [
+ "api",
  "rocket",
  "rocket_cors",
  "serde",

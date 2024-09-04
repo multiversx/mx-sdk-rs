@@ -1,10 +1,7 @@
 #![allow(non_snake_case)]
 
-// mod controllers;
-// mod models;
-// mod views;
-
 pub mod controller;
+pub mod model;
 
 use rocket::*;
 use rocket_cors::{AllowedOrigins, CorsOptions};
