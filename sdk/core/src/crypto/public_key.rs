@@ -1,6 +1,8 @@
+use std::fmt::Display;
+
 use super::private_key::PrivateKey;
 use anyhow::Result;
-use bech32::{self, ToBase32, Variant};
+use bech32::{self, Bech32, Hrp};
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
@@ -21,7 +23,8 @@ impl PublicKey {
     }
 
     pub fn to_address(&self) -> Result<String> {
-        let address = bech32::encode("erd", self.0.to_base32(), Variant::Bech32)?;
+        let hrp = Hrp::parse("erd")?;
+        let address = bech32::encode::<Bech32>(hrp, &self.0)?;
         Ok(address)
     }
 
@@ -44,9 +47,9 @@ impl<'a> From<&'a PrivateKey> for PublicKey {
     }
 }
 
-impl ToString for PublicKey {
-    fn to_string(&self) -> String {
-        hex::encode(self.0)
+impl Display for PublicKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        hex::encode(self.0).fmt(f)
     }
 }
 

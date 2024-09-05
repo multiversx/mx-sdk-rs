@@ -1,0 +1,52 @@
+{
+    "comment": "verifies that setState and checkState are consistent",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:contract-address": {
+                    "code": "file:set-check-esdt.scen.json"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "id": "check-default",
+            "accounts": {
+                "sc:contract-address": {
+                    "code": "*",
+                    "codeMetadata": "0x0506"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:contract-address": {
+                    "code": "file:set-check-esdt.scen.json",
+                    "codeMetadata": "0x0102"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "id": "check-1",
+            "accounts": {
+                "sc:contract-address": {
+                    "code": "*",
+                    "codeMetadata": "0x0102"
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "id": "check-2",
+            "accounts": {
+                "sc:contract-address": {
+                    "code": "*",
+                    "codeMetadata": "*"
+                }
+            }
+        }
+    ]
+}

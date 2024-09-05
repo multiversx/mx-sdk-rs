@@ -1,16 +1,13 @@
 use multiversx_sc::{
     codec::multi_types::OptionalValue,
-    esdt::ESDTSystemSmartContractProxy,
     types::{
         heap::{Address, BoxedBytes},
-        BigFloat, BigInt, BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress,
-        ManagedBuffer, ManagedByteArray, ManagedOption, ManagedType, ManagedVec, TokenIdentifier,
+        BigFloat, BigInt, BigUint, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier,
+        EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedOption,
+        ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-use multiversx_sc_scenario::{
-    api::{DebugHandle, DebugApi},
-    num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
-};
+use multiversx_sc_scenario::imports::*;
 
 macro_rules! push {
     ($list: ident, $name:ident, $expected: expr ) => {{
@@ -65,8 +62,7 @@ fn main() {
     let token_identifier: TokenIdentifier<DebugApi> = TokenIdentifier::from("MYTOK-123456");
     push!(to_check, token_identifier, "\"MYTOK-123456\"");
 
-    let system_sc = ESDTSystemSmartContractProxy::<DebugApi>::new_proxy_obj();
-    let managed_address = system_sc.esdt_system_sc_address();
+    let managed_address = ESDTSystemSCAddress.to_managed_address::<DebugApi>();
     push!(
         to_check,
         managed_address,

@@ -18,7 +18,7 @@
                         "str:balance|address:account_2": "0x0a",
                         "str:totalSupply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         },
@@ -49,7 +49,9 @@
                             "address:coin_holder_1",
                             "address:account_2"
                         ],
-                        "data": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
+                        "data": [
+                            "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -72,7 +74,7 @@
                         "str:balance|address:account_2": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                         "str:totalSupply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         }

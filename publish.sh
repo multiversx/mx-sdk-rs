@@ -19,6 +19,7 @@
 #
 # 2. Mass replace previous version -> new version.
 # Be careful to not accidentally replace some of the other dependencies we have.
+# Make sure to exclude files with extensions: *.lock, *.md, *.wat, *.txt, *.sh.
 #
 # 3. Write release name, date and description in `CHANGELOG.md`.
 #
@@ -30,7 +31,7 @@
 #
 # 6. Make sure that the contract upgrade tool is still sound.
 # At the very least add the new version to `VERSIONS` and change `DEFAULT_LAST_VERSION` in 
-# `/home/andreim/multiversx/rs/mx-sdk-rs/framework/meta/src/sc_upgrade/upgrade_versions.rs`
+# `/home/andreim/multiversx/rs/mx-sdk-rs/framework/meta/src/sc_upgrade/upgrade_versions.rs`+
 # 
 # 7. Run this script, `./publish.sh`.
 # You can comment out the crates you are not publishing. The script will stop otherwise when it cannot publish them.
@@ -87,7 +88,7 @@ cd framework/base
 cargo publish || return 1
 cd ../..
 
-cd framework/meta
+cd framework/meta-lib
 cargo publish || return 1
 cd ../..
 
@@ -96,6 +97,10 @@ cargo publish || return 1
 cd ../..
 
 cd framework/snippets
+cargo publish || return 1
+cd ../..
+
+cd framework/meta
 cargo publish || return 1
 cd ../..
 

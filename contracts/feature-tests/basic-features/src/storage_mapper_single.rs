@@ -7,6 +7,15 @@ pub trait SingleValueMapperFeatures {
     #[storage_mapper("my_single_value_mapper")]
     fn map_my_single_value_mapper(&self) -> SingleValueMapper<BigInt>;
 
+    #[storage_mapper_from_address("my_single_value_mapper")]
+    fn map_my_single_value_mapper_from_address(
+        &self,
+        address: ManagedAddress,
+    ) -> SingleValueMapper<BigUint, ManagedAddress>;
+
+    #[storage_mapper("single_value_mapper_with_key")]
+    fn single_value_mapper_with_key(&self, extra_key: usize) -> SingleValueMapper<ManagedBuffer>;
+
     #[endpoint]
     fn my_single_value_mapper_increment_1(&self, amount: BigInt) {
         let my_single_value_mapper = self.map_my_single_value_mapper();
@@ -53,12 +62,17 @@ pub trait SingleValueMapperFeatures {
 
     #[endpoint]
     fn is_empty_at_address_single_value_mapper(&self, address: ManagedAddress) -> bool {
-        self.map_my_single_value_mapper()
-            .is_empty_at_address(&address)
+        self.map_my_single_value_mapper_from_address(address)
+            .is_empty()
     }
 
     #[endpoint]
     fn raw_byte_length_single_value_mapper(&self) -> usize {
         self.map_my_single_value_mapper().raw_byte_length()
+    }
+
+    #[endpoint]
+    fn set_single_value_mapper_with_key(&self, key: usize, value: ManagedBuffer) {
+        self.single_value_mapper_with_key(key).set(value);
     }
 }

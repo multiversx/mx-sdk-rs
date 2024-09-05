@@ -1,6 +1,7 @@
 use multiversx_sdk::{
-    blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::{address::Address, transaction::Transaction},
+    gateway::{GatewayProxy, DEVNET_GATEWAY},
+    utils::base64_encode,
 };
 
 #[tokio::main]
@@ -16,7 +17,7 @@ async fn main() {
             "erd1rh5ws22jxm9pe7dtvhfy6j3uttuupkepferdwtmslms5fydtrh5sx3xr8r",
         )
         .unwrap(),
-        data: Some(base64::encode("hello")),
+        data: Some(base64_encode("hello")),
         chain_id: "1".to_string(),
         version: 1,
         options: 0,
@@ -25,7 +26,7 @@ async fn main() {
         signature: None,
     };
 
-    let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string());
     let cost = blockchain.request_transaction_cost(&tx).await.unwrap();
 
     println!("tx cost: {cost:#?}");

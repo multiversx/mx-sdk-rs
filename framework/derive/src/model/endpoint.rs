@@ -29,6 +29,9 @@ pub enum PublicRole {
     /// The smart contract constructor. There can be only one.
     Init(InitMetadata),
 
+    /// The smart contract upgrade constructor.
+    Upgrade(InitMetadata),
+
     /// Means it gets a smart contract function generated for it
     Endpoint(EndpointMetadata),
 

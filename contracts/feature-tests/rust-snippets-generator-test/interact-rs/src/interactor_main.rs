@@ -2,25 +2,12 @@
 
 use rust_snippets_generator_test::{ProxyTrait as _, *};
 
-use multiversx_sc_snippets::{
-    env_logger,
-    erdrs::wallet::Wallet,
-    multiversx_sc::{codec::multi_types::*, types::*},
-    multiversx_sc_scenario::{
-        api::StaticApi,
-        bech32,
-        scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::*,
-        ContractInfo,
-    },
-    sdk, tokio, Interactor,
-};
+use multiversx_sc_snippets::imports::*;
 
 const GATEWAY: &str = sdk::blockchain::DEVNET_GATEWAY;
 const PEM: &str = "alice.pem";
 const SC_ADDRESS: &str = "";
 
-const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 const DEFAULT_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;
@@ -74,7 +61,7 @@ impl State {
             "bech32:".to_string() + SC_ADDRESS
         };
         let contract_code = BytesValue::interpret_from(
-            "file:../output/rust-snippets-generator-test.wasm",
+            "mxsc:../output/rust-snippets-generator-test.mxsc.json",
             &InterpreterContext::default(),
         );
         let contract = ContractType::new(sc_addr_expr);

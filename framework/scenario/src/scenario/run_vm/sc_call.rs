@@ -1,6 +1,6 @@
 use crate::{
-    multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-    scenario::model::{ScCallStep, TxESDT, TypedScCall},
+    multiversx_sc::codec::{PanicErrorHandler, TopEncodeMulti},
+    scenario::model::{ScCallStep, TxESDT},
     scenario_model::TxResponse,
 };
 
@@ -8,6 +8,7 @@ use multiversx_chain_vm::{
     tx_execution::execute_current_tx_context_input,
     tx_mock::{TxInput, TxResult, TxTokenTransfer},
 };
+use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti};
 
 use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
@@ -28,13 +29,18 @@ impl ScenarioVMRunner {
     ///
     /// It takes the `contract_call` argument separately from the SC call step,
     /// so we can benefit from type inference in the result.
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
     pub fn perform_sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
-        typed_sc_call: TypedScCall<OriginalResult>,
+        typed_sc_call: crate::scenario_model::TypedScCall<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let sc_call_step: ScCallStep = typed_sc_call.into();
         let tx_result =

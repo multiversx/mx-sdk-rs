@@ -4,7 +4,7 @@ use quote::quote;
 
 pub fn dep_encode_snippet(value: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     quote! {
-        codec::NestedEncode::dep_encode_or_handle_err(&#value, dest, h)?;
+        codec::NestedEncode::dep_encode_or_handle_err(&#value, __dest__, __h__)?;
     }
 }
 
@@ -12,12 +12,13 @@ fn variant_dep_encode_snippets(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
 ) -> Vec<proc_macro2::TokenStream> {
+    let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
     data_enum
         .variants
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            let variant_index_u8 = variant_index as u8;
+            let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
             let variant_ident = &variant.ident;
             let local_var_declarations =
                 fields_decl_syntax(&variant.fields, local_variable_for_field);
@@ -26,7 +27,7 @@ fn variant_dep_encode_snippets(
             });
             quote! {
                 #name::#variant_ident #local_var_declarations => {
-                    codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, dest, h)?;
+                    codec::NestedEncode::dep_encode_or_handle_err(&#variant_discriminant, __dest__, __h__)?;
                     #(#variant_field_snippets)*
                 },
             }
@@ -44,7 +45,7 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
             });
             quote! {
                 impl #impl_generics codec::NestedEncode for #name #ty_generics #where_clause {
-                    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> core::result::Result<(), H::HandledErr>
+                    fn dep_encode_or_handle_err<O, H>(&self, __dest__: &mut O, __h__: H) -> core::result::Result<(), H::HandledErr>
                     where
                         O: codec::NestedEncodeOutput,
                         H: codec::EncodeErrorHandler,
@@ -56,15 +57,13 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
             }
         },
         syn::Data::Enum(data_enum) => {
-            assert!(
-                data_enum.variants.len() < 256,
-                "enums with more than 256 variants not supported"
-            );
+            validate_enum_variants(&data_enum.variants);
+
             let variant_dep_encode_snippets = variant_dep_encode_snippets(name, data_enum);
 
             quote! {
                 impl #impl_generics codec::NestedEncode for #name #ty_generics #where_clause {
-                    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> core::result::Result<(), H::HandledErr>
+                    fn dep_encode_or_handle_err<O, H>(&self, __dest__: &mut O, __h__: H) -> core::result::Result<(), H::HandledErr>
                     where
                         O: codec::NestedEncodeOutput,
                         H: codec::EncodeErrorHandler,

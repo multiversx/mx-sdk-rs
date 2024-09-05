@@ -83,7 +83,7 @@
                         "str:balanceOf|address:user1|str:.node_id|biguint:1": "1",
                         "str:balanceOf|address:user1|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
-                    "code": "file:../../erc1155/output/erc1155.wasm"
+                    "code": "mxsc:../../erc1155/output/erc1155.mxsc.json"
                 },
                 "sc:marketplace_contract": {
                     "nonce": "0",
@@ -97,7 +97,7 @@
                         "str:claimableFunds|str:.node_id|nested:str:EGLD": "1",
                         "str:claimableFunds|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
-                    "code": "file:../output/erc1155-marketplace.wasm"
+                    "code": "mxsc:../output/erc1155-marketplace.mxsc.json"
                 }
             }
         }

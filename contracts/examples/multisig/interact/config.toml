@@ -1,2 +1,3 @@
-gateway = 'https://testnet-gateway.multiversx.com'
+gateway = 'https://devnet-gateway.multiversx.com'
 quorum = 2
+wegld_address = "erd1qqqqqqqqqqqqqpgqqkwzsxkjc83vlfex9dmznwm7tjvxlqqkpauqx0n782"

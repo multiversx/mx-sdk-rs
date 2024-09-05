@@ -1,5 +1,6 @@
+use super::EncodedManagedVecItem;
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
@@ -11,10 +12,15 @@ use crate::{
         ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
-use alloc::vec::Vec;
-use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
-
-use super::EncodedManagedVecItem;
+use alloc::{format, vec::Vec};
+use core::{
+    borrow::Borrow,
+    cmp::Ordering,
+    fmt::Debug,
+    iter::FromIterator,
+    marker::PhantomData,
+    mem::{transmute_copy, ManuallyDrop, MaybeUninit},
+};
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
@@ -117,7 +123,7 @@ where
     /// Number of items.
     #[inline]
     pub fn len(&self) -> usize {
-        self.byte_len() / T::PAYLOAD_SIZE
+        self.byte_len() / T::payload_size()
     }
 
     #[inline]
@@ -126,7 +132,7 @@ where
     }
 
     pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
-        let byte_index = index * T::PAYLOAD_SIZE;
+        let byte_index = index * T::payload_size();
         let mut load_result = Ok(());
         let result = unsafe {
             T::from_byte_reader_as_borrow(|dest_slice| {
@@ -147,12 +153,14 @@ where
             return None;
         }
 
-        let mut result_uninit = core::mem::MaybeUninit::<T::Ref<'_>>::uninit_array();
+        let mut result_uninit =
+            unsafe { MaybeUninit::<[MaybeUninit<T::Ref<'_>>; N]>::uninit().assume_init() };
+
         for (index, value) in self.iter().enumerate() {
             result_uninit[index].write(value);
         }
 
-        let result = unsafe { core::mem::MaybeUninit::array_assume_init(result_uninit) };
+        let result = unsafe { transmute_copy(&ManuallyDrop::new(result_uninit)) };
         Some(result)
     }
 
@@ -170,7 +178,7 @@ where
     }
 
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
-        let byte_index = index * T::PAYLOAD_SIZE;
+        let byte_index = index * T::payload_size();
         let mut load_result = Ok(());
         let result = T::from_byte_reader(|dest_slice| {
             load_result = self.buffer.load_slice(byte_index, dest_slice);
@@ -183,15 +191,15 @@ where
     }
 
     pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
-        let byte_index = index * T::PAYLOAD_SIZE;
+        let byte_index = index * T::payload_size();
         item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
     }
 
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
     /// Returns `None` if any index is out of range
     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
-        let byte_start = start_index * T::PAYLOAD_SIZE;
-        let byte_end = end_index * T::PAYLOAD_SIZE;
+        let byte_start = start_index * T::payload_size();
+        let byte_end = end_index * T::payload_size();
         let opt_buffer = self.buffer.copy_slice(byte_start, byte_end - byte_start);
         opt_buffer.map(ManagedVec::new_from_raw_buffer)
     }
@@ -227,6 +235,12 @@ where
 
         self.buffer = part_before.buffer;
         self.buffer.append(&part_after.buffer);
+    }
+
+    pub fn take(&mut self, index: usize) -> T {
+        let item = unsafe { self.get_unsafe(index) };
+        self.remove(index);
+        item
     }
 
     /// New `ManagedVec` instance with 1 element in it.
@@ -300,10 +314,9 @@ where
     fn with_self_as_slice<R, F>(&self, f: F) -> R
     where
         F: FnOnce(&[EncodedManagedVecItem<T>]) -> R,
-        [(); T::PAYLOAD_SIZE]:,
     {
         self.buffer.with_buffer_contents(|bytes| {
-            let item_len = bytes.len() / T::PAYLOAD_SIZE;
+            let item_len = bytes.len() / T::payload_size();
             let values = Self::transmute_slice(bytes, item_len);
             f(values)
         })
@@ -312,14 +325,13 @@ where
     fn with_self_as_slice_mut<F>(&mut self, f: F)
     where
         F: FnOnce(&mut [EncodedManagedVecItem<T>]) -> &[EncodedManagedVecItem<T>],
-        [(); T::PAYLOAD_SIZE]:,
     {
         self.buffer.with_buffer_contents_mut(|bytes| {
-            let item_len = bytes.len() / T::PAYLOAD_SIZE;
+            let item_len = bytes.len() / T::payload_size();
             let values = Self::transmute_slice_mut(bytes, item_len);
 
             let result = f(values);
-            let result_len = result.len() * T::PAYLOAD_SIZE;
+            let result_len = result.len() * T::payload_size();
             Self::transmute_slice(result, result_len)
         });
     }
@@ -343,7 +355,6 @@ impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + Ord + Debug,
-    [(); T::PAYLOAD_SIZE]:,
 {
     pub fn sort(&mut self) {
         self.with_self_as_slice_mut(|slice| {
@@ -384,10 +395,7 @@ where
         });
     }
 
-    pub fn sort_unstable(&mut self)
-    where
-        [(); T::PAYLOAD_SIZE]:,
-    {
+    pub fn sort_unstable(&mut self) {
         self.with_self_as_slice_mut(|slice| {
             slice.sort_unstable();
             slice
@@ -397,7 +405,6 @@ where
     pub fn sort_unstable_by<F>(&mut self, mut compare: F)
     where
         F: FnMut(&T, &T) -> Ordering,
-        [(); T::PAYLOAD_SIZE]:,
     {
         self.with_self_as_slice_mut(|slice| {
             slice.sort_unstable_by(|a, b| compare(&a.decode(), &b.decode()));
@@ -409,7 +416,6 @@ where
     where
         F: FnMut(&T) -> K,
         K: Ord,
-        [(); T::PAYLOAD_SIZE]:,
     {
         self.with_self_as_slice_mut(|slice| {
             slice.sort_unstable_by_key(|a| f(&a.decode()));
@@ -418,24 +424,29 @@ where
     }
 
     pub fn is_sorted(&self) -> bool {
-        self.with_self_as_slice(|slice| slice.is_sorted())
-    }
-
-    pub fn is_sorted_by<F>(&self, mut compare: F) -> bool
-    where
-        F: FnMut(&T, &T) -> Option<Ordering>,
-    {
         self.with_self_as_slice(|slice| {
-            slice.is_sorted_by(|a, b| compare(&a.decode(), &b.decode()))
-        })
-    }
+            let mut slice_iter = slice.iter();
+            #[inline]
+            fn check<'a, T>(
+                last: &'a mut T,
+                mut compare: impl FnMut(&T, &T) -> Option<Ordering> + 'a,
+            ) -> impl FnMut(T) -> bool + 'a {
+                move |curr| {
+                    if let Some(Ordering::Greater) | None = compare(last, &curr) {
+                        return false;
+                    }
+                    *last = curr;
+                    true
+                }
+            }
 
-    pub fn is_sorted_by_key<K, F>(&self, mut f: F) -> bool
-    where
-        F: FnMut(&T) -> K,
-        K: Ord,
-    {
-        self.with_self_as_slice(|slice| slice.is_sorted_by_key(|a| f(&a.decode())))
+            let mut last = match slice_iter.next() {
+                Some(e) => e,
+                None => return true,
+            };
+
+            slice_iter.all(check(&mut last, PartialOrd::partial_cmp))
+        })
     }
 }
 
@@ -444,12 +455,34 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + PartialEq + Debug,
 {
-    pub fn dedup(&mut self)
-    where
-        [(); T::PAYLOAD_SIZE]:,
-    {
+    pub fn dedup(&mut self) {
         self.with_self_as_slice_mut(|slice| {
-            let (dedup, _) = slice.partition_dedup();
+            let same_bucket = |a, b| a == b;
+            let len = slice.len();
+            if len <= 1 {
+                return slice;
+            }
+
+            let ptr = slice.as_mut_ptr();
+            let mut next_read: usize = 1;
+            let mut next_write: usize = 1;
+            unsafe {
+                // Avoid bounds checks by using raw pointers.
+                while next_read < len {
+                    let ptr_read = ptr.add(next_read);
+                    let prev_ptr_write = ptr.add(next_write - 1);
+                    if !same_bucket(&mut *ptr_read, &mut *prev_ptr_write) {
+                        if next_read != next_write {
+                            let ptr_write = prev_ptr_write.add(1);
+                            core::ptr::swap(ptr_read, ptr_write);
+                        }
+                        next_write += 1;
+                    }
+                    next_read += 1;
+                }
+            }
+
+            let (dedup, _) = slice.split_at_mut(next_write);
             dedup
         })
     }
@@ -495,7 +528,7 @@ where
             if self_item != other_item {
                 return false;
             }
-            byte_index += T::PAYLOAD_SIZE;
+            byte_index += T::payload_size();
         }
         true
     }
@@ -634,14 +667,43 @@ where
     }
 }
 
+impl<M, T, U> TypeAbiFrom<ManagedVec<M, U>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    U: ManagedVecItem,
+    T: ManagedVecItem + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<Vec<U>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<ManagedVec<M, U>> for Vec<T>
+where
+    M: ManagedTypeApi,
+    U: ManagedVecItem,
+    T: TypeAbiFrom<U>,
+{
+}
+
 impl<M, T> TypeAbi for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
+    type Unmanaged = Vec<T::Unmanaged>;
+
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         <&[T] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("ManagedVec<$API, {}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

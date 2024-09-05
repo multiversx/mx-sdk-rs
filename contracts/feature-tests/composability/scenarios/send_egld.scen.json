@@ -8,7 +8,7 @@
                 "sc:basic-features": {
                     "nonce": "1000",
                     "balance": "200",
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -64,7 +64,7 @@
                     "nonce": "1000",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",

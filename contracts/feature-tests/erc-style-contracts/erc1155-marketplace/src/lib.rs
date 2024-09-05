@@ -3,6 +3,8 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
+pub mod erc1155_proxy;
+
 const PERCENTAGE_TOTAL: u8 = 100;
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
@@ -106,7 +108,10 @@ pub trait Erc1155Marketplace {
 
         let claimable_funds_mapper = self.get_claimable_funds_mapper();
         for (token_identifier, amount) in claimable_funds_mapper.iter() {
-            self.send().direct(&caller, &token_identifier, 0, &amount);
+            self.tx()
+                .to(&caller)
+                .egld_or_single_esdt(&token_identifier, 0, &amount)
+                .transfer();
             self.clear_claimable_funds(&token_identifier);
         }
     }
@@ -176,12 +181,10 @@ pub trait Erc1155Marketplace {
 
         // refund losing bid
         if !auction.current_winner.is_zero() {
-            self.send().direct(
-                &auction.current_winner,
-                &auction.token_identifier,
-                0,
-                &auction.current_bid,
-            );
+            self.tx()
+                .to(&auction.current_winner)
+                .egld_or_single_esdt(&auction.token_identifier, 0, &auction.current_bid)
+                .transfer();
         }
 
         // update auction bid and winner
@@ -215,12 +218,10 @@ pub trait Erc1155Marketplace {
             self.add_claimable_funds(&auction.token_identifier, &cut_amount);
 
             // send part of the bid to the original owner
-            self.send().direct(
-                &auction.original_owner,
-                &auction.token_identifier,
-                0,
-                &amount_to_send,
-            );
+            self.tx()
+                .to(&auction.original_owner)
+                .egld_or_single_esdt(&auction.token_identifier, 0, &amount_to_send)
+                .transfer();
 
             // send token to winner
             self.async_transfer_token(type_id, nft_id, auction.current_winner);
@@ -310,10 +311,11 @@ pub trait Erc1155Marketplace {
         let sc_own_address = self.blockchain().get_sc_address();
         let token_ownership_contract_address = self.token_ownership_contract_address().get();
 
-        self.erc1155_proxy(token_ownership_contract_address)
+        self.tx()
+            .to(&token_ownership_contract_address)
+            .typed(erc1155_proxy::Erc1155Proxy)
             .safe_transfer_from(sc_own_address, to, type_id, nft_id, &[])
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit();
     }
 
     fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: u8) -> BigUint {
@@ -331,11 +333,6 @@ pub trait Erc1155Marketplace {
         let mut mapper = self.get_claimable_funds_mapper();
         mapper.insert(token_identifier.clone(), BigUint::zero());
     }
-
-    // proxy
-
-    #[proxy]
-    fn erc1155_proxy(&self, to: ManagedAddress) -> erc1155::Proxy<Self::Api>;
 
     // storage
 

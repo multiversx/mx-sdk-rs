@@ -7,6 +7,23 @@ main = "multi-contract-main"
 # main contract can have any id and any name
 name = "multi-contract-features"
 
+# all default values below:
+external-view = false
+panic-message = false
+ei = "1.3"
+allocator = "fail"
+stack-size = "64k"
+features = []
+
+[contracts.multi-contract-main.profile]
+# these are just the defaults, checking that parsing works fine
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = false
+
 [contracts.multi-contract-features-view]
 # name is optional, if missing this ^^^ id will be used
 external-view = true
@@ -14,9 +31,20 @@ add-unlabelled = false
 add-labels = ["mcs-external-view"]
 
 [contracts.multi-contract-example-feature]
-add-unlabelled = true # optional here, since the default is true
+add-unlabelled = true          # optional here, since the default is true
 features = ["example_feature"]
 
 [contracts.multi-contract-alt-impl]
+add-unlabelled = false
+add-labels = ["alt-impl"]
+
+[[proxy]]
+variant = "multi-contract-example-feature"
+path = "src/multi_contract_example_feature_proxy.rs"
+
+
+[[proxy]]
+variant = "multi-contract-alt-impl"
+path = "src/multi_contract_alt_impl_proxy.rs"
 add-unlabelled = false
 add-labels = ["alt-impl"]

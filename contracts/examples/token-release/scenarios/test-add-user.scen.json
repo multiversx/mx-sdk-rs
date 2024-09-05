@@ -96,7 +96,7 @@
                             "5-release_ticks": "u64:4"
                         }
                     },
-                    "code": "file:../output/token-release.wasm"
+                    "code": "mxsc:../output/token-release.mxsc.json"
                 }
             }
         }

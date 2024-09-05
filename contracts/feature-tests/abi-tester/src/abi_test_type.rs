@@ -1,12 +1,13 @@
 use crate::only_nested::*;
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{BigUint, Box, ManagedBuffer},
+    types::{BigUint, Box, ConstDecimals, ManagedBuffer, ManagedBufferReadToEnd, ManagedDecimal},
 };
 multiversx_sc::derive_imports!();
 
 /// Its only purpose is to test that the ABI generator works fine.
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct AbiTestType {
     /// This type should only appear here.
     pub nested: OnlyShowsUpAsNested01,
@@ -20,7 +21,8 @@ pub struct AbiTestType {
 }
 
 /// Its only purpose is to test that the ABI generator works fine.
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct AbiManagedType<M: ManagedTypeApi> {
     pub big_uint: BigUint<M>,
     pub integer: i32,
@@ -28,13 +30,30 @@ pub struct AbiManagedType<M: ManagedTypeApi> {
 }
 
 /// Its only purpose is to test that the ABI generator works fine.
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, ManagedVecItem)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, ManagedVecItem)]
 pub struct AbiManagedVecItem {
     pub value1: u32,
     pub value2: u32,
 }
 
-#[derive(TypeAbi)]
+#[type_abi]
 pub struct OnlyShowsUpInEsdtAttr {
+    #[allow(dead_code)]
     pub field: OnlyShowsUpAsNested10,
+}
+
+#[type_abi]
+pub struct ManagedDecimalWrapper<M: ManagedTypeApi> {
+    #[allow(dead_code)]
+    pub field: ManagedDecimal<M, ConstDecimals<2>>,
+}
+
+/// Its only purpose is to test that the ABI generator works fine.
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+pub struct AbiWithManagedBufferReadToEnd<M: ManagedTypeApi> {
+    pub endpoint: ManagedBuffer<M>,
+    pub gas: u64,
+    pub flush: ManagedBufferReadToEnd<M>,
 }

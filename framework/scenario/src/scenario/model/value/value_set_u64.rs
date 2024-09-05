@@ -36,6 +36,15 @@ impl Default for U64Value {
     }
 }
 
+impl InterpretableFrom<u64> for U64Value {
+    fn interpret_from(from: u64, _context: &InterpreterContext) -> Self {
+        U64Value {
+            value: from,
+            original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
 impl InterpretableFrom<ValueSubTree> for U64Value {
     fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
         let bytes = interpret_subtree(&from, context);

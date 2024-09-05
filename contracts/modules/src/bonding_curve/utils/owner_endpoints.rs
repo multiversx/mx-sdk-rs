@@ -25,8 +25,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     #[endpoint(unsetLocalRoles)]
@@ -39,8 +38,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         self.send()
             .esdt_system_sc_proxy()
             .unset_special_roles(&address, &token_identifier, roles.into_iter())
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit()
     }
 
     fn set_bonding_curve<T>(
@@ -179,9 +177,9 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             self.bonding_curve(&token).clear();
         }
         self.owned_tokens(&caller).clear();
-        self.send().direct_multi(&caller, &tokens_to_claim);
+        self.tx().to(&caller).multi_esdt(tokens_to_claim).transfer();
         if egld_to_claim > BigUint::zero() {
-            self.send().direct_egld(&caller, &egld_to_claim);
+            self.tx().to(&caller).egld(&egld_to_claim).transfer();
         }
     }
 

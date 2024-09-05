@@ -5,16 +5,17 @@ multiversx_sc::imports!();
 mod events;
 pub mod median;
 pub mod price_aggregator_data;
-pub mod staking;
 
+use multiversx_sc_modules::staking;
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 
 const SUBMISSION_LIST_MAX_LEN: usize = 50;
+const SUBMISSION_LIST_MIN_LEN: usize = 3;
 const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 30;
 pub const MAX_ROUND_DURATION_SECONDS: u64 = 1_800; // 30 minutes
-static PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
-static PAIR_DECIMALS_NOT_CONFIGURED_ERROR: &[u8] = b"pair decimals not configured";
-static WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
+const PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
+const PAIR_DECIMALS_NOT_CONFIGURED_ERROR: &[u8] = b"pair decimals not configured";
+const WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
 
 #[multiversx_sc::contract]
 pub trait PriceAggregator:
@@ -44,6 +45,39 @@ pub trait PriceAggregator:
         self.submission_count().set(submission_count);
 
         self.set_paused(true);
+    }
+
+    #[only_owner]
+    #[endpoint(changeAmounts)]
+    fn change_amounts(&self, staking_amount: BigUint, slash_amount: BigUint) {
+        require!(
+            staking_amount > 0 && slash_amount > 0,
+            "Staking and slash amount cannot be 0"
+        );
+        require!(
+            slash_amount <= staking_amount,
+            "Slash amount cannot be higher than required stake"
+        );
+
+        let user_whitelist = self.user_whitelist();
+        let slash_quorum = self.slash_quorum().get();
+
+        let mut users_owning_new_amount = 0;
+        for user in user_whitelist.iter() {
+            if staking_amount < self.staked_amount(&user).get() {
+                users_owning_new_amount += 1;
+            }
+            if users_owning_new_amount > slash_quorum {
+                break;
+            }
+        }
+
+        require!(
+            users_owning_new_amount > slash_quorum,
+            "New staking amount is too big compared to members staked amount"
+        );
+        self.required_stake_amount().set(staking_amount);
+        self.slash_amount().set(slash_amount);
     }
 
     #[only_owner]
@@ -204,7 +238,7 @@ pub trait PriceAggregator:
 
     fn require_valid_submission_count(&self, submission_count: usize) {
         require!(
-            submission_count >= 1
+            submission_count >= SUBMISSION_LIST_MIN_LEN
                 && submission_count <= self.oracle_status().len()
                 && submission_count <= SUBMISSION_LIST_MAX_LEN,
             "Invalid submission count"
@@ -269,16 +303,16 @@ pub trait PriceAggregator:
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-    ) -> SCResult<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
-        require_old!(self.not_paused(), PAUSED_ERROR_MSG);
+    ) -> MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8> {
+        require!(self.not_paused(), PAUSED_ERROR_MSG);
 
         let token_pair = TokenPair { from, to };
         let round_values = self
             .rounds()
             .get(&token_pair)
-            .ok_or("token pair not found")?;
+            .unwrap_or_else(|| sc_panic!("token pair not found"));
         let feed = self.make_price_feed(token_pair, round_values);
-        Ok((
+        (
             feed.round_id,
             feed.from,
             feed.to,
@@ -286,7 +320,7 @@ pub trait PriceAggregator:
             feed.price,
             feed.decimals,
         )
-            .into())
+            .into()
     }
 
     #[view(latestPriceFeedOptional)]
@@ -295,7 +329,7 @@ pub trait PriceAggregator:
         from: ManagedBuffer,
         to: ManagedBuffer,
     ) -> OptionalValue<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
-        self.latest_price_feed(from, to).ok().into()
+        Some(self.latest_price_feed(from, to)).into()
     }
 
     #[only_owner]

@@ -35,6 +35,7 @@ use crate::Result::{Err, Ok};
 // They are not used in the derive, but just to make sure:
 fn top_encode_number() {}
 fn universal_decode_number() {}
+fn universal_decode_number_unchecked() {}
 fn dep_decode_from_byte_slice() {}
 fn dep_encode_to_vec() {}
 fn top_decode_from_nested_or_handle_err() {}
@@ -51,6 +52,9 @@ pub struct Struct {
     pub another_byte: u8,
     pub uint_32: u32,
     pub uint_64: u64,
+    buffer: bool, // used to occur in derive implementation
+    dest: bool,   // used to occur in derive implementation
+    h: bool,      // used to occur in derive implementation
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
@@ -78,6 +82,9 @@ enum EnumWithEverything {
         another_byte: u8,
         uint_32: u32,
         uint_64: u64,
+        buffer: bool, // used to occur in derive implementation
+        dest: bool,   // used to occur in derive implementation
+        h: bool,      // used to occur in derive implementation
     },
 }
 

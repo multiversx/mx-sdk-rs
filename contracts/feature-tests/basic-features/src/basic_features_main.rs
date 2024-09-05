@@ -1,8 +1,8 @@
 #![no_std]
-#![feature(never_type)]
 
 multiversx_sc::imports!();
 
+pub mod basic_features_proxy;
 pub mod big_num_methods;
 pub mod big_num_operators;
 pub mod block_info_features;
@@ -11,17 +11,21 @@ pub mod codec_err_test;
 pub mod crypto_features;
 pub mod echo;
 pub mod echo_managed;
+pub mod egld_decimal;
 pub mod elliptic_curve_features;
 pub mod event_features;
 pub mod macro_features;
 pub mod managed_address_features;
 pub mod managed_buffer_features;
+pub mod managed_decimal_features;
 pub mod managed_vec_features;
 pub mod non_zero_features;
+pub mod small_num_overflow_test_ops;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_address_to_id;
 pub mod storage_mapper_fungible_token;
+pub mod storage_mapper_get_at_address;
 pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
 pub mod storage_mapper_map_storage;
@@ -31,6 +35,7 @@ pub mod storage_mapper_set;
 pub mod storage_mapper_single;
 pub mod storage_mapper_token_attributes;
 pub mod storage_mapper_unique_id_mapper;
+pub mod storage_mapper_unordered_set;
 pub mod storage_mapper_vec;
 pub mod storage_mapper_whitelist;
 pub mod storage_raw_api_features;
@@ -70,10 +75,15 @@ pub trait BasicFeatures:
     + storage_mapper_fungible_token::FungibleTokenMapperFeatures
     + storage_mapper_non_fungible_token::NonFungibleTokenMapperFeatures
     + storage_mapper_unique_id_mapper::UniqueIdMapperFeatures
+    + storage_mapper_unordered_set::UnorderedSetMapperFeatures
     + struct_eq::StructEquals
+    + small_num_overflow_test_ops::SmallIntOverflow
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
+    + egld_decimal::EgldDecimal
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + storage_mapper_get_at_address::StorageMapperGetAtAddress
+    + managed_decimal_features::ManagedDecimalFeatures
 {
     #[init]
     fn init(&self) {}
@@ -96,4 +106,7 @@ pub trait BasicFeatures:
 
         arg1
     }
+
+    #[storage_mapper("coolTree")]
+    fn cool_tree(&self) -> OrderedBinaryTreeMapper<Self::Api, BigUint>;
 }

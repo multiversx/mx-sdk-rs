@@ -1,5 +1,8 @@
 use core::marker::PhantomData;
 
+use unwrap_infallible::UnwrapInfallible;
+
+use crate::api::HandleConstraints;
 use crate::codec::{TopDecode, TopEncode};
 
 use crate::{
@@ -63,9 +66,11 @@ where
             result_buffer.get_handle(),
         );
 
-        let Ok(value) =
-            V::top_decode_or_handle_err(result_buffer, StorageGetErrorHandler::<A>::default());
-        value
+        V::top_decode_or_handle_err(
+            result_buffer,
+            StorageGetErrorHandler::<A>::new(key.get_handle().get_raw_handle_unchecked()),
+        )
+        .unwrap_infallible()
     }
 
     /// Write a serializable value to storage under the given key

@@ -1,11 +1,12 @@
 #![no_std]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::proxy_imports::*;
 
 pub mod dummy_module;
+pub mod rust_testing_framework_tester_proxy;
 
-#[derive(TopEncode, TopDecode, TypeAbi, Clone, Debug, PartialEq, Eq)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, Clone, Debug, PartialEq, Eq)]
 pub struct NftDummyAttributes {
     pub creation_epoch: u64,
     pub cool_factor: u8,
@@ -20,7 +21,7 @@ pub struct StructWithManagedTypes<M: ManagedTypeApi> {
 pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[init]
     fn init(&self) -> ManagedBuffer {
-        self.total_value().set(&BigUint::from(1u32));
+        self.total_value().set(BigUint::from(1u32));
         b"constructor-result".into()
     }
 
@@ -62,14 +63,8 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("EGLD")]
     #[endpoint]
     fn recieve_egld_half(&self) {
-        let caller = self.blockchain().get_caller();
         let payment_amount = &*self.call_value().egld_value() / 2u32;
-        self.send().direct(
-            &caller,
-            &EgldOrEsdtTokenIdentifier::egld(),
-            0,
-            &payment_amount,
-        );
+        self.tx().to(ToCaller).egld(payment_amount).transfer();
     }
 
     #[payable("*")]
@@ -88,12 +83,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("*")]
     #[endpoint]
     fn receive_esdt_half(&self) {
-        let caller = self.blockchain().get_caller();
         let payment = self.call_value().single_esdt();
         let amount = payment.amount / 2u32;
 
-        self.send()
-            .direct_esdt(&caller, &payment.token_identifier, 0, &amount);
+        self.tx()
+            .to(ToCaller)
+            .single_esdt(&payment.token_identifier, 0, &amount)
+            .transfer();
     }
 
     #[payable("*")]
@@ -111,7 +107,10 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         nft_nonce: u64,
         amount: BigUint,
     ) {
-        self.send().direct_esdt(&to, &token_id, nft_nonce, &amount);
+        self.tx()
+            .to(&to)
+            .single_esdt(&token_id, nft_nonce, &amount)
+            .transfer();
     }
 
     #[endpoint]
@@ -172,13 +171,14 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn call_other_contract_execute_on_dest(&self, other_sc_address: ManagedAddress) -> BigUint {
-        let call_result = self.send_raw().execute_on_dest_context_raw(
-            self.blockchain().get_gas_left(),
-            &other_sc_address,
-            &BigUint::zero(),
-            &ManagedBuffer::new_from_bytes(b"getTotalValue"),
-            &ManagedArgBuffer::new(),
-        );
+        let gas_left = self.blockchain().get_gas_left();
+        let call_result = self
+            .tx()
+            .to(&other_sc_address)
+            .gas(gas_left)
+            .raw_call("getTotalValue")
+            .returns(ReturnsRawResult)
+            .sync_call();
         if let Some(raw_value) = call_result.try_get(0) {
             BigUint::from_bytes_be_buffer(&raw_value)
         } else {
@@ -188,15 +188,11 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn call_other_contract_add_async_call(&self, other_sc_address: ManagedAddress, value: BigUint) {
-        let mut args = ManagedArgBuffer::new();
-        args.push_arg(&value);
-
-        self.send_raw().async_call_raw(
-            &other_sc_address,
-            &BigUint::zero(),
-            &ManagedBuffer::new_from_bytes(b"add"),
-            &args,
-        );
+        self.tx()
+            .to(&other_sc_address)
+            .raw_call("add")
+            .argument(&value)
+            .async_call_and_exit();
     }
 
     #[callback_raw]
@@ -211,16 +207,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn execute_on_dest_add_value(&self, other_sc_address: ManagedAddress, value: BigUint) {
-        let mut args = ManagedArgBuffer::new();
-        args.push_arg(value);
-
-        let _ = self.send_raw().execute_on_dest_context_raw(
-            self.blockchain().get_gas_left(),
-            &other_sc_address,
-            &BigUint::zero(),
-            &ManagedBuffer::new_from_bytes(b"addValue"),
-            &args,
-        );
+        let gas_left = self.blockchain().get_gas_left();
+        self.tx()
+            .to(&other_sc_address)
+            .gas(gas_left)
+            .raw_call("addValue")
+            .argument(&value)
+            .sync_call();
     }
 
     #[endpoint(addValue)]

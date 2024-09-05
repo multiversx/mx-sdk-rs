@@ -23,7 +23,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/multi-contract-features.wasm",
+                "contractCode": "mxsc:../output/multi-contract-features.mxsc.json",
                 "arguments": [
                     "123"
                 ],
@@ -43,7 +43,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/multi-contract-features-view.wasm",
+                "contractCode": "mxsc:../output/multi-contract-features-view.mxsc.json",
                 "arguments": [
                     "sc:mcf"
                 ],
@@ -67,7 +67,7 @@
                     "storage": {
                         "str:sample-value": "123"
                     },
-                    "code": "file:../output/multi-contract-features.wasm"
+                    "code": "mxsc:../output/multi-contract-features.mxsc.json"
                 },
                 "sc:mcf-view": {
                     "nonce": "0",
@@ -75,7 +75,7 @@
                     "storage": {
                         "str:external-view-target-address": "sc:mcf"
                     },
-                    "code": "file:../output/multi-contract-features-view.wasm"
+                    "code": "mxsc:../output/multi-contract-features-view.mxsc.json"
                 },
                 "address:owner": {
                     "nonce": "*"
@@ -108,7 +108,7 @@
                     "storage": {
                         "str:sample-value": "123"
                     },
-                    "code": "file:../output/multi-contract-features.wasm"
+                    "code": "mxsc:../output/multi-contract-features.mxsc.json"
                 },
                 "sc:mcf-view": {
                     "nonce": "0",
@@ -117,7 +117,7 @@
                         "str:sample-value": "567",
                         "str:external-view-target-address": "sc:mcf"
                     },
-                    "code": "file:../output/multi-contract-features-view.wasm"
+                    "code": "mxsc:../output/multi-contract-features-view.mxsc.json"
                 },
                 "address:owner": {
                     "nonce": "*"

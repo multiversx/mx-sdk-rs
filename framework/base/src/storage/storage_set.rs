@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
     api::{
         const_handles, use_raw_handle, ErrorApi, ManagedBufferApiImpl, ManagedTypeApi,
@@ -6,7 +8,7 @@ use crate::{
     codec::*,
     contract_base::ExitCodecErrorHandler,
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferBuilder, ManagedRef, ManagedType},
 };
 
 use super::StorageKey;
@@ -39,7 +41,7 @@ impl<'k, A> TopEncodeOutput for StorageSetOutput<'k, A>
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    type NestedBuffer = ManagedBufferCachedBuilder<A>;
+    type NestedBuffer = ManagedBufferBuilder<A>;
 
     fn set_slice_u8(self, bytes: &[u8]) {
         self.set_managed_buffer(&bytes.into())
@@ -71,7 +73,7 @@ where
     }
 
     fn start_nested_encode(&self) -> Self::NestedBuffer {
-        ManagedBufferCachedBuilder::new_from_slice(&[])
+        ManagedBufferBuilder::new_from_slice(&[])
     }
 
     fn finalize_nested_encode(self, nb: Self::NestedBuffer) {
@@ -85,10 +87,12 @@ where
     T: TopEncode,
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
-    let Ok(()) = value.top_encode_or_handle_err(
-        StorageSetOutput::new(key),
-        ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_ENCODE_ERROR),
-    );
+    value
+        .top_encode_or_handle_err(
+            StorageSetOutput::new(key),
+            ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_ENCODE_ERROR),
+        )
+        .unwrap_infallible()
 }
 
 /// Useful for storage mappers.

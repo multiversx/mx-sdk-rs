@@ -2,20 +2,19 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/multi-contract-features");
 
     blockchain.register_partial_contract::<multi_contract_features::AbiProvider, _>(
-        "file:output/multi-contract-features.wasm",
+        "mxsc:output/multi-contract-features.mxsc.json",
         multi_contract_features::ContractBuilder,
         "multi-contract-features",
     );
     blockchain.register_partial_contract::<multi_contract_features::AbiProvider, _>(
-        "file:output/multi-contract-features-view.wasm",
+        "mxsc:output/multi-contract-features-view.mxsc.json",
         multi_contract_features::ContractBuilder,
         "multi-contract-features-view",
     );
     blockchain.register_partial_contract::<multi_contract_features::AbiProvider, _>(
-        "file:output/multi-contract-alt-impl.wasm",
+        "mxsc:output/multi-contract-alt-impl.mxsc.json",
         multi_contract_features::ContractBuilder,
         "multi-contract-alt-impl",
     );

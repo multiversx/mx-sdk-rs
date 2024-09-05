@@ -9,10 +9,11 @@ The `mx-sdk-rs` repo contains many crates, grouped into several families. Crates
 For brevity, the changelog will only mention a short version of their name.
 
 They are:
-- `multiversx-sc`, in short `sc`, the smart contract framework, 6 crates + 3 for contracts/modules:
+- `multiversx-sc`, in short `sc`, the smart contract framework, 7 crates + 3 for contracts/modules:
 	- `multiversx-sc`
     - `multiversx-sc-derive`
     - `multiversx-sc-meta`
+    - `multiversx-sc-meta-lib`
     - `multiversx-sc-scenario`
     - `multiversx-sc-snippets`
     - `multiversx-sc-wasm-adapter`
@@ -25,6 +26,224 @@ They are:
 - `multiversx-chain-vm`, in short `vm`, a Rust VM implementation, 1 crate.
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
+
+## [sc 0.53.0 codec 0.21.0, vm 0.10.0, sdk 0.6.0, scenario-format 0.23.0] - 2024-09-04
+- Unified syntax:
+  -  Whitebox testing;
+  -  Proxy fix for ManagedOption;
+  -  TestTokenIdentifier syntactic sugar.
+- New ResultHandler: `ReturnsLogs`.
+- Interactor: 
+  - Fix on API fetch process status;
+  - Fix on ReturnsNewTokenIdentifier edge cases solved;
+  - Fix on ESDTTransfer for transfer step;
+  - Support for Keystore + password.
+- Framework API support: EI 1.4 crypto functions.
+- `sc-meta`:
+  -  New `wallet` command: PEM and keystore generator and conversions;
+  -  New `report` command: 
+     -  Generate json or Markdown report based on size, path, allocator and panic messages;
+     -  Compare reports;
+     -  Convert reports.
+- VecMapper update with index.
+- Substitution list: AddressToIdMapper
+- Dependencies updated.
+
+## [sc 0.52.3] - 2024-08-06
+- Pause module events.
+
+## [sc 0.52.2] - 2024-08-01
+- `ManagedBufferReadToEnd` extract data methods.
+
+## [sc 0.52.1] - 2024-07-31
+- `ManagedBufferReadToEnd` `TypeAbi` implementation.
+
+## [sc 0.52.0, codec 0.20.1] - 2024-07-31
+- ManagedBufferReadToEnd type, which flushed a nested data buffer.
+- Fixed hex and binary formatters for byte slices.
+- Added EI 1.4 and 1.5 configs.
+- Dependency upgrades.
+
+## [sc 0.51.1]
+- `sc-meta upgrade` bugfix.
+
+## [sc 0.51.0, codec 0.20.0, vm 0.9.0, sdk 0.5.0, scenario-format 0.22.3] - 2024-07-06
+- Major refactoring of `multiversx-sc-meta`
+	- Crate `multiversx-sc-meta` split in 2:
+		1. `multiversx-sc-meta` remains the standalone tool. For backwards compatibility, it can still be used in contract meta crates, but a warning will be issued.
+		2. `multiversx-sc-meta-lib` is the contract-only library to contract meta crates.
+	- The refactoring came with few code changes, but dependencies were disentangled and cleaned up.
+	- Account retrieval tool was merged into `sc-meta` standalone. Previously little known feature, it enables downloading the full state of an account and formatting it as a mandos set state step. Very useful for generating tests and investigating state.
+	- `multiversx-sdk` was also refactored, especially the gateway proxy.
+- A new code report is available in the `.mxsc.json` build output. The report analyzes the wasm code after build and always offers the following information:
+	- `imports`: what VM hooks are used;
+	- `eiCheck`: if the used imports comply with the environment interface (EI, allowed VM hooks);
+	- `hasAllocator`: is it allocates on the heap;
+	- `hasPanic`: whether it produces Rust panics and formats error messages using the standard Rust formatter (a source of code bloat).
+- `ManagedDecimal` and `ManagedDecimalSigned`:
+	- New types that encapulate a managed `BigUint` and `BigInt` respectively, but treat them as base 10 fixed point rational numbers.
+	- Two flavors are allowed: the number of decimals is known at compile time (e.g. EGLD always has 18 decimals), or only at runtime.
+		- Type `ConstDecimals` is able to resolve conversions at compile time, reducing code size and making encoding and decoding easier, since the number of decimals does not need to be encoded.
+		- Regular `usize` number of decimals is resolved at runtime.
+	- All basic arithmetic operations are implemented for these types, just like for the big integers.
+- Implemented logarithms:
+	- Natural logarithm `ln` for `ManagedDecimal`, `BigFloat`, and `BigInt`.
+	- Base 2 logarithm `log2` for `ManagedDecimal`.
+	- Precision is about 5 decimals, largely irrespective of input.
+	- The operation is cheap, `ln` costs 44980 gas for managed decimals and 153772 for big floats, largely irrespective of input.
+- Smart contract code on the front-end:
+	- Framework and contract code, together with the Rust VM as a backend, can now be compiled to WebAssembly for front-end, using `wasm-bindgen`.
+	- A few incompatible Rust VM features needed to be made optional for this to work.
+- Reverted changes in `sc 0.50.6` (`diagnostic::on_unimplemented` & rustc 1.78 dependency).
+- Bugfix: `sync_call_readonly` can now be used with proxies.
+
+
+## [sc 0.50.6] - 2024-07-05
+- Temporarily removed dependency to rustc 1.78, to ease transition from older versions. Will be re-enabled in 0.51.0.
+
+## [sc 0.50.5] - 2024-06-21
+- `#[storage_mapper_from_address] annotation.
+- Added missing equality operator for test addresses (`TestAddress`, `TestSCAddress`).
+
+## [sc 0.50.4] - 2024-06-06
+- Compiler version requirement (1.78).
+- Minor imports fix.
+
+## [sc 0.50.3] - 2024-05-25
+- Dependency update and fix. There was an issue with the `zip` dependency in sc-meta.
+
+## [sc 0.50.2] - 2024-05-24
+- Unified transaction syntax:
+	- Better compilation error messages for malformed transactions;
+	- Deprecated methods `async_call` and `async_call_promises`, which are kept for backwards compatibility, but causing confusion among developers;
+	- Contract upgrade available in tests.
+- `sc-meta` proxy compare option, which checks that proxies are up to date. Useful for CI.
+- `TypeAbi` - removed `Unmanaged` associated type trait bounds, and implemented it for more types.
+- Removed jitter from interactor transaction fetch.
+- Fixed an issue in the snippets generator.
+
+## [sc 0.50.1] - 2024-05-16
+- `sc-meta all snippets` generates unified syntax.
+- Proxy generator can reference multi-contract variant.
+- Fixes:
+	- `BoxedBytes` - fixed memory leak.
+	- `ManagedVecItem` - allowing larger payloads (up to 128 bytes).
+
+## [sc 0.50.0, codec 0.19.0, vm 0.8.4, sdk 0.4.1] - 2024-05-10
+- Framework now runs on **stable** Rust. All unstable features were removed. The most important changes enabling this:
+	- `CodecFrom` completely removed, `TypeAbiFrom` was used instead since 0.49.0.
+	- `ManagedVecItem` payload redesigned.
+	- Contract panic message mechanism improved.
+- Unified syntax:
+	- `NotPayable` marker type in proxies, which prevents callers to add payment to a non-payable endpoint.
+
+## [sc 0.49.0, codec 0.18.8, sdk 0.4.0] - 2024-05-07
+- Unified transaction syntax
+	- new syntax for sending transactions from contracts
+	- new syntax for integration tests: tx, set state, check state, etc.
+	- new syntax for interactors
+	- new proxies, generated from sc-meta
+	- support for upgrade in new proxies
+- Improved interactor tx result polling performance.
+
+## [sc 0.48.1, codec 0.18.7] - 2024-04-30
+- Simplified decoding of small numbers (i64/u64).
+- Manual reset of the `StaticApi`, in order to free memory for long-running tasks.
+
+## [sc 0.49.0-alpha.4, sdk 0.4.0-alpha.4] - 2024-04-23
+Fourth pre-release, contains many interactor improvements, including improved tx polling.
+
+## [sc 0.49.0-alpha.3] - 2024-04-13
+Third pre-release of the unified syntax, includes backwards compatibility fixes and testing set state/check state.
+
+## [sc 0.49.0-alpha.2] - 2024-04-09
+Second pre-release of the unified syntax. Most features done, including fully featured interactors.
+Still missing: set state/check state in tests.
+
+## [sc 0.48.0] - 2024-04-09
+- When serializing to a managed buffer, static buffer caching is disabled by default.
+- `sc-meta:` - installers for wasm32 target and wasm-opt.
+- Integrated traits for token management: `FixedSupplyToken`, `Mergeable`.
+
+## [sc 0.48.0-alpha.1] - 2024-03-27 (actually alpha release of 0.49.0)
+First pre-release of the unified syntax. Syntax not yet stabilized, should only be used for experimenting with various smart contracts.
+
+## [sc 0.47.8] - 2024-03-22
+- Test coverage functionality in sc-meta.
+- Removed deprecation from legacy whitebox testing framework, since it is still used extensively.
+
+## [sc 0.47.7] - 2024-03-15
+- Template bugfix (concerning the interactor).
+
+## [sc 0.47.6] - 2024-03-14
+- Template naming bugfix, regarding numbers in the project name.
+- Added the interactor to the adder template.
+
+## [sc 0.47.5] - 2024-03-08
+- Fixed an issue with `MapMapper` when reading from another contract.
+- Got rid of nightly feature `maybe_uninit_uninit_array`/`maybe_uninit_array_assume_init`.
+
+## [sc 0.47.4, vm 0.8.3] - 2024-02-08
+- Post-build wasm report added to `.mxsc.json` file.
+- Fixed a dependency issue involving ed25519-dalek (downgraded dependency).
+
+## [sc 0.47.3, sdk 0.3.2] - 2024-02-06
+- SDK: changed the way to retrieve the new deployed address afte deploy/
+- Support for reading from another contract for the following storage mappers: `AddressToIdMapper`, `BiDiMapper`, `LinkedListMapper`, `SetMapper`, `SingleValueMapper`, `UniqueIdMapper`, `UnorderedSetMapper`, `UserMapper`, `VecMapper`, `WhitelistMapper`.
+- Additional methods to access data nodes directly in the `SetMapper` and `QueueMapper`.
+
+## [sc 0.47.2, codec 0.18.6, vm 0.8.2, scenario-format 0.22.2] - 2024-02-02
+- Scenario testing infrastructure:
+	- The Rust VM can generate mock addresses, if not specified in advance.
+	- The `sc:` syntax now generates addresses with VM type 0x0500, same as the latest version of mx-scenario-go.
+	- Rust test support for checking `code_metadata`.
+- Explicit discriminants supported for enums.
+- Optimized `top_encode_number` function. It no longer contains branches or loops.
+- Removed reliance on Rust nightly features `is_sorted` and `slice_partition_dedup`.
+
+## [sc 0.47.1, codec 0.18.5, vm 0.8.1, scenario-format 0.22.1] - 2024-01-29
+- Blockchain hooks: `get_code_metadata`, `is_builtin_function`.
+- Support for `mxsc:` syntax in scenarios.
+- Updated dependencies.
+
+## [sc 0.47.0, codec 0.18.4, vm 0.8.0, scenario-format 0.22.0] - 2024-01-23
+- Added support for the code metadata in the Rust VM and Rust scenarios backend.
+- `sc-meta`:
+	- New `mx-scenario-go` installer;
+	- `--nocapture` flag added in `sc-meta test` CLI;
+	- Framework version system refactor,
+- `SetMapper` and `QueueMapper` can read from another contract.
+- Fixed an edge case when generating enum encoding.
+
+## [sc 0.46.1] - 2024-01-10
+- Interactor: fixed parsing of newly issued token identifier.
+
+## [sc 0.46.0] - 2024-01-05
+- Promises callback memory allocator bugfix.
+- Removed features: `promises`, `managed-map`, `back-transfers`.
+- Removed `hashbrown` dependency from framework.
+- Imports in output now sorted.
+
+## [sc 0.45.2, codec 0.18.3, vm 0.7.1, scenario-format 0.21.1, sdk 0.3.1] - 2023-12-18
+- Updated framework dependencies to the latest versions: syn, bitflags, wasmparser, base64, sha2, sha3, itertools, hmac, pem, pbkdf2, etc.
+- `sc-meta` improvements:
+	- `overflow-checks` field in `sc-config.toml`;
+	- Upgrade: new `--no-check` flag, which disables the compile check after major version upgrades;
+	- Template: `wasm` crates no longer copied for new versions; retroactively patched missing `multiversx.json` file for older versions.
+
+## [sc 0.45.1, codec 0.18.2] - 2023-11-24
+- Fixed sc-meta standalone install backwards compatibility.
+- Better hygiene in codec derive.
+
+## [sc 0.45.0, vm 0.7.0, scenario-format 0.21.0, sdk 0.3.0] - 2023-11-24
+- Replicated VM 1.5 in the Rust VM. This includes support for:
+	- promises,
+	- back-transfers,
+	- modified event logs.
+- New endpoint annotation, `#[upgrade]`. Contract variants with upgrade endpoint, but without init now allowed.
+- Build system:
+	- `wasm` crates now fully generated based on data from `sc-config.toml` and root `Cargo.toml`.
+	- Setting wasm target dir automatically, if not specified, based on workspace.
 
 ## [sc 0.44.0, vm 0.6.0] - 2023-11-03
 - Back-transfer:

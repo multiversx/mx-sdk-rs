@@ -1,5 +1,5 @@
 use multiversx_sc_codec_human_readable::interpret_value_according_to_abi;
-use multiversx_sc_meta::abi_json::{deserialize_abi_from_json, ContractAbiJson};
+use multiversx_sc_meta_lib::abi_json::{deserialize_abi_from_json, ContractAbiJson};
 use multiversx_sc_scenario::multiversx_sc::codec::top_encode_to_vec_u8;
 
 const TEST_ABI_JSON: &str = r#"{

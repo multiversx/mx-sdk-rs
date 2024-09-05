@@ -1,8 +1,8 @@
 use std::{error::Error, fmt::Display};
 
 use crate::multiversx_sc::abi::{TypeContents, TypeDescription};
-use multiversx_sc_meta::abi_json::ContractAbiJson;
-use multiversx_sc_scenario::num_bigint::BigUint;
+use multiversx_sc_meta_lib::abi_json::ContractAbiJson;
+use multiversx_sc_scenario::{multiversx_sc::abi::TypeNames, num_bigint::BigUint};
 
 use crate::{AnyValue, SingleValue::UnsignedNumber};
 
@@ -12,12 +12,13 @@ pub fn interpret_value_according_to_abi(
     contract_abi: &ContractAbiJson, // TODO: will need to convert to high-level ContractAbi first, this is just a prototype
 ) -> Result<AnyValue, Box<dyn Error>> {
     let type_description = if let Some(type_description_json) = contract_abi.types.get(type_name) {
-        type_description_json.to_type_description(type_name)
+        type_description_json.to_type_description(TypeNames::abi_only(type_name.to_owned()))
     } else {
         TypeDescription {
             docs: Vec::new(),
-            name: type_name.to_string(),
+            names: TypeNames::abi_only(type_name.to_owned()),
             contents: TypeContents::NotSpecified,
+            macro_attributes: Vec::new(),
         }
     };
     interpret_any_value(input, &type_description)
@@ -28,7 +29,7 @@ pub fn interpret_any_value(
     type_description: &TypeDescription,
 ) -> Result<AnyValue, Box<dyn Error>> {
     match &type_description.contents {
-        TypeContents::NotSpecified => interpret_single_value(input, type_description.name.as_str()),
+        TypeContents::NotSpecified => interpret_single_value(input, &type_description.names.abi),
         TypeContents::Enum(_) => todo!(),
         TypeContents::Struct(_) => todo!(),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),

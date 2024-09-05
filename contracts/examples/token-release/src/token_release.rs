@@ -1,7 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
 mod contract_data;
 
@@ -313,8 +312,10 @@ pub trait TokenRelease {
         address: &ManagedAddress,
         amount: &BigUint,
     ) {
-        self.send()
-            .direct_esdt(address, token_identifier, 0, amount);
+        self.tx()
+            .to(address)
+            .single_esdt(token_identifier, 0, amount)
+            .transfer();
     }
 
     fn mint_all_tokens(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {

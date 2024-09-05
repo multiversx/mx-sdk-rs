@@ -1,7 +1,7 @@
 #![allow(clippy::bad_bit_mask)]
 
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     codec::*,
     formatter::{hex_util, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex},
 };
@@ -14,7 +14,7 @@ const PAYABLE_BY_SC_STRING: &[u8] = b"PayableBySC";
 const DEFAULT_STRING: &[u8] = b"Default";
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, PartialEq, Debug, Clone, Copy)]
     pub struct CodeMetadata: u16 {
         const DEFAULT = 0;
         const UPGRADEABLE = 0b0000_0001_0000_0000; // LSB of first byte
@@ -103,8 +103,16 @@ impl TopDecode for CodeMetadata {
     }
 }
 
+impl TypeAbiFrom<Self> for CodeMetadata {}
+
 impl TypeAbi for CodeMetadata {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
+        "CodeMetadata".into()
+    }
+
+    fn type_name_rust() -> TypeName {
         "CodeMetadata".into()
     }
 }

@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::contract]
 pub trait NftStoragePrepay {
@@ -42,7 +42,7 @@ pub trait NftStoragePrepay {
         self.total_reserved().clear();
 
         let owner = self.blockchain().get_caller();
-        self.send().direct_egld(&owner, &total_reserved);
+        self.tx().to(&owner).egld(&total_reserved).transfer();
     }
 
     // endpoints
@@ -71,7 +71,7 @@ pub trait NftStoragePrepay {
         user_deposit -= &amount;
         self.deposit(&caller).set(&user_deposit);
 
-        self.send().direct_egld(&caller, &amount);
+        self.tx().to(&caller).egld(&amount).transfer();
     }
 
     // views

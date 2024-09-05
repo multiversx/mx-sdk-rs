@@ -24,7 +24,7 @@
                             ]
                         }
                     },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },
@@ -56,7 +56,7 @@
                             "",
                             "str:new-uri-1"
                         ],
-                        "data": ""
+                        "data": []
                     }
                 ],
                 "gas": "*",
@@ -91,7 +91,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },
@@ -125,7 +125,7 @@
                             "str:new-uri-2",
                             "str:new-uri-3"
                         ],
-                        "data": ""
+                        "data": []
                     }
                 ],
                 "gas": "*",
@@ -162,7 +162,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         }

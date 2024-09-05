@@ -14,12 +14,12 @@
                     "esdt": {
                         "str:TEST-TOKENA": "1000"
                     },
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },
@@ -44,6 +44,21 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:retrieve_funds",
+                            "str:TEST-TOKENA",
+                            "0",
+                            "1000"
+                        ]
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:retrieve_funds",
                         "topics": [
@@ -52,18 +67,25 @@
                             "0",
                             "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     },
                     {
                         "address": "sc:vault",
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:TEST-TOKENA",
-                            "",
+                            "0",
                             "1000",
                             "sc:forwarder"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:BackTransfer",
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
@@ -74,7 +96,9 @@
                             "0",
                             "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -94,7 +118,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -103,7 +127,7 @@
                         "str:TEST-TOKENA": "1000"
                     },
                     "storage": "*",
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         }

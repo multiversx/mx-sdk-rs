@@ -30,6 +30,11 @@ fn big_uint_from_u_64_go() {
 }
 
 #[test]
+fn big_uint_pow_go() {
+    world().run("scenarios/big_uint_pow.scen.json");
+}
+
+#[test]
 fn big_uint_sqrt_go() {
     world().run("scenarios/big_uint_sqrt.scen.json");
 }
@@ -80,6 +85,18 @@ fn crypto_verify_bls_go() {
 }
 
 #[test]
+#[ignore = "requires EI 1.4 in mx-scenario-go"]
+fn crypto_verify_bls_share_go() {
+    world().run("scenarios/crypto_verify_bls_share.scen.json");
+}
+
+#[test]
+#[ignore = "requires EI 1.4 in mx-scenario-go"]
+fn crypto_verify_bls_aggregated_go() {
+    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
+}
+
+#[test]
 fn crypto_verify_ed_25519_go() {
     world().run("scenarios/crypto_verify_ed25519.scen.json");
 }
@@ -87,6 +104,12 @@ fn crypto_verify_ed_25519_go() {
 #[test]
 fn crypto_verify_secp_256_k_1_go() {
     world().run("scenarios/crypto_verify_secp256k1.scen.json");
+}
+
+#[test]
+#[ignore = "requires EI 1.4 in mx-scenario-go"]
+fn crypto_verify_secp_256_r_1_go() {
+    world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }
 
 #[test]
@@ -195,6 +218,11 @@ fn get_caller_go() {
 }
 
 #[test]
+fn get_code_metadata_go() {
+    world().run("scenarios/get_code_metadata.scen.json");
+}
+
+#[test]
 fn get_cumulated_validator_rewards_go() {
     world().run("scenarios/get_cumulated_validator_rewards.scen.json");
 }
@@ -203,6 +231,11 @@ fn get_cumulated_validator_rewards_go() {
 #[ignore = "TODO: missing support from scenario-go"]
 fn get_shard_of_address_go() {
     world().run("scenarios/get_shard_of_address.scen.json");
+}
+
+#[test]
+fn is_builtin_function_go() {
+    world().run("scenarios/is_builtin_function.scen.json");
 }
 
 #[test]
@@ -236,18 +269,28 @@ fn managed_buffer_set_random_go() {
 }
 
 #[test]
+fn managed_decimal_go() {
+    world().run("scenarios/managed_decimal.scen.json");
+}
+
+#[test]
+fn managed_decimal_logarithm_go() {
+    world().run("scenarios/managed_decimal_logarithm.scen.json");
+}
+
+#[test]
 fn managed_vec_address_push_go() {
     world().run("scenarios/managed_vec_address_push.scen.json");
 }
 
 #[test]
-fn managed_vec_array_push_go() {
-    world().run("scenarios/managed_vec_array_push.scen.json");
+fn managed_vec_biguint_push_go() {
+    world().run("scenarios/managed_vec_biguint_push.scen.json");
 }
 
 #[test]
-fn managed_vec_biguint_push_go() {
-    world().run("scenarios/managed_vec_biguint_push.scen.json");
+fn new_address_go() {
+    world().run("scenarios/new_address.scen.json");
 }
 
 #[test]
@@ -278,6 +321,11 @@ fn return_codes_go() {
 #[test]
 fn sc_properties_go() {
     world().run("scenarios/sc_properties.scen.json");
+}
+
+#[test]
+fn small_num_overflow_go() {
+    world().run("scenarios/small_num_overflow.scen.json");
 }
 
 #[test]
@@ -336,13 +384,24 @@ fn storage_map_3_go() {
 }
 
 #[test]
+fn storage_mapper_address_to_id_go() {
+    world().run("scenarios/storage_mapper_address_to_id.scen.json");
+}
+
+#[test]
+#[ignore = "currently not supported. TODO: investigate"]
 fn storage_mapper_fungible_token_go() {
     world().run("scenarios/storage_mapper_fungible_token.scen.json");
 }
 
 #[test]
-fn storage_mapper_address_to_id_go() {
-    world().run("scenarios/storage_mapper_address_to_id.scen.json");
+fn storage_mapper_get_at_address_go() {
+    world().run("scenarios/storage_mapper_get_at_address.scen.json");
+}
+
+#[test]
+fn storage_mapper_get_at_address_extra_key_go() {
+    world().run("scenarios/storage_mapper_get_at_address_extra_key.scen.json");
 }
 
 #[test]
@@ -411,7 +470,6 @@ fn storage_raw_api_features_go() {
 }
 
 #[test]
-#[ignore = "the error message has changed, re-enable when we move to VM 1.5"]
 fn storage_reserved_go() {
     world().run("scenarios/storage_reserved.scen.json");
 }
