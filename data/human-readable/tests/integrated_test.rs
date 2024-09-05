@@ -1,8 +1,10 @@
 use multiversx_sc_codec_human_readable::{
     decode_human_readable_value, default_value_for_abi_type, encode_human_readable_value,
 };
-use multiversx_sc_meta::abi_json::deserialize_abi_from_json;
-use multiversx_sc_scenario::multiversx_sc::{abi::ContractAbi, codec::top_encode_to_vec_u8};
+use multiversx_sc_scenario::{
+    meta::abi_json::deserialize_abi_from_json,
+    multiversx_sc::{abi::ContractAbi, codec::top_encode_to_vec_u8},
+};
 
 const ABI_JSON: &str = r#"{
     "name": "Test",

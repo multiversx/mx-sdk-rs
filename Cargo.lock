@@ -2049,7 +2049,6 @@ name = "multiversx-sc-codec-human-readable"
 version = "0.1.0"
 dependencies = [
  "bech32 0.9.1",
- "multiversx-sc-meta",
  "multiversx-sc-scenario",
  "serde_json",
 ]

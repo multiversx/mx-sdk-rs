@@ -21,7 +21,3 @@ bech32 = "0.9"
 [dependencies.multiversx-sc-scenario]
 version = "=0.53.0"
 path = "../../framework/scenario"
-
-[dependencies.multiversx-sc-meta]
-version = "=0.53.0"
-path = "../../framework/meta"
