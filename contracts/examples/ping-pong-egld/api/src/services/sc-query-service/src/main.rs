@@ -1,10 +1,9 @@
 #![allow(non_snake_case)]
 
-use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use api::services::interactor::basic_interact::ActixInteractor;
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 mod controller;
-mod view;
 mod model;
+mod view;
 
 async fn default_route() -> impl Responder {
     HttpResponse::Ok().body("Ee Aa Aa")
@@ -12,10 +11,6 @@ async fn default_route() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let mut itr = ActixInteractor::init().await;
-
-    itr.deploy().await;
-
     HttpServer::new(move || {
         App::new()
             .service(controller::timestamp_controller::timestamp)

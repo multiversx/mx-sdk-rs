@@ -1,39 +1,36 @@
 #![allow(non_snake_case)]
 
 mod controllers;
-use rocket::*;
-use rocket_cors::{AllowedOrigins, CorsOptions};
+use actix_cors::Cors;
+use actix_web::*;
 
-#[get("/")]
-fn default_route() -> &'static str {
-    "Placeholder instead of gateway error :)"
+async fn default_route() -> impl Responder {
+    HttpResponse::Ok().body("Hello")
 }
 
-#[launch]
-fn rocket() -> _ {
-    // CORS config
-    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:8080"]);
-
-    let cors = CorsOptions {
-        allowed_origins,
-        allowed_methods: vec![rocket::http::Method::Get, rocket::http::Method::Post]
-            .into_iter()
-            .map(From::from)
-            .collect(),
-        allowed_headers: rocket_cors::AllowedHeaders::some(&[
-            "Authorization",
-            "Accept",
-            "Content-Type",
-        ]),
-        allow_credentials: true,
-        ..Default::default()
-    }
-    .to_cors()
-    .expect("Failed to create CORS fairing");
-
-    rocket::build()
-        .mount("/", routes![default_route]) // http://127.0.0.1:8000
-        .mount("/", routes![controllers::api_controller::tx])
-        .mount("/", routes![controllers::api_controller::query])
-        .attach(cors)
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(move || {
+        App::new()
+            .wrap(
+                Cors::default()
+                    .allowed_origin("http://localhost:8080") // Specify the frontend's origin
+                    .allowed_methods(vec!["GET", "POST"]) // Allowed HTTP methods
+                    .allowed_headers(vec![actix_web::http::header::CONTENT_TYPE])
+                    .supports_credentials()
+                    .max_age(3600), // Cache the CORS headers for an hour
+            )
+            .route(
+                "/tx/{tx_type}",
+                web::post().to(controllers::api_controller::tx),
+            )
+            .route(
+                "/query/{query_type}",
+                web::get().to(controllers::api_controller::query),
+            )
+            .route("/", web::get().to(default_route))
+    })
+    .bind(("localhost", 8000))?
+    .run()
+    .await
 }

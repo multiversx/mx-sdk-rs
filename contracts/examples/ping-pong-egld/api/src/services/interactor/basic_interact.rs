@@ -25,7 +25,7 @@ impl ActixInteractor {
             .await;
 
         let ping_pong_owner = interactor.register_wallet(Wallet::from(test_wallets::alice()));
-        let wallet_address = interactor.register_wallet(test_wallets::carol());
+        let wallet_address = interactor.register_wallet(test_wallets::heidi());
 
         Self {
             interactor,
@@ -43,23 +43,30 @@ impl ActixInteractor {
         self.interactor.retrieve_account(&self.wallet_address).await;
     }
 
-    pub async fn deploy(&mut self) {
-        let ping_amount = BigUint::<StaticApi>::from(10000000000000000u128);
-        let duration_in_seconds = 1825457087u64;
-        let opt_activation_timestamp = Option::Some(0u64);
-        let max_funds = OptionalValue::Some(BigUint::<StaticApi>::from(100000000000000000000u128));
+    pub async fn deploy(
+        &mut self,
+        ping_amount: u128,
+        duration_in_seconds: u64,
+        opt_activation_timestamp: Option<u64>,
+        max_funds: u128,
+        deployer: String,
+    ) -> String {
+        let ping_amount = BigUint::<StaticApi>::from(ping_amount);
+        // let duration_in_seconds = 1825457087u64;
+        // let opt_activation_timestamp = Option::Someping_amount0u64);
+        let max_funds_option = OptionalValue::Some(BigUint::<StaticApi>::from(max_funds));
 
         let new_address = self
             .interactor
             .tx()
-            .from(&self.adder_owner_address)
+            .from(Bech32Address::from_bech32_string(deployer))
             .gas(30_000_000)
             .typed(ping_pong_proxy::PingPongProxy)
             .init(
                 ping_amount,
                 duration_in_seconds,
                 opt_activation_timestamp,
-                max_funds,
+                max_funds_option,
             )
             .code(PINGPONG_CODE_PATH)
             .code_metadata(CodeMetadata::UPGRADEABLE)
@@ -68,8 +75,12 @@ impl ActixInteractor {
             .run()
             .await;
 
+        let str_addr = new_address.to_string();
+
         println!("new address: {new_address}");
         self.state.set_contract_address(new_address);
+
+        str_addr
     }
 
     pub async fn deadline(&mut self) {
@@ -118,11 +129,11 @@ impl ActixInteractor {
         println!("Result: {result_value:?}");
     }
 
-    pub async fn ping(&mut self, value: u128) -> String {
+    pub async fn ping(&mut self, sender: String, contract_address: String, value: u128) -> String {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
-            .to(self.state.current_contract_address())
+            .from(Bech32Address::from_bech32_string(sender))
+            .to(Bech32Address::from_bech32_string(contract_address))
             .gas(30_000_000)
             .typed(ping_pong_proxy::PingPongProxy)
             .ping(IgnoreValue)
@@ -131,18 +142,43 @@ impl ActixInteractor {
             .run()
             .await;
 
-        "Success".to_string()
+        "Tx successful".to_string()
+    }
+
+    pub async fn pong(&mut self, sender: String, contract_address: String) -> String {
+        self.interactor
+            .tx()
+            .from(Bech32Address::from_bech32_string(sender))
+            .to(Bech32Address::from_bech32_string(contract_address))
+            .gas(30_000_000)
+            .typed(ping_pong_proxy::PingPongProxy)
+            .pong()
+            .prepare_async()
+            .run()
+            .await;
+
+        "Tx successful".to_string()
     }
 }
 
 #[tokio::test]
-async fn test_deploy() {
+async fn test() {
     let mut interactor = ActixInteractor::init().await;
-    interactor.deploy().await;
-}
 
-#[tokio::test]
-async fn test_ping() {
-    let mut interactor = ActixInteractor::init().await;
-    interactor.ping(1).await;
+    // interactor
+    //     .deploy(
+    //         1000000000000000u128,
+    //         60,
+    //         None,
+    //         1000000000000000000000000000000u128,
+    //         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
+    //     )
+    //     .await;
+
+    // interactor
+    //     .pong(
+    //         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
+    //         "erd1qqqqqqqqqqqqqpgqmdsgk535ujtcjnhcs7fvzuemksqygchwd8ss0za8wa".to_string(),
+    //     )
+    //     .await;
 }

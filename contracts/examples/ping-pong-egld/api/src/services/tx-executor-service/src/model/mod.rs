@@ -1,2 +1,3 @@
+pub mod deploy_model;
 pub mod ping_model;
-use api::services::interactor::basic_interact::ActixInteractor;
+pub mod pong_model;

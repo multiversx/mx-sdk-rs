@@ -2,40 +2,33 @@
 
 pub mod controller;
 pub mod model;
+pub mod view;
 
-use rocket::*;
-use rocket_cors::{AllowedOrigins, CorsOptions};
+use actix_cors::Cors;
+use actix_web::*;
 
-#[get("/")]
-fn default_route() -> &'static str {
-    "Placeholder instead of gateway error :)"
+async fn default_route() -> impl Responder {
+    HttpResponse::Ok().body("Hello")
 }
 
-#[launch]
-fn rocket() -> _ {
-    // CORS config
-    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:8000"]);
-
-    let cors = CorsOptions {
-        allowed_origins,
-        allowed_methods: vec![rocket::http::Method::Get, rocket::http::Method::Post]
-            .into_iter()
-            .map(From::from)
-            .collect(),
-        allowed_headers: rocket_cors::AllowedHeaders::some(&[
-            "Authorization",
-            "Accept",
-            "Content-Type",
-        ]),
-        allow_credentials: true,
-        ..Default::default()
-    }
-    .to_cors()
-    .expect("Failed to create CORS fairing");
-
-    rocket::build()
-        .configure(config::Config::figment().merge(("port", 8002)))
-        .mount("/", routes![default_route]) // http://127.0.0.1:8002
-        .mount("/", routes![controller::tx_controller::ping])
-        .attach(cors)
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(move || {
+        App::new()
+            .wrap(
+                Cors::default()
+                    .allowed_origin("http://localhost:8000")
+                    .allowed_methods(vec!["GET", "POST"])
+                    .allowed_headers(vec![actix_web::http::header::CONTENT_TYPE])
+                    .supports_credentials()
+                    .max_age(3600),
+            )
+            .route("/ping", web::post().to(controller::tx_controller::ping))
+            .route("/deploy", web::post().to(controller::tx_controller::deploy))
+            .route("/pong", web::post().to(controller::tx_controller::pong))
+            .route("/", web::get().to(default_route))
+    })
+    .bind(("localhost", 8002))?
+    .run()
+    .await
 }

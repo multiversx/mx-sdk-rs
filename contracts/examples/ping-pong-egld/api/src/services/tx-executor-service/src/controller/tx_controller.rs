@@ -1,19 +1,37 @@
-use std::str::FromStr;
+use crate::{
+    model::{deploy_model, ping_model, pong_model},
+    view::{
+        deploy_view::{DeployReqBody, DeployResponse},
+        ping_view::{PingReqBody, PingResponse},
+        pong_view::{PongReqBody, PongResponse},
+    },
+};
+use actix_web::{web, Responder};
 
-use crate::model::ping_model;
-use rocket::{get, post};
-use serde_json::*;
+pub async fn ping(body: web::Json<PingReqBody>) -> impl Responder {
+    let (value, sender, contract_address) = body.get_tx_sending_values();
+    PingResponse::new(ping_model::ping(value, sender, contract_address).await).send()
+}
 
-#[post("/ping", data = "<body>")]
-pub async fn ping(body: String) -> Value {
-    let res = Value::from_str(&body).unwrap();
-    let egld_amount = res["value"].as_u64().unwrap() as u128;
+pub async fn deploy(body: web::Json<DeployReqBody>) -> impl Responder {
+    let (ping_amount, max_funds, activation_timestamp, duration, deployer) =
+        body.get_tx_sending_values();
 
-    let result_value_after_tx = ping_model::ping(egld_amount).await;
+    DeployResponse::new(
+        deploy_model::deploy(
+            ping_amount,
+            max_funds,
+            activation_timestamp,
+            duration,
+            deployer,
+        )
+        .await,
+    )
+    .send()
+}
 
-    let json = json!({
-        "response": result_value_after_tx
-    });
+pub async fn pong(body: web::Json<PongReqBody>) -> impl Responder {
+    let (sender, contract_address) = body.get_tx_sending_values();
 
-    json
+    PongResponse::new(pong_model::pong(sender, contract_address).await).send()
 }

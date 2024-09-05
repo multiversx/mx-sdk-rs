@@ -1,31 +1,34 @@
-use std::str::FromStr;
-
-use reqwest::*;
-use rocket::{get, local::asynchronous::Client, post, response::content::RawText};
+use actix_web::*;
 use serde_json::*;
 
-#[post("/tx/<tx_type>", data = "<body>")]
-pub async fn tx(tx_type: &str, body: &str) -> Value {
+pub async fn tx(path: web::Path<String>, body: web::Json<Value>) -> impl Responder {
+    let tx_type = path.into_inner();
     let client = reqwest::Client::new();
+
+    println!("Request: {:?}", body);
+
     let res = client
         .post(format!("http://localhost:8002/{}", tx_type))
-        .body(body.to_string())
+        .json(&body)
         .send()
         .await
         .unwrap();
 
-    res.json().await.unwrap()
+    println!("Response: {:?}", res);
+    let json: Value = res.json().await.unwrap();
+    HttpResponse::Ok().json(json)
 }
 
-#[get("/query/<query_type>")]
-pub async fn query(query_type: &str) -> Value {
+pub async fn query(path: web::Path<String>) -> impl Responder {
+    let query_type = path.into_inner();
     let client = reqwest::Client::new();
+
     let res = client
         .get(format!("http://localhost:8001/{}", query_type))
         .send()
         .await
         .unwrap();
 
-    res.json().await.unwrap()
+    let json: Value = res.json().await.unwrap();
+    HttpResponse::Ok().json(json)
 }
-
