@@ -2152,7 +2152,6 @@ dependencies = [
  "multiversx-sc-scenario",
  "multiversx-sdk",
  "serde_json",
- "tokio",
 ]
 
 [[package]]

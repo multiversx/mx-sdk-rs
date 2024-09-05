@@ -7,4 +7,4 @@ pub use crate::{
 pub use multiversx_sdk::{data::keystore::InsertPassword, wallet::Wallet};
 
 pub use env_logger;
-pub use tokio;
+pub use multiversx_sdk::tokio;

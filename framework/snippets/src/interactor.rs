@@ -61,7 +61,7 @@ impl Interactor {
 
     pub async fn sleep(&mut self, duration: Duration) {
         self.waiting_time_ms += duration.as_millis() as u64;
-        tokio::time::sleep(duration).await;
+        crate::tokio::time::sleep(duration).await;
     }
 
     pub async fn with_tracer<P: AsRef<Path>>(mut self, path: P) -> Self {
