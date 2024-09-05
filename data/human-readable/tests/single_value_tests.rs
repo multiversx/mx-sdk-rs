@@ -48,14 +48,14 @@ fn serialize_single_value_signed() {
 
     let result = decode_human_readable_value(&value, "i32", &abi).unwrap();
     let serialized = top_encode_to_vec_u8(&result).unwrap();
-    assert_eq!(serialized, (-1234 as i16).to_be_bytes().to_vec()); // should take only 2 bytes (top encoded)
+    assert_eq!(serialized, (-1234i16).to_be_bytes().to_vec()); // should take only 2 bytes (top encoded)
 }
 
 #[test]
 fn deserialize_single_value_signed() {
     let abi: ContractAbi = deserialize_abi_from_json(EMPTY_ABI_JSON).unwrap().into();
 
-    let value = AnyValue::SingleValue(SingleValue::SignedNumber((-1234 as i16).into()));
+    let value = AnyValue::SingleValue(SingleValue::SignedNumber((-1234i16).into()));
     let result = encode_human_readable_value(&value, "i32", &abi).unwrap();
 
     assert_eq!(result.to_string(), "-1234");
@@ -118,7 +118,7 @@ fn serialize_single_value_bool() {
 fn deserialize_single_value_bool() {
     let abi: ContractAbi = deserialize_abi_from_json(EMPTY_ABI_JSON).unwrap().into();
 
-    let value = AnyValue::SingleValue(SingleValue::Bool(true.into()));
+    let value = AnyValue::SingleValue(SingleValue::Bool(true));
     let result = encode_human_readable_value(&value, "bool", &abi).unwrap();
 
     assert_eq!(result.to_string(), "true");
@@ -200,5 +200,5 @@ fn default_single_values() {
     else {
         panic!("Expected default value to be a SingleValue::Bool")
     };
-    assert_eq!(default_bool, false);
+    assert!(!default_bool);
 }

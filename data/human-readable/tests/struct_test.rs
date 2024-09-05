@@ -88,7 +88,7 @@ fn default_struct_simple() {
     };
     assert_eq!(struct_value.0.len(), 2);
 
-    let first_field = struct_value.0.get(0).unwrap();
+    let first_field = struct_value.0.first().unwrap();
     assert_eq!(first_field.name, "first");
     let AnyValue::SingleValue(SingleValue::UnsignedNumber(first_value)) = &first_field.value else {
         panic!("Expected default value to be a SingleValue::UnsignedNumber")
@@ -171,7 +171,7 @@ fn default_struct_nested() {
     };
     assert_eq!(struct_value.0.len(), 2);
 
-    let first_field = struct_value.0.get(0).unwrap();
+    let first_field = struct_value.0.first().unwrap();
     assert_eq!(first_field.name, "first");
     let AnyValue::SingleValue(SingleValue::UnsignedNumber(first_value)) = &first_field.value else {
         panic!("Expected default value to be a SingleValue::UnsignedNumber")
@@ -186,7 +186,7 @@ fn default_struct_nested() {
 
     assert_eq!(nested_struct_value.0.len(), 2);
 
-    let first_nested_field = nested_struct_value.0.get(0).unwrap();
+    let first_nested_field = nested_struct_value.0.first().unwrap();
     let AnyValue::SingleValue(SingleValue::UnsignedNumber(first_nested_value)) =
         &first_nested_field.value
     else {
