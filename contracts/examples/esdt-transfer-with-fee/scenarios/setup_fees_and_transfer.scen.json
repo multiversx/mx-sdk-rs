@@ -306,7 +306,7 @@
                         "str:paid_fees.value|u32:1": "nested:str:USDC-aaaaaa|u64:0",
                         "str:paid_fees.mapped|nested:str:USDC-aaaaaa|u64:0": "13"
                     },
-                    "code": "file:../output/esdt-transfer-with-fee.wasm",
+                    "code": "mxsc:../output/esdt-transfer-with-fee.mxsc.json",
                     "owner": "address:owner"
                 }
             }

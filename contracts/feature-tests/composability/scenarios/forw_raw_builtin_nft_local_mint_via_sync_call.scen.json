@@ -20,7 +20,7 @@
                             ]
                         }
                     },
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 }
             }
         },
@@ -52,7 +52,7 @@
                             "0",
                             "1200"
                         ],
-                        "data": ""
+                        "data": []
                     },
                     {
                         "address": "sc:forwarder",
@@ -60,7 +60,9 @@
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -90,7 +92,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 }
             }
         }

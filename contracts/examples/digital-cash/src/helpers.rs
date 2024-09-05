@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 use crate::{
     constants::*,
@@ -9,11 +9,13 @@ use crate::{
 pub trait HelpersModule: storage::StorageModule {
     fn send_fee_to_address(&self, fee: &EgldOrEsdtTokenPayment, address: &ManagedAddress) {
         if fee.token_identifier == EgldOrEsdtTokenIdentifier::egld() {
-            self.send().direct_egld(address, &fee.amount);
+            self.tx().to(address).egld(&fee.amount).transfer();
         } else {
             let esdt_fee = fee.clone().unwrap_esdt();
-            self.send()
-                .direct_esdt(address, &esdt_fee.token_identifier, 0, &esdt_fee.amount);
+            self.tx()
+                .to(address)
+                .single_esdt(&esdt_fee.token_identifier, 0, &esdt_fee.amount)
+                .transfer();
         }
     }
 

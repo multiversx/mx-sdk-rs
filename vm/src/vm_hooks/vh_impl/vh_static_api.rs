@@ -72,7 +72,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         panic!("cannot access the back transfers in the StaticApi")
     }
 
-    fn account_data(&self, _address: &VMAddress) -> AccountData {
+    fn account_data(&self, _address: &VMAddress) -> Option<AccountData> {
         panic!("cannot access account data in the StaticApi")
     }
 

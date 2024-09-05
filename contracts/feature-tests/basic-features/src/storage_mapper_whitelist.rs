@@ -19,7 +19,7 @@ pub trait StorageMapperWhitelistFeatures {
 
     #[endpoint]
     fn check_contains_at_address(&self, address: ManagedAddress, item: ManagedBuffer) -> bool {
-        self.whitelist_mapper().contains_at_address(&address, &item)
+        self.whitelist_mapper_from_address(address).contains(&item)
     }
 
     #[endpoint]
@@ -29,10 +29,16 @@ pub trait StorageMapperWhitelistFeatures {
 
     #[endpoint]
     fn require_contains_at_address(&self, address: ManagedAddress, item: ManagedBuffer) {
-        self.whitelist_mapper()
-            .require_whitelisted_at_address(&address, &item);
+        self.whitelist_mapper_from_address(address)
+            .require_whitelisted(&item)
     }
 
     #[storage_mapper("whitelistMapper")]
     fn whitelist_mapper(&self) -> WhitelistMapper<ManagedBuffer>;
+
+    #[storage_mapper_from_address("whitelistMapper")]
+    fn whitelist_mapper_from_address(
+        &self,
+        address: ManagedAddress,
+    ) -> WhitelistMapper<ManagedBuffer, ManagedAddress>;
 }

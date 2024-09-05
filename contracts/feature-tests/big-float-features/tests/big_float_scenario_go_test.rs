@@ -5,6 +5,11 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+fn big_float_ln_go() {
+    world().run("scenarios/big_float_ln.scen.json");
+}
+
+#[test]
 fn big_float_new_from_big_int_go() {
     world().run("scenarios/big_float_new_from_big_int.scen.json");
 }

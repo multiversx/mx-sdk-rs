@@ -1,4 +1,3 @@
-use ed25519_dalek::*;
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
 
@@ -18,6 +17,8 @@ pub fn keccak256(data: &[u8]) -> [u8; KECCAK256_RESULT_LEN] {
 }
 
 pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+    use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+
     let key_32: [u8; 32] = if let Ok(key_32) = key.try_into() {
         key_32
     } else {

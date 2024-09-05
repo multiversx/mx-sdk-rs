@@ -5,14 +5,15 @@ use super::{
     auto_impl_parse::{
         process_event_attribute, process_proxy_attribute, process_storage_clear_attribute,
         process_storage_get_attribute, process_storage_is_empty_attribute,
-        process_storage_mapper_attribute, process_storage_set_attribute,
+        process_storage_mapper_attribute, process_storage_mapper_from_address_attribute,
+        process_storage_set_attribute,
     },
     extract_method_args, process_allow_multiple_var_args_attribute, process_callback_attribute,
     process_callback_raw_attribute, process_endpoint_attribute, process_external_view_attribute,
     process_init_attribute, process_label_names_attribute, process_only_admin_attribute,
     process_only_owner_attribute, process_only_user_account_attribute,
     process_output_names_attribute, process_payable_attribute, process_promises_callback_attribute,
-    process_view_attribute,
+    process_upgrade_attribute, process_view_attribute,
 };
 pub struct MethodAttributesPass1 {
     pub method_name: String,
@@ -23,7 +24,7 @@ pub struct MethodAttributesPass1 {
     pub allow_multiple_var_args: bool,
 }
 
-pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperties) -> Method {
+pub fn process_method(m: &syn::TraitItemFn, trait_attributes: &TraitProperties) -> Method {
     let method_args = extract_method_args(m);
 
     let implementation = if let Some(body) = m.default.clone() {
@@ -116,6 +117,7 @@ fn process_attribute_second_pass(
 ) -> bool {
     process_init_attribute(attr, first_pass_data, method)
         || process_endpoint_attribute(attr, first_pass_data, method)
+        || process_upgrade_attribute(attr, first_pass_data, method)
         || process_view_attribute(attr, first_pass_data, method)
         || process_external_view_attribute(attr, first_pass_data, method)
         || process_callback_raw_attribute(attr, method)
@@ -126,6 +128,7 @@ fn process_attribute_second_pass(
         || process_storage_get_attribute(attr, method)
         || process_storage_set_attribute(attr, method)
         || process_storage_mapper_attribute(attr, method)
+        || process_storage_mapper_from_address_attribute(attr, method)
         || process_storage_is_empty_attribute(attr, method)
         || process_storage_clear_attribute(attr, method)
         || process_output_names_attribute(attr, method)
@@ -136,8 +139,8 @@ fn validate_method(method: &Method) {
     assert!(
         matches!(
             method.public_role,
-            PublicRole::Init(_) | PublicRole::Endpoint(_) | PublicRole::CallbackPromise(_)
-        ) || method.label_names.is_empty(),
+            PublicRole::Init(_) | PublicRole::Endpoint(_) | PublicRole::CallbackPromise(_) | PublicRole::Upgrade(_)
+                ) || method.label_names.is_empty(),
         "Labels can only be placed on endpoints, constructors, and promises callbacks. Method '{}' is neither.",
         &method.name.to_string()
     )

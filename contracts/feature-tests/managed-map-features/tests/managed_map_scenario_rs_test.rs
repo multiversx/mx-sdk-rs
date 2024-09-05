@@ -2,9 +2,8 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/managed-map-features");
     blockchain.register_contract(
-        "file:output/managed-map-features.wasm",
+        "mxsc:output/managed-map-features.mxsc.json",
         managed_map_features::ContractBuilder,
     );
     blockchain

@@ -3,6 +3,7 @@
 multiversx_sc::imports!();
 
 mod abi_enum;
+pub mod abi_proxy;
 mod abi_test_type;
 mod only_nested;
 
@@ -11,7 +12,7 @@ use abi_test_type::*;
 use only_nested::*;
 
 /// Contract whose sole purpose is to verify that
-/// the ABI generation framework works sa expected.
+/// the ABI generation framework works as expected.
 ///
 /// Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,
 /// including Rust docs.
@@ -22,11 +23,21 @@ use only_nested::*;
 #[esdt_attribute("STRUCT1", AbiEnum)]
 #[esdt_attribute("STRUCT2", AbiManagedType<Self::Api>)]
 #[esdt_attribute("OnlyInEsdt", OnlyShowsUpInEsdtAttr)]
+#[esdt_attribute("ExplicitDiscriminant", ExplicitDiscriminant)]
+#[esdt_attribute("ExplicitDiscriminantMixed", ExplicitDiscriminantMixed)]
+#[esdt_attribute("ManagedDecimalVar", ManagedDecimal<Self::Api, NumDecimals>)]
+#[esdt_attribute("ManagedDecimalConst", ManagedDecimalWrapper<Self::Api>)]
 pub trait AbiTester {
     /// Contract constructor.
     #[init]
     #[payable("EGLD")]
     fn init(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {}
+
+    /// Upgrade constructor.
+    #[upgrade]
+    fn upgrade(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {
+        self.init(_constructor_arg_1, _constructor_arg_2)
+    }
 
     /// Example endpoint docs.
     #[endpoint]
@@ -154,6 +165,19 @@ pub trait AbiTester {
     #[view]
     fn item_for_option(&self) -> Option<OnlyShowsUpAsNestedInOption> {
         None
+    }
+
+    #[view]
+    fn operation_completion_status(&self) -> OperationCompletionStatus {
+        OperationCompletionStatus::Completed
+    }
+
+    #[view]
+    fn takes_object_with_managed_buffer_read_to_end(
+        &self,
+        arg: AbiWithManagedBufferReadToEnd<Self::Api>,
+    ) -> ManagedBuffer {
+        arg.flush.into_managed_buffer()
     }
 
     #[endpoint]

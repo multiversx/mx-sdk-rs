@@ -1,0 +1,375 @@
+{
+    "name": "storage mapper get at address",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:caller": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "sc:to-be-called": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "set contract address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "set_contract_address",
+                "arguments": [
+                    "sc:to-be-called"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fill set mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:to-be-called",
+                "function": "fill_set_mapper",
+                "arguments": [
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:caller": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:contract_address": "sc:to-be-called"
+                    },
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "sc:to-be-called": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": "*",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "is empty at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "is_empty_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    ""
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "contains at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "contains_at_address",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "len at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "len_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "10"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "next at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "next_at_address",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "6"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "previous at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "previous_at_address",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "4"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "front at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "front_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "back at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "back_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "10"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fill map mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:to-be-called",
+                "function": "fill_map_mapper",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "keys at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "keys_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x0000271100002712000027130000271400002715"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "values at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "values_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x0000000100000002000000030000000400000005"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fill unordered set mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:to-be-called",
+                "function": "fill_unordered_set_mapper",
+                "arguments": [
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "contains unordered at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "contains_unordered_at_address",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get by index at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "get_by_index",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "5"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

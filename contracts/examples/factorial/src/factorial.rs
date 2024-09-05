@@ -1,11 +1,15 @@
 #![no_std]
+#![allow(unused_imports)]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::contract]
 pub trait Factorial {
     #[init]
     fn init(&self) {}
+
+    #[upgrade]
+    fn upgrade(&self) {}
 
     #[endpoint]
     fn factorial(&self, value: BigUint) -> BigUint {

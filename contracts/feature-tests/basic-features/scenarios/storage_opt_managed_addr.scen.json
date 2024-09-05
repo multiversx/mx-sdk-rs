@@ -14,7 +14,7 @@
                             "str:____________address_too_long____________"
                         ]
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -36,7 +36,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:storage decode error: input too long",
+                "message": "str:storage decode error (key: opt_addr): input too long",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -72,7 +72,7 @@
                     "storage": {
                         "str:opt_addr": "1|str:____________address_____________"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "+": ""
             }
@@ -168,7 +168,7 @@
                     "storage": {
                         "str:opt_addr": ""
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "+": ""
             }

@@ -8,15 +8,12 @@ mod comp_interact_config;
 mod comp_interact_controller;
 mod comp_interact_state;
 
+mod forwarder_queue_proxy;
+mod vault_proxy;
+
 use clap::Parser;
-
 use comp_interact_controller::ComposabilityInteract;
-
-use multiversx_sc_snippets::{
-    env_logger,
-    multiversx_sc_scenario::{api::StaticApi, ContractInfo},
-    tokio,
-};
+use multiversx_sc_snippets::imports::*;
 
 #[tokio::main]
 async fn main() {

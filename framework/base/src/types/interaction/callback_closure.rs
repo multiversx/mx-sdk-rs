@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     codec::{
@@ -28,9 +30,20 @@ pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
 ///
 /// In both cases the framework hides all the magic, the developer shouldn't worry about it.
 #[derive(TopEncode)]
-pub struct CallbackClosure<M: ManagedTypeApi + ErrorApi> {
+pub struct CallbackClosure<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
     pub(super) callback_name: &'static str,
     pub(super) closure_args: ManagedArgBuffer<M>,
+}
+
+pub struct CallbackClosureWithGas<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    pub(super) closure: CallbackClosure<M>,
+    pub(super) gas_for_callback: u64,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
@@ -52,7 +65,9 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
 
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
         let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-        let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.closure_args, h);
+        endpoint_arg
+            .multi_encode_or_handle_err(&mut self.closure_args, h)
+            .unwrap_infallible()
     }
 
     pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self) {

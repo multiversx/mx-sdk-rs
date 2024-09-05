@@ -11,4 +11,10 @@ name = "abi-tester-ev"
 external-view = true
 add-unlabelled = false
 add-labels = ["test-external-view"]
-add-endpoints = ["payable_any_token", "label_a"] # labels can be bypassed, endpoints added directly
+add-endpoints = [
+    "payable_any_token",
+    "label_a",
+] # labels can be bypassed, endpoints added directly
+
+[[proxy]]
+path = "src/abi_proxy.rs"

@@ -18,12 +18,10 @@ pub fn panic_fmt(_: &PanicInfo) -> ! {
 /// Mostly used for debugging, the additional code is normally not deemed to be worth it.
 pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {
     let mut panic_msg = ManagedPanicMessage::default();
-    if let Some(args) = panic_info.message() {
-        panic_msg.append_str("panic occurred: ");
-        let _ = core::fmt::write(&mut panic_msg, *args);
-    } else {
-        panic_msg.append_str("unknown panic occurred");
-    };
+    panic_msg.append_str("panic occurred: ");
+
+    core::fmt::write(&mut panic_msg, format_args!("{panic_info}"))
+        .unwrap_or_else(|_| panic_msg.append_str("unable to write panic"));
 
     VmApiImpl::error_api_impl().signal_error_from_buffer(panic_msg.buffer.get_handle())
 }
@@ -41,7 +39,11 @@ impl ManagedPanicMessage {
 
 impl core::fmt::Write for ManagedPanicMessage {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        self.append_str(s);
+        let file_name = match s.rfind('/') {
+            Some(index) => &s[index + 1..],
+            None => s,
+        };
+        self.append_str(file_name);
         Ok(())
     }
 }

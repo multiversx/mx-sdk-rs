@@ -8,7 +8,7 @@ use core::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 use num_bigint::BigInt;
-use num_traits::ToPrimitive;
+use num_traits::{ToPrimitive, Zero};
 use std::convert::TryInto;
 
 macro_rules! binary_op_method {
@@ -115,16 +115,18 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
 
     fn bf_sign(&self, x: RawHandle) -> i32 {
         let bf = self.m_types_lock().bf_get_f64(x);
+        if bf.is_zero() {
+            return 0;
+        }
+
         if !bf.is_normal() {
             self.vm_error(vm_err_msg::NUMBER_IS_NOT_NORMAL)
         }
 
         if bf.is_sign_positive() {
             1
-        } else if bf.is_sign_negative() {
-            -1
         } else {
-            0
+            -1
         }
     }
 

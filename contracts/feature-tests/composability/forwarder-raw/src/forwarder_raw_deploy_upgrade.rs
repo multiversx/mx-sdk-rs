@@ -6,16 +6,18 @@ pub trait ForwarderRawDeployUpgrade {
     fn deploy_contract(
         &self,
         code: ManagedBuffer,
+        code_metadata: CodeMetadata,
         args: MultiValueEncoded<ManagedBuffer>,
     ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
-        self.send_raw()
-            .deploy_contract(
-                self.blockchain().get_gas_left(),
-                &BigUint::zero(),
-                &code,
-                CodeMetadata::DEFAULT,
-                &args.to_arg_buffer(),
-            )
+        self.tx()
+            .raw_deploy()
+            .code(code)
+            .code_metadata(code_metadata)
+            .arguments_raw(args.to_arg_buffer())
+            .gas(self.blockchain().get_gas_left())
+            .returns(ReturnsNewManagedAddress)
+            .returns(ReturnsRawResult)
+            .sync_call()
             .into()
     }
 
@@ -23,34 +25,34 @@ pub trait ForwarderRawDeployUpgrade {
     fn deploy_from_source(
         &self,
         source_contract_address: ManagedAddress,
-        arguments: MultiValueEncoded<ManagedBuffer>,
+        code_metadata: CodeMetadata,
+        args: MultiValueEncoded<ManagedBuffer>,
     ) -> ManagedAddress {
-        let (address, _) = self.send_raw().deploy_from_source_contract(
-            self.blockchain().get_gas_left(),
-            &BigUint::zero(),
-            &source_contract_address,
-            CodeMetadata::DEFAULT,
-            &arguments.to_arg_buffer(),
-        );
-
-        address
+        self.tx()
+            .raw_deploy()
+            .from_source(source_contract_address)
+            .code_metadata(code_metadata)
+            .arguments_raw(args.to_arg_buffer())
+            .gas(self.blockchain().get_gas_left())
+            .returns(ReturnsNewManagedAddress)
+            .sync_call()
     }
 
     #[endpoint]
     fn call_upgrade(
         &self,
-        child_sc_address: &ManagedAddress,
-        new_code: &ManagedBuffer,
-        arguments: MultiValueEncoded<ManagedBuffer>,
+        child_sc_address: ManagedAddress,
+        new_code: ManagedBuffer,
+        code_metadata: CodeMetadata,
+        args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        self.send_raw().upgrade_contract(
-            child_sc_address,
-            self.blockchain().get_gas_left(),
-            &BigUint::zero(),
-            new_code,
-            CodeMetadata::UPGRADEABLE,
-            &arguments.to_arg_buffer(),
-        );
+        self.tx()
+            .to(child_sc_address)
+            .raw_upgrade()
+            .code(new_code)
+            .code_metadata(code_metadata)
+            .arguments_raw(args.to_arg_buffer())
+            .upgrade_async_call_and_exit();
     }
 
     #[endpoint]
@@ -58,15 +60,16 @@ pub trait ForwarderRawDeployUpgrade {
         &self,
         sc_address: ManagedAddress,
         source_contract_address: ManagedAddress,
-        arguments: MultiValueEncoded<ManagedBuffer>,
+        code_metadata: CodeMetadata,
+        args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        self.send_raw().upgrade_from_source_contract(
-            &sc_address,
-            self.blockchain().get_gas_left(),
-            &BigUint::zero(),
-            &source_contract_address,
-            CodeMetadata::DEFAULT,
-            &arguments.to_arg_buffer(),
-        )
+        self.tx()
+            .to(sc_address)
+            .raw_upgrade()
+            .from_source(source_contract_address)
+            .code_metadata(code_metadata)
+            .arguments_raw(args.to_arg_buffer())
+            .gas(self.blockchain().get_gas_left())
+            .upgrade_async_call_and_exit();
     }
 }

@@ -16,7 +16,7 @@
             "id": "deploy-router",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../../output/order-book-pair.wasm",
+                "contractCode": "mxsc:../../output/order-book-pair.mxsc.json",
                 "arguments": [
                     "str:WEGLD-abcdef",
                     "str:BUSD-abcdef"

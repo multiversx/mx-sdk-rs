@@ -6,37 +6,42 @@
             "accounts": {
                 "address:a_user": {},
                 "sc:forwarder": {
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                },
+                "sc:reference": {
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json"
                 },
                 "sc:child": {
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 }
             }
         },
         {
             "step": "scCall",
-            "id": "upgrade-vault-to-forwarder",
+            "id": "upgrade-vault-from-source",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "function": "upgrade_vault_from_source",
                 "arguments": [
                     "sc:child",
-                    "sc:forwarder"
+                    "sc:reference"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": []
+                "out": "*",
+                "status": ""
             }
         },
         {
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json",
+                    "codeMetadata": "0x0100"
                 },
                 "+": ""
             }
@@ -51,20 +56,64 @@
                 "function": "upgradeVault",
                 "arguments": [
                     "sc:child",
-                    "file:../vault/output/vault.wasm"
+                    "mxsc:../vault/output/vault.mxsc.json",
+                    "str:arg"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": []
+                "out": "*",
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:child"
+                        ],
+                        "data": [
+                            "str:UpgradeFromSource",
+                            "str:upgradeContract",
+                            "*",
+                            "0x0100",
+                            "str:arg"
+                        ]
+                    },
+                    {
+                        "address": "sc:child",
+                        "endpoint": "str:upgradeContract",
+                        "topics": [
+                            "str:upgraded"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:child",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00",
+                            "str:upgraded",
+                            "str:arg"
+                        ]
+                    }
+                ]
             }
         },
         {
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "+": ""
             }

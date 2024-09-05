@@ -3,9 +3,10 @@ use multiversx_sc::{
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
-multiversx_sc::derive_imports!();
+use multiversx_sc::derive_imports::*;
 
-#[derive(NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, Clone)]
 pub struct CallActionData<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
     pub egld_amount: BigUint<M>,
@@ -13,7 +14,8 @@ pub struct CallActionData<M: ManagedTypeApi> {
     pub arguments: ManagedVec<M, ManagedBuffer<M>>,
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, Clone)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
 pub enum Action<M: ManagedTypeApi> {
     Nothing,
     AddBoardMember(ManagedAddress<M>),
@@ -47,7 +49,8 @@ impl<M: ManagedTypeApi> Action<M> {
 }
 
 /// Not used internally, just to retrieve results via endpoint.
-#[derive(TopEncode, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode)]
 pub struct ActionFullInfo<M: ManagedTypeApi> {
     pub action_id: usize,
     pub action_data: Action<M>,

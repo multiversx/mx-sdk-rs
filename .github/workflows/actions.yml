@@ -5,6 +5,7 @@ on:
     branches:
       - master
   pull_request:
+  workflow_dispatch:
 
 permissions:
   checks: write
@@ -13,10 +14,11 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v2.3.3
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v3.3.0
     with:
-      rust-toolchain: nightly-2023-05-26
-      vmtools-repository: "https://github.com/multiversx/mx-chain-vm-v1_4-go/archive/{TAG}.tar.gz"
-      vmtools-version: v1.4.89
+      rust-toolchain: stable
+      path-to-sc-meta: framework/meta
+      mx-scenario-go-version: v2.1.0-alpha
+      coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}

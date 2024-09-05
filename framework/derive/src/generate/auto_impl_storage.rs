@@ -82,6 +82,31 @@ pub fn generate_mapper_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
     }
 }
 
+pub fn generate_mapper_from_address_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
+    let msig = method_gen::generate_sig_with_attributes(m);
+    assert!(
+        !m.method_args.is_empty(),
+        "mapper from address must have at least one argument, for the value"
+    );
+    let address_arg = &m.method_args[0];
+    let address_pat = address_arg.pat.to_owned();
+    let key_snippet = generate_key_snippet(&m.method_args[1..], identifier);
+    match m.return_type.clone() {
+        syn::ReturnType::Default => panic!("getter from address should return some value"),
+        syn::ReturnType::Type(_, ty) => {
+            quote! {
+                #msig {
+                    #key_snippet
+                    <#ty as multiversx_sc::storage::mappers::StorageMapperFromAddress<Self::Api>>::new_from_address(
+                        #address_pat,
+                        ___key___
+                    )
+                }
+            }
+        },
+    }
+}
+
 pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
     let msig = method_gen::generate_sig_with_attributes(m);
     let key_snippet = generate_key_snippet(m.method_args.as_slice(), identifier);

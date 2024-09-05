@@ -11,12 +11,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 }
             }
         },
@@ -45,17 +45,48 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
                         "endpoint": "str:callBack",
                         "topics": [
                             "str:callback_raw"
                         ],
-                        "data": {
-                            "0-status": "nested:0x00",
-                            "1-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "data": [
+                            {
+                                "0-status": "nested:0x00",
+                                "1-echoed-args": [
+                                    "biguint:1",
+                                    "biguint:2"
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -77,7 +108,7 @@
                     "storage": {
                         "str:call_counts|nested:str:echo_arguments": "1"
                     },
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -90,7 +121,7 @@
                             "biguint:2"
                         ]
                     },
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 }
             }
         }

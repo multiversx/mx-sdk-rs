@@ -19,6 +19,7 @@ pub struct Account {
     pub username: Option<BytesValue>,
     pub storage: BTreeMap<BytesKey, BytesValue>,
     pub code: Option<BytesValue>,
+    pub code_metadata: Option<BytesValue>,
     pub owner: Option<AddressValue>,
     pub developer_rewards: Option<BigUintValue>,
 }
@@ -85,14 +86,14 @@ impl Account {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_all_properties<K, N, V, T>(
+    pub fn esdt_nft_all_properties<K, N, V, T, A>(
         mut self,
         token_id_expr: K,
         nonce_expr: N,
         balance_expr: V,
         opt_attributes_expr: Option<T>,
         royalties_expr: N,
-        creator_expr: Option<T>,
+        creator_expr: Option<A>,
         hash_expr: Option<T>,
         uris_expr: Vec<T>,
     ) -> Self
@@ -101,6 +102,7 @@ impl Account {
         U64Value: From<N>,
         BigUintValue: From<V>,
         BytesValue: From<T>,
+        AddressValue: From<A>,
     {
         let token_id = BytesKey::from(token_id_expr);
 
@@ -210,6 +212,9 @@ impl InterpretableFrom<AccountRaw> for Account {
                 })
                 .collect(),
             code: from.code.map(|c| BytesValue::interpret_from(c, context)),
+            code_metadata: from
+                .code_metadata
+                .map(|c| BytesValue::interpret_from(c, context)),
             owner: from.owner.map(|v| AddressValue::interpret_from(v, context)),
             developer_rewards: from
                 .developer_rewards
@@ -236,6 +241,7 @@ impl IntoRaw<AccountRaw> for Account {
                 .map(|(key, value)| (key.original, value.original))
                 .collect(),
             code: self.code.map(|n| n.original),
+            code_metadata: self.code_metadata.map(|n| n.original),
             owner: self.owner.map(|n| n.original),
             developer_rewards: self.developer_rewards.map(|n| n.original),
         }

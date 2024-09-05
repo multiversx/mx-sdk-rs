@@ -1,17 +1,22 @@
-use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use alloc::format;
+
+use crate::{
+    abi::TypeAbiFrom,
+    codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
+};
 
 use crate::{
     abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
     api::EndpointFinishApi,
 };
-use core::{
-    convert,
-    ops::{ControlFlow, FromResidual, Try},
-};
 
 use super::{SCError, StaticSCError};
 
 /// Default way to optionally return an error from a smart contract endpoint.
+#[deprecated(
+    since = "0.48.0",
+    note = "Use in-place error handling instead, such as `require!` or `sc_panic!`"
+)]
 #[must_use]
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SCResult<T, E = StaticSCError> {
@@ -72,40 +77,6 @@ impl<T, E> SCResult<T, E> {
     }
 }
 
-/// Implementing the `Try` trait overloads the `?` operator.
-/// Documentation on the new version of the trait:
-/// <https://github.com/scottmcm/rfcs/blob/do-or-do-not/text/0000-try-trait-v2.md#the-try-trait>
-impl<T, E> Try for SCResult<T, E> {
-    type Output = T;
-    type Residual = E;
-
-    fn branch(self) -> ControlFlow<Self::Residual, T> {
-        match self {
-            SCResult::Ok(t) => ControlFlow::Continue(t),
-            SCResult::Err(e) => ControlFlow::Break(e),
-        }
-    }
-    fn from_output(v: T) -> Self {
-        SCResult::Ok(v)
-    }
-}
-
-impl<T, E> FromResidual for SCResult<T, E> {
-    fn from_residual(r: E) -> Self {
-        SCResult::Err(r)
-    }
-}
-
-impl<T, FromErr> FromResidual<Result<convert::Infallible, FromErr>> for SCResult<T>
-where
-    FromErr: Into<StaticSCError>,
-{
-    fn from_residual(residual: Result<convert::Infallible, FromErr>) -> Self {
-        let Err(e) = residual;
-        SCResult::Err(e.into())
-    }
-}
-
 impl<T, E> TopEncodeMulti for SCResult<T, E>
 where
     T: TopEncodeMulti,
@@ -123,9 +94,21 @@ where
     }
 }
 
+impl<T: TypeAbi, E> TypeAbiFrom<Self> for SCResult<T, E> {}
+
 impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!(
+            "SCResult<{}, {}>",
+            T::type_name_rust(),
+            core::any::type_name::<E>()
+        )
     }
 
     /// Gives `SCResult<()>` the possibility to produce 0 output ABIs,

@@ -15,7 +15,7 @@ pub fn generate_endpoints_mod(
             let module_path = &supertrait.module_path;
             let endpoints_alias = generate_endpoints_mod_alias(index);
             quote! {
-                pub use #module_path endpoints as #endpoints_alias;
+                pub use #module_path __wasm__endpoints__ as #endpoints_alias;
             }
         })
         .collect();
@@ -49,7 +49,7 @@ pub fn generate_endpoints_mod(
         #(#endpoint_aliases_decl)*
 
         #[allow(non_snake_case)]
-        pub mod endpoints {
+        pub mod __wasm__endpoints__ {
             use super::EndpointWrappers;
 
             #(#endpoint_aliases_use)*
@@ -67,6 +67,7 @@ fn generate_wasm_endpoints(contract_trait: &ContractTrait) -> Vec<proc_macro2::T
         .iter()
         .filter_map(|m| match &m.public_role {
             PublicRole::Init(_) => Some(generate_wasm_endpoint(m, &quote! { init })),
+            PublicRole::Upgrade(_) => Some(generate_wasm_endpoint(m, &quote! { upgrade })),
             PublicRole::Endpoint(endpoint_metadata) => {
                 let endpoint_ident = &endpoint_metadata.public_name;
                 Some(generate_wasm_endpoint(m, &quote! { #endpoint_ident }))

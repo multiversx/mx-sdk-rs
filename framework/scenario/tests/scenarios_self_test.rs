@@ -1,11 +1,9 @@
 use multiversx_sc_scenario::*;
 
-// These tests don't really test any contract, but the testing framework itslef.
+// These tests don't really test any contract, but the testing framework itself.
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("framework/scenario");
-    blockchain
+    ScenarioWorld::new()
 }
 
 /// Checks that externalSteps work fine.
@@ -64,6 +62,17 @@ fn set_check_code_err_rs() {
 #[test]
 fn set_check_code() {
     world().run("tests/scenarios-self/set-check/set-check-code.scen.json");
+}
+
+#[test]
+#[should_panic]
+fn set_check_codemetadata_err_rs() {
+    world().run("tests/scenarios-self/set-check/set-check-codemetadata.err.json");
+}
+
+#[test]
+fn set_check_codemetadata() {
+    world().run("tests/scenarios-self/set-check/set-check-codemetadata.scen.json");
 }
 
 #[test]

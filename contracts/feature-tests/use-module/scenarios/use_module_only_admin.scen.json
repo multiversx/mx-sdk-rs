@@ -30,7 +30,7 @@
             "id": "1",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/use-module.wasm",
+                "contractCode": "mxsc:../output/use-module.mxsc.json",
                 "arguments": [],
                 "gasLimit": "20,000,000",
                 "gasPrice": "0"

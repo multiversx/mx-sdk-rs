@@ -1,5 +1,4 @@
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::{derive_imports::*, imports::*};
 
 use multiversx_sc::contract_base::ManagedSerializer;
 
@@ -27,7 +26,7 @@ impl<M: ManagedTypeApi> FractionalUriInfo<M> {
         let serializer = ManagedSerializer::new();
         serializer.top_decode_from_managed_buffer_custom_message(
             &first_uri,
-            b"Invalid Fractional URI info",
+            "Invalid Fractional URI info",
         )
     }
 

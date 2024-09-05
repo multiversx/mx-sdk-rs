@@ -1,3 +1,4 @@
+use multiversx_sc_scenario::imports::Bech32Address;
 use serde::Deserialize;
 use std::io::Read;
 
@@ -7,8 +8,9 @@ const CONFIG_FILE: &str = "config.toml";
 /// Multisig Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    gateway: String,
-    quorum: usize,
+    pub gateway: String,
+    pub quorum: usize,
+    pub wegld_address: Bech32Address,
 }
 
 impl Config {
@@ -18,15 +20,5 @@ impl Config {
         let mut content = String::new();
         file.read_to_string(&mut content).unwrap();
         toml::from_str(&content).unwrap()
-    }
-
-    // Returns the gateway
-    pub fn gateway(&self) -> &str {
-        &self.gateway
-    }
-
-    // Returns the quorum
-    pub fn quorum(&self) -> usize {
-        self.quorum
     }
 }

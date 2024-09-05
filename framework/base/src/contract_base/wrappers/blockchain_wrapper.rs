@@ -10,8 +10,9 @@ use crate::{
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage::{self},
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
-        ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec, TokenIdentifier,
+        BackTransfers, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags,
+        EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType,
+        ManagedVec, TokenIdentifier,
     },
 };
 
@@ -76,7 +77,7 @@ where
 
     pub fn check_caller_is_owner(&self) {
         if self.get_owner_address() != self.get_caller() {
-            A::error_api_impl().signal_error(ONLY_OWNER_CALLER);
+            A::error_api_impl().signal_error(ONLY_OWNER_CALLER.as_bytes());
         }
     }
 
@@ -84,7 +85,7 @@ where
         let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::blockchain_api_impl().load_caller_managed(mbuf_temp_1.clone());
         if A::blockchain_api_impl().is_smart_contract(mbuf_temp_1) {
-            A::error_api_impl().signal_error(ONLY_USER_ACCOUNT_CALLER);
+            A::error_api_impl().signal_error(ONLY_USER_ACCOUNT_CALLER.as_bytes());
         }
     }
 
@@ -135,10 +136,26 @@ where
     }
 
     #[inline]
+    pub fn get_code_metadata(&self, address: &ManagedAddress<A>) -> CodeMetadata {
+        let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::blockchain_api_impl()
+            .managed_get_code_metadata(address.get_handle(), mbuf_temp_1.clone());
+        let mut buffer = [0u8; 2];
+        ManagedBuffer::<A>::from_handle(mbuf_temp_1).load_to_byte_array(&mut buffer);
+        CodeMetadata::from(buffer)
+    }
+
+    #[inline]
+    pub fn is_builtin_function(&self, function_name: &ManagedBuffer<A>) -> bool {
+        A::blockchain_api_impl().managed_is_builtin_function(function_name.get_handle())
+    }
+
+    #[inline]
     pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
         token.map_ref_or_else(
-            || self.get_balance(&self.get_sc_address()),
-            |token_identifier| {
+            (),
+            |()| self.get_balance(&self.get_sc_address()),
+            |(), token_identifier| {
                 self.get_esdt_balance(&self.get_sc_address(), token_identifier, nonce)
             },
         )
@@ -347,8 +364,7 @@ where
     /// Works after:
     /// - synchronous calls
     /// - asynchronous calls too, in callbacks.
-    #[cfg(feature = "back-transfers")]
-    pub fn get_back_transfers(&self) -> crate::types::BackTransfers<A> {
+    pub fn get_back_transfers(&self) -> BackTransfers<A> {
         let esdt_transfer_value_handle: A::BigIntHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         let call_value_handle: A::BigIntHandle =
@@ -359,7 +375,7 @@ where
             call_value_handle.get_raw_handle(),
         );
 
-        crate::types::BackTransfers {
+        BackTransfers {
             total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
             esdt_payments: ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
         }

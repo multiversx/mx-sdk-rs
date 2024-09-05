@@ -2,10 +2,9 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/core/wegld-swap");
 
     blockchain.register_contract(
-        "file:output/multiversx-wegld-swap-sc.wasm",
+        "mxsc:output/multiversx-wegld-swap-sc.mxsc.json",
         multiversx_wegld_swap_sc::ContractBuilder,
     );
     blockchain

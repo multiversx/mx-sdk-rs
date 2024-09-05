@@ -1,15 +1,14 @@
 use core::{convert::TryInto, marker::PhantomData};
 
 use crate::{
-    abi::TypeName,
+    abi::{TypeAbiFrom, TypeName},
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
         ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     codec::{
-        CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
-        NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-        TopEncodeOutput, TryStaticCast,
+        DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+        NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
@@ -100,7 +99,8 @@ macro_rules! big_int_conv_num {
             }
         }
 
-        impl<M: ManagedTypeApi> CodecFrom<$num_ty> for BigInt<M> {}
+        impl<M: ManagedTypeApi> TypeAbiFrom<$num_ty> for BigInt<M> {}
+        impl<M: ManagedTypeApi> TypeAbiFrom<&$num_ty> for BigInt<M> {}
     };
 }
 
@@ -111,12 +111,29 @@ big_int_conv_num! {isize}
 big_int_conv_num! {i16}
 big_int_conv_num! {i8}
 
-impl<M> CodecFromSelf for BigInt<M> where M: ManagedTypeApi {}
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> TypeAbiFrom<crate::codec::num_bigint::BigInt> for BigInt<M> {}
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> TypeAbiFrom<BigInt<M>> for crate::codec::num_bigint::BigInt {}
 
-#[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<crate::codec::num_bigint::BigInt> for BigInt<M> {}
-#[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<BigInt<M>> for crate::codec::num_bigint::BigInt {}
+impl<M> TypeAbiFrom<Self> for BigInt<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for BigInt<M> where M: ManagedTypeApi {}
+
+impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
+    #[cfg(feature = "num-bigint")]
+    type Unmanaged = crate::codec::num_bigint::BigInt;
+
+    #[cfg(not(feature = "num-bigint"))]
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        TypeName::from("BigInt")
+    }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("BigInt<$API>")
+    }
+}
 
 #[cfg(feature = "num-bigint")]
 impl<M: ManagedTypeApi> From<&crate::codec::num_bigint::BigInt> for BigInt<M> {
@@ -200,9 +217,9 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_biguint(sign: Sign, unsigned: BigUint<M>) -> Self {
         let api = M::managed_type_impl();
         if sign.is_minus() {
-            api.bi_neg(unsigned.handle.clone(), unsigned.handle.clone());
+            api.bi_neg(unsigned.value.handle.clone(), unsigned.value.handle.clone());
         }
-        BigInt::from_handle(unsigned.handle)
+        BigInt::from_handle(unsigned.value.handle)
     }
 
     /// Returns the sign of the `BigInt` as a `Sign`.
@@ -229,12 +246,21 @@ impl<M: ManagedTypeApi> BigInt<M> {
         (self.sign(), self.magnitude())
     }
 
+    /// Converts to an unsigned `BigUint`, without performing any checks.
+    ///
+    /// # Safety
+    ///
+    /// If the number is negative, undefined behavior might occur further down the execution.
+    pub unsafe fn into_big_uint_unchecked(self) -> BigUint<M> {
+        BigUint::from_handle(self.handle)
+    }
+
     /// Converts this `BigInt` into a `BigUint`, if it's not negative.
     pub fn into_big_uint(self) -> ManagedOption<M, BigUint<M>> {
         if let Sign::Minus = self.sign() {
             ManagedOption::none()
         } else {
-            ManagedOption::some(BigUint::from_handle(self.handle))
+            ManagedOption::some(unsafe { self.into_big_uint_unchecked() })
         }
     }
 }
@@ -295,12 +321,6 @@ impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
             let boxed_bytes = BoxedBytes::top_decode_or_handle_err(input, h)?;
             Ok(Self::from_signed_bytes_be(boxed_bytes.as_slice()))
         }
-    }
-}
-
-impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
-    fn type_name() -> TypeName {
-        TypeName::from("BigInt")
     }
 }
 

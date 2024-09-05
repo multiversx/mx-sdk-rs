@@ -1,33 +1,6 @@
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
-use crate::{storage, zombie_factory, zombie_helper};
-use crypto_kitties_proxy::Kitty;
-
-mod crypto_kitties_proxy {
-    multiversx_sc::imports!();
-    multiversx_sc::derive_imports!();
-
-    #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-    pub struct Kitty {
-        pub is_gestating: bool,
-        pub is_ready: bool,
-        pub cooldown_index: u64,
-        pub next_action_at: u64,
-        pub siring_with_id: u64,
-        pub birth_time: u64,
-        pub matron_id: u64,
-        pub sire_id: u64,
-        pub generation: u64,
-        pub genes: u64,
-    }
-
-    #[multiversx_sc::proxy]
-    pub trait CryptoKitties {
-        #[endpoint]
-        fn get_kitty(&self, id: usize) -> Kitty;
-    }
-}
+use crate::{kitty_obj::Kitty, kitty_ownership_proxy, storage, zombie_factory, zombie_helper};
 
 #[multiversx_sc::module]
 pub trait ZombieFeeding:
@@ -70,7 +43,7 @@ pub trait ZombieFeeding:
     ) {
         match result {
             ManagedAsyncCallResult::Ok(kitty) => {
-                let kitty_dna = kitty.genes;
+                let kitty_dna = kitty.genes.get_as_u64();
                 self.feed_and_multiply(zombie_id, kitty_dna, ManagedBuffer::from(b"kitty"));
             },
             ManagedAsyncCallResult::Err(_) => {},
@@ -78,14 +51,13 @@ pub trait ZombieFeeding:
     }
 
     #[endpoint]
-    fn feed_on_kitty(&self, zombie_id: usize, kitty_id: usize) {
+    fn feed_on_kitty(&self, zombie_id: usize, kitty_id: u32) {
         let crypto_kitties_sc_address = self.crypto_kitties_sc_address().get();
-        self.kitty_proxy(crypto_kitties_sc_address)
-            .get_kitty(kitty_id)
-            .async_call()
-            .with_callback(self.callbacks().get_kitty_callback(zombie_id))
-            .call_and_exit();
+        self.tx()
+            .to(&crypto_kitties_sc_address)
+            .typed(kitty_ownership_proxy::KittyOwnershipProxy)
+            .get_kitty_by_id_endpoint(kitty_id)
+            .callback(self.callbacks().get_kitty_callback(zombie_id))
+            .async_call_and_exit();
     }
-    #[proxy]
-    fn kitty_proxy(&self, to: ManagedAddress) -> crypto_kitties_proxy::Proxy<Self::Api>;
 }

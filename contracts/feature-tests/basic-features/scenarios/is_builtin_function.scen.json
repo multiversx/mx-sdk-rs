@@ -1,0 +1,65 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json",
+                    "codeMetadata": "0x0104"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "is builtin function - true",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "is_builtin_function",
+                "arguments": [
+                    "str:ESDTTransfer"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "is builtin function - false",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "is_builtin_function",
+                "arguments": [
+                    "str:anyFunction"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

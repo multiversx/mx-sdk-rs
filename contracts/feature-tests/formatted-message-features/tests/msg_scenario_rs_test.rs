@@ -2,10 +2,9 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/formatted-message-features");
 
     blockchain.register_contract(
-        "file:output/formatted-message-features.wasm",
+        "mxsc:output/formatted-message-features.mxsc.json",
         formatted_message_features::ContractBuilder,
     );
 
