@@ -19,7 +19,7 @@ pub fn decode_human_readable_value(
     contract_abi: &ContractAbi,
 ) -> Result<AnyValue, Box<dyn Error>> {
     let type_description = contract_abi.type_descriptions.find_or_default(type_name);
-    decode_any_value(input, &type_description, &contract_abi)
+    decode_any_value(input, &type_description, contract_abi)
 }
 
 pub fn decode_any_value(
@@ -31,8 +31,8 @@ pub fn decode_any_value(
         TypeContents::NotSpecified => {
             decode_single_value(input, type_description.names.abi.as_str())
         },
-        TypeContents::Enum(variants) => decode_enum(input, &variants, &contract_abi),
-        TypeContents::Struct(fields) => decode_struct(input, &fields, &contract_abi),
+        TypeContents::Enum(variants) => decode_enum(input, variants, contract_abi),
+        TypeContents::Struct(fields) => decode_struct(input, fields, contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
     }
 }
@@ -116,7 +116,7 @@ fn decode_single_value(
                 .as_bool()
                 .ok_or_else(|| Box::new(DecodeError("expected bool value")))?;
 
-            Ok(AnyValue::SingleValue(SingleValue::Bool(bool_value.into())))
+            Ok(AnyValue::SingleValue(SingleValue::Bool(bool_value)))
         },
         _ => Err(Box::new(DecodeError("unknown type"))),
     }
@@ -124,7 +124,7 @@ fn decode_single_value(
 
 pub fn decode_struct(
     input: &HumanReadableValue,
-    fields: &Vec<StructFieldDescription>,
+    fields: &[StructFieldDescription],
     contract_abi: &ContractAbi,
 ) -> Result<AnyValue, Box<dyn Error>> {
     let mut field_values: Vec<StructField> = vec![];
@@ -133,7 +133,7 @@ pub fn decode_struct(
         let value = input
             .child(&field.name)
             .ok_or_else(|| Box::new(DecodeError("missing field")))?;
-        let value = decode_human_readable_value(&value, &field.field_type.abi, &contract_abi)?;
+        let value = decode_human_readable_value(&value, &field.field_type.abi, contract_abi)?;
         field_values.push(StructField {
             name: field.name.clone(),
             value,
@@ -145,7 +145,7 @@ pub fn decode_struct(
 
 pub fn decode_enum(
     input: &HumanReadableValue,
-    variants: &Vec<EnumVariantDescription>,
+    variants: &[EnumVariantDescription],
     contract_abi: &ContractAbi,
 ) -> Result<AnyValue, Box<dyn Error>> {
     if input.get_value().is_string() {
@@ -212,7 +212,7 @@ pub fn decode_enum(
             let value = decode_human_readable_value(
                 &(value.to_owned().into()),
                 &field.field_type.abi,
-                &contract_abi,
+                contract_abi,
             )?;
             field_values.push(StructField {
                 name: field.name.clone(),

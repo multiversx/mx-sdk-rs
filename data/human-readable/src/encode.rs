@@ -14,7 +14,7 @@ pub fn encode_human_readable_value(
     contract_abi: &ContractAbi,
 ) -> Result<HumanReadableValue, Box<dyn Error>> {
     let type_description = contract_abi.type_descriptions.find_or_default(type_name);
-    encode_any_value(input, &type_description, &contract_abi)
+    encode_any_value(input, &type_description, contract_abi)
 }
 
 pub fn encode_any_value(
@@ -26,8 +26,8 @@ pub fn encode_any_value(
         TypeContents::NotSpecified => {
             encode_single_value(input, type_description.names.abi.as_str())
         },
-        TypeContents::Enum(variants) => encode_enum(input, &variants, &contract_abi),
-        TypeContents::Struct(fields) => encode_struct(input, &fields, &contract_abi),
+        TypeContents::Enum(variants) => encode_enum(input, variants, contract_abi),
+        TypeContents::Struct(fields) => encode_struct(input, fields, contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
     }
 }
@@ -123,7 +123,7 @@ fn encode_single_value(
 
 pub fn encode_struct(
     input: &AnyValue,
-    fields: &Vec<StructFieldDescription>,
+    fields: &[StructFieldDescription],
     contract_abi: &ContractAbi,
 ) -> Result<HumanReadableValue, Box<dyn Error>> {
     let AnyValue::Struct(struct_value) = input else {
@@ -147,7 +147,7 @@ pub fn encode_struct(
 
 pub fn encode_enum(
     input: &AnyValue,
-    variants: &Vec<EnumVariantDescription>,
+    variants: &[EnumVariantDescription],
     contract_abi: &ContractAbi,
 ) -> Result<HumanReadableValue, Box<dyn Error>> {
     let AnyValue::Enum(enum_value) = input else {

@@ -25,8 +25,8 @@ pub fn default_value_for_any_value(
         TypeContents::NotSpecified => {
             default_value_for_single_value(type_description.names.abi.as_str())
         },
-        TypeContents::Enum(variants) => default_value_for_enum(&variants, contract_abi),
-        TypeContents::Struct(fields) => default_value_for_struct(&fields, contract_abi),
+        TypeContents::Enum(variants) => default_value_for_enum(variants, contract_abi),
+        TypeContents::Struct(fields) => default_value_for_struct(fields, contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
     }
 }
@@ -50,13 +50,13 @@ pub fn default_value_for_single_value(type_name: &str) -> Result<AnyValue, Box<d
 }
 
 pub fn default_value_for_struct(
-    fields: &Vec<StructFieldDescription>,
+    fields: &[StructFieldDescription],
     contract_abi: &ContractAbi,
 ) -> Result<AnyValue, Box<dyn Error>> {
     let mut field_values: Vec<StructField> = vec![];
 
     for field in fields.iter() {
-        let value = default_value_for_abi_type(&field.field_type.abi, &contract_abi)?;
+        let value = default_value_for_abi_type(&field.field_type.abi, contract_abi)?;
         field_values.push(StructField {
             name: field.name.clone(),
             value,
@@ -67,7 +67,7 @@ pub fn default_value_for_struct(
 }
 
 pub fn default_value_for_enum(
-    variants: &Vec<EnumVariantDescription>,
+    variants: &[EnumVariantDescription],
     contract_abi: &ContractAbi,
 ) -> Result<AnyValue, Box<dyn Error>> {
     let variant = variants
@@ -92,7 +92,7 @@ pub fn default_value_for_enum(
     } else if variant.is_tuple_variant() {
         let mut field_values: Vec<StructField> = vec![];
         for field in variant.fields.iter() {
-            let value = default_value_for_abi_type(&field.field_type.abi, &contract_abi)?;
+            let value = default_value_for_abi_type(&field.field_type.abi, contract_abi)?;
             field_values.push(StructField {
                 name: field.name.clone(),
                 value,

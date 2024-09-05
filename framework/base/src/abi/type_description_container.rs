@@ -25,7 +25,7 @@ impl TypeDescriptionContainerImpl {
     pub fn find(&self, abi_type_name: &str) -> Option<&TypeDescription> {
         self.0
             .iter()
-            .find(|(existing_type_name, _)| &existing_type_name.abi == abi_type_name)
+            .find(|(existing_type_name, _)| existing_type_name.abi == abi_type_name)
             .map(|(_, description)| description)
     }
 

@@ -98,7 +98,7 @@ impl EnumVariantDescription {
             }
         }
 
-        return true;
+        true
     }
 }
 

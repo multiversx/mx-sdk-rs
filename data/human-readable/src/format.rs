@@ -1,5 +1,5 @@
 pub use serde_json::Value as JsonValue;
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 pub struct HumanReadableValue {
     value: JsonValue,
@@ -30,8 +30,10 @@ impl HumanReadableValue {
             value: value.clone(),
         })
     }
+}
 
-    pub fn to_string(&self) -> String {
-        self.value.to_string()
+impl Display for HumanReadableValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.value.fmt(f)
     }
 }
