@@ -18,17 +18,7 @@ pub fn decode_human_readable_value(
     type_name: &str,
     contract_abi: &ContractAbi,
 ) -> Result<AnyValue, Box<dyn Error>> {
-    let type_description =
-        if let Some(type_description) = contract_abi.type_descriptions.0.get(type_name) {
-            type_description.to_owned()
-        } else {
-            TypeDescription {
-                docs: Vec::new(),
-                name: type_name.to_string(),
-                contents: TypeContents::NotSpecified,
-            }
-        };
-
+    let type_description = contract_abi.type_descriptions.find_or_default(type_name);
     decode_any_value(input, &type_description, &contract_abi)
 }
 
@@ -38,7 +28,9 @@ pub fn decode_any_value(
     contract_abi: &ContractAbi,
 ) -> Result<AnyValue, Box<dyn Error>> {
     match &type_description.contents {
-        TypeContents::NotSpecified => decode_single_value(input, type_description.name.as_str()),
+        TypeContents::NotSpecified => {
+            decode_single_value(input, type_description.names.abi.as_str())
+        },
         TypeContents::Enum(variants) => decode_enum(input, &variants, &contract_abi),
         TypeContents::Struct(fields) => decode_struct(input, &fields, &contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
@@ -141,7 +133,7 @@ pub fn decode_struct(
         let value = input
             .child(&field.name)
             .ok_or_else(|| Box::new(DecodeError("missing field")))?;
-        let value = decode_human_readable_value(&value, &field.field_type, &contract_abi)?;
+        let value = decode_human_readable_value(&value, &field.field_type.abi, &contract_abi)?;
         field_values.push(StructField {
             name: field.name.clone(),
             value,
@@ -196,7 +188,7 @@ pub fn decode_enum(
     if variant.is_tuple_variant() && variant.fields.len() == 1 {
         let value = input.child(variant.name.as_str()).unwrap();
         let value =
-            decode_human_readable_value(&value, &variant.fields[0].field_type, contract_abi)?;
+            decode_human_readable_value(&value, &variant.fields[0].field_type.abi, contract_abi)?;
         return Ok(AnyValue::Enum(Box::new(crate::EnumVariant {
             discriminant: variant.discriminant,
             value,
@@ -219,7 +211,7 @@ pub fn decode_enum(
             let value = value.get(i).unwrap();
             let value = decode_human_readable_value(
                 &(value.to_owned().into()),
-                &field.field_type,
+                &field.field_type.abi,
                 &contract_abi,
             )?;
             field_values.push(StructField {

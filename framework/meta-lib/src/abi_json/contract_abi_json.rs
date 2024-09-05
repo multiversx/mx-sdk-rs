@@ -136,7 +136,10 @@ pub fn convert_json_to_type_descriptions(
 ) -> TypeDescriptionContainerImpl {
     let mut type_descriptions = TypeDescriptionContainerImpl::new();
     for (type_name, type_description) in types.into_iter() {
-        type_descriptions.insert(type_name, TypeDescription::from(&type_description));
+        type_descriptions.insert(
+            TypeNames::from_abi(type_name),
+            TypeDescription::from(&type_description),
+        );
     }
     type_descriptions
 }

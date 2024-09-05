@@ -13,17 +13,7 @@ pub fn encode_human_readable_value(
     type_name: &str,
     contract_abi: &ContractAbi,
 ) -> Result<HumanReadableValue, Box<dyn Error>> {
-    let type_description =
-        if let Some(type_description) = contract_abi.type_descriptions.0.get(type_name) {
-            type_description.to_owned()
-        } else {
-            TypeDescription {
-                docs: Vec::new(),
-                name: type_name.to_string(),
-                contents: TypeContents::NotSpecified,
-            }
-        };
-
+    let type_description = contract_abi.type_descriptions.find_or_default(type_name);
     encode_any_value(input, &type_description, &contract_abi)
 }
 
@@ -33,7 +23,9 @@ pub fn encode_any_value(
     contract_abi: &ContractAbi,
 ) -> Result<HumanReadableValue, Box<dyn Error>> {
     match &type_description.contents {
-        TypeContents::NotSpecified => encode_single_value(input, type_description.name.as_str()),
+        TypeContents::NotSpecified => {
+            encode_single_value(input, type_description.names.abi.as_str())
+        },
         TypeContents::Enum(variants) => encode_enum(input, &variants, &contract_abi),
         TypeContents::Struct(fields) => encode_struct(input, &fields, &contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
@@ -146,7 +138,7 @@ pub fn encode_struct(
             .find(|f| f.name == field.name)
             .ok_or_else(|| Box::new(EncodeError("missing field")))?;
 
-        let value = encode_human_readable_value(&value.value, &field.field_type, contract_abi)?;
+        let value = encode_human_readable_value(&value.value, &field.field_type.abi, contract_abi)?;
         field_values.insert(field.name.to_owned(), value.get_value().to_owned());
     }
 
@@ -173,7 +165,7 @@ pub fn encode_enum(
     if variant.is_tuple_variant() && variant.fields.len() == 1 {
         let value = encode_human_readable_value(
             &enum_value.value,
-            &variant.fields[0].field_type,
+            &variant.fields[0].field_type.abi,
             contract_abi,
         )?;
         return Ok(JsonValue::Object(
@@ -192,8 +184,11 @@ pub fn encode_enum(
         let mut field_values: Vec<JsonValue> = vec![];
 
         for (field, field_type) in variant.fields.iter().zip(variant_fields.0.iter()) {
-            let value =
-                encode_human_readable_value(&field_type.value, &field.field_type, contract_abi)?;
+            let value = encode_human_readable_value(
+                &field_type.value,
+                &field.field_type.abi,
+                contract_abi,
+            )?;
             field_values.push(value.get_value().to_owned());
         }
 
@@ -212,7 +207,7 @@ pub fn encode_enum(
     let mut field_values: Map<String, JsonValue> = Map::new();
     for (field, field_type) in variant.fields.iter().zip(variant_fields.0.iter()) {
         let value =
-            encode_human_readable_value(&field_type.value, &field.field_type, contract_abi)?;
+            encode_human_readable_value(&field_type.value, &field.field_type.abi, contract_abi)?;
         field_values.insert(field.name.to_owned(), value.get_value().to_owned());
     }
 

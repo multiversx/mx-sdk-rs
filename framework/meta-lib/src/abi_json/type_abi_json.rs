@@ -45,8 +45,9 @@ impl From<&TypeDescriptionJson> for TypeDescription {
         };
         TypeDescription {
             docs: abi.docs.iter().map(|line| line.to_string()).collect(),
-            name: "".to_string(),
+            names: TypeNames::new(),
             contents: content_type,
+            macro_attributes: Vec::new(),
         }
     }
 }

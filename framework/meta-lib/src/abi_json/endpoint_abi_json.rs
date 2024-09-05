@@ -29,7 +29,7 @@ impl From<&InputAbiJson> for InputAbi {
     fn from(abi: &InputAbiJson) -> Self {
         InputAbi {
             arg_name: abi.arg_name.to_string(),
-            type_names: abi.type_names.clone(),
+            type_names: TypeNames::from_abi(abi.type_name.clone()),
             multi_arg: abi.multi_arg.unwrap_or(false),
         }
     }
@@ -69,7 +69,7 @@ impl From<&OutputAbiJson> for OutputAbi {
     fn from(abi: &OutputAbiJson) -> Self {
         OutputAbi {
             output_name: abi.output_name.clone(),
-            type_names: abi.type_name.clone(),
+            type_names: TypeNames::from_abi(abi.type_name.clone()),
             multi_result: abi.multi_result.unwrap_or(false),
         }
     }

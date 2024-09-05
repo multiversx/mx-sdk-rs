@@ -13,17 +13,7 @@ pub fn default_value_for_abi_type(
     type_name: &str,
     contract_abi: &ContractAbi,
 ) -> Result<AnyValue, Box<dyn Error>> {
-    let type_description =
-        if let Some(type_description) = contract_abi.type_descriptions.0.get(type_name) {
-            type_description.to_owned()
-        } else {
-            TypeDescription {
-                docs: Vec::new(),
-                name: type_name.to_string(),
-                contents: TypeContents::NotSpecified,
-            }
-        };
-
+    let type_description = contract_abi.type_descriptions.find_or_default(type_name);
     default_value_for_any_value(&type_description, contract_abi)
 }
 
@@ -33,7 +23,7 @@ pub fn default_value_for_any_value(
 ) -> Result<AnyValue, Box<dyn Error>> {
     match &type_description.contents {
         TypeContents::NotSpecified => {
-            default_value_for_single_value(type_description.name.as_str())
+            default_value_for_single_value(type_description.names.abi.as_str())
         },
         TypeContents::Enum(variants) => default_value_for_enum(&variants, contract_abi),
         TypeContents::Struct(fields) => default_value_for_struct(&fields, contract_abi),
@@ -66,7 +56,7 @@ pub fn default_value_for_struct(
     let mut field_values: Vec<StructField> = vec![];
 
     for field in fields.iter() {
-        let value = default_value_for_abi_type(&field.field_type, &contract_abi)?;
+        let value = default_value_for_abi_type(&field.field_type.abi, &contract_abi)?;
         field_values.push(StructField {
             name: field.name.clone(),
             value,
@@ -94,7 +84,7 @@ pub fn default_value_for_enum(
 
     // handle tuple with only one field as a special case (we don't need a wrapper array)
     if variant.is_tuple_variant() && variant.fields.len() == 1 {
-        let value = default_value_for_abi_type(&variant.fields[0].field_type, contract_abi)?;
+        let value = default_value_for_abi_type(&variant.fields[0].field_type.abi, contract_abi)?;
         return Ok(AnyValue::Enum(Box::new(crate::EnumVariant {
             discriminant: variant.discriminant,
             value,
@@ -102,7 +92,7 @@ pub fn default_value_for_enum(
     } else if variant.is_tuple_variant() {
         let mut field_values: Vec<StructField> = vec![];
         for field in variant.fields.iter() {
-            let value = default_value_for_abi_type(&field.field_type, &contract_abi)?;
+            let value = default_value_for_abi_type(&field.field_type.abi, &contract_abi)?;
             field_values.push(StructField {
                 name: field.name.clone(),
                 value,
