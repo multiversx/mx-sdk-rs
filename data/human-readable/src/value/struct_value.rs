@@ -4,7 +4,7 @@ use multiversx_sc_scenario::multiversx_sc::codec::{
 
 use crate::AnyValue;
 
-pub struct StructValue(Vec<StructField>);
+pub struct StructValue(pub Vec<StructField>);
 
 pub struct StructField {
     pub name: String,

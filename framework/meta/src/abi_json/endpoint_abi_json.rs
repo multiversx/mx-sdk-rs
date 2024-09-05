@@ -25,6 +25,22 @@ impl From<&InputAbi> for InputAbiJson {
     }
 }
 
+impl From<&InputAbiJson> for InputAbi {
+    fn from(abi: &InputAbiJson) -> Self {
+        InputAbi {
+            arg_name: abi.arg_name.to_string(),
+            type_name: abi.type_name.clone(),
+            multi_arg: abi.multi_arg.unwrap_or(false),
+        }
+    }
+}
+
+impl From<InputAbiJson> for InputAbi {
+    fn from(abi: InputAbiJson) -> Self {
+        InputAbi::from(&abi)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct OutputAbiJson {
     #[serde(rename = "name")]
@@ -46,6 +62,22 @@ impl From<&OutputAbi> for OutputAbiJson {
             type_name: abi.type_name.clone(),
             multi_result: if abi.multi_result { Some(true) } else { None },
         }
+    }
+}
+
+impl From<&OutputAbiJson> for OutputAbi {
+    fn from(abi: &OutputAbiJson) -> Self {
+        OutputAbi {
+            output_name: abi.output_name.clone(),
+            type_name: abi.type_name.clone(),
+            multi_result: abi.multi_result.unwrap_or(false),
+        }
+    }
+}
+
+impl From<OutputAbiJson> for OutputAbi {
+    fn from(abi: OutputAbiJson) -> Self {
+        OutputAbi::from(&abi)
     }
 }
 
@@ -149,5 +181,67 @@ impl From<&EndpointAbi> for EndpointAbiJson {
                 None
             },
         }
+    }
+}
+
+impl From<&EndpointAbiJson> for EndpointAbi {
+    fn from(abi: &EndpointAbiJson) -> Self {
+        EndpointAbi {
+            docs: abi.docs.iter().map(|d| d.to_string()).collect(),
+            name: abi.name.to_string(),
+            only_owner: abi.only_owner.unwrap_or(false),
+            only_admin: abi.only_admin.unwrap_or(false),
+            mutability: match abi.mutability {
+                EndpointMutabilityAbiJson::Mutable => EndpointMutabilityAbi::Mutable,
+                EndpointMutabilityAbiJson::Readonly => EndpointMutabilityAbi::Readonly,
+                EndpointMutabilityAbiJson::Pure => EndpointMutabilityAbi::Pure,
+            },
+            payable_in_tokens: abi
+                .payable_in_tokens
+                .iter()
+                .map(|d| d.to_string())
+                .collect(),
+            inputs: abi.inputs.iter().map(InputAbi::from).collect(),
+            outputs: abi.outputs.iter().map(OutputAbi::from).collect(),
+            labels: abi.labels.clone(),
+            allow_multiple_var_args: abi.allow_multiple_var_args.unwrap_or(false),
+            rust_method_name: abi.name.clone(),
+            endpoint_type: EndpointTypeAbi::Endpoint,
+        }
+    }
+}
+
+impl From<EndpointAbiJson> for EndpointAbi {
+    fn from(abi: EndpointAbiJson) -> Self {
+        EndpointAbi::from(&abi)
+    }
+}
+
+impl From<&ConstructorAbiJson> for EndpointAbi {
+    fn from(abi: &ConstructorAbiJson) -> Self {
+        EndpointAbi {
+            docs: abi.docs.iter().map(|d| d.to_string()).collect(),
+            name: "".to_string(),
+            only_owner: false,
+            only_admin: false,
+            mutability: EndpointMutabilityAbi::Mutable,
+            payable_in_tokens: abi
+                .payable_in_tokens
+                .iter()
+                .map(|d| d.to_string())
+                .collect(),
+            inputs: abi.inputs.iter().map(InputAbi::from).collect(),
+            outputs: abi.outputs.iter().map(OutputAbi::from).collect(),
+            labels: vec![],
+            allow_multiple_var_args: false,
+            rust_method_name: "".to_string(),
+            endpoint_type: EndpointTypeAbi::Init,
+        }
+    }
+}
+
+impl From<ConstructorAbiJson> for EndpointAbi {
+    fn from(abi: ConstructorAbiJson) -> Self {
+        EndpointAbi::from(&abi)
     }
 }

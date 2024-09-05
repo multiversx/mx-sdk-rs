@@ -5,6 +5,7 @@ use multiversx_sc_scenario::multiversx_sc::codec::{
 use crate::{EnumVariant, SingleValue, StructValue};
 
 pub enum AnyValue {
+    None,
     SingleValue(SingleValue),
     Struct(StructValue),
     Enum(Box<EnumVariant>),
@@ -17,9 +18,10 @@ impl NestedEncode for AnyValue {
         H: EncodeErrorHandler,
     {
         match self {
+            AnyValue::None => Ok(()),
             AnyValue::SingleValue(sv) => sv.dep_encode_or_handle_err(dest, h),
             AnyValue::Struct(s) => s.dep_encode_or_handle_err(dest, h),
-            AnyValue::Enum(_) => todo!(),
+            AnyValue::Enum(e) => e.dep_encode_or_handle_err(dest, h),
         }
     }
 }
@@ -31,9 +33,10 @@ impl TopEncode for AnyValue {
         H: EncodeErrorHandler,
     {
         match self {
+            AnyValue::None => Ok(()),
             AnyValue::SingleValue(sv) => sv.top_encode_or_handle_err(output, h),
             AnyValue::Struct(s) => s.top_encode_or_handle_err(output, h),
-            AnyValue::Enum(_) => todo!(),
+            AnyValue::Enum(e) => e.top_encode_or_handle_err(output, h),
         }
     }
 }

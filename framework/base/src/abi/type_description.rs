@@ -72,6 +72,21 @@ impl EnumVariantDescription {
             fields,
         }
     }
+
+    pub fn is_empty_variant(&self) -> bool {
+        self.fields.is_empty()
+    }
+
+    pub fn is_tuple_variant(&self) -> bool {
+        // all fields are numbers
+        for field in self.fields.iter() {
+            if field.name.parse::<u64>().is_err() {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
