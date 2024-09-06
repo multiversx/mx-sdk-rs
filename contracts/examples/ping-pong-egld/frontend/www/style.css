@@ -1,42 +1,65 @@
+/* Existing styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f0f0f0;
+    background-color: #282828;
+    transition: filter 0.3s ease;
 }
 
 h1 {
-    color: #333;
+    color: #d5d5d5;
     text-align: center;
 }
 
 p {
-    color: #666;
+    color: #989898;
     text-align: center;
+}
+
+#walletButton {
+    padding: 15px 25px; 
+    background-color: #008cb3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#walletButton:hover {
+    background-color: #0068b3;
+    transform: scale(1.05);
 }
 
 .button-container {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Increased gap between buttons */
-    width: 250px; /* Slightly wider container */
+    gap: 15px;
+    width: 250px;
     margin: 0 auto;
     margin-top: 50px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-button {
-    padding: 15px 25px; /* Increased padding for bigger buttons */
+.sc-interact {
+    padding: 15px 25px;
     background-color: #1bca81;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
-    font-size: 18px; /* Increased font size */
+    font-size: 18px;
 }
 
-button:hover {
+.sc-interact:hover {
     background-color: #00b368;
+    transform: scale(1.05);
 }
 
 .ping-container {
@@ -45,10 +68,91 @@ button:hover {
     align-items: center;
 }
 
-#addInput {
-    padding: 15px;
-    border: 1px solid #ccc;
+#deploySubmit, #pingSubmit, #pongSubmit {
+    padding: 15px 25px;
+    background-color: #008cb3;
+    color: white;
+    border: none;
     border-radius: 5px;
-    flex-grow: 1;
-    font-size: 18px; /* Match the font size of the buttons */
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#deploySubmit:hover, #pingSubmit:hover, #pongSubmit:hover {
+    background-color: #0068b3;
+    transform: scale(1.05);
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(148, 136, 136, 0.6);
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+}
+
+.modal {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    border-radius: 10px;
+    text-align: left;
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#bodyWrapper {
+    transition: filter 0.3s ease;
+}
+
+/* Blur effect only on the content wrapper */
+#bodyWrapper.modal-open {
+    filter: blur(5px);
 }

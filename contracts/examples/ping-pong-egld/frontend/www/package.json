@@ -17,6 +17,10 @@
     "style-loader": "^4.0.0",
     "webpack": "^5.93.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.1.0"
+    "webpack-dev-server": "^5.0.4"
+  },
+  "dependencies": {
+    "@multiversx/sdk-dapp": "^2.40.1",
+    "@multiversx/sdk-web-wallet-cross-window-provider": "^1.0.0"
   }
 }

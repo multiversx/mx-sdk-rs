@@ -1,5 +1,5 @@
 use crate::view::helpers::denominate;
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::HttpResponse;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]

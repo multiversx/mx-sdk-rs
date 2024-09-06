@@ -7,23 +7,84 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>MultiversX Smart Contract Interactor</h1>
-  <p>Interact with your contract, by using the buttons below corresponding to the endpoints of the SC</p>
-  
-  <div class="button-container">
-    <button id="getPingAmountButton">get_ping_amount</button>
-    <button id="getMaxFundsButton">get_max_funds</button>
-    <button id="getUserAddresses">get_user_addresses</button>
-    <button id="pongButton">pong</button>
-    <button id="pongAllButton">pong_all</button>
-    <button id="deployButton">deploy</button>
-    <button id="timestampButton">timestamp</button>
-    <button id="deadlineButton">deadline</button>
-    <div class="ping-container">
-      <button id="pingButton">ping</button>
-      <input type="text" id="addInput" placeholder="EGLD amount">
+  <button id="walletButton">Connect Wallet</button>
+  <div id="bodyWrapper">
+    <h1>MultiversX Smart Contract Interactor</h1>
+    <p>Interact with your contract, by using the buttons below corresponding to the endpoints of the SC</p>
+    
+    <div class="button-container">
+      <button class="sc-interact" id="getPingAmountButton">get_ping_amount</button>
+      <button id="getMaxFundsButton">get_max_funds</button>
+      <button id="getUserAddresses">get_user_addresses</button>
+      <button id="timestampButton">timestamp</button>
+      <button id="deadlineButton">deadline</button>
+      <button class="sc-interact" id="pongButton">pong</button>
+      <button class="sc-interact" id="pongAllButton">pong_all</button>
+      <button class="sc-interact" id="deployButton">deploy</button>
+      <button class="sc-interact" id="pingButton">ping</button>
     </div>
   </div>
+
+  <div id="deployModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Deploy Contract</h2>
+      <form id="deployForm">
+        <label for="pingAmount">Ping Amount</label>
+        <input type="text" id="pingAmount" name="pingAmount" required><br>
+
+        <label for="maxFunds">Max Funds</label>
+        <input type="text" id="maxFunds" name="maxFunds" required><br>
+
+        <label for="activationTimestamp">Activation Timestamp</label>
+        <input type="text" id="activationTimestamp" name="activationTimestamp" required><br>
+
+        <label for="duration">Duration (seconds)</label>
+        <input type="text" id="duration" name="duration" required><br>
+
+        <label for="deployer">Deployer Address</label>
+        <input type="text" id="deployer" name="deployer" required><br>
+
+        <button id="deploySubmit" type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="pingModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Ping Transaction</h2>
+      <form id="pingForm">
+        <label for="egldValue">Ping Amount</label>
+        <input type="text" id="egldValue" name="egldValue" required><br>
+
+        <label for="senderPing">Sender address</label>
+        <input type="text" id="senderPing" name="deployer" required><br>
+
+        <label for="contractAddrPing">Contract Address</label>
+        <input type="text" id="contractAddrPing" name="deployer" required><br>
+
+        <button id="pingSubmit" type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="pongModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Pong Transaction</h2>
+      <form id="pongForm">
+        <label for="senderPong">Sender address</label>
+        <input type="text" id="senderPong" name="deployer" required><br>
+
+        <label for="contractAddrPong">Contract Address</label>
+        <input type="text" id="contractAddrPong" name="deployer" required><br>
+
+        <button id="pongSubmit" type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+</body>
 
   <script src="index.js"></script>
 </body>

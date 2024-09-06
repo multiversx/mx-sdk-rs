@@ -38,7 +38,7 @@ impl ActixInteractor {
         }
     }
 
-    async fn set_state(&mut self) {
+    async fn _set_state(&mut self) {
         println!("wallet address: {}", self.wallet_address);
         self.interactor
             .retrieve_account(&self.adder_owner_address)
