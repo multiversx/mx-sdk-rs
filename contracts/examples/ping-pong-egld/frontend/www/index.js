@@ -1,12 +1,18 @@
-import { tx_request } from "../pkg";
+import { tx_request, query_request } from "../pkg";
 
 const pingButton = document.getElementById('pingButton');
 const deployButton = document.getElementById('deployButton');
 const pongButton = document.getElementById('pongButton');
+const timestampButton = document.getElementById('timestampButton');
+const deadlineButton = document.getElementById('deadlineButton');
+const maxFundsButton = document.getElementById('getMaxFundsButton');
+const userAddressesButton = document.getElementById('getUserAddresses');
+const pingAmountButton = document.getElementById('getPingAmountButton');
 
 const alice_wallet = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
 
 let deployed_contract_address = "";
+
 
 async function handlePing(event) {
     event.preventDefault();
@@ -71,6 +77,18 @@ async function handleDeploy(event) {
     }
 }
 
+async function handleTimestamp(event) {
+    event.preventDefault();
+    try {
+        let res = await query_request("timestamp");
+        console.log("Response:", res);
+        alert(`Response: ${JSON.stringify(res)}`);   
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while processing your request.");
+    }
+}
+
 
 async function handlePong(event) {
     event.preventDefault();
@@ -87,6 +105,59 @@ async function handlePong(event) {
     }
 }
 
+async function handleDeadline(event) {
+    event.preventDefault();
+    try {
+        let res = await query_request("deadline");;
+        console.log("Response:", res);
+        alert(`Response: ${JSON.stringify(res)}`);   
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while processing your request.");
+    }
+}
+
+async function handleMaxFunds(event) {
+    event.preventDefault();
+    try {
+        let res = await query_request("max_funds");
+        console.log("Response:", res);
+        alert(`Response: ${JSON.stringify(res)}`);   
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while processing your request.");
+    }
+}
+
+async function handlePingAmount(event) {
+    event.preventDefault();
+    try {
+        let res = await query_request("ping_amount");
+        console.log("Response:", res);
+        alert(`Response: ${JSON.stringify(res)}`);   
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while processing your request.");
+    }
+}
+
+async function handleUserAddresses(event) {
+    event.preventDefault();
+    try {
+        let res = await query_request("user_addresses");
+        console.log("Response:", res);
+        alert(`Response: ${JSON.stringify(res)}`);   
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while processing your request.");
+    }
+}
+
 pingButton.addEventListener('click', handlePing);
 deployButton.addEventListener('click', handleDeploy);
 pongButton.addEventListener('click', handlePong);
+timestampButton.addEventListener('click', handleTimestamp);
+deadlineButton.addEventListener('click', handleDeadline);
+pingAmountButton.addEventListener('click', handlePingAmount);
+maxFundsButton.addEventListener('click', handleMaxFunds);
+userAddressesButton.addEventListener('click', handleUserAddresses);

@@ -1,11 +1,11 @@
 use serde_json::{json, Value};
 
 #[derive(Debug, Clone)]
-pub struct TimestampResponse {
+pub struct PingAmountResponse {
     response: Option<Value>,
 }
 
-impl TimestampResponse {
+impl PingAmountResponse {
     pub fn new(response: String) -> Self {
         let response = serde_json::from_str::<Value>(&response).ok();
         Self { response }

@@ -3,7 +3,7 @@ mod basic_interact_state;
 use basic_interact_state::State;
 use ping_pong_egld::ping_pong_proxy;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{hex, imports::*};
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json"; // wrong - doesn't exist
 
@@ -27,11 +27,14 @@ impl ActixInteractor {
         let ping_pong_owner = interactor.register_wallet(Wallet::from(test_wallets::alice()));
         let wallet_address = interactor.register_wallet(test_wallets::heidi());
 
+        let mut state = State::load_state();
+        state.set_contract_address(Bech32Address::from_bech32_string("erd1qqqqqqqqqqqqqpgqmg79q8dvh4x8equxrtccf5jqw2ruc2d3d8ssww2c7t".to_string()));
+
         Self {
             interactor,
             adder_owner_address: ping_pong_owner.into(),
             wallet_address: wallet_address.into(),
-            state: State::load_state(),
+            state,
         }
     }
 
@@ -83,7 +86,7 @@ impl ActixInteractor {
         str_addr
     }
 
-    pub async fn deadline(&mut self) {
+    pub async fn deadline(&mut self) -> String {
         let result_value = self
             .interactor
             .query()
@@ -95,7 +98,7 @@ impl ActixInteractor {
             .run()
             .await;
 
-        println!("Result: {result_value:?}");
+        result_value.to_string()
     }
 
     pub async fn activation_timestamp(&mut self) -> String {
@@ -110,11 +113,10 @@ impl ActixInteractor {
             .run()
             .await;
 
-        println!("Result: {result_value:?}");
         result_value.to_string()
     }
 
-    pub async fn max_funds(&mut self) {
+    pub async fn max_funds(&mut self) -> String {
         let result_value = self
             .interactor
             .query()
@@ -126,7 +128,45 @@ impl ActixInteractor {
             .run()
             .await;
 
-        println!("Result: {result_value:?}");
+        result_value.unwrap().to_string()
+    }
+
+    pub async fn ping_amount(&mut self) -> String {
+        let result_value = self
+            .interactor
+            .query()
+            .to(self.state.current_contract_address())
+            .typed(ping_pong_proxy::PingPongProxy)
+            .ping_amount()
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+
+        result_value.to_string()
+    }
+
+    pub async fn user_addresses(&mut self) -> String {
+        let result_value = self
+            .interactor
+            .query()
+            .to(self.state.current_contract_address())
+            .typed(ping_pong_proxy::PingPongProxy)
+            .get_user_addresses()
+            .returns(ReturnsResultUnmanaged)
+            .prepare_async()
+            .run()
+            .await;
+
+        // ??? HEADCANON
+        let addresses_str: Vec<String> = result_value
+            .iter()
+            .map(|address| hex::encode(address.as_bytes()))
+            .collect();
+
+        let result = addresses_str.join(", ");
+
+        result
     }
 
     pub async fn ping(&mut self, sender: String, contract_address: String, value: u128) -> String {
@@ -182,3 +222,25 @@ async fn test() {
     //     )
     //     .await;
 }
+
+#[tokio::test]
+async fn test_deadline() {
+    let mut interactor = ActixInteractor::init().await;
+    let res = interactor.deadline().await;
+    println!("Deadline: {}", res);
+}
+
+#[tokio::test]
+async fn test_user_addresses() {
+    let mut interactor = ActixInteractor::init().await;
+    let res = interactor.user_addresses().await;
+    println!("User Addresses: {}", res);
+}
+
+#[tokio::test]
+async fn test_max_funds() {
+    let mut interactor = ActixInteractor::init().await;
+    let res = interactor.max_funds().await;
+    println!("Max Funds: {}", res);
+}
+

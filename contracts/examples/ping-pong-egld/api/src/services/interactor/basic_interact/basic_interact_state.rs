@@ -6,7 +6,7 @@ use std::{
 };
 
 /// State file
-const STATE_FILE: &str = "/home/andreiv24/Documents/mvx/work/mx-sdk-rs/contracts/examples/ping-pong-egld/api/src/services/interactor/basic_interact/state.toml";
+const STATE_FILE: &str = "/home/justeatanapple/mx-sdk-rs/contracts/examples/ping-pong-egld/api/src/services/interactor/basic_interact/state.toml";
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
@@ -35,7 +35,7 @@ impl State {
     pub fn current_contract_address(&self) -> &Bech32Address {
         self.adder_address
             .as_ref()
-            .expect("no known adder contract, deploy first")
+            .expect("no known contract, deploy first")
     }
 }
 

@@ -3428,6 +3428,7 @@ dependencies = [
 name = "sc-query-service"
 version = "0.1.0"
 dependencies = [
+ "actix-cors",
  "actix-web",
  "api",
  "serde",

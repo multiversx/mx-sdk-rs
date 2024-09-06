@@ -9,4 +9,5 @@ toml = "0.8.6"
 tokio = "1.2.4"
 serde_json = "1.0.127"
 actix-web = "4.0"
+actix-cors = "0.7"
 api = { path = "../../.." }
