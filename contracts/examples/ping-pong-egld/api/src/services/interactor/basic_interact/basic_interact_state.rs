@@ -6,7 +6,7 @@ use std::{
 };
 
 /// State file
-const STATE_FILE: &str = "/home/justeatanapple/mx-sdk-rs/contracts/examples/ping-pong-egld/api/src/services/interactor/basic_interact/state.toml";
+const STATE_FILE: &str = "mystate.toml";
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {

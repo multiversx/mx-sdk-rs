@@ -204,18 +204,6 @@ async function handleDeadline(event) {
     }
 }
 
-async function handleMaxFunds(event) {
-    event.preventDefault();
-    try {
-        let res = await query_request("max_funds");
-        console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
-    } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while processing your request.");
-    }
-}
-
 async function handlePingAmount(event) {
     event.preventDefault();
     try {
@@ -245,46 +233,10 @@ async function handleUserAddresses(event) {
 
 }
 
-async function handleDeadline(event) {
-    event.preventDefault();
-    try {
-        let res = await query_request("deadline");;
-        console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
-    } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while processing your request.");
-    }
-}
-
 async function handleMaxFunds(event) {
     event.preventDefault();
     try {
         let res = await query_request("max_funds");
-        console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
-    } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while processing your request.");
-    }
-}
-
-async function handlePingAmount(event) {
-    event.preventDefault();
-    try {
-        let res = await query_request("ping_amount");
-        console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
-    } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while processing your request.");
-    }
-}
-
-async function handleUserAddresses(event) {
-    event.preventDefault();
-    try {
-        let res = await query_request("user_addresses");
         console.log("Response:", res);
         alert(`Response: ${JSON.stringify(res)}`);   
     } catch (error) {

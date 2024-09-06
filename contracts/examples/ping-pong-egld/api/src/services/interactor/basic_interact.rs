@@ -27,14 +27,11 @@ impl ActixInteractor {
         let ping_pong_owner = interactor.register_wallet(Wallet::from(test_wallets::alice()));
         let wallet_address = interactor.register_wallet(test_wallets::heidi());
 
-        let mut state = State::load_state();
-        state.set_contract_address(Bech32Address::from_bech32_string("erd1qqqqqqqqqqqqqpgqmg79q8dvh4x8equxrtccf5jqw2ruc2d3d8ssww2c7t".to_string()));
-
         Self {
             interactor,
             adder_owner_address: ping_pong_owner.into(),
             wallet_address: wallet_address.into(),
-            state,
+            state: State::load_state(),
         }
     }
 
@@ -243,4 +240,3 @@ async fn test_max_funds() {
     let res = interactor.max_funds().await;
     println!("Max Funds: {}", res);
 }
-
