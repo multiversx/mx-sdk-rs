@@ -1,8 +1,11 @@
 use std::{error::Error, fmt::Display};
 
-use bech32::ToBase32;
-use multiversx_sc_scenario::multiversx_sc::abi::{
-    ContractAbi, EnumVariantDescription, StructFieldDescription, TypeContents, TypeDescription,
+use multiversx_sc_scenario::{
+    bech32,
+    imports::Address,
+    multiversx_sc::abi::{
+        ContractAbi, EnumVariantDescription, StructFieldDescription, TypeContents, TypeDescription,
+    },
 };
 use serde_json::{Map, Value as JsonValue};
 
@@ -99,10 +102,8 @@ fn encode_single_value(
                 return Err(Box::new(EncodeError("expected bytes value")));
             };
 
-            let address = bech32::encode("erd", value.to_base32(), bech32::Variant::Bech32)
-                .map_err(|_| Box::new(EncodeError("failed to encode address")))?;
-
-            Ok(JsonValue::String(address).into())
+            let bech32_addres_string = bech32::encode(&Address::from_slice(value));
+            Ok(JsonValue::String(bech32_addres_string).into())
         },
         "bool" => {
             let AnyValue::SingleValue(value) = input else {

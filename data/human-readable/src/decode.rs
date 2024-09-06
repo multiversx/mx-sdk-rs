@@ -5,8 +5,8 @@ use crate::{
     multiversx_sc::abi::{TypeContents, TypeDescription},
     SingleValue, StructField, StructValue,
 };
-use bech32::FromBase32;
 use multiversx_sc_scenario::{
+    bech32,
     multiversx_sc::abi::{ContractAbi, EnumVariantDescription, StructFieldDescription},
     num_bigint::{BigInt, BigUint},
 };
@@ -95,19 +95,11 @@ fn decode_single_value(
                 .as_str()
                 .ok_or_else(|| Box::new(DecodeError("expected string value")))?;
 
-            let (_, address_bytes_u5, _) = bech32::decode(str_value)
+            let address = bech32::try_decode(str_value)
                 .map_err(|_| Box::new(DecodeError("failed to parse address")))?;
-            let address_bytes = Vec::<u8>::from_base32(&address_bytes_u5)
-                .map_err(|_| Box::new(DecodeError("failed to parse address")))?;
-
-            if address_bytes.len() != 32 {
-                return Err(Box::new(DecodeError(
-                    "Invalid address length after decoding",
-                )));
-            }
 
             Ok(AnyValue::SingleValue(SingleValue::Bytes(
-                address_bytes.into(),
+                address.into_boxed_bytes().into_box(),
             )))
         },
         "bool" => {

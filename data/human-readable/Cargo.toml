@@ -16,7 +16,6 @@ categories = ["cryptography::cryptocurrencies", "development-tools"]
 
 [dependencies]
 serde_json = { version = "1.0.68" }
-bech32 = "0.9"
 
 [dependencies.multiversx-sc-scenario]
 version = "=0.53.0"
