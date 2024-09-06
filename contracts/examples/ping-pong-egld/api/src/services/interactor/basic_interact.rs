@@ -52,8 +52,6 @@ impl ActixInteractor {
         deployer: String,
     ) -> String {
         let ping_amount = BigUint::<StaticApi>::from(ping_amount);
-        // let duration_in_seconds = 1825457087u64;
-        // let opt_activation_timestamp = Option::Someping_amount0u64);
         let max_funds_option = OptionalValue::Some(BigUint::<StaticApi>::from(max_funds));
 
         let new_address = self

@@ -13,15 +13,22 @@
     <p>Interact with your contract, by using the buttons below corresponding to the endpoints of the SC</p>
     
     <div class="button-container">
-      <button class="sc-interact" id="getPingAmountButton">get_ping_amount</button>
-      <button class="sc-interact" id="getMaxFundsButton">get_max_funds</button>
-      <button class="sc-interact" id="getUserAddresses">get_user_addresses</button>
-      <button class="sc-interact" id="timestampButton">timestamp</button>
-      <button class="sc-interact" id="deadlineButton">deadline</button>
-      <button class="sc-interact" id="pongButton">pong</button>
-      <button class="sc-interact" id="pongAllButton">pong_all</button>
-      <button class="sc-interact" id="deployButton">deploy</button>
-      <button class="sc-interact" id="pingButton">ping</button>
+      <div id="queryContainer">
+        <h2 class="column_name">Queries</h2>
+        <button class="sc-interact" id="getPingAmountButton">get_ping_amount</button>
+        <button class="sc-interact" id="getMaxFundsButton">get_max_funds</button>
+        <button class="sc-interact" id="getUserAddresses">get_user_addresses</button>
+        <button class="sc-interact" id="timestampButton">timestamp</button>
+        <button class="sc-interact" id="deadlineButton">deadline</button>
+      </div>
+
+      <div id="txContainer">
+        <h2 class="column_name">Transactions</h2>
+        <button class="sc-interact" id="pongButton">pong</button>
+        <button class="sc-interact" id="pongAllButton">pong_all</button>
+        <button class="sc-interact" id="deployButton">deploy</button>
+        <button class="sc-interact" id="pingButton">ping</button>
+      </div>
     </div>
   </div>
 
@@ -84,6 +91,16 @@
       </form>
     </div>
   </div>
+
+  <div id="txStatusModal">
+    <span class="close">&times;</span>
+    <h2>Transaction Status</h2>
+    <div id="statusContainer">
+      <img src="https://imgur.com/AmoFMD5.gif" alt="loading" id="statusImage">
+      <h3 id="status">In progress...</h3>
+    </div>
+  </div>
+  
 </body>
 
   <script src="index.js"></script>

@@ -6,7 +6,7 @@ use std::{
 };
 
 /// State file
-const STATE_FILE: &str = "mystate.toml";
+const STATE_FILE: &str = "state.toml";
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
@@ -29,6 +29,10 @@ impl State {
     /// Sets the contract address
     pub fn set_contract_address(&mut self, address: Bech32Address) {
         self.adder_address = Some(address);
+        println!(
+            "contract address set to: {}",
+            self.adder_address.as_ref().unwrap()
+        );
     }
 
     /// Returns the contract address
@@ -42,6 +46,7 @@ impl State {
 impl Drop for State {
     // Serializes state to file
     fn drop(&mut self) {
+        println!("saving state");
         let mut file = std::fs::File::create(STATE_FILE).unwrap();
         file.write_all(toml::to_string(self).unwrap().as_bytes())
             .unwrap();

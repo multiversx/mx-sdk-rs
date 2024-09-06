@@ -15,12 +15,30 @@ const pingAmountButton = document.getElementById('getPingAmountButton');
 // const alice_wallet = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
 
 const deployModal = document.getElementById("deployModal");
+const pingModal = document.getElementById("pingModal");
+const pongModal = document.getElementById("pongModal");
+const txStatusModal = document.getElementById("txStatusModal");
+const bodyWrapper = document.getElementById("bodyWrapper");
+
+
 const closeModalDeploy = document.getElementsByClassName("close")[0];
 const closeModalPing = document.getElementsByClassName("close")[1];
 const closeModalPong = document.getElementsByClassName("close")[2];
-const pingModal = document.getElementById("pingModal");
-const pongModal = document.getElementById("pongModal");
-const bodyWrapper = document.getElementById("bodyWrapper");
+const closeModalTxStatus = document.getElementsByClassName("close")[3];
+
+function showStatusModal(statusText, imgSrc) {
+    document.getElementById('statusImage').src = imgSrc;
+    document.getElementById('status').innerText = statusText;
+    
+    txStatusModal.classList.add("show");
+
+    if (statusText !== "In progress...") {
+        setTimeout(() => {
+            txStatusModal.classList.remove("show");
+            bodyWrapper.classList.remove("modal-open");
+        }, 4000); // Hide modal after 4 seconds
+    }
+}
 
 function checkValidAmount (egldValue) {
     if (isNaN(egldValue)) {
@@ -59,6 +77,10 @@ closeModalPong.onclick = function() {
     bodyWrapper.classList.remove("modal-open");
 }
 
+closeModalTxStatus.onclick = function() {
+    txStatusModal.classList.remove("show");
+}
+
 async function handlePing(event) {
     event.preventDefault();
     pingModal.classList.add("show");
@@ -87,11 +109,13 @@ async function handlePingSubmit(event) {
     };
 
     try {
+        showStatusModal("In progress...", "https://imgur.com/AmoFMD5.gif");
         let res = await tx_request("ping", JSON.stringify(body));
+        showStatusModal("Success", "https://imgur.com/MfsVKLh.png");
         console.log(`Response: ${res.response}`);
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while processing your request.");
+        showStatusModal("Error", "https://imgur.com/lVCaXg2.png")
     } finally {
         pingModal.style.display = "none";
         document.getElementById('pingForm').reset();
@@ -133,12 +157,14 @@ async function handleDeploySumbit(event) {
     console.log(body);
 
     try {
+        showStatusModal("In progress...", "https://imgur.com/AmoFMD5.gif");
         let res = await tx_request("deploy", JSON.stringify(body));
+        showStatusModal("Success", "https://imgur.com/MfsVKLh.png");
         console.log(`Response: ${res.response}`);
         console.log(`Contract address: ${res.address}`);
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while processing your request.");
+        showStatusModal("Error", "https://imgur.com/lVCaXg2.png")
     } finally {
         deployModal.classList.remove("show");
         document.getElementById('deployForm').reset();
@@ -179,11 +205,13 @@ async function handlePongSubmit(event) {
     console.log(body);
 
     try {
+        showStatusModal("In progress...", "https://imgur.com/AmoFMD5.gif");
         let res = await tx_request("pong", JSON.stringify(body));
+        showStatusModal("Success", "https://imgur.com/MfsVKLh.png");
         console.log(`Response: ${res.response}`);
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while processing your request.");
+        showStatusModal("Error", "https://imgur.com/lVCaXg2.png")
     } finally {
         pongModal.classList.remove("show");
         document.getElementById('pongForm').reset();
