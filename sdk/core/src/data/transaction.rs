@@ -131,7 +131,7 @@ pub struct ApiSmartContractResult {
     pub value: u64,
     pub receiver: Address,
     pub sender: Address,
-    pub data: String,
+    pub data: Option<String>,
     pub prev_tx_hash: String,
     pub original_tx_hash: String,
     pub gas_limit: u64,
