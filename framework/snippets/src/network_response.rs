@@ -52,12 +52,14 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
 fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
     let out_scr = tx.smart_contract_results.iter().find(is_out_scr);
 
-    match out_scr {
-        Some(out_scr) => match &out_scr.data {
-            Some(data) => decode_scr_data_or_panic(data),
-            None => Vec::new(),
-        },
-        None => process_out_from_log(tx).unwrap_or_default(),
+    if let Some(out_scr) = out_scr {
+        if let Some(data) = &out_scr.data {
+            decode_scr_data_or_panic(data)
+        } else {
+            Vec::new()
+        }
+    } else {
+        process_out_from_log(tx).unwrap_or_default()
     }
 }
 
@@ -155,9 +157,10 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
             .iter()
             .find(|e| e.hash == scr.prev_tx_hash)
         {
-            match &prev_tx.data {
-                Some(data) => data.as_ref(),
-                None => "",
+            if let Some(data) = &prev_tx.data {
+                data.as_ref()
+            } else {
+                ""
             }
         } else if &scr.prev_tx_hash == tx.hash.as_ref().unwrap() {
             &original_tx_data
@@ -181,17 +184,16 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
             continue;
         }
 
-        match &scr.data {
-            Some(data) => {
-                if data.starts_with("ESDTTransfer@") {
-                    let encoded_tid = data.split('@').nth(1);
-                    return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
-                } else if data.starts_with("@00@") || data.starts_with("@6f6b@") {
-                    let encoded_tid = data.split('@').nth(2);
-                    return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
-                }
-            },
-            None => return Some(String::new()),
+        if let Some(data) = &scr.data {
+            if data.starts_with("ESDTTransfer@") {
+                let encoded_tid = data.split('@').nth(1);
+                return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
+            } else if data.starts_with("@00@") || data.starts_with("@6f6b@") {
+                let encoded_tid = data.split('@').nth(2);
+                return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
+            }
+        } else {
+            return Some(String::new());
         }
     }
     None
@@ -238,8 +240,9 @@ pub fn decode_scr_data_or_panic(data: &str) -> Vec<Vec<u8>> {
 
 /// Checks if the given smart contract result is an out smart contract result.
 pub fn is_out_scr(scr: &&ApiSmartContractResult) -> bool {
-    match &scr.data {
-        Some(data) => scr.nonce != 0 && data.starts_with('@'),
-        None => scr.nonce != 0,
+    if let Some(data) = &scr.data {
+        scr.nonce != 0 && data.starts_with('@')
+    } else {
+        scr.nonce != 0
     }
 }
