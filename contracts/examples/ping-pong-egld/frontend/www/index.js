@@ -18,6 +18,11 @@ const deployModal = document.getElementById("deployModal");
 const pingModal = document.getElementById("pingModal");
 const pongModal = document.getElementById("pongModal");
 const txStatusModal = document.getElementById("txStatusModal");
+const timestampModal = document.getElementById("timestampModal");
+const deadlineModal = document.getElementById("deadlineModal");
+const maxFundsModal = document.getElementById("maxFundsModal");
+const pingAmountModal = document.getElementById("pingAmountModal");
+const userAddressesModal = document.getElementById("userAddressesModal");
 const bodyWrapper = document.getElementById("bodyWrapper");
 
 
@@ -25,6 +30,11 @@ const closeModalDeploy = document.getElementsByClassName("close")[0];
 const closeModalPing = document.getElementsByClassName("close")[1];
 const closeModalPong = document.getElementsByClassName("close")[2];
 const closeModalTxStatus = document.getElementsByClassName("close")[3];
+const closeModalTimestamp = timestampModal.querySelector(".close");
+const closeModalDeadline = deadlineModal.querySelector(".close");
+const closeModalMaxFunds = maxFundsModal.querySelector(".close");
+const closeModalPingAmount = pingAmountModal.querySelector(".close");
+const closeModalUserAddresses = userAddressesModal.querySelector(".close");
 
 function showStatusModal(statusText, imgSrc) {
     document.getElementById('statusImage').src = imgSrc;
@@ -36,8 +46,33 @@ function showStatusModal(statusText, imgSrc) {
         setTimeout(() => {
             txStatusModal.classList.remove("show");
             bodyWrapper.classList.remove("modal-open");
-        }, 4000); // Hide modal after 4 seconds
+        }, 4000);
     }
+}
+
+function showTimestampModal(timestampText) {
+    document.getElementById('timestampResponse').innerText = timestampText;
+    timestampModal.classList.add("show");
+}
+
+function showDeadlineModal(timestampText) {
+    document.getElementById('deadlineResponse').innerText = timestampText;
+    deadlineModal.classList.add("show");
+}
+
+function showMaxFundsModal(timestampText) {
+    document.getElementById('maxFundsResponse').innerText = timestampText;
+    maxFundsModal.classList.add("show");
+}
+
+function showPingAmountModal(timestampText) {
+    document.getElementById('pingAmountResponse').innerText = timestampText;
+    pingAmountModal.classList.add("show");
+}
+
+function showUserAddressesModal(timestampText) {
+    document.getElementById('userAddressesResponse').innerText = timestampText;
+    userAddressesModal.classList.add("show");
 }
 
 function checkValidAmount (egldValue) {
@@ -76,6 +111,32 @@ closeModalPong.onclick = function() {
     document.getElementById('pongForm').reset();
     bodyWrapper.classList.remove("modal-open");
 }
+
+closeModalTimestamp.onclick = function () {
+    timestampModal.classList.remove("show");
+    bodyWrapper.classList.remove("modal-open");
+};
+
+closeModalDeadline.onclick = function () {
+    deadlineModal.classList.remove("show");
+    bodyWrapper.classList.remove("modal-open");
+};
+
+closeModalMaxFunds.onclick = function () {
+    maxFundsModal.classList.remove("show");
+    bodyWrapper.classList.remove("modal-open");
+};
+
+closeModalPingAmount.onclick = function () {
+    pingAmountModal.classList.remove("show");
+    bodyWrapper.classList.remove("modal-open");
+};
+
+closeModalUserAddresses.onclick = function () {
+    userAddressesModal.classList.remove("show");
+    bodyWrapper.classList.remove("modal-open");
+};
+
 
 closeModalTxStatus.onclick = function() {
     txStatusModal.classList.remove("show");
@@ -174,10 +235,11 @@ async function handleDeploySumbit(event) {
 
 async function handleTimestamp(event) {
     event.preventDefault();
+
     try {
         let res = await query_request("timestamp");
         console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
+        showTimestampModal(`Timestamp Response: ${JSON.stringify(res)}`);
     } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while processing your request.");
@@ -225,7 +287,7 @@ async function handleDeadline(event) {
     try {
         let res = await query_request("deadline");;
         console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
+        showDeadlineModal(`Deadline Response: ${JSON.stringify(res)}`); 
     } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while processing your request.");
@@ -237,7 +299,7 @@ async function handlePingAmount(event) {
     try {
         let res = await query_request("ping_amount");
         console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
+        showPingAmountModal(`Ping Amount Response: ${JSON.stringify(res)}`); 
     } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while processing your request.");
@@ -249,16 +311,11 @@ async function handleUserAddresses(event) {
     try {
         let res = await query_request("user_addresses");
         console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
+        showUserAddressesModal(`User Addresses Response: ${JSON.stringify(res)}`);  
     } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while processing your request.");
-    } finally {
-        pongModal.classList.remove("show");
-        document.getElementById('pongForm').reset();
-        bodyWrapper.classList.remove("modal-open");
     }
-
 }
 
 async function handleMaxFunds(event) {
@@ -266,7 +323,7 @@ async function handleMaxFunds(event) {
     try {
         let res = await query_request("max_funds");
         console.log("Response:", res);
-        alert(`Response: ${JSON.stringify(res)}`);   
+        showMaxFundsModal(`Max Funds Response: ${JSON.stringify(res)}`);  
     } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while processing your request.");

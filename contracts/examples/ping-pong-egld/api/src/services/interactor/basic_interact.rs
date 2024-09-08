@@ -13,6 +13,7 @@ pub struct ActixInteractor {
     interactor: Interactor,
     adder_owner_address: Bech32Address,
     wallet_address: Bech32Address,
+    wallet_address2: Bech32Address,
     state: State,
 }
 
@@ -26,11 +27,13 @@ impl ActixInteractor {
 
         let ping_pong_owner = interactor.register_wallet(Wallet::from(test_wallets::alice()));
         let wallet_address = interactor.register_wallet(test_wallets::heidi());
+        let wallet_address2 = interactor.register_wallet(test_wallets::eve());
 
         Self {
             interactor,
             adder_owner_address: ping_pong_owner.into(),
             wallet_address: wallet_address.into(),
+            wallet_address2: wallet_address2.into(),
             state: State::load_state(),
         }
     }
@@ -153,7 +156,6 @@ impl ActixInteractor {
             .run()
             .await;
 
-        // ??? HEADCANON
         let addresses_str: Vec<String> = result_value
             .iter()
             .map(|address| hex::encode(address.as_bytes()))
@@ -200,16 +202,33 @@ impl ActixInteractor {
 async fn test() {
     let mut interactor = ActixInteractor::init().await;
 
-    // interactor
-    //     .deploy(
-    //         1000000000000000u128,
-    //         60,
-    //         None,
-    //         1000000000000000000000000000000u128,
-    //         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
-    //     )
-    //     .await;
+    interactor
+        .deploy(
+            1000000000000000u128,
+            60,
+            None,
+            1000000000000000000000000000000u128,
+            "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
+        )
+        .await;
 
+    interactor
+        .ping(
+            "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
+            interactor.state.current_contract_address().clone().to_bech32_string(),
+            1000000000000000u128,
+        )
+        .await;
+
+        interactor
+        .ping(
+            "erd18tudnj2z8vjh0339yu3vrkgzz2jpz8mjq0uhgnmklnap6z33qqeszq2yn4".to_string(),
+            interactor.state.current_contract_address().clone().to_bech32_string(),
+            1000000000000000u128,
+        )
+        .await;
+
+        
     // interactor
     //     .pong(
     //         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),

@@ -1,19 +1,15 @@
-use actix_web::{get, HttpResponse, Responder};
-use serde_json::json;
 use crate::model::{
-    timestamp_model::fetch_timestamp,
-    deadline_model::fetch_deadline,
-    ping_amount_model::fetch_ping_amount,
-    max_funds_model::fetch_max_funds,
+    deadline_model::fetch_deadline, max_funds_model::fetch_max_funds,
+    ping_amount_model::fetch_ping_amount, timestamp_model::fetch_timestamp,
     user_addresses_model::fetch_user_addresses,
 };
 use crate::view::{
-    timestamp_view::TimestampResponse,
-    deadline_view::DeadlineResponse,   
-    ping_amount_view::PingAmountResponse,
-    max_funds_view::MaxFundsResponse,
+    deadline_view::DeadlineResponse, max_funds_view::MaxFundsResponse,
+    ping_amount_view::PingAmountResponse, timestamp_view::TimestampResponse,
     user_addresses_view::UserAddressesResponse,
 };
+use actix_web::{get, HttpResponse, Responder};
+use serde_json::json;
 
 #[get("/timestamp")]
 async fn timestamp() -> impl Responder {
@@ -22,10 +18,9 @@ async fn timestamp() -> impl Responder {
         Ok(response) => {
             let view = TimestampResponse::new(response);
             HttpResponse::Ok().json(view.response())
-        }
-        Err(_) => {
-            HttpResponse::InternalServerError().json(json!({ "error": "Failed to fetch timestamp" }))
-        }
+        },
+        Err(_) => HttpResponse::InternalServerError()
+            .json(json!({ "error": "Failed to fetch timestamp" })),
     }
 }
 
@@ -36,10 +31,10 @@ async fn deadline() -> impl Responder {
         Ok(response) => {
             let view = DeadlineResponse::new(response);
             HttpResponse::Ok().json(view.response())
-        }
+        },
         Err(_) => {
             HttpResponse::InternalServerError().json(json!({ "error": "Failed to fetch deadline" }))
-        }
+        },
     }
 }
 
@@ -50,10 +45,9 @@ async fn ping_amount() -> impl Responder {
         Ok(response) => {
             let view = PingAmountResponse::new(response);
             HttpResponse::Ok().json(view.response())
-        }
-        Err(_) => {
-            HttpResponse::InternalServerError().json(json!({ "error": "Failed to fetch pingAmount" }))
-        }
+        },
+        Err(_) => HttpResponse::InternalServerError()
+            .json(json!({ "error": "Failed to fetch pingAmount" })),
     }
 }
 
@@ -64,27 +58,22 @@ async fn max_funds() -> impl Responder {
         Ok(response) => {
             let view = MaxFundsResponse::new(response);
             HttpResponse::Ok().json(view.response())
-        }
+        },
         Err(_) => {
             HttpResponse::InternalServerError().json(json!({ "error": "Failed to fetch maxFunds" }))
-        }
+        },
     }
 }
+
 #[get("/user_addresses")]
 async fn user_addresses() -> impl Responder {
     // Model raw response
     match fetch_user_addresses().await {
         Ok(response) => {
             let view = UserAddressesResponse::new(response);
-            
-            if view.is_empty() {
-                HttpResponse::Ok().json(json!({ "message": "userAddresses is empty" }))
-            } else {
-                HttpResponse::Ok().json(view.response())
-            }
-        }
-        Err(_) => {
-            HttpResponse::InternalServerError().json(json!({ "error": "Failed to fetch user addresses" }))
-        }
+            HttpResponse::Ok().json(view.response())
+        },
+        Err(_) => HttpResponse::InternalServerError()
+            .json(json!({ "error": "Failed to fetch user addresses" })),
     }
 }

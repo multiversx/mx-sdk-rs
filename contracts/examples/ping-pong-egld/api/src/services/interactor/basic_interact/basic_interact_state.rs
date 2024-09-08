@@ -6,7 +6,7 @@ use std::{
 };
 
 /// State file
-const STATE_FILE: &str = "state.toml";
+const STATE_FILE: &str = "../state.toml";
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
@@ -46,7 +46,6 @@ impl State {
 impl Drop for State {
     // Serializes state to file
     fn drop(&mut self) {
-        println!("saving state");
         let mut file = std::fs::File::create(STATE_FILE).unwrap();
         file.write_all(toml::to_string(self).unwrap().as_bytes())
             .unwrap();
