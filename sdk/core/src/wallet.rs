@@ -156,14 +156,24 @@ impl Wallet {
         (private_key_str, public_key_str)
     }
 
-    pub fn from_keystore_secret(file_path: &str) -> Result<Self> {
-        let decyption_params =
-            Self::validate_keystore_password(file_path, Self::get_keystore_password())
-                .unwrap_or_else(|e| {
-                    panic!("Error: {:?}", e);
-                });
+    pub fn from_keystore_secret(file_path: &str, insert_password: InsertPassword) -> Result<Self> {
+        let decryption_params = match insert_password {
+            InsertPassword::Plaintext(password) => {
+                Self::validate_keystore_password(file_path, password.to_string()).unwrap_or_else(
+                    |e| {
+                        panic!("Error: {:?}", e);
+                    },
+                )
+            },
+            InsertPassword::StandardInput => {
+                Self::validate_keystore_password(file_path, Self::get_keystore_password())
+                    .unwrap_or_else(|e| {
+                        panic!("Error: {:?}", e);
+                    })
+            },
+        };
         let priv_key = PrivateKey::from_hex_str(
-            hex::encode(Self::decrypt_secret_key(decyption_params)).as_str(),
+            hex::encode(Self::decrypt_secret_key(decryption_params)).as_str(),
         )?;
         Ok(Self { priv_key })
     }

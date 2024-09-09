@@ -27,6 +27,28 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.53.0 codec 0.21.0, vm 0.10.0, sdk 0.6.0, scenario-format 0.23.0] - 2024-09-04
+- Unified syntax:
+  -  Whitebox testing;
+  -  Proxy fix for ManagedOption;
+  -  TestTokenIdentifier syntactic sugar.
+- New ResultHandler: `ReturnsLogs`.
+- Interactor: 
+  - Fix on API fetch process status;
+  - Fix on ReturnsNewTokenIdentifier edge cases solved;
+  - Fix on ESDTTransfer for transfer step;
+  - Support for Keystore + password.
+- Framework API support: EI 1.4 crypto functions.
+- `sc-meta`:
+  -  New `wallet` command: PEM and keystore generator and conversions;
+  -  New `report` command: 
+     -  Generate json or Markdown report based on size, path, allocator and panic messages;
+     -  Compare reports;
+     -  Convert reports.
+- VecMapper update with index.
+- Substitution list: AddressToIdMapper
+- Dependencies updated.
+
 ## [sc 0.52.3] - 2024-08-06
 - Pause module events.
 

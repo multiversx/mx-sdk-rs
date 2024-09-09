@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          403
+// Endpoints:                          409
 // Async Callback:                       1
-// Total number of exported functions: 405
+// Total number of exported functions: 411
 
 #![no_std]
 
@@ -169,6 +169,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_big_int => echo_big_int
         echo_managed_buffer => echo_managed_buffer
         echo_managed_address => echo_managed_address
+        echo_managed_option => echo_managed_option
         echo_big_int_managed_vec => echo_big_int_managed_vec
         echo_big_int_tuple => echo_big_int_tuple
         echo_big_int_option => echo_big_int_option
@@ -421,6 +422,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         managed_decimal_into_raw_units => managed_decimal_into_raw_units
         managed_decimal_ln => managed_decimal_ln
         managed_decimal_log2 => managed_decimal_log2
+        managed_decimal_addition_var => managed_decimal_addition_var
+        managed_decimal_subtraction_var => managed_decimal_subtraction_var
+        managed_decimal_eq_var => managed_decimal_eq_var
+        managed_decimal_ln_var => managed_decimal_ln_var
+        managed_decimal_log2_var => managed_decimal_log2_var
     )
 }
 

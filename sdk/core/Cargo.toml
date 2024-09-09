@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 
 authors = [
@@ -31,7 +31,7 @@ hex = "0.4.3"
 base64 = "0.22"
 pbkdf2 = { version = "0.12.2", default-features = false }
 zeroize = "1.4.2"
-bech32 = "0.9"
+bech32 = "0.11"
 itertools = "0.13.0"
 pem = "3.0.2"
 log = "0.4.17"
