@@ -25,7 +25,6 @@ const pingAmountModal = document.getElementById("pingAmountModal");
 const userAddressesModal = document.getElementById("userAddressesModal");
 const bodyWrapper = document.getElementById("bodyWrapper");
 
-
 const closeModalDeploy = document.getElementsByClassName("close")[0];
 const closeModalPing = document.getElementsByClassName("close")[1];
 const closeModalPong = document.getElementsByClassName("close")[2];
@@ -35,6 +34,27 @@ const closeModalDeadline = deadlineModal.querySelector(".close");
 const closeModalMaxFunds = maxFundsModal.querySelector(".close");
 const closeModalPingAmount = pingAmountModal.querySelector(".close");
 const closeModalUserAddresses = userAddressesModal.querySelector(".close");
+
+const copyButton = document.getElementById("copyAddr");
+const copySuccess = document.getElementById("copySuccess");
+const copyIcon = document.getElementById("copyIcon");
+
+const toggleButton = document.getElementById("toggleButton");
+const contractModal = document.getElementById("contractAddrModal");
+const scAddressContainer = document.getElementById("scAddressContainer");
+const arrowDown = document.getElementById("arrowDown");
+const arrowUp = document.getElementById("arrowUp");
+const scAddress = document.getElementById("scAddress");
+const redirectLink = document.getElementById('redirectLink');
+
+function updateExplorerLink(contract_address) {
+    if (contract_address && contract_address !== "No contract deployed") {
+        redirectLink.href = `https://devnet-explorer.multiversx.com/accounts/${contract_address}`;
+        redirectLink.style.display = 'block';
+    } else {
+        redirectLink.style.display = 'none';
+    }
+}
 
 function showStatusModal(statusText, imgSrc) {
     document.getElementById('statusImage').src = imgSrc;
@@ -157,6 +177,7 @@ async function handlePing(event) {
 
 async function handlePingSubmit(event) {
     event.preventDefault();
+
     const egldValue = document.getElementById("egldValue").value;
     const wallet_addr = document.getElementById("senderPing").value.trim();
     const contract_address = document.getElementById("contractAddrPing").value.trim();
@@ -176,6 +197,10 @@ async function handlePingSubmit(event) {
         contract_address: contract_address
     };
 
+    pingModal.style.display = "none";
+    document.getElementById('pingForm').reset();
+    bodyWrapper.classList.remove("modal-open");
+
     try {
         showStatusModal("In progress...", "https://imgur.com/AmoFMD5.gif");
         let res = await tx_request("ping", JSON.stringify(body));
@@ -184,10 +209,6 @@ async function handlePingSubmit(event) {
     } catch (error) {
         console.error("Error:", error);
         showStatusModal("Error", "https://imgur.com/lVCaXg2.png")
-    } finally {
-        pingModal.style.display = "none";
-        document.getElementById('pingForm').reset();
-        bodyWrapper.classList.remove("modal-open");
     }
 }
 
@@ -224,19 +245,19 @@ async function handleDeploySumbit(event) {
 
     console.log(body);
 
+    deployModal.classList.remove("show");
+    document.getElementById('deployForm').reset();
+    bodyWrapper.classList.remove("modal-open");
+
     try {
         showStatusModal("In progress...", "https://imgur.com/AmoFMD5.gif");
         let res = await tx_request("deploy", JSON.stringify(body));
         showStatusModal("Success", "https://imgur.com/MfsVKLh.png");
-        console.log(`Response: ${res.response}`);
-        console.log(`Contract address: ${res.address}`);
+        scAddress.innerText = res.address;
+        updateExplorerLink(res.address);
     } catch (error) {
         console.error("Error:", error);
         showStatusModal("Error", "https://imgur.com/lVCaXg2.png")
-    } finally {
-        deployModal.classList.remove("show");
-        document.getElementById('deployForm').reset();
-        bodyWrapper.classList.remove("modal-open");
     }
 }
 
@@ -273,6 +294,10 @@ async function handlePongSubmit(event) {
     };
     console.log(body);
 
+    pongModal.classList.remove("show");
+    document.getElementById('pongForm').reset();
+    bodyWrapper.classList.remove("modal-open");
+
     try {
         showStatusModal("In progress...", "https://imgur.com/AmoFMD5.gif");
         let res = await tx_request("pong", JSON.stringify(body));
@@ -281,12 +306,7 @@ async function handlePongSubmit(event) {
     } catch (error) {
         console.error("Error:", error);
         showStatusModal("Error", "https://imgur.com/lVCaXg2.png")
-    } finally {
-        pongModal.classList.remove("show");
-        document.getElementById('pongForm').reset();
-        bodyWrapper.classList.remove("modal-open");
     }
-
 }
 
 async function handleDeadline(event) {
@@ -349,3 +369,40 @@ deadlineButton.addEventListener('click', handleDeadline);
 pingAmountButton.addEventListener('click', handlePingAmount);
 maxFundsButton.addEventListener('click', handleMaxFunds);
 userAddressesButton.addEventListener('click', handleUserAddresses);
+
+toggleButton.addEventListener("click", () => {
+  const isExpanded = contractModal.classList.contains("expanded");
+
+  if (isExpanded) {
+    contractModal.classList.remove("expanded");
+    contractModal.classList.add("compressed");
+    arrowUp.style.display = "none";
+    arrowDown.style.display = "block";
+    scAddressContainer.style.display = "none";
+  } else {
+    contractModal.classList.remove("compressed");
+    contractModal.classList.add("expanded");
+    arrowUp.style.display = "block";
+    arrowDown.style.display = "none";
+    scAddressContainer.style.display = "flex";
+  }
+});
+
+copyButton.addEventListener('click', () => {
+    let contract_address = document.getElementById("scAddress").innerText;
+
+    if (contract_address === 'No contract deployed') {
+        return
+    }
+    navigator.clipboard.writeText(contract_address).then(() => {
+        copyIcon.style.display = "none";
+        copySuccess.style.display = "block";
+
+        setTimeout(() => {
+            copyIcon.style.display = "block";
+            copySuccess.style.display = "none";
+        }, 2000);
+    }).catch((error) => {
+        console.error("Error copying:", error);
+    });
+});

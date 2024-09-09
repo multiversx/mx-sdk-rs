@@ -22,7 +22,6 @@ pub async fn tx_request(endpoint: &str, body: &str) -> Result<JsValue, JsValue> 
     let req = Request::new_with_str_and_init(&url, &opts).unwrap();
 
     let window = web_sys::window().unwrap();
-    alert(&format!("Tx request sent!"));
 
     let resp_value = JsFuture::from(window.fetch_with_request(&req)).await?;
 

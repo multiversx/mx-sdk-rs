@@ -1,97 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SC Interactor</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <button id="walletButton">Connect Wallet</button>
-  <div id="bodyWrapper">
-    <h1>MultiversX Smart Contract Interactor</h1>
-    <p>Interact with your contract, by using the buttons below corresponding to the endpoints of the SC</p>
-    
-    <div class="button-container">
-      <div id="queryContainer">
-        <h2 class="column_name">Queries</h2>
-        <button class="sc-interact" id="getPingAmountButton">get_ping_amount</button>
-        <button class="sc-interact" id="getMaxFundsButton">get_max_funds</button>
-        <button class="sc-interact" id="getUserAddresses">get_user_addresses</button>
-        <button class="sc-interact" id="timestampButton">timestamp</button>
-        <button class="sc-interact" id="deadlineButton">deadline</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SC Interactor</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <button id="walletButton">Connect Wallet</button>
+    <div id="bodyWrapper">
+      <h1>MultiversX Smart Contract Interactor</h1>
+      <p>Interact with your contract, by using the buttons below</p>
+
+      <div class="button-container">
+        <div id="queryContainer">
+          <h2 class="column_name">Queries</h2>
+          <button class="sc-interact" id="getPingAmountButton">
+            get_ping_amount
+          </button>
+          <button class="sc-interact" id="getMaxFundsButton">
+            get_max_funds
+          </button>
+          <button class="sc-interact" id="getUserAddresses">
+            get_user_addresses
+          </button>
+          <button class="sc-interact" id="timestampButton">timestamp</button>
+          <button class="sc-interact" id="deadlineButton">deadline</button>
+        </div>
+
+        <div id="txContainer">
+          <h2 class="column_name">Transactions</h2>
+          <button class="sc-interact" id="pongButton">pong</button>
+          <button class="sc-interact" id="pongAllButton">pong_all</button>
+          <button class="sc-interact" id="deployButton">deploy</button>
+          <button class="sc-interact" id="pingButton">ping</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="deployModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Deploy Contract</h2>
+        <form id="deployForm">
+          <label for="pingAmount">Ping Amount</label>
+          <input type="text" id="pingAmount" name="pingAmount" required /><br />
+
+          <label for="maxFunds">Max Funds</label>
+          <input type="text" id="maxFunds" name="maxFunds" required /><br />
+
+          <label for="activationTimestamp">Activation Timestamp</label>
+          <input
+            type="text"
+            id="activationTimestamp"
+            name="activationTimestamp"
+            required
+          /><br />
+
+          <label for="duration">Duration (seconds)</label>
+          <input type="text" id="duration" name="duration" required /><br />
+
+          <label for="deployer">Deployer Address</label>
+          <input type="text" id="deployer" name="deployer" required /><br />
+
+          <button id="deploySubmit" type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="pingModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Ping Transaction</h2>
+        <form id="pingForm">
+          <label for="egldValue">Ping Amount</label>
+          <input type="text" id="egldValue" name="egldValue" required /><br />
+
+          <label for="senderPing">Sender address</label>
+          <input type="text" id="senderPing" name="deployer" required /><br />
+
+          <label for="contractAddrPing">Contract Address</label>
+          <input
+            type="text"
+            id="contractAddrPing"
+            name="deployer"
+            required
+          /><br />
+
+          <button id="pingSubmit" type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="pongModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Pong Transaction</h2>
+        <form id="pongForm">
+          <label for="senderPong">Sender address</label>
+          <input type="text" id="senderPong" name="deployer" required /><br />
+
+          <label for="contractAddrPong">Contract Address</label>
+          <input
+            type="text"
+            id="contractAddrPong"
+            name="deployer"
+            required
+          /><br />
+
+          <button id="pongSubmit" type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="txStatusModal">
+      <span class="close">&times;</span>
+      <h2>Transaction Status</h2>
+      <div id="statusContainer">
+        <img
+          src="https://imgur.com/AmoFMD5.gif"
+          alt="loading"
+          id="statusImage"
+        />
+        <h3 id="status">In progress...</h3>
+      </div>
+    </div>
+
+    <div id="contractAddrModal" class="compressed">
+      <div id="headerContainer">
+        <button id="toggleButton">
+          <div class="arrow-container">
+            <!-- Down Arrow -->
+            <svg
+              id="arrowDown"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="arrow size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+
+            <!-- Up Arrow -->
+            <svg
+              id="arrowUp"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="arrow size-6"
+              style="display: none"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4.5 15.75l7.5-7.5 7.5 7.5"
+              />
+            </svg>
+          </div>
+        </button>
+
+        <h2>Contract Address</h2>
+        <a
+          id="redirectLink"
+          target="_blank"
+          href="#"
+          style="display: none; cursor: pointer"
+          title="MultiversX Explorer"
+        >
+          <svg
+            id="redirect"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+            />
+          </svg>
+        </a>
       </div>
 
-      <div id="txContainer">
-        <h2 class="column_name">Transactions</h2>
-        <button class="sc-interact" id="pongButton">pong</button>
-        <button class="sc-interact" id="pongAllButton">pong_all</button>
-        <button class="sc-interact" id="deployButton">deploy</button>
-        <button class="sc-interact" id="pingButton">ping</button>
+      <div id="scAddressContainer">
+        <h3 id="scAddress">No contract deployed</h3>
+        <button id="copyAddr" class="copy-button">
+          <img
+            src="https://imgur.com/DqR0mQ7.png"
+            id="copyIcon"
+            style="cursor: pointer"
+          />
+          <img
+            src="https://imgur.com/g9S1oLi.png"
+            id="copySuccess"
+            style="display: none"
+          />
+        </button>
       </div>
     </div>
-  </div>
-
-  <div id="deployModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Deploy Contract</h2>
-      <form id="deployForm">
-        <label for="pingAmount">Ping Amount</label>
-        <input type="text" id="pingAmount" name="pingAmount" required><br>
-
-        <label for="maxFunds">Max Funds</label>
-        <input type="text" id="maxFunds" name="maxFunds" required><br>
-
-        <label for="activationTimestamp">Activation Timestamp</label>
-        <input type="text" id="activationTimestamp" name="activationTimestamp" required><br>
-
-        <label for="duration">Duration (seconds)</label>
-        <input type="text" id="duration" name="duration" required><br>
-
-        <label for="deployer">Deployer Address</label>
-        <input type="text" id="deployer" name="deployer" required><br>
-
-        <button id="deploySubmit" type="submit">Submit</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="pingModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Ping Transaction</h2>
-      <form id="pingForm">
-        <label for="egldValue">Ping Amount</label>
-        <input type="text" id="egldValue" name="egldValue" required><br>
-
-        <label for="senderPing">Sender address</label>
-        <input type="text" id="senderPing" name="deployer" required><br>
-
-        <label for="contractAddrPing">Contract Address</label>
-        <input type="text" id="contractAddrPing" name="deployer" required><br>
-
-        <button id="pingSubmit" type="submit">Submit</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="pongModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Pong Transaction</h2>
-      <form id="pongForm">
-        <label for="senderPong">Sender address</label>
-        <input type="text" id="senderPong" name="deployer" required><br>
-
-        <label for="contractAddrPong">Contract Address</label>
-        <input type="text" id="contractAddrPong" name="deployer" required><br>
-
-        <button id="pongSubmit" type="submit">Submit</button>
-      </form>
-    </div>
-  </div>
-
+  </body>
   <div id="txStatusModal">
     <span class="close">&times;</span>
     <h2>Transaction Status</h2>
@@ -152,5 +277,4 @@
   </div>
 
   <script src="index.js"></script>
-</body>
 </html>

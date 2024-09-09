@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #282828;
+    background-color: #001F3F;
     transition: filter 0.3s ease;
 }
 
@@ -24,12 +24,13 @@ p {
 
 #walletButton {
     padding: 15px 25px; 
-    background-color: #008cb3;
+    background-color:   #1cb390;
     color: #d6d6d6;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 18px;
+    font-weight: bold;
     position: fixed;
     top: 20px;
     right: 30px;
@@ -37,7 +38,7 @@ p {
 }
 
 #walletButton:hover {
-    background-color: #0068b3;
+    background-color: #16a469;
     transform: scale(1.05);
 }
 
@@ -57,7 +58,7 @@ p {
 
 .sc-interact {
     padding: 15px 25px;
-    background-color: #06b48b;
+    background-color: #008cb3;
     color: white;
     border: none;
     border-radius: 5px;
@@ -71,7 +72,7 @@ p {
 }
 
 .sc-interact:hover {
-    background-color: #16a469;
+    background-color: #0068b3;
     transform: scale(1.05);
 }
 
@@ -189,26 +190,12 @@ input {
     filter: blur(5px);
 }
 
-.loader {
-    border: 4px solid #f3f3f3; /* Light grey */
-    border-top: 4px solid #008cb3; /* Blue */
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto; /* Center the loader */
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  #txStatusModal {
+#txStatusModal {
     opacity: 0;
     margin-top: 230px;
-    margin-left: 10px;
-    background-color: #f3f3f3;
+    left: 20px;
+    bottom: 20px;
+    background-color: #F2F2F2;
     text-align: left;
     position: fixed;
     width: 290px;
@@ -217,22 +204,22 @@ input {
     transition: opacity 0.3s ease;
   }
   
-  #txStatusModal h2 {
+#txStatusModal h2 {
     color: #1b1b1b;
     margin-top: 10px;
     margin-left: 10px;
     font-size: 23px; ;
   }
   
-  #txStatusContent {
+#txStatusContent {
     padding: 10px;
   }
 
-  #statusImage {
+#statusImage {
     margin-left: 10px;
   }
 
-  #statusContainer {
+#statusContainer {
     display: flex;
     gap: 30px;
   }
@@ -248,7 +235,179 @@ input {
     opacity: 1;
   }
 
-  #userAddressesModal .modal-content {
+#headerContainer {
+    display: flex;
+    align-items: center; /* Aligns vertically */
+    gap: 10px; /* Space between arrow and text */
+}
+
+/* Modal Styling */
+#contractAddrModal {
+    background-color: transparent;
+    width: 350px;
+    border-radius: 10px;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    height: auto;
+    padding: 10px;
+    color: white;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smoother transition */
+    overflow: hidden; /* Hide address until expanded */
+}
+
+#contractAddrModal h2 {
+    font-size: 23px;
+    margin: 0;
+    transition: color 0.3s ease; /* Smooth color change */
+}
+
+
+#contractAddrModal.expanded {
+    background-color: white;
+    color: black;
+    height: auto; /* Allow content to expand naturally */
+}
+
+
+/* Address Container */
+#scAddressContainer {
+    display: none; /* Initially hidden */
+    margin-top: 10px;
+}
+
+#contractAddrModal.expanded #scAddressContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    transition: display 0.3s ease;
+}
+
+#scAddress {
+    font-size: 14px;
+    word-wrap: break-word;
+    max-width: 260px;
+    padding-left: 15px;
+}
+
+/* Copy Button */
+#copyAddr {
+    width: 24px;
+    cursor: pointer;
+}
+
+.copy-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+.copy-button:hover {
+    transform: scale(1.1); /* Subtle scale effect */
+}
+
+#copyIcon {
+    width: 18px;
+    height: 18px;
+}
+
+#copySuccess {
+    width: 18px;
+    height: 18px;
+}
+
+/* SVG Arrows Styling */
+.size-6 {
+    color: white;
+    width: 30px;
+    height: 30px;
+}
+
+#contractAddrModal.expanded .size-6 {
+    color: black; /* Change arrow color to black when expanded */
+}
+
+#toggleButton {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.arrow-container {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.arrow {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease, color 0.3s ease;
+    transform-origin: center;
+}
+
+
+#contractAddrModal.expanded .arrow {
+    stroke: black; /* Change arrow stroke color on expansion */
+}
+
+#arrowUp {
+    opacity: 0;
+}
+
+#arrowDown {
+    opacity: 1;
+}
+
+/* Hover Effect */
+#toggleButton:hover .arrow {
+    transform: scale(1.2);
+    transform-origin: center;
+}
+
+#toggleButton:hover #arrowUp, #toggleButton:hover #arrowDown {
+    opacity: 1;
+}
+
+#contractAddrModal.expanded #arrowUp {
+    opacity: 1;
+    display: block;
+}
+
+#contractAddrModal.expanded #arrowDown {
+    display: none;
+}
+
+#redirectLink {
+    padding-top: 3px;
+    transition: transform 0.3s ease;
+}
+
+#redirectLink:hover {
+    transform: scale(1.2);
+}
+
+
+#redirect {
+    width: 20px;
+    height: 20px;
+}
+
+#userAddressesModal .modal-content {
     width: 600px;
     padding: 30px;
     border-radius: 10px;
