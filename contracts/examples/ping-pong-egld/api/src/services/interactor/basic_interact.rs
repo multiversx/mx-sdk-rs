@@ -144,7 +144,7 @@ impl ActixInteractor {
         result_value.to_string()
     }
 
-    pub async fn user_addresses(&mut self) -> String {
+    pub async fn user_addresses(&mut self) -> Vec<String> {
         let result_value = self
             .interactor
             .query()
@@ -156,14 +156,10 @@ impl ActixInteractor {
             .run()
             .await;
 
-        let addresses_str: Vec<String> = result_value
+        result_value
             .iter()
             .map(|address| hex::encode(address.as_bytes()))
-            .collect();
-
-        let result = addresses_str.join(", ");
-
-        result
+            .collect()
     }
 
     pub async fn ping(&mut self, sender: String, contract_address: String, value: u128) -> String {
@@ -215,20 +211,27 @@ async fn test() {
     interactor
         .ping(
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
-            interactor.state.current_contract_address().clone().to_bech32_string(),
+            interactor
+                .state
+                .current_contract_address()
+                .clone()
+                .to_bech32_string(),
             1000000000000000u128,
         )
         .await;
 
-        interactor
+    interactor
         .ping(
             "erd18tudnj2z8vjh0339yu3vrkgzz2jpz8mjq0uhgnmklnap6z33qqeszq2yn4".to_string(),
-            interactor.state.current_contract_address().clone().to_bech32_string(),
+            interactor
+                .state
+                .current_contract_address()
+                .clone()
+                .to_bech32_string(),
             1000000000000000u128,
         )
         .await;
 
-        
     // interactor
     //     .pong(
     //         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
@@ -248,7 +251,7 @@ async fn test_deadline() {
 async fn test_user_addresses() {
     let mut interactor = ActixInteractor::init().await;
     let res = interactor.user_addresses().await;
-    println!("User Addresses: {}", res);
+    println!("User Addresses: {:?}", res);
 }
 
 #[tokio::test]

@@ -247,3 +247,12 @@ input {
   #txStatusModal.show {
     opacity: 1;
   }
+
+  #userAddressesModal .modal-content {
+    width: 600px;
+    padding: 30px;
+    border-radius: 10px;
+    overflow-y: auto;
+    max-height: 80vh;
+    word-wrap: break-word;
+}

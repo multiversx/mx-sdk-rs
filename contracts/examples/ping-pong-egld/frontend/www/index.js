@@ -55,24 +55,31 @@ function showTimestampModal(timestampText) {
     timestampModal.classList.add("show");
 }
 
-function showDeadlineModal(timestampText) {
-    document.getElementById('deadlineResponse').innerText = timestampText;
+function showDeadlineModal(deadlineText) {
+    document.getElementById('deadlineResponse').innerText = deadlineText;
     deadlineModal.classList.add("show");
 }
 
-function showMaxFundsModal(timestampText) {
-    document.getElementById('maxFundsResponse').innerText = timestampText;
+function showMaxFundsModal(maxFundsText) {
+    document.getElementById('maxFundsResponse').innerText = maxFundsText;
     maxFundsModal.classList.add("show");
 }
 
-function showPingAmountModal(timestampText) {
-    document.getElementById('pingAmountResponse').innerText = timestampText;
+function showPingAmountModal(pingAmountText) {
+    document.getElementById('pingAmountResponse').innerText = pingAmountText;
     pingAmountModal.classList.add("show");
 }
 
-function showUserAddressesModal(timestampText) {
-    document.getElementById('userAddressesResponse').innerText = timestampText;
-    userAddressesModal.classList.add("show");
+function showUserAddressesModal(responseText) {
+    const responseObject = JSON.parse(responseText);
+
+    if (responseObject.response && Array.isArray(responseObject.response)) {
+        const addressesHtml = responseObject.response.map(address => `<li>${address}</li>`).join("");
+        userAddressesResponse.innerHTML = `<ul>${addressesHtml}</ul>`;
+        document.getElementById('userAddressesModal').classList.add('show');
+    } else {
+        userAddressesResponse.innerHTML = "<p>No addresses found.</p>";
+    }
 }
 
 function checkValidAmount (egldValue) {
@@ -311,7 +318,7 @@ async function handleUserAddresses(event) {
     try {
         let res = await query_request("user_addresses");
         console.log("Response:", res);
-        showUserAddressesModal(`User Addresses Response: ${JSON.stringify(res)}`);  
+        showUserAddressesModal(JSON.stringify(res));
     } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while processing your request.");
