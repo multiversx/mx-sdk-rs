@@ -164,7 +164,6 @@ closeModalUserAddresses.onclick = function () {
     bodyWrapper.classList.remove("modal-open");
 };
 
-
 closeModalTxStatus.onclick = function() {
     txStatusModal.classList.remove("show");
 }

@@ -24,7 +24,7 @@ p {
 
 #walletButton {
     padding: 15px 25px; 
-    background-color:   #1cb390;
+    background-color:   #1a9e7f;
     color: #d6d6d6;
     border: none;
     border-radius: 5px;
@@ -146,6 +146,13 @@ p {
     cursor: pointer;
 }
 
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 #txStatusModal .close {
     color: #aaa;
     float: right;
@@ -159,14 +166,7 @@ p {
 #txStatusModal .close:hover {
     color: black;
     text-decoration: none;
-    cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+    cursor: pointer
 }
 
 form {
@@ -185,7 +185,6 @@ input {
     transition: filter 0.3s ease;
 }
 
-/* Blur effect only on the content wrapper */
 #bodyWrapper.modal-open {
     filter: blur(5px);
 }
