@@ -1,5 +1,8 @@
 use colored::Colorize;
-use std::{collections::HashMap, fs};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+};
 use wasmparser::{
     BinaryReaderError, DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader,
     Operator, Parser, Payload,
@@ -55,19 +58,24 @@ fn populate_wasm_info(
     let mut ei_check = false;
     let mut memory_grow_flag = false;
     let mut has_panic = "none";
-    let mut function_names: HashMap<u32, String> = HashMap::new();
-    let mut read_functions: Vec<bool> = Vec::new();
+    let mut call_graph: HashMap<usize, Vec<usize>> = HashMap::new();
+    let mut views_data: HashMap<usize, String> = HashMap::new();
+    let mut write_functions: Vec<usize> = Vec::new();
 
     let mut parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
         match payload? {
             Payload::ImportSection(import_section) => {
-                imports =
-                    extract_imports(import_section, extract_imports_enabled, &mut read_functions);
-                ei_check = is_ei_valid(imports.clone(), check_ei);
+                imports = extract_imports(
+                    import_section,
+                    extract_imports_enabled,
+                    &mut call_graph,
+                    &mut write_functions,
+                );
+                ei_check = is_ei_valid(&imports, check_ei);
             },
             Payload::DataSection(data_section) => {
-                allocator_trigger = is_fail_allocator_triggered(data_section.clone());
+                allocator_trigger = is_fail_allocator_triggered(&data_section);
                 if is_panic_with_message_triggered(data_section.clone()) {
                     has_panic = WITH_MESSAGE;
                 } else if is_panic_without_message_triggered(data_section) {
@@ -75,10 +83,10 @@ fn populate_wasm_info(
                 }
             },
             Payload::CodeSectionEntry(code_section) => {
-                memory_grow_flag = is_mem_grow(code_section.clone());
+                memory_grow_flag = is_mem_grow(&code_section);
             },
             Payload::ExportSection(export_section) => {
-                parse_export_section(export_section, &mut function_names, view_endpoints.clone());
+                views_data = parse_export_section(export_section, &view_endpoints);
             },
             _ => (),
         }
@@ -87,13 +95,16 @@ fn populate_wasm_info(
     parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
         if let Payload::CodeSectionEntry(body) = payload? {
-            analyze_function_body(body, &mut read_functions);
+            create_call_graph(body, &mut call_graph);
         }
     }
+    let mut visited: HashSet<usize> = HashSet::new();
+    for (index, _name) in &views_data {
+        mark_write(*index, &call_graph, &mut write_functions, &mut visited);
+    }
 
-    for (index, name) in function_names {
-        let i: usize = index.try_into().unwrap();
-        if !read_functions[i] {
+    for (index, name) in views_data {
+        if write_functions.contains(&index) {
             println!(
                 "{} {}",
                 "Write storage operation in VIEW endpoint:"
@@ -122,64 +133,68 @@ fn populate_wasm_info(
 
 fn parse_export_section(
     export_section: ExportSectionReader,
-    function_names: &mut HashMap<u32, String>,
-    view_endpoints: Vec<String>,
-) {
+    view_endpoints: &Vec<String>,
+) -> HashMap<usize, String> {
+    let mut views_data: HashMap<usize, String> = HashMap::new();
     for export in export_section {
         let export = export.expect("Failed to read export section");
         if let wasmparser::ExternalKind::Func = export.kind {
             if view_endpoints.contains(&export.name.to_string()) {
-                function_names.insert(export.index, export.name.to_string());
+                views_data.insert(export.index.try_into().unwrap(), export.name.to_string());
+            }
+        }
+    }
+    views_data
+}
+
+fn mark_write(
+    func: usize,
+    call_graph: &HashMap<usize, Vec<usize>>,
+    write_functions: &mut Vec<usize>,
+    visited: &mut HashSet<usize>,
+) {
+    // Return early to prevent cycles.
+    if visited.contains(&func) {
+        return;
+    }
+
+    visited.insert(func);
+
+    if let Some(callees) = call_graph.get(&func) {
+        for &callee in callees {
+            if write_functions.contains(&callee) {
+                write_functions.push(func);
+            } else {
+                mark_write(callee, call_graph, write_functions, visited);
+                if write_functions.contains(&callee) {
+                    write_functions.push(func);
+                }
             }
         }
     }
 }
 
-fn analyze_function_body(body: FunctionBody, functions: &mut Vec<bool>) {
-    // Implement your function body analysis here
-    // For example, you can parse the locals and instructions
-    // let locals_reader = body
-    // .get_locals_reader()
-    // .expect("Failed to get locals reader");
+fn create_call_graph(body: FunctionBody, call_graph: &mut HashMap<usize, Vec<usize>>) {
     let mut instructions_reader = body
         .get_operators_reader()
         .expect("Failed to get operators reader");
 
-    // println!("Function has {} locals", locals_reader.get_count());
-
-    let mut value = true;
+    let mut call_functions = Vec::new();
     while let Ok(op) = instructions_reader.read() {
         match op {
             Operator::Call { function_index } => {
                 let function_usize: usize = function_index.try_into().unwrap();
-                if function_usize >= functions.len() {
-                    functions.push(true);
-                    return;
-                }
-
-                value &= functions[function_usize];
-
-                if !value {
-                    functions.push(value);
-                    return;
-                }
-            },
-            Operator::I32Load { memarg } => {
-                if memarg.offset > 0 {
-                    functions.push(false);
-                    return;
-                }
+                call_functions.push(function_usize);
             },
             _ => (),
         }
     }
 
-    functions.push(value);
-    // println!("====================");
+    call_graph.insert(call_graph.len(), call_functions);
 }
 
-fn is_fail_allocator_triggered(data_section: DataSectionReader) -> bool {
-    for data_fragment in data_section.into_iter().flatten() {
+fn is_fail_allocator_triggered(data_section: &DataSectionReader) -> bool {
+    for data_fragment in data_section.clone().into_iter().flatten() {
         if data_fragment
             .data
             .windows(ERROR_FAIL_ALLOCATOR.len())
@@ -230,19 +245,19 @@ fn is_panic_without_message_triggered(data_section: DataSectionReader) -> bool {
 pub fn extract_imports(
     import_section: ImportSectionReader,
     import_extraction_enabled: bool,
-    write_or_read_functions: &mut Vec<bool>,
+    call_graph: &mut HashMap<usize, Vec<usize>>,
+    write_functions: &mut Vec<usize>,
 ) -> Vec<String> {
     if !import_extraction_enabled {
         return Vec::new();
     }
 
     let mut import_names = Vec::new();
-    for import in import_section.into_iter().flatten() {
+    for (index, import) in import_section.into_iter().flatten().enumerate() {
         import_names.push(import.name.to_string());
+        call_graph.insert(index, vec![]);
         if WRITE_OP.contains(&import.name) {
-            write_or_read_functions.push(false);
-        } else {
-            write_or_read_functions.push(true);
+            write_functions.push(index);
         }
     }
 
@@ -251,7 +266,7 @@ pub fn extract_imports(
     import_names
 }
 
-fn is_ei_valid(imports: Vec<String>, check_ei: &Option<EIVersion>) -> bool {
+fn is_ei_valid(imports: &Vec<String>, check_ei: &Option<EIVersion>) -> bool {
     if let Some(ei) = check_ei {
         let mut num_errors = 0;
         for import in imports {
@@ -268,7 +283,7 @@ fn is_ei_valid(imports: Vec<String>, check_ei: &Option<EIVersion>) -> bool {
     false
 }
 
-fn is_mem_grow(code_section: FunctionBody) -> bool {
+fn is_mem_grow(code_section: &FunctionBody) -> bool {
     let mut code = code_section.get_binary_reader();
     while code.bytes_remaining() > 0 {
         if code.read_u8().unwrap() == MEMORY_GROW_OPCODE {
