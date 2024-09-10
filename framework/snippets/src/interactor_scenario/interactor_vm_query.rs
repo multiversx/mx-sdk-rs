@@ -41,7 +41,11 @@ impl Interactor {
 
         info!("{:#?}", result);
 
-        let raw_results: Vec<Vec<u8>> = result.data.return_data.iter().map(base64_decode).collect();
+        let raw_results: Vec<Vec<u8>> = if let Some(data) = result.data.return_data {
+            data.iter().map(base64_decode).collect()
+        } else {
+            Vec::new()
+        };
 
         step.save_response(TxResponse::from_raw_results(raw_results));
 
