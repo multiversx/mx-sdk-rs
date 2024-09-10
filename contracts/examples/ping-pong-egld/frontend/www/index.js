@@ -91,7 +91,15 @@ function showPingAmountModal(pingAmountText) {
 }
 
 function showUserAddressesModal(responseText) {
-    const responseObject = JSON.parse(responseText);
+    let responseObject;
+
+    try {
+        responseObject = JSON.parse(responseText);
+    } catch (error) {
+        userAddressesResponse.innerHTML = `<p>${responseText}</p>`;
+        document.getElementById('userAddressesModal').classList.add('show');
+        return;
+    }
 
     if (responseObject.response && Array.isArray(responseObject.response)) {
         const addressesHtml = responseObject.response.map(address => `<li>${address}</li>`).join("");
@@ -270,7 +278,7 @@ async function handleTimestamp(event) {
     } catch (error) {
         console.error("Error:", error);
         if (error.message.includes('Failed to fetch')) {
-            alert("Please deploy a contract first.");
+            showTimestampModal(`Please deploy a contract first.`);
         } else {
             alert("An error occurred while processing your request.");
         }
@@ -321,7 +329,7 @@ async function handleDeadline(event) {
     } catch (error) {
         console.error("Error:", error);
         if (error.message.includes('Failed to fetch')) {
-            alert("Please deploy a contract first.");
+            showDeadlineModal(`Please deploy a contract first.`); 
         } else {
             alert("An error occurred while processing your request.");
         }
@@ -337,7 +345,7 @@ async function handlePingAmount(event) {
     } catch (error) {
         console.error("Error:", error);
         if (error.message.includes('Failed to fetch')) {
-            alert("Please deploy a contract first.");
+            showPingAmountModal(`Please deploy a contract first.`);
         } else {
             alert("An error occurred while processing your request.");
         }
@@ -353,7 +361,7 @@ async function handleUserAddresses(event) {
     } catch (error) {
         console.error("Error:", error);
         if (error.message.includes('Failed to fetch')) {
-            alert("Please deploy a contract first.");
+            showUserAddressesModal(`Please deploy a contract first.`);
         } else {
             alert("An error occurred while processing your request.");
         }
@@ -369,7 +377,7 @@ async function handleMaxFunds(event) {
     } catch (error) {
         console.error("Error:", error);
         if (error.message.includes('Failed to fetch')) {
-            alert("Please deploy a contract first.");
+            showMaxFundsModal(`Please deploy a contract first.`);
         } else {
             alert("An error occurred while processing your request.");
         }
