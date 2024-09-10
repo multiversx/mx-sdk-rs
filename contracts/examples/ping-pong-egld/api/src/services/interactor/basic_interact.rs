@@ -1,7 +1,10 @@
 mod basic_interact_state;
 
+use core::str;
+
 use basic_interact_state::State;
 use ping_pong_egld::ping_pong_proxy;
+use redis::Client;
 
 use multiversx_sc_snippets::{hex, imports::*};
 
@@ -158,15 +161,15 @@ impl ActixInteractor {
 
         result_value
             .iter()
-            .map(|address| hex::encode(address.as_bytes()))
+            .map(|address| Bech32Address::from(address).to_string())
             .collect()
     }
 
-    pub async fn ping(&mut self, sender: String, contract_address: String, value: u128) -> String {
+    pub async fn ping(&mut self, sender: String, value: u128) -> String {
         self.interactor
             .tx()
             .from(Bech32Address::from_bech32_string(sender))
-            .to(Bech32Address::from_bech32_string(contract_address))
+            .to(self.state.current_contract_address())
             .gas(30_000_000)
             .typed(ping_pong_proxy::PingPongProxy)
             .ping(IgnoreValue)
@@ -178,11 +181,11 @@ impl ActixInteractor {
         "Tx successful".to_string()
     }
 
-    pub async fn pong(&mut self, sender: String, contract_address: String) -> String {
+    pub async fn pong(&mut self, sender: String) -> String {
         self.interactor
             .tx()
             .from(Bech32Address::from_bech32_string(sender))
-            .to(Bech32Address::from_bech32_string(contract_address))
+            .to(self.state.current_contract_address())
             .gas(30_000_000)
             .typed(ping_pong_proxy::PingPongProxy)
             .pong()
@@ -208,35 +211,22 @@ async fn test() {
         )
         .await;
 
-    interactor
-        .ping(
-            "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
-            interactor
-                .state
-                .current_contract_address()
-                .clone()
-                .to_bech32_string(),
-            1000000000000000u128,
-        )
-        .await;
-
-    interactor
-        .ping(
-            "erd18tudnj2z8vjh0339yu3vrkgzz2jpz8mjq0uhgnmklnap6z33qqeszq2yn4".to_string(),
-            interactor
-                .state
-                .current_contract_address()
-                .clone()
-                .to_bech32_string(),
-            1000000000000000u128,
-        )
-        .await;
+    // interactor
+    //     .ping(
+    //         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
+    //         1000000000000000u128,
+    //     )
+    //     .await;
 
     // interactor
-    //     .pong(
-    //         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
-    //         "erd1qqqqqqqqqqqqqpgqmdsgk535ujtcjnhcs7fvzuemksqygchwd8ss0za8wa".to_string(),
+    //     .ping(
+    //         "erd18tudnj2z8vjh0339yu3vrkgzz2jpz8mjq0uhgnmklnap6z33qqeszq2yn4".to_string(),
+    //         1000000000000000u128,
     //     )
+    //     .await;
+
+    // interactor
+    //     .pong("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string())
     //     .await;
 }
 

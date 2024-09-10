@@ -17,6 +17,7 @@ async fn default_route() -> impl Responder {
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
     let redis_client = Client::open(env::var("REDIS_URL").unwrap()).expect("Invalid URL");
+    println!("redis client: {:?}", redis_client);
 
     HttpServer::new(move || {
         App::new()

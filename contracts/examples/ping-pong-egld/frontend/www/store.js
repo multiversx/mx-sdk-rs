@@ -2,7 +2,7 @@ import { configureStore, createSlice } from '@reduxjs/toolkit';
 
 const loadState = () => {
     try {
-      const serializedState = localStorage.getItem('scAddress');
+      const serializedState = sessionStorage.getItem('scAddress');
       if (serializedState === null) {
         return { contract_address: ''};
       }
@@ -15,9 +15,9 @@ const loadState = () => {
   const saveState = (state) => {
     try {
       const serializedState = JSON.stringify(state.contract_address);
-      localStorage.setItem('scAddress', serializedState);
+      sessionStorage.setItem('scAddress', serializedState);
     } catch (err) {
-      console.error("Error saving state to localStorage", err);
+      console.error("Error saving state to sessionStorage", err);
     }
   };
 

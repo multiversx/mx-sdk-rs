@@ -61,6 +61,13 @@ async function getScAddress() {
     let response = await query_request("contract_address");
     let contract_address = response.contract_address;
 
+    if (contract_address === undefined || contract_address === null) {
+        if (response.error === 'No contract deployed') {
+            scAddress.innerText = "No contract deployed";
+            return
+        }
+    }
+
     if (contract_address !== '') {
         store.dispatch(setScAddress(contract_address));
         scAddress.innerText = contract_address;
@@ -210,8 +217,6 @@ async function handlePingSubmit(event) {
 
     const egldValue = document.getElementById("egldValue").value;
     const wallet_addr = document.getElementById("senderPing").value.trim();
-    const contract_address = document.getElementById("contractAddrPing").value.trim();
-
 
     if (!egldValue) {
         alert("Please fill in all the fields.");
@@ -224,10 +229,10 @@ async function handlePingSubmit(event) {
     let body = {
         value: Number(egldValue),
         sender: wallet_addr,
-        contract_address: contract_address
+        contract_address: await getScAddress()
     };
 
-    pingModal.style.display = "none";
+    pingModal.classList.remove('show');
     document.getElementById('pingForm').reset();
     bodyWrapper.classList.remove("modal-open");
 
@@ -321,11 +326,10 @@ async function handlePong(event) {
 async function handlePongSubmit(event) {
     event.preventDefault();
     const wallet_addr = document.getElementById("senderPong").value.trim();
-    const contract_address = document.getElementById("contractAddrPong").value.trim();
 
     let body = {
         sender: wallet_addr,
-        contract_address: contract_address
+        contract_address: await getScAddress()
 
     };
     console.log(body);

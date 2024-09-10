@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize)]
 pub struct PingReqBody {
     pub sender: String,
-    pub contract_address: String,
     pub value: f64,
 }
 
@@ -15,12 +14,8 @@ pub struct PingResponse {
 }
 
 impl PingReqBody {
-    pub fn get_tx_sending_values(&self) -> (u128, String, String) {
-        (
-            denominate(self.value),
-            self.sender.clone(),
-            self.contract_address.clone(),
-        )
+    pub fn get_tx_sending_values(&self) -> (u128, String) {
+        (denominate(self.value), self.sender.clone())
     }
 }
 

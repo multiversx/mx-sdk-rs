@@ -114,6 +114,10 @@ p {
     transition: opacity 0.3s ease;
 }
 
+.modal h2 {
+    margin-top: 2px;
+}
+
 
 .modal.show {
     display: flex;
