@@ -269,7 +269,11 @@ async function handleTimestamp(event) {
         showTimestampModal(`Timestamp Response: ${JSON.stringify(res)}`);
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while processing your request.");
+        if (error.message.includes('Failed to fetch')) {
+            alert("Please deploy a contract first.");
+        } else {
+            alert("An error occurred while processing your request.");
+        }
     }
 }
 
@@ -316,7 +320,11 @@ async function handleDeadline(event) {
         showDeadlineModal(`Deadline Response: ${JSON.stringify(res)}`); 
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while processing your request.");
+        if (error.message.includes('Failed to fetch')) {
+            alert("Please deploy a contract first.");
+        } else {
+            alert("An error occurred while processing your request.");
+        }
     }
 }
 
@@ -328,7 +336,11 @@ async function handlePingAmount(event) {
         showPingAmountModal(`Ping Amount Response: ${JSON.stringify(res)}`); 
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while processing your request.");
+        if (error.message.includes('Failed to fetch')) {
+            alert("Please deploy a contract first.");
+        } else {
+            alert("An error occurred while processing your request.");
+        }
     }
 }
 
@@ -340,7 +352,11 @@ async function handleUserAddresses(event) {
         showUserAddressesModal(JSON.stringify(res));
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while processing your request.");
+        if (error.message.includes('Failed to fetch')) {
+            alert("Please deploy a contract first.");
+        } else {
+            alert("An error occurred while processing your request.");
+        }
     }
 }
 
@@ -349,12 +365,17 @@ async function handleMaxFunds(event) {
     try {
         let res = await query_request("max_funds");
         console.log("Response:", res);
-        showMaxFundsModal(`Max Funds Response: ${JSON.stringify(res)}`);  
+        showMaxFundsModal(`Max Funds Response: ${JSON.stringify(res)}`);
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while processing your request.");
+        if (error.message.includes('Failed to fetch')) {
+            alert("Please deploy a contract first.");
+        } else {
+            alert("An error occurred while processing your request.");
+        }
     }
 }
+
 
 pingButton.addEventListener('click', handlePing);
 deployButton.addEventListener('click', handleDeploy);
