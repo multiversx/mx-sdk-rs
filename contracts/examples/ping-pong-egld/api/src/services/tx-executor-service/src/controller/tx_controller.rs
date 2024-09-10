@@ -7,6 +7,7 @@ use crate::{
     },
 };
 use actix_web::{web, Responder};
+use redis::{Client, Commands};
 
 pub async fn ping(body: web::Json<PingReqBody>) -> impl Responder {
     let (value, sender, contract_address) = body.get_tx_sending_values();

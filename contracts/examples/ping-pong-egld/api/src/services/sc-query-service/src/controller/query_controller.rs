@@ -1,3 +1,5 @@
+use std::fs;
+
 use crate::model::{
     deadline_model::fetch_deadline, max_funds_model::fetch_max_funds,
     ping_amount_model::fetch_ping_amount, timestamp_model::fetch_timestamp,
@@ -10,6 +12,7 @@ use crate::view::{
 };
 use actix_web::{get, HttpResponse, Responder};
 use serde_json::json;
+use toml::Value;
 
 #[get("/timestamp")]
 async fn timestamp() -> impl Responder {
@@ -76,4 +79,13 @@ async fn user_addresses() -> impl Responder {
         Err(_) => HttpResponse::InternalServerError()
             .json(json!({ "error": "Failed to fetch user addresses" })),
     }
+}
+
+#[get("/contract_address")]
+async fn contract_address() -> impl Responder {
+    let toml_str = fs::read_to_string("../state.toml").unwrap();
+    let toml_value: Value = toml_str.parse().unwrap();
+    println!("{:?}", toml_value);
+    let address = toml_value["adder_address"].as_str().unwrap();
+    HttpResponse::Ok().json(json!({ "contract_address": address}))
 }

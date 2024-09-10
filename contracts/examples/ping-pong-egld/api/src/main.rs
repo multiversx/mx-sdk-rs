@@ -3,6 +3,9 @@
 mod controllers;
 use actix_cors::Cors;
 use actix_web::*;
+use dotenv::dotenv;
+use redis::Client;
+use std::env;
 
 async fn default_route() -> impl Responder {
     HttpResponse::Ok().body("Hello")
@@ -10,6 +13,10 @@ async fn default_route() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+    let redis_client = Client::open(env::var("REDIS_URL").unwrap()).expect("Invalid URL");
+
+    println!("{:?}", redis_client);
     HttpServer::new(move || {
         App::new()
             .wrap(
@@ -20,6 +27,7 @@ async fn main() -> std::io::Result<()> {
                     .supports_credentials()
                     .max_age(3600), // Cache the CORS headers for an hour
             )
+            .app_data(web::Data::new(redis_client.clone()))
             .route(
                 "/tx/{tx_type}",
                 web::post().to(controllers::api_controller::tx),

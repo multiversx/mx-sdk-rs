@@ -1,4 +1,5 @@
 import { tx_request, query_request } from "../pkg";
+import store, { clearScAddress, setScAddress } from './store';
 
 const pingButton = document.getElementById('pingButton');
 const deployButton = document.getElementById('deployButton');
@@ -46,6 +47,28 @@ const arrowDown = document.getElementById("arrowDown");
 const arrowUp = document.getElementById("arrowUp");
 const scAddress = document.getElementById("scAddress");
 const redirectLink = document.getElementById('redirectLink');
+
+async function getScAddress() {
+    const cachedAddress = store.getState().scAddress.contract_address;
+    console.log("Cached address:", cachedAddress);
+
+    if (cachedAddress != '') {
+        scAddress.innerText = cachedAddress;
+        updateExplorerLink(cachedAddress);
+        return;
+    }
+
+    let response = await query_request("contract_address");
+    let contract_address = response.contract_address;
+
+    if (contract_address !== '') {
+        store.dispatch(setScAddress(contract_address));
+        scAddress.innerText = contract_address;
+        updateExplorerLink(contract_address);
+    } else {
+        scAddress.innerText = "No contract deployed";
+    }
+}
 
 function updateExplorerLink(contract_address) {
     if (contract_address && contract_address !== "No contract deployed") {
@@ -259,9 +282,11 @@ async function handleDeploySumbit(event) {
     try {
         showStatusModal("In progress...", "https://imgur.com/AmoFMD5.gif");
         let res = await tx_request("deploy", JSON.stringify(body));
+
+        store.dispatch(clearScAddress());
+
         showStatusModal("Success", "https://imgur.com/MfsVKLh.png");
-        scAddress.innerText = res.address;
-        updateExplorerLink(res.address);
+        await getScAddress();
     } catch (error) {
         console.error("Error:", error);
         showStatusModal("Error", "https://imgur.com/lVCaXg2.png")
@@ -434,3 +459,6 @@ copyButton.addEventListener('click', () => {
         console.error("Error copying:", error);
     });
 });
+
+
+await getScAddress();

@@ -12,3 +12,4 @@ actix-web = "4.9.0"
 actix-cors = "0.7"
 api = { path = "../../.." }
 redis = "0.26.1"
+dotenv = "0.15.0"
