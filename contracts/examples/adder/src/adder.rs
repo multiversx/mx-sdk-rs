@@ -23,7 +23,7 @@ pub trait Adder {
     }
 
     /// Add desired amount to the storage variable.
-    #[view]
+    #[endpoint]
     fn add(&self, value: BigUint) {
         self.sum().update(|sum| *sum += value);
     }

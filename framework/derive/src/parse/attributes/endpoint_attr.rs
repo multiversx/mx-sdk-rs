@@ -57,7 +57,7 @@ pub struct ViewAttribute {
     pub view_name: Option<syn::Ident>,
 }
 
-impl ViewAttribute {  
+impl ViewAttribute {
     pub fn parse(attr: &syn::Attribute) -> Option<ViewAttribute> {
         match is_attr_with_one_opt_token_tree_arg(attr, ATTR_VIEW) {
             None => None,

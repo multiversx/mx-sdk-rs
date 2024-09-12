@@ -1,9 +1,8 @@
 #![no_std]
 
-use benchmark_common::ExampleStruct;
-
 multiversx_sc::imports!();
 
+use benchmark_common::ExampleStruct;
 pub mod linked_list_repeat_proxy;
 
 #[multiversx_sc::contract]
@@ -39,8 +38,7 @@ pub trait LinkedListRepeat: benchmark_common::BenchmarkCommon {
     #[storage_mapper("benchmark")]
     fn bench(&self) -> LinkedListMapper<ManagedBuffer>;
 
-    #[view]
-    // #[endpoint]
+    #[endpoint]
     fn add_struct(&self, num_repeats: usize, value: ExampleStruct<Self::Api>) {
         let mut bench = self.bench_struct();
         for i in 0..num_repeats {
