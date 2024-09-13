@@ -1,4 +1,4 @@
-use std::{ffi::OsStr, fs, process::Command};
+use std::{collections::HashMap, ffi::OsStr, fs, process::Command};
 
 use super::ContractVariant;
 use crate::{
@@ -95,12 +95,8 @@ impl ContractVariant {
         let mut abi = ContractAbiJson::from(&self.abi);
         let mut view_endpoints = Vec::new();
         for endpoint in &abi.endpoints {
-            match endpoint.mutability {
-                crate::abi_json::EndpointMutabilityAbiJson::Readonly => {
-                    view_endpoints.push(&endpoint.name)
-                },
-                crate::abi_json::EndpointMutabilityAbiJson::Mutable => (),
-                crate::abi_json::EndpointMutabilityAbiJson::Pure => (),
+            if let crate::abi_json::EndpointMutabilityAbiJson::Readonly = endpoint.mutability {
+                view_endpoints.push(&endpoint.name)
             }
         }
         let build_info = core::mem::take(&mut abi.build_info).unwrap();
@@ -141,14 +137,10 @@ impl ContractVariant {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
 
         let abi = ContractAbiJson::from(&self.abi);
-        let mut view_endpoints = Vec::new();
+        let mut view_endpoints: HashMap<&str, usize> = HashMap::new();
         for endpoint in &abi.endpoints {
-            match endpoint.mutability {
-                crate::abi_json::EndpointMutabilityAbiJson::Readonly => {
-                    view_endpoints.push(endpoint.name.clone())
-                },
-                crate::abi_json::EndpointMutabilityAbiJson::Mutable => (),
-                crate::abi_json::EndpointMutabilityAbiJson::Pure => (),
+            if let crate::abi_json::EndpointMutabilityAbiJson::Readonly = endpoint.mutability {
+                view_endpoints.insert(&endpoint.name, 0);
             }
         }
 
