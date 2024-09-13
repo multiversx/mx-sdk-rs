@@ -17,6 +17,7 @@ pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
     if !tx_error.is_success() {
         return TxResponse {
             tx_error,
+            tx_hash: process_tx_hash(&tx).to_string(),
             ..Default::default()
         };
     }
@@ -45,8 +46,13 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
         new_deployed_address: process_new_deployed_address(tx),
         new_issued_token_identifier: process_new_issued_token_identifier(tx),
         logs: process_logs(tx),
+        tx_hash: process_tx_hash(tx).to_string(),
         ..Default::default()
     }
+}
+
+fn process_tx_hash(tx: &TransactionOnNetwork) -> &str {
+    tx.hash.as_deref().unwrap_or("")
 }
 
 fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {

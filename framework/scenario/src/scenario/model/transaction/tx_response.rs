@@ -20,6 +20,8 @@ pub struct TxResponse {
     pub gas: u64,
     /// The refund of the transaction.
     pub refund: u64,
+    /// The transaction hash
+    pub tx_hash: String,
 }
 
 impl TxResponse {
