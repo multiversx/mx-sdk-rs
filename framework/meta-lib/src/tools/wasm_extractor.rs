@@ -75,7 +75,7 @@ fn populate_wasm_info(
                 ei_check = is_ei_valid(&imports, check_ei);
             },
             Payload::DataSection(data_section) => {
-                allocator_trigger = is_fail_allocator_triggered(&data_section);
+                allocator_trigger = is_fail_allocator_triggered(data_section.clone());
                 if is_panic_with_message_triggered(data_section.clone()) {
                     has_panic = WITH_MESSAGE;
                 } else if is_panic_without_message_triggered(data_section) {
@@ -99,8 +99,8 @@ fn populate_wasm_info(
         }
     }
     let mut visited: HashSet<usize> = HashSet::new();
-    for (index, _name) in &views_data {
-        mark_write(*index, &call_graph, &mut write_functions, &mut visited);
+    for key in views_data.keys() {
+        mark_write(*key, &call_graph, &mut write_functions, &mut visited);
     }
 
     for (index, name) in views_data {
@@ -133,7 +133,7 @@ fn populate_wasm_info(
 
 fn parse_export_section(
     export_section: ExportSectionReader,
-    view_endpoints: &Vec<String>,
+    view_endpoints: &[String],
 ) -> HashMap<usize, String> {
     let mut views_data: HashMap<usize, String> = HashMap::new();
     for export in export_section {
@@ -181,20 +181,17 @@ fn create_call_graph(body: FunctionBody, call_graph: &mut HashMap<usize, Vec<usi
 
     let mut call_functions = Vec::new();
     while let Ok(op) = instructions_reader.read() {
-        match op {
-            Operator::Call { function_index } => {
-                let function_usize: usize = function_index.try_into().unwrap();
-                call_functions.push(function_usize);
-            },
-            _ => (),
+        if let Operator::Call { function_index } = op {
+            let function_usize: usize = function_index.try_into().unwrap();
+            call_functions.push(function_usize);
         }
     }
 
     call_graph.insert(call_graph.len(), call_functions);
 }
 
-fn is_fail_allocator_triggered(data_section: &DataSectionReader) -> bool {
-    for data_fragment in data_section.clone().into_iter().flatten() {
+fn is_fail_allocator_triggered(data_section: DataSectionReader) -> bool {
+    for data_fragment in data_section.into_iter().flatten() {
         if data_fragment
             .data
             .windows(ERROR_FAIL_ALLOCATOR.len())
@@ -266,7 +263,7 @@ pub fn extract_imports(
     import_names
 }
 
-fn is_ei_valid(imports: &Vec<String>, check_ei: &Option<EIVersion>) -> bool {
+fn is_ei_valid(imports: &[String], check_ei: &Option<EIVersion>) -> bool {
     if let Some(ei) = check_ei {
         let mut num_errors = 0;
         for import in imports {
