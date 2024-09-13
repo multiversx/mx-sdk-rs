@@ -70,9 +70,9 @@ fn populate_wasm_info(
             Payload::DataSection(data_section) => {
                 wasm_info.report.has_allocator = is_fail_allocator_triggered(data_section.clone());
                 if is_panic_with_message_triggered(data_section.clone()) {
-                    wasm_info.report.has_panic = WITH_MESSAGE.to_owned();
+                    WITH_MESSAGE.clone_into(&mut wasm_info.report.has_panic);
                 } else if is_panic_without_message_triggered(data_section) {
-                    wasm_info.report.has_panic = WITHOUT_MESSAGE.to_owned();
+                    WITHOUT_MESSAGE.clone_into(&mut wasm_info.report.has_panic);
                 }
             },
             Payload::CodeSectionEntry(code_section) => {
