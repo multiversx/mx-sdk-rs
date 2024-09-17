@@ -78,62 +78,68 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call(CHANGE_OWNER_BUILTIN_FUNC_NAME)
-            .argument(new_owner)
+            .argument(&new_owner)
             .original_result()
     }
 
-    pub fn esdt_local_burn(
+    pub fn esdt_local_burn<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
         self,
-        token: &TokenIdentifier<Env::Api>,
+        token: Arg0,
         nonce: u64,
-        amount: &BigUint<Env::Api>,
+        amount: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         if nonce == 0 {
             return self
                 .wrapped_tx
                 .payment(NotPayable)
                 .raw_call(ESDT_LOCAL_BURN_FUNC_NAME)
-                .argument(token)
-                .argument(amount)
+                .argument(&token)
+                .argument(&amount)
                 .original_result();
         }
 
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call(ESDT_NFT_BURN_FUNC_NAME)
-            .argument(token)
+            .argument(&token)
             .argument(&nonce)
-            .argument(amount)
+            .argument(&amount)
             .original_result()
     }
 
-    pub fn esdt_local_mint(
+    pub fn esdt_local_mint<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
         self,
-        token: &TokenIdentifier<Env::Api>,
+        token: Arg0,
         nonce: u64,
-        amount: &BigUint<Env::Api>,
+        amount: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         if nonce == 0 {
             return self
                 .wrapped_tx
                 .payment(NotPayable)
                 .raw_call(ESDT_LOCAL_MINT_FUNC_NAME)
-                .argument(token)
-                .argument(amount)
+                .argument(&token)
+                .argument(&amount)
                 .original_result();
         }
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call(ESDT_NFT_ADD_QUANTITY_FUNC_NAME)
-            .argument(token)
+            .argument(&token)
             .argument(&nonce)
-            .argument(amount)
+            .argument(&amount)
             .original_result()
     }
 
-    pub fn nft_add_multiple_uri(
+    pub fn nft_add_multiple_uri<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
-        token_id: &TokenIdentifier<Env::Api>,
+        token_id: Arg0,
         nft_nonce: u64,
         new_uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -141,7 +147,7 @@ where
             .wrapped_tx
             .payment(NotPayable)
             .raw_call(ESDT_NFT_ADD_URI_FUNC_NAME)
-            .argument(token_id)
+            .argument(&token_id)
             .argument(&nft_nonce);
 
         for uri in new_uris {
@@ -151,29 +157,36 @@ where
         tx.original_result()
     }
 
-    pub fn nft_update_attributes<T: TopEncode>(
+    pub fn nft_update_attributes<T: TopEncode, Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
-        token_id: &TokenIdentifier<Env::Api>,
+        token_id: Arg0,
         nft_nonce: u64,
         new_attributes: &T,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call(ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME)
-            .argument(token_id)
+            .argument(&token_id)
             .argument(&nft_nonce)
-            .argument(new_attributes)
+            .argument(&new_attributes)
             .original_result()
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_create<T: TopEncode>(
+    pub fn esdt_nft_create<
+        T: TopEncode,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
         self,
-        token: &TokenIdentifier<Env::Api>,
-        amount: &BigUint<Env::Api>,
-        name: &ManagedBuffer<Env::Api>,
-        royalties: &BigUint<Env::Api>,
-        hash: &ManagedBuffer<Env::Api>,
+        token: Arg0,
+        amount: Arg1,
+        name: Arg2,
+        royalties: Arg3,
+        hash: Arg4,
         attributes: &T,
         uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
@@ -181,12 +194,12 @@ where
             .wrapped_tx
             .payment(NotPayable)
             .raw_call(ESDT_NFT_CREATE_FUNC_NAME)
-            .argument(token)
-            .argument(amount)
-            .argument(name)
-            .argument(royalties)
-            .argument(hash)
-            .argument(attributes);
+            .argument(&token)
+            .argument(&amount)
+            .argument(&name)
+            .argument(&royalties)
+            .argument(&hash)
+            .argument(&attributes);
 
         if uris.is_empty() {
             // at least one URI is required, so we push an empty one
