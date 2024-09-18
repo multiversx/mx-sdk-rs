@@ -85,3 +85,44 @@ fn test_multi_call_back_transfers() {
         .check_account(PROMISES_FEATURE_ADDRESS)
         .esdt_balance(TOKEN_ID_EXPR, token_amount);
 }
+
+#[test]
+fn test_back_transfers_logs() {
+    let mut state = PromisesFeaturesTestState::new();
+    let token_amount = BigUint::from(1000u64);
+
+    let logs = state
+        .world
+        .tx()
+        .from(USER_ADDRESS)
+        .to(PROMISES_FEATURE_ADDRESS)
+        .typed(promises_feature_proxy::PromisesFeaturesProxy)
+        .forward_sync_retrieve_funds_bt(VAULT_ADDRESS, TOKEN_ID, 0u64, &token_amount)
+        .returns(ReturnsLogs)
+        .run();
+
+    assert!(!logs.is_empty() && !logs[0].topics.is_empty());
+    assert_eq!(logs[0].address, PROMISES_FEATURE_ADDRESS);
+    assert_eq!(logs[0].endpoint, "transferValueOnly");
+}
+
+#[test]
+fn test_multi_call_back_transfers_logs() {
+    let mut state = PromisesFeaturesTestState::new();
+    let token_amount = BigUint::from(1000u64);
+    let half_token_amount = token_amount.clone() / 2u64;
+
+    let logs = state
+        .world
+        .tx()
+        .from(USER_ADDRESS)
+        .to(PROMISES_FEATURE_ADDRESS)
+        .typed(promises_feature_proxy::PromisesFeaturesProxy)
+        .forward_sync_retrieve_funds_bt_twice(VAULT_ADDRESS, TOKEN_ID, 0u64, &half_token_amount)
+        .returns(ReturnsLogs)
+        .run();
+
+    assert!(!logs.is_empty() && !logs[0].topics.is_empty());
+    assert_eq!(logs[0].address, PROMISES_FEATURE_ADDRESS);
+    assert_eq!(logs[0].endpoint, "transferValueOnly");
+}

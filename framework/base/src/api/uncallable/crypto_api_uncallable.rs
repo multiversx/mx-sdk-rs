@@ -42,7 +42,7 @@ impl CryptoApiImpl for UncallableApi {
         _key: Self::ManagedBufferHandle,
         _message: Self::ManagedBufferHandle,
         _signature: Self::ManagedBufferHandle,
-    ) -> bool {
+    ) {
         unreachable!()
     }
 
@@ -79,6 +79,33 @@ impl CryptoApiImpl for UncallableApi {
         _r: Self::ManagedBufferHandle,
         _s: Self::ManagedBufferHandle,
         _dest: Self::ManagedBufferHandle,
+    ) {
+        unreachable!()
+    }
+
+    fn verify_secp256r1_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) {
+        unreachable!()
+    }
+
+    fn verify_bls_signature_share_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
+    ) {
+        unreachable!()
+    }
+
+    fn verify_bls_aggregated_signature_managed(
+        &self,
+        _key: Self::ManagedBufferHandle,
+        _message: Self::ManagedBufferHandle,
+        _signature: Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }

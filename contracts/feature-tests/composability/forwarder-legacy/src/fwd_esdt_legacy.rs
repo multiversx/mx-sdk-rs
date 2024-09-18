@@ -128,8 +128,7 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
         // so we can get the token identifier and amount from the call data
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                self.last_issued_token()
-                    .set(&token_identifier.unwrap_esdt());
+                self.last_issued_token().set(token_identifier.unwrap_esdt());
                 self.last_error_message().clear();
             },
             ManagedAsyncCallResult::Err(message) => {

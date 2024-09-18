@@ -31,6 +31,7 @@ pub trait ManagedVecItem: 'static {
     /// - For items with Copy semantics, it should be the type itself.
     /// - For managed types, ManagedRef does the job.
     /// - For any other types, `Self` is currently used, although this is technically unsafe.
+    ///
     /// TODO: wrap other types in readonly wrapper.
     type Ref<'a>: Borrow<Self>;
 

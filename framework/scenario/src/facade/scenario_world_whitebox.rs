@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use multiversx_chain_vm::tx_mock::{TxFunctionName, TxResult};
 use multiversx_sc::contract_base::{CallableContract, ContractBase};
 
@@ -10,6 +12,10 @@ use crate::{
 use super::whitebox_contract::WhiteboxContract;
 
 impl ScenarioWorld {
+    #[deprecated(
+        since = "0.53.0",
+        note = "Please use method `whitebox`, as part of the unified transaction syntax."
+    )]
     pub fn whitebox_query<ContractObj, F>(
         &mut self,
         whitebox_contract: &WhiteboxContract<ContractObj>,
@@ -24,6 +30,10 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.53.0",
+        note = "Please use method `whitebox`, as part of the unified transaction syntax."
+    )]
     pub fn whitebox_query_check<ContractObj, F, C>(
         &mut self,
         whitebox_contract: &WhiteboxContract<ContractObj>,
@@ -50,6 +60,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.53.0",
+        note = "Please use method `whitebox`, as part of the unified transaction syntax."
+    )]
     pub fn whitebox_call<ContractObj, F>(
         &mut self,
         whitebox_contract: &WhiteboxContract<ContractObj>,
@@ -65,6 +79,10 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.53.0",
+        note = "Please use method `whitebox`, as part of the unified transaction syntax."
+    )]
     pub fn whitebox_call_check<ContractObj, F, C>(
         &mut self,
         whitebox_contract: &WhiteboxContract<ContractObj>,
@@ -99,6 +117,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.53.0",
+        note = "Please use method `whitebox`, as part of the unified transaction syntax."
+    )]
     pub fn whitebox_deploy<ContractObj, F>(
         &mut self,
         whitebox_contract: &WhiteboxContract<ContractObj>,
@@ -114,6 +136,10 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.53.0",
+        note = "Please use method `whitebox`, as part of the unified transaction syntax."
+    )]
     pub fn whitebox_deploy_check<ContractObj, F, C>(
         &mut self,
         whitebox_contract: &WhiteboxContract<ContractObj>,
