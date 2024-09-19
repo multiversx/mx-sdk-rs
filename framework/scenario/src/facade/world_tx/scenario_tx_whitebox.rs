@@ -1,3 +1,5 @@
+use core::str;
+
 use crate::debug_executor::contract_instance_wrapped_execution;
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::{
@@ -68,6 +70,15 @@ where
             });
 
         let mut response = TxResponse::from_tx_result(tx_result);
+        if let Some(tx_hash) = &step_wrapper.env.data.tx_hash {
+            let tx_hash_bytes = tx_hash.as_bytes();
+            response.tx_hash = str::from_utf8(tx_hash_bytes)
+                .expect("tx hash not utf8 valid")
+                .to_string();
+        } else {
+            response.tx_hash = String::from("");
+        }
+
         response.new_deployed_address = Some(new_address);
         step_wrapper.step.save_response(response);
         step_wrapper.process_result()
@@ -140,7 +151,16 @@ where
                 });
             });
 
-        let response = TxResponse::from_tx_result(tx_result);
+        let mut response = TxResponse::from_tx_result(tx_result);
+        if let Some(tx_hash) = &step_wrapper.env.data.tx_hash {
+            let tx_hash_bytes = tx_hash.as_bytes();
+            response.tx_hash = str::from_utf8(tx_hash_bytes)
+                .expect("tx hash not utf8 valid")
+                .to_string();
+        } else {
+            response.tx_hash = String::from("");
+        }
+
         step_wrapper.step.save_response(response);
         step_wrapper.process_result()
     }
