@@ -7,7 +7,7 @@ const CONFIG_FILE: &str = "config.toml";
 /// Adder Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    gateway: Option<String>,
+    gateway_uri: String,
     chain_type: String,
 }
 
@@ -20,12 +20,20 @@ impl Config {
         toml::from_str(&content).unwrap()
     }
 
-    // Returns the gateway
-    pub fn gateway(&self) -> &str {
+    // Returns the gateway URI
+    pub fn gateway_uri(&self) -> &str {
+        &self.gateway_uri
+    }
+
+    // Returns if chain type is chain simulator
+    pub fn use_chain_simulator(&self) -> bool {
         match self.chain_type.as_str() {
-            "real" => self.gateway.as_deref().expect("Please provide gateway!"),
-            "simulator" => "http://localhost:8085",
-            _ => "",
+            "simulator" => return true,
+            "real" => return false,
+            _ => panic!(
+                "Invalid chain type: {}. Expected 'simulator' or 'real'.",
+                self.chain_type
+            ),
         }
     }
 }

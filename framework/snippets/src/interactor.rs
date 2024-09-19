@@ -32,8 +32,8 @@ pub struct Interactor {
 }
 
 impl Interactor {
-    pub async fn new(gateway_url: &str) -> Self {
-        let proxy = GatewayProxy::new(gateway_url.to_string());
+    pub async fn new(gateway_uri: &str, use_chain_simulator: bool) -> Self {
+        let proxy = GatewayProxy::new(gateway_uri.to_string(), use_chain_simulator);
         let network_config = proxy.get_network_config().await.unwrap();
         Self {
             proxy,

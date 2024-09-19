@@ -15,9 +15,10 @@ use std::collections::{BTreeMap, HashMap};
 /// then formats it as a scenario set state step.
 pub async fn print_account_as_scenario_set_state(
     api_string: String,
+    use_chain_simulator: bool,
     address_bech32_string: String,
 ) {
-    let api = GatewayProxy::new(api_string);
+    let api = GatewayProxy::new(api_string, use_chain_simulator);
     let address = Bech32Address::from_bech32_string(address_bech32_string);
     let set_state = retrieve_account_as_scenario_set_state(&api, &address).await;
     let scenario = build_scenario(set_state);

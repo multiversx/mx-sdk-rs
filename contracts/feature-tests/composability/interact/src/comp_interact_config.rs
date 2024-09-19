@@ -11,7 +11,8 @@ const CONFIG_FILE: &str = "config.toml";
 /// Multisig Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    gateway: String,
+    gateway_uri: String,
+    chain_type: String,
     call_type: String,
     token_id: String,
     token_nonce: u64,
@@ -27,9 +28,21 @@ impl Config {
         toml::from_str(&content).unwrap()
     }
 
-    // Returns the gateway
-    pub fn gateway(&self) -> &str {
-        &self.gateway
+    // Returns the gateway URI
+    pub fn gateway_uri(&self) -> &str {
+        &self.gateway_uri
+    }
+
+    // Returns if chain type is chain simulator
+    pub fn use_chain_simulator(&self) -> bool {
+        match self.chain_type.as_str() {
+            "simulator" => return true,
+            "real" => return false,
+            _ => panic!(
+                "Invalid chain type: {}. Expected 'simulator' or 'real'.",
+                self.chain_type
+            ),
+        }
     }
 
     pub fn call_type(&self) -> QueuedCallType {
