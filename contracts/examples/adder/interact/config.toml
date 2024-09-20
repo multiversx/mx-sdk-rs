@@ -1,1 +1,2 @@
-chain_type = "simulator"
+chain_type = 'real'
+gateway_uri = 'http://localhost:8085'
