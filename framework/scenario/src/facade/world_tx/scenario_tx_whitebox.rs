@@ -1,5 +1,3 @@
-use core::str;
-
 use crate::debug_executor::contract_instance_wrapped_execution;
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::{
@@ -57,6 +55,7 @@ where
         let contract_obj = contract_obj_builder();
 
         let mut step_wrapper = self.tx_to_step();
+        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
         let (new_address, tx_result) = step_wrapper
             .env
             .world
@@ -70,15 +69,6 @@ where
             });
 
         let mut response = TxResponse::from_tx_result(tx_result);
-        if let Some(tx_hash) = &step_wrapper.env.data.tx_hash {
-            let tx_hash_bytes = tx_hash.as_bytes();
-            response.tx_hash = str::from_utf8(tx_hash_bytes)
-                .expect("tx hash not utf8 valid")
-                .to_string();
-        } else {
-            response.tx_hash = String::from("");
-        }
-
         response.new_deployed_address = Some(new_address);
         step_wrapper.step.save_response(response);
         step_wrapper.process_result()
@@ -133,6 +123,7 @@ where
         let contract_obj = contract_obj_builder();
 
         let mut step_wrapper = self.tx_to_step();
+        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
 
         // no endpoint is called per se, but if it is empty, the VM thinks it is a simple transfer of value
         if step_wrapper.step.tx.function.is_empty() {
@@ -151,16 +142,7 @@ where
                 });
             });
 
-        let mut response = TxResponse::from_tx_result(tx_result);
-        if let Some(tx_hash) = &step_wrapper.env.data.tx_hash {
-            let tx_hash_bytes = tx_hash.as_bytes();
-            response.tx_hash = str::from_utf8(tx_hash_bytes)
-                .expect("tx hash not utf8 valid")
-                .to_string();
-        } else {
-            response.tx_hash = String::from("");
-        }
-
+        let response = TxResponse::from_tx_result(tx_result);
         step_wrapper.step.save_response(response);
         step_wrapper.process_result()
     }
