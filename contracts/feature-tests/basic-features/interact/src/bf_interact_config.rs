@@ -28,8 +28,8 @@ impl Config {
     // Returns if true if chain type is chain simulator
     pub fn use_chain_simulator(&self) -> bool {
         match self.chain_type.as_str() {
-            "simulator" => return true,
-            "real" => return false,
+            "simulator" => true,
+            "real" => false,
             _ => panic!(
                 "Invalid chain type: {}. Expected 'simulator' or 'real'.",
                 self.chain_type
