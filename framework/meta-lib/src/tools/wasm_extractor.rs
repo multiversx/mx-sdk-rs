@@ -1,17 +1,17 @@
 use colored::Colorize;
 use std::fs;
 use wasmparser::{
-    BinaryReaderError, DataSectionReader, FunctionBody, ImportSectionReader, Parser, Payload,
+    BinaryReaderError, DataSectionReader, FunctionBody, ImportSectionReader, Operator, Parser,
+    Payload,
 };
 
 use crate::ei::EIVersion;
 
-use super::report_creator::{ReportCreator, WITHOUT_MESSAGE, WITH_MESSAGE};
+use super::report_creator::{PanicMessage, ReportCreator};
 
 const PANIC_WITH_MESSAGE: &[u8; 16] = b"panic occurred: ";
 const PANIC_WITHOUT_MESSAGE: &[u8; 14] = b"panic occurred";
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
-const MEMORY_GROW_OPCODE: u8 = 0x40;
 
 pub struct WasmInfo {
     pub imports: Vec<String>,
@@ -49,25 +49,35 @@ fn populate_wasm_info(
     let mut allocator_trigger = false;
     let mut ei_check = false;
     let mut memory_grow_flag = false;
-    let mut has_panic = "none";
+    let mut has_panic: PanicMessage = PanicMessage::default();
 
     let parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
         match payload? {
             Payload::ImportSection(import_section) => {
                 imports = extract_imports(import_section, extract_imports_enabled);
-                ei_check = is_ei_valid(imports.clone(), check_ei);
+                ei_check |= is_ei_valid(imports.clone(), check_ei);
             },
             Payload::DataSection(data_section) => {
-                allocator_trigger = is_fail_allocator_triggered(data_section.clone());
-                if is_panic_with_message_triggered(data_section.clone()) {
-                    has_panic = WITH_MESSAGE;
-                } else if is_panic_without_message_triggered(data_section) {
-                    has_panic = WITHOUT_MESSAGE;
+                allocator_trigger |= is_fail_allocator_triggered(data_section.clone());
+                match has_panic {
+                    PanicMessage::None => {
+                        if is_panic_with_message_triggered(data_section.clone()) {
+                            has_panic = PanicMessage::WithMessage;
+                        } else if is_panic_without_message_triggered(data_section) {
+                            has_panic = PanicMessage::WithoutMessage;
+                        }
+                    },
+                    PanicMessage::WithoutMessage => {
+                        if is_panic_with_message_triggered(data_section.clone()) {
+                            has_panic = PanicMessage::WithMessage;
+                        }
+                    },
+                    PanicMessage::WithMessage => continue,
                 }
             },
             Payload::CodeSectionEntry(code_section) => {
-                memory_grow_flag = is_mem_grow(code_section);
+                memory_grow_flag |= is_mem_grow(code_section);
             },
             _ => (),
         }
@@ -76,7 +86,7 @@ fn populate_wasm_info(
     let report = ReportCreator {
         path,
         has_allocator: allocator_trigger,
-        has_panic: has_panic.to_string(),
+        has_panic,
     };
 
     Ok(WasmInfo {
@@ -173,9 +183,9 @@ fn is_ei_valid(imports: Vec<String>, check_ei: &Option<EIVersion>) -> bool {
 }
 
 fn is_mem_grow(code_section: FunctionBody) -> bool {
-    let mut code = code_section.get_binary_reader();
-    while code.bytes_remaining() > 0 {
-        if code.read_u8().unwrap() == MEMORY_GROW_OPCODE {
+    for op_reader in code_section.get_operators_reader().iter_mut() {
+        let op = op_reader.read().unwrap();
+        if let Operator::MemoryGrow { mem: _ } = op {
             return true;
         }
     }
