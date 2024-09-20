@@ -55,7 +55,6 @@ where
         let contract_obj = contract_obj_builder();
 
         let mut step_wrapper = self.tx_to_step();
-        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
         let (new_address, tx_result) = step_wrapper
             .env
             .world
@@ -123,7 +122,6 @@ where
         let contract_obj = contract_obj_builder();
 
         let mut step_wrapper = self.tx_to_step();
-        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
 
         // no endpoint is called per se, but if it is empty, the VM thinks it is a simple transfer of value
         if step_wrapper.step.tx.function.is_empty() {
