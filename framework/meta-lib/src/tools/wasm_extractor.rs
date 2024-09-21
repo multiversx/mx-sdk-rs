@@ -39,7 +39,7 @@ impl WasmInfo {
     }
 }
 
-fn populate_wasm_info(
+pub(crate) fn populate_wasm_info(
     path: String,
     wasm_data: Vec<u8>,
     extract_imports_enabled: bool,
@@ -183,11 +183,15 @@ fn is_ei_valid(imports: Vec<String>, check_ei: &Option<EIVersion>) -> bool {
 }
 
 fn is_mem_grow(code_section: FunctionBody) -> bool {
-    for op_reader in code_section.get_operators_reader().iter_mut() {
-        let op = op_reader.read().unwrap();
+    let mut instructions_reader = code_section
+        .get_operators_reader()
+        .expect("Failed to get operators reader");
+
+    while let Ok(op) = instructions_reader.read() {
         if let Operator::MemoryGrow { mem: _ } = op {
             return true;
         }
     }
+
     false
 }

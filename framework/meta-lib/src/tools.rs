@@ -3,6 +3,7 @@ mod git_describe;
 pub(crate) mod report_creator;
 pub mod twiggy;
 mod wasm_extractor;
+mod wasm_extractor_test;
 mod wasm_opt;
 mod wasm_to_wat;
 
