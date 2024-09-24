@@ -3,7 +3,7 @@ use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
-use multiversx_sdk::{
+use multiversx_sdk_wbg::{
     data::{address::Address, esdt::EsdtBalance},
     gateway::GatewayProxy,
 };
@@ -67,7 +67,7 @@ pub async fn retrieve_account_as_scenario_set_state(
 }
 
 fn set_account(
-    account: multiversx_sdk::data::account::Account,
+    account: multiversx_sdk_wbg::data::account::Account,
     account_storage: HashMap<String, String>,
     account_esdt: HashMap<String, EsdtBalance>,
     account_esdt_roles: HashMap<String, Vec<String>>,

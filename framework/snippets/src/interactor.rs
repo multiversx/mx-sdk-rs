@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     multiversx_sc::types::Address,
     scenario_model::AddressValue,
 };
-use multiversx_sdk::{
+use multiversx_sdk_wbg::{
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
     gateway::GatewayProxy,
     wallet::Wallet,
@@ -61,7 +61,9 @@ impl Interactor {
 
     pub async fn sleep(&mut self, duration: Duration) {
         self.waiting_time_ms += duration.as_millis() as u64;
-        tokio::time::sleep(duration).await;
+        gloo_timers::future::sleep(duration).await;
+
+        // tokio::time::sleep(duration).await;
     }
 
     pub async fn with_tracer<P: AsRef<Path>>(mut self, path: P) -> Self {

@@ -1,6 +1,6 @@
 use crate::{multiversx_sc::types::Address, Interactor, Sender};
 use futures::future::join_all;
-use multiversx_sdk::data::transaction::{Transaction, TransactionOnNetwork};
+use multiversx_sdk_wbg::data::transaction::{Transaction, TransactionOnNetwork};
 use std::collections::HashSet;
 
 pub(crate) type Txs = Vec<Transaction>;

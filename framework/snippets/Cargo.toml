@@ -14,7 +14,7 @@ keywords = ["multiversx", "blockchain", "contract", "snippets"]
 categories = ["cryptography::cryptocurrencies"]
 
 [dependencies]
-tokio = { version = "1.24", features = ["full"] }
+gloo-timers = { version = "0.3.0", features = ["futures"] }
 hex = "0.4"
 base64 = "0.22"
 log = "0.4.17"
@@ -29,9 +29,9 @@ path = "../scenario"
 version = "0.23.0"
 path = "../../sdk/scenario-format"
 
-[dependencies.multiversx-sdk]
+[dependencies.multiversx-sdk-wbg]
 version = "=0.6.0"
-path = "../../sdk/core"
+path = "../../sdk-wbg/core"
 
 [dev-dependencies]
 serde_json = "1.0"

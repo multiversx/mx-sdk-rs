@@ -16,6 +16,9 @@ members = [
   "sdk/core",
   "sdk/scenario-format",
 
+  "sdk-wbg/core",
+  "sdk-wbg/core/examples/ping-pong-dapp",
+
   "tools/mxpy-snippet-generator",
   "tools/payload-macro-generator",
   # "tools/plotter",

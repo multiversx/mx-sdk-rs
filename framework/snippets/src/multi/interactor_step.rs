@@ -2,7 +2,7 @@ use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
     scenario_model::{AddressValue, ScCallStep, ScDeployStep, TxResponse},
 };
-use multiversx_sdk::data::transaction::Transaction;
+use multiversx_sdk_wbg::data::transaction::Transaction;
 
 use crate::Interactor;
 

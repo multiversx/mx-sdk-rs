@@ -5,7 +5,7 @@ use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
-use multiversx_sdk::{data::transaction::Transaction, utils::base64_encode};
+use multiversx_sdk_wbg::{data::transaction::Transaction, utils::base64_encode};
 
 impl Interactor {
     pub async fn sc_call<S>(&mut self, mut sc_call_step: S)
