@@ -7,5 +7,3 @@ pub use crate::{
 pub use multiversx_sdk_wbg::{data::keystore::InsertPassword, wallet::Wallet};
 
 pub use env_logger;
-pub use gloo_timers;
-// pub use tokio;
