@@ -168,13 +168,6 @@ impl Address {
         self.0.is_zero()
     }
 
-    // /// Transmutes self to an (in principle) variable length boxed bytes object.
-    // /// Both BoxedBytes and H256 keep the data on the heap, so only the pointer to that data needs to be transmuted.
-    // /// Does not reallocate or copy data, the data on the heap remains untouched.
-    // pub fn into_boxed_bytes(self) -> BoxedBytes {
-    //     self.0.into_boxed_bytes()
-    // }
-
     pub fn is_smart_contract_address(&self) -> bool {
         self.as_bytes()
             .iter()

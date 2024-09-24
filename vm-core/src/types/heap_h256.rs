@@ -224,20 +224,6 @@ impl TopDecode for HeapH256 {
     }
 }
 
-// impl TypeAbiFrom<Self> for HeapH256 {}
-
-// impl TypeAbi for HeapH256 {
-//     type Unmanaged = Self;
-
-//     fn type_name() -> TypeName {
-//         "H256".into()
-//     }
-
-//     fn type_name_rust() -> TypeName {
-//         "H256".into()
-//     }
-// }
-
 #[cfg(test)]
 mod h256_tests {
     use super::*;

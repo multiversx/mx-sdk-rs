@@ -198,20 +198,6 @@ impl TopDecode for HeapAddress {
     }
 }
 
-// impl TypeAbiFrom<Self> for HeapAddress {}
-
-// impl TypeAbi for HeapAddress {
-//     type Unmanaged = Self;
-
-//     fn type_name() -> TypeName {
-//         "Address".into()
-//     }
-
-//     fn type_name_rust() -> TypeName {
-//         "Address".into()
-//     }
-// }
-
 #[cfg(test)]
 mod address_tests {
     use super::*;
