@@ -1,17 +1,13 @@
 #![allow(clippy::bad_bit_mask)]
 
-use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
-    codec::*,
-    formatter::{hex_util, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex},
-};
+use crate::codec::*;
 use bitflags::bitflags;
 
-const UPGRADEABLE_STRING: &[u8] = b"Upgradeable";
-const READABLE_STRING: &[u8] = b"Readable";
-const PAYABLE_STRING: &[u8] = b"Payable";
-const PAYABLE_BY_SC_STRING: &[u8] = b"PayableBySC";
-const DEFAULT_STRING: &[u8] = b"Default";
+const UPGRADEABLE_STRING: &str = "Upgradeable";
+const READABLE_STRING: &str = "Readable";
+const PAYABLE_STRING: &str = "Payable";
+const PAYABLE_BY_SC_STRING: &str = "PayableBySC";
+const DEFAULT_STRING: &str = "Default";
 
 bitflags! {
     #[derive(Default, PartialEq, Debug, Clone, Copy)]
@@ -45,6 +41,43 @@ impl CodeMetadata {
     pub fn to_byte_array(&self) -> [u8; 2] {
         self.bits().to_be_bytes()
     }
+
+    pub fn to_vec(&self) -> Vec<u8> {
+        self.to_byte_array().to_vec()
+    }
+
+    pub fn for_each_string_token<F: FnMut(&'static str)>(&self, mut f: F) {
+        let mut nothing_printed: bool = true;
+        if self.is_upgradeable() {
+            f(UPGRADEABLE_STRING);
+            nothing_printed = false;
+        }
+        if self.is_readable() {
+            if !nothing_printed {
+                f("|");
+            }
+            f(READABLE_STRING);
+            nothing_printed = false;
+        }
+        if self.is_payable() {
+            if !nothing_printed {
+                f("|");
+            }
+            f(PAYABLE_STRING);
+            nothing_printed = false;
+        }
+        if self.is_payable_by_sc() {
+            if !nothing_printed {
+                f("|");
+            }
+            f(PAYABLE_BY_SC_STRING);
+            nothing_printed = false;
+        }
+
+        if nothing_printed {
+            f(DEFAULT_STRING);
+        }
+    }
 }
 
 impl From<[u8; 2]> for CodeMetadata {
@@ -58,6 +91,19 @@ impl From<u16> for CodeMetadata {
     #[inline]
     fn from(value: u16) -> Self {
         CodeMetadata::from_bits_truncate(value)
+    }
+}
+
+impl From<&[u8]> for CodeMetadata {
+    fn from(slice: &[u8]) -> Self {
+        let arr: [u8; 2] = slice.try_into().unwrap_or_default();
+        CodeMetadata::from(arr)
+    }
+}
+
+impl From<&Vec<u8>> for CodeMetadata {
+    fn from(v: &Vec<u8>) -> Self {
+        CodeMetadata::from(v.as_slice())
     }
 }
 
@@ -100,74 +146,6 @@ impl TopDecode for CodeMetadata {
         H: DecodeErrorHandler,
     {
         top_decode_from_nested_or_handle_err(input, h)
-    }
-}
-
-impl TypeAbiFrom<Self> for CodeMetadata {}
-
-impl TypeAbi for CodeMetadata {
-    type Unmanaged = Self;
-
-    fn type_name() -> TypeName {
-        "CodeMetadata".into()
-    }
-
-    fn type_name_rust() -> TypeName {
-        "CodeMetadata".into()
-    }
-}
-
-impl SCDisplay for CodeMetadata {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let mut nothing_printed: bool = true;
-        verify_metadata_and_append(
-            self.is_upgradeable(),
-            f,
-            UPGRADEABLE_STRING,
-            &mut nothing_printed,
-        );
-        verify_metadata_and_append(self.is_readable(), f, READABLE_STRING, &mut nothing_printed);
-        verify_metadata_and_append(self.is_payable(), f, PAYABLE_STRING, &mut nothing_printed);
-        verify_metadata_and_append(
-            self.is_payable_by_sc(),
-            f,
-            PAYABLE_BY_SC_STRING,
-            &mut nothing_printed,
-        );
-        if nothing_printed {
-            f.append_bytes(DEFAULT_STRING);
-        }
-    }
-}
-
-impl SCLowerHex for CodeMetadata {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let num = self.bits().to_be_bytes();
-        f.append_bytes(&hex_util::byte_to_hex_digits(num[0])[..]);
-        f.append_bytes(&hex_util::byte_to_hex_digits(num[1])[..]);
-    }
-}
-
-impl SCBinary for CodeMetadata {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let num = self.bits().to_be_bytes();
-        f.append_bytes(&hex_util::byte_to_binary_digits(num[0])[..]);
-        f.append_bytes(&hex_util::byte_to_binary_digits(num[1])[..]);
-    }
-}
-
-fn verify_metadata_and_append<F: FormatByteReceiver>(
-    constraint: bool,
-    f: &mut F,
-    bytes_to_append: &[u8],
-    nothing_printed: &mut bool,
-) {
-    if constraint {
-        if !*nothing_printed {
-            f.append_bytes(b"|");
-        }
-        f.append_bytes(bytes_to_append);
-        *nothing_printed = false;
     }
 }
 

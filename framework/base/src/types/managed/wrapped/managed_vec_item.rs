@@ -1,5 +1,7 @@
 use core::borrow::Borrow;
 
+use multiversx_chain_vm_core::types::{EsdtLocalRole, EsdtTokenType};
+
 use crate::{
     api::ManagedTypeApi,
     types::{
@@ -256,5 +258,47 @@ where
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         <M::ManagedBufferHandle as ManagedVecItem>::to_byte_writer(&self.get_handle(), writer)
+    }
+}
+
+impl ManagedVecItem for EsdtTokenType {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
+    const SKIPS_RESERIALIZATION: bool = true;
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
+        let mut arr: [u8; 1] = [0u8; 1];
+        reader(&mut arr[..]);
+        arr[0].into()
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+        writer(&[self.as_u8()])
+    }
+}
+
+impl ManagedVecItem for EsdtLocalRole {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
+    const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
+        u16::from_byte_reader(reader).into()
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
+    }
+
+    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
+        <u16 as ManagedVecItem>::to_byte_writer(&self.as_u16(), writer)
     }
 }

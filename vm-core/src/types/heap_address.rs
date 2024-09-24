@@ -1,109 +1,105 @@
-use super::h256::H256;
-use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
-    types::heap::BoxedBytes,
-};
+use super::{heap_h256::HeapH256, BoxedBytes};
+
 use alloc::{boxed::Box, vec::Vec};
 use core::fmt::Debug;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 
-/// An Address is just a H256 with a different name.
-/// Has a different ABI name than H256.
+/// Old smart contracts were using this Address implementation,
+/// which was explicitly relying on the heap, to avoid large data copies on the stack.
 ///
-/// Note: we are currently using ManagedAddress in contracts.
-/// While this also works, its use in contracts is discouraged.
+/// It is no longer used, kept for reference.
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
-pub struct Address(H256);
+pub struct HeapAddress(HeapH256);
 
-impl From<H256> for Address {
+impl From<HeapH256> for HeapAddress {
     #[inline]
-    fn from(hash: H256) -> Self {
-        Address(hash)
+    fn from(hash: HeapH256) -> Self {
+        HeapAddress(hash)
     }
 }
 
-impl From<Address> for H256 {
+impl From<HeapAddress> for HeapH256 {
     #[inline]
-    fn from(address: Address) -> Self {
+    fn from(address: HeapAddress) -> Self {
         address.0
     }
 }
 
-impl<'a> From<&'a Address> for &'a H256 {
+impl<'a> From<&'a HeapAddress> for &'a HeapH256 {
     #[inline]
-    fn from(address: &'a Address) -> Self {
+    fn from(address: &'a HeapAddress) -> Self {
         &address.0
     }
 }
 
-impl From<[u8; 32]> for Address {
+impl From<[u8; 32]> for HeapAddress {
     #[inline]
     fn from(arr: [u8; 32]) -> Self {
-        Address(H256::from(arr))
+        HeapAddress(HeapH256::from(arr))
     }
 }
 
-impl<'a> From<&'a [u8; 32]> for Address {
+impl<'a> From<&'a [u8; 32]> for HeapAddress {
     #[inline]
     fn from(bytes: &'a [u8; 32]) -> Self {
-        Address(H256::from(bytes))
+        HeapAddress(HeapH256::from(bytes))
     }
 }
 
-impl<'a> From<&'a mut [u8; 32]> for Address {
+impl<'a> From<&'a mut [u8; 32]> for HeapAddress {
     #[inline]
     fn from(bytes: &'a mut [u8; 32]) -> Self {
-        Address(H256::from(bytes))
+        HeapAddress(HeapH256::from(bytes))
     }
 }
 
-impl From<Box<[u8; 32]>> for Address {
+impl From<Box<[u8; 32]>> for HeapAddress {
     #[inline]
     fn from(bytes: Box<[u8; 32]>) -> Self {
-        Address(H256::from(bytes))
+        HeapAddress(HeapH256::from(bytes))
     }
 }
 
-impl Address {
+impl HeapAddress {
     pub fn from_slice(slice: &[u8]) -> Self {
-        Address(H256::from_slice(slice))
+        HeapAddress(HeapH256::from_slice(slice))
     }
 }
 
-impl From<Address> for [u8; 32] {
+impl From<HeapAddress> for [u8; 32] {
     #[inline]
-    fn from(addr: Address) -> Self {
+    fn from(addr: HeapAddress) -> Self {
         addr.0.into()
     }
 }
 
-impl AsRef<[u8]> for Address {
+impl AsRef<[u8]> for HeapAddress {
     #[inline]
     fn as_ref(&self) -> &[u8] {
         self.0.as_ref()
     }
 }
 
-impl AsMut<[u8]> for Address {
+impl AsMut<[u8]> for HeapAddress {
     #[inline]
     fn as_mut(&mut self) -> &mut [u8] {
         self.0.as_mut()
     }
 }
 
-impl Address {
+impl HeapAddress {
     /// Returns a new address of 32 zeros.
     /// Allocates directly in heap.
     /// Minimal resulting wasm code (14 bytes if not inlined).
     pub fn zero() -> Self {
-        Address(H256::zero())
+        HeapAddress(HeapH256::zero())
     }
 
     /// Returns the size of an address in bytes.
     #[inline]
     pub fn len_bytes() -> usize {
-        H256::len_bytes()
+        HeapH256::len_bytes()
     }
 
     /// Extracts a byte slice containing the entire fixed hash.
@@ -162,7 +158,7 @@ impl Address {
 
 use crate::codec::*;
 
-impl NestedEncode for Address {
+impl NestedEncode for HeapAddress {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -172,7 +168,7 @@ impl NestedEncode for Address {
     }
 }
 
-impl TopEncode for Address {
+impl TopEncode for HeapAddress {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -182,39 +178,39 @@ impl TopEncode for Address {
     }
 }
 
-impl NestedDecode for Address {
+impl NestedDecode for HeapAddress {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        Ok(Address(H256::dep_decode_or_handle_err(input, h)?))
+        Ok(HeapAddress(HeapH256::dep_decode_or_handle_err(input, h)?))
     }
 }
 
-impl TopDecode for Address {
+impl TopDecode for HeapAddress {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        Ok(Address(H256::top_decode_or_handle_err(input, h)?))
+        Ok(HeapAddress(HeapH256::top_decode_or_handle_err(input, h)?))
     }
 }
 
-impl TypeAbiFrom<Self> for Address {}
+// impl TypeAbiFrom<Self> for HeapAddress {}
 
-impl TypeAbi for Address {
-    type Unmanaged = Self;
+// impl TypeAbi for HeapAddress {
+//     type Unmanaged = Self;
 
-    fn type_name() -> TypeName {
-        "Address".into()
-    }
+//     fn type_name() -> TypeName {
+//         "Address".into()
+//     }
 
-    fn type_name_rust() -> TypeName {
-        "Address".into()
-    }
-}
+//     fn type_name_rust() -> TypeName {
+//         "Address".into()
+//     }
+// }
 
 #[cfg(test)]
 mod address_tests {
@@ -224,13 +220,13 @@ mod address_tests {
 
     #[test]
     fn test_address() {
-        let addr = Address::from([4u8; 32]);
+        let addr = HeapAddress::from([4u8; 32]);
         check_top_encode_decode(addr, &[4u8; 32]);
     }
 
     #[test]
     fn test_opt_address() {
-        let addr = Address::from([4u8; 32]);
+        let addr = HeapAddress::from([4u8; 32]);
         let mut expected: Vec<u8> = Vec::new();
         expected.push(1u8);
         expected.extend_from_slice(&[4u8; 32]);
@@ -239,7 +235,7 @@ mod address_tests {
 
     #[test]
     fn test_ser_address_ref() {
-        let addr = Address::from([4u8; 32]);
+        let addr = HeapAddress::from([4u8; 32]);
         let expected_bytes: &[u8] = &[4u8; 32 * 3];
 
         let tuple = (&addr, &&&addr, addr.clone());
@@ -249,13 +245,13 @@ mod address_tests {
 
     #[test]
     fn test_is_zero() {
-        assert!(Address::zero().is_zero());
+        assert!(HeapAddress::zero().is_zero());
     }
 
     #[test]
     fn test_size_of() {
         use core::mem::size_of;
-        assert_eq!(size_of::<Address>(), size_of::<usize>());
-        assert_eq!(size_of::<Option<Address>>(), size_of::<usize>());
+        assert_eq!(size_of::<HeapAddress>(), size_of::<usize>());
+        assert_eq!(size_of::<Option<HeapAddress>>(), size_of::<usize>());
     }
 }
