@@ -1,10 +1,8 @@
-use crate::tx_execution::{
-    builtin_function_names::CHANGE_OWNER_BUILTIN_FUNC_NAME, BlockchainVMRef,
-};
-
 use crate::{
+    tx_execution::BlockchainVMRef,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
+    vm_core::builtin_func_names::CHANGE_OWNER_BUILTIN_FUNC_NAME,
 };
 
 use super::super::builtin_func_trait::BuiltinFunction;

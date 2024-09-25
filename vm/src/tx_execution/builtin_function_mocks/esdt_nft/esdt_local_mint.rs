@@ -1,9 +1,9 @@
 use num_bigint::BigUint;
 
-use crate::tx_execution::{builtin_function_names::ESDT_LOCAL_MINT_FUNC_NAME, BlockchainVMRef};
-
 use crate::{
+    tx_execution::BlockchainVMRef,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
+    vm_core::builtin_func_names::ESDT_LOCAL_MINT_FUNC_NAME,
     world_mock::EsdtInstanceMetadata,
 };
 

@@ -1,10 +1,11 @@
-use crate::tx_execution::{
-    builtin_function_names::CLAIM_DEVELOPER_REWARDS_FUNC_NAME, BlockchainVMRef,
-};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
+use crate::{
+    tx_execution::BlockchainVMRef,
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    vm_core::builtin_func_names::CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
+};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 

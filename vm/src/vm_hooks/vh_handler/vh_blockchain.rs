@@ -1,6 +1,6 @@
 use crate::{
-    tx_execution::vm_builtin_function_names::*,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
+    vm_core::builtin_func_names::*,
     vm_hooks::VMHooksHandlerSource,
     world_mock::{EsdtData, EsdtInstance},
 };

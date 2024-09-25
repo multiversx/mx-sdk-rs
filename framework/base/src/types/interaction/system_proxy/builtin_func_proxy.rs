@@ -5,7 +5,7 @@ use crate::types::{
     TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
-use super::builtin_func_names::{
+use crate::vm_core::builtin_func_names::{
     CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME, DELETE_USERNAME_FUNC_NAME,
     ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
     ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
