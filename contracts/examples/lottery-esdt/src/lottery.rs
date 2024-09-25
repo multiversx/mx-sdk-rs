@@ -163,6 +163,15 @@ pub trait Lottery {
 
     #[endpoint]
     fn determine_winner(&self, lottery_name: ManagedBuffer) -> AwardingStatus {
+        let sc_address = self.blockchain().get_sc_address();
+        let sc_address_shard = self.blockchain().get_shard_of_address(&sc_address);
+        let caller = self.blockchain().get_caller();
+        let caller_shard = self.blockchain().get_shard_of_address(&caller);
+        // require!(
+        //     sc_address_shard != caller_shard,
+        //     "Caller needs to be on a remote shard"
+        // );
+
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is inactive!"),
             Status::Running => sc_panic!("Lottery is still running!"),
@@ -302,12 +311,17 @@ pub trait Lottery {
             if index_last_winner < total_winning_tickets {
                 let prize = self.calculate_percentage_of(
                     &info.prize_pool,
-                    &BigUint::from(info.prize_distribution.get(index_last_winner)),
+                    &BigUint::from(info.prize_distribution.get(1)),
                 );
+                if prize > 0 {
+                    self.assign_prize_to_winner(
+                        info.token_identifier.clone(),
+                        &prize,
+                        &winner_address,
+                    );
 
-                self.assign_prize_to_winner(info.token_identifier.clone(), &prize, &winner_address);
-
-                info.unawarded_amount -= prize;
+                    info.unawarded_amount -= prize;
+                }
             } else {
                 // insert token in accumulated rewards first place
                 let first_place_winner = ticket_holders_mapper.get(index_last_winner);
@@ -386,7 +400,6 @@ pub trait Lottery {
                 );
             }
         };
-
         if !accumulated_esdt_rewards.is_empty() {
             self.tx()
                 .to(&caller)
@@ -410,6 +423,7 @@ pub trait Lottery {
         accumulated_esdt_rewards: &mut ManagedVec<Self::Api, EsdtTokenPayment>,
     ) {
         let value = self.accumulated_rewards(&token_id, caller).take();
+        sc_print!("caller {:x} has rewards {}", caller, value);
         if token_id.is_egld() {
             *accumulated_egld_rewards += value;
         } else {

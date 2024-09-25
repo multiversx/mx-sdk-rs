@@ -25,7 +25,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["1"],
+                "out": [
+                    "1"
+                ],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -59,16 +61,19 @@
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce": "1",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "esdt": {
-                        "str:LOTTERY-123456": "200"
+                        "str:LOTTERY-123456": "0"
                     },
                     "storage": {}
                 },
                 "address:acc2": {
                     "nonce": "1",
                     "balance": "1,000,000",
+                    "esdt": {
+                        "str:LOTTERY-123456": "0"
+                    },
                     "storage": {}
                 },
                 "sc:lottery": {
