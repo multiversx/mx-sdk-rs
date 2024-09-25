@@ -311,7 +311,7 @@ pub trait Lottery {
             if index_last_winner < total_winning_tickets {
                 let prize = self.calculate_percentage_of(
                     &info.prize_pool,
-                    &BigUint::from(info.prize_distribution.get(1)),
+                    &BigUint::from(info.prize_distribution.get(index_last_winner)),
                 );
                 if prize > 0 {
                     self.assign_prize_to_winner(
