@@ -22,6 +22,7 @@ impl Config {
     }
 
     /// Sets the contract address
+    #[allow(unused)]
     pub fn set_address(&mut self, address: Bech32Address) {
         self.contract_address = address.to_string()
     }

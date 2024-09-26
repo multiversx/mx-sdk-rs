@@ -17,7 +17,6 @@ members = [
   "sdk/scenario-format",
 
   "sdk-wbg/core",
-  "sdk-wbg/core/examples/ping-pong-dapp",
 
   "tools/mxpy-snippet-generator",
   "tools/payload-macro-generator",
@@ -101,6 +100,7 @@ members = [
   "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/ping-pong-egld/dapp",
   "contracts/examples/rewards-distribution",
   "contracts/examples/rewards-distribution/meta",
   "contracts/examples/seed-nft-minter",
