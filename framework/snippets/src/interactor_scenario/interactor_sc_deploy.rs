@@ -5,7 +5,7 @@ use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
 };
-use multiversx_sdk::{
+use crate::sdk::{
     data::{address::Address as ErdrsAddress, transaction::Transaction},
     utils::base64_encode,
 };

@@ -29,9 +29,9 @@ path = "../scenario"
 version = "0.23.0"
 path = "../../sdk/scenario-format"
 
-[dependencies.multiversx-sdk]
+[dependencies.multiversx-sdk-reqwest]
 version = "=0.6.0"
-path = "../../sdk/core"
+path = "../../sdk/reqwest"
 
 [dev-dependencies]
 serde_json = "1.0"

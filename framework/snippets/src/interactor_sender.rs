@@ -1,6 +1,6 @@
 use log::debug;
 use multiversx_sc_scenario::multiversx_sc::types::Address;
-use multiversx_sdk::{data::transaction::Transaction, wallet::Wallet};
+use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
 
 use crate::{address_h256_to_erdrs, Interactor};
 

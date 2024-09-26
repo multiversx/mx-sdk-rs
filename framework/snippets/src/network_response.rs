@@ -3,7 +3,7 @@ use multiversx_sc_scenario::{
     multiversx_chain_vm::crypto_functions::keccak256,
     scenario_model::{Log, TxResponse, TxResponseStatus},
 };
-use multiversx_sdk::{
+use crate::sdk::{
     data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
     utils::base64_decode,
 };

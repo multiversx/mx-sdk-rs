@@ -1,14 +1,14 @@
+use crate::sdk::{
+    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
+    wallet::Wallet,
+};
 use multiversx_sc_scenario::{
     imports::{Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
     scenario_model::AddressValue,
 };
-use multiversx_sdk::{
-    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
-    gateway::GatewayProxy,
-    wallet::Wallet,
-};
+use multiversx_sdk_reqwest::gateway::GatewayProxy;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
