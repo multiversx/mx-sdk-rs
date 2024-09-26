@@ -1,4 +1,4 @@
-use crate::data::{
+use multiversx_sdk::data::{
     address::Address,
     network_config::NetworkConfig,
     transaction::{

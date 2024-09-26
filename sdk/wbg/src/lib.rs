@@ -1,5 +1,5 @@
-pub mod crypto;
-pub mod data;
 pub mod gateway;
-pub mod utils;
-pub mod wallet;
+
+pub use multiversx_sdk as core;
+
+pub use multiversx_sdk::{data, utils, wallet};

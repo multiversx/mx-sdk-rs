@@ -1119,9 +1119,9 @@ dependencies = [
 
 [[package]]
 name = "flate2"
-version = "1.0.33"
+version = "1.0.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "324a1be68054ef05ad64b861cc9eaf1d623d2d8cb25b4bf2cb9cdd902b4bf253"
+checksum = "a1b589b4dc103969ad3cf85c950899926ec64300a1a46d76c03a6072957036f0"
 dependencies = [
  "crc32fast",
  "miniz_oxide",
@@ -2476,33 +2476,16 @@ dependencies = [
 name = "multiversx-sdk-wbg"
 version = "0.6.0"
 dependencies = [
- "aes",
  "anyhow",
- "base64",
- "bech32",
- "bip39",
- "ctr",
- "getrandom",
  "gloo-net 0.6.0",
  "hex",
- "hmac",
  "itertools",
  "js-sys",
  "log",
- "pbkdf2",
- "pem",
- "rand",
- "scrypt",
- "serde",
- "serde_json",
- "serde_repr",
- "sha2",
- "sha3",
- "uuid",
+ "multiversx-sdk",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
- "zeroize",
 ]
 
 [[package]]

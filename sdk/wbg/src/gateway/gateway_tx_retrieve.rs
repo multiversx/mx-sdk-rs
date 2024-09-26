@@ -1,4 +1,4 @@
-use crate::data::transaction::TransactionOnNetwork;
+use multiversx_sdk::data::transaction::TransactionOnNetwork;
 use js_sys::Promise;
 use log::info;
 use wasm_bindgen_futures::JsFuture;

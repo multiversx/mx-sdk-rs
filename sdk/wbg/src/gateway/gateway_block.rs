@@ -1,4 +1,4 @@
-use crate::data::{
+use multiversx_sdk::data::{
     hyperblock::{HyperBlock, HyperBlockResponse},
     network_status::NetworkStatusResponse,
 };

@@ -1,4 +1,4 @@
-use crate::data::{
+use multiversx_sdk::data::{
     network_config::{NetworkConfig, NetworkConfigResponse},
     network_economics::{NetworkEconomics, NetworkEconomicsResponse},
     network_status::{NetworkStatus, NetworkStatusResponse},
