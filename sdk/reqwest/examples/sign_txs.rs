@@ -1,7 +1,7 @@
-use multiversx_sdk::{
-    data::transaction::Transaction,
+use multiversx_sdk_reqwest::{
+    core::data::transaction::Transaction,
     gateway::{GatewayProxy, DEVNET_GATEWAY},
-    wallet::Wallet,
+    core::wallet::Wallet,
 };
 
 #[tokio::main]
@@ -21,7 +21,7 @@ async fn main() {
 
     let mut unsign_tx = Transaction {
         nonce: arg.nonce,
-        value: "0".to_string(),
+        value: "1000000000000000000".to_string(),
         receiver: addr.clone(),
         sender: addr.clone(),
         gas_price: arg.gas_price,
@@ -33,8 +33,20 @@ async fn main() {
         options: arg.options,
     };
 
+    let mut txs: Vec<Transaction> = vec![];
+
     let signature = wl.sign_tx(&unsign_tx);
     unsign_tx.signature = Some(hex::encode(signature));
-    let tx_hash = blockchain.send_transaction(&unsign_tx).await.unwrap();
-    println!("tx_hash {tx_hash}");
+    txs.push(unsign_tx.clone());
+
+    unsign_tx.version = 2;
+    unsign_tx.options = 1;
+    unsign_tx.nonce += 1;
+
+    let signature = wl.sign_tx(&unsign_tx);
+    unsign_tx.signature = Some(hex::encode(signature));
+    txs.push(unsign_tx.clone());
+
+    let tx_hash = blockchain.send_transactions(&txs).await.unwrap();
+    println!("tx_hashes {tx_hash:?}");
 }

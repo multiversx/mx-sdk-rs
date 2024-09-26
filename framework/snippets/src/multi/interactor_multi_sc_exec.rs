@@ -1,4 +1,5 @@
 use super::interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs};
+use crate::sdk::data::transaction::Transaction;
 use crate::{network_response, Interactor, InteractorStep, StepBuffer};
 use multiversx_sdk_wbg::data::transaction::Transaction;
 

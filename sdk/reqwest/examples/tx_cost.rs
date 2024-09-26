@@ -1,7 +1,7 @@
-use multiversx_sdk::{
-    data::{address::Address, transaction::Transaction},
+use multiversx_sdk_reqwest::{
+    core::data::{address::Address, transaction::Transaction},
+    core::utils::base64_encode,
     gateway::{GatewayProxy, DEVNET_GATEWAY},
-    utils::base64_encode,
 };
 
 #[tokio::main]

@@ -1,3 +1,4 @@
+use crate::sdk_core::data::{address::Address, esdt::EsdtBalance};
 use multiversx_chain_scenario_format::interpret_trait::IntoRaw;
 use multiversx_sc_scenario::{
     imports::Bech32Address,

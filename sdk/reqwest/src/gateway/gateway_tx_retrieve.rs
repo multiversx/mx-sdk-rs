@@ -1,4 +1,4 @@
-use crate::data::transaction::TransactionOnNetwork;
+use multiversx_sdk::data::transaction::TransactionOnNetwork;
 use log::info;
 use std::time::{Duration, Instant};
 

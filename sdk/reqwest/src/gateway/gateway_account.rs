@@ -1,4 +1,4 @@
-use crate::data::{
+use multiversx_sdk::data::{
     account::{Account, AccountResponse},
     account_storage::AccountStorageResponse,
     address::Address,

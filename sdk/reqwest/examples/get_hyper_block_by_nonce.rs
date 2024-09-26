@@ -1,4 +1,4 @@
-use multiversx_sdk::gateway::{GatewayProxy, DEVNET_GATEWAY};
+use multiversx_sdk_reqwest::gateway::{GatewayProxy, DEVNET_GATEWAY};
 
 #[tokio::main]
 async fn main() {
