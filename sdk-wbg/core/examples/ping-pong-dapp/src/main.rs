@@ -1,14 +1,17 @@
+mod components;
+mod context;
+mod pages;
+mod requests;
+mod routes;
+mod interactor;
+
+
 use components::Footer;
 use context::ConfigProvider;
 use log::Level;
 use routes::{switch, Route};
 use yew::prelude::*;
 use yew_router::{BrowserRouter, Switch};
-mod components;
-mod context;
-mod pages;
-mod requests;
-mod routes;
 
 #[function_component(App)]
 fn app() -> Html {

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 const GATEWAY: &str = sdk::gateway::DEVNET_GATEWAY;
 const CONTRACT_ADDRESS: &str = "erd1qqqqqqqqqqqqqpgq6tqvj5f59xrgxwrtwy30elgpu7l4zrv6d8ssnjdwxq";
-const PING_PONG_CODE: &[u8] = include_bytes!("ping-pong-egld.wasm");
+const PING_PONG_CODE: &[u8] = include_bytes!("../ping-pong-egld.wasm");
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Config {

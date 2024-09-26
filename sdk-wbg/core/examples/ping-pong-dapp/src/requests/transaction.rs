@@ -1,4 +1,4 @@
-use interactor::ContractInteract;
+use crate::interactor::ContractInteract;
 use multiversx_sc_snippets::{
     imports::{
         Bech32Address, BigUint, IgnoreValue, OptionalValue, ReturnsMessage,

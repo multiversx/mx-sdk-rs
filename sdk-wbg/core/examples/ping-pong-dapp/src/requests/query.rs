@@ -1,4 +1,4 @@
-use interactor::ContractInteract;
+use crate::interactor::ContractInteract;
 use multiversx_sc_snippets::sdk::data::network_status::NetworkStatus;
 
 pub async fn get_network_status() -> Result<NetworkStatus, String> {
