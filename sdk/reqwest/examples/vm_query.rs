@@ -1,7 +1,7 @@
 use multiversx_sdk_reqwest::{
     core::data::{address::Address, vm::VmValueRequest},
-    gateway::{GatewayProxy, DEVNET_GATEWAY},
     core::wallet::Wallet,
+    gateway::{GatewayProxy, DEVNET_GATEWAY},
 };
 
 #[tokio::main]

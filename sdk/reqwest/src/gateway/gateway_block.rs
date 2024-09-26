@@ -1,8 +1,8 @@
+use anyhow::{anyhow, Result};
 use multiversx_sdk::data::{
     hyperblock::{HyperBlock, HyperBlockResponse},
     network_status::NetworkStatusResponse,
 };
-use anyhow::{anyhow, Result};
 
 use super::GatewayProxy;
 use super::METACHAIN_SHARD_ID;

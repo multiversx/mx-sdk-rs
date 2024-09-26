@@ -2399,6 +2399,22 @@ dependencies = [
  "env_logger",
  "futures",
  "hex",
+ "log",
+ "multiversx-chain-scenario-format",
+ "multiversx-sc-scenario",
+ "multiversx-sdk-reqwest",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
+name = "multiversx-sc-snippets-dapp"
+version = "0.53.0"
+dependencies = [
+ "base64",
+ "env_logger",
+ "futures",
+ "hex",
  "js-sys",
  "log",
  "multiversx-chain-scenario-format",
@@ -2871,7 +2887,7 @@ version = "0.1.0"
 dependencies = [
  "console_log",
  "log",
- "multiversx-sc-snippets",
+ "multiversx-sc-snippets-dapp",
  "serde",
  "serde_json",
  "wasm-bindgen-futures",

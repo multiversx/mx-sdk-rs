@@ -1,4 +1,4 @@
-use multiversx_sdk_wbg::wallet::Wallet;
+use crate::sdk::wallet::Wallet;
 
 fn test_wallet(pem_file_contents: &str) -> Wallet {
     Wallet::from_pem_file_contents(pem_file_contents.to_string()).unwrap()

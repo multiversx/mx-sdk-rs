@@ -1,7 +1,7 @@
 use crate::requests::query;
 
 use html::ChildrenProps;
-use multiversx_sc_snippets::sdk::data::network_status::NetworkStatus;
+use multiversx_sc_snippets_dapp::sdk::data::network_status::NetworkStatus;
 use yew::prelude::*;
 
 #[derive(Clone, Debug, PartialEq)]

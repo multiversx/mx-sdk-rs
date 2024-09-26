@@ -1,5 +1,5 @@
 use multiversx_sc_snippets::network_response;
-use multiversx_sdk_wbg::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
 #[test]
 fn test_process_issued_token_identifier_fungible() {

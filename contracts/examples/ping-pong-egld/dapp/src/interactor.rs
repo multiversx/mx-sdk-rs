@@ -1,5 +1,5 @@
 use imports::{Address, Bech32Address, BytesValue};
-use multiversx_sc_snippets::*;
+use multiversx_sc_snippets_dapp::*;
 use serde::{Deserialize, Serialize};
 
 const GATEWAY: &str = sdk::gateway::DEVNET_GATEWAY;

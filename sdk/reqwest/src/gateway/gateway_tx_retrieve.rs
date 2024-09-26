@@ -1,5 +1,5 @@
-use multiversx_sdk::data::transaction::TransactionOnNetwork;
 use log::info;
+use multiversx_sdk::data::transaction::TransactionOnNetwork;
 use std::time::{Duration, Instant};
 
 use super::GatewayProxy;

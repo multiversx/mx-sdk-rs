@@ -1,10 +1,9 @@
 mod components;
 mod context;
+mod interactor;
 mod pages;
 mod requests;
 mod routes;
-mod interactor;
-
 
 use components::Footer;
 use context::ConfigProvider;

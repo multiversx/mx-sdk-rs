@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use multiversx_sc_snippets::imports::*;
 
 use super::*;
@@ -10,7 +12,7 @@ impl MultisigInteract {
         self.deploy().await;
         self.feed_contract_egld().await;
         self.wrap_egld().await;
-        self.interactor.sleep(15u32).await;
+        self.interactor.sleep(Duration::from_secs(15)).await;
         self.unwrap_egld().await;
     }
 

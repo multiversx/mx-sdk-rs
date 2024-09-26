@@ -1,21 +1,19 @@
-use js_sys::Promise;
+use crate::sdk::{
+    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
+    wallet::Wallet,
+};
 use multiversx_sc_scenario::{
     imports::{Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
     scenario_model::AddressValue,
 };
-use multiversx_sdk_wbg::{
-    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
-    gateway::GatewayProxy,
-    wallet::Wallet,
-};
+use multiversx_sdk_reqwest::gateway::GatewayProxy;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
+    time::Duration,
 };
-use wasm_bindgen_futures::JsFuture;
-use web_sys::window;
 
 use crate::{account_tool::retrieve_account_as_scenario_set_state, Sender};
 
@@ -31,22 +29,6 @@ pub struct Interactor {
     pub post_runners: ScenarioRunnerList,
 
     pub current_dir: PathBuf,
-}
-
-async fn sleep(seconds: u32) {
-    let promise = Promise::new(&mut |resolve, _| {
-        if let Some(win) = window() {
-            let _ = win
-                .set_timeout_with_callback_and_timeout_and_arguments_0(
-                    &resolve,
-                    (seconds * 1000) as i32,
-                )
-                .expect("Failed to set timeout");
-        } else {
-            panic!("No global window object available");
-        }
-    });
-    JsFuture::from(promise).await.unwrap();
 }
 
 impl Interactor {
@@ -77,9 +59,9 @@ impl Interactor {
         address
     }
 
-    pub async fn sleep(&mut self, duration: u32) {
-        self.waiting_time_ms += (duration as u64) * 1000;
-        sleep(duration).await;
+    pub async fn sleep(&mut self, duration: Duration) {
+        self.waiting_time_ms += duration.as_millis() as u64;
+        tokio::time::sleep(duration).await;
     }
 
     pub async fn with_tracer<P: AsRef<Path>>(mut self, path: P) -> Self {

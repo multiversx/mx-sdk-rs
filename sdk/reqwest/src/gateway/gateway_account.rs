@@ -1,10 +1,10 @@
+use anyhow::{anyhow, Result};
 use multiversx_sdk::data::{
     account::{Account, AccountResponse},
     account_storage::AccountStorageResponse,
     address::Address,
     esdt::{EsdtBalance, EsdtBalanceResponse, EsdtRolesResponse},
 };
-use anyhow::{anyhow, Result};
 use std::collections::HashMap;
 
 use super::GatewayProxy;

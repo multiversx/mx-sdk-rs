@@ -1,8 +1,8 @@
+use anyhow::{anyhow, Result};
 use multiversx_sdk::data::{
     network_config::{NetworkConfig, NetworkConfigResponse},
     network_economics::{NetworkEconomics, NetworkEconomicsResponse},
 };
-use anyhow::{anyhow, Result};
 
 use super::GatewayProxy;
 

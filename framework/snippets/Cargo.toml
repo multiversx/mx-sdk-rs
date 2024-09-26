@@ -14,9 +14,7 @@ keywords = ["multiversx", "blockchain", "contract", "snippets"]
 categories = ["cryptography::cryptocurrencies"]
 
 [dependencies]
-web-sys = { version = "0.3.70" }
-js-sys = { version = "0.3.70" }
-wasm-bindgen-futures = { version = "0.4.43" }
+tokio = { version = "1.24", features = ["full"] }
 hex = "0.4"
 base64 = "0.22"
 log = "0.4.17"
@@ -31,9 +29,9 @@ path = "../scenario"
 version = "0.23.0"
 path = "../../sdk/scenario-format"
 
-[dependencies.multiversx-sdk-wbg]
+[dependencies.multiversx-sdk-reqwest]
 version = "=0.6.0"
-path = "../../sdk-wbg/core"
+path = "../../sdk/reqwest"
 
 [dev-dependencies]
 serde_json = "1.0"

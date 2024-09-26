@@ -1,5 +1,5 @@
 use crate::interactor::ContractInteract;
-use multiversx_sc_snippets::sdk::data::network_status::NetworkStatus;
+use multiversx_sc_snippets_dapp::sdk::data::network_status::NetworkStatus;
 
 pub async fn get_network_status() -> Result<NetworkStatus, String> {
     let contract_interact = ContractInteract::new().await;
