@@ -1,6 +1,6 @@
 use super::interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs};
+use crate::sdk::data::transaction::Transaction;
 use crate::{network_response, Interactor, InteractorStep, StepBuffer};
-use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
     pub async fn multi_sc_exec(&mut self, mut buffer: StepBuffer<'_>) {

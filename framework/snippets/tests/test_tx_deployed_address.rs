@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::Address;
 use multiversx_sc_snippets::network_response;
-use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
 #[test]
 fn test_deployed_address() {
@@ -55,7 +55,7 @@ fn test_deployed_address() {
         .transaction;
     let tx_response = network_response::parse_tx_response(tx_on_network);
     let opt_address = tx_response.new_deployed_address.map(|e| {
-        multiversx_sdk::data::address::Address::from_bytes(*e.as_array())
+        multiversx_sc_snippets::sdk::data::address::Address::from_bytes(*e.as_array())
             .to_bech32_string()
             .unwrap()
     });

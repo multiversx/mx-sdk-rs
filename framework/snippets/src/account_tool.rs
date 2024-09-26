@@ -1,12 +1,10 @@
+use crate::sdk_core::data::{address::Address, esdt::EsdtBalance};
 use multiversx_chain_scenario_format::interpret_trait::IntoRaw;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
-use multiversx_sdk::{
-    data::{address::Address, esdt::EsdtBalance},
-    gateway::GatewayProxy,
-};
+use multiversx_sdk_reqwest::gateway::GatewayProxy;
 use std::collections::{BTreeMap, HashMap};
 
 /// Called directly from CLI, from `sc-meta`.
@@ -67,7 +65,7 @@ pub async fn retrieve_account_as_scenario_set_state(
 }
 
 fn set_account(
-    account: multiversx_sdk::data::account::Account,
+    account: crate::sdk::data::account::Account,
     account_storage: HashMap<String, String>,
     account_esdt: HashMap<String, EsdtBalance>,
     account_esdt_roles: HashMap<String, Vec<String>>,

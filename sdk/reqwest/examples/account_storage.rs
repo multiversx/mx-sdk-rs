@@ -1,5 +1,5 @@
-use multiversx_sdk::{
-    data::address::Address,
+use multiversx_sdk_reqwest::{
+    core::data::address::Address,
     gateway::{GatewayProxy, DEVNET_GATEWAY},
 };
 
