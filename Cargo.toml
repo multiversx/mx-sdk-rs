@@ -16,9 +16,8 @@ members = [
 
   "sdk/core",
   "sdk/reqwest",
+  "sdk/wbg",
   "sdk/scenario-format",
-
-  "sdk-wbg/core",
 
   "tools/mxpy-snippet-generator",
   "tools/payload-macro-generator",

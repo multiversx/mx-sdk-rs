@@ -33,7 +33,7 @@ path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-sdk-wbg]
 version = "=0.6.0"
-path = "../../sdk-wbg/core"
+path = "../../sdk/wbg"
 
 [dev-dependencies]
 serde_json = "1.0"
