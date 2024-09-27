@@ -41,12 +41,8 @@ impl GatewayProxy {
     }
 
     // get_latest_hyper_block_nonce retrieves the latest hyper block (metachain) nonce from the network
-    pub async fn get_latest_hyper_block_nonce(&self, with_metachain: bool) -> Result<u64> {
-        let mut endpoint = GET_NETWORK_STATUS_ENDPOINT.to_string();
-
-        if with_metachain {
-            endpoint = format!("{GET_NETWORK_STATUS_ENDPOINT}/{METACHAIN_SHARD_ID}");
-        }
+    pub async fn get_latest_hyper_block_nonce(&self) -> Result<u64> {
+        let endpoint = format!("{GET_NETWORK_STATUS_ENDPOINT}/{METACHAIN_SHARD_ID}");
 
         let endpoint = self.get_endpoint(endpoint.as_str());
 

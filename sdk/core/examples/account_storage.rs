@@ -6,7 +6,7 @@ use multiversx_sdk::{
 #[tokio::main]
 async fn main() {
     let addr = Address::from_bech32_string(
-        "erd1932eft30w753xyvme8d49qejgkjc09n5e49w4mwdjtm0neld797su0dlxp",
+        "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
     )
     .unwrap();
 
