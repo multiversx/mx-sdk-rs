@@ -2,7 +2,7 @@
 pub mod tests {
     use wat::Parser;
 
-    use crate::tools::{report_creator::PanicMessage, wasm_extractor::populate_wasm_info};
+    use crate::tools::{panic_report::PanicReport, wasm_extractor::populate_wasm_info};
 
     const EMPTY_WITH_FAIL_ALLOCATOR: &str = r#"
 (module $empty_wasm.wasm
@@ -261,7 +261,7 @@ pub mod tests {
             assert!(!wasm_info.memory_grow_flag);
             assert!(!wasm_info.report.has_allocator);
             assert_eq!(
-                PanicMessage::None.to_string(),
+                PanicReport::None.to_string(),
                 wasm_info.report.has_panic.to_string()
             );
         }
@@ -275,7 +275,7 @@ pub mod tests {
             assert!(wasm_info.memory_grow_flag);
             assert!(!wasm_info.report.has_allocator);
             assert_eq!(
-                PanicMessage::WithoutMessage.to_string(),
+                PanicReport::WithoutMessage.to_string(),
                 wasm_info.report.has_panic.to_string()
             );
         }
@@ -289,7 +289,7 @@ pub mod tests {
             assert!(!wasm_info.memory_grow_flag);
             assert!(wasm_info.report.has_allocator);
             assert_eq!(
-                PanicMessage::None.to_string(),
+                PanicReport::None.to_string(),
                 wasm_info.report.has_panic.to_string()
             );
         }

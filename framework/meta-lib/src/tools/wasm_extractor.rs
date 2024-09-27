@@ -7,10 +7,8 @@ use wasmparser::{
 
 use crate::ei::EIVersion;
 
-use super::report_creator::{PanicMessage, ReportCreator};
+use super::{panic_report::PanicReport, report_creator::ReportCreator};
 
-const PANIC_WITH_MESSAGE: &[u8; 16] = b"panic occurred: ";
-const PANIC_WITHOUT_MESSAGE: &[u8; 14] = b"panic occurred";
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
 
 pub struct WasmInfo {
@@ -49,7 +47,7 @@ pub(crate) fn populate_wasm_info(
     let mut allocator_trigger = false;
     let mut ei_check = false;
     let mut memory_grow_flag = false;
-    let mut has_panic: PanicMessage = PanicMessage::default();
+    let mut has_panic: PanicReport = PanicReport::default();
 
     let parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
@@ -60,21 +58,7 @@ pub(crate) fn populate_wasm_info(
             },
             Payload::DataSection(data_section) => {
                 allocator_trigger |= is_fail_allocator_triggered(data_section.clone());
-                match has_panic {
-                    PanicMessage::None => {
-                        if is_panic_with_message_triggered(data_section.clone()) {
-                            has_panic = PanicMessage::WithMessage;
-                        } else if is_panic_without_message_triggered(data_section) {
-                            has_panic = PanicMessage::WithoutMessage;
-                        }
-                    },
-                    PanicMessage::WithoutMessage => {
-                        if is_panic_with_message_triggered(data_section.clone()) {
-                            has_panic = PanicMessage::WithMessage;
-                        }
-                    },
-                    PanicMessage::WithMessage => continue,
-                }
+                has_panic.max_severity(data_section);
             },
             Payload::CodeSectionEntry(code_section) => {
                 memory_grow_flag |= is_mem_grow(code_section);
@@ -112,34 +96,6 @@ fn is_fail_allocator_triggered(data_section: DataSectionReader) -> bool {
                     .red()
                     .bold()
             );
-            return true;
-        }
-    }
-
-    false
-}
-
-fn is_panic_with_message_triggered(data_section: DataSectionReader) -> bool {
-    for data_fragment in data_section.into_iter().flatten() {
-        if data_fragment
-            .data
-            .windows(PANIC_WITH_MESSAGE.len())
-            .any(|data| data == PANIC_WITH_MESSAGE)
-        {
-            return true;
-        }
-    }
-
-    false
-}
-
-fn is_panic_without_message_triggered(data_section: DataSectionReader) -> bool {
-    for data_fragment in data_section.into_iter().flatten() {
-        if data_fragment
-            .data
-            .windows(PANIC_WITHOUT_MESSAGE.len())
-            .any(|data| data == PANIC_WITHOUT_MESSAGE)
-        {
             return true;
         }
     }
