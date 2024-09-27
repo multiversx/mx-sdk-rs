@@ -83,6 +83,8 @@ impl AdderInteract {
             )
             .await;
 
+        interactor.proxy.generate_blocks(1).await.unwrap();
+
         Self {
             interactor,
             adder_owner_address: adder_owner_address.into(),
