@@ -4,11 +4,18 @@ use std::io::Read;
 /// Config file
 const CONFIG_FILE: &str = "config.toml";
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ChainType {
+    Real,
+    Simulator,
+}
+
 /// SysFuncCalls Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
     gateway_uri: String,
-    chain_type: String,
+    chain_type: ChainType,
 }
 
 impl Config {
@@ -27,13 +34,9 @@ impl Config {
 
     // Returns if chain type is chain simulator
     pub fn use_chain_simulator(&self) -> bool {
-        match self.chain_type.as_str() {
-            "simulator" => true,
-            "real" => false,
-            _ => panic!(
-                "Invalid chain type: {}. Expected 'simulator' or 'real'.",
-                self.chain_type
-            ),
+        match self.chain_type {
+            ChainType::Real => false,
+            ChainType::Simulator => true,
         }
     }
 }
