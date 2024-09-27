@@ -10,7 +10,7 @@ extern crate alloc;
 pub use multiversx_sc_codec as codec;
 
 // Re-exporting the VM-core, for convenience.
-pub use multiversx_chain_vm_core as vm_core;
+pub use multiversx_chain_core as chain_core;
 
 /// Reexported for convenience.
 pub use crate::codec::arrayvec;

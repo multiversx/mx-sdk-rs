@@ -1,8 +1,8 @@
 use crate::{
+    chain_core::builtin_func_names::UPGRADE_CONTRACT_FUNC_NAME,
     tx_execution::{create_transfer_value_log, BlockchainVMRef},
     tx_mock::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
-    vm_core::builtin_func_names::UPGRADE_CONTRACT_FUNC_NAME,
 };
 
 use super::super::builtin_func_trait::BuiltinFunction;

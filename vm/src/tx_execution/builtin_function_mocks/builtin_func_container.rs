@@ -15,7 +15,7 @@ use crate::{
     types::EsdtLocalRole,
 };
 
-use crate::vm_core::builtin_func_names::*;
+use crate::chain_core::builtin_func_names::*;
 
 /// Container for builtin function logic.
 ///

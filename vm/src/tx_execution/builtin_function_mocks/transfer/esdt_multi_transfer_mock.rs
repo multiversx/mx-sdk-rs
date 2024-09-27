@@ -1,8 +1,8 @@
 use crate::{
+    chain_core::builtin_func_names::ESDT_MULTI_TRANSFER_FUNC_NAME,
     tx_execution::BlockchainVMRef,
     tx_mock::TxLog,
     types::{top_decode_u64, top_encode_u64},
-    vm_core::builtin_func_names::ESDT_MULTI_TRANSFER_FUNC_NAME,
 };
 
 use crate::{

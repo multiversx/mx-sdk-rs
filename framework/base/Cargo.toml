@@ -38,6 +38,6 @@ version = "=0.21.0"
 path = "../../data/codec"
 features = ["derive"]
 
-[dependencies.multiversx-chain-vm-core]
+[dependencies.multiversx-chain-core]
 version = "=0.10.0"
 path = "../../vm-core"

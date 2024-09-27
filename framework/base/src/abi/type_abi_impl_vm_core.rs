@@ -1,7 +1,7 @@
 use super::*;
 
 use alloc::vec::Vec;
-use multiversx_chain_vm_core::types::{
+use multiversx_chain_core::types::{
     Address, BoxedBytes, CodeMetadata, EsdtLocalRole, EsdtTokenType, H256,
 };
 

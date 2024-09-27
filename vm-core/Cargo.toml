@@ -1,5 +1,5 @@
 [package]
-name = "multiversx-chain-vm-core"
+name = "multiversx-chain-core"
 version = "0.10.0"
 edition = "2021"
 

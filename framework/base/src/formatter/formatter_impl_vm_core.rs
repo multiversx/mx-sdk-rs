@@ -1,4 +1,4 @@
-use multiversx_chain_vm_core::types::CodeMetadata;
+use multiversx_chain_core::types::CodeMetadata;
 
 use super::{hex_util, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex};
 

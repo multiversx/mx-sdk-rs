@@ -1,9 +1,9 @@
-pub use crate::vm_core::types::Address as VMAddress;
-pub use crate::vm_core::types::CodeMetadata as VMCodeMetadata;
-pub use crate::vm_core::types::EsdtLocalRole;
-pub use crate::vm_core::types::EsdtLocalRoleFlags;
-pub use crate::vm_core::types::TokenType as VMTokenType;
-pub use crate::vm_core::types::H256;
+pub use crate::chain_core::types::Address as VMAddress;
+pub use crate::chain_core::types::CodeMetadata as VMCodeMetadata;
+pub use crate::chain_core::types::EsdtLocalRole;
+pub use crate::chain_core::types::EsdtLocalRoleFlags;
+pub use crate::chain_core::types::TokenType as VMTokenType;
+pub use crate::chain_core::types::H256;
 
 pub type RawHandle = i32;
 

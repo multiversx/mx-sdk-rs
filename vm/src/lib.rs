@@ -15,7 +15,7 @@ pub use world_mock::BlockchainMock;
 pub use multiversx_chain_vm_executor as executor;
 
 // Re-exporting the VM-core, for convenience.
-pub use multiversx_chain_vm_core as vm_core;
+pub use multiversx_chain_core as chain_core;
 
 #[macro_use]
 extern crate alloc;

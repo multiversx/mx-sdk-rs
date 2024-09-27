@@ -1,6 +1,6 @@
 use core::borrow::Borrow;
 
-use multiversx_chain_vm_core::types::{EsdtLocalRole, EsdtTokenType};
+use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
 
 use crate::{
     api::ManagedTypeApi,

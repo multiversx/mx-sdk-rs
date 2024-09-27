@@ -1,6 +1,6 @@
+use crate::chain_core::builtin_func_names::MIGRATE_USERNAME_FUNC_NAME;
 use crate::tx_execution::BlockchainVMRef;
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
-use crate::vm_core::builtin_func_names::MIGRATE_USERNAME_FUNC_NAME;
 
 use super::super::builtin_func_trait::BuiltinFunction;
 

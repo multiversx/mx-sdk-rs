@@ -1,8 +1,8 @@
 use crate::{
+    chain_core::builtin_func_names::ESDT_NFT_ADD_URI_FUNC_NAME,
     tx_execution::BlockchainVMRef,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     types::{top_decode_u64, top_encode_u64},
-    vm_core::builtin_func_names::ESDT_NFT_ADD_URI_FUNC_NAME,
 };
 
 use super::super::builtin_func_trait::BuiltinFunction;

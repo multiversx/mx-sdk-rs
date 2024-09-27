@@ -8,4 +8,4 @@ pub use queue::Queue;
 
 pub use alloc::{boxed::Box, string::String, vec::Vec};
 
-pub use crate::vm_core::types::{Address, BoxedBytes, H256};
+pub use crate::chain_core::types::{Address, BoxedBytes, H256};
