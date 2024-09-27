@@ -1936,7 +1936,6 @@ name = "multiversx-chain-core"
 version = "0.10.0"
 dependencies = [
  "bitflags",
- "multiversx-chain-vm-executor",
  "multiversx-sc-codec",
 ]
 

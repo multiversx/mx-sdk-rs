@@ -1,4 +1,4 @@
-# MultiversX VM base types, interfaces and builtin function names
+# MultiversX blockchain base types, interfaces and builtin function names
 
 It provides various types and contants referring to the MultiversX blockchain base implementation.
 

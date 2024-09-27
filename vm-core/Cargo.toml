@@ -23,6 +23,3 @@ bitflags = "=2.6.0"
 version = "=0.21.0"
 path = "../data/codec"
 features = ["derive"]
-
-[dependencies.multiversx-chain-vm-executor]
-version = "=0.2.0"
