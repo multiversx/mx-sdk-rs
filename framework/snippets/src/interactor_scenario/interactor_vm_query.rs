@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-use crate::{address_h256_to_erdrs, Interactor};
+use crate::Interactor;
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -20,9 +20,9 @@ impl Interactor {
     }
 
     pub async fn perform_sc_query(&mut self, step: &mut ScQueryStep) {
-        let sc_address = address_h256_to_erdrs(&step.tx.to.to_address());
-        let req = VmValueRequest {
-            sc_address: sc_address.clone(),
+        let sc_address = step.tx.to.to_address();
+             let req = VmValueRequest {
+            sc_address: sc_address.clone().into(),
             func_name: step.tx.function.clone(),
             args: step
                 .tx
@@ -30,7 +30,7 @@ impl Interactor {
                 .iter()
                 .map(|arg| hex::encode(&arg.value))
                 .collect(),
-            caller: sc_address,
+            caller: sc_address.into(),
             value: "0".to_string(),
         };
         let result = self
