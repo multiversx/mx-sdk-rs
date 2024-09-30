@@ -1,18 +1,18 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VMTokenType {
+pub enum TokenType {
     Fungible,
     SemiFungible,
     Meta,
     NonFungible,
 }
 
-impl VMTokenType {
+impl TokenType {
     pub fn from_system_sc_arg(raw: &[u8]) -> Self {
         match raw {
-            b"FNG" => VMTokenType::Fungible,
-            b"SFT" => VMTokenType::SemiFungible,
-            b"META" => VMTokenType::Meta,
-            b"NFT" => VMTokenType::NonFungible,
+            b"FNG" => TokenType::Fungible,
+            b"SFT" => TokenType::SemiFungible,
+            b"META" => TokenType::Meta,
+            b"NFT" => TokenType::NonFungible,
             _ => panic!("invalid token type"),
         }
     }
