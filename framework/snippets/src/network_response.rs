@@ -4,7 +4,7 @@ use crate::sdk::{
 };
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress},
-    multiversx_chain_vm::crypto_functions::keccak256,
+    multiversx_chain_vm::{crypto_functions::keccak256, types::H256},
     scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 
@@ -17,6 +17,7 @@ pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
     if !tx_error.is_success() {
         return TxResponse {
             tx_error,
+            tx_hash: process_tx_hash(&tx),
             ..Default::default()
         };
     }
@@ -45,8 +46,17 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
         new_deployed_address: process_new_deployed_address(tx),
         new_issued_token_identifier: process_new_issued_token_identifier(tx),
         logs: process_logs(tx),
+        tx_hash: process_tx_hash(tx),
         ..Default::default()
     }
+}
+
+fn process_tx_hash(tx: &TransactionOnNetwork) -> Option<H256> {
+    tx.hash.as_ref().map(|encoded_hash| {
+        let decoded = hex::decode(encoded_hash).expect("error decoding tx hash from hex");
+        assert_eq!(decoded.len(), 32);
+        H256::from_slice(&decoded)
+    })
 }
 
 fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {

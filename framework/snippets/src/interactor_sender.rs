@@ -2,7 +2,7 @@ use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
 use log::debug;
 use multiversx_sc_scenario::multiversx_sc::types::Address;
 
-use crate::{address_h256_to_erdrs, Interactor};
+use crate::Interactor;
 
 /// A user account that can sign transactions (a pem is present).
 pub struct Sender {
@@ -13,10 +13,9 @@ pub struct Sender {
 
 impl Interactor {
     pub async fn recall_nonce(&self, address: &Address) -> u64 {
-        let erdrs_address = address_h256_to_erdrs(address);
         let account = self
             .proxy
-            .get_account(&erdrs_address)
+            .get_account(&address.clone().into())
             .await
             .expect("failed to retrieve account nonce");
         account.nonce

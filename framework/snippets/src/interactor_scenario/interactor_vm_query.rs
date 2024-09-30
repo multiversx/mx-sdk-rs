@@ -1,7 +1,6 @@
 #![allow(deprecated)]
 
-use crate::sdk::{data::vm::VmValueRequest, utils::base64_decode};
-use crate::{address_h256_to_erdrs, Interactor};
+use crate::Interactor;
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -9,6 +8,7 @@ use multiversx_sc_scenario::{
     multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti, types::ContractCall},
     scenario_model::{ScQueryStep, TxResponse},
 };
+use multiversx_sdk_reqwest::core::{data::vm::VmValueRequest, utils::base64_decode};
 
 impl Interactor {
     pub async fn sc_query<S>(&mut self, mut step: S) -> &mut Self
@@ -20,9 +20,9 @@ impl Interactor {
     }
 
     pub async fn perform_sc_query(&mut self, step: &mut ScQueryStep) {
-        let sc_address = address_h256_to_erdrs(&step.tx.to.to_address());
+        let sc_address = step.tx.to.to_address();
         let req = VmValueRequest {
-            sc_address: sc_address.clone(),
+            sc_address: sc_address.clone().into(),
             func_name: step.tx.function.clone(),
             args: step
                 .tx
@@ -30,7 +30,7 @@ impl Interactor {
                 .iter()
                 .map(|arg| hex::encode(&arg.value))
                 .collect(),
-            caller: sc_address,
+            caller: sc_address.into(),
             value: "0".to_string(),
         };
         let result = self

@@ -24,6 +24,7 @@ members = [
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
 
+  "vm-core",
   "vm",
 
   "contracts/modules",

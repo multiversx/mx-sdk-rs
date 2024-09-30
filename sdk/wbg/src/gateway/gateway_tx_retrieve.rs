@@ -1,6 +1,6 @@
-use multiversx_sdk::data::transaction::TransactionOnNetwork;
 use js_sys::Promise;
 use log::info;
+use multiversx_sdk::data::transaction::TransactionOnNetwork;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::window;
 

@@ -1,11 +1,11 @@
-use crate::sdk::{data::transaction::Transaction, utils::base64_encode};
-use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, network_response, Interactor};
+use crate::{network_response, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
+use multiversx_sdk_reqwest::core::{data::transaction::Transaction, utils::base64_encode};
 
 impl Interactor {
     pub async fn sc_call<S>(&mut self, mut sc_call_step: S)
@@ -14,6 +14,10 @@ impl Interactor {
     {
         let sc_call_step = sc_call_step.as_mut();
         let tx_hash = self.launch_sc_call(sc_call_step).await;
+        self.proxy
+            .generate_blocks_until_tx_processed(&tx_hash)
+            .await
+            .unwrap();
         let tx = self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
 
         sc_call_step.save_response(network_response::parse_tx_response(tx));
@@ -57,8 +61,8 @@ impl Interactor {
         Transaction {
             nonce: 0,
             value: contract_call.egld_payment.to_alloc().to_string(),
-            sender: mandos_to_erdrs_address(&tx_call.from),
-            receiver: address_h256_to_erdrs(&contract_call.basic.to.to_address()),
+            sender: tx_call.from.to_address().into(),
+            receiver: contract_call.basic.to.to_address().into(),
             gas_price: self.network_config.min_gas_price,
             gas_limit: tx_call.gas_limit.value,
             data,

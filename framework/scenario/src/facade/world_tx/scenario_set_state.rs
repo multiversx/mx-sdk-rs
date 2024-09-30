@@ -73,7 +73,7 @@ impl ScenarioWorld {
         let balance_value = big_uint_annotated(&env, &balance);
         let accounts = &mut self.get_mut_state().accounts;
         for (vm_address_key, account) in accounts.iter_mut() {
-            if vm_address_key == &address_value.to_vm_address() {
+            if vm_address_key == &address_value.to_address() {
                 account.egld_balance.clone_from(&balance_value.value);
             }
         }
@@ -88,8 +88,8 @@ impl ScenarioWorld {
         let address_value = address_annotated(&env, &address);
         let balance_value = big_uint_annotated(&env, &balance);
         let accounts = &mut self.get_mut_state().accounts;
-        for (vm_address, account) in accounts.iter_mut() {
-            if vm_address == &address_value.to_vm_address() {
+        for (address, account) in accounts.iter_mut() {
+            if address == &address_value.to_address() {
                 account.esdt.set_esdt_balance(
                     token_id.to_vec(),
                     0,
@@ -129,8 +129,8 @@ impl ScenarioWorld {
         let mut esdt_attributes = Vec::new();
         let _ = attributes.top_encode(&mut esdt_attributes);
         let accounts = &mut self.get_mut_state().accounts;
-        for (vm_address, account) in accounts.iter_mut() {
-            if vm_address == &address_value.to_vm_address() {
+        for (account_address, account) in accounts.iter_mut() {
+            if account_address == &address_value.to_address() {
                 account.esdt.set_esdt_balance(
                     token_id.to_vec(),
                     nonce_value.value,
@@ -138,7 +138,7 @@ impl ScenarioWorld {
                     EsdtInstanceMetadata {
                         creator: creator
                             .as_ref()
-                            .map(|c| address_annotated(&env, c).to_vm_address()),
+                            .map(|c| address_annotated(&env, c).to_address()),
                         attributes: esdt_attributes.clone(),
                         royalties: royalties_value.value,
                         name: name.unwrap_or_default().to_vec(),
@@ -156,8 +156,8 @@ impl ScenarioWorld {
         BigUintValue: From<V>,
     {
         let accounts = &mut self.get_mut_state().accounts;
-        for (vm_address, account) in accounts.iter_mut() {
-            if vm_address == &AddressKey::from(address).to_vm_address() {
+        for (account_address, account) in accounts.iter_mut() {
+            if account_address == &AddressKey::from(address).to_address() {
                 account
                     .developer_rewards
                     .clone_from(&BigUintValue::from(developer_rewards).value);
@@ -172,8 +172,8 @@ impl ScenarioWorld {
         let env = self.new_env_data();
         let address_value = address_annotated(&env, &address);
         let accounts = &mut self.get_mut_state().accounts;
-        for (vm_address, account) in accounts.iter_mut() {
-            if vm_address == &address_value.to_vm_address() {
+        for (account_address, account) in accounts.iter_mut() {
+            if account_address == &address_value.to_address() {
                 account.esdt.set_roles(
                     token_id.to_vec(),
                     roles
@@ -231,7 +231,7 @@ impl<'w> SetStateBuilderBase<'w> {
                 .vm_runner
                 .blockchain_mock
                 .state
-                .account_exists(&address.to_vm_address()),
+                .account_exists(&address.to_address()),
             "updating existing accounts currently not supported"
         );
 

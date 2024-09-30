@@ -1,10 +1,10 @@
+use anyhow::{anyhow, Result};
+use gloo_net::http::Request;
 use multiversx_sdk::data::{
     network_config::{NetworkConfig, NetworkConfigResponse},
     network_economics::{NetworkEconomics, NetworkEconomicsResponse},
     network_status::{NetworkStatus, NetworkStatusResponse},
 };
-use anyhow::{anyhow, Result};
-use gloo_net::http::Request;
 
 use super::GatewayProxy;
 

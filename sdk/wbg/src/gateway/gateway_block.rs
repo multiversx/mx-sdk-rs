@@ -1,9 +1,9 @@
+use anyhow::{anyhow, Result};
+use gloo_net::http::Request;
 use multiversx_sdk::data::{
     hyperblock::{HyperBlock, HyperBlockResponse},
     network_status::NetworkStatusResponse,
 };
-use anyhow::{anyhow, Result};
-use gloo_net::http::Request;
 
 use super::GatewayProxy;
 use super::METACHAIN_SHARD_ID;
