@@ -43,7 +43,6 @@ impl Interactor {
 
     pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
         let wallet_address = wallet.address();
-        // let address = erdrs_address_to_h256(wallet.address());
         self.proxy
             .send_user_funds(&wallet_address.to_bech32_string().unwrap())
             .await
