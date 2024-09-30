@@ -27,8 +27,8 @@ pub struct Interactor {
 }
 
 impl Interactor {
-    pub async fn new(gateway_url: &str) -> Self {
-        let proxy = GatewayProxy::new(gateway_url.to_string());
+    pub async fn new(gateway_uri: &str, use_chain_simulator: bool) -> Self {
+        let proxy = GatewayProxy::new(gateway_uri.to_string(), use_chain_simulator);
         let network_config = proxy.get_network_config().await.unwrap();
         Self {
             proxy,
@@ -41,8 +41,15 @@ impl Interactor {
         }
     }
 
-    pub fn register_wallet(&mut self, wallet: Wallet) -> Address {
-        let address: Address = wallet.address().into();
+    pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
+        let wallet_address = wallet.address();
+        // let address = erdrs_address_to_h256(wallet.address());
+        self.proxy
+            .send_user_funds(&wallet_address.to_bech32_string().unwrap())
+            .await
+            .unwrap();
+
+        let address: Address = wallet_address.into();
         self.sender_map.insert(
             address.clone(),
             Sender {
