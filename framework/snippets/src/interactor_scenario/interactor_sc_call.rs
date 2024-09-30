@@ -1,3 +1,4 @@
+use crate::sdk::{data::transaction::Transaction, utils::base64_encode};
 use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, network_response, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
@@ -5,7 +6,6 @@ use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
-use crate::sdk::{data::transaction::Transaction, utils::base64_encode};
 
 impl Interactor {
     pub async fn sc_call<S>(&mut self, mut sc_call_step: S)

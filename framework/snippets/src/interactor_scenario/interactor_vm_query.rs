@@ -1,5 +1,6 @@
 #![allow(deprecated)]
 
+use crate::sdk::{data::vm::VmValueRequest, utils::base64_decode};
 use crate::{address_h256_to_erdrs, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
@@ -8,7 +9,6 @@ use multiversx_sc_scenario::{
     multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti, types::ContractCall},
     scenario_model::{ScQueryStep, TxResponse},
 };
-use crate::sdk::{data::vm::VmValueRequest, utils::base64_decode};
 
 impl Interactor {
     pub async fn sc_query<S>(&mut self, mut step: S) -> &mut Self

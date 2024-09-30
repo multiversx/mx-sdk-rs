@@ -1,11 +1,11 @@
+use crate::sdk::{
+    data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
+    utils::base64_decode,
+};
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress},
     multiversx_chain_vm::crypto_functions::keccak256,
     scenario_model::{Log, TxResponse, TxResponseStatus},
-};
-use crate::sdk::{
-    data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
-    utils::base64_decode,
 };
 
 const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";

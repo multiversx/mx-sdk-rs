@@ -12,6 +12,7 @@ path = "src/comp_interact_main.rs"
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.24" }
 toml = "0.8.6"
 
 [dependencies.multiversx-sc]

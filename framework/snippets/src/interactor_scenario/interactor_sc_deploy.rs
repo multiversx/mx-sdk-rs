@@ -1,13 +1,13 @@
+use crate::sdk::{
+    data::{address::Address as ErdrsAddress, transaction::Transaction},
+    utils::base64_encode,
+};
 use crate::{mandos_to_erdrs_address, network_response, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
-};
-use crate::sdk::{
-    data::{address::Address as ErdrsAddress, transaction::Transaction},
-    utils::base64_encode,
 };
 
 const DEPLOY_RECEIVER: [u8; 32] = [0u8; 32];

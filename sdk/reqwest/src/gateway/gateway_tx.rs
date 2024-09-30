@@ -1,3 +1,5 @@
+use anyhow::{anyhow, Result};
+use itertools::Itertools;
 use multiversx_sdk::data::{
     address::Address,
     network_config::NetworkConfig,
@@ -8,8 +10,6 @@ use multiversx_sdk::data::{
     },
     vm::{ResponseVmValue, VmValueRequest, VmValuesResponseData},
 };
-use anyhow::{anyhow, Result};
-use itertools::Itertools;
 
 use super::GatewayProxy;
 

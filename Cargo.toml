@@ -11,10 +11,12 @@ members = [
   "framework/meta-lib",
   "framework/scenario",
   "framework/snippets",
+  "framework/snippets-dapp",
   "framework/wasm-adapter",
 
   "sdk/core",
   "sdk/reqwest",
+  "sdk/wbg",
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",
@@ -99,6 +101,7 @@ members = [
   "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/ping-pong-egld/dapp",
   "contracts/examples/rewards-distribution",
   "contracts/examples/rewards-distribution/meta",
   "contracts/examples/seed-nft-minter",
