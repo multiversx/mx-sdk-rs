@@ -52,7 +52,7 @@ impl<'w> TxEnvMockDeployAddress for ScenarioEnvExec<'w> {
             .world
             .get_state()
             .accounts
-            .get(&from_value.to_vm_address())
+            .get(&from_value.to_address())
             .expect("sender does not exist")
             .nonce;
         let new_address_value = address_annotated(self, &new_address);

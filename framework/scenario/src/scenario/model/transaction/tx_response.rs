@@ -37,7 +37,7 @@ impl TxResponse {
                 .result_logs
                 .iter()
                 .map(|tx_log| Log {
-                    address: Address::from_slice(tx_log.address.as_bytes()),
+                    address: tx_log.address.clone(),
                     endpoint: tx_log.endpoint.to_string(),
                     topics: tx_log.topics.clone(),
                     data: tx_log.data.clone(),
