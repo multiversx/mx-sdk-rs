@@ -13,9 +13,10 @@ use std::collections::{BTreeMap, HashMap};
 /// then formats it as a scenario set state step.
 pub async fn print_account_as_scenario_set_state(
     api_string: String,
+    use_chain_simulator: bool,
     address_bech32_string: String,
 ) {
-    let api = GatewayProxy::new(api_string);
+    let api = GatewayProxy::new(api_string, use_chain_simulator);
     let address = Bech32Address::from_bech32_string(address_bech32_string);
     let set_state = retrieve_account_as_scenario_set_state(&api, &address).await;
     let scenario = build_scenario(set_state);
@@ -38,20 +39,30 @@ pub async fn retrieve_account_as_scenario_set_state(
     let sdk_address = Address::from_bech32_string(address.to_bech32_str()).unwrap();
     let sdk_account = api.get_account(&sdk_address).await.unwrap();
 
-    let account_esdt = api
-        .get_account_esdt_tokens(&sdk_address)
-        .await
-        .unwrap_or_else(|err| {
-            panic!("failed to retrieve ESDT tokens for address {address}: {err}")
-        });
-    let account_esdt_roles = api
-        .get_account_esdt_roles(&sdk_address)
-        .await
-        .unwrap_or_else(|err| panic!("failed to retrieve ESDT roles for address {address}: {err}"));
-    let account_storage = api
-        .get_account_storage_keys(&sdk_address)
-        .await
-        .unwrap_or_else(|err| panic!("failed to retrieve storage for address {address}: {err}"));
+    let (account_esdt, account_esdt_roles, account_storage) = if api.chain_simulator {
+        (HashMap::new(), HashMap::new(), HashMap::new())
+    } else {
+        let account_esdt = api
+            .get_account_esdt_tokens(&sdk_address)
+            .await
+            .unwrap_or_else(|err| {
+                panic!("failed to retrieve ESDT tokens for address {address}: {err}")
+            });
+        let account_esdt_roles = api
+            .get_account_esdt_roles(&sdk_address)
+            .await
+            .unwrap_or_else(|err| {
+                panic!("failed to retrieve ESDT roles for address {address}: {err}")
+            });
+        let account_storage = api
+            .get_account_storage_keys(&sdk_address)
+            .await
+            .unwrap_or_else(|err| {
+                panic!("failed to retrieve storage for address {address}: {err}")
+            });
+
+        (account_esdt, account_esdt_roles, account_storage)
+    };
 
     let account_state = set_account(
         sdk_account,

@@ -35,7 +35,7 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
         );
 
         state.validate_and_add_account(AccountData {
-            address: address.to_vm_address(),
+            address: address.to_address(),
             nonce: account
                 .nonce
                 .as_ref()
@@ -65,7 +65,7 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
             contract_owner: account
                 .owner
                 .as_ref()
-                .map(|address_value| address_value.to_vm_address()),
+                .map(|address_value| address_value.to_address()),
             developer_rewards: account
                 .developer_rewards
                 .as_ref()
@@ -79,9 +79,9 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
             "field should have SC format"
         );
         state.put_new_address(
-            new_address.creator_address.to_vm_address(),
+            new_address.creator_address.to_address(),
             new_address.creator_nonce.value,
-            new_address.new_address.to_vm_address(),
+            new_address.new_address.to_address(),
         )
     }
     for new_token_identifier in set_state_step.new_token_identifiers.iter().cloned() {
@@ -155,7 +155,7 @@ fn convert_scenario_esdt_instance_to_world_mock(
             creator: scenario_esdt
                 .creator
                 .as_ref()
-                .map(|creator| creator.to_vm_address()),
+                .map(|creator| creator.to_address()),
             royalties: scenario_esdt
                 .royalties
                 .as_ref()

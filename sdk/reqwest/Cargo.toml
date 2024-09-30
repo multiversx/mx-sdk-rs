@@ -23,6 +23,10 @@ hex = "0.4.3"
 itertools = "0.13.0"
 log = "0.4.17"
 
+# TEMP
+serde = { version = "1.0.130", features = ["derive"] }
+serde_json = { version = "1.0.68", features = ["preserve_order"] }
+
 [dependencies.multiversx-sdk]
 version = "=0.6.0"
 path = "../core"

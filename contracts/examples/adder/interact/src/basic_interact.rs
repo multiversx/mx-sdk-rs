@@ -2,6 +2,8 @@ mod basic_interact_cli;
 mod basic_interact_config;
 mod basic_interact_state;
 
+use core::str;
+
 use adder::adder_proxy;
 use basic_interact_config::Config;
 use basic_interact_state::State;
@@ -61,22 +63,27 @@ struct AdderInteract {
 impl AdderInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway())
+        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
-        let adder_owner_address =
-            interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
+        let adder_owner_address = interactor
+            .register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap())
+            .await;
         // PASSWORD: "alice"
         // InsertPassword::Plaintext("alice".to_string()) || InsertPassword::StandardInput
-        let wallet_address = interactor.register_wallet(
-            Wallet::from_keystore_secret(
-                "alice.json",
-                InsertPassword::Plaintext("alice".to_string()),
+        let wallet_address = interactor
+            .register_wallet(
+                Wallet::from_keystore_secret(
+                    "alice.json",
+                    InsertPassword::Plaintext("alice".to_string()),
+                )
+                .unwrap(),
             )
-            .unwrap(),
-        );
+            .await;
+
+        interactor.proxy.generate_blocks(1).await.unwrap();
 
         Self {
             interactor,

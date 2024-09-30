@@ -1,13 +1,10 @@
-use crate::sdk::{
-    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
-    wallet::Wallet,
-};
+use crate::sdk::{data::network_config::NetworkConfig, wallet::Wallet};
 use multiversx_sc_scenario::{
     imports::{Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
-    scenario_model::AddressValue,
 };
+// use multiversx_sdk_reqwest::core::{data::network_config::NetworkConfig, wallet::Wallet};
 use multiversx_sdk_reqwest::gateway::GatewayProxy;
 use std::{
     collections::HashMap,
@@ -32,8 +29,8 @@ pub struct Interactor {
 }
 
 impl Interactor {
-    pub async fn new(gateway_url: &str) -> Self {
-        let proxy = GatewayProxy::new(gateway_url.to_string());
+    pub async fn new(gateway_uri: &str, use_chain_simulator: bool) -> Self {
+        let proxy = GatewayProxy::new(gateway_uri.to_string(), use_chain_simulator);
         let network_config = proxy.get_network_config().await.unwrap();
         Self {
             proxy,
@@ -46,8 +43,14 @@ impl Interactor {
         }
     }
 
-    pub fn register_wallet(&mut self, wallet: Wallet) -> Address {
-        let address = erdrs_address_to_h256(wallet.address());
+    pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
+        let wallet_address = wallet.address();
+        self.proxy
+            .send_user_funds(&wallet_address.to_bech32_string().unwrap())
+            .await
+            .unwrap();
+
+        let address: Address = wallet_address.into();
         self.sender_map.insert(
             address.clone(),
             Sender {
@@ -74,18 +77,4 @@ impl Interactor {
         self.pre_runners.run_set_state_step(&set_state);
         self.post_runners.run_set_state_step(&set_state);
     }
-}
-
-pub(crate) fn mandos_to_erdrs_address(mandos_address: &AddressValue) -> ErdrsAddress {
-    let bytes = mandos_address.value.as_array();
-    ErdrsAddress::from_bytes(*bytes)
-}
-
-pub(crate) fn address_h256_to_erdrs(address: &Address) -> ErdrsAddress {
-    let bytes = address.as_array();
-    ErdrsAddress::from_bytes(*bytes)
-}
-
-pub(crate) fn erdrs_address_to_h256(erdrs_address: ErdrsAddress) -> Address {
-    erdrs_address.to_bytes().into()
 }

@@ -1,23 +1,20 @@
-use multiversx_sdk_reqwest::{
-    core::data::{address::Address, vm::VmValueRequest},
-    core::wallet::Wallet,
-    gateway::{GatewayProxy, DEVNET_GATEWAY},
+use multiversx_sdk::{
+    data::{address::Address, vm::VmValueRequest},
+    wallet::Wallet,
 };
+use multiversx_sdk_reqwest::gateway::{GatewayProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY};
 
 #[tokio::main]
 async fn main() {
-    let wl = Wallet::from_private_key(
-        "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
-    )
-    .unwrap();
+    let wl = Wallet::from_pem_file("sdk/core/tests/alice.pem").unwrap();
     let addr = wl.address();
-    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string(), DEFAULT_USE_CHAIN_SIMULATOR);
     let req = VmValueRequest {
         sc_address: Address::from_bech32_string(
-            "erd1qqqqqqqqqqqqqpgqhn3ae8dpc957t7jadn7kywtg503dy7pnj9ts3umqxx",
+            "erd1qqqqqqqqqqqqqpgq5dvvkmka7sujfsx7cfmygnx0n7luv8k0d8sskpqcec",
         )
         .unwrap(),
-        func_name: "get".to_string(),
+        func_name: "empty".to_string(),
         args: vec![],
         caller: addr.clone(),
         value: "0".to_string(),

@@ -1,6 +1,8 @@
 use multiversx_sc_scenario::{
     api::StaticApi,
-    multiversx_sc::types::{ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv, TxEnv},
+    multiversx_sc::types::{
+        ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv, TxEnv, TxEnvWithTxHash, H256,
+    },
     scenario_model::TxExpect,
     ScenarioTxEnv, ScenarioTxEnvData,
 };
@@ -42,5 +44,15 @@ impl<'w> TxEnv for InteractorEnvExec<'w> {
 impl<'w> ScenarioTxEnv for InteractorEnvExec<'w> {
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
+    }
+}
+
+impl<'w> TxEnvWithTxHash for InteractorEnvExec<'w> {
+    fn set_tx_hash(&mut self, tx_hash: H256) {
+        self.data.set_tx_hash(tx_hash);
+    }
+
+    fn take_tx_hash(&mut self) -> Option<H256> {
+        self.data.take_tx_hash()
     }
 }

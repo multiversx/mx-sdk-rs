@@ -34,6 +34,7 @@ impl Interactor {
             futures.push(self.proxy.retrieve_tx_on_network(tx_hash.clone()));
         }
 
+        self.proxy.generate_blocks(4).await.unwrap();
         join_all(futures).await
     }
 }

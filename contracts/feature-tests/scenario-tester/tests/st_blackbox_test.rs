@@ -244,3 +244,45 @@ fn set_state_test() {
         .balance(600)
         .esdt_balance(TOKEN_ID, 60);
 }
+
+#[test]
+fn st_blackbox_tx_hash() {
+    let mut world = world();
+
+    world
+        .account(OWNER_ADDRESS)
+        .nonce(1)
+        .balance(100)
+        .account(OTHER_ADDRESS)
+        .nonce(2)
+        .balance(300)
+        .esdt_balance(TOKEN_ID, 500)
+        .commit();
+
+    let (new_address, tx_hash) = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .init(5u32)
+        .code(CODE_PATH)
+        .new_address(ST_ADDRESS)
+        .tx_hash([11u8; 32])
+        .returns(ReturnsNewAddress)
+        .returns(ReturnsTxHash)
+        .run();
+
+    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(tx_hash.as_array(), &[11u8; 32]);
+
+    let tx_hash = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .add(1u32)
+        .tx_hash([22u8; 32])
+        .returns(ReturnsTxHash)
+        .run();
+
+    assert_eq!(tx_hash.as_array(), &[22u8; 32]);
+}

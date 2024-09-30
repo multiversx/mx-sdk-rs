@@ -1,5 +1,5 @@
 use crate::{
-    tx_execution::builtin_function_names::{
+    chain_core::builtin_func_names::{
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
         UPGRADE_CONTRACT_FUNC_NAME,
     },
