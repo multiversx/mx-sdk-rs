@@ -1,6 +1,6 @@
 use multiversx_sdk::{
     data::address::Address,
-    gateway::{GatewayProxy, DEVNET_GATEWAY},
+    gateway::{GatewayProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY},
 };
 
 #[tokio::main]
@@ -10,7 +10,7 @@ async fn main() {
     )
     .unwrap();
 
-    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string(), DEFAULT_USE_CHAIN_SIMULATOR);
     let account = blockchain.get_account(&addr).await.unwrap();
 
     println!("account: {account:#?}");

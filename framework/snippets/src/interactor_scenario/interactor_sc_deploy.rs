@@ -53,6 +53,10 @@ impl Interactor {
     {
         let sc_deploy_step = sc_deploy_step.as_mut();
         let tx_hash = self.launch_sc_deploy(sc_deploy_step).await;
+        self.proxy
+            .generate_blocks_until_tx_processed(&tx_hash)
+            .await
+            .unwrap();
         let tx = self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
 
         let addr = sc_deploy_step.tx.from.clone();
