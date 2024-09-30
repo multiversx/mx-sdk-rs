@@ -1,24 +1,19 @@
-use crate::{mandos_to_erdrs_address, network_response, Interactor};
+use crate::{network_response, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
-    imports::Bech32Address,
+    imports::{Address, Bech32Address},
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
 };
-use multiversx_sdk::{
-    data::{address::Address as ErdrsAddress, transaction::Transaction},
-    utils::base64_encode,
-};
-
-const DEPLOY_RECEIVER: [u8; 32] = [0u8; 32];
+use multiversx_sdk::{data::transaction::Transaction, utils::base64_encode};
 
 impl Interactor {
     pub(crate) fn sc_deploy_to_blockchain_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
         Transaction {
             nonce: 0,
             value: sc_deploy_step.tx.egld_value.value.to_string(),
-            sender: mandos_to_erdrs_address(&sc_deploy_step.tx.from),
-            receiver: ErdrsAddress::from_bytes(DEPLOY_RECEIVER),
+            sender: sc_deploy_step.tx.from.to_address().into(),
+            receiver: Address::zero().into(),
             gas_price: self.network_config.min_gas_price,
             gas_limit: sc_deploy_step.tx.gas_limit.value,
             data: Some(base64_encode(sc_deploy_step.tx.to_tx_data())),

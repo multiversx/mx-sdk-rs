@@ -1,4 +1,4 @@
-use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, network_response, Interactor};
+use crate::{network_response, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -57,8 +57,8 @@ impl Interactor {
         Transaction {
             nonce: 0,
             value: contract_call.egld_payment.to_alloc().to_string(),
-            sender: mandos_to_erdrs_address(&tx_call.from),
-            receiver: address_h256_to_erdrs(&contract_call.basic.to.to_address()),
+            sender: tx_call.from.to_address().into(),
+            receiver: contract_call.basic.to.to_address().into(),
             gas_price: self.network_config.min_gas_price,
             gas_limit: tx_call.gas_limit.value,
             data,

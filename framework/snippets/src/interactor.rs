@@ -2,13 +2,8 @@ use multiversx_sc_scenario::{
     imports::{Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
-    scenario_model::AddressValue,
 };
-use multiversx_sdk::{
-    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
-    gateway::GatewayProxy,
-    wallet::Wallet,
-};
+use multiversx_sdk::{data::network_config::NetworkConfig, gateway::GatewayProxy, wallet::Wallet};
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
@@ -47,7 +42,7 @@ impl Interactor {
     }
 
     pub fn register_wallet(&mut self, wallet: Wallet) -> Address {
-        let address = erdrs_address_to_h256(wallet.address());
+        let address: Address = wallet.address().into();
         self.sender_map.insert(
             address.clone(),
             Sender {
@@ -74,18 +69,4 @@ impl Interactor {
         self.pre_runners.run_set_state_step(&set_state);
         self.post_runners.run_set_state_step(&set_state);
     }
-}
-
-pub(crate) fn mandos_to_erdrs_address(mandos_address: &AddressValue) -> ErdrsAddress {
-    let bytes = mandos_address.value.as_array();
-    ErdrsAddress::from_bytes(*bytes)
-}
-
-pub(crate) fn address_h256_to_erdrs(address: &Address) -> ErdrsAddress {
-    let bytes = address.as_array();
-    ErdrsAddress::from_bytes(*bytes)
-}
-
-pub(crate) fn erdrs_address_to_h256(erdrs_address: ErdrsAddress) -> Address {
-    erdrs_address.to_bytes().into()
 }

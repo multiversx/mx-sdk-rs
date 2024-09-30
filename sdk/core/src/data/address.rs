@@ -40,6 +40,18 @@ impl Address {
     }
 }
 
+impl From<multiversx_chain_core::types::Address> for Address {
+    fn from(value: multiversx_chain_core::types::Address) -> Self {
+        Address(value.as_array().clone())
+    }
+}
+
+impl From<Address> for multiversx_chain_core::types::Address {
+    fn from(value: Address) -> Self {
+        multiversx_chain_core::types::Address::new(value.0)
+    }
+}
+
 impl<'a> From<&'a PublicKey> for Address {
     fn from(public_key: &PublicKey) -> Address {
         let bytes = public_key.to_bytes();
