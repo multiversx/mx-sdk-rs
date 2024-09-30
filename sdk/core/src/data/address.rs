@@ -42,7 +42,7 @@ impl Address {
 
 impl From<multiversx_chain_core::types::Address> for Address {
     fn from(value: multiversx_chain_core::types::Address) -> Self {
-        Address(value.as_array().clone())
+        Address(*value.as_array())
     }
 }
 
