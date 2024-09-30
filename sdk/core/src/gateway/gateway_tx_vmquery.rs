@@ -1,13 +1,13 @@
-use crate::data::vm::{ResponseVmValue, VmValueRequest, VmValuesResponseData};
+use crate::data::vm::{ResponseVmValue, VMQueryInput, VmValuesResponseData};
 use anyhow::anyhow;
 
 use super::{GatewayRequest, GatewayRequestType, VM_VALUES_ENDPOINT};
 
 /// Executes a VM query.
-pub struct VMQueryRequest<'a>(pub &'a VmValueRequest);
+pub struct VMQueryRequest<'a>(pub &'a VMQueryInput);
 
 impl<'a> GatewayRequest for VMQueryRequest<'a> {
-    type Payload = VmValueRequest;
+    type Payload = VMQueryInput;
     type DecodedJson = ResponseVmValue;
     type Result = VmValuesResponseData;
 

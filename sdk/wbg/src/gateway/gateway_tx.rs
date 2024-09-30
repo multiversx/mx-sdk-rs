@@ -9,7 +9,7 @@ use multiversx_sdk::data::{
         Transaction, TransactionInfo, TransactionOnNetwork, TransactionProcessStatus,
         TransactionStatus, TxCostResponseData,
     },
-    vm::{ResponseVmValue, VmValueRequest, VmValuesResponseData},
+    vm::{ResponseVmValue, VMQueryInput, VmValuesResponseData},
 };
 
 use super::GatewayProxy;
@@ -171,10 +171,7 @@ impl GatewayProxy {
     }
 
     // execute_vmquery retrieves data from existing SC trie through the use of a VM
-    pub async fn execute_vmquery(
-        &self,
-        vm_request: &VmValueRequest,
-    ) -> Result<VmValuesResponseData> {
+    pub async fn execute_vmquery(&self, vm_request: &VMQueryInput) -> Result<VmValuesResponseData> {
         let endpoint = self.get_endpoint(VM_VALUES_ENDPOINT);
         let resp = Request::post(&endpoint)
             .json(vm_request)?

@@ -1,4 +1,4 @@
-use multiversx_sdk::data::{address::Address, vm::VmValueRequest};
+use multiversx_sdk::data::{address::Address, vm::VMQueryInput};
 use multiversx_sdk_reqwest::gateway::{GatewayProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY};
 
 #[tokio::main]
@@ -8,12 +8,10 @@ async fn main() {
         "erd1qqqqqqqqqqqqqpgq5dvvkmka7sujfsx7cfmygnx0n7luv8k0d8sskpqcec",
     )
     .unwrap();
-    let req = VmValueRequest {
+    let req = VMQueryInput {
         sc_address: sc_address.clone(),
         func_name: "empty".to_string(),
         args: vec![],
-        caller: sc_address,
-        value: "0".to_string(),
     };
     let result = blockchain.execute_vmquery(&req).await;
     println!("{result:#?}");
