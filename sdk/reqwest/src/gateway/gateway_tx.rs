@@ -24,7 +24,6 @@ impl GatewayProxy {
 
     // get_transaction_info retrieves a transaction's details from the network
     pub async fn get_transaction_info(&self, hash: &str) -> Result<TransactionOnNetwork> {
-        // self.get_transaction_info_internal(hash, false).await
         self.request(GetTxInfo::new(hash)).await
     }
 
@@ -33,7 +32,6 @@ impl GatewayProxy {
         &self,
         hash: &str,
     ) -> Result<TransactionOnNetwork> {
-        // self.get_transaction_info_internal(hash, true).await
         self.request(GetTxInfo::new(hash).with_results()).await
     }
 
