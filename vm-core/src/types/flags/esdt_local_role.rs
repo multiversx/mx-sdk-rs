@@ -1,4 +1,8 @@
 use super::EsdtLocalRoleFlags;
+use crate::codec::{
+    self,
+    derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+};
 
 const ESDT_ROLE_NONE: &str = "";
 const ESDT_ROLE_LOCAL_MINT: &str = "ESDTRoleLocalMint";
@@ -10,12 +14,7 @@ const ESDT_ROLE_NFT_ADD_URI: &str = "ESDTRoleNFTAddURI";
 const ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &str = "ESDTRoleNFTUpdateAttributes";
 const ESDT_ROLE_TRANSFER: &str = "ESDTTransferRole";
 
-/// The VM implementation for EsdtLocalRole, used internally in builtin functions.
-///
-/// There is another near-identical implementation in the framework, used for communicating with the VM.
-///
-/// It might be a good idea to move it to some "common ground" crate, between the framework and the VM.
-#[derive(Clone, PartialEq, Eq, Debug, Copy)]
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
 pub enum EsdtLocalRole {
     None,
     Mint,
@@ -41,6 +40,10 @@ impl EsdtLocalRole {
             Self::NftUpdateAttributes => 7,
             Self::Transfer => 8,
         }
+    }
+
+    pub fn as_role_name(&self) -> &'static [u8] {
+        self.name().as_bytes()
     }
 
     pub fn name(&self) -> &'static str {

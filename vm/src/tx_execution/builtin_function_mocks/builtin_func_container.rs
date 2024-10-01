@@ -1,6 +1,5 @@
 use super::{
     builtin_func_trait::BuiltinFunction,
-    builtin_function_names::*,
     esdt_nft::{
         ESDTLocalBurn, ESDTLocalMint, ESDTNftAddQuantity, ESDTNftAddUri, ESDTNftBurn,
         ESDTNftCreate, ESDTNftUpdateAttributes,
@@ -9,11 +8,14 @@ use super::{
     transfer::{ESDTMultiTransfer, ESDTNftTransfer, ESDTTransfer},
     BuiltinFunctionEsdtTransferInfo,
 };
+
 use crate::{
     tx_execution::BlockchainVMRef,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::EsdtLocalRole,
 };
+
+use crate::chain_core::builtin_func_names::*;
 
 /// Container for builtin function logic.
 ///

@@ -29,6 +29,7 @@ hex = "0.4"
 wasmparser = "0.216"
 wasmprinter = "0.216"
 semver = "1.0.20"
+wat = "1.217.0"
 
 [dependencies.multiversx-sc]
 version = "=0.53.1"

@@ -1,12 +1,11 @@
-use super::h256::H256;
-use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
-    types::heap::BoxedBytes,
-};
+use super::H256;
 use alloc::{boxed::Box, vec::Vec};
 use core::fmt::Debug;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
+pub const NUM_INT_CHARACTERS_FOR_ADDRESS: usize = 10;
+pub const VM_TYPE_LEN: usize = 2;
+pub const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
 /// An Address is just a H256 with a different name.
 /// Has a different ABI name than H256.
@@ -15,6 +14,30 @@ const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 /// While this also works, its use in contracts is discouraged.
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct Address(H256);
+
+impl Address {
+    pub const fn new(bytes: [u8; 32]) -> Self {
+        Address(H256::new(bytes))
+    }
+
+    pub fn generate_mock_address(creator_address: &[u8], creator_nonce: u64) -> Self {
+        let mut result = [0x00; 32];
+
+        result[10] = 0x11;
+        result[11] = 0x11;
+        result[12] = 0x11;
+        result[13] = 0x11;
+
+        result[14..29].copy_from_slice(&creator_address[..15]);
+        result[29] = creator_nonce as u8;
+        result[30..].copy_from_slice(&creator_address[30..]);
+
+        let start_index = NUM_INT_CHARACTERS_FOR_ADDRESS - VM_TYPE_LEN;
+        result[start_index..(start_index + DEFAULT_VM_TYPE.len())].copy_from_slice(DEFAULT_VM_TYPE);
+
+        Address::from(result)
+    }
+}
 
 impl From<H256> for Address {
     #[inline]
@@ -145,13 +168,6 @@ impl Address {
         self.0.is_zero()
     }
 
-    /// Transmutes self to an (in principle) variable length boxed bytes object.
-    /// Both BoxedBytes and H256 keep the data on the heap, so only the pointer to that data needs to be transmuted.
-    /// Does not reallocate or copy data, the data on the heap remains untouched.
-    pub fn into_boxed_bytes(self) -> BoxedBytes {
-        self.0.into_boxed_bytes()
-    }
-
     pub fn is_smart_contract_address(&self) -> bool {
         self.as_bytes()
             .iter()
@@ -202,20 +218,6 @@ impl TopDecode for Address {
     }
 }
 
-impl TypeAbiFrom<Self> for Address {}
-
-impl TypeAbi for Address {
-    type Unmanaged = Self;
-
-    fn type_name() -> TypeName {
-        "Address".into()
-    }
-
-    fn type_name_rust() -> TypeName {
-        "Address".into()
-    }
-}
-
 #[cfg(test)]
 mod address_tests {
     use super::*;
@@ -250,12 +252,5 @@ mod address_tests {
     #[test]
     fn test_is_zero() {
         assert!(Address::zero().is_zero());
-    }
-
-    #[test]
-    fn test_size_of() {
-        use core::mem::size_of;
-        assert_eq!(size_of::<Address>(), size_of::<usize>());
-        assert_eq!(size_of::<Option<Address>>(), size_of::<usize>());
     }
 }

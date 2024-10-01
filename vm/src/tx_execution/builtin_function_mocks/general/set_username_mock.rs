@@ -1,5 +1,5 @@
-use crate::tx_execution::{builtin_function_names::SET_USERNAME_FUNC_NAME, BlockchainVMRef};
-
+use crate::chain_core::builtin_func_names::SET_USERNAME_FUNC_NAME;
+use crate::tx_execution::BlockchainVMRef;
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 
 use super::super::builtin_func_trait::BuiltinFunction;

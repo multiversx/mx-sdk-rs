@@ -1,16 +1,16 @@
 use multiversx_sdk::{
     data::address::Address,
-    gateway::{GatewayProxy, DEVNET_GATEWAY},
+    gateway::{GatewayProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY},
 };
 
 #[tokio::main]
 async fn main() {
     let addr = Address::from_bech32_string(
-        "erd1932eft30w753xyvme8d49qejgkjc09n5e49w4mwdjtm0neld797su0dlxp",
+        "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
     )
     .unwrap();
 
-    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string(), DEFAULT_USE_CHAIN_SIMULATOR);
     let account_storage = blockchain.get_account_storage_keys(&addr).await.unwrap();
 
     println!("Account Storage: {account_storage:#?}");
