@@ -28,7 +28,6 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 ## [sc 0.53.1, sdk 0.6.1] - 2024-10-01
-- Ping Pong: events, upgrade endpoint and new view that returns the current contract state.
 - Interactor: 
   - Allow signature to be empty in TransactionOnNetwork;
   - Allow return data to be empty in VMOutputApi.
