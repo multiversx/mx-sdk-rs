@@ -27,6 +27,11 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.53.1, sdk 0.6.1] - 2024-10-01
+- Interactor: 
+  - Allow signature to be empty in TransactionOnNetwork;
+  - Allow return data to be empty in VMOutputApi.
+
 ## [sc 0.53.0 codec 0.21.0, vm 0.10.0, sdk 0.6.0, scenario-format 0.23.0] - 2024-09-04
 - Unified syntax:
   -  Whitebox testing;
