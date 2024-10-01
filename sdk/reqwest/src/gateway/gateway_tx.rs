@@ -6,7 +6,7 @@ use multiversx_sdk::{
         transaction::{
             ArgCreateTransaction, Transaction, TransactionOnNetwork, TxCostResponseData,
         },
-        vm::{VmValueRequest, VmValuesResponseData},
+        vm::{VMQueryInput, VmValuesResponseData},
     },
     gateway::{
         GetTxCost, GetTxInfo, GetTxProcessStatus, GetTxStatus, SendMultiTxRequest, SendTxRequest,
@@ -79,10 +79,7 @@ impl GatewayProxy {
     }
 
     // execute_vmquery retrieves data from existing SC trie through the use of a VM
-    pub async fn execute_vmquery(
-        &self,
-        vm_request: &VmValueRequest,
-    ) -> Result<VmValuesResponseData> {
+    pub async fn execute_vmquery(&self, vm_request: &VMQueryInput) -> Result<VmValuesResponseData> {
         self.request(VMQueryRequest(vm_request)).await
     }
 }

@@ -25,11 +25,9 @@ pub enum CallType {
 // VmValueRequest defines the request struct for values available in a VM
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct VmValueRequest {
+pub struct VMQueryInput {
     pub sc_address: Address,
     pub func_name: String,
-    pub caller: Address,
-    pub value: String,
     pub args: Vec<String>,
 }
 
