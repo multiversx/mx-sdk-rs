@@ -4,7 +4,6 @@ use multiversx_sc_scenario::{
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
 };
-// use multiversx_sdk_reqwest::core::{data::network_config::NetworkConfig, wallet::Wallet};
 use multiversx_sdk_reqwest::gateway::GatewayProxy;
 use std::{
     collections::HashMap,
