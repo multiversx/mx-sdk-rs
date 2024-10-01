@@ -85,7 +85,8 @@ pub struct StorageUpdateApi {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VMOutputApi {
-    pub return_data: Option<Vec<String>>,
+    #[serde(default)]
+    pub return_data: Vec<String>,
     pub return_code: String,
     pub return_message: String,
     pub gas_remaining: u64,
