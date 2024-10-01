@@ -6,7 +6,7 @@ mod interactor_sender;
 mod interactor_tx;
 mod multi;
 pub mod network_response;
-pub mod test_wallets;
+// pub mod test_wallets;
 
 pub use env_logger;
 pub use hex;
@@ -23,3 +23,6 @@ pub use tokio;
 
 /// Imports normally needed in interactors, grouped together.
 pub mod imports;
+
+/// Backwards compatibility.
+pub use crate::sdk_core::test_wallets;
