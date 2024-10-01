@@ -1,7 +1,4 @@
-use multiversx_sdk::{
-    data::transaction::Transaction,
-    wallet::Wallet,
-};
+use multiversx_sdk::{data::transaction::Transaction, wallet::Wallet};
 use multiversx_sdk_reqwest::gateway::{GatewayProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY};
 
 #[tokio::main]
