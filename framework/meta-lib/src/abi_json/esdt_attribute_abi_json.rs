@@ -3,7 +3,10 @@ use std::collections::BTreeMap;
 use multiversx_sc::abi::EsdtAttributeAbi;
 use serde::{Deserialize, Serialize};
 
-use super::{convert_type_descriptions_to_json, EsdtAttributeJson, TypeDescriptionJson};
+use super::{
+    convert_type_descriptions_to_json, empty_type_description_container, EsdtAttributeJson,
+    TypeDescriptionJson,
+};
 
 /// Represents an entire ESDT attribute ABI file. The type descriptions only show up here.
 #[derive(Serialize, Deserialize)]
@@ -21,6 +24,16 @@ impl EsdtAttributeAbiJson {
         EsdtAttributeAbiJson {
             esdt_attribute: EsdtAttributeJson::from(attr),
             types: convert_type_descriptions_to_json(&attr.type_descriptions),
+        }
+    }
+}
+
+impl From<&EsdtAttributeAbiJson> for EsdtAttributeAbi {
+    fn from(abi_json: &EsdtAttributeAbiJson) -> Self {
+        EsdtAttributeAbi {
+            ticker: abi_json.esdt_attribute.ticker.clone(),
+            ty: abi_json.esdt_attribute.ty.clone(),
+            type_descriptions: empty_type_description_container(), // TODO: @Laur should recursively call convert_json_to_type_descriptions
         }
     }
 }
