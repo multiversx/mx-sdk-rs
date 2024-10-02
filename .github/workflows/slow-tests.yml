@@ -22,6 +22,6 @@ jobs:
 
       - name: Get dependencies
         run: |
-          go get -v -t -d ./...
+          go mod tidy
       - name: Slow tests
         run: make slow-tests
