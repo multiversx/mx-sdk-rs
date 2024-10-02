@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
 };
-use multiversx_sdk_reqwest::gateway::GatewayHttpProxy;
+use multiversx_sdk_http::GatewayHttpProxy;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},

@@ -76,8 +76,10 @@ pub trait GatewayRequest: Send {
 }
 
 pub trait GatewayAsyncService: Send {
-    fn request<G>(&self, request: G) -> impl std::future::Future<Output = anyhow::Result<G::Result>> + Send
+    fn request<G>(
+        &self,
+        request: G,
+    ) -> impl std::future::Future<Output = anyhow::Result<G::Result>> + Send
     where
         G: GatewayRequest;
 }
-

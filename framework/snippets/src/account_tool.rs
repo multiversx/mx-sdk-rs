@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
-use multiversx_sdk_reqwest::gateway::GatewayHttpProxy;
+use multiversx_sdk_http::GatewayHttpProxy;
 use std::collections::{BTreeMap, HashMap};
 
 /// Called directly from CLI, from `sc-meta`.

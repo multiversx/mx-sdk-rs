@@ -21,7 +21,8 @@ impl GatewayHttpProxy {
         &self,
         address: &Address,
     ) -> Result<HashMap<String, Vec<String>>> {
-        self.http_request(GetAccountEsdtRolesRequest::new(address)).await
+        self.http_request(GetAccountEsdtRolesRequest::new(address))
+            .await
     }
 
     // get_account_esdt_tokens retrieves an all esdt token of an account from the network
@@ -38,6 +39,7 @@ impl GatewayHttpProxy {
         &self,
         address: &Address,
     ) -> Result<HashMap<String, String>> {
-        self.http_request(GetAccountStorageRequest::new(address)).await
+        self.http_request(GetAccountStorageRequest::new(address))
+            .await
     }
 }

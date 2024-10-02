@@ -5,7 +5,7 @@ use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
 };
-use multiversx_sdk_reqwest::core::{data::transaction::Transaction, utils::base64_encode};
+use multiversx_sdk_http::core::{data::transaction::Transaction, utils::base64_encode};
 
 impl Interactor {
     pub(crate) fn sc_deploy_to_blockchain_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {

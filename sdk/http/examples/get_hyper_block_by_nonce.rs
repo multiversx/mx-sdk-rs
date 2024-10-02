@@ -1,4 +1,4 @@
-use multiversx_sdk_reqwest::gateway::{GatewayHttpProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY};
+use multiversx_sdk_http::{GatewayHttpProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY};
 
 #[tokio::main]
 async fn main() {

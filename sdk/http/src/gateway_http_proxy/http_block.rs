@@ -14,7 +14,8 @@ impl GatewayHttpProxy {
 
     // get_hyper_block_by_nonce retrieves a hyper block's info by nonce from the network
     pub async fn get_hyper_block_by_nonce(&self, nonce: u64) -> Result<HyperBlock> {
-        self.http_request(GetHyperBlockRequest::by_nonce(nonce)).await
+        self.http_request(GetHyperBlockRequest::by_nonce(nonce))
+            .await
     }
 
     // get_latest_hyper_block_nonce retrieves the latest hyper block (metachain) nonce from the network

@@ -16,8 +16,8 @@ pub use interactor_tx::*;
 pub use log;
 pub use multi::*;
 pub use multiversx_sc_scenario::{self, multiversx_sc};
-pub use multiversx_sdk_reqwest::core as sdk_core;
-pub use multiversx_sdk_reqwest::core as sdk;
+pub use multiversx_sdk_http::core as sdk_core;
+pub use multiversx_sdk_http::core as sdk;
 pub use tokio;
 
 /// Imports normally needed in interactors, grouped together.
