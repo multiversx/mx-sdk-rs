@@ -2493,8 +2493,6 @@ dependencies = [
  "log",
  "multiversx-sdk",
  "reqwest",
- "serde",
- "serde_json",
  "tokio",
 ]
 

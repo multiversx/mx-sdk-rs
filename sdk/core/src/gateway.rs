@@ -3,6 +3,8 @@ mod gateway_account_esdt_roles;
 mod gateway_account_esdt_tokens;
 mod gateway_account_storage;
 mod gateway_block;
+mod gateway_chain_simulator_blocks;
+mod gateway_chain_simulator_send_funds;
 mod gateway_network_config;
 mod gateway_network_economics;
 mod gateway_network_status;
@@ -19,6 +21,8 @@ pub use gateway_account_esdt_roles::GetAccountEsdtRolesRequest;
 pub use gateway_account_esdt_tokens::GetAccountEsdtTokensRequest;
 pub use gateway_account_storage::GetAccountStorageRequest;
 pub use gateway_block::GetHyperBlockRequest;
+pub use gateway_chain_simulator_blocks::ChainSimulatorGenerateBlocksRequest;
+pub use gateway_chain_simulator_send_funds::ChainSimulatorSendFundsRequest;
 pub use gateway_network_config::NetworkConfigRequest;
 pub use gateway_network_economics::NetworkEconimicsRequest;
 pub use gateway_network_status::NetworkStatusRequest;
@@ -50,6 +54,13 @@ const SEND_MULTIPLE_TRANSACTIONS_ENDPOINT: &str = "transaction/send-multiple";
 const GET_TRANSACTION_INFO_ENDPOINT: &str = "transaction/";
 const WITH_RESULTS_QUERY_PARAM: &str = "?withResults=true";
 const VM_VALUES_ENDPOINT: &str = "vm-values/query";
+
+const SEND_USER_FUNDS_ENDPOINT: &str = "transaction/send-user-funds";
+const GENERATE_BLOCKS_ENDPOINT: &str = "simulator/generate-blocks";
+const GENERATE_BLOCKS_UNTIL_TX_PROCESSED_ENDPOINT: &str =
+    "simulator/generate-blocks-until-transaction-processed";
+const GENERATE_BLOCKS_UNTIL_EPOCH_REACHED_ENDPOINT: &str =
+    "simulator/generate-blocks-until-epoch-reached";
 
 pub enum GatewayRequestType {
     Get,
