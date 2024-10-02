@@ -1,9 +1,9 @@
-use multiversx_sdk_http::{GatewayHttpProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY};
+use multiversx_sdk_http::{GatewayHttpProxy, DEVNET_GATEWAY};
 
 #[tokio::main]
 async fn main() {
     let tx_hash = "fd21782ddb9e2217a3239e849e39d1d2c8fa74142a73f2dda3adb3028c0514e9";
-    let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string(), DEFAULT_USE_CHAIN_SIMULATOR);
+    let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
 
     let status = blockchain.get_transaction_status(tx_hash).await;
     println!("tx status: {status:?}");

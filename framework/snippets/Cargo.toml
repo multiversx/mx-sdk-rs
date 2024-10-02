@@ -20,6 +20,7 @@ base64 = "0.22"
 log = "0.4.17"
 env_logger = "0.11"
 futures = "0.3"
+anyhow = "1.0.44"
 
 [dependencies.multiversx-sc-scenario]
 version = "=0.53.1"
@@ -28,6 +29,10 @@ path = "../scenario"
 [dependencies.multiversx-chain-scenario-format]
 version = "0.23.0"
 path = "../../sdk/scenario-format"
+
+[dependencies.multiversx-sdk]
+version = "=0.6.1"
+path = "../../sdk/core"
 
 [dependencies.multiversx-sdk-http]
 version = "=0.6.1"
