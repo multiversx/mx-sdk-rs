@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+ chain-simulator:
+  image: multiversx/chainsimulator:v1.7.13-patch2
+  ports:
+    - 8085:8085
+  volumes:
+    - "../scripts:/docker/scripts"
+  entrypoint: "./chainsimulator -log-level *:INFO"
