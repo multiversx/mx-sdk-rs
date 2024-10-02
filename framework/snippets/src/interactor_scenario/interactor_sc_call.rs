@@ -5,6 +5,7 @@ use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
+use multiversx_sdk::retrieve_tx_on_network;
 use multiversx_sdk_http::core::{data::transaction::Transaction, utils::base64_encode};
 
 impl Interactor {
@@ -17,7 +18,7 @@ impl Interactor {
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let tx = self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
+        let tx = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
 
         sc_call_step.save_response(network_response::parse_tx_response(tx));
 

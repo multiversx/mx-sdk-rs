@@ -93,4 +93,6 @@ pub trait GatewayAsyncService: Send {
     ) -> impl std::future::Future<Output = anyhow::Result<G::Result>> + Send
     where
         G: GatewayRequest;
+
+    fn sleep(&self, millis: u64) -> impl std::future::Future<Output = ()> + Send;
 }

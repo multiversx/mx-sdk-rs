@@ -1,6 +1,7 @@
 use crate::Interactor;
 use log::info;
 use multiversx_sc_scenario::{scenario::ScenarioRunner, scenario_model::TransferStep};
+use multiversx_sdk::retrieve_tx_on_network;
 
 impl Interactor {
     pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
@@ -18,7 +19,7 @@ impl Interactor {
         println!("transfer tx hash: {tx_hash}");
         info!("transfer tx hash: {}", tx_hash);
 
-        self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
+        retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
 
         self.post_runners.run_transfer_step(&transfer_step);
 

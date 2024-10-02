@@ -3,7 +3,8 @@ mod http_block;
 mod http_chain_simulator;
 mod http_network;
 mod http_tx;
-mod http_tx_retrieve;
+
+use std::time::Duration;
 
 use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest};
 
@@ -62,5 +63,9 @@ impl GatewayAsyncService for GatewayHttpProxy {
         G: multiversx_sdk::gateway::GatewayRequest,
     {
         self.http_request(request)
+    }
+
+    fn sleep(&self, millis: u64) -> impl std::future::Future<Output = ()> + Send {
+        tokio::time::sleep(Duration::from_millis(millis))
     }
 }

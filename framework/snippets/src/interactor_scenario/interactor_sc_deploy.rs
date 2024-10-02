@@ -5,6 +5,7 @@ use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
 };
+use multiversx_sdk::retrieve_tx_on_network;
 use multiversx_sdk_http::core::{data::transaction::Transaction, utils::base64_encode};
 
 impl Interactor {
@@ -51,7 +52,7 @@ impl Interactor {
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let tx = self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
+        let tx = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
 
         let addr = sc_deploy_step.tx.from.clone();
         let nonce = tx.nonce;
