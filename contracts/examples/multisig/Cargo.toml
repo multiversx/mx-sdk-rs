@@ -9,15 +9,15 @@ publish = false
 path = "src/multisig.rs"
 
 [dependencies.multiversx-sc]
-version = "0.53.0"
+version = "0.53.1"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.53.0"
+version = "0.53.1"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.53.0"
+version = "0.53.1"
 path = "../../../framework/scenario"
 
 [dev-dependencies.adder]
@@ -27,7 +27,7 @@ path = "../adder"
 path = "../factorial"
 
 [dev-dependencies.multiversx-wegld-swap-sc]
-version = "0.53.0"
+version = "0.53.1"
 path = "../../core/wegld-swap"
 
 [dev-dependencies]
