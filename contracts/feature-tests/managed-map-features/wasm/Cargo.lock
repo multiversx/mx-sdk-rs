@@ -55,7 +55,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.53.1"
+version = "0.53.2"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -86,7 +86,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.53.1"
+version = "0.53.2"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -97,7 +97,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.53.1"
+version = "0.53.2"
 dependencies = [
  "multiversx-sc",
 ]
