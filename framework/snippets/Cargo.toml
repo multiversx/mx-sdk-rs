@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.53.0"
+version = "0.53.1"
 edition = "2021"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -22,7 +22,7 @@ env_logger = "0.11"
 futures = "0.3"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.53.0"
+version = "=0.53.1"
 path = "../scenario"
 
 [dependencies.multiversx-chain-scenario-format]
@@ -30,7 +30,7 @@ version = "0.23.0"
 path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-sdk-reqwest]
-version = "=0.6.0"
+version = "=0.6.1"
 path = "../../sdk/reqwest"
 
 [dev-dependencies]
