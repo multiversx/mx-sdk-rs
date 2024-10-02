@@ -1,4 +1,4 @@
-use crate::data::{account_storage::AccountStorageResponse, address::Address};
+use crate::data::{account_storage::AccountStorageResponse, sdk_address::SdkAddress};
 use anyhow::anyhow;
 use std::collections::HashMap;
 
@@ -6,11 +6,11 @@ use super::{GatewayRequest, GatewayRequestType, ACCOUNT_ENDPOINT, KEYS_ENDPOINT}
 
 /// Retrieves an account storage from the network.
 pub struct GetAccountStorageRequest<'a> {
-    pub address: &'a Address,
+    pub address: &'a SdkAddress,
 }
 
 impl<'a> GetAccountStorageRequest<'a> {
-    pub fn new(address: &'a Address) -> Self {
+    pub fn new(address: &'a SdkAddress) -> Self {
         Self { address }
     }
 }

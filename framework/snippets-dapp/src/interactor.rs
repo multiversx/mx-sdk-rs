@@ -6,7 +6,7 @@ use multiversx_sc_scenario::{
     scenario_model::AddressValue,
 };
 use multiversx_sdk_wbg::{
-    data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
+    data::{network_config::NetworkConfig, sdk_address::SdkAddress as ErdrsAddress},
     gateway::GatewayProxy,
     wallet::Wallet,
 };

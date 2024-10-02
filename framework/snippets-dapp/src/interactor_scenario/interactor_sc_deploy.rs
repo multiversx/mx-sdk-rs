@@ -6,7 +6,7 @@ use multiversx_sc_scenario::{
     scenario_model::{ScDeployStep, SetStateStep},
 };
 use multiversx_sdk_wbg::{
-    data::{address::Address as ErdrsAddress, transaction::Transaction},
+    data::{sdk_address::SdkAddress as ErdrsAddress, transaction::Transaction},
     utils::base64_encode,
 };
 

@@ -1,4 +1,4 @@
-use crate::data::{address::Address, esdt::EsdtRolesResponse};
+use crate::data::{esdt::EsdtRolesResponse, sdk_address::SdkAddress};
 use anyhow::anyhow;
 use std::collections::HashMap;
 
@@ -8,11 +8,11 @@ const ACCOUNT_ENDPOINT: &str = "address/";
 
 /// Retrieves an all esdt roles of an account from the network.
 pub struct GetAccountEsdtRolesRequest<'a> {
-    pub address: &'a Address,
+    pub address: &'a SdkAddress,
 }
 
 impl<'a> GetAccountEsdtRolesRequest<'a> {
-    pub fn new(address: &'a Address) -> Self {
+    pub fn new(address: &'a SdkAddress) -> Self {
         Self { address }
     }
 }

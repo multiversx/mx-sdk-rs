@@ -1,6 +1,6 @@
 use crate::data::{
     account::{Account, AccountResponse},
-    address::Address,
+    sdk_address::SdkAddress,
 };
 use anyhow::anyhow;
 
@@ -9,11 +9,11 @@ use super::{GatewayRequest, GatewayRequestType};
 
 /// Retrieves an account info from the network (nonce, balance).
 pub struct GetAccountRequest<'a> {
-    pub address: &'a Address,
+    pub address: &'a SdkAddress,
 }
 
 impl<'a> GetAccountRequest<'a> {
-    pub fn new(address: &'a Address) -> Self {
+    pub fn new(address: &'a SdkAddress) -> Self {
         Self { address }
     }
 }

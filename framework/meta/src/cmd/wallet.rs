@@ -3,7 +3,7 @@ use core::str;
 use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
 use multiversx_sc::types::{self};
 use multiversx_sc_snippets::sdk::{
-    crypto::public_key::PublicKey, data::address::Address, wallet::Wallet,
+    crypto::public_key::PublicKey, data::sdk_address::SdkAddress, wallet::Wallet,
 };
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
 use std::{
@@ -137,7 +137,7 @@ fn bech32_conversion(bech32_args: &WalletBech32Args) {
     }
 }
 
-fn get_wallet_address(private_key: &str) -> Address {
+fn get_wallet_address(private_key: &str) -> SdkAddress {
     let wallet = Wallet::from_private_key(private_key).unwrap();
     wallet.address()
 }

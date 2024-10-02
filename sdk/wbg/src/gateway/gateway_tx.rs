@@ -2,8 +2,8 @@ use anyhow::{anyhow, Result};
 use gloo_net::http::Request;
 use itertools::Itertools;
 use multiversx_sdk::data::{
-    address::Address,
     network_config::NetworkConfig,
+    sdk_address::SdkAddress,
     transaction::{
         ArgCreateTransaction, ResponseTxCost, SendTransactionResponse, SendTransactionsResponse,
         Transaction, TransactionInfo, TransactionOnNetwork, TransactionProcessStatus,
@@ -112,7 +112,7 @@ impl GatewayProxy {
     // get_default_transaction_arguments will prepare the transaction creation argument by querying the account's info
     pub async fn get_default_transaction_arguments(
         &self,
-        address: &Address,
+        address: &SdkAddress,
         network_configs: &NetworkConfig,
     ) -> Result<ArgCreateTransaction> {
         let account = self.get_account(address).await?;

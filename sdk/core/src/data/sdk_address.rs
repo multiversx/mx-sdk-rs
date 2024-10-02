@@ -9,9 +9,9 @@ use serde::{
 };
 
 #[derive(Clone)]
-pub struct Address([u8; 32]);
+pub struct SdkAddress([u8; 32]);
 
-impl Address {
+impl SdkAddress {
     pub fn from_bytes(bytes: [u8; 32]) -> Self {
         Self(bytes)
     }
@@ -40,48 +40,48 @@ impl Address {
     }
 }
 
-impl From<multiversx_chain_core::types::Address> for Address {
+impl From<multiversx_chain_core::types::Address> for SdkAddress {
     fn from(value: multiversx_chain_core::types::Address) -> Self {
-        Address(*value.as_array())
+        SdkAddress(*value.as_array())
     }
 }
 
-impl From<Address> for multiversx_chain_core::types::Address {
-    fn from(value: Address) -> Self {
+impl From<SdkAddress> for multiversx_chain_core::types::Address {
+    fn from(value: SdkAddress) -> Self {
         multiversx_chain_core::types::Address::new(value.0)
     }
 }
 
-impl<'a> From<&'a PublicKey> for Address {
-    fn from(public_key: &PublicKey) -> Address {
+impl<'a> From<&'a PublicKey> for SdkAddress {
+    fn from(public_key: &PublicKey) -> SdkAddress {
         let bytes = public_key.to_bytes();
 
         let mut bits: [u8; 32] = [0u8; 32];
         bits.copy_from_slice(&bytes);
 
-        Address(bits)
+        SdkAddress(bits)
     }
 }
 
-impl Display for Address {
+impl Display for SdkAddress {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.to_bech32_string().unwrap().as_str())
     }
 }
 
-impl Debug for Address {
+impl Debug for SdkAddress {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.to_bech32_string().unwrap().as_str())
     }
 }
 
-impl Default for Address {
+impl Default for SdkAddress {
     fn default() -> Self {
-        Address::from_bytes([0u8; 32])
+        SdkAddress::from_bytes([0u8; 32])
     }
 }
 
-impl Serialize for Address {
+impl Serialize for SdkAddress {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -90,7 +90,7 @@ impl Serialize for Address {
     }
 }
 
-impl<'de> Deserialize<'de> for Address {
+impl<'de> Deserialize<'de> for SdkAddress {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -106,7 +106,7 @@ pub mod tests {
 
     #[test]
     fn test_decode_address() {
-        let addr = Address::from_bech32_string(
+        let addr = SdkAddress::from_bech32_string(
             "erd1qqqqqqqqqqqqqpgqyfjjn43spw7teklwtpz4x5waygq2mluyj9ts0mdwn6",
         )
         .unwrap();
