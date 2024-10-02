@@ -11,8 +11,5 @@ jobs:
     name: Slow
     runs-on: ubuntu-latest
     steps:
-      - name: Clean workspace
-        run: cargo clean
-
       - name: Slow tests
         run: make slow-tests
