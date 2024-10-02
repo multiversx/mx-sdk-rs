@@ -80,8 +80,11 @@
                             "7-unawarded_amount": "biguint:100"
                         },
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "1",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1"
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|u64:1": "1",
+                        "str:addressToIdMapper|str:lastId": "1",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1"
                     },
                     "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }

@@ -344,6 +344,7 @@ pub trait Lottery {
         // swap indexes of the winner addresses - we are basically bringing the winners in the first indexes of the mapper
         let winner_address = self.ticket_holders(lottery_name).get(rand_index);
         let last_index_winner_address = self.ticket_holders(lottery_name).get(*index_last_winner);
+
         self.ticket_holders(lottery_name)
             .set(rand_index, &last_index_winner_address);
         self.ticket_holders(lottery_name)
