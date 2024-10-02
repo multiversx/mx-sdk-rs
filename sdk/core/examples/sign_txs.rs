@@ -1,6 +1,6 @@
 use multiversx_sdk::{
     data::transaction::Transaction,
-    gateway::{GatewayProxy, DEVNET_GATEWAY},
+    gateway::{GatewayProxy, DEFAULT_USE_CHAIN_SIMULATOR, DEVNET_GATEWAY},
     wallet::Wallet,
 };
 
@@ -11,7 +11,7 @@ async fn main() {
     )
     .unwrap();
     let addr = wl.address();
-    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = GatewayProxy::new(DEVNET_GATEWAY.to_string(), DEFAULT_USE_CHAIN_SIMULATOR);
     let network_config = blockchain.get_network_config().await.unwrap();
 
     let arg = blockchain

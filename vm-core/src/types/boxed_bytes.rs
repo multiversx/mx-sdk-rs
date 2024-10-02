@@ -5,14 +5,14 @@ use alloc::{
     vec::Vec,
 };
 
-use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
-    codec::*,
-};
+use crate::codec::*;
 
 /// Simple wrapper around a boxed byte slice,
 /// but with a lot of optimized methods for manipulating it.
 /// The focus is on reducing code size rather improving speed.
+///
+/// Used to be used extensively in smart contracts, before the introduction of ManagedBuffer,
+/// but was superseded by it.
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct BoxedBytes(Box<[u8]>);
 
@@ -221,20 +221,6 @@ impl TopDecode for BoxedBytes {
         H: DecodeErrorHandler,
     {
         Ok(BoxedBytes(input.into_boxed_slice_u8()))
-    }
-}
-
-impl TypeAbiFrom<Self> for BoxedBytes {}
-
-impl TypeAbi for BoxedBytes {
-    type Unmanaged = Self;
-
-    fn type_name() -> TypeName {
-        "bytes".into()
-    }
-
-    fn type_name_rust() -> TypeName {
-        "BoxedBytes".into()
     }
 }
 

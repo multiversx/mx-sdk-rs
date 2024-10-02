@@ -19,7 +19,7 @@ async fn main() {
     env_logger::init();
 
     let mut multisig_interact = MultisigInteract::init().await;
-    multisig_interact.register_wallets();
+    multisig_interact.register_wallets().await;
 
     let cli = multisig_interact_cli::InteractCli::parse();
     match &cli.command {
@@ -86,11 +86,11 @@ struct MultisigInteract {
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(&config.gateway)
+        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
         let multisig_code = BytesValue::interpret_from(
             "mxsc:../output/multisig.mxsc.json",
             &InterpreterContext::default(),
@@ -106,13 +106,13 @@ impl MultisigInteract {
         }
     }
 
-    fn register_wallets(&mut self) {
+    async fn register_wallets(&mut self) {
         let carol = test_wallets::carol();
         let dan = test_wallets::dan();
         let eve = test_wallets::eve();
 
         for wallet in &[carol, dan, eve] {
-            self.interactor.register_wallet(*wallet);
+            self.interactor.register_wallet(*wallet).await;
         }
     }
 

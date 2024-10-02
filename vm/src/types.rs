@@ -1,20 +1,14 @@
-mod vm_address;
-mod vm_code_metadata;
-mod vm_esdt_local_role;
-mod vm_esdt_local_role_flags;
-mod vm_h256;
-mod vm_token_type;
+pub use crate::chain_core::types::Address as VMAddress;
+pub use crate::chain_core::types::CodeMetadata as VMCodeMetadata;
+pub use crate::chain_core::types::EsdtLocalRole;
+pub use crate::chain_core::types::EsdtLocalRoleFlags;
+pub use crate::chain_core::types::TokenType as VMTokenType;
+pub use crate::chain_core::types::H256;
+
+pub type RawHandle = i32;
 
 use num_bigint::BigUint;
 use num_traits::Zero;
-pub use vm_address::VMAddress;
-pub use vm_code_metadata::VMCodeMetadata;
-pub use vm_esdt_local_role::EsdtLocalRole;
-pub use vm_esdt_local_role_flags::EsdtLocalRoleFlags;
-pub use vm_h256::H256;
-pub use vm_token_type::VMTokenType;
-
-pub type RawHandle = i32;
 
 pub(crate) fn top_encode_u64(value: u64) -> Vec<u8> {
     top_encode_big_uint(&BigUint::from(value))
