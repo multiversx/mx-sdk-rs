@@ -3,13 +3,13 @@ use reqwest::Client;
 
 /// Allows communication with the MultiversX gateway API.
 #[derive(Clone, Debug)]
-pub struct GatewayProxy {
+pub struct GatewayHttpProxy {
     pub(crate) proxy_uri: String,
     pub(crate) client: Client,
     pub chain_simulator: bool,
 }
 
-impl GatewayProxy {
+impl GatewayHttpProxy {
     pub fn new(proxy_uri: String, chain_simulator: bool) -> Self {
         Self {
             proxy_uri,
@@ -24,9 +24,7 @@ impl GatewayProxy {
 
     /// Performs a request to the gateway.
     /// Can be either GET or POST, depending on the argument.
-    ///
-    ///
-    pub async fn request<G>(&self, request: G) -> anyhow::Result<G::Result>
+    pub async fn http_request<G>(&self, request: G) -> anyhow::Result<G::Result>
     where
         G: GatewayRequest,
     {
@@ -54,3 +52,4 @@ impl GatewayProxy {
         request.process_json(decoded)
     }
 }
+
