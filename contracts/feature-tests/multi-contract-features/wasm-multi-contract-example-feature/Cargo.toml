@@ -29,7 +29,7 @@ path = ".."
 features = ["example_feature"]
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.53.1"
+version = "0.53.2"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]
