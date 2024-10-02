@@ -20,8 +20,5 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Get dependencies
-        run: |
-          go mod tidy
       - name: Slow tests
         run: make slow-tests
