@@ -24,10 +24,6 @@ impl GatewayHttpProxy {
         }
     }
 
-    pub(crate) fn get_endpoint(&self, endpoint: &str) -> String {
-        format!("{}/{}", self.proxy_uri, endpoint)
-    }
-
     /// Performs a request to the gateway.
     /// Can be either GET or POST, depending on the argument.
     pub async fn http_request<G>(&self, request: G) -> anyhow::Result<G::Result>
