@@ -1,12 +1,8 @@
-mod gateway_account;
-mod gateway_block;
-mod gateway_chain_simulator;
-mod gateway_network;
-mod gateway_proxy;
-mod gateway_tx;
-mod gateway_tx_retrieve;
+mod gateway_http_proxy;
 
-pub use gateway_proxy::GatewayProxy;
+pub use gateway_http_proxy::GatewayHttpProxy;
+
+pub use multiversx_sdk as core;
 
 pub const MAINNET_GATEWAY: &str = "https://gateway.multiversx.com";
 pub const TESTNET_GATEWAY: &str = "https://testnet-gateway.multiversx.com";

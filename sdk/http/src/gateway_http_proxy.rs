@@ -1,19 +1,25 @@
-use multiversx_sdk::gateway::GatewayRequest;
-use reqwest::Client;
+mod http_account;
+mod http_block;
+mod http_chain_simulator;
+mod http_network;
+mod http_tx;
+mod http_tx_retrieve;
+
+use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest};
 
 /// Allows communication with the MultiversX gateway API.
 #[derive(Clone, Debug)]
-pub struct GatewayProxy {
+pub struct GatewayHttpProxy {
     pub(crate) proxy_uri: String,
-    pub(crate) client: Client,
+    pub(crate) client: reqwest::Client,
     pub chain_simulator: bool,
 }
 
-impl GatewayProxy {
+impl GatewayHttpProxy {
     pub fn new(proxy_uri: String, chain_simulator: bool) -> Self {
         Self {
             proxy_uri,
-            client: Client::new(),
+            client: reqwest::Client::new(),
             chain_simulator,
         }
     }
@@ -24,9 +30,7 @@ impl GatewayProxy {
 
     /// Performs a request to the gateway.
     /// Can be either GET or POST, depending on the argument.
-    ///
-    ///
-    pub async fn request<G>(&self, request: G) -> anyhow::Result<G::Result>
+    pub async fn http_request<G>(&self, request: G) -> anyhow::Result<G::Result>
     where
         G: GatewayRequest,
     {
@@ -52,5 +56,17 @@ impl GatewayProxy {
             .await?;
 
         request.process_json(decoded)
+    }
+}
+
+impl GatewayAsyncService for GatewayHttpProxy {
+    fn request<G>(
+        &self,
+        request: G,
+    ) -> impl std::future::Future<Output = anyhow::Result<G::Result>> + Send
+    where
+        G: multiversx_sdk::gateway::GatewayRequest,
+    {
+        self.http_request(request)
     }
 }

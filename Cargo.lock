@@ -2425,7 +2425,7 @@ dependencies = [
  "log",
  "multiversx-chain-scenario-format",
  "multiversx-sc-scenario",
- "multiversx-sdk-reqwest",
+ "multiversx-sdk-http",
  "serde_json",
  "tokio",
 ]
@@ -2484,7 +2484,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "multiversx-sdk-reqwest"
+name = "multiversx-sdk-http"
 version = "0.6.1"
 dependencies = [
  "anyhow",

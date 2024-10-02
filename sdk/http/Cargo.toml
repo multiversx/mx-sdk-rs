@@ -1,5 +1,5 @@
 [package]
-name = "multiversx-sdk-reqwest"
+name = "multiversx-sdk-http"
 version = "0.6.1"
 edition = "2021"
 

@@ -14,17 +14,17 @@ use multiversx_sdk::{
     },
 };
 
-use super::GatewayProxy;
+use super::GatewayHttpProxy;
 
-impl GatewayProxy {
+impl GatewayHttpProxy {
     // request_transaction_cost retrieves how many gas a transaction will consume
     pub async fn request_transaction_cost(&self, tx: &Transaction) -> Result<TxCostResponseData> {
-        self.request(GetTxCost(tx)).await
+        self.http_request(GetTxCost(tx)).await
     }
 
     // get_transaction_info retrieves a transaction's details from the network
     pub async fn get_transaction_info(&self, hash: &str) -> Result<TransactionOnNetwork> {
-        self.request(GetTxInfo::new(hash)).await
+        self.http_request(GetTxInfo::new(hash)).await
     }
 
     // get_transaction_info_with_results retrieves a transaction's details from the network with events
@@ -32,17 +32,17 @@ impl GatewayProxy {
         &self,
         hash: &str,
     ) -> Result<TransactionOnNetwork> {
-        self.request(GetTxInfo::new(hash).with_results()).await
+        self.http_request(GetTxInfo::new(hash).with_results()).await
     }
 
     // get_transaction_status retrieves a transaction's status from the network
     pub async fn get_transaction_status(&self, hash: &str) -> Result<String> {
-        self.request(GetTxStatus::new(hash)).await
+        self.http_request(GetTxStatus::new(hash)).await
     }
 
     // get_transaction_process_status retrieves a transaction's status from the network using process-status API
     pub async fn get_transaction_process_status(&self, hash: &str) -> Result<(String, String)> {
-        self.request(GetTxProcessStatus::new(hash)).await
+        self.http_request(GetTxProcessStatus::new(hash)).await
     }
 
     // get_default_transaction_arguments will prepare the transaction creation argument by querying the account's info
@@ -70,16 +70,16 @@ impl GatewayProxy {
     }
 
     pub async fn send_transaction(&self, tx: &Transaction) -> Result<String> {
-        self.request(SendTxRequest(tx)).await
+        self.http_request(SendTxRequest(tx)).await
     }
 
     #[allow(clippy::ptr_arg)]
     pub async fn send_transactions(&self, txs: &Vec<Transaction>) -> Result<Vec<String>> {
-        self.request(SendMultiTxRequest(txs)).await
+        self.http_request(SendMultiTxRequest(txs)).await
     }
 
     // execute_vmquery retrieves data from existing SC trie through the use of a VM
     pub async fn execute_vmquery(&self, vm_request: &VMQueryInput) -> Result<VmValuesResponseData> {
-        self.request(VMQueryRequest(vm_request)).await
+        self.http_request(VMQueryRequest(vm_request)).await
     }
 }

@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
-use multiversx_sdk_reqwest::gateway::GatewayProxy;
+use multiversx_sdk_http::GatewayHttpProxy;
 use std::collections::{BTreeMap, HashMap};
 
 /// Called directly from CLI, from `sc-meta`.
@@ -16,7 +16,7 @@ pub async fn print_account_as_scenario_set_state(
     use_chain_simulator: bool,
     address_bech32_string: String,
 ) {
-    let api = GatewayProxy::new(api_string, use_chain_simulator);
+    let api = GatewayHttpProxy::new(api_string, use_chain_simulator);
     let address = Bech32Address::from_bech32_string(address_bech32_string);
     let set_state = retrieve_account_as_scenario_set_state(&api, &address).await;
     let scenario = build_scenario(set_state);
@@ -33,7 +33,7 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
 }
 
 pub async fn retrieve_account_as_scenario_set_state(
-    api: &GatewayProxy,
+    api: &GatewayHttpProxy,
     address: &Bech32Address,
 ) -> SetStateStep {
     let sdk_address = Address::from_bech32_string(address.to_bech32_str()).unwrap();

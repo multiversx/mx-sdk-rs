@@ -4,8 +4,7 @@ use multiversx_sc_scenario::{
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
 };
-// use multiversx_sdk_reqwest::core::{data::network_config::NetworkConfig, wallet::Wallet};
-use multiversx_sdk_reqwest::gateway::GatewayProxy;
+use multiversx_sdk_http::GatewayHttpProxy;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
@@ -17,7 +16,7 @@ use crate::{account_tool::retrieve_account_as_scenario_set_state, Sender};
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 pub struct Interactor {
-    pub proxy: GatewayProxy,
+    pub proxy: GatewayHttpProxy,
     pub network_config: NetworkConfig,
     pub sender_map: HashMap<Address, Sender>,
 
@@ -30,7 +29,7 @@ pub struct Interactor {
 
 impl Interactor {
     pub async fn new(gateway_uri: &str, use_chain_simulator: bool) -> Self {
-        let proxy = GatewayProxy::new(gateway_uri.to_string(), use_chain_simulator);
+        let proxy = GatewayHttpProxy::new(gateway_uri.to_string(), use_chain_simulator);
         let network_config = proxy.get_network_config().await.unwrap();
         Self {
             proxy,

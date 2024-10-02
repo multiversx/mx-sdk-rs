@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::GatewayProxy;
+use super::GatewayHttpProxy;
 use anyhow::{anyhow, Error};
 use serde::{Deserialize, Serialize};
 
@@ -18,7 +18,7 @@ pub struct GenerateBlocksResponse {
     pub code: String,
 }
 
-impl GatewayProxy {
+impl GatewayHttpProxy {
     pub async fn send_user_funds(&self, receiver: &String) -> Result<String, Error> {
         if !self.chain_simulator {
             return Ok(String::from("no-simulator"));

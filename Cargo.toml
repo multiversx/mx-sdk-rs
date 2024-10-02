@@ -15,7 +15,7 @@ members = [
   "framework/wasm-adapter",
 
   "sdk/core",
-  "sdk/reqwest",
+  "sdk/http",
   "sdk/wbg",
   "sdk/scenario-format",
 

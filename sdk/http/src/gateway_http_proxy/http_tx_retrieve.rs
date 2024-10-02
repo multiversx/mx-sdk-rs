@@ -2,13 +2,13 @@ use log::info;
 use multiversx_sdk::data::transaction::TransactionOnNetwork;
 use std::time::{Duration, Instant};
 
-use super::GatewayProxy;
+use super::GatewayHttpProxy;
 
 const INITIAL_BACKOFF_DELAY: f32 = 1.4;
 const MAX_RETRIES: usize = 8;
 const MAX_BACKOFF_DELAY: Duration = Duration::from_secs(6);
 
-impl GatewayProxy {
+impl GatewayHttpProxy {
     /// Retrieves a transaction from the network.
     pub async fn retrieve_tx_on_network(&self, tx_hash: String) -> TransactionOnNetwork {
         let mut retries = 0;

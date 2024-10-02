@@ -8,12 +8,12 @@ use multiversx_sdk::{
 };
 use std::collections::HashMap;
 
-use super::GatewayProxy;
+use super::GatewayHttpProxy;
 
-impl GatewayProxy {
+impl GatewayHttpProxy {
     // get_account retrieves an account info from the network (nonce, balance)
     pub async fn get_account(&self, address: &Address) -> Result<Account> {
-        self.request(GetAccountRequest::new(address)).await
+        self.http_request(GetAccountRequest::new(address)).await
     }
 
     // get_account_esdt_roles retrieves an all esdt roles of an account from the network
@@ -21,7 +21,8 @@ impl GatewayProxy {
         &self,
         address: &Address,
     ) -> Result<HashMap<String, Vec<String>>> {
-        self.request(GetAccountEsdtRolesRequest::new(address)).await
+        self.http_request(GetAccountEsdtRolesRequest::new(address))
+            .await
     }
 
     // get_account_esdt_tokens retrieves an all esdt token of an account from the network
@@ -29,7 +30,7 @@ impl GatewayProxy {
         &self,
         address: &Address,
     ) -> Result<HashMap<String, EsdtBalance>> {
-        self.request(GetAccountEsdtTokensRequest::new(address))
+        self.http_request(GetAccountEsdtTokensRequest::new(address))
             .await
     }
 
@@ -38,6 +39,7 @@ impl GatewayProxy {
         &self,
         address: &Address,
     ) -> Result<HashMap<String, String>> {
-        self.request(GetAccountStorageRequest::new(address)).await
+        self.http_request(GetAccountStorageRequest::new(address))
+            .await
     }
 }

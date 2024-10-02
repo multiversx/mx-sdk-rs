@@ -4,16 +4,16 @@ use multiversx_sdk::{
     gateway::{NetworkConfigRequest, NetworkEconimicsRequest},
 };
 
-use super::GatewayProxy;
+use super::GatewayHttpProxy;
 
-impl GatewayProxy {
+impl GatewayHttpProxy {
     // get_network_config retrieves the network configuration from the proxy
     pub async fn get_network_config(&self) -> Result<NetworkConfig> {
-        self.request(NetworkConfigRequest).await
+        self.http_request(NetworkConfigRequest).await
     }
 
     // get_network_economics retrieves the network economics from the proxy
     pub async fn get_network_economics(&self) -> Result<NetworkEconomics> {
-        self.request(NetworkEconimicsRequest).await
+        self.http_request(NetworkEconimicsRequest).await
     }
 }
