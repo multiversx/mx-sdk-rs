@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                           10
+// Endpoints:                           11
 // Async Callback (empty):               1
-// Total number of exported functions:  13
+// Total number of exported functions:  14
 
 #![no_std]
 
@@ -24,6 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         pong => pong
         pongAll => pong_all
         getUserAddresses => get_user_addresses
+        getContractState => get_contract_state
         getPingAmount => ping_amount
         getDeadline => deadline
         getActivationTimestamp => activation_timestamp
