@@ -8,8 +8,9 @@ use multiversx_sc_scenario::{
     scenario_model::TxResponse,
     ScenarioTxEnvData,
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::Interactor;
+use crate::InteractorBase;
 
 use super::{InteractorEnvQuery, InteractorPrepareAsync, InteractorQueryStep};
 
@@ -45,7 +46,10 @@ where
     }
 }
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub async fn chain_query<To, Payment, RH, F>(&mut self, f: F) -> &mut Self
     where
         To: TxToSpecified<ScenarioTxEnvData>,

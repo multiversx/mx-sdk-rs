@@ -1,14 +1,17 @@
 use crate::sdk::data::transaction::{Transaction, TransactionOnNetwork};
-use crate::{multiversx_sc::types::Address, Interactor, Sender};
+use crate::{multiversx_sc::types::Address, InteractorBase, Sender};
 use futures::future::join_all;
-use multiversx_sdk::gateway::SendTxRequest;
+use multiversx_sdk::gateway::{GatewayAsyncService, SendTxRequest};
 use multiversx_sdk::retrieve_tx_on_network;
 use std::collections::HashSet;
 
 pub(crate) type Txs = Vec<Transaction>;
 pub(crate) type SenderSet = HashSet<Address>;
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub(crate) async fn recall_senders_nonce(&mut self, senders: HashSet<Address>) {
         for sender_address in &senders {
             let nonce = self.recall_nonce(sender_address).await;
@@ -28,7 +31,7 @@ impl Interactor {
         for tx in &txs {
             let tx_hash = self
                 .proxy
-                .http_request(SendTxRequest(tx))
+                .request(SendTxRequest(tx))
                 .await
                 .expect("failed to send transaction");
 

@@ -4,6 +4,7 @@ use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
 use multiversx_sdk::gateway::{
     GetAccountEsdtRolesRequest, GetAccountEsdtTokensRequest, GetAccountRequest,
     GetAccountStorageRequest,
@@ -37,14 +38,14 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
     }
 }
 
-pub async fn retrieve_account_as_scenario_set_state(
-    api: &GatewayHttpProxy,
+pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncService>(
+    api: &GatewayProxy,
     use_chain_simulator: bool,
     address: &Bech32Address,
 ) -> SetStateStep {
     let sdk_address = SdkAddress::from_bech32_string(address.to_bech32_str()).unwrap();
     let sdk_account = api
-        .http_request(GetAccountRequest::new(&sdk_address))
+        .request(GetAccountRequest::new(&sdk_address))
         .await
         .unwrap();
 
@@ -52,19 +53,19 @@ pub async fn retrieve_account_as_scenario_set_state(
         (HashMap::new(), HashMap::new(), HashMap::new())
     } else {
         let account_esdt = api
-            .http_request(GetAccountEsdtTokensRequest::new(&sdk_address))
+            .request(GetAccountEsdtTokensRequest::new(&sdk_address))
             .await
             .unwrap_or_else(|err| {
                 panic!("failed to retrieve ESDT tokens for address {address}: {err}")
             });
         let account_esdt_roles = api
-            .http_request(GetAccountEsdtRolesRequest::new(&sdk_address))
+            .request(GetAccountEsdtRolesRequest::new(&sdk_address))
             .await
             .unwrap_or_else(|err| {
                 panic!("failed to retrieve ESDT roles for address {address}: {err}")
             });
         let account_storage = api
-            .http_request(GetAccountStorageRequest::new(&sdk_address))
+            .request(GetAccountStorageRequest::new(&sdk_address))
             .await
             .unwrap_or_else(|err| {
                 panic!("failed to retrieve storage for address {address}: {err}")

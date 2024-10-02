@@ -1,9 +1,15 @@
-use crate::Interactor;
+use crate::InteractorBase;
 use log::info;
 use multiversx_sc_scenario::{scenario::ScenarioRunner, scenario_model::TransferStep};
-use multiversx_sdk::retrieve_tx_on_network;
+use multiversx_sdk::{
+    gateway::{GatewayAsyncService, SendTxRequest},
+    retrieve_tx_on_network,
+};
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
         self.pre_runners.run_transfer_step(&transfer_step);
 
@@ -11,7 +17,11 @@ impl Interactor {
         let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
-        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
+        let tx_hash = self
+            .proxy
+            .request(SendTxRequest(&transaction))
+            .await
+            .unwrap();
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();

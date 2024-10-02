@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-use crate::Interactor;
+use crate::InteractorBase;
 use multiversx_sc_scenario::{
     api::StaticApi,
     multiversx_sc::{
@@ -13,8 +13,12 @@ use multiversx_sc_scenario::{
         TypedScDeploy, TypedScQuery,
     },
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     #[deprecated(
         since = "0.49.0",
         note = "Please use the unified transaction syntax instead."

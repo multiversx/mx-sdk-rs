@@ -1,14 +1,20 @@
-use crate::{network_response, Interactor};
+use crate::{network_response, InteractorBase};
 use log::info;
 use multiversx_sc_scenario::{
     imports::{Address, Bech32Address},
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
 };
-use multiversx_sdk::retrieve_tx_on_network;
+use multiversx_sdk::{
+    gateway::{GatewayAsyncService, SendTxRequest},
+    retrieve_tx_on_network,
+};
 use multiversx_sdk_http::core::{data::transaction::Transaction, utils::base64_encode};
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub(crate) fn sc_deploy_to_blockchain_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
         Transaction {
             nonce: 0,
@@ -34,7 +40,7 @@ impl Interactor {
             .await;
         let tx_hash = self
             .proxy
-            .send_transaction(&transaction)
+            .request(SendTxRequest(&transaction))
             .await
             .expect("error sending tx (possible API failure)");
         println!("sc deploy tx hash: {tx_hash}");
