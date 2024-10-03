@@ -3,7 +3,6 @@ use crate::{
     gateway::{GetTxInfo, GetTxProcessStatus},
 };
 use log::info;
-use std::time::Instant;
 
 use crate::gateway::GatewayAsyncService;
 
@@ -18,7 +17,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
 ) -> TransactionOnNetwork {
     let mut retries = 0;
     let mut backoff_delay = INITIAL_BACKOFF_DELAY;
-    let start_time = Instant::now();
+    let start_time = proxy.now();
 
     loop {
         match proxy.request(GetTxProcessStatus::new(&tx_hash)).await {
@@ -30,7 +29,6 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         let transaction_info_with_results = proxy
                             .request(GetTxInfo::new(&tx_hash).with_results())
                             .await
-                            // .get_transaction_info_with_results(&tx_hash)
                             .unwrap();
 
                         info!(
@@ -74,17 +72,15 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
 
                 let backoff_time = backoff_delay.min(MAX_BACKOFF_DELAY);
                 proxy.sleep(backoff_time).await;
-                // tokio::time::sleep(backoff_time).await;
                 backoff_delay *= 2; // exponential backoff
             },
         }
     }
 
     // retries have been exhausted
-    let elapsed_time = start_time.elapsed();
     println!(
-            "Fetching transaction failed and retries exhausted, returning default transaction. Total elapsed time: {:?}",
-            elapsed_time
+            "Fetching transaction failed and retries exhausted, returning default transaction. Total elapsed time: {:?}s",
+            proxy.elapsed_seconds(&start_time)
         );
     TransactionOnNetwork::default()
 }

@@ -55,6 +55,8 @@ impl GatewayHttpProxy {
 }
 
 impl GatewayAsyncService for GatewayHttpProxy {
+    type Instant = std::time::Instant;
+
     fn request<G>(
         &self,
         request: G,
@@ -67,5 +69,13 @@ impl GatewayAsyncService for GatewayHttpProxy {
 
     fn sleep(&self, millis: u64) -> impl std::future::Future<Output = ()> + Send {
         tokio::time::sleep(Duration::from_millis(millis))
+    }
+
+    fn now(&self) -> Self::Instant {
+        std::time::Instant::now()
+    }
+
+    fn elapsed_seconds(&self, instant: &Self::Instant) -> f32 {
+        instant.elapsed().as_secs_f32()
     }
 }
