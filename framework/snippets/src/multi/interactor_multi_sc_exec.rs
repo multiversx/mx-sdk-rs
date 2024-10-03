@@ -1,8 +1,9 @@
 use multiversx_sdk_http::GatewayHttpProxy;
 
 use super::interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs};
+use super::InteractorStepRef;
 use crate::sdk::data::transaction::Transaction;
-use crate::{network_response, InteractorBase, InteractorStep, StepBuffer};
+use crate::{network_response, InteractorBase, StepBuffer};
 
 impl InteractorBase<GatewayHttpProxy> {
     pub async fn multi_sc_exec(&mut self, mut buffer: StepBuffer<'_>) {
@@ -45,7 +46,7 @@ impl InteractorBase<GatewayHttpProxy> {
     }
 }
 
-fn retrieve_senders(sc_call_steps: &[&mut dyn InteractorStep]) -> SenderSet {
+fn retrieve_senders(sc_call_steps: &[InteractorStepRef]) -> SenderSet {
     let mut senders = SenderSet::new();
 
     for sc_call_step in sc_call_steps {
