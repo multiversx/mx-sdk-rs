@@ -1,5 +1,6 @@
 pub mod account_tool;
 mod interactor;
+mod interactor_chain_simulator;
 mod interactor_dns;
 mod interactor_scenario;
 mod interactor_sender;

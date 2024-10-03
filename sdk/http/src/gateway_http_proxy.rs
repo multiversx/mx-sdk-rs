@@ -12,15 +12,13 @@ use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest};
 pub struct GatewayHttpProxy {
     pub(crate) proxy_uri: String,
     pub(crate) client: reqwest::Client,
-    pub chain_simulator: bool,
 }
 
 impl GatewayHttpProxy {
-    pub fn new(proxy_uri: String, chain_simulator: bool) -> Self {
+    pub fn new(proxy_uri: String) -> Self {
         Self {
             proxy_uri,
             client: reqwest::Client::new(),
-            chain_simulator,
         }
     }
 

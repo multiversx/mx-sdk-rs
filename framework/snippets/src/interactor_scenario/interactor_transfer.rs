@@ -11,8 +11,7 @@ impl Interactor {
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
         let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
-        self.proxy
-            .generate_blocks_until_tx_processed(&tx_hash)
+        self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
 

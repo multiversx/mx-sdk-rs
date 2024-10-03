@@ -16,9 +16,10 @@ pub async fn print_account_as_scenario_set_state(
     use_chain_simulator: bool,
     address_bech32_string: String,
 ) {
-    let api = GatewayHttpProxy::new(api_string, use_chain_simulator);
+    let api = GatewayHttpProxy::new(api_string);
     let address = Bech32Address::from_bech32_string(address_bech32_string);
-    let set_state = retrieve_account_as_scenario_set_state(&api, &address).await;
+    let set_state =
+        retrieve_account_as_scenario_set_state(&api, use_chain_simulator, &address).await;
     let scenario = build_scenario(set_state);
     println!("{}", scenario.into_raw().to_json_string());
 }
@@ -34,12 +35,13 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
 
 pub async fn retrieve_account_as_scenario_set_state(
     api: &GatewayHttpProxy,
+    use_chain_simulator: bool,
     address: &Bech32Address,
 ) -> SetStateStep {
     let sdk_address = Address::from_bech32_string(address.to_bech32_str()).unwrap();
     let sdk_account = api.get_account(&sdk_address).await.unwrap();
 
-    let (account_esdt, account_esdt_roles, account_storage) = if api.chain_simulator {
+    let (account_esdt, account_esdt_roles, account_storage) = if use_chain_simulator {
         (HashMap::new(), HashMap::new(), HashMap::new())
     } else {
         let account_esdt = api

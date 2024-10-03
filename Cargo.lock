@@ -2418,6 +2418,7 @@ dependencies = [
 name = "multiversx-sc-snippets"
 version = "0.53.1"
 dependencies = [
+ "anyhow",
  "base64",
  "env_logger",
  "futures",
@@ -2425,6 +2426,7 @@ dependencies = [
  "log",
  "multiversx-chain-scenario-format",
  "multiversx-sc-scenario",
+ "multiversx-sdk",
  "multiversx-sdk-http",
  "serde_json",
  "tokio",
