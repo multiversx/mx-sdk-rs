@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-use crate::Interactor;
+use crate::InteractorBase;
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -8,9 +8,13 @@ use multiversx_sc_scenario::{
     multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti, types::ContractCall},
     scenario_model::{ScQueryStep, TxResponse},
 };
+use multiversx_sdk::gateway::{GatewayAsyncService, VMQueryRequest};
 use multiversx_sdk_http::core::{data::vm::VMQueryInput, utils::base64_decode};
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub async fn sc_query<S>(&mut self, mut step: S) -> &mut Self
     where
         S: AsMut<ScQueryStep>,
@@ -33,7 +37,7 @@ impl Interactor {
         };
         let result = self
             .proxy
-            .execute_vmquery(&req)
+            .request(VMQueryRequest(&req))
             .await
             .expect("error executing VM query");
 

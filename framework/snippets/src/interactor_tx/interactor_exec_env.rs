@@ -6,10 +6,12 @@ use multiversx_sc_scenario::{
     scenario_model::TxExpect,
     ScenarioTxEnv, ScenarioTxEnvData,
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
+use multiversx_sdk_http::GatewayHttpProxy;
 
-use crate::Interactor;
+use crate::InteractorBase;
 
-impl Interactor {
+impl InteractorBase<GatewayHttpProxy> {
     pub fn tx(&mut self) -> TxBaseWithEnv<InteractorEnvExec<'_>> {
         let data = self.new_env_data();
         let env = InteractorEnvExec { world: self, data };
@@ -19,7 +21,7 @@ impl Interactor {
 
 /// Environment for executing transactions.
 pub struct InteractorEnvExec<'w> {
-    pub world: &'w mut Interactor,
+    pub world: &'w mut InteractorBase<GatewayHttpProxy>,
     pub data: ScenarioTxEnvData,
 }
 

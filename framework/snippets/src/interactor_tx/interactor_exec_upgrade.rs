@@ -12,7 +12,7 @@ use multiversx_sc_scenario::{
     ScenarioTxEnvData,
 };
 
-use crate::Interactor;
+use crate::InteractorBase;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
 

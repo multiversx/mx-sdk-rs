@@ -6,9 +6,12 @@ use multiversx_sdk::{
     },
 };
 
-use crate::Interactor;
+use crate::InteractorBase;
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub async fn send_user_funds(&self, receiver: &SdkAddress) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));

@@ -1,13 +1,20 @@
-use crate::{network_response, Interactor};
+use crate::{network_response, InteractorBase};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
+use multiversx_sdk::{
+    gateway::{GatewayAsyncService, SendTxRequest},
+    retrieve_tx_on_network,
+};
 use multiversx_sdk_http::core::{data::transaction::Transaction, utils::base64_encode};
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub async fn sc_call<S>(&mut self, mut sc_call_step: S)
     where
         S: AsMut<ScCallStep>,
@@ -17,7 +24,7 @@ impl Interactor {
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let tx = self.proxy.retrieve_tx_on_network(tx_hash.clone()).await;
+        let tx = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
 
         sc_call_step.save_response(network_response::parse_tx_response(tx));
 
@@ -40,7 +47,11 @@ impl Interactor {
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
-        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
+        let tx_hash = self
+            .proxy
+            .request(SendTxRequest(&transaction))
+            .await
+            .unwrap();
         println!("sc call tx hash: {tx_hash}");
         info!("sc call tx hash: {}", tx_hash);
 

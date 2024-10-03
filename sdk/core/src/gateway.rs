@@ -87,10 +87,19 @@ pub trait GatewayRequest: Send {
 }
 
 pub trait GatewayAsyncService: Send {
+    /// Keeps track of elapsed time.
+    type Instant;
+
     fn request<G>(
         &self,
         request: G,
     ) -> impl std::future::Future<Output = anyhow::Result<G::Result>> + Send
     where
         G: GatewayRequest;
+
+    fn sleep(&self, millis: u64) -> impl std::future::Future<Output = ()> + Send;
+
+    fn now(&self) -> Self::Instant;
+
+    fn elapsed_seconds(&self, instant: &Self::Instant) -> f32;
 }

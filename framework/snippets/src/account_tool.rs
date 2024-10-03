@@ -4,6 +4,11 @@ use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
+use multiversx_sdk::gateway::{
+    GetAccountEsdtRolesRequest, GetAccountEsdtTokensRequest, GetAccountRequest,
+    GetAccountStorageRequest,
+};
 use multiversx_sdk_http::GatewayHttpProxy;
 use std::collections::{BTreeMap, HashMap};
 
@@ -33,31 +38,34 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
     }
 }
 
-pub async fn retrieve_account_as_scenario_set_state(
-    api: &GatewayHttpProxy,
+pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncService>(
+    api: &GatewayProxy,
     use_chain_simulator: bool,
     address: &Bech32Address,
 ) -> SetStateStep {
     let sdk_address = SdkAddress::from_bech32_string(address.to_bech32_str()).unwrap();
-    let sdk_account = api.get_account(&sdk_address).await.unwrap();
+    let sdk_account = api
+        .request(GetAccountRequest::new(&sdk_address))
+        .await
+        .unwrap();
 
     let (account_esdt, account_esdt_roles, account_storage) = if use_chain_simulator {
         (HashMap::new(), HashMap::new(), HashMap::new())
     } else {
         let account_esdt = api
-            .get_account_esdt_tokens(&sdk_address)
+            .request(GetAccountEsdtTokensRequest::new(&sdk_address))
             .await
             .unwrap_or_else(|err| {
                 panic!("failed to retrieve ESDT tokens for address {address}: {err}")
             });
         let account_esdt_roles = api
-            .get_account_esdt_roles(&sdk_address)
+            .request(GetAccountEsdtRolesRequest::new(&sdk_address))
             .await
             .unwrap_or_else(|err| {
                 panic!("failed to retrieve ESDT roles for address {address}: {err}")
             });
         let account_storage = api
-            .get_account_storage_keys(&sdk_address)
+            .request(GetAccountStorageRequest::new(&sdk_address))
             .await
             .unwrap_or_else(|err| {
                 panic!("failed to retrieve storage for address {address}: {err}")

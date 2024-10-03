@@ -7,15 +7,16 @@ use multiversx_sc_scenario::{
     scenario_model::TxResponse,
     ScenarioTxEnvData,
 };
+use multiversx_sdk_http::GatewayHttpProxy;
 
-use crate::{Interactor, InteractorEnvExec, InteractorStep, StepBuffer};
+use crate::{InteractorBase, InteractorEnvExec, InteractorStep, StepBuffer};
 
 pub struct HomogenousTxBuffer<'w, Step, RH> {
     env: InteractorEnvExec<'w>,
     steps: Vec<StepWrapper<ScenarioTxEnvData, Step, RH>>,
 }
 
-impl Interactor {
+impl InteractorBase<GatewayHttpProxy> {
     /// Creates a buffer that can hold multiple transactions, and then execute them all at once.
     ///
     /// This buffer holds transactions of the same type (call/deploy) and with identical result handler types.

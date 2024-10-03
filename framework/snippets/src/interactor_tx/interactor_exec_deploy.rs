@@ -10,8 +10,9 @@ use multiversx_sc_scenario::{
     scenario_model::{ScDeployStep, TxResponse},
     ScenarioTxEnvData,
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::Interactor;
+use crate::InteractorBase;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
 
@@ -57,7 +58,10 @@ where
     }
 }
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub async fn chain_deploy<From, Payment, Gas, CodeValue, RH, F>(&mut self, f: F) -> &mut Self
     where
         From: TxFromSpecified<ScenarioTxEnvData>,

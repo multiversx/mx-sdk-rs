@@ -1,8 +1,10 @@
+use multiversx_sdk_http::GatewayHttpProxy;
+
 use super::interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs};
 use crate::sdk::data::transaction::Transaction;
-use crate::{network_response, Interactor, InteractorStep, StepBuffer};
+use crate::{network_response, InteractorBase, InteractorStep, StepBuffer};
 
-impl Interactor {
+impl InteractorBase<GatewayHttpProxy> {
     pub async fn multi_sc_exec(&mut self, mut buffer: StepBuffer<'_>) {
         for step in buffer.refs.iter_mut() {
             step.run_step(&mut self.pre_runners);

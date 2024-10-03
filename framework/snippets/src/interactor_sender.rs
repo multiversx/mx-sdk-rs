@@ -1,8 +1,9 @@
 use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
 use log::debug;
 use multiversx_sc_scenario::multiversx_sc::types::Address;
+use multiversx_sdk::gateway::{GatewayAsyncService, GetAccountRequest};
 
-use crate::Interactor;
+use crate::InteractorBase;
 
 /// A user account that can sign transactions (a pem is present).
 pub struct Sender {
@@ -11,11 +12,14 @@ pub struct Sender {
     pub current_nonce: Option<u64>,
 }
 
-impl Interactor {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub async fn recall_nonce(&self, address: &Address) -> u64 {
         let account = self
             .proxy
-            .get_account(&address.clone().into())
+            .request(GetAccountRequest::new(&address.clone().into()))
             .await
             .expect("failed to retrieve account nonce");
         account.nonce

@@ -3,12 +3,13 @@ use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
     scenario_model::{AddressValue, ScCallStep, ScDeployStep, TxResponse},
 };
+use multiversx_sdk_http::GatewayHttpProxy;
 
-use crate::Interactor;
+use crate::InteractorBase;
 
 /// Describes a scenario step that can be executed in an interactor.
 pub trait InteractorStep {
-    fn to_transaction(&self, interactor: &Interactor) -> Transaction;
+    fn to_transaction(&self, interactor: &InteractorBase<GatewayHttpProxy>) -> Transaction;
 
     fn sender_address(&self) -> &AddressValue;
 
@@ -18,7 +19,7 @@ pub trait InteractorStep {
 }
 
 impl InteractorStep for ScCallStep {
-    fn to_transaction(&self, interactor: &Interactor) -> Transaction {
+    fn to_transaction(&self, interactor: &InteractorBase<GatewayHttpProxy>) -> Transaction {
         interactor.tx_call_to_blockchain_tx(&self.tx)
     }
 
@@ -37,7 +38,7 @@ impl InteractorStep for ScCallStep {
 }
 
 impl InteractorStep for ScDeployStep {
-    fn to_transaction(&self, interactor: &Interactor) -> Transaction {
+    fn to_transaction(&self, interactor: &InteractorBase<GatewayHttpProxy>) -> Transaction {
         interactor.sc_deploy_to_blockchain_tx(self)
     }
 
