@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::StepWithResponse,
     scenario_model::{AddressValue, ScCallStep, ScDeployStep, TxResponse},
 };
-use multiversx_sdk_http::GatewayHttpProxy;
+use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::InteractorBase;
 
@@ -14,7 +14,10 @@ pub enum InteractorStepRef<'a> {
 }
 
 impl<'a> InteractorStepRef<'a> {
-    pub fn to_transaction(&self, interactor: &InteractorBase<GatewayHttpProxy>) -> Transaction {
+    pub fn to_transaction<GatewayProxy: GatewayAsyncService>(
+        &self,
+        interactor: &InteractorBase<GatewayProxy>,
+    ) -> Transaction {
         match self {
             InteractorStepRef::ScCall(sc_call) => interactor.tx_call_to_blockchain_tx(&sc_call.tx),
             InteractorStepRef::ScDeploy(sc_deploy) => {
