@@ -1,6 +1,6 @@
 use crate::data::{
-    address::Address,
     esdt::{EsdtBalance, EsdtBalanceResponse},
+    sdk_address::SdkAddress,
 };
 use anyhow::anyhow;
 use std::collections::HashMap;
@@ -9,11 +9,11 @@ use super::{GatewayRequest, GatewayRequestType, ACCOUNT_ENDPOINT};
 
 /// Retrieves an all esdt tokens of an account from the network.
 pub struct GetAccountEsdtTokensRequest<'a> {
-    pub address: &'a Address,
+    pub address: &'a SdkAddress,
 }
 
 impl<'a> GetAccountEsdtTokensRequest<'a> {
-    pub fn new(address: &'a Address) -> Self {
+    pub fn new(address: &'a SdkAddress) -> Self {
         Self { address }
     }
 }

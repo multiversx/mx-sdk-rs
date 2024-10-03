@@ -1,4 +1,4 @@
-use crate::sdk_core::data::{address::Address, esdt::EsdtBalance};
+use crate::sdk_core::data::{esdt::EsdtBalance, sdk_address::SdkAddress};
 use multiversx_chain_scenario_format::interpret_trait::IntoRaw;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
@@ -38,7 +38,7 @@ pub async fn retrieve_account_as_scenario_set_state(
     use_chain_simulator: bool,
     address: &Bech32Address,
 ) -> SetStateStep {
-    let sdk_address = Address::from_bech32_string(address.to_bech32_str()).unwrap();
+    let sdk_address = SdkAddress::from_bech32_string(address.to_bech32_str()).unwrap();
     let sdk_account = api.get_account(&sdk_address).await.unwrap();
 
     let (account_esdt, account_esdt_roles, account_storage) = if use_chain_simulator {

@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
 use multiversx_sdk_wbg::{
-    data::{address::Address, esdt::EsdtBalance},
+    data::{esdt::EsdtBalance, sdk_address::SdkAddress},
     gateway::GatewayProxy,
 };
 use std::collections::{BTreeMap, HashMap};
@@ -37,7 +37,7 @@ pub async fn retrieve_account_as_scenario_set_state(
     api: &GatewayProxy,
     address: &Bech32Address,
 ) -> SetStateStep {
-    let sdk_address = Address::from_bech32_string(address.to_bech32_str()).unwrap();
+    let sdk_address = SdkAddress::from_bech32_string(address.to_bech32_str()).unwrap();
     let sdk_account = api.get_account(&sdk_address).await.unwrap();
 
     let account_esdt = api

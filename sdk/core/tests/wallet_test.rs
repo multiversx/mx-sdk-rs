@@ -1,6 +1,8 @@
 use bip39::Mnemonic;
 
-use multiversx_sdk::{crypto::public_key::PublicKey, data::address::Address, wallet::Wallet};
+use multiversx_sdk::{
+    crypto::public_key::PublicKey, data::sdk_address::SdkAddress, wallet::Wallet,
+};
 use std::fs::{self, File};
 use std::io::Write;
 
@@ -18,7 +20,7 @@ fn test_private_key_from_mnemonic() {
 
     let private_key = Wallet::get_private_key_from_mnemonic(mnemonic.clone(), 0, 0);
     let public_key = PublicKey::from(&private_key);
-    let address = Address::from(&public_key);
+    let address = SdkAddress::from(&public_key);
     assert_eq!(
         "0b7966138e80b8f3bb64046f56aea4250fd7bacad6ed214165cea6767fd0bc2c",
         private_key.to_string()
@@ -34,7 +36,7 @@ fn test_private_key_from_mnemonic() {
 
     let private_key = Wallet::get_private_key_from_mnemonic(mnemonic, 0, 1);
     let public_key = PublicKey::from(&private_key);
-    let address = Address::from(&public_key);
+    let address = SdkAddress::from(&public_key);
     assert_eq!(
         "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
         private_key.to_string()
@@ -64,7 +66,7 @@ fn write_to_file(content: &str, file: &str) {
     file.write_all(content.as_bytes()).unwrap();
 }
 
-fn create_keystore_file_from_scratch(file: &str) -> Address {
+fn create_keystore_file_from_scratch(file: &str) -> SdkAddress {
     let wallet = Wallet::from_private_key(ALICE_PRIVATE_KEY).unwrap();
     let address = wallet.address();
 

@@ -3,8 +3,8 @@ use gloo_net::http::Request;
 use multiversx_sdk::data::{
     account::{Account, AccountResponse},
     account_storage::AccountStorageResponse,
-    address::Address,
     esdt::{EsdtBalance, EsdtBalanceResponse, EsdtRolesResponse},
+    sdk_address::SdkAddress,
 };
 use std::collections::HashMap;
 
@@ -15,7 +15,7 @@ const KEYS_ENDPOINT: &str = "/keys/";
 
 impl GatewayProxy {
     // get_account retrieves an account info from the network (nonce, balance)
-    pub async fn get_account(&self, address: &Address) -> Result<Account> {
+    pub async fn get_account(&self, address: &SdkAddress) -> Result<Account> {
         if !address.is_valid() {
             return Err(anyhow!("invalid address"));
         }
@@ -37,7 +37,7 @@ impl GatewayProxy {
     // get_account_esdt_roles retrieves an all esdt roles of an account from the network
     pub async fn get_account_esdt_roles(
         &self,
-        address: &Address,
+        address: &SdkAddress,
     ) -> Result<HashMap<String, Vec<String>>> {
         if !address.is_valid() {
             return Err(anyhow!("invalid address"));
@@ -61,7 +61,7 @@ impl GatewayProxy {
     // get_account_esdt_tokens retrieves an all esdt token of an account from the network
     pub async fn get_account_esdt_tokens(
         &self,
-        address: &Address,
+        address: &SdkAddress,
     ) -> Result<HashMap<String, EsdtBalance>> {
         if !address.is_valid() {
             return Err(anyhow!("invalid address"));
@@ -84,7 +84,7 @@ impl GatewayProxy {
     // get_account_esdt_tokens retrieves an all esdt token of an account from the network
     pub async fn get_account_storage_keys(
         &self,
-        address: &Address,
+        address: &SdkAddress,
     ) -> Result<HashMap<String, String>> {
         if !address.is_valid() {
             return Err(anyhow!("invalid address"));

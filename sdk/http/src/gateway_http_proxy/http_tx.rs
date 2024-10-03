@@ -1,8 +1,8 @@
 use anyhow::Result;
 use multiversx_sdk::{
     data::{
-        address::Address,
         network_config::NetworkConfig,
+        sdk_address::SdkAddress,
         transaction::{
             ArgCreateTransaction, Transaction, TransactionOnNetwork, TxCostResponseData,
         },
@@ -48,7 +48,7 @@ impl GatewayHttpProxy {
     // get_default_transaction_arguments will prepare the transaction creation argument by querying the account's info
     pub async fn get_default_transaction_arguments(
         &self,
-        address: &Address,
+        address: &SdkAddress,
         network_configs: &NetworkConfig,
     ) -> Result<ArgCreateTransaction> {
         let account = self.get_account(address).await?;

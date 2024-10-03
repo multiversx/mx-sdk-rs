@@ -1,5 +1,5 @@
 use multiversx_sdk::{
-    data::{address::Address, transaction::Transaction},
+    data::{sdk_address::SdkAddress, transaction::Transaction},
     utils::base64_encode,
 };
 use multiversx_sdk_http::{GatewayHttpProxy, DEVNET_GATEWAY};
@@ -9,11 +9,11 @@ async fn main() {
     let tx = Transaction {
         nonce: 1,
         value: "50".to_string(),
-        receiver: Address::from_bech32_string(
+        receiver: SdkAddress::from_bech32_string(
             "erd1rh5ws22jxm9pe7dtvhfy6j3uttuupkepferdwtmslms5fydtrh5sx3xr8r",
         )
         .unwrap(),
-        sender: Address::from_bech32_string(
+        sender: SdkAddress::from_bech32_string(
             "erd1rh5ws22jxm9pe7dtvhfy6j3uttuupkepferdwtmslms5fydtrh5sx3xr8r",
         )
         .unwrap(),

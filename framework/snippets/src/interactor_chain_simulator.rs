@@ -1,6 +1,6 @@
 use anyhow::Error;
 use multiversx_sdk::{
-    data::address::Address,
+    data::sdk_address::SdkAddress,
     gateway::{
         ChainSimulatorGenerateBlocksRequest, ChainSimulatorSendFundsRequest, GatewayAsyncService,
     },
@@ -9,7 +9,7 @@ use multiversx_sdk::{
 use crate::Interactor;
 
 impl Interactor {
-    pub async fn send_user_funds(&self, receiver: &Address) -> Result<String, Error> {
+    pub async fn send_user_funds(&self, receiver: &SdkAddress) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));
         }

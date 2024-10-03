@@ -24,7 +24,7 @@ use crate::{
         private_key::{PrivateKey, PRIVATE_KEY_LENGTH},
         public_key::PublicKey,
     },
-    data::{address::Address, keystore::*, transaction::Transaction},
+    data::{keystore::*, sdk_address::SdkAddress, transaction::Transaction},
     utils::*,
 };
 
@@ -192,9 +192,9 @@ impl Wallet {
         Ok(priv_key)
     }
 
-    pub fn address(&self) -> Address {
+    pub fn address(&self) -> SdkAddress {
         let public_key = PublicKey::from(&self.priv_key);
-        Address::from(&public_key)
+        SdkAddress::from(&public_key)
     }
 
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> [u8; 64] {
@@ -287,7 +287,7 @@ impl Wallet {
 
     pub fn encrypt_keystore(
         data: &[u8],
-        address: &Address,
+        address: &SdkAddress,
         public_key: &str,
         password: &str,
     ) -> String {
@@ -344,7 +344,11 @@ impl Wallet {
         keystore_json
     }
 
-    pub fn generate_pem_content(address: &Address, private_key: &str, public_key: &str) -> String {
+    pub fn generate_pem_content(
+        address: &SdkAddress,
+        private_key: &str,
+        public_key: &str,
+    ) -> String {
         let concat_keys = format!("{}{}", private_key, public_key);
         let concat_keys_b64 = base64_encode(concat_keys);
 
