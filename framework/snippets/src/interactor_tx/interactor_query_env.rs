@@ -5,7 +5,6 @@ use multiversx_sc_scenario::{
     ScenarioTxEnv, ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
-use multiversx_sdk_http::GatewayHttpProxy;
 
 use crate::InteractorBase;
 
