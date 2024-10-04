@@ -43,4 +43,20 @@ pub trait EventsModule {
         #[indexed] epoch: u64,
         new_round_event: &NewRoundEvent<Self::Api>,
     );
+
+    #[event("discard_round")]
+    fn discard_round_event(
+        &self,
+        #[indexed] from: &ManagedBuffer,
+        #[indexed] to: &ManagedBuffer,
+        #[indexed] epoch: u64,
+    );
+
+    #[event("add_submission")]
+    fn add_submission_event(
+        &self,
+        #[indexed] caller: &ManagedAddress,
+        #[indexed] price: &BigUint,
+        #[indexed] epoch: u64,
+    );
 }
