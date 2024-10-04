@@ -390,9 +390,11 @@ pub trait PriceAggregator:
     #[only_owner]
     #[endpoint(setPairDecimals)]
     fn set_pair_decimals(&self, from: ManagedBuffer, to: ManagedBuffer, decimals: u8) {
-        self.require_paused();
-
-        self.pair_decimals(&from, &to).set(Some(decimals));
+        let pair_decimals_mapper = self.pair_decimals(&from, &to);
+        if !pair_decimals_mapper.is_empty() {
+            self.require_paused();
+        }
+        pair_decimals_mapper.set(Some(decimals));
         let pair = TokenPair { from, to };
         self.clear_submissions(&pair);
     }
