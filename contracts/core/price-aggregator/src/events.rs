@@ -13,6 +13,14 @@ pub struct NewRoundEvent<M: ManagedTypeApi> {
     epoch: u64,
 }
 
+#[type_abi]
+#[derive(TopEncode)]
+pub struct DiscardSubmissionEvent {
+    submission_timestamp: u64,
+    first_submission_timestamp: u64,
+    has_caller_already_submitted: bool,
+}
+
 #[multiversx_sc::module]
 pub trait EventsModule {
     fn emit_new_round_event(
@@ -43,6 +51,35 @@ pub trait EventsModule {
         #[indexed] to: &ManagedBuffer,
         #[indexed] round: usize,
         new_round_event: &NewRoundEvent<Self::Api>,
+    );
+
+    fn emit_discard_submission_event(
+        &self,
+        token_pair: &TokenPair<Self::Api>,
+        round_id: usize,
+        submission_timestamp: u64, 
+        first_submission_timestamp: u64,
+        has_caller_already_submitted: bool,
+    ) {
+        self.discard_submission_event(
+            &token_pair.from.clone(),
+            &token_pair.to.clone(),
+            round_id,
+            &DiscardSubmissionEvent {
+                submission_timestamp,
+                first_submission_timestamp,
+                has_caller_already_submitted
+            },
+        )
+    }
+
+    #[event("discard_submission")]
+    fn discard_submission_event(
+        &self,
+        #[indexed] from: &ManagedBuffer,
+        #[indexed] to: &ManagedBuffer,
+        #[indexed] round: usize,
+        discard_submission_event: &DiscardSubmissionEvent,
     );
 
     #[event("discard_round")]
