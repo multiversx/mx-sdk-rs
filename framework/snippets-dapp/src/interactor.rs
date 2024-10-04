@@ -7,8 +7,8 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk_wbg::{
     data::{network_config::NetworkConfig, sdk_address::SdkAddress as ErdrsAddress},
-    gateway::GatewayProxy,
     wallet::Wallet,
+    GatewayDappProxy,
 };
 use std::{
     collections::HashMap,
@@ -22,7 +22,7 @@ use crate::{account_tool::retrieve_account_as_scenario_set_state, Sender};
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 pub struct Interactor {
-    pub proxy: GatewayProxy,
+    pub proxy: GatewayDappProxy,
     pub network_config: NetworkConfig,
     pub sender_map: HashMap<Address, Sender>,
 
@@ -51,7 +51,7 @@ async fn sleep(seconds: u32) {
 
 impl Interactor {
     pub async fn new(gateway_url: &str) -> Self {
-        let proxy = GatewayProxy::new(gateway_url.to_string());
+        let proxy = GatewayDappProxy::new(gateway_url.to_string());
         let network_config = proxy.get_network_config().await.unwrap();
         Self {
             proxy,

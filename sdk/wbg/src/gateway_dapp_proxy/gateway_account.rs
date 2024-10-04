@@ -8,12 +8,12 @@ use multiversx_sdk::data::{
 };
 use std::collections::HashMap;
 
-use super::GatewayProxy;
+use super::GatewayDappProxy;
 
 const ACCOUNT_ENDPOINT: &str = "address/";
 const KEYS_ENDPOINT: &str = "/keys/";
 
-impl GatewayProxy {
+impl GatewayDappProxy {
     // get_account retrieves an account info from the network (nonce, balance)
     pub async fn get_account(&self, address: &SdkAddress) -> Result<Account> {
         if !address.is_valid() {

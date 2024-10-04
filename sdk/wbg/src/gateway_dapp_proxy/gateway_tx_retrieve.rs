@@ -4,7 +4,7 @@ use multiversx_sdk::data::transaction::TransactionOnNetwork;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::window;
 
-use super::GatewayProxy;
+use super::GatewayDappProxy;
 
 const INITIAL_BACKOFF_DELAY: f32 = 1.4; // seconds
 const MAX_RETRIES: usize = 8;
@@ -26,7 +26,7 @@ async fn sleep(seconds: f32) {
     JsFuture::from(promise).await.unwrap();
 }
 
-impl GatewayProxy {
+impl GatewayDappProxy {
     /// Retrieves a transaction from the network.
     pub async fn retrieve_tx_on_network(&self, tx_hash: String) -> TransactionOnNetwork {
         let mut retries = 0;
