@@ -47,6 +47,11 @@ pub trait PriceAggregator:
         self.set_paused(true);
     }
 
+    #[upgrade]
+    fn upgrade(&self) {
+        self.set_paused(true);
+    }
+
     #[only_owner]
     #[endpoint(changeAmounts)]
     fn change_amounts(&self, staking_amount: BigUint, slash_amount: BigUint) {
@@ -192,7 +197,12 @@ pub trait PriceAggregator:
                 round_id = wrapped_rounds.unwrap().len() + 1;
             }
             self.create_new_round(token_pair.clone(), round_id, submissions, decimals);
-            self.add_submission_event(&token_pair.from.clone(), &token_pair.to.clone(), round_id, &price);
+            self.add_submission_event(
+                &token_pair.from.clone(),
+                &token_pair.to.clone(),
+                round_id,
+                &price,
+            );
         }
 
         self.oracle_status()
