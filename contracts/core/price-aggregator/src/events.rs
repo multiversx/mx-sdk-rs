@@ -49,7 +49,7 @@ pub trait EventsModule {
         &self,
         #[indexed] from: &ManagedBuffer,
         #[indexed] to: &ManagedBuffer,
-        #[indexed] epoch: u64,
+        #[indexed] round: u64,
     );
 
     #[event("add_submission")]
@@ -57,6 +57,6 @@ pub trait EventsModule {
         &self,
         #[indexed] caller: &ManagedAddress,
         #[indexed] price: &BigUint,
-        #[indexed] epoch: u64,
+        #[indexed] round: u64,
     );
 }

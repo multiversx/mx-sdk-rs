@@ -187,8 +187,8 @@ pub trait PriceAggregator:
             last_sub_time_mapper.set(current_timestamp);
 
             self.create_new_round(token_pair, submissions, decimals);
-            let epoch = self.blockchain().get_block_epoch();
-            self.add_submission_event(&caller, &price, epoch);
+            let round = self.blockchain().get_block_round();
+            self.add_submission_event(&caller, &price, round);
         }
 
         self.oracle_status()
@@ -285,8 +285,8 @@ pub trait PriceAggregator:
                 .push(&price_feed);
             self.emit_new_round_event(&token_pair, &price_feed);
         } else {
-            let epoch = self.blockchain().get_block_epoch();
-            self.discard_round_event(&token_pair.from.clone(), &token_pair.to.clone(), epoch);
+            let round = self.blockchain().get_block_round();
+            self.discard_round_event(&token_pair.from.clone(), &token_pair.to.clone(), round);
         }
     }
 
