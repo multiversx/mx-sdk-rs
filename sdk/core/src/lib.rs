@@ -1,3 +1,4 @@
+pub mod bech32;
 pub mod crypto;
 pub mod data;
 pub mod gateway;
