@@ -187,7 +187,11 @@ pub trait PriceAggregator:
             last_sub_time_mapper.set(current_timestamp);
 
             self.create_new_round(token_pair.clone(), submissions, decimals);
-            let round_id = self.rounds().get(&token_pair).unwrap().len();
+            let wrapped_rounds = self.rounds().get(&token_pair);
+            let mut round_id = 0;
+            if wrapped_rounds.is_some() {
+                round_id = wrapped_rounds.unwrap().len();
+            }
             self.add_submission_event(&caller, &price, round_id);
         }
 
@@ -285,7 +289,11 @@ pub trait PriceAggregator:
                 .push(&price_feed);
             self.emit_new_round_event(&token_pair, &price_feed);
         } else {
-            let round_id = self.rounds().get(&token_pair).unwrap().len();
+            let wrapped_rounds = self.rounds().get(&token_pair);
+            let mut round_id = 0;
+            if wrapped_rounds.is_some() {
+                round_id = wrapped_rounds.unwrap().len();
+            }
             self.discard_round_event(&token_pair.from.clone(), &token_pair.to.clone(), round_id);
         }
     }
