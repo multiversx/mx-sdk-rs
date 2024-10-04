@@ -9,7 +9,7 @@ use multiversx_sc_scenario::{
     scenario_model::{ScQueryStep, TxResponse},
 };
 use multiversx_sdk::gateway::{GatewayAsyncService, VMQueryRequest};
-use multiversx_sdk_http::core::{data::vm::VMQueryInput, utils::base64_decode};
+use multiversx_sdk::{data::vm::VMQueryInput, utils::base64_decode};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where

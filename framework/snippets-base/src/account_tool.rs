@@ -9,22 +9,21 @@ use multiversx_sdk::gateway::{
     GetAccountEsdtRolesRequest, GetAccountEsdtTokensRequest, GetAccountRequest,
     GetAccountStorageRequest,
 };
-use multiversx_sdk_http::GatewayHttpProxy;
 use std::collections::{BTreeMap, HashMap};
 
 /// Called directly from CLI, from `sc-meta`.
 ///
 /// Retrieves an account data via the API,
 /// then formats it as a scenario set state step.
-pub async fn print_account_as_scenario_set_state(
-    api_string: String,
+pub async fn print_account_as_scenario_set_state<GatewayProxy: GatewayAsyncService>(
+    gateway_proxy: GatewayProxy,
     use_chain_simulator: bool,
     address_bech32_string: String,
 ) {
-    let api = GatewayHttpProxy::new(api_string);
+    // let gateway_proxy = GatewayHttpProxy::new(api_string);
     let address = Bech32Address::from_bech32_string(address_bech32_string);
     let set_state =
-        retrieve_account_as_scenario_set_state(&api, use_chain_simulator, &address).await;
+        retrieve_account_as_scenario_set_state(&gateway_proxy, use_chain_simulator, &address).await;
     let scenario = build_scenario(set_state);
     println!("{}", scenario.into_raw().to_json_string());
 }

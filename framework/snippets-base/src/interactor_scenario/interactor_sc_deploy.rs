@@ -5,11 +5,11 @@ use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
 };
+use multiversx_sdk::{data::transaction::Transaction, utils::base64_encode};
 use multiversx_sdk::{
     gateway::{GatewayAsyncService, SendTxRequest},
     retrieve_tx_on_network,
 };
-use multiversx_sdk_http::core::{data::transaction::Transaction, utils::base64_encode};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where

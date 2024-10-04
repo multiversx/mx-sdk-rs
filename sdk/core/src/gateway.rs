@@ -90,6 +90,8 @@ pub trait GatewayAsyncService {
     /// Keeps track of elapsed time.
     type Instant;
 
+    fn from_uri(uri: &str) -> Self;
+
     fn request<G>(
         &self,
         request: G,

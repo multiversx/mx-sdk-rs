@@ -11,6 +11,7 @@ members = [
   "framework/meta-lib",
   "framework/scenario",
   "framework/snippets",
+  "framework/snippets-base",
   "framework/snippets-dapp",
   "framework/wasm-adapter",
 

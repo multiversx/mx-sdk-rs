@@ -52,6 +52,10 @@ impl GatewayDappProxy {
 impl GatewayAsyncService for GatewayDappProxy {
     type Instant = f64;
 
+    fn from_uri(uri: &str) -> Self {
+        Self::new(uri.to_owned())
+    }
+
     fn request<G>(&self, request: G) -> impl std::future::Future<Output = anyhow::Result<G::Result>>
     where
         G: multiversx_sdk::gateway::GatewayRequest,

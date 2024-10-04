@@ -1,5 +1,5 @@
 [package]
-name = "multiversx-sc-snippets"
+name = "multiversx-sc-snippets-base"
 version = "0.53.1"
 edition = "2021"
 
@@ -30,17 +30,9 @@ path = "../scenario"
 version = "0.23.0"
 path = "../../sdk/scenario-format"
 
-[dependencies.multiversx-sc-snippets-base]
-version = "=0.53.1"
-path = "../snippets-base"
-
 [dependencies.multiversx-sdk]
 version = "=0.6.1"
 path = "../../sdk/core"
-
-[dependencies.multiversx-sdk-http]
-version = "=0.6.1"
-path = "../../sdk/http"
 
 [dev-dependencies]
 serde_json = "1.0"
