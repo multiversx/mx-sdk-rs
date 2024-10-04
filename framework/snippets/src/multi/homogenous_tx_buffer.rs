@@ -7,21 +7,29 @@ use multiversx_sc_scenario::{
     scenario_model::TxResponse,
     ScenarioTxEnvData,
 };
-use multiversx_sdk_http::GatewayHttpProxy;
+use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::{InteractorBase, InteractorEnvExec, InteractorStep, StepBuffer};
 
-pub struct HomogenousTxBuffer<'w, Step, RH> {
-    env: InteractorEnvExec<'w>,
+pub struct HomogenousTxBuffer<'w, GatewayProxy, Step, RH>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    env: InteractorEnvExec<'w, GatewayProxy>,
     steps: Vec<StepWrapper<ScenarioTxEnvData, Step, RH>>,
 }
 
-impl InteractorBase<GatewayHttpProxy> {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     /// Creates a buffer that can hold multiple transactions, and then execute them all at once.
     ///
     /// This buffer holds transactions of the same type (call/deploy) and with identical result handler types.
     /// Therefore, after execution, all results will have the same type.
-    pub fn homogenous_call_buffer<Step, RH>(&mut self) -> HomogenousTxBuffer<'_, Step, RH> {
+    pub fn homogenous_call_buffer<Step, RH>(
+        &mut self,
+    ) -> HomogenousTxBuffer<'_, GatewayProxy, Step, RH> {
         let data = self.new_env_data();
         let env = InteractorEnvExec { world: self, data };
         HomogenousTxBuffer {
@@ -31,8 +39,9 @@ impl InteractorBase<GatewayHttpProxy> {
     }
 }
 
-impl<'w, Step, RH> HomogenousTxBuffer<'w, Step, RH>
+impl<'w, GatewayProxy, Step, RH> HomogenousTxBuffer<'w, GatewayProxy, Step, RH>
 where
+    GatewayProxy: GatewayAsyncService,
     Step: InteractorStep,
     RH: RHListExec<TxResponse, ScenarioTxEnvData>,
     RH::ListReturns: NestedTupleFlatten,

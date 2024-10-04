@@ -7,12 +7,14 @@ use multiversx_sc_scenario::{
     ScenarioTxEnv, ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
-use multiversx_sdk_http::GatewayHttpProxy;
 
 use crate::InteractorBase;
 
-impl InteractorBase<GatewayHttpProxy> {
-    pub fn tx(&mut self) -> TxBaseWithEnv<InteractorEnvExec<'_>> {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    pub fn tx(&mut self) -> TxBaseWithEnv<InteractorEnvExec<'_, GatewayProxy>> {
         let data = self.new_env_data();
         let env = InteractorEnvExec { world: self, data };
         Tx::new_with_env(env)
@@ -20,12 +22,18 @@ impl InteractorBase<GatewayHttpProxy> {
 }
 
 /// Environment for executing transactions.
-pub struct InteractorEnvExec<'w> {
-    pub world: &'w mut InteractorBase<GatewayHttpProxy>,
+pub struct InteractorEnvExec<'w, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    pub world: &'w mut InteractorBase<GatewayProxy>,
     pub data: ScenarioTxEnvData,
 }
 
-impl<'w> TxEnv for InteractorEnvExec<'w> {
+impl<'w, GatewayProxy> TxEnv for InteractorEnvExec<'w, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     type Api = StaticApi;
 
     type RHExpect = TxExpect;
@@ -43,13 +51,19 @@ impl<'w> TxEnv for InteractorEnvExec<'w> {
     }
 }
 
-impl<'w> ScenarioTxEnv for InteractorEnvExec<'w> {
+impl<'w, GatewayProxy> ScenarioTxEnv for InteractorEnvExec<'w, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
     }
 }
 
-impl<'w> TxEnvWithTxHash for InteractorEnvExec<'w> {
+impl<'w, GatewayProxy> TxEnvWithTxHash for InteractorEnvExec<'w, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     fn set_tx_hash(&mut self, tx_hash: H256) {
         self.data.set_tx_hash(tx_hash);
     }

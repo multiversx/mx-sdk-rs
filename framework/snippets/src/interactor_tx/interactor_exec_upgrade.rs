@@ -11,30 +11,32 @@ use multiversx_sc_scenario::{
     scenario_model::{ScDeployStep, TxResponse},
     ScenarioTxEnvData,
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::InteractorBase;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
 
-impl<'w, From, To, Gas, CodeValue, RH> InteractorPrepareAsync
+impl<'w, GatewayProxy, From, To, Gas, CodeValue, RH> InteractorPrepareAsync
     for Tx<
-        InteractorEnvExec<'w>,
+        InteractorEnvExec<'w, GatewayProxy>,
         From,
         To,
         NotPayable,
         Gas,
-        UpgradeCall<InteractorEnvExec<'w>, Code<CodeValue>>,
+        UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >
 where
-    From: TxFromSpecified<InteractorEnvExec<'w>>,
-    To: TxToSpecified<InteractorEnvExec<'w>>,
-    Gas: TxGas<InteractorEnvExec<'w>>,
-    CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
-    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    type Exec = InteractorExecStep<'w, ScCallStep, RH>;
+    type Exec = InteractorExecStep<'w, GatewayProxy, ScCallStep, RH>;
 
     fn prepare_async(self) -> Self::Exec {
         InteractorExecStep {
@@ -43,27 +45,29 @@ where
     }
 }
 
-impl<'w, From, To, Gas, RH, CodeValue> TxToStep<InteractorEnvExec<'w>, RH>
+impl<'w, GatewayProxy, From, To, Gas, RH, CodeValue>
+    TxToStep<InteractorEnvExec<'w, GatewayProxy>, RH>
     for Tx<
-        InteractorEnvExec<'w>,
+        InteractorEnvExec<'w, GatewayProxy>,
         From,
         To,
         NotPayable,
         Gas,
-        UpgradeCall<InteractorEnvExec<'w>, Code<CodeValue>>,
+        UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >
 where
-    From: TxFromSpecified<InteractorEnvExec<'w>>,
-    To: TxToSpecified<InteractorEnvExec<'w>>,
-    Gas: TxGas<InteractorEnvExec<'w>>,
-    CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
-    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Step = ScCallStep;
 
-    fn tx_to_step(self) -> StepWrapper<InteractorEnvExec<'w>, Self::Step, RH> {
+    fn tx_to_step(self) -> StepWrapper<InteractorEnvExec<'w, GatewayProxy>, Self::Step, RH> {
         let mut step =
             tx_to_sc_call_upgrade_step(&self.env, self.from, self.to, self.gas, self.data);
         step.expect = Some(self.result_handler.list_tx_expect());
@@ -76,18 +80,19 @@ where
     }
 }
 
-pub fn tx_to_sc_call_upgrade_step<'a, 'w: 'a, From, To, Gas, CodeValue>(
-    env: &'a InteractorEnvExec<'w>,
+pub fn tx_to_sc_call_upgrade_step<'a, 'w: 'a, GatewayProxy, From, To, Gas, CodeValue>(
+    env: &'a InteractorEnvExec<'w, GatewayProxy>,
     from: From,
     to: To,
     gas: Gas,
-    data: UpgradeCall<InteractorEnvExec<'w>, Code<CodeValue>>,
+    data: UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
 ) -> ScCallStep
 where
-    From: TxFromSpecified<InteractorEnvExec<'w>>,
-    To: TxToSpecified<InteractorEnvExec<'w>>,
-    Gas: TxGas<InteractorEnvExec<'w>>,
-    CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
 {
     let mut step = ScCallStep::new()
         .from(address_annotated(env, &from))
