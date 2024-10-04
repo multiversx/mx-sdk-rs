@@ -68,12 +68,12 @@ pub enum GatewayRequestType {
 }
 
 /// Models requests to the gateway.
-pub trait GatewayRequest: Send {
+pub trait GatewayRequest {
     type Payload: serde::ser::Serialize + ?Sized;
 
     type DecodedJson: serde::de::DeserializeOwned;
 
-    type Result: Send;
+    type Result;
 
     fn request_type(&self) -> GatewayRequestType;
 
@@ -86,18 +86,18 @@ pub trait GatewayRequest: Send {
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result>;
 }
 
-pub trait GatewayAsyncService: Send {
+pub trait GatewayAsyncService {
     /// Keeps track of elapsed time.
     type Instant;
 
     fn request<G>(
         &self,
         request: G,
-    ) -> impl std::future::Future<Output = anyhow::Result<G::Result>> + Send
+    ) -> impl std::future::Future<Output = anyhow::Result<G::Result>>
     where
         G: GatewayRequest;
 
-    fn sleep(&self, millis: u64) -> impl std::future::Future<Output = ()> + Send;
+    fn sleep(&self, millis: u64) -> impl std::future::Future<Output = ()>;
 
     fn now(&self) -> Self::Instant;
 

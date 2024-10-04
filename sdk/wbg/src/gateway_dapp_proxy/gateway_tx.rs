@@ -12,7 +12,7 @@ use multiversx_sdk::data::{
     vm::{ResponseVmValue, VMQueryInput, VmValuesResponseData},
 };
 
-use super::GatewayProxy;
+use super::GatewayDappProxy;
 
 const COST_TRANSACTION_ENDPOINT: &str = "transaction/cost";
 const SEND_TRANSACTION_ENDPOINT: &str = "transaction/send";
@@ -21,7 +21,7 @@ const GET_TRANSACTION_INFO_ENDPOINT: &str = "transaction/";
 const WITH_RESULTS_QUERY_PARAM: &str = "?withResults=true";
 const VM_VALUES_ENDPOINT: &str = "vm-values/query";
 
-impl GatewayProxy {
+impl GatewayDappProxy {
     // request_transaction_cost retrieves how many gas a transaction will consume
     pub async fn request_transaction_cost(&self, tx: &Transaction) -> Result<TxCostResponseData> {
         let endpoint = self.get_endpoint(COST_TRANSACTION_ENDPOINT);

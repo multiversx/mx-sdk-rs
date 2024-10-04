@@ -6,13 +6,13 @@ use multiversx_sdk::data::{
     network_status::{NetworkStatus, NetworkStatusResponse},
 };
 
-use super::GatewayProxy;
+use super::GatewayDappProxy;
 
 const NETWORK_CONFIG_ENDPOINT: &str = "network/config";
 const NETWORK_ECONOMICS_ENDPOINT: &str = "network/economics";
 const NETWORK_STATUS_ENDPOINT: &str = "network/status";
 
-impl GatewayProxy {
+impl GatewayDappProxy {
     // get_network_config retrieves the network configuration from the proxy
     pub async fn get_network_config(&self) -> Result<NetworkConfig> {
         let endpoint = self.get_endpoint(NETWORK_CONFIG_ENDPOINT);

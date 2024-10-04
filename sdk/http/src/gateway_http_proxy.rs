@@ -60,14 +60,14 @@ impl GatewayAsyncService for GatewayHttpProxy {
     fn request<G>(
         &self,
         request: G,
-    ) -> impl std::future::Future<Output = anyhow::Result<G::Result>> + Send
+    ) -> impl std::future::Future<Output = anyhow::Result<G::Result>>
     where
         G: multiversx_sdk::gateway::GatewayRequest,
     {
         self.http_request(request)
     }
 
-    fn sleep(&self, millis: u64) -> impl std::future::Future<Output = ()> + Send {
+    fn sleep(&self, millis: u64) -> impl std::future::Future<Output = ()> {
         tokio::time::sleep(Duration::from_millis(millis))
     }
 
