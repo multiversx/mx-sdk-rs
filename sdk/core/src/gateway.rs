@@ -41,8 +41,8 @@ pub const DEVNET_GATEWAY: &str = "https://devnet-gateway.multiversx.com";
 // MetachainShardId will be used to identify a shard ID as metachain
 pub const METACHAIN_SHARD_ID: u32 = 0xFFFFFFFF;
 
-const ACCOUNT_ENDPOINT: &str = "address/";
-const KEYS_ENDPOINT: &str = "/keys/";
+const ACCOUNT_ENDPOINT: &str = "address";
+const KEYS_ENDPOINT: &str = "keys";
 const NETWORK_CONFIG_ENDPOINT: &str = "network/config";
 const NETWORK_ECONOMICS_ENDPOINT: &str = "network/economics";
 const GET_NETWORK_STATUS_ENDPOINT: &str = "network/status";
@@ -51,7 +51,7 @@ const GET_HYPER_BLOCK_BY_HASH_ENDPOINT: &str = "hyperblock/by-hash";
 const COST_TRANSACTION_ENDPOINT: &str = "transaction/cost";
 const SEND_TRANSACTION_ENDPOINT: &str = "transaction/send";
 const SEND_MULTIPLE_TRANSACTIONS_ENDPOINT: &str = "transaction/send-multiple";
-const GET_TRANSACTION_INFO_ENDPOINT: &str = "transaction/";
+const GET_TRANSACTION_INFO_ENDPOINT: &str = "transaction";
 const WITH_RESULTS_QUERY_PARAM: &str = "?withResults=true";
 const VM_VALUES_ENDPOINT: &str = "vm-values/query";
 

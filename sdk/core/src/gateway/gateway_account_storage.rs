@@ -27,7 +27,7 @@ impl<'a> GatewayRequest for GetAccountStorageRequest<'a> {
 
     fn get_endpoint(&self) -> String {
         format!(
-            "{ACCOUNT_ENDPOINT}{}{KEYS_ENDPOINT}",
+            "{ACCOUNT_ENDPOINT}/{}/{KEYS_ENDPOINT}",
             crate::bech32::encode(self.address)
         )
     }

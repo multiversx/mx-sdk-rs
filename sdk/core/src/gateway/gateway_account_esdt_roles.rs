@@ -3,9 +3,7 @@ use anyhow::anyhow;
 use multiversx_chain_core::types::Address;
 use std::collections::HashMap;
 
-use super::{GatewayRequest, GatewayRequestType};
-
-const ACCOUNT_ENDPOINT: &str = "address/";
+use super::{GatewayRequest, GatewayRequestType, ACCOUNT_ENDPOINT};
 
 /// Retrieves an all esdt roles of an account from the network.
 pub struct GetAccountEsdtRolesRequest<'a> {

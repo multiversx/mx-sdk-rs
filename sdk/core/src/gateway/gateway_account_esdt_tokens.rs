@@ -27,7 +27,7 @@ impl<'a> GatewayRequest for GetAccountEsdtTokensRequest<'a> {
 
     fn get_endpoint(&self) -> String {
         format!(
-            "{ACCOUNT_ENDPOINT}{}/esdt",
+            "{ACCOUNT_ENDPOINT}/{}/esdt",
             crate::bech32::encode(self.address)
         )
     }

@@ -26,7 +26,7 @@ impl<'a> GatewayRequest for GetAccountRequest<'a> {
     }
 
     fn get_endpoint(&self) -> String {
-        format!("{ACCOUNT_ENDPOINT}{}", crate::bech32::encode(self.address))
+        format!("{ACCOUNT_ENDPOINT}/{}", crate::bech32::encode(self.address))
     }
 
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result> {

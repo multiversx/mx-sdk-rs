@@ -37,7 +37,7 @@ impl<'a> GatewayRequest for GetTxInfo<'a> {
     }
 
     fn get_endpoint(&self) -> String {
-        let mut endpoint = format!("{GET_TRANSACTION_INFO_ENDPOINT}{}", self.hash);
+        let mut endpoint = format!("{GET_TRANSACTION_INFO_ENDPOINT}/{}", self.hash);
 
         if self.with_results {
             endpoint += WITH_RESULTS_QUERY_PARAM;
