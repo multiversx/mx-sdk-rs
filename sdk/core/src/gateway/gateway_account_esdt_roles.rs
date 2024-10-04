@@ -1,5 +1,6 @@
-use crate::data::{esdt::EsdtRolesResponse, sdk_address::SdkAddress};
+use crate::data::esdt::EsdtRolesResponse;
 use anyhow::anyhow;
+use multiversx_chain_core::types::Address;
 use std::collections::HashMap;
 
 use super::{GatewayRequest, GatewayRequestType};
@@ -8,11 +9,11 @@ const ACCOUNT_ENDPOINT: &str = "address/";
 
 /// Retrieves an all esdt roles of an account from the network.
 pub struct GetAccountEsdtRolesRequest<'a> {
-    pub address: &'a SdkAddress,
+    pub address: &'a Address,
 }
 
 impl<'a> GetAccountEsdtRolesRequest<'a> {
-    pub fn new(address: &'a SdkAddress) -> Self {
+    pub fn new(address: &'a Address) -> Self {
         Self { address }
     }
 }
@@ -27,7 +28,10 @@ impl<'a> GatewayRequest for GetAccountEsdtRolesRequest<'a> {
     }
 
     fn get_endpoint(&self) -> String {
-        format!("{ACCOUNT_ENDPOINT}/{}/esdts/roles", self.address)
+        format!(
+            "{ACCOUNT_ENDPOINT}/{}/esdts/roles",
+            crate::bech32::encode(self.address)
+        )
     }
 
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result> {

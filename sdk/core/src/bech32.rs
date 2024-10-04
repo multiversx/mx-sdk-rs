@@ -1,5 +1,5 @@
 //! Duplicated between sdk and scnearios.
-//! 
+//!
 //! TODO: de-duplicate, place in chain core crate, if possible.
 
 use bech32::{Bech32, Hrp};

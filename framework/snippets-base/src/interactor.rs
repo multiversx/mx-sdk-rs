@@ -52,11 +52,9 @@ where
     }
 
     pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
-        let wallet_address = wallet.address();
+        let address = wallet.to_address();
 
-        self.send_user_funds(&wallet_address).await.unwrap();
-
-        let address: Address = wallet_address.into();
+        self.send_user_funds(&address).await.unwrap();
         self.sender_map.insert(
             address.clone(),
             Sender {

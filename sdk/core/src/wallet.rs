@@ -11,6 +11,7 @@ use anyhow::Result;
 use bip39::{Language, Mnemonic};
 use ctr::{cipher::StreamCipher, Ctr128BE};
 use hmac::{Hmac, Mac};
+use multiversx_chain_core::types::Address;
 use pbkdf2::pbkdf2;
 use rand::RngCore;
 use scrypt::{scrypt, Params};
@@ -24,7 +25,7 @@ use crate::{
         private_key::{PrivateKey, PRIVATE_KEY_LENGTH},
         public_key::PublicKey,
     },
-    data::{keystore::*, sdk_address::SdkAddress, transaction::Transaction},
+    data::{keystore::*, transaction::Transaction},
     utils::*,
 };
 
@@ -192,9 +193,16 @@ impl Wallet {
         Ok(priv_key)
     }
 
-    pub fn address(&self) -> SdkAddress {
-        let public_key = PublicKey::from(&self.priv_key);
-        SdkAddress::from(&public_key)
+    #[deprecated(
+        since = "0.54.0",
+        note = "Renamed to `to_address`, type changed to multiversx_chain_core::types::Address"
+    )]
+    pub fn address(&self) -> crate::data::sdk_address::SdkAddress {
+        crate::data::sdk_address::SdkAddress(self.to_address())
+    }
+
+    pub fn to_address(&self) -> Address {
+        PublicKey::from(&self.priv_key).to_address()
     }
 
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> [u8; 64] {
@@ -287,7 +295,7 @@ impl Wallet {
 
     pub fn encrypt_keystore(
         data: &[u8],
-        address: &SdkAddress,
+        address: &Address,
         public_key: &str,
         password: &str,
     ) -> String {
@@ -336,7 +344,7 @@ impl Wallet {
             version: KEYSTORE_VERSION,
             kind: "secretKey".to_string(),
             address: public_key.to_string(),
-            bech32: address.to_string(),
+            bech32: crate::bech32::encode(address),
         };
 
         let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
@@ -344,11 +352,7 @@ impl Wallet {
         keystore_json
     }
 
-    pub fn generate_pem_content(
-        address: &SdkAddress,
-        private_key: &str,
-        public_key: &str,
-    ) -> String {
+    pub fn generate_pem_content(address: &Address, private_key: &str, public_key: &str) -> String {
         let concat_keys = format!("{}{}", private_key, public_key);
         let concat_keys_b64 = base64_encode(concat_keys);
 
@@ -360,11 +364,9 @@ impl Wallet {
             .collect::<Vec<&str>>()
             .join("\n");
 
+        let address_bech32 = crate::bech32::encode(address);
         let pem_content = format!(
-            "-----BEGIN PRIVATE KEY for {}-----\n{}\n-----END PRIVATE KEY for {}-----\n",
-            address.to_bech32_string().unwrap(),
-            formatted_key,
-            address.to_bech32_string().unwrap()
+            "-----BEGIN PRIVATE KEY for {address_bech32}-----\n{formatted_key}\n-----END PRIVATE KEY for {address_bech32}-----\n"
         );
 
         pem_content

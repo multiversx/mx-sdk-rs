@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::anyhow;
+use multiversx_chain_core::types::Address;
 
 use super::{
     gateway_chain_simulator_blocks::GenerateBlocksResponse, GatewayRequest, GatewayRequestType,
@@ -13,10 +14,9 @@ pub struct ChainSimulatorSendFundsRequest {
 }
 
 impl ChainSimulatorSendFundsRequest {
-    /// TODO: convert to argument to Address
-    pub fn to_address(receiver: String) -> Self {
+    pub fn to_address(receiver: &Address) -> Self {
         let mut payload = HashMap::new();
-        payload.insert("receiver", receiver);
+        payload.insert("receiver", crate::bech32::encode(receiver));
         Self { payload }
     }
 }

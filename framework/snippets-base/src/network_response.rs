@@ -154,7 +154,7 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
     let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
 
     for scr in tx.smart_contract_results.iter() {
-        if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
+        if scr.sender.0 != ESDTSystemSCAddress.to_address() {
             continue;
         }
 

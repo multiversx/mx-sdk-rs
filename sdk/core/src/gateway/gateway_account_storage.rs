@@ -1,16 +1,17 @@
-use crate::data::{account_storage::AccountStorageResponse, sdk_address::SdkAddress};
+use crate::data::account_storage::AccountStorageResponse;
 use anyhow::anyhow;
+use multiversx_chain_core::types::Address;
 use std::collections::HashMap;
 
 use super::{GatewayRequest, GatewayRequestType, ACCOUNT_ENDPOINT, KEYS_ENDPOINT};
 
 /// Retrieves an account storage from the network.
 pub struct GetAccountStorageRequest<'a> {
-    pub address: &'a SdkAddress,
+    pub address: &'a Address,
 }
 
 impl<'a> GetAccountStorageRequest<'a> {
-    pub fn new(address: &'a SdkAddress) -> Self {
+    pub fn new(address: &'a Address) -> Self {
         Self { address }
     }
 }
@@ -25,7 +26,10 @@ impl<'a> GatewayRequest for GetAccountStorageRequest<'a> {
     }
 
     fn get_endpoint(&self) -> String {
-        format!("{ACCOUNT_ENDPOINT}{}{KEYS_ENDPOINT}", self.address)
+        format!(
+            "{ACCOUNT_ENDPOINT}{}{KEYS_ENDPOINT}",
+            crate::bech32::encode(self.address)
+        )
     }
 
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result> {
