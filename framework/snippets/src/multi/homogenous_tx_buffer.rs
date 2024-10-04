@@ -3,7 +3,7 @@ use multiversx_sc_scenario::{
         tuple_util::NestedTupleFlatten,
         types::{RHListExec, TxBaseWithEnv},
     },
-    scenario::tx_to_step::{StepWithResponse, StepWrapper, TxToStep},
+    scenario::tx_to_step::{StepWrapper, TxToStep},
     scenario_model::TxResponse,
     ScenarioTxEnvData,
 };
@@ -33,7 +33,7 @@ impl InteractorBase<GatewayHttpProxy> {
 
 impl<'w, Step, RH> HomogenousTxBuffer<'w, Step, RH>
 where
-    Step: InteractorStep + StepWithResponse,
+    Step: InteractorStep,
     RH: RHListExec<TxResponse, ScenarioTxEnvData>,
     RH::ListReturns: NestedTupleFlatten,
 {
@@ -54,7 +54,7 @@ where
     pub async fn run(mut self) -> Vec<<RH::ListReturns as NestedTupleFlatten>::Unpacked> {
         let mut step_buffer = StepBuffer::default();
         for step in &mut self.steps {
-            step_buffer.refs.push(&mut step.step);
+            step_buffer.refs.push(step.step.as_interactor_step());
         }
         self.env.world.multi_sc_exec(step_buffer).await;
 
