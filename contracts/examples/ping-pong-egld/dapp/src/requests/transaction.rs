@@ -1,10 +1,7 @@
 use crate::interactor::ContractInteract;
-use multiversx_sc_snippets_dapp::{
-    imports::{
-        Bech32Address, BigUint, IgnoreValue, OptionalValue, ReturnsMessage,
-        ReturnsNewBech32Address, ReturnsStatus,
-    },
-    InteractorPrepareAsync,
+use multiversx_sc_snippets_dapp::imports::{
+    Bech32Address, BigUint, IgnoreValue, InteractorPrepareAsync, OptionalValue, ReturnsMessage,
+    ReturnsNewBech32Address, ReturnsStatus,
 };
 
 use super::proxy;

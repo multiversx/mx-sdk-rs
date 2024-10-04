@@ -16,8 +16,8 @@ members = [
   "framework/wasm-adapter",
 
   "sdk/core",
+  "sdk/dapp",
   "sdk/http",
-  "sdk/wbg",
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",

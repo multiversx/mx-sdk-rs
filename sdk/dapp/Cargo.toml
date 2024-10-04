@@ -1,5 +1,5 @@
 [package]
-name = "multiversx-sdk-wbg"
+name = "multiversx-sdk-dapp"
 version = "0.6.1"
 edition = "2021"
 
@@ -14,6 +14,7 @@ categories = ["cryptography::cryptocurrencies", "api-bindings"]
 keywords = ["multiversx", "blockchain", "sdk", "api", "wasm", "wasm-bindgen"]
 
 [dependencies]
+getrandom = { version = "0.2.15", features = ["js"] }
 web-sys = { version = "0.3.70" }
 js-sys = { version = "0.3.70" }
 wasm-bindgen = { version = "0.2.93" }

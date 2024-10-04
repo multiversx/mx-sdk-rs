@@ -36,7 +36,7 @@ impl Config {
 }
 
 pub struct ContractInteract {
-    pub interactor: Interactor,
+    pub interactor: DappInteractor,
     pub wallet_address: Address,
     pub contract_code: BytesValue,
     pub config: Config,
@@ -45,8 +45,8 @@ pub struct ContractInteract {
 impl ContractInteract {
     pub async fn new() -> Self {
         let config = Config::new();
-        let mut interactor = Interactor::new(&config.gateway).await;
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let mut interactor = DappInteractor::new(&config.gateway, false).await;
+        let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
 
         let contract_code = BytesValue::from(PING_PONG_CODE);
 

@@ -2447,7 +2447,6 @@ dependencies = [
  "multiversx-sc-scenario",
  "multiversx-sdk",
  "serde_json",
- "tokio",
 ]
 
 [[package]]
@@ -2462,7 +2461,8 @@ dependencies = [
  "log",
  "multiversx-chain-scenario-format",
  "multiversx-sc-scenario",
- "multiversx-sdk-wbg",
+ "multiversx-sc-snippets-base",
+ "multiversx-sdk-dapp",
  "serde_json",
  "wasm-bindgen-futures",
  "web-sys",
@@ -2504,6 +2504,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "multiversx-sdk-dapp"
+version = "0.6.1"
+dependencies = [
+ "anyhow",
+ "getrandom",
+ "gloo-net 0.6.0",
+ "hex",
+ "itertools",
+ "js-sys",
+ "log",
+ "multiversx-sdk",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
 name = "multiversx-sdk-http"
 version = "0.6.1"
 dependencies = [
@@ -2514,22 +2531,6 @@ dependencies = [
  "multiversx-sdk",
  "reqwest",
  "tokio",
-]
-
-[[package]]
-name = "multiversx-sdk-wbg"
-version = "0.6.1"
-dependencies = [
- "anyhow",
- "gloo-net 0.6.0",
- "hex",
- "itertools",
- "js-sys",
- "log",
- "multiversx-sdk",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
 ]
 
 [[package]]

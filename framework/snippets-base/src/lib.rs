@@ -19,7 +19,6 @@ pub use multi::*;
 pub use multiversx_sc_scenario::{self, multiversx_sc};
 pub use multiversx_sdk as sdk_core;
 pub use multiversx_sdk as sdk;
-pub use tokio;
 
 /// Backwards compatibility.
 pub use crate::sdk_core::test_wallets;
