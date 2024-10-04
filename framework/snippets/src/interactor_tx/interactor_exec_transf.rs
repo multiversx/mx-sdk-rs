@@ -3,18 +3,20 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::TxToStep,
     scenario_model::TransferStep,
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
 
-impl<'w, From, To, Payment, Gas> InteractorPrepareAsync
-    for Tx<InteractorEnvExec<'w>, From, To, Payment, Gas, (), ()>
+impl<'w, GatewayProxy, From, To, Payment, Gas> InteractorPrepareAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>
 where
-    From: TxFromSpecified<InteractorEnvExec<'w>>,
-    To: TxToSpecified<InteractorEnvExec<'w>>,
-    Payment: TxPayment<InteractorEnvExec<'w>>,
-    Gas: TxGas<InteractorEnvExec<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Exec = InteractorExecStep<'w, TransferStep, ()>;
+    type Exec = InteractorExecStep<'w, GatewayProxy, TransferStep, ()>;
 
     fn prepare_async(self) -> Self::Exec {
         InteractorExecStep {
@@ -23,7 +25,10 @@ where
     }
 }
 
-impl<'w> InteractorExecStep<'w, TransferStep, ()> {
+impl<'w, GatewayProxy> InteractorExecStep<'w, GatewayProxy, TransferStep, ()>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     pub async fn run(self) {
         self.step_wrapper
             .env

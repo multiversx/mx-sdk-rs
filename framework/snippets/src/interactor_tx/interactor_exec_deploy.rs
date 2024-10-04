@@ -16,25 +16,26 @@ use crate::InteractorBase;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
 
-impl<'w, From, Payment, Gas, CodeValue, RH> InteractorPrepareAsync
+impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorPrepareAsync
     for Tx<
-        InteractorEnvExec<'w>,
+        InteractorEnvExec<'w, GatewayProxy>,
         From,
         (),
         Payment,
         Gas,
-        DeployCall<InteractorEnvExec<'w>, Code<CodeValue>>,
+        DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >
 where
-    From: TxFromSpecified<InteractorEnvExec<'w>>,
-    Payment: TxPayment<InteractorEnvExec<'w>>,
-    Gas: TxGas<InteractorEnvExec<'w>>,
-    CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
-    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    type Exec = InteractorExecStep<'w, ScDeployStep, RH>;
+    type Exec = InteractorExecStep<'w, GatewayProxy, ScDeployStep, RH>;
 
     fn prepare_async(self) -> Self::Exec {
         InteractorExecStep {
@@ -43,9 +44,10 @@ where
     }
 }
 
-impl<'w, RH> InteractorExecStep<'w, ScDeployStep, RH>
+impl<'w, GatewayProxy, RH> InteractorExecStep<'w, GatewayProxy, ScDeployStep, RH>
 where
-    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(mut self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
