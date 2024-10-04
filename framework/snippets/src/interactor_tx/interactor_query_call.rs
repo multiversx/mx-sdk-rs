@@ -14,15 +14,16 @@ use crate::InteractorBase;
 
 use super::{InteractorEnvQuery, InteractorPrepareAsync, InteractorQueryStep};
 
-impl<'w, To, Payment, RH> InteractorPrepareAsync
-    for Tx<InteractorEnvQuery<'w>, (), To, Payment, (), FunctionCall<StaticApi>, RH>
+impl<'w, GatewayProxy, To, Payment, RH> InteractorPrepareAsync
+    for Tx<InteractorEnvQuery<'w, GatewayProxy>, (), To, Payment, (), FunctionCall<StaticApi>, RH>
 where
-    To: TxToSpecified<InteractorEnvQuery<'w>>,
-    Payment: TxNoPayment<InteractorEnvQuery<'w>>,
-    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    To: TxToSpecified<InteractorEnvQuery<'w, GatewayProxy>>,
+    Payment: TxNoPayment<InteractorEnvQuery<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w, GatewayProxy>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    type Exec = InteractorQueryStep<'w, RH>;
+    type Exec = InteractorQueryStep<'w, GatewayProxy, RH>;
 
     fn prepare_async(self) -> Self::Exec {
         InteractorQueryStep {
@@ -31,9 +32,10 @@ where
     }
 }
 
-impl<'w, RH> InteractorQueryStep<'w, RH>
+impl<'w, GatewayProxy, RH> InteractorQueryStep<'w, GatewayProxy, RH>
 where
-    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w, GatewayProxy>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(mut self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {

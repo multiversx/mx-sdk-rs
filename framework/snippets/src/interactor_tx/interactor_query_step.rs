@@ -3,13 +3,15 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::StepWrapper,
     scenario_model::{ScQueryStep, TxResponse},
 };
+use multiversx_sdk::gateway::GatewayAsyncService;
 
 use super::InteractorEnvQuery;
 
-pub struct InteractorQueryStep<'w, RH>
+pub struct InteractorQueryStep<'w, GatewayProxy, RH>
 where
-    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
+    GatewayProxy: GatewayAsyncService,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w, GatewayProxy>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    pub(crate) step_wrapper: StepWrapper<InteractorEnvQuery<'w>, ScQueryStep, RH>,
+    pub(crate) step_wrapper: StepWrapper<InteractorEnvQuery<'w, GatewayProxy>, ScQueryStep, RH>,
 }

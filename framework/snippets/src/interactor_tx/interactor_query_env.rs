@@ -9,20 +9,29 @@ use multiversx_sdk_http::GatewayHttpProxy;
 
 use crate::InteractorBase;
 
-impl InteractorBase<GatewayHttpProxy> {
-    pub fn query(&mut self) -> TxBaseWithEnv<InteractorEnvQuery<'_>> {
+impl<GatewayProxy> InteractorBase<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    pub fn query(&mut self) -> TxBaseWithEnv<InteractorEnvQuery<'_, GatewayProxy>> {
         let data = self.new_env_data();
         let env = InteractorEnvQuery { world: self, data };
         Tx::new_with_env(env)
     }
 }
 
-pub struct InteractorEnvQuery<'w> {
-    pub world: &'w mut InteractorBase<GatewayHttpProxy>,
+pub struct InteractorEnvQuery<'w, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    pub world: &'w mut InteractorBase<GatewayProxy>,
     pub data: ScenarioTxEnvData,
 }
 
-impl<'w> TxEnv for InteractorEnvQuery<'w> {
+impl<'w, GatewayProxy> TxEnv for InteractorEnvQuery<'w, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     type Api = StaticApi;
 
     type RHExpect = TxExpect;
@@ -40,7 +49,10 @@ impl<'w> TxEnv for InteractorEnvQuery<'w> {
     }
 }
 
-impl<'w> ScenarioTxEnv for InteractorEnvQuery<'w> {
+impl<'w, GatewayProxy> ScenarioTxEnv for InteractorEnvQuery<'w, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
     }
