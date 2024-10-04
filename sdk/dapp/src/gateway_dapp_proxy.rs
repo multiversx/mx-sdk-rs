@@ -1,15 +1,6 @@
 use gloo_net::http::Request;
 use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest, GatewayRequestType};
 
-mod gateway_account;
-mod gateway_block;
-mod gateway_network;
-mod gateway_tx;
-mod gateway_tx_retrieve;
-
-// MetachainShardId will be used to identify a shard ID as metachain
-pub const METACHAIN_SHARD_ID: u32 = 0xFFFFFFFF;
-
 /// Allows communication with the MultiversX gateway API.
 #[derive(Clone, Debug)]
 pub struct GatewayDappProxy {
@@ -19,10 +10,6 @@ pub struct GatewayDappProxy {
 impl GatewayDappProxy {
     pub fn new(proxy_url: String) -> Self {
         Self { proxy_url }
-    }
-
-    pub(crate) fn get_endpoint(&self, endpoint: &str) -> String {
-        format!("{}/{}", self.proxy_url, endpoint)
     }
 
     /// Performs a request to the gateway.

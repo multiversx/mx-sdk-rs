@@ -8,6 +8,12 @@ pub struct NetworkStatusRequest {
     shard: u32,
 }
 
+impl NetworkStatusRequest {
+    pub fn new(shard: u32) -> Self {
+        NetworkStatusRequest { shard }
+    }
+}
+
 impl Default for NetworkStatusRequest {
     fn default() -> Self {
         Self {
