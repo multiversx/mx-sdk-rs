@@ -22,12 +22,12 @@ jobs:
         uses: robinraju/release-downloader@v1.5
         with:
           repository: vadimcn/vscode-lldb
-          latest: true
-          fileName: codelldb-linux-x64.vsix
+          tag: 1.10.0
+          fileName: codelldb-x86_64-linux.vsix
 
       - name: Setup vscode-lldb
         run: |
-          unzip codelldb-linux-x64.vsix -d vscode-lldb
+          unzip codelldb-x86_64-linux.vsix -d vscode-lldb
           mkdir -p $HOME/.vscode/extensions/vadimcn.vscode-lldb-x.x.x/
           mv vscode-lldb/extension/* $HOME/.vscode/extensions/vadimcn.vscode-lldb-x.x.x/
 
