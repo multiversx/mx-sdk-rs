@@ -1,4 +1,4 @@
-use multiversx_sc_snippets::account_tool;
+use multiversx_sc_snippets::{base::account_tool, imports::GatewayHttpProxy};
 
 use crate::cli::AccountArgs;
 
@@ -7,7 +7,7 @@ pub async fn retrieve_address(args: &AccountArgs) {
     let api_string = args.api.clone().expect("API needs to be specified");
     let use_chain_simulator = args.chain_simulator.unwrap_or_default();
     account_tool::print_account_as_scenario_set_state(
-        api_string,
+        GatewayHttpProxy::new(api_string),
         use_chain_simulator,
         args.address.to_string(),
     )

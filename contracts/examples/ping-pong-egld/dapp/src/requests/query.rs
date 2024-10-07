@@ -1,14 +1,17 @@
 use crate::interactor::ContractInteract;
-use multiversx_sc_snippets_dapp::sdk::data::network_status::NetworkStatus;
+use multiversx_sc_snippets_dapp::sdk::{
+    core::gateway::GatewayAsyncService, core::gateway::NetworkStatusRequest,
+    data::network_status::NetworkStatus,
+};
 
 pub async fn get_network_status() -> Result<NetworkStatus, String> {
     let contract_interact = ContractInteract::new().await;
-    let shard = 1u8;
+    let shard = 1u32;
 
     let response = contract_interact
         .interactor
         .proxy
-        .get_network_status(shard)
+        .request(NetworkStatusRequest::new(shard))
         .await;
 
     match response {

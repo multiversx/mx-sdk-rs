@@ -11,12 +11,13 @@ members = [
   "framework/meta-lib",
   "framework/scenario",
   "framework/snippets",
+  "framework/snippets-base",
   "framework/snippets-dapp",
   "framework/wasm-adapter",
 
   "sdk/core",
+  "sdk/dapp",
   "sdk/http",
-  "sdk/wbg",
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",

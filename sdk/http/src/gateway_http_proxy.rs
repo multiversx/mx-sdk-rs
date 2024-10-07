@@ -57,10 +57,11 @@ impl GatewayHttpProxy {
 impl GatewayAsyncService for GatewayHttpProxy {
     type Instant = std::time::Instant;
 
-    fn request<G>(
-        &self,
-        request: G,
-    ) -> impl std::future::Future<Output = anyhow::Result<G::Result>>
+    fn from_uri(uri: &str) -> Self {
+        Self::new(uri.to_owned())
+    }
+
+    fn request<G>(&self, request: G) -> impl std::future::Future<Output = anyhow::Result<G::Result>>
     where
         G: multiversx_sdk::gateway::GatewayRequest,
     {

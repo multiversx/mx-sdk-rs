@@ -1,5 +1,5 @@
 [package]
-name = "multiversx-sc-snippets"
+name = "multiversx-sc-snippets-base"
 version = "0.53.1"
 edition = "2021"
 
@@ -14,7 +14,6 @@ keywords = ["multiversx", "blockchain", "contract", "snippets"]
 categories = ["cryptography::cryptocurrencies"]
 
 [dependencies]
-tokio = { version = "1.24", features = ["full"] }
 hex = "0.4"
 base64 = "0.22"
 log = "0.4.17"
@@ -30,17 +29,9 @@ path = "../scenario"
 version = "0.23.0"
 path = "../../sdk/scenario-format"
 
-[dependencies.multiversx-sc-snippets-base]
-version = "=0.53.1"
-path = "../snippets-base"
-
 [dependencies.multiversx-sdk]
 version = "=0.6.1"
 path = "../../sdk/core"
-
-[dependencies.multiversx-sdk-http]
-version = "=0.6.1"
-path = "../../sdk/http"
 
 [dev-dependencies]
 serde_json = "1.0"
