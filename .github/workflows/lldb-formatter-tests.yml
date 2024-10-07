@@ -22,7 +22,7 @@ jobs:
         uses: robinraju/release-downloader@v1.5
         with:
           repository: vadimcn/vscode-lldb
-          tag: 1.10.0
+          tag: v1.10.0
           fileName: codelldb-x86_64-linux.vsix
 
       - name: Setup vscode-lldb
