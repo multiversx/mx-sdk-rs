@@ -190,9 +190,9 @@ impl MultisigInteract {
 
         MultiValueVec::from([
             self.wallet_address.to_address(),
-            carol.address().to_bytes().into(),
-            dan.address().to_bytes().into(),
-            eve.address().to_bytes().into(),
+            carol.to_address(),
+            dan.to_address(),
+            eve.to_address(),
         ])
     }
 

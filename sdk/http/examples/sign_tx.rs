@@ -1,4 +1,7 @@
-use multiversx_sdk::{data::transaction::Transaction, wallet::Wallet};
+use multiversx_sdk::{
+    data::{sdk_address::SdkAddress, transaction::Transaction},
+    wallet::Wallet,
+};
 use multiversx_sdk_http::{GatewayHttpProxy, DEVNET_GATEWAY};
 
 #[tokio::main]
@@ -7,7 +10,7 @@ async fn main() {
         "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
     )
     .unwrap();
-    let addr = wl.address();
+    let addr = wl.to_address();
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
     let network_config = blockchain.get_network_config().await.unwrap();
 
@@ -19,8 +22,8 @@ async fn main() {
     let mut unsign_tx = Transaction {
         nonce: arg.nonce,
         value: "0".to_string(),
-        receiver: addr.clone(),
-        sender: addr.clone(),
+        receiver: SdkAddress(addr.clone()),
+        sender: SdkAddress(addr.clone()),
         gas_price: arg.gas_price,
         gas_limit: arg.gas_limit,
         data: arg.data,

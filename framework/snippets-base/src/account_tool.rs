@@ -1,4 +1,4 @@
-use crate::sdk_core::data::{esdt::EsdtBalance, sdk_address::SdkAddress};
+use crate::sdk_core::data::esdt::EsdtBalance;
 use multiversx_chain_scenario_format::interpret_trait::IntoRaw;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
@@ -40,34 +40,31 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
 pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncService>(
     api: &GatewayProxy,
     use_chain_simulator: bool,
-    address: &Bech32Address,
+    bech32_address: &Bech32Address,
 ) -> SetStateStep {
-    let sdk_address = SdkAddress::from_bech32_string(address.to_bech32_str()).unwrap();
-    let sdk_account = api
-        .request(GetAccountRequest::new(&sdk_address))
-        .await
-        .unwrap();
+    let address = bech32_address.as_address();
+    let sdk_account = api.request(GetAccountRequest::new(address)).await.unwrap();
 
     let (account_esdt, account_esdt_roles, account_storage) = if use_chain_simulator {
         (HashMap::new(), HashMap::new(), HashMap::new())
     } else {
         let account_esdt = api
-            .request(GetAccountEsdtTokensRequest::new(&sdk_address))
+            .request(GetAccountEsdtTokensRequest::new(address))
             .await
             .unwrap_or_else(|err| {
-                panic!("failed to retrieve ESDT tokens for address {address}: {err}")
+                panic!("failed to retrieve ESDT tokens for address {bech32_address}: {err}")
             });
         let account_esdt_roles = api
-            .request(GetAccountEsdtRolesRequest::new(&sdk_address))
+            .request(GetAccountEsdtRolesRequest::new(address))
             .await
             .unwrap_or_else(|err| {
-                panic!("failed to retrieve ESDT roles for address {address}: {err}")
+                panic!("failed to retrieve ESDT roles for address {bech32_address}: {err}")
             });
         let account_storage = api
-            .request(GetAccountStorageRequest::new(&sdk_address))
+            .request(GetAccountStorageRequest::new(address))
             .await
             .unwrap_or_else(|err| {
-                panic!("failed to retrieve storage for address {address}: {err}")
+                panic!("failed to retrieve storage for address {bech32_address}: {err}")
             });
 
         (account_esdt, account_esdt_roles, account_storage)
@@ -81,7 +78,7 @@ pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncSe
     );
 
     let set_state_step = SetStateStep::new();
-    set_state_step.put_account(address, account_state)
+    set_state_step.put_account(bech32_address, account_state)
 }
 
 fn set_account(

@@ -19,7 +19,7 @@ where
     pub async fn recall_nonce(&self, address: &Address) -> u64 {
         let account = self
             .proxy
-            .request(GetAccountRequest::new(&address.clone().into()))
+            .request(GetAccountRequest::new(address))
             .await
             .expect("failed to retrieve account nonce");
         account.nonce

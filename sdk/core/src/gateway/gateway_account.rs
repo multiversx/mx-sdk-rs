@@ -1,19 +1,17 @@
-use crate::data::{
-    account::{Account, AccountResponse},
-    sdk_address::SdkAddress,
-};
+use crate::data::account::{Account, AccountResponse};
 use anyhow::anyhow;
+use multiversx_chain_core::types::Address;
 
 use super::ACCOUNT_ENDPOINT;
 use super::{GatewayRequest, GatewayRequestType};
 
 /// Retrieves an account info from the network (nonce, balance).
 pub struct GetAccountRequest<'a> {
-    pub address: &'a SdkAddress,
+    pub address: &'a Address,
 }
 
 impl<'a> GetAccountRequest<'a> {
-    pub fn new(address: &'a SdkAddress) -> Self {
+    pub fn new(address: &'a Address) -> Self {
         Self { address }
     }
 }
@@ -28,7 +26,7 @@ impl<'a> GatewayRequest for GetAccountRequest<'a> {
     }
 
     fn get_endpoint(&self) -> String {
-        format!("{ACCOUNT_ENDPOINT}{}", self.address)
+        format!("{ACCOUNT_ENDPOINT}/{}", crate::bech32::encode(self.address))
     }
 
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result> {

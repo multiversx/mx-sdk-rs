@@ -1,65 +1,52 @@
 use std::fmt::{Debug, Display};
 
-use crate::crypto::public_key::PublicKey;
 use anyhow::Result;
-use bech32::{Bech32, Hrp};
+use multiversx_chain_core::types::Address;
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
 };
 
+/// Wrapper around a regular Address.
+///
+/// Provides:
+/// - serde serialization/deserialization as bech32
+/// - conversions to/from bech32
+///
+/// It should only be used in the sdk, to serialize/deserialize to JSON as bech32.
+///
+/// It exists primarily because it is currently inconvenient to provide
+/// bech32 and serde functionality to the base Address directly.
 #[derive(Clone)]
-pub struct SdkAddress([u8; 32]);
+pub struct SdkAddress(pub Address);
 
 impl SdkAddress {
     pub fn from_bytes(bytes: [u8; 32]) -> Self {
-        Self(bytes)
+        Self(Address::from(bytes))
     }
 
     pub fn to_bytes(&self) -> [u8; 32] {
-        self.0
+        *self.0.as_array()
     }
 
     pub fn from_bech32_string(bech32: &str) -> Result<Self> {
-        let (_hrp, data) = bech32::decode(bech32)?;
-
-        let mut bits: [u8; 32] = [0u8; 32];
-        bits.copy_from_slice(&data);
-
-        Ok(Self(bits))
+        Ok(SdkAddress(crate::bech32::decode(bech32)))
     }
 
     pub fn to_bech32_string(&self) -> Result<String> {
-        let hrp = Hrp::parse("erd")?;
-        let address = bech32::encode::<Bech32>(hrp, &self.0)?;
-        Ok(address)
-    }
-
-    pub fn is_valid(&self) -> bool {
-        self.0.len() == 32
+        Ok(crate::bech32::encode(&self.0))
     }
 }
 
 impl From<multiversx_chain_core::types::Address> for SdkAddress {
     fn from(value: multiversx_chain_core::types::Address) -> Self {
-        SdkAddress(*value.as_array())
+        SdkAddress(value)
     }
 }
 
 impl From<SdkAddress> for multiversx_chain_core::types::Address {
     fn from(value: SdkAddress) -> Self {
-        multiversx_chain_core::types::Address::new(value.0)
-    }
-}
-
-impl<'a> From<&'a PublicKey> for SdkAddress {
-    fn from(public_key: &PublicKey) -> SdkAddress {
-        let bytes = public_key.to_bytes();
-
-        let mut bits: [u8; 32] = [0u8; 32];
-        bits.copy_from_slice(&bytes);
-
-        SdkAddress(bits)
+        value.0
     }
 }
 
@@ -77,7 +64,7 @@ impl Debug for SdkAddress {
 
 impl Default for SdkAddress {
     fn default() -> Self {
-        SdkAddress::from_bytes([0u8; 32])
+        SdkAddress(Address::zero())
     }
 }
 
@@ -110,7 +97,7 @@ pub mod tests {
             "erd1qqqqqqqqqqqqqpgqyfjjn43spw7teklwtpz4x5waygq2mluyj9ts0mdwn6",
         )
         .unwrap();
-        let encode = hex::encode(addr.to_bytes());
+        let encode = hex::encode(addr.0.as_bytes());
         assert_eq!(
             encode,
             "00000000000000000500226529d6300bbcbcdbee58455351dd2200adff849157"

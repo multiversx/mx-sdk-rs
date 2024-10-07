@@ -11,7 +11,7 @@ async fn main() {
     .unwrap();
 
     let arg = blockchain
-        .get_default_transaction_arguments(&addr, &network_config)
+        .get_default_transaction_arguments(&addr.0, &network_config)
         .await
         .unwrap();
 
