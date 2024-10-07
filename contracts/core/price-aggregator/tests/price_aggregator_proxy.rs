@@ -406,3 +406,11 @@ where
     pub block: u64,
     pub epoch: u64,
 }
+
+#[type_abi]
+#[derive(TopEncode)]
+pub struct DiscardSubmissionEvent {
+    pub submission_timestamp: u64,
+    pub first_submission_timestamp: u64,
+    pub has_caller_already_submitted: bool,
+}
