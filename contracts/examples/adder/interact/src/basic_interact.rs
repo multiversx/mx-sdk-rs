@@ -84,11 +84,7 @@ impl AdderInteract {
             .await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor
-            .proxy
-            .generate_blocks_until_epoch(1)
-            .await
-            .unwrap();
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
 
         Self {
             interactor,
