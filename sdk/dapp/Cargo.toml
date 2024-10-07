@@ -1,0 +1,30 @@
+[package]
+name = "multiversx-sdk-dapp"
+version = "0.6.1"
+edition = "2021"
+
+authors = ["MultiversX <contact@multiversx.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/multiversx/mx-sdk-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.multiversx.com/"
+description = "SDK for interacting with the MultiversX blockchain for wasm-bindgen environments"
+categories = ["cryptography::cryptocurrencies", "api-bindings"]
+keywords = ["multiversx", "blockchain", "sdk", "api", "wasm", "wasm-bindgen"]
+
+[dependencies]
+getrandom = { version = "0.2.15", features = ["js"] } # js feature overrides import from sdk
+web-sys = { version = "0.3.70" }
+js-sys = { version = "0.3.70" }
+wasm-bindgen = { version = "0.2.93" }
+wasm-bindgen-futures = { version = "0.4.43" }
+gloo-net = { version = "0.6.0" }
+anyhow = "1.0.44"
+hex = "0.4.3"
+itertools = "0.13.0"
+log = "0.4.17"
+
+[dependencies.multiversx-sdk]
+version = "=0.6.1"
+path = "../core"
