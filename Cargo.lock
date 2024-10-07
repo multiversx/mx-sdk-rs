@@ -1830,6 +1830,16 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
+version = "1.9.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd070e393353796e801d209ad339e89596eb4c8d430d18ede6a1cced8fafbd99"
+dependencies = [
+ "autocfg",
+ "hashbrown 0.12.3",
+]
+
+[[package]]
+name = "indexmap"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "707907fe3c25f5424cce2cb7e1cbcafee6bdbe735ca90ef77c29e84591e5b9da"
@@ -2425,7 +2435,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets-base"
-version = "0.53.1"
+version = "0.53.2"
 dependencies = [
  "anyhow",
  "base64",
@@ -2441,7 +2451,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets-dapp"
-version = "0.53.1"
+version = "0.53.2"
 dependencies = [
  "base64",
  "env_logger",

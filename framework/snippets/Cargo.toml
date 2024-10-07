@@ -31,7 +31,7 @@ version = "0.23.0"
 path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-sc-snippets-base]
-version = "=0.53.1"
+version = "=0.53.2"
 path = "../snippets-base"
 
 [dependencies.multiversx-sdk]
