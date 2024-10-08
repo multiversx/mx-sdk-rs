@@ -1,4 +1,4 @@
-use std::{collections::HashMap, ffi::OsStr, fs, process::Command};
+use std::{ffi::OsStr, fs, process::Command};
 
 use super::ContractVariant;
 use crate::{
@@ -131,10 +131,10 @@ impl ContractVariant {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
 
         let abi = ContractAbiJson::from(&self.abi);
-        let mut view_endpoints: HashMap<&str, usize> = HashMap::new();
+        let mut view_endpoints: Vec<&str> = Vec::new();
         for endpoint in &abi.endpoints {
             if let crate::abi_json::EndpointMutabilityAbiJson::Readonly = endpoint.mutability {
-                view_endpoints.insert(&endpoint.name, 0);
+                view_endpoints.push(&endpoint.name);
             }
         }
 
@@ -144,8 +144,7 @@ impl ContractVariant {
                 build_args.extract_imports,
                 &self.settings.check_ei,
                 view_endpoints,
-            )
-            .expect("error occured while extracting imports from .wasm ");
+            );
         }
 
         let output_imports_json_path = format!(
@@ -160,8 +159,7 @@ impl ContractVariant {
             true,
             &self.settings.check_ei,
             view_endpoints,
-        )
-        .expect("error occured while extracting imports from .wasm ");
+        );
 
         write_imports_output(
             output_imports_json_path.as_str(),

@@ -4,7 +4,7 @@ pub mod tests {
 
     use wat::Parser;
 
-    use crate::tools::{panic_report::PanicReport, wasm_extractor::populate_wasm_info};
+    use crate::tools::{panic_report::PanicReport, wasm_extractor::populate_wasm_info, WasmInfo};
 
     const ADDER_WITH_ERR_IN_VIEW: &str = r#"
 (module $adder_wasm.wasm
@@ -408,14 +408,9 @@ pub mod tests {
     #[test]
     fn test_empty() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
-            let wasm_info = populate_wasm_info(
-                String::new(),
-                content.to_vec(),
-                false,
-                &None,
-                HashMap::new(),
-            )
-            .expect("Unable to parse WASM content.");
+            let wasm_info =
+                populate_wasm_info(String::new(), content.to_vec(), false, &None, Vec::new())
+                    .expect("Unable to parse WASM content.");
             assert!(!wasm_info.memory_grow_flag);
             assert!(!wasm_info.report.has_allocator);
             assert_eq!(
@@ -428,14 +423,9 @@ pub mod tests {
     #[test]
     fn test_empty_with_mem_grow() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_MEM_GROW.as_bytes()) {
-            let wasm_info = populate_wasm_info(
-                String::new(),
-                content.to_vec(),
-                false,
-                &None,
-                HashMap::new(),
-            )
-            .expect("Unable to parse WASM content.");
+            let wasm_info =
+                populate_wasm_info(String::new(), content.to_vec(), false, &None, Vec::new())
+                    .expect("Unable to parse WASM content.");
             assert!(wasm_info.memory_grow_flag);
             assert!(!wasm_info.report.has_allocator);
             assert_eq!(
@@ -448,14 +438,9 @@ pub mod tests {
     #[test]
     fn test_empty_with_fail_allocator() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_FAIL_ALLOCATOR.as_bytes()) {
-            let wasm_info = populate_wasm_info(
-                String::new(),
-                content.to_vec(),
-                false,
-                &None,
-                HashMap::new(),
-            )
-            .expect("Unable to parse WASM content.");
+            let wasm_info =
+                populate_wasm_info(String::new(), content.to_vec(), false, &None, Vec::new())
+                    .expect("Unable to parse WASM content.");
             assert!(!wasm_info.memory_grow_flag);
             assert!(wasm_info.report.has_allocator);
             assert_eq!(
@@ -467,8 +452,10 @@ pub mod tests {
 
     #[test]
     fn test_adder_with_write_op_in_view() {
-        let view_endpoints: HashMap<&str, usize> = HashMap::from([("sum", 0), ("add", 0)]);
+        let view_endpoints: Vec<&str> = Vec::from(["getSum", "add"]);
 
+        let expected_view_index: HashMap<String, usize> =
+            HashMap::from([("getSum".to_string(), 18), ("add".to_string(), 19)]);
         let expected_write_index_functions: HashSet<usize> = HashSet::from([4, 19, 14]);
         let expected_call_graph: HashMap<usize, HashSet<usize>> = HashMap::from([
             (0, HashSet::new()),
@@ -509,6 +496,7 @@ pub mod tests {
                 wasm_info.write_index_functions
             );
             assert_eq!(expected_call_graph, wasm_info.call_graph);
+            assert_eq!(expected_view_index, wasm_info.view_endpoints);
         }
     }
 }
