@@ -4,7 +4,7 @@ pub mod tests {
 
     use wat::Parser;
 
-    use crate::tools::{panic_report::PanicReport, wasm_extractor::populate_wasm_info, WasmInfo};
+    use crate::tools::{panic_report::PanicReport, wasm_extractor::populate_wasm_info};
 
     const ADDER_WITH_ERR_IN_VIEW: &str = r#"
 (module $adder_wasm.wasm
