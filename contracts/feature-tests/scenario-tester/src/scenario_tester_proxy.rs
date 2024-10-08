@@ -43,12 +43,13 @@ where
     From: TxFrom<Env>,
     Gas: TxGas<Env>,
 {
+    /// Return value for testing reasons. 
     pub fn init<
         Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         initial_value: Arg0,
-    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, &'static str> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_deploy()

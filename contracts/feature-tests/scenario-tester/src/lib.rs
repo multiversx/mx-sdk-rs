@@ -12,9 +12,11 @@ pub trait ScenarioTester {
     #[storage_mapper("sum")]
     fn sum(&self) -> SingleValueMapper<BigUint>;
 
+    /// Return value for testing reasons.
     #[init]
-    fn init(&self, initial_value: BigUint) {
+    fn init(&self, initial_value: BigUint) -> &'static str {
         self.sum().set(initial_value);
+        "init-result"
     }
 
     #[upgrade]

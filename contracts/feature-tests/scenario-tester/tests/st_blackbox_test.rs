@@ -286,3 +286,41 @@ fn st_blackbox_tx_hash() {
 
     assert_eq!(tx_hash.as_array(), &[22u8; 32]);
 }
+
+#[test]
+fn st_blackbox_returns_result_or_error() {
+    let mut world = world();
+
+    world
+        .account(OWNER_ADDRESS)
+        .nonce(1)
+        .balance(100)
+        .account(OTHER_ADDRESS)
+        .nonce(2)
+        .balance(300)
+        .esdt_balance(TOKEN_ID, 500)
+        .commit();
+
+    let (result, check_tx_hash) = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .init(5u32)
+        .code(CODE_PATH)
+        .new_address(ST_ADDRESS)
+        .tx_hash([33u8; 32])
+        .returns(
+            ReturnsResultOrError::new()
+                .returns(ReturnsNewAddress)
+                .returns(ReturnsResultAs::<String>::new())
+                .returns(ReturnsTxHash),
+        )
+        .returns(ReturnsTxHash)
+        .run();
+
+    assert_eq!(check_tx_hash.as_array(), &[33u8; 32]);
+    let (new_address, out_value, also_check_tx_hash) = result.unwrap();
+    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(out_value, "init-result");
+    assert_eq!(also_check_tx_hash.as_array(), &[33u8; 32]);
+}
