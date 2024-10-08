@@ -57,7 +57,7 @@ pub trait EventsModule {
         &self,
         token_pair: &TokenPair<Self::Api>,
         round_id: usize,
-        submission_timestamp: u64, 
+        submission_timestamp: u64,
         first_submission_timestamp: u64,
         has_caller_already_submitted: bool,
     ) {
@@ -68,7 +68,7 @@ pub trait EventsModule {
             &DiscardSubmissionEvent {
                 submission_timestamp,
                 first_submission_timestamp,
-                has_caller_already_submitted
+                has_caller_already_submitted,
             },
         )
     }
