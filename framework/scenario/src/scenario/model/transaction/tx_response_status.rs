@@ -1,4 +1,4 @@
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 /// The status of a transaction.
 pub struct TxResponseStatus {
     /// The status of the transaction.

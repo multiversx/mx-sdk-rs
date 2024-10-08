@@ -40,4 +40,9 @@ pub trait ScenarioTester {
         let value_plus_one = &value + 1u32;
         (value, value_plus_one).into()
     }
+
+    #[view]
+    fn sc_panic(&self) {
+        sc_panic!("sc_panic! example");
+    }
 }

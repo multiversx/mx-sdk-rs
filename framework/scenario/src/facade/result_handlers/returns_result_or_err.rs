@@ -8,7 +8,7 @@ use multiversx_sc::{
     },
 };
 
-use crate::scenario_model::{TxResponse, TxResponseStatus};
+use crate::scenario_model::{CheckValue, TxExpect, TxResponse, TxResponseStatus};
 
 /// Indicates that a `Result` will be returned, either with the handled result,
 /// according to the inner result handlers, or with an error in case of a failed transaction.
@@ -74,10 +74,16 @@ where
 impl<Env, Original, Ok> RHListItemExec<TxResponse, Env, Original>
     for ReturnsResultOrError<Env, Original, Ok>
 where
-    Env: TxEnv,
+    Env: TxEnv<RHExpect = TxExpect>,
     Ok: RHListExec<TxResponse, Env>,
     Ok::ListReturns: NestedTupleFlatten,
 {
+    fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+        prev.status = CheckValue::Star;
+        prev.message = CheckValue::Star;
+        prev
+    }
+
     fn item_process_result(self, raw_result: &TxResponse) -> Self::Returns {
         if raw_result.tx_error.is_success() {
             let tuple_result = self.ok_t.list_process_result(raw_result);

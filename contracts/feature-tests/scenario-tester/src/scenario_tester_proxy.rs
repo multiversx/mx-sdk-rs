@@ -140,4 +140,13 @@ where
             .argument(&value)
             .original_result()
     }
+
+    pub fn sc_panic(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("sc_panic")
+            .original_result()
+    }
 }
