@@ -10,12 +10,19 @@ use wasmparser::{
 
 use crate::ei::EIVersion;
 
-use super::{panic_report::PanicReport, report_creator::ReportCreator};
+use super::report_creator::ReportCreator;
 
 type CallGraph = HashMap<usize, HashSet<usize>>;
 
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
-const WRITE_OP: [&str; 1] = ["mBufferStorageStore"];
+const WRITE_OP: &[&str] = &[
+    "mBufferStorageStore",
+    "storageStore",
+    "int64storageStore",
+    "bigIntStorageStoreUnsigned",
+    "smallIntStorageStoreUnsigned",
+    "smallIntStorageStoreSigned",
+];
 
 #[derive(Default)]
 pub struct WasmInfo {
@@ -24,6 +31,7 @@ pub struct WasmInfo {
     pub memory_grow_flag: bool,
     pub report: ReportCreator,
     pub call_graph: CallGraph,
+    pub write_index_functions: HashSet<usize>,
 }
 
 impl WasmInfo {
@@ -49,24 +57,23 @@ impl WasmInfo {
 pub(crate) fn populate_wasm_info(
     path: String,
     wasm_data: Vec<u8>,
-    extract_imports_enabled: bool,
+    import_extraction_enabled: bool,
     check_ei: &Option<EIVersion>,
     mut view_endpoints: HashMap<&str, usize>,
 ) -> Result<WasmInfo, BinaryReaderError> {
     let mut wasm_info = WasmInfo::default();
-    let mut write_functions: HashSet<usize> = HashSet::new();
 
     let parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
         match payload? {
             Payload::ImportSection(import_section) => {
-                write_functions =
-                    process_imports(import_section, extract_imports_enabled, &mut wasm_info);
+                wasm_info.write_index_functions =
+                    process_imports(import_section, import_extraction_enabled, &mut wasm_info);
                 wasm_info.ei_check |= is_ei_valid(&wasm_info.imports, check_ei);
             },
             Payload::DataSection(data_section) => {
-                allocator_trigger |= is_fail_allocator_triggered(data_section.clone());
-                has_panic.max_severity(data_section);
+                wasm_info.report.has_allocator |= is_fail_allocator_triggered(data_section.clone());
+                wasm_info.report.has_panic.max_severity(data_section);
             },
             Payload::CodeSectionEntry(code_section) => {
                 wasm_info.memory_grow_flag |= is_mem_grow(&code_section);
@@ -79,7 +86,11 @@ pub(crate) fn populate_wasm_info(
         }
     }
 
-    detect_write_operations_in_views(&view_endpoints, &wasm_info.call_graph, &mut write_functions);
+    detect_write_operations_in_views(
+        &view_endpoints,
+        &wasm_info.call_graph,
+        &mut wasm_info.write_index_functions,
+    );
 
     let report = ReportCreator {
         path,
@@ -93,13 +104,14 @@ pub(crate) fn populate_wasm_info(
         memory_grow_flag: wasm_info.memory_grow_flag,
         call_graph: wasm_info.call_graph,
         report,
+        write_index_functions: wasm_info.write_index_functions,
     })
 }
 
-fn detect_write_operations_in_views(
-    views_data: &HashMap<&str, usize>,
-    call_graph: &CallGraph,
-    write_functions: &mut HashSet<usize>,
+fn detect_write_operations_in_views<'a>(
+    views_data: &'a HashMap<&'a str, usize>,
+    call_graph: &'a CallGraph,
+    write_functions: &'a mut HashSet<usize>,
 ) {
     let mut visited: HashSet<usize> = HashSet::new();
     for index in views_data.values() {

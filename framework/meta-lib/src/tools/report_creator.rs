@@ -13,7 +13,7 @@ impl Default for ReportCreator {
         ReportCreator {
             path: String::new(),
             has_allocator: false,
-            has_panic: "none".to_string(),
+            has_panic: PanicReport::None,
         }
     }
 }
