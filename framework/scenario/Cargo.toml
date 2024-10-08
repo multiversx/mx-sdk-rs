@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.53.0"
+version = "0.53.2"
 edition = "2021"
 
 authors = [
@@ -37,12 +37,12 @@ wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
 run-go-tests = []
 
 [dependencies.multiversx-sc]
-version = "=0.53.0"
+version = "=0.53.2"
 features = ["alloc", "num-bigint"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.53.0"
+version = "=0.53.2"
 path = "../meta-lib"
 
 [dependencies.multiversx-chain-scenario-format]
