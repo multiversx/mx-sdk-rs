@@ -233,11 +233,7 @@ impl SysFuncCallsInteract {
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor
-            .proxy
-            .generate_blocks_until_epoch(1)
-            .await
-            .unwrap();
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
 
         Self {
             interactor,
