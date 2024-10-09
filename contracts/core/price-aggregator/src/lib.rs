@@ -6,7 +6,7 @@ mod events;
 pub mod median;
 pub mod price_aggregator_data;
 
-use events::{RoundId, Timestamp};
+use events::{Round, Timestamp};
 use multiversx_sc_modules::staking;
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 
@@ -270,7 +270,7 @@ pub trait PriceAggregator:
     fn create_new_round(
         &self,
         token_pair: TokenPair<Self::Api>,
-        round_id: RoundId,
+        round: Round,
         mut submissions: MapMapper<ManagedAddress, BigUint>,
         decimals: u8,
     ) {
@@ -304,7 +304,7 @@ pub trait PriceAggregator:
                 .or_default()
                 .get()
                 .push(&price_feed);
-            self.emit_new_round_event(&token_pair, round_id, &price_feed);
+            self.emit_new_round_event(&token_pair, round, &price_feed);
         }
     }
 

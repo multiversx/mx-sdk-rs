@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 use crate::price_aggregator_data::{TimestampedPrice, TokenPair};
-pub type RoundId = usize;
+pub type RoundId = u32;
 pub type Round = usize;
 pub type Block = u64;
 pub type Epoch = u64;
@@ -31,14 +31,14 @@ pub trait EventsModule {
     fn emit_new_round_event(
         &self,
         token_pair: &TokenPair<Self::Api>,
-        round_id: RoundId,
+        round: Round,
         price_feed: &TimestampedPrice<Self::Api>,
     ) {
         let epoch = self.blockchain().get_block_epoch();
         self.new_round_event(
             &token_pair.from.clone(),
             &token_pair.to.clone(),
-            round_id,
+            round,
             &NewRoundEvent {
                 price: price_feed.price.clone(),
                 timestamp: price_feed.timestamp,
@@ -61,7 +61,7 @@ pub trait EventsModule {
     fn emit_discard_submission_event(
         &self,
         token_pair: &TokenPair<Self::Api>,
-        round_id: RoundId,
+        round: Round,
         submission_timestamp: Timestamp,
         first_submission_timestamp: Timestamp,
         has_caller_already_submitted: bool,
@@ -69,7 +69,7 @@ pub trait EventsModule {
         self.discard_submission_event(
             &token_pair.from.clone(),
             &token_pair.to.clone(),
-            round_id,
+            round,
             &DiscardSubmissionEvent {
                 submission_timestamp,
                 first_submission_timestamp,
