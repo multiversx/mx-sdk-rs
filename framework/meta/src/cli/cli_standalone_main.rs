@@ -1,5 +1,6 @@
 use crate::cli::{StandaloneCliAction, StandaloneCliArgs};
 use crate::cmd::retrieve_address::retrieve_address;
+use crate::cmd::test_interactors::test_interactors;
 use crate::cmd::wallet::wallet;
 use clap::Parser;
 
@@ -35,6 +36,7 @@ pub async fn cli_main_standalone() {
             test_gen_tool(args);
         },
         Some(StandaloneCliAction::Test(args)) => test(args),
+        Some(StandaloneCliAction::TestInteractors(args)) => test_interactors(args),
         Some(StandaloneCliAction::TestCoverage(args)) => {
             test_coverage(args);
         },
