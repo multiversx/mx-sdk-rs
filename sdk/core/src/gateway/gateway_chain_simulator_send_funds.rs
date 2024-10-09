@@ -27,7 +27,7 @@ impl GatewayRequest for ChainSimulatorSendFundsRequest {
     type Result = String;
 
     fn request_type(&self) -> GatewayRequestType {
-        GatewayRequestType::Get
+        GatewayRequestType::Post
     }
 
     fn get_endpoint(&self) -> String {
