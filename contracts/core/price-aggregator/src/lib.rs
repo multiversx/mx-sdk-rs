@@ -6,6 +6,7 @@ mod events;
 pub mod median;
 pub mod price_aggregator_data;
 
+use events::{RoundId, Timestamp};
 use multiversx_sc_modules::staking;
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 
@@ -123,7 +124,7 @@ pub trait PriceAggregator:
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-        submission_timestamp: u64,
+        submission_timestamp: Timestamp,
         price: BigUint,
         decimals: u8,
     ) {
@@ -230,7 +231,9 @@ pub trait PriceAggregator:
     #[endpoint(submitBatch)]
     fn submit_batch(
         &self,
-        submissions: MultiValueEncoded<MultiValue5<ManagedBuffer, ManagedBuffer, u64, BigUint, u8>>,
+        submissions: MultiValueEncoded<
+            MultiValue5<ManagedBuffer, ManagedBuffer, Timestamp, BigUint, u8>,
+        >,
     ) {
         self.require_not_paused();
         self.require_is_oracle();
@@ -267,7 +270,7 @@ pub trait PriceAggregator:
     fn create_new_round(
         &self,
         token_pair: TokenPair<Self::Api>,
-        round_id: usize,
+        round_id: RoundId,
         mut submissions: MapMapper<ManagedAddress, BigUint>,
         decimals: u8,
     ) {
@@ -444,13 +447,13 @@ pub trait PriceAggregator:
     fn first_submission_timestamp(
         &self,
         token_pair: &TokenPair<Self::Api>,
-    ) -> SingleValueMapper<u64>;
+    ) -> SingleValueMapper<Timestamp>;
 
     #[storage_mapper("last_submission_timestamp")]
     fn last_submission_timestamp(
         &self,
         token_pair: &TokenPair<Self::Api>,
-    ) -> SingleValueMapper<u64>;
+    ) -> SingleValueMapper<Timestamp>;
 
     #[storage_mapper("submissions")]
     fn submissions(
