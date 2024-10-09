@@ -62,9 +62,6 @@ pub enum StandaloneCliAction {
     #[command(name = "test", about = "Runs cargo test")]
     Test(TestArgs),
 
-    #[command(name = "test-interactors", about = "Runs cargo test for interactors")]
-    TestInteractors(TestInteractorsArgs),
-
     #[command(name = "test-coverage", about = "Run test coverage and output report")]
     TestCoverage(TestCoverageArgs),
 
@@ -103,18 +100,6 @@ pub struct InfoArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct TestInteractorsArgs {
-    /// Target directory where to generate contract integration tests.
-    /// Will be current directory if not specified.
-    #[arg(short, long, verbatim_doc_comment)]
-    pub path: Option<String>,
-
-    /// This arg prints the entire output of the vm.
-    /// Default value will be "false" if not specified
-    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
-    pub nocapture: bool,
-}
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct TestArgs {
     /// Target directory where to generate contract integration tests.
     /// Will be current directory if not specified.
@@ -125,6 +110,16 @@ pub struct TestArgs {
     /// Default value will be "false" if not specified.
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub go: bool,
+
+    /// This arg runs interactor tests using chain simulator
+    /// Default value will be "false" if not specified
+    #[arg(
+        short = 'c',
+        long = "chain-simulator",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub chain_simulator: bool,
 
     /// This arg runs scenarios.
     /// Default value will be "false" if not specified.

@@ -9,6 +9,5 @@ pub mod scen_test_gen;
 pub mod template;
 pub mod test;
 pub mod test_coverage;
-pub mod test_interactors;
 pub mod upgrade;
 pub mod wallet;
