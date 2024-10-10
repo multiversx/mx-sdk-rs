@@ -1,7 +1,6 @@
 use super::*;
 use alloc::{
-    string::{String, ToString},
-    vec::Vec,
+    borrow::ToOwned, string::{String, ToString}, vec::Vec
 };
 
 #[derive(Clone, Debug)]
@@ -42,6 +41,7 @@ pub struct EndpointAbi {
     pub docs: Vec<String>,
     pub name: String,
     pub rust_method_name: String,
+    pub title: Option<String>,
     pub only_owner: bool,
     pub only_admin: bool,
     pub labels: Vec<String>,
@@ -62,6 +62,7 @@ impl EndpointAbi {
         docs: &[&str],
         name: &str,
         rust_method_name: &str,
+        title: Option<&str>,
         only_owner: bool,
         only_admin: bool,
         mutability: EndpointMutabilityAbi,
@@ -80,6 +81,7 @@ impl EndpointAbi {
             endpoint_type,
             mutability,
             payable_in_tokens: payable_in_tokens.iter().map(|s| s.to_string()).collect(),
+            title: title.map(|title| title.to_owned()),
             inputs: Vec::new(),
             outputs: Vec::new(),
             allow_multiple_var_args,
