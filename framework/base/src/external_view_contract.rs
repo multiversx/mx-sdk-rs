@@ -39,6 +39,7 @@ pub fn external_view_contract_constructor_abi() -> EndpointAbi {
             ],
         "init",
         EXTERNAL_VIEW_CONSTRUCTOR_FLAG,
+        None,
         false,
         false,
         EndpointMutabilityAbi::Mutable,

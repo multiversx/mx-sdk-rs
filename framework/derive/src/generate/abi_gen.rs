@@ -15,6 +15,11 @@ fn generate_endpoint_snippet(
 ) -> proc_macro2::TokenStream {
     let endpoint_docs = &m.docs;
     let rust_method_name = m.name.to_string();
+    let title_tokens = if let Some(title) = &m.title {
+        quote! { Some(#title) }
+    } else {
+        quote! { None }
+    };
     let payable_in_tokens = m.payable_metadata().abi_strings();
 
     let input_snippets: Vec<proc_macro2::TokenStream> = m
@@ -58,6 +63,7 @@ fn generate_endpoint_snippet(
             &[ #(#endpoint_docs),* ],
             #endpoint_name,
             #rust_method_name,
+            #title_tokens,
             #only_owner,
             #only_admin,
             #mutability_tokens,
