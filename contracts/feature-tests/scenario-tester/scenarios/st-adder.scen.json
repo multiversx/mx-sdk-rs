@@ -32,7 +32,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "str:init-result"
+                ],
                 "status": "",
                 "logs": "*",
                 "gas": "*",
