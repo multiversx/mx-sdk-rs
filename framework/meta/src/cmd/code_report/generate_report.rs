@@ -108,6 +108,11 @@ fn find_mxsc_files(path: &PathBuf) -> Vec<PathBuf> {
     let mut mxsc_files = Vec::new();
     for entry in read_dir(path).unwrap() {
         let file_path = entry.unwrap().path();
+
+        if file_path.to_str().unwrap().ends_with("-dbg.mxsc.json") {
+            continue;
+        }
+
         if file_path.to_str().unwrap().ends_with(".mxsc.json") {
             mxsc_files.push(file_path);
         }

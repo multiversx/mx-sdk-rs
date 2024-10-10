@@ -1,7 +1,5 @@
-# MultiversX transaction snippets
+# MultiversX framework for communicating with a real blockchain
 
 Provides basic functionality for interacting with smart contracts directly from Rust.
 
-It a base on top of which little interaction programs (or snippets) can be written.
-
-It is largely a wrapper around `elrond-sdk-erdrs` and `multiversx-chain-vm`.
+Uses `reqwest` for web communication, and `tokio` for managing async execution.

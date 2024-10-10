@@ -1,10 +1,16 @@
-pub use crate::multiversx_sc_scenario::imports::*;
+pub use multiversx_sc_snippets_base::multiversx_sc_scenario::imports::*;
 
-pub use crate::{
-    dns_address_for_name, test_wallets, Interactor, InteractorPrepareAsync, StepBuffer,
+pub use multiversx_sc_snippets_base::{
+    dns_address_for_name, InteractorBase, InteractorPrepareAsync, StepBuffer,
 };
 
-pub use multiversx_sdk::{data::keystore::InsertPassword, wallet::Wallet};
+pub use multiversx_sc_snippets_base::sdk::{
+    data::keystore::InsertPassword, test_wallets, wallet::Wallet,
+};
+
+pub use crate::{HttpInteractor, Interactor};
+
+pub use multiversx_sdk_http::GatewayHttpProxy;
 
 pub use env_logger;
 pub use tokio;

@@ -1,7 +1,8 @@
 use num_bigint::BigUint;
 
 use crate::{
-    tx_execution::{builtin_function_names::ESDT_LOCAL_BURN_FUNC_NAME, BlockchainVMRef},
+    chain_core::builtin_func_names::ESDT_LOCAL_BURN_FUNC_NAME,
+    tx_execution::BlockchainVMRef,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
 };
 

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 // NetworkStatus holds the network status details of a specified shard
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NetworkStatus {
     #[serde(rename = "erd_current_round")]
     pub current_round: u64,

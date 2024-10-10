@@ -408,10 +408,18 @@ pub struct InstallWasmOptArgs {}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct AccountArgs {
-    /// Provide the target API you want the real data to come from
+    /// Provide the target API you want the data to come from
     #[arg(long = "api")]
     #[clap(global = true)]
     pub api: Option<String>,
+
+    /// Provide if the API is a chain simulator or not
+    #[arg(
+        long = "chain-simulator",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub chain_simulator: Option<bool>,
 
     /// Provide the address you want to retrieve data from
     #[arg(long = "address", verbatim_doc_comment)]

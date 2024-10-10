@@ -41,11 +41,11 @@ struct BasicFeaturesInteract {
 impl BasicFeaturesInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway())
+        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
         let code_expr = BytesValue::interpret_from(
             "mxsc:../output/basic-features-storage-bytes.mxsc.json",
             &InterpreterContext::default(),

@@ -1,6 +1,6 @@
 use multiversx_sc::types::{
-    Code, FunctionCall, NotPayable, RHListExec, Tx, TxEnv, TxFromSpecified, TxGas, TxPayment,
-    TxToSpecified, UpgradeCall,
+    Code, FunctionCall, NotPayable, RHListExec, Tx, TxEnv, TxEnvWithTxHash, TxFromSpecified, TxGas,
+    TxPayment, TxToSpecified, UpgradeCall,
 };
 
 use crate::{
@@ -14,7 +14,7 @@ use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
 impl<Env, From, To, Payment, Gas, RH> TxToStep<Env, RH>
     for Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
 where
-    Env: TxEnv<RHExpect = TxExpect>,
+    Env: TxEnvWithTxHash<RHExpect = TxExpect>,
     From: TxFromSpecified<Env>,
     To: TxToSpecified<Env>,
     Payment: TxPayment<Env>,
@@ -23,7 +23,7 @@ where
 {
     type Step = ScCallStep;
 
-    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, RH> {
+    fn tx_to_step(mut self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step = tx_to_sc_call_step(
             &self.env,
             self.from,
@@ -32,6 +32,7 @@ where
             self.gas,
             self.data,
         );
+        step.explicit_tx_hash = self.env.take_tx_hash();
         step.expect = Some(self.result_handler.list_tx_expect());
 
         StepWrapper {

@@ -23,7 +23,7 @@ impl ScenarioVMRunner {
 
 fn execute(state: &BlockchainState, accounts: &CheckAccounts) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
-        if let Some(account) = state.accounts.get(&expected_address.to_vm_address()) {
+        if let Some(account) = state.accounts.get(&expected_address.to_address()) {
             assert!(
                 expected_account.nonce.check(account.nonce),
                 "bad account nonce. Address: {}. Want: {}. Have: {}",

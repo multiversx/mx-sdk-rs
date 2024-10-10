@@ -43,7 +43,7 @@ impl ScenarioVMRunner {
             tx_result.pending_calls.no_calls(),
             "Async calls from constructors are currently not supported"
         );
-        (new_address.as_array().into(), tx_result)
+        (new_address, tx_result)
     }
 
     pub fn perform_sc_deploy_lambda_and_check<F>(
@@ -65,7 +65,7 @@ impl ScenarioVMRunner {
 fn tx_input_from_deploy(sc_deploy_step: &ScDeployStep) -> TxInput {
     let tx = &sc_deploy_step.tx;
     TxInput {
-        from: tx.from.to_vm_address(),
+        from: tx.from.to_address(),
         to: multiversx_chain_vm::types::VMAddress::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
