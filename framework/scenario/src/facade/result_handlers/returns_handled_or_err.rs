@@ -11,15 +11,15 @@ use multiversx_sc::{
 use crate::scenario_model::{CheckValue, TxExpect, TxResponse, TxResponseStatus};
 
 /// Indicates that a `Result` will be returned, either with the handled result,
-/// according to the inner result handlers, or with an error in case of a failed transaction.
-pub struct ReturnsHandledOrError<Env, Original, Ok>
+/// according to the nested result handlers, or with an error in case of a failed transaction.
+pub struct ReturnsHandledOrError<Env, Original, NHList>
 where
     Env: TxEnv,
-    Ok: RHList<Env>,
+    NHList: RHList<Env>,
 {
     _phantom_env: PhantomData<Env>,
     _phantom_original: PhantomData<Original>,
-    pub nested_handlers: Ok,
+    pub nested_handlers: NHList,
 }
 
 impl<Env, Original> Default for ReturnsHandledOrError<Env, Original, OriginalResultMarker<Original>>
@@ -44,15 +44,15 @@ where
     }
 }
 
-impl<Env, Original, Ok> ReturnsHandledOrError<Env, Original, Ok>
+impl<Env, Original, NHList> ReturnsHandledOrError<Env, Original, NHList>
 where
     Env: TxEnv,
-    Ok: RHListExec<TxResponse, Env>,
+    NHList: RHListExec<TxResponse, Env>,
 {
-    pub fn returns<RH>(self, item: RH) -> ReturnsHandledOrError<Env, Original, Ok::RetOutput>
+    pub fn returns<RH>(self, item: RH) -> ReturnsHandledOrError<Env, Original, NHList::RetOutput>
     where
-        RH: RHListItem<Env, Ok::OriginalResult>,
-        Ok: RHListAppendRet<Env, RH>,
+        RH: RHListItem<Env, NHList::OriginalResult>,
+        NHList: RHListAppendRet<Env, RH>,
     {
         ReturnsHandledOrError {
             _phantom_env: PhantomData,
@@ -62,21 +62,22 @@ where
     }
 }
 
-impl<Env, Original, Ok> RHListItem<Env, Original> for ReturnsHandledOrError<Env, Original, Ok>
+impl<Env, Original, NHList> RHListItem<Env, Original>
+    for ReturnsHandledOrError<Env, Original, NHList>
 where
     Env: TxEnv,
-    Ok: RHListExec<TxResponse, Env>,
-    Ok::ListReturns: NestedTupleFlatten,
+    NHList: RHListExec<TxResponse, Env>,
+    NHList::ListReturns: NestedTupleFlatten,
 {
-    type Returns = Result<<Ok::ListReturns as NestedTupleFlatten>::Unpacked, TxResponseStatus>;
+    type Returns = Result<<NHList::ListReturns as NestedTupleFlatten>::Unpacked, TxResponseStatus>;
 }
 
-impl<Env, Original, Ok> RHListItemExec<TxResponse, Env, Original>
-    for ReturnsHandledOrError<Env, Original, Ok>
+impl<Env, Original, NHList> RHListItemExec<TxResponse, Env, Original>
+    for ReturnsHandledOrError<Env, Original, NHList>
 where
     Env: TxEnv<RHExpect = TxExpect>,
-    Ok: RHListExec<TxResponse, Env>,
-    Ok::ListReturns: NestedTupleFlatten,
+    NHList: RHListExec<TxResponse, Env>,
+    NHList::ListReturns: NestedTupleFlatten,
 {
     fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
         prev.status = CheckValue::Star;
