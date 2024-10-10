@@ -12,57 +12,57 @@ use crate::scenario_model::{CheckValue, TxExpect, TxResponse, TxResponseStatus};
 
 /// Indicates that a `Result` will be returned, either with the handled result,
 /// according to the inner result handlers, or with an error in case of a failed transaction.
-pub struct ReturnsResultOrError<Env, Original, Ok>
+pub struct ReturnsHandledOrError<Env, Original, Ok>
 where
     Env: TxEnv,
     Ok: RHList<Env>,
 {
     _phantom_env: PhantomData<Env>,
     _phantom_original: PhantomData<Original>,
-    pub ok_t: Ok,
+    pub nested_handlers: Ok,
 }
 
-impl<Env, Original> Default for ReturnsResultOrError<Env, Original, OriginalResultMarker<Original>>
+impl<Env, Original> Default for ReturnsHandledOrError<Env, Original, OriginalResultMarker<Original>>
 where
     Env: TxEnv,
 {
     fn default() -> Self {
-        ReturnsResultOrError {
+        ReturnsHandledOrError {
             _phantom_env: PhantomData,
             _phantom_original: PhantomData,
-            ok_t: OriginalResultMarker::new(),
+            nested_handlers: OriginalResultMarker::new(),
         }
     }
 }
 
-impl<Env, Original> ReturnsResultOrError<Env, Original, OriginalResultMarker<Original>>
+impl<Env, Original> ReturnsHandledOrError<Env, Original, OriginalResultMarker<Original>>
 where
     Env: TxEnv,
 {
     pub fn new() -> Self {
-        ReturnsResultOrError::default()
+        ReturnsHandledOrError::default()
     }
 }
 
-impl<Env, Original, Ok> ReturnsResultOrError<Env, Original, Ok>
+impl<Env, Original, Ok> ReturnsHandledOrError<Env, Original, Ok>
 where
     Env: TxEnv,
     Ok: RHListExec<TxResponse, Env>,
 {
-    pub fn returns<RH>(self, item: RH) -> ReturnsResultOrError<Env, Original, Ok::RetOutput>
+    pub fn returns<RH>(self, item: RH) -> ReturnsHandledOrError<Env, Original, Ok::RetOutput>
     where
         RH: RHListItem<Env, Ok::OriginalResult>,
         Ok: RHListAppendRet<Env, RH>,
     {
-        ReturnsResultOrError {
+        ReturnsHandledOrError {
             _phantom_env: PhantomData,
             _phantom_original: PhantomData,
-            ok_t: self.ok_t.append_ret(item),
+            nested_handlers: self.nested_handlers.append_ret(item),
         }
     }
 }
 
-impl<Env, Original, Ok> RHListItem<Env, Original> for ReturnsResultOrError<Env, Original, Ok>
+impl<Env, Original, Ok> RHListItem<Env, Original> for ReturnsHandledOrError<Env, Original, Ok>
 where
     Env: TxEnv,
     Ok: RHListExec<TxResponse, Env>,
@@ -72,7 +72,7 @@ where
 }
 
 impl<Env, Original, Ok> RHListItemExec<TxResponse, Env, Original>
-    for ReturnsResultOrError<Env, Original, Ok>
+    for ReturnsHandledOrError<Env, Original, Ok>
 where
     Env: TxEnv<RHExpect = TxExpect>,
     Ok: RHListExec<TxResponse, Env>,
@@ -86,7 +86,7 @@ where
 
     fn item_process_result(self, raw_result: &TxResponse) -> Self::Returns {
         if raw_result.tx_error.is_success() {
-            let tuple_result = self.ok_t.list_process_result(raw_result);
+            let tuple_result = self.nested_handlers.list_process_result(raw_result);
             Ok(tuple_result.flatten_unpack())
         } else {
             Err(raw_result.tx_error.clone())

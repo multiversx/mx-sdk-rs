@@ -311,7 +311,7 @@ fn st_blackbox_returns_result_or_error() {
         .new_address(ST_ADDRESS)
         .tx_hash([33u8; 32])
         .returns(
-            ReturnsResultOrError::new()
+            ReturnsHandledOrError::new()
                 .returns(ReturnsNewAddress)
                 .returns(ReturnsResultAs::<String>::new())
                 .returns(ReturnsTxHash),
@@ -331,7 +331,7 @@ fn st_blackbox_returns_result_or_error() {
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sum()
-        .returns(ReturnsResultOrError::new().returns(ReturnsResultUnmanaged))
+        .returns(ReturnsHandledOrError::new().returns(ReturnsResultUnmanaged))
         .run();
     assert_eq!(result, Ok(RustBigUint::from(5u32)));
 
@@ -341,7 +341,7 @@ fn st_blackbox_returns_result_or_error() {
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sc_panic()
-        .returns(ReturnsResultOrError::new())
+        .returns(ReturnsHandledOrError::new())
         .run();
 
     assert_eq!(result, Err(TxResponseStatus::new(4, "sc_panic! example")));
@@ -353,7 +353,7 @@ fn st_blackbox_returns_result_or_error() {
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .add(1u32)
-        .returns(ReturnsResultOrError::new())
+        .returns(ReturnsHandledOrError::new())
         .run();
 
     assert_eq!(result, Ok(()));
@@ -365,7 +365,7 @@ fn st_blackbox_returns_result_or_error() {
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sc_panic()
-        .returns(ReturnsResultOrError::new())
+        .returns(ReturnsHandledOrError::new())
         .run();
 
     assert_eq!(result, Err(TxResponseStatus::new(4, "sc_panic! example")));
