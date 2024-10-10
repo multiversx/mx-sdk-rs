@@ -1,6 +1,8 @@
 use super::*;
 use alloc::{
-    borrow::ToOwned, string::{String, ToString}, vec::Vec
+    borrow::ToOwned,
+    string::{String, ToString},
+    vec::Vec,
 };
 
 #[derive(Clone, Debug)]
