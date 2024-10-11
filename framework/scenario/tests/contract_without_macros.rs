@@ -387,17 +387,10 @@ mod sample_adder {
                 false,
             );
             let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
-                &[],
                 "getSum",
                 "sum",
-                None,
-                false,
-                false,
                 multiversx_sc::abi::EndpointMutabilityAbi::Readonly,
                 multiversx_sc::abi::EndpointTypeAbi::Endpoint,
-                &[],
-                &[],
-                false,
             );
             endpoint_abi
             .add_output::<
@@ -409,50 +402,30 @@ mod sample_adder {
             >();
             contract_abi.endpoints.push(endpoint_abi);
             let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
-                &[],
                 "init",
                 "init",
-                None,
-                false,
-                false,
                 multiversx_sc::abi::EndpointMutabilityAbi::Mutable,
                 multiversx_sc::abi::EndpointTypeAbi::Init,
-                &[],
-                &[],
-                false,
             );
             endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("initial_value");
             contract_abi.add_type_descriptions::<multiversx_sc::types::BigUint<Self::Api>>();
             contract_abi.constructors.push(endpoint_abi);
             let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
-                &[],
                 "upgrade",
                 "upgrade",
-                None,
-                false,
-                false,
                 multiversx_sc::abi::EndpointMutabilityAbi::Mutable,
                 multiversx_sc::abi::EndpointTypeAbi::Upgrade,
-                &[],
-                &[],
-                false,
             );
             endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("initial_value");
             contract_abi.add_type_descriptions::<multiversx_sc::types::BigUint<Self::Api>>();
             contract_abi.upgrade_constructors.push(endpoint_abi);
             let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
-                &["Add desired amount to the storage variable."],
                 "add",
                 "add",
-                None,
-                false,
-                false,
                 multiversx_sc::abi::EndpointMutabilityAbi::Mutable,
                 multiversx_sc::abi::EndpointTypeAbi::Endpoint,
-                &[],
-                &[],
-                false,
-            );
+            )
+            .with_docs("Add desired amount to the storage variable.");
             endpoint_abi.add_input::<multiversx_sc::types::BigUint<Self::Api>>("value");
             contract_abi.add_type_descriptions::<multiversx_sc::types::BigUint<Self::Api>>();
             contract_abi.endpoints.push(endpoint_abi);
