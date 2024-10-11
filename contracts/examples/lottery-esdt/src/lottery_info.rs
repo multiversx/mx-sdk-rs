@@ -15,4 +15,5 @@ pub struct LotteryInfo<M: ManagedTypeApi> {
     pub max_entries_per_user: usize,
     pub prize_distribution: ManagedVec<M, u8>,
     pub prize_pool: BigUint<M>,
+    pub unawarded_amount: BigUint<M>,
 }
