@@ -50,7 +50,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                             .await
                             .unwrap();
 
-                        println!("Transaction failed: {}", result);
+                        info!("Transaction failed: {}", result);
 
                         return transaction_info_with_results;
                     },
