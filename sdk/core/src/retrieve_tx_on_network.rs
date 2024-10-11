@@ -45,17 +45,14 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         }
 
                         let result = parse_reason(&reason);
+                        let transaction_info_with_results = proxy
+                            .request(GetTxInfo::new(&tx_hash).with_results())
+                            .await
+                            .unwrap();
 
-                        match result {
-                            Ok((code, err)) => {
-                                info!("Transaction failed. Code: {code}, message: {err}");
-                                panic!("Transaction failed. Code: {code}, message: {err}")
-                            },
-                            Err(err) => {
-                                info!("Reason parsing error for failed transaction: {err}");
-                                panic!("Reason parsing error for failed transaction: {err}")
-                            },
-                        }
+                        println!("Transaction failed: {}", result);
+
+                        return transaction_info_with_results;
                     },
                     _ => {
                         continue;
@@ -85,22 +82,18 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
     TransactionOnNetwork::default()
 }
 
-pub fn parse_reason(reason: &str) -> Result<(u64, String), String> {
-    let parts: Vec<&str> = reason.split('@').collect();
-
-    if parts.len() < 2 {
-        return Err("Invalid reason format".to_string());
+pub fn parse_reason(reason: &str) -> String {
+    let parts: Vec<&str> = reason.split('@').filter(|part| !part.is_empty()).collect();
+    let mut responses: Vec<String> = Vec::new();
+    for part in &parts {
+        match u64::from_str_radix(part, 16) {
+            Ok(error_code) => responses.push(error_code.to_string()),
+            Err(_) => responses.push(
+                String::from_utf8(hex::decode(part).expect("Failed to decode error message"))
+                    .expect("Failed to decode error message as UTF-8"),
+            ),
+        }
     }
 
-    let error_code_hex = parts[1];
-    let error_message_hex = parts[2];
-
-    let error_code =
-        u64::from_str_radix(error_code_hex, 16).expect("Failed to decode error code as u64");
-
-    let error_message =
-        String::from_utf8(hex::decode(error_message_hex).expect("Failed to decode error message"))
-            .expect("Failed to decode error message as UTF-8");
-
-    Ok((error_code, error_message))
+    responses.join(" ")
 }
