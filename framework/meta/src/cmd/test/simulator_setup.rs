@@ -20,7 +20,6 @@ pub(crate) fn simulator_setup(interactors_dir: &Path) -> bool {
 }
 
 pub(crate) fn is_chain_simulator_config(config_path: PathBuf) -> bool {
-    println!(">>>{}", config_path.display());
     let config_content = read_to_string(config_path).expect("Failed to read configuration file.");
 
     let parsed_config = config_content
