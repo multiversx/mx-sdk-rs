@@ -20,3 +20,9 @@ pub trait InteractorPrepareAsync {
 
     fn prepare_async(self) -> Self::Exec;
 }
+
+pub trait InteractorRunAsync {
+    type Result;
+
+    fn run(self) -> impl std::future::Future<Output = Self::Result>;
+}
