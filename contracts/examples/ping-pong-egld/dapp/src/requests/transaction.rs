@@ -1,8 +1,5 @@
 use crate::interactor::ContractInteract;
-use multiversx_sc_snippets_dapp::imports::{
-    Bech32Address, BigUint, IgnoreValue, InteractorPrepareAsync, OptionalValue, ReturnsMessage,
-    ReturnsNewBech32Address, ReturnsStatus,
-};
+use multiversx_sc_snippets_dapp::imports::*;
 
 use super::proxy;
 
@@ -29,7 +26,6 @@ pub async fn deploy_sc() -> Result<Bech32Address, String> {
         .returns(ReturnsNewBech32Address)
         .returns(ReturnsStatus)
         .returns(ReturnsMessage)
-        .prepare_async()
         .run()
         .await;
 
@@ -57,7 +53,6 @@ pub async fn ping() -> Result<String, String> {
         .typed(proxy::PingPongProxy)
         .ping(_data)
         .egld(BigUint::from(amount))
-        .prepare_async()
         .run()
         .await;
 
