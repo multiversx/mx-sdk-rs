@@ -19,6 +19,7 @@ use super::{
     InteractorPrepareAsync,
 };
 
+#[allow(clippy::type_complexity)]
 async fn run_async_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,

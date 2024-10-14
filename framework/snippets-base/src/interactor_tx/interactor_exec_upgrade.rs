@@ -17,6 +17,7 @@ use crate::InteractorBase;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
 
+#[allow(clippy::type_complexity)]
 async fn run_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,
