@@ -96,7 +96,7 @@ impl EndpointAbi {
     }
 
     pub fn with_only_admin(mut self) -> Self {
-        self.only_owner = true;
+        self.only_admin = true;
         self
     }
 
