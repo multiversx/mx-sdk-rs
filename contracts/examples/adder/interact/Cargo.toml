@@ -10,7 +10,7 @@ name = "basic-interact"
 path = "src/basic_interact_main.rs"
 
 [lib]
-path = "src/basic_interact_lib.rs"
+path = "src/basic_interact.rs"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }

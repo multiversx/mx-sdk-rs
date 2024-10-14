@@ -1,13 +1,10 @@
-// mod basic_interact_cli;
-// mod basic_interact_config;
-// mod basic_interact_state;
+mod basic_interact_cli;
+mod basic_interact_config;
+mod basic_interact_state;
 
-use core::str;
-
-use crate::basic_interact_cli;
-use crate::basic_interact_config::Config;
 use crate::basic_interact_state::State;
 use adder::adder_proxy;
+pub use basic_interact_config::Config;
 use clap::Parser;
 
 use multiversx_sc_snippets::imports::*;
