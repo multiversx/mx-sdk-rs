@@ -277,6 +277,7 @@ impl AdderInteract {
 }
 
 #[tokio::test]
+#[cfg(feature = "chain_simulator")]
 async fn simulator_upgrade_test() {
     let mut basic_interact = AdderInteract::init().await;
     let wallet_address = basic_interact.wallet_address.clone();
