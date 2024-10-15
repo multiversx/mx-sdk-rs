@@ -169,7 +169,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         );
 
         match tx_result.result_status {
-            ReturnCode::UserError => (
+            ReturnCode::Success => (
                 new_address,
                 self.sync_call_post_processing(tx_result, blockchain_updates),
             ),
@@ -199,7 +199,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         );
 
         match tx_result.result_status {
-            ReturnCode::UserError => {
+            ReturnCode::Success => {
                 self.0.result_lock().all_calls.push(async_call_data);
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
