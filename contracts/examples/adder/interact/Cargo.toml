@@ -24,7 +24,6 @@ path = ".."
 [dependencies.multiversx-sc-snippets]
 version = "0.53.2"
 path = "../../../../framework/snippets"
-features = ["chain_simulator"]
 
 [features]
 chain_simulator = []
