@@ -2,11 +2,9 @@ mod basic_interact_cli;
 mod basic_interact_config;
 mod basic_interact_state;
 
-use core::str;
-
+use crate::basic_interact_state::State;
 use adder::adder_proxy;
-use basic_interact_config::Config;
-use basic_interact_state::State;
+pub use basic_interact_config::Config;
 use clap::Parser;
 
 use multiversx_sc_snippets::imports::*;
@@ -15,11 +13,12 @@ const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 const ADDER_CODE_PATH: MxscPath = MxscPath::new("../output/adder.mxsc.json");
 
-#[tokio::main]
-async fn main() {
+pub async fn adder_cli() {
     env_logger::init();
 
-    let mut basic_interact = AdderInteract::init().await;
+    let config = Config::load_config();
+
+    let mut basic_interact = AdderInteract::init(config).await;
 
     let cli = basic_interact_cli::InteractCli::parse();
     match &cli.command {
@@ -53,16 +52,15 @@ async fn main() {
 }
 
 #[allow(unused)]
-struct AdderInteract {
-    interactor: Interactor,
-    adder_owner_address: Bech32Address,
-    wallet_address: Bech32Address,
-    state: State,
+pub struct AdderInteract {
+    pub interactor: Interactor,
+    pub adder_owner_address: Bech32Address,
+    pub wallet_address: Bech32Address,
+    pub state: State,
 }
 
 impl AdderInteract {
-    async fn init() -> Self {
-        let config = Config::load_config();
+    pub async fn init(config: Config) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
@@ -94,7 +92,7 @@ impl AdderInteract {
         }
     }
 
-    async fn set_state(&mut self) {
+    pub async fn set_state(&mut self) {
         println!("wallet address: {}", self.wallet_address);
         self.interactor
             .retrieve_account(&self.adder_owner_address)
@@ -102,7 +100,7 @@ impl AdderInteract {
         self.interactor.retrieve_account(&self.wallet_address).await;
     }
 
-    async fn deploy(&mut self) {
+    pub async fn deploy(&mut self) {
         // warning: multi deploy not yet fully supported
         // only works with last deployed address
 
@@ -126,7 +124,7 @@ impl AdderInteract {
         self.state.set_adder_address(new_address);
     }
 
-    async fn multi_deploy(&mut self, count: usize) {
+    pub async fn multi_deploy(&mut self, count: usize) {
         if count == 0 {
             println!("count must be greater than 0");
             return;
@@ -159,7 +157,7 @@ impl AdderInteract {
         }
     }
 
-    async fn multi_add(&mut self, value: u32, count: usize) {
+    pub async fn multi_add(&mut self, value: u32, count: usize) {
         self.set_state().await;
         println!("calling contract {count} times...");
 
@@ -179,7 +177,7 @@ impl AdderInteract {
         println!("successfully performed add {count} times");
     }
 
-    async fn feed_contract_egld(&mut self) {
+    pub async fn feed_contract_egld(&mut self) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
@@ -190,7 +188,7 @@ impl AdderInteract {
             .await;
     }
 
-    async fn add(&mut self, value: u32) {
+    pub async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
@@ -205,7 +203,7 @@ impl AdderInteract {
         println!("successfully performed add");
     }
 
-    async fn print_sum(&mut self) {
+    pub async fn print_sum(&mut self) {
         let sum = self
             .interactor
             .query()
@@ -220,7 +218,7 @@ impl AdderInteract {
         println!("sum: {sum}");
     }
 
-    async fn upgrade(
+    pub async fn upgrade(
         &mut self,
         new_value: u32,
         sender: &Bech32Address,
@@ -274,33 +272,4 @@ impl AdderInteract {
             },
         }
     }
-}
-
-#[cfg(feature = "chain_simulator")]
-#[tokio::test]
-async fn simulator_upgrade_test() {
-    let mut basic_interact = AdderInteract::init().await;
-    // let wallet_address = basic_interact.wallet_address.clone();
-    let adder_owner_address = basic_interact.adder_owner_address.clone();
-    // let error_not_owner = (4, "upgrade is allowed only for owner");
-
-    basic_interact.deploy().await;
-    basic_interact.add(1u32).await;
-
-    // Sum will be 1
-    basic_interact.print_sum().await;
-
-    basic_interact
-        .upgrade(7u32, &adder_owner_address, None)
-        .await;
-
-    // Sum will be the updated value of 7
-    basic_interact.print_sum().await;
-
-    // basic_interact
-    //     .upgrade(10u32, &wallet_address, Some(error_not_owner))
-    //     .await;
-
-    // // Sum will remain 7
-    // basic_interact.print_sum().await;
 }
