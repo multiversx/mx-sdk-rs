@@ -1,5 +1,6 @@
 use std::sync::{Arc, MutexGuard};
 
+use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::BreakpointValue;
 
 use crate::{
@@ -36,10 +37,10 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         self.0.m_types_lock()
     }
 
-    fn halt_with_error(&self, status: u64, message: &str) -> ! {
+    fn halt_with_error(&self, status: ReturnCode, message: &str) -> ! {
         *self.0.result_lock() = TxResult::from_panic_obj(&TxPanic::new(status, message));
         let breakpoint = match status {
-            4 => BreakpointValue::SignalError,
+            ReturnCode::UserError => BreakpointValue::SignalError,
             _ => BreakpointValue::ExecutionFailed,
         };
         std::panic::panic_any(breakpoint);
@@ -127,7 +128,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
             execute_current_tx_context_input,
         );
 
-        if tx_result.result_status == 0 {
+        if tx_result.result_status.is_success() {
             self.sync_call_post_processing(tx_result, blockchain_updates)
         } else {
             // also kill current execution
@@ -168,11 +169,11 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         );
 
         match tx_result.result_status {
-            0 => (
+            ReturnCode::UserError => (
                 new_address,
                 self.sync_call_post_processing(tx_result, blockchain_updates),
             ),
-            10 => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
+            ReturnCode::ExecutionFailed => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
             _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
@@ -198,12 +199,12 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         );
 
         match tx_result.result_status {
-            0 => {
+            ReturnCode::UserError => {
                 self.0.result_lock().all_calls.push(async_call_data);
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
             },
-            10 => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
+            ReturnCode::ExecutionFailed => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
             _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
