@@ -1,0 +1,29 @@
+* {
+  font-family: monospace;
+}
+
+.footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  font-size: 14px;
+}
+
+.network-status-container {
+  font-size: 14px;
+}
+
+.btns {
+  display: flex;
+  flex-direction: row;
+  padding: 20px 0;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}

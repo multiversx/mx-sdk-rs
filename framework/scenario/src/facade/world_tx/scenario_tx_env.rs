@@ -1,5 +1,5 @@
 use multiversx_chain_scenario_format::interpret_trait::InterpreterContext;
-use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv, H256};
+use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv, TxEnvWithTxHash, H256};
 
 use crate::{api::StaticApi, scenario_model::TxExpect, ScenarioWorld};
 
@@ -30,6 +30,17 @@ impl TxEnv for ScenarioTxEnvData {
 
     fn default_gas_value(&self) -> u64 {
         5_000_000
+    }
+}
+
+impl TxEnvWithTxHash for ScenarioTxEnvData {
+    fn set_tx_hash(&mut self, tx_hash: H256) {
+        assert!(self.tx_hash.is_none(), "tx hash set twice");
+        self.tx_hash = Some(tx_hash);
+    }
+
+    fn take_tx_hash(&mut self) -> Option<H256> {
+        core::mem::take(&mut self.tx_hash)
     }
 }
 

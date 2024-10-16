@@ -58,6 +58,7 @@ pub trait AbiTester {
     fn take_managed_type(&self, _arg: AbiManagedType<Self::Api>) {}
 
     #[endpoint]
+    #[title("result-3")]
     #[output_name("multi-result-1")]
     #[output_name("multi-result-2")]
     #[output_name("multi-result-3")]

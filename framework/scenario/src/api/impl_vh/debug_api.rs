@@ -5,7 +5,7 @@ use multiversx_chain_vm::{
     tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
     vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
 };
-use multiversx_sc::err_msg;
+use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
 use crate::debug_executor::{StaticVarData, StaticVarStack};
 
@@ -61,7 +61,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     fn assert_live_handle(handle: &Self::HandleType) {
         if !handle.is_on_current_context() {
             debugger_panic(
-                err_msg::DEBUG_API_ERR_STATUS,
+                ReturnCode::DebugApiError,
                 err_msg::DEBUG_API_ERR_HANDLE_STALE,
             );
         }
@@ -93,7 +93,7 @@ impl std::fmt::Debug for DebugApi {
     }
 }
 
-fn debugger_panic(status: u64, message: &str) {
+fn debugger_panic(status: ReturnCode, message: &str) {
     TxContextRef::new_from_static().replace_tx_result_with_error(TxPanic::new(status, message));
     std::panic::panic_any(BreakpointValue::SignalError);
 }
@@ -101,7 +101,7 @@ fn debugger_panic(status: u64, message: &str) {
 fn assert_handles_on_same_context(handle1: &DebugHandle, handle2: &DebugHandle) {
     if !handle1.is_on_same_context(handle2) {
         debugger_panic(
-            err_msg::DEBUG_API_ERR_STATUS,
+            ReturnCode::DebugApiError,
             err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
         );
     }

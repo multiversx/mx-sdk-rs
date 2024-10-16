@@ -7,6 +7,7 @@ mod type_abi;
 mod type_abi_from;
 mod type_abi_impl_basic;
 mod type_abi_impl_codec_multi;
+mod type_abi_impl_vm_core;
 mod type_description;
 mod type_description_container;
 

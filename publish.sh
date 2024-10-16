@@ -60,6 +60,18 @@
 # 15. Write a release announcement in Confluence.
 #
 
+cd data/codec-derive
+cargo publish || return 1
+cd ../..
+
+cd data/codec
+cargo publish || return 1
+cd ../..
+
+cd vm-core
+cargo publish || return 1
+cd ..
+
 cd vm
 cargo publish || return 1
 cd ..
@@ -69,14 +81,6 @@ cargo publish || return 1
 cd ../..
 
 cd sdk/scenario-format/
-cargo publish || return 1
-cd ../..
-
-cd data/codec-derive
-cargo publish || return 1
-cd ../..
-
-cd data/codec
 cargo publish || return 1
 cd ../..
 

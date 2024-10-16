@@ -49,8 +49,8 @@ pub trait NftModule {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(
-                &self.blockchain().get_sc_address(),
-                &self.nft_token_id().get(),
+                self.blockchain().get_sc_address(),
+                self.nft_token_id().get(),
                 [EsdtLocalRole::NftCreate][..].iter().cloned(),
             )
             .async_call_and_exit()

@@ -8,10 +8,18 @@ use crate::forwarder_queue_proxy::QueuedCallType;
 /// Config file
 const CONFIG_FILE: &str = "config.toml";
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ChainType {
+    Real,
+    Simulator,
+}
+
 /// Multisig Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    gateway: String,
+    gateway_uri: String,
+    chain_type: ChainType,
     call_type: String,
     token_id: String,
     token_nonce: u64,
@@ -27,9 +35,17 @@ impl Config {
         toml::from_str(&content).unwrap()
     }
 
-    // Returns the gateway
-    pub fn gateway(&self) -> &str {
-        &self.gateway
+    // Returns the gateway URI
+    pub fn gateway_uri(&self) -> &str {
+        &self.gateway_uri
+    }
+
+    // Returns if chain type is chain simulator
+    pub fn use_chain_simulator(&self) -> bool {
+        match self.chain_type {
+            ChainType::Real => false,
+            ChainType::Simulator => true,
+        }
     }
 
     pub fn call_type(&self) -> QueuedCallType {

@@ -25,7 +25,7 @@ fn scenario_tester_blackbox_raw() {
                 .from("address:owner")
                 .code(scenario_tester_code)
                 .argument("5")
-                .expect(TxExpect::ok().no_result()),
+                .expect(TxExpect::ok().result("str:init-result")),
         )
         .sc_query(
             ScQueryStep::new()

@@ -3,6 +3,8 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 
+use multiversx_chain_core::types::ReturnCode;
+
 use crate::{
     tx_mock::{BackTransfers, TxFunctionName, TxInput, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata},
@@ -57,7 +59,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         self.0.managed_types.lock().unwrap()
     }
 
-    fn halt_with_error(&self, status: u64, message: &str) -> ! {
+    fn halt_with_error(&self, status: ReturnCode, message: &str) -> ! {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 

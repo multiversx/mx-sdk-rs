@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::{address::Address, vm::CallType};
+use super::{sdk_address::SdkAddress, vm::CallType};
 use serde::{Deserialize, Serialize};
 
 // Transaction holds the fields of a transaction to be broadcasted to the network
@@ -9,8 +9,8 @@ use serde::{Deserialize, Serialize};
 pub struct Transaction {
     pub nonce: u64,
     pub value: String,
-    pub receiver: Address,
-    pub sender: Address,
+    pub receiver: SdkAddress,
+    pub sender: SdkAddress,
     pub gas_price: u64,
     pub gas_limit: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,8 +58,8 @@ pub struct TransactionOnNetwork {
     pub round: u64,
     pub epoch: u64,
     pub value: String,
-    pub receiver: Address,
-    pub sender: Address,
+    pub receiver: SdkAddress,
+    pub sender: SdkAddress,
     pub gas_price: u64,
     pub gas_limit: u64,
     #[serde(default)]
@@ -90,7 +90,7 @@ pub struct TransactionOnNetwork {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Events {
-    pub address: Address,
+    pub address: SdkAddress,
     pub identifier: String,
     pub topics: Option<Vec<String>>,
     #[serde(default)]
@@ -120,7 +120,7 @@ impl LogData {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiLogs {
-    pub address: Address,
+    pub address: SdkAddress,
     pub events: Vec<Events>,
 }
 
@@ -130,8 +130,8 @@ pub struct ApiSmartContractResult {
     pub hash: String,
     pub nonce: u64,
     pub value: u64,
-    pub receiver: Address,
-    pub sender: Address,
+    pub receiver: SdkAddress,
+    pub sender: SdkAddress,
     pub data: String,
     pub prev_tx_hash: String,
     pub original_tx_hash: String,
@@ -192,8 +192,8 @@ pub struct TransactionProcessStatus {
 pub struct ArgCreateTransaction {
     pub nonce: u64,
     pub value: String,
-    pub rcv_addr: Address,
-    pub snd_addr: Address,
+    pub rcv_addr: SdkAddress,
+    pub snd_addr: SdkAddress,
     pub gas_price: u64,
     pub gas_limit: u64,
     pub data: Option<String>,

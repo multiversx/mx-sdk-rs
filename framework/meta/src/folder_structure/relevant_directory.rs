@@ -6,7 +6,7 @@ use std::{
 };
 use toml::Value;
 
-use super::version_req::VersionReq;
+use super::{version_req::VersionReq, DependencyReference, GitReference};
 
 /// Used for retrieving crate versions.
 pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
@@ -35,7 +35,7 @@ pub enum DirectoryType {
 #[derive(Debug, Clone)]
 pub struct RelevantDirectory {
     pub path: PathBuf,
-    pub version: VersionReq,
+    pub version: DependencyReference,
     pub upgrade_in_progress: Option<(FrameworkVersion, FrameworkVersion)>,
     pub dir_type: DirectoryType,
 }
@@ -89,7 +89,7 @@ impl RelevantDirectories {
     pub fn count_for_version(&self, version: &FrameworkVersion) -> usize {
         self.0
             .iter()
-            .filter(|dir| dir.version.semver == *version)
+            .filter(|dir| dir.version.is_framework_version(version))
             .count()
     }
 
@@ -99,13 +99,13 @@ impl RelevantDirectories {
     ) -> impl Iterator<Item = &RelevantDirectory> {
         self.0
             .iter()
-            .filter(move |dir| dir.version.semver == *version)
+            .filter(move |dir| dir.version.is_framework_version(version))
     }
 
     /// Marks all appropriate directories as ready for upgrade.
     pub fn start_upgrade(&mut self, from_version: FrameworkVersion, to_version: FrameworkVersion) {
         for dir in self.0.iter_mut() {
-            if dir.version.semver == from_version {
+            if dir.version.is_framework_version(&from_version) {
                 dir.upgrade_in_progress = Some((from_version.clone(), to_version.clone()));
             }
         }
@@ -116,7 +116,9 @@ impl RelevantDirectories {
     pub fn finish_upgrade(&mut self) {
         for dir in self.0.iter_mut() {
             if let Some((_, to_version)) = &dir.upgrade_in_progress {
-                dir.version.semver = to_version.clone();
+                if let DependencyReference::Version(version_req) = &mut dir.version {
+                    version_req.semver = to_version.clone();
+                }
                 dir.upgrade_in_progress = None;
             }
         }
@@ -136,7 +138,7 @@ fn populate_directories(path: &Path, ignore: &[String], result: &mut Vec<Relevan
         }
     }
 
-    if let Some(version) = find_framework_version(path) {
+    if let Some(version) = find_framework_dependency(path) {
         let dir_type = if is_contract {
             DirectoryType::Contract
         } else {
@@ -172,11 +174,30 @@ fn can_continue_recursion(dir_entry: &DirEntry, blacklist: &[String]) -> bool {
     }
 }
 
-fn find_framework_version_string(cargo_toml_contents: &CargoTomlContents) -> Option<String> {
+fn find_framework_toml_dependency(
+    cargo_toml_contents: &CargoTomlContents,
+) -> Option<DependencyReference> {
     for &crate_name in FRAMEWORK_CRATE_NAMES {
-        if let Some(old_base) = cargo_toml_contents.dependency(crate_name) {
-            if let Some(Value::String(s)) = old_base.get("version") {
-                return Some(s.clone());
+        if let Some(dep_value) = cargo_toml_contents.dependency(crate_name) {
+            if let Some(Value::String(s)) = dep_value.get("path") {
+                return Some(DependencyReference::Path(s.clone()));
+            }
+
+            if let Some(Value::String(git)) = dep_value.get("git") {
+                let rev = dep_value
+                    .get("rev")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default();
+                return Some(DependencyReference::Git(GitReference {
+                    git: git.clone(),
+                    rev: rev.to_owned(),
+                }));
+            }
+
+            if let Some(Value::String(s)) = dep_value.get("version") {
+                return Some(DependencyReference::Version(VersionReq::from_string(
+                    s.clone(),
+                )));
             }
         }
     }
@@ -200,10 +221,10 @@ impl RelevantDirectory {
     }
 }
 
-fn find_framework_version(dir_path: &Path) -> Option<VersionReq> {
+fn find_framework_dependency(dir_path: &Path) -> Option<DependencyReference> {
     if let Some(cargo_toml_contents) = load_cargo_toml_contents(dir_path) {
-        if let Some(version) = find_framework_version_string(&cargo_toml_contents) {
-            return Some(VersionReq::from_string(version));
+        if let Some(dep_ref) = find_framework_toml_dependency(&cargo_toml_contents) {
+            return Some(dep_ref);
         }
     }
 

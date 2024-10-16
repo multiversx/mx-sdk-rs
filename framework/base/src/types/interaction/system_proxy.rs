@@ -1,4 +1,3 @@
-pub mod builtin_func_names;
 mod builtin_func_proxy;
 mod esdt_system_sc_proxy;
 mod legacy_system_sc_proxy;
