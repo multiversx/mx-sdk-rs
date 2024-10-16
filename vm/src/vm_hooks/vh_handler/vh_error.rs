@@ -1,3 +1,5 @@
+use multiversx_chain_core::types::ReturnCode;
+
 use crate::{types::RawHandle, vm_hooks::VMHooksHandlerSource};
 
 use super::VMHooksManagedTypes;
@@ -8,7 +10,7 @@ pub trait VMHooksError: VMHooksHandlerSource {
         // run `clear & cargo test -- --nocapture` to see the output
         println!("{}", std::str::from_utf8(message).unwrap());
 
-        self.halt_with_error(4, std::str::from_utf8(message).unwrap())
+        self.halt_with_error(ReturnCode::UserError, std::str::from_utf8(message).unwrap())
     }
 }
 

@@ -1,12 +1,9 @@
-use imports::{Address, Bech32Address, BytesValue};
-use multiversx_sc_snippets_dapp::*;
+use multiversx_sc_snippets_dapp::imports::*;
 use serde::{Deserialize, Serialize};
 
-const GATEWAY: &str = sdk::core::gateway::DEVNET_GATEWAY;
+const GATEWAY: &str = multiversx_sc_snippets_dapp::sdk::core::gateway::DEVNET_GATEWAY;
 const CONTRACT_ADDRESS: &str = "erd1qqqqqqqqqqqqqpgq6tqvj5f59xrgxwrtwy30elgpu7l4zrv6d8ssnjdwxq";
 const PING_PONG_CODE: &[u8] = include_bytes!("../ping-pong-egld.wasm");
-
-use multiversx_sc_snippets_dapp::imports::*;
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Config {

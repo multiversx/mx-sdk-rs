@@ -29,7 +29,7 @@ fn st_blackbox_upgrade() {
                 .code(&st_code)
                 .argument("5")
                 .gas_limit("5,000,000")
-                .expect(TxExpect::ok().no_result()),
+                .expect(TxExpect::ok().result("str:init-result")),
         )
         .sc_call(
             ScCallStep::new()

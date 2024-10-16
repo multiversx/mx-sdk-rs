@@ -116,7 +116,6 @@ impl AdderInteract {
             .code(ADDER_CODE_PATH)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewBech32Address)
-            .prepare_async()
             .run()
             .await;
 
@@ -183,7 +182,6 @@ impl AdderInteract {
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
             .egld(NumExpr("0,050000000000000000"))
-            .prepare_async()
             .run()
             .await;
     }
@@ -196,7 +194,6 @@ impl AdderInteract {
             .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .add(value)
-            .prepare_async()
             .run()
             .await;
 
@@ -211,7 +208,6 @@ impl AdderInteract {
             .typed(adder_proxy::AdderProxy)
             .sum()
             .returns(ReturnsResultUnmanaged)
-            .prepare_async()
             .run()
             .await;
 
@@ -237,7 +233,6 @@ impl AdderInteract {
                     .code_metadata(CodeMetadata::UPGRADEABLE)
                     .code(ADDER_CODE_PATH)
                     .returns(ExpectError(code, msg))
-                    .prepare_async()
                     .run()
                     .await;
 
@@ -253,7 +248,6 @@ impl AdderInteract {
                     .upgrade(new_value)
                     .code_metadata(CodeMetadata::UPGRADEABLE)
                     .code(ADDER_CODE_PATH)
-                    .prepare_async()
                     .run()
                     .await;
 
@@ -264,7 +258,6 @@ impl AdderInteract {
                     .typed(adder_proxy::AdderProxy)
                     .sum()
                     .returns(ReturnsResultUnmanaged)
-                    .prepare_async()
                     .run()
                     .await;
 

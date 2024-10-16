@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: move prepare_async calls to a test for backwards compatibility and delete from here
+
 mod system_sc_interact_cli;
 mod system_sc_interact_config;
 mod system_sc_interact_state;

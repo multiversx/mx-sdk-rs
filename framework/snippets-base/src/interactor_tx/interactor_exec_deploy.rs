@@ -14,7 +14,66 @@ use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::InteractorBase;
 
-use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
+use super::{
+    interactor_prepare_async::InteractorRunAsync, InteractorEnvExec, InteractorExecStep,
+    InteractorPrepareAsync,
+};
+
+#[allow(clippy::type_complexity)]
+async fn run_async_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH>(
+    tx: Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        (),
+        Payment,
+        Gas,
+        DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >,
+) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    let mut step_wrapper = tx.tx_to_step();
+    step_wrapper
+        .env
+        .world
+        .sc_deploy(&mut step_wrapper.step)
+        .await;
+    step_wrapper.process_result()
+}
+
+impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorRunAsync
+    for Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        (),
+        Payment,
+        Gas,
+        DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn run(self) -> impl std::future::Future<Output = Self::Result> {
+        run_async_deploy(self)
+    }
+}
 
 impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorPrepareAsync
     for Tx<
