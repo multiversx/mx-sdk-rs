@@ -26,4 +26,4 @@ version = "0.53.2"
 path = "../../../../framework/snippets"
 
 [features]
-chain_simulator = []
+chain-simulator-tests = []

@@ -29,7 +29,7 @@ pub fn test(test_args: &TestArgs) {
         }
 
         if chain_simulator {
-            args.extend(["--features", "chain_simulator"]);
+            args.extend(["--features", "chain-simulator-tests"]);
         }
 
         if no_capture {

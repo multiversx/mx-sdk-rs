@@ -1,7 +1,7 @@
 use basic_interact::{AdderInteract, Config};
 
 #[tokio::test]
-#[cfg_attr(not(feature = "chain_simulator"), ignore)]
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn simulator_upgrade_test() {
     let mut basic_interact = AdderInteract::init(Config::chain_simulator_config()).await;
     // let wallet_address = basic_interact.wallet_address.clone();
