@@ -92,7 +92,7 @@ impl BlockchainVMRef {
             self.execute_builtin_function_or_default(tx_input, tx_cache, f)
         });
 
-        if tx_result.result_status == 0 {
+        if tx_result.result_status.is_success() {
             blockchain_updates.apply(state);
         }
 
@@ -155,7 +155,7 @@ impl BlockchainVMRef {
 
         // legacy async call
         // the async call also gets reset
-        if tx_result.result_status == 0 {
+        if tx_result.result_status.is_success() {
             if let Some(async_data) = pending_calls.async_call {
                 let (async_result, callback_result) =
                     self.execute_async_call_and_callback(async_data, state);

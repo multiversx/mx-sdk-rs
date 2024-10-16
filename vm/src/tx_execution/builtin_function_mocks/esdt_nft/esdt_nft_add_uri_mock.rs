@@ -1,3 +1,5 @@
+use multiversx_chain_core::types::ReturnCode;
+
 use crate::{
     chain_core::builtin_func_names::ESDT_NFT_ADD_URI_FUNC_NAME,
     tx_execution::BlockchainVMRef,
@@ -53,7 +55,7 @@ impl BuiltinFunction for ESDTNftAddUri {
         };
 
         let tx_result = TxResult {
-            result_status: 0,
+            result_status: ReturnCode::Success,
             result_logs: vec![esdt_nft_create_log],
             ..Default::default()
         };

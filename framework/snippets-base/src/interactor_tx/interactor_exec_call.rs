@@ -15,7 +15,50 @@ use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::InteractorBase;
 
-use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
+use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
+
+async fn run_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
+    tx: Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        To,
+        Payment,
+        Gas,
+        FunctionCall<StaticApi>,
+        RH,
+    >,
+) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    let mut step_wrapper = tx.tx_to_step();
+    step_wrapper.env.world.sc_call(&mut step_wrapper.step).await;
+    step_wrapper.process_result()
+}
+
+impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorRunAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn run(self) -> impl std::future::Future<Output = Self::Result> {
+        run_async_call(self)
+    }
+}
 
 impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorPrepareAsync
     for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>

@@ -7,3 +7,13 @@ pub struct ReportCreator {
 }
 
 impl ReportCreator {}
+
+impl Default for ReportCreator {
+    fn default() -> Self {
+        ReportCreator {
+            path: String::new(),
+            has_allocator: false,
+            has_panic: PanicReport::None,
+        }
+    }
+}

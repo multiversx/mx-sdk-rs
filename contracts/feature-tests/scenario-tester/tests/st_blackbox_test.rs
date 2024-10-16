@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::imports::*;
+use multiversx_sc_scenario::{imports::*, scenario_model::TxResponseStatus};
 
 use scenario_tester::*;
 
@@ -285,4 +285,100 @@ fn st_blackbox_tx_hash() {
         .run();
 
     assert_eq!(tx_hash.as_array(), &[22u8; 32]);
+}
+
+#[test]
+fn st_blackbox_returns_result_or_error() {
+    let mut world = world();
+
+    world
+        .account(OWNER_ADDRESS)
+        .nonce(1)
+        .balance(100)
+        .account(OTHER_ADDRESS)
+        .nonce(2)
+        .balance(300)
+        .esdt_balance(TOKEN_ID, 500)
+        .commit();
+
+    // deploy
+    let (result, check_tx_hash) = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .init(5u32)
+        .code(CODE_PATH)
+        .new_address(ST_ADDRESS)
+        .tx_hash([33u8; 32])
+        .returns(
+            ReturnsHandledOrError::new()
+                .returns(ReturnsNewAddress)
+                .returns(ReturnsResultAs::<String>::new())
+                .returns(ReturnsTxHash),
+        )
+        .returns(ReturnsTxHash)
+        .run();
+
+    assert_eq!(check_tx_hash.as_array(), &[33u8; 32]);
+    let (new_address, out_value, also_check_tx_hash) = result.unwrap();
+    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(out_value, "init-result");
+    assert_eq!(also_check_tx_hash.as_array(), &[33u8; 32]);
+
+    // query - ok
+    let result = world
+        .query()
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .sum()
+        .returns(ReturnsHandledOrError::new().returns(ReturnsResultUnmanaged))
+        .run();
+    assert_eq!(result, Ok(RustBigUint::from(5u32)));
+
+    // query - error
+    let result = world
+        .query()
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .sc_panic()
+        .returns(ReturnsHandledOrError::new())
+        .run();
+
+    assert_eq!(
+        result,
+        Err(TxResponseStatus::new(
+            ReturnCode::UserError,
+            "sc_panic! example"
+        ))
+    );
+
+    // call - ok
+    let result = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .add(1u32)
+        .returns(ReturnsHandledOrError::new())
+        .run();
+
+    assert_eq!(result, Ok(()));
+
+    // call - error
+    let result = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .sc_panic()
+        .returns(ReturnsHandledOrError::new())
+        .run();
+
+    assert_eq!(
+        result,
+        Err(TxResponseStatus::new(
+            ReturnCode::UserError,
+            "sc_panic! example"
+        ))
+    );
 }

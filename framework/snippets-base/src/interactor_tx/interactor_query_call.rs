@@ -12,7 +12,42 @@ use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::InteractorBase;
 
-use super::{InteractorEnvQuery, InteractorPrepareAsync, InteractorQueryStep};
+use super::{InteractorEnvQuery, InteractorPrepareAsync, InteractorQueryStep, InteractorRunAsync};
+
+async fn run_async_query<'w, GatewayProxy, To, Payment, RH>(
+    tx: Tx<InteractorEnvQuery<'w, GatewayProxy>, (), To, Payment, (), FunctionCall<StaticApi>, RH>,
+) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
+where
+    GatewayProxy: GatewayAsyncService,
+    To: TxToSpecified<InteractorEnvQuery<'w, GatewayProxy>>,
+    Payment: TxNoPayment<InteractorEnvQuery<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    let mut step_wrapper = tx.tx_to_query_step();
+    step_wrapper
+        .env
+        .world
+        .sc_query(&mut step_wrapper.step)
+        .await;
+    step_wrapper.process_result()
+}
+
+impl<'w, GatewayProxy, To, Payment, RH> InteractorRunAsync
+    for Tx<InteractorEnvQuery<'w, GatewayProxy>, (), To, Payment, (), FunctionCall<StaticApi>, RH>
+where
+    GatewayProxy: GatewayAsyncService,
+    To: TxToSpecified<InteractorEnvQuery<'w, GatewayProxy>>,
+    Payment: TxNoPayment<InteractorEnvQuery<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn run(self) -> impl std::future::Future<Output = Self::Result> {
+        run_async_query(self)
+    }
+}
 
 impl<'w, GatewayProxy, To, Payment, RH> InteractorPrepareAsync
     for Tx<InteractorEnvQuery<'w, GatewayProxy>, (), To, Payment, (), FunctionCall<StaticApi>, RH>

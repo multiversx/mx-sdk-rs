@@ -145,7 +145,6 @@ impl MultisigInteract {
             .code(&self.multisig_code)
             .gas(NumExpr("100,000,000"))
             .returns(ReturnsNewBech32Address)
-            .prepare_async()
             .run()
             .await;
 
@@ -202,7 +201,6 @@ impl MultisigInteract {
             .from(&self.wallet_address)
             .to(self.state.current_multisig_address())
             .egld(BigUint::from(50_000_000_000_000_000u64)) // 0,05 or 5 * 10^16
-            .prepare_async()
             .run()
             .await;
     }
@@ -220,7 +218,6 @@ impl MultisigInteract {
             .gas(gas_expr)
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
-            .prepare_async()
             .run()
             .await;
 
@@ -273,7 +270,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .quorum_reached(action_id)
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await
     }
@@ -285,7 +281,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .signed(signer, action_id)
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await
     }
@@ -340,7 +335,6 @@ impl MultisigInteract {
             .gas(NumExpr("30,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .dns_register(dns_address, name)
-            .prepare_async()
             .run()
             .await;
 
@@ -355,7 +349,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .quorum()
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 
@@ -370,7 +363,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .num_board_members()
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 

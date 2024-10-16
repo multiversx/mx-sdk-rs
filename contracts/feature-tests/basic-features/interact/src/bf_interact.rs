@@ -86,7 +86,6 @@ impl BasicFeaturesInteract {
             .code(&self.code_expr)
             .gas(NumExpr("4,000,000"))
             .returns(ReturnsNewBech32Address)
-            .prepare_async()
             .run()
             .await;
 
@@ -103,7 +102,6 @@ impl BasicFeaturesInteract {
             .gas(NumExpr("600,000,000"))
             .typed(basic_features_proxy::BasicFeaturesProxy)
             .store_bytes(value)
-            .prepare_async()
             .run()
             .await;
 
@@ -118,7 +116,6 @@ impl BasicFeaturesInteract {
             .typed(basic_features_proxy::BasicFeaturesProxy)
             .load_bytes()
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 

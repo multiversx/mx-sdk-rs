@@ -130,13 +130,21 @@ impl ContractVariant {
     fn extract_wasm_info(&self, build_args: &BuildArgs, output_path: &str) -> WasmInfo {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
 
+        let abi = ContractAbiJson::from(&self.abi);
+        let mut view_endpoints: Vec<&str> = Vec::new();
+        for endpoint in &abi.endpoints {
+            if let crate::abi_json::EndpointMutabilityAbiJson::Readonly = endpoint.mutability {
+                view_endpoints.push(&endpoint.name);
+            }
+        }
+
         if !build_args.extract_imports {
             return WasmInfo::extract_wasm_info(
                 &output_wasm_path,
                 build_args.extract_imports,
                 &self.settings.check_ei,
-            )
-            .expect("error occured while extracting imports from .wasm ");
+                view_endpoints,
+            );
         }
 
         let output_imports_json_path = format!(
@@ -146,9 +154,12 @@ impl ContractVariant {
         );
         print_extract_imports(&output_imports_json_path);
 
-        let wasm_data =
-            WasmInfo::extract_wasm_info(&output_wasm_path, true, &self.settings.check_ei)
-                .expect("error occured while extracting imports from .wasm ");
+        let wasm_data = WasmInfo::extract_wasm_info(
+            &output_wasm_path,
+            true,
+            &self.settings.check_ei,
+            view_endpoints,
+        );
 
         write_imports_output(
             output_imports_json_path.as_str(),

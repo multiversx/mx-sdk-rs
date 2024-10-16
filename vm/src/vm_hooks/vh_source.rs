@@ -1,5 +1,7 @@
 use std::{fmt::Debug, sync::MutexGuard};
 
+use multiversx_chain_core::types::ReturnCode;
+
 use crate::{
     tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata, H256},
@@ -10,10 +12,10 @@ use crate::{
 pub trait VMHooksHandlerSource: Debug {
     fn m_types_lock(&self) -> MutexGuard<TxManagedTypes>;
 
-    fn halt_with_error(&self, status: u64, message: &str) -> !;
+    fn halt_with_error(&self, status: ReturnCode, message: &str) -> !;
 
     fn vm_error(&self, message: &str) -> ! {
-        self.halt_with_error(10, message)
+        self.halt_with_error(ReturnCode::ExecutionFailed, message)
     }
 
     fn input_ref(&self) -> &TxInput;
