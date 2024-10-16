@@ -39,7 +39,8 @@ pub async fn adder_cli() {
             basic_interact.multi_deploy(args.count).await;
         },
         Some(basic_interact_cli::InteractCliCommand::Sum) => {
-            basic_interact.print_sum().await;
+            let sum = basic_interact.get_sum().await;
+            println!("sum: {sum}");
         },
         Some(basic_interact_cli::InteractCliCommand::Upgrade(args)) => {
             let owner_address = basic_interact.adder_owner_address.clone();
@@ -200,18 +201,15 @@ impl AdderInteract {
         println!("successfully performed add");
     }
 
-    pub async fn print_sum(&mut self) {
-        let sum = self
-            .interactor
+    pub async fn get_sum(&mut self) -> RustBigUint {
+        self.interactor
             .query()
             .to(self.state.current_adder_address())
             .typed(adder_proxy::AdderProxy)
             .sum()
             .returns(ReturnsResultUnmanaged)
             .run()
-            .await;
-
-        println!("sum: {sum}");
+            .await
     }
 
     pub async fn upgrade(
