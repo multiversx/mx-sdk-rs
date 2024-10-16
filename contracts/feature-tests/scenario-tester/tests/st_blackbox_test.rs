@@ -344,7 +344,13 @@ fn st_blackbox_returns_result_or_error() {
         .returns(ReturnsHandledOrError::new())
         .run();
 
-    assert_eq!(result, Err(TxResponseStatus::new(4, "sc_panic! example")));
+    assert_eq!(
+        result,
+        Err(TxResponseStatus::new(
+            ReturnCode::UserError,
+            "sc_panic! example"
+        ))
+    );
 
     // call - ok
     let result = world
@@ -368,5 +374,11 @@ fn st_blackbox_returns_result_or_error() {
         .returns(ReturnsHandledOrError::new())
         .run();
 
-    assert_eq!(result, Err(TxResponseStatus::new(4, "sc_panic! example")));
+    assert_eq!(
+        result,
+        Err(TxResponseStatus::new(
+            ReturnCode::UserError,
+            "sc_panic! example"
+        ))
+    );
 }

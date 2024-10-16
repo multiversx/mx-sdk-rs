@@ -1,3 +1,4 @@
+use multiversx_chain_core::types::ReturnCode;
 use num_bigint::BigUint;
 
 use crate::{
@@ -56,7 +57,7 @@ impl BuiltinFunction for ESDTNftAddQuantity {
         };
 
         let tx_result = TxResult {
-            result_status: 0,
+            result_status: ReturnCode::Success,
             result_logs: vec![esdt_nft_create_log],
             ..Default::default()
         };

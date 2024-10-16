@@ -4,6 +4,7 @@ use crate::scenario_format::{
     value_interpreter::{interpret_string, interpret_subtree},
 };
 
+use multiversx_sc::chain_core::types::ReturnCode;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use std::fmt;
@@ -105,6 +106,12 @@ impl From<i32> for U64Value {
     fn from(from: i32) -> Self {
         assert!(from >= 0, "U64Value cannot be negative");
         Self::from(from as u32)
+    }
+}
+
+impl From<ReturnCode> for U64Value {
+    fn from(from: ReturnCode) -> Self {
+        U64Value::from(from.as_u64())
     }
 }
 
