@@ -1,3 +1,4 @@
+use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets_base::network_response::{self, is_out_scr};
 use multiversx_sc_snippets_base::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
@@ -285,5 +286,5 @@ fn test_transaction_multiple_sc_results() {
     assert!(is_out_scr(
         &tx_on_network.smart_contract_results.get(2).unwrap()
     ));
-    let _ = network_response::parse_tx_response(tx_on_network);
+    let _ = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 }

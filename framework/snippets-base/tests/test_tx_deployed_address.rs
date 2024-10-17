@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::imports::Address;
+use multiversx_sc_scenario::imports::{Address, ReturnCode};
 use multiversx_sc_snippets_base::network_response;
 use multiversx_sc_snippets_base::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 use multiversx_sdk::bech32;
@@ -54,7 +54,7 @@ fn test_deployed_address() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
     let opt_address = tx_response
         .new_deployed_address
         .map(|address| bech32::encode(&address));
@@ -123,7 +123,7 @@ fn test_deployed_address_should_be_none_if_not_a_sc_deployment_tx() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
     let opt_address = tx_response.new_deployed_address;
 
     let expected: Option<Address> = None;
