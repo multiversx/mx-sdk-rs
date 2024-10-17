@@ -1,3 +1,4 @@
+use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets_base::network_response;
 use multiversx_sc_snippets_base::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
@@ -251,7 +252,7 @@ fn test_with_tx_that_has_sc_result() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Vec<Vec<u8>> = vec![
         hex::decode("0000000c5745474c442d64376336626200000000000000000000000803856446ff9a304b")
@@ -339,7 +340,7 @@ fn test_with_tx_that_has_no_sc_result() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Vec<Vec<u8>> = vec![
         hex::decode("0a").unwrap(),

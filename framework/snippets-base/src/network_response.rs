@@ -3,7 +3,7 @@ use crate::sdk::{
     utils::base64_decode,
 };
 use multiversx_sc_scenario::{
-    imports::{Address, ESDTSystemSCAddress},
+    imports::{Address, ESDTSystemSCAddress, ReturnCode},
     multiversx_chain_vm::{crypto_functions::keccak256, types::H256},
     scenario_model::{Log, TxResponse, TxResponseStatus},
 };
@@ -12,8 +12,8 @@ const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
 /// Creates a [`TxResponse`] from a [`TransactionOnNetwork`].
-pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
-    let tx_error = process_signal_error(&tx);
+pub fn parse_tx_response(tx: TransactionOnNetwork, return_code: ReturnCode) -> TxResponse {
+    let tx_error = process_signal_error(&tx, return_code);
     if !tx_error.is_success() {
         return TxResponse {
             tx_error,
@@ -25,7 +25,7 @@ pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
     process_success(&tx)
 }
 
-fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
+fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> TxResponseStatus {
     if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR) {
         let topics = event.topics.as_ref();
         if let Some(error) = process_topics_error(topics) {
@@ -34,7 +34,7 @@ fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
 
         let error_raw = base64_decode(topics.unwrap().get(1).unwrap());
         let error = String::from_utf8(error_raw).unwrap();
-        return TxResponseStatus::signal_error(&error);
+        return TxResponseStatus::new(return_code, &error);
     }
 
     TxResponseStatus::default()

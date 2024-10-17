@@ -82,6 +82,43 @@ impl ReturnCode {
             _ => MESSAGE_UNKNOWN_ERROR,
         }
     }
+
+    pub fn from_u64(value: u64) -> Option<ReturnCode> {
+        match value {
+            0 => Some(ReturnCode::Success),
+            1 => Some(ReturnCode::FunctionNotFound),
+            2 => Some(ReturnCode::FunctionWrongSignature),
+            3 => Some(ReturnCode::ContractNotFound),
+            4 => Some(ReturnCode::UserError),
+            5 => Some(ReturnCode::OutOfGas),
+            6 => Some(ReturnCode::AccountCollision),
+            7 => Some(ReturnCode::OutOfFunds),
+            8 => Some(ReturnCode::CallStackOverFlow),
+            9 => Some(ReturnCode::ContractInvalid),
+            10 => Some(ReturnCode::ExecutionFailed),
+            11 => Some(ReturnCode::UpgradeFailed),
+            12 => Some(ReturnCode::SimulateFailed),
+            100 => Some(ReturnCode::DebugApiError),
+            _ => None,
+        }
+    }
+
+    pub fn from_message(message: &str) -> Option<ReturnCode> {
+        match message {
+            MESSAGE_OK => Some(ReturnCode::Success),
+            MESSAGE_FUNCTION_NOT_FOUND => Some(ReturnCode::FunctionNotFound),
+            MESSAGE_WRONG_SIGNATURE => Some(ReturnCode::FunctionWrongSignature),
+            MESSAGE_CONTRACT_NOT_FOUND => Some(ReturnCode::ContractNotFound),
+            MESSAGE_USER_ERROR => Some(ReturnCode::UserError),
+            MESSAGE_OUT_OF_GAS => Some(ReturnCode::OutOfGas),
+            MESSAGE_ACCOUNT_COLLISION => Some(ReturnCode::AccountCollision),
+            MESSAGE_OUT_OF_FUNDS => Some(ReturnCode::OutOfFunds),
+            MESSAGE_CALL_STACK_OVERFLOW => Some(ReturnCode::CallStackOverFlow),
+            MESSAGE_CONTRACT_INVALID => Some(ReturnCode::ContractInvalid),
+            MESSAGE_EXECUTION_FAILED => Some(ReturnCode::ExecutionFailed),
+            _ => None,
+        }
+    }
 }
 
 impl core::fmt::Display for ReturnCode {
