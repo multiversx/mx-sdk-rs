@@ -2,7 +2,7 @@ pub mod bech32;
 pub mod crypto;
 pub mod data;
 pub mod gateway;
-mod retrieve_tx_on_network;
+pub mod retrieve_tx_on_network;
 pub mod test_wallets;
 pub mod utils;
 pub mod wallet;

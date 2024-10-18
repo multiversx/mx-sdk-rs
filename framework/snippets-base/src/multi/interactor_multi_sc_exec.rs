@@ -20,9 +20,8 @@ where
         let results = self.process_txs(txs).await;
 
         for (i, sc_call_step) in buffer.refs.iter_mut().enumerate() {
-            sc_call_step.set_response(network_response::parse_tx_response(
-                results.get(i).unwrap().clone(),
-            ));
+            let (tx, return_code) = results.get(i).unwrap().clone();
+            sc_call_step.set_response(network_response::parse_tx_response(tx, return_code));
         }
 
         for step in buffer.refs.iter_mut() {

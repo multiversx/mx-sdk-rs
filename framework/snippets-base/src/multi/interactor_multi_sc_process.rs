@@ -1,6 +1,7 @@
 use crate::sdk::data::transaction::{Transaction, TransactionOnNetwork};
 use crate::{multiversx_sc::types::Address, InteractorBase, Sender};
 use futures::future::join_all;
+use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sdk::gateway::{GatewayAsyncService, SendTxRequest};
 use multiversx_sdk::retrieve_tx_on_network;
 use std::collections::HashSet;
@@ -25,7 +26,10 @@ where
         }
     }
 
-    pub(crate) async fn process_txs(&mut self, txs: Vec<Transaction>) -> Vec<TransactionOnNetwork> {
+    pub(crate) async fn process_txs(
+        &mut self,
+        txs: Vec<Transaction>,
+    ) -> Vec<(TransactionOnNetwork, ReturnCode)> {
         let mut futures = Vec::new();
 
         for tx in &txs {

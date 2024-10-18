@@ -24,9 +24,9 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let tx = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
+        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
 
-        sc_call_step.save_response(network_response::parse_tx_response(tx));
+        sc_call_step.save_response(network_response::parse_tx_response(tx, return_code));
 
         if let Some(token_identifier) = sc_call_step.response().new_issued_token_identifier.clone()
         {
@@ -51,7 +51,7 @@ where
             .proxy
             .request(SendTxRequest(&transaction))
             .await
-            .unwrap();
+            .expect("Launch sc call failed");
         println!("sc call tx hash: {tx_hash}");
         info!("sc call tx hash: {}", tx_hash);
 

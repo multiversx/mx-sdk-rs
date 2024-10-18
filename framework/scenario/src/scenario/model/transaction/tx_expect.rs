@@ -119,7 +119,7 @@ impl TxExpect {
             self.message.check(tx_response.tx_error.message.as_str()),
             "{}result message mismatch. Want: {}. Have: {}.",
             &self.additional_error_message,
-            &self.status,
+            &self.message,
             &tx_response.tx_error.message,
         );
     }
