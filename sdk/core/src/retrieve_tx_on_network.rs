@@ -1,10 +1,12 @@
 use crate::{
-    data::transaction::{Events, TransactionOnNetwork},
+    data::{
+        sdk_address::SdkAddress,
+        transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
+    },
     gateway::{GetTxInfo, GetTxProcessStatus},
-    utils::base64_encode,
 };
 use log::info;
-use multiversx_chain_core::types::ReturnCode;
+use multiversx_chain_core::types::{Address, ReturnCode};
 
 use crate::gateway::GatewayAsyncService;
 
@@ -42,20 +44,13 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                     },
                     "fail" => {
                         let (error_code, error_message) = parse_reason(&reason);
-                        let mut transaction_info_with_results: TransactionOnNetwork = proxy
-                            .request(GetTxInfo::new(&tx_hash).with_results())
-                            .await
-                            .unwrap();
-                        replace_with_error_message(
-                            &mut transaction_info_with_results,
-                            error_message,
-                        );
+                        let failed_transaction_info: TransactionOnNetwork =
+                            create_tx_failed(&error_message);
 
                         info!(
-                            "Transaction retrieved successfully, with status {}: {:#?}",
-                            status, transaction_info_with_results
+                            "Transaction failed with status {status} and message {error_message}",
                         );
-                        return (transaction_info_with_results, error_code);
+                        return (failed_transaction_info, error_code);
                     },
                     _ => {
                         continue;
@@ -87,7 +82,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
 
 pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
     if reason.is_empty() {
-        return (ReturnCode::UserError, String::new());
+        return (ReturnCode::UserError, "invalid transaction".to_string());
     }
 
     let (code, mut message) = find_code_and_message(reason);
@@ -98,7 +93,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
                 ReturnCode::message(return_code).clone_into(&mut message);
             }
 
-            (return_code, base64_encode(message))
+            (return_code, message)
         },
         None => {
             if message.is_empty() {
@@ -106,7 +101,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
             }
             let return_code = ReturnCode::from_message(&message).unwrap_or(ReturnCode::UserError);
 
-            (return_code, base64_encode(message))
+            (return_code, message)
         },
     }
 }
@@ -141,26 +136,20 @@ pub fn extract_message_from_string_reason(reason: &str) -> String {
     return contract_error.last().unwrap_or(&"").split(']').collect();
 }
 
-pub fn replace_with_error_message(tx: &mut TransactionOnNetwork, error_message: String) {
-    if error_message.is_empty() {
-        return;
-    }
+fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
+    let mut failed_transaction_info = TransactionOnNetwork::default();
 
-    if let Some(event) = find_log(tx) {
-        if let Some(event_topics) = event.topics.as_mut() {
-            if event_topics.len() == 2 {
-                event_topics[1] = error_message;
-            }
-        }
-    }
-}
+    let log: ApiLogs = ApiLogs {
+        address: SdkAddress(Address::zero()),
+        events: vec![Events {
+            address: SdkAddress(Address::zero()),
+            identifier: LOG_IDENTIFIER_SIGNAL_ERROR.to_string(),
+            topics: Some(vec![error_message.to_string()]),
+            data: LogData::default(),
+        }],
+    };
 
-fn find_log(tx: &mut TransactionOnNetwork) -> Option<&mut Events> {
-    if let Some(logs) = tx.logs.as_mut() {
-        logs.events
-            .iter_mut()
-            .find(|event| event.identifier == LOG_IDENTIFIER_SIGNAL_ERROR)
-    } else {
-        None
-    }
+    failed_transaction_info.logs = Some(log);
+
+    failed_transaction_info
 }

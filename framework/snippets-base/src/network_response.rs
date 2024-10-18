@@ -28,13 +28,9 @@ pub fn parse_tx_response(tx: TransactionOnNetwork, return_code: ReturnCode) -> T
 fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> TxResponseStatus {
     if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR) {
         let topics = event.topics.as_ref();
-        if let Some(error) = process_topics_error(topics) {
-            return TxResponseStatus::signal_error(&error);
-        }
 
-        let error_raw = base64_decode(topics.unwrap().get(1).unwrap());
-        let error = String::from_utf8(error_raw).unwrap();
-        return TxResponseStatus::new(return_code, &error);
+        let error = topics.unwrap().first().unwrap();
+        return TxResponseStatus::new(return_code, error);
     }
 
     TxResponseStatus::default()
