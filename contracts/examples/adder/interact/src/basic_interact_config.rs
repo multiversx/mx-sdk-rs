@@ -4,10 +4,18 @@ use std::io::Read;
 /// Config file
 const CONFIG_FILE: &str = "config.toml";
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ChainType {
+    Real,
+    Simulator,
+}
+
 /// Adder Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    gateway: String,
+    pub gateway_uri: String,
+    pub chain_type: ChainType,
 }
 
 impl Config {
@@ -19,8 +27,23 @@ impl Config {
         toml::from_str(&content).unwrap()
     }
 
-    // Returns the gateway
-    pub fn gateway(&self) -> &str {
-        &self.gateway
+    pub fn chain_simulator_config() -> Self {
+        Config {
+            gateway_uri: "http://localhost:8085".to_owned(),
+            chain_type: ChainType::Simulator,
+        }
+    }
+
+    // Returns the gateway URI
+    pub fn gateway_uri(&self) -> &str {
+        &self.gateway_uri
+    }
+
+    // Returns if chain type is chain simulator
+    pub fn use_chain_simulator(&self) -> bool {
+        match self.chain_type {
+            ChainType::Real => false,
+            ChainType::Simulator => true,
+        }
     }
 }

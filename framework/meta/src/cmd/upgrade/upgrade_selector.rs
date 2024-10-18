@@ -1,6 +1,6 @@
 use crate::{
     cli::UpgradeArgs,
-    cmd::upgrade::upgrade_settings::UpgradeSettings,
+    cmd::{print_util::print_tree_dir_metadata, upgrade::upgrade_settings::UpgradeSettings},
     folder_structure::{dir_pretty_print, RelevantDirectories, RelevantDirectory},
     version::FrameworkVersion,
     version_history::{versions_iter, CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION, VERSIONS},

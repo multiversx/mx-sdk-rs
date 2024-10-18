@@ -27,4 +27,7 @@ pub trait TxEnvMockDeployAddress: TxEnv {
 
 pub trait TxEnvWithTxHash: TxEnv {
     fn set_tx_hash(&mut self, tx_hash: H256);
+
+    /// Retrieves current tx hash, while resetting it in self.
+    fn take_tx_hash(&mut self) -> Option<H256>;
 }

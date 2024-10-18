@@ -110,6 +110,7 @@
         },
         {
             "name": "multi_result_3",
+            "title": "result-3",
             "mutability": "mutable",
             "inputs": [],
             "outputs": [

@@ -1,6 +1,8 @@
-use crate::tx_execution::{builtin_function_names::DELETE_USERNAME_FUNC_NAME, BlockchainVMRef};
-
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
+use crate::{
+    chain_core::builtin_func_names::DELETE_USERNAME_FUNC_NAME,
+    tx_execution::BlockchainVMRef,
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 

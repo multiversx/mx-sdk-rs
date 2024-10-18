@@ -56,7 +56,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(&self.config.wegld_address, WRAP_AMOUNT, function_call)
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 
@@ -72,7 +71,6 @@ impl MultisigInteract {
             .typed(wegld_proxy::EgldEsdtSwapProxy)
             .wrapped_egld_token_id()
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 
@@ -104,7 +102,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(normalized_to, 0u64, normalized_data)
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 

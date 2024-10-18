@@ -65,7 +65,7 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
             .init({})
             .code(&self.contract_code)
             .returns(ReturnsNewAddress)
-            .prepare_async()
+            
             .run()
             .await;
         let new_address_bech32 = bech32::encode(&new_address);
@@ -101,7 +101,7 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
             .code(&self.contract_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewAddress)
-            .prepare_async()
+            
             .run()
             .await;
 
@@ -214,7 +214,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
             .typed(proxy::{}Proxy)
             .{}({}){}
             .returns(ReturnsResultUnmanaged)
-            .prepare_async()
+            
             .run()
             .await;
 
@@ -237,7 +237,7 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi, name: &Stri
             .typed(proxy::{}Proxy)
             .{}({})
             .returns(ReturnsResultUnmanaged)
-            .prepare_async()
+            
             .run()
             .await;
 

@@ -1,4 +1,5 @@
 use hex_literal::hex;
+use multiversx_chain_core::types::Address;
 use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
@@ -24,6 +25,10 @@ impl ESDTSystemSCAddress {
         Api: ManagedTypeApi,
     {
         ManagedAddress::from(SYSTEM_SC_ADDRESS_BYTES)
+    }
+
+    pub fn to_address(&self) -> Address {
+        SYSTEM_SC_ADDRESS_BYTES.into()
     }
 
     pub fn to_bech32_str(&self) -> &str {

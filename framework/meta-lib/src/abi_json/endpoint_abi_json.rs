@@ -93,6 +93,10 @@ pub struct EndpointAbiJson {
     pub docs: Vec<String>,
     pub name: String,
 
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+
     #[serde(rename = "onlyOwner")]
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -128,6 +132,7 @@ impl From<&EndpointAbi> for EndpointAbiJson {
         EndpointAbiJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
+            title: abi.title.clone(),
             only_owner: if abi.only_owner { Some(true) } else { None },
             only_admin: if abi.only_admin { Some(true) } else { None },
             mutability: match abi.mutability {

@@ -24,7 +24,7 @@ impl CodeReportJson {
             path: report.path.clone(),
             size,
             has_allocator: report.has_allocator,
-            has_panic: report.has_panic.clone(),
+            has_panic: report.has_panic.to_string(),
         }
     }
 }

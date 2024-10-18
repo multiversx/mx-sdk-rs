@@ -1,7 +1,9 @@
+use multiversx_chain_core::types::ReturnCode;
 use num_bigint::BigUint;
 
 use crate::{
-    tx_execution::{builtin_function_names::ESDT_NFT_BURN_FUNC_NAME, BlockchainVMRef},
+    chain_core::builtin_func_names::ESDT_NFT_BURN_FUNC_NAME,
+    tx_execution::BlockchainVMRef,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     types::{top_decode_u64, top_encode_u64},
 };
@@ -52,7 +54,7 @@ impl BuiltinFunction for ESDTNftBurn {
         };
 
         let tx_result = TxResult {
-            result_status: 0,
+            result_status: ReturnCode::Success,
             result_logs: vec![esdt_nft_create_log],
             ..Default::default()
         };

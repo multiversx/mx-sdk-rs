@@ -908,11 +908,11 @@ where
 impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
 where
     Env: TxEnvWithTxHash,
-    From: TxFromSpecified<Env>,
+    From: TxFrom<Env>,
     To: TxTo<Env>,
-    Payment: TxPaymentEgldOnly<Env>,
+    Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
-    Data: TxDataFunctionCall<Env>,
+    Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
     /// Sets the mock transaction hash to be used in a test.

@@ -56,8 +56,8 @@ pub fn async_callback_tx_input(
     async_result: &TxResult,
     builtin_functions: &BuiltinFunctionContainer,
 ) -> TxInput {
-    let mut args: Vec<Vec<u8>> = vec![result_status_bytes(async_result.result_status)];
-    if async_result.result_status == 0 {
+    let mut args: Vec<Vec<u8>> = vec![result_status_bytes(async_result.result_status.as_u64())];
+    if async_result.result_status.is_success() {
         args.extend_from_slice(async_result.result_values.as_slice());
     } else {
         args.push(async_result.result_message.clone().into_bytes());
@@ -108,7 +108,7 @@ pub fn async_promise_callback_tx_input(
     async_result: &TxResult,
     builtin_functions: &BuiltinFunctionContainer,
 ) -> TxInput {
-    let callback_name = if async_result.result_status == 0 {
+    let callback_name = if async_result.result_status.is_success() {
         promise.success_callback.clone()
     } else {
         promise.error_callback.clone()
@@ -122,7 +122,7 @@ pub fn async_promise_callback_tx_input(
 }
 
 pub fn merge_results(mut original: TxResult, mut new: TxResult) -> TxResult {
-    if original.result_status == 0 {
+    if original.result_status.is_success() {
         original.result_values.append(&mut new.result_values);
         original.result_logs.append(&mut new.result_logs);
         original.result_message = new.result_message;

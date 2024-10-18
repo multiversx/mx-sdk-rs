@@ -36,7 +36,9 @@
                 "gasLimit": "70,000,000"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "str:init-result"
+                ],
                 "status": "0"
             }
         },
