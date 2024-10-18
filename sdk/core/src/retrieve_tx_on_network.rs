@@ -95,7 +95,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
     match code {
         Some(return_code) => {
             if message.is_empty() {
-                message = ReturnCode::message(return_code).to_owned();
+                ReturnCode::message(return_code).clone_into(&mut message);
             }
 
             (return_code, base64_encode(message))
