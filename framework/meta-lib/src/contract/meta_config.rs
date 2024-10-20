@@ -73,6 +73,7 @@ impl MetaConfig {
                 framework_version: main_cargo_toml_contents.dependency_version(FRAMEWORK_NAME_BASE),
                 framework_path: main_cargo_toml_contents.dependency_path(FRAMEWORK_NAME_BASE),
                 contract_features: contract.settings.features.clone(),
+                contract_default_features: contract.settings.default_features,
             };
             generate_wasm_cargo_toml(&cargo_toml_data, crate_name.as_str())
                 .save_to_file(contract.cargo_toml_path());
@@ -228,6 +229,7 @@ members = [\".\"]
             framework_version: "x.y.z".to_string(),
             framework_path: Option::Some("../../../framework/base".to_string()),
             contract_features: Vec::<String>::new(),
+            contract_default_features: None,
         };
         let crate_name = "test-crate-name".to_string();
         let generated_contents =

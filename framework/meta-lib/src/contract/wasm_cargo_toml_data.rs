@@ -8,4 +8,5 @@ pub struct WasmCargoTomlData {
     pub framework_version: String,
     pub framework_path: Option<String>,
     pub contract_features: Vec<String>,
+    pub contract_default_features: Option<bool>,
 }
