@@ -10,6 +10,7 @@ const MESSAGE_CALL_STACK_OVERFLOW: &str = "call stack overflow";
 const MESSAGE_CONTRACT_INVALID: &str = "contract invalid";
 const MESSAGE_EXECUTION_FAILED: &str = "execution failed";
 const MESSAGE_UNKNOWN_ERROR: &str = "unknown error";
+const MESSAGE_NETWORK_TIMEOUT: &str = "network timeout";
 
 #[derive(Clone, Copy, Default, PartialEq, Eq, Debug)]
 pub enum ReturnCode {
@@ -55,6 +56,9 @@ pub enum ReturnCode {
 
     /// Only occurs in the debugger context.
     DebugApiError = 100,
+
+    // Returned when a connection timeout occurs
+    NetworkTimeout = 101,
 }
 
 impl ReturnCode {
@@ -79,6 +83,7 @@ impl ReturnCode {
             ReturnCode::CallStackOverFlow => MESSAGE_CALL_STACK_OVERFLOW,
             ReturnCode::ContractInvalid => MESSAGE_CONTRACT_INVALID,
             ReturnCode::ExecutionFailed => MESSAGE_EXECUTION_FAILED,
+            ReturnCode::NetworkTimeout => MESSAGE_NETWORK_TIMEOUT,
             _ => MESSAGE_UNKNOWN_ERROR,
         }
     }
@@ -99,6 +104,7 @@ impl ReturnCode {
             11 => Some(ReturnCode::UpgradeFailed),
             12 => Some(ReturnCode::SimulateFailed),
             100 => Some(ReturnCode::DebugApiError),
+            101 => Some(ReturnCode::NetworkTimeout),
             _ => None,
         }
     }
@@ -116,6 +122,7 @@ impl ReturnCode {
             MESSAGE_CALL_STACK_OVERFLOW => Some(ReturnCode::CallStackOverFlow),
             MESSAGE_CONTRACT_INVALID => Some(ReturnCode::ContractInvalid),
             MESSAGE_EXECUTION_FAILED => Some(ReturnCode::ExecutionFailed),
+            MESSAGE_NETWORK_TIMEOUT => Some(ReturnCode::NetworkTimeout),
             _ => None,
         }
     }

@@ -77,7 +77,11 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
             "Fetching transaction failed and retries exhausted, returning default transaction. Total elapsed time: {:?}s",
             proxy.elapsed_seconds(&start_time)
         );
-    (TransactionOnNetwork::default(), ReturnCode::UserError)
+
+    let error_message = ReturnCode::message(ReturnCode::NetworkTimeout);
+    let failed_transaction: TransactionOnNetwork = create_tx_failed(&error_message);
+
+    (failed_transaction, ReturnCode::NetworkTimeout)
 }
 
 pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
