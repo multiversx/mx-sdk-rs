@@ -1,8 +1,8 @@
 use colored::Colorize;
-use multiversx_sc_meta_lib::version::FrameworkVersion;
+use multiversx_sc_meta_lib::{cargo_toml::DependencyReference, version::FrameworkVersion};
 use std::path::Path;
 
-use crate::folder_structure::{DependencyReference, DirectoryType, RelevantDirectory};
+use crate::folder_structure::{DirectoryType, RelevantDirectory};
 
 pub fn print_all_count(num_contract_crates: usize) {
     println!(

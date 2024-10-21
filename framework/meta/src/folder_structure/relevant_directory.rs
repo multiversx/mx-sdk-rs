@@ -1,12 +1,14 @@
 use crate::version::FrameworkVersion;
-use multiversx_sc_meta_lib::cargo_toml_contents::CargoTomlContents;
+use multiversx_sc_meta_lib::cargo_toml::{
+    CargoTomlContents, DependencyReference, GitReference, VersionReq,
+};
 use std::{
     fs::{self, DirEntry},
     path::{Path, PathBuf},
 };
 use toml::Value;
 
-use super::{version_req::VersionReq, DependencyReference, GitReference};
+// use super::{version_req::VersionReq, DependencyReference, GitReference};
 
 /// Used for retrieving crate versions.
 pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[

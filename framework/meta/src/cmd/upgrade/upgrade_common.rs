@@ -2,12 +2,12 @@ use super::{upgrade_print::*, upgrade_settings::UpgradeSettings};
 use crate::{
     cmd::all::call_contract_meta,
     folder_structure::{
-        DirectoryType, RelevantDirectory, VersionReq, CARGO_TOML_FILE_NAME, FRAMEWORK_CRATE_NAMES,
+        DirectoryType, RelevantDirectory, CARGO_TOML_FILE_NAME, FRAMEWORK_CRATE_NAMES,
     },
     version::FrameworkVersion,
 };
-use multiversx_sc_meta_lib::cargo_toml_contents::{
-    CargoTomlContents, CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES,
+use multiversx_sc_meta_lib::cargo_toml::{
+    CargoTomlContents, VersionReq, CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES
 };
 use ruplacer::{Console, DirectoryPatcher, Query, Settings};
 use std::{

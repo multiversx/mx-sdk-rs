@@ -3,7 +3,7 @@ use std::fs;
 use multiversx_sc::abi::ContractAbi;
 
 use crate::{
-    cargo_toml_contents::CargoTomlContents, cli::BuildArgs, print_util::print_workspace_target_dir,
+    cargo_toml::CargoTomlContents, cli::BuildArgs, print_util::print_workspace_target_dir,
     tools::check_tools_installed, tools::find_current_workspace,
 };
 

@@ -1,6 +1,6 @@
 use super::wasm_cargo_toml_data::WasmCargoTomlData;
 use crate::{
-    cargo_toml_contents::change_from_base_to_adapter_path, cargo_toml_contents::CargoTomlContents,
+    cargo_toml::change_from_base_to_adapter_path, cargo_toml::CargoTomlContents,
 };
 
 const WASM_ADAPTER: &str = "multiversx-sc-wasm-adapter";
