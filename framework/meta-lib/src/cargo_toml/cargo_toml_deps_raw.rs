@@ -3,6 +3,8 @@ pub struct DependencyRawValue {
     pub version: Option<String>,
     pub git: Option<String>,
     pub rev: Option<String>,
+    pub branch: Option<String>,
+    pub tag: Option<String>,
     pub path: Option<String>,
 }
 
@@ -31,6 +33,12 @@ impl DependencyRawValue {
                 if let Some(toml::Value::String(rev)) = table.get("rev") {
                     result.rev = Some(rev.to_owned());
                 }
+                if let Some(toml::Value::String(branch)) = table.get("branch") {
+                    result.branch = Some(branch.to_owned());
+                }
+                if let Some(toml::Value::String(tag)) = table.get("tag") {
+                    result.tag = Some(tag.to_owned());
+                }
                 result
             },
             _ => panic!("Unsupported dependency value"),
@@ -50,6 +58,14 @@ impl DependencyRawValue {
 
         if let Some(rev) = self.rev {
             table.insert("rev".to_string(), toml::Value::String(rev));
+        }
+
+        if let Some(branch) = self.branch {
+            table.insert("branch".to_string(), toml::Value::String(branch));
+        }
+
+        if let Some(tag) = self.tag {
+            table.insert("tag".to_string(), toml::Value::String(tag));
         }
 
         if let Some(path) = self.path {

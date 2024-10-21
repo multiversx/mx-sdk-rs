@@ -51,6 +51,22 @@ pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &Framework
             );
             print!(" {}", git_string.truecolor(255, 198, 0));
         },
+        DependencyReference::GitBranch(git_reference) => {
+            let git_string = format!(
+                "[git: {} branch: {}]",
+                git_reference.git.truecolor(255, 127, 0),
+                git_reference.branch.truecolor(255, 127, 0)
+            );
+            print!(" {}", git_string.truecolor(255, 198, 0));
+        },
+        DependencyReference::GitTag(git_reference) => {
+            let git_string = format!(
+                "[git: {} rev: {}]",
+                git_reference.git.truecolor(255, 127, 0),
+                git_reference.tag.truecolor(255, 127, 0)
+            );
+            print!(" {}", git_string.truecolor(255, 198, 0));
+        },
         DependencyReference::Path(path_buf) => {
             let git_string = format!("[path: {}]", path_buf.truecolor(255, 127, 0));
             print!(" {}", git_string.truecolor(255, 198, 0));

@@ -3,12 +3,24 @@ use crate::version::FrameworkVersion;
 use super::{DependencyRawValue, VersionReq};
 
 /// A dependency reference to a git commit. We mostly use git commits when referencing git.
-///
-/// TODO: add support for `branch` and `tag`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GitCommitReference {
     pub git: String,
     pub rev: String,
+}
+
+/// A dependency reference to a git branch.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GitBranchReference {
+    pub git: String,
+    pub branch: String,
+}
+
+/// A dependency reference to a git tag.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GitTagReference {
+    pub git: String,
+    pub tag: String,
 }
 
 /// Models how a dependency is expressed in Cargo.toml.
@@ -16,6 +28,8 @@ pub struct GitCommitReference {
 pub enum DependencyReference {
     Version(VersionReq),
     GitCommit(GitCommitReference),
+    GitBranch(GitBranchReference),
+    GitTag(GitTagReference),
     Path(String),
     Unsupported,
 }
@@ -39,11 +53,28 @@ impl DependencyRawValue {
         }
 
         if let Some(git) = self.git {
-            let rev = self.rev.unwrap_or_default();
-            return DependencyReference::GitCommit(GitCommitReference {
-                git: git.clone(),
-                rev: rev.to_owned(),
-            });
+            if let Some(rev) = self.rev {
+                return DependencyReference::GitCommit(GitCommitReference {
+                    git: git.clone(),
+                    rev: rev.to_owned(),
+                });
+            }
+
+            if let Some(branch) = self.branch {
+                return DependencyReference::GitBranch(GitBranchReference {
+                    git: git.clone(),
+                    branch,
+                });
+            }
+
+            if let Some(tag) = self.tag {
+                return DependencyReference::GitTag(GitTagReference {
+                    git: git.clone(),
+                    tag: tag.to_owned(),
+                });
+            }
+
+            return DependencyReference::Unsupported;
         }
 
         // explicit version = "..."

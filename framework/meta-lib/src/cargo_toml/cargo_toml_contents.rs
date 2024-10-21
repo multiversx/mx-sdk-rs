@@ -97,30 +97,8 @@ impl CargoTomlContents {
 
     /// Interprets the dependency value and organizes values in a struct.
     pub fn dependency_raw_value(&self, crate_name: &str) -> Option<DependencyRawValue> {
-        if let Some(dep_value) = self.dependency(crate_name) {
-            match dep_value {
-                Value::String(version) => Some(DependencyRawValue::from_version(version)),
-                Value::Table(table) => {
-                    let mut result = DependencyRawValue::default();
-                    if let Some(Value::String(version)) = dep_value.get("version") {
-                        result.version = Some(version.to_owned());
-                    }
-                    if let Some(Value::String(path)) = table.get("path") {
-                        result.path = Some(path.to_owned());
-                    }
-                    if let Some(Value::String(git)) = table.get("git") {
-                        result.git = Some(git.to_owned());
-                    }
-                    if let Some(Value::String(rev)) = table.get("rev") {
-                        result.rev = Some(rev.to_owned());
-                    }
-                    Some(result)
-                },
-                _ => panic!("Unsupported dependency value"),
-            }
-        } else {
-            None
-        }
+        self.dependency(crate_name)
+            .map(DependencyRawValue::parse_toml_value)
     }
 
     pub fn insert_dependency_raw_value(&mut self, crate_name: &str, raw_value: DependencyRawValue) {

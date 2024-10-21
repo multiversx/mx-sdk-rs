@@ -229,9 +229,8 @@ members = [\".\"]
             profile: ContractVariantProfile::default(),
             framework_dependency: DependencyRawValue {
                 version: Some("x.y.z".to_owned()),
-                git: None,
-                rev: None,
                 path: Option::Some("../../../framework/base".to_owned()),
+                ..Default::default()
             },
             contract_features: Vec::<String>::new(),
             contract_default_features: None,
