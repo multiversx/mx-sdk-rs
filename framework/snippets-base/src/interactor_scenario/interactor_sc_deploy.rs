@@ -58,11 +58,11 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let tx = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
+        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
 
         let addr = sc_deploy_step.tx.from.clone();
         let nonce = tx.nonce;
-        sc_deploy_step.save_response(network_response::parse_tx_response(tx));
+        sc_deploy_step.save_response(network_response::parse_tx_response(tx, return_code));
 
         let deploy_address = sc_deploy_step
             .response()
