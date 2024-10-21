@@ -288,7 +288,11 @@ impl CargoTomlContents {
         result
     }
 
-    pub fn change_features_for_parent_crate_dep(&mut self, features: &[String]) {
+    pub fn change_features_for_parent_crate_dep(
+        &mut self,
+        features: &[String],
+        default_features: Option<bool>,
+    ) {
         let deps_mut = self.dependencies_mut();
         for (_, dep) in deps_mut {
             if is_dep_path_above(dep) {
@@ -296,9 +300,14 @@ impl CargoTomlContents {
                     .iter()
                     .map(|feature| Value::String(feature.clone()))
                     .collect();
-                dep.as_table_mut()
-                    .expect("malformed crate Cargo.toml")
-                    .insert("features".to_string(), Value::Array(feature_values));
+                let deps_table = dep.as_table_mut().expect("malformed crate Cargo.toml");
+                deps_table.insert("features".to_string(), Value::Array(feature_values));
+                if let Some(default_features_value) = default_features {
+                    deps_table.insert(
+                        "default-features".to_string(),
+                        Value::Boolean(default_features_value),
+                    );
+                }
             }
         }
     }

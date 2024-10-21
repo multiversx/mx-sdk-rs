@@ -39,8 +39,10 @@ pub fn generate_wasm_cargo_toml(
 
     //check features
     if !cargo_toml_data.contract_features.is_empty() {
-        new_cargo
-            .change_features_for_parent_crate_dep(cargo_toml_data.contract_features.as_slice());
+        new_cargo.change_features_for_parent_crate_dep(
+            cargo_toml_data.contract_features.as_slice(),
+            cargo_toml_data.contract_default_features,
+        );
     }
 
     //insert default workspace
