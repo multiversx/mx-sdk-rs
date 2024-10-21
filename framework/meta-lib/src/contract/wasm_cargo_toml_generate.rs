@@ -55,7 +55,7 @@ fn add_wasm_crate_deps(
 ) {
     let mut wasm_adapter_dep = framework_dependency.clone();
     if let Some(path) = &mut wasm_adapter_dep.path {
-        *path = change_from_base_to_adapter_path(&path);
+        *path = change_from_base_to_adapter_path(path);
     }
 
     cargo_toml_contents.insert_dependency_raw_value(

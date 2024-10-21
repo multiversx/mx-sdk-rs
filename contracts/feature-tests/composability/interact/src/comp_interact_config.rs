@@ -65,10 +65,7 @@ impl Config {
     }
 
     pub fn token_amount(&self) -> BigUint {
-        match BigUint::from_str(&self.amount) {
-            Ok(amount) => amount,
-            Err(_) => BigUint::default(),
-        }
+        BigUint::from_str(&self.amount).unwrap_or_default()
     }
 
     pub fn token_nonce(&self) -> u64 {

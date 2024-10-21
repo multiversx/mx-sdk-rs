@@ -22,7 +22,7 @@ impl VersionReq {
             }
         } else {
             VersionReq {
-                semver: find_version_by_str(&raw).unwrap_or(&LAST_VERSION).clone(),
+                semver: find_version_by_str(raw).unwrap_or(&LAST_VERSION).clone(),
                 is_strict: false,
             }
         }

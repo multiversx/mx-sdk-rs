@@ -366,7 +366,7 @@ fn remove_quotes(var: &Value) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cargo_toml::{GitCommitReference, VersionReq};
+    use crate::cargo_toml::{DependencyReference, GitCommitReference, VersionReq};
 
     #[test]
     fn test_change_from_base_to_adapter_path() {
