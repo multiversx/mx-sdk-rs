@@ -31,7 +31,7 @@ pub enum DependencyReference {
     GitBranch(GitBranchReference),
     GitTag(GitTagReference),
     Path(String),
-    Unsupported,
+    Unsupported(&'static str),
 }
 
 impl DependencyReference {
@@ -53,28 +53,25 @@ impl DependencyRawValue {
         }
 
         if let Some(git) = self.git {
-            if let Some(rev) = self.rev {
-                return DependencyReference::GitCommit(GitCommitReference {
-                    git: git.clone(),
-                    rev: rev.to_owned(),
-                });
-            }
+            return match (self.rev, self.branch, self.tag) {
+                (Some(rev), None, None) => {
+                    DependencyReference::GitCommit(GitCommitReference { git, rev })
+                },
+                (None, Some(branch), None) => {
+                    DependencyReference::GitBranch(GitBranchReference { git, branch })
+                },
 
-            if let Some(branch) = self.branch {
-                return DependencyReference::GitBranch(GitBranchReference {
-                    git: git.clone(),
-                    branch,
-                });
-            }
+                (None, None, Some(tag)) => {
+                    DependencyReference::GitTag(GitTagReference { git, tag })
+                },
 
-            if let Some(tag) = self.tag {
-                return DependencyReference::GitTag(GitTagReference {
-                    git: git.clone(),
-                    tag: tag.to_owned(),
-                });
-            }
-
-            return DependencyReference::Unsupported;
+                (None, None, None) => DependencyReference::Unsupported(
+                    "need at least one of: git commit, git brach, or git tag",
+                ),
+                _ => DependencyReference::Unsupported(
+                    "can only have one of: git commit, git brach, or git tag",
+                ),
+            };
         }
 
         // explicit version = "..."
@@ -83,6 +80,6 @@ impl DependencyRawValue {
             return DependencyReference::Version(VersionReq::from_version_str(&version));
         }
 
-        DependencyReference::Unsupported
+        DependencyReference::Unsupported("expected at least one of: version, git, path")
     }
 }
