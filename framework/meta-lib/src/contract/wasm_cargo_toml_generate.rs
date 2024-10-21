@@ -1,7 +1,5 @@
 use super::wasm_cargo_toml_data::WasmCargoTomlData;
-use crate::{
-    cargo_toml::change_from_base_to_adapter_path, cargo_toml::CargoTomlContents,
-};
+use crate::cargo_toml::{change_from_base_to_adapter_path, CargoTomlContents, DependencyRawValue};
 
 const WASM_ADAPTER: &str = "multiversx-sc-wasm-adapter";
 const CDYLIB_CRATE_TYPE: &str = "cdylib";
@@ -33,8 +31,7 @@ pub fn generate_wasm_cargo_toml(
     add_wasm_crate_deps(
         &mut new_cargo,
         crate_name,
-        cargo_toml_data.framework_version.as_str(),
-        &cargo_toml_data.framework_path,
+        &cargo_toml_data.framework_dependency,
     );
 
     //check features
@@ -54,41 +51,20 @@ pub fn generate_wasm_cargo_toml(
 fn add_wasm_crate_deps(
     cargo_toml_contents: &mut CargoTomlContents,
     crate_name: &str,
-    adapter_version: &str,
-    adapter_path: &Option<String>,
+    framework_dependency: &DependencyRawValue,
 ) {
-    let mut crate_deps = toml::map::Map::new();
-    crate_deps.insert("path".to_string(), toml::Value::String("..".to_string()));
-
-    let mut adapter_deps = toml::map::Map::new();
-    adapter_deps.insert(
-        "version".to_string(),
-        toml::Value::String(adapter_version.to_string()),
-    );
-
-    if adapter_path.is_some() {
-        adapter_deps.insert(
-            "path".to_string(),
-            toml::Value::String(change_from_base_to_adapter_path(
-                adapter_path.to_owned().unwrap().as_str(),
-            )),
-        );
+    let mut wasm_adapter_dep = framework_dependency.clone();
+    if let Some(path) = &mut wasm_adapter_dep.path {
+        *path = change_from_base_to_adapter_path(&path);
     }
 
-    let mut toml_table_adapter = toml::map::Map::new();
-    toml_table_adapter.insert(WASM_ADAPTER.to_string(), toml::Value::Table(adapter_deps));
+    cargo_toml_contents.insert_dependency_raw_value(
+        crate_name,
+        DependencyRawValue {
+            path: Some("..".to_owned()),
+            ..Default::default()
+        },
+    );
 
-    let mut toml_table_crate = toml::map::Map::new();
-    toml_table_crate.insert(crate_name.to_string(), toml::Value::Table(crate_deps));
-
-    toml_table_crate.extend(toml_table_adapter);
-
-    cargo_toml_contents
-        .toml_value
-        .as_table_mut()
-        .expect("add deps cargo toml error wasm adapter")
-        .insert(
-            "dependencies".to_string(),
-            toml::Value::Table(toml_table_crate),
-        );
+    cargo_toml_contents.insert_dependency_raw_value(WASM_ADAPTER, wasm_adapter_dep);
 }

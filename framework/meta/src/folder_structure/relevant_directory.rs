@@ -1,12 +1,9 @@
 use crate::version::FrameworkVersion;
-use multiversx_sc_meta_lib::cargo_toml::{
-    CargoTomlContents, DependencyReference, GitReference, VersionReq,
-};
+use multiversx_sc_meta_lib::cargo_toml::{CargoTomlContents, DependencyReference};
 use std::{
     fs::{self, DirEntry},
     path::{Path, PathBuf},
 };
-use toml::Value;
 
 // use super::{version_req::VersionReq, DependencyReference, GitReference};
 
@@ -180,27 +177,8 @@ fn find_framework_toml_dependency(
     cargo_toml_contents: &CargoTomlContents,
 ) -> Option<DependencyReference> {
     for &crate_name in FRAMEWORK_CRATE_NAMES {
-        if let Some(dep_value) = cargo_toml_contents.dependency(crate_name) {
-            if let Some(Value::String(s)) = dep_value.get("path") {
-                return Some(DependencyReference::Path(s.clone()));
-            }
-
-            if let Some(Value::String(git)) = dep_value.get("git") {
-                let rev = dep_value
-                    .get("rev")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or_default();
-                return Some(DependencyReference::Git(GitReference {
-                    git: git.clone(),
-                    rev: rev.to_owned(),
-                }));
-            }
-
-            if let Some(Value::String(s)) = dep_value.get("version") {
-                return Some(DependencyReference::Version(VersionReq::from_string(
-                    s.clone(),
-                )));
-            }
+        if let Some(dep_raw) = cargo_toml_contents.dependency_raw_value(crate_name) {
+            return Some(dep_raw.interpret());
         }
     }
 
