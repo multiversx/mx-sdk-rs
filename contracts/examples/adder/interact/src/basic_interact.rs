@@ -168,13 +168,19 @@ impl AdderInteract {
                     .to(self.state.current_adder_address())
                     .typed(adder_proxy::AdderProxy)
                     .add(value)
+                    .returns(ReturnsGasUsed)
                     .gas(6_000_000)
             });
         }
 
-        let _ = buffer.run().await;
+        let gas_used = buffer.run().await;
+        let gas_used_sum = gas_used.iter().sum::<u64>();
 
-        println!("successfully performed add {count} times");
+        println!(
+            "successfully performed add {count} times, total gas used: {}, avg gas used: {}",
+            gas_used_sum,
+            gas_used_sum / count as u64
+        );
     }
 
     pub async fn feed_contract_egld(&mut self) {

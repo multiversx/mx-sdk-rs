@@ -17,7 +17,7 @@ pub struct TxResponse {
     /// The logs of the transaction.
     pub logs: Vec<Log>,
     /// The gas used by the transaction.
-    pub gas: u64,
+    pub gas_used: u64,
     /// The refund of the transaction.
     pub refund: u64,
     /// The transaction hash, if available.
