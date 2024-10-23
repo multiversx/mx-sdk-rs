@@ -225,6 +225,12 @@ pub trait Vault {
         self.tx().to(ToCaller).payment(new_tokens).transfer();
     }
 
+    #[endpoint]
+    #[payable("*")]
+    fn explicit_panic(&self) {
+        sc_panic!("explicit panic");
+    }
+
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,
