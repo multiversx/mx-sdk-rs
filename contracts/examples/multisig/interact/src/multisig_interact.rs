@@ -246,13 +246,14 @@ impl MultisigInteract {
                     .gas(gas_expr)
                     .typed(multisig_proxy::MultisigProxy)
                     .perform_action_endpoint(action_id)
+                    .returns(PassValue(action_id))
                     .returns(ReturnsResult)
             });
         }
 
-        let deployed_addresses = buffer.run().await;
+        let result = buffer.run().await;
 
-        for (action_id, address) in deployed_addresses.iter().enumerate() {
+        for (action_id, address) in result {
             println!("successfully performed action `{action_id}`");
             if address.is_some() {
                 println!(
