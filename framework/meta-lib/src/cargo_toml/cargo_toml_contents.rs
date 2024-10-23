@@ -8,6 +8,8 @@ use toml::{value::Table, Value};
 
 use crate::contract::sc_config::ContractVariantProfile;
 
+use super::DependencyRawValue;
+
 pub const CARGO_TOML_DEPENDENCIES: &str = "dependencies";
 pub const CARGO_TOML_DEV_DEPENDENCIES: &str = "dev-dependencies";
 pub const PACKAGE: &str = "package";
@@ -34,24 +36,26 @@ pub struct CargoTomlContents {
 }
 
 impl CargoTomlContents {
+    pub fn parse_string(raw_str: &str, path: &Path) -> Self {
+        let toml_value = raw_str.parse::<toml::Value>().unwrap_or_else(|e| {
+            panic!(
+                "failed to parse Cargo.toml toml format, path:{}, error: {e}",
+                path.display()
+            )
+        });
+        CargoTomlContents {
+            path: path.to_owned(),
+            toml_value,
+            prepend_auto_generated_comment: false,
+        }
+    }
+
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Self {
         let path_ref = path.as_ref();
         let cargo_toml_content = fs::read(path_ref).expect("failed to open Cargo.toml file");
         let cargo_toml_content_str =
             String::from_utf8(cargo_toml_content).expect("error decoding Cargo.toml utf-8");
-        let toml_value = cargo_toml_content_str
-            .parse::<toml::Value>()
-            .unwrap_or_else(|e| {
-                panic!(
-                    "failed to parse Cargo.toml toml format, path:{}, error: {e}",
-                    path_ref.display()
-                )
-            });
-        CargoTomlContents {
-            path: path_ref.to_owned(),
-            toml_value,
-            prepend_auto_generated_comment: false,
-        }
+        Self::parse_string(&cargo_toml_content_str, path_ref)
     }
 
     pub fn new() -> Self {
@@ -91,27 +95,15 @@ impl CargoTomlContents {
             .to_string()
     }
 
-    pub fn dependency_version(&self, crate_name: &str) -> String {
-        let toml_value = self.dependency(crate_name).unwrap().to_owned();
-
-        if let Value::Table(table) = toml_value {
-            if let Some(version) = table.get("version") {
-                return remove_quotes(version);
-            }
-        }
-        panic!("could not find multiversx-sc dependency version in cargo toml")
+    /// Interprets the dependency value and organizes values in a struct.
+    pub fn dependency_raw_value(&self, crate_name: &str) -> Option<DependencyRawValue> {
+        self.dependency(crate_name)
+            .map(DependencyRawValue::parse_toml_value)
     }
 
-    pub fn dependency_path(&self, crate_name: &str) -> Option<String> {
-        let toml_value = self.dependency(crate_name).unwrap().to_owned();
-
-        if let Value::Table(table) = toml_value {
-            if let Some(path) = table.get("path") {
-                return Option::Some(remove_quotes(path));
-            }
-        }
-
-        Option::None
+    pub fn insert_dependency_raw_value(&mut self, crate_name: &str, raw_value: DependencyRawValue) {
+        self.dependencies_mut()
+            .insert(crate_name.to_owned(), raw_value.into_toml_value());
     }
 
     /// Assumes that a package section already exists.
@@ -150,8 +142,10 @@ impl CargoTomlContents {
 
     pub fn dependencies_mut(&mut self) -> &mut Table {
         self.toml_value
-            .get_mut(CARGO_TOML_DEPENDENCIES)
-            .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
+            .as_table_mut()
+            .expect("add deps cargo toml error wasm adapter")
+            .entry(CARGO_TOML_DEPENDENCIES)
+            .or_insert(toml::Value::Table(toml::map::Map::new()))
             .as_table_mut()
             .expect("malformed crate Cargo.toml")
     }
@@ -341,11 +335,16 @@ pub fn change_from_base_to_adapter_path(base_path: &str) -> String {
     )
 }
 
+/// TODO: still useful?
+#[allow(unused)]
 fn remove_quotes(var: &Value) -> String {
     var.to_string().replace('\"', "")
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::cargo_toml::{DependencyReference, GitCommitReference, VersionReq};
 
     #[test]
     fn test_change_from_base_to_adapter_path() {
@@ -354,6 +353,156 @@ mod tests {
         assert_eq!(
             super::change_from_base_to_adapter_path(base_path),
             adapter_path
+        );
+    }
+
+    const CARGO_TOML_RAW: &str = r#"
+[dependencies.by-version-1]
+version = "1.2.30"
+
+[dependencies.by-version-1-strict]
+version = "=1.2.31"
+
+[dependencies.by-git-commit-1]
+git = "https://github.com/multiversx/repo1"
+rev = "85c31b9ce730bd5ffe41589c353d935a14baaa96"
+
+[dependencies.by-path-1]
+path = "a/b/c"
+
+[dependencies]
+by-version-2 = "4.5.60"
+by-version-2-strict = "=4.5.61"
+by-path-2 = { path = "d/e/f" }
+by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be823f26d1e7f59c71536d337b7240dc3fa2" }
+    "#;
+
+    #[test]
+    fn test_dependency_value() {
+        let cargo_toml = CargoTomlContents::parse_string(CARGO_TOML_RAW, "/test".as_ref());
+
+        // version
+        let raw_value = cargo_toml.dependency_raw_value("by-version-1").unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                version: Some("1.2.30".to_owned()),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            raw_value.interpret(),
+            DependencyReference::Version(VersionReq::from_version_str("1.2.30")),
+        );
+
+        // version, strict
+        let raw_value = cargo_toml
+            .dependency_raw_value("by-version-1-strict")
+            .unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                version: Some("=1.2.31".to_owned()),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            raw_value.interpret(),
+            DependencyReference::Version(VersionReq::from_version_str("1.2.31").strict()),
+        );
+
+        // version, compact
+        let raw_value = cargo_toml.dependency_raw_value("by-version-2").unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                version: Some("4.5.60".to_owned()),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            raw_value.interpret(),
+            DependencyReference::Version(VersionReq::from_version_str("4.5.60")),
+        );
+
+        // version, compact, strict
+        let raw_value = cargo_toml
+            .dependency_raw_value("by-version-2-strict")
+            .unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                version: Some("=4.5.61".to_owned()),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            raw_value.interpret(),
+            DependencyReference::Version(VersionReq::from_version_str("4.5.61").strict()),
+        );
+
+        // git
+        let raw_value = cargo_toml.dependency_raw_value("by-git-commit-1").unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                git: Some("https://github.com/multiversx/repo1".to_owned()),
+                rev: Some("85c31b9ce730bd5ffe41589c353d935a14baaa96".to_owned()),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            raw_value.interpret(),
+            DependencyReference::GitCommit(GitCommitReference {
+                git: "https://github.com/multiversx/repo1".to_owned(),
+                rev: "85c31b9ce730bd5ffe41589c353d935a14baaa96".to_owned(),
+            })
+        );
+
+        // git, compact
+        let raw_value = cargo_toml.dependency_raw_value("by-git-commit-2").unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                git: Some("https://github.com/multiversx/repo2".to_owned()),
+                rev: Some("e990be823f26d1e7f59c71536d337b7240dc3fa2".to_owned()),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            raw_value.interpret(),
+            DependencyReference::GitCommit(GitCommitReference {
+                git: "https://github.com/multiversx/repo2".to_owned(),
+                rev: "e990be823f26d1e7f59c71536d337b7240dc3fa2".to_owned(),
+            })
+        );
+
+        // path
+        let raw_value = cargo_toml.dependency_raw_value("by-path-1").unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                path: Some("a/b/c".to_owned()),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            raw_value.interpret(),
+            DependencyReference::Path("a/b/c".to_owned()),
+        );
+
+        // path, compact
+        let raw_value = cargo_toml.dependency_raw_value("by-path-2").unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                path: Some("d/e/f".to_owned()),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            raw_value.interpret(),
+            DependencyReference::Path("d/e/f".to_owned()),
         );
     }
 }

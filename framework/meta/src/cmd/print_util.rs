@@ -1,8 +1,8 @@
 use colored::Colorize;
-use multiversx_sc_meta_lib::version::FrameworkVersion;
+use multiversx_sc_meta_lib::{cargo_toml::DependencyReference, version::FrameworkVersion};
 use std::path::Path;
 
-use crate::folder_structure::{DependencyReference, DirectoryType, RelevantDirectory};
+use crate::folder_structure::{DirectoryType, RelevantDirectory};
 
 pub fn print_all_count(num_contract_crates: usize) {
     println!(
@@ -43,7 +43,7 @@ pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &Framework
                 print!(" {}", version_string.red());
             };
         },
-        DependencyReference::Git(git_reference) => {
+        DependencyReference::GitCommit(git_reference) => {
             let git_string = format!(
                 "[git: {} rev: {}]",
                 git_reference.git.truecolor(255, 127, 0),
@@ -51,9 +51,29 @@ pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &Framework
             );
             print!(" {}", git_string.truecolor(255, 198, 0));
         },
+        DependencyReference::GitBranch(git_reference) => {
+            let git_string = format!(
+                "[git: {} branch: {}]",
+                git_reference.git.truecolor(255, 127, 0),
+                git_reference.branch.truecolor(255, 127, 0)
+            );
+            print!(" {}", git_string.truecolor(255, 198, 0));
+        },
+        DependencyReference::GitTag(git_reference) => {
+            let git_string = format!(
+                "[git: {} rev: {}]",
+                git_reference.git.truecolor(255, 127, 0),
+                git_reference.tag.truecolor(255, 127, 0)
+            );
+            print!(" {}", git_string.truecolor(255, 198, 0));
+        },
         DependencyReference::Path(path_buf) => {
             let git_string = format!("[path: {}]", path_buf.truecolor(255, 127, 0));
             print!(" {}", git_string.truecolor(255, 198, 0));
+        },
+        DependencyReference::Unsupported(error) => {
+            let message = format!("dependency error: {error}");
+            print!(" {}", message.red());
         },
     }
 }

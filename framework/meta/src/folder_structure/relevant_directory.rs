@@ -1,12 +1,11 @@
 use crate::version::FrameworkVersion;
-use multiversx_sc_meta_lib::cargo_toml_contents::CargoTomlContents;
+use multiversx_sc_meta_lib::cargo_toml::{CargoTomlContents, DependencyReference};
 use std::{
     fs::{self, DirEntry},
     path::{Path, PathBuf},
 };
-use toml::Value;
 
-use super::{version_req::VersionReq, DependencyReference, GitReference};
+// use super::{version_req::VersionReq, DependencyReference, GitReference};
 
 /// Used for retrieving crate versions.
 pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
@@ -174,37 +173,6 @@ fn can_continue_recursion(dir_entry: &DirEntry, blacklist: &[String]) -> bool {
     }
 }
 
-fn find_framework_toml_dependency(
-    cargo_toml_contents: &CargoTomlContents,
-) -> Option<DependencyReference> {
-    for &crate_name in FRAMEWORK_CRATE_NAMES {
-        if let Some(dep_value) = cargo_toml_contents.dependency(crate_name) {
-            if let Some(Value::String(s)) = dep_value.get("path") {
-                return Some(DependencyReference::Path(s.clone()));
-            }
-
-            if let Some(Value::String(git)) = dep_value.get("git") {
-                let rev = dep_value
-                    .get("rev")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or_default();
-                return Some(DependencyReference::Git(GitReference {
-                    git: git.clone(),
-                    rev: rev.to_owned(),
-                }));
-            }
-
-            if let Some(Value::String(s)) = dep_value.get("version") {
-                return Some(DependencyReference::Version(VersionReq::from_string(
-                    s.clone(),
-                )));
-            }
-        }
-    }
-
-    None
-}
-
 fn load_cargo_toml_contents(dir_path: &Path) -> Option<CargoTomlContents> {
     let cargo_toml_path = dir_path.join(CARGO_TOML_FILE_NAME);
     if cargo_toml_path.is_file() {
@@ -223,8 +191,10 @@ impl RelevantDirectory {
 
 fn find_framework_dependency(dir_path: &Path) -> Option<DependencyReference> {
     if let Some(cargo_toml_contents) = load_cargo_toml_contents(dir_path) {
-        if let Some(dep_ref) = find_framework_toml_dependency(&cargo_toml_contents) {
-            return Some(dep_ref);
+        for &crate_name in FRAMEWORK_CRATE_NAMES {
+            if let Some(dep_raw) = cargo_toml_contents.dependency_raw_value(crate_name) {
+                return Some(dep_raw.interpret());
+            }
         }
     }
 
