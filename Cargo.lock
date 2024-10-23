@@ -2936,6 +2936,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "ping-pong-egld-interact"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "multiversx-sc-snippets",
+ "ping-pong-egld",
+ "serde",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "ping-pong-egld-meta"
 version = "0.0.0"
 dependencies = [
