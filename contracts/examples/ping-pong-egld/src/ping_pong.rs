@@ -2,6 +2,7 @@
 
 use multiversx_sc::imports::*;
 
+pub mod ping_pong_egld_proxy;
 mod types;
 
 use types::{ContractState, UserStatus};
@@ -27,7 +28,7 @@ pub trait PingPong {
     /// Necessary configuration when deploying:
     /// `ping_amount` - the exact EGLD amount that needs to be sent when `ping`-ing.
     /// `duration_in_seconds` - how much time (in seconds) until contract expires.
-    /// `opt_activation_timestamp` - optionally specify the contract to only actvivate at a later date.
+    /// `opt_activation_timestamp` - optionally specify the contract to only activate at a later date.
     /// `max_funds` - optional funding cap, no more funds than this can be added to the contract.
     #[allow_multiple_var_args]
     #[init]
@@ -245,7 +246,7 @@ pub trait PingPong {
     fn user_status(&self, user_id: usize) -> SingleValueMapper<UserStatus>;
 
     /// Part of the `pongAll` status, the last user to be processed.
-    /// 0 if never called `pongAll` or `pongAll` completed..
+    /// 0 if never called `pongAll` or `pongAll` completed.
     #[view(pongAllLastUser)]
     #[storage_mapper("pongAllLastUser")]
     fn pong_all_last_user(&self) -> SingleValueMapper<usize>;
