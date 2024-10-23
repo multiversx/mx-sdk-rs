@@ -43,6 +43,7 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
         new_issued_token_identifier: process_new_issued_token_identifier(tx),
         logs: process_logs(tx),
         tx_hash: process_tx_hash(tx),
+        gas_used: tx.gas_used,
         ..Default::default()
     }
 }

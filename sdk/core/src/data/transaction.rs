@@ -63,6 +63,8 @@ pub struct TransactionOnNetwork {
     pub gas_price: u64,
     pub gas_limit: u64,
     #[serde(default)]
+    pub gas_used: u64,
+    #[serde(default)]
     pub signature: String,
     pub source_shard: u32,
     pub destination_shard: u32,
