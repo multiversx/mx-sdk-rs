@@ -2,7 +2,7 @@
 
 use multiversx_sc::imports::*;
 
-pub mod ping_pong_egld_proxy;
+pub mod proxy_ping_pong_egld;
 mod types;
 
 use types::{ContractState, UserStatus};

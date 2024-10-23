@@ -100,7 +100,7 @@ async fn test_ping() {
     let mut interact = PingPongEgldInteract::init(Config::chain_simulator_config()).await;
 
     let ping_amount = 1u64;
-    let duration_in_seconds = 100u64;
+    let duration_in_seconds = 20u64;
     let max_funds = 100_000u64;
 
     interact
@@ -130,7 +130,7 @@ async fn test_pong_all() {
     let mut interact = PingPongEgldInteract::init(Config::chain_simulator_config()).await;
 
     let ping_amount = 1u64;
-    let duration_in_seconds = 50u64;
+    let duration_in_seconds = 18u64;
     let max_funds = 100_000u64;
 
     interact
@@ -143,18 +143,18 @@ async fn test_pong_all() {
         .await;
 
     interact
-        .ping(1u64, None, Some(&interact.wallet_address_2.clone()))
+        .ping(1u64, None, Some(&interact.ping_pong_owner_address.clone()))
         .await;
 
     interact
-        .ping(1u64, None, Some(&interact.wallet_address_1.clone()))
+        .ping(1u64, None, Some(&interact.wallet_address.clone()))
         .await;
 
     interact.pong_all(None, None).await;
     interact
         .pong(
             Some("already withdrawn"),
-            Some(&interact.wallet_address_1.clone()),
+            Some(&interact.wallet_address.clone()),
         )
         .await;
 }
