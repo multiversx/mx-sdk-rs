@@ -55,6 +55,7 @@ where
         let address = wallet.to_address();
 
         self.send_user_funds(&address).await.unwrap();
+        self.generate_blocks(1).await.unwrap();
         self.sender_map.insert(
             address.clone(),
             Sender {

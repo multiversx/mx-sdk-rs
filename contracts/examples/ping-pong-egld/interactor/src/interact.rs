@@ -43,12 +43,19 @@ pub async fn ping_pong_egld_cli() {
                 .await
         },
         Some(interact_cli::InteractCliCommand::Ping(args)) => {
+            let sender = interact.ping_pong_owner_address.clone();
             interact
-                .ping(args.cost.unwrap_or_default(), None, None)
+                .ping(args.cost.unwrap_or_default(), None, &sender)
                 .await
         },
-        Some(interact_cli::InteractCliCommand::Pong) => interact.pong(None, None).await,
-        Some(interact_cli::InteractCliCommand::PongAll) => interact.pong_all(None, None).await,
+        Some(interact_cli::InteractCliCommand::Pong) => {
+            let sender = interact.ping_pong_owner_address.clone();
+            interact.pong(None, &sender).await;
+        },
+        Some(interact_cli::InteractCliCommand::PongAll) => {
+            let sender = interact.ping_pong_owner_address.clone();
+            interact.pong_all(None, &sender).await;
+        },
         Some(interact_cli::InteractCliCommand::GetUserAddresses) => {
             let user_addresses = interact.get_user_addresses().await;
             println!("User addresses: ");
@@ -114,12 +121,8 @@ impl PingPongEgldInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
-        let ping_pong_owner_address = interactor
-            .register_wallet(Wallet::from_pem_file("ping-pong-owner.pem").unwrap())
-            .await;
-        let wallet_address = interactor
-            .register_wallet(Wallet::from_pem_file("wallet.pem").unwrap())
-            .await;
+        let ping_pong_owner_address = interactor.register_wallet(test_wallets::eve()).await;
+        let wallet_address = interactor.register_wallet(test_wallets::mallory()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
         interactor.generate_blocks_until_epoch(1).await.unwrap();
@@ -133,7 +136,6 @@ impl PingPongEgldInteract {
     }
 
     pub async fn set_state(&mut self) {
-        println!("ping pong owner address: {}", self.ping_pong_owner_address);
         println!("wallet address: {}", self.wallet_address);
         self.interactor
             .retrieve_account(&self.ping_pong_owner_address)
@@ -203,18 +205,13 @@ impl PingPongEgldInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn ping(
-        &mut self,
-        egld_amount: u64,
-        message: Option<&str>,
-        sender: Option<&Bech32Address>,
-    ) {
+    pub async fn ping(&mut self, egld_amount: u64, message: Option<&str>, sender: &Bech32Address) {
         let _data: IgnoreValue = IgnoreValue;
 
         let response = self
             .interactor
             .tx()
-            .from(sender.unwrap_or(&self.wallet_address))
+            .from(sender)
             .to(self.state.current_ping_pong_egld_address())
             .gas(30_000_000u64)
             .typed(proxy_ping_pong_egld::PingPongProxy)
@@ -233,11 +230,11 @@ impl PingPongEgldInteract {
         }
     }
 
-    pub async fn pong(&mut self, message: Option<&str>, sender: Option<&Bech32Address>) {
+    pub async fn pong(&mut self, message: Option<&str>, sender: &Bech32Address) {
         let response = self
             .interactor
             .tx()
-            .from(sender.unwrap_or(&self.wallet_address))
+            .from(sender)
             .to(self.state.current_ping_pong_egld_address())
             .gas(30_000_000u64)
             .typed(proxy_ping_pong_egld::PingPongProxy)
@@ -255,11 +252,11 @@ impl PingPongEgldInteract {
         }
     }
 
-    pub async fn pong_all(&mut self, message: Option<String>, sender: Option<&Bech32Address>) {
+    pub async fn pong_all(&mut self, message: Option<String>, sender: &Bech32Address) {
         let response = self
             .interactor
             .tx()
-            .from(sender.unwrap_or(&self.wallet_address))
+            .from(sender)
             .to(self.state.current_ping_pong_egld_address())
             .gas(30_000_000u64)
             .typed(proxy_ping_pong_egld::PingPongProxy)
