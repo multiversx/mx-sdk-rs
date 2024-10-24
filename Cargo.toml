@@ -103,6 +103,7 @@ members = [
   "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/ping-pong-egld/interactor",
   "contracts/examples/ping-pong-egld/dapp",
   "contracts/examples/rewards-distribution",
   "contracts/examples/rewards-distribution/meta",

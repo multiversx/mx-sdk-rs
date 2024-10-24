@@ -134,6 +134,7 @@ pub struct ApiSmartContractResult {
     pub value: u64,
     pub receiver: SdkAddress,
     pub sender: SdkAddress,
+    #[serde(default)]
     pub data: String,
     pub prev_tx_hash: String,
     pub original_tx_hash: String,

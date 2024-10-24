@@ -30,7 +30,6 @@ impl PanicReport {
         }
 
         if is_panic_without_message_triggered(data_section) {
-            println!("here");
             return Self::WithoutMessage;
         }
 
