@@ -114,8 +114,12 @@ impl PingPongEgldInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
-        let ping_pong_owner_address = interactor.register_wallet(test_wallets::eve()).await;
-        let wallet_address = interactor.register_wallet(test_wallets::mallory()).await;
+        let ping_pong_owner_address = interactor
+            .register_wallet(Wallet::from_pem_file("ping-pong-owner.pem").unwrap())
+            .await;
+        let wallet_address = interactor
+            .register_wallet(Wallet::from_pem_file("wallet.pem").unwrap())
+            .await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
         interactor.generate_blocks_until_epoch(1).await.unwrap();
