@@ -35,7 +35,6 @@ where
 
     fn run(self) -> Self::Returns {
         let mut step_wrapper = self.tx_to_step();
-        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
         step_wrapper.env.world.sc_deploy(&mut step_wrapper.step);
         step_wrapper.process_result()
     }

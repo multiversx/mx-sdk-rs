@@ -33,6 +33,7 @@ add-labels = ["mcs-external-view"]
 [contracts.multi-contract-example-feature]
 add-unlabelled = true          # optional here, since the default is true
 features = ["example_feature"]
+default-features = false
 
 [contracts.multi-contract-alt-impl]
 add-unlabelled = false

@@ -29,6 +29,9 @@ pub struct ContractVariantSettings {
     /// Features that are activated on the contract crate, from wasm.
     pub features: Vec<String>,
 
+    /// Allows disabling default features in the contract crate, from wasm.
+    pub default_features: Option<bool>,
+
     /// Forcibly remove the original contrct legacy callback.
     pub kill_legacy_callback: bool,
 
@@ -44,6 +47,7 @@ impl Default for ContractVariantSettings {
             allocator: Default::default(),
             stack_size: DEFAULT_STACK_SIZE,
             features: Default::default(),
+            default_features: None,
             kill_legacy_callback: false,
             profile: Default::default(),
         }

@@ -31,7 +31,7 @@ where
             result,
             new_issued_token_identifier: raw_response.new_issued_token_identifier.clone(),
             logs: raw_response.logs.clone(),
-            gas: raw_response.gas,
+            gas: raw_response.gas_used,
             refund: raw_response.refund,
         }
     }

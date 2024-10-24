@@ -21,7 +21,7 @@ pub struct ScenarioWorld {
 }
 
 pub(crate) enum Backend {
-    Debugger(DebuggerBackend),
+    Debugger(Box<DebuggerBackend>),
     VmGoBackend,
 }
 
@@ -35,10 +35,10 @@ impl ScenarioWorld {
     pub fn debugger() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),
-            backend: Backend::Debugger(DebuggerBackend {
+            backend: Backend::Debugger(Box::new(DebuggerBackend {
                 vm_runner: ScenarioVMRunner::new(),
                 trace: None,
-            }),
+            })),
         }
     }
 

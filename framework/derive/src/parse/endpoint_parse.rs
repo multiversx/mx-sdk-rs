@@ -8,7 +8,7 @@ use super::{
         is_allow_multiple_var_args, is_callback_raw, is_init, is_only_admin, is_only_owner,
         is_only_user_account, is_upgrade, CallbackAttribute, EndpointAttribute,
         ExternalViewAttribute, LabelAttribute, OutputNameAttribute, PromisesCallbackAttribute,
-        ViewAttribute,
+        TitleAttribute, ViewAttribute,
     },
     MethodAttributesPass1,
 };
@@ -220,6 +220,18 @@ pub fn process_output_names_attribute(attr: &syn::Attribute, method: &mut Method
     OutputNameAttribute::parse(attr)
         .map(|output_name_attr| {
             method.output_names.push(output_name_attr.output_name);
+        })
+        .is_some()
+}
+
+pub fn process_title_attribute(attr: &syn::Attribute, method: &mut Method) -> bool {
+    TitleAttribute::parse(attr)
+        .map(|title_attr| {
+            assert!(
+                method.title.is_none(),
+                "only one title attribute allowed per method"
+            );
+            method.title = Some(title_attr.title);
         })
         .is_some()
 }

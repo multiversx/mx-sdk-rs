@@ -78,6 +78,7 @@ impl ContractVariantBuilder {
                     allocator: parse_allocator(&cms.allocator),
                     stack_size: parse_stack_size(&cms.stack_size),
                     features: cms.features.clone(),
+                    default_features: cms.default_features,
                     kill_legacy_callback: cms.kill_legacy_callback,
                     profile: ContractVariantProfile::from_serde(&cms.profile),
                 },

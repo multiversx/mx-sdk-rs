@@ -1,13 +1,11 @@
+use multiversx_chain_core::types::ReturnCode;
 use num_bigint::BigUint;
 
 use crate::{
+    chain_core::builtin_func_names::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
     tx_execution::BlockchainVMRef,
-    types::{top_decode_u64, top_encode_u64},
-};
-
-use crate::{
-    tx_execution::builtin_function_names::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
+    types::{top_decode_u64, top_encode_u64},
     world_mock::EsdtInstanceMetadata,
 };
 
@@ -59,7 +57,7 @@ impl BuiltinFunction for ESDTNftAddQuantity {
         };
 
         let tx_result = TxResult {
-            result_status: 0,
+            result_status: ReturnCode::Success,
             result_logs: vec![esdt_nft_create_log],
             ..Default::default()
         };

@@ -1,11 +1,6 @@
-use crate::{
-    folder_structure::{
-        DirectoryType::{Contract, Lib},
-        RelevantDirectory,
-    },
-    version::FrameworkVersion,
-};
+use crate::{folder_structure::RelevantDirectory, version::FrameworkVersion};
 use colored::Colorize;
+use multiversx_sc_meta_lib::cargo_toml::DependencyReference;
 use std::path::Path;
 
 pub fn print_upgrading(dir: &RelevantDirectory) {
@@ -82,20 +77,6 @@ pub fn print_postprocessing_after_39_1(path: &Path) {
     );
 }
 
-pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &FrameworkVersion) {
-    match dir.dir_type {
-        Contract => print!(" {}", "[contract]".blue()),
-        Lib => print!(" {}", "[lib]".magenta()),
-    }
-
-    let version_string = format!("[{}]", dir.version.semver);
-    if dir.version.semver == *last_version {
-        print!(" {}", version_string.green());
-    } else {
-        print!(" {}", version_string.red());
-    };
-}
-
 pub fn print_cargo_dep_remove(path: &Path, dep_name: &str) {
     println!(
         "{}/dependencies/{}",
@@ -113,15 +94,17 @@ pub fn print_cargo_dep_add(path: &Path, dep_name: &str) {
 }
 
 pub fn print_cargo_check(dir: &RelevantDirectory) {
-    println!(
-        "\n{}",
-        format!(
-            "Running cargo check after upgrading to version {} in {}\n",
-            dir.version.semver,
-            dir.path.display(),
-        )
-        .purple()
-    );
+    if let DependencyReference::Version(version_req) = &dir.version {
+        println!(
+            "\n{}",
+            format!(
+                "Running cargo check after upgrading to version {} in {}\n",
+                version_req.semver,
+                dir.path.display(),
+            )
+            .purple()
+        );
+    }
 }
 
 pub fn print_cargo_check_fail() {
