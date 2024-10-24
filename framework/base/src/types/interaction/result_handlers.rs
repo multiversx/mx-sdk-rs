@@ -1,3 +1,4 @@
+mod pass_value;
 mod returns_bt;
 mod returns_new_address;
 mod returns_new_managed_address;
@@ -10,6 +11,7 @@ mod with_raw_result;
 mod with_result;
 mod with_result_as;
 
+pub use pass_value::PassValue;
 pub use returns_bt::*;
 pub use returns_new_address::*;
 pub use returns_new_managed_address::*;

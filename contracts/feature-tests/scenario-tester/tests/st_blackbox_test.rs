@@ -302,7 +302,7 @@ fn st_blackbox_returns_result_or_error() {
         .commit();
 
     // deploy
-    let (result, check_tx_hash) = world
+    let (result, check_tx_hash, pass_value_2) = world
         .tx()
         .from(OWNER_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
@@ -314,16 +314,20 @@ fn st_blackbox_returns_result_or_error() {
             ReturnsHandledOrError::new()
                 .returns(ReturnsNewAddress)
                 .returns(ReturnsResultAs::<String>::new())
+                .returns(PassValue("pass-value-1"))
                 .returns(ReturnsTxHash),
         )
         .returns(ReturnsTxHash)
+        .returns(PassValue("pass-value-2"))
         .run();
 
     assert_eq!(check_tx_hash.as_array(), &[33u8; 32]);
-    let (new_address, out_value, also_check_tx_hash) = result.unwrap();
+    let (new_address, out_value, pass_value_1, also_check_tx_hash) = result.unwrap();
     assert_eq!(new_address, ST_ADDRESS.to_address());
     assert_eq!(out_value, "init-result");
+    assert_eq!(pass_value_1, "pass-value-1");
     assert_eq!(also_check_tx_hash.as_array(), &[33u8; 32]);
+    assert_eq!(pass_value_2, "pass-value-2");
 
     // query - ok
     let result = world
