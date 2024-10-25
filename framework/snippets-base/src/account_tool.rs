@@ -90,7 +90,7 @@ fn set_account(
     let mut account_state = Account::new()
         .nonce(account.nonce)
         .balance(account.balance.as_str())
-        .code(account.code);
+        .code(BytesValue::from_hex(&account.code));
     account_state.username = Some(format!("str:{}", account.username.as_str()).into());
     account_state.storage = convert_storage(account_storage);
 
@@ -112,6 +112,6 @@ fn convert_storage(account_storage: HashMap<String, String>) -> BTreeMap<BytesKe
     account_storage
         .into_iter()
         .filter(|(k, _)| !k.starts_with("454c524f4e44"))
-        .map(|(k, v)| (BytesKey::from(k.as_str()), BytesValue::from(v)))
+        .map(|(k, v)| (BytesKey::from_hex(&k), BytesValue::from_hex(&v)))
         .collect()
 }

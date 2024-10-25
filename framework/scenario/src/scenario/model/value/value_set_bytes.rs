@@ -23,6 +23,13 @@ impl BytesValue {
             original: ValueSubTree::Str(String::default()),
         }
     }
+
+    pub fn from_hex(hex_value: &str) -> Self {
+        Self {
+            value: hex::decode(hex_value).expect("could not decode hex value"),
+            original: ValueSubTree::Str(format!("0x{hex_value}")),
+        }
+    }
 }
 
 impl InterpretableFrom<ValueSubTree> for BytesValue {
