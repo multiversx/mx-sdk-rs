@@ -41,11 +41,11 @@ struct BasicFeaturesInteract {
 impl BasicFeaturesInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway())
+        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
         let code_expr = BytesValue::interpret_from(
             "mxsc:../output/basic-features-storage-bytes.mxsc.json",
             &InterpreterContext::default(),
@@ -86,7 +86,6 @@ impl BasicFeaturesInteract {
             .code(&self.code_expr)
             .gas(NumExpr("4,000,000"))
             .returns(ReturnsNewBech32Address)
-            .prepare_async()
             .run()
             .await;
 
@@ -103,7 +102,6 @@ impl BasicFeaturesInteract {
             .gas(NumExpr("600,000,000"))
             .typed(basic_features_proxy::BasicFeaturesProxy)
             .store_bytes(value)
-            .prepare_async()
             .run()
             .await;
 
@@ -118,7 +116,6 @@ impl BasicFeaturesInteract {
             .typed(basic_features_proxy::BasicFeaturesProxy)
             .load_bytes()
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 

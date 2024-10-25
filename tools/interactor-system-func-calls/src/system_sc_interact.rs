@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: move prepare_async calls to a test for backwards compatibility and delete from here
+
 mod system_sc_interact_cli;
 mod system_sc_interact_config;
 mod system_sc_interact_state;
@@ -227,9 +229,13 @@ struct SysFuncCallsInteract {
 impl SysFuncCallsInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway()).await;
+        let mut interactor =
+            Interactor::new(config.gateway_uri(), config.use_chain_simulator()).await;
 
-        let wallet_address = interactor.register_wallet(test_wallets::alice());
+        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+
+        // generate blocks until ESDTSystemSCAddress is enabled
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
 
         Self {
             interactor,

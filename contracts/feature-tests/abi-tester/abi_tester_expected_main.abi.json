@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.53.0"
+            "version": "0.53.2"
         }
     },
     "docs": [
@@ -110,6 +110,7 @@
         },
         {
             "name": "multi_result_3",
+            "title": "result-3",
             "mutability": "mutable",
             "inputs": [],
             "outputs": [

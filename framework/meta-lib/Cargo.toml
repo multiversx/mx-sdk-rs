@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta-lib"
-version = "0.53.0"
+version = "0.53.2"
 edition = "2021"
 
 authors = [
@@ -29,8 +29,9 @@ hex = "0.4"
 wasmparser = "0.216"
 wasmprinter = "0.216"
 semver = "1.0.20"
+wat = "1.217.0"
 
 [dependencies.multiversx-sc]
-version = "=0.53.0"
+version = "=0.53.2"
 path = "../base"
 features = ["alloc", "num-bigint"]
