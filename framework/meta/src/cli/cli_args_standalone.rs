@@ -423,14 +423,6 @@ pub struct AccountArgs {
     #[clap(global = true)]
     pub api: Option<String>,
 
-    /// Provide if the API is a chain simulator or not
-    #[arg(
-        long = "chain-simulator",
-        default_value = "false",
-        verbatim_doc_comment
-    )]
-    pub chain_simulator: Option<bool>,
-
     /// Provide the address you want to retrieve data from
     #[arg(long = "address", verbatim_doc_comment)]
     pub address: String,
