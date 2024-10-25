@@ -45,14 +45,14 @@ pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncSe
         .request(GetAccountEsdtTokensRequest::new(address))
         .await
         .unwrap_or_else(|err| {
-            println!("failed to retrieve ESDT tokens for address {bech32_address}: {err}");
+            eprintln!("failed to retrieve ESDT tokens for address {bech32_address}: {err}");
             HashMap::new()
         });
     let account_esdt_roles = api
         .request(GetAccountEsdtRolesRequest::new(address))
         .await
         .unwrap_or_else(|err| {
-            println!("failed to retrieve ESDT roles for address {bech32_address}: {err}");
+            eprintln!("failed to retrieve ESDT roles for address {bech32_address}: {err}");
             HashMap::new()
         });
     let account_storage = api
