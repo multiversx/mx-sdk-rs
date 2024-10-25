@@ -17,13 +17,10 @@ use std::collections::{BTreeMap, HashMap};
 /// then formats it as a scenario set state step.
 pub async fn print_account_as_scenario_set_state<GatewayProxy: GatewayAsyncService>(
     gateway_proxy: GatewayProxy,
-    use_chain_simulator: bool,
     address_bech32_string: String,
 ) {
-    // let gateway_proxy = GatewayHttpProxy::new(api_string);
     let address = Bech32Address::from_bech32_string(address_bech32_string);
-    let set_state =
-        retrieve_account_as_scenario_set_state(&gateway_proxy, use_chain_simulator, &address).await;
+    let set_state = retrieve_account_as_scenario_set_state(&gateway_proxy, &address).await;
     let scenario = build_scenario(set_state);
     println!("{}", scenario.into_raw().to_json_string());
 }
@@ -39,36 +36,31 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
 
 pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncService>(
     api: &GatewayProxy,
-    use_chain_simulator: bool,
     bech32_address: &Bech32Address,
 ) -> SetStateStep {
     let address = bech32_address.as_address();
     let sdk_account = api.request(GetAccountRequest::new(address)).await.unwrap();
 
-    let (account_esdt, account_esdt_roles, account_storage) = if use_chain_simulator {
-        (HashMap::new(), HashMap::new(), HashMap::new())
-    } else {
-        let account_esdt = api
-            .request(GetAccountEsdtTokensRequest::new(address))
-            .await
-            .unwrap_or_else(|err| {
-                panic!("failed to retrieve ESDT tokens for address {bech32_address}: {err}")
-            });
-        let account_esdt_roles = api
-            .request(GetAccountEsdtRolesRequest::new(address))
-            .await
-            .unwrap_or_else(|err| {
-                panic!("failed to retrieve ESDT roles for address {bech32_address}: {err}")
-            });
-        let account_storage = api
-            .request(GetAccountStorageRequest::new(address))
-            .await
-            .unwrap_or_else(|err| {
-                panic!("failed to retrieve storage for address {bech32_address}: {err}")
-            });
-
-        (account_esdt, account_esdt_roles, account_storage)
-    };
+    let account_esdt = api
+        .request(GetAccountEsdtTokensRequest::new(address))
+        .await
+        .unwrap_or_else(|err| {
+            eprintln!("failed to retrieve ESDT tokens for address {bech32_address}: {err}");
+            HashMap::new()
+        });
+    let account_esdt_roles = api
+        .request(GetAccountEsdtRolesRequest::new(address))
+        .await
+        .unwrap_or_else(|err| {
+            eprintln!("failed to retrieve ESDT roles for address {bech32_address}: {err}");
+            HashMap::new()
+        });
+    let account_storage = api
+        .request(GetAccountStorageRequest::new(address))
+        .await
+        .unwrap_or_else(|err| {
+            panic!("failed to retrieve storage for address {bech32_address}: {err}")
+        });
 
     let account_state = set_account(
         sdk_account,
@@ -90,7 +82,7 @@ fn set_account(
     let mut account_state = Account::new()
         .nonce(account.nonce)
         .balance(account.balance.as_str())
-        .code(account.code);
+        .code(BytesValue::from_hex(&account.code));
     account_state.username = Some(format!("str:{}", account.username.as_str()).into());
     account_state.storage = convert_storage(account_storage);
 
@@ -112,6 +104,6 @@ fn convert_storage(account_storage: HashMap<String, String>) -> BTreeMap<BytesKe
     account_storage
         .into_iter()
         .filter(|(k, _)| !k.starts_with("454c524f4e44"))
-        .map(|(k, v)| (BytesKey::from(k.as_str()), BytesValue::from(v)))
+        .map(|(k, v)| (BytesKey::from_hex(&k), BytesValue::from_hex(&v)))
         .collect()
 }

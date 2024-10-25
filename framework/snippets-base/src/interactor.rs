@@ -79,12 +79,7 @@ where
     }
 
     pub async fn retrieve_account(&mut self, wallet_address: &Bech32Address) {
-        let set_state = retrieve_account_as_scenario_set_state(
-            &self.proxy,
-            self.use_chain_simulator,
-            wallet_address,
-        )
-        .await;
+        let set_state = retrieve_account_as_scenario_set_state(&self.proxy, wallet_address).await;
         self.pre_runners.run_set_state_step(&set_state);
         self.post_runners.run_set_state_step(&set_state);
     }
