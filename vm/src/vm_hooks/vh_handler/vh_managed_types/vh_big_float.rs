@@ -177,4 +177,8 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     fn bf_get_const_e(&self, dest: RawHandle) {
         self.m_types_lock().bf_overwrite(dest, std::f64::consts::E);
     }
+
+    fn bf_drop(&self, map_handle: RawHandle) {
+        self.m_types_lock().bf_remove(map_handle);
+    }
 }

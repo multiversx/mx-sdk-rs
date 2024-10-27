@@ -352,7 +352,8 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
     fn drop(&mut self) {
-        let _ = core::mem::replace(&mut self.get_handle(), unsafe { core::mem::zeroed() });
+        // TODO: enable, after fixing all ownership issues
+        // M::managed_type_impl().drop_managed_buffer(self.handle.clone());
     }
 }
 

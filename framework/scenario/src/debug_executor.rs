@@ -3,6 +3,7 @@ mod contract_container;
 mod contract_map;
 mod static_var_stack;
 mod tx_static_vars;
+mod vm_hooks_debugger;
 
 pub use catch_tx_panic::catch_tx_panic;
 pub use contract_container::{
@@ -11,3 +12,4 @@ pub use contract_container::{
 pub use contract_map::{ContractMap, ContractMapRef};
 pub use static_var_stack::{StaticVarData, StaticVarStack};
 pub use tx_static_vars::TxStaticVars;
+pub use vm_hooks_debugger::VMHooksDebugger;

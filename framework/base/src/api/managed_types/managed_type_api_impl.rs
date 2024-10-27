@@ -66,10 +66,7 @@ pub trait ManagedTypeApiImpl:
         super::token_identifier_util::get_token_ticker_len(token_id_len)
     }
 
-    fn drop_managed_buffer(&self, handle: Self::ManagedBufferHandle) {
-        drop(handle)
-    }
-
+    fn drop_managed_buffer(&self, _handle: Self::ManagedBufferHandle) {}
     fn drop_big_float(&self, _handle: Self::BigFloatHandle) {}
     fn drop_big_int(&self, _handle: Self::BigIntHandle) {}
     fn drop_elliptic_curve(&self, _handle: Self::EllipticCurveHandle) {}
