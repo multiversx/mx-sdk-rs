@@ -53,7 +53,16 @@ pub trait ManagedVecItem: 'static {
         reader: Reader,
     ) -> Self::Ref<'a>;
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R;
+    /// Converts the object into bytes.
+    ///
+    /// The output is processed by the `writer` lambda.
+    /// The writer is provided by the caller.
+    /// The callee will use it to pass on the bytes.
+    ///
+    /// The method is used when instering (push, overwrite) into a ManagedVec.
+    ///
+    /// Note that a destructor should not be called at this moment, since the ManagedVec will take ownership of the item.
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R;
 }
 
 macro_rules! impl_int {
@@ -73,7 +82,7 @@ macro_rules! impl_int {
                 Self::from_byte_reader(reader)
             }
 
-            fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+            fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
                 let bytes = self.to_be_bytes();
                 writer(&bytes)
             }
@@ -104,8 +113,8 @@ impl ManagedVecItem for usize {
         Self::from_byte_reader(reader)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-        let bytes = (*self as u32).to_be_bytes();
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
+        let bytes = (self as u32).to_be_bytes();
         writer(&bytes)
     }
 }
@@ -125,11 +134,11 @@ impl ManagedVecItem for bool {
         Self::from_byte_reader(reader)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
         // true -> 1u8
         // false -> 0u8
-        let u8_value = u8::from(*self);
-        <u8 as ManagedVecItem>::to_byte_writer(&u8_value, writer)
+        let u8_value = u8::from(self);
+        <u8 as ManagedVecItem>::into_byte_writer(u8_value, writer)
     }
 }
 
@@ -161,12 +170,12 @@ where
         Self::from_byte_reader(reader)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
         let mut payload = Self::PAYLOAD::new_buffer();
         let slice = payload.payload_slice_mut();
         if let Some(t) = self {
             slice[0] = 1;
-            T::to_byte_writer(t, |bytes| {
+            T::into_byte_writer(t, |bytes| {
                 slice[1..].copy_from_slice(bytes);
             });
         }
@@ -193,8 +202,8 @@ macro_rules! impl_managed_type {
                 ManagedRef::wrap_handle(handle)
             }
 
-            fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-                <$ty<M> as ManagedType<M>>::OwnHandle::to_byte_writer(&self.get_handle(), writer)
+            fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+                <$ty<M> as ManagedType<M>>::OwnHandle::into_byte_writer(self.get_handle(), writer)
             }
         }
     };
@@ -227,9 +236,9 @@ where
         ManagedRef::wrap_handle(handle)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <<Self as ManagedType<M>>::OwnHandle as ManagedVecItem>::to_byte_writer(
-            &self.get_handle(),
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        <<Self as ManagedType<M>>::OwnHandle as ManagedVecItem>::into_byte_writer(
+            self.get_handle(),
             writer,
         )
     }
@@ -256,8 +265,8 @@ where
         ManagedRef::wrap_handle(handle)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <M::ManagedBufferHandle as ManagedVecItem>::to_byte_writer(&self.get_handle(), writer)
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        <M::ManagedBufferHandle as ManagedVecItem>::into_byte_writer(self.get_handle(), writer)
     }
 }
 
@@ -278,7 +287,7 @@ impl ManagedVecItem for EsdtTokenType {
         Self::from_byte_reader(reader)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
         writer(&[self.as_u8()])
     }
 }
@@ -298,7 +307,7 @@ impl ManagedVecItem for EsdtLocalRole {
         Self::from_byte_reader(reader)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <u16 as ManagedVecItem>::to_byte_writer(&self.as_u16(), writer)
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        <u16 as ManagedVecItem>::into_byte_writer(self.as_u16(), writer)
     }
 }

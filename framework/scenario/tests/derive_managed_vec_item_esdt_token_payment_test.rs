@@ -63,8 +63,8 @@ fn struct_to_bytes_writer() {
         handle3[1], handle3[2], handle3[3], handle4[0], handle4[1], handle4[2], handle4[3],
     ];
 
-    <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::to_byte_writer(
-        &s,
+    <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::into_byte_writer(
+        s,
         |bytes| {
             payload_slice.copy_from_slice(bytes);
 
