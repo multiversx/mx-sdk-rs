@@ -190,7 +190,7 @@ where
         }
     }
 
-    pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
+    pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
         item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
     }

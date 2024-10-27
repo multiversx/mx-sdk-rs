@@ -39,7 +39,7 @@ pub trait ManagedVecFeatures {
         &self,
         mv: ManagedVec<BigUint>,
         index: usize,
-        item: &BigUint,
+        item: BigUint,
     ) -> ManagedVec<BigUint> {
         let mut result = mv;
         if result.set(index, item).is_ok() {
