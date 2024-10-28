@@ -16,6 +16,7 @@ const TOKEN_ID: &[u8] = b"TOKEN-123456";
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
     blockchain.register_contract(PROMISES_FEATURES_PATH, promises_features::ContractBuilder);
     blockchain.register_contract(VAULT_PATH, vault::ContractBuilder);
 

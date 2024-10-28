@@ -8,6 +8,7 @@ const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/benchmarks/mappers/linked-list-repeat");
 
     blockchain.register_contract(WASM_PATH, linked_list_repeat::ContractBuilder);
     blockchain

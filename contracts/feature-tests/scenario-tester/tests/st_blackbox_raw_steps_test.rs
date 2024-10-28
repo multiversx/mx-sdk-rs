@@ -5,6 +5,7 @@ const SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
     blockchain.register_contract(SCENARIO_TESTER_PATH_EXPR, scenario_tester::ContractBuilder);
     blockchain
 }

@@ -67,6 +67,8 @@ impl AdderInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
+        interactor.set_current_dir_from_workspace("contracts/examples/adder/interact");
+
         let adder_owner_address = interactor
             .register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap())
             .await;
