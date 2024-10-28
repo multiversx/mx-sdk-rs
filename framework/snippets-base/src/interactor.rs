@@ -85,6 +85,8 @@ where
         self.post_runners.run_set_state_step(&set_state);
     }
 
+    /// Tells the interactor where the crate lies relative to the workspace.
+    /// This ensures that the paths are set correctly, including in debug mode.
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
         let mut path = find_current_workspace().unwrap();
         path.push(relative_path);

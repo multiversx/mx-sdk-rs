@@ -21,14 +21,9 @@ impl MetaConfig {
     pub fn generate_rust_snippets(&self, args: &GenerateSnippetsArgs) {
         let main_contract = self.sc_config.main_contract();
         let crate_name = &main_contract.contract_name;
-        let wasm_output_file_path_expr = format!("\"mxsc:../output/{crate_name}.mxsc.json\"");
         let file =
             create_snippets_crate_and_get_lib_file(&self.snippets_dir, crate_name, args.overwrite);
-        write_snippets_to_file(
-            file,
-            &self.original_contract_abi,
-            &wasm_output_file_path_expr,
-        );
+        write_snippets_to_file(file, &self.original_contract_abi, crate_name);
     }
 }
 
@@ -46,12 +41,12 @@ fn create_snippets_crate_and_get_lib_file(
     create_and_get_lib_file(snippets_folder_path, overwrite)
 }
 
-fn write_snippets_to_file(mut file: File, abi: &ContractAbi, wasm_output_file_path_expr: &str) {
+fn write_snippets_to_file(mut file: File, abi: &ContractAbi, crate_name: &str) {
     write_snippet_imports(&mut file);
     write_snippet_constants(&mut file);
     write_snippet_main_function(&mut file, abi);
     write_state_struct_declaration(&mut file);
     write_snippet_state_impl(&mut file);
     write_interact_struct_declaration(&mut file);
-    write_interact_struct_impl(&mut file, abi, wasm_output_file_path_expr);
+    write_interact_struct_impl(&mut file, abi, crate_name);
 }
