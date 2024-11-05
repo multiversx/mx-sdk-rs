@@ -1,4 +1,5 @@
 use crate::{
+    api::{ErrorApi, ErrorApiImpl},
     contract_base::BlockchainWrapper,
     types::{EsdtTokenPayment, RHListItem, RHListItemExec, TxEnv},
 };
@@ -24,7 +25,7 @@ where
             .esdt_payments;
 
         if esdt_payments.len() != 1 {
-            panic!("Back transfers expected to be a single ESDT")
+            Env::Api::error_api_impl().signal_error(b"Back transfers expected to be a single ESDT")
         }
 
         esdt_payments.get(0)
