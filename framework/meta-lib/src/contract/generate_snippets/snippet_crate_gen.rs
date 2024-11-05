@@ -169,7 +169,7 @@ gateway_uri = 'https://devnet-gateway.multiversx.com'
 pub(crate) fn create_config_rust_file(snippets_folder_path: &str) -> File {
     let lib_path = format!("{snippets_folder_path}/src/{CONFIG_SOURCE_FILE_NAME}");
 
-    File::create(&lib_path).unwrap()
+    File::create(lib_path).unwrap()
 }
 
 fn file_exists(path: &str) -> bool {
