@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
  chain-simulator:
-  image: multiversx/chainsimulator:latest
+  image: multiversx/chainsimulator:v1.8.0
   ports:
     - 8085:8085
   volumes:
