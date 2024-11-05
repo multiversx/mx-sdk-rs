@@ -29,6 +29,12 @@ async fn simulator_basic_features_test() {
         .echo_managed_option(expected_type_managed_option)
         .await;
     assert_eq!(Some(RustBigUint::from(8u16)), type_managed_option);
+}
+
+#[tokio::test]
+#[ignore = "signature verification is currently unavailable"]
+async fn simulator_crypto_test() {
+    let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
 
     bf_interact.deploy_crypto().await;
 
