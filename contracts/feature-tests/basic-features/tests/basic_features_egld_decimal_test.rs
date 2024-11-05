@@ -28,6 +28,7 @@ impl BasicFeaturesState {
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
     blockchain.register_contract(BASIC_FEATURES_PATH, basic_features::ContractBuilder);
     blockchain
 }

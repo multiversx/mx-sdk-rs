@@ -90,6 +90,7 @@ impl MultisigInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
+        interactor.set_current_dir_from_workspace("contracts/examples/multisig/interact");
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
         let multisig_code = BytesValue::interpret_from(
             "mxsc:../output/multisig.mxsc.json",

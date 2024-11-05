@@ -45,6 +45,8 @@ impl BasicFeaturesInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
+        interactor
+            .set_current_dir_from_workspace("contracts/feature-tests/basic-features/interact");
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
         let code_expr = BytesValue::interpret_from(
             "mxsc:../output/basic-features-storage-bytes.mxsc.json",
