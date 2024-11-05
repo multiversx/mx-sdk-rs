@@ -171,6 +171,30 @@ pub trait Vault {
     }
 
     #[endpoint]
+    #[payable("*")]
+    fn retrieve_funds_egld_or_single_esdt(&self) {
+        let token = self.call_value().egld_or_single_esdt();
+        self.retrieve_funds_event(&token.token_identifier, token.token_nonce, &token.amount);
+
+        if let Some(esdt_token_id) = token.token_identifier.into_esdt_option() {
+            self.tx()
+                .to(ToCaller)
+                .esdt((esdt_token_id, token.token_nonce, token.amount))
+                .transfer();
+        } else {
+            self.tx().to(ToCaller).egld(token.amount).transfer();
+        }
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn retrieve_funds_multi_esdt(&self) {
+        let tokens = self.call_value().all_esdt_transfers().clone_value();
+
+        self.tx().to(ToCaller).multi_esdt(tokens).transfer();
+    }
+
+    #[endpoint]
     fn retrieve_multi_funds_async(
         &self,
         token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,

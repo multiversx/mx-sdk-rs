@@ -79,6 +79,67 @@ pub trait ForwarderSyncCallModule {
         self.accept_funds_sync_result_event(&egld_value, &esdt_transfers_multi);
     }
 
+    #[endpoint]
+    #[payable("EGLD")]
+    fn forward_sync_accept_funds_rh_egld(&self, to: ManagedAddress) -> BigUint {
+        let payment = self.call_value().egld_value();
+        let half_gas = self.blockchain().get_gas_left() / 2;
+
+        self.tx()
+            .to(&to)
+            .gas(half_gas)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_egld_or_single_esdt()
+            .egld(payment)
+            .returns(ReturnsBackTransfersEGLD)
+            .sync_call()
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn forward_sync_accept_funds_rh_single_esdt(
+        &self,
+        to: ManagedAddress,
+    ) -> EsdtTokenPayment<Self::Api> {
+        let payment = self.call_value().single_esdt();
+        let half_gas = self.blockchain().get_gas_left() / 2;
+
+        let result = self
+            .tx()
+            .to(&to)
+            .gas(half_gas)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_egld_or_single_esdt()
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            )
+            .returns(ReturnsBackTransfersSingleESDT)
+            .sync_call();
+
+        result
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn forward_sync_accept_funds_rh_multi_esdt(
+        &self,
+        to: ManagedAddress,
+    ) -> ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>> {
+        let payment = self.call_value().all_esdt_transfers().clone_value();
+        let half_gas = self.blockchain().get_gas_left() / 2;
+
+        self.tx()
+            .to(&to)
+            .gas(half_gas)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_multi_esdt()
+            .multi_esdt(payment)
+            .returns(ReturnsBackTransfersMultiESDT)
+            .sync_call()
+    }
+
     #[payable("*")]
     #[endpoint]
     fn forward_sync_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
