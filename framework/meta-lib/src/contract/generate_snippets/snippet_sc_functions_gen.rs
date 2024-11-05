@@ -13,10 +13,11 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
         file,
         r#"impl ContractInteract {{
     async fn new() -> Self {{
-        let mut interactor = Interactor::new(GATEWAY).await;
+        let config = Config::new();
+        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator()).await;
         interactor.set_current_dir_from_workspace("{}");
 
-        let wallet_address = interactor.register_wallet(test_wallets::alice());
+        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
         
         let contract_code = BytesValue::interpret_from(
             {},
