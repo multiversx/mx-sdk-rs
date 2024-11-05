@@ -15,6 +15,9 @@ const VAULT_PATH: MxscPath = MxscPath::new("../vault/output/vault.mxsc.json");
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace(
+        "contracts/feature-tests/composability/transfer-role-features",
+    );
     blockchain.register_contract(
         TRANSFER_ROLE_FEATURES_PATH,
         transfer_role_features::ContractBuilder,

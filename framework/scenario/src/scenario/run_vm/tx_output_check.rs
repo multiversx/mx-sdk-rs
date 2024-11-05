@@ -8,7 +8,7 @@ use multiversx_chain_vm::{
 pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
     let have_str = tx_result.result_message.as_str();
     assert!(
-        tx_expect.status.check(tx_result.result_status),
+        tx_expect.status.check(tx_result.result_status.as_u64()),
         "result code mismatch. Tx id: '{}'. Want: {}. Have: {}. Message: {}",
         tx_id,
         tx_expect.status,

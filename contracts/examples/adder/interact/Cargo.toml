@@ -7,12 +7,16 @@ publish = false
 
 [[bin]]
 name = "basic-interact"
+path = "src/basic_interact_main.rs"
+
+[lib]
 path = "src/basic_interact.rs"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8.6"
+tokio = { version = "1.24" }
 
 [dependencies.adder]
 path = ".."
@@ -20,3 +24,6 @@ path = ".."
 [dependencies.multiversx-sc-snippets]
 version = "0.53.2"
 path = "../../../../framework/snippets"
+
+[features]
+chain-simulator-tests = []

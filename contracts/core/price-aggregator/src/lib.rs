@@ -381,6 +381,7 @@ pub trait PriceAggregator:
     }
 
     #[view(getOracles)]
+    #[title("oracles")]
     fn get_oracles(&self) -> MultiValueEncoded<ManagedAddress> {
         let mut result = MultiValueEncoded::new();
         for key in self.oracle_status().keys() {

@@ -5,7 +5,7 @@ use crate::{
     },
 };
 use common_path::common_path_all;
-use multiversx_sc_meta_lib::cargo_toml_contents::CargoTomlContents;
+use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, LinkedList},

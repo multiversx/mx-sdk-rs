@@ -56,6 +56,10 @@ pub struct ContractVariantSerde {
     pub features: Vec<String>,
 
     #[serde(default)]
+    #[serde(rename = "default-features")]
+    pub default_features: Option<bool>,
+
+    #[serde(default)]
     pub kill_legacy_callback: bool,
 
     #[serde(default)]

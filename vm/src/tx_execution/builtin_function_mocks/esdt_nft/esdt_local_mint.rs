@@ -1,8 +1,9 @@
+use multiversx_chain_core::types::ReturnCode;
 use num_bigint::BigUint;
 
-use crate::tx_execution::{builtin_function_names::ESDT_LOCAL_MINT_FUNC_NAME, BlockchainVMRef};
-
 use crate::{
+    chain_core::builtin_func_names::ESDT_LOCAL_MINT_FUNC_NAME,
+    tx_execution::BlockchainVMRef,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     world_mock::EsdtInstanceMetadata,
 };
@@ -50,7 +51,7 @@ impl BuiltinFunction for ESDTLocalMint {
         };
 
         let tx_result = TxResult {
-            result_status: 0,
+            result_status: ReturnCode::Success,
             result_logs: vec![esdt_nft_create_log],
             ..Default::default()
         };

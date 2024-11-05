@@ -6,16 +6,16 @@ use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to
 
 const DEFAULT_GAS: &str = "30_000_000u64";
 
-pub(crate) fn write_interact_struct_impl(
-    file: &mut File,
-    abi: &ContractAbi,
-    wasm_output_file_path_expr: &str,
-) {
+pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, crate_name: &str) {
+    let wasm_output_file_path_expr = format!("\"mxsc:../output/{crate_name}.mxsc.json\"");
+
     writeln!(
         file,
         r#"impl ContractInteract {{
     async fn new() -> Self {{
         let mut interactor = Interactor::new(GATEWAY).await;
+        interactor.set_current_dir_from_workspace("{}");
+
         let wallet_address = interactor.register_wallet(test_wallets::alice());
         
         let contract_code = BytesValue::interpret_from(
@@ -31,10 +31,9 @@ pub(crate) fn write_interact_struct_impl(
         }}
     }}
 "#,
-        wasm_output_file_path_expr,
+        crate_name, wasm_output_file_path_expr,
     )
     .unwrap();
-
     write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
 
     for upgrade_abi in &abi.upgrade_constructors {
@@ -65,7 +64,7 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
             .init({})
             .code(&self.contract_code)
             .returns(ReturnsNewAddress)
-            .prepare_async()
+            
             .run()
             .await;
         let new_address_bech32 = bech32::encode(&new_address);
@@ -101,7 +100,7 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
             .code(&self.contract_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewAddress)
-            .prepare_async()
+            
             .run()
             .await;
 
@@ -214,7 +213,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
             .typed(proxy::{}Proxy)
             .{}({}){}
             .returns(ReturnsResultUnmanaged)
-            .prepare_async()
+            
             .run()
             .await;
 
@@ -237,7 +236,7 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi, name: &Stri
             .typed(proxy::{}Proxy)
             .{}({})
             .returns(ReturnsResultUnmanaged)
-            .prepare_async()
+            
             .run()
             .await;
 

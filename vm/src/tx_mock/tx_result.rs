@@ -1,11 +1,13 @@
 use std::fmt;
 
+use multiversx_chain_core::types::ReturnCode;
+
 use super::{AsyncCallTxData, TxLog, TxPanic, TxResultCalls};
 
 #[derive(Clone, Debug)]
 #[must_use]
 pub struct TxResult {
-    pub result_status: u64,
+    pub result_status: ReturnCode,
     pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
@@ -24,7 +26,7 @@ pub struct TxResult {
 impl Default for TxResult {
     fn default() -> Self {
         TxResult {
-            result_status: 0,
+            result_status: ReturnCode::Success,
             result_message: String::new(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
@@ -55,7 +57,7 @@ impl TxResult {
 
     pub fn from_panic_string(s: &str) -> Self {
         TxResult {
-            result_status: 4,
+            result_status: ReturnCode::UserError,
             result_message: s.to_string(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
@@ -72,7 +74,7 @@ impl TxResult {
         S: Into<String>,
     {
         TxResult {
-            result_status: 10,
+            result_status: ReturnCode::ExecutionFailed,
             result_message: result_message.into(),
             ..Default::default()
         }
@@ -94,7 +96,7 @@ impl TxResult {
 
     pub fn assert_ok(&self) {
         assert!(
-            self.result_status == 0,
+            self.result_status.is_success(),
             "Tx success expected, but failed. Status: {}, message: \"{}\"",
             self.result_status,
             self.result_message.as_str()
@@ -111,7 +113,7 @@ impl TxResult {
             self.result_message.as_str()
         );
         assert!(
-            self.result_status == expected_status,
+            self.result_status.as_u64() == expected_status,
             "Tx error status mismatch. Want status {}, message \"{}\". Have status {}, message \"{}\"",
             expected_status,
             expected_message,
@@ -121,7 +123,7 @@ impl TxResult {
     }
 
     pub fn assert_user_error(&self, expected_message: &str) {
-        self.assert_error(4, expected_message);
+        self.assert_error(ReturnCode::UserError.as_u64(), expected_message);
     }
 }
 
