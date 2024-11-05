@@ -170,6 +170,22 @@ where
             .original_result()
     }
 
+    pub fn retrieve_funds_egld_or_single_esdt(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("retrieve_funds_egld_or_single_esdt")
+            .original_result()
+    }
+
+    pub fn retrieve_funds_multi_esdt(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("retrieve_funds_multi_esdt")
+            .original_result()
+    }
+
     pub fn retrieve_multi_funds_async<
         Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
