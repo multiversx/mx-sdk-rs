@@ -13,6 +13,10 @@ description = "MultiversX framework for building smart contract interaction snip
 keywords = ["multiversx", "blockchain", "contract", "snippets"]
 categories = ["cryptography::cryptocurrencies"]
 
+[features]
+default = ["http"]
+http = []
+
 [dependencies]
 hex = "0.4"
 base64 = "0.22"
