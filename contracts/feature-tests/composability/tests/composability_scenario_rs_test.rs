@@ -494,6 +494,12 @@ fn promises_multi_transfer_rs() {
 }
 
 #[test]
+#[ignore = "TODO - some log is missing"]
+fn promises_multi_transfer_err_rs() {
+    world().run("scenarios/promises_multi_transfer_err.scen.json");
+}
+
+#[test]
 #[ignore = "gas"]
 fn promises_single_transfer_rs() {
     world().run("scenarios/promises_single_transfer.scen.json");

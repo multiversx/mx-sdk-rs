@@ -207,6 +207,14 @@ where
             .original_result()
     }
 
+    pub fn explicit_panic(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("explicit_panic")
+            .original_result()
+    }
+
     pub fn get_owner_address(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
