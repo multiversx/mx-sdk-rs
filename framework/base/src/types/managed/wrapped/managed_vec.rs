@@ -190,9 +190,9 @@ where
         }
     }
 
-    pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
+    pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
-        item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+        item.into_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
     }
 
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
@@ -205,7 +205,7 @@ where
     }
 
     pub fn push(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
+        item.into_byte_writer(|bytes| {
             self.buffer.append_bytes(bytes);
         });
     }
@@ -251,7 +251,7 @@ where
     }
 
     pub fn overwrite_with_single_item(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
+        item.into_byte_writer(|bytes| {
             self.buffer.overwrite(bytes);
         });
     }

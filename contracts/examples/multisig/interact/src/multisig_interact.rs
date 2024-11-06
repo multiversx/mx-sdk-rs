@@ -19,7 +19,7 @@ async fn main() {
     env_logger::init();
 
     let mut multisig_interact = MultisigInteract::init().await;
-    multisig_interact.register_wallets();
+    multisig_interact.register_wallets().await;
 
     let cli = multisig_interact_cli::InteractCli::parse();
     match &cli.command {
@@ -86,11 +86,12 @@ struct MultisigInteract {
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(&config.gateway)
+        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        interactor.set_current_dir_from_workspace("contracts/examples/multisig/interact");
+        let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
         let multisig_code = BytesValue::interpret_from(
             "mxsc:../output/multisig.mxsc.json",
             &InterpreterContext::default(),
@@ -106,13 +107,13 @@ impl MultisigInteract {
         }
     }
 
-    fn register_wallets(&mut self) {
+    async fn register_wallets(&mut self) {
         let carol = test_wallets::carol();
         let dan = test_wallets::dan();
         let eve = test_wallets::eve();
 
         for wallet in &[carol, dan, eve] {
-            self.interactor.register_wallet(*wallet);
+            self.interactor.register_wallet(*wallet).await;
         }
     }
 
@@ -145,7 +146,6 @@ impl MultisigInteract {
             .code(&self.multisig_code)
             .gas(NumExpr("100,000,000"))
             .returns(ReturnsNewBech32Address)
-            .prepare_async()
             .run()
             .await;
 
@@ -190,9 +190,9 @@ impl MultisigInteract {
 
         MultiValueVec::from([
             self.wallet_address.to_address(),
-            carol.address().to_bytes().into(),
-            dan.address().to_bytes().into(),
-            eve.address().to_bytes().into(),
+            carol.to_address(),
+            dan.to_address(),
+            eve.to_address(),
         ])
     }
 
@@ -202,7 +202,6 @@ impl MultisigInteract {
             .from(&self.wallet_address)
             .to(self.state.current_multisig_address())
             .egld(BigUint::from(50_000_000_000_000_000u64)) // 0,05 or 5 * 10^16
-            .prepare_async()
             .run()
             .await;
     }
@@ -220,7 +219,6 @@ impl MultisigInteract {
             .gas(gas_expr)
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
-            .prepare_async()
             .run()
             .await;
 
@@ -249,13 +247,14 @@ impl MultisigInteract {
                     .gas(gas_expr)
                     .typed(multisig_proxy::MultisigProxy)
                     .perform_action_endpoint(action_id)
+                    .returns(PassValue(action_id))
                     .returns(ReturnsResult)
             });
         }
 
-        let deployed_addresses = buffer.run().await;
+        let result = buffer.run().await;
 
-        for (action_id, address) in deployed_addresses.iter().enumerate() {
+        for (action_id, address) in result {
             println!("successfully performed action `{action_id}`");
             if address.is_some() {
                 println!(
@@ -273,7 +272,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .quorum_reached(action_id)
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await
     }
@@ -285,7 +283,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .signed(signer, action_id)
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await
     }
@@ -340,7 +337,6 @@ impl MultisigInteract {
             .gas(NumExpr("30,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .dns_register(dns_address, name)
-            .prepare_async()
             .run()
             .await;
 
@@ -355,7 +351,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .quorum()
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 
@@ -370,7 +365,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .num_board_members()
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 

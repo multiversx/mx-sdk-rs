@@ -111,6 +111,16 @@ pub struct TestArgs {
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub go: bool,
 
+    /// This arg runs interactor tests using chain simulator
+    /// Default value will be "false" if not specified
+    #[arg(
+        short = 'c',
+        long = "chain-simulator",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub chain_simulator: bool,
+
     /// This arg runs scenarios.
     /// Default value will be "false" if not specified.
     /// If scen and go are both specified, scen overrides the go argument.
@@ -408,7 +418,7 @@ pub struct InstallWasmOptArgs {}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct AccountArgs {
-    /// Provide the target API you want the real data to come from
+    /// Provide the target API you want the data to come from
     #[arg(long = "api")]
     #[clap(global = true)]
     pub api: Option<String>,

@@ -24,3 +24,5 @@ pub use crate::{
     whitebox_legacy::*,
     ScenarioTxRun,
 };
+
+pub use crate::multiversx_sc::chain_core::types::ReturnCode;

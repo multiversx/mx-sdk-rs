@@ -14,6 +14,15 @@ pub struct BytesKey {
     pub original: String,
 }
 
+impl BytesKey {
+    pub fn from_hex(hex_value: &str) -> Self {
+        Self {
+            value: hex::decode(hex_value).expect("could not decode hex value"),
+            original: format!("0x{hex_value}"),
+        }
+    }
+}
+
 impl From<Vec<u8>> for BytesKey {
     fn from(v: Vec<u8>) -> Self {
         BytesKey {

@@ -42,10 +42,10 @@ MANAGED_VEC_TYPE = f"{MOD_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_
 
 # 4. SC wasm - Managed multi value types
 
-# 5. SC wasm - heap
-MOD_PATH = "multiversx_sc::types::heap"
+# 5. VM core types
+MOD_PATH = "multiversx_chain_core::types"
 
-HEAP_ADDRESS_TYPE = f"{MOD_PATH}::h256_address::Address"
+HEAP_ADDRESS_TYPE = f"{MOD_PATH}::address::Address"
 BOXED_BYTES_TYPE = f"{MOD_PATH}::boxed_bytes::BoxedBytes"
 
 # 6. MultiversX codec - Multi-types

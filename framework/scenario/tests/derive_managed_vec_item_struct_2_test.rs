@@ -49,7 +49,7 @@ fn struct_to_bytes_writer() {
         /* arr  */ 0x61, 0x11, 0x62, 0x22,
     ];
 
-    <Struct2 as multiversx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
+    <Struct2 as multiversx_sc::types::ManagedVecItem>::into_byte_writer(s, |bytes| {
         assert_eq!(bytes, &expected_payload[..]);
     });
 }

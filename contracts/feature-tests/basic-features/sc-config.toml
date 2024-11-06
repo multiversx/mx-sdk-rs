@@ -28,3 +28,4 @@ add-endpoints = [
     "returns_egld_decimal",
     "echo_managed_option",
 ]
+add-labels = ["crypto-ei-1.4"]
