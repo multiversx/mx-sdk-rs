@@ -23,9 +23,54 @@ They are:
 - `multiversx-sc-codec`, in short `codec`, the serializer/deserializer, 2 crates:
 	- `multiversx-sc-codec`
 	- `multiversx-sc-codec-derive`
-- `multiversx-chain-vm`, in short `vm`, a Rust VM implementation, 1 crate.
+- Chain crates, in short `chain`. Formerly it was only the VM (`vm`). 2 crates:
+	- `multiversx-chain-core` - *a common crate for chain types, constants, flags*
+	- `multiversx-chain-vm` - *a Rust VM implementation*
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
-- `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
+- `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 3 crates:
+	- `multiversx-sdk`
+	- `multiversx-sdk-http`
+	- `multiversx-sdk-dapp`
+
+
+## [sc 0.54.0, sdk 0.7.0, chain 0.11.0] - 2024-11-06
+- New crate, `multiversx-chain-core`, to be used in both framework and Rust VM. It contains common types, flags, and constants that refer to the protocol.
+- Major SDK/interactor refactor:
+	- Added support for Chain Simulator in interactors:
+		- Added chain-simulator-specific endpoints: feed account, advance blocks
+		- Added a system to set up accounts in the chain simulator from the interactor;
+		- Support for advancing blocks in the interactor;
+	- Split SDK crate into:
+		- `multiversx-sdk` - only contains the specifications of the gateway API, without a mechanism to call the API;
+		- `multiversx-sdk-http` - functionality to call the gateway via reqwest;
+		- `multiversx-sdk-dapp` - functionality to call the gateway via wasm-bindgen, to be used in WebAssembly front-ends;
+	- Major improvements in the retrieving of transactions and other blockchain data fron the API, many bugs fixed;
+	- Support for writing integration tests for interactors, using the Chain Simulator;
+		- Also added support for test-related `chain-simulator-tests` feature flag in `sc-meta`;
+	- Interactors on the front-end:
+		- Interactor type made generic over the gateway API implementation, so that it can be used in both front-end and back-end, with no change in the code base;
+		- Support for custom random number generation for the front-end;
+	- Mechanism for fixing file paths in the interactor context;
+	- Fixed an issue with the account tool;
+	- Adjusted `sc-meta snippets` for the new syntax and the chain simulator support;
+- Unified syntax:
+	- `ReturnsHandledOrError` result handler, which can gracefully deal with failed transactions;
+	- `ReturnsGasUsed` result handler;
+	- `PassValue` result handler for providing a closure-like context for multi-transaction call/deploy;
+	- More specific back transfer result handlers: `ReturnsBackTransfersEGLD`, `ReturnsBackTransfersMultiESDT`, `ReturnsBackTransfersSingleESDT`;
+	- Fixed an issue with the update functionality not being general enough;
+	- Deprecated `prepare_async()`, developers can now call `run()` directly, asynchronously;
+- `sc-meta` improvements:
+	- New mechanism for detecting and warning about storage writes in readonly endpoints, integrated into the build system;
+	- Support for referencing the framework via git commit, branch, or tag, to make it easier to try out unreleased versions;
+	- Support for `default-features`;
+	- Better representation in console of the contract/lib folders, as well as better error messages.
+	- Refactoring of the dependency handling logic.
+- Fixed the debugger, following changes in the Rust debug tooling.
+- `ManagedVec` `set` always consumes ownership. Preparations for a profound memory management cleanup.
+- ABI:
+	- `title` field and annotation;
+	- Refactoring.
 
 ## [sc 0.53.2] - 2024-10-02
 - `StakingModule` fix.
