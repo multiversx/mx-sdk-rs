@@ -126,8 +126,8 @@ mod tests {
     #[test]
     fn test_top() {
         let s = "abc";
-        check_top_encode_decode(String::from(s), &[b'a', b'b', b'c']);
-        check_top_encode_decode(String::from(s).into_boxed_str(), &[b'a', b'b', b'c']);
+        check_top_encode_decode(String::from(s), b"abc");
+        check_top_encode_decode(String::from(s).into_boxed_str(), b"abc");
     }
 
     #[test]
