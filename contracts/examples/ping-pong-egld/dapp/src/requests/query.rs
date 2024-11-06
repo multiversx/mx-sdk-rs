@@ -1,7 +1,7 @@
 use crate::interactor::ContractInteract;
-use multiversx_sc_snippets_dapp::sdk::{
-    core::gateway::GatewayAsyncService, core::gateway::NetworkStatusRequest,
-    data::network_status::NetworkStatus,
+use multiversx_sc_snippets::sdk::{
+    data::network_status::NetworkStatus, gateway::GatewayAsyncService,
+    gateway::NetworkStatusRequest,
 };
 
 pub async fn get_network_status() -> Result<NetworkStatus, String> {

@@ -1,4 +1,4 @@
-use multiversx_sc_snippets::{base::account_tool, imports::GatewayHttpProxy};
+use multiversx_sc_snippets::{account_tool, imports::GatewayHttpProxy};
 
 use crate::cli::AccountArgs;
 

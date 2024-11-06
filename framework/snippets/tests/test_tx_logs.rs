@@ -1,5 +1,5 @@
 use multiversx_sc_scenario::imports::ReturnCode;
-use multiversx_sc_snippets_base::network_response;
+use multiversx_sc_snippets::network_response;
 use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
 #[test]
