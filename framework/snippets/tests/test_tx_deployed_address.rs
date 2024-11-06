@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::{Address, ReturnCode};
-use multiversx_sc_snippets_base::network_response;
-use multiversx_sc_snippets_base::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::network_response;
+use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 use multiversx_sdk::bech32;
 
 #[test]

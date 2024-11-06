@@ -2584,46 +2584,11 @@ dependencies = [
  "log",
  "multiversx-chain-scenario-format",
  "multiversx-sc-scenario",
- "multiversx-sc-snippets-base",
  "multiversx-sdk",
+ "multiversx-sdk-dapp",
  "multiversx-sdk-http",
  "serde_json",
  "tokio",
-]
-
-[[package]]
-name = "multiversx-sc-snippets-base"
-version = "0.53.2"
-dependencies = [
- "anyhow",
- "base64",
- "env_logger",
- "futures",
- "hex",
- "log",
- "multiversx-chain-scenario-format",
- "multiversx-sc-scenario",
- "multiversx-sdk",
- "serde_json",
-]
-
-[[package]]
-name = "multiversx-sc-snippets-dapp"
-version = "0.53.2"
-dependencies = [
- "base64",
- "env_logger",
- "futures",
- "hex",
- "js-sys",
- "log",
- "multiversx-chain-scenario-format",
- "multiversx-sc-scenario",
- "multiversx-sc-snippets-base",
- "multiversx-sdk-dapp",
- "serde_json",
- "wasm-bindgen-futures",
- "web-sys",
 ]
 
 [[package]]
@@ -3073,7 +3038,7 @@ version = "0.1.0"
 dependencies = [
  "console_log",
  "log",
- "multiversx-sc-snippets-dapp",
+ "multiversx-sc-snippets",
  "serde",
  "serde_json",
  "wasm-bindgen-futures",
