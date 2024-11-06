@@ -18,7 +18,7 @@ path = "../../../framework/scenario"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.10.0"
-path = "../../../vm"
+path = "../../../chain/core"
 
 [dev-dependencies]
 glob = "0.3.0"
