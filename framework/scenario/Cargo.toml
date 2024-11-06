@@ -54,4 +54,4 @@ version = "0.2.0"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.10.0"
-path = "../../vm"
+path = "../../chain/vm"

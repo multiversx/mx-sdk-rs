@@ -2,7 +2,6 @@
 use std::{io::BufRead, path::Path, process::Command};
 
 #[test]
-#[ignore = "TODO: fix LLDB integration"]
 fn run_format_tests() {
     let home_dir = home::home_dir().unwrap();
 

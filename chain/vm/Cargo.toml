@@ -36,7 +36,7 @@ ed25519-dalek = "2.1.0"
 
 [dependencies.multiversx-chain-core]
 version = "=0.10.0"
-path = "../vm-core"
+path = "../core"
 
 [dependencies.multiversx-chain-vm-executor]
 version = "0.2.0"
