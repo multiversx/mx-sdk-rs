@@ -84,6 +84,15 @@ pub enum StandaloneCliAction {
         about = "Generates a new wallet or performs actions on an existing wallet."
     )]
     Wallet(WalletArgs),
+    #[command(
+        name = "cs-install",
+        about = "Builds the latest chain simulator docker image. The build needs Docker installed."
+    )]
+    CSInstall,
+    #[command(name = "cs-start", about = "Starts the chain simulator")]
+    CSStart,
+    #[command(name = "cs-stop", about = "Stops the chain simulator")]
+    CSStop,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
