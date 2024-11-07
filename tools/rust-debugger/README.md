@@ -26,3 +26,5 @@ Then, adjust the `lldb.launch.initCommands` entry in your Visual Studio Code set
     ]
 }
 ```
+
+Once you have completed the steps above, you can start debugging your smart contract in Visual Studio Code. The pretty-printer script will automatically format managed types for you.
