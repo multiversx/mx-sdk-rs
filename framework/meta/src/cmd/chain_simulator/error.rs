@@ -9,6 +9,7 @@ pub const DEFAULT_PORT: &str = "8085:8085";
 pub enum ChainSimulatorError {
     DockerNotInstalled,
     CommandFailed(String),
+    OperationFailed(String),
     ContainerNotRunning,
 }
 
@@ -24,6 +25,9 @@ impl fmt::Display for ChainSimulatorError {
             },
             ChainSimulatorError::CommandFailed(cmd) => {
                 write!(f, "{} {}", "Error: Failed to execute command:".red(), cmd)
+            },
+            ChainSimulatorError::OperationFailed(op) => {
+                write!(f, "{} {}", "Error: Operation failed:".red(), op)
             },
             ChainSimulatorError::ContainerNotRunning => {
                 write!(
