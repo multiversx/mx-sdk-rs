@@ -86,12 +86,12 @@ pub enum StandaloneCliAction {
     Wallet(WalletArgs),
     #[command(
         name = "cs-install",
-        about = "Builds the latest chain simulator docker image. The build needs Docker installed."
+        about = "Pulls the latest chain simulator docker image available. Needs Docker installed."
     )]
     CSInstall,
-    #[command(name = "cs-start", about = "Starts the chain simulator")]
+    #[command(name = "cs-start", about = "Starts the chain simulator.")]
     CSStart,
-    #[command(name = "cs-stop", about = "Stops the chain simulator")]
+    #[command(name = "cs-stop", about = "Stops the chain simulator.")]
     CSStop,
 }
 
