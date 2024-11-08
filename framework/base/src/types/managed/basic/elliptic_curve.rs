@@ -46,6 +46,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
     fn transmute_from_handle_ref(handle_ref: &M::EllipticCurveHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::EllipticCurveHandle) -> &mut Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<M: ManagedTypeApi> EllipticCurve<M> {

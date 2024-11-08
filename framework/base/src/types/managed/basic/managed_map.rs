@@ -26,6 +26,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
     fn transmute_from_handle_ref(handle_ref: &M::ManagedMapHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedMapHandle) -> &mut Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<M: ManagedTypeApi> ManagedMap<M> {

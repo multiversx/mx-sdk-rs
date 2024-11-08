@@ -26,6 +26,8 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
     /// For types that just wrap another managed type it is easier, call for the wrapped object.
     fn transmute_from_handle_ref(handle_ref: &Self::OwnHandle) -> &Self;
 
+    fn transmute_from_handle_ref_mut(handle_ref: &mut Self::OwnHandle) -> &mut Self;
+
     fn as_ref(&self) -> ManagedRef<'_, M, Self> {
         ManagedRef::new(self)
     }

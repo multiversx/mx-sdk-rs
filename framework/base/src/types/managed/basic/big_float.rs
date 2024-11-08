@@ -38,6 +38,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
     fn transmute_from_handle_ref(handle_ref: &M::BigFloatHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::BigFloatHandle) -> &mut Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
 }
 
 impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigFloat<M> {

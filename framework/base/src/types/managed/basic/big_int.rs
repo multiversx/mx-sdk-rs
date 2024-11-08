@@ -39,6 +39,11 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     fn transmute_from_handle_ref(handle_ref: &M::BigIntHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::BigIntHandle) -> &mut Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+    
 }
 
 impl<M: ManagedTypeApi> Default for BigInt<M> {

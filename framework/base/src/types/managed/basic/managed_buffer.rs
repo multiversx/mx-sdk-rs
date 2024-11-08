@@ -13,7 +13,9 @@ use crate::{
         hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay,
         SCLowerHex,
     },
-    types::{heap::BoxedBytes, ManagedBufferCachedBuilder, ManagedType, StaticBufferRef},
+    types::{
+        heap::BoxedBytes, ManagedBufferCachedBuilder, ManagedType, StaticBufferRef,
+    },
 };
 
 /// A byte buffer managed by an external API.
@@ -35,6 +37,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
