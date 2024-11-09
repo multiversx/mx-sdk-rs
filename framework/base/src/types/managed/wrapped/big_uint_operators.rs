@@ -18,7 +18,7 @@ macro_rules! binary_operator {
                     self.value.handle.clone(),
                     other.value.handle.clone(),
                 );
-                BigUint::from_handle(self.value.handle.clone())
+                self
             }
         }
 
@@ -33,7 +33,7 @@ macro_rules! binary_operator {
                     self.value.handle.clone(),
                     other.value.handle.clone(),
                 );
-                BigUint::from_handle(result_handle)
+                unsafe { BigUint::from_handle(result_handle) }
             }
         }
 
@@ -46,7 +46,7 @@ macro_rules! binary_operator {
                     self.value.handle.clone(),
                     other.value.handle.clone(),
                 );
-                BigUint::from_handle(self.value.handle.clone())
+                self
             }
         }
 
@@ -60,7 +60,7 @@ macro_rules! binary_operator {
                     self.value.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(self.value.handle.clone())
+                self
             }
         }
 
@@ -77,7 +77,7 @@ macro_rules! binary_operator {
                     self.value.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(result_handle)
+                unsafe { BigUint::from_handle(result_handle) }
             }
         }
 
@@ -91,7 +91,7 @@ macro_rules! binary_operator {
                     self.value.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(self.value.handle.clone())
+                self
             }
         }
 
@@ -108,7 +108,7 @@ macro_rules! binary_operator {
                     self.value.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(result_handle)
+                unsafe { BigUint::from_handle(result_handle) }
             }
         }
     };
@@ -207,7 +207,7 @@ macro_rules! shift_traits {
                     self.value.handle.clone(),
                     rhs,
                 );
-                BigUint::from_handle(result_handle)
+                unsafe { BigUint::from_handle(result_handle) }
             }
         }
     };

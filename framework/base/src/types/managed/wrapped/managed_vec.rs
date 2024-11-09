@@ -45,7 +45,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedVec {
             buffer: ManagedBuffer::from_handle(handle),
             _phantom: PhantomData,
@@ -768,4 +768,3 @@ where
         }
     }
 }
-

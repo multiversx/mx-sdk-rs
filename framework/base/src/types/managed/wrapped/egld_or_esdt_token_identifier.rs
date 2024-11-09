@@ -58,7 +58,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
 
     pub fn from_opt_raw_handle(opt_handle: Option<M::ManagedBufferHandle>) -> Self {
         match opt_handle {
-            Some(handle) => Self::esdt(TokenIdentifier::from_handle(handle)),
+            Some(handle) => Self::esdt(unsafe { TokenIdentifier::from_handle(handle) }),
             None => Self::egld(),
         }
     }
@@ -240,9 +240,12 @@ impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer(&ManagedBuffer::from_handle(
-                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
-            ));
+            let cast_handle = token_identifier.get_handle().cast_or_signal_error::<M, _>();
+            let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+            f.append_managed_buffer(&wrap_cast);
+            // f.append_managed_buffer(&ManagedBuffer::from_handle(
+            //     token_identifier.get_handle().cast_or_signal_error::<M, _>(),
+            // ));
         } else {
             f.append_bytes(Self::EGLD_REPRESENTATION);
         }
@@ -254,9 +257,12 @@ const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
 impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
-                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
-            ));
+            let cast_handle = token_identifier.get_handle().cast_or_signal_error::<M, _>();
+            let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+            f.append_managed_buffer_lower_hex(&wrap_cast);
+            // f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
+            //     token_identifier.get_handle().cast_or_signal_error::<M, _>(),
+            // ));
         } else {
             f.append_bytes(EGLD_REPRESENTATION_HEX);
         }

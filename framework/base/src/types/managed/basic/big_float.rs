@@ -27,7 +27,7 @@ pub struct BigFloat<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
     type OwnHandle = M::BigFloatHandle;
 
-    fn from_handle(handle: M::BigFloatHandle) -> Self {
+    unsafe fn from_handle(handle: M::BigFloatHandle) -> Self {
         BigFloat { handle }
     }
 
@@ -88,7 +88,7 @@ macro_rules! big_float_conv_num {
                 let new_bf_handle: M::BigFloatHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 M::managed_type_impl().bf_set_i64(new_bf_handle.clone(), value as i64);
-                BigFloat::from_handle(new_bf_handle)
+                unsafe { BigFloat::from_handle(new_bf_handle) }
             }
         }
     };
@@ -105,28 +105,28 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_neg(new_bf_handle.clone(), self.handle.clone());
-        BigFloat::from_handle(new_bf_handle)
+        unsafe { BigFloat::from_handle(new_bf_handle) }
     }
 
     pub fn abs(&self) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_abs(new_bf_handle.clone(), self.handle.clone());
-        BigFloat::from_handle(new_bf_handle)
+        unsafe { BigFloat::from_handle(new_bf_handle) }
     }
 
     pub fn from_big_uint(big_uint: &BigUint<M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), big_uint.value.handle.clone());
-        BigFloat::from_handle(new_bf_handle)
+        unsafe { BigFloat::from_handle(new_bf_handle) }
     }
 
     pub fn from_big_int(big_int: &BigInt<M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), big_int.handle.clone());
-        BigFloat::from_handle(new_bf_handle)
+        unsafe { BigFloat::from_handle(new_bf_handle) }
     }
 
     #[inline]
@@ -138,42 +138,42 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         let api = M::managed_type_impl();
         let new_bf_handle =
             api.bf_from_parts(integral_part_value, fractional_part_value, exponent_value);
-        BigFloat::from_handle(new_bf_handle)
+        unsafe { BigFloat::from_handle(new_bf_handle) }
     }
 
     #[inline]
     pub fn from_frac(numerator_value: i64, denominator_value: i64) -> Self {
         let api = M::managed_type_impl();
         let new_bf_handle = api.bf_from_frac(numerator_value, denominator_value);
-        BigFloat::from_handle(new_bf_handle)
+        unsafe { BigFloat::from_handle(new_bf_handle) }
     }
 
     #[inline]
     pub fn from_sci(significand_value: i64, exponent_value: i32) -> Self {
         let api = M::managed_type_impl();
         let new_bf_handle = api.bf_from_sci(significand_value, exponent_value as i64);
-        BigFloat::from_handle(new_bf_handle)
+        unsafe { BigFloat::from_handle(new_bf_handle) }
     }
 
     pub fn trunc(&self) -> BigInt<M> {
         let result: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let api = M::managed_type_impl();
         api.bf_trunc(result.clone(), self.handle.clone());
-        BigInt::from_handle(result)
+        unsafe { BigInt::from_handle(result) }
     }
 
     pub fn floor(&self) -> BigInt<M> {
         let result: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let api = M::managed_type_impl();
         api.bf_floor(result.clone(), self.handle.clone());
-        BigInt::from_handle(result)
+        unsafe { BigInt::from_handle(result) }
     }
 
     pub fn ceil(&self) -> BigInt<M> {
         let result: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let api = M::managed_type_impl();
         api.bf_ceil(result.clone(), self.handle.clone());
-        BigInt::from_handle(result)
+        unsafe { BigInt::from_handle(result) }
     }
 
     pub fn to_fixed_point(&self, denominator: &BigFloat<M>) -> BigInt<M> {
@@ -254,7 +254,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
 
     #[inline]
     pub fn zero() -> Self {
-        BigFloat::from_handle(M::managed_type_impl().bf_new_zero())
+        unsafe { BigFloat::from_handle(M::managed_type_impl().bf_new_zero()) }
     }
 
     pub fn from_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
@@ -262,14 +262,14 @@ impl<M: ManagedTypeApi> BigFloat<M> {
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl()
             .mb_to_big_float(managed_buffer.handle.clone(), new_bf_handle.clone());
-        BigFloat::from_handle(new_bf_handle)
+        unsafe { BigFloat::from_handle(new_bf_handle) }
     }
 
     pub fn to_buffer(&self) -> ManagedBuffer<M> {
         let new_man_buf_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_from_big_float(self.handle.clone(), new_man_buf_handle.clone());
-        ManagedBuffer::from_handle(new_man_buf_handle)
+        unsafe { ManagedBuffer::from_handle(new_man_buf_handle) }
     }
 }
 
@@ -278,14 +278,14 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         let api = M::managed_type_impl();
         let new_handle: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bf_sqrt(new_handle.clone(), self.handle.clone());
-        BigFloat::from_handle(new_handle)
+        unsafe { BigFloat::from_handle(new_handle) }
     }
 
     pub fn pow(&self, exp: i32) -> Self {
         let api = M::managed_type_impl();
         let new_handle: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bf_pow(new_handle.clone(), self.handle.clone(), exp);
-        BigFloat::from_handle(new_handle)
+        unsafe { BigFloat::from_handle(new_handle) }
     }
 
     /// Returns the sign of the `BigFloat` as a `Sign`.
@@ -301,7 +301,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     pub fn magnitude(&self) -> BigFloat<M> {
         let result: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_abs(result.clone(), self.handle.clone());
-        BigFloat::from_handle(result)
+        unsafe { BigFloat::from_handle(result) }
     }
 
     /// Convert this `BigFloat` into its `Sign` and its magnitude,
@@ -343,7 +343,7 @@ impl<M: ManagedTypeApi> Clone for BigFloat<M> {
     fn clone(&self) -> Self {
         let new_handle: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_clone(new_handle.clone(), self.handle.clone());
-        BigFloat::from_handle(new_handle)
+        unsafe { BigFloat::from_handle(new_handle) }
     }
 }
 

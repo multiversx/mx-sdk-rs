@@ -7,12 +7,12 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
     type OwnHandle: HandleConstraints;
 
     #[doc(hidden)]
-    fn from_handle(handle: Self::OwnHandle) -> Self;
+    unsafe fn from_handle(handle: Self::OwnHandle) -> Self;
 
     fn get_handle(&self) -> Self::OwnHandle;
 
     #[doc(hidden)]
-    fn from_raw_handle(handle: RawHandle) -> Self {
+    unsafe fn from_raw_handle(handle: RawHandle) -> Self {
         Self::from_handle(Self::OwnHandle::new(handle))
     }
 

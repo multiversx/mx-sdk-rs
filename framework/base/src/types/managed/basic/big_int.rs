@@ -11,7 +11,9 @@ use crate::{
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
-    types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
+    types::{
+        heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedRef, ManagedType, Sign,
+    },
 };
 
 use super::cast_to_i64::cast_to_i64;
@@ -25,7 +27,7 @@ pub struct BigInt<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     type OwnHandle = M::BigIntHandle;
 
-    fn from_handle(handle: M::BigIntHandle) -> Self {
+    unsafe fn from_handle(handle: M::BigIntHandle) -> Self {
         BigInt {
             handle,
             _phantom: PhantomData,
@@ -43,7 +45,6 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
     fn transmute_from_handle_ref_mut(handle_ref: &mut M::BigIntHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
-    
 }
 
 impl<M: ManagedTypeApi> Default for BigInt<M> {
@@ -68,6 +69,16 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
+        let new_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
+        BigInt::from_handle(new_handle)
+    }
+
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
     where
         T: TryInto<i64>,
@@ -88,7 +99,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
 impl<M: ManagedTypeApi> From<BigUint<M>> for BigInt<M> {
     #[inline]
     fn from(item: BigUint<M>) -> Self {
-        BigInt::from_handle(item.get_handle())
+        item.into_big_int()
     }
 }
 
@@ -100,7 +111,7 @@ macro_rules! big_int_conv_num {
                 let handle: M::BigIntHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 Self::set_value(handle.clone(), value);
-                BigInt::from_handle(handle)
+                unsafe { BigInt::from_handle(handle) }
             }
         }
 
@@ -157,9 +168,8 @@ impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
     pub fn zero() -> Self {
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        // TODO: seting 0 will no longer be needed once we fix VM handle error
         M::managed_type_impl().bi_set_int64(handle.clone(), 0);
-        BigInt::from_handle(handle)
+        unsafe { BigInt::from_handle(handle) }
     }
 
     #[inline]
@@ -178,7 +188,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         M::managed_type_impl().mb_overwrite(mb_handle.clone(), bytes);
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_to_big_int_signed(mb_handle, handle.clone());
-        BigInt::from_handle(handle)
+        unsafe { BigInt::from_handle(handle) }
     }
 
     #[inline]
@@ -192,7 +202,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_to_big_int_signed(managed_buffer.handle.clone(), handle.clone());
-        BigInt::from_handle(handle)
+        unsafe { BigInt::from_handle(handle) }
     }
 
     #[inline]
@@ -200,7 +210,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         let mb_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_from_big_int_signed(self.handle.clone(), mb_handle.clone());
-        ManagedBuffer::from_handle(mb_handle)
+        unsafe { ManagedBuffer::from_handle(mb_handle) }
     }
 }
 
@@ -214,7 +224,7 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
             clone_handle.clone(),
             self.handle.clone(),
         );
-        BigInt::from_handle(clone_handle)
+        unsafe { BigInt::from_handle(clone_handle) }
     }
 }
 
@@ -224,7 +234,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         if sign.is_minus() {
             api.bi_neg(unsigned.value.handle.clone(), unsigned.value.handle.clone());
         }
-        BigInt::from_handle(unsigned.value.handle)
+        unsafe { BigInt::from_handle(unsigned.value.handle) }
     }
 
     /// Returns the sign of the `BigInt` as a `Sign`.
@@ -242,7 +252,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         let api = M::managed_type_impl();
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bi_abs(result_handle.clone(), self.handle.clone());
-        BigUint::from_handle(result_handle)
+        unsafe { BigUint::from_handle(result_handle) }
     }
 
     /// Convert this `BigInt` into its `Sign` and `BigUint` magnitude,
@@ -335,7 +345,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let exp_handle = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
         M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), exp_handle);
-        BigInt::from_handle(result_handle)
+        unsafe { BigInt::from_handle(result_handle) }
     }
 }
 
@@ -343,9 +353,9 @@ impl<M: ManagedTypeApi> SCDisplay for BigInt<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().bi_to_string(self.handle.clone(), str_handle.clone());
-        f.append_managed_buffer(&ManagedBuffer::from_handle(
-            str_handle.cast_or_signal_error::<M, _>(),
-        ));
+        let cast_handle = str_handle.cast_or_signal_error::<M, _>();
+        let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer(&wrap_cast);
     }
 }
 

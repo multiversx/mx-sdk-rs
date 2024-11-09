@@ -22,7 +22,7 @@ where
     type OwnHandle = A::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: A::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: A::ManagedBufferHandle) -> Self {
         StorageKey {
             buffer: ManagedBuffer::from_handle(handle),
         }

@@ -192,7 +192,7 @@ macro_rules! impl_managed_type {
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
                 let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
-                $ty::from_handle(handle)
+                unsafe { $ty::from_handle(handle) }
             }
 
             unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -226,7 +226,7 @@ where
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
-        Self::from_handle(handle)
+        unsafe { Self::from_handle(handle) }
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -255,7 +255,7 @@ where
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         let handle = M::ManagedBufferHandle::from_byte_reader(reader);
-        Self::from_handle(handle)
+        unsafe { Self::from_handle(handle) }
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(

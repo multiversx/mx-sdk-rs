@@ -34,7 +34,7 @@ where
 
     /// Will completely disregard lifetimes, use with care.
     #[doc(hidden)]
-    pub(crate) unsafe fn wrap_handle(handle: T::OwnHandle) -> Self {
+    pub unsafe fn wrap_handle(handle: T::OwnHandle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,

@@ -26,7 +26,7 @@ pub struct BigUint<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     type OwnHandle = M::BigIntHandle;
 
-    fn from_handle(handle: M::BigIntHandle) -> Self {
+    unsafe fn from_handle(handle: M::BigIntHandle) -> Self {
         BigUint {
             value: BigInt::from_handle(handle),
         }
@@ -66,6 +66,17 @@ impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
+        BigUint {
+            value: BigInt::new_uninit(),
+        }
+    }
+
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
     where
         T: TryInto<i64> + num_traits::Unsigned,
@@ -77,9 +88,11 @@ impl<M: ManagedTypeApi> BigUint<M> {
     where
         T: TryInto<i64> + num_traits::Unsigned,
     {
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        Self::set_value(handle.clone(), value);
-        BigUint::from_handle(handle)
+        unsafe {
+            let result = Self::new_uninit();
+            Self::set_value(result.get_handle(), value);
+            result
+        }
     }
 
     pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle
@@ -173,9 +186,11 @@ impl<M: ManagedTypeApi> Default for BigUint<M> {
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn zero() -> Self {
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().bi_set_int64(handle.clone(), 0);
-        BigUint::from_handle(handle)
+        unsafe {
+            let result = Self::new_uninit();
+            M::managed_type_impl().bi_set_int64(result.get_handle(), 0);
+            result
+        }
     }
 
     pub fn zero_ref() -> ManagedRef<'static, M, BigUint<M>> {
@@ -199,9 +214,11 @@ impl<M: ManagedTypeApi> BigUint<M> {
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
         let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().mb_overwrite(mb_handle.clone(), bytes);
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_to_big_int_unsigned(mb_handle, handle.clone());
-        BigUint::from_handle(handle)
+        unsafe {
+            let result = Self::new_uninit();
+            M::managed_type_impl().mb_to_big_int_unsigned(mb_handle, result.get_handle());
+            result
+        }
     }
 
     #[inline]
@@ -217,7 +234,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl()
             .mb_to_big_int_unsigned(managed_buffer.handle.clone(), handle.clone());
-        BigUint::from_handle(handle)
+        unsafe { BigUint::from_handle(handle) }
     }
 
     #[inline]
@@ -226,7 +243,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl()
             .mb_from_big_int_unsigned(self.value.handle.clone(), mb_handle.clone());
-        ManagedBuffer::from_handle(mb_handle)
+        unsafe { ManagedBuffer::from_handle(mb_handle) }
     }
 }
 
@@ -237,7 +254,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         let api = M::managed_type_impl();
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bi_sqrt(result_handle.clone(), self.value.handle.clone());
-        BigUint::from_handle(result_handle)
+        unsafe { BigUint::from_handle(result_handle) }
     }
 
     #[must_use]
@@ -249,7 +266,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
             self.value.handle.clone(),
             big_int_temp_1,
         );
-        BigUint::from_handle(result_handle)
+        unsafe { BigUint::from_handle(result_handle) }
     }
 
     /// The whole part of the base-2 logarithm.
@@ -310,7 +327,7 @@ impl<M: ManagedTypeApi> Clone for BigUint<M> {
             clone_handle.clone(),
             self.value.handle.clone(),
         );
-        BigUint::from_handle(clone_handle)
+        unsafe { BigUint::from_handle(clone_handle) }
     }
 }
 
@@ -376,9 +393,9 @@ impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().bi_to_string(self.value.handle.clone(), str_handle.clone());
-        f.append_managed_buffer(&ManagedBuffer::from_handle(
-            str_handle.cast_or_signal_error::<M, _>(),
-        ));
+        let cast_handle = str_handle.cast_or_signal_error::<M, _>();
+        let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer(&wrap_cast);
     }
 }
 

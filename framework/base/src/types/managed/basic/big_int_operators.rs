@@ -19,7 +19,7 @@ macro_rules! binary_operator {
                     self.handle.clone(),
                     other.handle.clone(),
                 );
-                BigInt::from_handle(self.handle.clone())
+                self
             }
         }
 
@@ -44,14 +44,15 @@ macro_rules! binary_operator {
 
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {
                 let api = M::managed_type_impl();
-                let result_handle: M::BigIntHandle =
-                    use_raw_handle(M::static_var_api_impl().next_handle());
-                api.$api_func(
-                    result_handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
-                );
-                BigInt::from_handle(result_handle)
+                unsafe {
+                    let result = BigInt::new_uninit();
+                    api.$api_func(
+                        result.get_handle(),
+                        self.handle.clone(),
+                        other.handle.clone(),
+                    );
+                    result
+                }
             }
         }
 
@@ -59,7 +60,7 @@ macro_rules! binary_operator {
             type Output = BigInt<M>;
 
             fn $method(self, other: &BigUint<M>) -> BigInt<M> {
-                self.$method(&BigInt::from_handle(other.get_handle()))
+                self.$method(other.as_big_int())
             }
         }
 
@@ -67,7 +68,7 @@ macro_rules! binary_operator {
             type Output = BigInt<M>;
 
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {
-                (&BigInt::from_handle(self.get_handle())).$method(other)
+                self.as_big_int().$method(other)
             }
         }
     };
@@ -120,6 +121,6 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
         let api = M::managed_type_impl();
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bi_neg(result_handle.clone(), self.handle);
-        BigInt::from_handle(result_handle)
+        unsafe { BigInt::from_handle(result_handle) }
     }
 }

@@ -16,7 +16,7 @@ macro_rules! binary_operator {
                     self.handle.clone(),
                     other.handle.clone(),
                 );
-                BigFloat::from_handle(self.handle.clone())
+                unsafe { BigFloat::from_handle(self.handle.clone()) }
             }
         }
 
@@ -31,7 +31,7 @@ macro_rules! binary_operator {
                     self.handle.clone(),
                     other.handle.clone(),
                 );
-                BigFloat::from_handle(result_handle)
+                unsafe { BigFloat::from_handle(result_handle) }
             }
         }
     };
@@ -82,6 +82,6 @@ impl<M: ManagedTypeApi> Neg for BigFloat<M> {
         let result_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_neg(result_handle.clone(), self.handle);
-        BigFloat::from_handle(result_handle)
+        unsafe { BigFloat::from_handle(result_handle) }
     }
 }
