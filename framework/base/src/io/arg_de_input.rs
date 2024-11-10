@@ -64,10 +64,6 @@ where
                 .load_argument_big_int_unsigned(self.arg_index, result.get_handle());
             result
         }
-
-        // let bi_handle: AA::BigIntHandle = use_raw_handle(AA::static_var_api_impl().next_handle());
-        // AA::argument_api_impl().load_argument_big_int_unsigned(self.arg_index, bi_handle.clone());
-        // BigUint::from_handle(bi_handle)
     }
 }
 
