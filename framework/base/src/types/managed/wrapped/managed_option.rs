@@ -143,7 +143,7 @@ where
         F: FnOnce(Context, &T) -> R,
     {
         if self.is_some() {
-            f(context, &T::from_handle(self.handle.clone()))
+            f(context, unsafe { &T::from_handle(self.handle.clone()) })
         } else {
             default(context)
         }
@@ -158,7 +158,7 @@ where
     #[allow(clippy::redundant_clone)] // the clone is not redundant
     fn clone(&self) -> Self {
         if self.is_some() {
-            Self::some(T::from_handle(self.handle.clone()).clone())
+            Self::some(unsafe { T::from_handle(self.handle.clone()) }.clone())
         } else {
             Self::none()
         }
@@ -177,7 +177,10 @@ where
             return true;
         }
         if self.is_some() && other.is_some() {
-            return T::from_handle(self.handle.clone()) == T::from_handle(other.handle.clone());
+            unsafe {
+                return ManagedRef::<'_, _, T>::wrap_handle(self.handle.clone())
+                    == ManagedRef::<'_, _, T>::wrap_handle(other.handle.clone());
+            }
         }
         false
     }
@@ -327,7 +330,7 @@ where
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         if self.is_some() {
             f.debug_tuple("ManagedOption::Some")
-                .field(&T::from_handle(self.handle.clone()))
+                .field(unsafe { &T::from_handle(self.handle.clone()) })
                 .finish()
         } else {
             f.write_str("ManagedOption::None")

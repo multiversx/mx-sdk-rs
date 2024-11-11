@@ -1,10 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{
-        use_raw_handle, CryptoApi, CryptoApiImpl, StaticVarApiImpl, KECCAK256_RESULT_LEN,
-        SHA256_RESULT_LEN,
-    },
+    api::{CryptoApi, CryptoApiImpl, KECCAK256_RESULT_LEN, SHA256_RESULT_LEN},
     types::{ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec, MessageHashType},
 };
 
@@ -30,30 +27,33 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
-        let new_handle: A::ManagedBufferHandle =
-            use_raw_handle(A::static_var_api_impl().next_handle());
-        A::crypto_api_impl().sha256_managed(new_handle.clone(), data.borrow().get_handle());
-        ManagedByteArray::from_handle(new_handle)
+        unsafe {
+            let result = ManagedByteArray::new_uninit();
+            A::crypto_api_impl().sha256_managed(result.get_handle(), data.borrow().get_handle());
+            result
+        }
     }
 
     pub fn keccak256<B: core::borrow::Borrow<ManagedBuffer<A>>>(
         &self,
         data: B,
     ) -> ManagedByteArray<A, KECCAK256_RESULT_LEN> {
-        let new_handle: A::ManagedBufferHandle =
-            use_raw_handle(A::static_var_api_impl().next_handle());
-        A::crypto_api_impl().keccak256_managed(new_handle.clone(), data.borrow().get_handle());
-        ManagedByteArray::from_handle(new_handle)
+        unsafe {
+            let result = ManagedByteArray::new_uninit();
+            A::crypto_api_impl().keccak256_managed(result.get_handle(), data.borrow().get_handle());
+            result
+        }
     }
 
     pub fn ripemd160<B: core::borrow::Borrow<ManagedBuffer<A>>>(
         &self,
         data: B,
     ) -> ManagedByteArray<A, { crate::api::RIPEMD_RESULT_LEN }> {
-        let new_handle: A::ManagedBufferHandle =
-            use_raw_handle(A::static_var_api_impl().next_handle());
-        A::crypto_api_impl().ripemd160_managed(new_handle.clone(), data.borrow().get_handle());
-        ManagedByteArray::from_handle(new_handle)
+        unsafe {
+            let result = ManagedByteArray::new_uninit();
+            A::crypto_api_impl().ripemd160_managed(result.get_handle(), data.borrow().get_handle());
+            result
+        }
     }
 
     pub fn verify_bls(
@@ -122,14 +122,15 @@ where
         r: &ManagedBuffer<A>,
         s: &ManagedBuffer<A>,
     ) -> ManagedBuffer<A> {
-        let new_handle: A::ManagedBufferHandle =
-            use_raw_handle(A::static_var_api_impl().next_handle());
-        A::crypto_api_impl().encode_secp256k1_der_signature_managed(
-            r.get_handle(),
-            s.get_handle(),
-            new_handle.clone(),
-        );
-        ManagedBuffer::from_handle(new_handle)
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            A::crypto_api_impl().encode_secp256k1_der_signature_managed(
+                r.get_handle(),
+                s.get_handle(),
+                result.get_handle(),
+            );
+            result
+        }
     }
 
     /// Calls the Vm to verify secp256r1 signature.
