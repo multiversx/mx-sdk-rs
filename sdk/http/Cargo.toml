@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk-http"
-version = "0.6.1"
+version = "0.7.0"
 edition = "2021"
 
 authors = [
@@ -16,16 +16,19 @@ categories = ["cryptography::cryptocurrencies", "api-bindings"]
 keywords = ["multiversx", "blockchain", "sdk", "api"]
 
 [features]
+default = ["default-tls"]
+default-tls = ["reqwest/default-tls"]
+static-tls = ["reqwest/rustls-tls"]
 chain_simulator = []
 
 [dependencies]
 tokio = { version = "1.24", features = ["full"] }
-reqwest = { version = "0.12", features = ["blocking", "json"] }
+reqwest = { version = "0.12", features = ["blocking", "json"], default-features = false }
 anyhow = "1.0.44"
 hex = "0.4.3"
 itertools = "0.13.0"
 log = "0.4.17"
 
 [dependencies.multiversx-sdk]
-version = "=0.6.1"
+version = "=0.7.0"
 path = "../core"

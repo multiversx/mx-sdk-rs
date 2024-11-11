@@ -14,6 +14,7 @@ mod managed_byte_array;
 mod managed_decimal;
 mod managed_option;
 mod managed_ref;
+mod managed_ref_mut;
 mod managed_vec;
 mod managed_vec_item;
 mod managed_vec_item_nested_tuple;
@@ -43,6 +44,7 @@ pub use managed_decimal::{
 };
 pub use managed_option::ManagedOption;
 pub use managed_ref::ManagedRef;
+pub use managed_ref_mut::ManagedRefMut;
 pub use managed_vec::ManagedVec;
 pub use managed_vec_item::ManagedVecItem;
 pub use managed_vec_item_nested_tuple::ManagedVecItemNestedTuple;

@@ -121,6 +121,7 @@ impl PingPongEgldInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
+        interactor.set_current_dir_from_workspace("contracts/examples/ping-pong-egld/interactor");
         let ping_pong_owner_address = interactor.register_wallet(test_wallets::eve()).await;
         let wallet_address = interactor.register_wallet(test_wallets::mallory()).await;
 

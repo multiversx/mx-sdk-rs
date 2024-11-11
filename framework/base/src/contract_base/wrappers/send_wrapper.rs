@@ -2,6 +2,7 @@ use core::marker::PhantomData;
 
 use crate::codec::Empty;
 
+use crate::types::ManagedRef;
 use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
@@ -589,7 +590,9 @@ where
     ) -> u64 {
         let big_zero = BigUint::zero();
         let empty_buffer = ManagedBuffer::new();
-        let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
+
+        // sneakily reuses the same handle
+        let empty_vec = unsafe { ManagedRef::wrap_handle(empty_buffer.get_handle()) };
 
         self.esdt_nft_create(
             token,

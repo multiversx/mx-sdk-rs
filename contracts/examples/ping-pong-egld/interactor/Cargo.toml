@@ -1,7 +1,7 @@
 [package]
 name = "ping-pong-egld-interact"
 version = "0.0.0"
-authors = ["Ovidiu Stinga <ovidiu.stinga@multiversx.com>"]
+authors = ["MultiversX <contact@multiversx.com>"]
 edition = "2021"
 publish = false
 
@@ -22,7 +22,7 @@ tokio = { version = "1.24" }
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.53.2"
+version = "0.54.0"
 path = "../../../../framework/snippets"
 
 [features]

@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.53.2"
+version = "0.54.0"
 edition = "2021"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -13,8 +13,14 @@ description = "MultiversX framework for building smart contract interaction snip
 keywords = ["multiversx", "blockchain", "contract", "snippets"]
 categories = ["cryptography::cryptocurrencies"]
 
+[features]
+default = ["http", "default-tls"]
+http = ["multiversx-sdk-http", "tokio"]
+dapp = ["multiversx-sdk-dapp"]
+default-tls = ["multiversx-sdk-http/default-tls"]
+static-tls = ["multiversx-sdk-http/static-tls"]
+
 [dependencies]
-tokio = { version = "1.24", features = ["full"] }
 hex = "0.4"
 base64 = "0.22"
 log = "0.4.17"
@@ -22,25 +28,30 @@ env_logger = "0.11"
 futures = "0.3"
 anyhow = "1.0.44"
 
+tokio = { version = "1.24", features = ["full"], optional = true}
+
 [dependencies.multiversx-sc-scenario]
-version = "=0.53.2"
+version = "=0.54.0"
 path = "../scenario"
 
 [dependencies.multiversx-chain-scenario-format]
 version = "0.23.0"
 path = "../../sdk/scenario-format"
 
-[dependencies.multiversx-sc-snippets-base]
-version = "=0.53.2"
-path = "../snippets-base"
-
 [dependencies.multiversx-sdk]
-version = "=0.6.1"
+version = "=0.7.0"
 path = "../../sdk/core"
 
 [dependencies.multiversx-sdk-http]
-version = "=0.6.1"
+version = "=0.7.0"
 path = "../../sdk/http"
+optional = true
+default-features = false
+
+[dependencies.multiversx-sdk-dapp]
+version = "=0.7.0"
+path = "../../sdk/dapp"
+optional = true
 
 [dev-dependencies]
 serde_json = "1.0"

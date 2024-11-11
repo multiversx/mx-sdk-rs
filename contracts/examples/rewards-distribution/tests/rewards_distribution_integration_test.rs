@@ -21,6 +21,7 @@ const NFT_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("NFT-123456")
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/rewards-distribution");
     blockchain.register_contract(
         REWARDS_DISTRIBUTION_PATH,
         rewards_distribution::ContractBuilder,

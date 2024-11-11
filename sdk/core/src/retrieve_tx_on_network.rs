@@ -48,7 +48,8 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                             create_tx_failed(&error_message);
 
                         info!(
-                            "Transaction failed with status {status} and message {error_message}",
+                            "Transaction failed with error code: {} and message: {error_message}",
+                            error_code.as_u64()
                         );
                         return (failed_transaction_info, error_code);
                     },

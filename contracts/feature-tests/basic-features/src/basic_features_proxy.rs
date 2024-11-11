@@ -62,6 +62,63 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    pub fn verify_secp256r1_signature<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        key: Arg0,
+        message: Arg1,
+        signature: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("verify_secp256r1_signature")
+            .argument(&key)
+            .argument(&message)
+            .argument(&signature)
+            .original_result()
+    }
+
+    pub fn verify_bls_signature_share<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        key: Arg0,
+        message: Arg1,
+        signature: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("verify_bls_signature_share")
+            .argument(&key)
+            .argument(&message)
+            .argument(&signature)
+            .original_result()
+    }
+
+    pub fn verify_bls_aggregated_signature<
+        Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        key: Arg0,
+        message: Arg1,
+        signature: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("verify_bls_aggregated_signature")
+            .argument(&key)
+            .argument(&message)
+            .argument(&signature)
+            .original_result()
+    }
+
     /// This tests how is generated type name in proxy 
     pub fn echo_managed_option<
         Arg0: ProxyArg<ManagedOption<Env::Api, BigUint<Env::Api>>>,

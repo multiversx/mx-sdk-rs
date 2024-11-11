@@ -8,6 +8,8 @@ use crate::version_history;
 
 static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
 static SC_CONFIG_PATH: &str = "../sc-config.toml";
+static CONFIG_TOML_PATH: &str = "config.toml";
+static CONFIG_SOURCE_FILE_NAME: &str = "config.rs";
 static FULL_PROXY_ENTRY: &str = r#"[[proxy]]
 path = "interactor/src/proxy.rs"
  "#;
@@ -89,7 +91,9 @@ clap = {{ version = "4.4.7", features = ["derive"] }}
 serde = {{ version = "1.0", features = ["derive"] }}
 toml = "0.8.6"
 
-# [workspace]
+# uncomment when using chain simulator
+# [features]
+# chain-simulator-tests = []
 "#
     )
     .unwrap();
@@ -142,6 +146,30 @@ pub(crate) fn create_sc_config_file(overwrite: bool) {
 
     // write full proxy toml entry to the file
     writeln!(&mut file, "\n{FULL_PROXY_ENTRY}").unwrap();
+}
+
+pub(crate) fn create_config_toml_file(snippets_folder_path: &str) {
+    let config_path = format!("{snippets_folder_path}/src/{CONFIG_TOML_PATH}");
+
+    let mut file = File::create(config_path).unwrap();
+
+    writeln!(
+        &mut file,
+        r#"
+# chain_type = 'simulator'
+# gateway_uri = 'http://localhost:8085'
+
+chain_type = 'real'
+gateway_uri = 'https://devnet-gateway.multiversx.com'
+"#
+    )
+    .unwrap();
+}
+
+pub(crate) fn create_config_rust_file(snippets_folder_path: &str) -> File {
+    let lib_path = format!("{snippets_folder_path}/src/{CONFIG_SOURCE_FILE_NAME}");
+
+    File::create(lib_path).unwrap()
 }
 
 fn file_exists(path: &str) -> bool {
