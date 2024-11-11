@@ -85,10 +85,11 @@ macro_rules! big_float_conv_num {
         impl<M: ManagedTypeApi> From<$num_ty> for BigFloat<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
-                let new_bf_handle: M::BigFloatHandle =
-                    use_raw_handle(M::static_var_api_impl().next_handle());
-                M::managed_type_impl().bf_set_i64(new_bf_handle.clone(), value as i64);
-                unsafe { BigFloat::from_handle(new_bf_handle) }
+                unsafe {
+                    let result = BigFloat::new_uninit();
+                    M::managed_type_impl().bf_set_i64(result.get_handle(), value as i64);
+                    result
+                }
             }
         }
     };

@@ -108,10 +108,11 @@ macro_rules! big_int_conv_num {
         impl<M: ManagedTypeApi> From<$num_ty> for BigInt<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
-                let handle: M::BigIntHandle =
-                    use_raw_handle(M::static_var_api_impl().next_handle());
-                Self::set_value(handle.clone(), value);
-                unsafe { BigInt::from_handle(handle) }
+                unsafe {
+                    let result = BigInt::new_uninit();
+                    Self::set_value(result.get_handle(), value);
+                    result
+                }
             }
         }
 
@@ -167,9 +168,11 @@ impl<M: ManagedTypeApi> From<crate::codec::num_bigint::BigInt> for BigInt<M> {
 impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
     pub fn zero() -> Self {
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().bi_set_int64(handle.clone(), 0);
-        unsafe { BigInt::from_handle(handle) }
+        unsafe {
+            let result = BigInt::new_uninit();
+            M::managed_type_impl().bi_set_int64(result.get_handle(), 0);
+            result
+        }
     }
 
     #[inline]
@@ -186,9 +189,11 @@ impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_signed_bytes_be(bytes: &[u8]) -> Self {
         let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().mb_overwrite(mb_handle.clone(), bytes);
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_to_big_int_signed(mb_handle, handle.clone());
-        unsafe { BigInt::from_handle(handle) }
+        unsafe {
+            let result = BigInt::new_uninit();
+            M::managed_type_impl().mb_to_big_int_signed(mb_handle, result.get_handle());
+            result
+        }
     }
 
     #[inline]
@@ -200,41 +205,47 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     #[inline]
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_to_big_int_signed(managed_buffer.handle.clone(), handle.clone());
-        unsafe { BigInt::from_handle(handle) }
+        unsafe {
+            let result = BigInt::new_uninit();
+            M::managed_type_impl()
+                .mb_to_big_int_signed(managed_buffer.handle.clone(), result.get_handle());
+            result
+        }
     }
 
     #[inline]
     pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        let mb_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_from_big_int_signed(self.handle.clone(), mb_handle.clone());
-        unsafe { ManagedBuffer::from_handle(mb_handle) }
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            M::managed_type_impl().mb_from_big_int_signed(self.handle.clone(), result.get_handle());
+            result
+        }
     }
 }
 
 impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
-        let clone_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        api.bi_set_int64(clone_handle.clone(), 0);
-        api.bi_add(
-            clone_handle.clone(),
-            clone_handle.clone(),
-            self.handle.clone(),
-        );
-        unsafe { BigInt::from_handle(clone_handle) }
+        unsafe {
+            let result = BigInt::new_uninit();
+            api.bi_set_int64(result.get_handle(), 0);
+            api.bi_add(
+                result.get_handle(),
+                result.get_handle(),
+                self.handle.clone(),
+            );
+            result
+        }
     }
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_biguint(sign: Sign, unsigned: BigUint<M>) -> Self {
-        let api = M::managed_type_impl();
+        let result = unsigned.into_big_int();
         if sign.is_minus() {
-            api.bi_neg(unsigned.value.handle.clone(), unsigned.value.handle.clone());
+            M::managed_type_impl().bi_neg(result.handle.clone(), result.handle.clone());
         }
-        unsafe { BigInt::from_handle(unsigned.value.handle) }
+        result
     }
 
     /// Returns the sign of the `BigInt` as a `Sign`.
@@ -249,10 +260,11 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     /// Returns the magnitude of the `BigInt` as a `BigUint`.
     pub fn magnitude(&self) -> BigUint<M> {
-        let api = M::managed_type_impl();
-        let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        api.bi_abs(result_handle.clone(), self.handle.clone());
-        unsafe { BigUint::from_handle(result_handle) }
+        unsafe {
+            let result = BigUint::new_uninit();
+            M::managed_type_impl().bi_abs(result.get_handle(), self.get_handle());
+            result
+        }
     }
 
     /// Convert this `BigInt` into its `Sign` and `BigUint` magnitude,
@@ -267,7 +279,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     ///
     /// If the number is negative, undefined behavior might occur further down the execution.
     pub unsafe fn into_big_uint_unchecked(self) -> BigUint<M> {
-        BigUint::from_handle(self.handle)
+        BigUint { value: self }
     }
 
     /// Converts this `BigInt` into a `BigUint`, if it's not negative.
@@ -342,10 +354,12 @@ impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
 impl<M: ManagedTypeApi> BigInt<M> {
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
-        let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let exp_handle = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
-        M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), exp_handle);
-        unsafe { BigInt::from_handle(result_handle) }
+        unsafe {
+            let result = BigInt::new_uninit();
+            M::managed_type_impl().bi_pow(result.get_handle(), self.get_handle(), exp_handle);
+            result
+        }
     }
 }
 

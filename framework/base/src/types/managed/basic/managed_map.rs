@@ -1,5 +1,5 @@
 use crate::{
-    api::{use_raw_handle, ManagedMapApiImpl, ManagedTypeApi, StaticVarApiImpl},
+    api::{ManagedMapApiImpl, ManagedTypeApi},
     types::ManagedType,
 };
 
@@ -68,14 +68,15 @@ impl<M: ManagedTypeApi> ManagedMap<M> {
     }
 
     pub fn remove(&mut self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
-        let new_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mm_remove(
-            self.handle.clone(),
-            key.handle.clone(),
-            new_handle.clone(),
-        );
-        unsafe { ManagedBuffer::from_handle(new_handle) }
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            M::managed_type_impl().mm_remove(
+                self.handle.clone(),
+                key.handle.clone(),
+                result.get_handle(),
+            );
+            result
+        }
     }
 
     pub fn contains(&self, key: &ManagedBuffer<M>) -> bool {

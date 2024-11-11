@@ -3,7 +3,7 @@ use core::ops::{
 };
 
 use crate::{
-    api::{use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
+    api::{BigIntApiImpl, ManagedTypeApi},
     types::{BigInt, BigUint, ManagedType, Sign},
 };
 
@@ -118,9 +118,10 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
     type Output = BigInt<M>;
 
     fn neg(self) -> Self::Output {
-        let api = M::managed_type_impl();
-        let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        api.bi_neg(result_handle.clone(), self.handle);
-        unsafe { BigInt::from_handle(result_handle) }
+        unsafe {
+            let result = BigInt::new_uninit();
+            M::managed_type_impl().bi_neg(result.get_handle(), self.handle);
+            result
+        }
     }
 }
