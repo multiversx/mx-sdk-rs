@@ -783,6 +783,7 @@ fn contract_without_macros_basic() {
 
 fn world() -> multiversx_sc_scenario::ScenarioWorld {
     let mut blockchain = multiversx_sc_scenario::ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("framework/scenario");
     blockchain.register_contract(
         "mxsc:../../contracts/examples/adder/output/adder.mxsc.json",
         sample_adder::ContractBuilder,

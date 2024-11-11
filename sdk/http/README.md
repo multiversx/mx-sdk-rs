@@ -19,7 +19,3 @@ async fn get_network_config() {
 ```
 
 More examples in `./examples`.
-
-## Acknowledgements
-
-Project originally started by [Bicarus labs](https://github.com/bicarus-labs/elrond-sdk-erdrs), later integrated into the MultiversX official codebase.

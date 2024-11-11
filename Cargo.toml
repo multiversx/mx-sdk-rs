@@ -11,9 +11,10 @@ members = [
   "framework/meta-lib",
   "framework/scenario",
   "framework/snippets",
-  "framework/snippets-base",
-  "framework/snippets-dapp",
   "framework/wasm-adapter",
+
+  "chain/core",
+  "chain/vm",
 
   "sdk/core",
   "sdk/dapp",
@@ -24,9 +25,6 @@ members = [
   "tools/payload-macro-generator",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
-
-  "vm-core",
-  "vm",
 
   "contracts/modules",
 

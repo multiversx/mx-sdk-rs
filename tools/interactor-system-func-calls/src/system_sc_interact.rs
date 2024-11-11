@@ -232,6 +232,7 @@ impl SysFuncCallsInteract {
         let mut interactor =
             Interactor::new(config.gateway_uri(), config.use_chain_simulator()).await;
 
+        interactor.set_current_dir_from_workspace("tools/interactor-system-func-calls");
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled

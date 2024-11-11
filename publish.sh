@@ -68,15 +68,23 @@ cd data/codec
 cargo publish || return 1
 cd ../..
 
-cd vm-core
+cd chain/core
 cargo publish || return 1
-cd ..
+cd ../..
 
-cd vm
+cd chain/vm
 cargo publish || return 1
-cd ..
+cd ../..
 
 cd sdk/core
+cargo publish || return 1
+cd ../..
+
+cd sdk/http
+cargo publish || return 1
+cd ../..
+
+cd sdk/dapp
 cargo publish || return 1
 cd ../..
 

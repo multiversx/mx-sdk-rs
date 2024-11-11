@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::ReturnCode;
-use multiversx_sc_snippets_base::network_response;
-use multiversx_sc_snippets_base::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::network_response;
+use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
 #[test]
 fn test_with_multi_contract_same_shard_tx_that_has_no_sc_result() {

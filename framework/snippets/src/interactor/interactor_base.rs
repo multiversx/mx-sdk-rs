@@ -2,6 +2,7 @@ use crate::sdk::{data::network_config::NetworkConfig, wallet::Wallet};
 use multiversx_sc_scenario::{
     imports::{Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
+    meta::tools::find_current_workspace,
     multiversx_sc::types::Address,
 };
 use multiversx_sdk::gateway::{GatewayAsyncService, NetworkConfigRequest};
@@ -82,5 +83,14 @@ where
         let set_state = retrieve_account_as_scenario_set_state(&self.proxy, wallet_address).await;
         self.pre_runners.run_set_state_step(&set_state);
         self.post_runners.run_set_state_step(&set_state);
+    }
+
+    /// Tells the interactor where the crate lies relative to the workspace.
+    /// This ensures that the paths are set correctly, including in debug mode.
+    pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
+        let mut path = find_current_workspace().unwrap();
+        path.push(relative_path);
+        self.current_dir = path;
+        self
     }
 }

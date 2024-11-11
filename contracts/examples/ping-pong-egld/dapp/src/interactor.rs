@@ -1,7 +1,7 @@
-use multiversx_sc_snippets_dapp::imports::*;
+use multiversx_sc_snippets::imports::*;
 use serde::{Deserialize, Serialize};
 
-const GATEWAY: &str = multiversx_sc_snippets_dapp::sdk::core::gateway::DEVNET_GATEWAY;
+const GATEWAY: &str = multiversx_sc_snippets::sdk::gateway::DEVNET_GATEWAY;
 const CONTRACT_ADDRESS: &str = "erd1qqqqqqqqqqqqqpgq6tqvj5f59xrgxwrtwy30elgpu7l4zrv6d8ssnjdwxq";
 const PING_PONG_CODE: &[u8] = include_bytes!("../ping-pong-egld.wasm");
 
@@ -43,6 +43,7 @@ impl ContractInteract {
     pub async fn new() -> Self {
         let config = Config::new();
         let mut interactor = DappInteractor::new(&config.gateway, false).await;
+        interactor.set_current_dir_from_workspace("contracts/examples/ping-pong-egld/dapp");
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
 
         let contract_code = BytesValue::from(PING_PONG_CODE);

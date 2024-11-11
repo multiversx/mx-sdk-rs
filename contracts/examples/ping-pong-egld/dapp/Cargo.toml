@@ -13,5 +13,7 @@ yew = { version = "0.20.0", features = ["csr"] }
 yew_icons = { version = "0.7.3", features = ["BootstrapHeartFill"] }
 yew-router = { version = "0.17.0" }
 
-[dependencies.multiversx-sc-snippets-dapp]
-path = "../../../../framework/snippets-dapp"
+[dependencies.multiversx-sc-snippets]
+path = "../../../../framework/snippets"
+default-features = false
+features = ["dapp"]

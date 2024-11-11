@@ -1,5 +1,5 @@
 use crate::interactor::ContractInteract;
-use multiversx_sc_snippets_dapp::imports::*;
+use multiversx_sc_snippets::imports::*;
 
 use super::proxy;
 

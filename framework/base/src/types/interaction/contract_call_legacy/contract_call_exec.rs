@@ -36,10 +36,12 @@ where
             call_value_handle.get_raw_handle(),
         );
 
-        (
-            BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
-            ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
-        )
+        unsafe {
+            (
+                BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+                ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+            )
+        }
     }
 
     pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {

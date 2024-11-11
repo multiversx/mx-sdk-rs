@@ -8,6 +8,7 @@ const SCENARIO_TESTER: TestSCAddress = TestSCAddress::new("scenario-tester");
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests");
     blockchain.register_contract(
         "mxsc:output/scenario-tester.mxsc.json",
         scenario_tester::ContractBuilder,
