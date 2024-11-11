@@ -6,6 +6,7 @@ use num_bigint::BigUint;
 use scenario_tester::*;
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
+const ADDER: TestSCAddress = TestSCAddress::new("adder");
 
 const OWNER: TestAddress = TestAddress::new("owner");
 const CODE_EXPR: MxscPath = MxscPath::new("output/adder.mxsc.json");
@@ -21,16 +22,12 @@ fn world() -> ScenarioWorld {
 #[test]
 fn st_blackbox_legacy_proxy() {
     let mut world = world();
-    let owner_address = "address:owner";
     let mut st_contract = ContractInfo::<scenario_tester::Proxy<StaticApi>>::new("sc:adder");
 
     world.start_trace();
 
-    world.set_state_step(
-        SetStateStep::new()
-            .put_account(owner_address, Account::new().nonce(1))
-            .new_address(owner_address, 1, "sc:adder"),
-    );
+    world.account(OWNER).nonce(1);
+    world.new_address(OWNER, 1, ADDER);
 
     world
         .tx()
@@ -68,7 +65,7 @@ fn st_blackbox_legacy_proxy() {
 
     world.check_state_step(
         CheckStateStep::new()
-            .put_account(owner_address, CheckAccount::new())
+            .put_account(OWNER, CheckAccount::new())
             .put_account(
                 &st_contract,
                 CheckAccount::new().check_storage("str:sum", "8"),
