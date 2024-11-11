@@ -119,7 +119,6 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
         }
 
         let bu = unsafe { ManagedRef::wrap_handle(self.data.handle.clone()) };
-        // let bu = BigUint::from_handle(self.data.handle.clone());
         compute_log2(&bu, self.decimals.num_decimals())
     }
 }

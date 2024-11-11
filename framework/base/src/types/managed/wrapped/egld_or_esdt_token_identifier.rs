@@ -243,9 +243,6 @@ impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
             let cast_handle = token_identifier.get_handle().cast_or_signal_error::<M, _>();
             let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
             f.append_managed_buffer(&wrap_cast);
-            // f.append_managed_buffer(&ManagedBuffer::from_handle(
-            //     token_identifier.get_handle().cast_or_signal_error::<M, _>(),
-            // ));
         } else {
             f.append_bytes(Self::EGLD_REPRESENTATION);
         }
@@ -260,9 +257,6 @@ impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
             let cast_handle = token_identifier.get_handle().cast_or_signal_error::<M, _>();
             let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
             f.append_managed_buffer_lower_hex(&wrap_cast);
-            // f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
-            //     token_identifier.get_handle().cast_or_signal_error::<M, _>(),
-            // ));
         } else {
             f.append_bytes(EGLD_REPRESENTATION_HEX);
         }
