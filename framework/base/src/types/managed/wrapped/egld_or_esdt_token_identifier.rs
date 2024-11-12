@@ -57,13 +57,6 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         }
     }
 
-    // pub fn from_opt_raw_handle(opt_handle: Option<M::ManagedBufferHandle>) -> Self {
-    //     match opt_handle {
-    //         Some(handle) => Self::esdt(unsafe { TokenIdentifier::from_handle(handle) }),
-    //         None => Self::egld(),
-    //     }
-    // }
-
     pub fn parse(data: ManagedBuffer<M>) -> Self {
         if data == Self::EGLD_REPRESENTATION {
             Self::egld()
