@@ -25,7 +25,8 @@ use crate as multiversx_sc; // required by the ManagedVecItem derive
 ///
 /// It is, however more optimized than that. Its implementation is based on `ManagedOption`.
 ///
-/// EGLD a special, invalid token identifier handle. This way we can fit it inside a single i32 in memory.
+/// EGLD is indicated by a special, invalid token identifier handle.
+/// This way we can fit it inside a single i32 in memory.
 #[repr(transparent)]
 #[derive(ManagedVecItem, Clone)]
 pub struct EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
@@ -56,12 +57,12 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         }
     }
 
-    pub fn from_opt_raw_handle(opt_handle: Option<M::ManagedBufferHandle>) -> Self {
-        match opt_handle {
-            Some(handle) => Self::esdt(unsafe { TokenIdentifier::from_handle(handle) }),
-            None => Self::egld(),
-        }
-    }
+    // pub fn from_opt_raw_handle(opt_handle: Option<M::ManagedBufferHandle>) -> Self {
+    //     match opt_handle {
+    //         Some(handle) => Self::esdt(unsafe { TokenIdentifier::from_handle(handle) }),
+    //         None => Self::egld(),
+    //     }
+    // }
 
     pub fn parse(data: ManagedBuffer<M>) -> Self {
         if data == Self::EGLD_REPRESENTATION {
@@ -268,13 +269,15 @@ where
     M: ManagedTypeApi,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        if let Some(token_identifier) = self.data.as_option() {
-            let token_id_str = token_identifier.to_string();
-            f.debug_tuple("EgldOrEsdtTokenIdentifier::Esdt")
-                .field(&token_id_str)
-                .finish()
-        } else {
-            f.write_str("EgldOrEsdtTokenIdentifier::Egld")
-        }
+        self.map_ref_or_else(
+            f,
+            |f| f.write_str("EgldOrEsdtTokenIdentifier::Egld"),
+            |f, token_identifier| {
+                let token_id_str = token_identifier.to_string();
+                f.debug_tuple("EgldOrEsdtTokenIdentifier::Esdt")
+                    .field(&token_id_str)
+                    .finish()
+            },
+        )
     }
 }
