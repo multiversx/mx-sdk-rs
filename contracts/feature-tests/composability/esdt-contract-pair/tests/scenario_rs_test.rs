@@ -2,6 +2,8 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain
+        .set_current_dir_from_workspace("contracts/feature-tests/composability/esdt-contract-pair");
     blockchain.register_contract(
         "mxsc:first-contract/output/first-contract.mxsc.json",
         first_contract::ContractBuilder,

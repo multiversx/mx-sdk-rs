@@ -24,6 +24,7 @@ const PRICE_AGGREGATOR_PATH: MxscPath =
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/core/price-aggregator");
     blockchain.register_contract(
         PRICE_AGGREGATOR_PATH,
         multiversx_price_aggregator_sc::ContractBuilder,

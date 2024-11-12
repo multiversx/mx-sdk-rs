@@ -1,11 +1,11 @@
-use super::address::Address;
+use super::sdk_address::SdkAddress;
 use serde::{Deserialize, Serialize};
 
 // Account holds an Account's information
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Account {
-    pub address: Address,
+    pub address: SdkAddress,
     pub nonce: u64,
     pub balance: String,
     pub username: String,

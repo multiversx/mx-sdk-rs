@@ -18,6 +18,9 @@ const REJECT_FUNDS_FUNC_NAME: &[u8] = b"reject_funds";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace(
+        "contracts/feature-tests/composability/transfer-role-features",
+    );
     blockchain.register_contract(
         TRANSFER_ROLE_FEATURES_PATH_EXPR,
         transfer_role_features::ContractBuilder,

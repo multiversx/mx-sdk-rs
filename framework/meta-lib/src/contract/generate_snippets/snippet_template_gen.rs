@@ -10,9 +10,10 @@ pub(crate) fn write_snippet_imports(file: &mut File) {
         "#![allow(non_snake_case)]
 
 mod proxy;
+mod config;
 
+use config::Config;
 use multiversx_sc_snippets::imports::*;
-use multiversx_sc_snippets::sdk;
 use serde::{{Deserialize, Serialize}};
 use std::{{
     io::{{Read, Write}},
@@ -26,13 +27,7 @@ use std::{{
 }
 
 pub(crate) fn write_snippet_constants(file: &mut File) {
-    writeln!(
-        file,
-        "const GATEWAY: &str = sdk::gateway::DEVNET_GATEWAY;
-const STATE_FILE: &str = \"state.toml\";
-"
-    )
-    .unwrap();
+    writeln!(file, "const STATE_FILE: &str = \"state.toml\";").unwrap();
 
     write_newline(file);
 }
@@ -151,6 +146,94 @@ pub(crate) fn write_snippet_state_impl(file: &mut File) {
                 .unwrap();
         }}
     }}"#
+    )
+    .unwrap();
+
+    write_newline(file);
+}
+
+pub(crate) fn write_config_imports(file: &mut File) {
+    writeln!(
+        file,
+        "#![allow(unused)]
+
+use serde::Deserialize;
+use std::io::Read;
+"
+    )
+    .unwrap();
+
+    write_newline(file);
+}
+
+pub(crate) fn write_config_constants(file: &mut File) {
+    writeln!(
+        file,
+        "/// Config file
+const CONFIG_FILE: &str = \"config.toml\";
+"
+    )
+    .unwrap();
+
+    write_newline(file);
+}
+
+pub(crate) fn write_config_struct_declaration(file: &mut File) {
+    writeln!(
+        file,
+        r#"#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ChainType {{
+    Real,
+    Simulator,
+    }}
+
+/// Contract Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {{
+    pub gateway_uri: String,
+    pub chain_type: ChainType,
+    }}
+"#
+    )
+    .unwrap();
+
+    write_newline(file);
+}
+
+pub(crate) fn write_config_struct_impl(file: &mut File) {
+    writeln!(
+        file,
+        r#"impl Config {{
+    // Deserializes config from file
+    pub fn new() -> Self {{
+        let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
+        let mut content = String::new();
+        file.read_to_string(&mut content).unwrap();
+        toml::from_str(&content).unwrap()
+    }}
+
+    pub fn chain_simulator_config() -> Self {{
+        Config {{
+            gateway_uri: "http://localhost:8085".to_owned(),
+            chain_type: ChainType::Simulator,
+    }}
+    }}
+
+    // Returns the gateway URI
+    pub fn gateway_uri(&self) -> &str {{
+        &self.gateway_uri
+    }}
+
+    // Returns if chain type is chain simulator
+    pub fn use_chain_simulator(&self) -> bool {{
+        match self.chain_type {{
+            ChainType::Real => false,
+            ChainType::Simulator => true,
+    }}
+    }}
+    }}
+"#
     )
     .unwrap();
 

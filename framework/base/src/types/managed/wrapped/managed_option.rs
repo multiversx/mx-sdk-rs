@@ -210,8 +210,8 @@ where
         Self::from_byte_reader(reader)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle.clone(), writer)
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        <T::OwnHandle as ManagedVecItem>::into_byte_writer(self.handle, writer)
     }
 }
 

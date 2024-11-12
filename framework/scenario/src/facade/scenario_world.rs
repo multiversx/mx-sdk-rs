@@ -21,7 +21,7 @@ pub struct ScenarioWorld {
 }
 
 pub(crate) enum Backend {
-    Debugger(DebuggerBackend),
+    Debugger(Box<DebuggerBackend>),
     VmGoBackend,
 }
 
@@ -35,10 +35,10 @@ impl ScenarioWorld {
     pub fn debugger() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),
-            backend: Backend::Debugger(DebuggerBackend {
+            backend: Backend::Debugger(Box::new(DebuggerBackend {
                 vm_runner: ScenarioVMRunner::new(),
                 trace: None,
-            }),
+            })),
         }
     }
 
@@ -103,11 +103,8 @@ impl ScenarioWorld {
         self
     }
 
-    /// Older versions of the Rust compiler were setting a wrong path in the environment when debugging.
-    /// This method was made as a workaround to avoid this problem.
-    ///
-    /// Fortunately, the issue was fixed in Rust, and so this function is no longer necessary.
-    #[deprecated(since = "0.50.2", note = "No longer needed, simply delete.")]
+    /// Tells the tests where the crate lies relative to the workspace.
+    /// This ensures that the paths are set correctly, including in debug mode.
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
         let mut path = find_current_workspace().unwrap();
         path.push(relative_path);

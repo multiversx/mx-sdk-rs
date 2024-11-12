@@ -84,6 +84,32 @@ pub enum StandaloneCliAction {
         about = "Generates a new wallet or performs actions on an existing wallet."
     )]
     Wallet(WalletArgs),
+
+    #[command(
+        name = "cs",
+        about = "Can install, start and stop a chain simulator configuration."
+    )]
+    ChainSimulator(ChainSimulatorArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct ChainSimulatorArgs {
+    #[command(subcommand)]
+    pub command: ChainSimulatorCommand,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum ChainSimulatorCommand {
+    #[command(
+        about = "Pulls the latest chain simulator docker image available. Needs Docker installed."
+    )]
+    Install,
+
+    #[command(about = "Starts the chain simulator.")]
+    Start,
+
+    #[command(about = "Stops the chain simulator.")]
+    Stop,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -110,6 +136,16 @@ pub struct TestArgs {
     /// Default value will be "false" if not specified.
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub go: bool,
+
+    /// This arg runs interactor tests using chain simulator
+    /// Default value will be "false" if not specified
+    #[arg(
+        short = 'c',
+        long = "chain-simulator",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub chain_simulator: bool,
 
     /// This arg runs scenarios.
     /// Default value will be "false" if not specified.
@@ -408,7 +444,7 @@ pub struct InstallWasmOptArgs {}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct AccountArgs {
-    /// Provide the target API you want the real data to come from
+    /// Provide the target API you want the data to come from
     #[arg(long = "api")]
     #[clap(global = true)]
     pub api: Option<String>,

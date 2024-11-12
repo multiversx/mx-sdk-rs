@@ -27,8 +27,8 @@ fn enum_static() {
 
 #[test]
 fn enum_to_bytes_writer() {
-    <SimpleEnum as multiversx_sc::types::ManagedVecItem>::to_byte_writer(
-        &SimpleEnum::Variant1,
+    <SimpleEnum as multiversx_sc::types::ManagedVecItem>::into_byte_writer(
+        SimpleEnum::Variant1,
         |bytes| {
             assert_eq!(bytes.len(), 1);
             assert_eq!(bytes[0], 0);

@@ -57,8 +57,8 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     }
 
     #[inline]
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        self.obj.to_byte_writer(writer)
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        self.obj.into_byte_writer(writer)
     }
 }
 

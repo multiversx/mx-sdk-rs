@@ -8,6 +8,7 @@ const CODE_PATH: MxscPath = MxscPath::new("mxsc:output/adder.mxsc.json");
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/adder");
     blockchain.register_contract(CODE_PATH, adder::ContractBuilder);
     blockchain
 }

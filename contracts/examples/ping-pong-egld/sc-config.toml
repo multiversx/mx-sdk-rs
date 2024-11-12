@@ -1,0 +1,2 @@
+[[proxy]]
+path = "src/ping_pong_egld_proxy.rs"

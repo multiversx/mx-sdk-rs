@@ -4,6 +4,7 @@ use crate::{
 };
 use core::{
     marker::PhantomData,
+    mem::ManuallyDrop,
     ops::{Deref, DerefMut},
 };
 
@@ -16,7 +17,7 @@ where
     _phantom_t: PhantomData<&'a mut T>, // needed for the lifetime, even though T is present
     managed_vec_handle: M::ManagedBufferHandle,
     item_index: usize,
-    item: T,
+    item: ManuallyDrop<T>,
 }
 
 impl<'a, M, T> ManagedVecRef<'a, M, T>
@@ -37,7 +38,7 @@ where
             _phantom_t: PhantomData,
             managed_vec_handle,
             item_index,
-            item,
+            item: ManuallyDrop::new(item),
         }
     }
 }
@@ -48,8 +49,9 @@ where
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
-        let _ = Self::wrap_as_managed_vec(self.managed_vec_handle.clone())
-            .set(self.item_index, &self.item);
+        let item = unsafe { ManuallyDrop::take(&mut self.item) };
+        let _ =
+            Self::wrap_as_managed_vec(self.managed_vec_handle.clone()).set(self.item_index, item);
     }
 }
 
