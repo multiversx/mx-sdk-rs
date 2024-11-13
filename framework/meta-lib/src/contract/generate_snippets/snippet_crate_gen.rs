@@ -131,7 +131,7 @@ pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: boo
 pub(crate) fn create_main_file(snippets_folder_path: &str, contract_crate_name: &str) {
     let lib_path = format!("{snippets_folder_path}/src/{SNIPPETS_SOURCE_FILE_NAME}");
 
-    let mut file = File::create(&lib_path).unwrap();
+    let mut file = File::create(lib_path).unwrap();
 
     writeln!(
         &mut file,

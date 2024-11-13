@@ -7,7 +7,9 @@ use crate::cli::GenerateSnippetsArgs;
 use super::{
     super::meta_config::MetaConfig,
     snippet_crate_gen::{
-        create_and_get_lib_file, create_config_rust_file, create_config_toml_file, create_main_file, create_sc_config_file, create_snippets_cargo_toml, create_snippets_folder, create_snippets_gitignore, create_src_folder
+        create_and_get_lib_file, create_config_rust_file, create_config_toml_file,
+        create_main_file, create_sc_config_file, create_snippets_cargo_toml,
+        create_snippets_folder, create_snippets_gitignore, create_src_folder,
     },
     snippet_sc_functions_gen::write_interact_struct_impl,
     snippet_template_gen::{
