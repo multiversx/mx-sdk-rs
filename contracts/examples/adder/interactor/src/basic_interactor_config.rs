@@ -20,7 +20,7 @@ pub struct Config {
 
 impl Config {
     // Deserializes config from file
-    pub fn new() -> Self {
+    pub fn load_config() -> Self {
         let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
         let mut content = String::new();
         file.read_to_string(&mut content).unwrap();

@@ -14,7 +14,7 @@ const ADDER_CODE_PATH: MxscPath = MxscPath::new("../output/adder.mxsc.json");
 pub async fn adder_cli() {
     env_logger::init();
 
-    let config = Config::new();
+    let config = Config::load_config();
 
     let mut basic_interact = AdderInteract::new(config).await;
 
