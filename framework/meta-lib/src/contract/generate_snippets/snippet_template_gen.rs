@@ -9,8 +9,8 @@ pub(crate) fn write_snippet_imports(file: &mut File) {
         file,
         "#![allow(non_snake_case)]
 
-mod proxy;
 mod config;
+mod proxy;
 
 use config::Config;
 use multiversx_sc_snippets::imports::*;
@@ -18,8 +18,7 @@ use serde::{{Deserialize, Serialize}};
 use std::{{
     io::{{Read, Write}},
     path::Path,
-}};
-"
+}};"
     )
     .unwrap();
 
@@ -28,15 +27,13 @@ use std::{{
 
 pub(crate) fn write_snippet_constants(file: &mut File) {
     writeln!(file, "const STATE_FILE: &str = \"state.toml\";").unwrap();
-
-    write_newline(file);
 }
 
-pub(crate) fn write_snippet_main_function(file: &mut File, abi: &ContractAbi) {
+pub(crate) fn write_snippet_main_function(file: &mut File, abi: &ContractAbi, crate_name: &str) {
     writeln!(
         file,
-        "#[tokio::main]
-async fn main() {{
+        "
+pub async fn {crate_name}_cli() {{
     env_logger::init();
 
     let mut args = std::env::args();
@@ -76,8 +73,6 @@ async fn main() {{
 }}"
     )
     .unwrap();
-
-    write_newline(file);
 }
 
 pub(crate) fn write_interact_struct_declaration(file: &mut File) {

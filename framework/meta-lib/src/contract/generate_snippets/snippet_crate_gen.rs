@@ -7,6 +7,7 @@ use std::{
 use crate::version_history;
 
 static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
+static LIB_SOURCE_FILE_NAME: &str = "interact.rs";
 static SC_CONFIG_PATH: &str = "../sc-config.toml";
 static CONFIG_TOML_PATH: &str = "config.toml";
 static CONFIG_SOURCE_FILE_NAME: &str = "config.rs";
@@ -77,6 +78,9 @@ publish = false
 name = "rust-interact"
 path = "src/{SNIPPETS_SOURCE_FILE_NAME}"
 
+[lib]
+path = "src/{LIB_SOURCE_FILE_NAME}"
+
 [dependencies.{contract_crate_name}]
 path = ".."
 
@@ -91,9 +95,8 @@ clap = {{ version = "4.4.7", features = ["derive"] }}
 serde = {{ version = "1.0", features = ["derive"] }}
 toml = "0.8.6"
 
-# uncomment when using chain simulator
-# [features]
-# chain-simulator-tests = []
+[features]
+chain-simulator-tests = []
 "#
     )
     .unwrap();
@@ -107,7 +110,7 @@ pub(crate) fn create_src_folder(snippets_folder_path: &str) {
 
 #[must_use]
 pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: bool) -> File {
-    let lib_path = format!("{snippets_folder_path}/src/{SNIPPETS_SOURCE_FILE_NAME}");
+    let lib_path = format!("{snippets_folder_path}/src/{LIB_SOURCE_FILE_NAME}");
     if overwrite {
         File::create(&lib_path).unwrap()
     } else {
@@ -123,6 +126,26 @@ pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: boo
             },
         }
     }
+}
+
+pub(crate) fn create_main_file(snippets_folder_path: &str, contract_crate_name: &str) {
+    let lib_path = format!("{snippets_folder_path}/src/{SNIPPETS_SOURCE_FILE_NAME}");
+
+    let mut file = File::create(&lib_path).unwrap();
+
+    writeln!(
+        &mut file,
+        r#"
+use multiversx_sc_snippets::imports::*;
+use rust_interact::{contract_crate_name}_cli;
+
+#[tokio::main]
+async fn main() {{
+    {contract_crate_name}_cli().await;
+}}  
+"#
+    )
+    .unwrap();
 }
 
 pub(crate) fn create_sc_config_file(overwrite: bool) {
