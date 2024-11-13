@@ -93,15 +93,6 @@ where
     }
 }
 
-// impl<M, T> MultiValueEncodedCounted<M, T>
-// where
-//     M: ManagedTypeApi,
-// {
-//     pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
-//         ManagedArgBuffer::from_handle(self.raw_buffers.get_handle())
-//     }
-// }
-
 impl<M> MultiValueEncodedCounted<M, ManagedBuffer<M>>
 where
     M: ManagedTypeApi,
