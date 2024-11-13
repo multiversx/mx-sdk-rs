@@ -255,7 +255,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "basic-interact"
+name = "basic-interactor"
 version = "0.0.0"
 dependencies = [
  "adder",
