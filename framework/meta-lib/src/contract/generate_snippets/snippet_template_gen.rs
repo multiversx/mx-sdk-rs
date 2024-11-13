@@ -162,8 +162,6 @@ use std::io::Read;
 "
     )
     .unwrap();
-
-    write_newline(file);
 }
 
 pub(crate) fn write_config_constants(file: &mut File) {
@@ -228,10 +226,7 @@ pub(crate) fn write_config_struct_impl(file: &mut File) {
             ChainType::Simulator => true,
         }}
     }}
-}}
-"#
+}}"#
     )
     .unwrap();
-
-    write_newline(file);
 }
