@@ -12,7 +12,7 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
     writeln!(
         file,
         r#"impl ContractInteract {{
-    async fn new() -> Self {{
+    pub async fn new() -> Self {{
         let config = Config::new();
         let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator()).await;
         interactor.set_current_dir_from_workspace("{}");
@@ -130,7 +130,7 @@ fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
 }
 
 fn write_method_declaration(file: &mut File, endpoint_name: &str) {
-    writeln!(file, "    async fn {endpoint_name}(&mut self) {{").unwrap();
+    writeln!(file, "    pub async fn {endpoint_name}(&mut self) {{").unwrap();
 }
 
 fn write_payments_declaration(file: &mut File, accepted_tokens: &[String]) {

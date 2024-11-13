@@ -78,7 +78,7 @@ pub async fn {crate_name}_cli() {{
 pub(crate) fn write_interact_struct_declaration(file: &mut File) {
     writeln!(
         file,
-        "struct ContractInteract {{
+        "pub struct ContractInteract {{
     interactor: Interactor,
     wallet_address: Address,
     contract_code: BytesValue,
@@ -95,7 +95,7 @@ pub(crate) fn write_state_struct_declaration(file: &mut File) {
         file,
         "
 #[derive(Debug, Default, Serialize, Deserialize)]
-struct State {{
+pub struct State {{
     contract_address: Option<Bech32Address>
 }}"
     )
