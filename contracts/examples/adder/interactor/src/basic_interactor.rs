@@ -49,8 +49,9 @@ pub struct AdderInteract {
 
 impl AdderInteract {
     pub async fn new(config: Config) -> Self {
-        let mut interactor =
-            Interactor::new(config.gateway_uri(), config.use_chain_simulator()).await;
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.use_chain_simulator());
         interactor.set_current_dir_from_workspace("contracts/examples/adder/interactor");
 
         let adder_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
