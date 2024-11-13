@@ -174,8 +174,6 @@ const CONFIG_FILE: &str = \"config.toml\";
 "
     )
     .unwrap();
-
-    write_newline(file);
 }
 
 pub(crate) fn write_config_struct_declaration(file: &mut File) {
@@ -186,19 +184,17 @@ pub(crate) fn write_config_struct_declaration(file: &mut File) {
 pub enum ChainType {{
     Real,
     Simulator,
-    }}
+}}
 
 /// Contract Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {{
     pub gateway_uri: String,
     pub chain_type: ChainType,
-    }}
+}}
 "#
     )
     .unwrap();
-
-    write_newline(file);
 }
 
 pub(crate) fn write_config_struct_impl(file: &mut File) {
@@ -217,7 +213,7 @@ pub(crate) fn write_config_struct_impl(file: &mut File) {
         Config {{
             gateway_uri: "http://localhost:8085".to_owned(),
             chain_type: ChainType::Simulator,
-    }}
+        }}
     }}
 
     // Returns the gateway URI
@@ -230,9 +226,9 @@ pub(crate) fn write_config_struct_impl(file: &mut File) {
         match self.chain_type {{
             ChainType::Real => false,
             ChainType::Simulator => true,
+        }}
     }}
-    }}
-    }}
+}}
 "#
     )
     .unwrap();
