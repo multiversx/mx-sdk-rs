@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.54.0"
+version = "0.54.1"
 edition = "2021"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -31,7 +31,7 @@ anyhow = "1.0.44"
 tokio = { version = "1.24", features = ["full"], optional = true}
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.54.0"
+version = "=0.54.1"
 path = "../scenario"
 
 [dependencies.multiversx-chain-scenario-format]
