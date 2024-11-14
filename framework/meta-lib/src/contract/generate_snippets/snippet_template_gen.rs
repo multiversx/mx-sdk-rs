@@ -257,6 +257,7 @@ use rust_interact::ContractInteract;
 // In order for this test to work, make sure that the `config.toml` file contains the real blockchain config (or choose it manually)
 // Can be run with `cargo test`.
 #[tokio::test]
+#[ignore = "run on demand, relies on real blockchain state"]
 async fn deploy_test_{crate_name}() {{
     let mut interactor = ContractInteract::new().await;
 
