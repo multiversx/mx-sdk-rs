@@ -100,6 +100,7 @@ toml = "0.8.6"
 
 [features]
 chain-simulator-tests = []
+blockchain-tests = []
 "#
     )
     .unwrap();
