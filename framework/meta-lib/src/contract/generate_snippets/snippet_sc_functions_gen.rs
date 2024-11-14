@@ -14,10 +14,16 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
         r#"impl ContractInteract {{
     pub async fn new() -> Self {{
         let config = Config::new();
-        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator()).await;
-        interactor.set_current_dir_from_workspace("{}");
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.use_chain_simulator());
 
+        interactor.set_current_dir_from_workspace("{}");
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+
+        // Useful in the chain simulator setting
+        // generate blocks until ESDTSystemSCAddress is enabled
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
         
         let contract_code = BytesValue::interpret_from(
             {},
