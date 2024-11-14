@@ -162,9 +162,9 @@ pub(crate) fn create_test_folder_and_get_files(snippets_folder_path: &str) -> (F
     let interactor_cs_file_path = format!("{folder_path}/{INTERACTOR_CS_TEST_FILE_NAME}");
 
     let interactor_file =
-        File::create(&interactor_file_path).expect("Failed to create interact_tests.rs file");
+        File::create(interactor_file_path).expect("Failed to create interact_tests.rs file");
     let interactor_cs_file =
-        File::create(&interactor_cs_file_path).expect("Failed to create interact_cs_tests.rs file");
+        File::create(interactor_cs_file_path).expect("Failed to create interact_cs_tests.rs file");
 
     (interactor_file, interactor_cs_file)
 }
