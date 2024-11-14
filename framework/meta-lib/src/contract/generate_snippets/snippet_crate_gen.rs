@@ -2,6 +2,7 @@ use colored::Colorize;
 use std::{
     fs::{self, File, OpenOptions},
     io::Write,
+    path::Path,
 };
 
 use crate::version_history;
@@ -15,6 +16,8 @@ static FULL_PROXY_ENTRY: &str = r#"[[proxy]]
 path = "interactor/src/proxy.rs"
  "#;
 static PROXY_PATH: &str = "interactor/src/proxy.rs";
+static INTERACTOR_CS_TEST_FILE_NAME: &str = "interact_cs_tests.rs";
+static INTERACTOR_TEST_FILE_NAME: &str = "interact_tests.rs";
 
 pub(crate) fn create_snippets_folder(snippets_folder_path: &str) {
     // returns error if folder already exists, so we ignore the result
@@ -146,6 +149,24 @@ async fn main() {{
 "#
     )
     .unwrap();
+}
+
+pub(crate) fn create_test_folder_and_get_files(snippets_folder_path: &str) -> (File, File) {
+    let folder_path = format!("{snippets_folder_path}/tests");
+
+    if !Path::new(&folder_path).exists() {
+        fs::create_dir_all(&folder_path).expect("Failed to create tests directory");
+    }
+
+    let interactor_file_path = format!("{folder_path}/{INTERACTOR_TEST_FILE_NAME}");
+    let interactor_cs_file_path = format!("{folder_path}/{INTERACTOR_CS_TEST_FILE_NAME}");
+
+    let interactor_file =
+        File::create(&interactor_file_path).expect("Failed to create interact_tests.rs file");
+    let interactor_cs_file =
+        File::create(&interactor_cs_file_path).expect("Failed to create interact_cs_tests.rs file");
+
+    (interactor_file, interactor_cs_file)
 }
 
 pub(crate) fn create_sc_config_file(overwrite: bool) {

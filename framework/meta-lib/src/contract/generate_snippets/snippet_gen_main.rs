@@ -10,11 +10,13 @@ use super::{
         create_and_get_lib_file, create_config_rust_file, create_config_toml_file,
         create_main_file, create_sc_config_file, create_snippets_cargo_toml,
         create_snippets_folder, create_snippets_gitignore, create_src_folder,
+        create_test_folder_and_get_files,
     },
     snippet_sc_functions_gen::write_interact_struct_impl,
     snippet_template_gen::{
-        write_config_constants, write_config_imports, write_config_struct_declaration,
-        write_config_struct_impl, write_interact_struct_declaration, write_snippet_constants,
+        write_chain_sim_test_to_file, write_config_constants, write_config_imports,
+        write_config_struct_declaration, write_config_struct_impl,
+        write_interact_struct_declaration, write_interactor_test_to_file, write_snippet_constants,
         write_snippet_imports, write_snippet_main_function, write_snippet_state_impl,
         write_state_struct_declaration,
     },
@@ -29,6 +31,13 @@ impl MetaConfig {
         write_snippets_to_file(&mut file, &self.original_contract_abi, crate_name);
         let mut config_file = create_config_and_get_file(&self.snippets_dir);
         write_config_to_file(&mut config_file);
+        let (mut interactor_test_file, mut chain_sim_test_file) =
+            create_test_folder_and_get_files(&self.snippets_dir);
+        write_tests_to_files(
+            &mut interactor_test_file,
+            &mut chain_sim_test_file,
+            crate_name,
+        );
     }
 }
 
@@ -68,4 +77,13 @@ fn write_config_to_file(file: &mut File) {
     write_config_constants(file);
     write_config_struct_declaration(file);
     write_config_struct_impl(file);
+}
+
+fn write_tests_to_files(
+    interactor_test_file: &mut File,
+    chain_sim_test_file: &mut File,
+    crate_name: &str,
+) {
+    write_interactor_test_to_file(interactor_test_file, crate_name);
+    write_chain_sim_test_to_file(chain_sim_test_file, crate_name);
 }
