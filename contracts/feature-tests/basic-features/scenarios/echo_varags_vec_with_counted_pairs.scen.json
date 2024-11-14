@@ -1,0 +1,68 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_varags_vec_with_counted_pairs",
+                "arguments": [
+                    "str:alice",
+                    "1",
+                    "100",
+                    "address:a100",
+                    "str:bob",
+                    "0",
+                    "str:charlie",
+                    "3",
+                    "300",
+                    "address:a300",
+                    "301",
+                    "address:a301",
+                    "302",
+                    "address:a302"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:alice",
+                    "1",
+                    "100",
+                    "address:a100",
+                    "str:bob",
+                    "0",
+                    "str:charlie",
+                    "3",
+                    "300",
+                    "address:a300",
+                    "301",
+                    "address:a301",
+                    "302",
+                    "address:a302"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

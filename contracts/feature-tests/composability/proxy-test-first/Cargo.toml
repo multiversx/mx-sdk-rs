@@ -12,10 +12,10 @@ path = "src/proxy-test-first.rs"
 hex-literal = "0.4.1"
 
 [dependencies.multiversx-sc]
-version = "0.54.0"
+version = "0.54.1"
 path = "../../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.0"
+version = "0.54.1"
 path = "../../../../framework/scenario"
