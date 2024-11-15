@@ -37,12 +37,12 @@ where
     GatewayProxy: GatewayAsyncService,
 {
     /// Not yet changed for backwards compatibility.
-    pub async fn new(gateway_uri: &str, use_chain_simulator: bool) -> Self {
+    pub async fn new(gateway_uri: &str) -> Self {
         let proxy = GatewayProxy::from_uri(gateway_uri);
         let network_config = proxy.request(NetworkConfigRequest).await.unwrap();
         Self {
             proxy,
-            use_chain_simulator,
+            use_chain_simulator: false,
             network_config,
             sender_map: HashMap::new(),
             waiting_time_ms: 0,
@@ -50,6 +50,11 @@ where
             post_runners: ScenarioRunnerList::empty(),
             current_dir: PathBuf::default(),
         }
+    }
+
+    pub fn use_chain_simulator(mut self, use_chain_simulator: bool) -> Self {
+        self.use_chain_simulator = use_chain_simulator;
+        self
     }
 
     pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {

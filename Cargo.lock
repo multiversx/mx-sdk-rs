@@ -255,7 +255,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "basic-interact"
+name = "basic-interactor"
 version = "0.0.0"
 dependencies = [
  "adder",
@@ -2433,7 +2433,7 @@ source = "git+https://github.com/multiversx/mx-vm-executor-rs?branch=rc/v1.7.nex
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "arrayvec",
  "getrandom",
@@ -2454,7 +2454,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -2487,7 +2487,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -2498,7 +2498,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "bip39",
  "clap",
@@ -2522,7 +2522,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta-lib"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "clap",
  "colored",
@@ -2542,14 +2542,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "base64",
  "bech32",
@@ -2573,7 +2573,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "anyhow",
  "base64",
@@ -2592,7 +2592,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "multiversx-sc",
 ]
@@ -2657,7 +2657,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.54.0"
+version = "0.54.1"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",

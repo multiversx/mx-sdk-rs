@@ -105,14 +105,14 @@ fn crypto_verify_bls_rs() {
 
 #[test]
 #[ignore]
-fn crypto_verify_bls_share_rs() {
-    world().run("scenarios/crypto_verify_bls_share.scen.json");
+fn crypto_verify_bls_aggregated_signature_rs() {
+    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
 #[ignore]
-fn crypto_verify_bls_aggregated_rs() {
-    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
+fn crypto_verify_bls_share_rs() {
+    world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
 
 #[test]
@@ -210,6 +210,16 @@ fn echo_u_64_rs() {
 #[test]
 fn echo_usize_rs() {
     world().run("scenarios/echo_usize.scen.json");
+}
+
+#[test]
+fn echo_varags_vec_with_counted_rs() {
+    world().run("scenarios/echo_varags_vec_with_counted.scen.json");
+}
+
+#[test]
+fn echo_varags_vec_with_counted_pairs_rs() {
+    world().run("scenarios/echo_varags_vec_with_counted_pairs.scen.json");
 }
 
 #[test]

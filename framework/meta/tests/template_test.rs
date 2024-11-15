@@ -232,7 +232,7 @@ fn cargo_check_interactor(sub_path: &str, new_name: &str) {
         .join(TEMPLATE_TEMP_DIR_NAME)
         .join(sub_path)
         .join(new_name)
-        .join("interact");
+        .join("interactor");
 
     let exit_status = Command::new("cargo")
         .arg("check")

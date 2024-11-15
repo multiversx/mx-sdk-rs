@@ -1,4 +1,5 @@
 use crate::cli::{StandaloneCliAction, StandaloneCliArgs};
+use crate::cmd::chain_simulator::chain_simulator;
 use crate::cmd::retrieve_address::retrieve_address;
 use crate::cmd::wallet::wallet;
 use clap::Parser;
@@ -49,6 +50,9 @@ pub async fn cli_main_standalone() {
         },
         Some(StandaloneCliAction::Wallet(args)) => {
             wallet(args);
+        },
+        Some(StandaloneCliAction::ChainSimulator(args)) => {
+            chain_simulator(args);
         },
         None => {},
     }
