@@ -1,6 +1,7 @@
 use core::borrow::Borrow;
 
 use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
+use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 
 use crate::{
     api::ManagedTypeApi,
@@ -309,5 +310,128 @@ impl ManagedVecItem for EsdtLocalRole {
 
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
         <u16 as ManagedVecItem>::into_byte_writer(self.as_u16(), writer)
+    }
+}
+
+impl<T1, T2> ManagedVecItem for MultiValue2<T1, T2>
+where
+    T1: ManagedVecItem,
+    T2: ManagedVecItem,
+    (T1, (T2, ())): ManagedVecItemNestedTuple,
+{
+    type PAYLOAD = <(T1, (T2, ())) as ManagedVecItemNestedTuple>::PAYLOAD;
+    const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
+        let mut payload = <Self::PAYLOAD as ManagedVecItemPayload>::new_buffer();
+        let payload_slice = ManagedVecItemPayload::payload_slice_mut(&mut payload);
+        reader(payload_slice);
+        let mut index = 0;
+
+        (
+            T1::from_byte_reader(|bytes| {
+                let next_index = index + T1::payload_size();
+                bytes.copy_from_slice(&payload_slice[index..next_index]);
+                index = next_index;
+            }),
+            T2::from_byte_reader(|bytes| {
+                let next_index = index + T2::payload_size();
+                bytes.copy_from_slice(&payload_slice[index..next_index]);
+                index = next_index;
+            }),
+        )
+            .into()
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
+    }
+
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
+        let mut payload = Self::PAYLOAD::new_buffer();
+        let payload_slice = ManagedVecItemPayload::payload_slice_mut(&mut payload);
+        let mut index = 0;
+        let (t1, t2) = self.into_tuple();
+        T1::into_byte_writer(t1, |bytes| {
+            let next_index = index + T1::payload_size();
+            payload_slice[index..next_index].copy_from_slice(bytes);
+            index = next_index;
+        });
+        T2::into_byte_writer(t2, |bytes| {
+            let next_index = index + T2::payload_size();
+            payload_slice[index..next_index].copy_from_slice(bytes);
+            index = next_index;
+        });
+        writer(&payload_slice[..])
+    }
+}
+
+impl<T1, T2, T3> ManagedVecItem for MultiValue3<T1, T2, T3>
+where
+    T1: ManagedVecItem,
+    T2: ManagedVecItem,
+    T3: ManagedVecItem,
+    (T1, (T2, (T3, ()))): ManagedVecItemNestedTuple,
+{
+    type PAYLOAD = <(T1, (T2, (T3, ()))) as ManagedVecItemNestedTuple>::PAYLOAD;
+    const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
+        let mut payload = <Self::PAYLOAD as ManagedVecItemPayload>::new_buffer();
+        let payload_slice = ManagedVecItemPayload::payload_slice_mut(&mut payload);
+        reader(payload_slice);
+        let mut index = 0;
+
+        (
+            T1::from_byte_reader(|bytes| {
+                let next_index = index + T1::payload_size();
+                bytes.copy_from_slice(&payload_slice[index..next_index]);
+                index = next_index;
+            }),
+            T2::from_byte_reader(|bytes| {
+                let next_index = index + T2::payload_size();
+                bytes.copy_from_slice(&payload_slice[index..next_index]);
+                index = next_index;
+            }),
+            T3::from_byte_reader(|bytes| {
+                let next_index = index + T3::payload_size();
+                bytes.copy_from_slice(&payload_slice[index..next_index]);
+                index = next_index;
+            }),
+        )
+            .into()
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
+    }
+
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
+        let mut payload = Self::PAYLOAD::new_buffer();
+        let payload_slice = ManagedVecItemPayload::payload_slice_mut(&mut payload);
+        let mut index = 0;
+        let (t1, t2, t3) = self.into_tuple();
+        T1::into_byte_writer(t1, |bytes| {
+            let next_index = index + T1::payload_size();
+            payload_slice[index..next_index].copy_from_slice(bytes);
+            index = next_index;
+        });
+        T2::into_byte_writer(t2, |bytes| {
+            let next_index = index + T2::payload_size();
+            payload_slice[index..next_index].copy_from_slice(bytes);
+            index = next_index;
+        });
+        T3::into_byte_writer(t3, |bytes| {
+            let next_index = index + T2::payload_size();
+            payload_slice[index..next_index].copy_from_slice(bytes);
+            index = next_index;
+        });
+        writer(&payload_slice[..])
     }
 }
