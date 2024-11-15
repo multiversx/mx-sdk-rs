@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Test endpoint argument and result serialization.
 #[multiversx_sc::module]
@@ -21,6 +21,12 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_managed_address(&self, ma: ManagedAddress) -> ManagedAddress {
         ma
+    }
+
+    /// This tests how is generated type name in proxy
+    #[endpoint]
+    fn echo_managed_option(&self, mo: ManagedOption<BigUint>) -> ManagedOption<BigUint> {
+        mo
     }
 
     /// This tests that nested serialization of big ints within unmanaged types works.
@@ -93,5 +99,28 @@ pub trait EchoManagedTypes {
             result.push((x, y, x + y).into())
         }
         result
+    }
+
+    #[endpoint]
+    fn echo_varags_vec_with_counted(
+        &self,
+        m: MultiValueEncoded<MultiValue2<ManagedBuffer, MultiValueManagedVecCounted<usize>>>,
+    ) -> MultiValueEncoded<MultiValue2<ManagedBuffer, MultiValueManagedVecCounted<usize>>> {
+        m
+    }
+
+    #[endpoint]
+    fn echo_varags_vec_with_counted_pairs(
+        &self,
+        m: MultiValueEncoded<
+            MultiValue2<
+                ManagedBuffer,
+                MultiValueEncodedCounted<MultiValue2<usize, ManagedAddress>>,
+            >,
+        >,
+    ) -> MultiValueEncoded<
+        MultiValue2<ManagedBuffer, MultiValueEncodedCounted<MultiValue2<usize, ManagedAddress>>>,
+    > {
+        m
     }
 }

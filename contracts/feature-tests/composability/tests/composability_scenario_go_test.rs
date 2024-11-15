@@ -444,6 +444,11 @@ fn promises_multi_transfer_go() {
 }
 
 #[test]
+fn promises_multi_transfer_err_go() {
+    world().run("scenarios/promises_multi_transfer_err.scen.json");
+}
+
+#[test]
 fn promises_single_transfer_go() {
     world().run("scenarios/promises_single_transfer.scen.json");
 }

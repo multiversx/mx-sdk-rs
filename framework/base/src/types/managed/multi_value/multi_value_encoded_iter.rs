@@ -4,25 +4,15 @@ use unwrap_infallible::UnwrapInfallible;
 
 use crate::codec::{TopDecodeMulti, TopDecodeMultiInput};
 
+use crate::types::{ManagedBuffer, ManagedVec};
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
 };
 
-use super::MultiValueEncoded;
-
-impl<M, T> IntoIterator for MultiValueEncoded<M, T>
-where
-    M: ManagedTypeApi + ErrorApi,
-    T: TopDecodeMulti,
-{
-    type Item = T;
-    type IntoIter = MultiValueEncodedIterator<M, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        MultiValueEncodedIterator::new(self)
-    }
-}
-
+/// Iterator for `MultiValueEncoded` and `MultiValueEncodedCounted`.
+///
+/// Decodes items while it is iterating.
 pub struct MultiValueEncodedIterator<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
@@ -37,9 +27,9 @@ where
     M: ManagedTypeApi + ErrorApi,
     T: TopDecodeMulti,
 {
-    pub(crate) fn new(obj: MultiValueEncoded<M, T>) -> Self {
+    pub(crate) fn new(raw_buffers: ManagedVec<M, ManagedBuffer<M>>) -> Self {
         MultiValueEncodedIterator {
-            data_loader: ManagedResultArgLoader::new(obj.raw_buffers),
+            data_loader: ManagedResultArgLoader::new(raw_buffers),
             _phantom: PhantomData,
         }
     }

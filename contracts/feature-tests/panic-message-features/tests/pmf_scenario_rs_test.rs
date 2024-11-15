@@ -3,6 +3,7 @@ use multiversx_sc_scenario::*;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/panic-message-features");
     blockchain.register_partial_contract::<panic_message_features::AbiProvider, _>(
         "mxsc:output/panic-message-features.mxsc.json",
         panic_message_features::ContractBuilder,

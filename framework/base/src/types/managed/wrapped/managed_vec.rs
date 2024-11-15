@@ -45,7 +45,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedVec {
             buffer: ManagedBuffer::from_handle(handle),
             _phantom: PhantomData,
@@ -57,6 +57,10 @@ where
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -190,9 +194,9 @@ where
         }
     }
 
-    pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
+    pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
-        item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+        item.into_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
     }
 
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
@@ -205,7 +209,7 @@ where
     }
 
     pub fn push(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
+        item.into_byte_writer(|bytes| {
             self.buffer.append_bytes(bytes);
         });
     }
@@ -233,7 +237,7 @@ where
             ManagedVec::new()
         };
 
-        self.buffer = part_before.buffer;
+        *self = part_before;
         self.buffer.append(&part_after.buffer);
     }
 
@@ -251,7 +255,7 @@ where
     }
 
     pub fn overwrite_with_single_item(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
+        item.into_byte_writer(|bytes| {
             self.buffer.overwrite(bytes);
         });
     }

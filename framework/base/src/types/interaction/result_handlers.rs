@@ -1,4 +1,8 @@
+mod pass_value;
 mod returns_bt;
+mod returns_bt_egld;
+mod returns_bt_multi_esdt;
+mod returns_bt_single_esdt;
 mod returns_new_address;
 mod returns_new_managed_address;
 mod returns_raw_result;
@@ -10,7 +14,11 @@ mod with_raw_result;
 mod with_result;
 mod with_result_as;
 
+pub use pass_value::PassValue;
 pub use returns_bt::*;
+pub use returns_bt_egld::ReturnsBackTransfersEGLD;
+pub use returns_bt_multi_esdt::ReturnsBackTransfersMultiESDT;
+pub use returns_bt_single_esdt::ReturnsBackTransfersSingleESDT;
 pub use returns_new_address::*;
 pub use returns_new_managed_address::*;
 pub use returns_raw_result::*;

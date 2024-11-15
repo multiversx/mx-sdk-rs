@@ -58,6 +58,7 @@ pub trait AbiTester {
     fn take_managed_type(&self, _arg: AbiManagedType<Self::Api>) {}
 
     #[endpoint]
+    #[title("result-3")]
     #[output_name("multi-result-1")]
     #[output_name("multi-result-2")]
     #[output_name("multi-result-3")]
@@ -170,6 +171,14 @@ pub trait AbiTester {
     #[view]
     fn operation_completion_status(&self) -> OperationCompletionStatus {
         OperationCompletionStatus::Completed
+    }
+
+    #[view]
+    fn takes_object_with_managed_buffer_read_to_end(
+        &self,
+        arg: AbiWithManagedBufferReadToEnd<Self::Api>,
+    ) -> ManagedBuffer {
+        arg.flush.into_managed_buffer()
     }
 
     #[endpoint]

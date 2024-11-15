@@ -22,14 +22,14 @@ jobs:
         uses: robinraju/release-downloader@v1.5
         with:
           repository: vadimcn/vscode-lldb
-          latest: true
-          fileName: codelldb-x86_64-linux.vsix
+          tag: v1.11.0
+          fileName: codelldb-linux-x64.vsix
 
       - name: Setup vscode-lldb
         run: |
-          unzip codelldb-x86_64-linux.vsix -d vscode-lldb
-          mkdir -p $HOME/.vscode/extensions/vadimcn.vscode-lldb-x.x.x/
-          mv vscode-lldb/extension/* $HOME/.vscode/extensions/vadimcn.vscode-lldb-x.x.x/
+          unzip codelldb-linux-x64.vsix -d vscode-lldb
+          mkdir -p $HOME/.vscode/extensions/vadimcn.vscode-lldb-1.11.0/
+          mv vscode-lldb/extension/* $HOME/.vscode/extensions/vadimcn.vscode-lldb-1.11.0/
 
       - name: Run the rust tests
         run: |

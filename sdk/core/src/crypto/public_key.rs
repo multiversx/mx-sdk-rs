@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use super::private_key::PrivateKey;
 use anyhow::Result;
-use bech32::{self, ToBase32, Variant};
+use multiversx_chain_core::types::Address;
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
@@ -22,9 +22,8 @@ impl PublicKey {
         &self.0
     }
 
-    pub fn to_address(&self) -> Result<String> {
-        let address = bech32::encode("erd", self.0.to_base32(), Variant::Bech32)?;
-        Ok(address)
+    pub fn to_address(&self) -> Address {
+        self.0.into()
     }
 
     pub fn from_hex_str(pk: &str) -> Result<Self> {

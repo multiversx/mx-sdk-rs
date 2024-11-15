@@ -211,10 +211,12 @@ where
             new_address_handle,
             result_handle,
         );
-        (
-            ManagedAddress::from_raw_handle(new_address_handle),
-            ManagedVec::from_raw_handle(result_handle),
-        )
+        unsafe {
+            (
+                ManagedAddress::from_raw_handle(new_address_handle),
+                ManagedVec::from_raw_handle(result_handle),
+            )
+        }
     }
 
     /// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
@@ -241,10 +243,12 @@ where
             new_address_handle,
             result_handle,
         );
-        (
-            ManagedAddress::from_raw_handle(new_address_handle),
-            ManagedVec::from_raw_handle(result_handle),
-        )
+        unsafe {
+            (
+                ManagedAddress::from_raw_handle(new_address_handle),
+                ManagedVec::from_raw_handle(result_handle),
+            )
+        }
     }
 
     pub fn upgrade_from_source_contract(
@@ -310,7 +314,7 @@ where
             arg_buffer.get_handle().get_raw_handle(),
             result_handle,
         );
-        ManagedVec::from_raw_handle(result_handle)
+        unsafe { ManagedVec::from_raw_handle(result_handle) }
     }
 
     pub fn execute_on_same_context_raw(
@@ -330,7 +334,7 @@ where
             arg_buffer.get_handle().get_raw_handle(),
             result_handle,
         );
-        ManagedVec::from_raw_handle(result_handle)
+        unsafe { ManagedVec::from_raw_handle(result_handle) }
     }
 
     /// Same shard, in-line execution of another contract.
@@ -349,7 +353,7 @@ where
             arg_buffer.get_handle().get_raw_handle(),
             result_handle,
         );
-        ManagedVec::from_raw_handle(result_handle)
+        unsafe { ManagedVec::from_raw_handle(result_handle) }
     }
 
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
@@ -376,8 +380,7 @@ where
         );
 
         self.clean_return_data();
-
-        ManagedVec::from_raw_handle(result_handle)
+        unsafe { ManagedVec::from_raw_handle(result_handle) }
     }
 
     pub fn clean_return_data(&self) {
