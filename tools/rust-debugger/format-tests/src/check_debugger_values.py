@@ -30,7 +30,8 @@ def end_of_main_breakpoint_handler(frame: SBFrame, bp_loc: SBBreakpointLocation,
     incorrect = 0
     duplicate = 0
     checked = set()
-    for item in lldb.value(to_check):
+    to_check_value = lldb.value(to_check)
+    for item in to_check_value:
         variable_name_string, value_to_check_string = item
         variable_name = get_string(variable_name_string)
         value_to_check = get_string(value_to_check_string)

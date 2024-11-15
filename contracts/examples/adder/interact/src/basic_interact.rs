@@ -2,9 +2,9 @@ mod basic_interact_cli;
 mod basic_interact_config;
 mod basic_interact_state;
 
+use crate::basic_interact_state::State;
 use adder::adder_proxy;
-use basic_interact_config::Config;
-use basic_interact_state::State;
+pub use basic_interact_config::Config;
 use clap::Parser;
 
 use multiversx_sc_snippets::imports::*;
@@ -13,11 +13,12 @@ const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 const ADDER_CODE_PATH: MxscPath = MxscPath::new("../output/adder.mxsc.json");
 
-#[tokio::main]
-async fn main() {
+pub async fn adder_cli() {
     env_logger::init();
 
-    let mut basic_interact = AdderInteract::init().await;
+    let config = Config::load_config();
+
+    let mut basic_interact = AdderInteract::init(config).await;
 
     let cli = basic_interact_cli::InteractCli::parse();
     match &cli.command {
@@ -38,34 +39,53 @@ async fn main() {
             basic_interact.multi_deploy(args.count).await;
         },
         Some(basic_interact_cli::InteractCliCommand::Sum) => {
-            basic_interact.print_sum().await;
+            let sum = basic_interact.get_sum().await;
+            println!("sum: {sum}");
         },
         Some(basic_interact_cli::InteractCliCommand::Upgrade(args)) => {
-            basic_interact.upgrade(args.value).await
+            let owner_address = basic_interact.adder_owner_address.clone();
+            basic_interact
+                .upgrade(args.value, &owner_address, None)
+                .await
         },
         None => {},
     }
 }
 
 #[allow(unused)]
-struct AdderInteract {
-    interactor: Interactor,
-    adder_owner_address: Bech32Address,
-    wallet_address: Bech32Address,
-    state: State,
+pub struct AdderInteract {
+    pub interactor: Interactor,
+    pub adder_owner_address: Bech32Address,
+    pub wallet_address: Bech32Address,
+    pub state: State,
 }
 
 impl AdderInteract {
-    async fn init() -> Self {
-        let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway())
+    pub async fn init(config: Config) -> Self {
+        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
 
-        let adder_owner_address =
-            interactor.register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap());
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        interactor.set_current_dir_from_workspace("contracts/examples/adder/interact");
+
+        let adder_owner_address = interactor
+            .register_wallet(Wallet::from_pem_file("adder-owner.pem").unwrap())
+            .await;
+        // PASSWORD: "alice"
+        // InsertPassword::Plaintext("alice".to_string()) || InsertPassword::StandardInput
+        let wallet_address = interactor
+            .register_wallet(
+                Wallet::from_keystore_secret(
+                    "alice.json",
+                    InsertPassword::Plaintext("alice".to_string()),
+                )
+                .unwrap(),
+            )
+            .await;
+
+        // generate blocks until ESDTSystemSCAddress is enabled
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
 
         Self {
             interactor,
@@ -75,7 +95,7 @@ impl AdderInteract {
         }
     }
 
-    async fn set_state(&mut self) {
+    pub async fn set_state(&mut self) {
         println!("wallet address: {}", self.wallet_address);
         self.interactor
             .retrieve_account(&self.adder_owner_address)
@@ -83,7 +103,7 @@ impl AdderInteract {
         self.interactor.retrieve_account(&self.wallet_address).await;
     }
 
-    async fn deploy(&mut self) {
+    pub async fn deploy(&mut self) {
         // warning: multi deploy not yet fully supported
         // only works with last deployed address
 
@@ -93,13 +113,12 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.adder_owner_address)
-            .gas(3_000_000)
+            .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(ADDER_CODE_PATH)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewBech32Address)
-            .prepare_async()
             .run()
             .await;
 
@@ -107,7 +126,7 @@ impl AdderInteract {
         self.state.set_adder_address(new_address);
     }
 
-    async fn multi_deploy(&mut self, count: usize) {
+    pub async fn multi_deploy(&mut self, count: usize) {
         if count == 0 {
             println!("count must be greater than 0");
             return;
@@ -123,7 +142,7 @@ impl AdderInteract {
                     .typed(adder_proxy::AdderProxy)
                     .init(0u32)
                     .code(ADDER_CODE_PATH)
-                    .gas(3_000_000)
+                    .gas(6_000_000)
                     .returns(ReturnsNewBech32Address)
             });
         }
@@ -140,7 +159,7 @@ impl AdderInteract {
         }
     }
 
-    async fn multi_add(&mut self, value: u32, count: usize) {
+    pub async fn multi_add(&mut self, value: u32, count: usize) {
         self.set_state().await;
         println!("calling contract {count} times...");
 
@@ -151,95 +170,105 @@ impl AdderInteract {
                     .to(self.state.current_adder_address())
                     .typed(adder_proxy::AdderProxy)
                     .add(value)
-                    .gas(3_000_000)
+                    .returns(ReturnsGasUsed)
+                    .gas(6_000_000)
             });
         }
 
-        let _ = buffer.run().await;
+        let gas_used = buffer.run().await;
+        let gas_used_sum = gas_used.iter().sum::<u64>();
 
-        println!("successfully performed add {count} times");
+        println!(
+            "successfully performed add {count} times, total gas used: {}, avg gas used: {}",
+            gas_used_sum,
+            gas_used_sum / count as u64
+        );
     }
 
-    async fn feed_contract_egld(&mut self) {
+    pub async fn feed_contract_egld(&mut self) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
             .egld(NumExpr("0,050000000000000000"))
-            .prepare_async()
             .run()
             .await;
     }
 
-    async fn add(&mut self, value: u32) {
+    pub async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
-            .gas(3_000_000)
+            .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .add(value)
-            .prepare_async()
             .run()
             .await;
 
         println!("successfully performed add");
     }
 
-    async fn print_sum(&mut self) {
-        let sum = self
-            .interactor
+    pub async fn get_sum(&mut self) -> RustBigUint {
+        self.interactor
             .query()
             .to(self.state.current_adder_address())
             .typed(adder_proxy::AdderProxy)
             .sum()
             .returns(ReturnsResultUnmanaged)
-            .prepare_async()
             .run()
-            .await;
-
-        println!("sum: {sum}");
+            .await
     }
 
-    async fn upgrade(&mut self, new_value: u32) {
-        let response = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .to(self.state.current_adder_address())
-            .gas(3_000_000)
-            .typed(adder_proxy::AdderProxy)
-            .upgrade(BigUint::from(new_value))
-            .code_metadata(CodeMetadata::UPGRADEABLE)
-            .code(ADDER_CODE_PATH)
-            .returns(ReturnsResultUnmanaged)
-            .prepare_async()
-            .run()
-            .await;
+    pub async fn upgrade(
+        &mut self,
+        new_value: u32,
+        sender: &Bech32Address,
+        expected_result: Option<(u64, &str)>,
+    ) {
+        match expected_result {
+            Some((code, msg)) => {
+                let response = self
+                    .interactor
+                    .tx()
+                    .from(sender)
+                    .to(self.state.current_adder_address())
+                    .gas(6_000_000)
+                    .typed(adder_proxy::AdderProxy)
+                    .upgrade(new_value)
+                    .code_metadata(CodeMetadata::UPGRADEABLE)
+                    .code(ADDER_CODE_PATH)
+                    .returns(ExpectError(code, msg))
+                    .run()
+                    .await;
 
-        let sum = self
-            .interactor
-            .query()
-            .to(self.state.current_adder_address())
-            .typed(adder_proxy::AdderProxy)
-            .sum()
-            .returns(ReturnsResultUnmanaged)
-            .prepare_async()
-            .run()
-            .await;
-        assert_eq!(sum, RustBigUint::from(new_value));
+                println!("response: {response:?}");
+            },
+            None => {
+                self.interactor
+                    .tx()
+                    .from(sender)
+                    .to(self.state.current_adder_address())
+                    .gas(6_000_000)
+                    .typed(adder_proxy::AdderProxy)
+                    .upgrade(new_value)
+                    .code_metadata(CodeMetadata::UPGRADEABLE)
+                    .code(ADDER_CODE_PATH)
+                    .run()
+                    .await;
 
-        println!("response: {response:?}");
+                let sum = self
+                    .interactor
+                    .query()
+                    .to(self.state.current_adder_address())
+                    .typed(adder_proxy::AdderProxy)
+                    .sum()
+                    .returns(ReturnsResultUnmanaged)
+                    .run()
+                    .await;
+
+                assert_eq!(sum, RustBigUint::from(new_value));
+            },
+        }
     }
-}
-
-#[tokio::test]
-#[ignore = "run on demand"]
-async fn test() {
-    let mut basic_interact = AdderInteract::init().await;
-
-    basic_interact.deploy().await;
-    basic_interact.add(1u32).await;
-
-    basic_interact.upgrade(7u32).await;
 }

@@ -93,8 +93,8 @@ impl ManagedVecItem for DebugHandle {
         use_raw_handle(RawHandle::from_byte_reader(reader))
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        RawHandle::to_byte_writer(&self.get_raw_handle(), writer)
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        RawHandle::into_byte_writer(self.get_raw_handle(), writer)
     }
 }
 

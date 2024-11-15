@@ -3,8 +3,8 @@ use crate::{
     contract_base::{ErrorHelper, SendRawWrapper},
     types::{
         interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
-        FunctionCall, ManagedBuffer, ManagedType, OriginalResultMarker, Tx, TxGas, TxGasValue,
-        TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+        FunctionCall, ManagedBuffer, OriginalResultMarker, Tx, TxGas, TxGasValue, TxPayment,
+        TxResultHandler, TxScEnv, TxToSpecified,
     },
 };
 
@@ -160,7 +160,7 @@ where
     pub fn register_promise(self) {
         let callback_name = self.result_handler.callback_name();
         let mut cb_closure_args_serialized =
-            ManagedBuffer::<Api>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
+            unsafe { ManagedBuffer::temp_const_ref_mut(const_handles::MBUF_TEMPORARY_1) };
         self.result_handler
             .overwrite_with_serialized_args(&mut cb_closure_args_serialized);
         let extra_gas_for_callback = self.result_handler.gas_for_callback();

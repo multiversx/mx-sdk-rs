@@ -209,6 +209,16 @@ where
         self.set_unchecked(index, item);
     }
 
+    /// Syntactic sugar, to more compactly express a get, update and set in one line.
+    /// Takes whatever lies in storage, apples the given closure and saves the final value back to storage.
+    /// Propagates the return value of the given function.
+    pub fn update<R, F: FnOnce(&mut T) -> R>(&mut self, index: usize, f: F) -> R {
+        let mut value = self.get(index);
+        let result = f(&mut value);
+        self.set(index, &value);
+        result
+    }
+
     /// Keeping `set_unchecked` private on purpose, so developers don't write out of index limits by accident.
     fn set_unchecked(&self, index: usize, item: &T) {
         storage_set(self.item_key(index).as_ref(), item);

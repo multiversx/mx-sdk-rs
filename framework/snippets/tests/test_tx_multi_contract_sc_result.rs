@@ -1,5 +1,6 @@
+use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets::network_response;
-use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
 #[test]
 fn test_with_multi_contract_same_shard_tx_that_has_no_sc_result() {
@@ -79,7 +80,7 @@ fn test_with_multi_contract_same_shard_tx_that_has_no_sc_result() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Vec<Vec<u8>> = vec![
         hex::decode("0a").unwrap(),
@@ -211,7 +212,7 @@ fn test_with_multi_contract_cross_shard_tx_that_has_no_callback() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Vec<Vec<u8>> = vec![];
 
@@ -340,7 +341,7 @@ fn test_with_multi_contract_cross_shard_tx_that_has_non_returning_callback() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Vec<Vec<u8>> = vec![];
 
@@ -469,7 +470,7 @@ fn test_with_multi_contract_cross_shard_tx_that_has_returning_callback() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Vec<Vec<u8>> = vec![];
 

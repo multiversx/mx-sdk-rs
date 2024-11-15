@@ -27,9 +27,10 @@ panic = "abort"
 [dependencies.multi-contract-features]
 path = ".."
 features = ["example_feature"]
+default-features = false
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.51.1"
+version = "0.54.0"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]

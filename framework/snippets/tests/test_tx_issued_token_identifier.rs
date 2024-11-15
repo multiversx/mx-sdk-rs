@@ -1,5 +1,6 @@
+use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets::network_response;
-use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
 #[test]
 fn test_process_issued_token_identifier_fungible() {
@@ -203,7 +204,7 @@ fn test_process_issued_token_identifier_fungible() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Option<String> = Some("EGLDMEX-95c6d5".to_string());
 
@@ -362,7 +363,7 @@ fn test_process_issued_token_identifier_semi_fungible() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Option<String> = Some("DOPETEST-77200c".to_string());
 
@@ -618,7 +619,7 @@ fn test_process_issued_token_identifier_non_fungible() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Option<String> = Some("GEN-868593".to_string());
 
@@ -919,7 +920,7 @@ fn test_process_issued_token_identifier_meta_esdt() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Option<String> = Some("AVASH-7d8b5d".to_string());
 
@@ -1152,7 +1153,7 @@ fn test_set_special_roles_should_not_process_issued_token_identifier() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected: Option<String> = None;
 
@@ -1414,7 +1415,7 @@ fn test_multisig_issue_nft_and_set_all_roles() {
         .data
         .unwrap()
         .transaction;
-    let tx_response = network_response::parse_tx_response(tx_on_network);
+    let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
     let expected = Some("TESTCOLL1-5aa80c".to_string());
 

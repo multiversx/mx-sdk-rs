@@ -19,6 +19,7 @@
 #
 # 2. Mass replace previous version -> new version.
 # Be careful to not accidentally replace some of the other dependencies we have.
+# Make sure to exclude files with extensions: *.lock, *.md, *.wat, *.txt, *.sh.
 #
 # 3. Write release name, date and description in `CHANGELOG.md`.
 #
@@ -59,23 +60,35 @@
 # 15. Write a release announcement in Confluence.
 #
 
-cd vm
-cargo publish || return 1
-cd ..
-
-cd sdk/core
-cargo publish || return 1
-cd ../..
-
-cd sdk/scenario-format/
-cargo publish || return 1
-cd ../..
-
 cd data/codec-derive
 cargo publish || return 1
 cd ../..
 
 cd data/codec
+cargo publish || return 1
+cd ../..
+
+cd chain/core
+cargo publish || return 1
+cd ../..
+
+cd chain/vm
+cargo publish || return 1
+cd ../..
+
+cd sdk/core
+cargo publish || return 1
+cd ../..
+
+cd sdk/http
+cargo publish || return 1
+cd ../..
+
+cd sdk/dapp
+cargo publish || return 1
+cd ../..
+
+cd sdk/scenario-format/
 cargo publish || return 1
 cd ../..
 

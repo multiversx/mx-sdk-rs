@@ -1,0 +1,80 @@
+{
+    "name": "crypto",
+    "comment": "does not currently work with scenarios-rs, because verify_bls function is not yet mocked",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features-crypto": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features-crypto.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "bls multi - ok",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features-crypto",
+                "function": "verify_bls_aggregated_signature",
+                "arguments": [
+                    [
+                        "nested:0x95f1d96b582f35294eb7dd4589b158e108e1d94cd0dd71ef16140e9b37126ec52dac6f57397f1e041acd7bb77df1d214f9f894e3b7fbf7abeaabc9fab8ff5c2ef05f9841322f301fdb900ac59479c334ac76a2d4ff992cd49bc9b530c25ee293",
+                        "nested:0x97aa2862418eb4ea74fddcb511eef9b771e07ff901e7e6abb35847a4bb81e58f189fc9bce4186c6129014fb43002300e959702ef4b9d0c32ebe4d795457095d65b5414efb36edbb8dc66d84a445a92472d4a31cedd4700d5ebb885eb11d3430b",
+                        "nested:0x37b73265936a2aaafe652a4dd451a1851c2dbbb32208604787479b31033e2a354615562ea2a5488f9134843362477a139050a0e798dd5ce0f01b35b8d473454ae99633aadde9237f84c87eb366144cca4de3d2cc6acc35e522a3294bf1186800",
+                        "nested:0xf46c10d114dcd3019dd4bcd4152fda678c56144eb177c67a6411213b86e206e4e56a9aad1eab0313b13031fda046d715ec4a02612b083dfae0d82a23b643e1a89756c0df3d65c27e87a9c1289628d1a8404f0668a3d87c7451ba1c78fc452693",
+                        "nested:0xaa0a97917df9240c537c89e873d7baa5ce1796e8fedfb23cf682b80fa19b8baae35af3754f9b8149985cb2a1fbda0f02c2942d2c99d9af556c9a5e90b8170e6a96379a45dd69351abfb814a16b5665abb7ddb8b096ee9f273de81845cda9728a"
+                    ],
+                    "str:message0",
+                    "0xae12858363e8caa5b398d3febdd7bc01bc2fae1fef8f486ff4d84a5f3342f2d38085904eb10b73c0879a45d23585ce8f"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "bls multi - fail",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features-crypto",
+                "function": "verify_bls_aggregated_signature",
+                "arguments": [
+                    [
+                        "nested:0x95f1d96b582f35294eb7dd4589b158e108e1d94cd0dd71ef16140e9b37126ec52dac6f57397f1e041acd7bb77df1d214f9f894e3b7fbf7abeaabc9fab8ff5c2ef05f9841322f301fdb900ac59479c334ac76a2d4ff992cd49bc9b530c25ee293",
+                        "nested:0x97aa2862418eb4ea74fddcb511eef9b771e07ff901e7e6abb35847a4bb81e58f189fc9bce4186c6129014fb43002300e959702ef4b9d0c32ebe4d795457095d65b5414efb36edbb8dc66d84a445a92472d4a31cedd4700d5ebb885eb11d3430b",
+                        "nested:0x37b73265936a2aaafe652a4dd451a1851c2dbbb32208604787479b31033e2a354615562ea2a5488f9134843362477a139050a0e798dd5ce0f01b35b8d473454ae99633aadde9237f84c87eb366144cca4de3d2cc6acc35e522a3294bf1186800",
+                        "nested:0xf46c10d114dcd3019dd4bcd4152fda678c56144eb177c67a6411213b86e206e4e56a9aad1eab0313b13031fda046d715ec4a02612b083dfae0d82a23b643e1a89756c0df3d65c27e87a9c1289628d1a8404f0668a3d87c7451ba1c78fc452693",
+                        "nested:0xaa0a97917df9240c537c89e873d7baa5ce1796e8fedfb23cf682b80fa19b8baae35af3754f9b8149985cb2a1fbda0f02c2942d2c99d9af556c9a5e90b8170e6a96379a45dd69351abfb814a16b5665abb7ddb8b096ee9f273de81845cda9728a"
+                    ],
+                    "str:message0",
+                    "0x0012858363e8caa5b398d3febdd7bc01bc2fae1fef8f486ff4d84a5f3342f2d38085904eb10b73c0879a45d23585ce8f"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:err blsSignatureDeserialize 0012858363e8caa5b398d3febdd7bc01bc2fae1fef8f486ff4d84a5f3342f2d38085904eb10b73c0879a45d23585ce8f",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

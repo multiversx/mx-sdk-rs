@@ -7,7 +7,6 @@ import re
 import struct
 
 DEBUG_API_TYPE = "multiversx_sc_scenario::api::impl_vh::vm_hooks_api::VMHooksApi<multiversx_sc_scenario::api::impl_vh::debug_api::DebugApiBackend>"
-ANY_NUMBER = "[0-9]+"
 ANY_TYPE = ".*"
 SOME_OR_NONE = "(Some|None)"
 
@@ -18,25 +17,24 @@ NUM_BIG_UINT_TYPE = "num_bigint::biguint::BigUint"
 # 2. SC wasm - Managed basic types
 MOD_PATH = "multiversx_sc::types::managed::basic"
 
-BIG_INT_TYPE = f"{MOD_PATH}::big_int::BigInt<{DEBUG_API_TYPE}>"
-BIG_FLOAT_TYPE = f"{MOD_PATH}::big_float::BigFloat<{DEBUG_API_TYPE}>"
-MANAGED_BUFFER_TYPE = f"{MOD_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE}>"
+BIG_INT_TYPE = f"{MOD_PATH}::big_int::BigInt<{DEBUG_API_TYPE} ?>"
+BIG_FLOAT_TYPE = f"{MOD_PATH}::big_float::BigFloat<{DEBUG_API_TYPE} ?>"
+MANAGED_BUFFER_TYPE = f"{MOD_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE} ?>"
 
 # 3. SC wasm - Managed wrapped types
 MOD_PATH = "multiversx_sc::types::managed::wrapped"
 
-BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE}>"
-TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE}>"
-MANAGED_ADDRESS_TYPE = f"{MOD_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE}>"
-MANAGED_BYTE_ARRAY_TYPE = f"{MOD_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE}, {ANY_NUMBER}>"
+BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
+TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
+MANAGED_ADDRESS_TYPE = f"{MOD_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
+MANAGED_BYTE_ARRAY_TYPE = f"{MOD_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
 
 # ManagedOption
 MANAGED_OPTION_INNER_TYPE_INDEX = 1
 MANAGED_OPTION_NONE_HANDLE = 2147483646  # i32::MAX - 1
 MANAGED_OPTION_TYPE = f"{MOD_PATH}::managed_option::ManagedOption<{DEBUG_API_TYPE}, {ANY_TYPE}>"
-
-ESDT_TOKEN_PAYMENT_TYPE = f"{MOD_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE}>"
-EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE}>"
+ESDT_TOKEN_PAYMENT_TYPE = f"{MOD_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
+EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
 
 # ManagedVec
 MANAGED_VEC_INNER_TYPE_INDEX = 1
@@ -44,16 +42,16 @@ MANAGED_VEC_TYPE = f"{MOD_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_
 
 # 4. SC wasm - Managed multi value types
 
-# 5. SC wasm - heap
-MOD_PATH = "multiversx_sc::types::heap"
+# 5. VM core types
+MOD_PATH = "multiversx_chain_core::types"
 
-HEAP_ADDRESS_TYPE = f"{MOD_PATH}::h256_address::Address"
+HEAP_ADDRESS_TYPE = f"{MOD_PATH}::address::Address"
 BOXED_BYTES_TYPE = f"{MOD_PATH}::boxed_bytes::BoxedBytes"
 
 # 6. MultiversX codec - Multi-types
 MOD_PATH = "multiversx_sc_codec::multi_types"
 
-OPTIONAL_VALUE_TYPE = f"{MOD_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>::{SOME_OR_NONE}"
+OPTIONAL_VALUE_TYPE = f"{MOD_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>"
 
 
 class InvalidHandle(Exception):
@@ -241,7 +239,7 @@ class ManagedType(Handler):
         return full_value
 
     def extract_value_from_raw_handle(self, context: lldb.value, raw_handle: int, map_picker: Callable) -> lldb.value:
-        managed_types = context.managed_types
+        managed_types = context[0].managed_types.data.value
         chosen_map = map_picker(managed_types)
         value = map_lookup(chosen_map, raw_handle)
         return value
@@ -288,7 +286,7 @@ class PlainManagedVecItem(ManagedVecItem, ManagedType):
 class NumBigInt(Handler):
     def summary(self, num_big_int: lldb.value) -> str:
         value_int = num_bigint_data_to_int(num_big_int.data.data)
-        if num_big_int.sign.sbvalue.GetValue() == 'num_bigint::bigint::Sign::Minus':
+        if num_big_int.sign.sbvalue.GetValue() == 'Minus':
             return str(-value_int)
         return str(value_int)
 
@@ -461,13 +459,14 @@ class BoxedBytes(Handler):
 
 class OptionalValue(Handler):
     def summary(self, optional_value: lldb.value) -> str:
-        if optional_value.sbvalue.GetType().GetName().endswith('::Some'):
-            summary = optional_value.sbvalue.GetChildAtIndex(0).GetSummary()
+        base_type = optional_value.sbvalue.GetType().GetName()
+        if optional_value.value.sbvalue.GetType().GetName().startswith(f'{base_type}::Some'):
+            summary = optional_value.value.sbvalue.GetChildAtIndex(0).GetSummary()
             return f"OptionalValue::Some({summary})"
         return "OptionalValue::None"
 
 
-ELROND_WASM_TYPE_HANDLERS = [
+MULTIVERSX_WASM_TYPE_HANDLERS = [
     # 1. num_bigint library
     (NUM_BIG_INT_TYPE, NumBigInt),
     (NUM_BIG_UINT_TYPE, NumBigUint),
@@ -505,7 +504,7 @@ def get_inner_type_handler(type_info: lldb.SBType, inner_type_index: int) -> Tup
 
 
 def get_handler(type_name: str) -> Handler:
-    for rust_type, handler_class in ELROND_WASM_TYPE_HANDLERS:
+    for rust_type, handler_class in MULTIVERSX_WASM_TYPE_HANDLERS:
         if re.fullmatch(rust_type, type_name) is not None:
             return handler_class()
     raise UnknownType(type_name)
@@ -520,7 +519,7 @@ def summarize_handler(handler_type: Type[Handler], valobj: SBValue, dictionary) 
 def __lldb_init_module(debugger: SBDebugger, dict):
     python_module_name = Path(__file__).with_suffix('').name
 
-    for rust_type, handler_class in ELROND_WASM_TYPE_HANDLERS:
+    for rust_type, handler_class in MULTIVERSX_WASM_TYPE_HANDLERS:
         # Add summary binding
         summary_function_name = f"handle{handler_class.__name__}"
         globals()[summary_function_name] = partial(summarize_handler, handler_class)

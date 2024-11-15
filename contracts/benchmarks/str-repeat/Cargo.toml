@@ -12,10 +12,10 @@ path = "src/str_repeat.rs"
 managed-buffer-builder-cached = ["multiversx-sc/managed-buffer-builder-cached"]
 
 [dependencies.multiversx-sc]
-version = "0.51.1"
+version = "0.54.0"
 path = "../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.51.1"
+version = "0.54.0"
 path = "../../../framework/scenario"

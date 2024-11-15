@@ -44,5 +44,5 @@ fn test_managed_vec_set() {
     mv2.push(BigUint::from(1u32));
     mv2.push(BigUint::from(5u32));
     mv2.push(BigUint::from(3u32));
-    assert_eq!(bf.managed_vec_set(mv1, 1, &BigUint::from(5u64)), mv2);
+    assert_eq!(bf.managed_vec_set(mv1, 1, BigUint::from(5u64)), mv2);
 }
