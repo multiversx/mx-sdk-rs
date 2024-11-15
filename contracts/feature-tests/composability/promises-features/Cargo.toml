@@ -9,6 +9,6 @@ publish = false
 path = "src/promises_main.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.1"
+version = "0.54.2"
 path = "../../../../framework/base"
 
