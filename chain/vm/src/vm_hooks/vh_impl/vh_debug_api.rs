@@ -6,9 +6,8 @@ use multiversx_chain_vm_executor::BreakpointValue;
 use crate::{
     tx_execution::execute_current_tx_context_input,
     tx_mock::{
-        async_call_tx_input, transfer_by_user_tx_input, AsyncCallTxData, BackTransfers,
-        BlockchainUpdate, CallType, TranferByUserData, TxCache, TxContext, TxFunctionName, TxInput,
-        TxManagedTypes, TxPanic, TxResult, TxTokenTransfer,
+        async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, TxCache,
+        TxContext, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
     },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
@@ -209,41 +208,6 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
             _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
-
-    fn perform_transfer_execute_by_user(
-        &self,
-        from: VMAddress,
-        to: VMAddress,
-        token_transfers: Vec<TxTokenTransfer>,
-        func_name: TxFunctionName,
-        arguments: Vec<Vec<u8>>,
-    ) {
-        let transfer_by_user_data =
-            self.create_transfer_by_user_data(from, to, token_transfers, func_name, arguments);
-        let mut tx_input =
-            transfer_by_user_tx_input(&transfer_by_user_data, CallType::TransferExecute);
-
-        if self.is_back_transfer(&tx_input) {
-            tx_input.call_type = CallType::BackTransfer;
-        }
-
-        let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
-            tx_input,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
-
-        match tx_result.result_status {
-            0 => {
-                self.0.result_lock().all_calls.push(transfer_by_user_data);
-
-                let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
-            },
-            10 => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
-            _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
-        }
-    }
 }
 
 impl DebugApiVMHooksHandler {
@@ -261,25 +225,6 @@ impl DebugApiVMHooksHandler {
             to,
             call_value: egld_value,
             endpoint_name: func_name,
-            arguments,
-            tx_hash,
-        }
-    }
-
-    fn create_transfer_by_user_data(
-        &self,
-        from: VMAddress,
-        to: VMAddress,
-        token_transfers: Vec<TxTokenTransfer>,
-        func_name: TxFunctionName,
-        arguments: Vec<Vec<u8>>,
-    ) -> TranferByUserData {
-        let tx_hash = self.tx_hash();
-        TranferByUserData {
-            from,
-            to,
-            token_transfers,
-            func_name,
             arguments,
             tx_hash,
         }

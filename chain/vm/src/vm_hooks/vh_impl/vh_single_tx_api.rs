@@ -146,17 +146,6 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     ) {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
-
-    fn perform_transfer_execute_by_user(
-        &self,
-        _from: VMAddress,
-        _to: VMAddress,
-        _token_transfers: Vec<crate::tx_mock::TxTokenTransfer>,
-        _func_name: TxFunctionName,
-        _arguments: Vec<Vec<u8>>,
-    ) {
-        panic!("cannot launch contract calls in the SingleTxApi")
-    }
 }
 
 impl VMHooksBigInt for SingleTxApiVMHooksHandler {}

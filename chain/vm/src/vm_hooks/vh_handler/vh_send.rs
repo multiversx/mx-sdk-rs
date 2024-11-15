@@ -179,32 +179,6 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         }
     }
 
-    fn multi_transfer_esdt_nft_execute_by_user(
-        &self,
-        user_handle: RawHandle,
-        dst_handle: RawHandle,
-        token_transfer_handle: RawHandle,
-        _gas_limit: u64,
-        function_name_handle: RawHandle,
-        arguments_handle: RawHandle,
-    ) {
-        let from = self.m_types_lock().mb_to_address(user_handle);
-        let to = self.m_types_lock().mb_to_address(dst_handle);
-        let payments = self
-            .m_types_lock()
-            .mb_get_vec_of_esdt_payments(token_transfer_handle);
-        let endpoint_name = self
-            .m_types_lock()
-            .mb_to_function_name(function_name_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arguments_handle);
-
-        let _sender = self.current_address();
-        if to.is_smart_contract_address() {
-            // && sender.shard == to.shard ?
-            self.perform_transfer_execute_by_user(from, to, payments, endpoint_name, arg_buffer);
-        }
-    }
-
     fn async_call_raw(
         &self,
         to_handle: RawHandle,

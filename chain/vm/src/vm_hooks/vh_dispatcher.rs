@@ -910,15 +910,7 @@ impl VMHooks for VMHooksDispatcher {
         function_handle: i32,
         arguments_handle: i32,
     ) -> i32 {
-        self.handler.multi_transfer_esdt_nft_execute_by_user(
-            user_handle,
-            dst_handle,
-            token_transfers_handle,
-            gas_limit as u64,
-            function_handle,
-            arguments_handle,
-        );
-        0
+        panic!("Unavailable: managed_multi_transfer_esdt_nft_execute_by_user")
     }
 
     fn managed_transfer_value_execute(
