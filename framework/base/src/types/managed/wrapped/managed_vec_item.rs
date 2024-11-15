@@ -365,7 +365,7 @@ where
             payload_slice[index..next_index].copy_from_slice(bytes);
             index = next_index;
         });
-        writer(&payload_slice[..])
+        writer(payload_slice)
     }
 }
 
@@ -432,6 +432,6 @@ where
             payload_slice[index..next_index].copy_from_slice(bytes);
             index = next_index;
         });
-        writer(&payload_slice[..])
+        writer(payload_slice)
     }
 }
