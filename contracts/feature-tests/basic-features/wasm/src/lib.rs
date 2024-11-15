@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          411
+// Endpoints:                          413
 // Async Callback:                       1
-// Total number of exported functions: 413
+// Total number of exported functions: 415
 
 #![no_std]
 
@@ -181,6 +181,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_varags_managed_sum => echo_varags_managed_sum
         echo_varags_vec_with_counted => echo_varags_vec_with_counted
         echo_varags_vec_with_counted_pairs => echo_varags_vec_with_counted_pairs
+        convert_varags_vec_with_counted_pairs_1 => convert_varags_vec_with_counted_pairs_1
+        convert_varags_vec_with_counted_pairs_2 => convert_varags_vec_with_counted_pairs_2
         compute_get_values => compute_get_values
         compute_create_ec => compute_create_ec
         compute_get_ec_length => compute_get_ec_length
