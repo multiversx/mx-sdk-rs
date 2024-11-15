@@ -149,8 +149,7 @@ pub(crate) fn create_sc_config_file(overwrite: bool) {
 }
 
 pub(crate) fn create_config_toml_file(snippets_folder_path: &str) {
-    let config_path = format!("{snippets_folder_path}/src/{CONFIG_TOML_PATH}");
-
+    let config_path = format!("{snippets_folder_path}/{CONFIG_TOML_PATH}");
     let mut file = File::create(config_path).unwrap();
 
     writeln!(

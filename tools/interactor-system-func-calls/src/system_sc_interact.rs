@@ -229,8 +229,9 @@ struct SysFuncCallsInteract {
 impl SysFuncCallsInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor =
-            Interactor::new(config.gateway_uri(), config.use_chain_simulator()).await;
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.use_chain_simulator());
 
         interactor.set_current_dir_from_workspace("tools/interactor-system-func-calls");
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;

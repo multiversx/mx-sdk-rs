@@ -100,4 +100,27 @@ pub trait EchoManagedTypes {
         }
         result
     }
+
+    #[endpoint]
+    fn echo_varags_vec_with_counted(
+        &self,
+        m: MultiValueEncoded<MultiValue2<ManagedBuffer, MultiValueManagedVecCounted<usize>>>,
+    ) -> MultiValueEncoded<MultiValue2<ManagedBuffer, MultiValueManagedVecCounted<usize>>> {
+        m
+    }
+
+    #[endpoint]
+    fn echo_varags_vec_with_counted_pairs(
+        &self,
+        m: MultiValueEncoded<
+            MultiValue2<
+                ManagedBuffer,
+                MultiValueEncodedCounted<MultiValue2<usize, ManagedAddress>>,
+            >,
+        >,
+    ) -> MultiValueEncoded<
+        MultiValue2<ManagedBuffer, MultiValueEncodedCounted<MultiValue2<usize, ManagedAddress>>>,
+    > {
+        m
+    }
 }
