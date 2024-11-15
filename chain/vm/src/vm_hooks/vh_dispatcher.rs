@@ -1883,7 +1883,7 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         panic!("Unavailable: managed_multi_transfer_esdt_nft_execute_by_user")
     }
-    
+
     fn managed_verify_secp256r1(
         &self,
         key_handle: i32,
