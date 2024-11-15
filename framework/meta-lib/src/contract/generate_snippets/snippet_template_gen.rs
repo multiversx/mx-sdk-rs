@@ -236,7 +236,7 @@ use rust_interact::ContractInteract;
 // In order for this test to work, make sure that the `config.toml` file contains the chain simulator config (or choose it manually)
 // The chain simulator should already be installed and running before attempting to run this test.
 // The chain-simulator-tests feature should be present in Cargo.toml.
-// Can be run with `cargo test --features chain-simulator-tests`.
+// Can be run with `sc-meta test -c`.
 #[tokio::test]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn deploy_test_{crate_name}_cs() {{
@@ -255,7 +255,7 @@ use rust_interact::ContractInteract;
 
 // Simple deploy test that runs on the real blockchain configuration.
 // In order for this test to work, make sure that the `config.toml` file contains the real blockchain config (or choose it manually)
-// Can be run with `cargo test`.
+// Can be run with `sc-meta test`.
 #[tokio::test]
 #[cfg_attr(not(feature = "blockchain-tests"), ignore)]
 async fn deploy_test_{crate_name}() {{
