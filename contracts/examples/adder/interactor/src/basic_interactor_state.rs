@@ -8,7 +8,7 @@ use std::{
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-/// Multisig Interact state
+/// Adder Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
     adder_address: Option<Bech32Address>,

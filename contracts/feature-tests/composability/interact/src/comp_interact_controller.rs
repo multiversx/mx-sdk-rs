@@ -16,8 +16,9 @@ pub struct ComposabilityInteract {
 impl ComposabilityInteract {
     pub async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
+        let mut interactor = Interactor::new(config.gateway_uri())
             .await
+            .use_chain_simulator(config.use_chain_simulator())
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
         interactor.set_current_dir_from_workspace("contracts/feature-tests/composability/interact");
