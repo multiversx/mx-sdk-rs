@@ -1,15 +1,17 @@
-#[derive(Debug, Default, Clone)]
+use multiversx_sc::chain_core::types::ReturnCode;
+
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 /// The status of a transaction.
 pub struct TxResponseStatus {
     /// The status of the transaction.
-    pub status: u64,
+    pub status: ReturnCode,
     /// The message of the transaction.
     pub message: String,
 }
 
 impl TxResponseStatus {
     /// Creates a [`TxResponseStatus`]
-    pub fn new(status: u64, message: &str) -> Self {
+    pub fn new(status: ReturnCode, message: &str) -> Self {
         Self {
             status,
             message: message.to_string(),
@@ -18,12 +20,12 @@ impl TxResponseStatus {
 
     /// Creates a [`TxResponseStatus`] that signals an error.
     pub fn signal_error(message: &str) -> Self {
-        Self::new(4, message)
+        Self::new(ReturnCode::UserError, message)
     }
 
     /// Checks if the transaction was successful.
     pub fn is_success(&self) -> bool {
-        self.status == 0
+        self.status.is_success()
     }
 }
 

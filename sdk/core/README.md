@@ -4,21 +4,8 @@
 
 General purpose collection of tools & SDKs to interact with the MultiversX blockchain from Rust projects.
 
-## Example
+It provides communication via the MultiversX gateway API.
 
-```rust
-use multiversx_sdk::blockchain::rpc::{CommunicationProxy, DEVNET_GATEWAY};
-
-#[tokio::test]
-async fn get_network_config() {
-    let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
-    let network_config = blockchain.get_network_config().await.unwrap();
-
-    println!("network_config: {:?}", network_config)
-}
-```
-
-More examples in `./examples`.
 
 ## Acknowledgements
 

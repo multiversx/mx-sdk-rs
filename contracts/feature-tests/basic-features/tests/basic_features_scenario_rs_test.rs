@@ -2,6 +2,7 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
     blockchain.register_contract(
         "mxsc:output/basic-features.mxsc.json",
@@ -10,6 +11,10 @@ fn world() -> ScenarioWorld {
     blockchain.register_contract(
         "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
         esdt_system_sc_mock::ContractBuilder,
+    );
+    blockchain.register_contract(
+        "mxsc:output/basic-features-crypto.mxsc.json",
+        basic_features::ContractBuilder,
     );
 
     blockchain
@@ -99,6 +104,18 @@ fn crypto_verify_bls_rs() {
 }
 
 #[test]
+#[ignore]
+fn crypto_verify_bls_aggregated_signature_rs() {
+    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
+}
+
+#[test]
+#[ignore]
+fn crypto_verify_bls_share_rs() {
+    world().run("scenarios/crypto_verify_bls_share.scen.json");
+}
+
+#[test]
 fn crypto_verify_ed_25519_rs() {
     world().run("scenarios/crypto_verify_ed25519.scen.json");
 }
@@ -107,6 +124,12 @@ fn crypto_verify_ed_25519_rs() {
 #[ignore]
 fn crypto_verify_secp_256_k_1_rs() {
     world().run("scenarios/crypto_verify_secp256k1.scen.json");
+}
+
+#[test]
+#[ignore]
+fn crypto_verify_secp_256_r_1_rs() {
+    world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }
 
 #[test]
@@ -187,6 +210,16 @@ fn echo_u_64_rs() {
 #[test]
 fn echo_usize_rs() {
     world().run("scenarios/echo_usize.scen.json");
+}
+
+#[test]
+fn echo_varags_vec_with_counted_rs() {
+    world().run("scenarios/echo_varags_vec_with_counted.scen.json");
+}
+
+#[test]
+fn echo_varags_vec_with_counted_pairs_rs() {
+    world().run("scenarios/echo_varags_vec_with_counted_pairs.scen.json");
 }
 
 #[test]

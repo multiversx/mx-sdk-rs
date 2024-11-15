@@ -4,7 +4,8 @@
 // !!!!!!!!!!!!!!!!!!!!!! AUTO-GENERATED FILE !!!!!!!!!!!!!!!!!!!!!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-/// VM Hooks version planned to be released with VM 1.5 in Q2 2023.
+/// VM Hooks version released in January 2024:
+/// https://multiversx.com/release/release-sirius-v1-6-7
 ///
 /// It adds the new async call functionality (promises).
 ///

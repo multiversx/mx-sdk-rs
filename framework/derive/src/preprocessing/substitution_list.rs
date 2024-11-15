@@ -61,6 +61,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueManagedVecCounted));
+    add_managed_type_with_generics(substitutions, &quote!(MultiValueEncodedCounted));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueManagedVec));
@@ -109,6 +110,7 @@ fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
     add_storage_mapper_single_generic_arg(substitutions, &quote!(TokenAttributesMapper));
     add_storage_mapper_single_generic_arg(substitutions, &quote!(UniqueIdMapper));
     add_storage_mapper_single_generic_arg(substitutions, &quote!(UserMapper));
+    add_storage_mapper_single_generic_arg(substitutions, &quote!(AddressToIdMapper));
 
     add_storage_mapper(substitutions, &quote!(BiDiMapper));
     add_storage_mapper(substitutions, &quote!(LinkedListMapper));

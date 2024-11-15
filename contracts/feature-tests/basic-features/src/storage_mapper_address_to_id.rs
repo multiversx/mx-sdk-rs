@@ -43,5 +43,5 @@ pub trait AddressToIdMapperFeatures {
     }
 
     #[storage_mapper("address_ids")]
-    fn address_ids(&self) -> AddressToIdMapper<Self::Api>;
+    fn address_ids(&self) -> AddressToIdMapper;
 }

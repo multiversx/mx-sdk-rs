@@ -74,6 +74,27 @@ pub const EI_1_3_ADDED_NAMES: &[&str] = &[
     "managedIsBuiltinFunction",
 ];
 
+pub const EI_1_4_ADDED_NAMES: &[&str] = &[
+    "isReservedFunctionName",
+    "managedGetOriginalCallerAddr",
+    "managedGetRelayerAddr",
+    "managedMultiTransferESDTNFTExecuteByUser",
+    "managedVerifySecp256r1",
+    "managedVerifyBLSSignatureShare",
+    "managedVerifyBLSAggregatedSignature",
+];
+
+pub const EI_1_5_ADDED_NAMES: &[&str] = &[
+    "getRoundTime",
+    "epochStartBlockTimeStamp",
+    "epochStartBlockNonce",
+    "epochStartBlockRound",
+    "mBufferToSmallIntUnsigned",
+    "mBufferToSmallIntSigned",
+    "mBufferFromSmallIntUnsigned",
+    "mBufferFromSmallIntSigned",
+];
+
 fn list_to_set<'a>(list: &[&'a str]) -> HashSet<&'a str> {
     let mut set = HashSet::new();
     for &item in list {
@@ -108,4 +129,14 @@ fn test_added_names_ei_1_2() {
 #[test]
 fn test_added_names_ei_1_3() {
     test_added_names(ei::EI_1_2_NAMES, EI_1_3_ADDED_NAMES, ei::EI_1_3_NAMES);
+}
+
+#[test]
+fn test_added_names_ei_1_4() {
+    test_added_names(ei::EI_1_3_NAMES, EI_1_4_ADDED_NAMES, ei::EI_1_4_NAMES);
+}
+
+#[test]
+fn test_added_names_ei_1_5() {
+    test_added_names(ei::EI_1_4_NAMES, EI_1_5_ADDED_NAMES, ei::EI_1_5_NAMES);
 }

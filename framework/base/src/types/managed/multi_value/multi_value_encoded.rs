@@ -15,6 +15,8 @@ use crate::{
 };
 use core::{iter::FromIterator, marker::PhantomData};
 
+use super::MultiValueEncodedIterator;
+
 /// A multi-value container, that keeps raw values as ManagedBuffer
 /// It allows encoding and decoding of multi-values.
 ///
@@ -115,7 +117,7 @@ where
     M: ManagedTypeApi,
 {
     pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
-        ManagedArgBuffer::from_handle(self.raw_buffers.get_handle())
+        unsafe { ManagedArgBuffer::from_handle(self.raw_buffers.get_handle()) }
     }
 }
 
@@ -144,6 +146,18 @@ where
 
     pub fn is_empty(&self) -> bool {
         self.raw_buffers.is_empty()
+    }
+}
+
+impl<M, T> IntoIterator for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopDecodeMulti,
+{
+    type Item = T;
+    type IntoIter = MultiValueEncodedIterator<M, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        MultiValueEncodedIterator::new(self.raw_buffers)
     }
 }
 

@@ -1,5 +1,5 @@
 use crate::{
-    api::{const_handles, use_raw_handle, BlockchainApi, BlockchainApiImpl, CallTypeApi},
+    api::{const_handles, BlockchainApi, BlockchainApiImpl, CallTypeApi},
     contract_base::BlockchainWrapper,
     types::{
         AnnotatedValue, ManagedAddress, ManagedBuffer, ManagedType, TxScEnv, TxTo, TxToSpecified,
@@ -25,9 +25,11 @@ where
     where
         F: FnOnce(&ManagedAddress<Api>) -> R,
     {
-        let caller_handle: Api::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_CALLER);
-        Api::blockchain_api_impl().load_caller_managed(caller_handle.clone());
-        f(&ManagedAddress::from_handle(caller_handle))
+        unsafe {
+            let temp = ManagedAddress::temp_const_ref(const_handles::ADDRESS_CALLER);
+            Api::blockchain_api_impl().load_caller_managed(temp.get_handle());
+            f(&temp)
+        }
     }
 }
 

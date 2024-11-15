@@ -124,7 +124,6 @@ impl ComposabilityInteract {
             .to(&root_addr)
             .typed(forwarder_queue_proxy::ForwarderQueueProxy)
             .forward_queued_calls()
-            .prepare_async()
             .run()
             .await;
 

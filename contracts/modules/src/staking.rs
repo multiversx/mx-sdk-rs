@@ -8,7 +8,7 @@ pub struct TokenAmountPair<M: ManagedTypeApi> {
 }
 
 static NOT_ENOUGH_STAKE_ERR_MSG: &[u8] = b"Not enough stake";
-static MINIMUM_BOARD_MEMBERS: usize = 3;
+static MINIMUM_BOARD_MEMBERS: usize = 2;
 static MAXIMUM_BOARD_MEMBERS: usize = 100;
 
 #[multiversx_sc::module]

@@ -1,11 +1,14 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{ManagedType, ManagedVec, ManagedVecItem},
+    types::{ManagedVec, ManagedVecItem},
 };
 use core::{
     marker::PhantomData,
+    mem::ManuallyDrop,
     ops::{Deref, DerefMut},
 };
+
+use super::{ManagedRef, ManagedRefMut};
 
 pub struct ManagedVecRef<'a, M, T>
 where
@@ -16,7 +19,7 @@ where
     _phantom_t: PhantomData<&'a mut T>, // needed for the lifetime, even though T is present
     managed_vec_handle: M::ManagedBufferHandle,
     item_index: usize,
-    item: T,
+    item: ManuallyDrop<T>,
 }
 
 impl<'a, M, T> ManagedVecRef<'a, M, T>
@@ -25,8 +28,10 @@ where
     T: ManagedVecItem,
 {
     #[inline]
-    fn wrap_as_managed_vec(managed_vec_handle: M::ManagedBufferHandle) -> ManagedVec<M, T> {
-        ManagedVec::from_handle(managed_vec_handle)
+    unsafe fn wrap_as_managed_vec(
+        managed_vec_handle: M::ManagedBufferHandle,
+    ) -> ManagedRef<'static, M, ManagedVec<M, T>> {
+        ManagedRef::wrap_handle(managed_vec_handle)
     }
 
     pub(super) fn new(managed_vec_handle: M::ManagedBufferHandle, item_index: usize) -> Self {
@@ -37,7 +42,7 @@ where
             _phantom_t: PhantomData,
             managed_vec_handle,
             item_index,
-            item,
+            item: ManuallyDrop::new(item),
         }
     }
 }
@@ -48,8 +53,13 @@ where
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
-        let _ = Self::wrap_as_managed_vec(self.managed_vec_handle.clone())
-            .set(self.item_index, &self.item);
+        let item = unsafe { ManuallyDrop::take(&mut self.item) };
+        unsafe {
+            let _ =
+                ManagedRefMut::<M, ManagedVec<M, T>>::wrap_handle(self.managed_vec_handle.clone())
+                    .set(self.item_index, item);
+        }
+        // core::mem::forget(item);
     }
 }
 

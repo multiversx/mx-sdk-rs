@@ -1,5 +1,6 @@
 use super::*;
 use alloc::{
+    borrow::ToOwned,
     string::{String, ToString},
     vec::Vec,
 };
@@ -42,6 +43,7 @@ pub struct EndpointAbi {
     pub docs: Vec<String>,
     pub name: String,
     pub rust_method_name: String,
+    pub title: Option<String>,
     pub only_owner: bool,
     pub only_admin: bool,
     pub labels: Vec<String>,
@@ -55,35 +57,62 @@ pub struct EndpointAbi {
 
 impl EndpointAbi {
     /// Used in code generation.
-    ///
-    /// TODO: replace with builder pattern to gt rid of the too many arguments.
-    #[allow(clippy::too_many_arguments)]
     pub fn new(
-        docs: &[&str],
         name: &str,
         rust_method_name: &str,
-        only_owner: bool,
-        only_admin: bool,
         mutability: EndpointMutabilityAbi,
         endpoint_type: EndpointTypeAbi,
-        payable_in_tokens: &[&str],
-        labels: &[&str],
-        allow_multiple_var_args: bool,
     ) -> Self {
         EndpointAbi {
-            docs: docs.iter().map(|s| s.to_string()).collect(),
+            docs: Vec::new(),
             name: name.to_string(),
             rust_method_name: rust_method_name.to_string(),
-            only_owner,
-            only_admin,
-            labels: labels.iter().map(|s| s.to_string()).collect(),
+            only_owner: false,
+            only_admin: false,
+            labels: Vec::new(),
             endpoint_type,
             mutability,
-            payable_in_tokens: payable_in_tokens.iter().map(|s| s.to_string()).collect(),
+            payable_in_tokens: Vec::new(),
+            title: None,
             inputs: Vec::new(),
             outputs: Vec::new(),
-            allow_multiple_var_args,
+            allow_multiple_var_args: false,
         }
+    }
+
+    pub fn with_docs(mut self, doc_line: &str) -> Self {
+        self.docs.push(doc_line.to_owned());
+        self
+    }
+
+    pub fn with_title(mut self, title: &str) -> Self {
+        self.title = Some(title.to_owned());
+        self
+    }
+
+    pub fn with_only_owner(mut self) -> Self {
+        self.only_owner = true;
+        self
+    }
+
+    pub fn with_only_admin(mut self) -> Self {
+        self.only_admin = true;
+        self
+    }
+
+    pub fn with_allow_multiple_var_args(mut self) -> Self {
+        self.allow_multiple_var_args = true;
+        self
+    }
+
+    pub fn with_label(mut self, label: &str) -> Self {
+        self.labels.push(label.to_owned());
+        self
+    }
+
+    pub fn with_payable_token(mut self, token: &str) -> Self {
+        self.payable_in_tokens.push(token.to_owned());
+        self
     }
 
     pub fn add_input<T: TypeAbi>(&mut self, arg_name: &str) {

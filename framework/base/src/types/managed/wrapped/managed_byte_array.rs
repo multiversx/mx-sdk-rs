@@ -35,7 +35,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedByteArray {
             buffer: ManagedBuffer::from_handle(handle),
         }
@@ -46,6 +46,10 @@ where
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -78,6 +82,17 @@ where
     pub fn new_from_bytes(bytes: &[u8; N]) -> Self {
         ManagedByteArray {
             buffer: ManagedBuffer::new_from_bytes(&bytes[..]),
+        }
+    }
+
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
+        ManagedByteArray {
+            buffer: ManagedBuffer::new_uninit(),
         }
     }
 

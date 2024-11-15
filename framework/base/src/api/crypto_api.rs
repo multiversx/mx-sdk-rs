@@ -44,7 +44,7 @@ pub trait CryptoApiImpl: ManagedTypeApiImpl {
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool;
+    );
 
     fn verify_ed25519_managed(
         &self,
@@ -75,5 +75,26 @@ pub trait CryptoApiImpl: ManagedTypeApiImpl {
         r: Self::ManagedBufferHandle,
         s: Self::ManagedBufferHandle,
         dest: Self::ManagedBufferHandle,
+    );
+
+    fn verify_secp256r1_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    );
+
+    fn verify_bls_signature_share_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
+    );
+
+    fn verify_bls_aggregated_signature_managed(
+        &self,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
     );
 }
