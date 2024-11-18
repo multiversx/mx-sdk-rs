@@ -90,6 +90,7 @@ fn add_storage_mapper_single_generic_arg(
     substitutions: &mut SubstitutionsMap,
     mapper_name: &proc_macro2::TokenStream,
 ) {
+    add_managed_type_with_generics(substitutions, mapper_name);
     substitutions.add_substitution(
         quote!(#mapper_name<Self::Api>),
         quote!(#mapper_name<Self::Api>),
