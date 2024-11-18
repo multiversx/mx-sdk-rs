@@ -2,7 +2,10 @@ use core::marker::PhantomData;
 
 use crate::{
     codec::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-    storage::mappers::{set_mapper::CurrentStorage, StorageMapperFromAddress},
+    storage::mappers::{
+        set_mapper::{CurrentStorage, StorageAddress},
+        StorageMapperFromAddress,
+    },
     types::ManagedAddress,
 };
 
@@ -192,9 +195,10 @@ where
     }
 }
 
-impl<SA> TokenAttributesMapper<SA>
+impl<SA, A> TokenAttributesMapper<SA, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
 {
     pub fn has_attributes<M: ManagedTypeApi>(
         &self,

@@ -4,11 +4,14 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom},
     api::ErrorApiImpl,
     codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
-    storage::mappers::{set_mapper::CurrentStorage, StorageMapperFromAddress},
+    storage::mappers::{
+        set_mapper::{CurrentStorage, StorageAddress},
+        StorageMapperFromAddress,
+    },
     storage_clear, storage_get, storage_get_len, storage_set,
     types::{
         system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
-        ESDTSystemSCAddress, Tx,
+        ESDTSystemSCAddress, ManagedRef, Tx,
     },
 };
 
@@ -38,6 +41,7 @@ pub(crate) const DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME: &str =
 pub struct FungibleTokenMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,
+    A: StorageAddress<SA>,
 {
     key: StorageKey<SA>,
     token_state: TokenMapperState<SA>,
@@ -265,13 +269,27 @@ where
             &TokenMapperState::Token(token_id.clone()),
         );
     }
+
+    pub fn get_balance(&self) -> BigUint<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        let own_sc_address = Self::get_sc_address();
+        let token_id = self.get_token_id_ref();
+
+        b_wrapper.get_esdt_balance(&own_sc_address, token_id, 0)
+    }
+
+    pub fn get_sc_address() -> ManagedAddress<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        b_wrapper.get_sc_address()
+    }
 }
 
-impl<SA> FungibleTokenMapper<SA>
+impl<SA, A> FungibleTokenMapper<SA, A>
 where
     SA: StorageMapperApi + CallTypeApi,
+    A: StorageAddress<SA>,
 {
-    pub fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
+    pub fn get_storage_key(&self) -> ManagedRef<SA, StorageKey<SA>> {
         self.key.as_ref()
     }
 
@@ -293,11 +311,6 @@ where
         } else {
             SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
         }
-    }
-
-    pub fn get_sc_address() -> ManagedAddress<SA> {
-        let b_wrapper = BlockchainWrapper::new();
-        b_wrapper.get_sc_address()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -342,14 +355,6 @@ where
         cb_closure.push_endpoint_arg(&self.key.buffer);
 
         cb_closure
-    }
-
-    pub fn get_balance(&self) -> BigUint<SA> {
-        let b_wrapper = BlockchainWrapper::new();
-        let own_sc_address = Self::get_sc_address();
-        let token_id = self.get_token_id_ref();
-
-        b_wrapper.get_esdt_balance(&own_sc_address, token_id, 0)
     }
 
     pub(crate) fn check_not_set(&self) {

@@ -395,11 +395,38 @@ where
             &TokenMapperState::Token(token_id.clone()),
         );
     }
+
+    pub fn get_balance(&self, token_nonce: u64) -> BigUint<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        let own_sc_address = Self::get_sc_address();
+        let token_id = self.get_token_id_ref();
+
+        b_wrapper.get_esdt_balance(&own_sc_address, token_id, token_nonce)
+    }
+
+    pub fn get_sc_address() -> ManagedAddress<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        b_wrapper.get_sc_address()
+    }
+
+    pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        let own_sc_address = Self::get_sc_address();
+        let token_id = self.get_token_id_ref();
+
+        b_wrapper.get_esdt_token_data(&own_sc_address, token_id, token_nonce)
+    }
+
+    pub fn get_token_attributes<T: TopDecode>(&self, token_nonce: u64) -> T {
+        let token_data = self.get_all_token_data(token_nonce);
+        token_data.decode_attributes()
+    }
 }
 
-impl<SA> NonFungibleTokenMapper<SA>
+impl<SA, A> NonFungibleTokenMapper<SA, A>
 where
     SA: StorageMapperApi + CallTypeApi,
+    A: StorageAddress<SA>,
 {
     pub(crate) fn check_not_set(&self) {
         let storage_value: TokenMapperState<SA> = storage_get(self.get_storage_key());
@@ -416,11 +443,6 @@ where
 
     pub fn is_empty(&self) -> bool {
         storage_get_len(self.get_storage_key()) == 0
-    }
-
-    pub fn get_sc_address() -> ManagedAddress<SA> {
-        let b_wrapper = BlockchainWrapper::new();
-        b_wrapper.get_sc_address()
     }
 
     pub fn require_issued_or_set(&self) {
@@ -467,27 +489,6 @@ where
         } else {
             SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
         }
-    }
-
-    pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
-        let b_wrapper = BlockchainWrapper::new();
-        let own_sc_address = Self::get_sc_address();
-        let token_id = self.get_token_id_ref();
-
-        b_wrapper.get_esdt_token_data(&own_sc_address, token_id, token_nonce)
-    }
-
-    pub fn get_balance(&self, token_nonce: u64) -> BigUint<SA> {
-        let b_wrapper = BlockchainWrapper::new();
-        let own_sc_address = Self::get_sc_address();
-        let token_id = self.get_token_id_ref();
-
-        b_wrapper.get_esdt_balance(&own_sc_address, token_id, token_nonce)
-    }
-
-    pub fn get_token_attributes<T: TopDecode>(&self, token_nonce: u64) -> T {
-        let token_data = self.get_all_token_data(token_nonce);
-        token_data.decode_attributes()
     }
 
     pub fn default_callback_closure_obj(&self) -> CallbackClosure<SA> {
