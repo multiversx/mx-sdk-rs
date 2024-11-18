@@ -203,7 +203,8 @@ macro_rules! impl_managed_type {
             }
 
             fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-                <$ty<M> as ManagedType<M>>::OwnHandle::into_byte_writer(self.get_handle(), writer)
+                let handle = unsafe { self.forget_into_handle() };
+                <$ty<M> as ManagedType<M>>::OwnHandle::into_byte_writer(handle, writer)
             }
         }
     };
@@ -266,7 +267,8 @@ where
     }
 
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        <M::ManagedBufferHandle as ManagedVecItem>::into_byte_writer(self.get_handle(), writer)
+        let handle = unsafe { self.forget_into_handle() };
+        <M::ManagedBufferHandle as ManagedVecItem>::into_byte_writer(handle, writer)
     }
 }
 
