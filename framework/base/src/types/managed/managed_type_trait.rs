@@ -11,6 +11,11 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
 
     fn get_handle(&self) -> Self::OwnHandle;
 
+    /// Forgets current object (does not run destructor), but extracts the handle.
+    /// 
+    /// The handle remains an owned object, so the handle's destructor will run later, when dropped.
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle;
+
     #[doc(hidden)]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {
         Self::from_handle(Self::OwnHandle::new(handle))

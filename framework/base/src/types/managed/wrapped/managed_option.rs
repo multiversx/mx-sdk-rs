@@ -41,9 +41,7 @@ where
     }
 
     pub fn some(value: T) -> Self {
-        let handle = value.get_handle();
-        core::mem::forget(value);
-        Self::new_with_handle(handle)
+        unsafe { Self::new_with_handle(value.forget_into_handle()) }
     }
 
     pub fn none() -> Self {
@@ -145,10 +143,12 @@ where
         F: FnOnce(Context, &T) -> R,
     {
         if self.is_some() {
-            let obj = unsafe { T::from_handle(self.handle.clone()) };
-            let result = f(context, &obj);
-            core::mem::forget(obj);
-            result
+            unsafe {
+                let obj = T::from_handle(self.handle.clone());
+                let result = f(context, &obj);
+                let _ = obj.forget_into_handle();
+                result
+            }
         } else {
             default(context)
         }
