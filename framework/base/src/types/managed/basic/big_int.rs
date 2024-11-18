@@ -38,12 +38,9 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
         self.handle.clone()
     }
 
-    unsafe fn forget_into_handle(mut self) -> Self::OwnHandle {
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
         unsafe {
-            let handle = core::mem::replace(
-                &mut self.handle,
-                core::mem::MaybeUninit::uninit().assume_init(),
-            );
+            let handle = core::ptr::read(&self.handle);
             core::mem::forget(self);
             handle
         }

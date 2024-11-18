@@ -12,8 +12,18 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
     fn get_handle(&self) -> Self::OwnHandle;
 
     /// Forgets current object (does not run destructor), but extracts the handle.
-    /// 
+    ///
     /// The handle remains an owned object, so the handle's destructor will run later, when dropped.
+    ///
+    /// ## Safety
+    ///
+    /// Destructures the object, without running a constructor.
+    ///
+    /// To avoid a memory leak, it is necessary for the object to be later
+    /// reconstructed from handle and its destructor run.
+    ///
+    /// It is designed to be used ManagedVec and ManagedOption,
+    /// where items are dropped later, together with their container.
     unsafe fn forget_into_handle(self) -> Self::OwnHandle;
 
     #[doc(hidden)]
