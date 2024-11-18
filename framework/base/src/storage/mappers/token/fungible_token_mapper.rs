@@ -2,6 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom},
     api::ErrorApiImpl,
     codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
+    storage::mappers::{set_mapper::CurrentStorage, StorageMapperFromAddress},
     storage_clear, storage_get, storage_set,
     types::{
         system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
@@ -29,15 +30,16 @@ pub(crate) const DEFAULT_ISSUE_CALLBACK_NAME: &str = "default_issue_cb";
 pub(crate) const DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME: &str =
     "default_issue_init_supply_cb";
 
-pub struct FungibleTokenMapper<SA>
+pub struct FungibleTokenMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
     key: StorageKey<SA>,
     token_state: TokenMapperState<SA>,
+    address: A,
 }
 
-impl<SA> StorageMapper<SA> for FungibleTokenMapper<SA>
+impl<SA> StorageMapper<SA> for FungibleTokenMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
@@ -45,6 +47,20 @@ where
         Self {
             token_state: storage_get(base_key.as_ref()),
             key: base_key,
+            address: CurrentStorage,
+        }
+    }
+}
+
+impl<SA> StorageMapperFromAddress<SA> for FungibleTokenMapper<SA, ManagedAddress<SA>>
+where
+    SA: StorageMapperApi + CallTypeApi,
+{
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        Self {
+            token_state: storage_get(base_key.as_ref()),
+            key: base_key,
+            address,
         }
     }
 }
@@ -83,7 +99,7 @@ where
     }
 }
 
-impl<SA> FungibleTokenMapper<SA>
+impl<SA> FungibleTokenMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
@@ -195,21 +211,6 @@ where
         }
     }
 
-    fn default_callback_closure_obj(&self, initial_supply: &BigUint<SA>) -> CallbackClosure<SA> {
-        let initial_caller = BlockchainWrapper::<SA>::new().get_caller();
-        let cb_name = if initial_supply > &0 {
-            DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME
-        } else {
-            DEFAULT_ISSUE_CALLBACK_NAME
-        };
-
-        let mut cb_closure = CallbackClosure::new(cb_name);
-        cb_closure.push_endpoint_arg(&initial_caller);
-        cb_closure.push_endpoint_arg(&self.key.buffer);
-
-        cb_closure
-    }
-
     pub fn mint(&self, amount: BigUint<SA>) -> EsdtTokenPayment<SA> {
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id();
@@ -237,19 +238,39 @@ where
         send_wrapper.esdt_local_burn(token_id, 0, amount);
     }
 
+    fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
+        Tx::new_tx_from_sc()
+            .to(to)
+            .single_esdt(&payment.token_identifier, 0, &payment.amount)
+            .transfer();
+    }
+}
+
+impl<SA> FungibleTokenMapper<SA>
+where
+    SA: StorageMapperApi + CallTypeApi,
+{
+    fn default_callback_closure_obj(&self, initial_supply: &BigUint<SA>) -> CallbackClosure<SA> {
+        let initial_caller = BlockchainWrapper::<SA>::new().get_caller();
+        let cb_name = if initial_supply > &0 {
+            DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME
+        } else {
+            DEFAULT_ISSUE_CALLBACK_NAME
+        };
+
+        let mut cb_closure = CallbackClosure::new(cb_name);
+        cb_closure.push_endpoint_arg(&initial_caller);
+        cb_closure.push_endpoint_arg(&self.key.buffer);
+
+        cb_closure
+    }
+
     pub fn get_balance(&self) -> BigUint<SA> {
         let b_wrapper = BlockchainWrapper::new();
         let own_sc_address = Self::get_sc_address();
         let token_id = self.get_token_id_ref();
 
         b_wrapper.get_esdt_balance(&own_sc_address, token_id, 0)
-    }
-
-    fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
-        Tx::new_tx_from_sc()
-            .to(to)
-            .single_esdt(&payment.token_identifier, 0, &payment.amount)
-            .transfer();
     }
 }
 
