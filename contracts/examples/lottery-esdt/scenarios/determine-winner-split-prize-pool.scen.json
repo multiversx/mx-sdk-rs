@@ -18,7 +18,7 @@
             "id": "determine-winner-with-split-prize-pool",
             "tx": {
                 "from": "address:acc4",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -27,7 +27,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": ["1"],
+                "out": [
+                    "1"
+                ],
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
@@ -38,6 +40,11 @@
             "accounts": {
                 "address:my_address": {
                     "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
                     "balance": "1,000,000",
                     "storage": {}
                 },
@@ -72,7 +79,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},

@@ -51,7 +51,7 @@
             "id": "buy-ticket-acc1",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -77,7 +77,7 @@
             "id": "buy-ticket-acc2",
             "tx": {
                 "from": "address:acc2",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -103,7 +103,7 @@
             "id": "buy-ticket-acc3",
             "tx": {
                 "from": "address:acc3",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -129,7 +129,7 @@
             "id": "buy-ticket-acc4",
             "tx": {
                 "from": "address:acc4",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -155,7 +155,7 @@
             "id": "buy-ticket-acc5",
             "tx": {
                 "from": "address:acc5",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -184,6 +184,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
                 "address:acc1": {
                     "nonce": "1",
                     "balance": "1,000,000",
@@ -209,7 +214,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {

@@ -17,7 +17,7 @@
             "id": "status-test",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "status",
                 "arguments": [
                     "str:lottery_name"
@@ -39,7 +39,7 @@
             "id": "determine-winner-early",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -63,6 +63,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
                 "address:acc1": {
                     "nonce": "1",
                     "balance": "1,000,000",
@@ -73,7 +78,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {

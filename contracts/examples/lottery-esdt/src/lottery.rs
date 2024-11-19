@@ -164,21 +164,20 @@ pub trait Lottery {
 
     #[endpoint]
     fn determine_winner(&self, lottery_name: ManagedBuffer) -> AwardingStatus {
-        // let sc_address = self.blockchain().get_sc_address();
-        // let sc_address_shard = self.blockchain().get_shard_of_address(&sc_address);
-        // let caller = self.blockchain().get_caller();
-        // let caller_shard = self.blockchain().get_shard_of_address(&caller);
-        // require!(
-        //     sc_address_shard != caller_shard,
-        //     "Caller needs to be on a remote shard"
-        // );
+        let sc_address = self.blockchain().get_sc_address();
+        let sc_address_shard = self.blockchain().get_shard_of_address(&sc_address);
+        let caller = self.blockchain().get_caller();
+        let caller_shard = self.blockchain().get_shard_of_address(&caller);
+        require!(
+            sc_address_shard != caller_shard,
+            "Caller needs to be on a remote shard"
+        );
 
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is inactive!"),
             Status::Running => sc_panic!("Lottery is still running!"),
             Status::Ended => {
                 if self.total_winning_tickets(&lottery_name).is_empty() {
-                    require!(self.lottery_info(&lottery_name).is_empty(), "whoops!");
                     self.prepare_awarding(&lottery_name);
                 }
                 if self.distribute_prizes(&lottery_name) == AwardingStatus::Finished {

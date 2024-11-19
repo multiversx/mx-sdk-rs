@@ -23,7 +23,7 @@
             "id": "buy-ticket-not-on-whitelist",
             "tx": {
                 "from": "address:acc3",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -53,6 +53,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
                 "address:acc1": {
                     "nonce": "0",
                     "balance": "1,000,000",
@@ -71,7 +76,7 @@
                     },
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

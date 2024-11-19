@@ -12,7 +12,7 @@
             "comment": "try starting lottery without setting local burn role",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "createLotteryPool",
                 "arguments": [
                     "str:lottery_name",
@@ -47,7 +47,7 @@
                         "str:LOTTERY-123456": "200"
                     }
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -67,7 +67,7 @@
             "comment": "start lottery after setting local burn role",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "createLotteryPool",
                 "arguments": [
                     "str:lottery_name",
@@ -94,7 +94,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -127,7 +127,7 @@
             "id": "buy first ticket",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -154,7 +154,7 @@
             "id": "buy second ticket",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -187,7 +187,7 @@
                     },
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -233,7 +233,7 @@
             "id": "determine-winner-same-ticket-holder",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -263,7 +263,7 @@
                     },
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {

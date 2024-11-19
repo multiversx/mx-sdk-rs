@@ -17,7 +17,7 @@
             "id": "start limited tickets, fixed deadline, invalid deadline arg",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "createLotteryPool",
                 "arguments": [
                     "str:lottery_name",
@@ -48,6 +48,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
                 "address:acc1": {
                     "nonce": "0",
                     "balance": "1,000,000",
@@ -58,7 +63,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
