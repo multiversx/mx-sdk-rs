@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          409
+// Endpoints:                          414
 // Async Callback:                       1
-// Total number of exported functions: 411
+// Total number of exported functions: 416
 
 #![no_std]
 
@@ -179,6 +179,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_managed_async_result_empty => echo_managed_async_result_empty
         echo_varags_managed_eager => echo_varags_managed_eager
         echo_varags_managed_sum => echo_varags_managed_sum
+        echo_varags_vec_with_counted => echo_varags_vec_with_counted
+        echo_varags_vec_with_counted_pairs => echo_varags_vec_with_counted_pairs
+        convert_varags_vec_with_counted_pairs_1 => convert_varags_vec_with_counted_pairs_1
+        convert_varags_vec_with_counted_pairs_2 => convert_varags_vec_with_counted_pairs_2
         compute_get_values => compute_get_values
         compute_create_ec => compute_create_ec
         compute_get_ec_length => compute_get_ec_length
@@ -415,6 +419,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         fill_map_mapper => fill_map_mapper
         fill_unordered_set_mapper => fill_unordered_set_mapper
         get_value_from_address_with_keys => get_value_from_address_with_keys
+        address_to_id_mapper_get_id_from_address => address_to_id_mapper_get_id_from_address
         managed_decimal_addition => managed_decimal_addition
         managed_decimal_subtraction => managed_decimal_subtraction
         managed_decimal_eq => managed_decimal_eq

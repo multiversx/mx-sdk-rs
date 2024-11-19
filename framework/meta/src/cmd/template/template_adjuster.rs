@@ -14,7 +14,7 @@ const INTERACT_DIRECTORY: &str = "./interact";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
-const INTERACT_CARGO_TOML: &str = "./interact/Cargo.toml";
+const INTERACT_CARGO_TOML: &str = "./interactor/Cargo.toml";
 const DEFAULT_AUTHOR: &str = "you";
 
 pub struct TemplateAdjuster {
@@ -44,7 +44,7 @@ impl TemplateAdjuster {
         }
 
         if self.metadata.has_interactor {
-            toml.add_workspace(&[".", "meta", "interact"]);
+            toml.add_workspace(&[".", "meta", "interactor"]);
         } else {
             toml.add_workspace(&[".", "meta"]);
         }

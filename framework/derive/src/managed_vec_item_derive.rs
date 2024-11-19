@@ -186,7 +186,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
 
                 #(#to_byte_writer_snippets)*
 
-                writer(&payload_slice[..])
+                writer(payload_slice)
             }
         }
     };

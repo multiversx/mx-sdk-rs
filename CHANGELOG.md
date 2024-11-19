@@ -32,6 +32,23 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+## [sc 0.54.3] - 2024-11-18
+- `#[storage_mapper_from_address]` fixes for: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `TokenAttributesMapper`, `UniqueIdMapper`, `UserMapper`, `AddressToIdMapper`.
+
+## [sc 0.54.2, codec 0.21.1, chain 0.11.1, sdk 0.7.1] - 2024-11-15
+- Codec improvements:
+	- `MultiValueX` - `TopDecodeMultiLength` implementation fix;
+	- `ManagedVecItem` implented for MultiValue2 and MultiValue3.
+- `sc-meta snippets` improvements.
+
+## [sc 0.54.1] - 2024-11-13
+- `sc-meta` `cs` - ChainSimulator CLI, which provides handy functionality to:
+	- install the chain simulator image in Docker;
+	- start/stop the chain simulator;
+	- quick testing using the `chain-simulator-tests` feature flag.
+- Adder interactor cleanup, including in template.
+- Interactor - `use_chain_simulator` builder method, for improved backwards compatibility.
+- `MultiValueEncodedCounted` - a lazy multi-value encoding, but with known number of elements.
 
 ## [sc 0.54.0, sdk 0.7.0, chain 0.11.0] - 2024-11-06
 - New crate, `multiversx-chain-core`, to be used in both framework and Rust VM. It contains common types, flags, and constants that refer to the protocol.
