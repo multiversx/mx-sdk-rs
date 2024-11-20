@@ -1,7 +1,8 @@
 use anyhow::Error;
 use multiversx_sc_scenario::imports::Address;
 use multiversx_sdk::gateway::{
-    ChainSimulatorGenerateBlocksRequest, ChainSimulatorSendFundsRequest, GatewayAsyncService,
+    ChainSimulatorGenerateBlocksRequest, ChainSimulatorSendFundsRequest,
+    ChainSimulatorSetStateRequest, GatewayAsyncService, SetStateAccount,
 };
 
 use crate::InteractorBase;
@@ -51,6 +52,16 @@ where
             .request(ChainSimulatorGenerateBlocksRequest::until_tx_processed(
                 tx_hash,
             ))
+            .await
+    }
+
+    pub async fn set_state(&self, account: Vec<SetStateAccount>) -> Result<String, Error> {
+        if !self.use_chain_simulator {
+            return Ok(String::from("no-simulator"));
+        }
+
+        self.proxy
+            .request(ChainSimulatorSetStateRequest::for_account(account))
             .await
     }
 }
