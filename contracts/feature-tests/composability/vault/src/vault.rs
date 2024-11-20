@@ -84,6 +84,20 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
+    fn accept_funds_echo_caller(&self) -> ManagedAddress {
+        let egld_value = self.call_value().egld_value();
+        let esdt_transfers_multi = self.esdt_transfers_multi();
+        let caller = self.blockchain().get_caller();
+        self.accept_funds_event(&egld_value, &esdt_transfers_multi);
+
+        self.call_counts(ManagedBuffer::from(b"accept_funds_echo_caller"))
+            .update(|c| *c += 1);
+
+        caller
+    }
+
+    #[payable("*")]
+    #[endpoint]
     fn accept_funds_single_esdt_transfer(&self) {
         let _ = self.call_value().single_esdt();
     }
