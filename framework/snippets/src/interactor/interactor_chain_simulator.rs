@@ -55,13 +55,13 @@ where
             .await
     }
 
-    pub async fn set_state(&self, account: Vec<SetStateAccount>) -> Result<String, Error> {
+    pub async fn set_state(&self, accounts: Vec<SetStateAccount>) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));
         }
 
         self.proxy
-            .request(ChainSimulatorSetStateRequest::for_account(account))
+            .request(ChainSimulatorSetStateRequest::for_accounts(accounts))
             .await
     }
 }

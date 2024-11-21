@@ -59,12 +59,12 @@ impl SetStateAccount {
 
 /// Sets state for a list of accounts using the chain simulator API.
 pub struct ChainSimulatorSetStateRequest {
-    pub account: Vec<SetStateAccount>,
+    pub accounts: Vec<SetStateAccount>,
 }
 
 impl ChainSimulatorSetStateRequest {
-    pub fn for_account(account: Vec<SetStateAccount>) -> Self {
-        Self { account }
+    pub fn for_accounts(accounts: Vec<SetStateAccount>) -> Self {
+        Self { accounts }
     }
 }
 
@@ -74,7 +74,7 @@ impl GatewayRequest for ChainSimulatorSetStateRequest {
     type Result = String;
 
     fn get_payload(&self) -> Option<&Self::Payload> {
-        Some(&self.account)
+        Some(&self.accounts)
     }
 
     fn request_type(&self) -> GatewayRequestType {
