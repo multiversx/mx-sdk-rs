@@ -1,4 +1,5 @@
 #![allow(clippy::too_many_arguments)]
+#![allow(unused)]
 
 mod call_tree;
 mod call_tree_calling_functions;
@@ -37,7 +38,7 @@ async fn main() {
 }
 
 #[tokio::test]
-#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+#[ignore = "needs changes. to do when chain simulator set state is implemented"]
 pub async fn transf_exec_by_user_cs_test() {
     let mut composability_interact = ComposabilityInteract::init().await;
     let wallet_address = composability_interact.wallet_address.clone();
