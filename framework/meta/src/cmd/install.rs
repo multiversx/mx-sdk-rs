@@ -10,7 +10,7 @@ use crate::cli::{
 
 use self::install_scenario_go::ScenarioGoInstaller;
 
-pub fn install(args: &InstallArgs) {
+pub async fn install(args: &InstallArgs) {
     let command = args
         .command
         .as_ref()
@@ -18,20 +18,22 @@ pub fn install(args: &InstallArgs) {
 
     match command {
         InstallCommand::All => {
-            install_scenario_go(&InstallMxScenarioGoArgs::default());
+            install_scenario_go(&InstallMxScenarioGoArgs::default()).await;
             install_wasm32(&InstallWasm32Args::default());
             install_wasm_opt(&InstallWasmOptArgs::default());
             install_debugger(&InstallDebuggerArgs::default());
         },
-        InstallCommand::MxScenarioGo(sg_args) => install_scenario_go(sg_args),
+        InstallCommand::MxScenarioGo(sg_args) => install_scenario_go(sg_args).await,
         InstallCommand::Wasm32(wam32_args) => install_wasm32(wam32_args),
         InstallCommand::WasmOpt(wasm_opt_args) => install_wasm_opt(wasm_opt_args),
         InstallCommand::Debugger(debugger_args) => install_debugger(debugger_args),
     }
 }
 
-fn install_scenario_go(sg_args: &InstallMxScenarioGoArgs) {
-    ScenarioGoInstaller::new(sg_args.tag.clone()).install();
+async fn install_scenario_go(sg_args: &InstallMxScenarioGoArgs) {
+    ScenarioGoInstaller::new(sg_args.tag.clone())
+        .install()
+        .await;
 }
 
 fn install_wasm32(_wasm32_args: &InstallWasm32Args) {
