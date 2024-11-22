@@ -21,12 +21,12 @@ pub async fn install(args: &InstallArgs) {
             install_scenario_go(&InstallMxScenarioGoArgs::default()).await;
             install_wasm32(&InstallWasm32Args::default());
             install_wasm_opt(&InstallWasmOptArgs::default());
-            install_debugger(&InstallDebuggerArgs::default());
+            install_debugger(&InstallDebuggerArgs::default()).await;
         },
         InstallCommand::MxScenarioGo(sg_args) => install_scenario_go(sg_args).await,
         InstallCommand::Wasm32(wam32_args) => install_wasm32(wam32_args),
         InstallCommand::WasmOpt(wasm_opt_args) => install_wasm_opt(wasm_opt_args),
-        InstallCommand::Debugger(debugger_args) => install_debugger(debugger_args),
+        InstallCommand::Debugger(debugger_args) => install_debugger(debugger_args).await,
     }
 }
 
@@ -44,6 +44,6 @@ fn install_wasm_opt(_wasm_opt_args: &InstallWasmOptArgs) {
     install_wasm_tools::install_wasm_opt();
 }
 
-fn install_debugger(_debugger_args: &InstallDebuggerArgs) {
-    install_debugger::install_debugger(Option::None);
+async fn install_debugger(_debugger_args: &InstallDebuggerArgs) {
+    install_debugger::install_debugger(Option::None).await;
 }

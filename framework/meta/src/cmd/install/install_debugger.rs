@@ -9,10 +9,10 @@ pub const SCRIPT_NAME: &str = "multiversx_sc_lldb_pretty_printers.py";
 
 pub const TARGET_PATH: &str = ".vscode/extensions/";
 
-pub fn install_debugger(custom_path: Option<PathBuf>) {
+pub async fn install_debugger(custom_path: Option<PathBuf>) {
     let testing = custom_path.is_some();
     let _ = install_lldb_extension();
-    install_script(custom_path);
+    install_script(custom_path).await;
     if !testing {
         // if we are testing we skip the configuration path, not to mess up with the current vscode configuration
         configure_vscode();
@@ -38,11 +38,12 @@ fn install_lldb_extension() -> io::Result<()> {
     Ok(())
 }
 
-fn install_script(custom_path: Option<PathBuf>) {
+async fn install_script(custom_path: Option<PathBuf>) {
     let repo_temp_download = RepoSource::download_from_github(
         crate::cmd::template::RepoVersion::Master,
         std::env::temp_dir(),
-    );
+    )
+    .await;
 
     let script_path = repo_temp_download.repo_path().join(PATH_TO_SCRIPT);
     let path_ref: &Path = script_path.as_ref();
