@@ -33,6 +33,7 @@ coverage.md
 my-vm-tests.sh
 quick.sh
 template-test
+install-debugger-test
 
 # Zip output with example wasm binaries
 examples-wasm.zip
