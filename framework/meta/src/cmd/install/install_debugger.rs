@@ -105,12 +105,11 @@ fn configure_vscode() {
         .unwrap()
         .entry("lldb.launch.initCommands")
         .or_insert_with(|| serde_json::Value::Array(Vec::new()));
-
+    let command_script_line =
+        "command script import ".to_owned() + script_full_path.to_str().unwrap();
     if let serde_json::Value::Array(ref mut array) = init_commands {
         array.clear();
-        array.push(serde_json::Value::String(
-            script_full_path.to_str().unwrap().to_string(),
-        ));
+        array.push(serde_json::Value::String(command_script_line));
     }
 
     let _ = fs::write(
