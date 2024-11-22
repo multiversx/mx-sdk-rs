@@ -21,11 +21,11 @@ plotters-canvas = "^0.3.0"
 lto = true
 
 [dependencies.multiversx-sc]
-version = "=0.54.3"
+version = "=0.54.4"
 path = "../../framework/base"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.54.3"
+version = "=0.54.4"
 path = "../../framework/scenario"
 default-features = false
 
