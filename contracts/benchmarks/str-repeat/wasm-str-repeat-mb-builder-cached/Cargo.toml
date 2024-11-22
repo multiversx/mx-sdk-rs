@@ -29,7 +29,7 @@ path = ".."
 features = ["managed-buffer-builder-cached"]
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.54.3"
+version = "0.54.4"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]

@@ -11,6 +11,6 @@ authors = ["you"]
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]
-version = "0.54.3"
+version = "0.54.4"
 path = "../../../../framework/meta-lib"
 default-features = false
