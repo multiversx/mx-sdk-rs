@@ -2,7 +2,8 @@ use crate::only_nested::*;
 multiversx_sc::derive_imports!();
 
 /// Its only purpose is to test that the ABI generator works fine.
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum AbiEnum {
     Nothing,
     Something(i32),
@@ -11,7 +12,8 @@ pub enum AbiEnum {
 }
 
 /// An enum with similar explicit discriminants
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
     Zero,
     Thirty = 30,
@@ -21,7 +23,8 @@ pub enum ExplicitDiscriminant {
 }
 
 /// An enum with different explicit discriminants
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 #[repr(u8)]
 pub enum ExplicitDiscriminantMixed {
     Zero,

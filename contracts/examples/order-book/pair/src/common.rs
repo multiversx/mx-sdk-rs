@@ -6,8 +6,9 @@ pub const FEE_PENALTY_INCREASE_EPOCHS: u64 = 5;
 pub const FEE_PENALTY_INCREASE_PERCENT: u64 = 1_000;
 pub const FREE_ORDER_FROM_STORAGE_MIN_PENALTIES: u64 = 6;
 
+#[type_abi]
 #[derive(
-    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, TypeAbi, Clone,
+    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone,
 )]
 pub enum OrderType {
     Buy,
@@ -26,27 +27,29 @@ pub struct Transfer<M: ManagedTypeApi> {
     pub payment: Payment<M>,
 }
 
-#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[type_abi]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub enum FeeConfigEnum {
     Fixed,
     Percent,
 }
 
-#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[type_abi]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct FeeConfig<M: ManagedTypeApi> {
     pub fee_type: FeeConfigEnum,
     pub fixed_fee: BigUint<M>,
     pub percent_fee: u64,
 }
 
-#[derive(
-    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone, Default,
-)]
+#[type_abi]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, Default)]
 pub struct DealConfig {
     pub match_provider_percent: u64,
 }
 
-#[derive(TopEncode, TopDecode, TypeAbi, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, Clone)]
 pub struct OrderInputParams<M: ManagedTypeApi> {
     pub amount: BigUint<M>,
     pub match_provider: ManagedAddress<M>,
@@ -54,7 +57,8 @@ pub struct OrderInputParams<M: ManagedTypeApi> {
     pub deal_config: DealConfig,
 }
 
-#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[type_abi]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
     pub creator: ManagedAddress<M>,

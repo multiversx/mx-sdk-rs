@@ -5,7 +5,8 @@ use multiversx_sc::{derive_imports::*, imports::*};
 pub mod nft_marketplace_proxy;
 mod nft_module;
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct ExampleAttributes {
     pub creation_timestamp: u64,
 }
