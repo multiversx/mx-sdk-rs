@@ -52,7 +52,7 @@ impl<'w> TxEnvMockDeployAddress for ScenarioEnvExec<'w> {
             .world
             .get_state()
             .accounts
-            .get(&from_value.to_vm_address())
+            .get(&from_value.to_address())
             .expect("sender does not exist")
             .nonce;
         let new_address_value = address_annotated(self, &new_address);
@@ -85,7 +85,6 @@ where
 
     fn run(self) -> Self::Returns {
         let mut step_wrapper = self.tx_to_step();
-        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
         step_wrapper.env.world.sc_call(&mut step_wrapper.step);
         step_wrapper.process_result()
     }
@@ -111,7 +110,6 @@ where
 
     fn run(self) -> Self::Returns {
         let mut step_wrapper = self.tx_to_step();
-        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
         step_wrapper.env.world.sc_call(&mut step_wrapper.step);
         step_wrapper.process_result()
     }
@@ -119,8 +117,11 @@ where
 
 impl<'w> TxEnvWithTxHash for ScenarioEnvExec<'w> {
     fn set_tx_hash(&mut self, tx_hash: H256) {
-        assert!(self.data.tx_hash.is_none(), "tx hash set twice");
-        self.data.tx_hash = Some(tx_hash);
+        self.data.set_tx_hash(tx_hash);
+    }
+
+    fn take_tx_hash(&mut self) -> Option<H256> {
+        self.data.take_tx_hash()
     }
 }
 

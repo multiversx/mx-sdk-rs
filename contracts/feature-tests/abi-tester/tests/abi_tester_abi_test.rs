@@ -12,7 +12,8 @@ use multiversx_sc_scenario::ScenarioWorld;
 
 #[test]
 fn abi_tester_abi_generated_ok() {
-    let blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
 
     // generate ABI
     let multi_contract_config = multiversx_sc_meta_lib::multi_contract_config::<
@@ -70,7 +71,8 @@ fn abi_tester_esdt_attr_abi_generated_ok() {
 
 #[test]
 fn check_multi_contract_config() {
-    let blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
 
     let multi_contract_config = multiversx_sc_meta_lib::multi_contract_config::<
         abi_tester::AbiProvider,

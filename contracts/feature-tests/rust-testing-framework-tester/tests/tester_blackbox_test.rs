@@ -8,6 +8,8 @@ const RUST_TESTING_FRAMEWORK_TESTER_ADDRESS: TestSCAddress =
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain
+        .set_current_dir_from_workspace("contracts/feature-tests/rust-testing-framework-tester");
     blockchain.register_contract(CODE_PATH, rust_testing_framework_tester::ContractBuilder);
 
     blockchain

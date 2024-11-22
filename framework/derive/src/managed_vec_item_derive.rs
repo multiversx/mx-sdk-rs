@@ -75,7 +75,7 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
                 let field_ident = &field.ident;
                 let type_name = &field.ty;
                 quote! {
-                    multiversx_sc::types::ManagedVecItem::to_byte_writer(&self.#field_ident, |bytes| {
+                    multiversx_sc::types::ManagedVecItem::into_byte_writer(self.#field_ident, |bytes| {
                         let next_index = index + <#type_name as multiversx_sc::types::ManagedVecItem>::payload_size();
                         payload_slice[index .. next_index].copy_from_slice(bytes);
                         index = next_index;
@@ -137,7 +137,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                 Self::from_byte_reader(reader)
             }
 
-            fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+            fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
                 let mut arr: [u8; 1] = [0u8; 1];
                 arr[0] = match self {
                     #(#writer_match_arms)*
@@ -180,13 +180,13 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                 Self::from_byte_reader(reader)
             }
 
-            fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+            fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
                 #payload_buffer_snippet
                 let mut index = 0;
 
                 #(#to_byte_writer_snippets)*
 
-                writer(&payload_slice[..])
+                writer(payload_slice)
             }
         }
     };

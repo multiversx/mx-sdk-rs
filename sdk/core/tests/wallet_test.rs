@@ -1,6 +1,8 @@
 use bip39::Mnemonic;
 
-use multiversx_sdk::{crypto::public_key::PublicKey, data::address::Address, wallet::Wallet};
+use multiversx_chain_core::types::Address;
+use multiversx_sdk::bech32;
+use multiversx_sdk::{crypto::public_key::PublicKey, wallet::Wallet};
 use std::fs::{self, File};
 use std::io::Write;
 
@@ -18,7 +20,7 @@ fn test_private_key_from_mnemonic() {
 
     let private_key = Wallet::get_private_key_from_mnemonic(mnemonic.clone(), 0, 0);
     let public_key = PublicKey::from(&private_key);
-    let address = Address::from(&public_key);
+    let address = public_key.to_address();
     assert_eq!(
         "0b7966138e80b8f3bb64046f56aea4250fd7bacad6ed214165cea6767fd0bc2c",
         private_key.to_string()
@@ -29,12 +31,12 @@ fn test_private_key_from_mnemonic() {
     );
     assert_eq!(
         "erd1mlh7q3fcgrjeq0et65vaaxcw6m5ky8jhu296pdxpk9g32zga6uhsemxx2a",
-        address.to_string()
+        bech32::encode(&address)
     );
 
     let private_key = Wallet::get_private_key_from_mnemonic(mnemonic, 0, 1);
     let public_key = PublicKey::from(&private_key);
-    let address = Address::from(&public_key);
+    let address = public_key.to_address();
     assert_eq!(
         "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
         private_key.to_string()
@@ -45,17 +47,17 @@ fn test_private_key_from_mnemonic() {
     );
     assert_eq!(
         "erd147877pc2tqv88yfvewhmdfuth845uqpsskky8kaalglzp6unem0qpwh982",
-        address.to_string()
+        bech32::encode(&address)
     );
 }
 
 #[test]
 fn test_load_from_pem() {
     let wallet = Wallet::from_pem_file("tests/alice.pem").unwrap();
-    let addr = wallet.address();
+    let address = wallet.to_address();
     assert_eq!(
-        addr.to_bech32_string().unwrap(),
-        "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+        "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+        bech32::encode(&address)
     );
 }
 
@@ -66,7 +68,7 @@ fn write_to_file(content: &str, file: &str) {
 
 fn create_keystore_file_from_scratch(file: &str) -> Address {
     let wallet = Wallet::from_private_key(ALICE_PRIVATE_KEY).unwrap();
-    let address = wallet.address();
+    let address = wallet.to_address();
 
     let concatenated_keys = format!("{}{}", ALICE_PRIVATE_KEY, ALICE_PUBLIC_KEY);
     let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();

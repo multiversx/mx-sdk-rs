@@ -1,0 +1,138 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_varags_vec_with_counted_pairs",
+                "arguments": [
+                    "str:alice",
+                    "1",
+                    "100",
+                    "address:a100",
+                    "str:bob",
+                    "0",
+                    "str:charlie",
+                    "3",
+                    "300",
+                    "address:a300",
+                    "301",
+                    "address:a301",
+                    "302",
+                    "address:a302"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:alice",
+                    "1",
+                    "100",
+                    "address:a100",
+                    "str:bob",
+                    "0",
+                    "str:charlie",
+                    "3",
+                    "300",
+                    "address:a300",
+                    "301",
+                    "address:a301",
+                    "302",
+                    "address:a302"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "convert1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "convert_varags_vec_with_counted_pairs_1",
+                "arguments": [
+                    "0x68d79a75b4aa11395dd08994855bd1d90b6b7583d7296dca31c2f8f59e0e7a68",
+                    "0x0f",
+                    "2",
+                    "5",
+                    "5",
+                    "4",
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x68d79a75b4aa11395dd08994855bd1d90b6b7583d7296dca31c2f8f59e0e7a68",
+                    "0x0f",
+                    "2",
+                    "5",
+                    "5",
+                    "4",
+                    "4"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "convert2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "convert_varags_vec_with_counted_pairs_2",
+                "arguments": [
+                    "0x68d79a75b4aa11395dd08994855bd1d90b6b7583d7296dca31c2f8f59e0e7a68",
+                    "0x0f",
+                    "2",
+                    "5",
+                    "5",
+                    "4",
+                    "4"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x68d79a75b4aa11395dd08994855bd1d90b6b7583d7296dca31c2f8f59e0e7a68",
+                    "0x0f",
+                    "2",
+                    "5",
+                    "5",
+                    "4",
+                    "4"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

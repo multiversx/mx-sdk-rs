@@ -12,9 +12,11 @@ pub trait ScenarioTester {
     #[storage_mapper("sum")]
     fn sum(&self) -> SingleValueMapper<BigUint>;
 
+    /// Return value for testing reasons.
     #[init]
-    fn init(&self, initial_value: BigUint) {
+    fn init(&self, initial_value: BigUint) -> &'static str {
         self.sum().set(initial_value);
+        "init-result"
     }
 
     #[upgrade]
@@ -37,5 +39,10 @@ pub trait ScenarioTester {
     fn multi_return(&self, value: BigUint) -> MultiValue2<BigUint, BigUint> {
         let value_plus_one = &value + 1u32;
         (value, value_plus_one).into()
+    }
+
+    #[view]
+    fn sc_panic(&self) {
+        sc_panic!("sc_panic! example");
     }
 }

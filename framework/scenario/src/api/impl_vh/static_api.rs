@@ -55,7 +55,7 @@ impl StaticApi {
     ///
     /// This placeholder then needs to be converted to something useful.
     pub fn is_current_address_placeholder(address: &Address) -> bool {
-        address.as_array() == StaticApiVMHooksHandler::CURRENT_ADDRESS_PLACEHOLDER.as_array()
+        address == &StaticApiVMHooksHandler::CURRENT_ADDRESS_PLACEHOLDER
     }
 
     pub fn reset() {

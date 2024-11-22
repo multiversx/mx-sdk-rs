@@ -1,22 +1,29 @@
 [package]
 name = "basic-features-interact"
 version = "0.0.0"
-authors = ["Ovidiu Stinga <ovidiu.stinga@multiversx.com>"]
+authors = ["MultiversX <contact@multiversx.com>"]
 edition = "2021"
 publish = false
 
 [[bin]]
 name = "basic-features-interact"
+path = "src/bf_interact_main.rs"
+
+[lib]
 path = "src/bf_interact.rs"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.24" }
 toml = "0.8.6"
 
 [dependencies.basic-features]
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.53.2"
+version = "0.54.3"
 path = "../../../../framework/snippets"
+
+[features]
+chain-simulator-tests = []

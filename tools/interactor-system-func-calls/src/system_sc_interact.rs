@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: move prepare_async calls to a test for backwards compatibility and delete from here
+
 mod system_sc_interact_cli;
 mod system_sc_interact_config;
 mod system_sc_interact_state;
@@ -227,9 +229,15 @@ struct SysFuncCallsInteract {
 impl SysFuncCallsInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway()).await;
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.use_chain_simulator());
 
-        let wallet_address = interactor.register_wallet(test_wallets::alice());
+        interactor.set_current_dir_from_workspace("tools/interactor-system-func-calls");
+        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+
+        // generate blocks until ESDTSystemSCAddress is enabled
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
 
         Self {
             interactor,
@@ -257,9 +265,9 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_fungible(
                 issue_cost.into(),
-                &token_display_name,
-                &token_ticker,
-                &initial_supply,
+                token_display_name,
+                token_ticker,
+                initial_supply,
                 FungibleTokenProperties {
                     num_decimals,
                     can_freeze: true,
@@ -297,8 +305,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_non_fungible(
                 issue_cost.into(),
-                &token_display_name,
-                &token_ticker,
+                token_display_name,
+                token_ticker,
                 NonFungibleTokenProperties {
                     can_freeze: true,
                     can_wipe: true,
@@ -334,8 +342,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_semi_fungible(
                 issue_cost.into(),
-                &token_display_name,
-                &token_ticker,
+                token_display_name,
+                token_ticker,
                 SemiFungibleTokenProperties {
                     can_freeze: true,
                     can_wipe: true,
@@ -397,8 +405,8 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .set_special_roles(
-                &ManagedAddress::from_address(wallet_address),
-                &TokenIdentifier::from(token_id),
+                ManagedAddress::from_address(wallet_address),
+                TokenIdentifier::from(token_id),
                 roles.into_iter(),
             )
             .prepare_async()
@@ -423,11 +431,11 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_nft_create(
-                &token_id,
-                &amount,
-                &name,
-                &royalties,
-                &hash,
+                token_id,
+                amount,
+                name,
+                royalties,
+                hash,
                 &NftDummyAttributes {
                     creation_epoch: 2104,
                     cool_factor: 5,
@@ -457,8 +465,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .register_meta_esdt(
                 issue_cost.into(),
-                &token_display_name,
-                &token_ticker,
+                token_display_name,
+                token_ticker,
                 MetaTokenProperties {
                     num_decimals,
                     can_freeze: true,
@@ -487,7 +495,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .change_sft_to_meta_esdt(&token_id, num_decimals)
+            .change_sft_to_meta_esdt(token_id, num_decimals)
             .prepare_async()
             .run()
             .await;
@@ -502,7 +510,7 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_local_mint(&token_id, nonce, &amount)
+            .esdt_local_mint(token_id, nonce, amount)
             .prepare_async()
             .run()
             .await;
@@ -517,7 +525,7 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_local_burn(&token_id, nonce, &amount)
+            .esdt_local_burn(token_id, nonce, amount)
             .prepare_async()
             .run()
             .await;
@@ -532,7 +540,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .pause(&token_id)
+            .pause(token_id)
             .prepare_async()
             .run()
             .await;
@@ -547,7 +555,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unpause(&token_id)
+            .unpause(token_id)
             .prepare_async()
             .run()
             .await;
@@ -562,7 +570,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .freeze(&token_id, &address)
+            .freeze(token_id, address)
             .prepare_async()
             .run()
             .await;
@@ -577,7 +585,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unfreeze(&token_id, &address)
+            .unfreeze(token_id, address)
             .prepare_async()
             .run()
             .await;
@@ -592,7 +600,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .freeze_nft(&token_id, nonce, &address)
+            .freeze_nft(token_id, nonce, address)
             .prepare_async()
             .run()
             .await;
@@ -607,7 +615,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unfreeze_nft(&token_id, nonce, &address)
+            .unfreeze_nft(token_id, nonce, address)
             .prepare_async()
             .run()
             .await;
@@ -622,7 +630,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .wipe(&token_id, &address)
+            .wipe(token_id, address)
             .prepare_async()
             .run()
             .await;
@@ -637,7 +645,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .wipe_nft(&token_id, nonce, &address)
+            .wipe_nft(token_id, nonce, address)
             .prepare_async()
             .run()
             .await;
@@ -660,11 +668,11 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_nft_create(
-                &token_id,
-                &amount,
-                &name,
-                &royalties,
-                &hash,
+                token_id,
+                amount,
+                name,
+                royalties,
+                hash,
                 &NftDummyAttributes {
                     creation_epoch: 2104,
                     cool_factor: 5,
@@ -690,7 +698,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unset_special_roles(&address, &token_id, roles.into_iter())
+            .unset_special_roles(address, token_id, roles.into_iter())
             .prepare_async()
             .run()
             .await;
@@ -705,7 +713,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .transfer_ownership(&token_id, &new_owner)
+            .transfer_ownership(token_id, new_owner)
             .prepare_async()
             .run()
             .await;
@@ -725,7 +733,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .transfer_nft_create_role(&token_id, &old_owner, &new_owner)
+            .transfer_nft_create_role(token_id, old_owner, new_owner)
             .prepare_async()
             .run()
             .await;
@@ -741,7 +749,7 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .control_changes(
-                &token_id,
+                token_id,
                 &TokenPropertyArguments {
                     can_freeze: Some(true),
                     can_wipe: Some(true),

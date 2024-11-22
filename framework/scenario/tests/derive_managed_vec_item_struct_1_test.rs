@@ -67,7 +67,7 @@ fn struct_1_to_bytes_writer() {
     let mut payload = <Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
     let payload_slice = payload.payload_slice_mut();
 
-    <Struct1 as multiversx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
+    <Struct1 as multiversx_sc::types::ManagedVecItem>::into_byte_writer(s, |bytes| {
         payload_slice.copy_from_slice(bytes);
         assert_eq!(
             payload_slice,

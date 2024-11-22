@@ -164,11 +164,11 @@ where
     })
 }
 
-fn managed_vec_item_to_slice<T>(arr: &mut [u8], index: &mut usize, item: &T)
+fn managed_vec_item_to_slice<T>(arr: &mut [u8], index: &mut usize, item: T)
 where
     T: ManagedVecItem,
 {
-    ManagedVecItem::to_byte_writer(item, |bytes| {
+    ManagedVecItem::into_byte_writer(item, |bytes| {
         let size = T::payload_size();
         arr[*index..*index + size].copy_from_slice(bytes);
         *index += size;
@@ -211,13 +211,13 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         Self::from_byte_reader(reader)
     }
 
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
         let mut arr: [u8; 16] = [0u8; 16];
         let mut index = 0;
 
-        managed_vec_item_to_slice(&mut arr, &mut index, &self.token_identifier);
-        managed_vec_item_to_slice(&mut arr, &mut index, &self.token_nonce);
-        managed_vec_item_to_slice(&mut arr, &mut index, &self.amount);
+        managed_vec_item_to_slice(&mut arr, &mut index, self.token_identifier);
+        managed_vec_item_to_slice(&mut arr, &mut index, self.token_nonce);
+        managed_vec_item_to_slice(&mut arr, &mut index, self.amount);
 
         writer(&arr[..])
     }
