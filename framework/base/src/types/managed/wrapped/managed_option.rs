@@ -41,7 +41,7 @@ where
     }
 
     pub fn some(value: T) -> Self {
-        Self::new_with_handle(value.get_handle())
+        unsafe { Self::new_with_handle(value.forget_into_handle()) }
     }
 
     pub fn none() -> Self {
@@ -143,7 +143,12 @@ where
         F: FnOnce(Context, &T) -> R,
     {
         if self.is_some() {
-            f(context, unsafe { &T::from_handle(self.handle.clone()) })
+            unsafe {
+                let obj = T::from_handle(self.handle.clone());
+                let result = f(context, &obj);
+                let _ = obj.forget_into_handle();
+                result
+            }
         } else {
             default(context)
         }
@@ -157,11 +162,7 @@ where
 {
     #[allow(clippy::redundant_clone)] // the clone is not redundant
     fn clone(&self) -> Self {
-        if self.is_some() {
-            Self::some(unsafe { T::from_handle(self.handle.clone()) }.clone())
-        } else {
-            Self::none()
-        }
+        self.map_ref_or_else((), |()| Self::none(), |(), obj| Self::some(obj.clone()))
     }
 }
 
@@ -328,12 +329,10 @@ where
     T: ManagedType<M> + core::fmt::Debug,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        if self.is_some() {
-            f.debug_tuple("ManagedOption::Some")
-                .field(unsafe { &T::from_handle(self.handle.clone()) })
-                .finish()
-        } else {
-            f.write_str("ManagedOption::None")
-        }
+        self.map_ref_or_else(
+            f,
+            |f| f.write_str("ManagedOption::None"),
+            |f, obj| f.debug_tuple("ManagedOption::Some").field(obj).finish(),
+        )
     }
 }

@@ -23,6 +23,14 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
         self.handle.clone()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        unsafe {
+            let handle = core::ptr::read(&self.handle);
+            core::mem::forget(self);
+            handle
+        }
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedMapHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
