@@ -7,7 +7,8 @@ pub type ProposalId = usize;
 pub type GovernanceActionAsMultiArg<M> =
     MultiValue4<u64, ManagedAddress<M>, ManagedBuffer<M>, ManagedVec<M, ManagedBuffer<M>>>;
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub enum VoteType {
     UpVote,
     DownVote,
@@ -15,7 +16,8 @@ pub enum VoteType {
     AbstainVote,
 }
 
-#[derive(TypeAbi, TopEncode, TopDecode, PartialEq, Eq)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, PartialEq, Eq)]
 pub enum GovernanceProposalStatus {
     None,
     Pending,
@@ -26,19 +28,22 @@ pub enum GovernanceProposalStatus {
     WaitingForFees,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem)]
 pub struct ProposalFees<M: ManagedTypeApi> {
     pub total_amount: BigUint<M>,
     pub entries: ManagedVec<M, FeeEntry<M>>,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem)]
 pub struct FeeEntry<M: ManagedTypeApi> {
     pub depositor_addr: ManagedAddress<M>,
     pub tokens: EsdtTokenPayment<M>,
 }
 
-#[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode)]
 pub struct GovernanceAction<M: ManagedTypeApi> {
     pub gas_limit: u64,
     pub dest_address: ManagedAddress<M>,
@@ -58,7 +63,8 @@ impl<M: ManagedTypeApi> GovernanceAction<M> {
     }
 }
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct GovernanceProposal<M: ManagedTypeApi> {
     pub proposer: ManagedAddress<M>,
     pub actions: ArrayVec<GovernanceAction<M>, MAX_GOVERNANCE_PROPOSAL_ACTIONS>,
@@ -66,7 +72,8 @@ pub struct GovernanceProposal<M: ManagedTypeApi> {
     pub fees: ProposalFees<M>,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode)]
 pub struct ProposalVotes<M: ManagedTypeApi> {
     pub up_votes: BigUint<M>,
     pub down_votes: BigUint<M>,
