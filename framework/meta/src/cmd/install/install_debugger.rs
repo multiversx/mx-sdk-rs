@@ -72,11 +72,10 @@ fn get_script_path(path: PathBuf) -> PathBuf {
     path.join(SCRIPT_NAME)
 }
 
-fn configure_vscode() {
+fn get_path_to_settings() -> PathBuf {
     let os = env::consts::OS;
     let user_home = home::home_dir().unwrap();
-
-    let path_to_settings = match os {
+    match os {
         "macos" => {
             // For macOS
             Path::new(&user_home)
@@ -95,7 +94,11 @@ fn configure_vscode() {
                 .join("settings.json")
         },
         _ => panic!("OS not supported"),
-    };
+    }
+}
+
+fn configure_vscode() {
+    let path_to_settings = get_path_to_settings();
 
     let script_full_path = get_script_path(home::home_dir().unwrap().join(TARGET_PATH));
     let json = fs::read_to_string(&path_to_settings).expect("Unable to read settings.json");
@@ -108,8 +111,18 @@ fn configure_vscode() {
         .or_insert_with(|| serde_json::Value::Array(Vec::new()));
     let command_script_line =
         "command script import ".to_owned() + script_full_path.to_str().unwrap();
+
     if let serde_json::Value::Array(ref mut array) = init_commands {
-        array.clear();
+        if let Some(pos) = array.iter().position(|v| {
+            if let serde_json::Value::String(s) = v {
+                s.contains(SCRIPT_NAME) // Replace with your substring
+            } else {
+                false
+            }
+        }) {
+            array.remove(pos); // Remove the element if the substring is found
+        }
+
         array.push(serde_json::Value::String(command_script_line));
     }
 
