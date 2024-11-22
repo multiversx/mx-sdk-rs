@@ -38,12 +38,14 @@ pub struct AbiManagedVecItem {
 }
 
 #[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct OnlyShowsUpInEsdtAttr {
     #[allow(dead_code)]
     pub field: OnlyShowsUpAsNested10,
 }
 
 #[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct ManagedDecimalWrapper<M: ManagedTypeApi> {
     #[allow(dead_code)]
     pub field: ManagedDecimal<M, ConstDecimals<2>>,
