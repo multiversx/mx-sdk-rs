@@ -55,13 +55,14 @@ fn install_script(custom_path: Option<PathBuf>) {
     });
     let script = canonicalized.join(SCRIPT_NAME);
 
-    let target_path = if custom_path.is_none() {
-        home::home_dir().unwrap().join(TARGET_PATH)
+    let target_path = if let Some(unwrapped_custom_path) = custom_path {
+        unwrapped_custom_path
     } else {
-        custom_path.unwrap()
+        home::home_dir().unwrap().join(TARGET_PATH)
     };
+
     let _ = fs::create_dir_all(&target_path);
-    if let Ok(_) = fs::copy(&script, get_script_path(target_path)) {
+    if fs::copy(&script, get_script_path(target_path)).is_ok() {
         println!("debugger script imported successfully");
     }
 }
