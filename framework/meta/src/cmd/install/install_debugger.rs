@@ -128,7 +128,7 @@ fn configure_vscode() {
 
     let _ = fs::write(
         path_to_settings,
-        serde_json::to_string(&sub_values).unwrap(),
+        serde_json::to_string_pretty(&sub_values).unwrap(),
     );
 
     println!("debugger script installed successfully");
