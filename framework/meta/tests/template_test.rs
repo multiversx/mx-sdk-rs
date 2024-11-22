@@ -106,28 +106,29 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, ne
     cargo_test(&target);
 }
 
-#[test]
+#[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-fn template_released_adder() {
+async fn template_released_adder() {
     template_test_released(
         "adder",
         "released-adder",
         "Alin Cruceat <alin.cruceat@multiversx.com>",
-    );
+    )
+    .await;
 
     cargo_check_interactor("", "released-adder");
 }
 
-#[test]
+#[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-fn template_released_crypto_zombies() {
-    template_test_released("crypto-zombies", "released-crypto-zombies", "");
+async fn template_released_crypto_zombies() {
+    template_test_released("crypto-zombies", "released-crypto-zombies", "").await;
 }
 
-#[test]
+#[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-fn template_released_empty() {
-    template_test_released("empty", "released-empty", "");
+async fn template_released_empty() {
+    template_test_released("empty", "released-empty", "").await;
 }
 
 /// These tests fully replicate the templating process. They
@@ -135,7 +136,7 @@ fn template_released_empty() {
 /// - create proper contracts,
 /// - build the newly created contracts (to wasm)
 /// - run all tests (including Go scenarios) on them.
-fn template_test_released(template_name: &str, new_name: &str, new_author: &str) {
+async fn template_test_released(template_name: &str, new_name: &str, new_author: &str) {
     let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
@@ -149,7 +150,8 @@ fn template_test_released(template_name: &str, new_name: &str, new_author: &str)
     let repo_source = RepoSource::download_from_github(
         RepoVersion::Tag(version_history::LAST_TEMPLATE_VERSION.to_string()),
         temp_dir_path,
-    );
+    )
+    .await;
 
     prepare_target_dir(&target);
 
