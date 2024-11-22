@@ -62,7 +62,7 @@ fn install_script(custom_path: Option<PathBuf>) {
     };
 
     let _ = fs::create_dir_all(&target_path);
-    if fs::copy(&script, get_script_path(target_path)).is_ok() {
+    if fs::copy(script, get_script_path(target_path)).is_ok() {
         println!("debugger script imported successfully");
     }
 }
