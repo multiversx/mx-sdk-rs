@@ -86,6 +86,9 @@ pub const VERSIONS: &[FrameworkVersion] = framework_versions![
     0.53.1,
     0.53.2,
     0.54.0,
+    0.54.1,
+    0.54.2,
+    0.54.3,
     0.54.4,
 ];
 
@@ -114,10 +117,6 @@ pub const CHECK_AFTER_UPGRADE_TO: &[FrameworkVersion] = framework_versions![
     0.51.1,
     0.52.3,
     0.53.2,
-    0.54.0,
-    0.54.1,
-    0.54.2,
-    0.54.3,
     0.54.4,
 ];
 
