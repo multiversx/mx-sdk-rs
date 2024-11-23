@@ -84,6 +84,32 @@ pub enum StandaloneCliAction {
         about = "Generates a new wallet or performs actions on an existing wallet."
     )]
     Wallet(WalletArgs),
+
+    #[command(
+        name = "cs",
+        about = "Can install, start and stop a chain simulator configuration."
+    )]
+    ChainSimulator(ChainSimulatorArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct ChainSimulatorArgs {
+    #[command(subcommand)]
+    pub command: ChainSimulatorCommand,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum ChainSimulatorCommand {
+    #[command(
+        about = "Pulls the latest chain simulator docker image available. Needs Docker installed."
+    )]
+    Install,
+
+    #[command(about = "Starts the chain simulator.")]
+    Start,
+
+    #[command(about = "Stops the chain simulator.")]
+    Stop,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

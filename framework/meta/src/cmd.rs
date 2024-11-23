@@ -1,4 +1,5 @@
 pub mod all;
+pub mod chain_simulator;
 pub mod code_report;
 pub mod info;
 pub mod install;

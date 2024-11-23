@@ -61,8 +61,9 @@ pub struct BasicFeaturesInteract {
 
 impl BasicFeaturesInteract {
     pub async fn init(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator())
+        let mut interactor = Interactor::new(config.gateway_uri())
             .await
+            .use_chain_simulator(config.use_chain_simulator())
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
         interactor
