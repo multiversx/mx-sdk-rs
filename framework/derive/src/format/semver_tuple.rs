@@ -32,7 +32,12 @@ fn convert_token_tree(token: &proc_macro2::TokenTree) -> proc_macro2::TokenStrea
 }
 
 fn u64_literal_from_str(s: &str) -> proc_macro2::TokenTree {
+    // For some reason a space creeps in at the end,
+    // but only when running from rust-analyzer,
+    // therefore also calling a trim()
     proc_macro2::TokenTree::Literal(proc_macro2::Literal::u64_suffixed(
-        s.parse().expect("failed to parse token as u64"),
+        s.trim()
+            .parse()
+            .unwrap_or_else(|err| panic!("failed to parse token as u64 '{s}': {err}")),
     ))
 }
