@@ -3,14 +3,14 @@ use core::borrow::Borrow;
 use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
 
 use crate::{
-    api::ManagedTypeApi,
+    api::{use_raw_handle, ManagedTypeApi},
     types::{
         BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
         ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
-use super::{ManagedVecItemNestedTuple, ManagedVecItemPayload, ManagedVecItemPayloadBuffer};
+use super::{ManagedVecItemNestedTuple, ManagedVecItemNestedTupleSplit, ManagedVecItemPayload, ManagedVecItemPayloadBuffer};
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
@@ -44,6 +44,8 @@ pub trait ManagedVecItem: 'static {
     /// Parses given bytes as a an owned object.
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self;
 
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self;
+
     /// Parses given bytes as a representation of the object, either owned, or a reference.
     ///
     /// # Safety
@@ -71,11 +73,17 @@ macro_rules! impl_int {
             type PAYLOAD = ManagedVecItemPayloadBuffer<$payload_size>;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
+
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
                 let mut arr: [u8; $payload_size] = [0u8; $payload_size];
                 reader(&mut arr[..]);
                 $ty::from_be_bytes(arr)
             }
+
+            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+                $ty::from_be_bytes(payload.buffer)
+            }
+
             unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
                 reader: Reader,
             ) -> Self::Ref<'a> {
@@ -107,6 +115,10 @@ impl ManagedVecItem for usize {
         u32::from_be_bytes(arr) as usize
     }
 
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        u32::read_from_payload(payload) as usize
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -126,6 +138,10 @@ impl ManagedVecItem for bool {
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         u8::from_byte_reader(reader) > 0
+    }
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        u8::read_from_payload(payload) > 0
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -164,6 +180,17 @@ where
         }
     }
 
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        // let (p1, (p2, ())) = <(u8, (T, ()))>::split_all(payload);
+        
+        // let disc = u8::read_from_payload(p1);
+        // let x = split_payload(payload);
+        // Self::PAYLOAD::spli
+        todo!()
+        // let (disc_payload, t_payload) = payload.split::<1>();
+        // let x = payload;
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -193,6 +220,11 @@ macro_rules! impl_managed_type {
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
                 let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
                 unsafe { $ty::from_handle(handle) }
+            }
+
+            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+                let handle = use_raw_handle(i32::read_from_payload(payload));
+                unsafe { Self::from_handle(handle) }
             }
 
             unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -230,6 +262,11 @@ where
         unsafe { Self::from_handle(handle) }
     }
 
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
+        unsafe { Self::from_handle(handle) }
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -259,6 +296,11 @@ where
         unsafe { Self::from_handle(handle) }
     }
 
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
+        unsafe { Self::from_handle(handle) }
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -283,6 +325,10 @@ impl ManagedVecItem for EsdtTokenType {
         arr[0].into()
     }
 
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        u8::read_from_payload(payload).into()
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -295,12 +341,16 @@ impl ManagedVecItem for EsdtTokenType {
 }
 
 impl ManagedVecItem for EsdtLocalRole {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<2>;
     const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         u16::from_byte_reader(reader).into()
+    }
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        u16::read_from_payload(payload).into()
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(

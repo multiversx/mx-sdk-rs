@@ -47,7 +47,7 @@ pub use managed_ref::ManagedRef;
 pub use managed_ref_mut::ManagedRefMut;
 pub use managed_vec::ManagedVec;
 pub use managed_vec_item::ManagedVecItem;
-pub use managed_vec_item_nested_tuple::ManagedVecItemNestedTuple;
+pub use managed_vec_item_nested_tuple::{ManagedVecItemNestedTuple, ManagedVecItemNestedTupleSplit};
 pub use managed_vec_item_payload::*;
 pub use managed_vec_owned_iter::ManagedVecOwnedIterator;
 pub use managed_vec_ref::ManagedVecRef;

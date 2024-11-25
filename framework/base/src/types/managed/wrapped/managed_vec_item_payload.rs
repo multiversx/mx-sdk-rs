@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 /// Describes the binary represetnation of a ManagedVecItem.
 ///
 /// It is always an array that can be allocated directly on stack.
@@ -35,8 +37,9 @@ impl ManagedVecItemPayload for ManagedVecItemEmptyPayload {
 }
 
 /// The main ManagedVecItemPayload implementation. Uses an array in its implementation.
+#[repr(transparent)]
 pub struct ManagedVecItemPayloadBuffer<const N: usize> {
-    buffer: [u8; N],
+    pub buffer: [u8; N],
 }
 
 impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
@@ -57,6 +60,83 @@ impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
     }
 }
 
+#[repr(transparent)]
+pub struct ManagedVecItemPayloadConcat<P1, P2>
+where
+    P1: ManagedVecItemPayload,
+    P2: ManagedVecItemPayload,
+    P1: ManagedVecItemPayloadAdd<P2>,
+{
+    _phantom_1: PhantomData<P1>,
+    _phantom_2: PhantomData<P2>,
+    buffer: <P1 as ManagedVecItemPayloadAdd<P2>>::Output,
+}
+
+impl<P1, P2> ManagedVecItemPayload for ManagedVecItemPayloadConcat<P1, P2>
+where
+    P1: ManagedVecItemPayload,
+    P2: ManagedVecItemPayload,
+    P1: ManagedVecItemPayloadAdd<P2>,
+{
+    fn new_buffer() -> Self {
+        ManagedVecItemPayloadConcat {
+            _phantom_1: PhantomData,
+            _phantom_2: PhantomData,
+            buffer: ManagedVecItemPayload::new_buffer(),
+        }
+    }
+
+    fn payload_size() -> usize {
+        <P1 as ManagedVecItemPayloadAdd<P2>>::Output::payload_size()
+    }
+
+    fn payload_slice(&self) -> &[u8] {
+        self.buffer.payload_slice()
+    }
+
+    fn payload_slice_mut(&mut self) -> &mut [u8] {
+        self.buffer.payload_slice_mut()
+    }
+}
+
+impl<P1, P2> ManagedVecItemPayloadConcat<P1, P2>
+where
+    P1: ManagedVecItemPayload,
+    P2: ManagedVecItemPayload,
+    P1: ManagedVecItemPayloadAdd<P2>,
+{
+}
+
+impl<P0, P1, P2> ManagedVecItemPayloadAdd<ManagedVecItemPayloadConcat<P1, P2>> for P0
+where
+    P0: ManagedVecItemPayload,
+    P1: ManagedVecItemPayload,
+    P2: ManagedVecItemPayload,
+    P1: ManagedVecItemPayloadAdd<P2>,
+    P0: ManagedVecItemPayloadAdd<<P1 as ManagedVecItemPayloadAdd<P2>>::Output>,
+{
+    type Output = ManagedVecItemPayloadConcat<P0, ManagedVecItemPayloadConcat<P1, P2>>;
+    
+    fn split_from_add(payload: &Self::Output) -> (&Self, &ManagedVecItemPayloadConcat<P1, P2>) {
+        todo!()
+    }
+
+
+    
+    // fn split_from_add(
+    //     payload: &ManagedVecItemPayloadBuffer<$result_add>,
+    // ) -> (
+    //     &ManagedVecItemPayloadBuffer<$dec1>,
+    //     &ManagedVecItemPayloadBuffer<$dec2>,
+    // ) {
+    //     unsafe {
+    //         let ptr1 = payload.buffer.as_ptr();
+    //         let ptr2 = ptr1.offset($dec1 as isize);
+    //         (core::mem::transmute(ptr1), core::mem::transmute(ptr2))
+    //     }
+    // }
+}
+
 /// Describes concatantion of smaller payloads into a larger one.
 ///
 /// There is no runtime implementation, just a type-level addition.
@@ -67,12 +147,39 @@ where
     Rhs: ManagedVecItemPayload,
 {
     type Output: ManagedVecItemPayload;
+
+    fn split_from_add(payload: &Self::Output) -> (&Self, &Rhs);
 }
 
 impl<const N: usize> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload>
     for ManagedVecItemPayloadBuffer<N>
 {
     type Output = Self;
+
+    fn split_from_add(payload: &Self::Output) -> (&Self, &ManagedVecItemEmptyPayload) {
+        (payload, &ManagedVecItemEmptyPayload)
+    }
+}
+
+pub trait ManagedVecItemPayloadSplit<const S: usize>: ManagedVecItemPayload {
+    type P1: ManagedVecItemPayload;
+    type P2: ManagedVecItemPayload;
+
+    fn split_impl(&self) -> (&Self::P1, &Self::P2);
+}
+
+impl<const N: usize> ManagedVecItemPayloadBuffer<N> {
+    pub fn split_me<const S: usize>(
+        &self,
+    ) -> (
+        &<Self as ManagedVecItemPayloadSplit<S>>::P1,
+        &<Self as ManagedVecItemPayloadSplit<S>>::P2,
+    )
+    where
+        Self: ManagedVecItemPayloadSplit<S>,
+    {
+        ManagedVecItemPayloadSplit::<S>::split_impl(self)
+    }
 }
 
 /// Replaces a const generic expression.
@@ -84,8 +191,54 @@ macro_rules! payload_add {
             for ManagedVecItemPayloadBuffer<$dec1>
         {
             type Output = ManagedVecItemPayloadBuffer<$result_add>;
+
+            fn split_from_add(
+                payload: &ManagedVecItemPayloadBuffer<$result_add>,
+            ) -> (
+                &ManagedVecItemPayloadBuffer<$dec1>,
+                &ManagedVecItemPayloadBuffer<$dec2>,
+            ) {
+                unsafe {
+                    let ptr1 = payload.buffer.as_ptr();
+                    let ptr2 = ptr1.offset($dec1 as isize);
+                    (core::mem::transmute(ptr1), core::mem::transmute(ptr2))
+                }
+            }
+        }
+
+        impl ManagedVecItemPayloadSplit<$dec1> for ManagedVecItemPayloadBuffer<$result_add> {
+            type P1 = ManagedVecItemPayloadBuffer<$dec1>;
+            type P2 = ManagedVecItemPayloadBuffer<$dec2>;
+
+            fn split_impl(
+                &self,
+            ) -> (
+                &ManagedVecItemPayloadBuffer<$dec1>,
+                &ManagedVecItemPayloadBuffer<$dec2>,
+            ) {
+                unsafe {
+                    let ptr1 = self.buffer.as_ptr();
+                    let ptr2 = ptr1.offset($dec1 as isize);
+                    (core::mem::transmute(ptr1), core::mem::transmute(ptr2))
+                }
+            }
         }
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn payload_split() {
+        let payload = ManagedVecItemPayloadBuffer {
+            buffer: [1, 2, 3, 4, 5],
+        };
+        let (p1, p2) = payload.split_me::<3>();
+        assert_eq!(p1.buffer, [1, 2, 3]);
+        assert_eq!(p2.buffer, [4, 5]);
+    }
 }
 
 payload_add!(1usize, 1usize, 2usize);

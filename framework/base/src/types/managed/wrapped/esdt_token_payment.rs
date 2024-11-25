@@ -205,6 +205,10 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         }
     }
 
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        todo!()
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
