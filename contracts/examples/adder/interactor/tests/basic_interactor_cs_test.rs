@@ -1,5 +1,5 @@
 use basic_interactor::{AdderInteract, Config};
-use multiversx_sc_snippets::{sdk::gateway::SetStateAccount, test_wallets};
+use multiversx_sc_snippets::{imports::Bech32Address, sdk::gateway::SetStateAccount, test_wallets};
 
 #[tokio::test]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
@@ -58,6 +58,40 @@ async fn set_state_cs_test() {
     let set_state_response = simulator_interact.interactor.set_state(vec_state).await;
 
     let _ = simulator_interact.interactor.generate_blocks(2u64).await;
+
+    assert!(set_state_response.is_ok());
+}
+
+#[tokio::test]
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+async fn set_state_from_file_cs_test() {
+    let account_address = test_wallets::mike();
+    let account_address_2 = test_wallets::ivan();
+
+    let mut real_chain_interact = AdderInteract::new(Config::load_config()).await;
+    let simulator_interact = AdderInteract::new(Config::chain_simulator_config()).await;
+
+    // now we should have current mike account in the set state file
+    real_chain_interact
+        .interactor
+        .retrieve_account(&Bech32Address::from(&account_address.to_address()))
+        .await;
+
+    real_chain_interact
+        .interactor
+        .retrieve_account(&Bech32Address::from(&account_address_2.to_address()))
+        .await;
+
+    let set_state_response = simulator_interact
+        .interactor
+        .set_state_for_saved_accounts()
+        .await;
+
+    simulator_interact
+        .interactor
+        .generate_blocks(2u64)
+        .await
+        .unwrap();
 
     assert!(set_state_response.is_ok());
 }

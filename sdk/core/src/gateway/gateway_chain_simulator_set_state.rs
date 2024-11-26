@@ -1,6 +1,11 @@
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    fs::{File, OpenOptions},
+    io::{BufReader, BufWriter},
+    path::Path,
+};
 
 use crate::data::account::Account;
 
@@ -54,6 +59,40 @@ impl SetStateAccount {
         self.keys = keys;
 
         self
+    }
+
+    pub fn add_to_state_file(self, path: &Path) {
+        let mut accounts = if path.exists() {
+            let file = File::open(path)
+                .unwrap_or_else(|_| panic!("Failed to open state file at path {path:#?}"));
+
+            let reader = BufReader::new(file);
+
+            serde_json::from_reader::<_, Vec<SetStateAccount>>(reader).unwrap_or_default()
+        } else {
+            Vec::new()
+        };
+
+        if let Some(existing_account) = accounts
+            .iter_mut()
+            .find(|account| account.address == self.address)
+        {
+            *existing_account = self;
+        } else {
+            accounts.push(self);
+        }
+
+        let file = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(path)
+            .unwrap_or_else(|_| panic!("Failed to open or create state file at path {path:#?}"));
+
+        let writer = BufWriter::new(file);
+        serde_json::to_writer_pretty(writer, &accounts).unwrap_or_else(|_| {
+            panic!("Failed to write updated state accounts to file at path {path:#?}")
+        });
     }
 }
 

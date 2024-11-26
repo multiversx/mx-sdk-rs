@@ -64,4 +64,15 @@ where
             .request(ChainSimulatorSetStateRequest::for_accounts(accounts))
             .await
     }
+
+    pub async fn set_state_for_saved_accounts(&self) -> Result<String, Error> {
+        if !self.use_chain_simulator {
+            return Ok(String::from("no-simulator"));
+        }
+
+        let accounts = self.get_accounts_from_file();
+        self.proxy
+            .request(ChainSimulatorSetStateRequest::for_accounts(accounts))
+            .await
+    }
 }

@@ -57,7 +57,7 @@ impl AdderInteract {
         let adder_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
         let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
 
-        let _ = interactor.generate_blocks(30u64).await;
+        interactor.generate_blocks(30u64).await.unwrap();
 
         AdderInteract {
             interactor,
