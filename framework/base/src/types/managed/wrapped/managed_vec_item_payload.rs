@@ -39,7 +39,7 @@ impl ManagedVecItemPayload for ManagedVecItemEmptyPayload {
         &mut []
     }
 
-    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, _index: usize) -> &S {
         unimplemented!()
     }
 }
@@ -134,7 +134,7 @@ where
 {
     type Output = ManagedVecItemPayloadConcat<P0, ManagedVecItemPayloadConcat<P1, P2>>;
 
-    fn split_from_add(payload: &Self::Output) -> (&Self, &ManagedVecItemPayloadConcat<P1, P2>) {
+    fn split_from_add(_payload: &Self::Output) -> (&Self, &ManagedVecItemPayloadConcat<P1, P2>) {
         todo!()
     }
 }
@@ -198,27 +198,6 @@ where
     }
 }
 
-pub trait ManagedVecItemPayloadSplit<const S: usize>: ManagedVecItemPayload {
-    type P1: ManagedVecItemPayload;
-    type P2: ManagedVecItemPayload;
-
-    fn split_impl(&self) -> (&Self::P1, &Self::P2);
-}
-
-impl<const N: usize> ManagedVecItemPayloadBuffer<N> {
-    pub fn split_me<const S: usize>(
-        &self,
-    ) -> (
-        &<Self as ManagedVecItemPayloadSplit<S>>::P1,
-        &<Self as ManagedVecItemPayloadSplit<S>>::P2,
-    )
-    where
-        Self: ManagedVecItemPayloadSplit<S>,
-    {
-        ManagedVecItemPayloadSplit::<S>::split_impl(self)
-    }
-}
-
 /// Replaces a const generic expression.
 ///
 /// Remove once const generic expressions are stabilized in Rust.
@@ -242,40 +221,7 @@ macro_rules! payload_add {
                 }
             }
         }
-
-        impl ManagedVecItemPayloadSplit<$dec1> for ManagedVecItemPayloadBuffer<$result_add> {
-            type P1 = ManagedVecItemPayloadBuffer<$dec1>;
-            type P2 = ManagedVecItemPayloadBuffer<$dec2>;
-
-            fn split_impl(
-                &self,
-            ) -> (
-                &ManagedVecItemPayloadBuffer<$dec1>,
-                &ManagedVecItemPayloadBuffer<$dec2>,
-            ) {
-                unsafe {
-                    let ptr1 = self.buffer.as_ptr();
-                    let ptr2 = ptr1.offset($dec1 as isize);
-                    (core::mem::transmute(ptr1), core::mem::transmute(ptr2))
-                }
-            }
-        }
     };
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn payload_split() {
-        let payload = ManagedVecItemPayloadBuffer {
-            buffer: [1, 2, 3, 4, 5],
-        };
-        let (p1, p2) = payload.split_me::<3>();
-        assert_eq!(p1.buffer, [1, 2, 3]);
-        assert_eq!(p2.buffer, [4, 5]);
-    }
 }
 
 payload_add!(1usize, 1usize, 2usize);

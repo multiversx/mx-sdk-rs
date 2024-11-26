@@ -106,7 +106,7 @@ pub mod tests {
     #[test]
     fn split_all_test() {
         let p = ManagedVecItemPayloadBuffer::new_buffer();
-        let (p1, (p2, ())) = <(u16, (u32, ()))>::split_all(&p);
+        let (_p1, (_p2, ())) = <(u16, (u32, ()))>::split_all(&p);
     }
 
     // fn split_all_t<T>()
