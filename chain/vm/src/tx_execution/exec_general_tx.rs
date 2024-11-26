@@ -1,3 +1,4 @@
+use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
@@ -51,6 +52,19 @@ fn should_add_transfer_value_log(tx_input: &TxInput) -> bool {
 pub(crate) fn create_transfer_value_log(tx_input: &TxInput, call_type: CallType) -> TxLog {
     let mut data = vec![call_type.to_log_bytes(), tx_input.func_name.to_bytes()];
     data.append(&mut tx_input.args.clone());
+
+    if tx_input.esdt_values.is_empty() {
+        if !tx_input.callback_payments.egld_value.is_zero()
+            && tx_input.call_type == CallType::AsyncCallback
+        {
+            return TxLog {
+                address: tx_input.from.clone(),
+                endpoint: "transferValueOnly".into(),
+                topics: vec![b"".to_vec(), tx_input.to.to_vec()],
+                data,
+            };
+        }
+    }
 
     let egld_value = if tx_input.call_type == CallType::AsyncCallback {
         &tx_input.callback_payments.egld_value
