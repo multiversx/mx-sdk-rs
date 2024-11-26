@@ -86,6 +86,8 @@ where
 
 #[cfg(test)]
 pub mod tests {
+    use crate::types::ManagedVecItemPayloadBuffer;
+
     use super::*;
 
     #[test]
@@ -100,4 +102,20 @@ pub mod tests {
     fn assert_payload_size<N: ManagedVecItemNestedTuple>(expected_size: usize) {
         assert_eq!(N::PAYLOAD::payload_size(), expected_size);
     }
+
+    #[test]
+    fn split_all_test() {
+        let p = ManagedVecItemPayloadBuffer::new_buffer();
+        let (p1, (p2, ())) = <(u16, (u32, ()))>::split_all(&p);
+    }
+
+    // fn split_all_t<T>()
+    // where
+    //     T: ManagedVecItem,
+    //     ManagedVecItemPayloadBuffer<1>: ManagedVecItemPayloadAdd<T::PAYLOAD>,
+    //     (u16, (T, ())): ManagedVecItemNestedTuple,
+    // {
+    //     let p = ManagedVecItemPayloadBuffer::new_buffer();
+    //     let (p1, (p2, ())) = <(u16, (T, ()))>::split_all(&p);
+    // }
 }

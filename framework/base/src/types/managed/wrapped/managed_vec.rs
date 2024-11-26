@@ -1,4 +1,4 @@
-use super::EncodedManagedVecItem;
+use super::{EncodedManagedVecItem, ManagedVecItemPayload};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
@@ -187,15 +187,15 @@ where
 
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
         let byte_index = index * T::payload_size();
-        let mut load_result = Ok(());
-        let result = T::from_byte_reader(|dest_slice| {
-            load_result = self.buffer.load_slice(byte_index, dest_slice);
-        });
-
-        match load_result {
-            Ok(_) => result,
-            Err(_) => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self
+            .buffer
+            .load_slice(byte_index, payload.payload_slice_mut())
+            .is_err()
+        {
+            M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
         }
+        T::read_from_payload(&payload)
     }
 
     pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {

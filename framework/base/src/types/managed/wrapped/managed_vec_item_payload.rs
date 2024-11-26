@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use super::ManagedVecItem;
+
 /// Describes the binary represetnation of a ManagedVecItem.
 ///
 /// It is always an array that can be allocated directly on stack.
@@ -11,6 +13,8 @@ pub trait ManagedVecItemPayload {
     fn payload_slice(&self) -> &[u8];
 
     fn payload_slice_mut(&mut self) -> &mut [u8];
+
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S;
 }
 
 /// Empty ManagedVecItem.
@@ -33,6 +37,10 @@ impl ManagedVecItemPayload for ManagedVecItemEmptyPayload {
 
     fn payload_slice_mut(&mut self) -> &mut [u8] {
         &mut []
+    }
+
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
+        unimplemented!()
     }
 }
 
@@ -57,6 +65,11 @@ impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
 
     fn payload_slice_mut(&mut self) -> &mut [u8] {
         &mut self.buffer[..]
+    }
+
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
+        let ptr = self.buffer.as_ptr().offset(index as isize);
+        core::mem::transmute(ptr)
     }
 }
 
@@ -97,6 +110,10 @@ where
     fn payload_slice_mut(&mut self) -> &mut [u8] {
         self.buffer.payload_slice_mut()
     }
+
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
+        self.buffer.slice_unchecked(index)
+    }
 }
 
 impl<P1, P2> ManagedVecItemPayloadConcat<P1, P2>
@@ -116,25 +133,44 @@ where
     P0: ManagedVecItemPayloadAdd<<P1 as ManagedVecItemPayloadAdd<P2>>::Output>,
 {
     type Output = ManagedVecItemPayloadConcat<P0, ManagedVecItemPayloadConcat<P1, P2>>;
-    
+
     fn split_from_add(payload: &Self::Output) -> (&Self, &ManagedVecItemPayloadConcat<P1, P2>) {
         todo!()
     }
+}
 
+pub struct ManagedVecItemPayloadEquiv<T>
+where
+    T: ManagedVecItem,
+{
+    equiv: T::PAYLOAD,
+}
 
-    
-    // fn split_from_add(
-    //     payload: &ManagedVecItemPayloadBuffer<$result_add>,
-    // ) -> (
-    //     &ManagedVecItemPayloadBuffer<$dec1>,
-    //     &ManagedVecItemPayloadBuffer<$dec2>,
-    // ) {
-    //     unsafe {
-    //         let ptr1 = payload.buffer.as_ptr();
-    //         let ptr2 = ptr1.offset($dec1 as isize);
-    //         (core::mem::transmute(ptr1), core::mem::transmute(ptr2))
-    //     }
-    // }
+impl<T> ManagedVecItemPayload for ManagedVecItemPayloadEquiv<T>
+where
+    T: ManagedVecItem,
+{
+    fn new_buffer() -> Self {
+        ManagedVecItemPayloadEquiv {
+            equiv: ManagedVecItemPayload::new_buffer(),
+        }
+    }
+
+    fn payload_size() -> usize {
+        T::PAYLOAD::payload_size()
+    }
+
+    fn payload_slice(&self) -> &[u8] {
+        self.equiv.payload_slice()
+    }
+
+    fn payload_slice_mut(&mut self) -> &mut [u8] {
+        self.equiv.payload_slice_mut()
+    }
+
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
+        self.equiv.slice_unchecked(index)
+    }
 }
 
 /// Describes concatantion of smaller payloads into a larger one.
@@ -151,8 +187,9 @@ where
     fn split_from_add(payload: &Self::Output) -> (&Self, &Rhs);
 }
 
-impl<const N: usize> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload>
-    for ManagedVecItemPayloadBuffer<N>
+impl<P> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload> for P
+where
+    P: ManagedVecItemPayload,
 {
     type Output = Self;
 

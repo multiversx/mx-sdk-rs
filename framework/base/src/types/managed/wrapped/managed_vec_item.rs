@@ -10,7 +10,10 @@ use crate::{
     },
 };
 
-use super::{ManagedVecItemNestedTuple, ManagedVecItemNestedTupleSplit, ManagedVecItemPayload, ManagedVecItemPayloadBuffer};
+use super::{
+    ManagedVecItemEmptyPayload, ManagedVecItemNestedTuple, ManagedVecItemNestedTupleSplit,
+    ManagedVecItemPayload, ManagedVecItemPayloadAdd, ManagedVecItemPayloadBuffer,
+};
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
@@ -65,6 +68,16 @@ pub trait ManagedVecItem: 'static {
     ///
     /// Note that a destructor should not be called at this moment, since the ManagedVec will take ownership of the item.
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R;
+}
+
+pub unsafe fn managed_vec_item_read_from_payload_index<T, P>(payload: &P, index: &mut usize) -> T
+where
+    T: ManagedVecItem,
+    P: ManagedVecItemPayload,
+{
+    let value = T::read_from_payload(payload.slice_unchecked(*index));
+    *index += T::PAYLOAD::payload_size();
+    value
 }
 
 macro_rules! impl_int {
@@ -161,9 +174,12 @@ impl ManagedVecItem for bool {
 impl<T> ManagedVecItem for Option<T>
 where
     (u8, (T, ())): ManagedVecItemNestedTuple,
+    ManagedVecItemPayloadBuffer<1>: ManagedVecItemPayloadAdd<T::PAYLOAD>,
     T: ManagedVecItem,
 {
-    type PAYLOAD = <(u8, (T, ())) as ManagedVecItemNestedTuple>::PAYLOAD;
+    // type PAYLOAD = <(u8, (T, ())) as ManagedVecItemNestedTuple>::PAYLOAD;
+    type PAYLOAD = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
+    // type PAYLOAD = EquivPayload<(u8, T)>;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
@@ -182,13 +198,26 @@ where
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         // let (p1, (p2, ())) = <(u8, (T, ()))>::split_all(payload);
-        
+
+        // let (p1, p2) = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<
+        //     T::PAYLOAD,
+        // >>::split_from_add(payload);
+
         // let disc = u8::read_from_payload(p1);
-        // let x = split_payload(payload);
-        // Self::PAYLOAD::spli
-        todo!()
-        // let (disc_payload, t_payload) = payload.split::<1>();
-        // let x = payload;
+        // if disc == 0 {
+        //     None
+        // } else {
+        //     Some(T::read_from_payload(p2))
+        // }
+
+        unsafe {
+            let disc = u8::read_from_payload(payload.slice_unchecked(0));
+            if disc == 0 {
+                None
+            } else {
+                Some(T::read_from_payload(payload.slice_unchecked(1)))
+            }
+        }
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -361,5 +390,61 @@ impl ManagedVecItem for EsdtLocalRole {
 
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
         <u16 as ManagedVecItem>::into_byte_writer(self.as_u16(), writer)
+    }
+}
+
+impl ManagedVecItem for () {
+    type PAYLOAD = ManagedVecItemEmptyPayload;
+
+    const SKIPS_RESERIALIZATION: bool = true;
+
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
+        ()
+    }
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        ()
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        _reader: Reader,
+    ) -> Self::Ref<'a> {
+        ()
+    }
+
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        todo!()
+    }
+}
+
+impl<Head, Tail> ManagedVecItem for (Head, Tail)
+where
+    Head: ManagedVecItem + 'static,
+    Tail: ManagedVecItem + 'static,
+{
+    type PAYLOAD = ManagedVecItemEmptyPayload;
+
+    const SKIPS_RESERIALIZATION: bool = true;
+
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
+        todo!()
+    }
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        todo!()
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        todo!()
+    }
+
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        todo!()
     }
 }

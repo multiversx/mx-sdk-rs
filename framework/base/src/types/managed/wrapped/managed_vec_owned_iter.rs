@@ -1,6 +1,6 @@
 use crate::api::ManagedTypeApi;
 
-use super::{ManagedVec, ManagedVecItem};
+use super::{ManagedVec, ManagedVecItem, ManagedVecItemPayload};
 
 impl<'a, M, T> IntoIterator for &'a ManagedVec<M, T>
 where
@@ -52,15 +52,15 @@ where
         if next_byte_start > self.byte_end {
             return None;
         }
-        let result = T::from_byte_reader(|dest_slice| {
-            let _ = self
-                .managed_vec
-                .buffer
-                .load_slice(self.byte_start, dest_slice);
-        });
+
+        let mut payload = T::PAYLOAD::new_buffer();
+        let _ = self
+            .managed_vec
+            .buffer
+            .load_slice(self.byte_start, payload.payload_slice_mut());
 
         self.byte_start = next_byte_start;
-        Some(result)
+        Some(T::read_from_payload(&payload))
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
