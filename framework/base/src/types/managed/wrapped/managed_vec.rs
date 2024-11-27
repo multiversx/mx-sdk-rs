@@ -45,7 +45,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedVec {
             buffer: ManagedBuffer::from_handle(handle),
             _phantom: PhantomData,
@@ -56,7 +56,15 @@ where
         self.buffer.get_handle()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.buffer.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -233,7 +241,7 @@ where
             ManagedVec::new()
         };
 
-        self.buffer = part_before.buffer;
+        *self = part_before;
         self.buffer.append(&part_after.buffer);
     }
 

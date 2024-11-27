@@ -4,7 +4,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        ManagedTypeApi, ManagedTypeApiImpl, RawHandle,
     },
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
@@ -26,7 +26,7 @@ pub struct BigUint<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     type OwnHandle = M::BigIntHandle;
 
-    fn from_handle(handle: M::BigIntHandle) -> Self {
+    unsafe fn from_handle(handle: M::BigIntHandle) -> Self {
         BigUint {
             value: BigInt::from_handle(handle),
         }
@@ -36,7 +36,15 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
         self.value.handle.clone()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.value.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::BigIntHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::BigIntHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -62,6 +70,17 @@ impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
+        BigUint {
+            value: BigInt::new_uninit(),
+        }
+    }
+
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
     where
         T: TryInto<i64> + num_traits::Unsigned,
@@ -73,9 +92,11 @@ impl<M: ManagedTypeApi> BigUint<M> {
     where
         T: TryInto<i64> + num_traits::Unsigned,
     {
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        Self::set_value(handle.clone(), value);
-        BigUint::from_handle(handle)
+        unsafe {
+            let result = Self::new_uninit();
+            Self::set_value(result.get_handle(), value);
+            result
+        }
     }
 
     pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle
@@ -169,9 +190,11 @@ impl<M: ManagedTypeApi> Default for BigUint<M> {
 impl<M: ManagedTypeApi> BigUint<M> {
     #[inline]
     pub fn zero() -> Self {
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().bi_set_int64(handle.clone(), 0);
-        BigUint::from_handle(handle)
+        unsafe {
+            let result = Self::new_uninit();
+            M::managed_type_impl().bi_set_int64(result.get_handle(), 0);
+            result
+        }
     }
 
     pub fn zero_ref() -> ManagedRef<'static, M, BigUint<M>> {
@@ -191,16 +214,16 @@ impl<M: ManagedTypeApi> BigUint<M> {
         Self::set_value(self.value.handle.clone(), value);
     }
 
-    #[inline]
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
         let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().mb_overwrite(mb_handle.clone(), bytes);
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_to_big_int_unsigned(mb_handle, handle.clone());
-        BigUint::from_handle(handle)
+        unsafe {
+            let result = Self::new_uninit();
+            M::managed_type_impl().mb_to_big_int_unsigned(mb_handle, result.get_handle());
+            result
+        }
     }
 
-    #[inline]
     pub fn to_bytes_be(&self) -> BoxedBytes {
         let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl()
@@ -208,44 +231,40 @@ impl<M: ManagedTypeApi> BigUint<M> {
         M::managed_type_impl().mb_to_boxed_bytes(mb_handle)
     }
 
-    #[inline]
     pub fn from_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl()
-            .mb_to_big_int_unsigned(managed_buffer.handle.clone(), handle.clone());
-        BigUint::from_handle(handle)
+        unsafe {
+            let result = BigUint::new_uninit();
+            M::managed_type_impl()
+                .mb_to_big_int_unsigned(managed_buffer.handle.clone(), result.get_handle());
+            result
+        }
     }
 
-    #[inline]
     pub fn to_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        let mb_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl()
-            .mb_from_big_int_unsigned(self.value.handle.clone(), mb_handle.clone());
-        ManagedBuffer::from_handle(mb_handle)
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            M::managed_type_impl().mb_from_big_int_unsigned(self.get_handle(), result.get_handle());
+            result
+        }
     }
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
-    #[inline]
-    #[must_use]
     pub fn sqrt(&self) -> Self {
-        let api = M::managed_type_impl();
-        let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        api.bi_sqrt(result_handle.clone(), self.value.handle.clone());
-        BigUint::from_handle(result_handle)
+        unsafe {
+            let result = BigUint::new_uninit();
+            M::managed_type_impl().bi_sqrt(result.get_handle(), self.get_handle());
+            result
+        }
     }
 
-    #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
-        let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let big_int_temp_1 = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
-        M::managed_type_impl().bi_pow(
-            result_handle.clone(),
-            self.value.handle.clone(),
-            big_int_temp_1,
-        );
-        BigUint::from_handle(result_handle)
+        unsafe {
+            let result = BigUint::new_uninit();
+            M::managed_type_impl().bi_pow(result.get_handle(), self.get_handle(), big_int_temp_1);
+            result
+        }
     }
 
     /// The whole part of the base-2 logarithm.
@@ -254,7 +273,6 @@ impl<M: ManagedTypeApi> BigUint<M> {
     /// More specifically, the log2 floor is the position of the most significant bit minus one.
     ///
     /// Will return `None` for the number zero (the logarithm in this case would approach -inf).
-    #[inline]
     pub fn log2_floor(&self) -> Option<u32> {
         let api = M::managed_type_impl();
         let result = api.bi_log2(self.value.handle.clone());
@@ -298,15 +316,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
 impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
-        let api = M::managed_type_impl();
-        let clone_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        api.bi_set_int64(clone_handle.clone(), 0);
-        api.bi_add(
-            clone_handle.clone(),
-            clone_handle.clone(),
-            self.value.handle.clone(),
-        );
-        BigUint::from_handle(clone_handle)
+        unsafe { self.as_big_int().clone().into_big_uint_unchecked() }
     }
 }
 
@@ -372,9 +382,9 @@ impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().bi_to_string(self.value.handle.clone(), str_handle.clone());
-        f.append_managed_buffer(&ManagedBuffer::from_handle(
-            str_handle.cast_or_signal_error::<M, _>(),
-        ));
+        let cast_handle = str_handle.cast_or_signal_error::<M, _>();
+        let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer(&wrap_cast);
     }
 }
 

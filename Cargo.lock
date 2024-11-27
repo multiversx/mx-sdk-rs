@@ -2437,9 +2437,9 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm-executor"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b59072fa0624b55ae5ae3fa6bfa91515bbeb4ac440214bc4a509e2c8806d6e9f"
+checksum = "51cce7ae386960fbf5e85afe40ca16d63f926f0620ed1a36b019212b28e17219"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
