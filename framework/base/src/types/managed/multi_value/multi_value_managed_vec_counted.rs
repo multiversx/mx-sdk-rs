@@ -98,18 +98,16 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        Self::from(ManagedVec::<M, T>::from_byte_reader(reader))
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        Self::from(ManagedVec::<M, T>::read_from_payload(payload))
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        self.contents.into_byte_writer(writer)
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.contents.save_to_payload(payload);
     }
 }
 

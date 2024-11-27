@@ -11,7 +11,10 @@ use crate::{
     },
 };
 
-use super::{ManagedVecItemPayload, ManagedVecItemPayloadAdd, ManagedVecItemPayloadBuffer};
+use super::{
+    ManagedVecItemNestedTuple, ManagedVecItemPayload, ManagedVecItemPayloadAdd,
+    ManagedVecItemPayloadBuffer,
+};
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
@@ -323,49 +326,30 @@ where
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut payload = <Self::PAYLOAD as ManagedVecItemPayload>::new_buffer();
-        let payload_slice = ManagedVecItemPayload::payload_slice_mut(&mut payload);
-        reader(payload_slice);
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
-
-        (
-            T1::from_byte_reader(|bytes| {
-                let next_index = index + T1::payload_size();
-                bytes.copy_from_slice(&payload_slice[index..next_index]);
-                index = next_index;
-            }),
-            T2::from_byte_reader(|bytes| {
-                let next_index = index + T2::payload_size();
-                bytes.copy_from_slice(&payload_slice[index..next_index]);
-                index = next_index;
-            }),
-        )
-            .into()
+        unsafe {
+            (
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+            )
+                .into()
+        }
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        // TODO: tuple of refs
+        Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        let mut payload = Self::PAYLOAD::new_buffer();
-        let payload_slice = ManagedVecItemPayload::payload_slice_mut(&mut payload);
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let tuple = self.into_tuple();
         let mut index = 0;
-        let (t1, t2) = self.into_tuple();
-        T1::into_byte_writer(t1, |bytes| {
-            let next_index = index + T1::payload_size();
-            payload_slice[index..next_index].copy_from_slice(bytes);
-            index = next_index;
-        });
-        T2::into_byte_writer(t2, |bytes| {
-            let next_index = index + T2::payload_size();
-            payload_slice[index..next_index].copy_from_slice(bytes);
-            index = next_index;
-        });
-        writer(payload_slice)
+
+        unsafe {
+            managed_vec_item_save_to_payload_index(tuple.0, payload, &mut index);
+            managed_vec_item_save_to_payload_index(tuple.1, payload, &mut index);
+        }
     }
 }
 
@@ -380,58 +364,31 @@ where
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut payload = <Self::PAYLOAD as ManagedVecItemPayload>::new_buffer();
-        let payload_slice = ManagedVecItemPayload::payload_slice_mut(&mut payload);
-        reader(payload_slice);
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
-
-        (
-            T1::from_byte_reader(|bytes| {
-                let next_index = index + T1::payload_size();
-                bytes.copy_from_slice(&payload_slice[index..next_index]);
-                index = next_index;
-            }),
-            T2::from_byte_reader(|bytes| {
-                let next_index = index + T2::payload_size();
-                bytes.copy_from_slice(&payload_slice[index..next_index]);
-                index = next_index;
-            }),
-            T3::from_byte_reader(|bytes| {
-                let next_index = index + T3::payload_size();
-                bytes.copy_from_slice(&payload_slice[index..next_index]);
-                index = next_index;
-            }),
-        )
-            .into()
+        unsafe {
+            (
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+            )
+                .into()
+        }
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        // TODO: tuple of refs
+        Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        let mut payload = Self::PAYLOAD::new_buffer();
-        let payload_slice = ManagedVecItemPayload::payload_slice_mut(&mut payload);
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let tuple = self.into_tuple();
         let mut index = 0;
-        let (t1, t2, t3) = self.into_tuple();
-        T1::into_byte_writer(t1, |bytes| {
-            let next_index = index + T1::payload_size();
-            payload_slice[index..next_index].copy_from_slice(bytes);
-            index = next_index;
-        });
-        T2::into_byte_writer(t2, |bytes| {
-            let next_index = index + T2::payload_size();
-            payload_slice[index..next_index].copy_from_slice(bytes);
-            index = next_index;
-        });
-        T3::into_byte_writer(t3, |bytes| {
-            let next_index = index + T2::payload_size();
-            payload_slice[index..next_index].copy_from_slice(bytes);
-            index = next_index;
-        });
-        writer(payload_slice)
+
+        unsafe {
+            managed_vec_item_save_to_payload_index(tuple.0, payload, &mut index);
+            managed_vec_item_save_to_payload_index(tuple.1, payload, &mut index);
+            managed_vec_item_save_to_payload_index(tuple.2, payload, &mut index);
+        }
     }
 }
