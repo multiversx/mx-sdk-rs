@@ -141,15 +141,16 @@ where
 
     pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
         let byte_index = index * T::payload_size();
-        let mut load_result = Ok(());
-        let result = unsafe {
-            T::from_byte_reader_as_borrow(|dest_slice| {
-                load_result = self.buffer.load_slice(byte_index, dest_slice);
-            })
-        };
-        match load_result {
-            Ok(_) => Some(result),
-            Err(_) => None,
+
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self
+            .buffer
+            .load_slice(byte_index, payload.payload_slice_mut())
+            .is_ok()
+        {
+            unsafe { Some(T::borrow_from_payload(&payload)) }
+        } else {
+            None
         }
     }
 

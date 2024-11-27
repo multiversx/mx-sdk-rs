@@ -46,6 +46,8 @@ pub trait ManagedVecItem: 'static {
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self;
 
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a>;
+
     /// Parses given bytes as a representation of the object, either owned, or a reference.
     ///
     /// # Safety
@@ -94,6 +96,10 @@ macro_rules! impl_int {
                 $ty::from_be_bytes(payload.buffer)
             }
 
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                $ty::from_be_bytes(payload.buffer)
+            }
+
             unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
                 reader: Reader,
             ) -> Self::Ref<'a> {
@@ -129,6 +135,10 @@ impl ManagedVecItem for usize {
         u32::read_from_payload(payload) as usize
     }
 
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -152,6 +162,10 @@ impl ManagedVecItem for bool {
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         u8::read_from_payload(payload) > 0
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -203,6 +217,10 @@ where
         }
     }
 
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -237,6 +255,11 @@ macro_rules! impl_managed_type {
             fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let handle = use_raw_handle(i32::read_from_payload(payload));
                 unsafe { Self::from_handle(handle) }
+            }
+
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                let handle = use_raw_handle(i32::read_from_payload(payload));
+                ManagedRef::wrap_handle(handle)
             }
 
             unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -279,6 +302,11 @@ where
         unsafe { Self::from_handle(handle) }
     }
 
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
+        ManagedRef::wrap_handle(handle)
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -313,6 +341,11 @@ where
         unsafe { Self::from_handle(handle) }
     }
 
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
+        ManagedRef::wrap_handle(handle)
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -341,6 +374,10 @@ impl ManagedVecItem for EsdtTokenType {
         u8::read_from_payload(payload).into()
     }
 
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
+    }
+
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
     ) -> Self::Ref<'a> {
@@ -363,6 +400,10 @@ impl ManagedVecItem for EsdtLocalRole {
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         u16::read_from_payload(payload).into()
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(

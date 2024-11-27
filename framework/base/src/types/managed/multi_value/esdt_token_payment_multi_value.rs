@@ -52,6 +52,11 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
         EsdtTokenPayment::read_from_payload(payload).into()
     }
 
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        // TODO: managed ref
+        Self::read_from_payload(payload)
+    }
+
     #[inline]
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,

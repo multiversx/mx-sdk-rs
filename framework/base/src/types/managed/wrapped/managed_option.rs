@@ -209,7 +209,13 @@ where
     }
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        Self::new_with_handle(use_raw_handle(i32::read_from_payload(payload)))
+        let handle = use_raw_handle(i32::read_from_payload(payload));
+        Self::new_with_handle(handle)
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        // TODO: managed ref
+        Self::read_from_payload(payload)
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(

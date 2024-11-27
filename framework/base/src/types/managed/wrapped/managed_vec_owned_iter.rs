@@ -88,14 +88,13 @@ where
         }
         self.byte_end -= T::payload_size();
 
-        let result = T::from_byte_reader(|dest_slice| {
-            let _ = self
-                .managed_vec
-                .buffer
-                .load_slice(self.byte_end, dest_slice);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        let _ = self
+            .managed_vec
+            .buffer
+            .load_slice(self.byte_end, payload.payload_slice_mut());
 
-        Some(result)
+        Some(T::read_from_payload(&payload))
     }
 }
 

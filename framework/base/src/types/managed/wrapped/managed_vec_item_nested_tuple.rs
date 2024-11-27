@@ -31,9 +31,7 @@ impl ManagedVecItemNestedTuple for () {
 impl<'a> ManagedVecItemNestedTupleSplit<'a> for () {
     type S = ();
 
-    fn split_all(_payload: &'a Self::PAYLOAD) -> Self::S {
-        ()
-    }
+    fn split_all(_payload: &'a Self::PAYLOAD) -> Self::S {}
 }
 
 impl<Head, Tail> ManagedVecItemNestedTuple for (Head, Tail)

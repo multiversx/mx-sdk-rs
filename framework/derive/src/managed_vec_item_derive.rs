@@ -158,6 +158,10 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                 }
             }
 
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                Self::read_from_payload(payload)
+            }
+
             unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
                 Self::from_byte_reader(reader)
             }
@@ -210,6 +214,11 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                         #(#read_from_payload_snippets)*
                     }
                 }
+            }
+
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                // TODO: managed ref
+                Self::read_from_payload(payload)
             }
 
             unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
