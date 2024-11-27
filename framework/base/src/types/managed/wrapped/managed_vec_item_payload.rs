@@ -68,8 +68,8 @@ impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
     }
 
     unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
-        let ptr = self.buffer.as_ptr().offset(index as isize);
-        core::mem::transmute(ptr)
+        let ptr = self.buffer.as_ptr().add(index);
+        &*ptr.cast::<S>()
     }
 }
 
@@ -216,8 +216,11 @@ macro_rules! payload_add {
             ) {
                 unsafe {
                     let ptr1 = payload.buffer.as_ptr();
-                    let ptr2 = ptr1.offset($dec1 as isize);
-                    (core::mem::transmute(ptr1), core::mem::transmute(ptr2))
+                    let ptr2 = ptr1.add($dec1);
+                    (
+                        &*ptr1.cast::<ManagedVecItemPayloadBuffer<$dec1>>(),
+                        &*ptr2.cast::<ManagedVecItemPayloadBuffer<$dec2>>(),
+                    )
                 }
             }
         }

@@ -46,6 +46,11 @@ pub trait ManagedVecItem: 'static {
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self;
 
+    /// Parses given bytes as a representation of the object, either owned, or a reference.
+    ///
+    /// # Safety
+    ///
+    /// In certain cases this involves practically disregarding the lifetimes, hence it is unsafe.
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a>;
 
     /// Parses given bytes as a representation of the object, either owned, or a reference.
