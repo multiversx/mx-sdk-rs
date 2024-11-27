@@ -533,7 +533,7 @@ where
             let _ = self
                 .buffer
                 .load_slice(byte_index, self_payload.payload_slice_mut());
-            let _ = self
+            let _ = other
                 .buffer
                 .load_slice(byte_index, other_payload.payload_slice_mut());
             let self_item = T::read_from_payload(&self_payload);
