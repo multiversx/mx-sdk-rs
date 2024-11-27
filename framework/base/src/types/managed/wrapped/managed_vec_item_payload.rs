@@ -14,6 +14,11 @@ pub trait ManagedVecItemPayload {
 
     fn payload_slice_mut(&mut self) -> &mut [u8];
 
+    /// Takes a sub-payload item.
+    ///
+    /// ## Safety
+    ///
+    /// Only works correctly if the given index is correct, otherwise undefined behavior is possible.
     unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S;
 }
 

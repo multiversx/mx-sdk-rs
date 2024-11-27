@@ -63,6 +63,11 @@ pub trait ManagedVecItem: 'static {
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R;
 }
 
+/// Used by the ManagedVecItem derive.
+///
+/// ## Safety
+///
+/// Only works correctly if the given index is correct, otherwise undefined behavior is possible.
 pub unsafe fn managed_vec_item_read_from_payload_index<T, P>(payload: &P, index: &mut usize) -> T
 where
     T: ManagedVecItem,
