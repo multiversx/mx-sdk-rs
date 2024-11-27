@@ -9,7 +9,8 @@ mod nft_module;
 use distribution_module::Distribution;
 use multiversx_sc_modules::default_issue_callbacks;
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct ExampleAttributes {
     pub creation_timestamp: u64,
 }

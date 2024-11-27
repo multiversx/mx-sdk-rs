@@ -32,6 +32,14 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+## [sc 0.54.4] - 2024-11-22
+- `sc-meta`
+	- `install debugger` CLI that prepares VSCode extension for debugging;
+	- fixed a crash involving templates and installers.
+- Deprecated `#[derive(TypeAbi)]` and added an additional warning in the macro.
+
+## [sc 0.54.3] - 2024-11-18
+- `#[storage_mapper_from_address]` fixes for: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `TokenAttributesMapper`, `UniqueIdMapper`, `UserMapper`, `AddressToIdMapper`.
 
 ## [sc 0.54.2, codec 0.21.1, chain 0.11.1, sdk 0.7.1] - 2024-11-15
 - Codec improvements:

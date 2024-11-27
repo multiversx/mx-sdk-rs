@@ -101,7 +101,6 @@ serial_test = {{ version = "3.2.0" }}
 
 [features]
 chain-simulator-tests = []
-blockchain-tests = []
 "#
     )
     .unwrap();

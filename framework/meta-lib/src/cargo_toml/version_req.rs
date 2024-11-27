@@ -12,7 +12,21 @@ pub struct VersionReq {
     pub is_strict: bool,
 }
 impl VersionReq {
-    pub fn from_version_str(raw: &str) -> Self {
+    pub fn from_version_str(raw: &str) -> Option<Self> {
+        if let Some(stripped_version) = raw.strip_prefix('=') {
+            Some(VersionReq {
+                semver: find_version_by_str(stripped_version)?.clone(),
+                is_strict: true,
+            })
+        } else {
+            Some(VersionReq {
+                semver: find_version_by_str(raw)?.clone(),
+                is_strict: false,
+            })
+        }
+    }
+
+    pub fn from_version_str_or_latest(raw: &str) -> Self {
         if let Some(stripped_version) = raw.strip_prefix('=') {
             VersionReq {
                 semver: find_version_by_str(stripped_version)

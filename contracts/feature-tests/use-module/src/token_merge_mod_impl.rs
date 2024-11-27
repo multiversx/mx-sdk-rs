@@ -10,7 +10,8 @@ use multiversx_sc_modules::token_merge::{
     merged_token_instances::MergedTokenInstances,
 };
 
-#[derive(TypeAbi, TopEncode, TopDecode, PartialEq, Debug)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, PartialEq, Debug)]
 pub struct CustomAttributes {
     pub first: u32,
     pub second: u64,

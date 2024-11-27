@@ -438,7 +438,7 @@ pub struct OnlyShowsUpAsNested02 {
 
 #[rustfmt::skip]
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum AbiEnum {
     Nothing,
     Something(i32),
@@ -553,7 +553,7 @@ pub struct OnlyShowsUpInEsdtAttr {
 pub struct OnlyShowsUpAsNested10 {}
 
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
     Zero,
     Thirty,
@@ -564,7 +564,7 @@ pub enum ExplicitDiscriminant {
 
 #[rustfmt::skip]
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminantMixed {
     Zero,
     Unit,

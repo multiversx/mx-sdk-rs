@@ -3,7 +3,8 @@ use crate::bonding_curve::curves::curve_function::CurveFunction;
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone)]
 pub struct CurveArguments<M: ManagedTypeApi> {
     pub available_supply: BigUint<M>,
     pub balance: BigUint<M>,
@@ -15,7 +16,8 @@ impl<M: ManagedTypeApi> CurveArguments<M> {
     }
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone)]
 pub struct BondingCurve<
     M: ManagedTypeApi,
     T: CurveFunction<M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
@@ -39,7 +41,8 @@ impl<
     }
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone)]
 pub struct TokenOwnershipData<M: ManagedTypeApi> {
     pub token_nonces: ManagedVec<M, u64>,
     pub owner: ManagedAddress<M>,
