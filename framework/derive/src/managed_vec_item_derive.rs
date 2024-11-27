@@ -162,10 +162,6 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                 Self::read_from_payload(payload)
             }
 
-            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
-                Self::from_byte_reader(reader)
-            }
-
             fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
                 let mut arr: [u8; 1] = [0u8; 1];
                 arr[0] = match self {
@@ -219,10 +215,6 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
             unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
                 // TODO: managed ref
                 Self::read_from_payload(payload)
-            }
-
-            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
-                Self::from_byte_reader(reader)
             }
 
             fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {

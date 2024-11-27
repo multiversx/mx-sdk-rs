@@ -95,12 +95,6 @@ impl ManagedVecItem for DebugHandle {
         Self::read_from_payload(payload)
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        use_raw_handle(RawHandle::from_byte_reader(reader))
-    }
-
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
         RawHandle::into_byte_writer(self.get_raw_handle(), writer)
     }

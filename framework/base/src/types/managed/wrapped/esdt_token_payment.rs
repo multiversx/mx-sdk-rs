@@ -221,12 +221,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         Self::read_from_payload(payload)
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
-    }
-
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
         let mut arr: [u8; 16] = [0u8; 16];
         let mut index = 0;
