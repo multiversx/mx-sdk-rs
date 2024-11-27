@@ -55,7 +55,7 @@ checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
 name = "multiversx-chain-core"
-version = "0.11.0"
+version = "0.11.1"
 dependencies = [
  "bitflags",
  "multiversx-sc-codec",
@@ -63,7 +63,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.54.1"
+version = "0.54.4"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -76,7 +76,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.21.0"
+version = "0.21.1"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
@@ -85,7 +85,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.21.0"
+version = "0.21.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -95,7 +95,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.54.1"
+version = "0.54.4"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -106,7 +106,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.54.1"
+version = "0.54.4"
 dependencies = [
  "multiversx-sc",
 ]
@@ -176,9 +176,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.13"
+version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e91b56cd4cadaeb79bbf1a5645f6b4f8dc5bde8834ad5894a8db35fda9efa1fe"
+checksum = "adb9e6ca4f869e1180728b7950e35922a7fc6397f7b641499e8f3ef06e50dc83"
 
 [[package]]
 name = "unwrap-infallible"

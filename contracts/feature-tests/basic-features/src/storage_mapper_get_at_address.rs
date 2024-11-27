@@ -146,4 +146,16 @@ pub trait StorageMapperGetAtAddress {
         self.single_value_from_address_with_keys(address, extra_key)
             .get()
     }
+
+    #[storage_mapper_from_address("address_ids")]
+    fn address_ids_from_address(
+        &self,
+        address: ManagedAddress,
+    ) -> AddressToIdMapper<ManagedAddress>;
+
+    #[view]
+    fn address_to_id_mapper_get_id_from_address(&self, address_arg: ManagedAddress) -> AddressId {
+        let address = self.contract_address().get();
+        self.address_ids_from_address(address).get_id(&address_arg)
+    }
 }

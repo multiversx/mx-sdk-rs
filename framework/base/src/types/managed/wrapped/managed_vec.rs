@@ -367,6 +367,8 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + Ord + Debug,
 {
+    #[deprecated(since = "0.54.5", note = "Please use method `sort_unstable` instead.")]
+    #[cfg(feature = "alloc")]
     pub fn sort(&mut self) {
         self.with_self_as_slice_mut(|slice| {
             slice.sort();
@@ -374,6 +376,11 @@ where
         });
     }
 
+    #[deprecated(
+        since = "0.54.5",
+        note = "Please use method `sort_unstable_by` instead."
+    )]
+    #[cfg(feature = "alloc")]
     pub fn sort_by<F>(&mut self, mut compare: F)
     where
         F: FnMut(&T, &T) -> Ordering,
@@ -384,6 +391,11 @@ where
         });
     }
 
+    #[deprecated(
+        since = "0.54.5",
+        note = "Please use method `sort_unstable_by_key` instead."
+    )]
+    #[cfg(feature = "alloc")]
     pub fn sort_by_key<K, F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> K,
@@ -395,6 +407,8 @@ where
         });
     }
 
+    #[deprecated]
+    #[cfg(feature = "alloc")]
     pub fn sort_by_cached_key<K, F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> K,
