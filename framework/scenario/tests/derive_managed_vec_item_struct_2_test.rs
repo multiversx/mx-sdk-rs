@@ -67,7 +67,7 @@ fn struct_2_from_bytes_reader() {
     };
 
     #[rustfmt::skip]
-    let payload = &[
+    let payload = [
         /* u_8  */ 0x01,
         /* u_16 */ 0x00, 0x02,
         /* u_32 */ 0x00, 0x00, 0x00, 0x03,
@@ -78,8 +78,6 @@ fn struct_2_from_bytes_reader() {
     ];
 
     let struct_from_bytes =
-        <Struct2 as multiversx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
-            bytes.copy_from_slice(&payload[..]);
-        });
+        <Struct2 as multiversx_sc::types::ManagedVecItem>::read_from_payload(&payload.into());
     assert_eq!(expected_struct, struct_from_bytes);
 }

@@ -39,9 +39,6 @@ fn enum_to_bytes_writer() {
 #[test]
 fn enum_from_bytes_reader() {
     let enum_from_bytes =
-        <SimpleEnum as multiversx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
-            assert_eq!(bytes.len(), 1);
-            bytes[0] = 1;
-        });
+        <SimpleEnum as multiversx_sc::types::ManagedVecItem>::read_from_payload(&[1u8].into());
     assert_eq!(enum_from_bytes, SimpleEnum::Variant2);
 }

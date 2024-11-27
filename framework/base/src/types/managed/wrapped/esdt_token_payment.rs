@@ -153,17 +153,6 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 }
 
-fn managed_vec_item_from_slice<T>(arr: &[u8], index: &mut usize) -> T
-where
-    T: ManagedVecItem,
-{
-    ManagedVecItem::from_byte_reader(|bytes| {
-        let size = T::payload_size();
-        bytes.copy_from_slice(&arr[*index..*index + size]);
-        *index += size;
-    })
-}
-
 fn managed_vec_item_to_slice<T>(arr: &mut [u8], index: &mut usize, item: T)
 where
     T: ManagedVecItem,
@@ -188,22 +177,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     type PAYLOAD = ManagedVecItemPayloadBuffer<16>;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
-
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut arr: [u8; 16] = [0u8; 16];
-        reader(&mut arr[..]);
-        let mut index = 0;
-
-        let token_identifier = managed_vec_item_from_slice(&arr, &mut index);
-        let token_nonce = managed_vec_item_from_slice(&arr, &mut index);
-        let amount = managed_vec_item_from_slice(&arr, &mut index);
-
-        EsdtTokenPayment {
-            token_identifier,
-            token_nonce,
-            amount,
-        }
-    }
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;

@@ -50,6 +50,12 @@ pub struct ManagedVecItemPayloadBuffer<const N: usize> {
     pub buffer: [u8; N],
 }
 
+impl<const N: usize> From<[u8; N]> for ManagedVecItemPayloadBuffer<N> {
+    fn from(value: [u8; N]) -> Self {
+        ManagedVecItemPayloadBuffer { buffer: value }
+    }
+}
+
 impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
     fn new_buffer() -> Self {
         ManagedVecItemPayloadBuffer { buffer: [0u8; N] }

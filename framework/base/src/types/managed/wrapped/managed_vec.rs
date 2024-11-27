@@ -527,13 +527,17 @@ where
             return false;
         }
         let mut byte_index = 0;
+        let mut self_payload = T::PAYLOAD::new_buffer();
+        let mut other_payload = T::PAYLOAD::new_buffer();
         while byte_index < self_len {
-            let self_item = T::from_byte_reader(|dest_slice| {
-                let _ = self.buffer.load_slice(byte_index, dest_slice);
-            });
-            let other_item = T::from_byte_reader(|dest_slice| {
-                let _ = other.buffer.load_slice(byte_index, dest_slice);
-            });
+            let _ = self
+                .buffer
+                .load_slice(byte_index, self_payload.payload_slice_mut());
+            let _ = self
+                .buffer
+                .load_slice(byte_index, other_payload.payload_slice_mut());
+            let self_item = T::read_from_payload(&self_payload);
+            let other_item = T::read_from_payload(&other_payload);
             if self_item != other_item {
                 return false;
             }

@@ -65,14 +65,8 @@ fn managed_struct_from_bytes_reader() {
     let arr: [u8; 8] = [0xff, 0xff, 0xff, handle_bytes[3], 0x00, 0x01, 0x23, 0x45];
 
     let struct_from_bytes =
-        <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::from_byte_reader(
-            |bytes| {
-                bytes.copy_from_slice(
-                    &arr
-                        [0
-                            ..<ManagedStructWithBigUint::<StaticApi> as multiversx_sc::types::ManagedVecItem>::payload_size()],
-                );
-            },
+        <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::read_from_payload(
+            &arr.into()
         );
     assert_eq!(s, struct_from_bytes);
 }

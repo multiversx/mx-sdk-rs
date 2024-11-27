@@ -83,10 +83,6 @@ impl ManagedVecItem for DebugHandle {
 
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        use_raw_handle(RawHandle::from_byte_reader(reader))
-    }
-
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         use_raw_handle(RawHandle::read_from_payload(payload))
     }

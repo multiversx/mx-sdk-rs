@@ -44,10 +44,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        EsdtTokenPayment::from_byte_reader(reader).into()
-    }
-
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         EsdtTokenPayment::read_from_payload(payload).into()
     }

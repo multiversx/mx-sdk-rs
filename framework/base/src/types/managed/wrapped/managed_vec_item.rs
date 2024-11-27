@@ -42,8 +42,6 @@ pub trait ManagedVecItem: 'static {
     }
 
     /// Parses given bytes as a an owned object.
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self;
-
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self;
 
     /// Parses given bytes as a representation of the object, either owned, or a reference.
@@ -82,12 +80,6 @@ macro_rules! impl_int {
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
 
-            fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-                let mut arr: [u8; $payload_size] = [0u8; $payload_size];
-                reader(&mut arr[..]);
-                $ty::from_be_bytes(arr)
-            }
-
             fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 $ty::from_be_bytes(payload.buffer)
             }
@@ -115,12 +107,6 @@ impl ManagedVecItem for usize {
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut arr: [u8; 4] = [0u8; 4];
-        reader(&mut arr[..]);
-        u32::from_be_bytes(arr) as usize
-    }
-
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         u32::read_from_payload(payload) as usize
     }
@@ -139,10 +125,6 @@ impl ManagedVecItem for bool {
     type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
-
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        u8::from_byte_reader(reader) > 0
-    }
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         u8::read_from_payload(payload) > 0
@@ -168,19 +150,6 @@ where
     type PAYLOAD = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
-
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut payload = Self::PAYLOAD::new_buffer();
-        let payload_slice = payload.payload_slice_mut();
-        reader(payload_slice);
-        if payload_slice[0] == 0 {
-            None
-        } else {
-            Some(T::from_byte_reader(|bytes| {
-                bytes.copy_from_slice(&payload_slice[1..]);
-            }))
-        }
-    }
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let (p1, p2) = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<
@@ -219,11 +188,6 @@ macro_rules! impl_managed_type {
             const SKIPS_RESERIALIZATION: bool = false;
             type Ref<'a> = ManagedRef<'a, M, Self>;
 
-            fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-                let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
-                unsafe { $ty::from_handle(handle) }
-            }
-
             fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let handle = use_raw_handle(i32::read_from_payload(payload));
                 unsafe { Self::from_handle(handle) }
@@ -257,11 +221,6 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
-        unsafe { Self::from_handle(handle) }
-    }
-
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let handle = use_raw_handle(i32::read_from_payload(payload));
         unsafe { Self::from_handle(handle) }
@@ -289,11 +248,6 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = M::ManagedBufferHandle::from_byte_reader(reader);
-        unsafe { Self::from_handle(handle) }
-    }
-
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let handle = use_raw_handle(i32::read_from_payload(payload));
         unsafe { Self::from_handle(handle) }
@@ -315,12 +269,6 @@ impl ManagedVecItem for EsdtTokenType {
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut arr: [u8; 1] = [0u8; 1];
-        reader(&mut arr[..]);
-        arr[0].into()
-    }
-
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         u8::read_from_payload(payload).into()
     }
@@ -338,10 +286,6 @@ impl ManagedVecItem for EsdtLocalRole {
     type PAYLOAD = ManagedVecItemPayloadBuffer<2>;
     const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
     type Ref<'a> = Self;
-
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        u16::from_byte_reader(reader).into()
-    }
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         u16::read_from_payload(payload).into()

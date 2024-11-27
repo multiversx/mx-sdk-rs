@@ -203,11 +203,6 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = T::OwnHandle::from_byte_reader(reader);
-        Self::new_with_handle(handle)
-    }
-
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let handle = use_raw_handle(i32::read_from_payload(payload));
         Self::new_with_handle(handle)
@@ -217,8 +212,6 @@ where
         // TODO: managed ref
         Self::read_from_payload(payload)
     }
-
-
 
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
         <T::OwnHandle as ManagedVecItem>::into_byte_writer(self.handle, writer)

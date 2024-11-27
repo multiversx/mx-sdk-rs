@@ -93,14 +93,8 @@ fn struct_from_bytes_reader() {
     ];
 
     let struct_from_bytes =
-        <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::from_byte_reader(
-            |bytes| {
-                bytes.copy_from_slice(
-                    &arr
-                        [0
-                            ..<ManagedStructWithToken::<StaticApi> as multiversx_sc::types::ManagedVecItem>::payload_size()],
-                );
-            },
+        <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::read_from_payload(
+            &arr.into()
         );
 
     assert_eq!(s, struct_from_bytes);

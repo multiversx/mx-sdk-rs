@@ -94,10 +94,6 @@ fn struct_1_from_bytes_reader() {
     ];
 
     let struct_from_bytes =
-        <Struct1 as multiversx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
-            bytes.copy_from_slice(
-                &arr[0..<Struct1 as multiversx_sc::types::ManagedVecItem>::payload_size()],
-            );
-        });
+        <Struct1 as multiversx_sc::types::ManagedVecItem>::read_from_payload(&arr.into());
     assert_eq!(s, struct_from_bytes);
 }
