@@ -29,7 +29,7 @@ pub enum EIVersion {
     #[default]
     V1_3,
 
-    /// Version to be released to mainnet in August 2024.
+    /// Hooks made available in the Spica release, November 12, 2024: https://multiversx.com/release/release-spica-v1-8-4-0
     V1_4,
 
     /// Version planned for Q3 2024.
