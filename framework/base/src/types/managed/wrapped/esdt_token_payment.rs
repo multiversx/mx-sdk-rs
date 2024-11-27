@@ -156,17 +156,6 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 }
 
-fn managed_vec_item_to_slice<T>(arr: &mut [u8], index: &mut usize, item: T)
-where
-    T: ManagedVecItem,
-{
-    ManagedVecItem::into_byte_writer(item, |bytes| {
-        let size = T::payload_size();
-        arr[*index..*index + size].copy_from_slice(bytes);
-        *index += size;
-    });
-}
-
 impl<M: ManagedTypeApi> IntoMultiValue for EsdtTokenPayment<M> {
     type MultiValue = EsdtTokenPaymentMultiValue<M>;
 
@@ -195,17 +184,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
         // TODO: managed ref
         Self::read_from_payload(payload)
-    }
-
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        let mut arr: [u8; 16] = [0u8; 16];
-        let mut index = 0;
-
-        managed_vec_item_to_slice(&mut arr, &mut index, self.token_identifier);
-        managed_vec_item_to_slice(&mut arr, &mut index, self.token_nonce);
-        managed_vec_item_to_slice(&mut arr, &mut index, self.amount);
-
-        writer(&arr[..])
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

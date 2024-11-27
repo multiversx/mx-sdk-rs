@@ -201,7 +201,9 @@ where
 
     pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
-        item.into_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.set_slice(byte_index, payload.payload_slice())
     }
 
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
@@ -214,9 +216,9 @@ where
     }
 
     pub fn push(&mut self, item: T) {
-        item.into_byte_writer(|bytes| {
-            self.buffer.append_bytes(bytes);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.append_bytes(payload.payload_slice());
     }
 
     pub fn remove(&mut self, index: usize) {
@@ -260,9 +262,9 @@ where
     }
 
     pub fn overwrite_with_single_item(&mut self, item: T) {
-        item.into_byte_writer(|bytes| {
-            self.buffer.overwrite(bytes);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.overwrite(payload.payload_slice());
     }
 
     /// Appends all the contents of another managed vec at the end of the current one.

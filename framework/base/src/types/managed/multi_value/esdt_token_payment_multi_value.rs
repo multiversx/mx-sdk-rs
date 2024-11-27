@@ -53,11 +53,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
         Self::read_from_payload(payload)
     }
 
-    #[inline]
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        self.obj.into_byte_writer(writer)
-    }
-
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.obj.save_to_payload(payload);
     }

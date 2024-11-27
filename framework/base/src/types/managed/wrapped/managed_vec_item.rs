@@ -53,15 +53,9 @@ pub trait ManagedVecItem: 'static {
 
     /// Converts the object into bytes.
     ///
-    /// The output is processed by the `writer` lambda.
-    /// The writer is provided by the caller.
-    /// The callee will use it to pass on the bytes.
-    ///
     /// The method is used when instering (push, overwrite) into a ManagedVec.
     ///
     /// Note that a destructor should not be called at this moment, since the ManagedVec will take ownership of the item.
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R;
-
     fn save_to_payload(self, payload: &mut Self::PAYLOAD);
 }
 
@@ -112,11 +106,6 @@ macro_rules! impl_int {
                 $ty::from_be_bytes(payload.buffer)
             }
 
-            fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-                let bytes = self.to_be_bytes();
-                writer(&bytes)
-            }
-
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
                 payload.buffer = self.to_be_bytes();
             }
@@ -143,11 +132,6 @@ impl ManagedVecItem for usize {
         Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        let bytes = (self as u32).to_be_bytes();
-        writer(&bytes)
-    }
-
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         (self as u32).save_to_payload(payload);
     }
@@ -166,14 +150,9 @@ impl ManagedVecItem for bool {
         Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         // true -> 1u8
         // false -> 0u8
-        let u8_value = u8::from(self);
-        <u8 as ManagedVecItem>::into_byte_writer(u8_value, writer)
-    }
-
-    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         u8::from(self).save_to_payload(payload);
     }
 }
@@ -204,18 +183,6 @@ where
         Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        let mut payload = Self::PAYLOAD::new_buffer();
-        let slice = payload.payload_slice_mut();
-        if let Some(t) = self {
-            slice[0] = 1;
-            T::into_byte_writer(t, |bytes| {
-                slice[1..].copy_from_slice(bytes);
-            });
-        }
-        writer(slice)
-    }
-
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         let (p1, p2) = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<
             T::PAYLOAD,
@@ -243,11 +210,6 @@ macro_rules! impl_managed_type {
             unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
                 let handle = use_raw_handle(i32::read_from_payload(payload));
                 ManagedRef::wrap_handle(handle)
-            }
-
-            fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-                let handle = unsafe { self.forget_into_handle() };
-                <$ty<M> as ManagedType<M>>::OwnHandle::into_byte_writer(handle, writer)
             }
 
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -283,13 +245,6 @@ where
         ManagedRef::wrap_handle(handle)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        <<Self as ManagedType<M>>::OwnHandle as ManagedVecItem>::into_byte_writer(
-            self.get_handle(),
-            writer,
-        )
-    }
-
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         let handle = unsafe { self.forget_into_handle() };
         handle.get_raw_handle().save_to_payload(payload);
@@ -315,11 +270,6 @@ where
         ManagedRef::wrap_handle(handle)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        let handle = unsafe { self.forget_into_handle() };
-        <M::ManagedBufferHandle as ManagedVecItem>::into_byte_writer(handle, writer)
-    }
-
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         let handle = unsafe { self.forget_into_handle() };
         handle.get_raw_handle().save_to_payload(payload);
@@ -339,10 +289,6 @@ impl ManagedVecItem for EsdtTokenType {
         Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        writer(&[self.as_u8()])
-    }
-
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.as_u8().save_to_payload(payload);
     }
@@ -359,10 +305,6 @@ impl ManagedVecItem for EsdtLocalRole {
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
         Self::read_from_payload(payload)
-    }
-
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        <u16 as ManagedVecItem>::into_byte_writer(self.as_u16(), writer)
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
