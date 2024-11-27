@@ -1,7 +1,9 @@
 use multiversx_sc::{
     api::ManagedTypeApi,
-    codec,
-    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    codec::{
+        self,
+        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    },
     derive::ManagedVecItem,
     types::{BigUint, ManagedType, ManagedVecItemPayload},
 };
@@ -39,20 +41,15 @@ fn managed_struct_to_bytes_writer() {
         num: 0x12345,
     };
 
-    let mut payload = <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
-    let payload_slice = payload.payload_slice_mut();
-
     let handle_bytes = s.big_uint.get_handle().to_be_bytes();
     let expected = [0xff, 0xff, 0xff, handle_bytes[3], 0x00, 0x01, 0x23, 0x45];
 
-    <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::into_byte_writer(
+    let mut payload = <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
+    <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::save_to_payload(
         s,
-        |bytes| {
-            payload_slice.copy_from_slice(bytes);
-
-            assert_eq!(payload_slice, expected);
-        },
+        &mut payload,
     );
+    assert_eq!(payload.buffer, expected);
 }
 
 #[test]

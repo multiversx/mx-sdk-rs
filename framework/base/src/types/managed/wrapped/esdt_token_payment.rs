@@ -13,7 +13,10 @@ use crate::{
     derive::type_abi,
 };
 
-use super::{managed_vec_item_read_from_payload_index, ManagedVec, ManagedVecItemPayloadBuffer};
+use super::{
+    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, ManagedVec,
+    ManagedVecItemPayloadBuffer,
+};
 
 #[type_abi]
 #[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
@@ -203,6 +206,16 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         managed_vec_item_to_slice(&mut arr, &mut index, self.amount);
 
         writer(&arr[..])
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let mut index = 0;
+
+        unsafe {
+            managed_vec_item_save_to_payload_index(self.token_identifier, payload, &mut index);
+            managed_vec_item_save_to_payload_index(self.token_nonce, payload, &mut index);
+            managed_vec_item_save_to_payload_index(self.amount, payload, &mut index);
+        }
     }
 }
 

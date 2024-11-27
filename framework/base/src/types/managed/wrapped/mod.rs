@@ -46,7 +46,10 @@ pub use managed_option::ManagedOption;
 pub use managed_ref::ManagedRef;
 pub use managed_ref_mut::ManagedRefMut;
 pub use managed_vec::ManagedVec;
-pub use managed_vec_item::{managed_vec_item_read_from_payload_index, ManagedVecItem};
+pub use managed_vec_item::{
+    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
+    ManagedVecItem,
+};
 pub use managed_vec_item_nested_tuple::{
     ManagedVecItemNestedTuple, ManagedVecItemNestedTupleSplit,
 };

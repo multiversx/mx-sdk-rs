@@ -2,6 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     abi::TypeAbiFrom,
+    api::HandleConstraints,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -215,6 +216,10 @@ where
 
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
         <T::OwnHandle as ManagedVecItem>::into_byte_writer(self.handle, writer)
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.handle.get_raw_handle().save_to_payload(payload);
     }
 }
 

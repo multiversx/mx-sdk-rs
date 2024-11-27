@@ -20,6 +20,13 @@ pub trait ManagedVecItemPayload {
     ///
     /// Only works correctly if the given index is correct, otherwise undefined behavior is possible.
     unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S;
+
+    /// Takes a sub-payload item.
+    ///
+    /// ## Safety
+    ///
+    /// Only works correctly if the given index is correct, otherwise undefined behavior is possible.
+    unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, index: usize) -> &mut S;
 }
 
 /// Empty ManagedVecItem.
@@ -45,6 +52,10 @@ impl ManagedVecItemPayload for ManagedVecItemEmptyPayload {
     }
 
     unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, _index: usize) -> &S {
+        unimplemented!()
+    }
+
+    unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, _index: usize) -> &mut S {
         unimplemented!()
     }
 }
@@ -81,6 +92,11 @@ impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
     unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
         let ptr = self.buffer.as_ptr().add(index);
         &*ptr.cast::<S>()
+    }
+
+    unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, index: usize) -> &mut S {
+        let ptr = self.buffer.as_mut_ptr().add(index);
+        &mut *ptr.cast::<S>()
     }
 }
 
@@ -125,6 +141,10 @@ where
     unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
         self.buffer.slice_unchecked(index)
     }
+
+    unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, index: usize) -> &mut S {
+        self.buffer.slice_unchecked_mut(index)
+    }
 }
 
 impl<P1, P2> ManagedVecItemPayloadConcat<P1, P2>
@@ -146,6 +166,12 @@ where
     type Output = ManagedVecItemPayloadConcat<P0, ManagedVecItemPayloadConcat<P1, P2>>;
 
     fn split_from_add(_payload: &Self::Output) -> (&Self, &ManagedVecItemPayloadConcat<P1, P2>) {
+        todo!()
+    }
+
+    fn split_mut_from_add(
+        _payload: &mut Self::Output,
+    ) -> (&mut Self, &mut ManagedVecItemPayloadConcat<P1, P2>) {
         todo!()
     }
 }
@@ -182,6 +208,10 @@ where
     unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
         self.equiv.slice_unchecked(index)
     }
+
+    unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, index: usize) -> &mut S {
+        self.equiv.slice_unchecked_mut(index)
+    }
 }
 
 /// Describes concatantion of smaller payloads into a larger one.
@@ -196,6 +226,8 @@ where
     type Output: ManagedVecItemPayload;
 
     fn split_from_add(payload: &Self::Output) -> (&Self, &Rhs);
+
+    fn split_mut_from_add(payload: &mut Self::Output) -> (&mut Self, &mut Rhs);
 }
 
 impl<P> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload> for P
@@ -206,6 +238,12 @@ where
 
     fn split_from_add(payload: &Self::Output) -> (&Self, &ManagedVecItemEmptyPayload) {
         (payload, &ManagedVecItemEmptyPayload)
+    }
+
+    fn split_mut_from_add(
+        _payload: &mut Self::Output,
+    ) -> (&mut Self, &mut ManagedVecItemEmptyPayload) {
+        unimplemented!()
     }
 }
 
@@ -231,6 +269,22 @@ macro_rules! payload_add {
                     (
                         &*ptr1.cast::<ManagedVecItemPayloadBuffer<$dec1>>(),
                         &*ptr2.cast::<ManagedVecItemPayloadBuffer<$dec2>>(),
+                    )
+                }
+            }
+
+            fn split_mut_from_add(
+                payload: &mut Self::Output,
+            ) -> (
+                &mut ManagedVecItemPayloadBuffer<$dec1>,
+                &mut ManagedVecItemPayloadBuffer<$dec2>,
+            ) {
+                unsafe {
+                    let ptr1 = payload.buffer.as_mut_ptr();
+                    let ptr2 = ptr1.add($dec1);
+                    (
+                        &mut *ptr1.cast::<ManagedVecItemPayloadBuffer<$dec1>>(),
+                        &mut *ptr2.cast::<ManagedVecItemPayloadBuffer<$dec2>>(),
                     )
                 }
             }

@@ -1,7 +1,10 @@
 use multiversx_sc::{
-    codec,
-    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    codec::{
+        self,
+        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    },
     derive::ManagedVecItem,
+    types::{ManagedVecItemPayload, ManagedVecItemPayloadBuffer},
 };
 
 // to test, run the following command in the crate folder:
@@ -27,13 +30,13 @@ fn enum_static() {
 
 #[test]
 fn enum_to_bytes_writer() {
-    <SimpleEnum as multiversx_sc::types::ManagedVecItem>::into_byte_writer(
+    let mut payload = ManagedVecItemPayloadBuffer::new_buffer();
+    <SimpleEnum as multiversx_sc::types::ManagedVecItem>::save_to_payload(
         SimpleEnum::Variant1,
-        |bytes| {
-            assert_eq!(bytes.len(), 1);
-            assert_eq!(bytes[0], 0);
-        },
+        &mut payload,
     );
+
+    assert_eq!(payload.buffer, [0]);
 }
 
 #[test]

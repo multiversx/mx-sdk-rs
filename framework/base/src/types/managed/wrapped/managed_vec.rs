@@ -527,12 +527,12 @@ where
             return false;
         }
         let mut byte_index = 0;
-        let mut self_payload = T::PAYLOAD::new_buffer();
-        let mut other_payload = T::PAYLOAD::new_buffer();
         while byte_index < self_len {
+            let mut self_payload = T::PAYLOAD::new_buffer();
             let _ = self
                 .buffer
                 .load_slice(byte_index, self_payload.payload_slice_mut());
+            let mut other_payload = T::PAYLOAD::new_buffer();
             let _ = other
                 .buffer
                 .load_slice(byte_index, other_payload.payload_slice_mut());

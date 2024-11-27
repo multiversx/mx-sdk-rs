@@ -65,18 +65,14 @@ fn struct_1_to_bytes_writer() {
     };
 
     let mut payload = <Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
-    let payload_slice = payload.payload_slice_mut();
-
-    <Struct1 as multiversx_sc::types::ManagedVecItem>::into_byte_writer(s, |bytes| {
-        payload_slice.copy_from_slice(bytes);
-        assert_eq!(
-            payload_slice,
-            [
-                0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x04, 0x01,
-            ]
-        );
-    });
+    <Struct1 as multiversx_sc::types::ManagedVecItem>::save_to_payload(s, &mut payload);
+    assert_eq!(
+        payload.buffer,
+        [
+            0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x04, 0x01,
+        ]
+    );
 }
 
 #[test]

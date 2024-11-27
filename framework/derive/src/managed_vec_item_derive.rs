@@ -84,6 +84,24 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
     }
 }
 
+fn generate_save_to_payload_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+    match fields {
+        syn::Fields::Named(fields_named) => fields_named
+            .named
+            .iter()
+            .map(|field| {
+                let field_ident = &field.ident;
+                quote! {
+                    multiversx_sc::types::managed_vec_item_save_to_payload_index(self.#field_ident, payload, &mut index);
+                }
+            })
+            .collect(),
+        _ => {
+            panic!("ManagedVecItem only supports named fields")
+        }
+    }
+}
+
 fn generate_payload_buffer_snippet() -> proc_macro2::TokenStream {
     quote! {
         let mut payload = <Self::PAYLOAD as multiversx_sc::types::ManagedVecItemPayload>::new_buffer();
@@ -138,6 +156,13 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                 };
                 writer(&arr[..])
             }
+
+            fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+                let discriminant = match self {
+                    #(#writer_match_arms)*
+                };
+                <u8 as multiversx_sc::types::ManagedVecItem>::save_to_payload(discriminant, payload);
+            }
         }
     };
     gen.into()
@@ -151,6 +176,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
         generate_skips_reserialization_snippets(&data_struct.fields);
     let read_from_payload_snippets = generate_read_from_payload_snippets(&data_struct.fields);
     let to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
+    let save_to_payload_snippets = generate_save_to_payload_snippets(&data_struct.fields);
 
     let payload_buffer_snippet = generate_payload_buffer_snippet();
 
@@ -182,6 +208,13 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                 #(#to_byte_writer_snippets)*
 
                 writer(&payload_slice[..])
+            }
+
+            fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+                let mut index = 0;
+                unsafe {
+                    #(#save_to_payload_snippets)*
+                }
             }
         }
     };

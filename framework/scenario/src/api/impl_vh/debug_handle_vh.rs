@@ -94,6 +94,10 @@ impl ManagedVecItem for DebugHandle {
     fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
         RawHandle::into_byte_writer(self.get_raw_handle(), writer)
     }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.get_raw_handle().save_to_payload(payload);
+    }
 }
 
 impl TryStaticCast for DebugHandle {}
