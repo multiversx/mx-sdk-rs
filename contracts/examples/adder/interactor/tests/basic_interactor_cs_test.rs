@@ -1,7 +1,9 @@
 use basic_interactor::{AdderInteract, Config};
 use multiversx_sc_snippets::{imports::Bech32Address, sdk::gateway::SetStateAccount, test_wallets};
+use serial_test::serial;
 
 #[tokio::test]
+#[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn simulator_upgrade_test() {
     let mut basic_interact = AdderInteract::new(Config::chain_simulator_config()).await;
@@ -36,6 +38,7 @@ async fn simulator_upgrade_test() {
 }
 
 #[tokio::test]
+#[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn set_state_cs_test() {
     let account_address = test_wallets::mike();
@@ -57,12 +60,17 @@ async fn set_state_cs_test() {
 
     let set_state_response = simulator_interact.interactor.set_state(vec_state).await;
 
-    let _ = simulator_interact.interactor.generate_blocks(2u64).await;
+    simulator_interact
+        .interactor
+        .generate_blocks(2u64)
+        .await
+        .unwrap();
 
     assert!(set_state_response.is_ok());
 }
 
 #[tokio::test]
+#[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn set_state_from_file_cs_test() {
     let account_address = test_wallets::mike();
