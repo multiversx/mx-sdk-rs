@@ -89,6 +89,30 @@ where
     }
 }
 
+impl<M, T> ManagedVecItem for MultiValueManagedVecCounted<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    type PAYLOAD = <ManagedVec<M, T> as ManagedVecItem>::PAYLOAD;
+    const SKIPS_RESERIALIZATION: bool = false;
+    type Ref<'a> = Self;
+
+    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
+        Self::from(ManagedVec::<M, T>::from_byte_reader(reader))
+    }
+
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+        reader: Reader,
+    ) -> Self::Ref<'a> {
+        Self::from_byte_reader(reader)
+    }
+
+    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+        self.contents.into_byte_writer(writer)
+    }
+}
+
 impl<M, T> TopEncodeMulti for MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,

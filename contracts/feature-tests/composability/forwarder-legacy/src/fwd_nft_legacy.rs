@@ -4,14 +4,16 @@ multiversx_sc::derive_imports!();
 use super::fwd_storage_legacy;
 
 // used as mock attributes for NFTs
-#[derive(TopEncode, TopDecode, TypeAbi, Clone, Copy, PartialEq, Debug)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
     pub b: u8,
 }
 
-#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone)]
 pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub biguint: BigUint<M>,
     pub vec_u8: ManagedBuffer<M>,

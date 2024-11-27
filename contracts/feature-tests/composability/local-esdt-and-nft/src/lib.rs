@@ -4,7 +4,8 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 // used as mock attributes for NFTs
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct Color {
     r: u8,
     g: u8,
