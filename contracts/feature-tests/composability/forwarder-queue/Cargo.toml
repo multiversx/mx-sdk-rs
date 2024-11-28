@@ -9,14 +9,14 @@ publish = false
 path = "src/forwarder_queue.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.4"
+version = "0.54.5"
 path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.54.4"
+version = "0.54.5"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.4"
+version = "0.54.5"
 path = "../../../../framework/scenario"
