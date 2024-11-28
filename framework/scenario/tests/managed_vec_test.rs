@@ -145,6 +145,7 @@ fn test_take_biguint() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
@@ -163,6 +164,7 @@ fn test_sort_u64() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_biguint() {
     let mut vec = Vec::<BigUint<StaticApi>>::new();
     let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
@@ -185,6 +187,7 @@ fn flip(n: &u64) -> u64 {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_by_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
@@ -204,6 +207,7 @@ fn test_sort_by_u64() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_by_biguint() {
     let mut vec = Vec::<BigUint<StaticApi>>::new();
     let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
@@ -232,6 +236,7 @@ fn test_sort_by_biguint() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_by_key_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
@@ -251,6 +256,7 @@ fn test_sort_by_key_u64() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_by_key_biguint() {
     let mut vec = Vec::<BigUint<StaticApi>>::new();
     let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
@@ -271,6 +277,7 @@ fn test_sort_by_key_biguint() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_by_cached_key_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
@@ -287,6 +294,7 @@ fn test_sort_by_cached_key_u64() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_by_cached_key_biguint() {
     let mut vec = Vec::<BigUint<StaticApi>>::new();
     let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
@@ -304,6 +312,7 @@ fn test_sort_by_cached_key_biguint() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sort_unstable_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
@@ -448,6 +457,7 @@ fn test_dedup_biguint() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sorted_dedup_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
@@ -465,6 +475,7 @@ fn test_sorted_dedup_u64() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn test_sorted_dedup_biguint() {
     let mut vec = Vec::<BigUint<StaticApi>>::new();
     let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
