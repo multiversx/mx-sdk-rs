@@ -8,8 +8,8 @@ use crate::{
         TopEncodeMultiOutput, TopEncodeOutput,
     },
     types::{
-        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
-        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
+        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem,
+        ManagedVecRefIterator, ManagedVecRefMut, MultiValueEncoded, MultiValueManagedVec,
     },
 };
 use alloc::{format, vec::Vec};
@@ -182,8 +182,8 @@ where
         }
     }
 
-    pub fn get_mut(&mut self, index: usize) -> ManagedVecRef<M, T> {
-        ManagedVecRef::new(self.get_handle(), index)
+    pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<M, T> {
+        ManagedVecRefMut::new(self.get_handle(), index)
     }
 
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {

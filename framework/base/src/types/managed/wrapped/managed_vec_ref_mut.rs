@@ -10,7 +10,7 @@ use core::{
 
 use super::{ManagedRef, ManagedRefMut};
 
-pub struct ManagedVecRef<'a, M, T>
+pub struct ManagedVecRefMut<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -22,7 +22,7 @@ where
     item: ManuallyDrop<T>,
 }
 
-impl<'a, M, T> ManagedVecRef<'a, M, T>
+impl<'a, M, T> ManagedVecRefMut<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -47,7 +47,7 @@ where
     }
 }
 
-impl<'a, M, T> Drop for ManagedVecRef<'a, M, T>
+impl<'a, M, T> Drop for ManagedVecRefMut<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -63,7 +63,7 @@ where
     }
 }
 
-impl<'a, M, T> Deref for ManagedVecRef<'a, M, T>
+impl<'a, M, T> Deref for ManagedVecRefMut<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<'a, M, T> DerefMut for ManagedVecRef<'a, M, T>
+impl<'a, M, T> DerefMut for ManagedVecRefMut<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
