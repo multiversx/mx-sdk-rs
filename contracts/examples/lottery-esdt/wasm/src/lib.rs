@@ -18,11 +18,11 @@ multiversx_sc_wasm_adapter::endpoints! {
     lottery_esdt
     (
         init => init
-        start => start
         createLotteryPool => create_lottery_pool
         buy_ticket => buy_ticket
         determine_winner => determine_winner
         status => status
+        claim_rewards => claim_rewards
         getLotteryInfo => lottery_info
         getLotteryWhitelist => lottery_whitelist
     )
