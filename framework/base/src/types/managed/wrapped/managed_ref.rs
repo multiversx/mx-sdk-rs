@@ -143,7 +143,7 @@ where
     }
 }
 
-impl<'a, M, T> NestedEncode for ManagedRef<'a, M, T>
+impl<M, T> NestedEncode for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + NestedEncode,
@@ -158,7 +158,7 @@ where
     }
 }
 
-impl<'a, M, T> core::fmt::Debug for ManagedRef<'a, M, T>
+impl<M, T> core::fmt::Debug for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + core::fmt::Debug,
