@@ -18,7 +18,7 @@ jobs:
     with:
       rust-toolchain: stable
       path-to-sc-meta: framework/meta
-      mx-scenario-go-version: v2.1.0-alpha
+      mx-scenario-go-version: v3.0.0
       coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}

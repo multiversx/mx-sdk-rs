@@ -57,7 +57,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:signature verification failed",
+                "message": "str:signature is invalid",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
