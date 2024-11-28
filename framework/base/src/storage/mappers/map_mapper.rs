@@ -438,7 +438,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> VacantEntry<'a, SA, A, K, V>
+impl<SA, A, K, V> VacantEntry<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,

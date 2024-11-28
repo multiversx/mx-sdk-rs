@@ -27,7 +27,7 @@ impl<'a> GetTxInfo<'a> {
     }
 }
 
-impl<'a> GatewayRequest for GetTxInfo<'a> {
+impl GatewayRequest for GetTxInfo<'_> {
     type Payload = ();
     type DecodedJson = TransactionInfo;
     type Result = TransactionOnNetwork;

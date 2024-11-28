@@ -94,7 +94,6 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     /// ## Safety
     ///
     /// The reference points to a shared value. Make sure the handle is not leaked.
-
     pub unsafe fn temp_const_ref(
         raw_handle: RawHandle,
     ) -> ManagedRef<'static, M, ManagedBuffer<M>> {

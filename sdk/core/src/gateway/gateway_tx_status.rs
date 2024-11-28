@@ -14,7 +14,7 @@ impl<'a> GetTxStatus<'a> {
     }
 }
 
-impl<'a> GatewayRequest for GetTxStatus<'a> {
+impl GatewayRequest for GetTxStatus<'_> {
     type Payload = ();
     type DecodedJson = TransactionStatus;
     type Result = String;

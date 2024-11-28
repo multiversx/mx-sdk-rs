@@ -1,4 +1,5 @@
 #![allow(clippy::type_complexity)]
+#![allow(clippy::needless_lifetimes)] // TODO: fix them all!
 
 pub mod api;
 pub mod bech32;

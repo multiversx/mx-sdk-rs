@@ -20,12 +20,12 @@ where
     pub(super) handle: T::OwnHandle,
 }
 
-impl<'a, M, T> ManagedRefMut<'a, M, T>
+impl<M, T> ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    pub fn new(value: &'a mut T) -> Self {
+    pub fn new(value: &mut T) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -44,7 +44,7 @@ where
     }
 }
 
-impl<'a, M, T> ManagedRefMut<'a, M, T>
+impl<M, T> ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + Clone,
@@ -55,7 +55,7 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedRefMut<'a, M, T>
+impl<M, T> Clone for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -70,7 +70,7 @@ where
     }
 }
 
-impl<'a, M, T> Deref for ManagedRefMut<'a, M, T>
+impl<M, T> Deref for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -83,7 +83,7 @@ where
     }
 }
 
-impl<'a, M, T> DerefMut for ManagedRefMut<'a, M, T>
+impl<M, T> DerefMut for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -93,7 +93,7 @@ where
     }
 }
 
-impl<'a, M, T> Borrow<T> for ManagedRefMut<'a, M, T>
+impl<M, T> Borrow<T> for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
