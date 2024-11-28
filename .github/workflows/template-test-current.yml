@@ -29,7 +29,7 @@ jobs:
         run: |
           cargo install wasm-opt
           cargo install --path framework/meta
-          sc-meta install mx-scenario-go --tag v2.0.0
+          sc-meta install mx-scenario-go --tag v3.0.0
 
           which wasm-opt
           which mx-scenario-go
