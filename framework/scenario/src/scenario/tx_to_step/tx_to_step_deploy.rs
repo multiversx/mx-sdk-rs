@@ -50,6 +50,7 @@ where
     let mut step = ScDeployStep::new()
         .from(address_annotated(env, &from))
         .code(code_annotated(env, data.code_source));
+    step.tx.code_metadata = data.code_metadata;
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());
     }

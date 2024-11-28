@@ -22,7 +22,7 @@ where
     fn default() -> DeployCall<Env, ()> {
         DeployCall {
             code_source: (),
-            code_metadata: CodeMetadata::DEFAULT,
+            code_metadata: CodeMetadata::UPGRADEABLE,
             arg_buffer: ManagedArgBuffer::new(),
         }
     }
