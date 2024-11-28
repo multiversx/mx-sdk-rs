@@ -9,6 +9,20 @@ pub trait ManagedVecItemPayload {
     fn payload_slice(&self) -> &[u8];
 
     fn payload_slice_mut(&mut self) -> &mut [u8];
+
+    /// Takes a sub-payload item.
+    ///
+    /// ## Safety
+    ///
+    /// Only works correctly if the given index is correct, otherwise undefined behavior is possible.
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S;
+
+    /// Takes a sub-payload item.
+    ///
+    /// ## Safety
+    ///
+    /// Only works correctly if the given index is correct, otherwise undefined behavior is possible.
+    unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, index: usize) -> &mut S;
 }
 
 /// Empty ManagedVecItem.
@@ -32,11 +46,26 @@ impl ManagedVecItemPayload for ManagedVecItemEmptyPayload {
     fn payload_slice_mut(&mut self) -> &mut [u8] {
         &mut []
     }
+
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, _index: usize) -> &S {
+        unimplemented!()
+    }
+
+    unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, _index: usize) -> &mut S {
+        unimplemented!()
+    }
 }
 
 /// The main ManagedVecItemPayload implementation. Uses an array in its implementation.
+#[repr(transparent)]
 pub struct ManagedVecItemPayloadBuffer<const N: usize> {
-    buffer: [u8; N],
+    pub buffer: [u8; N],
+}
+
+impl<const N: usize> From<[u8; N]> for ManagedVecItemPayloadBuffer<N> {
+    fn from(value: [u8; N]) -> Self {
+        ManagedVecItemPayloadBuffer { buffer: value }
+    }
 }
 
 impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
@@ -55,6 +84,16 @@ impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
     fn payload_slice_mut(&mut self) -> &mut [u8] {
         &mut self.buffer[..]
     }
+
+    unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
+        let ptr = self.buffer.as_ptr().add(index);
+        &*ptr.cast::<S>()
+    }
+
+    unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, index: usize) -> &mut S {
+        let ptr = self.buffer.as_mut_ptr().add(index);
+        &mut *ptr.cast::<S>()
+    }
 }
 
 /// Describes concatantion of smaller payloads into a larger one.
@@ -67,12 +106,27 @@ where
     Rhs: ManagedVecItemPayload,
 {
     type Output: ManagedVecItemPayload;
+
+    fn split_from_add(payload: &Self::Output) -> (&Self, &Rhs);
+
+    fn split_mut_from_add(payload: &mut Self::Output) -> (&mut Self, &mut Rhs);
 }
 
-impl<const N: usize> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload>
-    for ManagedVecItemPayloadBuffer<N>
+impl<P> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload> for P
+where
+    P: ManagedVecItemPayload,
 {
     type Output = Self;
+
+    fn split_from_add(payload: &Self::Output) -> (&Self, &ManagedVecItemEmptyPayload) {
+        (payload, &ManagedVecItemEmptyPayload)
+    }
+
+    fn split_mut_from_add(
+        _payload: &mut Self::Output,
+    ) -> (&mut Self, &mut ManagedVecItemEmptyPayload) {
+        unimplemented!()
+    }
 }
 
 /// Replaces a const generic expression.
@@ -84,6 +138,38 @@ macro_rules! payload_add {
             for ManagedVecItemPayloadBuffer<$dec1>
         {
             type Output = ManagedVecItemPayloadBuffer<$result_add>;
+
+            fn split_from_add(
+                payload: &ManagedVecItemPayloadBuffer<$result_add>,
+            ) -> (
+                &ManagedVecItemPayloadBuffer<$dec1>,
+                &ManagedVecItemPayloadBuffer<$dec2>,
+            ) {
+                unsafe {
+                    let ptr1 = payload.buffer.as_ptr();
+                    let ptr2 = ptr1.add($dec1);
+                    (
+                        &*ptr1.cast::<ManagedVecItemPayloadBuffer<$dec1>>(),
+                        &*ptr2.cast::<ManagedVecItemPayloadBuffer<$dec2>>(),
+                    )
+                }
+            }
+
+            fn split_mut_from_add(
+                payload: &mut Self::Output,
+            ) -> (
+                &mut ManagedVecItemPayloadBuffer<$dec1>,
+                &mut ManagedVecItemPayloadBuffer<$dec2>,
+            ) {
+                unsafe {
+                    let ptr1 = payload.buffer.as_mut_ptr();
+                    let ptr2 = ptr1.add($dec1);
+                    (
+                        &mut *ptr1.cast::<ManagedVecItemPayloadBuffer<$dec1>>(),
+                        &mut *ptr2.cast::<ManagedVecItemPayloadBuffer<$dec2>>(),
+                    )
+                }
+            }
         }
     };
 }

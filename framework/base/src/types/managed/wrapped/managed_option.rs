@@ -2,6 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     abi::TypeAbiFrom,
+    api::HandleConstraints,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -203,19 +204,18 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = T::OwnHandle::from_byte_reader(reader);
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
         Self::new_with_handle(handle)
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        // TODO: managed ref
+        Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        <T::OwnHandle as ManagedVecItem>::into_byte_writer(self.handle, writer)
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.handle.get_raw_handle().save_to_payload(payload);
     }
 }
 

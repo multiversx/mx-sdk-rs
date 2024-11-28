@@ -1,4 +1,4 @@
-use super::EncodedManagedVecItem;
+use super::{EncodedManagedVecItem, ManagedVecItemPayload};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
@@ -141,15 +141,16 @@ where
 
     pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
         let byte_index = index * T::payload_size();
-        let mut load_result = Ok(());
-        let result = unsafe {
-            T::from_byte_reader_as_borrow(|dest_slice| {
-                load_result = self.buffer.load_slice(byte_index, dest_slice);
-            })
-        };
-        match load_result {
-            Ok(_) => Some(result),
-            Err(_) => None,
+
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self
+            .buffer
+            .load_slice(byte_index, payload.payload_slice_mut())
+            .is_ok()
+        {
+            unsafe { Some(T::borrow_from_payload(&payload)) }
+        } else {
+            None
         }
     }
 
@@ -187,20 +188,22 @@ where
 
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
         let byte_index = index * T::payload_size();
-        let mut load_result = Ok(());
-        let result = T::from_byte_reader(|dest_slice| {
-            load_result = self.buffer.load_slice(byte_index, dest_slice);
-        });
-
-        match load_result {
-            Ok(_) => result,
-            Err(_) => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self
+            .buffer
+            .load_slice(byte_index, payload.payload_slice_mut())
+            .is_err()
+        {
+            M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
         }
+        T::read_from_payload(&payload)
     }
 
     pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
-        item.into_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.set_slice(byte_index, payload.payload_slice())
     }
 
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
@@ -213,9 +216,9 @@ where
     }
 
     pub fn push(&mut self, item: T) {
-        item.into_byte_writer(|bytes| {
-            self.buffer.append_bytes(bytes);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.append_bytes(payload.payload_slice());
     }
 
     pub fn remove(&mut self, index: usize) {
@@ -259,9 +262,9 @@ where
     }
 
     pub fn overwrite_with_single_item(&mut self, item: T) {
-        item.into_byte_writer(|bytes| {
-            self.buffer.overwrite(bytes);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.overwrite(payload.payload_slice());
     }
 
     /// Appends all the contents of another managed vec at the end of the current one.
@@ -541,12 +544,16 @@ where
         }
         let mut byte_index = 0;
         while byte_index < self_len {
-            let self_item = T::from_byte_reader(|dest_slice| {
-                let _ = self.buffer.load_slice(byte_index, dest_slice);
-            });
-            let other_item = T::from_byte_reader(|dest_slice| {
-                let _ = other.buffer.load_slice(byte_index, dest_slice);
-            });
+            let mut self_payload = T::PAYLOAD::new_buffer();
+            let _ = self
+                .buffer
+                .load_slice(byte_index, self_payload.payload_slice_mut());
+            let mut other_payload = T::PAYLOAD::new_buffer();
+            let _ = other
+                .buffer
+                .load_slice(byte_index, other_payload.payload_slice_mut());
+            let self_item = T::read_from_payload(&self_payload);
+            let other_item = T::read_from_payload(&other_payload);
             if self_item != other_item {
                 return false;
             }

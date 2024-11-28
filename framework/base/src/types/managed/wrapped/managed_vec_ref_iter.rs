@@ -1,6 +1,6 @@
 use crate::api::ManagedTypeApi;
 
-use super::{ManagedVec, ManagedVecItem};
+use super::{ManagedVec, ManagedVecItem, ManagedVecItemPayload};
 
 pub struct ManagedVecRefIterator<'a, M, T>
 where
@@ -38,17 +38,16 @@ where
         if next_byte_start > self.byte_end {
             return None;
         }
-        let result = unsafe {
-            T::from_byte_reader_as_borrow(|dest_slice| {
-                let _ = self
-                    .managed_vec
-                    .buffer
-                    .load_slice(self.byte_start, dest_slice);
-            })
-        };
+
+        let mut payload = T::PAYLOAD::new_buffer();
+        let _ = self
+            .managed_vec
+            .buffer
+            .load_slice(self.byte_start, payload.payload_slice_mut());
 
         self.byte_start = next_byte_start;
-        Some(result)
+
+        unsafe { Some(T::borrow_from_payload(&payload)) }
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -75,16 +74,13 @@ where
         }
         self.byte_end -= T::payload_size();
 
-        let result = unsafe {
-            T::from_byte_reader_as_borrow(|dest_slice| {
-                let _ = self
-                    .managed_vec
-                    .buffer
-                    .load_slice(self.byte_end, dest_slice);
-            })
-        };
+        let mut payload = T::PAYLOAD::new_buffer();
+        let _ = self
+            .managed_vec
+            .buffer
+            .load_slice(self.byte_end, payload.payload_slice_mut());
 
-        Some(result)
+        unsafe { Some(T::borrow_from_payload(&payload)) }
     }
 }
 

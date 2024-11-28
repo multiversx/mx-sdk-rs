@@ -44,21 +44,17 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
     type Ref<'a> = Self;
 
-    #[inline]
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        EsdtTokenPayment::from_byte_reader(reader).into()
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        EsdtTokenPayment::read_from_payload(payload).into()
     }
 
-    #[inline]
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        // TODO: managed ref
+        Self::read_from_payload(payload)
     }
 
-    #[inline]
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        self.obj.into_byte_writer(writer)
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.obj.save_to_payload(payload);
     }
 }
 
