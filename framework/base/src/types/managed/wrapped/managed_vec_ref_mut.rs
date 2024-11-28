@@ -22,7 +22,7 @@ where
     item: ManuallyDrop<T>,
 }
 
-impl<'a, M, T> ManagedVecRefMut<'a, M, T>
+impl<M, T> ManagedVecRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -47,7 +47,7 @@ where
     }
 }
 
-impl<'a, M, T> Drop for ManagedVecRefMut<'a, M, T>
+impl<M, T> Drop for ManagedVecRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -63,7 +63,7 @@ where
     }
 }
 
-impl<'a, M, T> Deref for ManagedVecRefMut<'a, M, T>
+impl<M, T> Deref for ManagedVecRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<'a, M, T> DerefMut for ManagedVecRefMut<'a, M, T>
+impl<M, T> DerefMut for ManagedVecRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
