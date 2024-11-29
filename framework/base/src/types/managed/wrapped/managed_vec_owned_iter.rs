@@ -39,7 +39,7 @@ where
     }
 }
 
-impl<'a, M, T> Iterator for ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> Iterator for ManagedVecOwnedIterator<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -70,14 +70,14 @@ where
     }
 }
 
-impl<'a, M, T> ExactSizeIterator for ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> ExactSizeIterator for ManagedVecOwnedIterator<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
 }
 
-impl<'a, M, T> DoubleEndedIterator for ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> DoubleEndedIterator for ManagedVecOwnedIterator<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -98,7 +98,7 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> Clone for ManagedVecOwnedIterator<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,

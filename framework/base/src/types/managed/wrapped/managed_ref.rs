@@ -49,7 +49,7 @@ where
     }
 }
 
-impl<'a, M, T> ManagedRef<'a, M, T>
+impl<M, T> ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + Clone,
@@ -60,7 +60,7 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedRef<'a, M, T>
+impl<M, T> Clone for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<'a, M, T> Deref for ManagedRef<'a, M, T>
+impl<M, T> Deref for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -88,7 +88,7 @@ where
     }
 }
 
-impl<'a, M, T> Borrow<T> for ManagedRef<'a, M, T>
+impl<M, T> Borrow<T> for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -110,7 +110,7 @@ where
     }
 }
 
-impl<'a, M, T> PartialEq for ManagedRef<'a, M, T>
+impl<M, T> PartialEq for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
@@ -121,14 +121,14 @@ where
     }
 }
 
-impl<'a, M, T> Eq for ManagedRef<'a, M, T>
+impl<M, T> Eq for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
 {
 }
 
-impl<'a, M, T> TopEncode for ManagedRef<'a, M, T>
+impl<M, T> TopEncode for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + TopEncode,
