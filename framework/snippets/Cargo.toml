@@ -27,8 +27,9 @@ log = "0.4.17"
 env_logger = "0.11"
 futures = "0.3"
 anyhow = "1.0.44"
+serde_json = "1.0"
 
-tokio = { version = "1.24", features = ["full"], optional = true}
+tokio = { version = "1.24", features = ["full"], optional = true }
 
 [dependencies.multiversx-sc-scenario]
 version = "=0.54.5"
@@ -52,6 +53,3 @@ default-features = false
 version = "=0.7.1"
 path = "../../sdk/dapp"
 optional = true
-
-[dev-dependencies]
-serde_json = "1.0"
