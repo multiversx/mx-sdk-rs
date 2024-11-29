@@ -87,12 +87,11 @@ where
     T: ManagedVecItem + TopEncode + 'static,
 {
     #[inline]
-    #[rustfmt::skip]
     fn from(v: ManagedVec<M, T>) -> Self {
         try_cast_execute_or_else(
             v,
             MultiValueEncoded::from_raw_vec,
-             MultiValueEncoded::from,
+            MultiValueEncoded::from_iter,
         )
     }
 }
