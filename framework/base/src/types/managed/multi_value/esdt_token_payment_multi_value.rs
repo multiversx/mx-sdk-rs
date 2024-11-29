@@ -3,7 +3,7 @@ use crate::{
     codec::{
         multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
         TopDecodeMultiInput, TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
-    },
+    }, types::ManagedVecRef,
 };
 
 use crate::{
@@ -42,15 +42,14 @@ impl<M: ManagedTypeApi> EsdtTokenPaymentMultiValue<M> {
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     type PAYLOAD = <EsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD;
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
-    type Ref<'a> = Self;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         EsdtTokenPayment::read_from_payload(payload).into()
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        // TODO: managed ref
-        Self::read_from_payload(payload)
+        ManagedVecRef::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

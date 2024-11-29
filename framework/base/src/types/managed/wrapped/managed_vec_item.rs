@@ -13,7 +13,7 @@ use crate::{
 
 use super::{
     ManagedVecItemNestedTuple, ManagedVecItemPayload, ManagedVecItemPayloadAdd,
-    ManagedVecItemPayloadBuffer,
+    ManagedVecItemPayloadBuffer, ManagedVecRef,
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
@@ -168,7 +168,7 @@ where
 {
     type PAYLOAD = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = Self;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let (p1, p2) = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<
@@ -184,7 +184,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        ManagedVecRef::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

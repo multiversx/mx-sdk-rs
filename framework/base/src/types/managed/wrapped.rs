@@ -20,6 +20,7 @@ mod managed_vec_item;
 mod managed_vec_item_nested_tuple;
 mod managed_vec_item_payload;
 mod managed_vec_owned_iter;
+mod managed_vec_ref;
 mod managed_vec_ref_iter;
 mod managed_vec_ref_mut;
 pub(crate) mod preloaded_managed_buffer;
@@ -53,6 +54,7 @@ pub use managed_vec_item::{
 pub use managed_vec_item_nested_tuple::ManagedVecItemNestedTuple;
 pub use managed_vec_item_payload::*;
 pub use managed_vec_owned_iter::ManagedVecOwnedIterator;
+pub use managed_vec_ref::ManagedVecRef;
 pub use managed_vec_ref_iter::ManagedVecRefIterator;
 pub use managed_vec_ref_mut::ManagedVecRefMut;
 pub use randomness_source::RandomnessSource;
