@@ -1,7 +1,5 @@
 #![no_std]
 #![allow(deprecated)]
-#![allow(clippy::needless_lifetimes)] // TODO: fix them all!
-
 pub use multiversx_sc_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types
