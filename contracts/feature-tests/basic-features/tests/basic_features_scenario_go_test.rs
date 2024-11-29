@@ -188,6 +188,11 @@ fn echo_u_64_go() {
 }
 
 #[test]
+fn multi_transfer_with_egld_go() {
+    world().run("scenarios/multi_transfer_with_egld.scen.json");
+}
+
+#[test]
 fn echo_usize_go() {
     world().run("scenarios/echo_usize.scen.json");
 }

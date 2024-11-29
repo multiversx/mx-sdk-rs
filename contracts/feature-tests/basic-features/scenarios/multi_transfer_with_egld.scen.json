@@ -1,0 +1,66 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-6bb410"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "bech32:erd1y3z4vsn2m026glevhsqpwrc5w4v0xzr2qmukc5qde39jnzze324qf4e2r4",
+                "to": "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+                "egldValue": "50000000000000000",
+                "function": "issue",
+                "arguments": [
+                    "0x74657374",
+                    "0x54455354",
+                    "0x64",
+                    "0x",
+                    "0x63616e467265657a65",
+                    "0x74727565",
+                    "0x63616e57697065",
+                    "0x74727565",
+                    "0x63616e5061757365",
+                    "0x74727565",
+                    "0x63616e4d696e74",
+                    "0x74727565",
+                    "0x63616e4275726e",
+                    "0x74727565",
+                    "0x63616e4368616e67654f776e6572",
+                    "0x74727565",
+                    "0x63616e55706772616465",
+                    "0x74727565",
+                    "0x63616e4164645370656369616c526f6c6573",
+                    "0x74727565"
+                ],
+                "gasLimit": "100000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "",
+            "tx": {
+                "from": "bech32:erd1y3z4vsn2m026glevhsqpwrc5w4v0xzr2qmukc5qde39jnzze324qf4e2r4",
+                "to": "bech32:erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "0x45474c442d303030303030",
+                        "value": "50000000000000000"
+                    },
+                    {
+                        "tokenIdentifier": "0x544553542d366262343130",
+                        "value": "10"
+                    }
+                ],
+                "gasLimit": "5,000,000"
+            }
+        }
+    ]
+}

@@ -306,4 +306,56 @@ impl BasicFeaturesInteract {
             },
         }
     }
+
+    pub async fn multi_transfer_with_egld(&mut self) {
+        let alice = self.interactor.register_wallet(test_wallets::alice()).await;
+
+        let mut payments = ManagedVec::from((
+            TokenIdentifier::from_esdt_bytes(b"EGLD-000000").clone(),
+            0,
+            BigUint::from(50000000000000000u64),
+        ));
+
+        let token = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .issue_fungible(
+                BigUint::from(50000000000000000u64),
+                "test",
+                "TEST",
+                BigUint::from(100usize),
+                FungibleTokenProperties {
+                    num_decimals: 0usize,
+                    can_freeze: true,
+                    can_wipe: true,
+                    can_pause: true,
+                    can_mint: true,
+                    can_burn: true,
+                    can_change_owner: true,
+                    can_upgrade: true,
+                    can_add_special_roles: true,
+                },
+            )
+            .returns(ReturnsNewTokenIdentifier)
+            .run()
+            .await;
+
+        payments.push(EsdtTokenPayment::new(
+            TokenIdentifier::from_esdt_bytes(token).clone(),
+            0,
+            BigUint::from(10u32),
+        ));
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(alice)
+            .payment(payments)
+            .run()
+            .await;
+    }
 }
