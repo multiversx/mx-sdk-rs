@@ -9,7 +9,7 @@ use crate::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput, Vec,
     },
-    types::ManagedType,
+    types::{ManagedType, ManagedVecOwnedIterator},
 };
 
 use crate::types::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
@@ -141,6 +141,20 @@ where
 
     pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
         ManagedVecRefIterator::new(&self.0)
+    }
+}
+
+impl<M, T> IntoIterator for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    type Item = T;
+
+    type IntoIter = ManagedVecOwnedIterator<M, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
     }
 }
 

@@ -324,7 +324,7 @@ where
 {
     type PAYLOAD = <(T1, (T2, ())) as ManagedVecItemNestedTuple>::PAYLOAD;
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
-    type Ref<'a> = Self;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
@@ -338,8 +338,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        // TODO: tuple of refs
-        Self::read_from_payload(payload)
+        ManagedVecRef::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -362,7 +361,7 @@ where
 {
     type PAYLOAD = <(T1, (T2, (T3, ()))) as ManagedVecItemNestedTuple>::PAYLOAD;
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
-    type Ref<'a> = Self;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
@@ -377,8 +376,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        // TODO: tuple of refs
-        Self::read_from_payload(payload)
+        ManagedVecRef::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
