@@ -7,7 +7,7 @@ use crate::{
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<'a, Env> TxPayment<Env> for EsdtTokenPaymentRefs<'a, Env::Api>
+impl<Env> TxPayment<Env> for EsdtTokenPaymentRefs<'_, Env::Api>
 where
     Env: TxEnv,
 {

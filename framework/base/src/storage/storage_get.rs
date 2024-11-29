@@ -57,7 +57,7 @@ where
     }
 }
 
-impl<'k, A> TopDecodeInput for StorageGetInput<'k, A>
+impl<A> TopDecodeInput for StorageGetInput<'_, A>
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
