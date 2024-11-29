@@ -74,5 +74,4 @@ impl TopEncode for TestTokenIdentifier<'_> {
     }
 }
 
-impl<Api> TypeAbiFrom<TestTokenIdentifier<'_>> for TokenIdentifier<Api> where Api: ManagedTypeApi
-{}
+impl<Api> TypeAbiFrom<TestTokenIdentifier<'_>> for TokenIdentifier<Api> where Api: ManagedTypeApi {}
