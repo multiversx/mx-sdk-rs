@@ -115,7 +115,7 @@ where
     }
 }
 
-impl<'a, M, T> PartialEq for ManagedRefMut<'a, M, T>
+impl<M, T> PartialEq for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
@@ -126,14 +126,14 @@ where
     }
 }
 
-impl<'a, M, T> Eq for ManagedRefMut<'a, M, T>
+impl<M, T> Eq for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
 {
 }
 
-impl<'a, M, T> TopEncode for ManagedRefMut<'a, M, T>
+impl<M, T> TopEncode for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + TopEncode,
@@ -148,7 +148,7 @@ where
     }
 }
 
-impl<'a, M, T> NestedEncode for ManagedRefMut<'a, M, T>
+impl<M, T> NestedEncode for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + NestedEncode,
@@ -163,7 +163,7 @@ where
     }
 }
 
-impl<'a, M, T> core::fmt::Debug for ManagedRefMut<'a, M, T>
+impl<M, T> core::fmt::Debug for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + core::fmt::Debug,

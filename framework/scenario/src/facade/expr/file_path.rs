@@ -22,7 +22,7 @@ impl FilePath<'_> {
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for FilePath<'a>
+impl<Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for FilePath<'_>
 where
     Env: ScenarioTxEnv,
 {

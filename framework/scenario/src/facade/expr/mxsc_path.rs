@@ -20,7 +20,7 @@ impl<'a> MxscPath<'a> {
     }
 }
 
-impl<'a> MxscPath<'a> {
+impl MxscPath<'_> {
     pub fn eval_to_expr(&self) -> String {
         format!("{MXSC_PREFIX}{}", self.path)
     }
@@ -30,7 +30,7 @@ impl<'a> MxscPath<'a> {
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for MxscPath<'a>
+impl<Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for MxscPath<'_>
 where
     Env: ScenarioTxEnv,
 {
@@ -44,9 +44,9 @@ where
     }
 }
 
-impl<'a, Env> TxCodeValue<Env> for MxscPath<'a> where Env: ScenarioTxEnv {}
+impl<Env> TxCodeValue<Env> for MxscPath<'_> where Env: ScenarioTxEnv {}
 
-impl<'a> RegisterCodeSource for MxscPath<'a> {
+impl RegisterCodeSource for MxscPath<'_> {
     fn into_code(self, env_data: ScenarioTxEnvData) -> Vec<u8> {
         self.resolve_contents(&env_data.interpreter_context())
     }

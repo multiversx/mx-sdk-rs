@@ -207,11 +207,11 @@ impl<M> TypeAbiFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where 
 impl<M> TypeAbiFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 
-impl<'a, M> TypeAbiFrom<TestTokenIdentifier<'a>> for EgldOrEsdtTokenIdentifier<M> where
+impl<M> TypeAbiFrom<TestTokenIdentifier<'_>> for EgldOrEsdtTokenIdentifier<M> where
     M: ManagedTypeApi
 {
 }
-impl<'a, M> TypeAbiFrom<&TestTokenIdentifier<'a>> for EgldOrEsdtTokenIdentifier<M> where
+impl<M> TypeAbiFrom<&TestTokenIdentifier<'_>> for EgldOrEsdtTokenIdentifier<M> where
     M: ManagedTypeApi
 {
 }

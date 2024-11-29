@@ -16,7 +16,7 @@ where
 
 impl<Env> TxPaymentMultiEsdt<Env> for MultiEsdtPayment<Env::Api> where Env: TxEnv {}
 impl<Env> TxPaymentMultiEsdt<Env> for &MultiEsdtPayment<Env::Api> where Env: TxEnv {}
-impl<'a, Env> TxPaymentMultiEsdt<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::Api>> where
+impl<Env> TxPaymentMultiEsdt<Env> for ManagedRef<'_, Env::Api, MultiEsdtPayment<Env::Api>> where
     Env: TxEnv
 {
 }
@@ -76,7 +76,7 @@ where
     }
 }
 
-impl<'a, Env> TxPayment<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::Api>>
+impl<Env> TxPayment<Env> for ManagedRef<'_, Env::Api, MultiEsdtPayment<Env::Api>>
 where
     Env: TxEnv,
 {
