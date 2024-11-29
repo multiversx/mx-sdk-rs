@@ -1,15 +1,17 @@
 use multiversx_sc_codec::{Empty, TopEncode};
 
 use crate::types::{
-    BigUint, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg, TokenIdentifier, Tx,
-    TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg,
+    TokenIdentifier, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 use crate::chain_core::builtin_func_names::{
     CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME, DELETE_USERNAME_FUNC_NAME,
-    ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
-    ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
-    ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME, SET_USERNAME_FUNC_NAME,
+    ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_METADATA_RECREATE_FUNC_NAME,
+    ESDT_METADATA_UPDATE_FUNC_NAME, ESDT_MODIFY_CREATOR_FUNC_NAME, ESDT_MODIFY_ROYALTIES_FUNC_NAME,
+    ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
+    ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME, ESDT_SET_NEW_URIS_FUNC_NAME,
+    ESDT_SET_TOKEN_TYPE_FUNC_NAME, SET_USERNAME_FUNC_NAME,
 };
 
 /// Proxy describing the user builtin function signatures.
@@ -211,6 +213,132 @@ where
                 tx = tx.argument(&uri);
             }
         }
+
+        tx.original_result()
+    }
+
+    pub fn esdt_set_token_type<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenType>,
+    >(
+        self,
+        token_id: Arg0,
+        token_type: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let tx = self
+            .wrapped_tx
+            .payment(NotPayable)
+            .raw_call(ESDT_SET_TOKEN_TYPE_FUNC_NAME)
+            .argument(&token_id)
+            .argument(&token_type);
+
+        tx.original_result()
+    }
+
+    pub fn esdt_modify_royalties<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<u64>,
+    >(
+        self,
+        token_id: Arg0,
+        nonce: Arg1,
+        new_royalty: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let tx = self
+            .wrapped_tx
+            .payment(NotPayable)
+            .raw_call(ESDT_MODIFY_ROYALTIES_FUNC_NAME)
+            .argument(&token_id)
+            .argument(&nonce)
+            .argument(&new_royalty);
+
+        tx.original_result()
+    }
+
+    pub fn esdt_nft_set_new_uris<Arg0: ProxyArg<TokenIdentifier<Env::Api>>, Arg1: ProxyArg<u64>>(
+        self,
+        token_id: Arg0,
+        nonce: Arg1,
+        uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let mut tx = self
+            .wrapped_tx
+            .payment(NotPayable)
+            .raw_call(ESDT_SET_NEW_URIS_FUNC_NAME)
+            .argument(&token_id)
+            .argument(&nonce);
+
+        if uris.is_empty() {
+            // at least one URI is required, so we push an empty one
+            tx = tx.argument(&Empty);
+        } else {
+            // The API function has the last argument as variadic,
+            // so we top-encode each and send as separate argument
+            for uri in uris {
+                tx = tx.argument(&uri);
+            }
+        }
+
+        tx.original_result()
+    }
+
+    pub fn esdt_nft_modify_creator<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+    >(
+        self,
+        token_id: Arg0,
+        nonce: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let tx = self
+            .wrapped_tx
+            .payment(NotPayable)
+            .raw_call(ESDT_MODIFY_CREATOR_FUNC_NAME)
+            .argument(&token_id)
+            .argument(&nonce);
+
+        tx.original_result()
+    }
+
+    pub fn esdt_metadata_recreate<
+        T: TopEncode,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+    >(
+        self,
+        token_id: Arg0,
+        nonce: Arg1,
+        new_attributes: &T,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let tx = self
+            .wrapped_tx
+            .payment(NotPayable)
+            .raw_call(ESDT_METADATA_RECREATE_FUNC_NAME)
+            .argument(&token_id)
+            .argument(&nonce)
+            .argument(&new_attributes);
+
+        tx.original_result()
+    }
+
+    pub fn esdt_metadata_update<
+        T: TopEncode,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+    >(
+        self,
+        token_id: Arg0,
+        nonce: Arg1,
+        new_attributes: &T,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let tx = self
+            .wrapped_tx
+            .payment(NotPayable)
+            .raw_call(ESDT_METADATA_UPDATE_FUNC_NAME)
+            .argument(&token_id)
+            .argument(&nonce)
+            .argument(&new_attributes);
 
         tx.original_result()
     }

@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use multiversx_chain_core::types::EsdtTokenType;
+
 use crate::codec::Empty;
 
 use crate::types::ManagedRef;
@@ -761,6 +763,86 @@ where
             .gas(GasLeft)
             .typed(system_proxy::UserBuiltinProxy)
             .nft_update_attributes(token_id, nft_nonce, new_attributes)
+            .sync_call()
+    }
+
+    /// Sets the token type for a specific token.
+    pub fn esdt_set_token_type(&self, token_id: &TokenIdentifier<A>, token_type: EsdtTokenType) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_set_token_type(token_id, token_type)
+            .sync_call()
+    }
+
+    /// Modifies royalties for a specific token.
+    pub fn esdt_modify_royalties(
+        &self,
+        token_id: &TokenIdentifier<A>,
+        nonce: u64,
+        new_royalty: u64,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_modify_royalties(token_id, nonce, new_royalty)
+            .sync_call()
+    }
+
+    /// Sets new uris for a specific token.
+    pub fn esdt_nft_set_new_uris(
+        &self,
+        token_id: &TokenIdentifier<A>,
+        nonce: u64,
+        uris: &ManagedVec<A, ManagedBuffer<A>>,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_nft_set_new_uris(token_id, nonce, uris)
+            .sync_call()
+    }
+
+    /// Changes the creator of a specific token into the caller.
+    pub fn esdt_nft_modify_creator(&self, token_id: &TokenIdentifier<A>, nonce: u64) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_nft_modify_creator(token_id, nonce)
+            .sync_call()
+    }
+
+    /// Recreates an ESDT token with the newly specified attributes.
+    pub fn esdt_metadata_recreate<T: codec::TopEncode>(
+        &self,
+        token_id: TokenIdentifier<A>,
+        nonce: u64,
+        new_attributes: &T,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_metadata_recreate(token_id, nonce, new_attributes)
+            .sync_call()
+    }
+
+    /// Updates an ESDT token with the newly specified attributes.
+    pub fn esdt_metadata_update<T: codec::TopEncode>(
+        &self,
+        token_id: &TokenIdentifier<A>,
+        nonce: u64,
+        new_attributes: &T,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_metadata_update(token_id, nonce, new_attributes)
             .sync_call()
     }
 }

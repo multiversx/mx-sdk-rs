@@ -9,6 +9,10 @@ const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
 const ESDT_TYPE_NON_FUNGIBLE: &[u8] = b"NonFungibleESDT";
 const ESDT_TYPE_SEMI_FUNGIBLE: &[u8] = b"SemiFungibleESDT";
 const ESDT_TYPE_META: &[u8] = b"MetaESDT";
+const ESDT_TYPE_NON_FUNGIBLE_V2: &[u8] = b"NonFungibleESDTv2";
+const ESDT_TYPE_DYNAMIC_NON_FUNGIBLE: &[u8] = b"DynamicNonFungibleESDT";
+const ESDT_TYPE_DYNAMIC_SEMI_FUNGIBLE: &[u8] = b"DynamicSemiFungibleESDT";
+const ESDT_TYPE_DYNAMIC_META: &[u8] = b"DynamicMetaESDT";
 const ESDT_TYPE_INVALID: &[u8] = &[];
 
 // Note: In the current implementation, SemiFungible is never returned
@@ -19,6 +23,10 @@ pub enum EsdtTokenType {
     NonFungible,
     SemiFungible,
     Meta,
+    NonFungibleV2,
+    DynamicNFT,
+    DynamicSFT,
+    DynamicMeta,
     Invalid,
 }
 
@@ -37,7 +45,11 @@ impl EsdtTokenType {
             Self::NonFungible => 1,
             Self::SemiFungible => 2,
             Self::Meta => 3,
-            Self::Invalid => 4,
+            Self::NonFungibleV2 => 4,
+            Self::DynamicNFT => 5,
+            Self::DynamicSFT => 6,
+            Self::DynamicMeta => 7,
+            Self::Invalid => 8,
         }
     }
 
@@ -47,6 +59,10 @@ impl EsdtTokenType {
             Self::NonFungible => ESDT_TYPE_NON_FUNGIBLE,
             Self::SemiFungible => ESDT_TYPE_SEMI_FUNGIBLE,
             Self::Meta => ESDT_TYPE_META,
+            Self::NonFungibleV2 => ESDT_TYPE_NON_FUNGIBLE_V2,
+            Self::DynamicNFT => ESDT_TYPE_DYNAMIC_NON_FUNGIBLE,
+            Self::DynamicSFT => ESDT_TYPE_DYNAMIC_SEMI_FUNGIBLE,
+            Self::DynamicMeta => ESDT_TYPE_DYNAMIC_META,
             Self::Invalid => ESDT_TYPE_INVALID,
         }
     }
@@ -60,6 +76,10 @@ impl From<u8> for EsdtTokenType {
             1 => Self::NonFungible,
             2 => Self::SemiFungible,
             3 => Self::Meta,
+            4 => Self::NonFungibleV2,
+            5 => Self::DynamicNFT,
+            6 => Self::DynamicSFT,
+            7 => Self::DynamicMeta,
             _ => Self::Invalid,
         }
     }
@@ -76,6 +96,14 @@ impl<'a> From<&'a [u8]> for EsdtTokenType {
             Self::SemiFungible
         } else if byte_slice == ESDT_TYPE_META {
             Self::Meta
+        } else if byte_slice == ESDT_TYPE_NON_FUNGIBLE_V2 {
+            Self::NonFungibleV2
+        } else if byte_slice == ESDT_TYPE_DYNAMIC_NON_FUNGIBLE {
+            Self::DynamicNFT
+        } else if byte_slice == ESDT_TYPE_DYNAMIC_SEMI_FUNGIBLE {
+            Self::DynamicSFT
+        } else if byte_slice == ESDT_TYPE_DYNAMIC_META {
+            Self::DynamicMeta
         } else {
             Self::Invalid
         }

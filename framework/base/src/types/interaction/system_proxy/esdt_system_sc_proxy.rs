@@ -14,6 +14,8 @@ const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &str = "issueNonFungible";
 const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &str = "issueSemiFungible";
 const REGISTER_META_ESDT_ENDPOINT_NAME: &str = "registerMetaESDT";
 const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
+const REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME: &str = "registerDynamic";
+const REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME: &str = "registerAndSetAllRolesDynamic";
 
 /// The specific `Tx` type produces by the issue operations of the ESDTSystemSCProxy.
 pub type IssueCall<Env, From, To, Gas> = Tx<
@@ -214,11 +216,29 @@ where
             EsdtTokenType::NonFungible => "NFT",
             EsdtTokenType::SemiFungible => "SFT",
             EsdtTokenType::Meta => "META",
+            EsdtTokenType::NonFungibleV2 => "NFT",
+            EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::DynamicSFT => "SFT",
+            EsdtTokenType::DynamicMeta => "META",
+            EsdtTokenType::Invalid => "",
+        };
+
+        let endpoint = match token_type {
+            EsdtTokenType::Fungible
+            | EsdtTokenType::NonFungible
+            | EsdtTokenType::SemiFungible
+            | EsdtTokenType::Meta => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
+
+            EsdtTokenType::NonFungibleV2
+            | EsdtTokenType::DynamicNFT
+            | EsdtTokenType::DynamicSFT
+            | EsdtTokenType::DynamicMeta => REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME,
+
             EsdtTokenType::Invalid => "",
         };
 
         self.wrapped_tx
-            .raw_call(ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME)
+            .raw_call(endpoint)
             .egld(issue_cost)
             .argument(&token_display_name)
             .argument(&token_ticker)
@@ -246,6 +266,10 @@ where
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
+            EsdtTokenType::NonFungibleV2
+            | EsdtTokenType::DynamicNFT
+            | EsdtTokenType::DynamicSFT
+            | EsdtTokenType::DynamicMeta => REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME,
             EsdtTokenType::Invalid => "",
         };
 
