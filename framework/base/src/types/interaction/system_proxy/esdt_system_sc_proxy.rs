@@ -213,26 +213,24 @@ where
     ) -> IssueCall<Env, From, To, Gas> {
         let token_type_name = match token_type {
             EsdtTokenType::Fungible => "FNG",
-            EsdtTokenType::NonFungible => "NFT",
-            EsdtTokenType::SemiFungible => "SFT",
-            EsdtTokenType::Meta => "META",
-            EsdtTokenType::NonFungibleV2 => "NFT",
-            EsdtTokenType::DynamicNFT => "NFT",
-            EsdtTokenType::DynamicSFT => "SFT",
-            EsdtTokenType::DynamicMeta => "META",
+            EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
+            | EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::SemiFungible | EsdtTokenType::DynamicSFT => "SFT",
+            EsdtTokenType::Meta | EsdtTokenType::DynamicMeta => "META",
             EsdtTokenType::Invalid => "",
         };
 
         let endpoint = match token_type {
             EsdtTokenType::Fungible
             | EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
             | EsdtTokenType::SemiFungible
             | EsdtTokenType::Meta => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
 
-            EsdtTokenType::NonFungibleV2
-            | EsdtTokenType::DynamicNFT
-            | EsdtTokenType::DynamicSFT
-            | EsdtTokenType::DynamicMeta => REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME,
+            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
+                REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME
+            },
 
             EsdtTokenType::Invalid => "",
         };
@@ -263,13 +261,14 @@ where
     ) -> IssueCall<Env, From, To, Gas> {
         let endpoint_name = match token_type {
             EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
-            EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
+            EsdtTokenType::NonFungible | EsdtTokenType::NonFungibleV2 => {
+                ISSUE_NON_FUNGIBLE_ENDPOINT_NAME
+            },
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
-            EsdtTokenType::NonFungibleV2
-            | EsdtTokenType::DynamicNFT
-            | EsdtTokenType::DynamicSFT
-            | EsdtTokenType::DynamicMeta => REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME,
+            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
+                REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
+            },
             EsdtTokenType::Invalid => "",
         };
 
