@@ -60,13 +60,13 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedRef<'a, M, T>
+impl<'a, M, T> ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    #[inline]
-    fn clone(&self) -> Self {
+    /// Clones the reference itself, not the object contained therein.
+    pub fn clone_ref(&self) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,

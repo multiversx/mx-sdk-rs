@@ -13,6 +13,11 @@ impl<T> ManagedVecRef<'_, T>
 where
     T: ManagedVecItem,
 {
+    /// Creates a new ManagedVecRef instance.
+    ///
+    /// ## Safety
+    ///
+    /// The ManagedVecRef object might not drop its content, effectively leading to a leak.
     pub unsafe fn new(item: T) -> Self {
         ManagedVecRef {
             _phantom: PhantomData,

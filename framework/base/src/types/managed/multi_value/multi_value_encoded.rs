@@ -92,23 +92,8 @@ where
         try_cast_execute_or_else(
             v,
             MultiValueEncoded::from_raw_vec,
-            |v| MultiValueEncoded::from(&v),
+             MultiValueEncoded::from,
         )
-    }
-}
-
-impl<M, T> From<&ManagedVec<M, T>> for MultiValueEncoded<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + TopEncode,
-{
-    #[inline]
-    fn from(v: &ManagedVec<M, T>) -> Self {
-        let mut result = MultiValueEncoded::new();
-        for item in v.into_iter() {
-            result.push(item);
-        }
-        result
     }
 }
 
@@ -181,7 +166,7 @@ where
     pub fn to_vec(&self) -> ManagedVec<M, T> {
         let mut result = ManagedVec::new();
         let serializer = ManagedSerializer::<M>::new();
-        for item in self.raw_buffers.into_iter() {
+        for item in &self.raw_buffers {
             result.push(serializer.top_decode_from_managed_buffer(&item));
         }
         result
@@ -198,7 +183,7 @@ where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        for elem in self.raw_buffers.into_iter() {
+        for elem in &self.raw_buffers {
             elem.multi_encode_or_handle_err(output, h)?;
         }
         Ok(())

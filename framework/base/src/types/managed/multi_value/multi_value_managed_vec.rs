@@ -1,3 +1,5 @@
+use core::borrow::Borrow;
+
 use multiversx_sc_codec::multi_types::MultiValueVec;
 
 use crate::{
@@ -181,8 +183,8 @@ where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        for elem in self.0.into_iter() {
-            elem.multi_encode_or_handle_err(output, h)?;
+        for elem in &self.0 {
+            elem.borrow().multi_encode_or_handle_err(output, h)?;
         }
         Ok(())
     }

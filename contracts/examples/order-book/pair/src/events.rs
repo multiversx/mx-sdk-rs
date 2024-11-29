@@ -7,7 +7,7 @@ pub trait EventsModule {
     fn emit_order_event(&self, order: Order<Self::Api>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
-        let order_type = order.order_type.clone();
+        let order_type = order.order_type;
 
         self.order_event(caller, epoch, order_type, order);
     }

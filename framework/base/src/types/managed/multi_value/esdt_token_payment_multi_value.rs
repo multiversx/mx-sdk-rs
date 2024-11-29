@@ -3,7 +3,8 @@ use crate::{
     codec::{
         multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
         TopDecodeMultiInput, TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
-    }, types::ManagedVecRef,
+    },
+    types::ManagedVecRef,
 };
 
 use crate::{

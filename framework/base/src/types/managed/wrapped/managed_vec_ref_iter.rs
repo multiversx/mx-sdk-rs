@@ -2,6 +2,18 @@ use crate::api::ManagedTypeApi;
 
 use super::{ManagedVec, ManagedVecItem, ManagedVecItemPayload};
 
+impl<'a, M, T> IntoIterator for &'a ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    type Item = T::Ref<'a>;
+    type IntoIter = ManagedVecRefIterator<'a, M, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        ManagedVecRefIterator::new(self)
+    }
+}
+
 pub struct ManagedVecRefIterator<'a, M, T>
 where
     M: ManagedTypeApi,

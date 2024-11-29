@@ -2,34 +2,34 @@ use crate::api::ManagedTypeApi;
 
 use super::{ManagedVec, ManagedVecItem, ManagedVecItemPayload};
 
-impl<'a, M, T> IntoIterator for &'a ManagedVec<M, T>
+impl<M, T> IntoIterator for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
     type Item = T;
-    type IntoIter = ManagedVecOwnedIterator<'a, M, T>;
+    type IntoIter = ManagedVecOwnedIterator<M, T>;
     fn into_iter(self) -> Self::IntoIter {
         ManagedVecOwnedIterator::new(self)
     }
 }
 
-pub struct ManagedVecOwnedIterator<'a, M, T>
+pub struct ManagedVecOwnedIterator<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    managed_vec: &'a ManagedVec<M, T>,
+    managed_vec: ManagedVec<M, T>,
     byte_start: usize,
     byte_end: usize,
 }
 
-impl<'a, M, T> ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> ManagedVecOwnedIterator<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
+    pub(crate) fn new(managed_vec: ManagedVec<M, T>) -> Self {
         let byte_end = managed_vec.byte_len();
         ManagedVecOwnedIterator {
             managed_vec,
@@ -39,7 +39,7 @@ where
     }
 }
 
-impl<'a, M, T> Iterator for ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> Iterator for ManagedVecOwnedIterator<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -70,14 +70,14 @@ where
     }
 }
 
-impl<'a, M, T> ExactSizeIterator for ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> ExactSizeIterator for ManagedVecOwnedIterator<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
 }
 
-impl<'a, M, T> DoubleEndedIterator for ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> DoubleEndedIterator for ManagedVecOwnedIterator<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
@@ -98,15 +98,15 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedVecOwnedIterator<'a, M, T>
+impl<M, T> Clone for ManagedVecOwnedIterator<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem,
+    T: ManagedVecItem + Clone,
 {
     fn clone(&self) -> Self {
         let byte_end = self.byte_end;
         Self {
-            managed_vec: self.managed_vec,
+            managed_vec: self.managed_vec.clone(),
             byte_start: self.byte_start,
             byte_end,
         }
