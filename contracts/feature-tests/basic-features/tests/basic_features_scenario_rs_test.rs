@@ -208,12 +208,6 @@ fn echo_u_64_rs() {
 }
 
 #[test]
-#[ignore = "not supported yet"]
-fn multi_transfer_with_egld_rs() {
-    world().run("scenarios/multi_transfer_with_egld.scen.json");
-}
-
-#[test]
 fn echo_usize_rs() {
     world().run("scenarios/echo_usize.scen.json");
 }

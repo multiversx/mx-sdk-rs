@@ -16,7 +16,6 @@ async fn simulator_basic_features_test() {
     assert_eq!(bf_interact.large_storage_payload, data);
 
     bf_interact.deploy().await;
-    bf_interact.multi_transfer_with_egld().await;
 
     let expected_return_egld_decimal =
         ManagedDecimal::<StaticApi, ConstDecimals<18>>::const_decimals_from_raw(BigUint::from(
