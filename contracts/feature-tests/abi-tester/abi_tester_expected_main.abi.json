@@ -248,6 +248,21 @@
             ]
         },
         {
+            "name": "process_managed_decimal",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "input",
+                    "type": "ManagedDecimal<10>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<usize>"
+                }
+            ]
+        },
+        {
             "name": "esdt_local_role",
             "mutability": "mutable",
             "inputs": [],

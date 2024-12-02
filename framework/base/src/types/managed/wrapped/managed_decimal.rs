@@ -128,6 +128,14 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
     }
 }
 
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
+    From<ManagedDecimal<M, ConstDecimals<DECIMALS>>> for ManagedDecimal<M, NumDecimals>
+{
+    fn from(value: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self {
+        value.into_var_decimals()
+    }
+}
+
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
@@ -250,6 +258,10 @@ impl<M: ManagedTypeApi> TypeAbi for ManagedDecimal<M, NumDecimals> {
 
     fn type_name() -> TypeName {
         TypeName::from("ManagedDecimal<usize>")
+    }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("ManagedDecimal<$API, usize>")
     }
 
     fn is_variadic() -> bool {
