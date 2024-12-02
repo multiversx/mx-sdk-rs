@@ -1,0 +1,120 @@
+{
+    "name": "payable",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:payable-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/payable-features.mxsc.json",
+                    "codeMetadata": "0x0000"
+                },
+                "address:an-account": {
+                    "nonce": "0",
+                    "balance": "1,000,000,000,000",
+                    "esdt": {
+                        "str:PAYABLE-FEATURES-TOKEN": "1,000,000,000,000",
+                        "str:OTHER-TOKEN": "1,000,000,000,000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_token_1.1",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "function": "payable_token_1",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:function expects single ESDT payment",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_token_1.2",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "egldValue": "5",
+                "function": "payable_token_1",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:function expects single ESDT payment",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_token_1.3",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
+                        "value": "100"
+                    }
+                ],
+                "function": "payable_token_1",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x64",
+                    "0x50415941424c452d46454154555245532d544f4b454e"
+                ],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_token_1.4",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:OTHER-TOKEN",
+                        "value": "100"
+                    }
+                ],
+                "function": "payable_token_1",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:bad call value token provided",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

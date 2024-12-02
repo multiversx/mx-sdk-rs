@@ -78,3 +78,8 @@ fn payable_token_3_go() {
 fn payable_token_4_go() {
     world().run("scenarios/payable_token_4.scen.json");
 }
+
+#[test]
+fn payable_token_5_go() {
+    world().run("scenarios/payable_token_5.scen.json");
+}
