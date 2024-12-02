@@ -77,7 +77,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                &self.data * scaling_factor
+                &self.data / scaling_factor
             },
         }
     }
