@@ -1,5 +1,8 @@
 [[bin]]
 name = "system-sc-interact"
+path = "src/system_sc_main.rs"
+
+[lib]
 path = "src/system_sc_interact.rs"
 
 [package]
@@ -24,3 +27,6 @@ features = ["derive"]
 [dependencies.multiversx-sc-snippets]
 version = "=0.54.5"
 path = "../../framework/snippets"
+
+[features]
+chain-simulator-tests = []
