@@ -1,7 +1,9 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
+
+pub mod payable_features_proxy;
 
 /// Contract that only tests the call value features,
 /// i.e. the framework/Arwen functionality for accepting EGLD and ESDT payments.
