@@ -35,7 +35,7 @@ pub trait PayableFeatures {
     #[payable("*")]
     fn payment_array_3(&self) -> MultiValue3<EsdtTokenPayment, EsdtTokenPayment, EsdtTokenPayment> {
         let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();
-        (payment_a, payment_b, payment_c).into()
+        (payment_a.clone(), payment_b.clone(), payment_c.clone()).into()
     }
 
     #[endpoint]
@@ -129,7 +129,7 @@ pub trait PayableFeatures {
         &self,
         #[payment] payment: BigUint,
     ) -> MultiValue2<BigUint, TokenIdentifier> {
-        let token = self.call_value().single_esdt().token_identifier;
+        let token = self.call_value().single_esdt().token_identifier.clone();
         (payment, token).into()
     }
 
@@ -140,14 +140,14 @@ pub trait PayableFeatures {
         #[payment_token] token: EgldOrEsdtTokenIdentifier,
     ) -> MultiValue2<BigUint, EgldOrEsdtTokenIdentifier> {
         let payment = self.call_value().single_esdt();
-        (payment.amount, token).into()
+        (payment.amount.clone(), token).into()
     }
 
     #[endpoint]
     #[payable("PAYABLE-FEATURES-TOKEN")]
     fn payable_token_4(&self) -> MultiValue2<BigUint, TokenIdentifier> {
-        let payment = self.call_value().single_esdt().amount;
-        let token = self.call_value().single_esdt().token_identifier;
+        let payment = self.call_value().single_esdt().amount.clone();
+        let token = self.call_value().single_esdt().token_identifier.clone();
         (payment, token).into()
     }
 }

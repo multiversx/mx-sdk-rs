@@ -46,7 +46,7 @@ pub trait Child {
     #[callback]
     fn esdt_issue_callback(&self, #[call_result] _result: IgnoreValue) {
         let (token_identifier, _amount) = self.call_value().single_fungible_esdt();
-        self.wrapped_egld_token_identifier().set(&token_identifier);
+        self.wrapped_egld_token_identifier().set(token_identifier);
     }
 
     // storage

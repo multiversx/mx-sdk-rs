@@ -8,8 +8,8 @@ use crate::{
     err_msg,
     types::{
         BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
-        EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal, ManagedRef, ManagedVec,
-        TokenIdentifier,
+        EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal, ManagedRef, ManagedType,
+        ManagedVec, ManagedVecRef, TokenIdentifier,
     },
 };
 
@@ -71,12 +71,12 @@ where
     /// Can be used to extract all payments in one line like this:
     ///
     /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();`.
-    pub fn multi_esdt<const N: usize>(&self) -> [EsdtTokenPayment<A>; N] {
-        self.all_esdt_transfers()
-            .to_array_of_refs::<N>()
-            .unwrap_or_else(|| {
-                A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
-            })
+    pub fn multi_esdt<const N: usize>(&self) -> [ManagedVecRef<'static, EsdtTokenPayment<A>>; N] {
+        let esdt_transfers = self.all_esdt_transfers();
+        let array = esdt_transfers.to_array_of_refs::<N>().unwrap_or_else(|| {
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
+        });
+        unsafe { core::mem::transmute(array) }
     }
 
     /// Expects precisely one ESDT token transfer, fungible or not.
@@ -84,9 +84,13 @@ where
     /// Will return the received ESDT payment.
     ///
     /// The amount cannot be 0, since that would not qualify as an ESDT transfer.
-    pub fn single_esdt(&self) -> EsdtTokenPayment<A> {
-        let [payments] = self.multi_esdt();
-        payments
+    pub fn single_esdt(&self) -> ManagedVecRef<'static, EsdtTokenPayment<A>> {
+        let esdt_transfers = self.all_esdt_transfers();
+        if esdt_transfers.len() != 1 {
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
+        }
+        let value = esdt_transfers.get(0);
+        unsafe { core::mem::transmute(value) }
     }
 
     /// Expects precisely one fungible ESDT token transfer.
@@ -94,12 +98,23 @@ where
     /// Returns the token ID and the amount for fungible ESDT transfers.
     ///
     /// The amount cannot be 0, since that would not qualify as an ESDT transfer.
-    pub fn single_fungible_esdt(&self) -> (TokenIdentifier<A>, BigUint<A>) {
+    pub fn single_fungible_esdt(
+        &self,
+    ) -> (
+        ManagedRef<'static, A, TokenIdentifier<A>>,
+        ManagedRef<'static, A, BigUint<A>>,
+    ) {
         let payment = self.single_esdt();
         if payment.token_nonce != 0 {
             A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG.as_bytes());
         }
-        (payment.token_identifier, payment.amount)
+
+        unsafe {
+            (
+                ManagedRef::wrap_handle(payment.token_identifier.get_handle()),
+                ManagedRef::wrap_handle(payment.amount.get_handle()),
+            )
+        }
     }
 
     /// Accepts and returns either an EGLD payment, or a single ESDT token.
@@ -115,7 +130,7 @@ where
                 token_nonce: 0,
                 amount: self.egld_value().clone_value(),
             },
-            1 => esdt_transfers.get(0).into(),
+            1 => esdt_transfers.get(0).clone().into(),
             _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes()),
         }
     }
