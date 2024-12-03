@@ -521,7 +521,7 @@ where
     fn clone(&self) -> Self {
         let mut result = ManagedVec::new();
         for item in self.into_iter() {
-            result.push(item.clone())
+            result.push(item.borrow().clone())
         }
         result
     }
@@ -611,7 +611,8 @@ where
         } else {
             let mut nested_buffer = output.start_nested_encode();
             for item in self {
-                item.dep_encode_or_handle_err(&mut nested_buffer, h)?;
+                item.borrow()
+                    .dep_encode_or_handle_err(&mut nested_buffer, h)?;
             }
             output.finalize_nested_encode(nested_buffer);
             Ok(())
@@ -631,7 +632,7 @@ where
     {
         self.len().dep_encode_or_handle_err(dest, h)?;
         for item in self {
-            item.dep_encode_or_handle_err(dest, h)?;
+            item.borrow().dep_encode_or_handle_err(dest, h)?;
         }
         Ok(())
     }
@@ -748,7 +749,7 @@ where
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut dbg_list = f.debug_list();
         for item in self.into_iter() {
-            dbg_list.entry(&item);
+            dbg_list.entry(item.borrow());
         }
         dbg_list.finish()
     }

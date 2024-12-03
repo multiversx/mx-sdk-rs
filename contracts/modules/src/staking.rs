@@ -22,7 +22,7 @@ pub trait StakingModule {
         user_whitelist: &ManagedVec<ManagedAddress>,
     ) {
         for user in user_whitelist {
-            let _ = self.user_whitelist().insert(user);
+            let _ = self.user_whitelist().insert(user.clone());
         }
 
         let nr_board_members = self.user_whitelist().len();

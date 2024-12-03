@@ -148,7 +148,7 @@ pub trait Lottery {
         if let Some(whitelist) = opt_whitelist.as_option() {
             let mut mapper = self.lottery_whitelist(&lottery_name);
             for addr in &*whitelist {
-                mapper.insert(addr);
+                mapper.insert(addr.clone());
             }
         }
 

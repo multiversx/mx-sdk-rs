@@ -74,7 +74,7 @@ pub trait GovernanceModule:
         let mut i = 0;
         while i < proposal.fees.entries.len() {
             if proposal.fees.entries.get(i).depositor_addr == caller {
-                fees_to_send.push(proposal.fees.entries.get(i));
+                fees_to_send.push(proposal.fees.entries.get(i).clone());
                 proposal.fees.entries.remove(i);
             } else {
                 i += 1;
@@ -417,7 +417,7 @@ pub trait GovernanceModule:
         let payments = self.proposals().get(proposal_id).fees;
 
         for fee_entry in payments.entries.iter() {
-            let payment = fee_entry.tokens;
+            let payment = &fee_entry.tokens;
             self.tx()
                 .to(&fee_entry.depositor_addr)
                 .single_esdt(

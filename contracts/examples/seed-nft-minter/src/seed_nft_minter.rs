@@ -27,7 +27,7 @@ pub trait SeedNftMinter:
         marketplaces: ManagedVec<ManagedAddress>,
         distribution: ManagedVec<Distribution<Self::Api>>,
     ) {
-        self.marketplaces().extend(&marketplaces);
+        self.marketplaces().extend(marketplaces);
         self.init_distribution(distribution);
     }
 

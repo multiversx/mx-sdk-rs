@@ -220,7 +220,7 @@ pub trait Vault {
 
         let mut new_tokens = ManagedVec::new();
 
-        for payment in payments.into_iter() {
+        for payment in payments.iter() {
             // burn old tokens
             self.send().esdt_local_burn(
                 &payment.token_identifier,

@@ -132,8 +132,8 @@ pub trait FirstContract {
         arg_buffer.push_arg(esdt_token_identifier);
         arg_buffer.push_arg(amount);
         arg_buffer.push_arg(func_name);
-        for arg in args.into_iter() {
-            arg_buffer.push_arg_raw(arg);
+        for arg in args {
+            arg_buffer.push_arg_raw(arg.clone());
         }
 
         self.tx()
