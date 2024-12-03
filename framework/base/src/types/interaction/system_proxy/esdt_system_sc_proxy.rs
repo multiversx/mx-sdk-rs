@@ -239,13 +239,8 @@ where
             .argument(&token_ticker)
             .argument(&token_type_name);
 
-        if token_type_name == "META" {
+        if token_type != EsdtTokenType::DynamicNFT && token_type != EsdtTokenType::DynamicSFT {
             tx = tx.argument(&num_decimals);
-        } else {
-            assert!(
-                num_decimals == 0usize,
-                "only META tokens accept number of decimals > 0"
-            );
         }
 
         tx.original_result()
@@ -285,13 +280,8 @@ where
             .argument(&token_ticker)
             .argument(&token_type_name);
 
-        if token_type_name == "META" {
+        if token_type != EsdtTokenType::DynamicNFT && token_type != EsdtTokenType::DynamicSFT {
             tx = tx.argument(&num_decimals);
-        } else {
-            assert!(
-                num_decimals == 0usize,
-                "only META tokens accept number of decimals > 0"
-            );
         }
 
         tx.original_result()
@@ -648,6 +638,19 @@ where
             .argument(&token_identifier);
         append_token_property_arguments(&mut tx.data, property_arguments);
         tx.original_result()
+    }
+
+    /// Changes token to dynamic.
+    /// Does not work for: FungibleESDT, NonFungibleESDT, NonFungibleESDTv2.
+    pub fn change_to_dynamic<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("changeToDynamic")
+            .argument(&token_id)
+            .original_result()
     }
 }
 

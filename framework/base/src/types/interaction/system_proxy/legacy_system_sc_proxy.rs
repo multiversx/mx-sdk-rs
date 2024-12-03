@@ -206,11 +206,17 @@ where
             EsdtTokenType::Invalid => "",
         };
 
-        ContractCallWithEgld::new(esdt_system_sc_address, endpoint, issue_cost)
-            .argument(&token_display_name)
-            .argument(&token_ticker)
-            .argument(&token_type_name)
-            .argument(&num_decimals)
+        let mut contract_call =
+            ContractCallWithEgld::new(esdt_system_sc_address, endpoint, issue_cost)
+                .argument(&token_display_name)
+                .argument(&token_ticker)
+                .argument(&token_type_name);
+
+        if token_type != EsdtTokenType::DynamicNFT {
+            contract_call = contract_call.argument(&num_decimals);
+        }
+
+        contract_call
     }
 
     /// Issues dynamic ESDT tokens
@@ -245,13 +251,8 @@ where
         contract_call.proxy_arg(token_ticker);
         contract_call.proxy_arg(&token_type_name);
 
-        if token_type_name == "META" {
+        if token_type != EsdtTokenType::DynamicNFT {
             contract_call.proxy_arg(&num_decimals);
-        } else {
-            assert!(
-                num_decimals == 0usize,
-                "only META tokens accept number of decimals > 0"
-            );
         }
 
         contract_call

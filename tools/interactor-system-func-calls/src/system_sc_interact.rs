@@ -445,6 +445,20 @@ impl SysFuncCallsInteract {
             .await;
     }
 
+    pub async fn change_to_dynamic(&mut self, token_id: &[u8]) {
+        println!("Changing the following token {token_id:?} to dynamic...");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .change_to_dynamic(TokenIdentifier::from(token_id))
+            .run()
+            .await;
+    }
+
     pub async fn mint_sft(
         &mut self,
         token_id: &[u8],

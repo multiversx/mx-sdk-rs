@@ -44,6 +44,28 @@ async fn cs_builtin_func_tokens_test() {
         )
         .await;
 
+    // issue dynamic META with all roles
+    let _ = interact
+        .issue_token_all_roles(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            0usize,
+            EsdtTokenType::DynamicMeta,
+        )
+        .await;
+
+    // issue dynamic SFT with all roles
+    let _ = interact
+        .issue_token_all_roles(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            0usize,
+            EsdtTokenType::DynamicSFT,
+        )
+        .await;
+
     // issue dynamic NFT with all roles
     let dynamic_nft_token_id = interact
         .issue_token_all_roles(
@@ -125,4 +147,49 @@ async fn cs_builtin_func_tokens_test() {
         .await;
 
     println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
+}
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn change_to_dynamic_test() {
+    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+
+    // issue NFT with all roles
+    let _ = interact
+        .issue_token_all_roles(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            0usize,
+            EsdtTokenType::NonFungible,
+        )
+        .await;
+
+    // issue META token with all roles
+    let meta_token_id = interact
+        .issue_token_all_roles(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            18usize,
+            EsdtTokenType::Meta,
+        )
+        .await;
+
+    // change META to dynamic
+    interact.change_to_dynamic(meta_token_id.as_bytes()).await;
+
+    // issue SFT token with all roles
+    let sft_token_id = interact
+        .issue_token_all_roles(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            18usize,
+            EsdtTokenType::SemiFungible,
+        )
+        .await;
+
+    // change SFT to dynamic
+    interact.change_to_dynamic(sft_token_id.as_bytes()).await;
 }
