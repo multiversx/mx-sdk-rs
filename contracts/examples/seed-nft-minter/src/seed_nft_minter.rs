@@ -102,7 +102,7 @@ pub trait SeedNftMinter:
             } else {
                 esdt_payments
                     .try_get(0)
-                    .map(|esdt_payment| esdt_payment.amount)
+                    .map(|esdt_payment| esdt_payment.amount.clone())
                     .unwrap_or_default()
             };
             total_amount += amount;

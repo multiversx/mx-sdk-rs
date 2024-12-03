@@ -240,9 +240,9 @@ pub trait Vault {
             );
 
             new_tokens.push(EsdtTokenPayment::new(
-                payment.token_identifier,
+                payment.token_identifier.clone(),
                 new_token_nonce,
-                payment.amount,
+                payment.amount.clone(),
             ));
         }
 

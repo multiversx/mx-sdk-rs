@@ -435,7 +435,7 @@ pub trait GovernanceModule:
             payment.token_identifier == self.governance_token_id().get(),
             "Only Governance token accepted as payment"
         );
-        payment
+        payment.clone()
     }
 
     fn require_valid_proposal_id(&self, proposal_id: usize) {
