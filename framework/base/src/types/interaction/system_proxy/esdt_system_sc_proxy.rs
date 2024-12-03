@@ -231,14 +231,70 @@ where
             EsdtTokenType::Invalid => "",
         };
 
-        self.wrapped_tx
+        let mut tx = self
+            .wrapped_tx
             .raw_call(endpoint)
             .egld(issue_cost)
             .argument(&token_display_name)
             .argument(&token_ticker)
-            .argument(&token_type_name)
-            .argument(&num_decimals)
-            .original_result()
+            .argument(&token_type_name);
+
+        if token_type_name == "META" {
+            tx = tx.argument(&num_decimals);
+        } else {
+            assert!(
+                num_decimals == 0usize,
+                "only META tokens accept number of decimals > 0"
+            );
+        }
+
+        tx.original_result()
+    }
+
+    /// Issues dynamic ESDT tokens
+    pub fn issue_dynamic<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        issue_cost: BigUint<Env::Api>,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> IssueCall<Env, From, To, Gas> {
+        let endpoint_name = match token_type {
+            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
+                REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
+            },
+            _ => "",
+        };
+
+        let token_type_name = match token_type {
+            EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::DynamicSFT => "SFT",
+            EsdtTokenType::DynamicMeta => "META",
+            _ => "",
+        };
+
+        let mut tx = self
+            .wrapped_tx
+            .raw_call(endpoint_name)
+            .egld(issue_cost)
+            .argument(&token_display_name)
+            .argument(&token_ticker)
+            .argument(&token_type_name);
+
+        if token_type_name == "META" {
+            tx = tx.argument(&num_decimals);
+        } else {
+            assert!(
+                num_decimals == 0usize,
+                "only META tokens accept number of decimals > 0"
+            );
+        }
+
+        tx.original_result()
     }
 
     /// Deduplicates code from all the possible issue functions
@@ -260,10 +316,7 @@ where
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
-            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
-                REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
-            },
-            EsdtTokenType::Invalid => "",
+            _ => "",
         };
 
         let mut tx = self

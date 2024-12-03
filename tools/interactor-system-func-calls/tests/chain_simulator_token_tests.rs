@@ -1,15 +1,53 @@
 use multiversx_sc_snippets::imports::{EsdtTokenType, RustBigUint};
 use system_sc_interact::{Config, NftDummyAttributes, SysFuncCallsInteract};
 
+const ISSUE_COST: u64 = 50000000000000000u64;
+
+// real blockchain tests for now, fixes needed for chain simulator
 #[tokio::test]
-#[ignore = "fixes needed"]
+#[ignore = "run on demand"]
 async fn cs_builtin_func_tokens_test() {
-    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
+    // let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
+
+    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
 
     // issue dynamic NFT
+    interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            EsdtTokenType::DynamicNFT,
+            0usize,
+        )
+        .await;
+
+    // issue dynamic SFT
+    interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            EsdtTokenType::DynamicSFT,
+            0usize,
+        )
+        .await;
+
+    // issue dynamic META
+    interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            EsdtTokenType::DynamicMeta,
+            18usize,
+        )
+        .await;
+
+    // issue dynamic NFT with all roles
     let dynamic_nft_token_id = interact
-        .issue_token(
-            RustBigUint::from(50000000000000000u64),
+        .issue_token_all_roles(
+            RustBigUint::from(ISSUE_COST),
             b"TESTNFT",
             b"TEST",
             0usize,
@@ -51,4 +89,40 @@ async fn cs_builtin_func_tokens_test() {
         .await;
 
     println!("New uris set for {dynamic_nft_token_id:?} with nonce {nonce:?}");
+
+    // metadata update
+    interact
+        .metadata_update(
+            dynamic_nft_token_id.as_bytes(),
+            nonce,
+            b"TESTNFT",
+            30u64,
+            b"new_hash",
+            &NftDummyAttributes {
+                creation_epoch: 3u64,
+                cool_factor: 5u8,
+            },
+            Vec::new(),
+        )
+        .await;
+
+    println!("Metadata updated for {dynamic_nft_token_id:?} with nonce {nonce:?}");
+
+    // metadata recreate
+    interact
+        .metadata_recreate(
+            dynamic_nft_token_id.as_bytes(),
+            nonce,
+            b"TESTNFT",
+            30u64,
+            b"new_hash_recreated",
+            &NftDummyAttributes {
+                creation_epoch: 100u64,
+                cool_factor: 1u8,
+            },
+            Vec::new(),
+        )
+        .await;
+
+    println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
 }

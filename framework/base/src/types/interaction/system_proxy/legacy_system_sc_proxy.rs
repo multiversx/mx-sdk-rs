@@ -213,6 +213,50 @@ where
             .argument(&num_decimals)
     }
 
+    /// Issues dynamic ESDT tokens
+    pub fn issue_dynamic(
+        self,
+        issue_cost: BigUint<SA>,
+        token_display_name: &ManagedBuffer<SA>,
+        token_ticker: &ManagedBuffer<SA>,
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> ContractCallWithEgld<SA, ()> {
+        let esdt_system_sc_address = self.esdt_system_sc_address();
+
+        let endpoint_name = match token_type {
+            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
+                REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
+            },
+            _ => "",
+        };
+
+        let token_type_name = match token_type {
+            EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::DynamicSFT => "SFT",
+            EsdtTokenType::DynamicMeta => "META",
+            _ => "",
+        };
+
+        let mut contract_call =
+            ContractCallWithEgld::new(esdt_system_sc_address, endpoint_name, issue_cost);
+
+        contract_call.proxy_arg(token_display_name);
+        contract_call.proxy_arg(token_ticker);
+        contract_call.proxy_arg(&token_type_name);
+
+        if token_type_name == "META" {
+            contract_call.proxy_arg(&num_decimals);
+        } else {
+            assert!(
+                num_decimals == 0usize,
+                "only META tokens accept number of decimals > 0"
+            );
+        }
+
+        contract_call
+    }
+
     /// Deduplicates code from all the possible issue functions
     fn issue(
         self,
@@ -230,10 +274,7 @@ where
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
-            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
-                REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
-            },
-            EsdtTokenType::Invalid => "",
+            _ => "",
         };
 
         let mut contract_call =

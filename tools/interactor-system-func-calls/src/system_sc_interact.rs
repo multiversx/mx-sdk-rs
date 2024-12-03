@@ -18,7 +18,7 @@ pub async fn system_sc_interact_cli() {
     match &cli.command {
         Some(system_sc_interact_cli::InteractCliCommand::IssueToken(args)) => {
             basic_interact
-                .issue_token(
+                .issue_token_all_roles(
                     args.cost.clone(),
                     args.display_name.as_bytes(),
                     args.ticker.as_bytes(),
@@ -360,7 +360,40 @@ impl SysFuncCallsInteract {
         println!("SFT Collection ID: {:?}", sft_collection_id);
     }
 
-    pub async fn issue_token(
+    pub async fn issue_dynamic_token(
+        &mut self,
+        issue_cost: RustBigUint,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> String {
+        println!("Registering dynamic token {token_ticker:?} of type {token_type:?}...");
+
+        let token_id = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .issue_dynamic(
+                issue_cost.into(),
+                token_display_name,
+                token_ticker,
+                token_type,
+                num_decimals,
+            )
+            .returns(ReturnsNewTokenIdentifier)
+            .run()
+            .await;
+
+        println!("TOKEN ID: {:?}", token_id);
+
+        token_id
+    }
+
+    pub async fn issue_token_all_roles(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &[u8],
@@ -809,13 +842,23 @@ impl SysFuncCallsInteract {
             .await;
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn metadata_recreate<T: TopEncode>(
         &mut self,
         token_id: &[u8],
         nonce: u64,
-        new_attributes: T,
+        name: &[u8],
+        royalties: u64,
+        hash: &[u8],
+        new_attributes: &T,
+        uris: Vec<String>,
     ) {
         println!("Recreating the token {token_id:?} with nonce {nonce:?} with new attributes...");
+
+        let uris = uris
+            .into_iter()
+            .map(ManagedBuffer::from)
+            .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
         self.interactor
             .tx()
@@ -823,18 +866,28 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_metadata_recreate(token_id, nonce, &new_attributes)
+            .esdt_metadata_recreate(token_id, nonce, name, royalties, hash, new_attributes, uris)
             .run()
             .await;
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn metadata_update<T: TopEncode>(
         &mut self,
         token_id: &[u8],
         nonce: u64,
-        new_attributes: T,
+        name: &[u8],
+        royalties: u64,
+        hash: &[u8],
+        new_attributes: &T,
+        uris: Vec<String>,
     ) {
         println!("Updating the token {token_id:?} with nonce {nonce:?} with new attributes...");
+
+        let uris = uris
+            .into_iter()
+            .map(ManagedBuffer::from)
+            .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
         self.interactor
             .tx()
@@ -842,7 +895,7 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_metadata_update(token_id, nonce, &new_attributes)
+            .esdt_metadata_update(token_id, nonce, name, royalties, hash, new_attributes, uris)
             .run()
             .await;
     }

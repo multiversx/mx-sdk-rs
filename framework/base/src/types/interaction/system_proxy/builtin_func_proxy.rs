@@ -301,15 +301,23 @@ where
         tx.original_result()
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn esdt_metadata_recreate<
         T: TopEncode,
         Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg3: ProxyArg<u64>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         token_id: Arg0,
         nonce: Arg1,
+        name: Arg2,
+        royalties: Arg3,
+        hash: Arg4,
         new_attributes: &T,
+        uris: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let tx = self
             .wrapped_tx
@@ -317,20 +325,32 @@ where
             .raw_call(ESDT_METADATA_RECREATE_FUNC_NAME)
             .argument(&token_id)
             .argument(&nonce)
-            .argument(&new_attributes);
+            .argument(&name)
+            .argument(&royalties)
+            .argument(&hash)
+            .argument(&new_attributes)
+            .argument(&uris);
 
         tx.original_result()
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn esdt_metadata_update<
         T: TopEncode,
         Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg3: ProxyArg<u64>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         token_id: Arg0,
         nonce: Arg1,
+        name: Arg2,
+        royalties: Arg3,
+        hash: Arg4,
         new_attributes: &T,
+        uris: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let tx = self
             .wrapped_tx
@@ -338,7 +358,11 @@ where
             .raw_call(ESDT_METADATA_UPDATE_FUNC_NAME)
             .argument(&token_id)
             .argument(&nonce)
-            .argument(&new_attributes);
+            .argument(&name)
+            .argument(&royalties)
+            .argument(&hash)
+            .argument(&new_attributes)
+            .argument(&uris);
 
         tx.original_result()
     }
