@@ -77,7 +77,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                &self.data * scaling_factor
+                &self.data / scaling_factor
             },
         }
     }
@@ -125,6 +125,14 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
             data: self.data,
             decimals: DECIMALS,
         }
+    }
+}
+
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
+    From<ManagedDecimal<M, ConstDecimals<DECIMALS>>> for ManagedDecimal<M, NumDecimals>
+{
+    fn from(value: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self {
+        value.into_var_decimals()
     }
 }
 
@@ -250,6 +258,10 @@ impl<M: ManagedTypeApi> TypeAbi for ManagedDecimal<M, NumDecimals> {
 
     fn type_name() -> TypeName {
         TypeName::from("ManagedDecimal<usize>")
+    }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("ManagedDecimal<$API, usize>")
     }
 
     fn is_variadic() -> bool {

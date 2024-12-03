@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                           29
+// Endpoints:                           30
 // Async Callback (empty):               1
-// Total number of exported functions:  32
+// Total number of exported functions:  33
 
 #![no_std]
 
@@ -31,6 +31,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         optional_result => optional_result
         address_vs_h256 => address_vs_h256
         managed_address_vs_byte_array => managed_address_vs_byte_array
+        process_managed_decimal => process_managed_decimal
         esdt_local_role => esdt_local_role
         esdt_token_payment => esdt_token_payment
         esdt_token_data => esdt_token_data
