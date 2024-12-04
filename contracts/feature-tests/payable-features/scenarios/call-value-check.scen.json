@@ -87,6 +87,10 @@
                 "to": "sc:payable-features",
                 "esdtValue": [
                     {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "value": "15"
+                    },
+                    {
                         "tokenIdentifier": "str:TOK-123456",
                         "value": "100"
                     },
@@ -107,7 +111,7 @@
             },
             "expect": {
                 "out": [
-                    "0",
+                    "15",
                     [
                         "nested:str:TOK-123456|u64:0|biguint:100",
                         "nested:str:OTHERTOK-123456|u64:0|biguint:400",
