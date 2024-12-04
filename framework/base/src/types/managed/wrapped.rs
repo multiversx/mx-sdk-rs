@@ -20,6 +20,7 @@ mod managed_vec_item;
 mod managed_vec_item_nested_tuple;
 mod managed_vec_item_payload;
 mod managed_vec_iter_owned;
+mod managed_vec_iter_payload;
 mod managed_vec_iter_ref;
 mod managed_vec_ref;
 mod managed_vec_ref_mut;
@@ -54,6 +55,7 @@ pub use managed_vec_item::{
 pub use managed_vec_item_nested_tuple::ManagedVecItemNestedTuple;
 pub use managed_vec_item_payload::*;
 pub use managed_vec_iter_owned::ManagedVecOwnedIterator;
+pub use managed_vec_iter_payload::ManagedVecPayloadIterator;
 pub use managed_vec_iter_ref::ManagedVecRefIterator;
 pub use managed_vec_ref::ManagedVecRef;
 pub use managed_vec_ref_mut::ManagedVecRefMut;

@@ -1,6 +1,6 @@
-use crate::api::ManagedTypeApi;
+use crate::{api::ManagedTypeApi, types::ManagedType};
 
-use super::{ManagedVec, ManagedVecItem, ManagedVecItemPayload};
+use super::{ManagedVec, ManagedVecItem, ManagedVecPayloadIterator};
 
 impl<M, T> IntoIterator for ManagedVec<M, T>
 where
@@ -19,9 +19,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    managed_vec: ManagedVec<M, T>,
-    byte_start: usize,
-    byte_end: usize,
+    payload_iter: ManagedVecPayloadIterator<M, T::PAYLOAD>,
 }
 
 impl<M, T> ManagedVecOwnedIterator<M, T>
@@ -30,11 +28,10 @@ where
     T: ManagedVecItem,
 {
     pub(crate) fn new(managed_vec: ManagedVec<M, T>) -> Self {
-        let byte_end = managed_vec.byte_len();
-        ManagedVecOwnedIterator {
-            managed_vec,
-            byte_start: 0,
-            byte_end,
+        unsafe {
+            ManagedVecOwnedIterator {
+                payload_iter: ManagedVecPayloadIterator::new(managed_vec.forget_into_handle()),
+            }
         }
     }
 }
@@ -47,26 +44,12 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        // managedrev<t>  / reference type
-        let next_byte_start = self.byte_start + T::payload_size();
-        if next_byte_start > self.byte_end {
-            return None;
-        }
-
-        let mut payload = T::PAYLOAD::new_buffer();
-        let _ = self
-            .managed_vec
-            .buffer
-            .load_slice(self.byte_start, payload.payload_slice_mut());
-
-        self.byte_start = next_byte_start;
+        let payload = self.payload_iter.next()?;
         Some(T::read_from_payload(&payload))
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let size = T::payload_size();
-        let remaining = (self.byte_end - self.byte_start) / size;
-        (remaining, Some(remaining))
+        self.payload_iter.size_hint()
     }
 }
 
@@ -83,32 +66,7 @@ where
     T: ManagedVecItem,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
-        if self.byte_start + T::payload_size() > self.byte_end {
-            return None;
-        }
-        self.byte_end -= T::payload_size();
-
-        let mut payload = T::PAYLOAD::new_buffer();
-        let _ = self
-            .managed_vec
-            .buffer
-            .load_slice(self.byte_end, payload.payload_slice_mut());
-
+        let payload = self.payload_iter.next_back()?;
         Some(T::read_from_payload(&payload))
-    }
-}
-
-impl<M, T> Clone for ManagedVecOwnedIterator<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + Clone,
-{
-    fn clone(&self) -> Self {
-        let byte_end = self.byte_end;
-        Self {
-            managed_vec: self.managed_vec.clone(),
-            byte_start: self.byte_start,
-            byte_end,
-        }
     }
 }
