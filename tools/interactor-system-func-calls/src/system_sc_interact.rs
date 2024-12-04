@@ -459,6 +459,20 @@ impl SysFuncCallsInteract {
             .await;
     }
 
+    pub async fn update_token(&mut self, token_id: &[u8]) {
+        println!("Updating the following token {token_id:?} to the newest version...");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .update_token(TokenIdentifier::from(token_id))
+            .run()
+            .await;
+    }
+
     pub async fn mint_sft(
         &mut self,
         token_id: &[u8],

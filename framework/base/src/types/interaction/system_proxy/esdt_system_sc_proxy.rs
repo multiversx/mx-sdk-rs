@@ -652,6 +652,18 @@ where
             .argument(&token_id)
             .original_result()
     }
+
+    /// Updates a specific token to the newest version.
+    pub fn update_token<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("updateTokenID")
+            .argument(&token_id)
+            .original_result()
+    }
 }
 
 const TRUE_STR: &str = "true";

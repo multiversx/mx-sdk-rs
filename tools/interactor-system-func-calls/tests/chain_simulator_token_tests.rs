@@ -193,3 +193,23 @@ async fn change_to_dynamic_test() {
     // change SFT to dynamic
     interact.change_to_dynamic(sft_token_id.as_bytes()).await;
 }
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn update_token_test() {
+    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+
+    // issue NFT with all roles
+    let nft_token_id = interact
+        .issue_token_all_roles(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            0usize,
+            EsdtTokenType::NonFungible,
+        )
+        .await;
+
+    // update NFT
+    interact.update_token(nft_token_id.as_bytes()).await;
+}
