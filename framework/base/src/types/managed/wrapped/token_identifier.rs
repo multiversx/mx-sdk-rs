@@ -19,7 +19,7 @@ use super::{EgldOrEsdtTokenIdentifier, ManagedRef};
 #[repr(transparent)]
 #[derive(Clone)]
 pub struct TokenIdentifier<M: ErrorApi + ManagedTypeApi> {
-    buffer: ManagedBuffer<M>,
+    pub(crate) data: EgldOrEsdtTokenIdentifier<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
@@ -28,16 +28,16 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         TokenIdentifier {
-            buffer: ManagedBuffer::from_handle(handle),
+            data: EgldOrEsdtTokenIdentifier::from_handle(handle),
         }
     }
 
     fn get_handle(&self) -> M::ManagedBufferHandle {
-        self.buffer.get_handle()
+        self.data.get_handle()
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.buffer.forget_into_handle()
+        self.data.forget_into_handle()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -50,36 +50,44 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
 }
 
 impl<M: ManagedTypeApi> TokenIdentifier<M> {
+    /// Creates a new TokenIdentifier without verifying that it is not EGLD-000000.
+    ///
+    /// ## Safety
+    ///
+    /// Calling it for the EGLD token might lead to unexpected bugs.
+    pub unsafe fn esdt_unchecked(data: EgldOrEsdtTokenIdentifier<M>) -> Self {
+        Self { data }
+    }
+
     #[inline]
     pub fn from_esdt_bytes<B: Into<ManagedBuffer<M>>>(bytes: B) -> Self {
-        TokenIdentifier {
-            buffer: bytes.into(),
-        }
+        TokenIdentifier::from(bytes.into())
     }
 
     #[inline]
     pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
-        self.buffer
+        self.data.into_managed_buffer()
     }
 
     #[inline]
     pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
-        &self.buffer
+        self.data.as_managed_buffer()
     }
 
     #[inline]
     pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
-        self.buffer.to_boxed_bytes()
+        self.data.to_boxed_bytes()
     }
 
     pub fn is_valid_esdt_identifier(&self) -> bool {
-        M::managed_type_impl().validate_token_identifier(self.buffer.handle.clone())
+        M::managed_type_impl().validate_token_identifier(self.data.buffer.handle.clone())
     }
 
     pub fn ticker(&self) -> ManagedBuffer<M> {
-        let token_id_len = self.buffer.len();
+        let buffer = self.as_managed_buffer();
+        let token_id_len = buffer.len();
         let ticker_len = M::managed_type_impl().get_token_ticker_len(token_id_len);
-        self.buffer.copy_slice(0, ticker_len).unwrap_or_else(|| {
+        buffer.copy_slice(0, ticker_len).unwrap_or_else(|| {
             M::error_api_impl().signal_error(err_msg::BAD_TOKEN_TICKER_FORMAT.as_bytes())
         })
     }
@@ -88,15 +96,13 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenIdentifier<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
-        TokenIdentifier { buffer }
+        EgldOrEsdtTokenIdentifier::from(buffer).unwrap_esdt()
     }
 }
 
 impl<M: ManagedTypeApi> From<&[u8]> for TokenIdentifier<M> {
     fn from(bytes: &[u8]) -> Self {
-        TokenIdentifier {
-            buffer: ManagedBuffer::new_from_bytes(bytes),
-        }
+        EgldOrEsdtTokenIdentifier::from(bytes).unwrap_esdt()
     }
 }
 
@@ -115,7 +121,7 @@ impl<M: ManagedTypeApi> From<&crate::types::heap::String> for TokenIdentifier<M>
 impl<M: ManagedTypeApi> PartialEq for TokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.buffer == other.buffer
+        self.data == other.data
     }
 }
 
@@ -139,7 +145,7 @@ impl<M: ManagedTypeApi> NestedEncode for TokenIdentifier<M> {
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.buffer.dep_encode_or_handle_err(dest, h)
+        self.data.dep_encode_or_handle_err(dest, h)
     }
 }
 
@@ -150,7 +156,7 @@ impl<M: ManagedTypeApi> TopEncode for TokenIdentifier<M> {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.buffer.top_encode_or_handle_err(output, h)
+        self.data.top_encode_or_handle_err(output, h)
     }
 }
 
@@ -160,9 +166,11 @@ impl<M: ManagedTypeApi> NestedDecode for TokenIdentifier<M> {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        Ok(TokenIdentifier::from(
-            ManagedBuffer::dep_decode_or_handle_err(input, h)?,
-        ))
+        unsafe {
+            Ok(TokenIdentifier::esdt_unchecked(
+                EgldOrEsdtTokenIdentifier::dep_decode_or_handle_err(input, h)?,
+            ))
+        }
     }
 }
 
@@ -172,9 +180,11 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        Ok(TokenIdentifier::from(
-            ManagedBuffer::top_decode_or_handle_err(input, h)?,
-        ))
+        unsafe {
+            Ok(TokenIdentifier::esdt_unchecked(
+                EgldOrEsdtTokenIdentifier::top_decode_or_handle_err(input, h)?,
+            ))
+        }
     }
 }
 
@@ -198,7 +208,7 @@ impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let cast_handle = self.buffer.get_handle().cast_or_signal_error::<M, _>();
+        let cast_handle = self.get_handle().cast_or_signal_error::<M, _>();
         let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
         f.append_managed_buffer(&wrap_cast);
     }
@@ -206,7 +216,7 @@ impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        let cast_handle = self.buffer.get_handle().cast_or_signal_error::<M, _>();
+        let cast_handle = self.get_handle().cast_or_signal_error::<M, _>();
         let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
         f.append_managed_buffer_lower_hex(&wrap_cast);
     }
@@ -214,7 +224,7 @@ impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        let bytes = self.buffer.to_boxed_bytes();
+        let bytes = self.to_boxed_bytes();
         let s = alloc::string::String::from_utf8_lossy(bytes.as_slice());
         s.fmt(f)
     }

@@ -10,11 +10,9 @@ use crate::{
         BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal, ManagedRef, ManagedType,
         ManagedVec, ManagedVecItem, ManagedVecItemPayload, ManagedVecPayloadIterator,
-        ManagedVecRef, TokenIdentifier,
+        ManagedVecRef, TokenIdentifier, EGLD_000000_TOKEN_IDENTIFIER,
     },
 };
-
-const EGLD_000000_TOKEN_IDENTIFIER: &str = "EGLD-000000";
 
 #[derive(Default)]
 pub struct CallValueWrapper<A>
