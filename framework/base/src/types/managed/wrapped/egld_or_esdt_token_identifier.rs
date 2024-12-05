@@ -7,13 +7,10 @@ use crate::{
         ManagedTypeApi,
     },
     codec::*,
-    derive::ManagedVecItem,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
     types::{ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier},
 };
-
-use crate as multiversx_sc; // required by the ManagedVecItem derive
 
 pub const EGLD_000000_TOKEN_IDENTIFIER: &str = "EGLD-000000";
 
@@ -33,7 +30,7 @@ pub const EGLD_000000_TOKEN_IDENTIFIER: &str = "EGLD-000000";
 /// EGLD is indicated by a special, invalid token identifier handle.
 /// This way we can fit it inside a single i32 in memory.
 #[repr(transparent)]
-#[derive(ManagedVecItem, Clone)]
+#[derive(Clone)]
 pub struct EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
     pub(crate) buffer: ManagedBuffer<M>,
 }
