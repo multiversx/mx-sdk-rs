@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                           18
+// Endpoints:                           19
 // Async Callback (empty):               1
-// Total number of exported functions:  21
+// Total number of exported functions:  22
 
 #![no_std]
 
@@ -25,6 +25,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_caller => echo_caller
         accept_funds => accept_funds
         accept_funds_echo_payment => accept_funds_echo_payment
+        accept_funds_echo_caller => accept_funds_echo_caller
         accept_funds_single_esdt_transfer => accept_funds_single_esdt_transfer
         reject_funds => reject_funds
         retrieve_funds_with_transfer_exec => retrieve_funds_with_transfer_exec
