@@ -14,12 +14,12 @@ permissions:
 jobs:
   contracts:
     name: Contracts (nightly)
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v4.1.0
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@225ba4011828e5715ff853d72f1a86fb11e8f10d
     with:
       rust-toolchain: nightly-2024-05-22
       path-to-sc-meta: framework/meta
       enable-contracts-size-report: false
-      mx-scenario-go-version: v2.1.0-alpha
+      mx-scenario-go-version: v3.0.0
       coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
