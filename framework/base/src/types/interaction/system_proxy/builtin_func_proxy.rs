@@ -1,8 +1,8 @@
 use multiversx_sc_codec::{Empty, TopEncode};
 
 use crate::types::{
-    BigUint, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg,
-    TokenIdentifier, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg, TokenIdentifier, Tx,
+    TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 use crate::chain_core::builtin_func_names::{
@@ -11,7 +11,7 @@ use crate::chain_core::builtin_func_names::{
     ESDT_METADATA_UPDATE_FUNC_NAME, ESDT_MODIFY_CREATOR_FUNC_NAME, ESDT_MODIFY_ROYALTIES_FUNC_NAME,
     ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
     ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME, ESDT_SET_NEW_URIS_FUNC_NAME,
-    ESDT_SET_TOKEN_TYPE_FUNC_NAME, SET_USERNAME_FUNC_NAME,
+    SET_USERNAME_FUNC_NAME,
 };
 
 /// Proxy describing the user builtin function signatures.
@@ -213,24 +213,6 @@ where
                 tx = tx.argument(&uri);
             }
         }
-
-        tx.original_result()
-    }
-
-    pub fn esdt_set_token_type<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
-        Arg1: ProxyArg<EsdtTokenType>,
-    >(
-        self,
-        token_id: Arg0,
-        token_type: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let tx = self
-            .wrapped_tx
-            .payment(NotPayable)
-            .raw_call(ESDT_SET_TOKEN_TYPE_FUNC_NAME)
-            .argument(&token_id)
-            .argument(&token_type);
 
         tx.original_result()
     }

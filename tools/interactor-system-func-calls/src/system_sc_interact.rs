@@ -224,6 +224,7 @@ pub async fn system_sc_interact_cli() {
 pub struct SysFuncCallsInteract {
     interactor: Interactor,
     wallet_address: Bech32Address,
+    other_wallet_address: Bech32Address,
     #[allow(unused)]
     state: State,
 }
@@ -236,6 +237,7 @@ impl SysFuncCallsInteract {
 
         interactor.set_current_dir_from_workspace("tools/interactor-system-func-calls");
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+        let other_wallet_address = interactor.register_wallet(test_wallets::mike()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
         interactor.generate_blocks_until_epoch(1).await.unwrap();
@@ -243,6 +245,7 @@ impl SysFuncCallsInteract {
         Self {
             interactor,
             wallet_address: wallet_address.into(),
+            other_wallet_address: other_wallet_address.into(),
             state: State::load_state(),
         }
     }
@@ -424,6 +427,25 @@ impl SysFuncCallsInteract {
         println!("TOKEN ID: {:?}", token_id);
 
         token_id
+    }
+
+    pub async fn set_roles_for_other(&mut self, token_id: &[u8], roles: Vec<EsdtLocalRole>) {
+        let wallet_address = &self.other_wallet_address.clone().into_address();
+        println!("Setting the following roles: {roles:?} for {token_id:?} for other_address");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .set_special_roles(
+                ManagedAddress::from_address(wallet_address),
+                TokenIdentifier::from(token_id),
+                roles.into_iter(),
+            )
+            .run()
+            .await;
     }
 
     pub async fn set_roles(&mut self, token_id: &[u8], roles: Vec<EsdtLocalRole>) {
@@ -812,9 +834,9 @@ impl SysFuncCallsInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&self.wallet_address)
+            .to(SystemSCAddress)
             .gas(100_000_000u64)
-            .typed(UserBuiltinProxy)
+            .typed(SystemSCProxy)
             .esdt_set_token_type(token_id, token_type)
             .run()
             .await;
@@ -853,16 +875,28 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    // changes creator into caller
-    pub async fn modify_creator(&mut self, token_id: &[u8], nonce: u64) {
-        println!(
-            "Modifying the creator (into caller) for token {token_id:?} with nonce {nonce:?}..."
-        );
+    pub async fn send_esdt(&mut self, token_id: &[u8], nonce: u64, amount: RustBigUint) {
+        println!("Sending token {token_id:?} with nonce {nonce:?} to other_wallet_address...");
 
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&self.wallet_address)
+            .to(&self.other_wallet_address)
+            .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
+            .run()
+            .await;
+    }
+
+    // changes creator into caller
+    pub async fn modify_creator(&mut self, token_id: &[u8], nonce: u64) {
+        println!(
+            "Modifying the creator (into caller - other_wallet_address) for token {token_id:?} with nonce {nonce:?}..."
+        );
+
+        self.interactor
+            .tx()
+            .from(&self.other_wallet_address)
+            .to(&self.other_wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_nft_modify_creator(token_id, nonce)

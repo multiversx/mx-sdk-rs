@@ -1,4 +1,4 @@
-use multiversx_sc_snippets::imports::{EsdtTokenType, RustBigUint};
+use multiversx_sc_snippets::imports::{EsdtLocalRole, EsdtTokenType, RustBigUint};
 use system_sc_interact::{Config, NftDummyAttributes, SysFuncCallsInteract};
 
 const ISSUE_COST: u64 = 50000000000000000u64;
@@ -212,4 +212,87 @@ async fn update_token_test() {
 
     // update NFT
     interact.update_token(nft_token_id.as_bytes()).await;
+}
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn set_token_type_test() {
+    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+
+    // issue dynamic SFT with all roles
+    let dynamic_sft_token_id = interact
+        .issue_token_all_roles(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            0usize,
+            EsdtTokenType::DynamicSFT,
+        )
+        .await;
+
+    // set token type to dynamicMeta
+    interact
+        .set_token_type(dynamic_sft_token_id.as_bytes(), EsdtTokenType::DynamicMeta)
+        .await;
+}
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn modify_creator() {
+    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+
+    // issue dynamic NFT
+    let dynamic_nft_token_id = interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            EsdtTokenType::DynamicNFT,
+            0usize,
+        )
+        .await;
+
+    // set roles
+    interact
+        .set_roles(
+            dynamic_nft_token_id.as_bytes(),
+            vec![EsdtLocalRole::NftCreate],
+        )
+        .await;
+
+    // mint NFT
+    let nonce = interact
+        .mint_nft(
+            dynamic_nft_token_id.as_bytes(),
+            RustBigUint::from(1u64),
+            b"myNFT",
+            30u64,
+            b"",
+            &NftDummyAttributes {
+                creation_epoch: 2u64,
+                cool_factor: 3u8,
+            },
+            Vec::new(),
+        )
+        .await;
+
+    println!("Dynamic NFT minted at nonce {nonce:?}");
+
+    // set roles for other_address
+    interact
+        .set_roles_for_other(
+            dynamic_nft_token_id.as_bytes(),
+            vec![EsdtLocalRole::ModifyCreator],
+        )
+        .await;
+
+    // send to other_address
+    interact
+        .send_esdt(dynamic_nft_token_id.as_bytes(), 1u64, 1u64.into())
+        .await;
+
+    // modify creator
+    interact
+        .modify_creator(dynamic_nft_token_id.as_bytes(), nonce)
+        .await;
 }

@@ -1,10 +1,8 @@
 use core::marker::PhantomData;
 
-use multiversx_chain_core::types::EsdtTokenType;
-
 use crate::codec::Empty;
 
-use crate::types::ManagedRef;
+use crate::types::{ManagedRef, SystemSCAddress};
 use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
@@ -55,7 +53,7 @@ where
         self.esdt_system_sc_tx()
     }
 
-    /// Prepares a proxy object to call the system SC.
+    /// Prepares a proxy object to call the ESDT system SC.
     /// It has the destination address set, as well as the contract type (as specified in the proxy).
     pub fn esdt_system_sc_tx(
         &self,
@@ -63,6 +61,16 @@ where
         Tx::new_tx_from_sc()
             .to(ESDTSystemSCAddress)
             .typed(system_proxy::ESDTSystemSCProxy)
+    }
+
+    /// Prepares a proxy object to call the system SC.
+    /// It has the destination address set, as well as the contract type (as specified in the proxy).
+    pub fn system_sc_tx(
+        &self,
+    ) -> system_proxy::SystemSCProxyMethods<TxScEnv<A>, (), SystemSCAddress, ()> {
+        Tx::new_tx_from_sc()
+            .to(SystemSCAddress)
+            .typed(system_proxy::SystemSCProxy)
     }
 
     /// Convenient way to quickly instance a minimal contract call (with no EGLD, no arguments, etc.)
@@ -763,16 +771,6 @@ where
             .gas(GasLeft)
             .typed(system_proxy::UserBuiltinProxy)
             .nft_update_attributes(token_id, nft_nonce, new_attributes)
-            .sync_call()
-    }
-
-    /// Sets the token type for a specific token.
-    pub fn esdt_set_token_type(&self, token_id: &TokenIdentifier<A>, token_type: EsdtTokenType) {
-        Tx::new_tx_from_sc()
-            .to(ToSelf)
-            .gas(GasLeft)
-            .typed(system_proxy::UserBuiltinProxy)
-            .esdt_set_token_type(token_id, token_type)
             .sync_call()
     }
 
