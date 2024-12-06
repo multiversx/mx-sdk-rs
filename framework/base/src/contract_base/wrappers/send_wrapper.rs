@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::codec::Empty;
 
-use crate::types::{ManagedRef, SystemSCAddress};
+use crate::types::ManagedRef;
 use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
@@ -61,16 +61,6 @@ where
         Tx::new_tx_from_sc()
             .to(ESDTSystemSCAddress)
             .typed(system_proxy::ESDTSystemSCProxy)
-    }
-
-    /// Prepares a proxy object to call the system SC.
-    /// It has the destination address set, as well as the contract type (as specified in the proxy).
-    pub fn system_sc_tx(
-        &self,
-    ) -> system_proxy::SystemSCProxyMethods<TxScEnv<A>, (), SystemSCAddress, ()> {
-        Tx::new_tx_from_sc()
-            .to(SystemSCAddress)
-            .typed(system_proxy::SystemSCProxy)
     }
 
     /// Convenient way to quickly instance a minimal contract call (with no EGLD, no arguments, etc.)

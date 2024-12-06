@@ -216,28 +216,6 @@ async fn update_token_test() {
 
 #[tokio::test]
 #[ignore = "run on demand"]
-async fn set_token_type_test() {
-    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
-
-    // issue dynamic SFT with all roles
-    let dynamic_sft_token_id = interact
-        .issue_token_all_roles(
-            RustBigUint::from(ISSUE_COST),
-            b"TESTNFT",
-            b"TEST",
-            0usize,
-            EsdtTokenType::DynamicSFT,
-        )
-        .await;
-
-    // set token type to dynamicMeta
-    interact
-        .set_token_type(dynamic_sft_token_id.as_bytes(), EsdtTokenType::DynamicMeta)
-        .await;
-}
-
-#[tokio::test]
-#[ignore = "run on demand"]
 async fn modify_creator() {
     let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
 

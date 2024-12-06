@@ -828,20 +828,6 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    pub async fn set_token_type(&mut self, token_id: &[u8], token_type: EsdtTokenType) {
-        println!("Setting token type to {token_type:?} for token {token_id:?}...");
-
-        self.interactor
-            .tx()
-            .from(&self.wallet_address)
-            .to(SystemSCAddress)
-            .gas(100_000_000u64)
-            .typed(SystemSCProxy)
-            .esdt_set_token_type(token_id, token_type)
-            .run()
-            .await;
-    }
-
     pub async fn modify_royalties(&mut self, token_id: &[u8], nonce: u64, new_royalty: u64) {
         println!("Modifying royalties for token {token_id:?} into {new_royalty:?}...");
 
