@@ -1,8 +1,7 @@
 use multiversx_chain_vm::tx_mock::{TxContext, TxContextStack};
 use multiversx_sc::{
-    api::{use_raw_handle, HandleConstraints, RawHandle},
+    api::{HandleConstraints, RawHandle},
     codec::TryStaticCast,
-    types::ManagedVecItem,
 };
 use std::sync::Arc;
 
@@ -73,28 +72,6 @@ impl PartialEq<DebugHandle> for DebugHandle {
 impl From<i32> for DebugHandle {
     fn from(handle: i32) -> Self {
         DebugHandle::new(handle)
-    }
-}
-
-impl ManagedVecItem for DebugHandle {
-    type PAYLOAD = <RawHandle as ManagedVecItem>::PAYLOAD;
-
-    const SKIPS_RESERIALIZATION: bool = <RawHandle as ManagedVecItem>::SKIPS_RESERIALIZATION;
-
-    type Ref<'a> = Self;
-
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        use_raw_handle(RawHandle::from_byte_reader(reader))
-    }
-
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        use_raw_handle(RawHandle::from_byte_reader(reader))
-    }
-
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        RawHandle::into_byte_writer(self.get_raw_handle(), writer)
     }
 }
 

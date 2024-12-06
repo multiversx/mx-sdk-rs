@@ -71,7 +71,7 @@ where
         step.tx.esdt_value = full_payment_data
             .multi_esdt
             .iter()
-            .map(TxESDT::from)
+            .map(|item| TxESDT::from(item.clone()))
             .collect();
     }
 

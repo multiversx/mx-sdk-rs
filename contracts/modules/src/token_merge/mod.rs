@@ -69,7 +69,7 @@ pub trait TokenMergeModule:
         }
 
         for single_token_instance in single_tokens {
-            all_merged_instances.add_or_update_instance(single_token_instance);
+            all_merged_instances.add_or_update_instance(single_token_instance.clone());
         }
 
         let merged_token_payment =

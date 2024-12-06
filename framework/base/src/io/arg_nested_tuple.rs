@@ -198,13 +198,15 @@ fn callback_closure_args_loader<AA>() -> ManagedResultArgLoader<AA>
 where
     AA: VMApi,
 {
-    AA::argument_api_impl()
-        .load_callback_closure_buffer(use_raw_handle(const_handles::MBUF_TEMPORARY_1));
-    let cb_closure_args_serialized =
-        ManagedBuffer::<AA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
-    let mut cb_closure_args_buffer =
-        ManagedArgBuffer::<AA>::from_raw_handle(const_handles::CALLBACK_CLOSURE_ARGS_BUFFER);
-    cb_closure_args_buffer.deserialize_overwrite(cb_closure_args_serialized);
+    unsafe {
+        AA::argument_api_impl()
+            .load_callback_closure_buffer(use_raw_handle(const_handles::MBUF_TEMPORARY_1));
+        let cb_closure_args_serialized =
+            ManagedBuffer::<AA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        let mut cb_closure_args_buffer =
+            ManagedArgBuffer::<AA>::from_raw_handle(const_handles::CALLBACK_CLOSURE_ARGS_BUFFER);
+        cb_closure_args_buffer.deserialize_overwrite(cb_closure_args_serialized);
 
-    ManagedResultArgLoader::new(cb_closure_args_buffer.into_vec_of_buffers())
+        ManagedResultArgLoader::new(cb_closure_args_buffer.into_vec_of_buffers())
+    }
 }

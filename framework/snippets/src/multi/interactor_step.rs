@@ -13,7 +13,7 @@ pub enum InteractorStepRef<'a> {
     ScDeploy(&'a mut ScDeployStep),
 }
 
-impl<'a> InteractorStepRef<'a> {
+impl InteractorStepRef<'_> {
     pub fn to_transaction<GatewayProxy: GatewayAsyncService>(
         &self,
         interactor: &InteractorBase<GatewayProxy>,

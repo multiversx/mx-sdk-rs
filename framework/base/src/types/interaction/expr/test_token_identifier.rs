@@ -40,7 +40,7 @@ impl<'a> TestTokenIdentifier<'a> {
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, TokenIdentifier<Env::Api>> for TestTokenIdentifier<'a>
+impl<Env> AnnotatedValue<Env, TokenIdentifier<Env::Api>> for TestTokenIdentifier<'_>
 where
     Env: TxEnv,
 {
@@ -64,7 +64,7 @@ where
     }
 }
 
-impl<'a> TopEncode for TestTokenIdentifier<'a> {
+impl TopEncode for TestTokenIdentifier<'_> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -74,5 +74,4 @@ impl<'a> TopEncode for TestTokenIdentifier<'a> {
     }
 }
 
-impl<'a, Api> TypeAbiFrom<TestTokenIdentifier<'a>> for TokenIdentifier<Api> where Api: ManagedTypeApi
-{}
+impl<Api> TypeAbiFrom<TestTokenIdentifier<'_>> for TokenIdentifier<Api> where Api: ManagedTypeApi {}

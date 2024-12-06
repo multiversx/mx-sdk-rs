@@ -156,7 +156,7 @@ where
     }
 }
 
-impl<'a, E, const CAPACITY: usize> Iterator for SparseArrayIterator<'a, E, CAPACITY>
+impl<E, const CAPACITY: usize> Iterator for SparseArrayIterator<'_, E, CAPACITY>
 where
     E: ErrorApi,
 {
@@ -179,12 +179,12 @@ where
     }
 }
 
-impl<'a, E, const CAPACITY: usize> ExactSizeIterator for SparseArrayIterator<'a, E, CAPACITY> where
+impl<E, const CAPACITY: usize> ExactSizeIterator for SparseArrayIterator<'_, E, CAPACITY> where
     E: ErrorApi
 {
 }
 
-impl<'a, E, const CAPACITY: usize> DoubleEndedIterator for SparseArrayIterator<'a, E, CAPACITY>
+impl<E, const CAPACITY: usize> DoubleEndedIterator for SparseArrayIterator<'_, E, CAPACITY>
 where
     E: ErrorApi,
 {
@@ -200,7 +200,7 @@ where
     }
 }
 
-impl<'a, E, const CAPACITY: usize> Clone for SparseArrayIterator<'a, E, CAPACITY>
+impl<E, const CAPACITY: usize> Clone for SparseArrayIterator<'_, E, CAPACITY>
 where
     E: ErrorApi,
 {

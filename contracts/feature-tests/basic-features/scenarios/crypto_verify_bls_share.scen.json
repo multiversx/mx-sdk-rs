@@ -58,7 +58,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:err blsSignatureDeserialize ff725db195e37aa237cdbbda76270d4a229b6e7a3651104dc58c4349c0388e8546976fe54a04240530b99064e434c90f",
+                "message": "str:signature is invalid",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

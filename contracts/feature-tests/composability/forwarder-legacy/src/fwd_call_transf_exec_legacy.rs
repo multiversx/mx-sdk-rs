@@ -28,7 +28,7 @@ pub trait ForwarderTransferExecuteModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .payment((payment.token_identifier, 0, payment.amount))
+            .single_esdt(&payment.token_identifier, 0, &payment.amount)
             .transfer_execute();
     }
 

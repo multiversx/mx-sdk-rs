@@ -159,11 +159,11 @@ pub trait EchoManagedTypes {
         MultiValue3<ManagedAddress, usize, MultiValueEncodedCounted<MultiValue2<usize, usize>>>,
     > {
         let mut result = MultiValueEncoded::new();
-        for triple in address_number_pairs.into_iter() {
+        for triple in address_number_pairs {
             let (address, x, counted_list) = triple.into_tuple();
             let mut counted_lazy = MultiValueEncodedCounted::new();
             let v = counted_list.into_vec();
-            for pair in &v {
+            for pair in v {
                 counted_lazy.push(pair);
             }
             result.push((address, x, counted_lazy).into());
