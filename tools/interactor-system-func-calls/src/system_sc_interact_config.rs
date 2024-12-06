@@ -27,13 +27,20 @@ impl Config {
         toml::from_str(&content).unwrap()
     }
 
+    pub fn chain_simulator_config() -> Self {
+        Config {
+            gateway_uri: "http://localhost:8085".to_owned(),
+            chain_type: ChainType::Simulator,
+        }
+    }
+
     // Returns the gateway URI
     pub fn gateway_uri(&self) -> &str {
         &self.gateway_uri
     }
 
     // Returns if chain type is chain simulator
-    pub fn use_chain_simulator(&self) -> bool {
+    pub fn is_chain_simulator(&self) -> bool {
         match self.chain_type {
             ChainType::Real => false,
             ChainType::Simulator => true,
