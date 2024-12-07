@@ -9,7 +9,7 @@ where
     M: ManagedTypeApi,
     P: ManagedVecItemPayload,
 {
-    pub(super) vec_handle: M::ManagedBufferHandle,
+    vec_handle: M::ManagedBufferHandle,
     byte_start: usize,
     byte_end: usize,
     _phantom: PhantomData<P>,
@@ -40,6 +40,11 @@ where
             _phantom: PhantomData,
         }
     }
+
+    pub fn remaining_count(&self) -> usize {
+        let size = P::payload_size();
+        (self.byte_end - self.byte_start) / size
+    }
 }
 
 impl<M, P> Iterator for ManagedVecPayloadIterator<M, P>
@@ -67,8 +72,7 @@ where
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let size = P::payload_size();
-        let remaining = (self.byte_end - self.byte_start) / size;
+        let remaining = self.remaining_count();
         (remaining, Some(remaining))
     }
 }

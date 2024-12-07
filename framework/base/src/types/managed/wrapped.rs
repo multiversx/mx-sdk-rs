@@ -31,7 +31,7 @@ mod traits;
 
 pub use big_uint::BigUint;
 pub use builder::*;
-pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
+pub use egld_or_esdt_token_identifier::{EgldOrEsdtTokenIdentifier, EGLD_000000_TOKEN_IDENTIFIER};
 pub use egld_or_esdt_token_payment::{EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs};
 pub use egld_or_multi_esdt_payment::{EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs};
 pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;

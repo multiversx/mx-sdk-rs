@@ -22,6 +22,7 @@ pub const CALL_VALUE_SINGLE_ESDT_TOKEN_NAME: RawHandle = -22;
 pub const CALLBACK_CLOSURE_ARGS_BUFFER: RawHandle = -23;
 pub const MBUF_TEMPORARY_1: RawHandle = -25;
 pub const MBUF_TEMPORARY_2: RawHandle = -26;
+pub const MBUF_EGLD_000000: RawHandle = -27;
 
 pub const ADDRESS_CALLER: RawHandle = -30;
 pub const ADDRESS_SELF: RawHandle = -31;
