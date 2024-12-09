@@ -7,6 +7,7 @@ pub mod fwd_call_sync;
 pub mod fwd_call_transf_exec;
 pub mod fwd_change_owner;
 pub mod fwd_deploy;
+pub mod fwd_dynamic;
 pub mod fwd_esdt;
 pub mod fwd_nft;
 pub mod fwd_roles;
@@ -31,6 +32,7 @@ pub trait Forwarder:
     + fwd_sft::ForwarderSftModule
     + fwd_nft::ForwarderNftModule
     + fwd_roles::ForwarderRolesModule
+    + fwd_dynamic::ForwarderDynamicModule
     + fwd_storage::ForwarderStorageModule
 {
     #[init]

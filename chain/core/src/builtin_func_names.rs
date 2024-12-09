@@ -14,7 +14,6 @@ pub const SET_USERNAME_FUNC_NAME: &str = "SetUserName";
 pub const MIGRATE_USERNAME_FUNC_NAME: &str = "migrateUserName";
 pub const DELETE_USERNAME_FUNC_NAME: &str = "DeleteUserName";
 pub const UPGRADE_CONTRACT_FUNC_NAME: &str = "upgradeContract";
-pub const ESDT_SET_TOKEN_TYPE_FUNC_NAME: &str = "ESDTSetTokenType";
 pub const ESDT_MODIFY_ROYALTIES_FUNC_NAME: &str = "ESDTModifyRoyalties";
 pub const ESDT_SET_NEW_URIS_FUNC_NAME: &str = "ESDTSetNewURIs";
 pub const ESDT_MODIFY_CREATOR_FUNC_NAME: &str = "ESDTModifyCreator";
