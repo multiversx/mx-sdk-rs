@@ -173,12 +173,17 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
         let is_register_meta_esdt = prev_tx_data.starts_with("registerMetaESDT@");
         let is_register_and_set_all_roles_esdt =
             prev_tx_data.starts_with("registerAndSetAllRoles@");
+        let is_register_dynamic_esdt = prev_tx_data.starts_with("registerDynamic");
+        let is_register_and_set_all_roles_dynamic_esdt =
+            prev_tx_data.starts_with("registerAndSetAllRolesDynamic@");
 
         if !is_issue_fungible
             && !is_issue_semi_fungible
             && !is_issue_non_fungible
             && !is_register_meta_esdt
             && !is_register_and_set_all_roles_esdt
+            && !is_register_dynamic_esdt
+            && !is_register_and_set_all_roles_dynamic_esdt
         {
             continue;
         }

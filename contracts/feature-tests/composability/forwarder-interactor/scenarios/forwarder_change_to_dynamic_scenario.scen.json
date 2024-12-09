@@ -1,0 +1,179 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1": {
+                    "nonce": "11911",
+                    "balance": "100"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                    "creatorNonce": "11911",
+                    "newAddress": "bech32:erd1qqqqqqqqqqqqqpgqkwwmszeln3cjlxewv0a3uwgxf2ver22rd8ssdgezus"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "contractCode": "mxsc:../../forwarder/output/forwarder.mxsc.json",
+                "arguments": [],
+                "gasLimit": "300000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-34ddd9"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqkwwmszeln3cjlxewv0a3uwgxf2ver22rd8ssdgezus",
+                "egldValue": "50000000000000000",
+                "function": "issue_token_all_roles",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x01",
+                    "0x"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-a0503d"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqkwwmszeln3cjlxewv0a3uwgxf2ver22rd8ssdgezus",
+                "egldValue": "50000000000000000",
+                "function": "issue_token_all_roles",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x03",
+                    "0x12"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqkwwmszeln3cjlxewv0a3uwgxf2ver22rd8ssdgezus",
+                "function": "lastIssuedToken",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x544553542d613035303364"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqkwwmszeln3cjlxewv0a3uwgxf2ver22rd8ssdgezus",
+                "function": "change_to_dynamic",
+                "arguments": [
+                    "0x544553542d613035303364"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-45f8e0"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqkwwmszeln3cjlxewv0a3uwgxf2ver22rd8ssdgezus",
+                "egldValue": "50000000000000000",
+                "function": "issue_token_all_roles",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x02",
+                    "0x12"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqkwwmszeln3cjlxewv0a3uwgxf2ver22rd8ssdgezus",
+                "function": "lastIssuedToken",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x544553542d343566386530"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqkwwmszeln3cjlxewv0a3uwgxf2ver22rd8ssdgezus",
+                "function": "change_to_dynamic",
+                "arguments": [
+                    "0x544553542d343566386530"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        }
+    ]
+}
