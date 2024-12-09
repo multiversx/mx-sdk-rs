@@ -2,6 +2,12 @@
     "steps": [
         {
             "step": "setState",
+            "accounts": {
+                "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1": {
+                    "nonce": "11917",
+                    "balance": "100"
+                }
+            },
             "newAddresses": [
                 {
                     "creatorAddress": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
