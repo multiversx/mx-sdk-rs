@@ -20,6 +20,12 @@ pub struct Config {
     pub chain_type: ChainType,
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Config {
     // Deserializes config from file
     pub fn new() -> Self {

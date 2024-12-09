@@ -1192,6 +1192,27 @@ where
             .original_result()
     }
 
+    pub fn issue_token_all_roles<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<EsdtTokenType>,
+        Arg3: ProxyArg<usize>,
+    >(
+        self,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
+        token_type: Arg2,
+        num_decimals: Arg3,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("issue_token_all_roles")
+            .argument(&token_display_name)
+            .argument(&token_ticker)
+            .argument(&token_type)
+            .argument(&num_decimals)
+            .original_result()
+    }
+
     pub fn change_to_dynamic<
         Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(

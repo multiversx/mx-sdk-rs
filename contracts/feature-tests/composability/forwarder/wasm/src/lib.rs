@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           77
+// Endpoints:                           78
 // Async Callback:                       1
-// Total number of exported functions:  79
+// Total number of exported functions:  80
 
 #![no_std]
 
@@ -86,6 +86,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         setLocalRoles => set_local_roles
         unsetLocalRoles => unset_local_roles
         issue_dynamic_token => issue_dynamic_token
+        issue_token_all_roles => issue_token_all_roles
         change_to_dynamic => change_to_dynamic
         update_token => update_token
         modify_royalties => modify_royalties

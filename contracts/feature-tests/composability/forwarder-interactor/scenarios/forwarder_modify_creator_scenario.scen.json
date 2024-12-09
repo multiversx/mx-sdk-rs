@@ -1,0 +1,153 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                    "creatorNonce": "11928",
+                    "newAddress": "bech32:erd1qqqqqqqqqqqqqpgqm6d7cp70y7ft6xe78f7np9agdm7vpce6d8sskuuxnu"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "contractCode": "mxsc:../../forwarder/output/forwarder.mxsc.json",
+                "arguments": [],
+                "gasLimit": "300000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-d3c4e5"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+                "egldValue": "50000000000000000",
+                "function": "registerDynamic",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x4e4654"
+                ],
+                "gasLimit": "100000000"
+            },
+            "expect": {
+                "out": [
+                    "0x544553542d643363346535"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+                "function": "setSpecialRole",
+                "arguments": [
+                    "0x544553542d643363346535",
+                    "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                    "0x45534454526f6c654e4654437265617465"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "function": "ESDTNFTCreate",
+                "arguments": [
+                    "0x544553542d643363346535",
+                    "0x01",
+                    "0x6d794e4654",
+                    "0x1e",
+                    "0x",
+                    "0x010203",
+                    "0x"
+                ],
+                "gasLimit": "100000000"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+                "function": "setSpecialRole",
+                "arguments": [
+                    "0x544553542d643363346535",
+                    "0x00000000000000000500de9bec07cf2792bd1b3e3a7d3097a86efcc0e33a69e1",
+                    "0x45534454526f6c654d6f6469667943726561746f72"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqm6d7cp70y7ft6xe78f7np9agdm7vpce6d8sskuuxnu",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "0x544553542d643363346535",
+                        "nonce": "1",
+                        "value": "1"
+                    }
+                ],
+                "gasLimit": "5,000,000"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqm6d7cp70y7ft6xe78f7np9agdm7vpce6d8sskuuxnu",
+                "function": "modify_creator",
+                "arguments": [
+                    "0x544553542d643363346535",
+                    "0x01"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        }
+    ]
+}

@@ -1,4 +1,4 @@
-use forwarder_interact::ContractInteract;
+use forwarder_interact::{Config, ContractInteract};
 use multiversx_sc_snippets::imports::*;
 
 // Simple deploy test that runs using the chain simulator configuration.
@@ -9,7 +9,7 @@ use multiversx_sc_snippets::imports::*;
 #[tokio::test]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn deploy_test_forwarder_cs() {
-    let mut interactor = ContractInteract::new().await;
+    let mut interactor = ContractInteract::new(Config::chain_simulator_config(), None).await;
 
     interactor.deploy().await;
 }

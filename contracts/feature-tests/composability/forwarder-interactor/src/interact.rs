@@ -3,9 +3,9 @@
 mod config;
 mod proxy;
 
-use config::Config;
+pub use config::Config;
 use multiversx_sc_snippets::imports::*;
-use proxy::Color;
+pub use proxy::Color;
 use serde::{Deserialize, Serialize};
 use std::{
     io::{Read, Write},
@@ -13,6 +13,16 @@ use std::{
 };
 
 const STATE_FILE: &str = "state.toml";
+pub const FORWARDER_DEPLOY_INTERACTOR_TRACE_PATH: &str =
+    "scenarios/forwarder_deploy_scenario.scen.json";
+pub const FORWARDER_BUILTIN_INTERACTOR_TRACE_PATH: &str =
+    "scenarios/forwarder_builtin_scenario.scen.json";
+pub const FORWARDER_CHANGE_TO_DYNAMIC_INTERACTOR_TRACE_PATH: &str =
+    "scenarios/forwarder_change_to_dynamic_scenario.scen.json";
+pub const FORWARDER_UPDATE_TOKEN_INTERACTOR_TRACE_PATH: &str =
+    "scenarios/forwarder_update_token_scenario.scen.json";
+pub const FORWARDER_MODIFY_CREATOR_INTERACTOR_TRACE_PATH: &str =
+    "scenarios/forwarder_modify_creator_scenario.scen.json";
 
 pub async fn forwarder_cli() {
     env_logger::init();
@@ -20,7 +30,7 @@ pub async fn forwarder_cli() {
     let mut args = std::env::args();
     let _ = args.next();
     let cmd = args.next().expect("at least one argument required");
-    let mut interact = ContractInteract::new().await;
+    let mut interact = ContractInteract::new(Config::new(), None).await;
     match cmd.as_str() {
         "deploy" => interact.deploy().await,
         "send_egld" => interact.send_egld().await,
@@ -108,7 +118,7 @@ pub async fn forwarder_cli() {
         "get_nft_balance" => interact.get_nft_balance().await,
         "buy_nft" => interact.buy_nft().await,
         "nft_issue" => interact.nft_issue().await,
-        "nft_create" => interact.nft_create().await,
+        // "nft_create" => interact.nft_create().await,
         "nft_create_compact" => interact.nft_create_compact().await,
         "nft_add_uris" => interact.nft_add_uris().await,
         "nft_update_attributes" => interact.nft_update_attributes().await,
@@ -120,15 +130,15 @@ pub async fn forwarder_cli() {
         "create_and_send" => interact.create_and_send().await,
         "setLocalRoles" => interact.set_local_roles().await,
         "unsetLocalRoles" => interact.unset_local_roles().await,
-        "issue_dynamic_token" => interact.issue_dynamic_token().await,
-        "change_to_dynamic" => interact.change_to_dynamic().await,
-        "update_token" => interact.update_token().await,
-        "modify_royalties" => interact.modify_royalties().await,
-        "set_new_uris" => interact.set_new_uris().await,
-        "modify_creator" => interact.modify_creator().await,
-        "metadata_recreate" => interact.metadata_recreate().await,
-        "metadata_update" => interact.metadata_update().await,
-        "lastIssuedToken" => interact.last_issued_token().await,
+        // "issue_dynamic_token" => interact.issue_dynamic_token().await,
+        // "change_to_dynamic" => interact.change_to_dynamic().await,
+        // "update_token" => interact.update_token().await,
+        // "modify_royalties" => interact.modify_royalties().await,
+        // "set_new_uris" => interact.set_new_uris().await,
+        // "modify_creator" => interact.modify_creator().await,
+        // "metadata_recreate" => interact.metadata_recreate().await,
+        // "metadata_update" => interact.metadata_update().await,
+        // "lastIssuedToken" => interact.last_issued_token().await,
         "lastErrorMessage" => interact.last_error_message().await,
         _ => panic!("unknown command: {}", &cmd),
     }
@@ -176,17 +186,20 @@ impl Drop for State {
 
 pub struct ContractInteract {
     interactor: Interactor,
-    wallet_address: Address,
+    pub wallet_address: Address,
     contract_code: BytesValue,
-    state: State,
+    pub state: State,
 }
 
 impl ContractInteract {
-    pub async fn new() -> Self {
-        let config = Config::new();
+    pub async fn new(config: Config, trace_path: Option<&str>) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
             .use_chain_simulator(config.use_chain_simulator());
+
+        if let Some(path) = trace_path {
+            interactor = interactor.with_tracer(path).await;
+        }
 
         interactor.set_current_dir_from_workspace("forwarder-interactor");
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
@@ -237,7 +250,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .send_egld(to, amount)
             .returns(ReturnsResultUnmanaged)
@@ -260,7 +273,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .echo_arguments_sync(to, args)
             .payment((
@@ -288,7 +301,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .echo_arguments_sync_twice(to, args)
             .payment((
@@ -315,7 +328,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds(to)
             .payment((
@@ -340,7 +353,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_rh_egld(to)
             .egld(egld_amount)
@@ -363,7 +376,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_rh_single_esdt(to)
             .payment((
@@ -390,7 +403,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_rh_multi_esdt(to)
             .payment((
@@ -418,7 +431,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_with_fees(to, percentage_fees)
             .payment((
@@ -445,7 +458,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_then_read(to)
             .payment((
@@ -471,7 +484,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_retrieve_funds(to, token, token_nonce, amount)
             .returns(ReturnsResultUnmanaged)
@@ -495,7 +508,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_retrieve_funds_with_accept_func(to, token, amount)
             .payment((
@@ -520,7 +533,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .accept_funds_func()
             .payment((
@@ -552,7 +565,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_multi_transfer(to, token_payments)
             .returns(ReturnsResultUnmanaged)
@@ -571,7 +584,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .echo_args_async(to, args)
             .returns(ReturnsResultUnmanaged)
@@ -593,7 +606,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_async_accept_funds(to)
             .payment((
@@ -620,7 +633,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_async_accept_funds_half_payment(to)
             .payment((
@@ -648,7 +661,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_async_accept_funds_with_fees(to, percentage_fees)
             .payment((
@@ -674,7 +687,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_async_retrieve_funds(to, token, token_nonce, amount)
             .returns(ReturnsResultUnmanaged)
@@ -694,7 +707,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .send_funds_twice(to, token_identifier, amount)
             .returns(ReturnsResultUnmanaged)
@@ -721,7 +734,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .send_async_accept_multi_transfer(to, token_payments)
             .returns(ReturnsResultUnmanaged)
@@ -767,7 +780,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .clear_callback_data()
             .returns(ReturnsResultUnmanaged)
@@ -789,7 +802,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_transf_exec_accept_funds(to)
             .payment((
@@ -817,7 +830,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_transf_execu_accept_funds_with_fees(to, percentage_fees)
             .payment((
@@ -844,7 +857,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_transf_exec_accept_funds_twice(to)
             .payment((
@@ -871,7 +884,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_transf_exec_accept_funds_return_values(to)
             .payment((
@@ -903,7 +916,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .transf_exec_multi_accept_funds(to, token_payments)
             .returns(ReturnsResultUnmanaged)
@@ -930,7 +943,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .forward_transf_exec_reject_funds_multi_transfer(to, token_payments)
             .returns(ReturnsResultUnmanaged)
@@ -957,7 +970,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .transf_exec_multi_reject_funds(to, token_payments)
             .returns(ReturnsResultUnmanaged)
@@ -976,7 +989,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .change_owner(child_sc_address, new_owner)
             .returns(ReturnsResultUnmanaged)
@@ -995,7 +1008,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .deploy_contract(code, opt_arg)
             .returns(ReturnsResultUnmanaged)
@@ -1013,7 +1026,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .deploy_two_contracts(code)
             .returns(ReturnsResultUnmanaged)
@@ -1032,7 +1045,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .deploy_vault_from_source(source_address, opt_arg)
             .returns(ReturnsResultUnmanaged)
@@ -1052,7 +1065,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .upgrade_vault(child_sc_address, new_code, opt_arg)
             .returns(ReturnsResultUnmanaged)
@@ -1072,7 +1085,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .upgrade_vault_from_source(child_sc_address, source_address, opt_arg)
             .returns(ReturnsResultUnmanaged)
@@ -1124,7 +1137,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .send_esdt(to, token_id, amount)
             .returns(ReturnsResultUnmanaged)
@@ -1147,7 +1160,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .send_esdt_with_fees(to, percentage_fees)
             .payment((
@@ -1173,7 +1186,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .send_esdt_twice(to, token_id, amount_first_time, amount_second_time)
             .returns(ReturnsResultUnmanaged)
@@ -1200,7 +1213,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .send_esdt_direct_multi_transfer(to, token_payments)
             .returns(ReturnsResultUnmanaged)
@@ -1222,7 +1235,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .issue_fungible_token(token_display_name, token_ticker, initial_supply)
             .egld(egld_amount)
@@ -1242,7 +1255,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .local_mint(token_identifier, amount)
             .returns(ReturnsResultUnmanaged)
@@ -1261,7 +1274,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .local_burn(token_identifier, amount)
             .returns(ReturnsResultUnmanaged)
@@ -1382,7 +1395,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .sft_issue(token_display_name, token_ticker)
             .egld(egld_amount)
@@ -1424,7 +1437,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .buy_nft(nft_id, nft_nonce, nft_amount)
             .payment((
@@ -1450,7 +1463,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .nft_issue(token_display_name, token_ticker)
             .egld(egld_amount)
@@ -1461,23 +1474,35 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn nft_create(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
-        let amount = BigUint::<StaticApi>::from(0u128);
-        let name = ManagedBuffer::new_from_bytes(&b""[..]);
-        let royalties = BigUint::<StaticApi>::from(0u128);
-        let hash = ManagedBuffer::new_from_bytes(&b""[..]);
-        let color = Color::default();
-        let uri = ManagedBuffer::new_from_bytes(&b""[..]);
+    #[allow(clippy::too_many_arguments)]
+    pub async fn nft_create(
+        &mut self,
+        token_id: &[u8],
+        amount: RustBigUint,
+        name: &[u8],
+        royalties: u64,
+        hash: &[u8],
+        attributes: &Color,
+        uri: &[u8],
+    ) {
+        println!("Minting NFT...");
 
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .nft_create(token_identifier, amount, name, royalties, hash, color, uri)
+            .nft_create(
+                token_id,
+                amount,
+                name,
+                royalties,
+                hash,
+                attributes,
+                &ManagedBuffer::from(uri),
+            )
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1495,7 +1520,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .nft_create_compact(token_identifier, amount, color)
             .returns(ReturnsResultUnmanaged)
@@ -1515,7 +1540,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .nft_add_uris(token_identifier, nonce, uris)
             .returns(ReturnsResultUnmanaged)
@@ -1535,7 +1560,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .nft_update_attributes(token_identifier, nonce, new_attributes)
             .returns(ReturnsResultUnmanaged)
@@ -1571,7 +1596,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .nft_decode_complex_attributes(
                 token_identifier,
@@ -1599,7 +1624,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .nft_add_quantity(token_identifier, nonce, amount)
             .returns(ReturnsResultUnmanaged)
@@ -1619,7 +1644,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .nft_burn(token_identifier, nonce, amount)
             .returns(ReturnsResultUnmanaged)
@@ -1640,7 +1665,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .transfer_nft_via_async_call(to, token_identifier, nonce, amount)
             .returns(ReturnsResultUnmanaged)
@@ -1663,7 +1688,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .transfer_nft_and_execute(to, token_identifier, nonce, amount, function, arguments)
             .returns(ReturnsResultUnmanaged)
@@ -1688,7 +1713,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .create_and_send(
                 to,
@@ -1717,7 +1742,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .set_local_roles(address, token_identifier, roles)
             .returns(ReturnsResultUnmanaged)
@@ -1737,7 +1762,7 @@ impl ContractInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .unset_local_roles(address, token_identifier, roles)
             .returns(ReturnsResultUnmanaged)
@@ -1747,23 +1772,25 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn issue_dynamic_token(&mut self) {
-        let egld_amount = BigUint::<StaticApi>::from(0u128);
-
-        let token_display_name = ManagedBuffer::new_from_bytes(&b""[..]);
-        let token_ticker = ManagedBuffer::new_from_bytes(&b""[..]);
-        let token_type = EsdtTokenType::DynamicNFT;
-        let num_decimals = 0u32;
+    pub async fn issue_dynamic_token(
+        &mut self,
+        issue_cost: RustBigUint,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) {
+        println!("Registering dynamic token {token_ticker:?} of type {token_type:?}...");
 
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .issue_dynamic_token(token_display_name, token_ticker, token_type, num_decimals)
-            .egld(egld_amount)
+            .egld(BigUint::from(issue_cost))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1771,35 +1798,43 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn change_to_dynamic(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+    pub async fn issue_token_all_roles(
+        &mut self,
+        issue_cost: RustBigUint,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
+        num_decimals: usize,
+        token_type: EsdtTokenType,
+    ) {
+        println!("Registering and setting all roles for token {token_ticker:?} of type {token_type:?}...");
 
-        let response = self
+        let result = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .change_to_dynamic(token_id)
+            .issue_token_all_roles(token_display_name, token_ticker, token_type, num_decimals)
+            .egld(BigUint::from(issue_cost))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 
-        println!("Result: {response:?}");
+        println!("Result: {result:?}");
     }
 
-    pub async fn update_token(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+    pub async fn change_to_dynamic(&mut self, token_id: &[u8]) {
+        println!("Changing the following token {token_id:?} to dynamic...");
 
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .update_token(token_id)
+            .change_to_dynamic(TokenIdentifier::from(token_id))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1807,19 +1842,15 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn modify_royalties(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
-        let nonce = 0u64;
-        let new_royalty = 0u64;
-
+    pub async fn update_token(&mut self, token_id: &[u8]) {
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .modify_royalties(token_id, nonce, new_royalty)
+            .update_token(TokenIdentifier::from(token_id))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1827,19 +1858,17 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn set_new_uris(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
-        let nonce = 0u64;
-        let new_uris = MultiValueVec::from(vec![ManagedBuffer::new_from_bytes(&b""[..])]);
+    pub async fn modify_royalties(&mut self, token_id: &[u8], nonce: u64, new_royalty: u64) {
+        println!("Modifying royalties for token {token_id:?} into {new_royalty:?}...");
 
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .set_new_uris(token_id, nonce, new_uris)
+            .modify_royalties(TokenIdentifier::from(token_id), nonce, new_royalty)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1847,18 +1876,20 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn modify_creator(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
-        let nonce = 0u64;
+    pub async fn set_new_uris(&mut self, token_id: &[u8], nonce: u64, new_uris: Vec<String>) {
+        let uris = new_uris
+            .into_iter()
+            .map(ManagedBuffer::from)
+            .collect::<MultiValueEncoded<StaticApi, ManagedBuffer<StaticApi>>>();
 
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .modify_creator(token_id, nonce)
+            .set_new_uris(token_id, nonce, uris)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1866,21 +1897,46 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn metadata_recreate(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
-        let nonce = 0u64;
-        let name = ManagedBuffer::new_from_bytes(&b""[..]);
-        let royalties = 0u64;
-        let hash = ManagedBuffer::new_from_bytes(&b""[..]);
-        let new_attributes = Color::default();
-        let uris = MultiValueVec::from(vec![ManagedBuffer::new_from_bytes(&b""[..])]);
+    pub async fn modify_creator(&mut self, token_id: &[u8], nonce: u64) {
+        let response = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(80_000_000u64)
+            .typed(proxy::ForwarderProxy)
+            .modify_creator(TokenIdentifier::from(token_id), nonce)
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await;
+
+        println!("Result: {response:?}");
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn metadata_recreate(
+        &mut self,
+        token_id: &[u8],
+        nonce: u64,
+        name: &[u8],
+        royalties: u64,
+        hash: &[u8],
+        new_attributes: &Color,
+        uris: Vec<String>,
+    ) {
+        println!("Recreating the token {token_id:?} with nonce {nonce:?} with new attributes...");
+
+        let uris = uris
+            .into_iter()
+            .map(ManagedBuffer::from)
+            .collect::<MultiValueEncoded<StaticApi, ManagedBuffer<StaticApi>>>();
 
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .metadata_recreate(token_id, nonce, name, royalties, hash, new_attributes, uris)
             .returns(ReturnsResultUnmanaged)
@@ -1890,21 +1946,30 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn metadata_update(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
-        let nonce = 0u64;
-        let name = ManagedBuffer::new_from_bytes(&b""[..]);
-        let royalties = 0u64;
-        let hash = ManagedBuffer::new_from_bytes(&b""[..]);
-        let new_attributes = Color::default();
-        let uris = MultiValueVec::from(vec![ManagedBuffer::new_from_bytes(&b""[..])]);
+    #[allow(clippy::too_many_arguments)]
+    pub async fn metadata_update(
+        &mut self,
+        token_id: &[u8],
+        nonce: u64,
+        name: &[u8],
+        royalties: u64,
+        hash: &[u8],
+        new_attributes: &Color,
+        uris: Vec<String>,
+    ) {
+        println!("Updating the token {token_id:?} with nonce {nonce:?} with new attributes...");
+
+        let uris = uris
+            .into_iter()
+            .map(ManagedBuffer::from)
+            .collect::<MultiValueEncoded<StaticApi, ManagedBuffer<StaticApi>>>();
 
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .metadata_update(token_id, nonce, name, royalties, hash, new_attributes, uris)
             .returns(ReturnsResultUnmanaged)
@@ -1914,7 +1979,7 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn last_issued_token(&mut self) {
+    pub async fn last_issued_token(&mut self) -> String {
         let result_value = self
             .interactor
             .query()
@@ -1926,6 +1991,8 @@ impl ContractInteract {
             .await;
 
         println!("Result: {result_value:?}");
+
+        result_value.as_managed_buffer().to_string()
     }
 
     pub async fn last_error_message(&mut self) {
@@ -1940,5 +2007,109 @@ impl ContractInteract {
             .await;
 
         println!("Result: {result_value:?}");
+    }
+
+    pub async fn issue_dynamic_token_from_wallet(
+        &mut self,
+        issue_cost: RustBigUint,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> String {
+        println!("Registering dynamic token {token_ticker:?} of type {token_type:?} from the test wallet...");
+
+        let token_id = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .issue_dynamic(
+                issue_cost.into(),
+                token_display_name,
+                token_ticker,
+                token_type,
+                num_decimals,
+            )
+            .returns(ReturnsNewTokenIdentifier)
+            .run()
+            .await;
+
+        println!("TOKEN ID: {:?}", token_id);
+
+        token_id
+    }
+
+    pub async fn set_roles_from_wallet(
+        &mut self,
+        for_address: &Address,
+        token_id: &[u8],
+        roles: Vec<EsdtLocalRole>,
+    ) {
+        println!("Setting the following roles: {roles:?} for {token_id:?}");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(80_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .set_special_roles(
+                ManagedAddress::from_address(for_address),
+                TokenIdentifier::from(token_id),
+                roles.into_iter(),
+            )
+            .run()
+            .await;
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn mint_nft_from_wallet<T: TopEncode>(
+        &mut self,
+        token_id: &[u8],
+        amount: RustBigUint,
+        name: &[u8],
+        royalties: u64,
+        hash: &[u8],
+        attributes: &T,
+        uris: Vec<String>,
+    ) -> u64 {
+        println!("Minting NFT...");
+
+        let uris = uris
+            .into_iter()
+            .map(ManagedBuffer::from)
+            .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.wallet_address)
+            .gas(100_000_000u64)
+            .typed(UserBuiltinProxy)
+            .esdt_nft_create(token_id, amount, name, royalties, hash, attributes, &uris)
+            .returns(ReturnsResult)
+            .run()
+            .await
+    }
+
+    pub async fn send_esdt_from_wallet(
+        &mut self,
+        to: &Address,
+        token_id: &[u8],
+        nonce: u64,
+        amount: RustBigUint,
+    ) {
+        println!("Sending token {token_id:?} with nonce {nonce:?} to other_wallet_address...");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(to)
+            .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
+            .run()
+            .await;
     }
 }

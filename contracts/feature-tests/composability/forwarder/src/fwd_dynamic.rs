@@ -31,12 +31,37 @@ pub trait ForwarderDynamicModule:
             .async_call_and_exit();
     }
 
+    #[payable["EGLD"]]
+    #[endpoint]
+    fn issue_token_all_roles(
+        &self,
+        token_display_name: ManagedBuffer,
+        token_ticker: ManagedBuffer,
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) {
+        let issue_cost = self.call_value().egld_value().clone_value();
+        let caller = self.blockchain().get_caller();
+
+        self.send()
+            .esdt_system_sc_proxy()
+            .issue_and_set_all_roles(
+                issue_cost,
+                token_display_name,
+                token_ticker,
+                token_type,
+                num_decimals,
+            )
+            .callback(self.callbacks().nft_issue_callback(&caller))
+            .async_call_and_exit();
+    }
+
     #[endpoint]
     fn change_to_dynamic(&self, token_id: TokenIdentifier) {
         self.send()
             .esdt_system_sc_proxy()
             .change_to_dynamic(token_id)
-            .sync_call();
+            .async_call_and_exit();
     }
 
     #[endpoint]
@@ -44,7 +69,7 @@ pub trait ForwarderDynamicModule:
         self.send()
             .esdt_system_sc_proxy()
             .update_token(token_id)
-            .sync_call();
+            .async_call_and_exit();
     }
 
     #[endpoint]
