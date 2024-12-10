@@ -25,7 +25,7 @@ use super::{
 impl MetaConfig {
     pub fn generate_rust_snippets(&self, args: &GenerateSnippetsArgs) {
         let main_contract = self.sc_config.main_contract();
-        let crate_name = &main_contract.contract_name;
+        let crate_name = &main_contract.contract_name.replace("-", "_");
         let mut file =
             create_snippets_crate_and_get_lib_file(&self.snippets_dir, crate_name, args.overwrite);
         write_snippets_to_file(&mut file, &self.original_contract_abi, crate_name);

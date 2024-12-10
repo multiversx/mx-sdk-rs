@@ -14,12 +14,12 @@ pub struct RepoTempDownload {
 }
 
 impl RepoTempDownload {
-    pub fn download_from_github(version: RepoVersion, temp_dir_path: PathBuf) -> Self {
+    pub async fn download_from_github(version: RepoVersion, temp_dir_path: PathBuf) -> Self {
         let tt_download = RepoTempDownload {
             version,
             temp_dir_path,
         };
-        tt_download.download_binaries().unwrap();
+        tt_download.download_binaries().await.unwrap();
         tt_download.delete_temp_folder();
         tt_download.unzip_binaries();
         tt_download.delete_zip();
@@ -34,8 +34,8 @@ impl RepoTempDownload {
         self.temp_dir_path.join(self.version.temp_dir_name())
     }
 
-    fn download_binaries(&self) -> Result<(), reqwest::Error> {
-        let response = reqwest::blocking::get(self.version.url())?.bytes()?;
+    async fn download_binaries(&self) -> Result<(), reqwest::Error> {
+        let response = reqwest::get(self.version.url()).await?.bytes().await?;
         if response.len() < 10000 {
             panic!(
                 "Could not download artifact: {}",

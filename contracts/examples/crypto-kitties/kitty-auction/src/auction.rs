@@ -5,7 +5,8 @@ use multiversx_sc::{
     types::{BigUint, ManagedAddress},
 };
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum AuctionType {
     Selling,
     Siring,

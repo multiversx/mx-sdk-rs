@@ -46,8 +46,13 @@ fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
 
 pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
     let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    let name = &ast.ident;
+    let name_str = name.to_string();
     let type_docs = extract_doc(ast.attrs.as_slice());
     let macro_attributes = extract_macro_attributes(ast.attrs.as_slice());
+    if macro_attributes.is_empty() {
+        println!("Warning! {name_str} #[type_abi] implementation sees no derive traits. Make sure that the derive attribute comes after #[type_abi]");
+    }
 
     let type_description_impl = match &ast.data {
         syn::Data::Struct(data_struct) => {
@@ -119,8 +124,6 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
         syn::Data::Union(_) => panic!("Union not supported!"),
     };
 
-    let name = &ast.ident;
-    let name_str = name.to_string();
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     quote! {
         impl #impl_generics multiversx_sc::abi::TypeAbiFrom<Self> for #name #ty_generics #where_clause {}

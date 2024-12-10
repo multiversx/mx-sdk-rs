@@ -179,7 +179,7 @@ fn change_version_string(
     framework_crate_name: &str,
 ) {
     let version_string_before = version_string.clone();
-    let mut version_spec = VersionReq::from_version_str(&std::mem::take(version_string));
+    let mut version_spec = VersionReq::from_version_str_or_latest(&std::mem::take(version_string));
     if version_spec.semver == *from_version {
         version_spec.semver = to_version.clone();
     }

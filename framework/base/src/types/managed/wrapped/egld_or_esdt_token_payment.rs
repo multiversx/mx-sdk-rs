@@ -10,13 +10,12 @@ use crate::codec::{
 };
 
 use crate as multiversx_sc; // needed by the TypeAbi generated code
-use crate::derive::TypeAbi;
+use crate::derive::type_abi;
 
 use super::{EsdtTokenPayment, EsdtTokenPaymentRefs};
 
-#[derive(
-    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug,
-)]
+#[type_abi]
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub struct EgldOrEsdtTokenPayment<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub token_nonce: u64,

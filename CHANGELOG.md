@@ -32,6 +32,25 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+
+## [sc 0.54.6] - 2024-12-04
+- `ManagedDecimal` bugfixes:
+	- ABI/proxy bugfix;
+	- Rescale bugfix.
+
+## [sc 0.54.5] - 2024-11-28
+- `ManagedVec` - deprecated `sort` and guarded it by the `alloc` feature, since it uses the allocator.
+- `sc-meta`
+	- versioning fix;
+	- interactor generator fix.
+- Interactors - fixed code metadata on deploy.
+
+## [sc 0.54.4] - 2024-11-22
+- `sc-meta`
+	- `install debugger` CLI that prepares VSCode extension for debugging;
+	- fixed a crash involving templates and installers.
+- Deprecated `#[derive(TypeAbi)]` and added an additional warning in the macro.
+
 ## [sc 0.54.3] - 2024-11-18
 - `#[storage_mapper_from_address]` fixes for: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `TokenAttributesMapper`, `UniqueIdMapper`, `UserMapper`, `AddressToIdMapper`.
 
