@@ -35,13 +35,17 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
+    pub(crate) unsafe fn new_from_handle(vec_handle: M::ManagedBufferHandle) -> Self {
         unsafe {
             ManagedVecRefIterator {
-                payload_iter: ManagedVecPayloadIterator::new(managed_vec.get_handle()),
+                payload_iter: ManagedVecPayloadIterator::new(vec_handle),
                 _phantom: PhantomData,
             }
         }
+    }
+
+    pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
+        unsafe { ManagedVecRefIterator::new_from_handle(managed_vec.get_handle()) }
     }
 
     pub(crate) fn iter_is_empty(&self) -> bool {
