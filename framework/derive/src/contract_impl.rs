@@ -79,7 +79,9 @@ pub fn contract_implementation(
                 #function_selector_body
             }
 
-            fn callback_selector(&mut self, mut ___cb_closure___: multiversx_sc::types::CallbackClosureForDeser<Self::Api>) -> multiversx_sc::types::CallbackSelectorResult<Self::Api> {
+            fn callback_selector(&mut self, ___cb_closure___: &multiversx_sc::types::CallbackClosureForDeser<Self::Api>)
+                -> multiversx_sc::types::CallbackSelectorResult
+            {
                 #callback_selector_body
             }
 

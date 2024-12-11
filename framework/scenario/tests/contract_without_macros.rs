@@ -83,9 +83,9 @@ mod module_1 {
         }
         fn callback_selector(
             &mut self,
-            mut ___cb_closure___: multiversx_sc::types::CallbackClosureForDeser<Self::Api>,
-        ) -> multiversx_sc::types::CallbackSelectorResult<Self::Api> {
-            multiversx_sc::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
+            ___cb_closure___: &multiversx_sc::types::CallbackClosureForDeser<Self::Api>,
+        ) -> multiversx_sc::types::CallbackSelectorResult {
+            multiversx_sc::types::CallbackSelectorResult::NotProcessed
         }
     }
 
@@ -357,40 +357,25 @@ mod sample_adder {
         }
         fn callback_selector(
             &mut self,
-            mut ___cb_closure___: multiversx_sc::types::CallbackClosureForDeser<Self::Api>,
-        ) -> multiversx_sc::types::CallbackSelectorResult<Self::Api> {
+            ___cb_closure___: &multiversx_sc::types::CallbackClosureForDeser<Self::Api>,
+        ) -> multiversx_sc::types::CallbackSelectorResult {
             let ___cb_closure_matcher___ = ___cb_closure___.matcher::<32usize>();
             if ___cb_closure_matcher___.matches_empty() {
                 return multiversx_sc::types::CallbackSelectorResult::Processed;
             }
-            match super::module_1::EndpointWrappers::callback_selector(self, ___cb_closure___) {
-                multiversx_sc::types::CallbackSelectorResult::Processed => {
-                    return multiversx_sc::types::CallbackSelectorResult::Processed;
-                },
-                multiversx_sc::types::CallbackSelectorResult::NotProcessed(
-                    recovered_cb_closure,
-                ) => {
-                    ___cb_closure___ = recovered_cb_closure;
-                },
+            if super::module_1::EndpointWrappers::callback_selector(self, ___cb_closure___)
+                .is_processed()
+            {
+                return multiversx_sc::types::CallbackSelectorResult::Processed;
             }
-            match super::module_1::EndpointWrappers::callback_selector(self, ___cb_closure___) {
-                multiversx_sc::types::CallbackSelectorResult::Processed => {
-                    return multiversx_sc::types::CallbackSelectorResult::Processed;
-                },
-                multiversx_sc::types::CallbackSelectorResult::NotProcessed(
-                    recovered_cb_closure,
-                ) => {
-                    ___cb_closure___ = recovered_cb_closure;
-                },
-            }
-            multiversx_sc::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
+            multiversx_sc::types::CallbackSelectorResult::NotProcessed
         }
         fn callback(&mut self) {
             if let Some(___cb_closure___) =
                 multiversx_sc::types::CallbackClosureForDeser::storage_load_and_clear::<Self::Api>()
             {
-                if let multiversx_sc::types::CallbackSelectorResult::NotProcessed(_) =
-                    self::EndpointWrappers::callback_selector(self, ___cb_closure___)
+                if !self::EndpointWrappers::callback_selector(self, &___cb_closure___)
+                    .is_processed()
                 {
                     multiversx_sc::api::ErrorApiImpl::signal_error(
                         &<Self::Api as multiversx_sc::api::ErrorApi>::error_api_impl(),
