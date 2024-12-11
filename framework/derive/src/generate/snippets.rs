@@ -67,7 +67,8 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
             A: multiversx_sc::api::VMApi + Send + Sync,
         {
             fn call(&self, fn_name: &str) -> bool {
-                EndpointWrappers::call(self, fn_name)
+                let mut obj = multiversx_sc::contract_base::UniversalContractObj::<A>::new();
+                EndpointWrappers::call(&mut obj, fn_name)
             }
         }
     }

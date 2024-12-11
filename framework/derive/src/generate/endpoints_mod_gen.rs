@@ -37,7 +37,7 @@ pub fn generate_endpoints_mod(
                 A: multiversx_sc::api::VMApi ,
             {
                 super::EndpointWrappers::callback(
-                    &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                    &mut multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
                 );
             }
         }
@@ -93,7 +93,7 @@ fn generate_wasm_endpoint(
             A: multiversx_sc::api::VMApi,
         {
             super::EndpointWrappers::#call_method_ident(
-                &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                &mut multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
             );
         }
     }

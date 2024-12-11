@@ -52,7 +52,7 @@ pub fn contract_implementation(
 
         impl<C> #trait_name_ident for C
         where
-        C: AutoImpl #(#supertraits_main)*
+            C: AutoImpl #(#supertraits_main)*
         {
             #(#auto_impls)*
 
@@ -75,15 +75,15 @@ pub fn contract_implementation(
         {
             #(#call_methods)*
 
-            fn call(&self, fn_name: &str) -> bool {
+            fn call(&mut self, fn_name: &str) -> bool {
                 #function_selector_body
             }
 
-            fn callback_selector(&self, mut ___cb_closure___: multiversx_sc::types::CallbackClosureForDeser<Self::Api>) -> multiversx_sc::types::CallbackSelectorResult<Self::Api> {
+            fn callback_selector(&mut self, mut ___cb_closure___: multiversx_sc::types::CallbackClosureForDeser<Self::Api>) -> multiversx_sc::types::CallbackSelectorResult<Self::Api> {
                 #callback_selector_body
             }
 
-            fn callback(&self) {
+            fn callback(&mut self) {
                 #callback_body
             }
         }
