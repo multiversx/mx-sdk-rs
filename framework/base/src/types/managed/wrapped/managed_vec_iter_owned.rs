@@ -1,4 +1,9 @@
-use crate::{api::ManagedTypeApi, types::ManagedType};
+use multiversx_sc_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
+
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    types::{ManagedBuffer, ManagedType},
+};
 
 use super::{ManagedVec, ManagedVecItem, ManagedVecPayloadIterator};
 
@@ -34,6 +39,10 @@ where
             }
         }
     }
+
+    pub(crate) fn iter_is_empty(&self) -> bool {
+        self.payload_iter.iter_is_empty()
+    }
 }
 
 impl<M, T> Iterator for ManagedVecOwnedIterator<M, T>
@@ -68,5 +77,27 @@ where
     fn next_back(&mut self) -> Option<Self::Item> {
         let payload = self.payload_iter.next_back()?;
         Some(T::read_from_payload(&payload))
+    }
+}
+
+impl<A> TopDecodeMultiInput for ManagedVecOwnedIterator<A, ManagedBuffer<A>>
+where
+    A: ManagedTypeApi + ErrorApi,
+{
+    type ValueInput = ManagedBuffer<A>;
+
+    fn has_next(&self) -> bool {
+        !self.iter_is_empty()
+    }
+
+    fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        if let Some(buffer) = self.next() {
+            Ok(buffer)
+        } else {
+            Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS))
+        }
     }
 }

@@ -40,6 +40,15 @@ where
             _phantom: PhantomData,
         }
     }
+
+    pub(crate) fn remaining(&self) -> usize {
+        (self.byte_end - self.byte_start) / P::payload_size()
+    }
+
+    /// TODO: can be replaced with ExactSizeIterator::is_empty once it's stabilized
+    pub(crate) fn iter_is_empty(&self) -> bool {
+        self.byte_start >= self.byte_end
+    }
 }
 
 impl<M, P> Iterator for ManagedVecPayloadIterator<M, P>
@@ -50,10 +59,10 @@ where
     type Item = P;
 
     fn next(&mut self) -> Option<P> {
-        let next_byte_start = self.byte_start + P::payload_size();
-        if next_byte_start > self.byte_end {
+        if self.iter_is_empty() {
             return None;
         }
+        let next_byte_start = self.byte_start + P::payload_size();
 
         let mut payload = P::new_buffer();
         let _ = M::managed_type_impl().mb_load_slice(
@@ -67,8 +76,7 @@ where
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let size = P::payload_size();
-        let remaining = (self.byte_end - self.byte_start) / size;
+        let remaining = self.remaining();
         (remaining, Some(remaining))
     }
 }
@@ -78,6 +86,9 @@ where
     M: ManagedTypeApi,
     P: ManagedVecItemPayload,
 {
+    fn len(&self) -> usize {
+        self.remaining()
+    }
 }
 
 impl<M, P> DoubleEndedIterator for ManagedVecPayloadIterator<M, P>
@@ -86,7 +97,7 @@ where
     P: ManagedVecItemPayload,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
-        if self.byte_start + P::payload_size() > self.byte_end {
+        if self.iter_is_empty() {
             return None;
         }
         self.byte_end -= P::payload_size();
