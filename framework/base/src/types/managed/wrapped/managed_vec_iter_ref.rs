@@ -99,7 +99,7 @@ where
     }
 }
 
-impl<'a, A> TopDecodeMultiInput for ManagedVecRefIterator<'a, A, ManagedBuffer<A>>
+impl<A> TopDecodeMultiInput for ManagedVecRefIterator<'_, A, ManagedBuffer<A>>
 where
     A: ManagedTypeApi + ErrorApi,
 {
