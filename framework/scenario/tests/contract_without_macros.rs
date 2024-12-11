@@ -254,8 +254,6 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     pub trait AutoImpl: multiversx_sc::contract_base::ContractBase {}
 
-    // impl<C> super::module_1::AutoImpl for C where C: AutoImpl {}
-
     impl<C> Adder for C
     where
         C: AutoImpl + super::module_1::AutoImpl,
@@ -639,6 +637,8 @@ mod sample_adder {
         A: multiversx_sc::api::VMApi,
     {
         fn call(&self, fn_name: &str) -> bool {
+            // creating a new object, which we can mutate
+            // because of dynamic traits, we cannot move `self`
             let mut obj = multiversx_sc::contract_base::UniversalContractObj::<A>::new();
             EndpointWrappers::call(&mut obj, fn_name)
         }
