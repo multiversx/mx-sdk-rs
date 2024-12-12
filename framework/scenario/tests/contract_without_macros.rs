@@ -592,12 +592,9 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT OBJECT ////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    pub struct ContractObj<A>
+    pub struct ContractObj<A>(multiversx_sc::contract_base::UniversalContractObj<A>)
     where
-        A: multiversx_sc::api::VMApi,
-    {
-        _phantom: core::marker::PhantomData<A>,
-    }
+        A: multiversx_sc::api::VMApi;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT OBJECT as CONTRACT BASE ///////////////////////////////////////////////////////
@@ -633,19 +630,17 @@ mod sample_adder {
     where
         A: multiversx_sc::api::VMApi,
     {
-        ContractObj {
-            _phantom: core::marker::PhantomData,
-        }
+        ContractObj::<A>(multiversx_sc::contract_base::UniversalContractObj::<A>::new())
     }
+
     pub struct ContractBuilder;
+
     impl multiversx_sc::contract_base::CallableContractBuilder for self::ContractBuilder {
         fn new_contract_obj<A: multiversx_sc::api::VMApi + Send + Sync>(
             &self,
         ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract>
         {
-            multiversx_sc::types::heap::Box::new(ContractObj::<A> {
-                _phantom: core::marker::PhantomData,
-            })
+            multiversx_sc::types::heap::Box::new(self::contract_obj::<A>())
         }
     }
 
