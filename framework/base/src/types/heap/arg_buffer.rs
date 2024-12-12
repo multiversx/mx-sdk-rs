@@ -91,7 +91,7 @@ where
 {
     fn from(managed_arg_buffer: &ManagedArgBuffer<M>) -> Self {
         let mut result = Self::new();
-        for m_arg in managed_arg_buffer.data.into_iter() {
+        for m_arg in &managed_arg_buffer.data {
             result.push_argument_bytes(m_arg.to_boxed_bytes().as_slice());
         }
         result

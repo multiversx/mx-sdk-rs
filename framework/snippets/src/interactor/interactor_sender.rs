@@ -1,7 +1,10 @@
+use std::collections::HashMap;
+
 use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
 use log::debug;
 use multiversx_sc_scenario::multiversx_sc::types::Address;
-use multiversx_sdk::gateway::{GatewayAsyncService, GetAccountRequest};
+use multiversx_sdk::data::account::Account;
+use multiversx_sdk::gateway::{GatewayAsyncService, GetAccountRequest, GetAccountStorageRequest};
 
 use crate::InteractorBase;
 
@@ -23,6 +26,20 @@ where
             .await
             .expect("failed to retrieve account nonce");
         account.nonce
+    }
+
+    pub async fn get_account(&self, address: &Address) -> Account {
+        self.proxy
+            .request(GetAccountRequest::new(address))
+            .await
+            .expect("failed to retrieve account")
+    }
+
+    pub async fn get_account_storage(&self, address: &Address) -> HashMap<String, String> {
+        self.proxy
+            .request(GetAccountStorageRequest::new(address))
+            .await
+            .expect("failed to retrieve account")
     }
 
     pub(crate) async fn set_nonce_and_sign_tx(

@@ -9,7 +9,7 @@ use crate::{
     types::{ManagedBuffer, ManagedType},
 };
 
-use super::EgldOrEsdtTokenIdentifier;
+use super::{EgldOrEsdtTokenIdentifier, ManagedRef};
 
 /// Specialized type for handling token identifiers.
 /// It wraps a BoxedBytes with the full ASCII name of the token.
@@ -26,7 +26,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         TokenIdentifier {
             buffer: ManagedBuffer::from_handle(handle),
         }
@@ -36,7 +36,15 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
         self.buffer.get_handle()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.buffer.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -190,17 +198,17 @@ impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer(&ManagedBuffer::from_handle(
-            self.buffer.get_handle().cast_or_signal_error::<M, _>(),
-        ));
+        let cast_handle = self.buffer.get_handle().cast_or_signal_error::<M, _>();
+        let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer(&wrap_cast);
     }
 }
 
 impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
-            self.buffer.get_handle().cast_or_signal_error::<M, _>(),
-        ));
+        let cast_handle = self.buffer.get_handle().cast_or_signal_error::<M, _>();
+        let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer_lower_hex(&wrap_cast);
     }
 }
 

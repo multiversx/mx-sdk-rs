@@ -16,7 +16,7 @@ impl<'a> GetAccountStorageRequest<'a> {
     }
 }
 
-impl<'a> GatewayRequest for GetAccountStorageRequest<'a> {
+impl GatewayRequest for GetAccountStorageRequest<'_> {
     type Payload = ();
     type DecodedJson = AccountStorageResponse;
     type Result = HashMap<String, String>;

@@ -282,7 +282,7 @@ pub trait OrdersModule:
         let mut orders_vec = MultiValueManagedVec::new();
         for order in orders.iter() {
             if order.order_type == order_type {
-                orders_vec.push(order);
+                orders_vec.push(order.clone());
             }
         }
 

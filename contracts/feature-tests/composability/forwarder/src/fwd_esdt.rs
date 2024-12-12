@@ -42,8 +42,8 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     #[endpoint]
     fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
         let (token_id, payment) = self.call_value().single_fungible_esdt();
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
-        let amount_to_send = payment - fees;
+        let fees = percentage_fees * &*payment / PERCENTAGE_TOTAL;
+        let amount_to_send = payment.clone() - fees;
 
         self.tx()
             .to(&to)

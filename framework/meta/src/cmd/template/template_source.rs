@@ -16,7 +16,7 @@ pub struct TemplateSource<'a> {
     pub metadata: TemplateMetadata,
 }
 
-impl<'a> TemplateSource<'a> {
+impl TemplateSource<'_> {
     pub fn copy_template(&self, target_path: impl AsRef<Path>, args_tag: FrameworkVersion) {
         whitelisted_deep_copy(
             &self.source_path,

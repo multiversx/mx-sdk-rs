@@ -147,7 +147,7 @@ fn can_interpret_as_string(bytes: &[u8]) -> bool {
     if bytes.is_empty() {
         return false;
     }
-    return !bytes.iter().any(|&b| !(32..=126).contains(&b));
+    !bytes.iter().any(|&b| !(32..=126).contains(&b))
 }
 
 fn code_pretty(bytes: &[u8]) -> String {
