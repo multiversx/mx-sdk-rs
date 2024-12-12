@@ -9,7 +9,7 @@ use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::{ExitCodecErrorHandler, SendRawWrapper},
     err_msg,
-    io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
+    io::{ArgErrorHandler, ArgId},
     types::{
         BigUint, CodeMetadata, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedOption,
         ManagedVec,
@@ -112,7 +112,7 @@ where
     where
         RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
-        let mut loader = ManagedResultArgLoader::new(raw_result);
+        let mut loader = raw_result.into_iter();
         let arg_id = ArgId::from(&b"init result"[..]);
         let h = ArgErrorHandler::<SA>::from(arg_id);
         RequestedResult::multi_decode_or_handle_err(&mut loader, h).unwrap_infallible()

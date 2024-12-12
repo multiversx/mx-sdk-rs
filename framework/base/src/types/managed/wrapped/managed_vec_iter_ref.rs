@@ -1,6 +1,11 @@
 use core::marker::PhantomData;
 
-use crate::{api::ManagedTypeApi, types::ManagedType};
+use multiversx_sc_codec::{DecodeError, DecodeErrorHandler, TopDecodeMultiInput};
+
+use crate::{
+    api::{ErrorApi, ManagedTypeApi},
+    types::{ManagedBuffer, ManagedType},
+};
 
 use super::{ManagedVec, ManagedVecItem, ManagedVecPayloadIterator};
 
@@ -30,13 +35,21 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
+    pub(crate) unsafe fn new_from_handle(vec_handle: M::ManagedBufferHandle) -> Self {
         unsafe {
             ManagedVecRefIterator {
-                payload_iter: ManagedVecPayloadIterator::new(managed_vec.get_handle()),
+                payload_iter: ManagedVecPayloadIterator::new(vec_handle),
                 _phantom: PhantomData,
             }
         }
+    }
+
+    pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
+        unsafe { ManagedVecRefIterator::new_from_handle(managed_vec.get_handle()) }
+    }
+
+    pub(crate) fn iter_is_empty(&self) -> bool {
+        self.payload_iter.iter_is_empty()
     }
 }
 
@@ -86,6 +99,28 @@ where
                 payload_iter: self.payload_iter.clone_iter(),
                 _phantom: PhantomData,
             }
+        }
+    }
+}
+
+impl<A> TopDecodeMultiInput for ManagedVecRefIterator<'_, A, ManagedBuffer<A>>
+where
+    A: ManagedTypeApi + ErrorApi,
+{
+    type ValueInput = ManagedBuffer<A>;
+
+    fn has_next(&self) -> bool {
+        !self.iter_is_empty()
+    }
+
+    fn next_value_input<H>(&mut self, h: H) -> Result<Self::ValueInput, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        if let Some(buffer) = self.next() {
+            Ok(buffer.clone())
+        } else {
+            Err(h.handle_error(DecodeError::MULTI_TOO_FEW_ARGS))
         }
     }
 }
