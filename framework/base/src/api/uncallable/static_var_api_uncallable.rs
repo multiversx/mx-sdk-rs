@@ -1,5 +1,5 @@
 use crate::{
-    api::{RawHandle, StaticVarApi, StaticVarApiImpl},
+    api::{RawHandle, StaticVarApi, StaticVarApiFlags, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -38,6 +38,14 @@ impl StaticVarApiImpl for UncallableApi {
     }
 
     fn get_num_arguments(&self) -> i32 {
+        unreachable!()
+    }
+
+    fn set_flags(&self, _flags: StaticVarApiFlags) {
+        unreachable!()
+    }
+
+    fn get_flags(&self) -> StaticVarApiFlags {
         unreachable!()
     }
 

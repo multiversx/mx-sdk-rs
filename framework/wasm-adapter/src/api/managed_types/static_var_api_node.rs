@@ -1,5 +1,5 @@
 use multiversx_sc::{
-    api::{const_handles, RawHandle, StaticVarApi, StaticVarApiImpl},
+    api::{const_handles, RawHandle, StaticVarApi, StaticVarApiFlags, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -9,6 +9,7 @@ static mut STATIC_BUFFER: LockableStaticBuffer = LockableStaticBuffer::new();
 static mut EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE: i32 = 0;
 static mut NEXT_HANDLE: i32 = const_handles::NEW_HANDLE_START_FROM;
 static mut NUM_ARGUMENTS: i32 = 0;
+static mut FLAGS: StaticVarApiFlags = StaticVarApiFlags::NONE;
 static mut CALL_VALUE_EGLD_HANDLE: i32 = const_handles::UNINITIALIZED_HANDLE;
 static mut CALL_VALUE_MULTI_ESDT_HANDLE: i32 = const_handles::UNINITIALIZED_HANDLE;
 static mut SCALING_FACTOR_INIT: [bool; const_handles::SCALING_FACTOR_LENGTH] =
@@ -60,6 +61,16 @@ impl StaticVarApiImpl for VmApiImpl {
 
     fn get_num_arguments(&self) -> i32 {
         unsafe { NUM_ARGUMENTS }
+    }
+
+    fn set_flags(&self, flags: StaticVarApiFlags) {
+        unsafe {
+            FLAGS = flags;
+        }
+    }
+
+    fn get_flags(&self) -> StaticVarApiFlags {
+        unsafe { FLAGS }
     }
 
     fn set_call_value_egld_handle(&self, handle: RawHandle) {
