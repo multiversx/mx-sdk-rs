@@ -5,7 +5,7 @@ use super::fwd_storage;
 
 // used as mock attributes for NFTs
 #[type_abi]
-#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug)]
+#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug, Default)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
@@ -13,7 +13,7 @@ pub struct Color {
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone)]
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub biguint: BigUint<M>,
     pub vec_u8: ManagedBuffer<M>,

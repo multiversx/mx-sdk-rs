@@ -1,0 +1,34 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1": {
+                    "nonce": "11920",
+                    "balance": "100"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                    "creatorNonce": "11920",
+                    "newAddress": "bech32:erd1qqqqqqqqqqqqqpgq3tjap9t5nnat46nwdz6mtyy60na7vptnd8ss7r0jp8"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "contractCode": "mxsc:../../forwarder/output/forwarder.mxsc.json",
+                "arguments": [],
+                "gasLimit": "300000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        }
+    ]
+}
