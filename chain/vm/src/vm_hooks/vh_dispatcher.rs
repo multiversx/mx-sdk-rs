@@ -9,7 +9,7 @@ use super::VMHooksHandler;
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
 pub struct VMHooksDispatcher {
-    handler: Box<dyn VMHooksHandler>,
+    pub handler: Box<dyn VMHooksHandler>,
 }
 
 impl VMHooksDispatcher {
