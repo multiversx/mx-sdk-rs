@@ -1,8 +1,22 @@
-use core::marker::PhantomData;
+use core::{cell::UnsafeCell, marker::PhantomData};
 
-use crate::api::VMApi;
+use crate::api::{const_handles, RawHandle, VMApi};
 
-use super::ContractBase;
+use super::{CallValueWrapper, ContractBase};
+
+pub struct ContractObjData {
+    pub call_value_egld_handle: RawHandle,
+    pub call_value_multi_esdt_handle: RawHandle,
+}
+
+impl Default for ContractObjData {
+    fn default() -> Self {
+        ContractObjData {
+            call_value_egld_handle: const_handles::UNINITIALIZED_HANDLE,
+            call_value_multi_esdt_handle: const_handles::UNINITIALIZED_HANDLE,
+        }
+    }
+}
 
 /// A unique empty structure that automatically implements all smart contract traits.
 ///
@@ -18,7 +32,11 @@ where
     A: VMApi,
 {
     _phantom: PhantomData<A>,
+    pub data: UnsafeCell<ContractObjData>,
 }
+
+unsafe impl<A> Sync for UniversalContractObj<A> where A: VMApi {}
+unsafe impl<A> Send for UniversalContractObj<A> where A: VMApi {}
 
 impl<A> UniversalContractObj<A>
 where
@@ -27,6 +45,7 @@ where
     pub fn new() -> Self {
         Self {
             _phantom: PhantomData,
+            data: UnsafeCell::new(ContractObjData::default()),
         }
     }
 }
@@ -45,4 +64,8 @@ where
     A: VMApi,
 {
     type Api = A;
+
+    fn call_value(&self) -> CallValueWrapper<'_, Self::Api> {
+        CallValueWrapper::new(&self.data)
+    }
 }

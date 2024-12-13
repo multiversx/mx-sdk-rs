@@ -604,6 +604,10 @@ mod sample_adder {
         A: multiversx_sc::api::VMApi,
     {
         type Api = A;
+
+        fn call_value(&self) -> multiversx_sc::contract_base::CallValueWrapper<'_, Self::Api> {
+            multiversx_sc::contract_base::CallValueWrapper::new(&self.0.data)
+        }
     }
 
     impl<A> super::module_1::AutoImpl for ContractObj<A> where A: multiversx_sc::api::VMApi {}
