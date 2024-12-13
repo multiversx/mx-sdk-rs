@@ -9,10 +9,9 @@ use crate::{
     },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
-    io::ManagedResultArgLoader,
     storage::StorageKey,
     storage_clear, storage_get, storage_set,
-    types::{ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedType, ManagedVecRefIterator},
 };
 
 use super::ManagedArgBuffer;
@@ -125,8 +124,8 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosureForDeser<M> {
         CallbackClosureMatcher::new(&self.callback_name)
     }
 
-    pub fn into_arg_loader(self) -> ManagedResultArgLoader<M> {
-        ManagedResultArgLoader::new(self.closure_args.data)
+    pub fn arg_iter(&self) -> ManagedVecRefIterator<'_, M, ManagedBuffer<M>> {
+        self.closure_args.iter_buffers()
     }
 }
 

@@ -20,7 +20,7 @@ where
     ) -> Self {
         match payments.len() {
             0 => self,
-            1 => self.convert_to_single_transfer_esdt_call(payments.get(0)),
+            1 => self.convert_to_single_transfer_esdt_call(payments.get(0).clone()),
             _ => self.convert_to_multi_transfer_esdt_call(payments),
         }
     }

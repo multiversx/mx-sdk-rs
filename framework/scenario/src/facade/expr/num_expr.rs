@@ -19,7 +19,7 @@ where
     BigUint::from_bytes_be(&bytes)
 }
 
-impl<'a, Env> AnnotatedValue<Env, BigUint<Env::Api>> for NumExpr<'a>
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for NumExpr<'_>
 where
     Env: ScenarioTxEnv,
 {
@@ -32,7 +32,7 @@ where
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, u64> for NumExpr<'a>
+impl<Env> AnnotatedValue<Env, u64> for NumExpr<'_>
 where
     Env: ScenarioTxEnv,
 {
@@ -45,5 +45,5 @@ where
     }
 }
 
-impl<'a, Env> TxEgldValue<Env> for NumExpr<'a> where Env: ScenarioTxEnv {}
-impl<'a, Env> TxGasValue<Env> for NumExpr<'a> where Env: ScenarioTxEnv {}
+impl<Env> TxEgldValue<Env> for NumExpr<'_> where Env: ScenarioTxEnv {}
+impl<Env> TxGasValue<Env> for NumExpr<'_> where Env: ScenarioTxEnv {}

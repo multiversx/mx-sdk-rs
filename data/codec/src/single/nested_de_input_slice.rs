@@ -1,7 +1,7 @@
 use crate::{DecodeError, DecodeErrorHandler, NestedDecode, NestedDecodeInput};
 
 /// A nested decode buffer implementation on referenced data.
-impl<'a> NestedDecodeInput for &'a [u8] {
+impl NestedDecodeInput for &[u8] {
     fn remaining_len(&self) -> usize {
         self.len()
     }

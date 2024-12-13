@@ -8,7 +8,7 @@ pub const FREE_ORDER_FROM_STORAGE_MIN_PENALTIES: u64 = 6;
 
 #[type_abi]
 #[derive(
-    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone,
+    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone, Copy,
 )]
 pub enum OrderType {
     Buy,

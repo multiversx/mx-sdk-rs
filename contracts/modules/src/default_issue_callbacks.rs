@@ -35,7 +35,7 @@ pub trait DefaultIssueCallbacksModule {
         let key = StorageKey::from(storage_key);
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                let token_id = self.call_value().single_esdt().token_identifier;
+                let token_id = self.call_value().single_esdt().token_identifier.clone();
                 storage_set(key.as_ref(), &TokenMapperState::Token(token_id));
             },
             ManagedAsyncCallResult::Err(_) => {

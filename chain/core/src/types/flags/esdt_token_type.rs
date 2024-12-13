@@ -13,7 +13,7 @@ const ESDT_TYPE_INVALID: &[u8] = &[];
 
 // Note: In the current implementation, SemiFungible is never returned
 
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug)]
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum EsdtTokenType {
     Fungible,
     NonFungible,

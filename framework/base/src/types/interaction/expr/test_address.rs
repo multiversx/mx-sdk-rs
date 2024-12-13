@@ -56,13 +56,13 @@ impl<'a> TestAddress<'a> {
     }
 }
 
-impl<'a, 'b> PartialEq<TestSCAddress<'b>> for TestAddress<'a> {
+impl PartialEq<TestSCAddress<'_>> for TestAddress<'_> {
     fn eq(&self, other: &TestSCAddress) -> bool {
         self.to_address() == other.to_address()
     }
 }
 
-impl<'a> PartialEq<Address> for TestAddress<'a> {
+impl PartialEq<Address> for TestAddress<'_> {
     fn eq(&self, other: &Address) -> bool {
         &self.to_address() == other
     }
@@ -74,7 +74,7 @@ impl<'a> PartialEq<TestAddress<'a>> for Address {
     }
 }
 
-impl<'a, Api: ManagedTypeApi> PartialEq<ManagedAddress<Api>> for TestAddress<'a> {
+impl<Api: ManagedTypeApi> PartialEq<ManagedAddress<Api>> for TestAddress<'_> {
     fn eq(&self, other: &ManagedAddress<Api>) -> bool {
         self.to_address() == other.to_address()
     }
@@ -86,7 +86,7 @@ impl<'a, Api: ManagedTypeApi> PartialEq<TestAddress<'a>> for ManagedAddress<Api>
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for TestAddress<'a>
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for TestAddress<'_>
 where
     Env: TxEnv,
 {
@@ -102,7 +102,7 @@ where
     }
 }
 
-impl<'a, Env> TxFrom<Env> for TestAddress<'a>
+impl<Env> TxFrom<Env> for TestAddress<'_>
 where
     Env: TxEnv,
 {
@@ -111,11 +111,11 @@ where
         expr.into()
     }
 }
-impl<'a, Env> TxFromSpecified<Env> for TestAddress<'a> where Env: TxEnv {}
-impl<'a, Env> TxTo<Env> for TestAddress<'a> where Env: TxEnv {}
-impl<'a, Env> TxToSpecified<Env> for TestAddress<'a> where Env: TxEnv {}
+impl<Env> TxFromSpecified<Env> for TestAddress<'_> where Env: TxEnv {}
+impl<Env> TxTo<Env> for TestAddress<'_> where Env: TxEnv {}
+impl<Env> TxToSpecified<Env> for TestAddress<'_> where Env: TxEnv {}
 
-impl<'a> TopEncode for TestAddress<'a> {
+impl TopEncode for TestAddress<'_> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -125,7 +125,7 @@ impl<'a> TopEncode for TestAddress<'a> {
     }
 }
 
-impl<'a, Api> TypeAbiFrom<TestAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
+impl<Api> TypeAbiFrom<TestAddress<'_>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
 
 #[cfg(test)]
 pub mod tests {

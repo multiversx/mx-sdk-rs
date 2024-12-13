@@ -136,7 +136,7 @@ where
     pub fn to_vec(&self) -> ManagedVec<M, T> {
         let mut result = ManagedVec::new();
         let serializer = ManagedSerializer::<M>::new();
-        for item in self.raw_buffers.into_iter() {
+        for item in &self.raw_buffers {
             result.push(serializer.top_decode_from_managed_buffer(&item));
         }
         result
@@ -156,7 +156,7 @@ where
         let raw_count = self.raw_buffers.len();
         let count = raw_count / T::LEN;
         count.multi_encode_or_handle_err(output, h)?;
-        for elem in self.raw_buffers.into_iter() {
+        for elem in &self.raw_buffers {
             elem.multi_encode_or_handle_err(output, h)?;
         }
         Ok(())

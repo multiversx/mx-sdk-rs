@@ -36,10 +36,12 @@ where
             call_value_handle.get_raw_handle(),
         );
 
-        (
-            BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
-            ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
-        )
+        unsafe {
+            (
+                BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+                ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+            )
+        }
     }
 
     pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
@@ -206,7 +208,7 @@ where
     pub(super) fn transfer_execute_esdt(self, payments: ManagedVec<SA, EsdtTokenPayment<SA>>) {
         match payments.len() {
             0 => self.transfer_execute_egld(BigUint::zero()),
-            1 => self.transfer_execute_single_esdt(payments.get(0)),
+            1 => self.transfer_execute_single_esdt(payments.get(0).clone()),
             _ => self.transfer_execute_multi_esdt(payments),
         }
     }

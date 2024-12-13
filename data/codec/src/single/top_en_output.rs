@@ -5,7 +5,6 @@ use crate::{
 use alloc::vec::Vec;
 
 /// Specifies objects that can receive the result of a TopEncode computation.
-
 /// in principle from NestedEncode performed on nested items.
 ///
 /// All methods consume the object, so they can only be called once.
