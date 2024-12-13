@@ -15,7 +15,7 @@ use unwrap_infallible::UnwrapInfallible;
 
 use crate::{
     api::CallTypeApi,
-    io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
+    io::{ArgErrorHandler, ArgId},
     types::{ManagedBuffer, ManagedVec},
 };
 use multiversx_sc_codec::TopDecodeMulti;
@@ -30,7 +30,7 @@ where
     SA: CallTypeApi + 'static,
     RequestedResult: TopDecodeMulti,
 {
-    let mut loader = ManagedResultArgLoader::new(raw_result);
+    let mut loader = raw_result.into_iter();
     let arg_id = ArgId::from(&b"sync result"[..]);
     let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
     RequestedResult::multi_decode_or_handle_err(&mut loader, h).unwrap_infallible()
