@@ -52,6 +52,11 @@
                         "tokenIdentifier": "str:SFT-123",
                         "nonce": "5",
                         "value": "10"
+                    },
+                    {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "nonce": "0",
+                        "value": "103"
                     }
                 ],
                 "function": "payment_array_3",
@@ -111,7 +116,7 @@
                         "value": "100"
                     },
                     {
-                        "tokenIdentifier": "str:TOK-000002",
+                        "tokenIdentifier": "str:EGLD-000000",
                         "value": "400"
                     },
                     {
@@ -128,7 +133,7 @@
             "expect": {
                 "out": [
                     "nested:str:TOK-000001|u64:0|biguint:100",
-                    "nested:str:TOK-000002|u64:0|biguint:400",
+                    "nested:str:EGLD-000000|u64:0|biguint:400",
                     "nested:str:SFT-123|u64:5|biguint:10"
                 ],
                 "status": "",

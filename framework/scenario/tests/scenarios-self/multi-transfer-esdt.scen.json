@@ -6,7 +6,7 @@
             "accounts": {
                 "address:A": {
                     "nonce": "0",
-                    "balance": "0x1000000000",
+                    "balance": "1000000000",
                     "esdt": {
                         "str:TOK-123456": "150",
                         "str:OTHERTOK-123456": "500",
@@ -42,13 +42,16 @@
                         "value": "400"
                     },
                     {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "value": "500"
+                    },
+                    {
                         "tokenIdentifier": "str:NFT-123456",
                         "nonce": "5",
                         "value": "10"
                     }
                 ],
-                "gasLimit": "0x100000000",
-                "gasPrice": "0x01"
+                "gasLimit": "0x100000000"
             }
         },
         {
@@ -57,7 +60,7 @@
             "accounts": {
                 "address:A": {
                     "nonce": "1",
-                    "balance": "0xf00000000",
+                    "balance": "999999500",
                     "esdt": {
                         "str:TOK-123456": "50",
                         "str:OTHERTOK-123456": "100",
@@ -75,6 +78,7 @@
                 },
                 "address:B": {
                     "nonce": "0",
+                    "balance": "500",
                     "esdt": {
                         "str:TOK-123456": "100",
                         "str:OTHERTOK-123456": "400",
