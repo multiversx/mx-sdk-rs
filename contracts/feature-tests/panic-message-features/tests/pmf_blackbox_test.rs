@@ -18,11 +18,8 @@ fn setup() -> ScenarioWorld {
     let mut world = world();
     let code = world.code_expression(CODE_EXPR);
 
-    world.set_state_step(
-        SetStateStep::new()
-            .put_account(OWNER_ADDRESS, Account::new().nonce(1))
-            .put_account(SC_PMF, Account::new().code(code)),
-    );
+    world.account(OWNER_ADDRESS).nonce(1);
+    world.account(SC_PMF).code(code);
 
     world
 }
