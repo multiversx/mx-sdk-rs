@@ -1,11 +1,8 @@
 pub fn contract_object_def() -> proc_macro2::TokenStream {
     quote! {
-        pub struct ContractObj<A>
-        where
-            A: multiversx_sc::api::VMApi,
-        {
-            _phantom: core::marker::PhantomData<A>,
-        }
+    pub struct ContractObj<A>(multiversx_sc::contract_base::UniversalContractObj<A>)
+    where
+        A: multiversx_sc::api::VMApi;
     }
 }
 
@@ -26,9 +23,7 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
         where
             A: multiversx_sc::api::VMApi,
         {
-            ContractObj {
-                _phantom: core::marker::PhantomData,
-            }
+            ContractObj::<A>(multiversx_sc::contract_base::UniversalContractObj::<A>::new())
         }
 
         pub struct ContractBuilder;
@@ -36,10 +31,9 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
         impl multiversx_sc::contract_base::CallableContractBuilder for self::ContractBuilder {
             fn new_contract_obj<A: multiversx_sc::api::VMApi + Send + Sync>(
                 &self,
-            ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract> {
-                multiversx_sc::types::heap::Box::new(ContractObj::<A> {
-                    _phantom: core::marker::PhantomData,
-                })
+            ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract>
+            {
+                multiversx_sc::types::heap::Box::new(self::contract_obj::<A>())
             }
         }
     }
