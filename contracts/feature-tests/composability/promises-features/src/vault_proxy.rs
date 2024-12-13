@@ -117,6 +117,14 @@ where
             .original_result()
     }
 
+    pub fn accept_funds_echo_caller(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedAddress<Env::Api>> {
+        self.wrapped_tx
+            .raw_call("accept_funds_echo_caller")
+            .original_result()
+    }
+
     pub fn accept_funds_single_esdt_transfer(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {

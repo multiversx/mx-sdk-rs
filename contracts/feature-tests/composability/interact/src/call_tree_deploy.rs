@@ -6,7 +6,10 @@ use crate::{
 use multiversx_sc_snippets::imports::*;
 
 impl ComposabilityInteract {
-    pub async fn deploy_call_tree_contracts(&mut self, call_state: &CallState) {
+    pub async fn deploy_call_tree_contracts(
+        &mut self,
+        call_state: &CallState,
+    ) -> (Vec<Bech32Address>, Vec<Bech32Address>) {
         let vault_deploy_addresses = self.typed_sc_deploy_vault(call_state).await;
         let forwarder_deploy_addresses = self.typed_sc_deploy_forwarder_queue(call_state).await;
 
@@ -27,6 +30,8 @@ impl ComposabilityInteract {
 
             fwd.address = Some(address.to_address());
         }
+
+        (vault_deploy_addresses, forwarder_deploy_addresses)
     }
 
     pub async fn typed_sc_deploy_vault(&mut self, call_state: &CallState) -> Vec<Bech32Address> {
