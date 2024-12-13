@@ -19,9 +19,7 @@ pub trait ContractBase: Sized {
     /// Gateway into the call value retrieval functionality.
     /// The payment annotations should normally be the ones to handle this,
     /// but the developer is also given direct access to the API.
-    fn call_value(&self) -> CallValueWrapper<Self::Api> {
-        CallValueWrapper::new()
-    }
+    fn call_value(&self) -> CallValueWrapper<Self::Api>;
 
     /// Gateway to the functionality related to sending transactions from the current contract.
     #[inline]

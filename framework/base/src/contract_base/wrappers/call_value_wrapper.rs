@@ -1,10 +1,11 @@
-use core::marker::PhantomData;
+use core::{cell::UnsafeCell, marker::PhantomData};
 
 use crate::{
     api::{
         const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        HandleConstraints, ManagedTypeApi, StaticVarApiImpl,
+        ManagedTypeApi,
     },
+    contract_base::ContractObjData,
     err_msg,
     types::{
         BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
@@ -13,35 +14,34 @@ use crate::{
     },
 };
 
-#[derive(Default)]
-pub struct CallValueWrapper<A>
+pub struct CallValueWrapper<'a, A>
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
     _phantom: PhantomData<A>,
+    pub data_cell: &'a UnsafeCell<ContractObjData>,
 }
 
-impl<A> CallValueWrapper<A>
+impl<'a, A> CallValueWrapper<'a, A>
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
-    pub fn new() -> Self {
+    pub fn new(data_cell: &'a UnsafeCell<ContractObjData>) -> Self {
         CallValueWrapper {
             _phantom: PhantomData,
+            data_cell,
         }
     }
 
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn egld_value(&self) -> ManagedRef<'static, A, BigUint<A>> {
-        let mut call_value_handle: A::BigIntHandle =
-            use_raw_handle(A::static_var_api_impl().get_call_value_egld_handle());
-        if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
-            call_value_handle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
-            A::static_var_api_impl().set_call_value_egld_handle(call_value_handle.get_raw_handle());
-            A::call_value_api_impl().load_egld_value(call_value_handle.clone());
+        let data = unsafe { &mut *self.data_cell.get() };
+        if data.call_value_egld_handle == const_handles::UNINITIALIZED_HANDLE {
+            data.call_value_egld_handle = const_handles::CALL_VALUE_EGLD;
+            A::call_value_api_impl().load_egld_value(use_raw_handle(data.call_value_egld_handle));
         }
-        unsafe { ManagedRef::wrap_handle(call_value_handle) }
+        unsafe { ManagedRef::wrap_handle(use_raw_handle(data.call_value_egld_handle)) }
     }
 
     /// Returns the EGLD call value from the VM as ManagedDecimal
@@ -55,15 +55,13 @@ where
     /// Will return 0 results if nothing was transfered, or just EGLD.
     /// Fully managed underlying types, very efficient.
     pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {
-        let mut call_value_handle: A::ManagedBufferHandle =
-            use_raw_handle(A::static_var_api_impl().get_call_value_multi_esdt_handle());
-        if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
-            call_value_handle = use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
-            A::static_var_api_impl()
-                .set_call_value_multi_esdt_handle(call_value_handle.get_raw_handle());
-            A::call_value_api_impl().load_all_esdt_transfers(call_value_handle.clone());
+        let data = unsafe { &mut *self.data_cell.get() };
+        if data.call_value_multi_esdt_handle == const_handles::UNINITIALIZED_HANDLE {
+            data.call_value_multi_esdt_handle = const_handles::CALL_VALUE_MULTI_ESDT;
+            A::call_value_api_impl()
+                .load_all_esdt_transfers(use_raw_handle(data.call_value_multi_esdt_handle));
         }
-        unsafe { ManagedRef::wrap_handle(call_value_handle) }
+        unsafe { ManagedRef::wrap_handle(use_raw_handle(data.call_value_multi_esdt_handle)) }
     }
 
     /// Verify and casts the received multi ESDT transfer in to an array.

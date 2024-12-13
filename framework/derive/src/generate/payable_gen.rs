@@ -31,7 +31,7 @@ fn call_value_init_snippet(mpm: MethodPayableMetadata) -> proc_macro2::TokenStre
         },
         MethodPayableMetadata::SingleEsdtToken(token_identifier) => {
             quote! {
-                multiversx_sc::io::call_value_init::payable_single_specific_token::<Self::Api>(#token_identifier);
+                multiversx_sc::io::call_value_init::payable_single_specific_token::<Self::Api, _>(&*self, #token_identifier);
             }
         },
         MethodPayableMetadata::AnyToken => {
@@ -51,7 +51,7 @@ fn opt_payment_arg_snippet(
         .map(|arg| {
             let pat = &arg.pat;
             quote! {
-                let #pat = multiversx_sc::io::call_value_init::#init_fn_name::<Self::Api>();
+                let #pat = multiversx_sc::io::call_value_init::#init_fn_name::<Self::Api, Self>(&*self);
             }
         })
         .unwrap_or_default()

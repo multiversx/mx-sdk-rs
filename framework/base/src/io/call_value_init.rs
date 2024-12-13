@@ -3,8 +3,8 @@ use crate::{
         const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
         ManagedBufferApiImpl, ManagedTypeApi,
     },
-    contract_base::CallValueWrapper,
     err_msg,
+    imports::ContractBase,
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedRef, ManagedType, ManagedVec,
     },
@@ -38,11 +38,12 @@ where
 /// Called initially in the generated code whenever `#[payable("<token identifier>")]` annotation is provided.
 ///
 /// Was never really used, expected to be deprecated/removed.
-pub fn payable_single_specific_token<A>(expected_tokend_identifier: &str)
+pub fn payable_single_specific_token<A, O>(obj: &O, expected_tokend_identifier: &str)
 where
     A: CallValueApi + ManagedTypeApi + ErrorApi,
+    O: ContractBase<Api = A>,
 {
-    let transfers = CallValueWrapper::<A>::new().all_esdt_transfers();
+    let transfers = obj.call_value().all_esdt_transfers();
     if transfers.len() != 1 {
         A::error_api_impl().signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
     }
@@ -62,37 +63,39 @@ where
 }
 
 /// Initializes an argument annotated with `#[payment_amount]` or `#[payment]`.
-pub fn arg_payment_amount<A>() -> BigUint<A>
+pub fn arg_payment_amount<A, O>(obj: &O) -> BigUint<A>
 where
     A: CallValueApi + ManagedTypeApi,
+    O: ContractBase<Api = A>,
 {
-    CallValueWrapper::<A>::new().egld_or_single_esdt().amount
+    obj.call_value().egld_or_single_esdt().amount
 }
 
 /// Initializes an argument annotated with `#[payment_token]`.
-pub fn arg_payment_token<A>() -> EgldOrEsdtTokenIdentifier<A>
+pub fn arg_payment_token<A, O>(obj: &O) -> EgldOrEsdtTokenIdentifier<A>
 where
     A: CallValueApi + ManagedTypeApi,
+    O: ContractBase<Api = A>,
 {
-    CallValueWrapper::<A>::new()
-        .egld_or_single_esdt()
-        .token_identifier
+    obj.call_value().egld_or_single_esdt().token_identifier
 }
 
 /// Initializes an argument annotated with `#[payment_nonce]`.
-pub fn arg_payment_nonce<A>() -> u64
+pub fn arg_payment_nonce<A, O>(obj: &O) -> u64
 where
     A: CallValueApi + ManagedTypeApi,
+    O: ContractBase<Api = A>,
 {
-    CallValueWrapper::<A>::new()
-        .egld_or_single_esdt()
-        .token_nonce
+    obj.call_value().egld_or_single_esdt().token_nonce
 }
 
 /// Initializes an argument annotated with `#[payment_multi]`.
-pub fn arg_payment_multi<A>() -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>>
+pub fn arg_payment_multi<A, O>(
+    obj: &O,
+) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>>
 where
     A: CallValueApi + ManagedTypeApi,
+    O: ContractBase<Api = A>,
 {
-    CallValueWrapper::<A>::new().all_esdt_transfers()
+    obj.call_value().all_esdt_transfers()
 }

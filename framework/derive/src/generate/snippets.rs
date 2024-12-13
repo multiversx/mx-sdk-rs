@@ -13,6 +13,10 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
             A: multiversx_sc::api::VMApi,
         {
             type Api = A;
+
+            fn call_value(&self) -> multiversx_sc::contract_base::CallValueWrapper<'_, Self::Api> {
+                multiversx_sc::contract_base::CallValueWrapper::new(&self.0.data)
+            }
         }
     }
 }
