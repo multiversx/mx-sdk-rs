@@ -3,15 +3,14 @@ use core::marker::PhantomData;
 use crate::{
     api::{
         const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, RawHandle, StaticVarApiFlags,
-        StaticVarApiImpl,
+        ManagedBufferApiImpl, ManagedTypeApi, RawHandle, StaticVarApiFlags, StaticVarApiImpl,
     },
     err_msg,
     types::{
-        BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
-        EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal, ManagedRef, ManagedType,
-        ManagedVec, ManagedVecItem, ManagedVecItemPayload, ManagedVecPayloadIterator,
-        ManagedVecRef, TokenIdentifier, EGLD_000000_TOKEN_IDENTIFIER,
+        big_num_cmp::bi_gt_zero, BigInt, BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier,
+        EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal,
+        ManagedRef, ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload,
+        ManagedVecPayloadIterator, ManagedVecRef, TokenIdentifier, EGLD_000000_TOKEN_IDENTIFIER,
     },
 };
 
@@ -33,12 +32,47 @@ where
         }
     }
 
+    /// Cached transfers from the VM.
+    fn all_esdt_transfers_unchecked(&self) -> A::ManagedBufferHandle {
+        let all_transfers_unchecked_handle: A::ManagedBufferHandle =
+            use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
+        if !A::static_var_api_impl()
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ESDT_UNCHECKED_INITIALIZED)
+        {
+            A::call_value_api_impl()
+                .load_all_esdt_transfers(all_transfers_unchecked_handle.clone());
+        }
+        all_transfers_unchecked_handle
+    }
+
+    /// Cached egld transfer searched for in the ESDT transfers from the VM.
+    fn egld_from_multi_esdt(&self) -> A::BigIntHandle {
+        let egld_from_multi_esdt_handle: A::BigIntHandle =
+            use_raw_handle(const_handles::CALL_VALUE_EGLD_FROM_ESDT);
+        if !A::static_var_api_impl()
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_EGLD_FROM_ESDT_INITIALIZED)
+        {
+            let all_transfers_unchecked_handle = self.all_esdt_transfers_unchecked();
+            let egld_handle_result = find_egld_000000_transfer::<A>(all_transfers_unchecked_handle);
+            if let Some(found_egld_handle) = egld_handle_result {
+                BigInt::<A>::clone_to_handle(
+                    use_raw_handle(found_egld_handle),
+                    egld_from_multi_esdt_handle.clone(),
+                );
+            } else {
+                BigInt::<A>::set_value(egld_from_multi_esdt_handle.clone(), 0);
+            }
+        }
+        egld_from_multi_esdt_handle
+    }
+
     /// Retrieves the EGLD call value from the VM.
-    /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
+    ///
+    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now posible.
     pub fn egld_value(&self) -> ManagedRef<'static, A, BigUint<A>> {
         let call_value_handle: A::BigIntHandle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
         if !A::static_var_api_impl()
-            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_EGLD_INITIALIZED)
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_EGLD_SINGLE_INITIALIZED)
         {
             A::call_value_api_impl().load_egld_value(call_value_handle.clone());
         }
@@ -52,23 +86,82 @@ where
         )
     }
 
-    /// Returns all ESDT transfers that accompany this SC call.
-    /// Will return 0 results if nothing was transfered, or just EGLD.
-    /// Fully managed underlying types, very efficient.
-    pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {
-        let call_value_handle = load_all_transfers::<A>();
-
-        let egld_payment = find_egld_000000_transfer::<A>(call_value_handle.clone());
-        if egld_payment.is_some() {
-            A::error_api_impl().signal_error(err_msg::ESDT_UNEXPECTED_EGLD.as_bytes())
+    /// The quantity of EGLD transfered, either via simple EGLD transfer, or via ESDT multi-transfer.
+    pub fn egld_value_multi(&self) -> ManagedRef<'static, A, BigUint<A>> {
+        let egld_value_multi_handle: A::BigIntHandle =
+            use_raw_handle(const_handles::CALL_VALUE_EGLD_MULTI);
+        if !A::static_var_api_impl()
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_EGLD_MULTI_INITIALIZED)
+        {
+            let egld_single = self.egld_value();
+            if bi_gt_zero::<A>(egld_single.get_handle()) {
+                BigInt::<A>::clone_to_handle(
+                    egld_single.get_handle(),
+                    egld_value_multi_handle.clone(),
+                );
+            } else {
+                let egld_from_multi_esdt_handle = self.egld_from_multi_esdt();
+                BigInt::<A>::clone_to_handle(
+                    egld_from_multi_esdt_handle,
+                    egld_value_multi_handle.clone(),
+                );
+            }
         }
-        unsafe { ManagedRef::wrap_handle(call_value_handle) }
+        unsafe { ManagedRef::wrap_handle(egld_value_multi_handle) }
     }
 
+    /// Returns all ESDT transfers that accompany this SC call.
+    /// Will return 0 results if nothing was transfered, or just EGLD.
+    ///
+    /// Will crash for EGLD + ESDT multi transfers.
+    pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {
+        let multi_esdt_handle: A::ManagedBufferHandle =
+            use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
+        if !A::static_var_api_impl()
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ESDT_UNCHECKED_INITIALIZED)
+        {
+            let egld_value_multi_handle = self.egld_from_multi_esdt();
+            if bi_gt_zero::<A>(egld_value_multi_handle) {
+                A::error_api_impl().signal_error(err_msg::ESDT_UNEXPECTED_EGLD.as_bytes())
+            }
+        }
+
+        unsafe { ManagedRef::wrap_handle(multi_esdt_handle) }
+    }
+
+    /// Will return all transfers in the form of a list of EgldOrEsdtTokenPayment.
+    ///
+    /// Both EGLD and ESDT can be returned.
+    ///
+    /// In case of a single EGLD transfer, only one item will be returned,
+    /// the EGLD payment represented as an ESDT transfer (EGLD-000000).
     pub fn all_transfers(
         &self,
     ) -> ManagedRef<'static, A, ManagedVec<A, EgldOrEsdtTokenPayment<A>>> {
-        let (_, all_transfers_handle) = load_all_call_data::<A>();
+        let all_transfers_handle: A::ManagedBufferHandle =
+            use_raw_handle(const_handles::CALL_VALUE_ALL);
+        if !A::static_var_api_impl()
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED)
+        {
+            let egld_single = self.egld_value();
+            if bi_gt_zero::<A>(egld_single.get_handle()) {
+                A::managed_type_impl().mb_overwrite(
+                    use_raw_handle(const_handles::MBUF_EGLD_000000),
+                    EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
+                );
+                let _ = A::managed_type_impl().mb_set_slice(
+                    all_transfers_handle.clone(),
+                    0,
+                    &const_handles::EGLD_PAYMENT_PAYLOAD[..],
+                );
+            } else {
+                // clone all_esdt_transfers_unchecked -> all_transfers
+                let all_transfers_unchecked_handle = self.all_esdt_transfers_unchecked();
+                let _ = A::managed_type_impl().mb_set_slice(all_transfers_handle.clone(), 0, &[]);
+                A::managed_type_impl()
+                    .mb_append(all_transfers_handle.clone(), all_transfers_unchecked_handle);
+            }
+        }
         unsafe { ManagedRef::wrap_handle(all_transfers_handle) }
     }
 
@@ -129,14 +222,16 @@ where
     ///
     /// In case no transfer of value happen, it will return a payment of 0 EGLD.
     pub fn egld_or_single_esdt(&self) -> EgldOrEsdtTokenPayment<A> {
-        let esdt_transfers = self.all_esdt_transfers();
+        let esdt_transfers_handle = self.all_esdt_transfers_unchecked();
+        let esdt_transfers: ManagedRef<'static, A, ManagedVec<A, EgldOrEsdtTokenPayment<A>>> =
+            unsafe { ManagedRef::wrap_handle(esdt_transfers_handle) };
         match esdt_transfers.len() {
             0 => EgldOrEsdtTokenPayment {
                 token_identifier: EgldOrEsdtTokenIdentifier::egld(),
                 token_nonce: 0,
                 amount: self.egld_value().clone_value(),
             },
-            1 => esdt_transfers.get(0).clone().into(),
+            1 => esdt_transfers.get(0).clone(),
             _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes()),
         }
     }
@@ -171,22 +266,6 @@ where
     }
 }
 
-fn load_all_transfers<A>() -> A::ManagedBufferHandle
-where
-    A: CallValueApi + ErrorApi + ManagedTypeApi,
-{
-    // let mut all_transfers_handle: A::ManagedBufferHandle =
-    //     use_raw_handle(A::static_var_api_impl().get_call_value_multi_esdt_handle());
-    // if all_transfers_handle == const_handles::UNINITIALIZED_HANDLE {
-    //     all_transfers_handle = use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
-    //     A::static_var_api_impl()
-    //         .set_call_value_multi_esdt_handle(all_transfers_handle.get_raw_handle());
-    //     A::call_value_api_impl().load_all_esdt_transfers(all_transfers_handle.clone());
-    // }
-    // all_transfers_handle
-    todo!()
-}
-
 fn find_egld_000000_transfer<A>(transfers_vec_handle: A::ManagedBufferHandle) -> Option<RawHandle>
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
@@ -216,26 +295,4 @@ where
 
         egld_payload.map(|payload| RawHandle::read_from_payload(payload.slice_unchecked(12)))
     }
-}
-
-fn load_all_call_data<A>() -> (A::BigIntHandle, A::ManagedBufferHandle)
-where
-    A: CallValueApi + ErrorApi + ManagedTypeApi,
-{
-    // let all_transfers_handle = load_all_transfers::<A>();
-    // let mut egld_amount_handle: A::BigIntHandle =
-    //     use_raw_handle(A::static_var_api_impl().get_call_value_egld_handle());
-    // if egld_amount_handle == const_handles::UNINITIALIZED_HANDLE {
-    //     let egld_payment = find_egld_000000_transfer::<A>(all_transfers_handle.clone());
-    //     if let Some(egld_amount_raw_handle) = egld_payment {
-    //         egld_amount_handle = use_raw_handle(egld_amount_raw_handle);
-    //     } else {
-    //         egld_amount_handle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
-    //         A::call_value_api_impl().load_egld_value(egld_amount_handle.clone());
-    //     }
-    //     A::static_var_api_impl().set_call_value_egld_handle(egld_amount_handle.get_raw_handle());
-    // }
-
-    // (egld_amount_handle, all_transfers_handle)
-    todo!()
 }
