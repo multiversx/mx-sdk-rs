@@ -10,8 +10,6 @@ static mut EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE: i32 = 0;
 static mut NEXT_HANDLE: i32 = const_handles::NEW_HANDLE_START_FROM;
 static mut NUM_ARGUMENTS: i32 = 0;
 static mut FLAGS: StaticVarApiFlags = StaticVarApiFlags::NONE;
-static mut CALL_VALUE_EGLD_HANDLE: i32 = const_handles::UNINITIALIZED_HANDLE;
-static mut CALL_VALUE_MULTI_ESDT_HANDLE: i32 = const_handles::UNINITIALIZED_HANDLE;
 static mut SCALING_FACTOR_INIT: [bool; const_handles::SCALING_FACTOR_LENGTH] =
     [false; const_handles::SCALING_FACTOR_LENGTH];
 
@@ -71,26 +69,6 @@ impl StaticVarApiImpl for VmApiImpl {
 
     fn get_flags(&self) -> StaticVarApiFlags {
         unsafe { FLAGS }
-    }
-
-    fn set_call_value_egld_handle(&self, handle: RawHandle) {
-        unsafe {
-            CALL_VALUE_EGLD_HANDLE = handle;
-        }
-    }
-
-    fn get_call_value_egld_handle(&self) -> RawHandle {
-        unsafe { CALL_VALUE_EGLD_HANDLE }
-    }
-
-    fn set_call_value_multi_esdt_handle(&self, handle: RawHandle) {
-        unsafe {
-            CALL_VALUE_MULTI_ESDT_HANDLE = handle;
-        }
-    }
-
-    fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
-        unsafe { CALL_VALUE_MULTI_ESDT_HANDLE }
     }
 
     fn is_scaling_factor_cached(&self, decimals: usize) -> bool {

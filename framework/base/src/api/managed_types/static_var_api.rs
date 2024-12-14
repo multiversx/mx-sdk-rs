@@ -40,14 +40,6 @@ pub trait StaticVarApiImpl {
         contains_flag
     }
 
-    fn set_call_value_egld_handle(&self, handle: RawHandle);
-
-    fn get_call_value_egld_handle(&self) -> RawHandle;
-
-    fn set_call_value_multi_esdt_handle(&self, handle: RawHandle);
-
-    fn get_call_value_multi_esdt_handle(&self) -> RawHandle;
-
     fn is_scaling_factor_cached(&self, decimals: usize) -> bool;
 
     fn set_scaling_factor_cached(&self, decimals: usize);
