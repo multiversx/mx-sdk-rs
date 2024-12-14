@@ -3,7 +3,8 @@ use core::marker::PhantomData;
 use crate::{
     api::{
         const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, RawHandle, StaticVarApiImpl,
+        HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, RawHandle, StaticVarApiFlags,
+        StaticVarApiImpl,
     },
     err_msg,
     types::{
@@ -35,8 +36,13 @@ where
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
     pub fn egld_value(&self) -> ManagedRef<'static, A, BigUint<A>> {
-        let (egld_amount_handle, _) = load_all_call_data::<A>();
-        unsafe { ManagedRef::wrap_handle(egld_amount_handle) }
+        let call_value_handle: A::BigIntHandle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
+        if !A::static_var_api_impl()
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_EGLD_INITIALIZED)
+        {
+            A::call_value_api_impl().load_egld_value(call_value_handle.clone());
+        }
+        unsafe { ManagedRef::wrap_handle(call_value_handle) }
     }
 
     /// Returns the EGLD call value from the VM as ManagedDecimal
@@ -169,15 +175,16 @@ fn load_all_transfers<A>() -> A::ManagedBufferHandle
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
-    let mut all_transfers_handle: A::ManagedBufferHandle =
-        use_raw_handle(A::static_var_api_impl().get_call_value_multi_esdt_handle());
-    if all_transfers_handle == const_handles::UNINITIALIZED_HANDLE {
-        all_transfers_handle = use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
-        A::static_var_api_impl()
-            .set_call_value_multi_esdt_handle(all_transfers_handle.get_raw_handle());
-        A::call_value_api_impl().load_all_esdt_transfers(all_transfers_handle.clone());
-    }
-    all_transfers_handle
+    // let mut all_transfers_handle: A::ManagedBufferHandle =
+    //     use_raw_handle(A::static_var_api_impl().get_call_value_multi_esdt_handle());
+    // if all_transfers_handle == const_handles::UNINITIALIZED_HANDLE {
+    //     all_transfers_handle = use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
+    //     A::static_var_api_impl()
+    //         .set_call_value_multi_esdt_handle(all_transfers_handle.get_raw_handle());
+    //     A::call_value_api_impl().load_all_esdt_transfers(all_transfers_handle.clone());
+    // }
+    // all_transfers_handle
+    todo!()
 }
 
 fn find_egld_000000_transfer<A>(transfers_vec_handle: A::ManagedBufferHandle) -> Option<RawHandle>
@@ -215,19 +222,20 @@ fn load_all_call_data<A>() -> (A::BigIntHandle, A::ManagedBufferHandle)
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
-    let all_transfers_handle = load_all_transfers::<A>();
-    let mut egld_amount_handle: A::BigIntHandle =
-        use_raw_handle(A::static_var_api_impl().get_call_value_egld_handle());
-    if egld_amount_handle == const_handles::UNINITIALIZED_HANDLE {
-        let egld_payment = find_egld_000000_transfer::<A>(all_transfers_handle.clone());
-        if let Some(egld_amount_raw_handle) = egld_payment {
-            egld_amount_handle = use_raw_handle(egld_amount_raw_handle);
-        } else {
-            egld_amount_handle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
-            A::call_value_api_impl().load_egld_value(egld_amount_handle.clone());
-        }
-        A::static_var_api_impl().set_call_value_egld_handle(egld_amount_handle.get_raw_handle());
-    }
+    // let all_transfers_handle = load_all_transfers::<A>();
+    // let mut egld_amount_handle: A::BigIntHandle =
+    //     use_raw_handle(A::static_var_api_impl().get_call_value_egld_handle());
+    // if egld_amount_handle == const_handles::UNINITIALIZED_HANDLE {
+    //     let egld_payment = find_egld_000000_transfer::<A>(all_transfers_handle.clone());
+    //     if let Some(egld_amount_raw_handle) = egld_payment {
+    //         egld_amount_handle = use_raw_handle(egld_amount_raw_handle);
+    //     } else {
+    //         egld_amount_handle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
+    //         A::call_value_api_impl().load_egld_value(egld_amount_handle.clone());
+    //     }
+    //     A::static_var_api_impl().set_call_value_egld_handle(egld_amount_handle.get_raw_handle());
+    // }
 
-    (egld_amount_handle, all_transfers_handle)
+    // (egld_amount_handle, all_transfers_handle)
+    todo!()
 }
