@@ -229,19 +229,19 @@ impl<M: ManagedTypeApi> BigInt<M> {
             result
         }
     }
+
+    pub(crate) fn clone_to_handle(source_handle: M::BigIntHandle, dest_handle: M::BigIntHandle) {
+        let api = M::managed_type_impl();
+        api.bi_set_int64(dest_handle.clone(), 0);
+        api.bi_add(dest_handle.clone(), dest_handle, source_handle);
+    }
 }
 
 impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
-        let api = M::managed_type_impl();
         unsafe {
             let result = BigInt::new_uninit();
-            api.bi_set_int64(result.get_handle(), 0);
-            api.bi_add(
-                result.get_handle(),
-                result.get_handle(),
-                self.handle.clone(),
-            );
+            BigInt::<M>::clone_to_handle(self.get_handle(), result.get_handle());
             result
         }
     }
