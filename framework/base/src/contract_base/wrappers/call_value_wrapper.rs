@@ -115,8 +115,7 @@ where
     ///
     /// Will crash for EGLD + ESDT multi transfers.
     pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {
-        let multi_esdt_handle: A::ManagedBufferHandle =
-            use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
+        let multi_esdt_handle: A::ManagedBufferHandle = self.all_esdt_transfers_unchecked();
         if !A::static_var_api_impl()
             .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ESDT_UNCHECKED_INITIALIZED)
         {
