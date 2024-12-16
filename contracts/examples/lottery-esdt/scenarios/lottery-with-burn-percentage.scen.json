@@ -252,11 +252,30 @@
             }
         },
         {
+            "step": "scCall",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery#42",
+                "function": "claim_rewards",
+                "arguments": [
+                    "str:LOTTERY-123456"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
             "step": "checkState",
             "comment": "check that 50% was burned, and 50% returned to acc1",
             "accounts": {
                 "address:acc1": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "1,000,000",
                     "esdt": {
                         "str:LOTTERY-123456": "100"
@@ -274,6 +293,9 @@
                         }
                     },
                     "storage": {
+                        "str:addressToIdMapper|str:lastId": "1",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1",
                         "str:lotteryInfo|nested:str:lottery_name": "",
                         "str:burnPercentageForLottery|nested:str:lottery_name": "0"
                     },

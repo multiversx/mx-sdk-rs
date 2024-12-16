@@ -49,7 +49,7 @@
             "step": "checkState",
             "accounts": {
                 "address:my_address": {
-                    "nonce": "3",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "storage": {}
                 },
@@ -74,7 +74,13 @@
                 "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "str:addressToIdMapper|str:lastId": "2",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1",
+                        "str:addressToIdMapper|str:addr|address:acc2": "2",
+                        "str:addressToIdMapper|str:addrId|u64:2": "address:acc2"
+                    },
                     "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             }

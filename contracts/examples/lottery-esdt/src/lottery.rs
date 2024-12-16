@@ -176,17 +176,15 @@ pub trait Lottery {
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is inactive!"),
             Status::Running => sc_panic!("Lottery is still running!"),
-            Status::Ended => {
-                if self.total_winning_tickets(&lottery_name).is_empty() {
-                    self.prepare_awarding(&lottery_name);
-                }
-                if self.distribute_prizes(&lottery_name) == AwardingStatus::Finished {
-                    self.clear_storage(&lottery_name);
-                    return AwardingStatus::Finished;
-                }
-                AwardingStatus::Ongoing
-            },
+            Status::Ended => self.handle_awarding(&lottery_name),
         }
+    }
+
+    fn handle_awarding(&self, lottery_name: &ManagedBuffer) -> AwardingStatus {
+        if self.total_winning_tickets(&lottery_name).is_empty() {
+            self.prepare_awarding(&lottery_name);
+        }
+        self.distribute_prizes(&lottery_name)
     }
 
     #[view]
@@ -266,6 +264,8 @@ pub trait Lottery {
         self.total_winning_tickets(lottery_name)
             .set(total_winning_tickets);
         self.index_last_winner(lottery_name).set(1);
+
+        self.lottery_info(lottery_name).set(info);
     }
 
     fn burn_prize_percentage(
@@ -275,7 +275,6 @@ pub trait Lottery {
     ) {
         let burn_percentage = self.burn_percentage_for_lottery(lottery_name).get();
         if burn_percentage == 0 {
-            sc_print!("no burns occured {}", 0);
             return;
         }
 
@@ -289,12 +288,8 @@ pub trait Lottery {
             self.send().esdt_local_burn(&esdt_token_id, 0, &burn_amount);
         }
 
-        sc_print!("amount to burn: {}", burn_amount);
-        sc_print!("prize left after burn: {}", info.prize_pool);
         info.prize_pool -= &burn_amount;
         info.unawarded_amount -= burn_amount;
-        sc_print!("prize left after burn: {}", info.prize_pool);
-        sc_print!("unawarded amount after burn: {}", info.unawarded_amount);
     }
 
     fn distribute_prizes(&self, lottery_name: &ManagedBuffer) -> AwardingStatus {
@@ -324,6 +319,7 @@ pub trait Lottery {
         self.lottery_info(lottery_name).set(info);
         self.index_last_winner(lottery_name).set(index_last_winner);
         if index_last_winner > total_winning_tickets {
+            self.clear_storage(&lottery_name);
             return AwardingStatus::Finished;
         }
         AwardingStatus::Ongoing
@@ -352,7 +348,7 @@ pub trait Lottery {
         // distribute to the first place last. Laws of probability say that order doesn't matter.
         // this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
         // 1st place will get the spare money instead.
-        if *index_last_winner < total_winning_tickets {
+        if *index_last_winner <= total_winning_tickets {
             let prize = self.calculate_percentage_of(
                 &info.prize_pool,
                 &BigUint::from(
@@ -385,7 +381,6 @@ pub trait Lottery {
     ) {
         self.accumulated_rewards(&token_id, winner_id)
             .update(|value| *value += amount);
-
         self.user_accumulated_token_rewards(winner_id)
             .insert(token_id);
     }
@@ -478,7 +473,6 @@ pub trait Lottery {
         accumulated_esdt_rewards: &mut ManagedVec<Self::Api, EsdtTokenPayment>,
     ) {
         let value = self.accumulated_rewards(&token_id, caller_id).take();
-        sc_print!("caller {:x} has rewards {}", caller_id, value);
         if token_id.is_egld() {
             *accumulated_egld_rewards += value;
         } else {

@@ -37,7 +37,7 @@
             "step": "checkState",
             "accounts": {
                 "address:my_address": {
-                    "nonce": "4",
+                    "nonce": "3",
                     "balance": "1,000,000",
                     "storage": {}
                 },
@@ -47,7 +47,7 @@
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce": "1",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "esdt": {
                         "str:LOTTERY-123456": "200"
@@ -63,6 +63,11 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
+                        "str:addressToIdMapper|str:lastId": "2",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1",
+                        "str:addressToIdMapper|str:addr|address:acc2": "2",
+                        "str:addressToIdMapper|str:addrId|u64:2": "address:acc2",
                         "str:lotteryInfo|nested:str:lottery_name": {
                             "0-token_identifier": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:1000",
