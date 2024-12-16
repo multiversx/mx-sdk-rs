@@ -181,10 +181,10 @@ pub trait Lottery {
     }
 
     fn handle_awarding(&self, lottery_name: &ManagedBuffer) -> AwardingStatus {
-        if self.total_winning_tickets(&lottery_name).is_empty() {
-            self.prepare_awarding(&lottery_name);
+        if self.total_winning_tickets(lottery_name).is_empty() {
+            self.prepare_awarding(lottery_name);
         }
-        self.distribute_prizes(&lottery_name)
+        self.distribute_prizes(lottery_name)
     }
 
     #[view]
@@ -319,7 +319,7 @@ pub trait Lottery {
         self.lottery_info(lottery_name).set(info);
         self.index_last_winner(lottery_name).set(index_last_winner);
         if index_last_winner > total_winning_tickets {
-            self.clear_storage(&lottery_name);
+            self.clear_storage(lottery_name);
             return AwardingStatus::Finished;
         }
         AwardingStatus::Ongoing
