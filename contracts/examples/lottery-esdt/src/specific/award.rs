@@ -163,11 +163,13 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
                         .get(total_winning_tickets - *index_last_winner),
                 ),
             );
-            if prize > 0 {
-                self.assign_prize_to_winner(info.token_identifier.clone(), &prize, &winner_address);
-
-                info.unawarded_amount -= prize;
+            if prize == 0 {
+                return;
             }
+
+            self.assign_prize_to_winner(info.token_identifier.clone(), &prize, &winner_address);
+
+            info.unawarded_amount -= prize;
         } else {
             // insert token in accumulated rewards first place
             let first_place_winner = ticket_holders_mapper.get(*index_last_winner);

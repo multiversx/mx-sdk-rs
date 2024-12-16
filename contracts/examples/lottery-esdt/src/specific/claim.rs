@@ -20,24 +20,11 @@ pub trait ClaimModule: storage::StorageModule {
 
         if tokens.is_empty() {
             // if wanted tokens were not specified claim all, and clear user_accumulated_token_rewards storage mapper
-
-            let mut all_tokens: ManagedVec<Self::Api, EgldOrEsdtTokenIdentifier> =
-                ManagedVec::new();
-
-            for token_id in self.user_accumulated_token_rewards(&caller_id).iter() {
-                require!(
-                    !self.accumulated_rewards(&token_id, &caller_id).is_empty(),
-                    "Token requested not available for claim"
-                );
-                all_tokens.push(token_id);
-            }
-
-            self.claim_rewards_user(
-                all_tokens,
+            self.handle_claim_with_unspecified_tokens(
                 &caller_id,
                 &mut accumulated_egld_rewards,
                 &mut accumulated_esdt_rewards,
-            )
+            );
         } else {
             // otherwise claim just what was requested and remove those tokens from the user_accumulated_token_rewards storage mapper
 
@@ -61,6 +48,30 @@ pub trait ClaimModule: storage::StorageModule {
                 .egld(accumulated_egld_rewards)
                 .transfer();
         }
+    }
+
+    fn handle_claim_with_unspecified_tokens(
+        &self,
+        caller_id: &u64,
+        accumulated_egld_rewards: &mut BigUint,
+        accumulated_esdt_rewards: &mut ManagedVec<Self::Api, EsdtTokenPayment>,
+    ) {
+        let mut all_tokens: ManagedVec<Self::Api, EgldOrEsdtTokenIdentifier> = ManagedVec::new();
+
+        for token_id in self.user_accumulated_token_rewards(caller_id).iter() {
+            require!(
+                !self.accumulated_rewards(&token_id, caller_id).is_empty(),
+                "Token requested not available for claim"
+            );
+            all_tokens.push(token_id);
+        }
+
+        self.claim_rewards_user(
+            all_tokens,
+            caller_id,
+            accumulated_egld_rewards,
+            accumulated_esdt_rewards,
+        )
     }
 
     fn claim_rewards_user(
