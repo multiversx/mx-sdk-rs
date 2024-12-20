@@ -20,6 +20,21 @@ pub trait ForwarderTransferExecuteModule {
 
     #[endpoint]
     #[payable("*")]
+    fn forward_transf_exec_by_user_accept_funds(&self, to: ManagedAddress) {
+        let payments = self.call_value().all_esdt_transfers().clone_value();
+        let caller = self.blockchain().get_caller();
+        let _ = self.send_raw().multi_esdt_transfer_execute_by_user(
+            &caller,
+            &to,
+            &payments,
+            50_000_000u64,
+            &ManagedBuffer::from("accept_funds_echo_caller"),
+            &ManagedArgBuffer::new(),
+        );
+    }
+
+    #[endpoint]
+    #[payable("*")]
     fn forward_transf_execu_accept_funds_with_fees(
         &self,
         to: ManagedAddress,
