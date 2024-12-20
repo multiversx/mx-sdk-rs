@@ -1,0 +1,318 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1": {
+                    "nonce": "11899",
+                    "balance": "100"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                    "creatorNonce": "11899",
+                    "newAddress": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "contractCode": "mxsc:../../forwarder/output/forwarder.mxsc.json",
+                "arguments": [],
+                "gasLimit": "300000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-d49726"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "egldValue": "50000000000000000",
+                "function": "issue_dynamic_token",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x04",
+                    "0x"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-38e345"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "egldValue": "50000000000000000",
+                "function": "issue_dynamic_token",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x05",
+                    "0x"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-f781d6"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "egldValue": "50000000000000000",
+                "function": "issue_dynamic_token",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x06",
+                    "0x12"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-2b25f7"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "egldValue": "50000000000000000",
+                "function": "issue_token_all_roles",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x06",
+                    "0x"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-d0c358"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "egldValue": "50000000000000000",
+                "function": "issue_token_all_roles",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x05",
+                    "0x"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "setState",
+            "newTokenIdentifiers": [
+                "TEST-712a3f"
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "egldValue": "50000000000000000",
+                "function": "issue_token_all_roles",
+                "arguments": [
+                    "0x544553544e4654",
+                    "0x54455354",
+                    "0x04",
+                    "0x"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "function": "lastIssuedToken",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0x544553542d373132613366"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "function": "nft_create",
+                "arguments": [
+                    "0x544553542d373132613366",
+                    "0x01",
+                    "0x6d794e4654",
+                    "0x1e",
+                    "0x",
+                    "0x010205",
+                    "0x73616d706c655f757269"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "function": "modify_royalties",
+                "arguments": [
+                    "0x544553542d373132613366",
+                    "0x01",
+                    "0x14"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "function": "set_new_uris",
+                "arguments": [
+                    "0x544553542d373132613366",
+                    "0x01",
+                    "0x7468697369616e7572692e636f6d"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "function": "metadata_update",
+                "arguments": [
+                    "0x544553542d373132613366",
+                    "0x01",
+                    "0x544553544e4654",
+                    "0x1e",
+                    "0x6e65775f68617368",
+                    "0x060708"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                "to": "bech32:erd1qqqqqqqqqqqqqpgqwzty5wrdva7ymtwfrkj23ysdaauxx6j4d8sskh9qsv",
+                "function": "metadata_recreate",
+                "arguments": [
+                    "0x544553542d373132613366",
+                    "0x01",
+                    "0x544553544e4654",
+                    "0x1e",
+                    "0x6e65775f686173685f726563726561746564",
+                    "0x080808"
+                ],
+                "gasLimit": "80000000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        }
+    ]
+}

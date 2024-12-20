@@ -15,6 +15,11 @@ bitflags! {
         const NFT_ADD_URI           = 0b00100000;
         const NFT_UPDATE_ATTRIBUTES = 0b01000000;
         const TRANSFER              = 0b10000000;
+        const SET_NEW_URI           = 0b00000001_00000000;
+        const MODIFY_ROYALTIES      = 0b00000010_00000000;
+        const MODIFY_CREATOR        = 0b00000100_00000000;
+        const NFT_RECREATE          = 0b00001000_00000000;
+        const NFT_UPDATE            = 0b00010000_00000000;
     }
 }
 
