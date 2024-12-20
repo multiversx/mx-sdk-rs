@@ -14,9 +14,9 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@4ec1f927bd99ed90a816ded805daa75fd2040258
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@72dc7659e6945c8749d01ec28638843bae33437e
     with:
-      rust-toolchain: stable
+      rust-toolchain: 1.82
       path-to-sc-meta: framework/meta
       mx-scenario-go-version: v2.1.0-alpha
       coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md

@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.54.4"
+            "version": "0.54.6"
         }
     },
     "docs": [
@@ -244,6 +244,21 @@
                 },
                 {
                     "type": "array32<u8>"
+                }
+            ]
+        },
+        {
+            "name": "process_managed_decimal",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "input",
+                    "type": "ManagedDecimal<10>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<usize>"
                 }
             ]
         },
