@@ -118,7 +118,6 @@ pub async fn forwarder_cli() {
         "get_nft_balance" => interact.get_nft_balance().await,
         "buy_nft" => interact.buy_nft().await,
         "nft_issue" => interact.nft_issue().await,
-        // "nft_create" => interact.nft_create().await,
         "nft_create_compact" => interact.nft_create_compact().await,
         "nft_add_uris" => interact.nft_add_uris().await,
         "nft_update_attributes" => interact.nft_update_attributes().await,
@@ -130,15 +129,6 @@ pub async fn forwarder_cli() {
         "create_and_send" => interact.create_and_send().await,
         "setLocalRoles" => interact.set_local_roles().await,
         "unsetLocalRoles" => interact.unset_local_roles().await,
-        // "issue_dynamic_token" => interact.issue_dynamic_token().await,
-        // "change_to_dynamic" => interact.change_to_dynamic().await,
-        // "update_token" => interact.update_token().await,
-        // "modify_royalties" => interact.modify_royalties().await,
-        // "set_new_uris" => interact.set_new_uris().await,
-        // "modify_creator" => interact.modify_creator().await,
-        // "metadata_recreate" => interact.metadata_recreate().await,
-        // "metadata_update" => interact.metadata_update().await,
-        // "lastIssuedToken" => interact.last_issued_token().await,
         "lastErrorMessage" => interact.last_error_message().await,
         _ => panic!("unknown command: {}", &cmd),
     }
@@ -242,7 +232,7 @@ impl ContractInteract {
     }
 
     pub async fn send_egld(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let amount = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -265,7 +255,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
         let args = MultiValueVec::from(vec![ManagedBuffer::new_from_bytes(&b""[..])]);
 
         let response = self
@@ -293,7 +283,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
         let args = MultiValueVec::from(vec![ManagedBuffer::new_from_bytes(&b""[..])]);
 
         let response = self
@@ -321,7 +311,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -346,7 +336,7 @@ impl ContractInteract {
     pub async fn forward_sync_accept_funds_rh_egld(&mut self) {
         let egld_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -369,7 +359,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -396,7 +386,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -423,7 +413,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
         let percentage_fees = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -451,7 +441,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -474,7 +464,7 @@ impl ContractInteract {
     }
 
     pub async fn forward_sync_retrieve_funds(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token = EgldOrEsdtTokenIdentifier::esdt(&b""[..]);
         let token_nonce = 0u64;
         let amount = BigUint::<StaticApi>::from(0u128);
@@ -499,7 +489,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
 
@@ -549,7 +539,7 @@ impl ContractInteract {
     }
 
     pub async fn forward_sync_accept_funds_multi_transfer(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
             TokenIdentifier<StaticApi>,
             u64,
@@ -576,7 +566,7 @@ impl ContractInteract {
     }
 
     pub async fn echo_args_async(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let args = MultiValueVec::from(vec![ManagedBuffer::new_from_bytes(&b""[..])]);
 
         let response = self
@@ -599,7 +589,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -626,7 +616,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -653,7 +643,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
         let percentage_fees = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -677,7 +667,7 @@ impl ContractInteract {
     }
 
     pub async fn forward_async_retrieve_funds(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token = EgldOrEsdtTokenIdentifier::esdt(&b""[..]);
         let token_nonce = 0u64;
         let amount = BigUint::<StaticApi>::from(0u128);
@@ -698,7 +688,7 @@ impl ContractInteract {
     }
 
     pub async fn send_funds_twice(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_identifier = EgldOrEsdtTokenIdentifier::esdt(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
 
@@ -718,7 +708,7 @@ impl ContractInteract {
     }
 
     pub async fn send_async_accept_multi_transfer(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
             TokenIdentifier<StaticApi>,
             u64,
@@ -795,7 +785,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -822,7 +812,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
         let percentage_fees = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -850,7 +840,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -877,7 +867,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
 
         let response = self
             .interactor
@@ -900,7 +890,7 @@ impl ContractInteract {
     }
 
     pub async fn transf_exec_multi_accept_funds(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
             TokenIdentifier<StaticApi>,
             u64,
@@ -927,7 +917,7 @@ impl ContractInteract {
     }
 
     pub async fn forward_transf_exec_reject_funds_multi_transfer(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
             TokenIdentifier<StaticApi>,
             u64,
@@ -954,7 +944,7 @@ impl ContractInteract {
     }
 
     pub async fn transf_exec_multi_reject_funds(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
             TokenIdentifier<StaticApi>,
             u64,
@@ -981,8 +971,8 @@ impl ContractInteract {
     }
 
     pub async fn change_owner(&mut self) {
-        let child_sc_address = bech32::decode("");
-        let new_owner = bech32::decode("");
+        let child_sc_address = Address::zero();
+        let new_owner = Address::zero();
 
         let response = self
             .interactor
@@ -1037,7 +1027,7 @@ impl ContractInteract {
     }
 
     pub async fn deploy_vault_from_source(&mut self) {
-        let source_address = bech32::decode("");
+        let source_address = Address::zero();
         let opt_arg = OptionalValue::Some(ManagedBuffer::new_from_bytes(&b""[..]));
 
         let response = self
@@ -1056,7 +1046,7 @@ impl ContractInteract {
     }
 
     pub async fn upgrade_vault(&mut self) {
-        let child_sc_address = bech32::decode("");
+        let child_sc_address = Address::zero();
         let new_code = ManagedBuffer::new_from_bytes(&b""[..]);
         let opt_arg = OptionalValue::Some(ManagedBuffer::new_from_bytes(&b""[..]));
 
@@ -1076,8 +1066,8 @@ impl ContractInteract {
     }
 
     pub async fn upgrade_vault_from_source(&mut self) {
-        let child_sc_address = bech32::decode("");
-        let source_address = bech32::decode("");
+        let child_sc_address = Address::zero();
+        let source_address = Address::zero();
         let opt_arg = OptionalValue::Some(ManagedBuffer::new_from_bytes(&b""[..]));
 
         let response = self
@@ -1128,7 +1118,7 @@ impl ContractInteract {
     }
 
     pub async fn send_esdt(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
 
@@ -1152,7 +1142,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let to = bech32::decode("");
+        let to = Address::zero();
         let percentage_fees = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -1176,7 +1166,7 @@ impl ContractInteract {
     }
 
     pub async fn send_esdt_twice(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount_first_time = BigUint::<StaticApi>::from(0u128);
         let amount_second_time = BigUint::<StaticApi>::from(0u128);
@@ -1197,7 +1187,7 @@ impl ContractInteract {
     }
 
     pub async fn send_esdt_direct_multi_transfer(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
             TokenIdentifier<StaticApi>,
             u64,
@@ -1301,7 +1291,7 @@ impl ContractInteract {
     }
 
     pub async fn get_esdt_token_data(&mut self) {
-        let address = bech32::decode("");
+        let address = Address::zero();
         let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
 
@@ -1319,7 +1309,7 @@ impl ContractInteract {
     }
 
     pub async fn is_esdt_frozen(&mut self) {
-        let address = bech32::decode("");
+        let address = Address::zero();
         let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
 
@@ -1655,7 +1645,7 @@ impl ContractInteract {
     }
 
     pub async fn transfer_nft_via_async_call(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
         let amount = BigUint::<StaticApi>::from(0u128);
@@ -1676,7 +1666,7 @@ impl ContractInteract {
     }
 
     pub async fn transfer_nft_and_execute(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
         let amount = BigUint::<StaticApi>::from(0u128);
@@ -1699,7 +1689,7 @@ impl ContractInteract {
     }
 
     pub async fn create_and_send(&mut self) {
-        let to = bech32::decode("");
+        let to = Address::zero();
         let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
         let name = ManagedBuffer::new_from_bytes(&b""[..]);
@@ -1733,7 +1723,7 @@ impl ContractInteract {
     }
 
     pub async fn set_local_roles(&mut self) {
-        let address = bech32::decode("");
+        let address = Address::zero();
         let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let roles = MultiValueVec::<EsdtLocalRole>::new();
 
@@ -1753,7 +1743,7 @@ impl ContractInteract {
     }
 
     pub async fn unset_local_roles(&mut self) {
-        let address = bech32::decode("");
+        let address = Address::zero();
         let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
         let roles = MultiValueVec::<EsdtLocalRole>::new();
 
