@@ -54,7 +54,7 @@ where
     }
 }
 
-impl<'w, GatewayProxy> InteractorExecStep<'w, GatewayProxy, TransferStep, ()>
+impl<GatewayProxy> InteractorExecStep<'_, GatewayProxy, TransferStep, ()>
 where
     GatewayProxy: GatewayAsyncService,
 {

@@ -71,13 +71,13 @@ pub trait EsdtTransferWithFee {
                         "Mismatching payment for covering fees"
                     );
                     let _ = self.get_payment_after_fees(fee_type, &next_payment);
-                    new_payments.push(payment);
+                    new_payments.push(payment.clone());
                 },
                 Fee::Percentage(_) => {
                     new_payments.push(self.get_payment_after_fees(fee_type, &payment));
                 },
                 Fee::Unset => {
-                    new_payments.push(payment);
+                    new_payments.push(payment.clone());
                 },
             }
         }

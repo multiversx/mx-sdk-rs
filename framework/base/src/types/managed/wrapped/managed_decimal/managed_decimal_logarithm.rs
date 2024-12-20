@@ -2,7 +2,7 @@ use super::decimals::{ConstDecimals, Decimals};
 use super::ManagedDecimalSigned;
 use super::{ManagedDecimal, NumDecimals};
 
-use crate::proxy_imports::ManagedType;
+use crate::types::ManagedRef;
 use crate::{
     api::ManagedTypeApi,
     contract_base::ErrorHelper,
@@ -104,7 +104,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
             return None;
         }
 
-        let bu = BigUint::from_handle(self.data.handle.clone());
+        let bu = unsafe { ManagedRef::wrap_handle(self.data.handle.clone()) };
         compute_ln(&bu, self.decimals.num_decimals())
     }
 
@@ -118,7 +118,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
             return None;
         }
 
-        let bu = BigUint::from_handle(self.data.handle.clone());
+        let bu = unsafe { ManagedRef::wrap_handle(self.data.handle.clone()) };
         compute_log2(&bu, self.decimals.num_decimals())
     }
 }

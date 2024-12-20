@@ -16,7 +16,7 @@ impl<'a> GetAccountEsdtRolesRequest<'a> {
     }
 }
 
-impl<'a> GatewayRequest for GetAccountEsdtRolesRequest<'a> {
+impl GatewayRequest for GetAccountEsdtRolesRequest<'_> {
     type Payload = ();
     type DecodedJson = EsdtRolesResponse;
     type Result = HashMap<String, Vec<String>>;

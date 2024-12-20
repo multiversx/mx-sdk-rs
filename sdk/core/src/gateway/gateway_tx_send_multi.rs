@@ -7,7 +7,7 @@ use super::{GatewayRequest, GatewayRequestType, SEND_MULTIPLE_TRANSACTIONS_ENDPO
 /// Sends multiple transactions at once.
 pub struct SendMultiTxRequest<'a>(pub &'a [Transaction]);
 
-impl<'a> GatewayRequest for SendMultiTxRequest<'a> {
+impl GatewayRequest for SendMultiTxRequest<'_> {
     type Payload = [Transaction];
     type DecodedJson = SendTransactionsResponse;
     type Result = Vec<String>;

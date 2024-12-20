@@ -55,7 +55,7 @@ pub trait TokenMergeModImpl:
     ) -> ManagedVec<EsdtTokenPayment> {
         let payment = self.call_value().single_esdt();
         let attributes_creator = DefaultMergedAttributesWrapper::new();
-        self.split_token_partial(payment, tokens_to_remove, &attributes_creator)
+        self.split_token_partial(payment.clone(), tokens_to_remove, &attributes_creator)
     }
 }
 

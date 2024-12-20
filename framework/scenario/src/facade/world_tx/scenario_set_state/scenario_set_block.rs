@@ -49,7 +49,7 @@ impl SetStateBuilderItem for BlockItem {
     }
 }
 
-impl<'w> SetStateBuilder<'w, BlockItem> {
+impl SetStateBuilder<'_, BlockItem> {
     pub fn block_epoch<N>(mut self, block_epoch: N) -> Self
     where
         N: AnnotatedValue<ScenarioTxEnvData, u64>,

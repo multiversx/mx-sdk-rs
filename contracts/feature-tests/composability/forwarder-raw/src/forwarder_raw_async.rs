@@ -114,8 +114,8 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         let (token, payment) = self.call_value().single_fungible_esdt();
         self.forward_contract_call(
             to,
-            EgldOrEsdtTokenIdentifier::esdt(token),
-            payment,
+            EgldOrEsdtTokenIdentifier::esdt(token.clone()),
+            payment.clone(),
             endpoint_name,
             args,
         )
