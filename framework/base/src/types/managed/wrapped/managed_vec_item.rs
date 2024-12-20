@@ -12,8 +12,8 @@ use crate::{
 };
 
 use super::{
-    ManagedVecItemNestedTuple, ManagedVecItemPayload, ManagedVecItemPayloadAdd,
-    ManagedVecItemPayloadBuffer, ManagedVecRef,
+    EgldOrEsdtTokenIdentifier, ManagedVecItemNestedTuple, ManagedVecItemPayload,
+    ManagedVecItemPayloadAdd, ManagedVecItemPayloadBuffer, ManagedVecRef,
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
@@ -230,6 +230,7 @@ impl_managed_type! {BigInt}
 impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {TokenIdentifier}
+impl_managed_type! {EgldOrEsdtTokenIdentifier}
 
 impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>
 where
