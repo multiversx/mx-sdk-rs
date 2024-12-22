@@ -3,7 +3,7 @@ use crate::parse::attributes::util::{clean_string, is_first_char_numeric};
 use super::attr_names::*;
 
 pub struct PayableAttribute {
-    pub identifier: Option<String>,
+    pub identifier: String,
 }
 
 impl PayableAttribute {
@@ -24,11 +24,11 @@ impl PayableAttribute {
 
 /// Current implementation only works with 1 token name.
 /// Might be extended in the future.
-fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
+fn extract_token_identifier(attr: &syn::Attribute) -> String {
     match attr.meta.clone() {
         syn::Meta::Path(_) => {
             // #[payable]
-            Some("*".to_owned())
+            "*".to_owned()
         },
         syn::Meta::List(list) => {
             let mut iter = list.tokens.into_iter();
@@ -61,7 +61,7 @@ fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
                 iter.next().is_none(),
                 "too many tokens in attribute argument"
             );
-            Some(ticker)
+            ticker
         },
         syn::Meta::NameValue(_) => panic!(
             "attribute can not be name value. attribute needs 1 string argument: \"*\" or \"EGLD\""
