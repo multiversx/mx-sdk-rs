@@ -27,7 +27,8 @@ impl PayableAttribute {
 fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
     match attr.meta.clone() {
         syn::Meta::Path(_) => {
-            panic!("attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")]")
+            // #[payable]
+            Some("*".to_owned())
         },
         syn::Meta::List(list) => {
             let mut iter = list.tokens.into_iter();
