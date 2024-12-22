@@ -59,7 +59,7 @@ pub trait NftModule {
 
     // endpoints
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(buyNft)]
     fn buy_nft(&self, nft_nonce: u64) {
         let payment = self.call_value().egld_or_single_esdt();

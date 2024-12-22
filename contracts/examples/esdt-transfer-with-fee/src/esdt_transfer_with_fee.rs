@@ -43,7 +43,7 @@ pub trait EsdtTransferWithFee {
         self.tx().to(ToCaller).payment(fees).transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn transfer(&self, address: ManagedAddress) {
         require!(

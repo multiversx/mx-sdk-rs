@@ -46,7 +46,7 @@ pub trait NftSubscription:
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn update_attributes(&self, attributes: ManagedBuffer) {
         let payment = self.call_value().single_esdt();
@@ -65,7 +65,7 @@ pub trait NftSubscription:
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn renew(&self, duration: u64) {
         let payment = self.call_value().single_esdt();
@@ -84,7 +84,7 @@ pub trait NftSubscription:
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn cancel(&self) {
         let payment = self.call_value().single_esdt();
