@@ -4,6 +4,7 @@ use reqwest::blocking::Client;
 use serde_json::Value;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
+use std::{thread, time::Duration};
 use write::{write_cargo_toml, write_interactor_files, write_readme, write_src_folder};
 
 mod fetch;
@@ -34,26 +35,26 @@ fn main() -> io::Result<()> {
 fn process_entry(client: &Client, entry: &Value, writer: &mut BufWriter<File>) -> io::Result<()> {
     if let Some(folder_name) = entry["name"].as_str() {
         println!("Starting to process entry: {}", folder_name);
-        
+
         if let Some(folder_url) = entry["url"].as_str() {
             println!("Found URL: {}", folder_url);
-            
+
             writeln!(writer, "////////////////////////")?;
             writeln!(writer, "NAME: {}", folder_name)?;
-            println!("Processing contract {}", folder_name);
 
-            println!("Fetching README...");
+            thread::sleep(Duration::from_millis(100));
+
             write_readme(client, folder_url, writer, folder_name)?;
-            
-            println!("Fetching src folder...");
+            thread::sleep(Duration::from_millis(100));
+
             write_src_folder(client, folder_url, writer, folder_name)?;
-            
-            println!("Fetching Cargo.toml...");
+            thread::sleep(Duration::from_millis(100));
+
             write_cargo_toml(client, folder_url, writer, folder_name)?;
-            
-            println!("Fetching interactor files...");
+            thread::sleep(Duration::from_millis(100));
+
             write_interactor_files(client, folder_url, writer, folder_name)?;
-            
+
             writer.flush()?;
             println!("Finished processing {}", folder_name);
         }

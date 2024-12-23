@@ -1,4 +1,4 @@
-use crate::fetch::{fetch_directory_contents, fetch_file_content};
+use crate::fetch::{fetch_directory_contents, fetch_file_content, fetch_interactor_contents};
 use reqwest::blocking::Client;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
@@ -30,9 +30,9 @@ pub(crate) fn write_src_folder(
         for (file_name, file_content) in src_files {
             writeln!(writer, "FILE_NAME: {}", file_name)?;
             writeln!(writer, "{}", file_content)?;
-            writer.flush()?;
         }
     } else {
+        writeln!(writer, "No src folder found")?;
         println!("No src folder found for {}", folder_name);
     }
     writer.flush()?;
@@ -61,23 +61,22 @@ pub(crate) fn write_interactor_files(
     writer: &mut BufWriter<File>,
     folder_name: &str,
 ) -> io::Result<()> {
-    if let Some(interactor_files) = fetch_directory_contents(client, folder_url, "interactor/src") {
+    if let Some((src_files, cargo_content)) = fetch_interactor_contents(client, folder_url) {
         writeln!(writer, "\nINTERACTOR FOLDER:")?;
-        for (file_name, file_content) in interactor_files {
-            writeln!(writer, "FILE_NAME: {}", file_name)?;
-            writeln!(writer, "{}", file_content)?;
-            writer.flush()?;
+
+        if !src_files.is_empty() {
+            for (file_name, file_content) in src_files {
+                writeln!(writer, "FILE_NAME: {}", file_name)?;
+                writeln!(writer, "{}", file_content)?;
+            }
+        }
+
+        if let Some(cargo_content) = cargo_content {
+            writeln!(writer, "\nINTERACTOR CARGO.TOML:")?;
+            writeln!(writer, "{}", cargo_content)?;
         }
     } else {
-        writeln!(writer, "\nINTERACTOR FOLDER: None")?;
-        println!("No interactor/src folder found for {}", folder_name);
-    }
-
-    if let Some(interactor_cargo_content) = fetch_file_content(client, folder_url, "interactor/Cargo.toml") {
-        writeln!(writer, "\nINTERACTOR CARGO.TOML:")?;
-        writeln!(writer, "{}", interactor_cargo_content)?;
-    } else {
-        println!("No interactor Cargo.toml found for {}", folder_name);
+        println!("No interactor folder found for {}", folder_name);
     }
     writer.flush()?;
     Ok(())

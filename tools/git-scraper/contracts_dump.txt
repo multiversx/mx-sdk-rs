@@ -176,7 +176,335 @@ path = "../../../framework/base"
 version = "0.54.6"
 path = "../../../framework/scenario"
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
+FILE_NAME: basic_interactor.rs
+mod basic_interactor_cli;
+mod basic_interactor_config;
+mod basic_interactor_state;
+
+use adder::adder_proxy;
+pub use basic_interactor_config::Config;
+use basic_interactor_state::State;
+use clap::Parser;
+
+use multiversx_sc_snippets::imports::*;
+
+const ADDER_CODE_PATH: MxscPath = MxscPath::new("../output/adder.mxsc.json");
+
+pub async fn adder_cli() {
+    env_logger::init();
+
+    let config = Config::load_config();
+
+    let mut basic_interact = AdderInteract::new(config).await;
+
+    let cli = basic_interactor_cli::InteractCli::parse();
+    match &cli.command {
+        Some(basic_interactor_cli::InteractCliCommand::Deploy) => {
+            basic_interact.deploy().await;
+        },
+        Some(basic_interactor_cli::InteractCliCommand::Upgrade(args)) => {
+            let owner_address = basic_interact.adder_owner_address.clone();
+            basic_interact
+                .upgrade(args.value, &owner_address, None)
+                .await
+        },
+        Some(basic_interactor_cli::InteractCliCommand::Add(args)) => {
+            basic_interact.add(args.value).await;
+        },
+        Some(basic_interactor_cli::InteractCliCommand::Sum) => {
+            let sum = basic_interact.get_sum().await;
+            println!("sum: {sum}");
+        },
+        None => {},
+    }
+}
+
+pub struct AdderInteract {
+    pub interactor: Interactor,
+    pub adder_owner_address: Bech32Address,
+    pub wallet_address: Bech32Address,
+    pub state: State,
+}
+
+impl AdderInteract {
+    pub async fn new(config: Config) -> Self {
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.use_chain_simulator());
+        interactor.set_current_dir_from_workspace("contracts/examples/adder/interactor");
+
+        let adder_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
+        let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
+
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
+
+        AdderInteract {
+            interactor,
+            adder_owner_address: adder_owner_address.into(),
+            wallet_address: wallet_address.into(),
+            state: State::load_state(),
+        }
+    }
+
+    pub async fn deploy(&mut self) {
+        let new_address = self
+            .interactor
+            .tx()
+            .from(&self.adder_owner_address.clone())
+            .gas(6_000_000)
+            .typed(adder_proxy::AdderProxy)
+            .init(0u64)
+            .code(ADDER_CODE_PATH)
+            .returns(ReturnsNewBech32Address)
+            .run()
+            .await;
+
+        println!("new address: {new_address}");
+        self.state.set_adder_address(new_address);
+    }
+
+    pub async fn upgrade(&mut self, new_value: u32, sender: &Bech32Address, err: Option<&str>) {
+        let response = self
+            .interactor
+            .tx()
+            .from(sender)
+            .to(self.state.current_adder_address())
+            .gas(6_000_000)
+            .typed(adder_proxy::AdderProxy)
+            .upgrade(new_value)
+            .code(ADDER_CODE_PATH)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .returns(ReturnsHandledOrError::new())
+            .run()
+            .await;
+
+        match response {
+            Ok(_) => {
+                println!("Contract successfully upgraded.");
+            },
+            Err(tx_err) => {
+                println!("Contract failed upgrade with error: {}", tx_err.message);
+                assert_eq!(tx_err.message, err.unwrap_or_default());
+            },
+        }
+    }
+
+    pub async fn add(&mut self, value: u32) {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
+            .gas(6_000_000u64)
+            .typed(adder_proxy::AdderProxy)
+            .add(value)
+            .run()
+            .await;
+
+        println!("Successfully performed add");
+    }
+
+    pub async fn get_sum(&mut self) -> RustBigUint {
+        self.interactor
+            .query()
+            .to(self.state.current_adder_address())
+            .typed(adder_proxy::AdderProxy)
+            .sum()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+}
+
+FILE_NAME: basic_interactor_cli.rs
+use clap::{Args, Parser, Subcommand};
+
+/// Adder Interact CLI
+#[derive(Default, PartialEq, Eq, Debug, Parser)]
+#[command(version, about)]
+#[command(propagate_version = true)]
+pub struct InteractCli {
+    #[command(subcommand)]
+    pub command: Option<InteractCliCommand>,
+}
+
+/// Adder Interact CLI Commands
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum InteractCliCommand {
+    #[command(name = "deploy", about = "Deploy contract")]
+    Deploy,
+    #[command(name = "upgrade", about = "Upgrade contract")]
+    Upgrade(UpgradeArgs),
+    #[command(name = "sum", about = "Print sum")]
+    Sum,
+    #[command(name = "add", about = "Add value")]
+    Add(AddArgs),
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct AddArgs {
+    /// The value to add
+    #[arg(short = 'v', long = "value")]
+    pub value: u32,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct UpgradeArgs {
+    /// The value to add
+    #[arg(short = 'v', long = "value")]
+    pub value: u32,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct MultiDeployArgs {
+    /// The number of contracts to deploy
+    #[arg(short = 'c', long = "count")]
+    pub count: usize,
+}
+
+FILE_NAME: basic_interactor_config.rs
+use serde::Deserialize;
+use std::io::Read;
+
+/// Config file
+const CONFIG_FILE: &str = "config.toml";
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ChainType {
+    Real,
+    Simulator,
+}
+
+/// Adder Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    pub gateway_uri: String,
+    pub chain_type: ChainType,
+}
+
+impl Config {
+    // Deserializes config from file
+    pub fn load_config() -> Self {
+        let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
+        let mut content = String::new();
+        file.read_to_string(&mut content).unwrap();
+        toml::from_str(&content).unwrap()
+    }
+
+    pub fn chain_simulator_config() -> Self {
+        Config {
+            gateway_uri: "http://localhost:8085".to_owned(),
+            chain_type: ChainType::Simulator,
+        }
+    }
+
+    // Returns the gateway URI
+    pub fn gateway_uri(&self) -> &str {
+        &self.gateway_uri
+    }
+
+    // Returns if chain type is chain simulator
+    pub fn use_chain_simulator(&self) -> bool {
+        match self.chain_type {
+            ChainType::Real => false,
+            ChainType::Simulator => true,
+        }
+    }
+}
+
+FILE_NAME: basic_interactor_main.rs
+extern crate basic_interactor;
+
+#[tokio::main]
+pub async fn main() {
+    basic_interactor::adder_cli().await;
+}
+
+FILE_NAME: basic_interactor_state.rs
+use multiversx_sc_snippets::imports::*;
+use serde::{Deserialize, Serialize};
+use std::{
+    io::{Read, Write},
+    path::Path,
+};
+
+/// State file
+const STATE_FILE: &str = "state.toml";
+
+/// Adder Interact state
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct State {
+    adder_address: Option<Bech32Address>,
+}
+
+impl State {
+    // Deserializes state from file
+    pub fn load_state() -> Self {
+        if Path::new(STATE_FILE).exists() {
+            let mut file = std::fs::File::open(STATE_FILE).unwrap();
+            let mut content = String::new();
+            file.read_to_string(&mut content).unwrap();
+            toml::from_str(&content).unwrap()
+        } else {
+            Self::default()
+        }
+    }
+
+    /// Sets the adder address
+    pub fn set_adder_address(&mut self, address: Bech32Address) {
+        self.adder_address = Some(address);
+    }
+
+    /// Returns the adder contract
+    pub fn current_adder_address(&self) -> &Bech32Address {
+        self.adder_address
+            .as_ref()
+            .expect("no known adder contract, deploy first")
+    }
+}
+
+impl Drop for State {
+    // Serializes state to file
+    fn drop(&mut self) {
+        let mut file = std::fs::File::create(STATE_FILE).unwrap();
+        file.write_all(toml::to_string(self).unwrap().as_bytes())
+            .unwrap();
+    }
+}
+
+
+INTERACTOR CARGO.TOML:
+[package]
+name = "basic-interactor"
+version = "0.0.0"
+authors = ["MultiversX <contact@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "basic-interactor"
+path = "src/basic_interactor_main.rs"
+
+[lib]
+path = "src/basic_interactor.rs"
+
+[dependencies.adder]
+path = ".."
+
+[dependencies.multiversx-sc-snippets]
+version = "0.54.6"
+path = "../../../../framework/snippets"
+
+[dependencies]
+clap = { version = "4.4.7", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8.6"
+tokio = { version = "1.24" }
+
+[features]
+chain-simulator-tests = []
+
 ////////////////////////
 NAME: bonding-curve-contract
 
@@ -371,7 +699,7 @@ path = "../../../framework/scenario"
 
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: check-pause
 
@@ -426,7 +754,7 @@ path = "../../../framework/scenario"
 
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: crowdfunding-esdt
 
@@ -749,7 +1077,7 @@ num-traits = "0.2"
 hex = "0.4"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: crypto-bubbles
 
@@ -903,7 +1231,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: crypto-kitties
 
@@ -911,8 +1239,9 @@ DESCRIPTION:
 None
 
 SRC FOLDER:
+No src folder found
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: crypto-zombies
 
@@ -1979,7 +2308,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: digital-cash
 
@@ -2815,7 +3144,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: empty
 
@@ -2863,7 +3192,7 @@ path = "../../../framework/scenario"
 num-bigint = "0.4"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: esdt-transfer-with-fee
 
@@ -3056,7 +3385,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: factorial
 
@@ -3117,7 +3446,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: fractional-nfts
 
@@ -3393,7 +3722,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: lottery-esdt
 
@@ -3846,7 +4175,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: multisig
 
@@ -5558,7 +5887,7 @@ num-traits = "0.2"
 hex = "0.4"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: nft-minter
 
@@ -5925,7 +6254,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: nft-storage-prepay
 
@@ -6061,7 +6390,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: nft-subscription
 
@@ -6181,7 +6510,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: order-book
 
@@ -6189,8 +6518,9 @@ DESCRIPTION:
 None
 
 SRC FOLDER:
+No src folder found
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: ping-pong-egld
 
@@ -6784,7 +7114,609 @@ path = "../../../framework/scenario"
 
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
+FILE_NAME: interact.rs
+mod interact_cli;
+mod interact_config;
+mod interact_state;
+
+use crate::interact_state::State;
+use clap::Parser;
+pub use interact_config::Config;
+use ping_pong_egld::proxy_ping_pong_egld::{self, ContractState, UserStatus};
+
+use multiversx_sc_snippets::imports::*;
+
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
+
+const PING_PONG_CODE: MxscPath = MxscPath::new("../output/ping-pong-egld.mxsc.json");
+
+pub async fn ping_pong_egld_cli() {
+    env_logger::init();
+
+    let config = Config::load_config();
+
+    let mut interact = PingPongEgldInteract::init(config).await;
+
+    let cli = interact_cli::InteractCli::parse();
+    match &cli.command {
+        Some(interact_cli::InteractCliCommand::Deploy(args)) => {
+            interact
+                .deploy(
+                    args.ping_amount.clone(),
+                    args.duration_in_seconds,
+                    args.opt_activation_timestamp,
+                    OptionalValue::from(args.max_funds.clone()),
+                )
+                .await;
+        },
+        Some(interact_cli::InteractCliCommand::Upgrade(args)) => {
+            interact
+                .upgrade(
+                    args.ping_amount.clone(),
+                    args.duration_in_seconds,
+                    args.opt_activation_timestamp,
+                    OptionalValue::from(args.max_funds.clone()),
+                )
+                .await
+        },
+        Some(interact_cli::InteractCliCommand::Ping(args)) => {
+            let sender = interact.ping_pong_owner_address.clone();
+            interact
+                .ping(args.cost.unwrap_or_default(), None, &sender)
+                .await
+        },
+        Some(interact_cli::InteractCliCommand::Pong) => {
+            let sender = interact.ping_pong_owner_address.clone();
+            interact.pong(None, &sender).await;
+        },
+        Some(interact_cli::InteractCliCommand::PongAll) => {
+            let sender = interact.ping_pong_owner_address.clone();
+            interact.pong_all(None, &sender).await;
+        },
+        Some(interact_cli::InteractCliCommand::GetUserAddresses) => {
+            let user_addresses = interact.get_user_addresses().await;
+            println!("User addresses: ");
+            for address in user_addresses {
+                print!("{address} ");
+            }
+        },
+        Some(interact_cli::InteractCliCommand::GetContractState) => {
+            let contract_state = interact.get_contract_state().await;
+            println!("Contract state: ping_amount -> {:#?} | deadline -> {:#?} | activation_timestamp -> {:#?} | max_funds -> {:#?} | pong_all_last_user -> {:#?}", 
+            contract_state.ping_amount,
+            contract_state.deadline,
+            contract_state.activation_timestamp,
+            contract_state.max_funds,
+            contract_state.pong_all_last_user);
+        },
+        Some(interact_cli::InteractCliCommand::GetPingAmount) => {
+            let ping_amount = interact.get_ping_amount().await;
+            println!("Ping amount: {}", ping_amount);
+        },
+        Some(interact_cli::InteractCliCommand::GetDeadline) => {
+            let deadline = interact.get_deadline().await;
+            println!("Deadline: {}", deadline);
+        },
+        Some(interact_cli::InteractCliCommand::GetActivationTimestamp) => {
+            let activation_timestamp = interact.get_activation_timestamp().await;
+            println!("Activation timestamp: {}", activation_timestamp);
+        },
+        Some(interact_cli::InteractCliCommand::GetMaxFunds) => {
+            let max_funds = interact.get_max_funds().await;
+            match max_funds {
+                Some(funds) => println!("Max funds: {}", funds),
+                None => println!("Max funds: none"),
+            }
+        },
+        Some(interact_cli::InteractCliCommand::GetUserStatus(args)) => {
+            let user_status = interact.get_user_status(args.id).await;
+            match user_status {
+                UserStatus::New => println!("User status: unknown"),
+                UserStatus::Registered => println!("User status: `ping`-ed"),
+                UserStatus::Withdrawn => println!("User status: `pong`-ed"),
+            }
+        },
+        Some(interact_cli::InteractCliCommand::PongAllLastUser) => {
+            let pong_all_last_user = interact.pong_all_last_user().await;
+            println!("Pong all last user: {pong_all_last_user}");
+        },
+        None => {},
+    }
+}
+
+pub struct PingPongEgldInteract {
+    pub interactor: Interactor,
+    pub ping_pong_owner_address: Bech32Address,
+    pub wallet_address: Bech32Address,
+    pub state: State,
+}
+
+impl PingPongEgldInteract {
+    pub async fn init(config: Config) -> Self {
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.use_chain_simulator())
+            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+            .await;
+
+        interactor.set_current_dir_from_workspace("contracts/examples/ping-pong-egld/interactor");
+        let ping_pong_owner_address = interactor.register_wallet(test_wallets::eve()).await;
+        let wallet_address = interactor.register_wallet(test_wallets::mallory()).await;
+
+        // generate blocks until ESDTSystemSCAddress is enabled
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
+
+        Self {
+            interactor,
+            ping_pong_owner_address: ping_pong_owner_address.into(),
+            wallet_address: wallet_address.into(),
+            state: State::load_state(),
+        }
+    }
+
+    pub async fn set_state(&mut self) {
+        println!("wallet address: {}", self.wallet_address);
+        self.interactor
+            .retrieve_account(&self.ping_pong_owner_address)
+            .await;
+        self.interactor.retrieve_account(&self.wallet_address).await;
+    }
+
+    pub async fn deploy(
+        &mut self,
+        ping_amount: RustBigUint,
+        duration_in_seconds: u64,
+        opt_activation_timestamp: Option<u64>,
+        max_funds: OptionalValue<RustBigUint>,
+    ) -> (u64, String) {
+        self.set_state().await;
+
+        let (new_address, status, message) = self
+            .interactor
+            .tx()
+            .from(&self.ping_pong_owner_address)
+            .gas(30_000_000u64)
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .init(
+                ping_amount,
+                duration_in_seconds,
+                opt_activation_timestamp,
+                max_funds,
+            )
+            .code(PING_PONG_CODE)
+            .returns(ReturnsNewBech32Address)
+            .returns(ReturnsStatus)
+            .returns(ReturnsMessage)
+            .run()
+            .await;
+
+        println!("new address: {new_address}");
+        self.state.set_ping_pong_egld_address(new_address);
+
+        (status, message)
+    }
+
+    pub async fn upgrade(
+        &mut self,
+        ping_amount: RustBigUint,
+        duration_in_seconds: u64,
+        opt_activation_timestamp: Option<u64>,
+        max_funds: OptionalValue<RustBigUint>,
+    ) {
+        let response = self
+            .interactor
+            .tx()
+            .to(self.state.current_ping_pong_egld_address())
+            .from(&self.wallet_address)
+            .gas(30_000_000u64)
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .upgrade(
+                ping_amount,
+                duration_in_seconds,
+                opt_activation_timestamp,
+                max_funds,
+            )
+            .code(PING_PONG_CODE)
+            .returns(ReturnsNewAddress)
+            .run()
+            .await;
+
+        println!("Result: {response:?}");
+    }
+
+    pub async fn ping(&mut self, egld_amount: u64, message: Option<&str>, sender: &Bech32Address) {
+        let _data: IgnoreValue = IgnoreValue;
+
+        let response = self
+            .interactor
+            .tx()
+            .from(sender)
+            .to(self.state.current_ping_pong_egld_address())
+            .gas(30_000_000u64)
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .ping(_data)
+            .egld(egld_amount)
+            .returns(ReturnsHandledOrError::new())
+            .run()
+            .await;
+
+        match response {
+            Ok(_) => println!("Ping successful!"),
+            Err(err) => {
+                println!("Ping failed with message: {}", err.message);
+                assert_eq!(message.unwrap_or_default(), err.message);
+            },
+        }
+    }
+
+    pub async fn pong(&mut self, message: Option<&str>, sender: &Bech32Address) {
+        let response = self
+            .interactor
+            .tx()
+            .from(sender)
+            .to(self.state.current_ping_pong_egld_address())
+            .gas(30_000_000u64)
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .pong()
+            .returns(ReturnsHandledOrError::new())
+            .run()
+            .await;
+
+        match response {
+            Ok(_) => println!("Pong successful!"),
+            Err(err) => {
+                println!("Pong failed with message: {}", err.message);
+                assert_eq!(message.unwrap_or_default(), err.message);
+            },
+        }
+    }
+
+    pub async fn pong_all(&mut self, message: Option<String>, sender: &Bech32Address) {
+        let response = self
+            .interactor
+            .tx()
+            .from(sender)
+            .to(self.state.current_ping_pong_egld_address())
+            .gas(30_000_000u64)
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .pong_all()
+            .returns(ReturnsHandledOrError::new())
+            .run()
+            .await;
+
+        match response {
+            Ok(_) => println!("Pong All successful!"),
+            Err(err) => {
+                println!("Pong All failed with message: {}", err.message);
+                assert_eq!(message.unwrap_or_default(), err.message);
+            },
+        }
+    }
+
+    pub async fn get_user_addresses(&mut self) -> Vec<String> {
+        let response = self
+            .interactor
+            .query()
+            .to(self.state.current_ping_pong_egld_address())
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .get_user_addresses()
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        let mut response_vec: Vec<String> = Vec::new();
+        for r in response.to_vec().into_vec() {
+            response_vec.push(r.as_managed_buffer().to_string());
+        }
+
+        response_vec
+    }
+
+    pub async fn get_contract_state(&mut self) -> ContractState<StaticApi> {
+        self.interactor
+            .query()
+            .to(self.state.current_ping_pong_egld_address())
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .get_contract_state()
+            .returns(ReturnsResult)
+            .run()
+            .await
+    }
+
+    pub async fn get_ping_amount(&mut self) -> RustBigUint {
+        self.interactor
+            .query()
+            .to(self.state.current_ping_pong_egld_address())
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .ping_amount()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+
+    pub async fn get_deadline(&mut self) -> u64 {
+        self.interactor
+            .query()
+            .to(self.state.current_ping_pong_egld_address())
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .deadline()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+
+    pub async fn get_activation_timestamp(&mut self) -> u64 {
+        self.interactor
+            .query()
+            .to(self.state.current_ping_pong_egld_address())
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .activation_timestamp()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+
+    pub async fn get_max_funds(&mut self) -> Option<RustBigUint> {
+        self.interactor
+            .query()
+            .to(self.state.current_ping_pong_egld_address())
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .max_funds()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+
+    pub async fn get_user_status(&mut self, user_id: usize) -> UserStatus {
+        self.interactor
+            .query()
+            .to(self.state.current_ping_pong_egld_address())
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .user_status(user_id)
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+
+    pub async fn pong_all_last_user(&mut self) -> usize {
+        self.interactor
+            .query()
+            .to(self.state.current_ping_pong_egld_address())
+            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .pong_all_last_user()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+}
+
+FILE_NAME: interact_cli.rs
+use clap::{Args, Parser, Subcommand};
+use multiversx_sc_snippets::imports::RustBigUint;
+
+/// Ping Pong Interact CLI
+#[derive(Default, PartialEq, Eq, Debug, Parser)]
+#[command(version, about)]
+#[command(propagate_version = true)]
+pub struct InteractCli {
+    #[command(subcommand)]
+    pub command: Option<InteractCliCommand>,
+}
+
+/// Ping Pong Interact CLI Commands
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum InteractCliCommand {
+    #[command(name = "deploy", about = "Deploy contract.")]
+    Deploy(DeployArgs),
+    #[command(name = "upgrade", about = "Upgrade contract.")]
+    Upgrade(DeployArgs),
+    #[command(
+        name = "ping",
+        about = "User sends some EGLD to be locked in the contract for a period of time."
+    )]
+    Ping(PingArgs),
+    #[command(name = "pong", about = "User can take back funds from the contract.")]
+    Pong,
+    #[command(name = "pong-all", about = "Send back funds to all users who pinged.")]
+    PongAll,
+    #[command(
+        name = "user-addresses",
+        about = "Lists the addresses of all users that have `ping`-ed in the order they have `ping`-ed."
+    )]
+    GetUserAddresses,
+    #[command(name = "contract-state", about = "Returns the current contract state.")]
+    GetContractState,
+    #[command(name = "ping-amount", about = "Returns the ping amount.")]
+    GetPingAmount,
+    #[command(name = "deadline", about = "Return deadline.")]
+    GetDeadline,
+    #[command(
+        name = "activation-timestamp",
+        about = "Block timestamp of the block where the contract got activated. If not specified in the constructor it is the the deploy block timestamp."
+    )]
+    GetActivationTimestamp,
+    #[command(name = "max-funds", about = "Optional funding cap.")]
+    GetMaxFunds,
+    #[command(name = "user-status", about = "State of user funds.")]
+    GetUserStatus(UserStatusArgs),
+    #[command(
+        name = "pong-all-last-user",
+        about = "`pongAll` status, the last user to be processed. 0 if never called `pongAll` or `pongAll` completed."
+    )]
+    PongAllLastUser,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct DeployArgs {
+    #[arg(short = 'p', long = "ping-amount")]
+    pub ping_amount: RustBigUint,
+
+    #[arg(short = 'd', long = "duration-in-seconds")]
+    pub duration_in_seconds: u64,
+
+    #[arg(short = 'a', long = "activation-timestamp")]
+    pub opt_activation_timestamp: Option<u64>,
+
+    #[arg(short = 'm', long = "max-funds")]
+    pub max_funds: Option<RustBigUint>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct PingArgs {
+    #[arg(short = 'c', long = "cost", default_value = "50000000000000000")]
+    pub cost: Option<u64>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct UserStatusArgs {
+    #[arg(short = 'i')]
+    pub id: usize,
+}
+
+FILE_NAME: interact_config.rs
+use serde::Deserialize;
+use std::io::Read;
+
+/// Config file
+const CONFIG_FILE: &str = "config.toml";
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ChainType {
+    Real,
+    Simulator,
+}
+
+/// Ping Pong Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    pub gateway_uri: String,
+    pub chain_type: ChainType,
+}
+
+impl Config {
+    // Deserializes config from file
+    pub fn load_config() -> Self {
+        let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
+        let mut content = String::new();
+        file.read_to_string(&mut content).unwrap();
+        toml::from_str(&content).unwrap()
+    }
+
+    pub fn chain_simulator_config() -> Self {
+        Config {
+            gateway_uri: "http://localhost:8085".to_owned(),
+            chain_type: ChainType::Simulator,
+        }
+    }
+
+    // Returns the gateway URI
+    pub fn gateway_uri(&self) -> &str {
+        &self.gateway_uri
+    }
+
+    // Returns if chain type is chain simulator
+    pub fn use_chain_simulator(&self) -> bool {
+        match self.chain_type {
+            ChainType::Real => false,
+            ChainType::Simulator => true,
+        }
+    }
+}
+
+FILE_NAME: interact_main.rs
+extern crate ping_pong_egld_interact;
+
+#[tokio::main]
+pub async fn main() {
+    ping_pong_egld_interact::ping_pong_egld_cli().await;
+}
+
+FILE_NAME: interact_state.rs
+use multiversx_sc_snippets::imports::*;
+use serde::{Deserialize, Serialize};
+use std::{
+    io::{Read, Write},
+    path::Path,
+};
+
+/// State file
+const STATE_FILE: &str = "state.toml";
+
+/// Multisig Interact state
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct State {
+    ping_pong_egld_address: Option<Bech32Address>,
+}
+
+impl State {
+    // Deserializes state from file
+    pub fn load_state() -> Self {
+        if Path::new(STATE_FILE).exists() {
+            let mut file = std::fs::File::open(STATE_FILE).unwrap();
+            let mut content = String::new();
+            file.read_to_string(&mut content).unwrap();
+            toml::from_str(&content).unwrap()
+        } else {
+            Self::default()
+        }
+    }
+
+    /// Sets the ping pong address
+    pub fn set_ping_pong_egld_address(&mut self, address: Bech32Address) {
+        self.ping_pong_egld_address = Some(address);
+    }
+
+    /// Returns the ping pong contract
+    pub fn current_ping_pong_egld_address(&self) -> &Bech32Address {
+        self.ping_pong_egld_address
+            .as_ref()
+            .expect("no known ping pong contract, deploy first")
+    }
+}
+
+impl Drop for State {
+    // Serializes state to file
+    fn drop(&mut self) {
+        let mut file = std::fs::File::create(STATE_FILE).unwrap();
+        file.write_all(toml::to_string(self).unwrap().as_bytes())
+            .unwrap();
+    }
+}
+
+
+INTERACTOR CARGO.TOML:
+[package]
+name = "ping-pong-egld-interact"
+version = "0.0.0"
+authors = ["MultiversX <contact@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "ping-pong-egld-interact"
+path = "src/interact_main.rs"
+
+[lib]
+path = "src/interact.rs"
+
+[dependencies]
+clap = { version = "4.4.7", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8.6"
+tokio = { version = "1.24" }
+
+[dependencies.ping-pong-egld]
+path = ".."
+
+[dependencies.multiversx-sc-snippets]
+version = "0.54.6"
+path = "../../../../framework/snippets"
+
+[features]
+chain-simulator-tests = []
+
 ////////////////////////
 NAME: proxy-pause
 
@@ -6949,7 +7881,7 @@ path = "../check-pause"
 
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: rewards-distribution
 
@@ -7885,7 +8817,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: seed-nft-minter
 
@@ -8337,7 +9269,7 @@ version = "0.54.6"
 path = "../../../framework/scenario"
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
 NAME: token-release
 
@@ -8766,5 +9698,5 @@ path = "../../../framework/scenario"
 
 
 
-INTERACTOR FOLDER: None
+INTERACTOR FOLDER:
 ////////////////////////
