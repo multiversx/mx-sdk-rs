@@ -29,7 +29,7 @@
                 "function": "forward_sync_retrieve_funds",
                 "arguments": [
                     "sc:vault",
-                    "str:EGLD",
+                    "str:EGLD-000000",
                     "0",
                     "1000"
                 ],
@@ -50,7 +50,7 @@
                         "data": [
                             "str:ExecuteOnDestContext",
                             "str:retrieve_funds",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "1000"
                         ]
@@ -60,7 +60,7 @@
                         "endpoint": "str:retrieve_funds",
                         "topics": [
                             "str:retrieve_funds",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "1000"
                         ],

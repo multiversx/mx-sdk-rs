@@ -189,7 +189,7 @@
                 "function": "send_esdt_direct_multi_transfer",
                 "arguments": [
                     "address:a_user",
-                    "str:EGLD",
+                    "str:EGLD-000000",
                     "0",
                     "1000"
                 ],

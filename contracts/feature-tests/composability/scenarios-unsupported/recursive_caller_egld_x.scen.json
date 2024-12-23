@@ -29,7 +29,7 @@
                 "function": "recursive_send_funds",
                 "arguments": [
                     "sc:vault",
-                    "str:EGLD",
+                    "str:EGLD-000000",
                     "1",
                     "5"
                 ],

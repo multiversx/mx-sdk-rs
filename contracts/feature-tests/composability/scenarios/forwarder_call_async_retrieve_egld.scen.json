@@ -29,7 +29,7 @@
                 "function": "forward_async_retrieve_funds",
                 "arguments": [
                     "sc:vault",
-                    "str:EGLD",
+                    "str:EGLD-000000",
                     "0",
                     "1000"
                 ],
@@ -50,7 +50,7 @@
                         "data": [
                             "str:AsyncCall",
                             "str:retrieve_funds",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "1000"
                         ]
@@ -60,7 +60,7 @@
                         "endpoint": "str:retrieve_funds",
                         "topics": [
                             "str:retrieve_funds",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "1000"
                         ],
@@ -98,7 +98,7 @@
                         "endpoint": "str:callBack",
                         "topics": [
                             "str:retrieve_funds_callback",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "1000"
                         ],
