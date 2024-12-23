@@ -41,7 +41,7 @@ copy_dir = "0.1.2"
 pathdiff = "0.2.1"
 common-path = "1.0.0"
 bip39 = "2.0.0"
-home = "0.5.2"
+home = "=0.5.9" # TODO: can be upgraded once we drop support for the old nightly 
 
 [dependencies.multiversx-sc-meta-lib]
 version = "=0.54.6"
