@@ -33,6 +33,11 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.54.6] - 2024-12-04
+- `ManagedDecimal` bugfixes:
+	- ABI/proxy bugfix;
+	- Rescale bugfix.
+
 ## [sc 0.54.5] - 2024-11-28
 - `ManagedVec` - deprecated `sort` and guarded it by the `alloc` feature, since it uses the allocator.
 - `sc-meta`
