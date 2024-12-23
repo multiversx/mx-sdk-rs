@@ -8,7 +8,7 @@ use super::{GatewayRequest, GatewayRequestType, COST_TRANSACTION_ENDPOINT};
 /// Note: it is a POST request.
 pub struct GetTxCost<'a>(pub &'a Transaction);
 
-impl<'a> GatewayRequest for GetTxCost<'a> {
+impl GatewayRequest for GetTxCost<'_> {
     type Payload = Transaction;
     type DecodedJson = ResponseTxCost;
     type Result = TxCostResponseData;

@@ -2,7 +2,7 @@ use crate::types::{BigUint, EgldOrMultiEsdtPaymentRefs, ManagedAddress, TxFrom, 
 
 use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<'a, Env> TxPayment<Env> for EgldOrMultiEsdtPaymentRefs<'a, Env::Api>
+impl<Env> TxPayment<Env> for EgldOrMultiEsdtPaymentRefs<'_, Env::Api>
 where
     Env: TxEnv,
 {

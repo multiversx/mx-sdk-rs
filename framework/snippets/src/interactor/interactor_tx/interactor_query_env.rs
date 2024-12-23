@@ -27,7 +27,7 @@ where
     pub data: ScenarioTxEnvData,
 }
 
-impl<'w, GatewayProxy> TxEnv for InteractorEnvQuery<'w, GatewayProxy>
+impl<GatewayProxy> TxEnv for InteractorEnvQuery<'_, GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
@@ -48,7 +48,7 @@ where
     }
 }
 
-impl<'w, GatewayProxy> ScenarioTxEnv for InteractorEnvQuery<'w, GatewayProxy>
+impl<GatewayProxy> ScenarioTxEnv for InteractorEnvQuery<'_, GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {

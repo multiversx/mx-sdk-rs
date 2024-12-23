@@ -138,7 +138,7 @@ pub fn extract_message_from_string_reason(reason: &str) -> String {
         return message[0].to_string();
     }
 
-    return contract_error.last().unwrap_or(&"").split(']').collect();
+    contract_error.last().unwrap_or(&"").split(']').collect()
 }
 
 fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {

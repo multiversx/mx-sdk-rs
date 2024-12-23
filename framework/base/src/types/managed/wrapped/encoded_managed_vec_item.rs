@@ -1,4 +1,4 @@
-use super::{ManagedVecItem, ManagedVecItemPayload};
+use super::ManagedVecItem;
 use core::{cmp::Ordering, marker::PhantomData};
 
 pub struct EncodedManagedVecItem<T: ManagedVecItem>
@@ -14,9 +14,7 @@ where
     T: ManagedVecItem,
 {
     pub(crate) fn decode(&self) -> T {
-        T::from_byte_reader(|item_bytes| {
-            item_bytes.copy_from_slice(self.encoded.payload_slice());
-        })
+        T::read_from_payload(&self.encoded)
     }
 }
 

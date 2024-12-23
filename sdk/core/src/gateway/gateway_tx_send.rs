@@ -6,7 +6,7 @@ use super::{GatewayRequest, GatewayRequestType, SEND_TRANSACTION_ENDPOINT};
 /// Sends a single transaction.
 pub struct SendTxRequest<'a>(pub &'a Transaction);
 
-impl<'a> GatewayRequest for SendTxRequest<'a> {
+impl GatewayRequest for SendTxRequest<'_> {
     type Payload = Transaction;
     type DecodedJson = SendTransactionResponse;
     type Result = String;

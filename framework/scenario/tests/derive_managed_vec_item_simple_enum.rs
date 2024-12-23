@@ -1,7 +1,10 @@
 use multiversx_sc::{
-    codec,
-    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    codec::{
+        self,
+        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    },
     derive::ManagedVecItem,
+    types::{ManagedVecItemPayload, ManagedVecItemPayloadBuffer},
 };
 
 // to test, run the following command in the crate folder:
@@ -27,21 +30,18 @@ fn enum_static() {
 
 #[test]
 fn enum_to_bytes_writer() {
-    <SimpleEnum as multiversx_sc::types::ManagedVecItem>::into_byte_writer(
+    let mut payload = ManagedVecItemPayloadBuffer::new_buffer();
+    <SimpleEnum as multiversx_sc::types::ManagedVecItem>::save_to_payload(
         SimpleEnum::Variant1,
-        |bytes| {
-            assert_eq!(bytes.len(), 1);
-            assert_eq!(bytes[0], 0);
-        },
+        &mut payload,
     );
+
+    assert_eq!(payload.buffer, [0]);
 }
 
 #[test]
 fn enum_from_bytes_reader() {
     let enum_from_bytes =
-        <SimpleEnum as multiversx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
-            assert_eq!(bytes.len(), 1);
-            bytes[0] = 1;
-        });
+        <SimpleEnum as multiversx_sc::types::ManagedVecItem>::read_from_payload(&[1u8].into());
     assert_eq!(enum_from_bytes, SimpleEnum::Variant2);
 }

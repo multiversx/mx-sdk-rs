@@ -484,7 +484,7 @@ where
     }
 }
 
-impl<'a, SA, A, T> Iterator for Iter<'a, SA, A, T>
+impl<SA, A, T> Iterator for Iter<'_, SA, A, T>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,

@@ -34,7 +34,7 @@ impl PublicKey {
     }
 }
 
-impl<'a> From<&'a PrivateKey> for PublicKey {
+impl From<&PrivateKey> for PublicKey {
     fn from(private_key: &PrivateKey) -> PublicKey {
         let bytes = private_key.to_bytes();
 

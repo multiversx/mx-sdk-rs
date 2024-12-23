@@ -16,7 +16,7 @@ use super::{
     process_title_attribute, process_upgrade_attribute, process_view_attribute,
 };
 pub struct MethodAttributesPass1 {
-    pub method_name: String,
+    pub _method_name: String,
     pub payable: MethodPayableMetadata,
     pub only_owner: bool,
     pub only_admin: bool,
@@ -34,7 +34,7 @@ pub fn process_method(m: &syn::TraitItemFn, trait_attributes: &TraitProperties) 
     };
 
     let mut first_pass_data = MethodAttributesPass1 {
-        method_name: m.sig.ident.to_string(),
+        _method_name: m.sig.ident.to_string(),
         payable: MethodPayableMetadata::NotPayable,
         only_owner: trait_attributes.only_owner,
         only_admin: trait_attributes.only_admin,

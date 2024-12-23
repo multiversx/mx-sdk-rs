@@ -181,7 +181,7 @@ fn main() {
 
     let invalid_handle = DebugHandle::from(-1000);
     let biguint_with_invalid_handle: BigUint<DebugApi> =
-        BigUint::from_handle(invalid_handle.clone());
+        unsafe { BigUint::from_handle(invalid_handle.clone()) };
     push!(
         to_check,
         biguint_with_invalid_handle,
@@ -189,7 +189,7 @@ fn main() {
     );
 
     let big_float_with_invalid_handle: BigFloat<DebugApi> =
-        BigFloat::from_handle(invalid_handle.clone());
+        unsafe { BigFloat::from_handle(invalid_handle.clone()) };
     push!(
         to_check,
         big_float_with_invalid_handle,
@@ -197,7 +197,7 @@ fn main() {
     );
 
     let managed_buffer_with_invalid_handle: ManagedBuffer<DebugApi> =
-        ManagedBuffer::from_handle(invalid_handle.clone());
+        unsafe { ManagedBuffer::from_handle(invalid_handle.clone()) };
     push!(
         to_check,
         managed_buffer_with_invalid_handle,
@@ -205,7 +205,7 @@ fn main() {
     );
 
     let token_identifier_with_invalid_handle: TokenIdentifier<DebugApi> =
-        TokenIdentifier::from_handle(invalid_handle.clone());
+        unsafe { TokenIdentifier::from_handle(invalid_handle.clone()) };
     push!(
         to_check,
         token_identifier_with_invalid_handle,
@@ -213,7 +213,7 @@ fn main() {
     );
 
     let optional_value_some_with_invalid_handle: OptionalValue<BigUint<DebugApi>> =
-        OptionalValue::Some(BigUint::from_handle(invalid_handle.clone()));
+        OptionalValue::Some(unsafe { BigUint::from_handle(invalid_handle.clone()) });
     push!(
         to_check,
         optional_value_some_with_invalid_handle,

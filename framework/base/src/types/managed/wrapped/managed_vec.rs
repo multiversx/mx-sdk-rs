@@ -1,4 +1,4 @@
-use super::EncodedManagedVecItem;
+use super::{EncodedManagedVecItem, ManagedVecItemPayload};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
@@ -8,8 +8,8 @@ use crate::{
         TopEncodeMultiOutput, TopEncodeOutput,
     },
     types::{
-        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
-        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
+        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem,
+        ManagedVecRefIterator, ManagedVecRefMut, MultiValueEncoded, MultiValueManagedVec,
     },
 };
 use alloc::{format, vec::Vec};
@@ -45,7 +45,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedVec {
             buffer: ManagedBuffer::from_handle(handle),
             _phantom: PhantomData,
@@ -56,7 +56,15 @@ where
         self.buffer.get_handle()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.buffer.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -133,15 +141,16 @@ where
 
     pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
         let byte_index = index * T::payload_size();
-        let mut load_result = Ok(());
-        let result = unsafe {
-            T::from_byte_reader_as_borrow(|dest_slice| {
-                load_result = self.buffer.load_slice(byte_index, dest_slice);
-            })
-        };
-        match load_result {
-            Ok(_) => Some(result),
-            Err(_) => None,
+
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self
+            .buffer
+            .load_slice(byte_index, payload.payload_slice_mut())
+            .is_ok()
+        {
+            unsafe { Some(T::borrow_from_payload(&payload)) }
+        } else {
+            None
         }
     }
 
@@ -173,26 +182,28 @@ where
         }
     }
 
-    pub fn get_mut(&mut self, index: usize) -> ManagedVecRef<M, T> {
-        ManagedVecRef::new(self.get_handle(), index)
+    pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<M, T> {
+        ManagedVecRefMut::new(self.get_handle(), index)
     }
 
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
         let byte_index = index * T::payload_size();
-        let mut load_result = Ok(());
-        let result = T::from_byte_reader(|dest_slice| {
-            load_result = self.buffer.load_slice(byte_index, dest_slice);
-        });
-
-        match load_result {
-            Ok(_) => result,
-            Err(_) => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self
+            .buffer
+            .load_slice(byte_index, payload.payload_slice_mut())
+            .is_err()
+        {
+            M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
         }
+        T::read_from_payload(&payload)
     }
 
     pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
-        item.into_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.set_slice(byte_index, payload.payload_slice())
     }
 
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
@@ -205,9 +216,9 @@ where
     }
 
     pub fn push(&mut self, item: T) {
-        item.into_byte_writer(|bytes| {
-            self.buffer.append_bytes(bytes);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.append_bytes(payload.payload_slice());
     }
 
     pub fn remove(&mut self, index: usize) {
@@ -233,7 +244,7 @@ where
             ManagedVec::new()
         };
 
-        self.buffer = part_before.buffer;
+        *self = part_before;
         self.buffer.append(&part_after.buffer);
     }
 
@@ -251,9 +262,9 @@ where
     }
 
     pub fn overwrite_with_single_item(&mut self, item: T) {
-        item.into_byte_writer(|bytes| {
-            self.buffer.overwrite(bytes);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.overwrite(payload.payload_slice());
     }
 
     /// Appends all the contents of another managed vec at the end of the current one.
@@ -510,7 +521,7 @@ where
     fn clone(&self) -> Self {
         let mut result = ManagedVec::new();
         for item in self.into_iter() {
-            result.push(item.clone())
+            result.push(item.borrow().clone())
         }
         result
     }
@@ -533,12 +544,16 @@ where
         }
         let mut byte_index = 0;
         while byte_index < self_len {
-            let self_item = T::from_byte_reader(|dest_slice| {
-                let _ = self.buffer.load_slice(byte_index, dest_slice);
-            });
-            let other_item = T::from_byte_reader(|dest_slice| {
-                let _ = other.buffer.load_slice(byte_index, dest_slice);
-            });
+            let mut self_payload = T::PAYLOAD::new_buffer();
+            let _ = self
+                .buffer
+                .load_slice(byte_index, self_payload.payload_slice_mut());
+            let mut other_payload = T::PAYLOAD::new_buffer();
+            let _ = other
+                .buffer
+                .load_slice(byte_index, other_payload.payload_slice_mut());
+            let self_item = T::read_from_payload(&self_payload);
+            let other_item = T::read_from_payload(&other_payload);
             if self_item != other_item {
                 return false;
             }
@@ -596,7 +611,8 @@ where
         } else {
             let mut nested_buffer = output.start_nested_encode();
             for item in self {
-                item.dep_encode_or_handle_err(&mut nested_buffer, h)?;
+                item.borrow()
+                    .dep_encode_or_handle_err(&mut nested_buffer, h)?;
             }
             output.finalize_nested_encode(nested_buffer);
             Ok(())
@@ -616,7 +632,7 @@ where
     {
         self.len().dep_encode_or_handle_err(dest, h)?;
         for item in self {
-            item.dep_encode_or_handle_err(dest, h)?;
+            item.borrow().dep_encode_or_handle_err(dest, h)?;
         }
         Ok(())
     }
@@ -733,7 +749,7 @@ where
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut dbg_list = f.debug_list();
         for item in self.into_iter() {
-            dbg_list.entry(&item);
+            dbg_list.entry(item.borrow());
         }
         dbg_list.finish()
     }

@@ -37,6 +37,7 @@ pub trait MultisigStateModule {
 
     fn add_multiple_board_members(&self, new_board_members: ManagedVec<ManagedAddress>) -> usize {
         let mut duplicates = false;
+        let new_board_members_len = new_board_members.len();
         self.user_mapper().get_or_create_users(
             new_board_members.into_iter(),
             |user_id, new_user| {
@@ -49,7 +50,7 @@ pub trait MultisigStateModule {
         require!(!duplicates, "duplicate board member");
 
         let num_board_members_mapper = self.num_board_members();
-        let new_num_board_members = num_board_members_mapper.get() + new_board_members.len();
+        let new_num_board_members = num_board_members_mapper.get() + new_board_members_len;
         num_board_members_mapper.set(new_num_board_members);
 
         new_num_board_members

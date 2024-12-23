@@ -2,10 +2,7 @@ use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
     PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
-use multiversx_sc_modules::{
-    pause::EndpointWrappers as PauseEndpointWrappers,
-    staking::{EndpointWrappers as StakingEndpointWrappers, StakingModule},
-};
+use multiversx_sc_modules::{pause::PauseModule, staking::StakingModule};
 use multiversx_sc_scenario::imports::*;
 
 pub const DECIMALS: u8 = 0;
@@ -73,7 +70,7 @@ fn test_price_aggregator_submit() {
         .from(OWNER_ADDRESS)
         .to(PRICE_AGGREGATOR_ADDRESS)
         .whitebox(multiversx_price_aggregator_sc::contract_obj, |sc| {
-            sc.call_unpause_endpoint();
+            sc.unpause_endpoint();
         });
 
     // submit first timestamp too old
@@ -197,7 +194,7 @@ fn test_price_aggregator_submit_round_ok() {
         .from(OWNER_ADDRESS)
         .to(PRICE_AGGREGATOR_ADDRESS)
         .whitebox(multiversx_price_aggregator_sc::contract_obj, |sc| {
-            sc.call_unpause_endpoint();
+            sc.unpause_endpoint();
         });
 
     // submit first
@@ -304,7 +301,7 @@ fn test_price_aggregator_discarded_round() {
         .from(OWNER_ADDRESS)
         .to(PRICE_AGGREGATOR_ADDRESS)
         .whitebox(multiversx_price_aggregator_sc::contract_obj, |sc| {
-            sc.call_unpause_endpoint();
+            sc.unpause_endpoint();
         });
 
     // submit first
@@ -380,7 +377,7 @@ fn test_price_aggregator_slashing() {
         .from(OWNER_ADDRESS)
         .to(PRICE_AGGREGATOR_ADDRESS)
         .whitebox(multiversx_price_aggregator_sc::contract_obj, |sc| {
-            sc.call_unpause_endpoint();
+            sc.unpause_endpoint();
         });
 
     world
@@ -489,7 +486,7 @@ fn setup() -> (ScenarioWorld, Vec<Address>) {
             .to(PRICE_AGGREGATOR_ADDRESS)
             .egld(STAKE_AMOUNT)
             .whitebox(multiversx_price_aggregator_sc::contract_obj, |sc| {
-                sc.call_stake();
+                sc.stake();
             });
     }
 
