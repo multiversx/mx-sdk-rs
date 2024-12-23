@@ -7,6 +7,7 @@ pub const BAD_TOKEN_TICKER_FORMAT: &str = "bad token ticker format";
 pub const SINGLE_ESDT_EXPECTED: &str = "function expects single ESDT payment";
 pub const TOO_MANY_ESDT_TRANSFERS: &str = "too many ESDT transfers";
 pub const ESDT_INVALID_TOKEN_INDEX: &str = "invalid token index";
+pub const ESDT_UNEXPECTED_EGLD: &str = "unexpected EGLD transfer";
 pub const INCORRECT_NUM_ESDT_TRANSFERS: &str = "incorrect number of ESDT transfers";
 pub static FUNGIBLE_TOKEN_EXPECTED_ERR_MSG: &str = "fungible ESDT token expected";
 

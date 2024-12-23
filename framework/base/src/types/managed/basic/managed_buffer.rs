@@ -406,14 +406,13 @@ impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> Eq for ManagedBuffer<M> {}
 
 impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M> {
-    #[allow(clippy::op_ref)] // clippy is wrong here, it is not needless
     fn eq(&self, other: &&[u8; N]) -> bool {
         if self.len() != N {
             return false;
         }
         let mut self_bytes = [0u8; N];
         let _ = M::managed_type_impl().mb_load_slice(self.handle.clone(), 0, &mut self_bytes[..]);
-        &self_bytes[..] == &other[..]
+        self_bytes[..] == other[..]
     }
 }
 
