@@ -34,7 +34,7 @@
             "expect": {
                 "out": [
                     "0",
-                    "str:EGLD"
+                    "str:EGLD-000000"
                 ],
                 "status": "",
                 "logs": "*",
@@ -57,7 +57,7 @@
             "expect": {
                 "out": [
                     "5",
-                    "str:EGLD"
+                    "str:EGLD-000000"
                 ],
                 "status": "",
                 "logs": "*",

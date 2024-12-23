@@ -1,9 +1,11 @@
 use multiversx_sc::types::{
     BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedBuffer,
-    TokenIdentifier,
+    TokenIdentifier, EGLD_000000_TOKEN_IDENTIFIER,
 };
 use multiversx_sc_scenario::{
-    api::StaticApi, managed_egld_token_id, managed_test_util::check_managed_top_encode_decode,
+    api::StaticApi,
+    managed_egld_token_id,
+    managed_test_util::{check_managed_top_decode, check_managed_top_encode_decode},
     managed_token_id, managed_token_id_wrapped, multiversx_sc,
 };
 
@@ -16,17 +18,29 @@ fn test_egld() {
 fn test_codec() {
     check_managed_top_encode_decode(
         EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
-        EgldOrEsdtTokenIdentifier::<StaticApi>::EGLD_REPRESENTATION,
+        EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
     );
 
     let expected = BoxedBytes::from_concat(&[
-        &[0, 0, 0, 4],
-        &EgldOrEsdtTokenIdentifier::<StaticApi>::EGLD_REPRESENTATION[..],
+        &[0, 0, 0, EGLD_000000_TOKEN_IDENTIFIER.len() as u8],
+        EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
     ]);
     check_managed_top_encode_decode(
         vec![EgldOrEsdtTokenIdentifier::<StaticApi>::egld()],
         expected.as_slice(),
     );
+}
+
+#[test]
+fn test_decode_egld() {
+    let deserialized = check_managed_top_decode::<EgldOrEsdtTokenIdentifier<StaticApi>>(b"EGLD");
+    assert!(deserialized.is_egld());
+
+    let deserialized = check_managed_top_decode::<Vec<EgldOrEsdtTokenIdentifier<StaticApi>>>(
+        b"\x00\x00\x00\x04EGLD",
+    );
+    assert_eq!(deserialized.len(), 1);
+    assert!(deserialized[0].is_egld());
 }
 
 #[test]

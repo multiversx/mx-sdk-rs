@@ -29,7 +29,7 @@
                 "function": "recursive_send_funds",
                 "arguments": [
                     "sc:vault",
-                    "str:EGLD",
+                    "str:EGLD-000000",
                     "1",
                     "2"
                 ],
@@ -45,7 +45,7 @@
                         "endpoint": "str:recursive_send_funds",
                         "topics": [
                             "sc:vault",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "1"
                         ],
                         "data": [
@@ -56,7 +56,7 @@
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "str:FungibleESDT",
                             "1",
                             "0"
@@ -68,7 +68,7 @@
                         "endpoint": "str:recursive_send_funds_callback",
                         "topics": [
                             "sc:vault",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "1"
                         ],
                         "data": [
@@ -80,7 +80,7 @@
                         "endpoint": "str:recursive_send_funds",
                         "topics": [
                             "sc:vault",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "1"
                         ],
                         "data": [
@@ -91,7 +91,7 @@
                         "address": "sc:vault",
                         "endpoint": "str:accept_funds",
                         "topics": [
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "str:FungibleESDT",
                             "1",
                             "0"
@@ -103,7 +103,7 @@
                         "endpoint": "str:recursive_send_funds_callback",
                         "topics": [
                             "sc:vault",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "1"
                         ],
                         "data": [
