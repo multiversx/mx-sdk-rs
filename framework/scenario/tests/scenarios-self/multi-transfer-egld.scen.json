@@ -1,5 +1,5 @@
 {
-    "comment": "ESDT multi-transfer, no SC",
+    "comment": "ESDT multi-transfer with EGLD, no SC",
     "steps": [
         {
             "step": "setState",
@@ -42,6 +42,10 @@
                         "value": "400"
                     },
                     {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "value": "500"
+                    },
+                    {
                         "tokenIdentifier": "str:NFT-123456",
                         "nonce": "5",
                         "value": "10"
@@ -56,7 +60,7 @@
             "accounts": {
                 "address:A": {
                     "nonce": "1",
-                    "balance": "1000000000",
+                    "balance": "999999500",
                     "esdt": {
                         "str:TOK-123456": "50",
                         "str:OTHERTOK-123456": "100",
@@ -74,6 +78,7 @@
                 },
                 "address:B": {
                     "nonce": "0",
+                    "balance": "500",
                     "esdt": {
                         "str:TOK-123456": "100",
                         "str:OTHERTOK-123456": "400",
