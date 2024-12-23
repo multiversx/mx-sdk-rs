@@ -28,7 +28,7 @@ pub fn test(test_args: &TestArgs) {
             args.extend(["--features", "multiversx-sc-scenario/run-go-tests"]);
         }
 
-        if chain_simulator {
+        if chain_simulator && cfg!(feature = "chain-simulator-tests") {
             args.extend(["--features", "chain-simulator-tests"]);
         }
 
