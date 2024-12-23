@@ -161,6 +161,12 @@ fn esdt_zero_balance_check_err_rs() {
 }
 
 #[test]
+#[ignore = "TODO: not yet implemented in Rust VM"]
+fn multi_transfer_egld_rs() {
+    world().run("tests/scenarios-self/multi-transfer-esdt.scen.json");
+}
+
+#[test]
 fn multi_transfer_esdt_rs() {
     world().run("tests/scenarios-self/multi-transfer-esdt.scen.json");
 }
