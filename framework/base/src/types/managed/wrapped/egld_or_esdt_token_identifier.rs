@@ -243,11 +243,7 @@ impl<M: ManagedTypeApi> NestedEncode for EgldOrEsdtTokenIdentifier<M> {
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        if self.is_egld() {
-            (&Self::EGLD_REPRESENTATION[..]).dep_encode_or_handle_err(dest, h)
-        } else {
-            self.buffer.dep_encode_or_handle_err(dest, h)
-        }
+        self.buffer.dep_encode_or_handle_err(dest, h)
     }
 }
 
@@ -258,11 +254,7 @@ impl<M: ManagedTypeApi> TopEncode for EgldOrEsdtTokenIdentifier<M> {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        if self.is_egld() {
-            (&Self::EGLD_REPRESENTATION[..]).top_encode_or_handle_err(output, h)
-        } else {
-            self.buffer.top_encode_or_handle_err(output, h)
-        }
+        self.buffer.top_encode_or_handle_err(output, h)
     }
 }
 
