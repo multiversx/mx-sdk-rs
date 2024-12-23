@@ -150,4 +150,16 @@ impl SendApiImpl for UncallableApi {
     fn delete_from_return_data(&self, _index: usize) {
         unreachable!()
     }
+
+    fn multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        _user_handle: RawHandle,
+        _dst_handle: RawHandle,
+        _token_transfer_handle: RawHandle,
+        _gas_limit: u64,
+        _function_name_handle: RawHandle,
+        _arguments_handle: RawHandle,
+    ) -> Result<(), &'static [u8]> {
+        unreachable!()
+    }
 }

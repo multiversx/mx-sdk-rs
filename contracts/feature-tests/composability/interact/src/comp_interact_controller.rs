@@ -21,12 +21,18 @@ impl ComposabilityInteract {
             .use_chain_simulator(config.use_chain_simulator())
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
+
         interactor.set_current_dir_from_workspace("contracts/feature-tests/composability/interact");
+
         let wallet_address = interactor.register_wallet(test_wallets::judy()).await;
+
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
+
         let forw_queue_code = BytesValue::interpret_from(
             "mxsc:../forwarder-queue/output/forwarder-queue.mxsc.json",
             &InterpreterContext::default(),
         );
+
         let vault_code = BytesValue::interpret_from(
             "mxsc:../vault/output/vault.mxsc.json",
             &InterpreterContext::default(),
