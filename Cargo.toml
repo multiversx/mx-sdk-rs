@@ -25,6 +25,9 @@ members = [
   "tools/payload-macro-generator",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
+  "tools/git-scraper/",
+
+
 
   "contracts/modules",
 
