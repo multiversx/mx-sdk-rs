@@ -10,7 +10,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "4000",
                     "esdt": {
                         "str:FWD-TOKEN": "1000",
                         "str:NFT-123456": {
@@ -89,7 +89,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "4000",
                     "esdt": {
                         "str:FWD-TOKEN": "700",
                         "str:NFT-123456": {
@@ -130,6 +130,9 @@
                     "str:NFT-123456",
                     "1",
                     "1",
+                    "str:EGLD-000000",
+                    "0",
+                    "100",
                     "str:SFT-456789",
                     "3",
                     "6"
@@ -156,7 +159,7 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "100",
                     "esdt": {
                         "str:FWD-TOKEN": "800",
                         "str:NFT-123456": {
@@ -183,7 +186,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "3900",
                     "esdt": {
                         "str:FWD-TOKEN": "200",
                         "str:SFT-456789": {

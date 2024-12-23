@@ -1,4 +1,6 @@
 {
+    "name": "payable",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -12,8 +14,9 @@
                     "nonce": "0",
                     "balance": "10000",
                     "esdt": {
-                        "str:TOK-123456": "1000",
-                        "str:OTHERTOK-123456": "500",
+                        "str:TOK-000001": "1000",
+                        "str:TOK-000002": "500",
+                        "str:TOK-000003": "500",
                         "str:SFT-123": {
                             "instances": [
                                 {
@@ -28,70 +31,92 @@
         },
         {
             "step": "scCall",
-            "id": "call-value-egld",
-            "tx": {
-                "from": "address:an-account",
-                "to": "sc:payable-features",
-                "egldValue": "100",
-                "function": "echo_call_value",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "100",
-                    ""
-                ],
-                "status": "",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "call-value-single-esdt",
+            "id": "payment-array-too-many",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:TOK-123456",
-                        "value": "100"
-                    }
-                ],
-                "function": "echo_call_value",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "0",
-                    [
-                        "nested:str:TOK-123456|u64:0|biguint:100"
-                    ]
-                ],
-                "status": "",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "call-value-multi-esdt",
-            "tx": {
-                "from": "address:an-account",
-                "to": "sc:payable-features",
-                "esdtValue": [
-                    {
-                        "tokenIdentifier": "str:TOK-123456",
+                        "tokenIdentifier": "str:TOK-000001",
                         "value": "100"
                     },
                     {
-                        "tokenIdentifier": "str:OTHERTOK-123456",
+                        "tokenIdentifier": "str:TOK-000002",
+                        "value": "400"
+                    },
+                    {
+                        "tokenIdentifier": "str:TOK-000003",
+                        "value": "400"
+                    },
+                    {
+                        "tokenIdentifier": "str:SFT-123",
+                        "nonce": "5",
+                        "value": "10"
+                    },
+                    {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "nonce": "0",
+                        "value": "103"
+                    }
+                ],
+                "function": "payment_array_3",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:incorrect number of ESDT transfers",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payment-array-too-few",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-000001",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:SFT-123",
+                        "nonce": "5",
+                        "value": "10"
+                    }
+                ],
+                "function": "payment_array_3",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:incorrect number of ESDT transfers",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payment-array-ok",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:TOK-000001",
+                        "value": "100"
+                    },
+                    {
+                        "tokenIdentifier": "str:EGLD-000000",
                         "value": "400"
                     },
                     {
@@ -100,19 +125,16 @@
                         "value": "10"
                     }
                 ],
-                "function": "echo_call_value",
+                "function": "payment_array_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0",
-                    [
-                        "nested:str:TOK-123456|u64:0|biguint:100",
-                        "nested:str:OTHERTOK-123456|u64:0|biguint:400",
-                        "nested:str:SFT-123|u64:5|biguint:10"
-                    ]
+                    "nested:str:TOK-000001|u64:0|biguint:100",
+                    "nested:str:EGLD-000000|u64:0|biguint:400",
+                    "nested:str:SFT-123|u64:5|biguint:10"
                 ],
                 "status": "",
                 "logs": "*",
