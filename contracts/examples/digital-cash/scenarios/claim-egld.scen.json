@@ -162,10 +162,10 @@
                         },
                         "str:fee|nested:str:EGLD": "10",
                         "str:whitelistedFeeTokens|str:.len": "1",
-                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD-000000",
                         "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
                         "str:allTimeFeeTokens|str:.len": "1",
-                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD-000000",
                         "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1",
                         "str:collectedFees|nested:str:EGLD": "10"
                     },

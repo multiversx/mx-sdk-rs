@@ -26,7 +26,7 @@
                 "arguments": [
                     "500,000,000,000",
                     "123,000",
-                    "str:EGLD"
+                    "str:EGLD-000000"
                 ],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
@@ -52,7 +52,7 @@
                     "storage": {
                         "str:target": "500,000,000,000",
                         "str:deadline": "123,000",
-                        "str:tokenIdentifier": "str:EGLD"
+                        "str:tokenIdentifier": "str:EGLD-000000"
                     },
                     "code": "mxsc:../output/crowdfunding-esdt.mxsc.json"
                 }
