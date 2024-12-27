@@ -156,7 +156,7 @@ where
             } else {
                 // clone all_esdt_transfers_unchecked -> all_transfers
                 let all_transfers_unchecked_handle = self.all_esdt_transfers_unchecked();
-                let _ = A::managed_type_impl().mb_overwrite(all_transfers_handle.clone(), &[]);
+                A::managed_type_impl().mb_overwrite(all_transfers_handle.clone(), &[]);
                 A::managed_type_impl()
                     .mb_append(all_transfers_handle.clone(), all_transfers_unchecked_handle);
             }

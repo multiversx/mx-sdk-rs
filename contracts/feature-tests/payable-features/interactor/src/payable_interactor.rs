@@ -2,10 +2,10 @@ mod payable_interactor_cli;
 mod payable_interactor_config;
 mod payable_interactor_state;
 
+use clap::Parser;
 use payable_features::payable_features_proxy;
 pub use payable_interactor_config::Config;
 use payable_interactor_state::State;
-use clap::Parser;
 
 use multiversx_sc_snippets::imports::*;
 
@@ -75,10 +75,19 @@ impl PayableInteract {
 
     pub async fn check_all_transfers(&mut self) {
         let mut payment = MultiEsdtPayment::new();
-        payment.push(EsdtTokenPayment::new("EGLD-000000".into(), 0, 1_0000u64.into()));
-        payment.push(EsdtTokenPayment::new("EGLD-000000".into(), 0, 2_0000u64.into()));
+        payment.push(EsdtTokenPayment::new(
+            "EGLD-000000".into(),
+            0,
+            1_0000u64.into(),
+        ));
+        payment.push(EsdtTokenPayment::new(
+            "EGLD-000000".into(),
+            0,
+            2_0000u64.into(),
+        ));
 
-        let result = self.interactor
+        let result = self
+            .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
@@ -89,7 +98,7 @@ impl PayableInteract {
             .returns(ReturnsResult)
             .run()
             .await;
-        
+
         println!("Result: {result:?}");
     }
 }

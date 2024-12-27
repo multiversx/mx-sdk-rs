@@ -1,4 +1,7 @@
-use multiversx_sc::{api::ManagedTypeApi, types::EsdtTokenPayment};
+use multiversx_sc::{
+    api::ManagedTypeApi,
+    types::{EsdtTokenPayment, EGLD_000000_TOKEN_IDENTIFIER},
+};
 
 use crate::{
     scenario::model::{BigUintValue, BytesValue, U64Value},
@@ -13,6 +16,12 @@ pub struct TxESDT {
     pub esdt_token_identifier: BytesValue,
     pub nonce: U64Value,
     pub esdt_value: BigUintValue,
+}
+
+impl TxESDT {
+    pub fn is_egld(&self) -> bool {
+        self.esdt_token_identifier.value == EGLD_000000_TOKEN_IDENTIFIER.as_bytes()
+    }
 }
 
 impl InterpretableFrom<TxESDTRaw> for TxESDT {

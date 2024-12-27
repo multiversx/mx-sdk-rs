@@ -1,7 +1,6 @@
 use crate::{network_response, InteractorBase};
 use log::info;
 use multiversx_sc_scenario::{
-    api::StaticApi,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
@@ -58,10 +57,9 @@ where
         tx_hash
     }
 
-    #[allow(deprecated)] // TODO
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
-        let contract_call = tx_call.to_contract_call();
-        let contract_call_tx_data = contract_call_to_tx_data(&contract_call);
+        let normalized = tx_call.normalize();
+        let contract_call_tx_data = tx_call_to_tx_data(&normalized);
         let data = if contract_call_tx_data.is_empty() {
             None
         } else {
@@ -70,11 +68,11 @@ where
 
         Transaction {
             nonce: 0,
-            value: contract_call.egld_payment.to_alloc().to_string(),
-            sender: tx_call.from.to_address().into(),
-            receiver: contract_call.basic.to.to_address().into(),
+            value: normalized.egld_value.value.to_string(),
+            sender: normalized.from.to_address().into(),
+            receiver: normalized.to.to_address().into(),
             gas_price: self.network_config.min_gas_price,
-            gas_limit: tx_call.gas_limit.value,
+            gas_limit: normalized.gas_limit.value,
             data,
             signature: None,
             chain_id: self.network_config.chain_id.clone(),
@@ -84,22 +82,11 @@ where
     }
 }
 
-#[allow(deprecated)] // TODO
-fn contract_call_to_tx_data(
-    contract_call: &multiversx_sc_scenario::imports::ContractCallWithEgld<StaticApi, ()>,
-) -> String {
-    let mut result = String::from_utf8(
-        contract_call
-            .basic
-            .function_call
-            .function_name
-            .to_boxed_bytes()
-            .into_vec(),
-    )
-    .unwrap();
-    for argument in contract_call.basic.function_call.arg_buffer.raw_arg_iter() {
+fn tx_call_to_tx_data(tx_call: &TxCall) -> String {
+    let mut result = tx_call.function.clone();
+    for argument in &tx_call.arguments {
         result.push('@');
-        result.push_str(hex::encode(argument.to_boxed_bytes().as_slice()).as_str());
+        result.push_str(hex::encode(argument.value.as_slice()).as_str());
     }
     result
 }
