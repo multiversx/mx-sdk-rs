@@ -1,7 +1,7 @@
+use multiversx_chain_vm::types::{top_encode_big_uint, top_encode_u64};
 use multiversx_sc::api::{
     ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
 };
-use num_bigint::BigUint;
 
 use crate::{
     api::StaticApi,
@@ -233,20 +233,5 @@ impl TxCall {
         self.append_function_call_to_arguments(&mut arguments);
 
         (ESDT_MULTI_TRANSFER_FUNC_NAME.to_owned(), arguments, true)
-    }
-}
-
-// TODO: dedup
-fn top_encode_u64(value: u64) -> Vec<u8> {
-    top_encode_big_uint(&BigUint::from(value))
-}
-
-// TODO: dedup
-fn top_encode_big_uint(value: &BigUint) -> Vec<u8> {
-    use num_traits::Zero;
-    if value.is_zero() {
-        Vec::new()
-    } else {
-        value.to_bytes_be()
     }
 }
