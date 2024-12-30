@@ -74,17 +74,9 @@ impl PayableInteract {
     }
 
     pub async fn check_all_transfers(&mut self) {
-        let mut payment = MultiEsdtPayment::new();
-        payment.push(EsdtTokenPayment::new(
-            "EGLD-000000".into(),
-            0,
-            1_0000u64.into(),
-        ));
-        payment.push(EsdtTokenPayment::new(
-            "EGLD-000000".into(),
-            0,
-            2_0000u64.into(),
-        ));
+        let mut payment = MultiEgldOrEsdtPayment::new();
+        payment.push(EgldOrEsdtTokenPayment::egld_payment(1_0000u64.into()));
+        payment.push(EgldOrEsdtTokenPayment::egld_payment(2_0000u64.into()));
 
         let result = self
             .interactor
@@ -94,7 +86,7 @@ impl PayableInteract {
             .gas(6_000_000u64)
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .payable_all_transfers()
-            .multi_esdt(payment)
+            .payment(payment)
             .returns(ReturnsResult)
             .run()
             .await;

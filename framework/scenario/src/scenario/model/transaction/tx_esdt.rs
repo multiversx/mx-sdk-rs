@@ -1,6 +1,6 @@
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{EsdtTokenPayment, EGLD_000000_TOKEN_IDENTIFIER},
+    types::{EgldOrEsdtTokenPayment, EsdtTokenPayment, EGLD_000000_TOKEN_IDENTIFIER},
 };
 
 use crate::{
@@ -46,6 +46,18 @@ impl IntoRaw<TxESDTRaw> for TxESDT {
 
 impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for TxESDT {
     fn from(value: EsdtTokenPayment<M>) -> Self {
+        TxESDT {
+            esdt_token_identifier: BytesValue::from(
+                value.token_identifier.as_managed_buffer().to_vec(),
+            ),
+            nonce: U64Value::from(value.token_nonce),
+            esdt_value: BigUintValue::from(value.amount),
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> From<EgldOrEsdtTokenPayment<M>> for TxESDT {
+    fn from(value: EgldOrEsdtTokenPayment<M>) -> Self {
         TxESDT {
             esdt_token_identifier: BytesValue::from(
                 value.token_identifier.as_managed_buffer().to_vec(),

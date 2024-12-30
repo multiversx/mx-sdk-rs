@@ -14,8 +14,8 @@ use crate::derive::type_abi;
 
 use super::{
     managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
-    EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem, ManagedVecItemPayloadBuffer,
-    ManagedVecRef,
+    EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVec, ManagedVecItem,
+    ManagedVecItemPayloadBuffer, ManagedVecRef,
 };
 
 #[type_abi]
@@ -26,13 +26,12 @@ pub struct EgldOrEsdtTokenPayment<M: ManagedTypeApi> {
     pub amount: BigUint<M>,
 }
 
+/// Alias for a list of payments of EGLD or ESDT tokens.
+pub type MultiEgldOrEsdtPayment<Api> = ManagedVec<Api, EgldOrEsdtTokenPayment<Api>>;
+
 impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
     pub fn no_payment() -> Self {
-        EgldOrEsdtTokenPayment {
-            token_identifier: EgldOrEsdtTokenIdentifier::egld(),
-            token_nonce: 0,
-            amount: BigUint::zero(),
-        }
+        Self::egld_payment(BigUint::zero())
     }
 
     pub fn new(
@@ -45,6 +44,11 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
             token_nonce,
             amount,
         }
+    }
+
+    /// A payment of token EGLD-000000.
+    pub fn egld_payment(amount: BigUint<M>) -> Self {
+        Self::new(EgldOrEsdtTokenIdentifier::egld(), 0, amount)
     }
 
     /// Will convert to just ESDT or terminate execution if the token is EGLD.

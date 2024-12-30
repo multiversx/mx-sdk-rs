@@ -10,8 +10,8 @@ use crate::{
         ESDT_TRANSFER_FUNC_NAME,
     },
     types::{
-        ContractCallNoPayment, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedVec, MultiValueEncoded, TypedFunctionCall,
+        ContractCallNoPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, MultiEgldOrEsdtPayment, MultiValueEncoded, TypedFunctionCall,
     },
 };
 
@@ -196,7 +196,7 @@ where
     pub(crate) fn convert_to_multi_transfer_esdt_call(
         self,
         to: &ManagedAddress<Api>,
-        payments: &ManagedVec<Api, EsdtTokenPayment<Api>>,
+        payments: &MultiEgldOrEsdtPayment<Api>,
     ) -> FunctionCall<Api> {
         let mut result = FunctionCall::new(ESDT_MULTI_TRANSFER_FUNC_NAME)
             .argument(&to)
