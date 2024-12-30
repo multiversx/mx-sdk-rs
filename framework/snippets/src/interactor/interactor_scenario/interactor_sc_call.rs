@@ -59,7 +59,7 @@ where
 
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
         let normalized = tx_call.normalize();
-        let contract_call_tx_data = tx_call_to_tx_data(&normalized);
+        let contract_call_tx_data = normalized.compute_data_field();
         let data = if contract_call_tx_data.is_empty() {
             None
         } else {
@@ -80,13 +80,4 @@ where
             options: 0,
         }
     }
-}
-
-fn tx_call_to_tx_data(tx_call: &TxCall) -> String {
-    let mut result = tx_call.function.clone();
-    for argument in &tx_call.arguments {
-        result.push('@');
-        result.push_str(hex::encode(argument.value.as_slice()).as_str());
-    }
-    result
 }

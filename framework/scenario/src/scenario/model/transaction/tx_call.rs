@@ -234,4 +234,14 @@ impl TxCall {
 
         (ESDT_MULTI_TRANSFER_FUNC_NAME.to_owned(), arguments, true)
     }
+
+    /// Creates the data field of the transaction represented by object.
+    pub fn compute_data_field(&self) -> String {
+        let mut result = self.function.clone();
+        for argument in &self.arguments {
+            result.push('@');
+            result.push_str(hex::encode(argument.value.as_slice()).as_str());
+        }
+        result
+    }
 }
