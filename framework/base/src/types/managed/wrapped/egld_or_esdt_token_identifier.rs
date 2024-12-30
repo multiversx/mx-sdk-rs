@@ -1,4 +1,5 @@
 use alloc::string::ToString;
+use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
@@ -11,8 +12,6 @@ use crate::{
     proxy_imports::TestTokenIdentifier,
     types::{ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier},
 };
-
-pub const EGLD_000000_TOKEN_IDENTIFIER: &str = "EGLD-000000";
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
 ///

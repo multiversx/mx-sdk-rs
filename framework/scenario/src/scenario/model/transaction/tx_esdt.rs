@@ -1,6 +1,7 @@
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{EgldOrEsdtTokenPayment, EsdtTokenPayment, EGLD_000000_TOKEN_IDENTIFIER},
+    chain_core::EGLD_000000_TOKEN_IDENTIFIER,
+    types::{EgldOrEsdtTokenPayment, EsdtTokenPayment},
 };
 
 use crate::{

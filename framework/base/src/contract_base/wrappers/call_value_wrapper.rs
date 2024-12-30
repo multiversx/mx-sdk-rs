@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
+
 use crate::{
     api::{
         const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
@@ -10,7 +12,7 @@ use crate::{
         big_num_cmp::bi_gt_zero, BigInt, BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier,
         EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal,
         ManagedRef, ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload,
-        ManagedVecPayloadIterator, ManagedVecRef, TokenIdentifier, EGLD_000000_TOKEN_IDENTIFIER,
+        ManagedVecPayloadIterator, ManagedVecRef, TokenIdentifier,
     },
 };
 
@@ -148,9 +150,8 @@ where
                     use_raw_handle(const_handles::MBUF_EGLD_000000),
                     EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
                 );
-                let _ = A::managed_type_impl().mb_set_slice(
+                A::managed_type_impl().mb_overwrite(
                     all_transfers_handle.clone(),
-                    0,
                     &const_handles::EGLD_PAYMENT_PAYLOAD[..],
                 );
             } else {
