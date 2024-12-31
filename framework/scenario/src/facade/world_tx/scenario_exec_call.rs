@@ -23,7 +23,7 @@ pub struct ScenarioEnvExec<'w> {
     pub data: ScenarioTxEnvData,
 }
 
-impl<'w> TxEnv for ScenarioEnvExec<'w> {
+impl TxEnv for ScenarioEnvExec<'_> {
     type Api = StaticApi;
 
     type RHExpect = TxExpect;
@@ -41,7 +41,7 @@ impl<'w> TxEnv for ScenarioEnvExec<'w> {
     }
 }
 
-impl<'w> TxEnvMockDeployAddress for ScenarioEnvExec<'w> {
+impl TxEnvMockDeployAddress for ScenarioEnvExec<'_> {
     fn mock_deploy_new_address<From, NA>(&mut self, from: &From, new_address: NA)
     where
         From: TxFromSpecified<Self>,
@@ -65,7 +65,7 @@ impl<'w> TxEnvMockDeployAddress for ScenarioEnvExec<'w> {
     }
 }
 
-impl<'w> ScenarioTxEnv for ScenarioEnvExec<'w> {
+impl ScenarioTxEnv for ScenarioEnvExec<'_> {
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
     }
@@ -115,7 +115,7 @@ where
     }
 }
 
-impl<'w> TxEnvWithTxHash for ScenarioEnvExec<'w> {
+impl TxEnvWithTxHash for ScenarioEnvExec<'_> {
     fn set_tx_hash(&mut self, tx_hash: H256) {
         self.data.set_tx_hash(tx_hash);
     }

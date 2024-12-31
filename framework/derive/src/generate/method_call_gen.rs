@@ -27,7 +27,7 @@ pub fn generate_call_method(m: &Method) -> proc_macro2::TokenStream {
     let call_method_body = generate_endpoint_call_method_body(m);
     quote! {
         #[inline]
-        fn #call_method_ident (&self) {
+        fn #call_method_ident (&mut self) {
             #call_method_body
         }
     }

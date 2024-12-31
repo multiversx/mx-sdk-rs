@@ -84,7 +84,9 @@ pub trait EsdtModule {
     fn nft_create<T: TopEncode>(&self, amount: &BigUint, attributes: &T) -> u64 {
         let token_id = self.token_id().get();
         let empty_buffer = ManagedBuffer::new();
-        let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
+
+        // sneakily reuses the same handle
+        let empty_vec = unsafe { ManagedRef::wrap_handle(empty_buffer.get_handle()) };
 
         self.send().esdt_nft_create(
             &token_id,

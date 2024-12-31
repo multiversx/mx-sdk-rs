@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use multiversx_sc::types::{BigUint, ManagedVec};
+use multiversx_sc::types::{BigUint, ManagedRef, ManagedVec};
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
@@ -594,4 +594,19 @@ fn test_managed_vec_get_mut() {
 
     assert_eq!(*managed_vec.get(0), 200u32);
     assert_eq!(*managed_vec.get(1), 300u32);
+}
+
+#[test]
+fn test_is_single_item() {
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    assert!(managed_vec.is_single_item().is_none());
+
+    managed_vec.push(BigUint::<StaticApi>::from(1u32));
+    assert_eq!(
+        managed_vec.is_single_item(),
+        Some(ManagedRef::new(&BigUint::<StaticApi>::from(1u32)))
+    );
+
+    managed_vec.push(BigUint::<StaticApi>::from(2u32));
+    assert!(managed_vec.is_single_item().is_none());
 }

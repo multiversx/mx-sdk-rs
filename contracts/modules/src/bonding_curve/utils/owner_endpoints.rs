@@ -90,11 +90,14 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             + PartialEq
             + Default,
     {
-        let (identifier, nonce, amount) = self.call_value().single_esdt().into_tuple();
+        let esdt_payment = self.call_value().single_esdt();
+        let identifier = &esdt_payment.token_identifier;
+        let nonce = esdt_payment.token_nonce;
+        let amount = &esdt_payment.amount;
         let caller = self.blockchain().get_caller();
         let mut set_payment = EgldOrEsdtTokenIdentifier::egld();
 
-        if self.bonding_curve(&identifier).is_empty() {
+        if self.bonding_curve(identifier).is_empty() {
             match payment_token {
                 OptionalValue::Some(token) => set_payment = EgldOrEsdtTokenIdentifier::esdt(token),
                 OptionalValue::None => {
@@ -102,27 +105,27 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 },
             };
         }
-        if self.token_details(&identifier).is_empty() {
+        if self.token_details(identifier).is_empty() {
             let nonces = ManagedVec::from_single_item(nonce);
-            self.token_details(&identifier).set(&TokenOwnershipData {
+            self.token_details(identifier).set(&TokenOwnershipData {
                 token_nonces: nonces,
                 owner: caller.clone(),
             });
         } else {
-            let mut details = self.token_details(&identifier).get();
+            let mut details = self.token_details(identifier).get();
             require!(
                 details.owner == caller,
                 "The token was already deposited by another address"
             );
             if !details.token_nonces.contains(&nonce) {
                 details.token_nonces.push(nonce);
-                self.token_details(&identifier).set(&details);
+                self.token_details(identifier).set(&details);
             }
         }
 
-        self.set_curve_storage::<T>(&identifier, amount.clone(), set_payment);
+        self.set_curve_storage::<T>(identifier, amount.clone(), set_payment);
         self.owned_tokens(&caller).insert(identifier.clone());
-        self.nonce_amount(&identifier, nonce)
+        self.nonce_amount(identifier, nonce)
             .update(|current_amount| *current_amount += amount);
     }
 

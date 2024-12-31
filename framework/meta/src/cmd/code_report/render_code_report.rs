@@ -61,14 +61,14 @@ impl<'a> CodeReportRender<'a> {
 
     fn write_report_for_contract(
         &mut self,
-        path: &String,
-        size: &String,
-        has_allocator: &String,
-        has_panic: &String,
+        path: &str,
+        size: &str,
+        has_allocator: &str,
+        has_panic: &str,
     ) {
         self.writeln(format!(
             "| {} | {} | {} | {} |",
-            path.split('/').last().unwrap_or_else(|| path),
+            path.split('/').last().unwrap_or(path),
             size,
             has_allocator,
             has_panic

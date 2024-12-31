@@ -24,6 +24,7 @@ pub trait Randomizeable {
 
 impl Random {
     /// block random seed + salt creates a stronger randomness source
+    #[allow(static_mut_refs)]
     pub fn new<M: ManagedTypeApi>(
         seed: ManagedByteArray<M, SEED_SIZE>,
         salt: ManagedByteArray<M, SALT_SIZE>,

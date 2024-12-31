@@ -92,7 +92,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
     }
 
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn forward(
         &self,
         address: ManagedAddress,

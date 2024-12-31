@@ -7,7 +7,7 @@
                 "sc:alloc-mem-fail": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/alloc-mem-fail.wasm"
+                    "code": "mxsc:../output/alloc-mem-fail.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",

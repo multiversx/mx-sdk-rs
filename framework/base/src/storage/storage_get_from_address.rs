@@ -1,7 +1,7 @@
 use crate::{
     api::{
         const_handles, use_raw_handle, ErrorApi, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        ManagedTypeApi, StorageReadApi, StorageReadApiImpl,
     },
     codec::*,
     types::{
@@ -35,15 +35,15 @@ where
     }
 
     fn to_managed_buffer(&self) -> ManagedBuffer<A> {
-        let mbuf_handle: A::ManagedBufferHandle =
-            use_raw_handle(A::static_var_api_impl().next_handle());
-        A::storage_read_api_impl().storage_load_from_address(
-            self.addr.get_handle(),
-            self.key.buffer.get_handle(),
-            mbuf_handle.clone(),
-        );
-
-        ManagedBuffer::from_handle(mbuf_handle)
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            A::storage_read_api_impl().storage_load_from_address(
+                self.addr.get_handle(),
+                self.key.buffer.get_handle(),
+                result.get_handle(),
+            );
+            result
+        }
     }
 
     fn to_big_uint(&self) -> BigUint<A> {
@@ -66,7 +66,7 @@ where
     }
 }
 
-impl<'k, A> TopDecodeInput for StorageGetFromAddressInput<'k, A>
+impl<A> TopDecodeInput for StorageGetFromAddressInput<'_, A>
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {

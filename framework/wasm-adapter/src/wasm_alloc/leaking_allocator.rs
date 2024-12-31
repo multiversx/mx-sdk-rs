@@ -45,7 +45,7 @@ unsafe impl GlobalAlloc for LeakingAllocator {
         if new_total > *size {
             // Request enough new space for this allocation, even if we have some space left over from the last one incase they end up non-contiguous.
             // Round up to a number of pages
-            let requested_pages = (requested_size + PAGE_SIZE - 1) / PAGE_SIZE;
+            let requested_pages = requested_size.div_ceil(PAGE_SIZE);
             let previous_page_count = memory_grow(PageCount(requested_pages));
 
             let previous_size = previous_page_count.size_in_bytes();
