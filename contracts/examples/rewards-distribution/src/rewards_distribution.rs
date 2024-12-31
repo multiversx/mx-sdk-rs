@@ -57,7 +57,7 @@ pub trait RewardsDistribution:
         self.brackets().set(brackets);
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(depositRoyalties)]
     fn deposit_royalties(&self) {
         let payment = self.call_value().egld_or_single_esdt();
@@ -247,7 +247,7 @@ pub trait RewardsDistribution:
         );
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(claimRewards)]
     fn claim_rewards(
         &self,

@@ -47,7 +47,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
             .async_call_and_exit();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(fractionalizeNFT)]
     fn fractionalize_nft(
         &self,
@@ -97,7 +97,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(unFractionalizeNFT)]
     fn unfractionalize_nft(&self) {
         let fractional_payment = self.call_value().single_esdt();
