@@ -139,15 +139,20 @@ where
         self.byte_len() == 0
     }
 
-    pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
+    /// Internal function that loads the payload for an item.
+    ///
+    /// Payload passed as mutable reference, to avoid copying of bytes around the stack.
+    fn load_item_payload(&self, index: usize, payload: &mut T::PAYLOAD) -> bool {
         let byte_index = index * T::payload_size();
 
-        let mut payload = T::PAYLOAD::new_buffer();
-        if self
-            .buffer
+        self.buffer
             .load_slice(byte_index, payload.payload_slice_mut())
             .is_ok()
-        {
+    }
+
+    pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self.load_item_payload(index, &mut payload) {
             unsafe { Some(T::borrow_from_payload(&payload)) }
         } else {
             None
@@ -182,21 +187,30 @@ where
         }
     }
 
+    /// If it contains precisely one item, will return `Some` with a reference to that item.
+    ///
+    /// Will return `None` for zero or more than one item.
+    pub fn is_single_item(&self) -> Option<T::Ref<'_>> {
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self.len() == 1 {
+            let _ = self.load_item_payload(0, &mut payload);
+            unsafe { Some(T::borrow_from_payload(&payload)) }
+        } else {
+            None
+        }
+    }
+
     pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<M, T> {
         ManagedVecRefMut::new(self.get_handle(), index)
     }
 
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
-        let byte_index = index * T::payload_size();
         let mut payload = T::PAYLOAD::new_buffer();
-        if self
-            .buffer
-            .load_slice(byte_index, payload.payload_slice_mut())
-            .is_err()
-        {
+        if self.load_item_payload(index, &mut payload) {
+            T::read_from_payload(&payload)
+        } else {
             M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
         }
-        T::read_from_payload(&payload)
     }
 
     pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
