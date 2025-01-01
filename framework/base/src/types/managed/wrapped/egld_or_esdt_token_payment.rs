@@ -1,7 +1,9 @@
+use multiversx_sc_codec::IntoMultiValue;
+
 use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
-    types::{BigUint, EgldOrEsdtTokenIdentifier},
+    types::{BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue},
 };
 
 use crate::codec::{
@@ -130,6 +132,15 @@ impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EgldOrEsdtTokenPayment<M> 
             token_nonce: esdt_payment.token_nonce,
             amount: esdt_payment.amount,
         }
+    }
+}
+
+impl<M: ManagedTypeApi> IntoMultiValue for EgldOrEsdtTokenPayment<M> {
+    type MultiValue = EgldOrEsdtTokenPaymentMultiValue<M>;
+
+    #[inline]
+    fn into_multi_value(self) -> Self::MultiValue {
+        self.into()
     }
 }
 

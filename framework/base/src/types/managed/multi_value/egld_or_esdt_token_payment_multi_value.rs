@@ -4,49 +4,43 @@ use crate::{
         multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
         TopDecodeMultiInput, TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    types::ManagedVecRef,
+    types::{EgldOrEsdtTokenIdentifier, ManagedVecRef},
 };
 
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
-    types::{BigUint, EsdtTokenPayment, ManagedVecItem, TokenIdentifier},
+    types::{BigUint, EgldOrEsdtTokenPayment, ManagedVecItem, TokenIdentifier},
 };
 
-/// Thin wrapper around EsdtTokenPayment, which has different I/O behaviour:
+/// Thin wrapper around EgldOrEsdtTokenPayment, which has different I/O behaviour:
 /// - as input, is built from 3 arguments instead of 1: token identifier, nonce, value
 /// - as output, it becomes 3 results instead of 1: token identifier, nonce, value
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct EsdtTokenPaymentMultiValue<M: ManagedTypeApi> {
-    obj: EsdtTokenPayment<M>,
+pub struct EgldOrEsdtTokenPaymentMultiValue<M: ManagedTypeApi> {
+    obj: EgldOrEsdtTokenPayment<M>,
 }
 
-#[deprecated(
-    since = "0.29.3",
-    note = "Alias kept for backwards compatibility. Replace with `EsdtTokenPaymentMultiValue`"
-)]
-pub type EsdtTokenPaymentMultiArg<M> = EsdtTokenPaymentMultiValue<M>;
-
-impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EsdtTokenPaymentMultiValue<M> {
+impl<M: ManagedTypeApi> From<EgldOrEsdtTokenPayment<M>> for EgldOrEsdtTokenPaymentMultiValue<M> {
     #[inline]
-    fn from(obj: EsdtTokenPayment<M>) -> Self {
-        EsdtTokenPaymentMultiValue { obj }
+    fn from(obj: EgldOrEsdtTokenPayment<M>) -> Self {
+        EgldOrEsdtTokenPaymentMultiValue { obj }
     }
 }
 
-impl<M: ManagedTypeApi> EsdtTokenPaymentMultiValue<M> {
-    pub fn into_inner(self) -> EsdtTokenPayment<M> {
+impl<M: ManagedTypeApi> EgldOrEsdtTokenPaymentMultiValue<M> {
+    pub fn into_inner(self) -> EgldOrEsdtTokenPayment<M> {
         self.obj
     }
 }
 
-impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
-    type PAYLOAD = <EsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD;
-    const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
+impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPaymentMultiValue<M> {
+    type PAYLOAD = <EgldOrEsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD;
+    const SKIPS_RESERIALIZATION: bool = EgldOrEsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
     type Ref<'a> = ManagedVecRef<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        EsdtTokenPayment::read_from_payload(payload).into()
+        EgldOrEsdtTokenPayment::read_from_payload(payload).into()
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
@@ -58,7 +52,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     }
 }
 
-impl<M> TopEncodeMulti for EsdtTokenPaymentMultiValue<M>
+impl<M> TopEncodeMulti for EgldOrEsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
@@ -74,7 +68,7 @@ where
     }
 }
 
-impl<M> TopDecodeMulti for EsdtTokenPaymentMultiValue<M>
+impl<M> TopDecodeMulti for EgldOrEsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
@@ -83,23 +77,23 @@ where
         I: TopDecodeMultiInput,
         H: DecodeErrorHandler,
     {
-        let token_identifier = TokenIdentifier::multi_decode_or_handle_err(input, h)?;
+        let token_identifier = EgldOrEsdtTokenIdentifier::multi_decode_or_handle_err(input, h)?;
         let token_nonce = u64::multi_decode_or_handle_err(input, h)?;
         let amount = BigUint::multi_decode_or_handle_err(input, h)?;
-        Ok(EsdtTokenPayment::new(token_identifier, token_nonce, amount).into())
+        Ok(EgldOrEsdtTokenPayment::new(token_identifier, token_nonce, amount).into())
     }
 }
 
-impl<M> TopDecodeMultiLength for EsdtTokenPaymentMultiValue<M>
+impl<M> TopDecodeMultiLength for EgldOrEsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
     const LEN: usize = 3;
 }
 
-impl<M> TypeAbiFrom<Self> for EsdtTokenPaymentMultiValue<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<Self> for EgldOrEsdtTokenPaymentMultiValue<M> where M: ManagedTypeApi {}
 
-impl<M> TypeAbi for EsdtTokenPaymentMultiValue<M>
+impl<M> TypeAbi for EgldOrEsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
@@ -110,7 +104,7 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        "EsdtTokenPaymentMultiValue<$API>".into()
+        "EgldOrEsdtTokenPaymentMultiValue<$API>".into()
     }
 
     fn is_variadic() -> bool {
