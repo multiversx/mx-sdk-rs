@@ -1,11 +1,8 @@
 use core::ops::Deref;
 
 use crate::{
-    api::{HandleConstraints, SendApi, SendApiImpl},
-    types::{
-        BigUint, ManagedAddress, ManagedRef, ManagedType, MultiEgldOrEsdtPayment, TxFrom,
-        TxToSpecified,
-    },
+    contract_base::SendRawWrapper,
+    types::{BigUint, ManagedAddress, ManagedRef, MultiEgldOrEsdtPayment, TxFrom, TxToSpecified},
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
@@ -25,12 +22,12 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        let _ = Env::Api::send_api_impl().multi_transfer_esdt_nft_execute(
-            to.get_handle().get_raw_handle(),
-            self.get_handle().get_raw_handle(),
+        let _ = SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute(
+            to,
+            self,
             gas_limit,
-            fc.function_name.get_handle().get_raw_handle(),
-            fc.arg_buffer.get_handle().get_raw_handle(),
+            &fc.function_name,
+            &fc.arg_buffer,
         );
     }
 
