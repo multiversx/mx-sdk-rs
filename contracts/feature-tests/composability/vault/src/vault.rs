@@ -50,9 +50,9 @@ pub trait Vault {
         self.blockchain().get_caller()
     }
 
-    fn esdt_transfers_multi(&self) -> MultiValueEncoded<EsdtTokenPaymentMultiValue> {
+    fn all_transfers_multi(&self) -> MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue> {
         self.call_value()
-            .all_esdt_transfers()
+            .all_multi_transfers()
             .clone_value()
             .into_multi_value()
     }
@@ -60,7 +60,7 @@ pub trait Vault {
     #[payable("*")]
     #[endpoint]
     fn accept_funds(&self) {
-        let esdt_transfers_multi = self.esdt_transfers_multi();
+        let esdt_transfers_multi = self.all_transfers_multi();
         self.accept_funds_event(&self.call_value().egld_value(), &esdt_transfers_multi);
 
         self.call_counts(ManagedBuffer::from(b"accept_funds"))
@@ -71,9 +71,9 @@ pub trait Vault {
     #[endpoint]
     fn accept_funds_echo_payment(
         &self,
-    ) -> MultiValue2<BigUint, MultiValueEncoded<EsdtTokenPaymentMultiValue>> {
+    ) -> MultiValue2<BigUint, MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>> {
         let egld_value = self.call_value().egld_value();
-        let esdt_transfers_multi = self.esdt_transfers_multi();
+        let esdt_transfers_multi = self.all_transfers_multi();
         self.accept_funds_event(&egld_value, &esdt_transfers_multi);
 
         self.call_counts(ManagedBuffer::from(b"accept_funds_echo_payment"))
@@ -91,7 +91,7 @@ pub trait Vault {
     #[payable("*")]
     #[endpoint]
     fn reject_funds(&self) {
-        let esdt_transfers_multi = self.esdt_transfers_multi();
+        let esdt_transfers_multi = self.all_transfers_multi();
         self.reject_funds_event(&self.call_value().egld_value(), &esdt_transfers_multi);
         sc_panic!("reject_funds");
     }
@@ -259,14 +259,14 @@ pub trait Vault {
     fn accept_funds_event(
         &self,
         #[indexed] egld_value: &BigUint,
-        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     );
 
     #[event("reject_funds")]
     fn reject_funds_event(
         &self,
         #[indexed] egld_value: &BigUint,
-        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     );
 
     #[event("retrieve_funds")]

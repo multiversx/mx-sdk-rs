@@ -165,6 +165,16 @@ where
         unsafe { ManagedRef::wrap_handle(all_transfers_handle) }
     }
 
+    /// Same as `all_transfers`, but without EGLD singleton.
+    ///
+    /// Temporary!
+    pub fn all_multi_transfers(
+        &self,
+    ) -> ManagedRef<'static, A, ManagedVec<A, EgldOrEsdtTokenPayment<A>>> {
+        let all_transfers_unchecked_handle = self.all_esdt_transfers_unchecked();
+        unsafe { ManagedRef::wrap_handle(all_transfers_unchecked_handle) }
+    }
+
     /// Verify and casts the received multi ESDT transfer in to an array.
     ///
     /// Can be used to extract all payments in one line like this:
