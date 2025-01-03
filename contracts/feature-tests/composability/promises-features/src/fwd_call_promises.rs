@@ -64,7 +64,6 @@ pub trait CallPromisesModule: common::CommonModule {
 
         self.tx()
             .to(&to)
-            .raw_call("")
             .gas(gas_limit)
             .payment(payment)
             .callback(self.callbacks().transfer_callback())
