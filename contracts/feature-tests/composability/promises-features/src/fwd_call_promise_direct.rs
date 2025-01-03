@@ -35,7 +35,7 @@ pub trait CallPromisesDirectModule {
     ) {
         let mut token_payments_vec = ManagedVec::new();
         for token_payment_arg in token_payment_args {
-            token_payments_vec.push(token_payment_arg.into_esdt_token_payment());
+            token_payments_vec.push(token_payment_arg.into_inner());
         }
 
         let gas_limit = (self.blockchain().get_gas_left() - extra_gas_for_callback) * 9 / 10;

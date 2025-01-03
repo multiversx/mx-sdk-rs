@@ -1,4 +1,8 @@
-use multiversx_sc::{api::ManagedTypeApi, types::EsdtTokenPayment};
+use multiversx_sc::{
+    api::ManagedTypeApi,
+    chain_core::EGLD_000000_TOKEN_IDENTIFIER,
+    types::{EgldOrEsdtTokenPayment, EsdtTokenPayment},
+};
 
 use crate::{
     scenario::model::{BigUintValue, BytesValue, U64Value},
@@ -13,6 +17,12 @@ pub struct TxESDT {
     pub esdt_token_identifier: BytesValue,
     pub nonce: U64Value,
     pub esdt_value: BigUintValue,
+}
+
+impl TxESDT {
+    pub fn is_egld(&self) -> bool {
+        self.esdt_token_identifier.value == EGLD_000000_TOKEN_IDENTIFIER.as_bytes()
+    }
 }
 
 impl InterpretableFrom<TxESDTRaw> for TxESDT {
@@ -37,6 +47,18 @@ impl IntoRaw<TxESDTRaw> for TxESDT {
 
 impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for TxESDT {
     fn from(value: EsdtTokenPayment<M>) -> Self {
+        TxESDT {
+            esdt_token_identifier: BytesValue::from(
+                value.token_identifier.as_managed_buffer().to_vec(),
+            ),
+            nonce: U64Value::from(value.token_nonce),
+            esdt_value: BigUintValue::from(value.amount),
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> From<EgldOrEsdtTokenPayment<M>> for TxESDT {
+    fn from(value: EgldOrEsdtTokenPayment<M>) -> Self {
         TxESDT {
             esdt_token_identifier: BytesValue::from(
                 value.token_identifier.as_managed_buffer().to_vec(),

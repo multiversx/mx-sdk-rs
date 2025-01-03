@@ -181,4 +181,12 @@ where
             .raw_call("payable_token_4")
             .original_result()
     }
+
+    pub fn payable_all_transfers(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedVec<Env::Api, EgldOrEsdtTokenPayment<Env::Api>>> {
+        self.wrapped_tx
+            .raw_call("payable_all_transfers")
+            .original_result()
+    }
 }

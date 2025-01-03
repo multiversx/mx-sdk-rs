@@ -10,8 +10,8 @@ use crate::{
         ESDT_TRANSFER_FUNC_NAME,
     },
     types::{
-        ContractCallNoPayment, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedVec, MultiValueEncoded, TypedFunctionCall,
+        ContractCallNoPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, MultiEgldOrEsdtPayment, MultiValueEncoded, TypedFunctionCall,
     },
 };
 
@@ -166,8 +166,10 @@ where
         self,
         payment: EsdtTokenPaymentRefs<'_, Api>,
     ) -> FunctionCall<Api> {
+        // EGLD not supported
+        // but serializing token identifier buffer for efficiency, no need to convert to "EGLD" from "EGLD-000000"
         FunctionCall::new(ESDT_TRANSFER_FUNC_NAME)
-            .argument(&payment.token_identifier)
+            .argument(&payment.token_identifier.as_managed_buffer())
             .argument(&payment.amount)
             .argument(&self)
     }
@@ -184,8 +186,10 @@ where
         to: &ManagedAddress<Api>,
         payment: EsdtTokenPaymentRefs<'_, Api>,
     ) -> FunctionCall<Api> {
+        // EGLD not supported
+        // but serializing token identifier buffer for efficiency, no need to convert to "EGLD" from "EGLD-000000"
         FunctionCall::new(ESDT_NFT_TRANSFER_FUNC_NAME)
-            .argument(&payment.token_identifier)
+            .argument(&payment.token_identifier.as_managed_buffer())
             .argument(&payment.token_nonce)
             .argument(&payment.amount)
             .argument(to)
@@ -196,15 +200,16 @@ where
     pub(crate) fn convert_to_multi_transfer_esdt_call(
         self,
         to: &ManagedAddress<Api>,
-        payments: &ManagedVec<Api, EsdtTokenPayment<Api>>,
+        payments: &MultiEgldOrEsdtPayment<Api>,
     ) -> FunctionCall<Api> {
         let mut result = FunctionCall::new(ESDT_MULTI_TRANSFER_FUNC_NAME)
             .argument(&to)
             .argument(&payments.len());
 
         for payment in payments {
+            // serializing token identifier buffer to get EGLD-00000 instead of EGLD
             result = result
-                .argument(&payment.token_identifier)
+                .argument(&payment.token_identifier.buffer)
                 .argument(&payment.token_nonce)
                 .argument(&payment.amount);
         }

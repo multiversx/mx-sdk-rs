@@ -1,3 +1,4 @@
+use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 use num_bigint::BigUint;
 
 use crate::{
@@ -109,6 +110,10 @@ impl TxCache {
         nonce: u64,
         value: &BigUint,
     ) -> Result<(), TxPanic> {
+        if esdt_token_identifier == EGLD_000000_TOKEN_IDENTIFIER.as_bytes() {
+            return self.transfer_egld_balance(from, to, value);
+        }
+
         if !is_system_sc_address(from) && !is_system_sc_address(to) {
             let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value)?;
             self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);

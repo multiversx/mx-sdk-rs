@@ -239,6 +239,11 @@ fn forwarder_call_async_multi_transfer_rs() {
 }
 
 #[test]
+fn forwarder_call_async_multi_transfer_egld_rs() {
+    world().run("scenarios/forwarder_call_async_multi_transfer_egld.scen.json");
+}
+
+#[test]
 fn forwarder_call_async_retrieve_egld_rs() {
     world().run("scenarios/forwarder_call_async_retrieve_egld.scen.json");
 }
@@ -341,6 +346,11 @@ fn forwarder_call_transf_exec_accept_esdt_twice_rs() {
 #[test]
 fn forwarder_call_transf_exec_accept_multi_transfer_rs() {
     world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_accept_multi_transfer_egld_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer_egld.scen.json");
 }
 
 #[test]

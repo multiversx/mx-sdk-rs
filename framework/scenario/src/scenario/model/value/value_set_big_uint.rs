@@ -6,12 +6,19 @@ use crate::scenario_format::{
 
 use crate::multiversx_sc::api::ManagedTypeApi;
 use num_bigint::BigUint;
+use num_traits::Zero;
 use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct BigUintValue {
     pub value: BigUint,
     pub original: ValueSubTree,
+}
+
+impl BigUintValue {
+    pub fn is_zero(&self) -> bool {
+        self.value.is_zero()
+    }
 }
 
 impl InterpretableFrom<ValueSubTree> for BigUintValue {

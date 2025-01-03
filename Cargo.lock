@@ -2982,6 +2982,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "payable-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "multiversx-sc-snippets",
+ "payable-features",
+ "serde",
+ "serial_test",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "payload-macro-generator"
 version = "0.1.0"
 

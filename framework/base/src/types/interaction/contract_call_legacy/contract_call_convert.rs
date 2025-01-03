@@ -78,7 +78,10 @@ where
                 function_call: self
                     .basic
                     .function_call
-                    .convert_to_multi_transfer_esdt_call(&self.basic.to, &payments),
+                    .convert_to_multi_transfer_esdt_call(
+                        &self.basic.to,
+                        payments.as_multi_egld_or_esdt_payment(),
+                    ),
                 explicit_gas_limit: self.basic.explicit_gas_limit,
                 _return_type: PhantomData,
             },

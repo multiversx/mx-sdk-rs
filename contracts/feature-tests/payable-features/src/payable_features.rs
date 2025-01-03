@@ -152,4 +152,10 @@ pub trait PayableFeatures {
         let token = self.call_value().single_esdt().token_identifier.clone();
         (payment, token).into()
     }
+
+    #[endpoint]
+    #[payable("*")]
+    fn payable_all_transfers(&self) -> ManagedVec<EgldOrEsdtTokenPayment> {
+        self.call_value().all_transfers().clone()
+    }
 }
