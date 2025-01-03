@@ -1,0 +1,45 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "1000"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "egldValue": "1000",
+                "function": "forward_payment_callback",
+                "arguments": [
+                    "sc:vault"
+                ],
+                "gasLimit": "60,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:tokenize failed",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

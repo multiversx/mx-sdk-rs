@@ -438,9 +438,13 @@ fn promises_call_callback_directly_go() {
 }
 
 #[test]
-#[ignore = "VM does not support this"]
-fn promises_call_transfer_callback_go() {
-    world().run("scenarios/promises_call_transfer_callback.scen.json");
+fn promises_call_transfer_callback_egld_go() {
+    world().run("scenarios/promises_call_transfer_callback_egld.scen.json");
+}
+
+#[test]
+fn promises_call_transfer_callback_esdt_go() {
+    world().run("scenarios/promises_call_transfer_callback_esdt.scen.json");
 }
 
 #[test]
