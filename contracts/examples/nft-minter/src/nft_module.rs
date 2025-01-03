@@ -3,7 +3,8 @@ use multiversx_sc::{derive_imports::*, imports::*};
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000;
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct PriceTag<M: ManagedTypeApi> {
     pub token: EgldOrEsdtTokenIdentifier<M>,
     pub nonce: u64,
@@ -49,8 +50,8 @@ pub trait NftModule {
         self.send()
             .esdt_system_sc_proxy()
             .set_special_roles(
-                &self.blockchain().get_sc_address(),
-                &self.nft_token_id().get(),
+                self.blockchain().get_sc_address(),
+                self.nft_token_id().get(),
                 [EsdtLocalRole::NftCreate][..].iter().cloned(),
             )
             .async_call_and_exit()
@@ -123,7 +124,7 @@ pub trait NftModule {
     ) {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
-                self.nft_token_id().set(&token_id.unwrap_esdt());
+                self.nft_token_id().set(token_id.unwrap_esdt());
             },
             ManagedAsyncCallResult::Err(_) => {
                 let returned = self.call_value().egld_or_single_esdt();

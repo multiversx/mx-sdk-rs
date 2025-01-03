@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-codec"
-version = "0.19.0"
+version = "0.21.1"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
@@ -15,18 +15,17 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 
 [features]
 derive = ["multiversx-sc-codec-derive"]
-alloc = []
 
 [dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.19.0"
+version = "=0.21.1"
 optional = true
 
 [dependencies]
-arrayvec = { version = "=0.7.4", default-features = false }
-num-bigint = { version = "=0.4.5", optional = true } # can only be used in std contexts
+arrayvec = { version = "=0.7.6", default-features = false }
+num-bigint = { version = "0.4", optional = true } # can only be used in std contexts
 unwrap-infallible = "0.1.5"
 
 [dev-dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.19.0"
+version = "=0.21.1"

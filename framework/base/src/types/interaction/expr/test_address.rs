@@ -6,10 +6,12 @@ use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
     types::{
-        AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
-        TxToSpecified,
+        heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom,
+        TxFromSpecified, TxTo, TxToSpecified,
     },
 };
+
+use super::TestSCAddress;
 
 const ADDRESS_PREFIX: &str = "address:";
 
@@ -40,9 +42,47 @@ impl<'a> TestAddress<'a> {
         result
     }
 
+    pub fn to_address(&self) -> Address {
+        self.eval_to_array().into()
+    }
+
+    pub fn to_managed_address<Api: ManagedTypeApi>(&self) -> ManagedAddress<Api> {
+        self.eval_to_array().into()
+    }
+
     #[cfg(feature = "alloc")]
     pub fn eval_to_expr(&self) -> alloc::string::String {
         alloc::format!("{ADDRESS_PREFIX}{}", self.name)
+    }
+}
+
+impl<'a, 'b> PartialEq<TestSCAddress<'b>> for TestAddress<'a> {
+    fn eq(&self, other: &TestSCAddress) -> bool {
+        self.to_address() == other.to_address()
+    }
+}
+
+impl<'a> PartialEq<Address> for TestAddress<'a> {
+    fn eq(&self, other: &Address) -> bool {
+        &self.to_address() == other
+    }
+}
+
+impl<'a> PartialEq<TestAddress<'a>> for Address {
+    fn eq(&self, other: &TestAddress<'a>) -> bool {
+        self == &other.to_address()
+    }
+}
+
+impl<'a, Api: ManagedTypeApi> PartialEq<ManagedAddress<Api>> for TestAddress<'a> {
+    fn eq(&self, other: &ManagedAddress<Api>) -> bool {
+        self.to_address() == other.to_address()
+    }
+}
+
+impl<'a, Api: ManagedTypeApi> PartialEq<TestAddress<'a>> for ManagedAddress<Api> {
+    fn eq(&self, other: &TestAddress<'a>) -> bool {
+        self.to_address() == other.to_address()
     }
 }
 

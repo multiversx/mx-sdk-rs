@@ -5,10 +5,11 @@ use super::attributes::*;
 fn assert_no_other_auto_impl(method: &Method) {
     assert!(
         method.implementation.is_no_implementation(),
-        "Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}",
+        "Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}{}",
         "`#[storage_get]`, ",
         "`#[storage_set]`, ",
         "`#[storage_mapper]`, ",
+        "`#[storage_mapper_from_address]`, ",
         "`#[storage_is_empty]`, ",
         "`#[storage_clear]`, ",
         "`#[proxy]`, ",
@@ -67,6 +68,20 @@ pub fn process_storage_mapper_attribute(attr: &syn::Attribute, method: &mut Meth
             assert_no_other_auto_impl(&*method);
             method.implementation = MethodImpl::Generated(AutoImpl::StorageMapper {
                 identifier: storage_mapper.identifier,
+            });
+        })
+        .is_some()
+}
+
+pub fn process_storage_mapper_from_address_attribute(
+    attr: &syn::Attribute,
+    method: &mut Method,
+) -> bool {
+    StorageMapperFromAddressAttribute::parse(attr)
+        .map(|storage_mapper_from_address| {
+            assert_no_other_auto_impl(&*method);
+            method.implementation = MethodImpl::Generated(AutoImpl::StorageMapperFromAddress {
+                identifier: storage_mapper_from_address.identifier,
             });
         })
         .is_some()

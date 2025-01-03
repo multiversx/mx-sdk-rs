@@ -109,8 +109,8 @@ impl BigIntApiImpl for crate::api::VmApiImpl {
     unary_op_wrapper! {bi_sqrt, bigIntSqrt}
     binary_op_wrapper! {bi_pow, bigIntPow}
 
-    fn bi_log2(&self, x: Self::BigIntHandle) -> u32 {
-        unsafe { bigIntLog2(x) as u32 }
+    fn bi_log2(&self, x: Self::BigIntHandle) -> i32 {
+        unsafe { bigIntLog2(x) }
     }
 
     binary_op_wrapper! {bi_and, bigIntAnd}

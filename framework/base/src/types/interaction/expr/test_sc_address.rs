@@ -11,6 +11,8 @@ use crate::{
     },
 };
 
+use super::TestAddress;
+
 const SC_PREFIX: &str = "sc:";
 const VM_TYPE_LEN: usize = 2;
 const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
@@ -48,8 +50,41 @@ where
 
 impl<'a> TestSCAddress<'a> {
     pub fn to_address(&self) -> Address {
-        let expr: [u8; 32] = self.eval_to_array();
-        expr.into()
+        self.eval_to_array().into()
+    }
+
+    pub fn to_managed_address<Api: ManagedTypeApi>(&self) -> ManagedAddress<Api> {
+        self.eval_to_array().into()
+    }
+}
+
+impl<'a, 'b> PartialEq<TestAddress<'b>> for TestSCAddress<'a> {
+    fn eq(&self, other: &TestAddress) -> bool {
+        self.to_address() == other.to_address()
+    }
+}
+
+impl<'a> PartialEq<Address> for TestSCAddress<'a> {
+    fn eq(&self, other: &Address) -> bool {
+        &self.to_address() == other
+    }
+}
+
+impl<'a> PartialEq<TestSCAddress<'a>> for Address {
+    fn eq(&self, other: &TestSCAddress<'a>) -> bool {
+        self == &other.to_address()
+    }
+}
+
+impl<'a, Api: ManagedTypeApi> PartialEq<ManagedAddress<Api>> for TestSCAddress<'a> {
+    fn eq(&self, other: &ManagedAddress<Api>) -> bool {
+        self.to_address() == other.to_address()
+    }
+}
+
+impl<'a, Api: ManagedTypeApi> PartialEq<TestSCAddress<'a>> for ManagedAddress<Api> {
+    fn eq(&self, other: &TestSCAddress<'a>) -> bool {
+        self.to_address() == other.to_address()
     }
 }
 

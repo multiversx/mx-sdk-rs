@@ -8,10 +8,10 @@ publish = false
 path = ".."
 
 [dependencies.multiversx-sc]
-version = "0.50.3"
+version = "0.54.6"
 path = "../../../../framework/base"
 
-[dependencies.multiversx-sc-meta]
-version = "0.50.3"
-path = "../../../../framework/meta"
+[dependencies.multiversx-sc-meta-lib]
+version = "0.54.6"
+path = "../../../../framework/meta-lib"
 default-features = false

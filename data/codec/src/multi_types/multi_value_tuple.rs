@@ -55,9 +55,13 @@ macro_rules! multi_value_impls {
 
             impl<$($name),+ > TopDecodeMultiLength for $mv_struct<$($name,)+>
             where
-                $($name: TopDecodeMulti,)+
+                $($name: TopDecodeMulti + TopDecodeMultiLength,)+
             {
-                const LEN: usize = $len;
+                const LEN: usize = 0
+                $(
+                    + <$name as TopDecodeMultiLength>::LEN
+                )+
+                ;
             }
 
             impl<$($name),+ > TopDecodeMulti for $mv_struct<$($name,)+>

@@ -4,7 +4,8 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 // used as mock attributes for NFTs
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct Color {
     r: u8,
     g: u8,
@@ -276,8 +277,7 @@ pub trait LocalEsdtAndEsdtNft {
         // so we can get the token identifier and amount from the call data
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                self.last_issued_token()
-                    .set(&token_identifier.unwrap_esdt());
+                self.last_issued_token().set(token_identifier.unwrap_esdt());
                 self.last_error_message().clear();
             },
             ManagedAsyncCallResult::Err(message) => {

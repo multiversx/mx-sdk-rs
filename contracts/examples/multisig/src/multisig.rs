@@ -6,6 +6,7 @@ pub mod multisig_perform;
 pub mod multisig_propose;
 pub mod multisig_proxy;
 pub mod multisig_state;
+pub mod multisig_view_proxy;
 pub mod user_role;
 
 use action::ActionFullInfo;

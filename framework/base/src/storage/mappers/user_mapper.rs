@@ -9,7 +9,7 @@ use crate::{
 
 use super::{
     set_mapper::{CurrentStorage, StorageAddress},
-    StorageMapper,
+    StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     abi::{TypeAbi, TypeName},
@@ -54,11 +54,11 @@ where
     }
 }
 
-impl<SA> UserMapper<SA, ManagedAddress<SA>>
+impl<SA> StorageMapperFromAddress<SA> for UserMapper<SA, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         UserMapper {
             _phantom_api: PhantomData,
             address,

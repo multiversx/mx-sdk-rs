@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           66
+// Endpoints:                           69
 // Async Callback:                       1
-// Total number of exported functions:  68
+// Total number of exported functions:  71
 
 #![no_std]
 
@@ -22,6 +22,9 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_arguments_sync => echo_arguments_sync
         echo_arguments_sync_twice => echo_arguments_sync_twice
         forward_sync_accept_funds => forward_sync_accept_funds
+        forward_sync_accept_funds_rh_egld => forward_sync_accept_funds_rh_egld
+        forward_sync_accept_funds_rh_single_esdt => forward_sync_accept_funds_rh_single_esdt
+        forward_sync_accept_funds_rh_multi_esdt => forward_sync_accept_funds_rh_multi_esdt
         forward_sync_accept_funds_with_fees => forward_sync_accept_funds_with_fees
         forward_sync_accept_funds_then_read => forward_sync_accept_funds_then_read
         forward_sync_retrieve_funds => forward_sync_retrieve_funds

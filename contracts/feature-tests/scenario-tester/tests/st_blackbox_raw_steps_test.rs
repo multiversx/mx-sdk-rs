@@ -5,6 +5,7 @@ const SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
     blockchain.register_contract(SCENARIO_TESTER_PATH_EXPR, scenario_tester::ContractBuilder);
     blockchain
 }
@@ -25,7 +26,7 @@ fn scenario_tester_blackbox_raw() {
                 .from("address:owner")
                 .code(scenario_tester_code)
                 .argument("5")
-                .expect(TxExpect::ok().no_result()),
+                .expect(TxExpect::ok().result("str:init-result")),
         )
         .sc_query(
             ScQueryStep::new()

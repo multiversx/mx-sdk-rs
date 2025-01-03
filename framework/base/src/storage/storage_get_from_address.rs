@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        const_handles, use_raw_handle, ErrorApi, ManagedBufferApiImpl, ManagedTypeApi,
-        StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        const_handles, use_raw_handle, ErrorApi, HandleConstraints, ManagedBufferApiImpl,
+        ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
     codec::*,
     types::{
@@ -148,9 +148,10 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
+    let handle = key.get_handle().get_raw_handle_unchecked();
     T::top_decode_or_handle_err(
         StorageGetFromAddressInput::new(addr, key),
-        StorageGetErrorHandler::<A>::default(),
+        StorageGetErrorHandler::<A>::new(handle),
     )
     .unwrap_infallible()
 }

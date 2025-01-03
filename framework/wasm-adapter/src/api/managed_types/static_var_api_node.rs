@@ -11,6 +11,8 @@ static mut NEXT_HANDLE: i32 = const_handles::NEW_HANDLE_START_FROM;
 static mut NUM_ARGUMENTS: i32 = 0;
 static mut CALL_VALUE_EGLD_HANDLE: i32 = const_handles::UNINITIALIZED_HANDLE;
 static mut CALL_VALUE_MULTI_ESDT_HANDLE: i32 = const_handles::UNINITIALIZED_HANDLE;
+static mut SCALING_FACTOR_INIT: [bool; const_handles::SCALING_FACTOR_LENGTH] =
+    [false; const_handles::SCALING_FACTOR_LENGTH];
 
 // The compiler seems to enjoy inlining this method no matter how many times it shows up.
 // Hence the rather drastic directive.
@@ -78,5 +80,15 @@ impl StaticVarApiImpl for VmApiImpl {
 
     fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
         unsafe { CALL_VALUE_MULTI_ESDT_HANDLE }
+    }
+
+    fn is_scaling_factor_cached(&self, decimals: usize) -> bool {
+        unsafe { SCALING_FACTOR_INIT[decimals] }
+    }
+
+    fn set_scaling_factor_cached(&self, decimals: usize) {
+        {
+            unsafe { SCALING_FACTOR_INIT[decimals] = true }
+        }
     }
 }

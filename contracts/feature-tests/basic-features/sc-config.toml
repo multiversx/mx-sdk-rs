@@ -1,6 +1,8 @@
 [settings]
 main = "basic-features"
 
+[contracts.basic-features]
+
 [contracts.basic-features.profile]
 overflow-checks = true # needed for overflow tests
 
@@ -8,3 +10,22 @@ overflow-checks = true # needed for overflow tests
 add-unlabelled = false
 add-endpoints = ["init", "load_bytes", "store_bytes"]
 kill_legacy_callback = true
+
+[contracts.basic-features-crypto]
+ei = "1.4"
+add-unlabelled = false
+add-endpoints = ["init"]
+add-labels = ["crypto-ei-1.4"]
+kill_legacy_callback = true
+
+[[proxy]]
+path = "src/basic_features_proxy.rs"
+add-unlabelled = false
+add-endpoints = [
+    "init",
+    "store_bytes",
+    "load_bytes",
+    "returns_egld_decimal",
+    "echo_managed_option",
+]
+add-labels = ["crypto-ei-1.4"]

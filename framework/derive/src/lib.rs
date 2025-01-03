@@ -44,6 +44,10 @@ pub fn proxy(
     macro_proxy::process_proxy(args, input)
 }
 
+#[deprecated(
+    since = "0.54.4",
+    note = "Replace with attribute #[type_abi], which should be placed before all derives. More about this: https://docs.multiversx.com/developers/transactions/tx-migration/#replace-derivetypeabi-with-type_abi"
+)]
 #[proc_macro_derive(TypeAbi)]
 pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     type_abi_derive::type_abi_derive(input).into()
@@ -72,4 +76,52 @@ pub fn format_receiver_args(input: proc_macro::TokenStream) -> proc_macro::Token
 #[proc_macro]
 pub fn semver_tuple(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     format::semver_tuple(input.into()).into()
+}
+
+#[proc_macro]
+pub fn const_managed_decimal(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let input = parse_macro_input!(input as syn::LitStr);
+    let (raw_int, decimals) = format::extract_number_data(input);
+
+    let expanded = quote! {
+        multiversx_sc::types::ManagedDecimal::<<Self as ContractBase>::Api, multiversx_sc::types::ConstDecimals<#decimals>>::const_decimals_from_raw(multiversx_sc::types::BigUint::from(#raw_int))
+    };
+
+    proc_macro::TokenStream::from(expanded)
+}
+
+#[proc_macro]
+pub fn managed_decimal(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let input = parse_macro_input!(input as syn::LitStr);
+    let (raw_int, decimals) = format::extract_number_data(input);
+
+    let expanded = quote! {
+        multiversx_sc::types::ManagedDecimal::<<Self as ContractBase>::Api, usize>::from_raw_units(multiversx_sc::types::BigUint::from(#raw_int), #decimals)
+    };
+
+    proc_macro::TokenStream::from(expanded)
+}
+
+#[proc_macro]
+pub fn debug_const_managed_decimal(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let input = parse_macro_input!(input as syn::LitStr);
+    let (raw_int, decimals) = format::extract_number_data(input);
+
+    let expanded = quote! {
+        multiversx_sc::types::ManagedDecimal::<multiversx_sc_scenario::imports::StaticApi, multiversx_sc::types::ConstDecimals<#decimals>>::const_decimals_from_raw(multiversx_sc::types::BigUint::from(#raw_int))
+    };
+
+    proc_macro::TokenStream::from(expanded)
+}
+
+#[proc_macro]
+pub fn debug_managed_decimal(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let input = parse_macro_input!(input as syn::LitStr);
+    let (raw_int, decimals) = format::extract_number_data(input);
+
+    let expanded = quote! {
+        multiversx_sc::types::ManagedDecimal::<multiversx_sc_scenario::imports::StaticApi, usize>::from_raw_units(multiversx_sc::types::BigUint::from(#raw_int), #decimals)
+    };
+
+    proc_macro::TokenStream::from(expanded)
 }

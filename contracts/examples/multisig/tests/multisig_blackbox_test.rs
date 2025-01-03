@@ -2,7 +2,7 @@ use multiversx_sc::codec::top_encode_to_vec_u8_or_panic;
 use multiversx_sc_scenario::imports::*;
 
 use adder::adder_proxy;
-use multisig::multisig_proxy;
+use multisig::{multisig_proxy, multisig_view_proxy};
 use num_bigint::BigUint;
 
 const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
@@ -19,6 +19,7 @@ const QUORUM_SIZE: usize = 1;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
     blockchain.register_contract(MULTISIG_CODE_PATH, multisig::ContractBuilder);
     blockchain.register_contract(ADDER_CODE_PATH, adder::ContractBuilder);
     blockchain
@@ -71,7 +72,7 @@ impl MultisigTestState {
         self.sign(action_id);
         self.perform(action_id);
 
-        self.expect_user_role(PROPOSER_ADDRESS, multisig_proxy::UserRole::Proposer);
+        self.expect_user_role(PROPOSER_ADDRESS, multisig_view_proxy::UserRole::Proposer);
 
         self
     }
@@ -232,12 +233,12 @@ impl MultisigTestState {
     fn expect_user_role(
         &mut self,
         user: TestAddress,
-        expected_user_role: multisig_proxy::UserRole,
+        expected_user_role: multisig_view_proxy::UserRole,
     ) {
         self.world
             .query()
             .to(MULTISIG_ADDRESS)
-            .typed(multisig_proxy::MultisigProxy)
+            .typed(multisig_view_proxy::MultisigProxy)
             .user_role(user)
             .returns(ExpectValue(expected_user_role))
             .run();
@@ -253,7 +254,7 @@ fn test_add_board_member() {
 
     state.world.account(new_board_member_expr).nonce(1);
 
-    state.expect_user_role(new_board_member_expr, multisig_proxy::UserRole::None);
+    state.expect_user_role(new_board_member_expr, multisig_view_proxy::UserRole::None);
 
     let action_id = state.propose_add_board_member(new_board_member_expr);
     state.sign(action_id);
@@ -261,12 +262,15 @@ fn test_add_board_member() {
 
     let expected_value = MultiValueVec::from(vec![BOARD_MEMBER_ADDRESS, new_board_member_expr]);
 
-    state.expect_user_role(new_board_member_expr, multisig_proxy::UserRole::BoardMember);
+    state.expect_user_role(
+        new_board_member_expr,
+        multisig_view_proxy::UserRole::BoardMember,
+    );
     state
         .world
         .query()
         .to(MULTISIG_ADDRESS)
-        .typed(multisig_proxy::MultisigProxy)
+        .typed(multisig_view_proxy::MultisigProxy)
         .get_all_board_members()
         .returns(ExpectValue(expected_value))
         .run()
@@ -281,7 +285,10 @@ fn test_add_proposer() {
 
     state.world.account(new_proposer_address_expr).nonce(1);
 
-    state.expect_user_role(new_proposer_address_expr, multisig_proxy::UserRole::None);
+    state.expect_user_role(
+        new_proposer_address_expr,
+        multisig_view_proxy::UserRole::None,
+    );
 
     let action_id = state.propose_add_proposer(new_proposer_address_expr);
     state.sign(action_id);
@@ -289,7 +296,7 @@ fn test_add_proposer() {
 
     state.expect_user_role(
         new_proposer_address_expr,
-        multisig_proxy::UserRole::Proposer,
+        multisig_view_proxy::UserRole::Proposer,
     );
 
     let expected_value = MultiValueVec::from(vec![PROPOSER_ADDRESS, new_proposer_address_expr]);
@@ -297,7 +304,7 @@ fn test_add_proposer() {
         .world
         .query()
         .to(MULTISIG_ADDRESS)
-        .typed(multisig_proxy::MultisigProxy)
+        .typed(multisig_view_proxy::MultisigProxy)
         .get_all_proposers()
         .returns(ExpectValue(expected_value))
         .run();
@@ -308,18 +315,18 @@ fn test_remove_proposer() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
-    state.expect_user_role(PROPOSER_ADDRESS, multisig_proxy::UserRole::Proposer);
+    state.expect_user_role(PROPOSER_ADDRESS, multisig_view_proxy::UserRole::Proposer);
 
     let action_id = state.propose_remove_user(PROPOSER_ADDRESS);
     state.sign(action_id);
     state.perform(action_id);
 
-    state.expect_user_role(PROPOSER_ADDRESS, multisig_proxy::UserRole::None);
+    state.expect_user_role(PROPOSER_ADDRESS, multisig_view_proxy::UserRole::None);
     state
         .world
         .query()
         .to(MULTISIG_ADDRESS)
-        .typed(multisig_proxy::MultisigProxy)
+        .typed(multisig_view_proxy::MultisigProxy)
         .get_all_proposers()
         .returns(ExpectValue(MultiValueVec::<Address>::new()))
         .run();

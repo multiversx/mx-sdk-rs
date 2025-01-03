@@ -9,10 +9,11 @@ The `mx-sdk-rs` repo contains many crates, grouped into several families. Crates
 For brevity, the changelog will only mention a short version of their name.
 
 They are:
-- `multiversx-sc`, in short `sc`, the smart contract framework, 6 crates + 3 for contracts/modules:
+- `multiversx-sc`, in short `sc`, the smart contract framework, 7 crates + 3 for contracts/modules:
 	- `multiversx-sc`
     - `multiversx-sc-derive`
     - `multiversx-sc-meta`
+    - `multiversx-sc-meta-lib`
     - `multiversx-sc-scenario`
     - `multiversx-sc-snippets`
     - `multiversx-sc-wasm-adapter`
@@ -22,10 +23,180 @@ They are:
 - `multiversx-sc-codec`, in short `codec`, the serializer/deserializer, 2 crates:
 	- `multiversx-sc-codec`
 	- `multiversx-sc-codec-derive`
-- `multiversx-chain-vm`, in short `vm`, a Rust VM implementation, 1 crate.
+- Chain crates, in short `chain`. Formerly it was only the VM (`vm`). 2 crates:
+	- `multiversx-chain-core` - *a common crate for chain types, constants, flags*
+	- `multiversx-chain-vm` - *a Rust VM implementation*
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
-- `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
+- `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 3 crates:
+	- `multiversx-sdk`
+	- `multiversx-sdk-http`
+	- `multiversx-sdk-dapp`
 
+
+## [sc 0.54.6] - 2024-12-04
+- `ManagedDecimal` bugfixes:
+	- ABI/proxy bugfix;
+	- Rescale bugfix.
+
+## [sc 0.54.5] - 2024-11-28
+- `ManagedVec` - deprecated `sort` and guarded it by the `alloc` feature, since it uses the allocator.
+- `sc-meta`
+	- versioning fix;
+	- interactor generator fix.
+- Interactors - fixed code metadata on deploy.
+
+## [sc 0.54.4] - 2024-11-22
+- `sc-meta`
+	- `install debugger` CLI that prepares VSCode extension for debugging;
+	- fixed a crash involving templates and installers.
+- Deprecated `#[derive(TypeAbi)]` and added an additional warning in the macro.
+
+## [sc 0.54.3] - 2024-11-18
+- `#[storage_mapper_from_address]` fixes for: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `TokenAttributesMapper`, `UniqueIdMapper`, `UserMapper`, `AddressToIdMapper`.
+
+## [sc 0.54.2, codec 0.21.1, chain 0.11.1, sdk 0.7.1] - 2024-11-15
+- Codec improvements:
+	- `MultiValueX` - `TopDecodeMultiLength` implementation fix;
+	- `ManagedVecItem` implented for MultiValue2 and MultiValue3.
+- `sc-meta snippets` improvements.
+
+## [sc 0.54.1] - 2024-11-13
+- `sc-meta` `cs` - ChainSimulator CLI, which provides handy functionality to:
+	- install the chain simulator image in Docker;
+	- start/stop the chain simulator;
+	- quick testing using the `chain-simulator-tests` feature flag.
+- Adder interactor cleanup, including in template.
+- Interactor - `use_chain_simulator` builder method, for improved backwards compatibility.
+- `MultiValueEncodedCounted` - a lazy multi-value encoding, but with known number of elements.
+
+## [sc 0.54.0, sdk 0.7.0, chain 0.11.0] - 2024-11-06
+- New crate, `multiversx-chain-core`, to be used in both framework and Rust VM. It contains common types, flags, and constants that refer to the protocol.
+- Major SDK/interactor refactor:
+	- Added support for Chain Simulator in interactors:
+		- Added chain-simulator-specific endpoints: feed account, advance blocks
+		- Added a system to set up accounts in the chain simulator from the interactor;
+		- Support for advancing blocks in the interactor;
+	- Split SDK crate into:
+		- `multiversx-sdk` - only contains the specifications of the gateway API, without a mechanism to call the API;
+		- `multiversx-sdk-http` - functionality to call the gateway via reqwest;
+		- `multiversx-sdk-dapp` - functionality to call the gateway via wasm-bindgen, to be used in WebAssembly front-ends;
+	- Major improvements in the retrieving of transactions and other blockchain data fron the API, many bugs fixed;
+	- Support for writing integration tests for interactors, using the Chain Simulator;
+		- Also added support for test-related `chain-simulator-tests` feature flag in `sc-meta`;
+	- Interactors on the front-end:
+		- Interactor type made generic over the gateway API implementation, so that it can be used in both front-end and back-end, with no change in the code base;
+		- Support for custom random number generation for the front-end;
+	- Mechanism for fixing file paths in the interactor context;
+	- Fixed an issue with the account tool;
+	- Adjusted `sc-meta snippets` for the new syntax and the chain simulator support;
+- Unified syntax:
+	- `ReturnsHandledOrError` result handler, which can gracefully deal with failed transactions;
+	- `ReturnsGasUsed` result handler;
+	- `PassValue` result handler for providing a closure-like context for multi-transaction call/deploy;
+	- More specific back transfer result handlers: `ReturnsBackTransfersEGLD`, `ReturnsBackTransfersMultiESDT`, `ReturnsBackTransfersSingleESDT`;
+	- Fixed an issue with the update functionality not being general enough;
+	- Deprecated `prepare_async()`, developers can now call `run()` directly, asynchronously;
+- `sc-meta` improvements:
+	- New mechanism for detecting and warning about storage writes in readonly endpoints, integrated into the build system;
+	- Support for referencing the framework via git commit, branch, or tag, to make it easier to try out unreleased versions;
+	- Support for `default-features`;
+	- Better representation in console of the contract/lib folders, as well as better error messages.
+	- Refactoring of the dependency handling logic.
+- Fixed the debugger, following changes in the Rust debug tooling.
+- `ManagedVec` `set` always consumes ownership. Preparations for a profound memory management cleanup.
+- ABI:
+	- `title` field and annotation;
+	- Refactoring.
+
+## [sc 0.53.2] - 2024-10-02
+- `StakingModule` fix.
+
+## [sc 0.53.1, sdk 0.6.1] - 2024-10-01
+- Interactor: 
+  - Allow signature to be empty in TransactionOnNetwork;
+  - Allow return data to be empty in VMOutputApi.
+
+## [sc 0.53.0 codec 0.21.0, vm 0.10.0, sdk 0.6.0, scenario-format 0.23.0] - 2024-09-04
+- Unified syntax:
+  -  Whitebox testing;
+  -  Proxy fix for ManagedOption;
+  -  TestTokenIdentifier syntactic sugar.
+- New ResultHandler: `ReturnsLogs`.
+- Interactor: 
+  - Fix on API fetch process status;
+  - Fix on ReturnsNewTokenIdentifier edge cases solved;
+  - Fix on ESDTTransfer for transfer step;
+  - Support for Keystore + password.
+- Framework API support: EI 1.4 crypto functions.
+- `sc-meta`:
+  -  New `wallet` command: PEM and keystore generator and conversions;
+  -  New `report` command: 
+     -  Generate json or Markdown report based on size, path, allocator and panic messages;
+     -  Compare reports;
+     -  Convert reports.
+- VecMapper update with index.
+- Substitution list: AddressToIdMapper
+- Dependencies updated.
+
+## [sc 0.52.3] - 2024-08-06
+- Pause module events.
+
+## [sc 0.52.2] - 2024-08-01
+- `ManagedBufferReadToEnd` extract data methods.
+
+## [sc 0.52.1] - 2024-07-31
+- `ManagedBufferReadToEnd` `TypeAbi` implementation.
+
+## [sc 0.52.0, codec 0.20.1] - 2024-07-31
+- ManagedBufferReadToEnd type, which flushed a nested data buffer.
+- Fixed hex and binary formatters for byte slices.
+- Added EI 1.4 and 1.5 configs.
+- Dependency upgrades.
+
+## [sc 0.51.1]
+- `sc-meta upgrade` bugfix.
+
+## [sc 0.51.0, codec 0.20.0, vm 0.9.0, sdk 0.5.0, scenario-format 0.22.3] - 2024-07-06
+- Major refactoring of `multiversx-sc-meta`
+	- Crate `multiversx-sc-meta` split in 2:
+		1. `multiversx-sc-meta` remains the standalone tool. For backwards compatibility, it can still be used in contract meta crates, but a warning will be issued.
+		2. `multiversx-sc-meta-lib` is the contract-only library to contract meta crates.
+	- The refactoring came with few code changes, but dependencies were disentangled and cleaned up.
+	- Account retrieval tool was merged into `sc-meta` standalone. Previously little known feature, it enables downloading the full state of an account and formatting it as a mandos set state step. Very useful for generating tests and investigating state.
+	- `multiversx-sdk` was also refactored, especially the gateway proxy.
+- A new code report is available in the `.mxsc.json` build output. The report analyzes the wasm code after build and always offers the following information:
+	- `imports`: what VM hooks are used;
+	- `eiCheck`: if the used imports comply with the environment interface (EI, allowed VM hooks);
+	- `hasAllocator`: is it allocates on the heap;
+	- `hasPanic`: whether it produces Rust panics and formats error messages using the standard Rust formatter (a source of code bloat).
+- `ManagedDecimal` and `ManagedDecimalSigned`:
+	- New types that encapulate a managed `BigUint` and `BigInt` respectively, but treat them as base 10 fixed point rational numbers.
+	- Two flavors are allowed: the number of decimals is known at compile time (e.g. EGLD always has 18 decimals), or only at runtime.
+		- Type `ConstDecimals` is able to resolve conversions at compile time, reducing code size and making encoding and decoding easier, since the number of decimals does not need to be encoded.
+		- Regular `usize` number of decimals is resolved at runtime.
+	- All basic arithmetic operations are implemented for these types, just like for the big integers.
+- Implemented logarithms:
+	- Natural logarithm `ln` for `ManagedDecimal`, `BigFloat`, and `BigInt`.
+	- Base 2 logarithm `log2` for `ManagedDecimal`.
+	- Precision is about 5 decimals, largely irrespective of input.
+	- The operation is cheap, `ln` costs 44980 gas for managed decimals and 153772 for big floats, largely irrespective of input.
+- Smart contract code on the front-end:
+	- Framework and contract code, together with the Rust VM as a backend, can now be compiled to WebAssembly for front-end, using `wasm-bindgen`.
+	- A few incompatible Rust VM features needed to be made optional for this to work.
+- Reverted changes in `sc 0.50.6` (`diagnostic::on_unimplemented` & rustc 1.78 dependency).
+- Bugfix: `sync_call_readonly` can now be used with proxies.
+
+
+## [sc 0.50.6] - 2024-07-05
+- Temporarily removed dependency to rustc 1.78, to ease transition from older versions. Will be re-enabled in 0.51.0.
+
+## [sc 0.50.5] - 2024-06-21
+- `#[storage_mapper_from_address] annotation.
+- Added missing equality operator for test addresses (`TestAddress`, `TestSCAddress`).
+
+## [sc 0.50.4] - 2024-06-06
+- Compiler version requirement (1.78).
+- Minor imports fix.
 
 ## [sc 0.50.3] - 2024-05-25
 - Dependency update and fix. There was an issue with the `zip` dependency in sc-meta.

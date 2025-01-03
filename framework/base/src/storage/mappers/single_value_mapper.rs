@@ -2,7 +2,7 @@ use core::{borrow::Borrow, marker::PhantomData};
 
 use super::{
     set_mapper::{CurrentStorage, StorageAddress},
-    StorageMapper,
+    StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -44,13 +44,13 @@ where
     }
 }
 
-impl<SA, T> SingleValueMapper<SA, T, ManagedAddress<SA>>
+impl<SA, T> StorageMapperFromAddress<SA> for SingleValueMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     #[inline]
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
             address,
             key: base_key,

@@ -26,6 +26,18 @@ impl<'a> TestTokenIdentifier<'a> {
     pub fn eval_to_expr(&self) -> alloc::string::String {
         alloc::format!("{STR_PREFIX}{}", self.name)
     }
+
+    pub fn to_token_identifier<Api: ManagedTypeApi>(&self) -> TokenIdentifier<Api> {
+        self.name.into()
+    }
+
+    pub fn as_str(&self) -> &str {
+        self.name
+    }
+
+    pub fn as_bytes(&self) -> &[u8] {
+        self.name.as_bytes()
+    }
 }
 
 impl<'a, Env> AnnotatedValue<Env, TokenIdentifier<Env::Api>> for TestTokenIdentifier<'a>

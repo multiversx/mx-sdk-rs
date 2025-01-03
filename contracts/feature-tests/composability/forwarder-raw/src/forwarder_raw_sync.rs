@@ -101,6 +101,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
             .gas(half_gas)
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
+            .payment(NotPayable) // `()` and `NotPayable` both work
             .returns(ReturnsRawResult)
             .sync_call_readonly();
 

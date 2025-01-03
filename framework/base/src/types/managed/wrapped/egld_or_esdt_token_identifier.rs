@@ -1,3 +1,5 @@
+use alloc::string::ToString;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{HandleConstraints, ManagedTypeApi},
@@ -266,7 +268,6 @@ where
     M: ManagedTypeApi,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        use crate::alloc::string::ToString;
         if let Some(token_identifier) = self.data.as_option() {
             let token_id_str = token_identifier.to_string();
             f.debug_tuple("EgldOrEsdtTokenIdentifier::Esdt")

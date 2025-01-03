@@ -7,7 +7,8 @@ use multiversx_sc_modules::default_issue_callbacks;
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000; // 100%
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct PriceTag<M: ManagedTypeApi> {
     pub token: EgldOrEsdtTokenIdentifier<M>,
     pub nonce: u64,

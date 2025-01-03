@@ -2,8 +2,8 @@ use core::{convert::Infallible, marker::PhantomData};
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
-        ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, HandleConstraints,
+        ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
     codec::*,
     err_msg,
@@ -135,9 +135,10 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
+    let handle = key.get_handle().get_raw_handle_unchecked();
     T::top_decode_or_handle_err(
         StorageGetInput::new(key),
-        StorageGetErrorHandler::<A>::default(),
+        StorageGetErrorHandler::<A>::new(handle),
     )
     .unwrap_infallible()
 }
@@ -161,17 +162,20 @@ where
     M: ManagedTypeApi + ErrorApi,
 {
     _phantom: PhantomData<M>,
+    key: i32,
 }
 
 impl<M> Copy for StorageGetErrorHandler<M> where M: ManagedTypeApi + ErrorApi {}
 
-impl<M> Default for StorageGetErrorHandler<M>
+impl<M> StorageGetErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    fn default() -> Self {
-        Self {
+    #[inline]
+    pub fn new(key: i32) -> Self {
+        StorageGetErrorHandler {
             _phantom: PhantomData,
+            key,
         }
     }
 }
@@ -183,7 +187,10 @@ where
     type HandledErr = Infallible;
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
-        let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);
+        let mut message_buffer =
+            ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR_1.as_bytes());
+        M::managed_type_impl().mb_append(message_buffer.get_handle(), self.key.into());
+        message_buffer.append_bytes(err_msg::STORAGE_DECODE_ERROR_2.as_bytes());
         message_buffer.append_bytes(err.message_bytes());
         M::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
     }

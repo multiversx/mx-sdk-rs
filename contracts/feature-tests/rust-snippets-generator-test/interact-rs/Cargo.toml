@@ -13,7 +13,7 @@ path = "src/interactor_main.rs"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.50.3"
+version = "0.54.6"
 path = "../../../../framework/snippets"
 
 # [workspace]

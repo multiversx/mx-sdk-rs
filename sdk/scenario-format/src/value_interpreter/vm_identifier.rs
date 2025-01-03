@@ -1,6 +1,6 @@
 pub const VM_TYPE_LENGTH: usize = 2;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct VMIdentifier {
     pub vm_type: [u8; VM_TYPE_LENGTH],
 }

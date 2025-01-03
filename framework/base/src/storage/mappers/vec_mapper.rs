@@ -1,6 +1,6 @@
 use super::{
     set_mapper::{CurrentStorage, StorageAddress},
-    StorageClearable, StorageMapper,
+    StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -12,7 +12,7 @@ use crate::{
     storage::{storage_clear, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
-use core::{marker::PhantomData, usize};
+use core::marker::PhantomData;
 
 const ITEM_SUFFIX: &[u8] = b".item";
 const LEN_SUFFIX: &[u8] = b".len";
@@ -56,12 +56,12 @@ where
     }
 }
 
-impl<SA, T> VecMapper<SA, T, ManagedAddress<SA>>
+impl<SA, T> StorageMapperFromAddress<SA> for VecMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         let mut len_key = base_key.clone();
         len_key.append_bytes(LEN_SUFFIX);
 
@@ -207,6 +207,16 @@ where
             SA::error_api_impl().signal_error(&b"index out of range"[..]);
         }
         self.set_unchecked(index, item);
+    }
+
+    /// Syntactic sugar, to more compactly express a get, update and set in one line.
+    /// Takes whatever lies in storage, apples the given closure and saves the final value back to storage.
+    /// Propagates the return value of the given function.
+    pub fn update<R, F: FnOnce(&mut T) -> R>(&mut self, index: usize, f: F) -> R {
+        let mut value = self.get(index);
+        let result = f(&mut value);
+        self.set(index, &value);
+        result
     }
 
     /// Keeping `set_unchecked` private on purpose, so developers don't write out of index limits by accident.

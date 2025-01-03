@@ -190,9 +190,9 @@ where
         }
     }
 
-    pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
+    pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
-        item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+        item.into_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
     }
 
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
@@ -205,7 +205,7 @@ where
     }
 
     pub fn push(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
+        item.into_byte_writer(|bytes| {
             self.buffer.append_bytes(bytes);
         });
     }
@@ -251,7 +251,7 @@ where
     }
 
     pub fn overwrite_with_single_item(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
+        item.into_byte_writer(|bytes| {
             self.buffer.overwrite(bytes);
         });
     }
@@ -356,6 +356,8 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + Ord + Debug,
 {
+    #[deprecated(since = "0.54.5", note = "Please use method `sort_unstable` instead.")]
+    #[cfg(feature = "alloc")]
     pub fn sort(&mut self) {
         self.with_self_as_slice_mut(|slice| {
             slice.sort();
@@ -363,6 +365,11 @@ where
         });
     }
 
+    #[deprecated(
+        since = "0.54.5",
+        note = "Please use method `sort_unstable_by` instead."
+    )]
+    #[cfg(feature = "alloc")]
     pub fn sort_by<F>(&mut self, mut compare: F)
     where
         F: FnMut(&T, &T) -> Ordering,
@@ -373,6 +380,11 @@ where
         });
     }
 
+    #[deprecated(
+        since = "0.54.5",
+        note = "Please use method `sort_unstable_by_key` instead."
+    )]
+    #[cfg(feature = "alloc")]
     pub fn sort_by_key<K, F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> K,
@@ -384,6 +396,8 @@ where
         });
     }
 
+    #[deprecated]
+    #[cfg(feature = "alloc")]
     pub fn sort_by_cached_key<K, F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> K,

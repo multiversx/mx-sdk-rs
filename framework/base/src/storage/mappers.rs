@@ -20,7 +20,7 @@ pub use bi_di_mapper::BiDiMapper;
 pub use linked_list_mapper::{LinkedListMapper, LinkedListNode};
 pub use map_mapper::MapMapper;
 pub use map_storage_mapper::MapStorageMapper;
-pub use mapper::{StorageClearable, StorageMapper};
+pub use mapper::{StorageClearable, StorageMapper, StorageMapperFromAddress};
 pub use ordered_binary_tree_mapper::{
     NodeId, OrderedBinaryTreeMapper, OrderedBinaryTreeNode, NULL_NODE_ID,
 };

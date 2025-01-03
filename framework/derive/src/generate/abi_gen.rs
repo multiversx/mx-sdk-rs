@@ -15,6 +15,27 @@ fn generate_endpoint_snippet(
 ) -> proc_macro2::TokenStream {
     let endpoint_docs = &m.docs;
     let rust_method_name = m.name.to_string();
+    let title_tokens = m
+        .title
+        .as_ref()
+        .map(|title| quote! { .with_title(#title) })
+        .unwrap_or_default();
+    let only_owner_tokens = if only_owner {
+        quote! { .with_only_owner() }
+    } else {
+        quote! {}
+    };
+    let only_admin_tokens = if only_admin {
+        quote! { .with_only_admin() }
+    } else {
+        quote! {}
+    };
+    let allow_multiple_var_args_tokens = if allow_multiple_var_args {
+        quote! { .with_allow_multiple_var_args() }
+    } else {
+        quote! {}
+    };
+
     let payable_in_tokens = m.payable_metadata().abi_strings();
 
     let input_snippets: Vec<proc_macro2::TokenStream> = m
@@ -55,17 +76,20 @@ fn generate_endpoint_snippet(
 
     quote! {
         let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
-            &[ #(#endpoint_docs),* ],
             #endpoint_name,
             #rust_method_name,
-            #only_owner,
-            #only_admin,
             #mutability_tokens,
             #endpoint_type_tokens,
-            &[ #(#payable_in_tokens),* ],
-            &[ #(#label_names),* ],
-            #allow_multiple_var_args,
-        );
+        )
+        #(.with_docs(#endpoint_docs))*
+        #title_tokens
+        #only_owner_tokens
+        #only_admin_tokens
+        #(.with_label(#label_names))*
+        #(.with_payable_token(#payable_in_tokens))*
+        #allow_multiple_var_args_tokens
+        ;
+
         #(#input_snippets)*
         #output_snippet
     }

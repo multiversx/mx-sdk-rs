@@ -1,10 +1,11 @@
 use hex_literal::hex;
+use multiversx_chain_core::types::Address;
 use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
     abi::TypeAbiFrom,
-    api::{CallTypeApi, ManagedTypeApi},
-    types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxScEnv, TxTo, TxToSpecified},
+    api::ManagedTypeApi,
+    types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxTo, TxToSpecified},
 };
 
 /// Address of the system smart contract that manages ESDT.
@@ -26,6 +27,10 @@ impl ESDTSystemSCAddress {
         ManagedAddress::from(SYSTEM_SC_ADDRESS_BYTES)
     }
 
+    pub fn to_address(&self) -> Address {
+        SYSTEM_SC_ADDRESS_BYTES.into()
+    }
+
     pub fn to_bech32_str(&self) -> &str {
         SYSTEM_SC_ADDRESS_BECH32
     }
@@ -35,21 +40,21 @@ impl ESDTSystemSCAddress {
     }
 }
 
-impl<Api> AnnotatedValue<TxScEnv<Api>, ManagedAddress<Api>> for ESDTSystemSCAddress
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for ESDTSystemSCAddress
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn annotation(&self, _env: &TxScEnv<Api>) -> ManagedBuffer<Api> {
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         ManagedBuffer::from(SYSTEM_SC_ADDRESS_ANNOTATION)
     }
 
-    fn to_value(&self, _env: &TxScEnv<Api>) -> ManagedAddress<Api> {
+    fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         ESDTSystemSCAddress.to_managed_address()
     }
 }
 
-impl<Api> TxTo<TxScEnv<Api>> for ESDTSystemSCAddress where Api: CallTypeApi {}
-impl<Api> TxToSpecified<TxScEnv<Api>> for ESDTSystemSCAddress where Api: CallTypeApi {}
+impl<Env> TxTo<Env> for ESDTSystemSCAddress where Env: TxEnv {}
+impl<Env> TxToSpecified<Env> for ESDTSystemSCAddress where Env: TxEnv {}
 
 impl TopEncode for ESDTSystemSCAddress {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>

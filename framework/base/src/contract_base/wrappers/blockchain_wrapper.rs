@@ -77,7 +77,7 @@ where
 
     pub fn check_caller_is_owner(&self) {
         if self.get_owner_address() != self.get_caller() {
-            A::error_api_impl().signal_error(ONLY_OWNER_CALLER);
+            A::error_api_impl().signal_error(ONLY_OWNER_CALLER.as_bytes());
         }
     }
 
@@ -85,7 +85,7 @@ where
         let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::blockchain_api_impl().load_caller_managed(mbuf_temp_1.clone());
         if A::blockchain_api_impl().is_smart_contract(mbuf_temp_1) {
-            A::error_api_impl().signal_error(ONLY_USER_ACCOUNT_CALLER);
+            A::error_api_impl().signal_error(ONLY_USER_ACCOUNT_CALLER.as_bytes());
         }
     }
 
