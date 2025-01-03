@@ -127,6 +127,18 @@ where
             .original_result()
     }
 
+    pub fn forward_payment_callback<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("forward_payment_callback")
+            .argument(&to)
+            .original_result()
+    }
+
     pub fn promise_raw_single_token<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,

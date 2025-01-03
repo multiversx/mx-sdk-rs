@@ -21,6 +21,9 @@ pub trait CommonModule {
         #[indexed] payment: &BigUint,
     );
 
+    #[event("callback_result")]
+    fn callback_result(&self, #[indexed] result: MultiValueEncoded<ManagedBuffer>);
+
     #[view]
     #[storage_mapper("callback_data")]
     fn callback_data(&self) -> VecMapper<CallbackData<Self::Api>>;
