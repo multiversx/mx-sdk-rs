@@ -14,3 +14,5 @@ pub const ERROR_SIGNALLED_BY_SMARTCONTRACT: &str = "error signalled by smartcont
 
 pub const ERROR_NO_CALLBACK_CLOSURE: &str =
     "no callback for closure, cannot call callback directly";
+
+pub const PROMISES_TOKENIZE_FAILED: &str = "tokenize failed";
