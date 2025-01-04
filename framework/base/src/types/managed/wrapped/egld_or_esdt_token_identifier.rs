@@ -8,6 +8,7 @@ use crate::{
         ManagedTypeApi,
     },
     codec::*,
+    err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
     types::{ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier},
@@ -174,7 +175,9 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     pub fn unwrap_esdt(self) -> TokenIdentifier<M> {
         self.map_or_else(
             (),
-            |()| M::error_api_impl().signal_error(b"ESDT expected"),
+            |()| {
+                M::error_api_impl().signal_error(err_msg::TOKEN_IDENTIFIER_ESDT_EXPECTED.as_bytes())
+            },
             |(), token_identifier| token_identifier,
         )
     }

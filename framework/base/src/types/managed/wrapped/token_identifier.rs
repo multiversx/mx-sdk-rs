@@ -59,6 +59,14 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
         Self { data }
     }
 
+    pub fn try_new(data: EgldOrEsdtTokenIdentifier<M>) -> Option<Self> {
+        if data.is_egld() {
+            return None;
+        }
+
+        unsafe { Some(Self::esdt_unchecked(data)) }
+    }
+
     #[inline]
     pub fn from_esdt_bytes<B: Into<ManagedBuffer<M>>>(bytes: B) -> Self {
         TokenIdentifier::from(bytes.into())
@@ -166,10 +174,11 @@ impl<M: ManagedTypeApi> NestedDecode for TokenIdentifier<M> {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        unsafe {
-            Ok(TokenIdentifier::esdt_unchecked(
-                EgldOrEsdtTokenIdentifier::dep_decode_or_handle_err(input, h)?,
-            ))
+        let data = EgldOrEsdtTokenIdentifier::dep_decode_or_handle_err(input, h)?;
+        if let Some(ti) = TokenIdentifier::try_new(data) {
+            Ok(ti)
+        } else {
+            Err(h.handle_error(err_msg::TOKEN_IDENTIFIER_ESDT_EXPECTED.into()))
         }
     }
 }
@@ -180,10 +189,11 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        unsafe {
-            Ok(TokenIdentifier::esdt_unchecked(
-                EgldOrEsdtTokenIdentifier::top_decode_or_handle_err(input, h)?,
-            ))
+        let data = EgldOrEsdtTokenIdentifier::top_decode_or_handle_err(input, h)?;
+        if let Some(ti) = TokenIdentifier::try_new(data) {
+            Ok(ti)
+        } else {
+            Err(h.handle_error(err_msg::TOKEN_IDENTIFIER_ESDT_EXPECTED.into()))
         }
     }
 }
