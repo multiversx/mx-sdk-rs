@@ -111,7 +111,7 @@ where
 
     pub fn accept_funds_echo_payment(
         self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>> {
         self.wrapped_tx
             .raw_call("accept_funds_echo_payment")
             .original_result()

@@ -345,7 +345,7 @@ where
 
     pub fn send_async_accept_multi_transfer<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
@@ -445,7 +445,7 @@ where
 
     pub fn transf_exec_multi_accept_funds<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,

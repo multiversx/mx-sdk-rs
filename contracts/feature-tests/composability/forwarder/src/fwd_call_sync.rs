@@ -160,7 +160,7 @@ pub trait ForwarderSyncCallModule {
     fn accept_funds_sync_result_event(
         &self,
         #[indexed] egld_value: &BigUint,
-        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     );
 
     #[endpoint]
