@@ -10,6 +10,11 @@ fn call_value_check_go() {
 }
 
 #[test]
+fn call_value_check_multi_egld_go() {
+    world().run("scenarios/call-value-check-multi-egld.scen.json");
+}
+
+#[test]
 fn payable_all_transfers_go() {
     world().run("scenarios/payable_all_transfers.scen.json");
 }
@@ -60,8 +65,18 @@ fn payable_multi_array_go() {
 }
 
 #[test]
+fn payable_multi_array_egld_go() {
+    world().run("scenarios/payable_multi_array_egld.scen.json");
+}
+
+#[test]
 fn payable_multiple_go() {
     world().run("scenarios/payable_multiple.scen.json");
+}
+
+#[test]
+fn payable_multiple_egld_go() {
+    world().run("scenarios/payable_multiple_egld.scen.json");
 }
 
 #[test]

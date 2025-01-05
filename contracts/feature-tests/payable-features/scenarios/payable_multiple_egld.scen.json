@@ -65,7 +65,7 @@
                         "nested:str:TOK-123456|u64:0|biguint:100|",
                         "nested:str:OTHERTOK-123456|u64:0|biguint:400",
                         "nested:str:SFT-123|u64:5|biguint:10",
-                        "nested:str:EGLD-000000|u64:0|biguint:120"
+                        "nested:str:EGLD|u64:0|biguint:120"
                     ]
                 ],
                 "status": "",
