@@ -171,7 +171,10 @@ where
             unsafe { MaybeUninit::<[MaybeUninit<T::Ref<'_>>; N]>::uninit().assume_init() };
 
         for (index, value) in self.iter().enumerate() {
-            result_uninit[index].write(value);
+            // length already checked
+            unsafe {
+                result_uninit.get_unchecked_mut(index).write(value);
+            }
         }
 
         let result = unsafe { transmute_copy(&ManuallyDrop::new(result_uninit)) };
