@@ -69,9 +69,7 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn accept_funds_echo_payment(
-        &self,
-    ) -> MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue> {
+    fn accept_funds_echo_payment(&self) -> MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue> {
         let esdt_transfers_multi = self.all_transfers_multi();
         self.accept_funds_event(&esdt_transfers_multi);
 

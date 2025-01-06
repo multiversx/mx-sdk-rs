@@ -31,7 +31,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-too-many",
+            "id": "payment-array-egld-too-many",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -59,7 +59,7 @@
                         "value": "103"
                     }
                 ],
-                "function": "payment_array_3",
+                "function": "payment_array_egld_esdt_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -67,7 +67,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:incorrect number of ESDT transfers",
+                "message": "str:incorrect number of transfers",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -75,7 +75,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-too-few",
+            "id": "payment-array-egld-too-few",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -90,7 +90,7 @@
                         "value": "10"
                     }
                 ],
-                "function": "payment_array_3",
+                "function": "payment_array_egld_esdt_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -98,7 +98,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:incorrect number of ESDT transfers",
+                "message": "str:incorrect number of transfers",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -125,7 +125,7 @@
                         "value": "10"
                     }
                 ],
-                "function": "payment_array_3",
+                "function": "payment_array_egld_esdt_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

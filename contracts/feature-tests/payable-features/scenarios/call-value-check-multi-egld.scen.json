@@ -28,7 +28,7 @@
         },
         {
             "step": "scCall",
-            "id": "call-value-multi-esdt",
+            "id": "call-value-multi-egld-esdt",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -58,7 +58,6 @@
             },
             "expect": {
                 "out": [
-                    "0",
                     [
                         "nested:str:EGLD|u64:0|biguint:15",
                         "nested:str:TOK-123456|u64:0|biguint:100",

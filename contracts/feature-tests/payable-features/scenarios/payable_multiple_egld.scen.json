@@ -30,7 +30,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-multiple",
+            "id": "payment-multiple-egld",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -54,7 +54,7 @@
                         "value": "120"
                     }
                 ],
-                "function": "payment_multiple",
+                "function": "payable_all_transfers",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

@@ -6,9 +6,10 @@ bitflags! {
         const NONE                                  = 0b00000000;
         const CALL_VALUE_EGLD_SINGLE_INITIALIZED    = 0b00000001;
         const CALL_VALUE_ESDT_UNCHECKED_INITIALIZED = 0b00000010;
-        const CALL_VALUE_EGLD_MULTI_INITIALIZED     = 0b00000100;
-        const CALL_VALUE_EGLD_FROM_ESDT_INITIALIZED = 0b00001000;
-        const CALL_VALUE_ALL_INITIALIZED            = 0b00010000;
+        const CALL_VALUE_ESDT_INITIALIZED           = 0b00000100;
+        const CALL_VALUE_EGLD_MULTI_INITIALIZED     = 0b00001000;
+        const CALL_VALUE_EGLD_FROM_ESDT_INITIALIZED = 0b00010000;
+        const CALL_VALUE_ALL_INITIALIZED            = 0b00100000;
     }
 }
 

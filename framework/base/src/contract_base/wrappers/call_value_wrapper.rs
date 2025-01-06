@@ -119,7 +119,7 @@ where
     pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {
         let multi_esdt_handle: A::ManagedBufferHandle = self.all_esdt_transfers_unchecked();
         if !A::static_var_api_impl()
-            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ESDT_UNCHECKED_INITIALIZED)
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ESDT_INITIALIZED)
         {
             let egld_value_multi_handle = self.egld_from_multi_esdt();
             if bi_gt_zero::<A>(egld_value_multi_handle) {
@@ -170,10 +170,27 @@ where
     /// Can be used to extract all payments in one line like this:
     ///
     /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();`.
+    ///
+    /// Rejects EGLD transfers. Switch to `multi_egld_or_esdt` to accept mixed transfers.
     pub fn multi_esdt<const N: usize>(&self) -> [ManagedVecRef<'static, EsdtTokenPayment<A>>; N] {
         let esdt_transfers = self.all_esdt_transfers();
         let array = esdt_transfers.to_array_of_refs::<N>().unwrap_or_else(|| {
             A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
+        });
+        unsafe { core::mem::transmute(array) }
+    }
+
+    /// Verify and casts the received multi ESDT transfer in to an array.
+    ///
+    /// Can be used to extract all payments in one line like this:
+    ///
+    /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_egld_or_esdt();`.
+    pub fn multi_egld_or_esdt<const N: usize>(
+        &self,
+    ) -> [ManagedVecRef<'static, EgldOrEsdtTokenPayment<A>>; N] {
+        let esdt_transfers = self.all_transfers();
+        let array = esdt_transfers.to_array_of_refs::<N>().unwrap_or_else(|| {
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
         });
         unsafe { core::mem::transmute(array) }
     }
