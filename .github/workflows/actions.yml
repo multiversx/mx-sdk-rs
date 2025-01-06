@@ -19,7 +19,6 @@ jobs:
       rust-toolchain: 1.82
       path-to-sc-meta: framework/meta
       mx-scenario-go-version: v3.0.0
-      wabt-version: 1.0.32-1 # TODO: no longer needed, remove completely
       coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
