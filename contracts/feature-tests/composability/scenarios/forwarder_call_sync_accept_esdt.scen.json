@@ -98,7 +98,6 @@
                         "endpoint": "str:accept_funds_echo_payment",
                         "topics": [
                             "str:accept_funds",
-                            "0",
                             "str:TEST-TOKENA",
                             "0",
                             "1000"
@@ -112,7 +111,6 @@
                         "endpoint": "str:forward_sync_accept_funds",
                         "topics": [
                             "str:accept_funds_sync_result",
-                            "0",
                             "str:TEST-TOKENA",
                             "0",
                             "1000"
