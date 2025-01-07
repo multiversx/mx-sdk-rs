@@ -4,12 +4,10 @@ bitflags! {
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     pub struct StaticVarApiFlags: u8 {
         const NONE                                  = 0b00000000;
-        const CALL_VALUE_EGLD_SINGLE_INITIALIZED    = 0b00000001;
+        const CALL_VALUE_EGLD_DIRECT_INITIALIZED    = 0b00000001;
         const CALL_VALUE_ESDT_UNCHECKED_INITIALIZED = 0b00000010;
         const CALL_VALUE_ESDT_INITIALIZED           = 0b00000100;
-        const CALL_VALUE_EGLD_MULTI_INITIALIZED     = 0b00001000;
-        const CALL_VALUE_EGLD_FROM_ESDT_INITIALIZED = 0b00010000;
-        const CALL_VALUE_ALL_INITIALIZED            = 0b00100000;
+        const CALL_VALUE_ALL_INITIALIZED            = 0b00001000;
     }
 }
 
@@ -34,27 +32,27 @@ pub mod tests {
         assert!(current.check_and_set(StaticVarApiFlags::NONE));
         assert_eq!(current, StaticVarApiFlags::NONE);
 
-        assert!(!current.check_and_set(StaticVarApiFlags::CALL_VALUE_EGLD_SINGLE_INITIALIZED));
+        assert!(!current.check_and_set(StaticVarApiFlags::CALL_VALUE_EGLD_DIRECT_INITIALIZED));
         assert_eq!(
             current,
-            StaticVarApiFlags::CALL_VALUE_EGLD_SINGLE_INITIALIZED
+            StaticVarApiFlags::CALL_VALUE_EGLD_DIRECT_INITIALIZED
         );
-        assert!(current.check_and_set(StaticVarApiFlags::CALL_VALUE_EGLD_SINGLE_INITIALIZED));
+        assert!(current.check_and_set(StaticVarApiFlags::CALL_VALUE_EGLD_DIRECT_INITIALIZED));
         assert_eq!(
             current,
-            StaticVarApiFlags::CALL_VALUE_EGLD_SINGLE_INITIALIZED
+            StaticVarApiFlags::CALL_VALUE_EGLD_DIRECT_INITIALIZED
         );
 
         assert!(!current.check_and_set(StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED));
         assert_eq!(
             current,
-            StaticVarApiFlags::CALL_VALUE_EGLD_SINGLE_INITIALIZED
+            StaticVarApiFlags::CALL_VALUE_EGLD_DIRECT_INITIALIZED
                 | StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED
         );
         assert!(current.check_and_set(StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED));
         assert_eq!(
             current,
-            StaticVarApiFlags::CALL_VALUE_EGLD_SINGLE_INITIALIZED
+            StaticVarApiFlags::CALL_VALUE_EGLD_DIRECT_INITIALIZED
                 | StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED
         );
     }
