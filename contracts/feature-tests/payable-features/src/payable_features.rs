@@ -14,14 +14,18 @@ pub trait PayableFeatures {
 
     #[view]
     #[payable("*")]
-    fn echo_call_value(
-        &self,
-    ) -> MultiValue2<BigUint, ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>> {
+    fn echo_call_value_legacy(&self) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>> {
         (
             self.call_value().egld_value().clone_value(),
             self.call_value().all_esdt_transfers().clone_value(),
         )
             .into()
+    }
+
+    #[view]
+    #[payable("*")]
+    fn echo_call_value(&self) -> ManagedVec<EgldOrEsdtTokenPayment> {
+        self.call_value().all_transfers().clone_value()
     }
 
     #[endpoint]
@@ -35,8 +39,25 @@ pub trait PayableFeatures {
 
     #[endpoint]
     #[payable("*")]
-    fn payment_array_3(&self) -> MultiValue3<EsdtTokenPayment, EsdtTokenPayment, EsdtTokenPayment> {
+    fn payable_all_transfers(&self) -> ManagedVec<EgldOrEsdtTokenPayment> {
+        self.call_value().all_transfers().clone()
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn payment_array_esdt_3(
+        &self,
+    ) -> MultiValue3<EsdtTokenPayment, EsdtTokenPayment, EsdtTokenPayment> {
         let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();
+        (payment_a.clone(), payment_b.clone(), payment_c.clone()).into()
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn payment_array_egld_esdt_3(
+        &self,
+    ) -> MultiValue3<EgldOrEsdtTokenPayment, EgldOrEsdtTokenPayment, EgldOrEsdtTokenPayment> {
+        let [payment_a, payment_b, payment_c] = self.call_value().multi_egld_or_esdt();
         (payment_a.clone(), payment_b.clone(), payment_c.clone()).into()
     }
 

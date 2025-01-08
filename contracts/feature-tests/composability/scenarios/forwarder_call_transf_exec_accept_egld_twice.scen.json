@@ -55,6 +55,8 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
+                            "str:EGLD",
+                            "0",
                             "1000"
                         ],
                         "data": [
@@ -78,6 +80,8 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
+                            "str:EGLD",
+                            "0",
                             "1000"
                         ],
                         "data": [

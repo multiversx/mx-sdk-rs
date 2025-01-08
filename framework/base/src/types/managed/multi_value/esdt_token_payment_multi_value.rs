@@ -35,7 +35,7 @@ impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EsdtTokenPaymentMultiValue
 }
 
 impl<M: ManagedTypeApi> EsdtTokenPaymentMultiValue<M> {
-    pub fn into_esdt_token_payment(self) -> EsdtTokenPayment<M> {
+    pub fn into_inner(self) -> EsdtTokenPayment<M> {
         self.obj
     }
 }
