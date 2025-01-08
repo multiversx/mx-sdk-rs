@@ -37,7 +37,7 @@ where
     }
 }
 
-impl<'k, A> TopEncodeOutput for StorageSetOutput<'k, A>
+impl<A> TopEncodeOutput for StorageSetOutput<'_, A>
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {

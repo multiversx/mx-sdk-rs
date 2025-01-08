@@ -5,10 +5,10 @@ use crate::{constants::*, helpers, storage};
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint(payFeeAndFundESDT)]
-    #[payable("*")]
+    #[payable]
     fn pay_fee_and_fund_esdt(&self, address: ManagedAddress, valability: u64) {
-        let mut payments = self.call_value().all_esdt_transfers().clone_value();
-        let fee = EgldOrEsdtTokenPayment::from(payments.get(0));
+        let mut payments = self.call_value().all_esdt_transfers().clone();
+        let fee = EgldOrEsdtTokenPayment::from(payments.get(0).clone());
         let caller_address = self.blockchain().get_caller();
         self.update_fees(caller_address, &address, fee);
 
@@ -32,7 +32,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     }
 
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn fund(&self, address: ManagedAddress, valability: u64) {
         require!(!self.deposit(&address).is_empty(), FEES_NOT_COVERED_ERR_MSG);
         let deposit_mapper = self.deposit(&address).get();

@@ -46,37 +46,57 @@ pub trait NftSubscription:
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn update_attributes(&self, attributes: ManagedBuffer) {
-        let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
-        self.update_subscription_attributes::<ManagedBuffer>(&id, nonce, attributes);
+        let payment = self.call_value().single_esdt();
+        self.update_subscription_attributes::<ManagedBuffer>(
+            &payment.token_identifier,
+            payment.token_nonce,
+            attributes,
+        );
         self.tx()
             .to(ToCaller)
-            .single_esdt(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &BigUint::from(1u8),
+            )
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn renew(&self, duration: u64) {
-        let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
-        self.renew_subscription::<ManagedBuffer>(&id, nonce, duration);
+        let payment = self.call_value().single_esdt();
+        self.renew_subscription::<ManagedBuffer>(
+            &payment.token_identifier,
+            payment.token_nonce,
+            duration,
+        );
         self.tx()
             .to(ToCaller)
-            .single_esdt(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &BigUint::from(1u8),
+            )
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn cancel(&self) {
-        let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
-        self.cancel_subscription::<ManagedBuffer>(&id, nonce);
+        let payment = self.call_value().single_esdt();
+        self.cancel_subscription::<ManagedBuffer>(&payment.token_identifier, payment.token_nonce);
 
         self.tx()
             .to(ToCaller)
-            .single_esdt(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &BigUint::from(1u8),
+            )
             .transfer();
     }
 

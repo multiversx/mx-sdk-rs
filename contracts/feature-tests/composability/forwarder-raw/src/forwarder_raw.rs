@@ -35,11 +35,11 @@ pub trait ForwarderRaw:
                 ));
             }
         } else {
-            for payment in payments.into_iter() {
+            for payment in payments.iter() {
                 let _ = self.callback_payments().push(&(
-                    EgldOrEsdtTokenIdentifier::esdt(payment.token_identifier),
+                    EgldOrEsdtTokenIdentifier::esdt(payment.token_identifier.clone()),
                     payment.token_nonce,
-                    payment.amount,
+                    payment.amount.clone(),
                 ));
             }
         }

@@ -95,7 +95,6 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "0",
                             "str:FWD-TOKEN",
                             "0",
                             "100",

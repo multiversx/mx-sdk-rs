@@ -68,7 +68,6 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "0",
                             "str:TEST-TOKENA",
                             "0",
                             "1000"
@@ -99,7 +98,6 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "0",
                             "str:TEST-TOKENA",
                             "0",
                             "1000"

@@ -47,7 +47,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
             .async_call_and_exit();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(fractionalizeNFT)]
     fn fractionalize_nft(
         &self,
@@ -74,7 +74,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
         let fractional_token = fractional_token_mapper.get_token_id_ref();
         let hash = ManagedBuffer::new();
         let fractional_info =
-            FractionalUriInfo::new(original_payment, initial_fractional_amount.clone());
+            FractionalUriInfo::new(original_payment.clone(), initial_fractional_amount.clone());
         let uris = fractional_info.to_uris();
 
         let fractional_nonce = self.send().esdt_nft_create(
@@ -97,7 +97,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(unFractionalizeNFT)]
     fn unfractionalize_nft(&self) {
         let fractional_payment = self.call_value().single_esdt();

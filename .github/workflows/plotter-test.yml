@@ -21,8 +21,12 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: stable
+          toolchain: 1.82
           target: wasm32-unknown-unknown
+
+      - name: Prerequisites
+        run: |
+          sudo apt install pkg-config libfreetype6-dev libfontconfig1-dev
 
       - name: Run plotter tests
         run: |

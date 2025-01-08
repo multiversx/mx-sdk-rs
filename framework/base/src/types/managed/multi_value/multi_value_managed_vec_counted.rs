@@ -1,3 +1,5 @@
+use core::borrow::Borrow;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
@@ -122,8 +124,8 @@ where
         H: EncodeErrorHandler,
     {
         self.len().multi_encode_or_handle_err(output, h)?;
-        for elem in self.contents.into_iter() {
-            elem.multi_encode_or_handle_err(output, h)?;
+        for elem in &self.contents {
+            elem.borrow().multi_encode_or_handle_err(output, h)?;
         }
         Ok(())
     }
