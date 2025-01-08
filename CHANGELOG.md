@@ -41,12 +41,13 @@ They are:
 		- support in the Rust VM.
 	- New built-in functions in the `ESDTSystemSCProxy`: `ESDTModifyRoyalties`, `SDTSetNewURIs`, `ESDTModifyCreator`, `ESDTMetaDataRecreate`, `ESDTMetaDataUpdate`.
 - Interactor support for "set state" on the chain simulator.
+- Fixed ownership for ManagedVec iterators, specifically reference iterators only produce references to the items.
 - Syntax cleanup:
 	- `#[payable]` now allowed instead of `#[payable("*")]`;
 	- `register_promise` allows callback, without calling a function on destination.
 - Refactoring and optimizations:
 	- Simplified the callback selector;
-	- Improvements in ManagedVec iterators;
+	- Performance improvements in ManagedVec iterators;
 	- Removed some unnecessary bound checks in `multi_esdt`.
 
 ## [sc 0.54.6] - 2024-12-04
