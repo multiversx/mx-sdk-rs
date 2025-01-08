@@ -28,6 +28,7 @@ where
             Env::Api::error_api_impl().signal_error(b"Back transfers expected to be a single ESDT")
         }
 
-        esdt_payments.get(0)
+        let x = esdt_payments.get(0).clone();
+        x
     }
 }

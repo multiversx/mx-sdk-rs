@@ -1,2 +1,6 @@
 [[proxy]]
 path = "src/forwarder_proxy.rs"
+
+[[proxy]]
+path = "../forwarder-interactor/src/proxy.rs"
+ 

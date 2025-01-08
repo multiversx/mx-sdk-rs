@@ -33,7 +33,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedArgBuffer {
             data: ManagedVec::from_handle(handle),
         }
@@ -43,7 +43,15 @@ where
         self.data.get_handle()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.data.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -160,7 +168,7 @@ where
     #[cfg(feature = "alloc")]
     pub fn to_raw_args_vec(&self) -> Vec<Vec<u8>> {
         let mut v = Vec::new();
-        for item in self.data.into_iter() {
+        for item in &self.data {
             v.push(item.to_boxed_bytes().into_vec());
         }
         v

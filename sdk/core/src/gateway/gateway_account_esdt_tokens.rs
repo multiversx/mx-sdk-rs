@@ -16,7 +16,7 @@ impl<'a> GetAccountEsdtTokensRequest<'a> {
     }
 }
 
-impl<'a> GatewayRequest for GetAccountEsdtTokensRequest<'a> {
+impl GatewayRequest for GetAccountEsdtTokensRequest<'_> {
     type Payload = ();
     type DecodedJson = EsdtBalanceResponse;
     type Result = HashMap<String, EsdtBalance>;

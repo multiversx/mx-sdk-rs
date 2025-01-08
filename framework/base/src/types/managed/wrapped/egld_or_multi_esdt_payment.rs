@@ -49,7 +49,7 @@ impl<M: ManagedTypeApi> EgldOrMultiEsdtPayment<M> {
     }
 }
 
-impl<'a, M: ManagedTypeApi> EgldOrMultiEsdtPaymentRefs<'a, M> {
+impl<M: ManagedTypeApi> EgldOrMultiEsdtPaymentRefs<'_, M> {
     pub fn to_owned_payment(&self) -> EgldOrMultiEsdtPayment<M> {
         match self {
             EgldOrMultiEsdtPaymentRefs::Egld(egld_value) => {

@@ -1,6 +1,5 @@
 #![no_std]
 #![allow(deprecated)]
-
 pub use multiversx_sc_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types

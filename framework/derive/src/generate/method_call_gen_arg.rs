@@ -88,7 +88,7 @@ pub fn load_legacy_cb_closure_args_snippet(m: &Method) -> proc_macro2::TokenStre
         });
     quote! {
         let #closure_var_names = multiversx_sc::io::load_multi_args_custom_loader::<Self::Api, _, #closure_var_types>(
-            ___cb_closure___.into_arg_loader(),
+            ___cb_closure___.arg_iter(),
             #closure_var_names_str,
         );
     }

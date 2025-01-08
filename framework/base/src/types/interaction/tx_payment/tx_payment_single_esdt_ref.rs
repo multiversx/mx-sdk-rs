@@ -1,13 +1,11 @@
 use crate::{
     contract_base::SendRawWrapper,
-    types::{
-        BigUint, EsdtTokenPaymentRefs, ManagedAddress, MultiEsdtPayment, TxFrom, TxToSpecified,
-    },
+    types::{BigUint, EsdtTokenPaymentRefs, ManagedAddress, ManagedVec, TxFrom, TxToSpecified},
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<'a, Env> TxPayment<Env> for EsdtTokenPaymentRefs<'a, Env::Api>
+impl<Env> TxPayment<Env> for EsdtTokenPaymentRefs<'_, Env::Api>
 where
     Env: TxEnv,
 {
@@ -74,7 +72,9 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: MultiEsdtPayment::from_single_item(self.to_owned_payment()),
+            multi_esdt: ManagedVec::from_single_item(
+                self.to_owned_payment().into_multi_egld_or_esdt_payment(),
+            ),
         }
     }
 }

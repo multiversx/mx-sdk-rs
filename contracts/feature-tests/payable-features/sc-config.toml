@@ -1,0 +1,4 @@
+[settings]
+
+[[proxy]]
+path = "src/payable_features_proxy.rs"

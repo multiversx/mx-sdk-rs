@@ -21,7 +21,7 @@ pub trait Mergeable<M: ManagedTypeApi> {
     where
         Self: Sized + ManagedVecItem,
     {
-        for item in &others {
+        for item in others {
             self.merge_with(item);
         }
     }
