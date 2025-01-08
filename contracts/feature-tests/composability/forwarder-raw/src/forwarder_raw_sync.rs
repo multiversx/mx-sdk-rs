@@ -10,7 +10,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payment = self.call_value().egld().clone_value();
+        let payment = self.call_value().egld().clone();
         let half_gas = self.blockchain().get_gas_left() / 2;
         let result = self
             .tx()

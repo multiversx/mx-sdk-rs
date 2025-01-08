@@ -103,9 +103,7 @@ where
 
     /// Returns the EGLD call value from the VM as ManagedDecimal
     pub fn egld_decimal(&self) -> ManagedDecimal<A, ConstDecimals<18>> {
-        ManagedDecimal::<A, ConstDecimals<18>>::const_decimals_from_raw(
-            self.egld_value().clone_value(),
-        )
+        ManagedDecimal::<A, ConstDecimals<18>>::const_decimals_from_raw(self.egld_value().clone())
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
@@ -239,7 +237,7 @@ where
             0 => EgldOrEsdtTokenPayment {
                 token_identifier: EgldOrEsdtTokenIdentifier::egld(),
                 token_nonce: 0,
-                amount: self.egld_direct_non_strict().clone_value(),
+                amount: self.egld_direct_non_strict().clone(),
             },
             1 => esdt_transfers.get(0).clone(),
             _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes()),
@@ -269,9 +267,9 @@ where
     pub fn any_payment(&self) -> EgldOrMultiEsdtPayment<A> {
         let esdt_transfers = self.all_esdt_transfers();
         if esdt_transfers.is_empty() {
-            EgldOrMultiEsdtPayment::Egld(self.egld_direct_non_strict().clone_value())
+            EgldOrMultiEsdtPayment::Egld(self.egld_direct_non_strict().clone())
         } else {
-            EgldOrMultiEsdtPayment::MultiEsdt(esdt_transfers.clone_value())
+            EgldOrMultiEsdtPayment::MultiEsdt(esdt_transfers.clone())
         }
     }
 }

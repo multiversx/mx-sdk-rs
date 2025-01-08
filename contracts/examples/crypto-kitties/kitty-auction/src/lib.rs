@@ -192,7 +192,7 @@ pub trait KittyAuction {
         }
 
         // update auction bid and winner
-        auction.current_bid = payment.clone_value();
+        auction.current_bid = payment.clone();
         auction.current_winner = caller;
         self.auction(kitty_id).set(auction);
     }

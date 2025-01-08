@@ -33,7 +33,7 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 &initial_supply,
@@ -74,7 +74,7 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 NonFungibleTokenProperties {
@@ -180,7 +180,7 @@ pub trait LocalEsdtAndEsdtNft {
         self.send()
             .esdt_system_sc_proxy()
             .issue_semi_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 SemiFungibleTokenProperties {

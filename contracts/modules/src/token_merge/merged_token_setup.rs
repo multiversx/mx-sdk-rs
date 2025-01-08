@@ -17,7 +17,7 @@ pub trait MergedTokenSetupModule {
         let payment_amount = self.call_value().egld();
         self.merged_token().issue_and_set_all_roles(
             EsdtTokenType::NonFungible,
-            payment_amount.clone_value(),
+            payment_amount.clone(),
             token_display_name,
             token_ticker,
             0,

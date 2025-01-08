@@ -95,7 +95,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         self.forward_contract_call(
             to,
             EgldOrEsdtTokenIdentifier::egld(),
-            payment.clone_value(),
+            payment.clone(),
             endpoint_name,
             args,
         )

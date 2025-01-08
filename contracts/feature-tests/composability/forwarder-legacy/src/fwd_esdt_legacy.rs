@@ -96,7 +96,7 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 &initial_supply,

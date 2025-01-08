@@ -19,7 +19,7 @@ pub trait NonFungibleTokenMapperFeatures:
         let payment = self.call_value().egld();
         self.non_fungible_token_mapper().issue_and_set_all_roles(
             EsdtTokenType::Meta,
-            payment.clone_value(),
+            payment.clone(),
             ManagedBuffer::new(),
             token_ticker,
             0,

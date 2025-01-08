@@ -13,7 +13,7 @@ pub trait DnsModule {
     #[only_owner]
     #[endpoint(dnsRegister)]
     fn dns_register(&self, dns_address: ManagedAddress, name: ManagedBuffer) {
-        let payment = self.call_value().egld().clone_value();
+        let payment = self.call_value().egld().clone();
         self.tx()
             .to(&dns_address)
             .typed(dns_proxy::DnsProxy)
