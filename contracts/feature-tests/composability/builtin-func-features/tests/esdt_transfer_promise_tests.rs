@@ -1,4 +1,7 @@
-use builtin_func_features::{esdt_features::EsdtFeaturesModule, BuiltinFuncFeatures};
+use builtin_func_features::{
+    esdt_features::{EsdtFeaturesModule, TransferResult},
+    BuiltinFuncFeatures,
+};
 use multiversx_sc::{codec::Empty, types::Address};
 use multiversx_sc_scenario::{
     imports::{BlockchainStateWrapper, ContractObjWrapper},
@@ -85,4 +88,38 @@ fn transfer_fungible_promise_no_callback_test() {
         FUNGIBLE_TOKEN_ID,
         &rust_biguint!(0),
     );
+}
+
+#[test]
+fn transfer_fungible_promise_with_callback_test() {
+    let mut setup = BuiltInFuncFeaturesSetup::new(builtin_func_features::contract_obj);
+    let user_addr = setup.user.clone();
+    setup
+        .b_mock
+        .execute_tx(&setup.user, &setup.sc_wrapper, &rust_biguint!(0), |sc| {
+            sc.transfer_fungible_promise_with_callback(
+                managed_address!(&user_addr),
+                managed_biguint!(INIT_BALANCE),
+            );
+        })
+        .assert_ok();
+
+    setup
+        .b_mock
+        .check_esdt_balance(&setup.user, FUNGIBLE_TOKEN_ID, &rust_biguint!(INIT_BALANCE));
+    setup.b_mock.check_esdt_balance(
+        setup.sc_wrapper.address_ref(),
+        FUNGIBLE_TOKEN_ID,
+        &rust_biguint!(0),
+    );
+
+    setup
+        .b_mock
+        .execute_query(&setup.sc_wrapper, |sc| {
+            assert!(matches!(
+                sc.latest_transfer_result().get(),
+                TransferResult::Success
+            ));
+        })
+        .assert_ok();
 }
