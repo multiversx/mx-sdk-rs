@@ -15,7 +15,7 @@ pub trait ForwarderDynamicModule:
         token_type: EsdtTokenType,
         num_decimals: usize,
     ) {
-        let issue_cost = self.call_value().egld_value().clone_value();
+        let issue_cost = self.call_value().egld().clone_value();
         let caller = self.blockchain().get_caller();
 
         self.send()
@@ -40,7 +40,7 @@ pub trait ForwarderDynamicModule:
         token_type: EsdtTokenType,
         num_decimals: usize,
     ) {
-        let issue_cost = self.call_value().egld_value().clone_value();
+        let issue_cost = self.call_value().egld().clone_value();
         let caller = self.blockchain().get_caller();
 
         self.send()
