@@ -33,6 +33,22 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.55.0, codec 0.21.2, chain 0.12.0, sdk 0.8.0] - 2025-01-08
+- Integrating Spica changes into the framework:
+	- EGLD+ESDT multi-transfers are now possible:
+		- changed the handling of call values: EGLD is treated almost the same as an ESDT in `all_transfers` and `multi_egld_or_esdt`, old ESDT methods are given some protection against unexpected scenarios
+		- changed the tx unified syntax for sending EGLD+ESDT from contracts, interactors and tests;
+		- support in the Rust VM.
+	- New built-in functions in the `ESDTSystemSCProxy`: `ESDTModifyRoyalties`, `SDTSetNewURIs`, `ESDTModifyCreator`, `ESDTMetaDataRecreate`, `ESDTMetaDataUpdate`.
+- Interactor support for "set state" on the chain simulator.
+- Syntax cleanup:
+	- `#[payable]` now allowed instead of `#[payable("*")]`;
+	- `register_promise` allows callback, without calling a function on destination.
+- Refactoring and optimizations:
+	- Simplified the callback selector;
+	- Improvements in ManagedVec iterators;
+	- Removed some unnecessary bound checks in `multi_esdt`.
+
 ## [sc 0.54.6] - 2024-12-04
 - `ManagedDecimal` bugfixes:
 	- ABI/proxy bugfix;

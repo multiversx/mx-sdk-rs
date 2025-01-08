@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-codec"
-version = "0.21.1"
+version = "0.21.2"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
@@ -18,7 +18,7 @@ derive = ["multiversx-sc-codec-derive"]
 
 [dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.21.1"
+version = "=0.21.2"
 optional = true
 
 [dependencies]
@@ -28,4 +28,4 @@ unwrap-infallible = "0.1.5"
 
 [dev-dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.21.1"
+version = "=0.21.2"
