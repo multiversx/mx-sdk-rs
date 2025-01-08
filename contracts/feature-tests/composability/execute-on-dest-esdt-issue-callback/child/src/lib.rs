@@ -17,7 +17,7 @@ pub trait Child {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) {
-        let issue_cost = self.call_value().single_egld_value();
+        let issue_cost = self.call_value().egld();
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(

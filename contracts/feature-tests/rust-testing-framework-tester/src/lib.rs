@@ -57,13 +57,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("EGLD")]
     #[endpoint]
     fn receive_egld(&self) -> BigUint {
-        self.call_value().single_egld_value().clone_value()
+        self.call_value().egld().clone_value()
     }
 
     #[payable("EGLD")]
     #[endpoint]
     fn recieve_egld_half(&self) {
-        let payment_amount = &*self.call_value().single_egld_value() / 2u32;
+        let payment_amount = &*self.call_value().egld() / 2u32;
         self.tx().to(ToCaller).egld(payment_amount).transfer();
     }
 

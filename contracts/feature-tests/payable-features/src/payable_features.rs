@@ -16,7 +16,7 @@ pub trait PayableFeatures {
     #[payable("*")]
     fn echo_call_value_legacy(&self) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>> {
         (
-            self.call_value().egld_value().clone_value(),
+            self.call_value().egld_direct_non_strict().clone_value(),
             self.call_value().all_esdt_transfers().clone_value(),
         )
             .into()
@@ -104,7 +104,7 @@ pub trait PayableFeatures {
         &self,
         #[payment_token] token: EgldOrEsdtTokenIdentifier,
     ) -> MultiValue2<BigUint, EgldOrEsdtTokenIdentifier> {
-        let payment = self.call_value().single_egld_value().clone_value();
+        let payment = self.call_value().egld().clone_value();
         (payment, token).into()
     }
 
@@ -124,14 +124,14 @@ pub trait PayableFeatures {
         &self,
         #[payment_token] token: EgldOrEsdtTokenIdentifier,
     ) -> MultiValue2<BigUint, EgldOrEsdtTokenIdentifier> {
-        let payment = self.call_value().single_egld_value().clone_value();
+        let payment = self.call_value().egld().clone_value();
         (payment, token).into()
     }
 
     #[endpoint]
     #[payable("EGLD")]
     fn payable_egld_4(&self) -> MultiValue2<BigUint, EgldOrEsdtTokenIdentifier> {
-        let payment = self.call_value().single_egld_value();
+        let payment = self.call_value().egld();
         let token = self.call_value().egld_or_single_esdt().token_identifier;
         (payment.clone_value(), token).into()
     }

@@ -20,7 +20,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
         token_ticker: ManagedBuffer,
         num_decimals: usize,
     ) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         self.fractional_token().issue_and_set_all_roles(
             EsdtTokenType::SemiFungible,
             issue_cost.clone_value(),

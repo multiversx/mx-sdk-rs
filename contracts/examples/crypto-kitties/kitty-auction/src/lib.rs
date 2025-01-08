@@ -152,7 +152,7 @@ pub trait KittyAuction {
     #[payable("EGLD")]
     #[endpoint]
     fn bid(&self, kitty_id: u32) {
-        let payment = self.call_value().single_egld_value();
+        let payment = self.call_value().egld();
 
         require!(
             self.is_up_for_auction(kitty_id),

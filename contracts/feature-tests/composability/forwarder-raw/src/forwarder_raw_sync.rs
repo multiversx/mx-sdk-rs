@@ -10,7 +10,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payment = self.call_value().single_egld_value().clone_value();
+        let payment = self.call_value().egld().clone_value();
         let half_gas = self.blockchain().get_gas_left() / 2;
         let result = self
             .tx()
@@ -33,7 +33,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payment = self.call_value().single_egld_value();
+        let payment = self.call_value().egld();
         let one_third_gas = self.blockchain().get_gas_left() / 3;
         let half_payment = &*payment / 2u32;
         let arg_buffer = args.to_arg_buffer();
@@ -71,7 +71,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payment = self.call_value().single_egld_value();
+        let payment = self.call_value().egld();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result = self

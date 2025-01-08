@@ -6,7 +6,7 @@ mod dns_mock {
         #[payable("EGLD")]
         #[endpoint]
         fn register(&self, name: BoxedBytes) {
-            let _payment = self.call_value().single_egld_value();
+            let _payment = self.call_value().egld();
             let address = self.blockchain().get_caller();
             self.tx()
                 .to(&address)

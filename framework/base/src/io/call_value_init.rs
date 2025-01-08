@@ -31,7 +31,7 @@ where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
     // will crash if anything other than (single) EGLD was transferred
-    let _ = CallValueWrapper::<A>::new().single_egld_value();
+    let _ = CallValueWrapper::<A>::new().egld();
 }
 
 /// Called initially in the generated code whenever `#[payable("<token identifier>")]` annotation is provided.

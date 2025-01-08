@@ -14,7 +14,7 @@ pub trait MergedTokenSetupModule {
     #[payable("EGLD")]
     #[endpoint(issueMergedToken)]
     fn issue_merged_token(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let payment_amount = self.call_value().single_egld_value();
+        let payment_amount = self.call_value().egld();
         self.merged_token().issue_and_set_all_roles(
             EsdtTokenType::NonFungible,
             payment_amount.clone_value(),

@@ -90,7 +90,7 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) {
-        let issue_cost = self.call_value().single_egld_value();
+        let issue_cost = self.call_value().egld();
         let caller = self.blockchain().get_caller();
 
         self.send()
