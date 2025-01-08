@@ -19,7 +19,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint(payFeeAndFundEGLD)]
     #[payable("EGLD")]
     fn pay_fee_and_fund_egld(&self, address: ManagedAddress, valability: u64) {
-        let mut fund = self.call_value().egld_value().clone_value();
+        let mut fund = self.call_value().egld().clone();
         let fee_value = self.fee(&EgldOrEsdtTokenIdentifier::egld()).get();
         require!(fund > fee_value, "payment not covering fees");
 
@@ -43,8 +43,9 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         );
         let deposited_fee_token = deposit_mapper.fees.value;
         let fee_amount = self.fee(&deposited_fee_token.token_identifier).get();
-        let egld_payment = self.call_value().egld_value().clone_value();
-        let esdt_payment = self.call_value().all_esdt_transfers().clone_value();
+        // TODO: switch to egld+esdt multi transfer handling
+        let egld_payment = self.call_value().egld_direct_non_strict().clone();
+        let esdt_payment = self.call_value().all_esdt_transfers().clone();
 
         let num_tokens = self.get_num_token_transfers(&egld_payment, &esdt_payment);
         self.check_fees_cover_number_of_tokens(num_tokens, fee_amount, deposited_fee_token.amount);

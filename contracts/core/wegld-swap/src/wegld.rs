@@ -16,7 +16,7 @@ pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
     fn wrap_egld(&self) -> EsdtTokenPayment<Self::Api> {
         self.require_not_paused();
 
-        let payment_amount = self.call_value().egld_value();
+        let payment_amount = self.call_value().egld();
         require!(*payment_amount > 0u32, "Payment must be more than 0");
 
         let wrapped_egld_token_id = self.wrapped_egld_token_id().get();
@@ -28,7 +28,7 @@ pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
             .single_esdt(&wrapped_egld_token_id, 0, &payment_amount)
             .transfer();
 
-        EsdtTokenPayment::new(wrapped_egld_token_id, 0, payment_amount.clone_value())
+        EsdtTokenPayment::new(wrapped_egld_token_id, 0, payment_amount.clone())
     }
 
     #[payable("*")]

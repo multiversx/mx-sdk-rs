@@ -91,11 +91,11 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         self.forward_contract_call(
             to,
             EgldOrEsdtTokenIdentifier::egld(),
-            payment.clone_value(),
+            payment.clone(),
             endpoint_name,
             args,
         )

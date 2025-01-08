@@ -16,7 +16,7 @@ pub trait PayableFeatures {
     #[payable("*")]
     fn echo_call_value_legacy(&self) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>> {
         (
-            self.call_value().egld_value().clone_value(),
+            self.call_value().egld_direct_non_strict().clone_value(),
             self.call_value().all_esdt_transfers().clone_value(),
         )
             .into()
@@ -25,7 +25,7 @@ pub trait PayableFeatures {
     #[view]
     #[payable("*")]
     fn echo_call_value(&self) -> ManagedVec<EgldOrEsdtTokenPayment> {
-        self.call_value().all_transfers().clone_value()
+        self.call_value().all_transfers().clone()
     }
 
     #[endpoint]
@@ -34,7 +34,7 @@ pub trait PayableFeatures {
         &self,
         #[payment_multi] payments: ManagedRef<'static, ManagedVec<EsdtTokenPayment<Self::Api>>>,
     ) -> ManagedVec<EsdtTokenPayment<Self::Api>> {
-        payments.clone_value()
+        payments.clone()
     }
 
     #[endpoint]
@@ -104,7 +104,7 @@ pub trait PayableFeatures {
         &self,
         #[payment_token] token: EgldOrEsdtTokenIdentifier,
     ) -> MultiValue2<BigUint, EgldOrEsdtTokenIdentifier> {
-        let payment = self.call_value().egld_value().clone_value();
+        let payment = self.call_value().egld().clone();
         (payment, token).into()
     }
 
@@ -124,16 +124,16 @@ pub trait PayableFeatures {
         &self,
         #[payment_token] token: EgldOrEsdtTokenIdentifier,
     ) -> MultiValue2<BigUint, EgldOrEsdtTokenIdentifier> {
-        let payment = self.call_value().egld_value().clone_value();
+        let payment = self.call_value().egld().clone();
         (payment, token).into()
     }
 
     #[endpoint]
     #[payable("EGLD")]
     fn payable_egld_4(&self) -> MultiValue2<BigUint, EgldOrEsdtTokenIdentifier> {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let token = self.call_value().egld_or_single_esdt().token_identifier;
-        (payment.clone_value(), token).into()
+        (payment.clone(), token).into()
     }
 
     #[endpoint]

@@ -80,7 +80,7 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     #[payable("EGLD")]
     fn forward_sync_accept_funds_rh_egld(&self, to: ManagedAddress) -> BigUint {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.tx()
@@ -125,7 +125,7 @@ pub trait ForwarderSyncCallModule {
         &self,
         to: ManagedAddress,
     ) -> ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>> {
-        let payment = self.call_value().all_esdt_transfers().clone_value();
+        let payment = self.call_value().all_esdt_transfers().clone();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.tx()

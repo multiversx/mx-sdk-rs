@@ -51,10 +51,7 @@ pub trait Vault {
     }
 
     fn all_transfers_multi(&self) -> MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue> {
-        self.call_value()
-            .all_transfers()
-            .clone_value()
-            .into_multi_value()
+        self.call_value().all_transfers().clone().into_multi_value()
     }
 
     #[payable("*")]
