@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use serde::Deserialize;
 use std::io::Read;
 
@@ -11,16 +13,22 @@ pub enum ChainType {
     Simulator,
 }
 
-/// SysFuncCalls Interact configuration
+/// Contract Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    gateway_uri: String,
-    chain_type: ChainType,
+    pub gateway_uri: String,
+    pub chain_type: ChainType,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Config {
     // Deserializes config from file
-    pub fn load_config() -> Self {
+    pub fn new() -> Self {
         let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
         let mut content = String::new();
         file.read_to_string(&mut content).unwrap();
@@ -40,7 +48,7 @@ impl Config {
     }
 
     // Returns if chain type is chain simulator
-    pub fn is_chain_simulator(&self) -> bool {
+    pub fn use_chain_simulator(&self) -> bool {
         match self.chain_type {
             ChainType::Real => false,
             ChainType::Simulator => true,

@@ -41,7 +41,8 @@ copy_dir = "0.1.2"
 pathdiff = "0.2.1"
 common-path = "1.0.0"
 bip39 = "2.0.0"
-home = "=0.5.9" # TODO: can be upgraded once we drop support for the old nightly 
+# TODO: 0.5.11 doesn't support rustc 1.80, needs >= 1.81 (issue on ci/cd for nightly builds)
+home = "=0.5.9"
 
 [dependencies.multiversx-sc-meta-lib]
 version = "=0.54.6"
