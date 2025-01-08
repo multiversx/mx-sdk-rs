@@ -28,7 +28,7 @@ pub trait ProxyTestSecond {
     #[init]
     #[payable("EGLD")]
     fn init(&self, init_arg: i32) -> i32 {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().single_egld_value();
         self.set_last_payment(&payment);
         self.set_init_arg(init_arg);
         init_arg + 1
@@ -43,7 +43,7 @@ pub trait ProxyTestSecond {
     #[payable("EGLD")]
     #[endpoint(payMe)]
     fn pay_me(&self, arg1: i64) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().single_egld_value();
         self.set_last_payment(&payment);
         self.set_pay_me_arg(arg1);
     }
@@ -51,7 +51,7 @@ pub trait ProxyTestSecond {
     #[payable("EGLD")]
     #[endpoint(payMeWithResult)]
     fn pay_me_with_result_endpoint(&self, arg1: i64) -> i64 {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().single_egld_value();
         self.set_last_payment(&payment);
         self.set_pay_me_arg(arg1);
 

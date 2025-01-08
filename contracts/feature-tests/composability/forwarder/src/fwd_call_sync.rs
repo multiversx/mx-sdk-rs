@@ -80,7 +80,7 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     #[payable("EGLD")]
     fn forward_sync_accept_funds_rh_egld(&self, to: ManagedAddress) -> BigUint {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().single_egld_value();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.tx()

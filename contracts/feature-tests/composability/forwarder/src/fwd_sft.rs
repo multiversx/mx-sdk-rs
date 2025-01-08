@@ -7,7 +7,7 @@ pub trait ForwarderSftModule: fwd_storage::ForwarderStorageModule {
     #[payable("EGLD")]
     #[endpoint]
     fn sft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().single_egld_value();
         let caller = self.blockchain().get_caller();
 
         self.send()

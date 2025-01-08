@@ -19,7 +19,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint(payFeeAndFundEGLD)]
     #[payable("EGLD")]
     fn pay_fee_and_fund_egld(&self, address: ManagedAddress, valability: u64) {
-        let mut fund = self.call_value().egld_value().clone_value();
+        let mut fund = self.call_value().single_egld_value().clone_value();
         let fee_value = self.fee(&EgldOrEsdtTokenIdentifier::egld()).get();
         require!(fund > fee_value, "payment not covering fees");
 

@@ -52,7 +52,7 @@ pub trait ForwarderRawAlterativeInit: super::forwarder_raw_common::ForwarderRawC
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().single_egld_value();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result = self
