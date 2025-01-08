@@ -30,7 +30,7 @@ base64 = "0.22"
 pbkdf2 = { version = "0.12.2", default-features = false }
 zeroize = "1.4.2"
 bech32 = "0.11"
-itertools = "0.13.0"
+itertools = "0.14.0"
 pem = "3.0.2"
 log = "0.4.17"
 scrypt = "0.11"
