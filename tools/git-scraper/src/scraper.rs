@@ -5,7 +5,7 @@ use serde_json::Value;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
 use std::{thread, time::Duration};
-use write::{write_cargo_toml, write_interactor_files, write_readme, write_src_folder};
+use write::{write_cargo_toml, write_instructions, write_interactor_files, write_readme, write_src_folder};
 
 mod fetch;
 mod init;
@@ -18,6 +18,8 @@ const FILE_PATH: &str = "tools/git-scraper/contracts_dump.txt";
 fn main() -> io::Result<()> {
     let client = create_client();
     let mut writer = initialize_writer(FILE_PATH)?;
+
+    write_instructions(&mut writer)?;
 
     let response = fetch_directory_listing(&client, GITHUB_API_URL).unwrap();
     if let Some(entries) = response.as_array() {

@@ -1,3 +1,97 @@
+INSTRUCTIONS FOR USING THIS FILE
+==============================
+1. Each contract is separated by '////////////////////////'. The end of this section is also marked by '////////////////////////'.
+2. For each contract you will find:
+   - NAME: The contract's folder name
+   - DESCRIPTION: Content from README.md
+   - SRC FOLDER: All source files
+   - CARGO.TOML: Dependencies and contract configuration
+   - INTERACTOR FOLDER: If available, contains interactor files (used for deployment and interaction on the blockchain)
+3. Before the contract code dump you will find a step by step description of how to create, build and deploy smart contracts on MultiversX
+
+INSTRUCTIONS FOR CREATING, BUILDING AND DEPLOYING SMART CONTRACTS ON MULTIVERSX
+==============================
+1. Considering environment, the only critical components a developer should install are:
+- rust (using rustup for better version management, as recommended on rust-lang.org): 
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+After installing rust, use the `stable` toolchain:
+```bash
+rustup update
+rustup default stable
+```
+- sc-meta tool:
+```bash
+cargo install multiversx-sc-meta --locked
+```
+Once sc-meta is ready, install the wasm32 target (for the Rust compiler), wasm-opt, and others dependencies as follows:
+```bash
+# Installs `wasm32`, `wasm-opt`, and others in one go:
+sc-meta install all
+cargo install twiggy
+```
+If the dependencies installation fails (sc-meta install all) use `sc-meta install [dependency-name]` to install dependencies one by one.
+
+2. In order to start writing a smart contract from an empty folder, the easiest way is to use the sc-meta template feature with the `new` command:
+```bash
+sc-meta new --template empty --name my-contract
+```
+This will create a new project with the following structure:
+- src/
+  - lib.rs (main contract file, must include #[multiversx_sc::contract] attribute)
+- wasm/
+- Cargo.toml
+
+3. After creating a template, a developer should start writing rust code in src/. src/lib.rs is the main file, you can also create other rust files
+as modules marked with #[multiversx_sc::module] and import them in the main file).
+
+Key requirements:
+- Contract must have #[init] function for deployment
+- Public functions need #[endpoint] attribute
+- Storage mappers (like SingleValueMapper, UnorderedSetMapper) need #[storage_mapper] and #[view] for easier access API
+- Use MultiversX SC types (BigUint, ManagedBuffer, etc.)
+- Split code into modules using #[multiversx_sc::module] for better organization
+
+4. After the code is written, it should first compile. A quick `cargo check` can verify the compilation.
+
+5. If the code compiles, it is time to build the contract. A contract should build without errors (and preferably warnings):
+```bash
+sc-meta all build
+```
+This will generate:
+- wasm/my-contract.wasm (the contract bytecode)
+- wasm/my-contract.mxsc.json (contract metadata)
+
+6. After the build is done, we can use the interactor to deploy the contract. Generate it with:
+```bash
+sc-meta all snippets
+```
+The interactor allows you to:
+- Configure your wallet (use wallets from test_wallet for easier devnet deployment)
+- Choose network (devnet/testnet/mainnet)
+- Set gas limits
+- Send deploy/upgrade transactions for your contract through Rust functions
+- Call contract endpoints with arguments through Rust functions
+
+In short:
+- env installation (rust and sc-meta)
+- sc-meta new --template empty --name my-contract (new contract from template)
+- write rust code inside src/ (remember required attributes)
+- cargo check
+- sc-meta all build
+- write interactor code/ generate using sc-meta all snippets
+- deploy the contract on devnet using the interactor (recommended for testing, no real EGLD needed)
+
+Common issues:
+- Missing contract/module attributes
+- Incorrect types in function arguments
+- Storage not properly initialized
+- Gas limits too low
+- Missing endpoint attributes
+
+////////////////////////
+
 ////////////////////////
 NAME: adder
 
@@ -169,11 +263,11 @@ publish = false
 path = "src/adder.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 INTERACTOR FOLDER:
@@ -237,7 +331,7 @@ impl AdderInteract {
         let adder_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
         let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
 
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks(30u64).await.unwrap();
 
         AdderInteract {
             interactor,
@@ -493,7 +587,7 @@ path = "src/basic_interactor.rs"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../../framework/snippets"
 
 [dependencies]
@@ -501,6 +595,7 @@ clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8.6"
 tokio = { version = "1.24" }
+serial_test = { version = "3.2.0" }
 
 [features]
 chain-simulator-tests = []
@@ -577,13 +672,13 @@ pub trait Contract:
     #[init]
     fn init(&self) {}
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(sellToken)]
     fn sell_token_endpoint(&self) {
         self.sell_token::<FunctionSelector<Self::Api>>();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(buyToken)]
     fn buy_token_endpoint(
         &self,
@@ -599,7 +694,7 @@ pub trait Contract:
     }
 
     #[endpoint(deposit)]
-    #[payable("*")]
+    #[payable]
     fn deposit_endpoint(&self, payment_token: OptionalValue<TokenIdentifier>) {
         self.deposit::<FunctionSelector<Self::Api>>(payment_token)
     }
@@ -686,15 +781,15 @@ publish = false
 path = "src/bonding_curve_contract.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -741,15 +836,15 @@ path = "src/check_pause.rs"
 num-bigint = "0.4"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -794,7 +889,7 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn fund(&self) {
         let (token, _, payment) = self.call_value().egld_or_single_esdt().into_tuple();
 
@@ -1064,11 +1159,11 @@ publish = false
 path = "src/crowdfunding_esdt.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies]
@@ -1101,7 +1196,7 @@ pub trait CryptoBubbles {
     #[payable("EGLD")]
     #[endpoint(topUp)]
     fn top_up(&self) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let caller = self.blockchain().get_caller();
         self.player_balance(&caller)
             .update(|balance| *balance += &*payment);
@@ -1151,7 +1246,7 @@ pub trait CryptoBubbles {
     #[payable("EGLD")]
     #[endpoint(joinGame)]
     fn join_game(&self, game_index: BigUint) {
-        let bet = self.call_value().egld_value();
+        let bet = self.call_value().egld();
         let player = self.blockchain().get_caller();
         self.top_up();
         self.add_player_to_game_state_change(&game_index, &player, &bet)
@@ -1223,11 +1318,11 @@ publish = false
 path = "src/crypto_bubbles.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -2249,7 +2344,7 @@ pub trait ZombieHelper: storage::Storage {
     #[payable("EGLD")]
     #[endpoint]
     fn level_up(&self, zombie_id: usize) {
-        let payment_amount = self.call_value().egld_value();
+        let payment_amount = self.call_value().egld();
         let fee = self.level_up_fee().get();
         require!(*payment_amount == fee, "Payment must be must be 0.001 EGLD");
         self.zombies(&zombie_id)
@@ -2300,11 +2395,11 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -2886,10 +2981,10 @@ use crate::{constants::*, helpers, storage};
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint(payFeeAndFundESDT)]
-    #[payable("*")]
+    #[payable]
     fn pay_fee_and_fund_esdt(&self, address: ManagedAddress, valability: u64) {
-        let mut payments = self.call_value().all_esdt_transfers().clone_value();
-        let fee = EgldOrEsdtTokenPayment::from(payments.get(0));
+        let mut payments = self.call_value().all_esdt_transfers().clone();
+        let fee = EgldOrEsdtTokenPayment::from(payments.get(0).clone());
         let caller_address = self.blockchain().get_caller();
         self.update_fees(caller_address, &address, fee);
 
@@ -2900,7 +2995,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint(payFeeAndFundEGLD)]
     #[payable("EGLD")]
     fn pay_fee_and_fund_egld(&self, address: ManagedAddress, valability: u64) {
-        let mut fund = self.call_value().egld_value().clone_value();
+        let mut fund = self.call_value().egld().clone();
         let fee_value = self.fee(&EgldOrEsdtTokenIdentifier::egld()).get();
         require!(fund > fee_value, "payment not covering fees");
 
@@ -2913,7 +3008,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     }
 
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn fund(&self, address: ManagedAddress, valability: u64) {
         require!(!self.deposit(&address).is_empty(), FEES_NOT_COVERED_ERR_MSG);
         let deposit_mapper = self.deposit(&address).get();
@@ -2924,8 +3019,9 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         );
         let deposited_fee_token = deposit_mapper.fees.value;
         let fee_amount = self.fee(&deposited_fee_token.token_identifier).get();
-        let egld_payment = self.call_value().egld_value().clone_value();
-        let esdt_payment = self.call_value().all_esdt_transfers().clone_value();
+        // TODO: switch to egld+esdt multi transfer handling
+        let egld_payment = self.call_value().egld_direct_non_strict().clone();
+        let esdt_payment = self.call_value().all_esdt_transfers().clone();
 
         let num_tokens = self.get_num_token_transfers(&egld_payment, &esdt_payment);
         self.check_fees_cover_number_of_tokens(num_tokens, fee_amount, deposited_fee_token.amount);
@@ -3037,7 +3133,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
     }
 
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn forward(
         &self,
         address: ManagedAddress,
@@ -3136,11 +3232,11 @@ publish = false
 path = "src/digital_cash.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -3181,11 +3277,11 @@ publish = false
 path = "src/empty.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies]
@@ -3259,11 +3355,11 @@ pub trait EsdtTransferWithFee {
         self.tx().to(ToCaller).payment(fees).transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn transfer(&self, address: ManagedAddress) {
         require!(
-            *self.call_value().egld_value() == 0,
+            *self.call_value().egld_direct_non_strict() == 0,
             "EGLD transfers not allowed"
         );
         let payments = self.call_value().all_esdt_transfers();
@@ -3287,13 +3383,13 @@ pub trait EsdtTransferWithFee {
                         "Mismatching payment for covering fees"
                     );
                     let _ = self.get_payment_after_fees(fee_type, &next_payment);
-                    new_payments.push(payment);
+                    new_payments.push(payment.clone());
                 },
                 Fee::Percentage(_) => {
                     new_payments.push(self.get_payment_after_fees(fee_type, &payment));
                 },
                 Fee::Unset => {
-                    new_payments.push(payment);
+                    new_payments.push(payment.clone());
                 },
             }
         }
@@ -3377,11 +3473,11 @@ publish = false
 path = "src/esdt_transfer_with_fee.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -3438,11 +3534,11 @@ publish = false
 path = "src/factorial.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -3477,10 +3573,10 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
         token_ticker: ManagedBuffer,
         num_decimals: usize,
     ) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         self.fractional_token().issue_and_set_all_roles(
             EsdtTokenType::SemiFungible,
-            issue_cost.clone_value(),
+            issue_cost.clone(),
             token_display_name,
             token_ticker,
             num_decimals,
@@ -3504,7 +3600,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
             .async_call_and_exit();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(fractionalizeNFT)]
     fn fractionalize_nft(
         &self,
@@ -3531,7 +3627,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
         let fractional_token = fractional_token_mapper.get_token_id_ref();
         let hash = ManagedBuffer::new();
         let fractional_info =
-            FractionalUriInfo::new(original_payment, initial_fractional_amount.clone());
+            FractionalUriInfo::new(original_payment.clone(), initial_fractional_amount.clone());
         let uris = fractional_info.to_uris();
 
         let fractional_nonce = self.send().esdt_nft_create(
@@ -3554,7 +3650,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(unFractionalizeNFT)]
     fn unfractionalize_nft(&self) {
         let fractional_payment = self.call_value().single_esdt();
@@ -3710,15 +3806,15 @@ publish = false
 path = "src/fractional_nfts.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -3881,7 +3977,7 @@ pub trait Lottery {
         if let Some(whitelist) = opt_whitelist.as_option() {
             let mut mapper = self.lottery_whitelist(&lottery_name);
             for addr in &*whitelist {
-                mapper.insert(addr);
+                mapper.insert(addr.clone());
             }
         }
 
@@ -3899,7 +3995,7 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn buy_ticket(&self, lottery_name: ManagedBuffer) {
         let (token_identifier, payment) = self.call_value().egld_or_single_fungible_esdt();
 
@@ -4167,11 +4263,11 @@ publish = false
 path = "src/lottery.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -4390,7 +4486,7 @@ pub trait Multisig:
     }
 
     /// Allows the contract to receive funds even if it is marked as unpayable in the protocol.
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn deposit(&self) {}
 
@@ -5517,6 +5613,7 @@ pub trait MultisigStateModule {
 
     fn add_multiple_board_members(&self, new_board_members: ManagedVec<ManagedAddress>) -> usize {
         let mut duplicates = false;
+        let new_board_members_len = new_board_members.len();
         self.user_mapper().get_or_create_users(
             new_board_members.into_iter(),
             |user_id, new_user| {
@@ -5529,7 +5626,7 @@ pub trait MultisigStateModule {
         require!(!duplicates, "duplicate board member");
 
         let num_board_members_mapper = self.num_board_members();
-        let new_num_board_members = num_board_members_mapper.get() + new_board_members.len();
+        let new_num_board_members = num_board_members_mapper.get() + new_board_members_len;
         num_board_members_mapper.set(new_num_board_members);
 
         new_num_board_members
@@ -5860,15 +5957,15 @@ publish = false
 path = "src/multisig.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies.adder]
@@ -5878,7 +5975,7 @@ path = "../adder"
 path = "../factorial"
 
 [dev-dependencies.multiversx-wegld-swap-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../core/wegld-swap"
 
 [dev-dependencies]
@@ -6061,11 +6158,11 @@ pub trait NftModule {
     fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
         require!(self.nft_token_id().is_empty(), "Token already issued");
 
-        let payment_amount = self.call_value().egld_value();
+        let payment_amount = self.call_value().egld();
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                payment_amount.clone_value(),
+                payment_amount.clone(),
                 &token_name,
                 &token_ticker,
                 NonFungibleTokenProperties {
@@ -6099,7 +6196,7 @@ pub trait NftModule {
 
     // endpoints
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(buyNft)]
     fn buy_nft(&self, nft_nonce: u64) {
         let payment = self.call_value().egld_or_single_esdt();
@@ -6246,11 +6343,11 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -6315,7 +6412,7 @@ pub trait NftStoragePrepay {
     #[payable("EGLD")]
     #[endpoint(depositPaymentForStorage)]
     fn deposit_payment_for_storage(&self) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let caller = self.blockchain().get_caller();
         self.deposit(&caller)
             .update(|deposit| *deposit += &*payment);
@@ -6382,11 +6479,11 @@ path = "src/nft_storage_prepay.rs"
 
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -6413,10 +6510,11 @@ pub trait NftSubscription:
     fn init(&self) {}
 
     #[endpoint]
+    #[payable("EGLD")]
     fn issue(&self) {
         self.token_id().issue_and_set_all_roles(
             EsdtTokenType::NonFungible,
-            self.call_value().egld_value().clone_value(),
+            self.call_value().egld().clone(),
             ManagedBuffer::from(b"Subscription"),
             ManagedBuffer::from(b"SUB"),
             0,
@@ -6447,37 +6545,57 @@ pub trait NftSubscription:
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn update_attributes(&self, attributes: ManagedBuffer) {
-        let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
-        self.update_subscription_attributes::<ManagedBuffer>(&id, nonce, attributes);
+        let payment = self.call_value().single_esdt();
+        self.update_subscription_attributes::<ManagedBuffer>(
+            &payment.token_identifier,
+            payment.token_nonce,
+            attributes,
+        );
         self.tx()
             .to(ToCaller)
-            .single_esdt(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &BigUint::from(1u8),
+            )
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn renew(&self, duration: u64) {
-        let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
-        self.renew_subscription::<ManagedBuffer>(&id, nonce, duration);
+        let payment = self.call_value().single_esdt();
+        self.renew_subscription::<ManagedBuffer>(
+            &payment.token_identifier,
+            payment.token_nonce,
+            duration,
+        );
         self.tx()
             .to(ToCaller)
-            .single_esdt(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &BigUint::from(1u8),
+            )
             .transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn cancel(&self) {
-        let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
-        self.cancel_subscription::<ManagedBuffer>(&id, nonce);
+        let payment = self.call_value().single_esdt();
+        self.cancel_subscription::<ManagedBuffer>(&payment.token_identifier, payment.token_nonce);
 
         self.tx()
             .to(ToCaller)
-            .single_esdt(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &BigUint::from(1u8),
+            )
             .transfer();
     }
 
@@ -6498,15 +6616,15 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -6603,7 +6721,7 @@ pub trait PingPong {
     #[payable("EGLD")]
     #[endpoint]
     fn ping(&self, _data: IgnoreValue) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
 
         require!(
             *payment == self.ping_amount().get(),
@@ -7105,11 +7223,11 @@ publish = false
 path = "src/ping_pong.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -7711,7 +7829,7 @@ tokio = { version = "1.24" }
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../../framework/snippets"
 
 [features]
@@ -7869,11 +7987,11 @@ publish = false
 path = "src/proxy_pause.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies.check-pause]
@@ -7913,7 +8031,7 @@ pub struct Bracket {
 }
 
 #[type_abi]
-#[derive(ManagedVecItem, NestedEncode, NestedDecode)]
+#[derive(ManagedVecItem, NestedEncode, NestedDecode, Clone)]
 pub struct ComputedBracket<M: ManagedTypeApi> {
     pub end_index: u64,
     pub nft_reward_percent: BigUint<M>,
@@ -7949,7 +8067,7 @@ pub trait RewardsDistribution:
         self.brackets().set(brackets);
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(depositRoyalties)]
     fn deposit_royalties(&self) {
         let payment = self.call_value().egld_or_single_esdt();
@@ -7966,7 +8084,7 @@ pub trait RewardsDistribution:
             .unwrap_or_else(|| self.new_raffle());
         let mut rng = RandomnessSource::default();
 
-        let mut bracket = raffle.computed_brackets.get(0);
+        let mut bracket = raffle.computed_brackets.get(0).clone();
 
         let run_result = self.run_while_it_has_gas(DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, || {
             let ticket = self.shuffle_and_pick_single_ticket(
@@ -8030,7 +8148,7 @@ pub trait RewardsDistribution:
     ) {
         while ticket > bracket.end_index {
             computed_brackets.remove(0);
-            *bracket = computed_brackets.get(0);
+            *bracket = computed_brackets.get(0).clone();
         }
     }
 
@@ -8139,7 +8257,7 @@ pub trait RewardsDistribution:
         );
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(claimRewards)]
     fn claim_rewards(
         &self,
@@ -8805,15 +8923,15 @@ publish = false
 path = "src/rewards_distribution.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -8863,7 +8981,7 @@ pub trait DistributionModule {
             }
             self.tx()
                 .to(&distribution.address)
-                .raw_call(distribution.endpoint)
+                .raw_call(distribution.endpoint.clone())
                 .egld_or_single_esdt(token_id, token_nonce, &payment_amount)
                 .gas(distribution.gas_limit)
                 .transfer_execute();
@@ -8990,10 +9108,10 @@ pub trait NftModule:
     #[payable("EGLD")]
     #[endpoint(issueToken)]
     fn issue_token(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         self.nft_token_id().issue_and_set_all_roles(
             EsdtTokenType::NonFungible,
-            issue_cost.clone_value(),
+            issue_cost.clone(),
             token_display_name,
             token_ticker,
             0,
@@ -9003,7 +9121,7 @@ pub trait NftModule:
 
     // endpoints
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(buyNft)]
     fn buy_nft(&self, nft_nonce: u64) {
         let payment = self.call_value().egld_or_single_esdt();
@@ -9151,7 +9269,7 @@ pub trait SeedNftMinter:
         marketplaces: ManagedVec<ManagedAddress>,
         distribution: ManagedVec<Distribution<Self::Api>>,
     ) {
-        self.marketplaces().extend(&marketplaces);
+        self.marketplaces().extend(marketplaces);
         self.init_distribution(distribution);
     }
 
@@ -9226,7 +9344,7 @@ pub trait SeedNftMinter:
             } else {
                 esdt_payments
                     .try_get(0)
-                    .map(|esdt_payment| esdt_payment.amount)
+                    .map(|esdt_payment| esdt_payment.amount.clone())
                     .unwrap_or_default()
             };
             total_amount += amount;
@@ -9257,15 +9375,15 @@ publish = false
 path = "src/seed_nft_minter.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
@@ -9689,11 +9807,11 @@ publish = false
 path = "src/token_release.rs"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.55.0"
 path = "../../../framework/scenario"
 
 
