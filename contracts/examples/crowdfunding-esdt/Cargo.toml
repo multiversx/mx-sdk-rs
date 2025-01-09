@@ -10,11 +10,11 @@ path = "src/crowdfunding_esdt.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
+# path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
+# path = "../../../framework/scenario"
 
 [dev-dependencies]
 num-bigint = "0.4"
