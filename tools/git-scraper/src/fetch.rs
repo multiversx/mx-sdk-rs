@@ -1,6 +1,8 @@
 use reqwest::blocking::Client;
 use serde_json::Value;
 
+type InteractorContent = (Vec<(String, String)>, Option<String>);
+
 pub(crate) fn fetch_directory_listing(client: &Client, url: &str) -> reqwest::Result<Value> {
     println!("Fetching directory listing from: {}", url);
     let response = client
@@ -73,7 +75,7 @@ pub(crate) fn fetch_directory_contents(
 pub(crate) fn fetch_interactor_contents(
     client: &Client,
     folder_url: &str,
-) -> Option<(Vec<(String, String)>, Option<String>)> {
+) -> Option<InteractorContent> {
     println!("Fetching interactor contents from {}", folder_url);
 
     let folder_response: Value = client.get(folder_url).send().ok()?.json().ok()?;

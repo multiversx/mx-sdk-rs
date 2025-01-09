@@ -3,7 +3,6 @@ use serde::Deserialize;
 use std::fs;
 use std::fs::File;
 use std::io::{self, BufWriter};
-use toml;
 
 #[derive(Deserialize)]
 struct Config {

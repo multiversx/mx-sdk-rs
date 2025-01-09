@@ -211,7 +211,7 @@ pub(crate) fn cleanup_local_paths(file_path: &str) -> io::Result<()> {
     Ok(())
 }
 
-fn has_local_path_next<'a>(lines: &[&'a str], current: &str) -> bool {
+fn has_local_path_next(lines: &[&str], current: &str) -> bool {
     lines
         .iter()
         .skip_while(|&&x| x != current)
