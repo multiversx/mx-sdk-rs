@@ -25,10 +25,10 @@ pub trait NftModule:
     #[payable("EGLD")]
     #[endpoint(issueToken)]
     fn issue_token(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         self.nft_token_id().issue_and_set_all_roles(
             EsdtTokenType::NonFungible,
-            issue_cost.clone_value(),
+            issue_cost.clone(),
             token_display_name,
             token_ticker,
             0,
@@ -38,7 +38,7 @@ pub trait NftModule:
 
     // endpoints
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(buyNft)]
     fn buy_nft(&self, nft_nonce: u64) {
         let payment = self.call_value().egld_or_single_esdt();

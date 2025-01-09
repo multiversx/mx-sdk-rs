@@ -287,7 +287,7 @@ pub trait KittyOwnership {
         require!(self.is_valid_id(matron_id), "Invalid matron id!");
         require!(self.is_valid_id(sire_id), "Invalid sire id!");
 
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let auto_birth_fee = self.birth_fee().get();
         let caller = self.blockchain().get_caller();
 

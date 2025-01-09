@@ -1,5 +1,5 @@
 use crate::{
-    api::{use_raw_handle, ManagedMapApiImpl, ManagedTypeApi, StaticVarApiImpl},
+    api::{ManagedMapApiImpl, ManagedTypeApi},
     types::ManagedType,
 };
 
@@ -15,7 +15,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
     type OwnHandle = M::ManagedMapHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedMapHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedMapHandle) -> Self {
         ManagedMap { handle }
     }
 
@@ -23,7 +23,19 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
         self.handle.clone()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        unsafe {
+            let handle = core::ptr::read(&self.handle);
+            core::mem::forget(self);
+            handle
+        }
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedMapHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedMapHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -31,7 +43,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
 impl<M: ManagedTypeApi> ManagedMap<M> {
     pub fn new() -> Self {
         let new_handle = M::managed_type_impl().mm_new();
-        ManagedMap::from_handle(new_handle)
+        unsafe { ManagedMap::from_handle(new_handle) }
     }
 }
 
@@ -44,10 +56,15 @@ impl<M: ManagedTypeApi> Default for ManagedMap<M> {
 
 impl<M: ManagedTypeApi> ManagedMap<M> {
     pub fn get(&self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
-        let new_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mm_get(self.handle.clone(), key.handle.clone(), new_handle.clone());
-        ManagedBuffer::from_handle(new_handle)
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            M::managed_type_impl().mm_get(
+                self.handle.clone(),
+                key.handle.clone(),
+                result.get_handle(),
+            );
+            result
+        }
     }
 
     pub fn put(&mut self, key: &ManagedBuffer<M>, value: &ManagedBuffer<M>) {
@@ -59,14 +76,15 @@ impl<M: ManagedTypeApi> ManagedMap<M> {
     }
 
     pub fn remove(&mut self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
-        let new_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mm_remove(
-            self.handle.clone(),
-            key.handle.clone(),
-            new_handle.clone(),
-        );
-        ManagedBuffer::from_handle(new_handle)
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            M::managed_type_impl().mm_remove(
+                self.handle.clone(),
+                key.handle.clone(),
+                result.get_handle(),
+            );
+            result
+        }
     }
 
     pub fn contains(&self, key: &ManagedBuffer<M>) -> bool {

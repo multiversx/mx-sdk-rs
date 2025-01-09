@@ -8,14 +8,14 @@ use crate::scenario_model::{BytesValue, CheckValue, TxExpect, TxResponse};
 /// Can only be used in tests and interactors, not available in contracts.
 pub struct ExpectError<'a>(pub u64, pub &'a str);
 
-impl<'a, Env, Original> RHListItem<Env, Original> for ExpectError<'a>
+impl<Env, Original> RHListItem<Env, Original> for ExpectError<'_>
 where
     Env: TxEnv,
 {
     type Returns = ();
 }
 
-impl<'a, Env, Original> RHListItemExec<TxResponse, Env, Original> for ExpectError<'a>
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ExpectError<'_>
 where
     Env: TxEnv<RHExpect = TxExpect>,
 {

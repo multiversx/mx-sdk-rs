@@ -35,7 +35,7 @@ pub trait DefaultIssueCallbacksModule {
         let key = StorageKey::from(storage_key);
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                let token_id = self.call_value().single_esdt().token_identifier;
+                let token_id = self.call_value().single_esdt().token_identifier.clone();
                 storage_set(key.as_ref(), &TokenMapperState::Token(token_id));
             },
             ManagedAsyncCallResult::Err(_) => {
@@ -46,8 +46,8 @@ pub trait DefaultIssueCallbacksModule {
     }
 
     fn return_failed_issue_funds(&self, initial_caller: ManagedAddress) {
-        let egld_returned = self.call_value().egld_value().to_u64().unwrap();
-        if egld_returned > 0u64 {
+        let egld_returned = self.call_value().egld_direct_non_strict();
+        if *egld_returned > 0u64 {
             self.tx().to(&initial_caller).egld(egld_returned).transfer();
         }
     }

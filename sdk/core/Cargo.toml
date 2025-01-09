@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk"
-version = "0.7.1"
+version = "0.8.0"
 edition = "2021"
 
 authors = [
@@ -30,7 +30,7 @@ base64 = "0.22"
 pbkdf2 = { version = "0.12.2", default-features = false }
 zeroize = "1.4.2"
 bech32 = "0.11"
-itertools = "0.13.0"
+itertools = "0.14.0"
 pem = "3.0.2"
 log = "0.4.17"
 scrypt = "0.11"
@@ -39,5 +39,5 @@ ctr = "0.9.2"
 uuid = {version = "1.10.0", features = ["v4"]}
 
 [dependencies.multiversx-chain-core]
-version = "=0.11.1"
+version = "=0.12.0"
 path = "../../chain/core"
