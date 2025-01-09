@@ -264,11 +264,9 @@ path = "src/adder.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 INTERACTOR FOLDER:
 FILE_NAME: basic_interactor.rs
@@ -588,7 +586,6 @@ path = ".."
 
 [dependencies.multiversx-sc-snippets]
 version = "0.55.0"
-path = "../../../../framework/snippets"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
@@ -782,15 +779,12 @@ path = "src/bonding_curve_contract.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
 version = "0.55.0"
-path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 
@@ -837,15 +831,12 @@ num-bigint = "0.4"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
 version = "0.55.0"
-path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 
@@ -1160,11 +1151,9 @@ path = "src/crowdfunding_esdt.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 [dev-dependencies]
 num-bigint = "0.4"
@@ -1319,11 +1308,9 @@ path = "src/crypto_bubbles.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -2396,11 +2383,9 @@ path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -3233,11 +3218,9 @@ path = "src/digital_cash.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -3278,11 +3261,9 @@ path = "src/empty.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 [dev-dependencies]
 num-bigint = "0.4"
@@ -3474,11 +3455,9 @@ path = "src/esdt_transfer_with_fee.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -3535,11 +3514,9 @@ path = "src/factorial.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -3807,15 +3784,12 @@ path = "src/fractional_nfts.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
 version = "0.55.0"
-path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -4264,11 +4238,9 @@ path = "src/lottery.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -5958,15 +5930,12 @@ path = "src/multisig.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
 version = "0.55.0"
-path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 [dev-dependencies.adder]
 path = "../adder"
@@ -5976,7 +5945,6 @@ path = "../factorial"
 
 [dev-dependencies.multiversx-wegld-swap-sc]
 version = "0.55.0"
-path = "../../core/wegld-swap"
 
 [dev-dependencies]
 num-bigint = "0.4"
@@ -6344,11 +6312,9 @@ path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -6480,11 +6446,9 @@ path = "src/nft_storage_prepay.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -6617,15 +6581,12 @@ path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
 version = "0.55.0"
-path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -7224,11 +7185,9 @@ path = "src/ping_pong.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 
@@ -7830,7 +7789,6 @@ path = ".."
 
 [dependencies.multiversx-sc-snippets]
 version = "0.55.0"
-path = "../../../../framework/snippets"
 
 [features]
 chain-simulator-tests = []
@@ -7988,11 +7946,9 @@ path = "src/proxy_pause.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 [dev-dependencies.check-pause]
 path = "../check-pause"
@@ -8924,15 +8880,12 @@ path = "src/rewards_distribution.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
 version = "0.55.0"
-path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -9376,15 +9329,12 @@ path = "src/seed_nft_minter.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
 version = "0.55.0"
-path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 INTERACTOR FOLDER:
@@ -9808,11 +9758,9 @@ path = "src/token_release.rs"
 
 [dependencies.multiversx-sc]
 version = "0.55.0"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
-path = "../../../framework/scenario"
 
 
 

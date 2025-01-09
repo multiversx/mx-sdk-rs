@@ -1,5 +1,6 @@
 use crate::fetch::{fetch_directory_contents, fetch_file_content, fetch_interactor_contents};
 use reqwest::blocking::Client;
+use std::fs;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
 
@@ -181,4 +182,39 @@ pub(crate) fn write_interactor_files(
     }
     writer.flush()?;
     Ok(())
+}
+
+pub(crate) fn cleanup_local_paths(file_path: &str) -> io::Result<()> {
+    let content = fs::read_to_string(file_path)?;
+    let lines: Vec<&str> = content.lines().collect();
+    let mut result = Vec::new();
+    let mut skip_next = false;
+
+    for line in &lines {
+        if skip_next {
+            skip_next = false;
+            continue;
+        }
+
+        if line.trim().starts_with("path = \"../../../") {
+            continue;
+        }
+
+        if line.trim().starts_with("version = ") {
+            skip_next = has_local_path_next(&lines, line);
+        }
+
+        result.push(*line);
+    }
+
+    fs::write(file_path, result.join("\n"))?;
+    Ok(())
+}
+
+fn has_local_path_next<'a>(lines: &[&'a str], current: &str) -> bool {
+    lines
+        .iter()
+        .skip_while(|&&x| x != current)
+        .nth(1)
+        .map_or(false, |next| next.trim().starts_with("path = \"../../../"))
 }

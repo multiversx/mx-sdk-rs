@@ -5,7 +5,10 @@ use serde_json::Value;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
 use std::{thread, time::Duration};
-use write::{write_cargo_toml, write_instructions, write_interactor_files, write_readme, write_src_folder};
+use write::{
+    cleanup_local_paths, write_cargo_toml, write_instructions, write_interactor_files,
+    write_readme, write_src_folder,
+};
 
 mod fetch;
 mod init;
@@ -31,6 +34,9 @@ fn main() -> io::Result<()> {
     writeln!(writer, "////////////////////////")?;
     writer.flush()?;
     println!("Contracts processed and saved to contracts_dump.txt");
+
+    cleanup_local_paths(FILE_PATH)?;
+
     Ok(())
 }
 
