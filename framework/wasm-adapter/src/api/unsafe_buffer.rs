@@ -11,10 +11,12 @@ static mut BUFFER_1: [u8; BUFFER_1_SIZE] = [0u8; BUFFER_1_SIZE];
 /// The second buffer is for when the first one is busy with something else.
 static mut BUFFER_2: [u8; BUFFER_2_SIZE] = [0u8; BUFFER_2_SIZE];
 
+#[allow(static_mut_refs)]
 pub(crate) unsafe fn buffer_1_ptr() -> *mut u8 {
     BUFFER_1.as_mut_ptr()
 }
 
+#[allow(static_mut_refs)]
 pub(crate) unsafe fn buffer_2_ptr() -> *mut u8 {
     BUFFER_2.as_mut_ptr()
 }

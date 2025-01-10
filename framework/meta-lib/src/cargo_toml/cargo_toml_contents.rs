@@ -358,10 +358,10 @@ mod tests {
 
     const CARGO_TOML_RAW: &str = r#"
 [dependencies.by-version-1]
-version = "1.2.30"
+version = "0.54.0"
 
 [dependencies.by-version-1-strict]
-version = "=1.2.31"
+version = "=0.54.1"
 
 [dependencies.by-git-commit-1]
 git = "https://github.com/multiversx/repo1"
@@ -371,8 +371,8 @@ rev = "85c31b9ce730bd5ffe41589c353d935a14baaa96"
 path = "a/b/c"
 
 [dependencies]
-by-version-2 = "4.5.60"
-by-version-2-strict = "=4.5.61"
+by-version-2 = "0.54.2"
+by-version-2-strict = "=0.54.3"
 by-path-2 = { path = "d/e/f" }
 by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be823f26d1e7f59c71536d337b7240dc3fa2" }
     "#;
@@ -386,13 +386,13 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                version: Some("1.2.30".to_owned()),
+                version: Some("0.54.0".to_owned()),
                 ..Default::default()
             },
         );
         assert_eq!(
             raw_value.interpret(),
-            DependencyReference::Version(VersionReq::from_version_str("1.2.30")),
+            DependencyReference::Version(VersionReq::from_version_str("0.54.0").unwrap()),
         );
 
         // version, strict
@@ -402,13 +402,13 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                version: Some("=1.2.31".to_owned()),
+                version: Some("=0.54.1".to_owned()),
                 ..Default::default()
             },
         );
         assert_eq!(
             raw_value.interpret(),
-            DependencyReference::Version(VersionReq::from_version_str("1.2.31").strict()),
+            DependencyReference::Version(VersionReq::from_version_str("0.54.1").unwrap().strict()),
         );
 
         // version, compact
@@ -416,13 +416,13 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                version: Some("4.5.60".to_owned()),
+                version: Some("0.54.2".to_owned()),
                 ..Default::default()
             },
         );
         assert_eq!(
             raw_value.interpret(),
-            DependencyReference::Version(VersionReq::from_version_str("4.5.60")),
+            DependencyReference::Version(VersionReq::from_version_str("0.54.2").unwrap()),
         );
 
         // version, compact, strict
@@ -432,13 +432,13 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                version: Some("=4.5.61".to_owned()),
+                version: Some("=0.54.3".to_owned()),
                 ..Default::default()
             },
         );
         assert_eq!(
             raw_value.interpret(),
-            DependencyReference::Version(VersionReq::from_version_str("4.5.61").strict()),
+            DependencyReference::Version(VersionReq::from_version_str("0.54.3").unwrap().strict()),
         );
 
         // git

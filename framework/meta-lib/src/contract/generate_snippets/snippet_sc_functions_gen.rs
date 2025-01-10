@@ -12,12 +12,18 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
     writeln!(
         file,
         r#"impl ContractInteract {{
-    async fn new() -> Self {{
+    pub async fn new() -> Self {{
         let config = Config::new();
-        let mut interactor = Interactor::new(config.gateway_uri(), config.use_chain_simulator()).await;
-        interactor.set_current_dir_from_workspace("{}");
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.use_chain_simulator());
 
+        interactor.set_current_dir_from_workspace("{}");
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+
+        // Useful in the chain simulator setting
+        // generate blocks until ESDTSystemSCAddress is enabled
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
         
         let contract_code = BytesValue::interpret_from(
             {},
@@ -65,7 +71,6 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
             .init({})
             .code(&self.contract_code)
             .returns(ReturnsNewAddress)
-            
             .run()
             .await;
         let new_address_bech32 = bech32::encode(&new_address);
@@ -101,7 +106,6 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
             .code(&self.contract_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewAddress)
-            
             .run()
             .await;
 
@@ -132,7 +136,7 @@ fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
 }
 
 fn write_method_declaration(file: &mut File, endpoint_name: &str) {
-    writeln!(file, "    async fn {endpoint_name}(&mut self) {{").unwrap();
+    writeln!(file, "    pub async fn {endpoint_name}(&mut self) {{").unwrap();
 }
 
 fn write_payments_declaration(file: &mut File, accepted_tokens: &[String]) {
@@ -214,7 +218,6 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
             .typed(proxy::{}Proxy)
             .{}({}){}
             .returns(ReturnsResultUnmanaged)
-            
             .run()
             .await;
 
@@ -237,7 +240,6 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi, name: &Stri
             .typed(proxy::{}Proxy)
             .{}({})
             .returns(ReturnsResultUnmanaged)
-            
             .run()
             .await;
 

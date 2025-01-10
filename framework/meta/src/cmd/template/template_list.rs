@@ -2,9 +2,9 @@ use crate::cli::TemplateListArgs;
 
 use super::{contract_creator::get_repo_version, template_source::template_sources, RepoSource};
 
-pub fn print_template_names(args: &TemplateListArgs) {
+pub async fn print_template_names(args: &TemplateListArgs) {
     let version = get_repo_version(&args.tag);
-    let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir());
+    let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir()).await;
     let template_names = template_names_from_repo(&repo_temp_download);
     for template_name in template_names {
         println!("{template_name}");

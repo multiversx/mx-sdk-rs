@@ -32,6 +32,51 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+
+## [sc 0.55.0, codec 0.21.2, chain 0.12.0, sdk 0.8.0] - 2025-01-08
+- Integrating Spica changes into the framework:
+	- EGLD+ESDT multi-transfers are now possible:
+		- changed the handling of call values: EGLD is treated almost the same as an ESDT in `all_transfers` and `multi_egld_or_esdt`, old ESDT methods are given some protection against unexpected scenarios
+		- changed the tx unified syntax for sending EGLD+ESDT from contracts, interactors and tests;
+		- support in the Rust VM.
+	- New built-in functions in the `ESDTSystemSCProxy`: `ESDTModifyRoyalties`, `SDTSetNewURIs`, `ESDTModifyCreator`, `ESDTMetaDataRecreate`, `ESDTMetaDataUpdate`.
+- Interactor support for "set state" on the chain simulator.
+- Fixed ownership for ManagedVec iterators, specifically reference iterators only produce references to the items.
+- Syntax cleanup:
+	- `#[payable]` now allowed instead of `#[payable("*")]`;
+	- `register_promise` allows callback, without calling a function on destination.
+- Refactoring and optimizations:
+	- Simplified the callback selector;
+	- Performance improvements in ManagedVec iterators;
+	- Removed some unnecessary bound checks in `multi_esdt`.
+
+## [sc 0.54.6] - 2024-12-04
+- `ManagedDecimal` bugfixes:
+	- ABI/proxy bugfix;
+	- Rescale bugfix.
+
+## [sc 0.54.5] - 2024-11-28
+- `ManagedVec` - deprecated `sort` and guarded it by the `alloc` feature, since it uses the allocator.
+- `sc-meta`
+	- versioning fix;
+	- interactor generator fix.
+- Interactors - fixed code metadata on deploy.
+
+## [sc 0.54.4] - 2024-11-22
+- `sc-meta`
+	- `install debugger` CLI that prepares VSCode extension for debugging;
+	- fixed a crash involving templates and installers.
+- Deprecated `#[derive(TypeAbi)]` and added an additional warning in the macro.
+
+## [sc 0.54.3] - 2024-11-18
+- `#[storage_mapper_from_address]` fixes for: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `TokenAttributesMapper`, `UniqueIdMapper`, `UserMapper`, `AddressToIdMapper`.
+
+## [sc 0.54.2, codec 0.21.1, chain 0.11.1, sdk 0.7.1] - 2024-11-15
+- Codec improvements:
+	- `MultiValueX` - `TopDecodeMultiLength` implementation fix;
+	- `ManagedVecItem` implented for MultiValue2 and MultiValue3.
+- `sc-meta snippets` improvements.
+
 ## [sc 0.54.1] - 2024-11-13
 - `sc-meta` `cs` - ChainSimulator CLI, which provides handy functionality to:
 	- install the chain simulator image in Docker;

@@ -56,6 +56,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
     add_managed_type(substitutions, &quote!(EsdtTokenPaymentMultiArg));
     add_managed_type(substitutions, &quote!(EsdtTokenPaymentMultiValue));
+    add_managed_type(substitutions, &quote!(EgldOrEsdtTokenPaymentMultiValue));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueEncodedIterator));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueEncoded));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
@@ -90,6 +91,7 @@ fn add_storage_mapper_single_generic_arg(
     substitutions: &mut SubstitutionsMap,
     mapper_name: &proc_macro2::TokenStream,
 ) {
+    add_managed_type_with_generics(substitutions, mapper_name);
     substitutions.add_substitution(
         quote!(#mapper_name<Self::Api>),
         quote!(#mapper_name<Self::Api>),

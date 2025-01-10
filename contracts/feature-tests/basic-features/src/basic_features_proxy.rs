@@ -165,7 +165,7 @@ where
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(Clone, Copy)]
 pub struct CodecErrorTestType {}
 
 #[rustfmt::skip]

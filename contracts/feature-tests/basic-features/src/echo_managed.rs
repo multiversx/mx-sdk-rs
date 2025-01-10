@@ -123,4 +123,51 @@ pub trait EchoManagedTypes {
     > {
         m
     }
+
+    #[endpoint]
+    fn convert_varags_vec_with_counted_pairs_1(
+        &self,
+        address_number_pairs: MultiValueEncoded<
+            MultiValue3<ManagedAddress, usize, MultiValueEncodedCounted<MultiValue2<usize, usize>>>,
+        >,
+    ) -> MultiValueManagedVec<
+        MultiValue3<ManagedAddress, usize, MultiValueManagedVecCounted<MultiValue2<usize, usize>>>,
+    > {
+        let mut result = MultiValueManagedVec::new();
+        for triple in address_number_pairs {
+            let (address, num, counted_lazy) = triple.into_tuple();
+            let mut counted_list = MultiValueManagedVecCounted::new();
+            for pair in counted_lazy {
+                counted_list.push(pair);
+            }
+            result.push((address, num, counted_list).into());
+        }
+        result
+    }
+
+    #[endpoint]
+    fn convert_varags_vec_with_counted_pairs_2(
+        &self,
+        address_number_pairs: MultiValueManagedVec<
+            MultiValue3<
+                ManagedAddress,
+                usize,
+                MultiValueManagedVecCounted<MultiValue2<usize, usize>>,
+            >,
+        >,
+    ) -> MultiValueEncoded<
+        MultiValue3<ManagedAddress, usize, MultiValueEncodedCounted<MultiValue2<usize, usize>>>,
+    > {
+        let mut result = MultiValueEncoded::new();
+        for triple in address_number_pairs {
+            let (address, x, counted_list) = triple.into_tuple();
+            let mut counted_lazy = MultiValueEncodedCounted::new();
+            let v = counted_list.into_vec();
+            for pair in v {
+                counted_lazy.push(pair);
+            }
+            result.push((address, x, counted_lazy).into());
+        }
+        result
+    }
 }

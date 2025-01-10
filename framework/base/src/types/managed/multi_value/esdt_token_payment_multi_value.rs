@@ -4,6 +4,7 @@ use crate::{
         multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
         TopDecodeMultiInput, TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
     },
+    types::ManagedVecRef,
 };
 
 use crate::{
@@ -34,7 +35,7 @@ impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EsdtTokenPaymentMultiValue
 }
 
 impl<M: ManagedTypeApi> EsdtTokenPaymentMultiValue<M> {
-    pub fn into_esdt_token_payment(self) -> EsdtTokenPayment<M> {
+    pub fn into_inner(self) -> EsdtTokenPayment<M> {
         self.obj
     }
 }
@@ -42,23 +43,18 @@ impl<M: ManagedTypeApi> EsdtTokenPaymentMultiValue<M> {
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     type PAYLOAD = <EsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD;
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
-    type Ref<'a> = Self;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
 
-    #[inline]
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        EsdtTokenPayment::from_byte_reader(reader).into()
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        EsdtTokenPayment::read_from_payload(payload).into()
     }
 
-    #[inline]
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
     }
 
-    #[inline]
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        self.obj.into_byte_writer(writer)
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.obj.save_to_payload(payload);
     }
 }
 

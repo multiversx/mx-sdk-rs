@@ -50,9 +50,10 @@ impl ScenarioGoInstaller {
         }
     }
 
-    pub fn install(&self) {
+    pub async fn install(&self) {
         let release_raw = self
             .get_scenario_go_release_json()
+            .await
             .expect("couldn't retrieve mx-chain-scenario-cli-go release");
 
         assert!(
@@ -62,6 +63,7 @@ impl ScenarioGoInstaller {
 
         let release = self.parse_scenario_go_release(&release_raw);
         self.download_zip(&release)
+            .await
             .expect("could not download artifact");
 
         self.unzip_binaries();
@@ -76,16 +78,18 @@ impl ScenarioGoInstaller {
         }
     }
 
-    fn get_scenario_go_release_json(&self) -> Result<String, reqwest::Error> {
+    async fn get_scenario_go_release_json(&self) -> Result<String, reqwest::Error> {
         let release_url = self.release_url();
         println_green(format!("Retrieving release info: {release_url}"));
 
-        let response = reqwest::blocking::Client::builder()
+        let response = reqwest::Client::builder()
             .user_agent(&self.user_agent)
             .build()?
             .get(release_url)
-            .send()?
-            .text()?;
+            .send()
+            .await?
+            .text()
+            .await?;
 
         Ok(response)
     }
@@ -135,14 +139,16 @@ impl ScenarioGoInstaller {
         self.temp_dir_path.join(&self.zip_name)
     }
 
-    fn download_zip(&self, release: &ScenarioGoRelease) -> Result<(), reqwest::Error> {
+    async fn download_zip(&self, release: &ScenarioGoRelease) -> Result<(), reqwest::Error> {
         println_green(format!("Downloading binaries: {}", &release.download_url));
-        let response = reqwest::blocking::Client::builder()
+        let response = reqwest::Client::builder()
             .user_agent(&self.user_agent)
             .build()?
             .get(&release.download_url)
-            .send()?
-            .bytes()?;
+            .send()
+            .await?
+            .bytes()
+            .await?;
         if response.len() < 10000 {
             panic!(
                 "Could not download artifact: {}",

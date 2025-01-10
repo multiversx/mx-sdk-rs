@@ -3,7 +3,8 @@ multiversx_sc::derive_imports!();
 
 use crate::bonding_curve::{curves::curve_function::CurveFunction, utils::structs::CurveArguments};
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone)]
 pub struct LinearFunction<M: ManagedTypeApi> {
     pub initial_price: BigUint<M>,
     pub linear_coefficient: BigUint<M>,

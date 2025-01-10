@@ -427,6 +427,9 @@ pub enum InstallCommand {
 
     #[command(name = "wasm-opt", about = "Installs the `wasm-opt` tool")]
     WasmOpt(InstallWasmOptArgs),
+
+    #[command(name = "debugger", about = "Installs the lldb debugger script tool")]
+    Debugger(InstallDebuggerArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -441,6 +444,9 @@ pub struct InstallWasm32Args {}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct InstallWasmOptArgs {}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallDebuggerArgs {}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct AccountArgs {

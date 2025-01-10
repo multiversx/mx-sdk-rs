@@ -168,7 +168,7 @@ where
     #[cfg(feature = "alloc")]
     pub fn to_raw_args_vec(&self) -> Vec<Vec<u8>> {
         let mut v = Vec::new();
-        for item in self.data.into_iter() {
+        for item in &self.data {
             v.push(item.to_boxed_bytes().into_vec());
         }
         v

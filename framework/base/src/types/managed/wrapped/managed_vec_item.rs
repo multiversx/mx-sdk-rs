@@ -1,16 +1,20 @@
 use core::borrow::Borrow;
 
 use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
+use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 
 use crate::{
-    api::ManagedTypeApi,
+    api::{use_raw_handle, HandleConstraints, ManagedTypeApi},
     types::{
         BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
         ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
-use super::{ManagedVecItemNestedTuple, ManagedVecItemPayload, ManagedVecItemPayloadBuffer};
+use super::{
+    EgldOrEsdtTokenIdentifier, ManagedVecItemNestedTuple, ManagedVecItemPayload,
+    ManagedVecItemPayloadAdd, ManagedVecItemPayloadBuffer, ManagedVecRef,
+};
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
@@ -42,27 +46,53 @@ pub trait ManagedVecItem: 'static {
     }
 
     /// Parses given bytes as a an owned object.
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self;
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self;
 
     /// Parses given bytes as a representation of the object, either owned, or a reference.
     ///
     /// # Safety
     ///
     /// In certain cases this involves practically disregarding the lifetimes, hence it is unsafe.
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a>;
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a>;
 
     /// Converts the object into bytes.
-    ///
-    /// The output is processed by the `writer` lambda.
-    /// The writer is provided by the caller.
-    /// The callee will use it to pass on the bytes.
     ///
     /// The method is used when instering (push, overwrite) into a ManagedVec.
     ///
     /// Note that a destructor should not be called at this moment, since the ManagedVec will take ownership of the item.
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R;
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD);
+}
+
+/// Used by the ManagedVecItem derive.
+///
+/// ## Safety
+///
+/// Only works correctly if the given index is correct, otherwise undefined behavior is possible.
+pub unsafe fn managed_vec_item_read_from_payload_index<T, P>(payload: &P, index: &mut usize) -> T
+where
+    T: ManagedVecItem,
+    P: ManagedVecItemPayload,
+{
+    let value = T::read_from_payload(payload.slice_unchecked(*index));
+    *index += T::PAYLOAD::payload_size();
+    value
+}
+
+/// Used by the ManagedVecItem derive.
+///
+/// ## Safety
+///
+/// Only works correctly if the given index is correct, otherwise undefined behavior is possible.
+pub unsafe fn managed_vec_item_save_to_payload_index<T, P>(
+    item: T,
+    payload: &mut P,
+    index: &mut usize,
+) where
+    T: ManagedVecItem,
+    P: ManagedVecItemPayload,
+{
+    item.save_to_payload(payload.slice_unchecked_mut(*index));
+    *index += T::PAYLOAD::payload_size();
 }
 
 macro_rules! impl_int {
@@ -71,20 +101,17 @@ macro_rules! impl_int {
             type PAYLOAD = ManagedVecItemPayloadBuffer<$payload_size>;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
-            fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-                let mut arr: [u8; $payload_size] = [0u8; $payload_size];
-                reader(&mut arr[..]);
-                $ty::from_be_bytes(arr)
-            }
-            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-                reader: Reader,
-            ) -> Self::Ref<'a> {
-                Self::from_byte_reader(reader)
+
+            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+                $ty::from_be_bytes(payload.buffer)
             }
 
-            fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-                let bytes = self.to_be_bytes();
-                writer(&bytes)
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                $ty::from_be_bytes(payload.buffer)
+            }
+
+            fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+                payload.buffer = self.to_be_bytes();
             }
         }
     };
@@ -101,21 +128,16 @@ impl ManagedVecItem for usize {
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut arr: [u8; 4] = [0u8; 4];
-        reader(&mut arr[..]);
-        u32::from_be_bytes(arr) as usize
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        u32::read_from_payload(payload) as usize
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        let bytes = (self as u32).to_be_bytes();
-        writer(&bytes)
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        (self as u32).save_to_payload(payload);
     }
 }
 
@@ -124,62 +146,56 @@ impl ManagedVecItem for bool {
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        u8::from_byte_reader(reader) > 0
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        u8::read_from_payload(payload) > 0
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         // true -> 1u8
         // false -> 0u8
-        let u8_value = u8::from(self);
-        <u8 as ManagedVecItem>::into_byte_writer(u8_value, writer)
+        u8::from(self).save_to_payload(payload);
     }
 }
 
 impl<T> ManagedVecItem for Option<T>
 where
-    (u8, (T, ())): ManagedVecItemNestedTuple,
+    ManagedVecItemPayloadBuffer<1>: ManagedVecItemPayloadAdd<T::PAYLOAD>,
     T: ManagedVecItem,
 {
-    type PAYLOAD = <(u8, (T, ())) as ManagedVecItemNestedTuple>::PAYLOAD;
+    type PAYLOAD = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = Self;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut payload = Self::PAYLOAD::new_buffer();
-        let payload_slice = payload.payload_slice_mut();
-        reader(payload_slice);
-        if payload_slice[0] == 0 {
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let (p1, p2) = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<
+            T::PAYLOAD,
+        >>::split_from_add(payload);
+
+        let disc = u8::read_from_payload(p1);
+        if disc == 0 {
             None
         } else {
-            Some(T::from_byte_reader(|bytes| {
-                bytes.copy_from_slice(&payload_slice[1..]);
-            }))
+            Some(T::read_from_payload(p2))
         }
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        let mut payload = Self::PAYLOAD::new_buffer();
-        let slice = payload.payload_slice_mut();
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let (p1, p2) = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<
+            T::PAYLOAD,
+        >>::split_mut_from_add(payload);
+
         if let Some(t) = self {
-            slice[0] = 1;
-            T::into_byte_writer(t, |bytes| {
-                slice[1..].copy_from_slice(bytes);
-            });
+            1u8.save_to_payload(p1);
+            t.save_to_payload(p2);
         }
-        writer(slice)
     }
 }
 
@@ -190,21 +206,19 @@ macro_rules! impl_managed_type {
             const SKIPS_RESERIALIZATION: bool = false;
             type Ref<'a> = ManagedRef<'a, M, Self>;
 
-            fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-                let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
-                unsafe { $ty::from_handle(handle) }
+            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+                let handle = use_raw_handle(i32::read_from_payload(payload));
+                unsafe { Self::from_handle(handle) }
             }
 
-            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-                reader: Reader,
-            ) -> Self::Ref<'a> {
-                let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                let handle = use_raw_handle(i32::read_from_payload(payload));
                 ManagedRef::wrap_handle(handle)
             }
 
-            fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+            fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
                 let handle = unsafe { self.forget_into_handle() };
-                <$ty<M> as ManagedType<M>>::OwnHandle::into_byte_writer(handle, writer)
+                handle.get_raw_handle().save_to_payload(payload);
             }
         }
     };
@@ -216,6 +230,7 @@ impl_managed_type! {BigInt}
 impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {TokenIdentifier}
+impl_managed_type! {EgldOrEsdtTokenIdentifier}
 
 impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>
 where
@@ -225,23 +240,19 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
         unsafe { Self::from_handle(handle) }
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
         ManagedRef::wrap_handle(handle)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        <<Self as ManagedType<M>>::OwnHandle as ManagedVecItem>::into_byte_writer(
-            self.get_handle(),
-            writer,
-        )
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let handle = unsafe { self.forget_into_handle() };
+        handle.get_raw_handle().save_to_payload(payload);
     }
 }
 
@@ -254,21 +265,19 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = M::ManagedBufferHandle::from_byte_reader(reader);
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
         unsafe { Self::from_handle(handle) }
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        let handle = M::ManagedBufferHandle::from_byte_reader(reader);
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
         ManagedRef::wrap_handle(handle)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         let handle = unsafe { self.forget_into_handle() };
-        <M::ManagedBufferHandle as ManagedVecItem>::into_byte_writer(handle, writer)
+        handle.get_raw_handle().save_to_payload(payload);
     }
 }
 
@@ -277,39 +286,108 @@ impl ManagedVecItem for EsdtTokenType {
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut arr: [u8; 1] = [0u8; 1];
-        reader(&mut arr[..]);
-        arr[0].into()
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        u8::read_from_payload(payload).into()
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, mut writer: Writer) -> R {
-        writer(&[self.as_u8()])
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.as_u8().save_to_payload(payload);
     }
 }
 
 impl ManagedVecItem for EsdtLocalRole {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<2>;
     const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
     type Ref<'a> = Self;
 
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        u16::from_byte_reader(reader).into()
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        u16::read_from_payload(payload).into()
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
     }
 
-    fn into_byte_writer<R, Writer: FnMut(&[u8]) -> R>(self, writer: Writer) -> R {
-        <u16 as ManagedVecItem>::into_byte_writer(self.as_u16(), writer)
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.as_u16().save_to_payload(payload);
+    }
+}
+
+impl<T1, T2> ManagedVecItem for MultiValue2<T1, T2>
+where
+    T1: ManagedVecItem,
+    T2: ManagedVecItem,
+    (T1, (T2, ())): ManagedVecItemNestedTuple,
+{
+    type PAYLOAD = <(T1, (T2, ())) as ManagedVecItemNestedTuple>::PAYLOAD;
+    const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let mut index = 0;
+        unsafe {
+            (
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+            )
+                .into()
+        }
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let tuple = self.into_tuple();
+        let mut index = 0;
+
+        unsafe {
+            managed_vec_item_save_to_payload_index(tuple.0, payload, &mut index);
+            managed_vec_item_save_to_payload_index(tuple.1, payload, &mut index);
+        }
+    }
+}
+
+impl<T1, T2, T3> ManagedVecItem for MultiValue3<T1, T2, T3>
+where
+    T1: ManagedVecItem,
+    T2: ManagedVecItem,
+    T3: ManagedVecItem,
+    (T1, (T2, (T3, ()))): ManagedVecItemNestedTuple,
+{
+    type PAYLOAD = <(T1, (T2, (T3, ()))) as ManagedVecItemNestedTuple>::PAYLOAD;
+    const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let mut index = 0;
+        unsafe {
+            (
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+                managed_vec_item_read_from_payload_index(payload, &mut index),
+            )
+                .into()
+        }
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let tuple = self.into_tuple();
+        let mut index = 0;
+
+        unsafe {
+            managed_vec_item_save_to_payload_index(tuple.0, payload, &mut index);
+            managed_vec_item_save_to_payload_index(tuple.1, payload, &mut index);
+            managed_vec_item_save_to_payload_index(tuple.2, payload, &mut index);
+        }
     }
 }

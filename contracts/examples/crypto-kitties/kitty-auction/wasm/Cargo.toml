@@ -28,7 +28,7 @@ panic = "abort"
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.54.1"
+version = "0.55.0"
 path = "../../../../../framework/wasm-adapter"
 
 [workspace]
