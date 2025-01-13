@@ -2,6 +2,7 @@
 
 multiversx_sc::imports!();
 
+pub mod builtin_func_features_proxy;
 pub mod esdt_features;
 
 /// Test contract for investigating async calls.
