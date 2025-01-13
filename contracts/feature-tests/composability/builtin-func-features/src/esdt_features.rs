@@ -3,7 +3,7 @@ multiversx_sc::derive_imports!();
 
 static ESDT_TRANSFER_FUNC_NAME: &[u8] = b"ESDTTransfer";
 
-const GAS_LIMIT_ESDT_TRANSFER: u64 = 50_0000;
+const GAS_LIMIT_ESDT_TRANSFER: u64 = 500_000;
 const CALLBACK_ESDT_TRANSFER_GAS_LIMIT: u64 = 100_000;
 
 #[derive(TopEncode, TopDecode)]
