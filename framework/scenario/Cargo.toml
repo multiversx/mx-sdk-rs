@@ -52,8 +52,7 @@ path = "../../sdk/scenario-format"
 [dependencies.multiversx-chain-vm-executor]
 # version = "0.3.0"
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-branch = "convert-small-int"
-# path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor"
+rev = "45ad48765e9e2eaa446fe32327a414a3b4599820"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.12.0"

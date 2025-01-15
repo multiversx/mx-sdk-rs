@@ -1926,4 +1926,20 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         panic!("Unavailable: managed_verify_blsaggregated_signature")
     }
+
+    fn get_round_time(&self) -> i64 {
+        panic!("Unavailable: get_round_time")
+    }
+
+    fn epoch_start_block_time_stamp(&self) -> i64 {
+        panic!("Unavailable: epoch_start_block_time_stamp")
+    }
+
+    fn epoch_start_block_nonce(&self) -> i64 {
+        panic!("Unavailable: epoch_start_block_nonce")
+    }
+
+    fn epoch_start_block_round(&self) -> i64 {
+        panic!("Unavailable: epoch_start_block_round")
+    }
 }

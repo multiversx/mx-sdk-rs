@@ -2439,8 +2439,8 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm-executor"
-version = "0.2.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?branch=convert-small-int#3459261051bd4cc1f7d084a503c4b601963964e2"
+version = "0.3.0"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=45ad48765e9e2eaa446fe32327a414a3b4599820#45ad48765e9e2eaa446fe32327a414a3b4599820"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
