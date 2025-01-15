@@ -658,6 +658,10 @@ impl VMHooks for VMHooksDispatcher {
             .load_all_esdt_transfers(multi_call_value_handle)
     }
 
+    fn managed_get_all_transfers_call_value(&self, all_transfers_handle: i32) {
+        self.handler.load_all_transfers(all_transfers_handle)
+    }
+
     fn managed_get_esdt_balance(
         &self,
         address_handle: i32,

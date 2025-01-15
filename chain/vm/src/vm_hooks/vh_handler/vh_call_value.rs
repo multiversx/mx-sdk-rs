@@ -1,4 +1,7 @@
-use crate::{types::RawHandle, vm_err_msg, vm_hooks::VMHooksHandlerSource};
+use crate::{
+    tx_mock::TxTokenTransfer, types::RawHandle, vm_err_msg, vm_hooks::VMHooksHandlerSource,
+};
+use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 use num_traits::Zero;
 
 use super::VMHooksManagedTypes;
@@ -22,6 +25,21 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
         let transfers = self.input_ref().received_esdt();
         self.m_types_lock()
             .mb_set_vec_of_esdt_payments(dest_handle, transfers);
+    }
+
+    fn load_all_transfers(&self, dest_handle: RawHandle) {
+        let direct_egld_value = self.input_ref().received_egld().clone();
+        let transfers = if !direct_egld_value.is_zero() {
+            vec![TxTokenTransfer {
+                token_identifier: EGLD_000000_TOKEN_IDENTIFIER.as_bytes().to_vec(),
+                nonce: 0,
+                value: direct_egld_value,
+            }]
+        } else {
+            self.input_ref().received_esdt().to_owned()
+        };
+        self.m_types_lock()
+            .mb_set_vec_of_esdt_payments(dest_handle, &transfers);
     }
 
     fn esdt_num_transfers(&self) -> usize {

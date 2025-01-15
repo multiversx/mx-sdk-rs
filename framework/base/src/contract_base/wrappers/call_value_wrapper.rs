@@ -9,10 +9,10 @@ use crate::{
     },
     err_msg,
     types::{
-        big_num_cmp::bi_gt_zero, BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier,
-        EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal,
-        ManagedRef, ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload,
-        ManagedVecPayloadIterator, ManagedVecRef, TokenIdentifier,
+        BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
+        EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal, ManagedRef, ManagedType,
+        ManagedVec, ManagedVecItem, ManagedVecItemPayload, ManagedVecPayloadIterator,
+        ManagedVecRef, TokenIdentifier,
     },
 };
 
@@ -135,23 +135,7 @@ where
         if !A::static_var_api_impl()
             .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED)
         {
-            let egld_single = self.egld_direct_non_strict();
-            if bi_gt_zero::<A>(egld_single.get_handle()) {
-                A::managed_type_impl().mb_overwrite(
-                    use_raw_handle(const_handles::MBUF_EGLD_000000),
-                    EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
-                );
-                A::managed_type_impl().mb_overwrite(
-                    all_transfers_handle.clone(),
-                    &const_handles::EGLD_PAYMENT_PAYLOAD[..],
-                );
-            } else {
-                // clone all_esdt_transfers_unchecked -> all_transfers
-                let all_transfers_unchecked_handle = self.all_esdt_transfers_unchecked();
-                A::managed_type_impl().mb_overwrite(all_transfers_handle.clone(), &[]);
-                A::managed_type_impl()
-                    .mb_append(all_transfers_handle.clone(), all_transfers_unchecked_handle);
-            }
+            A::call_value_api_impl().load_all_transfers(all_transfers_handle.clone());
         }
         unsafe { ManagedRef::wrap_handle(all_transfers_handle) }
     }
