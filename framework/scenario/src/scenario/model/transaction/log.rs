@@ -1,9 +1,9 @@
-use crate::scenario_model::BytesValue;
+use multiversx_sc::types::Address;
 
 #[derive(Debug, Clone)]
 pub struct Log {
-    pub address: BytesValue,
-    pub endpoint: BytesValue,
-    pub topics: Vec<BytesValue>,
-    pub data: BytesValue,
+    pub address: Address,
+    pub endpoint: String,
+    pub topics: Vec<Vec<u8>>,
+    pub data: Vec<Vec<u8>>,
 }

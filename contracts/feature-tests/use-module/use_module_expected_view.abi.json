@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.51.1"
+            "version": "0.55.0"
         }
     },
     "docs": [
@@ -244,6 +244,14 @@
                     "type": "EsdtTokenPayment"
                 }
             ]
+        },
+        {
+            "identifier": "pauseContract",
+            "inputs": []
+        },
+        {
+            "identifier": "unpauseContract",
+            "inputs": []
         }
     ],
     "esdtAttributes": [

@@ -111,7 +111,7 @@ where
 
     pub fn accept_funds_echo_payment(
         self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>> {
         self.wrapped_tx
             .raw_call("accept_funds_echo_payment")
             .original_result()
@@ -170,6 +170,22 @@ where
             .original_result()
     }
 
+    pub fn retrieve_funds_egld_or_single_esdt(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("retrieve_funds_egld_or_single_esdt")
+            .original_result()
+    }
+
+    pub fn retrieve_funds_multi_esdt(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("retrieve_funds_multi_esdt")
+            .original_result()
+    }
+
     pub fn retrieve_multi_funds_async<
         Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
@@ -188,6 +204,14 @@ where
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("burn_and_create_retrieve_async")
+            .original_result()
+    }
+
+    pub fn explicit_panic(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("explicit_panic")
             .original_result()
     }
 

@@ -37,7 +37,7 @@ where
     }
 }
 
-impl<'k, A> TopEncodeOutput for StorageSetOutput<'k, A>
+impl<A> TopEncodeOutput for StorageSetOutput<'_, A>
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
@@ -50,14 +50,14 @@ where
     fn set_u64(self, value: u64) {
         let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_from_small_int_unsigned(handle.clone(), value as i64);
-        let managed_buffer = ManagedBuffer::from_handle(handle);
+        let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
         self.set_managed_buffer(&managed_buffer);
     }
 
     fn set_i64(self, value: i64) {
         let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_from_small_int_signed(handle.clone(), value);
-        let managed_buffer = ManagedBuffer::from_handle(handle);
+        let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
         self.set_managed_buffer(&managed_buffer);
     }
 

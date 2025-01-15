@@ -1,6 +1,6 @@
 use multiversx_sc::types::{Tx, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified};
 
-use crate::scenario_model::TransferStep;
+use crate::{imports::TxESDT, scenario_model::TransferStep};
 
 use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
 
@@ -48,6 +48,12 @@ where
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
+    } else {
+        step.tx.esdt_value = full_payment_data
+            .multi_esdt
+            .iter()
+            .map(|item| TxESDT::from(item.clone()))
+            .collect();
     }
 
     step

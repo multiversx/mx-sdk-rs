@@ -23,11 +23,17 @@ pub enum EIVersion {
     /// - some managed ESDT properties.
     V1_2,
 
-    /// Latest VM Hooks version, released with VM 1.5 in January 2024.
+    /// Latest VM Hooks version, released with VM 1.5 in January 2024: https://multiversx.com/release/release-sirius-v1-6-7
     ///
     /// It adds the new async call functionality (promises).
     #[default]
     V1_3,
+
+    /// Hooks made available in the Spica release, November 12, 2024: https://multiversx.com/release/release-spica-v1-8-4-0
+    V1_4,
+
+    /// Version planned for Q3 2024.
+    V1_5,
 }
 
 impl EIVersion {
@@ -37,6 +43,8 @@ impl EIVersion {
             "1.1" => Some(EIVersion::V1_1),
             "1.2" => Some(EIVersion::V1_2),
             "1.3" => Some(EIVersion::V1_3),
+            "1.4" => Some(EIVersion::V1_4),
+            "1.5" => Some(EIVersion::V1_5),
             _ => None,
         }
     }
@@ -47,6 +55,8 @@ impl EIVersion {
             EIVersion::V1_1 => "1.1",
             EIVersion::V1_2 => "1.2",
             EIVersion::V1_3 => "1.3",
+            EIVersion::V1_4 => "1.4",
+            EIVersion::V1_5 => "1.5",
         }
     }
 
@@ -56,6 +66,8 @@ impl EIVersion {
             EIVersion::V1_1 => super::EI_1_1_NAMES,
             EIVersion::V1_2 => super::EI_1_2_NAMES,
             EIVersion::V1_3 => super::EI_1_3_NAMES,
+            EIVersion::V1_4 => super::EI_1_4_NAMES,
+            EIVersion::V1_5 => super::EI_1_5_NAMES,
         }
     }
 

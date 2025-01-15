@@ -178,31 +178,6 @@
                     "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
-        },
-        {
-            "step": "scCall",
-            "id": "EGLD-test",
-            "comment": "send all types",
-            "tx": {
-                "from": "address:a_user",
-                "to": "sc:forwarder",
-                "function": "send_esdt_direct_multi_transfer",
-                "arguments": [
-                    "address:a_user",
-                    "str:EGLD",
-                    "0",
-                    "1000"
-                ],
-                "gasLimit": "80,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "10",
-                "message": "str:insufficient funds",
-                "gas": "*",
-                "refund": "*"
-            }
         }
     ]
 }

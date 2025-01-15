@@ -6,7 +6,7 @@ use crate::{
     },
     err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    types::{BigFloat, BigInt, BigUint, ManagedBuffer, ManagedType, Sign},
+    types::{BigFloat, BigInt, BigUint, Sign},
 };
 
 use alloc::string::ToString;
@@ -66,7 +66,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
-                &self.data * &scaling_factor.value
+                &self.data / &scaling_factor.value
             },
         }
     }
@@ -354,15 +354,15 @@ pub(super) fn managed_decimal_fmt<M: ManagedTypeApi, F: FormatByteReceiver>(
     if len > num_dec {
         let temp_str_handle: M::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_2);
+        let cast_handle = temp_str_handle.clone().cast_or_signal_error::<M, _>();
+        let temp_str_ref = unsafe { ManagedRef::wrap_handle(cast_handle) };
         let _ = M::managed_type_impl().mb_copy_slice(
             full_str_handle.clone(),
             0,
             len - num_dec,
             temp_str_handle.clone(),
         );
-        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-            temp_str_handle.get_raw_handle(),
-        ));
+        f.append_managed_buffer(&temp_str_ref);
         f.append_bytes(b".");
         let _ = M::managed_type_impl().mb_copy_slice(
             full_str_handle.clone(),
@@ -370,17 +370,15 @@ pub(super) fn managed_decimal_fmt<M: ManagedTypeApi, F: FormatByteReceiver>(
             num_dec,
             temp_str_handle.clone(),
         );
-        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-            temp_str_handle.get_raw_handle(),
-        ));
+        f.append_managed_buffer(&temp_str_ref);
     } else {
         f.append_bytes(b"0.");
         for _ in len..num_dec {
             f.append_bytes(b"0");
         }
-        f.append_managed_buffer(&ManagedBuffer::from_raw_handle(
-            full_str_handle.get_raw_handle(),
-        ));
+        let cast_handle = full_str_handle.clone().cast_or_signal_error::<M, _>();
+        let full_str_ref = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer(&full_str_ref);
     }
 }
 

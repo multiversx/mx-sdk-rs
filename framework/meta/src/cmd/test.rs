@@ -12,6 +12,7 @@ pub fn test(test_args: &TestArgs) {
     let go = test_args.go;
     let scen = test_args.scen;
     let no_capture = test_args.nocapture;
+    let chain_simulator = test_args.chain_simulator;
 
     if scen {
         program = "mx-scenario-go";
@@ -25,6 +26,10 @@ pub fn test(test_args: &TestArgs) {
 
         if go {
             args.extend(["--features", "multiversx-sc-scenario/run-go-tests"]);
+        }
+
+        if chain_simulator && cfg!(feature = "chain-simulator-tests") {
+            args.extend(["--features", "chain-simulator-tests"]);
         }
 
         if no_capture {

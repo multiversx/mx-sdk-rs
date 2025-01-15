@@ -1,3 +1,5 @@
+use multiversx_sc::types::{ManagedVecItemPayload, ManagedVecItemPayloadBuffer};
+
 multiversx_sc::derive_imports!();
 
 // to test, run the following command in the crate folder:
@@ -49,9 +51,9 @@ fn struct_to_bytes_writer() {
         /* arr  */ 0x61, 0x11, 0x62, 0x22,
     ];
 
-    <Struct2 as multiversx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
-        assert_eq!(bytes, &expected_payload[..]);
-    });
+    let mut payload = ManagedVecItemPayloadBuffer::new_buffer();
+    <Struct2 as multiversx_sc::types::ManagedVecItem>::save_to_payload(s, &mut payload);
+    assert_eq!(payload.buffer, &expected_payload[..]);
 }
 
 #[test]
@@ -67,7 +69,7 @@ fn struct_2_from_bytes_reader() {
     };
 
     #[rustfmt::skip]
-    let payload = &[
+    let payload = [
         /* u_8  */ 0x01,
         /* u_16 */ 0x00, 0x02,
         /* u_32 */ 0x00, 0x00, 0x00, 0x03,
@@ -78,8 +80,6 @@ fn struct_2_from_bytes_reader() {
     ];
 
     let struct_from_bytes =
-        <Struct2 as multiversx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
-            bytes.copy_from_slice(&payload[..]);
-        });
+        <Struct2 as multiversx_sc::types::ManagedVecItem>::read_from_payload(&payload.into());
     assert_eq!(expected_struct, struct_from_bytes);
 }

@@ -34,7 +34,7 @@ where
 
     /// Will completely disregard lifetimes, use with care.
     #[doc(hidden)]
-    pub(crate) unsafe fn wrap_handle(handle: T::OwnHandle) -> Self {
+    pub unsafe fn wrap_handle(handle: T::OwnHandle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -49,7 +49,7 @@ where
     }
 }
 
-impl<'a, M, T> ManagedRef<'a, M, T>
+impl<M, T> ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + Clone,
@@ -60,13 +60,13 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedRef<'a, M, T>
+impl<M, T> ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    #[inline]
-    fn clone(&self) -> Self {
+    /// Clones the reference itself, not the object contained therein.
+    pub fn clone_ref(&self) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<'a, M, T> Deref for ManagedRef<'a, M, T>
+impl<M, T> Deref for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -88,7 +88,7 @@ where
     }
 }
 
-impl<'a, M, T> Borrow<T> for ManagedRef<'a, M, T>
+impl<M, T> Borrow<T> for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -110,7 +110,7 @@ where
     }
 }
 
-impl<'a, M, T> PartialEq for ManagedRef<'a, M, T>
+impl<M, T> PartialEq for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
@@ -121,14 +121,14 @@ where
     }
 }
 
-impl<'a, M, T> Eq for ManagedRef<'a, M, T>
+impl<M, T> Eq for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
 {
 }
 
-impl<'a, M, T> TopEncode for ManagedRef<'a, M, T>
+impl<M, T> TopEncode for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + TopEncode,
@@ -143,7 +143,7 @@ where
     }
 }
 
-impl<'a, M, T> NestedEncode for ManagedRef<'a, M, T>
+impl<M, T> NestedEncode for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + NestedEncode,
@@ -158,7 +158,7 @@ where
     }
 }
 
-impl<'a, M, T> core::fmt::Debug for ManagedRef<'a, M, T>
+impl<M, T> core::fmt::Debug for ManagedRef<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + core::fmt::Debug,

@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.51.1"
+            "version": "0.55.0"
         }
     },
     "docs": [
@@ -256,6 +256,26 @@
                     ],
                     "name": "tuple_madness",
                     "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                }
+            ]
+        },
+        "AbiWithManagedBufferReadToEnd": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "name": "endpoint",
+                    "type": "bytes"
+                },
+                {
+                    "name": "gas",
+                    "type": "u64"
+                },
+                {
+                    "name": "flush",
+                    "type": "bytes-read-to-end"
                 }
             ]
         },

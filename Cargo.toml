@@ -13,14 +13,18 @@ members = [
   "framework/snippets",
   "framework/wasm-adapter",
 
+  "chain/core",
+  "chain/vm",
+
   "sdk/core",
+  "sdk/dapp",
+  "sdk/http",
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",
   "tools/payload-macro-generator",
   # "tools/plotter",
-
-  "vm",
+  "tools/interactor-system-func-calls/",
 
   "contracts/modules",
 
@@ -51,7 +55,7 @@ members = [
 
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
-  "contracts/examples/adder/interact",
+  "contracts/examples/adder/interactor",
   "contracts/examples/esdt-transfer-with-fee",
   "contracts/examples/esdt-transfer-with-fee/meta",
   "contracts/examples/bonding-curve-contract",
@@ -97,6 +101,8 @@ members = [
   "contracts/examples/proxy-pause/meta",
   "contracts/examples/ping-pong-egld",
   "contracts/examples/ping-pong-egld/meta",
+  "contracts/examples/ping-pong-egld/interactor",
+  "contracts/examples/ping-pong-egld/dapp",
   "contracts/examples/rewards-distribution",
   "contracts/examples/rewards-distribution/meta",
   "contracts/examples/seed-nft-minter",
@@ -127,6 +133,7 @@ members = [
   "contracts/feature-tests/composability/execute-on-dest-esdt-issue-callback/child",
   "contracts/feature-tests/composability/execute-on-dest-esdt-issue-callback/child/meta",
   "contracts/feature-tests/composability/forwarder",
+  "contracts/feature-tests/composability/forwarder-interactor",
   "contracts/feature-tests/composability/forwarder/meta",
   "contracts/feature-tests/composability/forwarder-legacy",
   "contracts/feature-tests/composability/forwarder-legacy/meta",
@@ -175,6 +182,7 @@ members = [
   "contracts/feature-tests/panic-message-features",
   "contracts/feature-tests/panic-message-features/meta",
   "contracts/feature-tests/payable-features",
+  "contracts/feature-tests/payable-features/interactor",
   "contracts/feature-tests/payable-features/meta",
   "contracts/feature-tests/rust-snippets-generator-test",
   "contracts/feature-tests/rust-snippets-generator-test/meta",

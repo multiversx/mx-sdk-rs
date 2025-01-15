@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::imports::*;
+use multiversx_sc_scenario::{imports::*, scenario_model::TxResponseStatus};
 
 use scenario_tester::*;
 
@@ -16,6 +16,7 @@ const NFT_ID: TestTokenIdentifier = TestTokenIdentifier::new("NFT-123456");
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
     blockchain.register_contract(
         SC_SCENARIO_TESTER_PATH_EXPR,
         scenario_tester::ContractBuilder,
@@ -243,4 +244,146 @@ fn set_state_test() {
         .nonce(6)
         .balance(600)
         .esdt_balance(TOKEN_ID, 60);
+}
+
+#[test]
+fn st_blackbox_tx_hash() {
+    let mut world = world();
+
+    world
+        .account(OWNER_ADDRESS)
+        .nonce(1)
+        .balance(100)
+        .account(OTHER_ADDRESS)
+        .nonce(2)
+        .balance(300)
+        .esdt_balance(TOKEN_ID, 500)
+        .commit();
+
+    let (new_address, tx_hash) = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .init(5u32)
+        .code(CODE_PATH)
+        .new_address(ST_ADDRESS)
+        .tx_hash([11u8; 32])
+        .returns(ReturnsNewAddress)
+        .returns(ReturnsTxHash)
+        .run();
+
+    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(tx_hash.as_array(), &[11u8; 32]);
+
+    let tx_hash = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .add(1u32)
+        .tx_hash([22u8; 32])
+        .returns(ReturnsTxHash)
+        .run();
+
+    assert_eq!(tx_hash.as_array(), &[22u8; 32]);
+}
+
+#[test]
+fn st_blackbox_returns_result_or_error() {
+    let mut world = world();
+
+    world
+        .account(OWNER_ADDRESS)
+        .nonce(1)
+        .balance(100)
+        .account(OTHER_ADDRESS)
+        .nonce(2)
+        .balance(300)
+        .esdt_balance(TOKEN_ID, 500)
+        .commit();
+
+    // deploy
+    let (result, check_tx_hash, pass_value_2) = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .init(5u32)
+        .code(CODE_PATH)
+        .new_address(ST_ADDRESS)
+        .tx_hash([33u8; 32])
+        .returns(
+            ReturnsHandledOrError::new()
+                .returns(ReturnsNewAddress)
+                .returns(ReturnsResultAs::<String>::new())
+                .returns(PassValue("pass-value-1"))
+                .returns(ReturnsTxHash),
+        )
+        .returns(ReturnsTxHash)
+        .returns(PassValue("pass-value-2"))
+        .run();
+
+    assert_eq!(check_tx_hash.as_array(), &[33u8; 32]);
+    let (new_address, out_value, pass_value_1, also_check_tx_hash) = result.unwrap();
+    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(out_value, "init-result");
+    assert_eq!(pass_value_1, "pass-value-1");
+    assert_eq!(also_check_tx_hash.as_array(), &[33u8; 32]);
+    assert_eq!(pass_value_2, "pass-value-2");
+
+    // query - ok
+    let result = world
+        .query()
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .sum()
+        .returns(ReturnsHandledOrError::new().returns(ReturnsResultUnmanaged))
+        .run();
+    assert_eq!(result, Ok(RustBigUint::from(5u32)));
+
+    // query - error
+    let result = world
+        .query()
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .sc_panic()
+        .returns(ReturnsHandledOrError::new())
+        .run();
+
+    assert_eq!(
+        result,
+        Err(TxResponseStatus::new(
+            ReturnCode::UserError,
+            "sc_panic! example"
+        ))
+    );
+
+    // call - ok
+    let result = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .add(1u32)
+        .returns(ReturnsHandledOrError::new())
+        .run();
+
+    assert_eq!(result, Ok(()));
+
+    // call - error
+    let result = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .sc_panic()
+        .returns(ReturnsHandledOrError::new())
+        .run();
+
+    assert_eq!(
+        result,
+        Err(TxResponseStatus::new(
+            ReturnCode::UserError,
+            "sc_panic! example"
+        ))
+    );
 }

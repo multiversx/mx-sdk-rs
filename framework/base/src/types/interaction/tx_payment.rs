@@ -1,9 +1,11 @@
+mod test_esdt_transfer;
 mod tx_payment_egld;
 mod tx_payment_egld_or_esdt;
 mod tx_payment_egld_or_esdt_refs;
 mod tx_payment_egld_or_multi_esdt;
 mod tx_payment_egld_or_multi_esdt_ref;
 mod tx_payment_egld_value;
+mod tx_payment_multi_egld_or_esdt;
 mod tx_payment_multi_esdt;
 mod tx_payment_none;
 mod tx_payment_not_payable;
@@ -11,6 +13,7 @@ mod tx_payment_single_esdt;
 mod tx_payment_single_esdt_ref;
 mod tx_payment_single_esdt_triple;
 
+pub use test_esdt_transfer::TestEsdtTransfer;
 pub use tx_payment_egld::{Egld, EgldPayment};
 pub use tx_payment_egld_value::TxEgldValue;
 pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
@@ -18,7 +21,7 @@ pub use tx_payment_not_payable::NotPayable;
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedAddress, ManagedBuffer, MultiEsdtPayment},
+    types::{BigUint, ManagedAddress, ManagedBuffer, MultiEgldOrEsdtPayment},
 };
 
 use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};
@@ -116,7 +119,7 @@ where
     Api: ManagedTypeApi,
 {
     pub egld: Option<AnnotatedEgldPayment<Api>>,
-    pub multi_esdt: MultiEsdtPayment<Api>,
+    pub multi_esdt: MultiEgldOrEsdtPayment<Api>,
 }
 
 impl<Api> Default for FullPaymentData<Api>

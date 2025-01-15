@@ -1,20 +1,16 @@
 use multiversx_sc::types::{
-    Code, FunctionCall, NotPayable, RHListExec, Tx, TxEnv, TxFromSpecified, TxGas, TxPayment,
-    TxToSpecified, UpgradeCall,
+    FunctionCall, RHListExec, Tx, TxEnv, TxEnvWithTxHash, TxFromSpecified, TxGas, TxPayment,
+    TxToSpecified,
 };
 
-use crate::{
-    imports::MxscPath,
-    scenario_model::{ScCallStep, TxESDT, TxExpect, TxResponse},
-    ScenarioEnvExec,
-};
+use crate::scenario_model::{ScCallStep, TxESDT, TxExpect, TxResponse};
 
 use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
 
 impl<Env, From, To, Payment, Gas, RH> TxToStep<Env, RH>
     for Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
 where
-    Env: TxEnv<RHExpect = TxExpect>,
+    Env: TxEnvWithTxHash<RHExpect = TxExpect>,
     From: TxFromSpecified<Env>,
     To: TxToSpecified<Env>,
     Payment: TxPayment<Env>,
@@ -23,7 +19,7 @@ where
 {
     type Step = ScCallStep;
 
-    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, RH> {
+    fn tx_to_step(mut self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step = tx_to_sc_call_step(
             &self.env,
             self.from,
@@ -32,6 +28,7 @@ where
             self.gas,
             self.data,
         );
+        step.explicit_tx_hash = self.env.take_tx_hash();
         step.expect = Some(self.result_handler.list_tx_expect());
 
         StepWrapper {
@@ -74,58 +71,8 @@ where
         step.tx.esdt_value = full_payment_data
             .multi_esdt
             .iter()
-            .map(TxESDT::from)
+            .map(|item| TxESDT::from(item.clone()))
             .collect();
-    }
-
-    step
-}
-
-impl<'w, From, To, RH> TxToStep<ScenarioEnvExec<'w>, RH>
-    for Tx<
-        ScenarioEnvExec<'w>,
-        From,
-        To,
-        NotPayable,
-        (),
-        UpgradeCall<ScenarioEnvExec<'w>, Code<MxscPath<'w>>>,
-        RH,
-    >
-where
-    From: TxFromSpecified<ScenarioEnvExec<'w>>,
-    To: TxToSpecified<ScenarioEnvExec<'w>>,
-    RH: RHListExec<TxResponse, ScenarioEnvExec<'w>>,
-{
-    type Step = ScCallStep;
-
-    fn tx_to_step(self) -> StepWrapper<ScenarioEnvExec<'w>, Self::Step, RH> {
-        let mut step = tx_to_sc_call_upgrade_step(&self.env, self.from, self.to, self.data);
-        step.expect = Some(self.result_handler.list_tx_expect());
-
-        StepWrapper {
-            env: self.env,
-            step,
-            result_handler: self.result_handler,
-        }
-    }
-}
-
-pub fn tx_to_sc_call_upgrade_step<'a, 'w: 'a, From, To>(
-    env: &'a ScenarioEnvExec<'w>,
-    from: From,
-    to: To,
-    data: UpgradeCall<ScenarioEnvExec<'w>, Code<MxscPath>>,
-) -> ScCallStep
-where
-    From: TxFromSpecified<ScenarioEnvExec<'w>>,
-    To: TxToSpecified<ScenarioEnvExec<'w>>,
-{
-    let mut step = ScCallStep::new()
-        .from(address_annotated(env, &from))
-        .to(address_annotated(env, &to))
-        .function("upgrade");
-    for arg in data.arg_buffer.iter_buffers() {
-        step.tx.arguments.push(arg.to_vec().into());
     }
 
     step

@@ -4,6 +4,7 @@ const WEGLD_SWAP_EXPR: &str = "0x0061736d0100000001661160000060017f0060027f7f017
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
     blockchain.register_partial_contract::<multisig::AbiProvider, _>(
         "mxsc:output/multisig.mxsc.json",

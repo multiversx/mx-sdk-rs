@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.51.1"
+            "version": "0.55.0"
         }
     },
     "docs": [
@@ -110,6 +110,7 @@
         },
         {
             "name": "multi_result_3",
+            "title": "result-3",
             "mutability": "mutable",
             "inputs": [],
             "outputs": [
@@ -243,6 +244,21 @@
                 },
                 {
                     "type": "array32<u8>"
+                }
+            ]
+        },
+        {
+            "name": "process_managed_decimal",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "input",
+                    "type": "ManagedDecimal<10>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<usize>"
                 }
             ]
         },
@@ -386,6 +402,21 @@
             "outputs": [
                 {
                     "type": "OperationCompletionStatus"
+                }
+            ]
+        },
+        {
+            "name": "takes_object_with_managed_buffer_read_to_end",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "arg",
+                    "type": "AbiWithManagedBufferReadToEnd"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
                 }
             ]
         },
@@ -605,6 +636,26 @@
                     ],
                     "name": "tuple_madness",
                     "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                }
+            ]
+        },
+        "AbiWithManagedBufferReadToEnd": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "name": "endpoint",
+                    "type": "bytes"
+                },
+                {
+                    "name": "gas",
+                    "type": "u64"
+                },
+                {
+                    "name": "flush",
+                    "type": "bytes-read-to-end"
                 }
             ]
         },

@@ -2,6 +2,7 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/payable-features");
     blockchain.register_contract(
         "mxsc:output/payable-features.mxsc.json",
         payable_features::ContractBuilder,
@@ -12,6 +13,16 @@ fn world() -> ScenarioWorld {
 #[test]
 fn call_value_check_rs() {
     world().run("scenarios/call-value-check.scen.json");
+}
+
+#[test]
+fn call_value_check_multi_egld_rs() {
+    world().run("scenarios/call-value-check-multi-egld.scen.json");
+}
+
+#[test]
+fn payable_all_transfers_rs() {
+    world().run("scenarios/payable_all_transfers.scen.json");
 }
 
 #[test]
@@ -60,8 +71,18 @@ fn payable_multi_array_rs() {
 }
 
 #[test]
+fn payable_multi_array_egld_rs() {
+    world().run("scenarios/payable_multi_array_egld.scen.json");
+}
+
+#[test]
 fn payable_multiple_rs() {
     world().run("scenarios/payable_multiple.scen.json");
+}
+
+#[test]
+fn payable_multiple_egld_rs() {
+    world().run("scenarios/payable_multiple_egld.scen.json");
 }
 
 #[test]
@@ -82,4 +103,9 @@ fn payable_token_3_rs() {
 #[test]
 fn payable_token_4_rs() {
     world().run("scenarios/payable_token_4.scen.json");
+}
+
+#[test]
+fn payable_token_5_rs() {
+    world().run("scenarios/payable_token_5.scen.json");
 }

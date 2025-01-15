@@ -2,7 +2,8 @@ use multiversx_sc::{
     codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
     derive::{debug_const_managed_decimal, debug_managed_decimal},
     types::{
-        BigFloat, BigInt, BigUint, ConstDecimals, ManagedDecimal, ManagedDecimalSigned, NumDecimals,
+        BigFloat, BigInt, BigUint, ConstDecimals, Decimals, ManagedDecimal, ManagedDecimalSigned,
+        NumDecimals,
     },
 };
 use multiversx_sc_scenario::api::StaticApi;
@@ -38,33 +39,83 @@ pub fn test_managed_decimal() {
         division,
         ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(5u64))
     );
+}
 
-    let fixed_4: ManagedDecimal<StaticApi, NumDecimals> =
+fn assert_exact<D: Decimals>(dec: &ManagedDecimal<StaticApi, D>, raw_u64: u64, scale: usize) {
+    let raw_units = BigUint::from(raw_u64);
+    assert_eq!(dec.scale(), scale);
+    assert_eq!(dec.into_raw_units(), &raw_units);
+    assert_eq!(dec, &ManagedDecimal::from_raw_units(raw_units, scale));
+}
+
+#[test]
+pub fn test_managed_decimal_rescale_unchanged() {
+    let dec: ManagedDecimal<StaticApi, NumDecimals> =
         ManagedDecimal::from_raw_units(BigUint::from(100u64), 2usize);
-    let fixed_5 = fixed_4.rescale(2usize);
+    assert_exact(&dec, 100u64, 2);
+    let rescaled = dec.rescale(2usize);
+    assert_exact(&rescaled, 100u64, 2);
     assert_eq!(
-        fixed_5,
+        rescaled,
         ManagedDecimal::from_raw_units(BigUint::from(100000000u64), 8usize)
     );
+}
 
-    let fixed_6: ManagedDecimal<StaticApi, ConstDecimals<2>> =
-        ManagedDecimal::from(BigUint::from(1500u64));
-    let fixed_7 = fixed_6.rescale(ConstDecimals::<8>);
+#[test]
+pub fn test_managed_decimal_rescale_up() {
+    let uint_value = 1500u64;
+    let dec: ManagedDecimal<StaticApi, ConstDecimals<2>> =
+        ManagedDecimal::from(BigUint::from(uint_value));
+    assert_exact(&dec, uint_value * 100, 2);
+    let rescaled = dec.rescale(ConstDecimals::<8>);
+    assert_exact(&rescaled, uint_value * 100000000, 8);
     assert_eq!(
-        fixed_7,
-        ManagedDecimal::<StaticApi, ConstDecimals<8>>::from(BigUint::from(1500u64))
+        rescaled,
+        ManagedDecimal::<StaticApi, ConstDecimals<8>>::from(BigUint::from(uint_value))
     );
+}
 
-    let fixed_8: ManagedDecimal<StaticApi, NumDecimals> =
-        ManagedDecimal::from_raw_units(BigUint::from(5u64), 5usize);
-    let fixed_9 = fixed_8.rescale(ConstDecimals::<3>);
+#[test]
+pub fn test_managed_decimal_rescale_down_1() {
+    // 1234.0000000 -> 1234.
+    let uint_value = 1234u64;
+    let dec: ManagedDecimal<StaticApi, ConstDecimals<7>> =
+        ManagedDecimal::from(BigUint::from(uint_value));
+    assert_exact(&dec, uint_value * 10000000, 7);
+    let rescaled = dec.rescale(ConstDecimals::<3>);
+    assert_exact(&rescaled, uint_value * 1000, 3);
+}
+
+#[test]
+pub fn test_managed_decimal_rescale_down_2() {
+    // 0.00009 -> 0.0000
+    let dec: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(9u64), 5usize);
+    assert_exact(&dec, 9, 5);
+    let rescaled = dec.rescale(ConstDecimals::<4>);
+    assert_exact(&rescaled, 0, 4);
     assert_eq!(
-        fixed_9,
-        ManagedDecimal::<StaticApi, ConstDecimals<3>>::const_decimals_from_raw(BigUint::from(
-            500u64
-        ))
+        rescaled,
+        ManagedDecimal::<StaticApi, ConstDecimals<4>>::from(BigUint::zero())
     );
+}
 
+#[test]
+pub fn test_managed_decimal_rescale_down_3() {
+    // 1.00009 -> 1.0000
+    let dec: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(100009u64), 5usize);
+    assert_exact(&dec, 100009, 5);
+    let rescaled = dec.rescale(ConstDecimals::<4>);
+    assert_exact(&rescaled, 10000, 4);
+    assert_eq!(
+        rescaled,
+        ManagedDecimal::<StaticApi, ConstDecimals<4>>::from(BigUint::from(1u64))
+    );
+}
+
+#[test]
+pub fn test_managed_decimal_from_big_float() {
     let float_1 = BigFloat::<StaticApi>::from_frac(3i64, 2i64);
     let fixed_float_1 = ManagedDecimalSigned::<StaticApi, ConstDecimals<1>>::from_big_float(
         &float_1,
@@ -166,6 +217,83 @@ pub fn test_addition_managed_decimal_signed() {
     assert_eq!(addition_4.trunc(), BigInt::from(1i64));
 }
 
+fn assert_exact_signed<D: Decimals>(
+    dec: &ManagedDecimalSigned<StaticApi, D>,
+    raw_u64: i64,
+    scale: usize,
+) {
+    let raw_units = BigInt::from(raw_u64);
+    assert_eq!(dec.scale(), scale);
+    assert_eq!(dec.into_raw_units(), &raw_units);
+    assert_eq!(dec, &ManagedDecimalSigned::from_raw_units(raw_units, scale));
+}
+
+#[test]
+pub fn test_managed_decimal_signed_rescale_unchanged() {
+    let dec: ManagedDecimalSigned<StaticApi, NumDecimals> =
+        ManagedDecimalSigned::from_raw_units(BigInt::from(100), 2usize);
+    assert_exact_signed(&dec, 100, 2);
+    let rescaled = dec.rescale(2usize);
+    assert_exact_signed(&rescaled, 100, 2);
+    assert_eq!(
+        rescaled,
+        ManagedDecimalSigned::from_raw_units(BigInt::from(100000000), 8usize)
+    );
+}
+
+#[test]
+pub fn test_managed_decimal_signed_rescale_up() {
+    let uint_value = -1500i64;
+    let dec: ManagedDecimalSigned<StaticApi, ConstDecimals<2>> =
+        ManagedDecimalSigned::from(BigInt::from(uint_value));
+    assert_exact_signed(&dec, uint_value * 100, 2);
+    let rescaled = dec.rescale(ConstDecimals::<8>);
+    assert_exact_signed(&rescaled, uint_value * 100000000, 8);
+    assert_eq!(
+        rescaled,
+        ManagedDecimalSigned::<StaticApi, ConstDecimals<8>>::from(BigInt::from(uint_value))
+    );
+}
+
+#[test]
+pub fn test_managed_decimal_signed_rescale_down_1() {
+    // -1234.0000000 -> -1234.
+    let uint_value = -1234;
+    let dec: ManagedDecimalSigned<StaticApi, ConstDecimals<7>> =
+        ManagedDecimalSigned::from(BigInt::from(uint_value));
+    assert_exact_signed(&dec, uint_value * 10000000, 7);
+    let rescaled = dec.rescale(ConstDecimals::<3>);
+    assert_exact_signed(&rescaled, uint_value * 1000, 3);
+}
+
+#[test]
+pub fn test_managed_decimal_signed_rescale_down_2() {
+    // 0.00009 -> 0.0000
+    let dec: ManagedDecimalSigned<StaticApi, NumDecimals> =
+        ManagedDecimalSigned::from_raw_units(BigInt::from(-9), 5usize);
+    assert_exact_signed(&dec, -9, 5);
+    let rescaled = dec.rescale(ConstDecimals::<4>);
+    assert_exact_signed(&rescaled, 0, 4);
+    assert_eq!(
+        rescaled,
+        ManagedDecimalSigned::<StaticApi, ConstDecimals<4>>::from(BigInt::zero())
+    );
+}
+
+#[test]
+pub fn test_managed_decimal_signed_rescale_down_3() {
+    // -1.00009 -> -1.0000
+    let dec: ManagedDecimalSigned<StaticApi, NumDecimals> =
+        ManagedDecimalSigned::from_raw_units(BigInt::from(-100009), 5usize);
+    assert_exact_signed(&dec, -100009, 5);
+    let rescaled = dec.rescale(ConstDecimals::<4>);
+    assert_exact_signed(&rescaled, -10000, 4);
+    assert_eq!(
+        rescaled,
+        ManagedDecimalSigned::<StaticApi, ConstDecimals<4>>::from(BigInt::from(-1))
+    );
+}
+
 #[test]
 pub fn test_substraction_managed_decimal_signed() {
     let fixed_1 = ManagedDecimalSigned::<StaticApi, ConstDecimals<2>>::from(BigInt::from(1i64));
@@ -260,30 +388,6 @@ pub fn test_devision_managed_decimal_signed() {
 
 #[test]
 pub fn test_rescale_managed_decimal_signed() {
-    let fixed_1: ManagedDecimalSigned<StaticApi, NumDecimals> =
-        ManagedDecimalSigned::from_raw_units(BigInt::from(-10000i64), 2usize);
-
-    let fixed_2 = fixed_1.rescale(3usize);
-    assert_eq!(
-        fixed_2,
-        ManagedDecimalSigned::from_raw_units(BigInt::from(-100000000i64), 6usize)
-    );
-
-    let fixed_3: ManagedDecimalSigned<StaticApi, ConstDecimals<2>> =
-        ManagedDecimalSigned::from(BigInt::from(-1500i64));
-    let fixed_4 = fixed_3.rescale(ConstDecimals::<8>);
-    assert_eq!(fixed_4.into_raw_units(), &BigInt::from(-150000000000i64));
-
-    let fixed_5: ManagedDecimalSigned<StaticApi, NumDecimals> =
-        ManagedDecimalSigned::from_raw_units(BigInt::from(-5i64), 5usize);
-    let fixed_6 = fixed_5.rescale(ConstDecimals::<3>);
-    assert_eq!(
-        fixed_6,
-        ManagedDecimalSigned::<StaticApi, ConstDecimals<3>>::const_decimals_from_raw(BigInt::from(
-            -500i64
-        ))
-    );
-
     let float_1 = BigFloat::<StaticApi>::from_frac(-3i64, 2i64);
     let fixed_float_1 = ManagedDecimalSigned::<StaticApi, ConstDecimals<1>>::from_big_float(
         &float_1,

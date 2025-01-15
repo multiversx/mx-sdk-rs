@@ -12,6 +12,7 @@ const NFT_TOKEN: &[u8] = b"COOL-123456";
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
     blockchain.register_contract(FORWARDER_PATH, forwarder::ContractBuilder);
     blockchain
 }

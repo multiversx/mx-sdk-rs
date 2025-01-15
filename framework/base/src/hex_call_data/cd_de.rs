@@ -103,7 +103,7 @@ impl<'a> HexCallDataDeserializer<'a> {
     }
 }
 
-impl<'a> TopDecodeMultiInput for HexCallDataDeserializer<'a> {
+impl TopDecodeMultiInput for HexCallDataDeserializer<'_> {
     type ValueInput = Box<[u8]>;
 
     fn has_next(&self) -> bool {

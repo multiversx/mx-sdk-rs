@@ -2,6 +2,7 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
         "mxsc:builtin-func-features/output/builtin-func-features.mxsc.json",
@@ -238,6 +239,11 @@ fn forwarder_call_async_multi_transfer_rs() {
 }
 
 #[test]
+fn forwarder_call_async_multi_transfer_egld_rs() {
+    world().run("scenarios/forwarder_call_async_multi_transfer_egld.scen.json");
+}
+
+#[test]
 fn forwarder_call_async_retrieve_egld_rs() {
     world().run("scenarios/forwarder_call_async_retrieve_egld.scen.json");
 }
@@ -340,6 +346,11 @@ fn forwarder_call_transf_exec_accept_esdt_twice_rs() {
 #[test]
 fn forwarder_call_transf_exec_accept_multi_transfer_rs() {
     world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_accept_multi_transfer_egld_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer_egld.scen.json");
 }
 
 #[test]
@@ -488,8 +499,24 @@ fn promises_call_callback_directly_rs() {
 }
 
 #[test]
+fn promises_call_transfer_callback_egld_rs() {
+    world().run("scenarios/promises_call_transfer_callback_egld.scen.json");
+}
+
+#[test]
+fn promises_call_transfer_callback_esdt_rs() {
+    world().run("scenarios/promises_call_transfer_callback_esdt.scen.json");
+}
+
+#[test]
 fn promises_multi_transfer_rs() {
     world().run("scenarios/promises_multi_transfer.scen.json");
+}
+
+#[test]
+#[ignore = "TODO - some log is missing"]
+fn promises_multi_transfer_err_rs() {
+    world().run("scenarios/promises_multi_transfer_err.scen.json");
 }
 
 #[test]

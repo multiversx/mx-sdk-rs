@@ -1,5 +1,6 @@
 use multiversx_sc::types::{
-    Code, DeployCall, RHListExec, Tx, TxCodeValue, TxEnv, TxFromSpecified, TxGas, TxPayment,
+    Code, DeployCall, RHListExec, Tx, TxCodeValue, TxEnv, TxEnvWithTxHash, TxFromSpecified, TxGas,
+    TxPayment,
 };
 
 use crate::scenario_model::{ScDeployStep, TxExpect, TxResponse};
@@ -9,7 +10,7 @@ use super::{address_annotated, code_annotated, gas_annotated, StepWrapper, TxToS
 impl<Env, From, Payment, Gas, CodeValue, RH> TxToStep<Env, RH>
     for Tx<Env, From, (), Payment, Gas, DeployCall<Env, Code<CodeValue>>, RH>
 where
-    Env: TxEnv<RHExpect = TxExpect>,
+    Env: TxEnvWithTxHash<RHExpect = TxExpect>,
     From: TxFromSpecified<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
@@ -18,9 +19,10 @@ where
 {
     type Step = ScDeployStep;
 
-    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, RH> {
+    fn tx_to_step(mut self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step =
             tx_to_sc_deploy_step(&self.env, self.from, self.payment, self.gas, self.data);
+        step.explicit_tx_hash = self.env.take_tx_hash();
         step.expect = Some(self.result_handler.list_tx_expect());
 
         StepWrapper {
@@ -48,6 +50,7 @@ where
     let mut step = ScDeployStep::new()
         .from(address_annotated(env, &from))
         .code(code_annotated(env, data.code_source));
+    step.tx.code_metadata = data.code_metadata;
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());
     }
