@@ -1884,6 +1884,24 @@ impl VMHooks for VMHooksDispatcher {
         panic!("Unavailable: managed_multi_transfer_esdt_nft_execute_by_user")
     }
 
+    fn mbuffer_to_small_int_unsigned(&self, m_buffer_handle: i32) -> i64 {
+        self.handler.mb_to_small_int_unsigned(m_buffer_handle) as i64
+    }
+
+    fn mbuffer_to_small_int_signed(&self, m_buffer_handle: i32) -> i64 {
+        self.handler.mb_to_small_int_signed(m_buffer_handle)
+    }
+
+    fn mbuffer_from_small_int_unsigned(&self, m_buffer_handle: i32, value: i64) {
+        self.handler
+            .mb_from_small_int_unsigned(m_buffer_handle, value as u64);
+    }
+
+    fn mbuffer_from_small_int_signed(&self, m_buffer_handle: i32, value: i64) {
+        self.handler
+            .mb_from_small_int_signed(m_buffer_handle, value);
+    }
+
     fn managed_verify_secp256r1(
         &self,
         key_handle: i32,
@@ -1907,5 +1925,21 @@ impl VMHooks for VMHooksDispatcher {
         sig_handle: i32,
     ) -> i32 {
         panic!("Unavailable: managed_verify_blsaggregated_signature")
+    }
+
+    fn get_round_time(&self) -> i64 {
+        panic!("Unavailable: get_round_time")
+    }
+
+    fn epoch_start_block_time_stamp(&self) -> i64 {
+        panic!("Unavailable: epoch_start_block_time_stamp")
+    }
+
+    fn epoch_start_block_nonce(&self) -> i64 {
+        panic!("Unavailable: epoch_start_block_nonce")
+    }
+
+    fn epoch_start_block_round(&self) -> i64 {
+        panic!("Unavailable: epoch_start_block_round")
     }
 }

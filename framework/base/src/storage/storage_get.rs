@@ -96,12 +96,18 @@ where
             .into_max_size_buffer_align_right(buffer, h)
     }
 
-    #[inline]
     fn into_i64<H>(self, h: H) -> Result<i64, H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
         self.to_managed_buffer().into_i64(h)
+    }
+
+    fn into_u64<H>(self, h: H) -> Result<u64, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.to_managed_buffer().into_u64(h)
     }
 
     #[inline]

@@ -19,6 +19,7 @@ pub const ARG_ASYNC_RETURN_WRONG_NUMBER: &str = "wrong number of arguments retur
 pub const ARG_CALLBACK_TOO_FEW: &str = "too few callback arguments provided";
 pub const ARG_CALLBACK_TOO_MANY: &str = "too many callback arguments provided";
 
+pub const VALUE_TOO_LONG: &str = "value too long";
 pub const ARG_OUT_OF_RANGE: &str = "argument out of range";
 pub const ARG_BAD_LENGTH: &str = "argument has wrong length";
 pub const ARG_BAD_LENGTH_32: &str = "argument has wrong length: 32 bytes expected";
