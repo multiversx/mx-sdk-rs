@@ -9,6 +9,8 @@ extern "C" {
     fn managedGetMultiESDTCallValue(resultHandle: i32);
 
     fn getNumESDTTransfers() -> i32;
+
+    fn managedGetAllTransfersCallValue(resultHandle: i32);
 }
 
 impl CallValueApi for VmApiImpl {
@@ -42,5 +44,11 @@ impl CallValueApiImpl for VmApiImpl {
 
     fn esdt_num_transfers(&self) -> usize {
         unsafe { getNumESDTTransfers() as usize }
+    }
+
+    fn load_all_transfers(&self, dest_handle: Self::ManagedBufferHandle) {
+        unsafe {
+            managedGetAllTransfersCallValue(dest_handle);
+        }
     }
 }
