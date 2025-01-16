@@ -52,6 +52,7 @@ pub(crate) fn create_snippets_cargo_toml(
     contract_crate_name: &str,
     overwrite: bool,
 ) {
+    let contract_deps = contract_crate_name.replace("_", "-");
     let cargo_toml_path = format!("{snippets_folder_path}/Cargo.toml");
     let mut file = if overwrite {
         File::create(&cargo_toml_path).unwrap()
@@ -84,7 +85,7 @@ path = "src/{SNIPPETS_SOURCE_FILE_NAME}"
 [lib]
 path = "src/{LIB_SOURCE_FILE_NAME}"
 
-[dependencies.{contract_crate_name}]
+[dependencies.{contract_deps}]
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
