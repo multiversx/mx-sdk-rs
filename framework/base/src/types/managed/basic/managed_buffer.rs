@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
-        ManagedTypeApi, StaticVarApiImpl,
+        ManagedTypeApi, RawHandle, StaticVarApiImpl,
     },
     codec::{
         DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -13,7 +13,10 @@ use crate::{
         hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay,
         SCLowerHex,
     },
-    types::{heap::BoxedBytes, ManagedBufferCachedBuilder, ManagedType, StaticBufferRef},
+    types::{
+        heap::BoxedBytes, ManagedBufferCachedBuilder, ManagedRef, ManagedRefMut, ManagedType,
+        StaticBufferRef,
+    },
 };
 
 /// A byte buffer managed by an external API.
@@ -26,7 +29,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedBuffer { handle }
     }
 
@@ -34,7 +37,19 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
         self.handle.clone()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        unsafe {
+            let handle = core::ptr::read(&self.handle);
+            core::mem::forget(self);
+            handle
+        }
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -42,27 +57,58 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn new() -> Self {
-        let new_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        // TODO: remove after VM no longer crashes with "unknown handle":
-        M::managed_type_impl().mb_overwrite(new_handle.clone(), &[]);
-        ManagedBuffer::from_handle(new_handle)
+        Self::new_from_bytes(&[])
     }
 
     #[inline]
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
-        let new_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_overwrite(new_handle.clone(), bytes);
-        ManagedBuffer::from_handle(new_handle)
+        unsafe {
+            let result = Self::new_uninit();
+            M::managed_type_impl().mb_overwrite(result.get_handle(), bytes);
+            result
+        }
     }
 
     #[inline]
     pub fn new_random(nr_bytes: usize) -> Self {
+        unsafe {
+            let result = Self::new_uninit();
+            M::managed_type_impl().mb_set_random(result.get_handle(), nr_bytes);
+            result
+        }
+    }
+
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_set_random(new_handle.clone(), nr_bytes);
         ManagedBuffer::from_handle(new_handle)
+    }
+
+    /// Creates a shared managed reference to a given raw handle.
+    ///
+    /// ## Safety
+    ///
+    /// The reference points to a shared value. Make sure the handle is not leaked.
+    pub unsafe fn temp_const_ref(
+        raw_handle: RawHandle,
+    ) -> ManagedRef<'static, M, ManagedBuffer<M>> {
+        ManagedRef::wrap_handle(use_raw_handle(raw_handle))
+    }
+
+    /// Creates a shared managed reference to a given raw handle.
+    ///
+    /// ## Safety
+    ///
+    /// The reference points to a shared value. Make sure the handle is not leaked.
+    pub unsafe fn temp_const_ref_mut(
+        raw_handle: RawHandle,
+    ) -> ManagedRefMut<'static, M, ManagedBuffer<M>> {
+        ManagedRefMut::wrap_handle(use_raw_handle(raw_handle))
     }
 
     fn load_static_cache(&self) -> StaticBufferRef<M>
@@ -233,7 +279,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             result_handle.clone(),
         );
         if err_result.is_ok() {
-            Some(ManagedBuffer::from_handle(result_handle))
+            Some(unsafe { ManagedBuffer::from_handle(result_handle) })
         } else {
             None
         }
@@ -346,7 +392,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
         let api = M::managed_type_impl();
         let clone_handle = api.mb_new_empty();
         api.mb_append(clone_handle.clone(), self.handle.clone());
-        ManagedBuffer::from_handle(clone_handle)
+        unsafe { ManagedBuffer::from_handle(clone_handle) }
     }
 }
 
@@ -360,14 +406,13 @@ impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> Eq for ManagedBuffer<M> {}
 
 impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M> {
-    #[allow(clippy::op_ref)] // clippy is wrong here, it is not needless
     fn eq(&self, other: &&[u8; N]) -> bool {
         if self.len() != N {
             return false;
         }
         let mut self_bytes = [0u8; N];
         let _ = M::managed_type_impl().mb_load_slice(self.handle.clone(), 0, &mut self_bytes[..]);
-        &self_bytes[..] == &other[..]
+        self_bytes[..] == other[..]
     }
 }
 
@@ -476,9 +521,9 @@ impl<M: ManagedTypeApi> TypeAbi for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
-        ));
+        let cast_handle = self.get_handle().cast_or_signal_error::<M, _>();
+        let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer(&wrap_cast);
     }
 }
 
@@ -487,18 +532,18 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
         let hex_handle: M::ManagedBufferHandle =
             use_raw_handle(crate::api::const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().mb_to_hex(self.handle.clone(), hex_handle.clone());
-        f.append_managed_buffer(&ManagedBuffer::from_handle(
-            hex_handle.cast_or_signal_error::<M, _>(),
-        ));
+        let cast_handle = hex_handle.cast_or_signal_error::<M, _>();
+        let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer(&wrap_cast);
     }
 }
 
 impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_binary(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
-        ));
+        let cast_handle = self.get_handle().cast_or_signal_error::<M, _>();
+        let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
+        f.append_managed_buffer_binary(&wrap_cast);
     }
 }
 

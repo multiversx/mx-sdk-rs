@@ -5,6 +5,7 @@ mod gateway_account_storage;
 mod gateway_block;
 mod gateway_chain_simulator_blocks;
 mod gateway_chain_simulator_send_funds;
+mod gateway_chain_simulator_set_state;
 mod gateway_network_config;
 mod gateway_network_economics;
 mod gateway_network_status;
@@ -23,6 +24,7 @@ pub use gateway_account_storage::GetAccountStorageRequest;
 pub use gateway_block::GetHyperBlockRequest;
 pub use gateway_chain_simulator_blocks::ChainSimulatorGenerateBlocksRequest;
 pub use gateway_chain_simulator_send_funds::ChainSimulatorSendFundsRequest;
+pub use gateway_chain_simulator_set_state::{ChainSimulatorSetStateRequest, SetStateAccount};
 pub use gateway_network_config::NetworkConfigRequest;
 pub use gateway_network_economics::NetworkEconimicsRequest;
 pub use gateway_network_status::NetworkStatusRequest;
@@ -61,6 +63,7 @@ const GENERATE_BLOCKS_UNTIL_TX_PROCESSED_ENDPOINT: &str =
     "simulator/generate-blocks-until-transaction-processed";
 const GENERATE_BLOCKS_UNTIL_EPOCH_REACHED_ENDPOINT: &str =
     "simulator/generate-blocks-until-epoch-reached";
+const SET_STATE_ENDPOINT: &str = "simulator/set-state";
 
 pub enum GatewayRequestType {
     Get,

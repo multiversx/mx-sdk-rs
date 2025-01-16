@@ -13,6 +13,11 @@ const ESDT_ROLE_NFT_BURN: &str = "ESDTRoleNFTBurn";
 const ESDT_ROLE_NFT_ADD_URI: &str = "ESDTRoleNFTAddURI";
 const ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &str = "ESDTRoleNFTUpdateAttributes";
 const ESDT_ROLE_TRANSFER: &str = "ESDTTransferRole";
+const ESDT_ROLE_SET_NEW_URI: &str = "ESDTRoleSetNewURI";
+const ESDT_ROLE_MODIFY_ROYALTIES: &str = "ESDTRoleModifyRoyalties";
+const ESDT_ROLE_MODIFY_CREATOR: &str = "ESDTRoleModifyCreator";
+const ESDT_ROLE_NFT_RECREATE: &str = "ESDTRoleNFTRecreate";
+const ESDT_ROLE_NFT_UPDATE: &str = "ESDTRoleNFTUpdate";
 
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
 pub enum EsdtLocalRole {
@@ -25,6 +30,11 @@ pub enum EsdtLocalRole {
     NftAddUri,
     NftUpdateAttributes,
     Transfer,
+    SetNewUri,
+    ModifyRoyalties,
+    ModifyCreator,
+    NftRecreate,
+    NftUpdate,
 }
 
 impl EsdtLocalRole {
@@ -39,6 +49,11 @@ impl EsdtLocalRole {
             Self::NftAddUri => 6,
             Self::NftUpdateAttributes => 7,
             Self::Transfer => 8,
+            Self::SetNewUri => 9,
+            Self::ModifyRoyalties => 10,
+            Self::ModifyCreator => 11,
+            Self::NftRecreate => 12,
+            Self::NftUpdate => 13,
         }
     }
 
@@ -57,6 +72,11 @@ impl EsdtLocalRole {
             Self::NftAddUri => ESDT_ROLE_NFT_ADD_URI,
             Self::NftUpdateAttributes => ESDT_ROLE_NFT_UPDATE_ATTRIBUTES,
             Self::Transfer => ESDT_ROLE_TRANSFER,
+            Self::SetNewUri => ESDT_ROLE_SET_NEW_URI,
+            Self::ModifyRoyalties => ESDT_ROLE_MODIFY_ROYALTIES,
+            Self::ModifyCreator => ESDT_ROLE_MODIFY_CREATOR,
+            Self::NftRecreate => ESDT_ROLE_NFT_RECREATE,
+            Self::NftUpdate => ESDT_ROLE_NFT_UPDATE,
         }
     }
 
@@ -71,13 +91,18 @@ impl EsdtLocalRole {
             Self::NftAddUri => EsdtLocalRoleFlags::NFT_ADD_URI,
             Self::NftUpdateAttributes => EsdtLocalRoleFlags::NFT_UPDATE_ATTRIBUTES,
             Self::Transfer => EsdtLocalRoleFlags::TRANSFER,
+            Self::SetNewUri => EsdtLocalRoleFlags::SET_NEW_URI,
+            Self::ModifyRoyalties => EsdtLocalRoleFlags::MODIFY_ROYALTIES,
+            Self::ModifyCreator => EsdtLocalRoleFlags::MODIFY_CREATOR,
+            Self::NftRecreate => EsdtLocalRoleFlags::NFT_RECREATE,
+            Self::NftUpdate => EsdtLocalRoleFlags::NFT_UPDATE,
         }
     }
 }
 
 // TODO: can be done with macros, but I didn't find a public library that does it and is no_std
 // we can implement it, it's easy
-const ALL_ROLES: [EsdtLocalRole; 8] = [
+const ALL_ROLES: [EsdtLocalRole; 13] = [
     EsdtLocalRole::Mint,
     EsdtLocalRole::Burn,
     EsdtLocalRole::NftCreate,
@@ -86,6 +111,11 @@ const ALL_ROLES: [EsdtLocalRole; 8] = [
     EsdtLocalRole::NftAddUri,
     EsdtLocalRole::NftUpdateAttributes,
     EsdtLocalRole::Transfer,
+    EsdtLocalRole::SetNewUri,
+    EsdtLocalRole::ModifyRoyalties,
+    EsdtLocalRole::ModifyCreator,
+    EsdtLocalRole::NftRecreate,
+    EsdtLocalRole::NftUpdate,
 ];
 
 impl EsdtLocalRole {
@@ -106,6 +136,11 @@ impl From<u16> for EsdtLocalRole {
             6 => Self::NftAddUri,
             7 => Self::NftUpdateAttributes,
             8 => Self::Transfer,
+            9 => Self::SetNewUri,
+            10 => Self::ModifyRoyalties,
+            11 => Self::ModifyCreator,
+            12 => Self::NftRecreate,
+            13 => Self::NftUpdate,
             _ => Self::None,
         }
     }
@@ -130,6 +165,16 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
             Self::NftUpdateAttributes
         } else if byte_slice == ESDT_ROLE_TRANSFER.as_bytes() {
             Self::Transfer
+        } else if byte_slice == ESDT_ROLE_SET_NEW_URI.as_bytes() {
+            Self::SetNewUri
+        } else if byte_slice == ESDT_ROLE_MODIFY_ROYALTIES.as_bytes() {
+            Self::ModifyRoyalties
+        } else if byte_slice == ESDT_ROLE_MODIFY_CREATOR.as_bytes() {
+            Self::ModifyCreator
+        } else if byte_slice == ESDT_ROLE_NFT_RECREATE.as_bytes() {
+            Self::NftRecreate
+        } else if byte_slice == ESDT_ROLE_NFT_UPDATE.as_bytes() {
+            Self::NftUpdate
         } else {
             Self::None
         }

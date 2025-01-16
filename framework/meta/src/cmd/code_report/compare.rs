@@ -1,10 +1,20 @@
 pub(crate) fn size_status_after_comparing(size: usize, compared_size: usize) -> String {
     match size.cmp(&compared_size) {
         std::cmp::Ordering::Greater => {
-            format!("{} :arrow_right: {} :red_circle:", compared_size, size)
+            format!(
+                "{} :arrow_right: {} :red_circle: (+{})",
+                compared_size,
+                size,
+                size - compared_size
+            )
         },
         std::cmp::Ordering::Less => {
-            format!("{} :arrow_right: {} :green_circle:", compared_size, size)
+            format!(
+                "{} :arrow_right: {} :green_circle: (-{})",
+                compared_size,
+                size,
+                compared_size - size
+            )
         },
         std::cmp::Ordering::Equal => {
             format!("{}", size)
