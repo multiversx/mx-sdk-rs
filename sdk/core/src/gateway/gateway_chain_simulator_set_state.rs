@@ -23,7 +23,7 @@ pub struct SetStateAccount {
     pub address: String,
     pub nonce: u64,
     pub balance: String,
-    pub keys: HashMap<String, String>,
+    pub pairs: HashMap<String, String>,
     pub code: String,
     #[serde(default)]
     pub code_hash: String,
@@ -43,7 +43,7 @@ impl From<Account> for SetStateAccount {
             address: value.address.to_bech32_string().unwrap_or_default(),
             nonce: value.nonce,
             balance: value.balance.to_string(),
-            keys: HashMap::new(),
+            pairs: HashMap::new(),
             code: value.code,
             code_hash: value.code_hash.unwrap_or_default(),
             root_hash: value.root_hash.unwrap_or_default(),
@@ -55,8 +55,8 @@ impl From<Account> for SetStateAccount {
 }
 
 impl SetStateAccount {
-    pub fn with_keys(mut self, keys: HashMap<String, String>) -> Self {
-        self.keys = keys;
+    pub fn with_pairs(mut self, pairs: HashMap<String, String>) -> Self {
+        self.pairs = pairs;
 
         self
     }

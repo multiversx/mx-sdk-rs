@@ -69,7 +69,7 @@ pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncSe
         account_esdt_roles,
     );
 
-    let set_state_account = SetStateAccount::from(sdk_account).with_keys(account_storage);
+    let set_state_account = SetStateAccount::from(sdk_account).with_pairs(account_storage);
     let set_state_step = SetStateStep::new();
     (
         set_state_account,
