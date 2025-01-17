@@ -8,6 +8,31 @@ INSTRUCTIONS FOR USING THIS FILE
    - CARGO.TOML: Dependencies and contract configuration
    - INTERACTOR FOLDER: If available, contains interactor files (used for deployment and interaction on the blockchain)
 3. Before the contract code dump you will find a step by step description of how to create, build and deploy smart contracts on MultiversX
+4. All contracts contain a multiversx.json file with the following content:
+{
+    "language": "rust"
+}
+This file is mandatory for sc-meta to recognize our contract crate. You should generate it for all contracts.
+5. If the contract contains an interactor/ folder, the file structure should change in order to compile. The contract is by default #[no_std],
+while the interactor uses std, so they cannot be compiled at once. We need an external workspace containing both of them in order to compile.
+For example, if we have adder/ contract which contains adder/interactor, we should create an outer workspace containing the adder, as such:
+
+Cargo.toml
+
+[workspace]
+resolver = "2"
+members = ["adder", "adder/meta", "adder/interactor]
+
+Folder structure:
+
+outer-folder/
+|---> adder/
+        |---> src/
+        |---> Cargo.toml
+        |---> interactor/
+                |---> src/
+                |---> Cargo.toml
+|---> Cargo.toml
 
 INSTRUCTIONS FOR CREATING, BUILDING AND DEPLOYING SMART CONTRACTS ON MULTIVERSX
 ==============================
@@ -268,7 +293,31 @@ version = "0.55.0"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<adder::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "adder-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.adder]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
+SRC FOLDER:
 FILE_NAME: basic_interactor.rs
 mod basic_interactor_cli;
 mod basic_interactor_config;
@@ -788,6 +837,30 @@ version = "0.55.0"
 
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<bonding_curve_contract::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "bonding-curve-contract-meta"
+version = "0.0.0"
+authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.bonding-curve-contract]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: check-pause
@@ -838,6 +911,30 @@ version = "0.55.0"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
 
+
+
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<check_pause::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "check-pause-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
+
+[dependencies.check-pause]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
 
 
 INTERACTOR FOLDER:
@@ -1161,6 +1258,30 @@ num-traits = "0.2"
 hex = "0.4"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<crowdfunding_esdt::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "crowdfunding-esdt-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.crowdfunding-esdt]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: crypto-bubbles
@@ -1313,6 +1434,30 @@ version = "0.55.0"
 version = "0.55.0"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<crypto_bubbles::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "crypto-bubbles-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.crypto-bubbles]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: crypto-kitties
@@ -1322,6 +1467,8 @@ None
 
 SRC FOLDER:
 No src folder found
+
+META FOLDER:
 
 INTERACTOR FOLDER:
 ////////////////////////
@@ -2388,6 +2535,29 @@ version = "0.55.0"
 version = "0.55.0"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<crypto_zombies::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "crypto-zombies-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.crypto-zombies]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: digital-cash
@@ -3223,6 +3393,29 @@ version = "0.55.0"
 version = "0.55.0"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<digital_cash::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "digital-cash-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.digital-cash]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: empty
@@ -3267,6 +3460,29 @@ version = "0.55.0"
 
 [dev-dependencies]
 num-bigint = "0.4"
+
+
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<empty::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "empty-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.empty]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
 
 
 INTERACTOR FOLDER:
@@ -3460,6 +3676,29 @@ version = "0.55.0"
 version = "0.55.0"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<esdt_transfer_with_fee::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "esdt-transfer-with-fee-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.esdt-transfer-with-fee]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: factorial
@@ -3517,6 +3756,30 @@ version = "0.55.0"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
+
+
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<factorial::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "factorial-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.factorial]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
 
 
 INTERACTOR FOLDER:
@@ -3790,6 +4053,30 @@ version = "0.55.0"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
+
+
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<fractional_nfts::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "fractional-nfts-meta"
+version = "0.0.0"
+authors = ["Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.fractional-nfts]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
 
 
 INTERACTOR FOLDER:
@@ -4241,6 +4528,30 @@ version = "0.55.0"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
+
+
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<lottery_esdt::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "lottery-esdt-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.lottery-esdt]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
 
 
 INTERACTOR FOLDER:
@@ -5952,6 +6263,30 @@ num-traits = "0.2"
 hex = "0.4"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<multisig::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "multisig-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.multisig]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: nft-minter
@@ -6317,6 +6652,30 @@ version = "0.55.0"
 version = "0.55.0"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<nft_minter::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "nft-minter-meta"
+version = "0.0.0"
+authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.nft-minter]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: nft-storage-prepay
@@ -6449,6 +6808,32 @@ version = "0.55.0"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
+
+
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<nft_storage_prepay::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "nft-storage-prepay-meta"
+version = "0.0.0"
+authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dev-dependencies]
+
+[dependencies.nft-storage-prepay]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
 
 
 INTERACTOR FOLDER:
@@ -6589,6 +6974,30 @@ version = "0.55.0"
 version = "0.55.0"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<nft_subscription::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "nft-subscription-meta"
+version = "0.0.0"
+authors = ["Thouny <thouny@tuta.io>"]
+edition = "2021"
+publish = false
+
+[dependencies.nft-subscription]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: order-book
@@ -6598,6 +7007,8 @@ None
 
 SRC FOLDER:
 No src folder found
+
+META FOLDER:
 
 INTERACTOR FOLDER:
 ////////////////////////
@@ -7191,7 +7602,32 @@ version = "0.55.0"
 
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<ping_pong_egld::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "ping-pong-egld-meta"
+version = "0.0.0"
+authors = ["Bruda Claudiu-Marcel <claudiu725@yahoo.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.ping-pong-egld]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
+SRC FOLDER:
 FILE_NAME: interact.rs
 mod interact_cli;
 mod interact_config;
@@ -7953,6 +8389,32 @@ version = "0.55.0"
 [dev-dependencies.check-pause]
 path = "../check-pause"
 
+
+
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<proxy_pause::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "proxy-pause-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+authors = ["you"]
+
+[dev-dependencies]
+
+[dependencies.proxy-pause]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
 
 
 INTERACTOR FOLDER:
@@ -8888,6 +9350,32 @@ version = "0.55.0"
 version = "0.55.0"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<rewards_distribution::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "rewards-distribution-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+authors = ["Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>"]
+
+[dev-dependencies]
+
+[dependencies.rewards-distribution]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: seed-nft-minter
@@ -9337,6 +9825,32 @@ version = "0.55.0"
 version = "0.55.0"
 
 
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<seed_nft_minter::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "seed-nft-minter-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+authors = ["Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>"]
+
+[dev-dependencies]
+
+[dependencies.seed-nft-minter]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
+
+
 INTERACTOR FOLDER:
 ////////////////////////
 NAME: token-release
@@ -9762,6 +10276,31 @@ version = "0.55.0"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.55.0"
 
+
+
+META FOLDER:
+SRC FOLDER:
+FILE_NAME: main.rs
+fn main() {
+    multiversx_sc_meta_lib::cli_main::<token_release::AbiProvider>();
+}
+
+
+META CARGO.TOML:
+[package]
+name = "token-release-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dev-dependencies]
+
+[dependencies.token-release]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.55.0"
+default-features = false
 
 
 INTERACTOR FOLDER:

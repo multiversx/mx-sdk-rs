@@ -148,3 +148,55 @@ fn fetch_files_from_directory(client: &Client, url: &str) -> Option<Vec<(String,
     }
     None
 }
+
+pub(crate) fn fetch_meta_contents(client: &Client, folder_url: &str) -> Option<InteractorContent> {
+    println!("Fetching meta contents from {}", folder_url);
+
+    let folder_response: Value = client.get(folder_url).send().ok()?.json().ok()?;
+
+    if let Some(entries) = folder_response.as_array() {
+        let mut src_contents = None;
+        let mut cargo_contents = None;
+
+        for entry in entries {
+            if let Some(name) = entry["name"].as_str() {
+                if name == "meta" {
+                    if let Some(url) = entry["url"].as_str() {
+                        println!("Found meta directory");
+                        let interactor_response: Value =
+                            client.get(url).send().ok()?.json().ok()?;
+
+                        if let Some(interactor_entries) = interactor_response.as_array() {
+                            for interactor_entry in interactor_entries {
+                                match interactor_entry["name"].as_str() {
+                                    Some("src") => {
+                                        if let Some(src_url) = interactor_entry["url"].as_str() {
+                                            src_contents =
+                                                fetch_files_from_directory(client, src_url);
+                                        }
+                                    },
+                                    Some("Cargo.toml") => {
+                                        if let Some(download_url) =
+                                            interactor_entry["download_url"].as_str()
+                                        {
+                                            if let Ok(content) =
+                                                client.get(download_url).send().unwrap().text()
+                                            {
+                                                cargo_contents = Some(content);
+                                            }
+                                        }
+                                    },
+                                    _ => {},
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return Some((src_contents.unwrap_or_default(), cargo_contents));
+    }
+
+    None
+}

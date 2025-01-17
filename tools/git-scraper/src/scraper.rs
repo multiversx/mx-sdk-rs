@@ -7,7 +7,7 @@ use std::io::{self, BufWriter, Write};
 use std::{thread, time::Duration};
 use write::{
     cleanup_local_paths, write_cargo_toml, write_instructions, write_interactor_files,
-    write_readme, write_src_folder,
+    write_meta_folder, write_readme, write_src_folder,
 };
 
 mod fetch;
@@ -59,6 +59,9 @@ fn process_entry(client: &Client, entry: &Value, writer: &mut BufWriter<File>) -
             thread::sleep(Duration::from_millis(100));
 
             write_cargo_toml(client, folder_url, writer, folder_name)?;
+            thread::sleep(Duration::from_millis(100));
+
+            write_meta_folder(client, folder_url, writer, folder_name)?;
             thread::sleep(Duration::from_millis(100));
 
             write_interactor_files(client, folder_url, writer, folder_name)?;

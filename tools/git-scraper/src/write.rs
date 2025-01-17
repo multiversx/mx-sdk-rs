@@ -1,4 +1,6 @@
-use crate::fetch::{fetch_directory_contents, fetch_file_content, fetch_interactor_contents};
+use crate::fetch::{
+    fetch_directory_contents, fetch_file_content, fetch_interactor_contents, fetch_meta_contents,
+};
 use reqwest::blocking::Client;
 use std::fs;
 use std::fs::File;
@@ -15,6 +17,31 @@ pub(crate) fn write_instructions(writer: &mut BufWriter<File>) -> io::Result<()>
    - CARGO.TOML: Dependencies and contract configuration
    - INTERACTOR FOLDER: If available, contains interactor files (used for deployment and interaction on the blockchain)
 3. Before the contract code dump you will find a step by step description of how to create, build and deploy smart contracts on MultiversX
+4. All contracts contain a multiversx.json file with the following content:
+{
+    "language": "rust"
+}
+This file is mandatory for sc-meta to recognize our contract crate. You should generate it for all contracts.
+5. If the contract contains an interactor/ folder, the file structure should change in order to compile. The contract is by default #[no_std],
+while the interactor uses std, so they cannot be compiled at once. We need an external workspace containing both of them in order to compile.
+For example, if we have adder/ contract which contains adder/interactor, we should create an outer workspace containing the adder, as such:
+
+Cargo.toml
+
+[workspace]
+resolver = "2"
+members = ["adder", "adder/meta", "adder/interactor]
+
+Folder structure:
+
+outer-folder/
+|---> adder/
+        |---> src/
+        |---> Cargo.toml
+        |---> interactor/
+                |---> src/
+                |---> Cargo.toml
+|---> Cargo.toml
 
 INSTRUCTIONS FOR CREATING, BUILDING AND DEPLOYING SMART CONTRACTS ON MULTIVERSX
 ==============================
@@ -167,6 +194,7 @@ pub(crate) fn write_interactor_files(
         writeln!(writer, "\nINTERACTOR FOLDER:")?;
 
         if !src_files.is_empty() {
+            writeln!(writer, "SRC FOLDER:")?;
             for (file_name, file_content) in src_files {
                 writeln!(writer, "FILE_NAME: {}", file_name)?;
                 writeln!(writer, "{}", file_content)?;
@@ -179,6 +207,34 @@ pub(crate) fn write_interactor_files(
         }
     } else {
         println!("No interactor folder found for {}", folder_name);
+    }
+    writer.flush()?;
+    Ok(())
+}
+
+pub(crate) fn write_meta_folder(
+    client: &Client,
+    folder_url: &str,
+    writer: &mut BufWriter<File>,
+    folder_name: &str,
+) -> io::Result<()> {
+    if let Some((src_files, cargo_content)) = fetch_meta_contents(client, folder_url) {
+        writeln!(writer, "\nMETA FOLDER:")?;
+
+        if !src_files.is_empty() {
+            writeln!(writer, "SRC FOLDER:")?;
+            for (file_name, file_content) in src_files {
+                writeln!(writer, "FILE_NAME: {}", file_name)?;
+                writeln!(writer, "{}", file_content)?;
+            }
+        }
+
+        if let Some(cargo_content) = cargo_content {
+            writeln!(writer, "\nMETA CARGO.TOML:")?;
+            writeln!(writer, "{}", cargo_content)?;
+        }
+    } else {
+        println!("No meta folder found for {}", folder_name);
     }
     writer.flush()?;
     Ok(())
