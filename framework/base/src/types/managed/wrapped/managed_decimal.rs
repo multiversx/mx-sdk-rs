@@ -170,47 +170,27 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimal<M, NumDecimals> {
     }
 }
 
-// impl<M: ManagedTypeApi, const N: NumDecimals> ManagedVecItem
-//     for ManagedDecimal<M, ConstDecimals<N>>
-// {
-//     type PAYLOAD = ManagedVecItemPayloadBuffer<8>; // 4 bigUint + 4 usize
+impl<M: ManagedTypeApi, const N: NumDecimals> ManagedVecItem
+    for ManagedDecimal<M, ConstDecimals<N>>
+{
+    type PAYLOAD = ManagedVecItemPayloadBuffer<4>; // data only
 
-//     const SKIPS_RESERIALIZATION: bool = false;
+    const SKIPS_RESERIALIZATION: bool = false;
 
-//     type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
 
-//     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-//         let mut index = 0;
-//         unsafe {
-//             Self {
-//                 data: managed_vec_item_read_from_payload_index::<
-//                     BigUint<M>,
-//                     ManagedVecItemPayloadBuffer<8>,
-//                 >(payload, &mut index),
-//                 decimals: managed_vec_item_read_from_payload_index::<
-//                     ConstDecimals<N>,
-//                     ManagedVecItemPayloadBuffer<8>,
-//                 >(payload, &mut index),
-//             }
-//         }
-//     }
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        Self::const_decimals_from_raw(BigUint::read_from_payload(payload))
+    }
 
-//     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-//         ManagedVecRef::new(Self::read_from_payload(payload))
-//     }
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
 
-//     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
-//         let mut index = 0;
-//         unsafe {
-//             managed_vec_item_save_to_payload_index(self.data, payload, &mut index);
-//             managed_vec_item_save_to_payload_index(
-//                 self.decimals.num_decimals(),
-//                 payload,
-//                 &mut index,
-//             );
-//         }
-//     }
-// }
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.data.save_to_payload(payload);
+    }
+}
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
