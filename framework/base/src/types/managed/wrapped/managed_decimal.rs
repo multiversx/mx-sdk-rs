@@ -31,7 +31,11 @@ use multiversx_sc_codec::{
 
 use core::{cmp::Ordering, ops::Deref};
 
-use super::{ManagedBufferCachedBuilder, ManagedRef};
+use super::{
+    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
+    ManagedBufferCachedBuilder, ManagedRef, ManagedVecItem, ManagedVecItemPayloadBuffer,
+    ManagedVecRef,
+};
 
 /// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
 ///
@@ -133,6 +137,58 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
 {
     fn from(value: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self {
         value.into_var_decimals()
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimal<M, NumDecimals> {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<8>; // 4 bigUint + 4 usize
+
+    const SKIPS_RESERIALIZATION: bool = false;
+
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let mut index = 0;
+        unsafe {
+            Self {
+                data: managed_vec_item_read_from_payload_index(payload, &mut index),
+                decimals: managed_vec_item_read_from_payload_index(payload, &mut index),
+            }
+        }
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let mut index = 0;
+        unsafe {
+            managed_vec_item_save_to_payload_index(self.data, payload, &mut index);
+            managed_vec_item_save_to_payload_index(self.decimals, payload, &mut index);
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, const N: NumDecimals> ManagedVecItem
+    for ManagedDecimal<M, ConstDecimals<N>>
+{
+    type PAYLOAD = ManagedVecItemPayloadBuffer<4>; // data only
+
+    const SKIPS_RESERIALIZATION: bool = false;
+
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        Self::const_decimals_from_raw(BigUint::read_from_payload(payload))
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.data.save_to_payload(payload);
     }
 }
 
