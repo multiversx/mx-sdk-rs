@@ -2,7 +2,7 @@ mod basic_interactor_cli;
 mod basic_interactor_config;
 mod basic_interactor_state;
 
-use adder::adder_proxy;
+use adder::adder_proxy::{self, SovereignConfig};
 pub use basic_interactor_config::Config;
 use basic_interactor_state::State;
 use clap::Parser;
@@ -67,12 +67,12 @@ impl AdderInteract {
         }
     }
 
-    pub async fn deploy(&mut self) {
+    pub async fn deploy(&mut self) -> Address {
         let new_address = self
             .interactor
             .tx()
             .from(&self.adder_owner_address.clone())
-            .gas(6_000_000)
+            .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u64)
             .code(ADDER_CODE_PATH)
@@ -81,7 +81,9 @@ impl AdderInteract {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_adder_address(new_address);
+        self.state.set_adder_address(new_address.clone());
+
+        new_address.to_address()
     }
 
     pub async fn upgrade(&mut self, new_value: u32, sender: &Bech32Address, err: Option<&str>) {
@@ -131,6 +133,32 @@ impl AdderInteract {
             .typed(adder_proxy::AdderProxy)
             .sum()
             .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+
+    pub async fn set_storage(&mut self, config: SovereignConfig<StaticApi>) {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
+            .typed(adder_proxy::AdderProxy)
+            .set_storage(config)
+            .run()
+            .await
+    }
+
+    pub async fn get_storage_from_address(
+        &mut self,
+        address: Address,
+    ) -> SovereignConfig<StaticApi> {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
+            .typed(adder_proxy::AdderProxy)
+            .get_storage_from_address(address)
+            .returns(ReturnsResult)
             .run()
             .await
     }

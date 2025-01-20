@@ -98,6 +98,59 @@ where
             .original_result()
     }
 
+    pub fn config(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, SovereignConfig<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("config")
+            .original_result()
+    }
+
+    pub fn get_storage_from_address<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        address: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, SovereignConfig<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_storage_from_address")
+            .argument(&address)
+            .original_result()
+    }
+
+    pub fn set_storage<
+        Arg0: ProxyArg<SovereignConfig<Env::Api>>,
+    >(
+        self,
+        config: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("set_storage")
+            .argument(&config)
+            .original_result()
+    }
+
+    pub fn test_endpoint(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EsdtTokenData<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("test_endpoint")
+            .original_result()
+    }
+
+    pub fn send_back_token(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("send_back_token")
+            .original_result()
+    }
+
     /// Add desired amount to the storage variable. 
     pub fn add<
         Arg0: ProxyArg<BigUint<Env::Api>>,
@@ -111,4 +164,26 @@ where
             .argument(&value)
             .original_result()
     }
+}
+
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Clone, Debug, PartialEq)]
+pub struct SovereignConfig<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub min_validators: u64,
+    pub max_validators: u64,
+    pub min_stake: BigUint<Api>,
+    pub opt_additional_stake_required: Option<ManagedVec<Api, StakeArgs<Api>>>,
+}
+
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Clone, Debug, PartialEq)]
+pub struct StakeArgs<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub token_id: TokenIdentifier<Api>,
+    pub amount: BigUint<Api>,
 }
