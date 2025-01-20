@@ -1,0 +1,40 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "100",
+                    "esdt": {
+                        "str:FIRSTTOKEN-123456": {
+                            "roles": [
+                                "NftAddUri",
+                                "NftRecreate",
+                                "SetNewUri"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:acc1": {
+                    "nonce": "1",
+                    "balance": "100",
+                    "esdt": {
+                        "str:FIRSTTOKEN-123456": {
+                            "roles": [
+                                "NftAddUri",
+                                "NftRecreate",
+                                "SetNewUri"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

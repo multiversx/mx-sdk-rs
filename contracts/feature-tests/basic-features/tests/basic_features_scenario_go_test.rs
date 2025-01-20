@@ -314,6 +314,11 @@ fn only_user_account_go() {
 }
 
 #[test]
+fn dynamic_nft_roles_go() {
+    world().run("scenarios/dynamic_nft_roles.scen.json");
+}
+
+#[test]
 fn out_of_gas_go() {
     world().run("scenarios/out_of_gas.scen.json");
 }
