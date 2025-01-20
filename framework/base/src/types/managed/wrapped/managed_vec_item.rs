@@ -141,6 +141,24 @@ impl ManagedVecItem for usize {
     }
 }
 
+// impl<const N: NumDecimals> ManagedVecItem for ConstDecimals<N> {
+//     type PAYLOAD = ManagedVecItemPayloadBuffer<4>; // 4 usize
+//     const SKIPS_RESERIALIZATION: bool = true;
+//     type Ref<'a> = Self;
+
+//     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+//         u32::read_from_payload(payload) as usize
+//     }
+
+//     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+//         Self::read_from_payload(payload)
+//     }
+
+//     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+//         (self as u32).save_to_payload(payload);
+//     }
+// }
+
 impl ManagedVecItem for bool {
     type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
     const SKIPS_RESERIALIZATION: bool = true;
