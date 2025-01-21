@@ -3,6 +3,7 @@ mod codec_util;
 mod managed_type_trait;
 mod multi_value;
 mod wrapped;
+mod managed_map;
 
 pub use basic::*;
 pub use codec_util::*;
