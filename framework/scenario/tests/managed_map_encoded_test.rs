@@ -1,6 +1,7 @@
 use multiversx_sc::api::ManagedTypeApi;
-use multiversx_sc::codec;
 use multiversx_sc::codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+use multiversx_sc::codec::{self, DecodeDefault, EncodeDefault};
+use multiversx_sc::proxy_imports::{TopDecodeOrDefault, TopEncodeOrDefault};
 use multiversx_sc::types::{BigUint, ManagedBuffer, ManagedMapEncoded};
 use multiversx_sc_scenario::api::StaticApi;
 
@@ -79,18 +80,18 @@ pub struct StructKey {
     b: i32,
 }
 
+#[derive(NestedEncode, NestedDecode, PartialEq, Debug)]
+pub struct StructValue<M: ManagedTypeApi> {
+    x: i32,
+    y: ManagedBuffer<M>,
+}
+
 fn assert_missing_opt_struct(
     mme: &ManagedMapEncoded<StaticApi, StructKey, Option<StructValue<StaticApi>>>,
     key: &StructKey,
 ) {
     assert!(!mme.contains(key));
     assert_eq!(mme.get(key), None);
-}
-
-#[derive(NestedEncode, NestedDecode, PartialEq, Debug)]
-pub struct StructValue<M: ManagedTypeApi> {
-    x: i32,
-    y: ManagedBuffer<M>,
 }
 
 #[test]
@@ -120,4 +121,80 @@ fn managed_map_encoded_opt_struct_test() {
 
     assert_eq!(&mme.remove(&key), &None);
     assert_missing_opt_struct(&mme, &key);
+}
+
+#[derive(TopEncode, TopDecode)]
+pub struct ManagedStructKey<M: ManagedTypeApi> {
+    a: BigUint<M>,
+    b: BigUint<M>,
+}
+
+#[derive(TopEncodeOrDefault, TopDecodeOrDefault, PartialEq, Debug)]
+pub struct StructValueOrDefault<M: ManagedTypeApi> {
+    x: i32,
+    y: ManagedBuffer<M>,
+}
+
+impl<M: ManagedTypeApi> EncodeDefault for StructValueOrDefault<M> {
+    fn is_default(&self) -> bool {
+        self.x == 0
+    }
+}
+
+impl<M: ManagedTypeApi> DecodeDefault for StructValueOrDefault<M> {
+    fn default() -> Self {
+        StructValueOrDefault {
+            x: 0,
+            y: ManagedBuffer::new(),
+        }
+    }
+}
+
+fn assert_missing_struct(
+    mme: &ManagedMapEncoded<
+        StaticApi,
+        ManagedStructKey<StaticApi>,
+        StructValueOrDefault<StaticApi>,
+    >,
+    key: &ManagedStructKey<StaticApi>,
+) {
+    assert!(!mme.contains(key));
+    assert_eq!(mme.get(key), StructValueOrDefault::default());
+}
+
+#[test]
+fn managed_map_encoded_struct_or_default_test() {
+    let mut mme = ManagedMapEncoded::<
+        StaticApi,
+        ManagedStructKey<StaticApi>,
+        StructValueOrDefault<StaticApi>,
+    >::new();
+
+    let key = ManagedStructKey {
+        a: 1u32.into(),
+        b: 2u32.into(),
+    };
+    assert_missing_struct(&mme, &key);
+
+    let value = StructValueOrDefault {
+        x: 3,
+        y: ManagedBuffer::from("abc"),
+    };
+    let default = StructValueOrDefault::default();
+
+    mme.put(&key, &value);
+    assert!(mme.contains(&key));
+    assert_eq!(&mme.get(&key), &value);
+
+    assert_eq!(&mme.remove(&key), &value);
+    assert_missing_struct(&mme, &key);
+
+    assert_eq!(&mme.remove(&key), &default);
+    assert_missing_struct(&mme, &key);
+
+    mme.put(&key, &default);
+    assert_missing_struct(&mme, &key);
+
+    assert_eq!(&mme.remove(&key), &default);
+    assert_missing_struct(&mme, &key);
 }
