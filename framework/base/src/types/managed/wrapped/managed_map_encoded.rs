@@ -39,57 +39,70 @@ where
     K: TopEncode,
     V: TopEncode + TopDecode,
 {
-    fn temp_key_encode(key: K) -> ManagedRefMut<'static, M, ManagedBuffer<M>> {
-        let mut key_ref =
-            unsafe { ManagedRefMut::wrap_handle(use_raw_handle(const_handles::MBUF_TEMPORARY_1)) };
-        key.top_encode_or_handle_err(
-            &mut *key_ref,
-            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        )
-        .unwrap_infallible();
-        key_ref
-    }
-
-    fn temp_value_encode(value: V) -> ManagedRefMut<'static, M, ManagedBuffer<M>> {
-        let mut value_ref =
-            unsafe { ManagedRefMut::wrap_handle(use_raw_handle(const_handles::MBUF_TEMPORARY_2)) };
-        value
-            .top_encode_or_handle_err(
-                &mut *value_ref,
-                ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-            )
-            .unwrap_infallible();
-        value_ref
-    }
-
-    fn value_decode(value_raw: ManagedBuffer<M>) -> V {
-        V::top_decode_or_handle_err(
-            value_raw,
-            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        )
-        .unwrap_infallible()
-    }
-
-    pub fn get(&mut self, key: K) -> V {
-        let temp_key = Self::temp_key_encode(key);
+    pub fn get(&self, key: &K) -> V {
+        let temp_key = temp_key_encode(key);
         let value_raw = self.raw_map.get(&temp_key);
-        Self::value_decode(value_raw)
+        value_decode(value_raw)
     }
 
-    pub fn put(&mut self, key: K, value: V) {
-        let temp_key = Self::temp_key_encode(key);
-        let temp_value = Self::temp_value_encode(value);
+    /// Since both the key and value are encoded before saving to the map, there is no need to take them owned.
+    pub fn put(&mut self, key: &K, value: &V) {
+        let temp_key = temp_key_encode(key);
+        let temp_value = temp_value_encode(value);
         self.raw_map.put(&temp_key, &temp_value);
     }
 
-    pub fn remove(&mut self, key: K) -> V {
-        let temp_key = Self::temp_key_encode(key);
+    pub fn remove(&mut self, key: &K) -> V {
+        let temp_key = temp_key_encode(key);
         let value_raw = self.raw_map.remove(&temp_key);
-        Self::value_decode(value_raw)
+        value_decode(value_raw)
     }
 
-    pub fn contains(&self, key: K) -> bool {
-        let temp_key = Self::temp_key_encode(key);
+    pub fn contains(&self, key: &K) -> bool {
+        let temp_key = temp_key_encode(key);
         self.raw_map.contains(&temp_key)
     }
+}
+
+fn temp_key_encode<M, K>(key: &K) -> ManagedRefMut<'static, M, ManagedBuffer<M>>
+where
+    M: ManagedTypeApi + ErrorApi,
+    K: TopEncode,
+{
+    let mut key_ref =
+        unsafe { ManagedRefMut::wrap_handle(use_raw_handle(const_handles::MBUF_TEMPORARY_1)) };
+    key.top_encode_or_handle_err(
+        &mut *key_ref,
+        ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+    )
+    .unwrap_infallible();
+    key_ref
+}
+
+fn temp_value_encode<M, V>(value: &V) -> ManagedRefMut<'static, M, ManagedBuffer<M>>
+where
+    M: ManagedTypeApi + ErrorApi,
+    V: TopEncode,
+{
+    let mut value_ref =
+        unsafe { ManagedRefMut::wrap_handle(use_raw_handle(const_handles::MBUF_TEMPORARY_2)) };
+    value
+        .top_encode_or_handle_err(
+            &mut *value_ref,
+            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+        )
+        .unwrap_infallible();
+    value_ref
+}
+
+fn value_decode<M, V>(value_raw: ManagedBuffer<M>) -> V
+where
+    M: ManagedTypeApi + ErrorApi,
+    V: TopDecode,
+{
+    V::top_decode_or_handle_err(
+        value_raw,
+        ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+    )
+    .unwrap_infallible()
 }
