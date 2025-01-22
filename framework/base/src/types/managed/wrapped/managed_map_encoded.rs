@@ -7,6 +7,21 @@ use crate::err_msg;
 use crate::types::{ManagedBuffer, ManagedMap, ManagedRefMut};
 use core::marker::PhantomData;
 
+/// A managed map that works with any serializable key and value types.
+///
+/// It encodes both when saving, and decodes the value when getting.
+///
+/// ## Empty encodings
+///
+/// Just like the base ManagedMap, it makes no difference between a missing key
+/// and a key with a corresponding empty encoded value.
+///
+/// So, for instance, here `contains` returns false, because `0` is encoded as an empty buffer:
+///
+/// ```
+/// mme.put(&key, &0);
+/// assert!(!mme.contains(&key));
+/// ```
 #[derive(Default)]
 pub struct ManagedMapEncoded<M, K, V>
 where
@@ -39,6 +54,7 @@ where
     K: TopEncode,
     V: TopEncode + TopDecode,
 {
+    /// Retrieves and decodes value associated with key.
     pub fn get(&self, key: &K) -> V {
         let temp_key = temp_key_encode(key);
         let value_raw = self.raw_map.get(&temp_key);
@@ -52,12 +68,14 @@ where
         self.raw_map.put(&temp_key, &temp_value);
     }
 
+    /// Clears value associated with key, and returns old value.
     pub fn remove(&mut self, key: &K) -> V {
         let temp_key = temp_key_encode(key);
         let value_raw = self.raw_map.remove(&temp_key);
         value_decode(value_raw)
     }
 
+    /// Returns true if there is a non-empty encoded value associated with the key.
     pub fn contains(&self, key: &K) -> bool {
         let temp_key = temp_key_encode(key);
         self.raw_map.contains(&temp_key)
