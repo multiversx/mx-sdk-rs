@@ -55,7 +55,7 @@ async fn set_state_cs_test() {
         .get_account_storage(&account_address.to_address())
         .await;
 
-    let set_state_account = SetStateAccount::from(account).with_pairs(pairs);
+    let set_state_account = SetStateAccount::from(account).with_storage(pairs);
     let vec_state = vec![set_state_account];
 
     let set_state_response = simulator_interact.interactor.set_state(vec_state).await;

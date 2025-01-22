@@ -55,10 +55,16 @@ impl From<Account> for SetStateAccount {
 }
 
 impl SetStateAccount {
-    pub fn with_pairs(mut self, pairs: HashMap<String, String>) -> Self {
+    /// Specify the storage key-value pairs to set to the target account.
+    pub fn with_storage(mut self, pairs: HashMap<String, String>) -> Self {
         self.pairs = pairs;
-
         self
+    }
+
+    /// Kept for backwards compatibility.
+    #[deprecated(since = "0.56.0", note = "Use `with_storage` instead.")]
+    pub fn with_keys(self, keys: HashMap<String, String>) -> Self {
+        self.with_storage(keys)
     }
 
     pub fn add_to_state_file(self, path: &Path) {
