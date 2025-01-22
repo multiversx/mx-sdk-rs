@@ -18,7 +18,7 @@
         },
         {
             "step": "scDeploy",
-            "id": "",
+            "id": "fwd deploy",
             "tx": {
                 "from": "0x0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
                 "contractCode": "mxsc:../../forwarder/output/forwarder.mxsc.json",
