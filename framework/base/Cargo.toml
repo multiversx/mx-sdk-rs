@@ -25,7 +25,7 @@ esdt-token-payment-legacy-decode = []
 
 [dependencies]
 hex-literal = "=0.4.1"
-bitflags = "=2.6.0"
+bitflags = "=2.8.0"
 num-traits = { version = "=0.2.19", default-features = false }
 unwrap-infallible = "0.1.5"
 

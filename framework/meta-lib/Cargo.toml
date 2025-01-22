@@ -24,10 +24,10 @@ rustc_version = "0.4"
 toml = { version = "0.8.6", features = ["preserve_order"] }
 colored = "2.2"
 lazy_static = "1.4.0"
-convert_case = "0.6.0"
+convert_case = "0.7.1"
 hex = "0.4"
-wasmparser = "0.223"
-wasmprinter = "0.223"
+wasmparser = "0.224"
+wasmprinter = "0.224"
 semver = "1.0.20"
 wat = "1.217.0"
 

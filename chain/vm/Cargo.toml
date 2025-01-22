@@ -28,7 +28,7 @@ sha2 = "0.10.6"
 sha3 = "0.10.6"
 itertools = "0.14.0"
 hex-literal = "=0.4.1"
-bitflags = "=2.6.0"
+bitflags = "=2.8.0"
 colored = "2.2"
 rand = { version= "0.8.5", optional = true }
 rand_seeder = "0.3.0"
