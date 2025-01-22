@@ -9,6 +9,8 @@ pub const EXPONENT_IS_POSITIVE: &str = "exponent must be negative";
 pub const NUMBER_IS_NOT_NORMAL: &str =
     "number is not normal. It is either infinite, NaN or subnormal";
 pub const CANNOT_COMPARE_VALUES: &str = "values are not comparable";
+pub const WRITE_RESERVED: &str = "cannot write to storage under reserved key";
+pub const WRITE_READONLY: &str = "cannot write on read only mode";
 
 pub const ERROR_SIGNALLED_BY_SMARTCONTRACT: &str = "error signalled by smartcontract";
 
