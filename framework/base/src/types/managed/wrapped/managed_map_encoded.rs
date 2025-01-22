@@ -18,7 +18,9 @@ use core::marker::PhantomData;
 ///
 /// So, for instance, here `contains` returns false, because `0` is encoded as an empty buffer:
 ///
-/// ```
+/// ```no_run
+/// # let mut mme = multiversx_sc::types::ManagedMapEncoded::<multiversx_sc::api::uncallable::UncallableApi, i32, i32>::new();
+/// # let key = 1;
 /// mme.put(&key, &0);
 /// assert!(!mme.contains(&key));
 /// ```
