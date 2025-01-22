@@ -120,6 +120,11 @@ fn forw_raw_sync_readonly_go() {
 }
 
 #[test]
+fn forw_raw_sync_reject_go() {
+    world().run("scenarios/forw_raw_sync_reject.scen.json");
+}
+
+#[test]
 fn forw_raw_sync_same_context_go() {
     world().run("scenarios/forw_raw_sync_same_context.scen.json");
 }

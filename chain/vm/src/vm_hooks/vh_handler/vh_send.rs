@@ -375,6 +375,26 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             .mb_set_vec_of_bytes(result_handle, result);
     }
 
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        _gas: u64,
+        to_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) {
+        let to = self.m_types_lock().mb_to_address(to_handle);
+        let endpoint_name = self
+            .m_types_lock()
+            .mb_to_function_name(endpoint_name_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+
+        let result = self.perform_execute_on_dest_context_readonly(to, endpoint_name, arg_buffer);
+
+        self.m_types_lock()
+            .mb_set_vec_of_bytes(result_handle, result);
+    }
+
     fn clean_return_data(&self) {
         let mut tx_result = self.result_lock();
         tx_result.result_values.clear();

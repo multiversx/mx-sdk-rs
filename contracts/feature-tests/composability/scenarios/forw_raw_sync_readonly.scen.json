@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -64,6 +63,29 @@
                     "storage": {},
                     "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "call_execute_on_dest_context_readonly",
+            "comment": "attempting to write should fail; error message currently different in Rust VM",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "call_execute_on_dest_context_readonly",
+                "arguments": [
+                    "sc:vault",
+                    "str:accept_funds"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
             }
         }
     ]
