@@ -1,7 +1,7 @@
 use multiversx_sc_codec::{TopDecode, TopEncode};
 use unwrap_infallible::UnwrapInfallible;
 
-use crate::api::{const_handles, use_raw_handle, ErrorApi, ManagedTypeApi};
+use crate::api::{const_handles, ErrorApi, ManagedTypeApi};
 use crate::contract_base::ExitCodecErrorHandler;
 use crate::err_msg;
 use crate::types::{ManagedBuffer, ManagedMap, ManagedRefMut};
@@ -89,8 +89,8 @@ where
     M: ManagedTypeApi + ErrorApi,
     K: TopEncode,
 {
-    let mut key_ref =
-        unsafe { ManagedRefMut::wrap_handle(use_raw_handle(const_handles::MBUF_TEMPORARY_1)) };
+    let mut key_ref = unsafe { ManagedBuffer::temp_const_ref_mut(const_handles::MBUF_TEMPORARY_1) };
+    key_ref.overwrite(&[]);
     key.top_encode_or_handle_err(
         &mut *key_ref,
         ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
@@ -105,7 +105,8 @@ where
     V: TopEncode,
 {
     let mut value_ref =
-        unsafe { ManagedRefMut::wrap_handle(use_raw_handle(const_handles::MBUF_TEMPORARY_2)) };
+        unsafe { ManagedBuffer::temp_const_ref_mut(const_handles::MBUF_TEMPORARY_2) };
+    value_ref.overwrite(&[]);
     value
         .top_encode_or_handle_err(
             &mut *value_ref,
