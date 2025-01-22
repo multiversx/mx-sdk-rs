@@ -33,6 +33,16 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.56.0, chain 0.13.0, sdk 0.8.1] - 2025-01-23
+- Rust VM support for readonly sync calls.
+- `ManagedMapEncoded`, a map type that can use any key or value types that are serializable.
+- `ManagedDecimal` implements `ManagedVecItem`.
+- Bugfixes, improvements:
+	- Fixed a bug regarding the ESDT roles VM hook;
+	- Pretty representation for ManagedBuffer and other string-like types when debugging;
+	- API fix of an issue that was preventing set state in chain simulator;
+	- Snippets generator fixes involving the crate path and the upgrade result handler.
+
 ## [sc 0.55.0, codec 0.21.2, chain 0.12.0, sdk 0.8.0] - 2025-01-08
 - Integrating Spica changes into the framework:
 	- EGLD+ESDT multi-transfers are now possible:
