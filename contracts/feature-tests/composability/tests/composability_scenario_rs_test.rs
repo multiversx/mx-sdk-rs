@@ -166,9 +166,14 @@ fn forw_raw_sync_egld_rs() {
 }
 
 #[test]
-#[ignore]
 fn forw_raw_sync_readonly_rs() {
     world().run("scenarios/forw_raw_sync_readonly.scen.json");
+}
+
+#[test]
+#[ignore = "different error code/message in Rust VM"]
+fn forw_raw_sync_reject_rs() {
+    world().run("scenarios/forw_raw_sync_reject.scen.json");
 }
 
 #[test]
