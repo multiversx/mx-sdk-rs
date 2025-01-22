@@ -12,8 +12,7 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
     writeln!(
         file,
         r#"impl ContractInteract {{
-    pub async fn new() -> Self {{
-        let config = Config::new();
+    pub async fn new(config: Config) -> Self {{
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
             .use_chain_simulator(config.use_chain_simulator());
@@ -105,7 +104,7 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
             .upgrade({})
             .code(&self.contract_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
-            .returns(ReturnsNewAddress)
+            .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 
