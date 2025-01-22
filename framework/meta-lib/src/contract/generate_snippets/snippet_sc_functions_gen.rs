@@ -7,7 +7,8 @@ use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to
 const DEFAULT_GAS: &str = "30_000_000u64";
 
 pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, crate_name: &str) {
-    let wasm_output_file_path_expr = format!("\"mxsc:../output/{crate_name}.mxsc.json\"");
+    let crate_path = crate_name.replace("_", "-");
+    let wasm_output_file_path_expr = format!("\"mxsc:../output/{crate_path}.mxsc.json\"");
 
     writeln!(
         file,
@@ -37,7 +38,7 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
         }}
     }}
 "#,
-        crate_name, wasm_output_file_path_expr,
+        crate_path, wasm_output_file_path_expr,
     )
     .unwrap();
     write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
