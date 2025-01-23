@@ -16,9 +16,9 @@ checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 
 [[package]]
 name = "bitflags"
-version = "2.6.0"
+version = "2.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
+checksum = "8f68f53c83ab957f72c32642f3868eec03eb974d1fb82e453128456482613d36"
 
 [[package]]
 name = "endian-type"
@@ -55,7 +55,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-core"
-version = "0.12.0"
+version = "0.13.0"
 dependencies = [
  "bitflags",
  "multiversx-sc-codec",
@@ -63,7 +63,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.55.0"
+version = "0.56.0"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -95,7 +95,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.55.0"
+version = "0.56.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -106,7 +106,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.55.0"
+version = "0.56.0"
 dependencies = [
  "multiversx-sc",
 ]
