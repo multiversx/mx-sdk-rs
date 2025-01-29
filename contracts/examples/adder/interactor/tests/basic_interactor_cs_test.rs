@@ -1,5 +1,9 @@
 use basic_interactor::{AdderInteract, Config};
-use multiversx_sc_snippets::{imports::Bech32Address, sdk::gateway::SetStateAccount, test_wallets};
+use multiversx_sc_snippets::{
+    imports::{Bech32Address, BigUint, TokenIdentifier},
+    sdk::gateway::SetStateAccount,
+    test_wallets, InteractorRunAsync,
+};
 use serial_test::serial;
 
 #[tokio::test]
@@ -86,7 +90,7 @@ async fn set_state_from_file_cs_test() {
     let account_address_2 = test_wallets::ivan();
 
     let mut real_chain_interact = AdderInteract::new(Config::load_config()).await;
-    let simulator_interact = AdderInteract::new(Config::chain_simulator_config()).await;
+    let mut simulator_interact = AdderInteract::new(Config::chain_simulator_config()).await;
 
     // now we should have current mike account in the set state file
     real_chain_interact
@@ -120,4 +124,18 @@ async fn set_state_from_file_cs_test() {
     assert!(storage.len() > 1);
 
     println!("mike's storage keys in chain simulator {:#?}", storage);
+
+    simulator_interact
+        .interactor
+        .tx()
+        .from(&account_address.to_address()) // mike
+        .to(&account_address_2.to_address()) // ivan
+        .single_esdt(
+            &TokenIdentifier::from_esdt_bytes(b"UTK-14d57d"),
+            // 55544b2d313464353764 
+            0u64,
+            &BigUint::from(1u64),
+        )
+        .run()
+        .await;
 }
