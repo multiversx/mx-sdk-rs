@@ -8,7 +8,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[payable]
     fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
         let mut payments = self.call_value().all_transfers().clone_value();
-        let mut fee_token = EgldOrEsdtTokenPayment::from(payments.get(0).clone());
+        let mut fee_token = payments.get(0).clone();
         let fee_value_mapper = self.fee(&fee_token.token_identifier);
 
         let provided_fee_token = payments.get(0).clone();
