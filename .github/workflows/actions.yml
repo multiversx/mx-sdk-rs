@@ -14,7 +14,7 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@b967f1f188a02b7d92e5d4425bd0334752a33e03
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v4.2.2
     with:
       rust-toolchain: 1.82
       path-to-sc-meta: framework/meta
