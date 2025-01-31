@@ -1,7 +1,10 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
-use multiversx_sc_snippets::imports::{
-    BigUint, ConstDecimals, ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec, RustBigUint,
-    StaticApi,
+use multiversx_sc_snippets::{
+    imports::{
+        BigUint, ConstDecimals, ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec,
+        RustBigUint, StaticApi,
+    },
+    test_wallets, InteractorRunAsync,
 };
 
 #[tokio::test]
@@ -189,5 +192,35 @@ async fn verify_bls_aggregated_signature(interact: &mut BasicFeaturesInteract) {
             &signature,
             Some("aggregate signature is invalid"),
         )
+        .await;
+}
+
+#[tokio::test]
+#[ignore = "fails before status check"]
+async fn send_to_non_existent_address_test() {
+    let registered_wallet = test_wallets::mike();
+    let not_registered_wallet = test_wallets::alice();
+
+    let mut chain_simulator_interact =
+        BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+
+    // send to not registered address
+    chain_simulator_interact
+        .interactor
+        .tx()
+        .from(&registered_wallet.to_address())
+        .to(&not_registered_wallet.to_address())
+        .egld(1u64)
+        .run()
+        .await;
+
+    // send back -> should fail
+    chain_simulator_interact
+        .interactor
+        .tx()
+        .from(&not_registered_wallet.to_address())
+        .to(&registered_wallet.to_address())
+        .egld(1u64)
+        .run()
         .await;
 }
