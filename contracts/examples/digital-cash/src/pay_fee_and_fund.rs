@@ -20,8 +20,8 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         let fee_without_first_token = fee_token.amount.clone() * (payments.len() as u32 - 1);
 
         require!(
-            (provided_fee_token.amount == fee_without_first_token || // case when first first token is the exact fee amount
-                provided_fee_token.amount > fee_with_first_token), // case when first token also covers part of the funds
+            (provided_fee_token.amount == fee_without_first_token || // case when the first token is the exact fee amount
+                provided_fee_token.amount > fee_with_first_token), // case when the first token also covers part of the funds
             "payment not covering fees"
         );
 
