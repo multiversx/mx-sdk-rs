@@ -2,6 +2,8 @@ use std::sync::{Arc, MutexGuard};
 
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::BreakpointValue;
+use num_bigint::BigUint;
+use num_traits::Zero;
 
 use crate::{
     tx_execution::execute_current_tx_context_input,
@@ -66,6 +68,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
 
     fn storage_write(&self, key: &[u8], value: &[u8]) {
         self.check_reserved_key(key);
+        self.check_not_readonly();
 
         self.0.with_contract_account_mut(|account| {
             account.storage.insert(key.to_vec(), value.to_vec());
@@ -121,6 +124,31 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
     ) -> Vec<Vec<u8>> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
+        let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
+        let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
+            tx_input,
+            tx_cache,
+            execute_current_tx_context_input,
+        );
+
+        if tx_result.result_status.is_success() {
+            self.sync_call_post_processing(tx_result, blockchain_updates)
+        } else {
+            // also kill current execution
+            self.halt_with_error(tx_result.result_status, &tx_result.result_message)
+        }
+    }
+
+    fn perform_execute_on_dest_context_readonly(
+        &self,
+        to: VMAddress,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>> {
+        let async_call_data =
+            self.create_async_call_data(to, BigUint::zero(), func_name, arguments);
+        let mut tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
+        tx_input.readonly = true;
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
             tx_input,
@@ -249,7 +277,14 @@ impl DebugApiVMHooksHandler {
 
     fn check_reserved_key(&self, key: &[u8]) {
         if key.starts_with(STORAGE_RESERVED_PREFIX) {
-            self.vm_error("cannot write to storage under reserved key");
+            self.vm_error(vm_err_msg::WRITE_RESERVED);
+        }
+    }
+
+    /// TODO: only checked on storage writes, needs more checks for calls, transfers, etc.
+    fn check_not_readonly(&self) {
+        if self.0.input_ref().readonly {
+            self.vm_error(vm_err_msg::WRITE_READONLY);
         }
     }
 

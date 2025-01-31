@@ -2,7 +2,7 @@ use super::{field_element::FieldElement, pre_computed_group_element::PreComputed
 
 // base contains precomputed multiples of the base-point. See the Ed25519 paper
 // for a discussion about how these values are used.
-pub const BASE: [[PreComputedGroupElement; 8]; 32] = [
+pub static BASE: [[PreComputedGroupElement; 8]; 32] = [
     [
         PreComputedGroupElement {
             y_plus_x: FieldElement([

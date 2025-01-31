@@ -252,13 +252,21 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
 
     fn execute_on_dest_context_readonly_raw(
         &self,
-        _gas: u64,
-        _to_handle: RawHandle,
-        _endpoint_name_handle: RawHandle,
-        _arg_buffer_handle: RawHandle,
-        _result_handle: RawHandle,
+        gas: u64,
+        to_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
     ) {
-        panic!("execute_on_dest_context_readonly_raw not implemented yet!");
+        self.with_vm_hooks(|vh| {
+            vh.managed_execute_read_only(
+                gas as i64,
+                to_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
+                result_handle,
+            )
+        });
     }
 
     fn clean_return_data(&self) {

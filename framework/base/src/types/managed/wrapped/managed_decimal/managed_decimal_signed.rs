@@ -6,7 +6,10 @@ use crate::{
     },
     err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    types::{BigFloat, BigInt, BigUint, Sign},
+    types::{
+        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigFloat,
+        BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, ManagedVecRef, Sign,
+    },
 };
 
 use alloc::string::ToString;
@@ -184,6 +187,58 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<f32>
 {
     fn from(x: f32) -> Self {
         Self::from(x as f64)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<8>; // 4 bigInt + 4 usize
+
+    const SKIPS_RESERIALIZATION: bool = false;
+
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let mut index = 0;
+        unsafe {
+            Self {
+                data: managed_vec_item_read_from_payload_index(payload, &mut index),
+                decimals: managed_vec_item_read_from_payload_index(payload, &mut index),
+            }
+        }
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let mut index = 0;
+        unsafe {
+            managed_vec_item_save_to_payload_index(self.data, payload, &mut index);
+            managed_vec_item_save_to_payload_index(self.decimals, payload, &mut index);
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, const N: NumDecimals> ManagedVecItem
+    for ManagedDecimalSigned<M, ConstDecimals<N>>
+{
+    type PAYLOAD = ManagedVecItemPayloadBuffer<4>; // data only
+
+    const SKIPS_RESERIALIZATION: bool = false;
+
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        Self::const_decimals_from_raw(BigInt::read_from_payload(payload))
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.data.save_to_payload(payload);
     }
 }
 
