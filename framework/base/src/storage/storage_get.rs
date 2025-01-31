@@ -3,7 +3,7 @@ use core::{convert::Infallible, marker::PhantomData};
 use crate::{
     api::{
         const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, HandleConstraints,
-        ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        ManagedBufferApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl,
     },
     codec::*,
     err_msg,
@@ -33,11 +33,12 @@ where
     }
 
     fn to_managed_buffer(&self) -> ManagedBuffer<A> {
-        let mbuf_handle: A::ManagedBufferHandle =
-            use_raw_handle(A::static_var_api_impl().next_handle());
-        A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), mbuf_handle.clone());
-        ManagedBuffer::from_handle(mbuf_handle)
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            A::storage_read_api_impl()
+                .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), result.get_handle());
+            result
+        }
     }
 
     fn to_big_uint(&self) -> BigUint<A> {
@@ -56,7 +57,7 @@ where
     }
 }
 
-impl<'k, A> TopDecodeInput for StorageGetInput<'k, A>
+impl<A> TopDecodeInput for StorageGetInput<'_, A>
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {

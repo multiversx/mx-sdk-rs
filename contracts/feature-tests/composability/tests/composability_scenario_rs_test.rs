@@ -166,9 +166,14 @@ fn forw_raw_sync_egld_rs() {
 }
 
 #[test]
-#[ignore]
 fn forw_raw_sync_readonly_rs() {
     world().run("scenarios/forw_raw_sync_readonly.scen.json");
+}
+
+#[test]
+#[ignore = "different error code/message in Rust VM"]
+fn forw_raw_sync_reject_rs() {
+    world().run("scenarios/forw_raw_sync_reject.scen.json");
 }
 
 #[test]
@@ -236,6 +241,11 @@ fn forwarder_call_async_accept_nft_rs() {
 #[test]
 fn forwarder_call_async_multi_transfer_rs() {
     world().run("scenarios/forwarder_call_async_multi_transfer.scen.json");
+}
+
+#[test]
+fn forwarder_call_async_multi_transfer_egld_rs() {
+    world().run("scenarios/forwarder_call_async_multi_transfer_egld.scen.json");
 }
 
 #[test]
@@ -341,6 +351,11 @@ fn forwarder_call_transf_exec_accept_esdt_twice_rs() {
 #[test]
 fn forwarder_call_transf_exec_accept_multi_transfer_rs() {
     world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_accept_multi_transfer_egld_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer_egld.scen.json");
 }
 
 #[test]
@@ -486,6 +501,16 @@ fn promises_call_async_retrieve_esdt_rs() {
 #[test]
 fn promises_call_callback_directly_rs() {
     world().run("scenarios/promises_call_callback_directly.scen.json");
+}
+
+#[test]
+fn promises_call_transfer_callback_egld_rs() {
+    world().run("scenarios/promises_call_transfer_callback_egld.scen.json");
+}
+
+#[test]
+fn promises_call_transfer_callback_esdt_rs() {
+    world().run("scenarios/promises_call_transfer_callback_esdt.scen.json");
 }
 
 #[test]

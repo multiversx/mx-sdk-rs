@@ -16,10 +16,10 @@ pub trait NonFungibleTokenMapperFeatures:
     #[payable("EGLD")]
     #[endpoint]
     fn issue_and_set_all_roles_meta(&self, token_ticker: ManagedBuffer) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         self.non_fungible_token_mapper().issue_and_set_all_roles(
             EsdtTokenType::Meta,
-            payment.clone_value(),
+            payment.clone(),
             ManagedBuffer::new(),
             token_ticker,
             0,

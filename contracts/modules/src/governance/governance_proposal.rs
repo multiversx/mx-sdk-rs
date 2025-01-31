@@ -36,7 +36,7 @@ pub struct ProposalFees<M: ManagedTypeApi> {
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Clone)]
 pub struct FeeEntry<M: ManagedTypeApi> {
     pub depositor_addr: ManagedAddress<M>,
     pub tokens: EsdtTokenPayment<M>,

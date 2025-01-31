@@ -12,7 +12,7 @@ const FILE_PREFIX: &str = "file:";
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct FilePath<'a>(pub &'a str);
 
-impl<'a> FilePath<'a> {
+impl FilePath<'_> {
     pub fn eval_to_expr(&self) -> String {
         format!("{FILE_PREFIX}{}", self.0)
     }
@@ -22,7 +22,7 @@ impl<'a> FilePath<'a> {
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for FilePath<'a>
+impl<Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for FilePath<'_>
 where
     Env: ScenarioTxEnv,
 {
@@ -36,9 +36,9 @@ where
     }
 }
 
-impl<'a, Env> TxCodeValue<Env> for FilePath<'a> where Env: ScenarioTxEnv {}
+impl<Env> TxCodeValue<Env> for FilePath<'_> where Env: ScenarioTxEnv {}
 
-impl<'a> RegisterCodeSource for FilePath<'a> {
+impl RegisterCodeSource for FilePath<'_> {
     fn into_code(self, env_data: ScenarioTxEnvData) -> Vec<u8> {
         self.resolve_contents(&env_data.interpreter_context())
     }

@@ -6,7 +6,7 @@ use super::{GatewayRequest, GatewayRequestType, VM_VALUES_ENDPOINT};
 /// Executes a VM query.
 pub struct VMQueryRequest<'a>(pub &'a VMQueryInput);
 
-impl<'a> GatewayRequest for VMQueryRequest<'a> {
+impl GatewayRequest for VMQueryRequest<'_> {
     type Payload = VMQueryInput;
     type DecodedJson = ResponseVmValue;
     type Result = VmValuesResponseData;

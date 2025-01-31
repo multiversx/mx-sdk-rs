@@ -5,6 +5,7 @@ use crate::{
     },
     tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
     types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
+    vm_err_msg,
     vm_hooks::VMHooksHandlerSource,
 };
 use num_traits::Zero;
@@ -215,6 +216,11 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let endpoint_name = self
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
+        if endpoint_name.is_empty() {
+            // immitating the behavior of the VM
+            // TODO: lift limitation from the VM, then also remove this condition here
+            self.vm_error(vm_err_msg::PROMISES_TOKENIZE_FAILED);
+        }
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
         let tx_hash = self.tx_hash();
         let callback_closure_data = self.m_types_lock().mb_get(callback_closure_handle).to_vec();
@@ -364,6 +370,26 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
         let result =
             self.perform_execute_on_dest_context(to, egld_value, endpoint_name, arg_buffer);
+
+        self.m_types_lock()
+            .mb_set_vec_of_bytes(result_handle, result);
+    }
+
+    fn execute_on_dest_context_readonly_raw(
+        &self,
+        _gas: u64,
+        to_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) {
+        let to = self.m_types_lock().mb_to_address(to_handle);
+        let endpoint_name = self
+            .m_types_lock()
+            .mb_to_function_name(endpoint_name_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+
+        let result = self.perform_execute_on_dest_context_readonly(to, endpoint_name, arg_buffer);
 
         self.m_types_lock()
             .mb_set_vec_of_bytes(result_handle, result);

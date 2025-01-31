@@ -2,7 +2,7 @@ use core::convert::{TryFrom, TryInto};
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::ManagedTypeApi,
+    api::{use_raw_handle, ManagedTypeApi, RawHandle},
     codec::{
         DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -10,6 +10,8 @@ use crate::{
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
 };
+
+use super::ManagedRef;
 
 #[repr(transparent)]
 #[derive(Clone)]
@@ -47,6 +49,28 @@ where
         ManagedAddress {
             bytes: ManagedByteArray::new_from_bytes(bytes),
         }
+    }
+
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
+        ManagedAddress {
+            bytes: ManagedByteArray::new_uninit(),
+        }
+    }
+
+    /// Creates a shared managed reference to a given raw handle.
+    ///
+    /// ## Safety
+    ///
+    /// The reference points to a shared value. Make sure the handle is not leaked.
+    pub unsafe fn temp_const_ref(
+        raw_handle: RawHandle,
+    ) -> ManagedRef<'static, M, ManagedAddress<M>> {
+        ManagedRef::wrap_handle(use_raw_handle(raw_handle))
     }
 
     #[inline]
@@ -133,7 +157,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedAddress {
             bytes: ManagedByteArray::from_handle(handle),
         }
@@ -143,7 +167,15 @@ where
         self.bytes.get_handle()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.bytes.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }

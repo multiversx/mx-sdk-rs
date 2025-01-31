@@ -16,7 +16,7 @@ impl<'a> GetAccountRequest<'a> {
     }
 }
 
-impl<'a> GatewayRequest for GetAccountRequest<'a> {
+impl GatewayRequest for GetAccountRequest<'_> {
     type Payload = ();
     type DecodedJson = AccountResponse;
     type Result = Account;

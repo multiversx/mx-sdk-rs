@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           15
+// Endpoints:                           18
 // Async Callback (empty):               1
-// Total number of exported functions:  17
+// Total number of exported functions:  20
 
 #![no_std]
 
@@ -18,9 +18,12 @@ multiversx_sc_wasm_adapter::endpoints! {
     payable_features
     (
         init => init
+        echo_call_value_legacy => echo_call_value_legacy
         echo_call_value => echo_call_value
         payment_multiple => payment_multiple
-        payment_array_3 => payment_array_3
+        payable_all_transfers => payable_all_transfers
+        payment_array_esdt_3 => payment_array_esdt_3
+        payment_array_egld_esdt_3 => payment_array_egld_esdt_3
         payable_any_1 => payable_any_1
         payable_any_2 => payable_any_2
         payable_any_3 => payable_any_3

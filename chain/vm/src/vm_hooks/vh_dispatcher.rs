@@ -848,7 +848,14 @@ impl VMHooks for VMHooksDispatcher {
         arguments_handle: i32,
         result_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_execute_read_only")
+        self.handler.execute_on_dest_context_readonly_raw(
+            gas as u64,
+            address_handle,
+            function_handle,
+            arguments_handle,
+            result_handle,
+        );
+        0
     }
 
     fn managed_execute_on_same_context(
@@ -1858,5 +1865,54 @@ impl VMHooks for VMHooksDispatcher {
         y_base_point_handle: i32,
     ) -> i32 {
         panic!("Unavailable: elliptic_curve_get_values")
+    }
+
+    fn is_reserved_function_name(&self, name_handle: i32) -> i32 {
+        panic!("Unavailable: is_reserved_function_name")
+    }
+
+    fn managed_get_original_caller_addr(&self, destination_handle: i32) {
+        panic!("Unavailable: managed_get_original_caller_addr")
+    }
+
+    fn managed_get_relayer_addr(&self, destination_handle: i32) {
+        panic!("Unavailable: managed_get_relayer_addr")
+    }
+
+    fn managed_multi_transfer_esdt_nft_execute_by_user(
+        &self,
+        user_handle: i32,
+        dst_handle: i32,
+        token_transfers_handle: i32,
+        gas_limit: i64,
+        function_handle: i32,
+        arguments_handle: i32,
+    ) -> i32 {
+        panic!("Unavailable: managed_multi_transfer_esdt_nft_execute_by_user")
+    }
+
+    fn managed_verify_secp256r1(
+        &self,
+        key_handle: i32,
+        message_handle: i32,
+        sig_handle: i32,
+    ) -> i32 {
+        panic!("Unavailable: managed_verify_secp256r1")
+    }
+    fn managed_verify_blssignature_share(
+        &self,
+        key_handle: i32,
+        message_handle: i32,
+        sig_handle: i32,
+    ) -> i32 {
+        panic!("Unavailable: managed_verify_blssignature_share")
+    }
+    fn managed_verify_blsaggregated_signature(
+        &self,
+        key_handle: i32,
+        message_handle: i32,
+        sig_handle: i32,
+    ) -> i32 {
+        panic!("Unavailable: managed_verify_blsaggregated_signature")
     }
 }

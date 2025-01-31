@@ -1,4 +1,5 @@
 from functools import partial
+import string
 from typing import Callable, Collection, Iterable, List, Tuple, Type
 from lldb import SBValue, SBDebugger
 import lldb
@@ -186,8 +187,17 @@ def ascii_to_string(buffer_iterator: Iterable[int]) -> str:
 
 
 def buffer_as_string(buffer: lldb.value) -> str:
-    buffer_string = ascii_to_string(buffer)
+    buffer_ints = buffer_to_bytes(buffer)
+    buffer_string = ascii_to_string(buffer_ints)
     return f'"{buffer_string}"'
+
+def mixed_representation(buffer: lldb.value) -> str:
+    buffer_hex = format_buffer_hex(buffer)
+    buffer_string = buffer_as_string(buffer)
+    if all(c in string.printable for c in buffer_string):
+        return buffer_string + " - " + buffer_hex
+
+    return buffer_hex
 
 
 def parse_handles_from_buffer_hex(buffer_hex: str) -> List[int]:
@@ -315,7 +325,7 @@ class BigFloat(PlainManagedVecItem, ManagedType):
 
 class ManagedBuffer(PlainManagedVecItem, ManagedType):
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
-        return format_buffer_hex(buffer)
+        return mixed_representation(buffer)
 
 
 class BigUint(PlainManagedVecItem, ManagedType):
@@ -331,7 +341,7 @@ class BigUint(PlainManagedVecItem, ManagedType):
 
 class TokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, token_identifier: lldb.value) -> lldb.value:
-        return token_identifier.buffer
+        return token_identifier.data.buffer
 
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
         return buffer_as_string(buffer)
@@ -342,7 +352,7 @@ class ManagedAddress(PlainManagedVecItem, ManagedType):
         return managed_address.bytes.buffer
 
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
-        return format_buffer_hex(buffer)
+        return mixed_representation(buffer)
 
 
 class ManagedByteArray(PlainManagedVecItem, ManagedType):
@@ -350,7 +360,7 @@ class ManagedByteArray(PlainManagedVecItem, ManagedType):
         return managed_byte_array.buffer
 
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
-        return format_buffer_hex(buffer)
+        return mixed_representation(buffer)
 
 
 class ManagedOption(PlainManagedVecItem, ManagedType):
@@ -417,14 +427,13 @@ class EsdtTokenPayment(ManagedVecItem, ManagedType):
 
 class EgldOrEsdtTokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, egld_or_esdt_token_identifier: lldb.value) -> lldb.value:
-        return egld_or_esdt_token_identifier.data
+        return egld_or_esdt_token_identifier.buffer
 
-    @check_invalid_handle
-    def summary_from_raw_handle(self, raw_handle: int, context: lldb.value, type_info: lldb.SBType) -> str:
-        if raw_handle == MANAGED_OPTION_NONE_HANDLE:
+    def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+        token_id = buffer_as_string(buffer)
+        if token_id == '"EGLD-000000"':
             return "EgldOrEsdtTokenIdentifier::egld()"
-        token_summary = TokenIdentifier().summary_from_raw_handle(raw_handle, context, None)
-        return f"EgldOrEsdtTokenIdentifier::esdt({token_summary})"
+        return f"EgldOrEsdtTokenIdentifier::esdt({token_id})" 
 
 
 class ManagedVec(PlainManagedVecItem, ManagedType):

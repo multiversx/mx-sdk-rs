@@ -16,9 +16,9 @@ where
     let obj_ref = obj.as_ref();
     assert_eq!(
         obj_ref.get_handle(),
-        ManagedRef::get_raw_handle_of_ref(obj_ref.clone())
+        ManagedRef::get_raw_handle_of_ref(obj_ref.clone_ref())
     );
-    let obj_clone: T = Clone::clone(&obj_ref);
+    let obj_clone: T = obj_ref.clone();
     assert_eq!(obj, obj_clone);
     assert_ne!(obj_ref.get_handle(), obj_clone.get_handle());
 }

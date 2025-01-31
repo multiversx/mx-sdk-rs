@@ -6,7 +6,7 @@
             "accounts": {
                 "address:A": {
                     "nonce": "0",
-                    "balance": "0x1000000000",
+                    "balance": "1000000000",
                     "esdt": {
                         "str:TOK-123456": "150",
                         "str:OTHERTOK-123456": "500",
@@ -47,8 +47,7 @@
                         "value": "10"
                     }
                 ],
-                "gasLimit": "0x100000000",
-                "gasPrice": "0x01"
+                "gasLimit": "0x100000000"
             }
         },
         {
@@ -57,7 +56,7 @@
             "accounts": {
                 "address:A": {
                     "nonce": "1",
-                    "balance": "0xf00000000",
+                    "balance": "1000000000",
                     "esdt": {
                         "str:TOK-123456": "50",
                         "str:OTHERTOK-123456": "100",

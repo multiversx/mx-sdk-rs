@@ -1,7 +1,9 @@
+use multiversx_sc_codec::IntoMultiValue;
+
 use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
-    types::{BigUint, EgldOrEsdtTokenIdentifier},
+    types::{BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue},
 };
 
 use crate::codec::{
@@ -12,7 +14,11 @@ use crate::codec::{
 use crate as multiversx_sc; // needed by the TypeAbi generated code
 use crate::derive::type_abi;
 
-use super::{EsdtTokenPayment, EsdtTokenPaymentRefs};
+use super::{
+    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
+    EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVec, ManagedVecItem,
+    ManagedVecItemPayloadBuffer, ManagedVecRef,
+};
 
 #[type_abi]
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug)]
@@ -22,13 +28,12 @@ pub struct EgldOrEsdtTokenPayment<M: ManagedTypeApi> {
     pub amount: BigUint<M>,
 }
 
+/// Alias for a list of payments of EGLD or ESDT tokens.
+pub type MultiEgldOrEsdtPayment<Api> = ManagedVec<Api, EgldOrEsdtTokenPayment<Api>>;
+
 impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
     pub fn no_payment() -> Self {
-        EgldOrEsdtTokenPayment {
-            token_identifier: EgldOrEsdtTokenIdentifier::egld(),
-            token_nonce: 0,
-            amount: BigUint::zero(),
-        }
+        Self::egld_payment(BigUint::zero())
     }
 
     pub fn new(
@@ -41,6 +46,11 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
             token_nonce,
             amount,
         }
+    }
+
+    /// A payment of token EGLD-000000.
+    pub fn egld_payment(amount: BigUint<M>) -> Self {
+        Self::new(EgldOrEsdtTokenIdentifier::egld(), 0, amount)
     }
 
     /// Will convert to just ESDT or terminate execution if the token is EGLD.
@@ -125,6 +135,15 @@ impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EgldOrEsdtTokenPayment<M> 
     }
 }
 
+impl<M: ManagedTypeApi> IntoMultiValue for EgldOrEsdtTokenPayment<M> {
+    type MultiValue = EgldOrEsdtTokenPaymentMultiValue<M>;
+
+    #[inline]
+    fn into_multi_value(self) -> Self::MultiValue {
+        self.into()
+    }
+}
+
 impl<M> TypeAbiFrom<&[u8]> for EgldOrEsdtTokenPayment<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
@@ -180,5 +199,36 @@ impl<'a, M: ManagedTypeApi> EgldOrEsdtTokenPaymentRefs<'a, M> {
                 )
             },
         )
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPayment<M> {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<16>;
+    const SKIPS_RESERIALIZATION: bool = false;
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let mut index = 0;
+        unsafe {
+            EgldOrEsdtTokenPayment {
+                token_identifier: managed_vec_item_read_from_payload_index(payload, &mut index),
+                token_nonce: managed_vec_item_read_from_payload_index(payload, &mut index),
+                amount: managed_vec_item_read_from_payload_index(payload, &mut index),
+            }
+        }
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let mut index = 0;
+
+        unsafe {
+            managed_vec_item_save_to_payload_index(self.token_identifier, payload, &mut index);
+            managed_vec_item_save_to_payload_index(self.token_nonce, payload, &mut index);
+            managed_vec_item_save_to_payload_index(self.amount, payload, &mut index);
+        }
     }
 }
