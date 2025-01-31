@@ -15,13 +15,18 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         require!(!fee_value_mapper.is_empty(), "invalid fee toke provided");
 
         fee_token.amount = fee_value_mapper.get();
+
+        let fee_with_first_token = fee_token.amount.clone() * payments.len() as u32;
+        let fee_without_first_token = fee_token.amount.clone() * (payments.len() as u32 - 1);
+
         require!(
-            (provided_fee_token.amount >= fee_token.amount && payments.len() > 1)                  // case when we have more than 1 type of token transfered
-                || (provided_fee_token.amount > fee_token.amount && payments.len() == 1), // case when token transfered is the same with the fee token
+            (provided_fee_token.amount == fee_without_first_token || // case when first first token is the exact fee amount
+                provided_fee_token.amount > fee_with_first_token), // case when first token also covers part of the funds
             "payment not covering fees"
         );
 
-        if provided_fee_token.amount > fee_token.amount {
+        if provided_fee_token.amount > fee_without_first_token {
+            fee_token.amount = fee_with_first_token;
             let extracted_fee = EgldOrEsdtTokenPayment::new(
                 provided_fee_token.token_identifier,
                 provided_fee_token.token_nonce,
@@ -30,6 +35,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
             let _ = payments.set(0, extracted_fee);
         } else {
             payments.remove(0);
+            fee_token.amount = fee_without_first_token;
         }
 
         let caller_address = self.blockchain().get_caller();
