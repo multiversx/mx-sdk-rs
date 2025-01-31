@@ -4,31 +4,38 @@ use crate::{constants::*, helpers, storage};
 
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
-    #[endpoint(payFeeAndFundESDT)]
+    #[endpoint(payFeeAndFund)]
     #[payable]
-    fn pay_fee_and_fund_esdt(&self, address: ManagedAddress, valability: u64) {
-        let mut payments = self.call_value().all_esdt_transfers().clone();
-        let fee = EgldOrEsdtTokenPayment::from(payments.get(0).clone());
+    fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
+        let mut payments = self.call_value().all_transfers().clone_value();
+        let mut fee_token = EgldOrEsdtTokenPayment::from(payments.get(0).clone());
+        let fee_value_mapper = self.fee(&fee_token.token_identifier);
+
+        let provided_fee_token = payments.get(0).clone();
+        require!(!fee_value_mapper.is_empty(), "invalid fee toke provided");
+
+        fee_token.amount = fee_value_mapper.get();
+        require!(
+            (provided_fee_token.amount >= fee_token.amount && payments.len() > 1)                  // case when we have more than 1 type of token transfered
+                || (provided_fee_token.amount > fee_token.amount && payments.len() == 1), // case when token transfered is the same with the fee token
+            "payment not covering fees"
+        );
+
+        if provided_fee_token.amount > fee_token.amount {
+            let extracted_fee = EgldOrEsdtTokenPayment::new(
+                provided_fee_token.token_identifier,
+                provided_fee_token.token_nonce,
+                provided_fee_token.amount - &fee_token.amount,
+            );
+            let _ = payments.set(0, extracted_fee);
+        } else {
+            payments.remove(0);
+        }
+
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, &address, fee);
+        self.update_fees(caller_address, &address, fee_token);
 
-        payments.remove(0);
-
-        self.make_fund(0u64.into(), payments, address, valability)
-    }
-    #[endpoint(payFeeAndFundEGLD)]
-    #[payable("EGLD")]
-    fn pay_fee_and_fund_egld(&self, address: ManagedAddress, valability: u64) {
-        let mut fund = self.call_value().egld().clone();
-        let fee_value = self.fee(&EgldOrEsdtTokenIdentifier::egld()).get();
-        require!(fund > fee_value, "payment not covering fees");
-
-        fund -= fee_value.clone();
-        let fee = EgldOrEsdtTokenPayment::new(EgldOrEsdtTokenIdentifier::egld(), 0, fee_value);
-        let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, &address, fee);
-
-        self.make_fund(fund, ManagedVec::new(), address, valability);
+        self.make_fund(payments, address, valability)
     }
 
     #[endpoint]
@@ -44,13 +51,12 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         let deposited_fee_token = deposit_mapper.fees.value;
         let fee_amount = self.fee(&deposited_fee_token.token_identifier).get();
         // TODO: switch to egld+esdt multi transfer handling
-        let egld_payment = self.call_value().egld_direct_non_strict().clone();
-        let esdt_payment = self.call_value().all_esdt_transfers().clone();
+        let payment = self.call_value().all_transfers().clone_value();
 
-        let num_tokens = self.get_num_token_transfers(&egld_payment, &esdt_payment);
+        let num_tokens = payment.len();
         self.check_fees_cover_number_of_tokens(num_tokens, fee_amount, deposited_fee_token.amount);
 
-        self.make_fund(egld_payment, esdt_payment, address, valability);
+        self.make_fund(payment, address, valability);
     }
 
     #[endpoint(depositFees)]

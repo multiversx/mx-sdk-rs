@@ -1,5 +1,5 @@
 {
-    "name": "pay-fee-adn-fund-egld",
+    "name": "pay-fee-and-fund-esdt-single",
     "steps": [
         {
             "step": "externalSteps",
@@ -7,35 +7,20 @@
         },
         {
             "step": "scCall",
-            "id": "pay-fee-and-fund-egld-fail",
+            "id": "pay-fee-and-fund-esdt-success",
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:the_digital_cash_contract",
-                "egldValue": "10",
-                "function": "payFeeAndFund",
-                "arguments": [
-                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
-                    "u64:100"
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CASHTOKEN-778899",
+                        "value": "3"
+                    },
+                    {
+                        "tokenIdentifier": "str:CASHTOKEN-112233",
+                        "value": "50"
+                    }
                 ],
-                "gasLimit": "500,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:payment not covering fees",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "pay-fee-and-fund-egld-success",
-            "tx": {
-                "from": "address:acc3",
-                "to": "sc:the_digital_cash_contract",
-                "egldValue": "1,000",
                 "function": "payFeeAndFund",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
@@ -58,19 +43,23 @@
             "accounts": {
                 "sc:the_digital_cash_contract": {
                     "nonce": "0",
-                    "balance": "1,000",
+                    "balance": "0",
+                    "esdt": {
+                        "str:CASHTOKEN-112233": "50",
+                        "str:CASHTOKEN-778899": "3"
+                    },
                     "storage": {
                         "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
                             "0-depositor_address": "address:acc3",
-                            "1-funds": "u32:1|nested:str:EGLD|u64:0|biguint:990",
+                            "1-funds": "u32:1|nested:str:CASHTOKEN-112233|u64:0|biguint:50",
                             "2-valability": "u64:100",
                             "3-expiration_round": "u64:16",
                             "4-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "0-tokenIdentifier": "nested:str:CASHTOKEN-778899",
                                     "1-nonce": "u64:0",
-                                    "2-amount": "biguint:10"
+                                    "2-amount": "biguint:3"
                                 }
                             }
                         },
@@ -105,12 +94,12 @@
                     "storage": {}
                 },
                 "address:acc3": {
-                    "nonce": "2",
-                    "balance": "999000",
+                    "nonce": "1",
+                    "balance": "1,000,000",
                     "esdt": {
-                        "str:CASHTOKEN-112233": "100",
+                        "str:CASHTOKEN-112233": "50",
                         "str:CASHTOKEN-445566": "100",
-                        "str:CASHTOKEN-778899": "100"
+                        "str:CASHTOKEN-778899": "97"
                     },
                     "storage": {}
                 },
