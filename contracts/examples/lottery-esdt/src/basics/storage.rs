@@ -8,7 +8,7 @@ pub trait StorageModule {
     #[storage_mapper("accumulatedRewards")]
     fn accumulated_rewards(
         &self,
-        token_id: &EgldOrEsdtTokenIdentifier,
+        token_id: &TokenIdentifier,
         user_id: &u64,
     ) -> SingleValueMapper<BigUint>;
 
@@ -19,10 +19,7 @@ pub trait StorageModule {
     fn index_last_winner(&self, lottery_name: &ManagedBuffer) -> SingleValueMapper<usize>;
 
     #[storage_mapper("accumulatedRewards")]
-    fn user_accumulated_token_rewards(
-        &self,
-        user_id: &u64,
-    ) -> UnorderedSetMapper<EgldOrEsdtTokenIdentifier>;
+    fn user_accumulated_token_rewards(&self, user_id: &u64) -> UnorderedSetMapper<TokenIdentifier>;
 
     #[storage_mapper("numberOfEntriesForUser")]
     fn number_of_entries_for_user(

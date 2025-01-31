@@ -7,7 +7,7 @@ use super::status::Status;
 #[multiversx_sc::module]
 pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn buy_ticket(&self, lottery_name: ManagedBuffer) {
         let (token_identifier, payment) = self.call_value().egld_or_single_fungible_esdt();
 

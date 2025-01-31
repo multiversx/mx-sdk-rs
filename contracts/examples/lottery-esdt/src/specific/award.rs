@@ -72,7 +72,7 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
 
         // Prevent crashing if the role was unset while the lottery was running
         // The tokens will simply remain locked forever
-        let esdt_token_id = info.token_identifier.clone().unwrap_esdt();
+        let esdt_token_id = info.token_identifier.clone();
         let roles = self.blockchain().get_esdt_local_roles(&esdt_token_id);
         if roles.has_role(&EsdtLocalRole::Burn) {
             self.send().esdt_local_burn(&esdt_token_id, 0, &burn_amount);
@@ -182,12 +182,7 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         }
     }
 
-    fn assign_prize_to_winner(
-        &self,
-        token_id: EgldOrEsdtTokenIdentifier,
-        amount: &BigUint,
-        winner_id: &u64,
-    ) {
+    fn assign_prize_to_winner(&self, token_id: TokenIdentifier, amount: &BigUint, winner_id: &u64) {
         self.accumulated_rewards(&token_id, winner_id)
             .update(|value| *value += amount);
         self.user_accumulated_token_rewards(winner_id)
