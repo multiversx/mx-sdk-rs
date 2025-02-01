@@ -8,6 +8,8 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[payable]
     fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
         let mut payments = self.call_value().all_transfers().clone_value();
+        require!(!payments.is_empty(), "no payment was provided");
+
         let mut fee_token = payments.get(0).clone();
         let fee_value_mapper = self.fee(&fee_token.token_identifier);
 
@@ -15,9 +17,10 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         require!(!fee_value_mapper.is_empty(), "invalid fee toke provided");
 
         fee_token.amount = fee_value_mapper.get();
+        let nr_of_payments = payments.len();
 
-        let fee_with_first_token = fee_token.amount.clone() * payments.len() as u32;
-        let fee_without_first_token = fee_token.amount.clone() * (payments.len() as u32 - 1);
+        let fee_with_first_token = fee_token.amount.clone() * nr_of_payments as u32;
+        let fee_without_first_token = fee_token.amount.clone() * (nr_of_payments as u32 - 1);
 
         require!(
             (provided_fee_token.amount == fee_without_first_token || // case when the first token is the exact fee amount
