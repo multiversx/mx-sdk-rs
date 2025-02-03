@@ -74,7 +74,7 @@ pub trait CallPromisesModule: common::CommonModule {
     #[payable("*")]
     fn forward_payment_gas_for_callback(&self, to: ManagedAddress) {
         let payment = self.call_value().any_payment();
-        let half_gas = self.blockchain().get_gas_left() / 2;
+        let half_gas = self.blockchain().get_gas_left() / 3;
 
         self.tx()
             .to(&to)

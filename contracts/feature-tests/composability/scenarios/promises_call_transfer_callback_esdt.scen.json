@@ -119,7 +119,7 @@
                 "arguments": [
                     "sc:vault"
                 ],
-                "gasLimit": "200,000,000",
+                "gasLimit": "300,000,000",
                 "gasPrice": "0"
             },
             "expect": {
