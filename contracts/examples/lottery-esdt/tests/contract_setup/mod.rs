@@ -107,7 +107,7 @@ impl LotteryScTestState {
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<Vec<u8>>,
-        opt_whitelist: Option<Vec<Address>>,
+        opt_whitelist: Option<Vec<TestAddress>>,
         opt_burn_percentage: OptionalValue<BigUint>,
     ) -> &mut Self {
         let expected_response = WithRawTxResponse(|response| {
