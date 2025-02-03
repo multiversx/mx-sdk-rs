@@ -157,6 +157,8 @@ impl LotteryScTestState {
         self
     }
 
+    // since some of the endpoints have OptionalValue parameters I chose to put the error message the first parameter as convention
+
     pub fn determine_winner(
         &mut self,
         expected_error: Option<String>,

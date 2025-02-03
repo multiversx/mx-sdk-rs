@@ -32,7 +32,7 @@ fn lottery_init() {
 }
 
 #[test]
-fn start_limited_tickets_and_fixes_deadline() {
+fn start_limited_tickets_and_fixed_deadline() {
     let mut state = LotteryScTestState::new();
 
     state.deploy();
