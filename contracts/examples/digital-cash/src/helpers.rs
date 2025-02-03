@@ -19,19 +19,6 @@ pub trait HelpersModule: storage::StorageModule {
         }
     }
 
-    fn get_num_token_transfers(
-        &self,
-        egld_value: &BigUint,
-        esdt_transfers: &ManagedVec<EsdtTokenPayment>,
-    ) -> usize {
-        let mut amount = esdt_transfers.len();
-        if egld_value > &0 {
-            amount += 1;
-        }
-
-        amount
-    }
-
     fn get_expiration_round(&self, valability: u64) -> u64 {
         let valability_rounds = valability / SECONDS_PER_ROUND;
         self.blockchain().get_block_round() + valability_rounds
@@ -48,24 +35,19 @@ pub trait HelpersModule: storage::StorageModule {
 
     fn make_fund(
         &self,
-        egld_payment: BigUint,
-        esdt_payment: ManagedVec<EsdtTokenPayment>,
+        payment: ManagedVec<EgldOrEsdtTokenPayment>,
         address: ManagedAddress,
         valability: u64,
     ) {
         let deposit_mapper = self.deposit(&address);
 
         deposit_mapper.update(|deposit| {
-            require!(
-                deposit.egld_funds == 0 && deposit.esdt_funds.is_empty(),
-                "key already used"
-            );
-            let num_tokens = self.get_num_token_transfers(&egld_payment, &esdt_payment);
+            require!(deposit.funds.is_empty(), "key already used");
+            let num_tokens = payment.len();
             deposit.fees.num_token_to_transfer += num_tokens;
             deposit.valability = valability;
             deposit.expiration_round = self.get_expiration_round(valability);
-            deposit.esdt_funds = esdt_payment;
-            deposit.egld_funds = egld_payment;
+            deposit.funds = payment;
         });
     }
 
@@ -107,8 +89,7 @@ pub trait HelpersModule: storage::StorageModule {
 
         let new_deposit = DepositInfo {
             depositor_address: caller_address,
-            esdt_funds: ManagedVec::new(),
-            egld_funds: BigUint::zero(),
+            funds: ManagedVec::new(),
             valability: 0,
             expiration_round: 0,
             fees: Fee {

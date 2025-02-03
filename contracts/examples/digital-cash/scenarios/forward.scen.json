@@ -162,11 +162,10 @@
                     "storage": {
                         "str:deposit|0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440": {
                             "0-depositor_address": "address:acc2",
-                            "1-esdt_funds": "u32:0",
-                            "2-egld_funds": "biguint:1,000",
-                            "3-valability": "u64:60",
-                            "4-expiration_round": "u64:10",
-                            "5-fees": {
+                            "1-funds": "u32:1|nested:str:EGLD|u64:0|biguint:1,000",
+                            "2-valability": "u64:60",
+                            "3-expiration_round": "u64:10",
+                            "4-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
                                     "0-tokenIdentifier": "nested:str:EGLD",
@@ -177,11 +176,10 @@
                         },
                         "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
                             "0-depositor_address": "address:acc2",
-                            "1-esdt_funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
-                            "2-egld_funds": "biguint:0",
-                            "3-valability": "u64:100",
-                            "4-expiration_round": "u64:16",
-                            "5-fees": {
+                            "1-funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
+                            "2-valability": "u64:100",
+                            "3-expiration_round": "u64:16",
+                            "4-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
                                     "0-tokenIdentifier": "nested:str:EGLD",
@@ -192,11 +190,10 @@
                         },
                         "str:deposit|0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee": {
                             "0-depositor_address": "address:acc2",
-                            "1-esdt_funds": "u32:3|nested:str:CASHTOKEN-112233|u64:0|biguint:50|nested:str:CASHTOKEN-445566|u64:0|biguint:50|nested:str:CASHTOKEN-778899|u64:0|biguint:50",
-                            "2-egld_funds": "biguint:0",
-                            "3-valability": "u64:100",
-                            "4-expiration_round": "u64:16",
-                            "5-fees": {
+                            "1-funds": "u32:3|nested:str:CASHTOKEN-112233|u64:0|biguint:50|nested:str:CASHTOKEN-445566|u64:0|biguint:50|nested:str:CASHTOKEN-778899|u64:0|biguint:50",
+                            "2-valability": "u64:100",
+                            "3-expiration_round": "u64:16",
+                            "4-fees": {
                                 "0-num_token_to_transfer": "u32:3",
                                 "1-value": {
                                     "0-tokenIdentifier": "nested:str:EGLD",

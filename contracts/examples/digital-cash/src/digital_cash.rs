@@ -80,13 +80,10 @@ pub trait DigitalCash:
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
         let deposit = deposit_mapper.get();
-        if token.is_egld() {
-            return deposit.egld_funds;
-        }
 
-        for esdt in deposit.esdt_funds.into_iter() {
-            if esdt.token_identifier == token && esdt.token_nonce == nonce {
-                return esdt.amount;
+        for fund in deposit.funds.into_iter() {
+            if fund.token_identifier == token && fund.token_nonce == nonce {
+                return fund.amount;
             }
         }
 
