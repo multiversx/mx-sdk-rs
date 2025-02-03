@@ -1,12 +1,3 @@
-use multiversx_sc::{
-    codec::multi_types::OptionalValue,
-    types::{
-        heap::{Address, BoxedBytes},
-        BigFloat, BigInt, BigUint, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier,
-        EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedOption,
-        ManagedType, ManagedVec, TokenIdentifier,
-    },
-};
 use multiversx_sc_scenario::imports::*;
 
 macro_rules! push {
@@ -62,6 +53,9 @@ fn main() {
         managed_buffer,
         "\"hello world\" - (11) 0x68656c6c6f20776f726c64"
     );
+
+    let test_sc_address: TestSCAddress = TestSCAddress::new("multi-transfer");
+    push!(to_check, test_sc_address, "\"sc:multi-transfer\"");
 
     let token_identifier: TokenIdentifier<DebugApi> = TokenIdentifier::from("MYTOK-123456");
     push!(to_check, token_identifier, "\"MYTOK-123456\"");

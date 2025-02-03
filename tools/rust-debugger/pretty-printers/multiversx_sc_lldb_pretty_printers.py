@@ -17,6 +17,7 @@ NUM_BIG_UINT_TYPE = "num_bigint::biguint::BigUint"
 
 # 2. SC wasm - Managed basic types
 MOD_PATH = "multiversx_sc::types::managed::basic"
+MOD_PATH_WRAPPED = "multiversx_sc::types::managed::wrapped"
 
 BIG_INT_TYPE = f"{MOD_PATH}::big_int::BigInt<{DEBUG_API_TYPE} ?>"
 BIG_FLOAT_TYPE = f"{MOD_PATH}::big_float::BigFloat<{DEBUG_API_TYPE} ?>"
@@ -27,7 +28,8 @@ MOD_PATH = "multiversx_sc::types::managed::wrapped"
 
 BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
 TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
-MANAGED_ADDRESS_TYPE = f"{MOD_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
+MANAGED_ADDRESS_TYPE = f"{MOD_PATH_WRAPPED}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
+TEST_SC_ADDRESS_TYPE = f"multiversx_sc::types::interaction::expr::test_sc_address::TestSCAddress"
 MANAGED_BYTE_ARRAY_TYPE = f"{MOD_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
 
 # ManagedOption
@@ -178,7 +180,7 @@ def format_buffer_hex(buffer: lldb.value) -> str:
 
 def ascii_to_string(buffer_iterator: Iterable[int]) -> str:
     """
-    Converts ascii codes to the coresponding string.
+    Converts ascii codes to the corresponding string.
 
     >>> ascii_to_string([116, 101, 115, 116])
     'test'
@@ -190,6 +192,11 @@ def buffer_as_string(buffer: lldb.value) -> str:
     buffer_ints = buffer_to_bytes(buffer)
     buffer_string = ascii_to_string(buffer_ints)
     return f'"{buffer_string}"'
+
+def test_address_as_string(buffer: lldb.value, prefix: str) -> str:
+    buffer_ints = buffer_to_bytes(buffer)
+    buffer_string = ascii_to_string(buffer_ints)
+    return f'"{prefix}:{buffer_string}"'
 
 def mixed_representation(buffer: lldb.value) -> str:
     buffer_hex = format_buffer_hex(buffer)
@@ -355,6 +362,11 @@ class ManagedAddress(PlainManagedVecItem, ManagedType):
         return mixed_representation(buffer)
 
 
+class TestSCAddress(Handler):
+    def summary(self, resp: lldb.value) -> str:
+        buffer = lldb.value(resp.sbvalue.GetChildAtIndex(0))
+        return test_address_as_string(buffer, "sc")
+
 class ManagedByteArray(PlainManagedVecItem, ManagedType):
     def lookup(self, managed_byte_array: lldb.value) -> lldb.value:
         return managed_byte_array.buffer
@@ -495,6 +507,7 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     # 4. SC wasm - Managed multi value types
     # 5. SC wasm - heap
     (HEAP_ADDRESS_TYPE, HeapAddress),
+    (TEST_SC_ADDRESS_TYPE, TestSCAddress),
     (BOXED_BYTES_TYPE, BoxedBytes),
     # 6. MultiversX codec - Multi-types
     (OPTIONAL_VALUE_TYPE, OptionalValue),
