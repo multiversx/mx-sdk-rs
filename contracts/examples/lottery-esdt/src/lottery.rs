@@ -11,6 +11,8 @@ use awarding_status::AwardingStatus;
 use lottery_info::LotteryInfo;
 use status::Status;
 
+pub mod lottery_proxy;
+
 #[multiversx_sc::contract]
 pub trait Lottery:
     award::AwardingModule

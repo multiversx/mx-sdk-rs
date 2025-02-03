@@ -1,0 +1,4 @@
+[settings]
+
+[[proxy]]
+path = "src/lottery_proxy.rs"
