@@ -31,4 +31,8 @@ pub trait VMHooksManagedMap: VMHooksHandlerSource {
         let key = self.m_types_lock().mb_get(key_handle).to_vec();
         self.m_types_lock().mm_contains(map_handle, key.as_slice())
     }
+
+    fn mm_drop(&self, map_handle: RawHandle) {
+        self.m_types_lock().mm_remove(map_handle);
+    }
 }

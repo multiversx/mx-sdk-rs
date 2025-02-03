@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
 use multiversx_chain_vm::{
-    executor::{BreakpointValue, VMHooks},
+    executor::BreakpointValue,
     tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
     vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::{StaticVarData, StaticVarStack};
+use crate::debug_executor::{StaticVarData, StaticVarStack, VMHooksDebugger};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
@@ -19,7 +19,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn VMHooksDebugger) -> R,
     {
         let top_context = TxContextStack::static_peek();
         let wrapper = DebugApiVMHooksHandler::new(top_context);
@@ -29,7 +29,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn VMHooksDebugger) -> R,
     {
         let wrapper = DebugApiVMHooksHandler::new(handle.context);
         let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
@@ -38,7 +38,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn VMHooksDebugger) -> R,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         Self::with_vm_hooks_ctx_1(handle1, f)
@@ -51,7 +51,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         f: F,
     ) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn VMHooksDebugger) -> R,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         assert_handles_on_same_context(&handle1, &handle3);
