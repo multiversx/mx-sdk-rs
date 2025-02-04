@@ -16,46 +16,48 @@ NUM_BIG_INT_TYPE = "num_bigint::bigint::BigInt"
 NUM_BIG_UINT_TYPE = "num_bigint::biguint::BigUint"
 
 # 2. SC wasm - Managed basic types
-MOD_PATH = "multiversx_sc::types::managed::basic"
-MOD_PATH_WRAPPED = "multiversx_sc::types::managed::wrapped"
+MANAGED_BASIC_PATH = "multiversx_sc::types::managed::basic"
 
-BIG_INT_TYPE = f"{MOD_PATH}::big_int::BigInt<{DEBUG_API_TYPE} ?>"
-BIG_FLOAT_TYPE = f"{MOD_PATH}::big_float::BigFloat<{DEBUG_API_TYPE} ?>"
-MANAGED_BUFFER_TYPE = f"{MOD_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE} ?>"
+BIG_INT_TYPE = f"{MANAGED_BASIC_PATH}::big_int::BigInt<{DEBUG_API_TYPE} ?>"
+BIG_FLOAT_TYPE = f"{MANAGED_BASIC_PATH}::big_float::BigFloat<{DEBUG_API_TYPE} ?>"
+MANAGED_BUFFER_TYPE = f"{MANAGED_BASIC_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE} ?>"
 
 # 3. SC wasm - Managed wrapped types
-MOD_PATH = "multiversx_sc::types::managed::wrapped"
+MANAGED_WRAPPED_PATH = "multiversx_sc::types::managed::wrapped"
 
-BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
-TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
-MANAGED_ADDRESS_TYPE = f"{MOD_PATH_WRAPPED}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
-TEST_SC_ADDRESS_TYPE = f"multiversx_sc::types::interaction::expr::test_sc_address::TestSCAddress"
-MANAGED_BYTE_ARRAY_TYPE = f"{MOD_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
-
+BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
+TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
+MANAGED_ADDRESS_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
+MANAGED_BYTE_ARRAY_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
+ESDT_TOKEN_PAYMENT_TYPE = f"{MANAGED_WRAPPED_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
+EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
 # ManagedOption
 MANAGED_OPTION_INNER_TYPE_INDEX = 1
 MANAGED_OPTION_NONE_HANDLE = 2147483646  # i32::MAX - 1
-MANAGED_OPTION_TYPE = f"{MOD_PATH}::managed_option::ManagedOption<{DEBUG_API_TYPE}, {ANY_TYPE}>"
-ESDT_TOKEN_PAYMENT_TYPE = f"{MOD_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
-EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
-
+MANAGED_OPTION_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_option::ManagedOption<{DEBUG_API_TYPE}, {ANY_TYPE}>"
 # ManagedVec
 MANAGED_VEC_INNER_TYPE_INDEX = 1
-MANAGED_VEC_TYPE = f"{MOD_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_TYPE}>"
+MANAGED_VEC_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_TYPE}>"
 
 # 4. SC wasm - Managed multi value types
 
 # 5. VM core types
-MOD_PATH = "multiversx_chain_core::types"
+CHAIN_CORE_PATH = "multiversx_chain_core::types"
 
-HEAP_ADDRESS_TYPE = f"{MOD_PATH}::address::Address"
-BOXED_BYTES_TYPE = f"{MOD_PATH}::boxed_bytes::BoxedBytes"
+HEAP_ADDRESS_TYPE = f"{CHAIN_CORE_PATH}::address::Address"
+BOXED_BYTES_TYPE = f"{CHAIN_CORE_PATH}::boxed_bytes::BoxedBytes"
 
-# 6. MultiversX codec - Multi-types
-MOD_PATH = "multiversx_sc_codec::multi_types"
+# 6. MultiversX interaction expression
+INTERACTION_EXPR_PATH = "multiversx_sc::types::interaction::expr"
 
-OPTIONAL_VALUE_TYPE = f"{MOD_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>"
+TEST_SC_ADDRESS_TYPE = f"{INTERACTION_EXPR_PATH}::test_sc_address::TestSCAddress"
+TEST_ADDRESS_TYPE = f"{INTERACTION_EXPR_PATH}::test_address::TestAddress"
+TEST_TOKEN_IDENTIFIER_TYPE = f"{INTERACTION_EXPR_PATH}::test_token_identifier::TestTokenIdentifier"
 
+# 7. MultiversX codec - Multi-types
+MULTI_TYPES_PATH = "multiversx_sc_codec::multi_types"
+
+OPTIONAL_VALUE_TYPE = f"{MULTI_TYPES_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>"
 
 class InvalidHandle(Exception):
     def __init__(self, raw_handle: int, map_: lldb.value) -> None:
@@ -193,7 +195,7 @@ def buffer_as_string(buffer: lldb.value) -> str:
     buffer_string = ascii_to_string(buffer_ints)
     return f'"{buffer_string}"'
 
-def test_address_as_string(buffer: lldb.value, prefix: str) -> str:
+def interaction_type_as_string(buffer: lldb.value, prefix: str) -> str:
     buffer_ints = buffer_to_bytes(buffer)
     buffer_string = ascii_to_string(buffer_ints)
     return f'"{prefix}:{buffer_string}"'
@@ -361,12 +363,6 @@ class ManagedAddress(PlainManagedVecItem, ManagedType):
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
         return mixed_representation(buffer)
 
-
-class TestSCAddress(Handler):
-    def summary(self, resp: lldb.value) -> str:
-        buffer = lldb.value(resp.sbvalue.GetChildAtIndex(0))
-        return test_address_as_string(buffer, "sc")
-
 class ManagedByteArray(PlainManagedVecItem, ManagedType):
     def lookup(self, managed_byte_array: lldb.value) -> lldb.value:
         return managed_byte_array.buffer
@@ -477,6 +473,20 @@ class BoxedBytes(Handler):
         buffer_hex = ints_to_hex(raw)
         return format_buffer_hex_string(buffer_hex)
 
+class TestSCAddress(Handler):
+    def summary(self, test_sc_address: lldb.value) -> str:
+        buffer = lldb.value(test_sc_address.sbvalue.GetChildAtIndex(0))
+        return interaction_type_as_string(buffer, "sc")
+    
+class TestAddress(Handler):
+    def summary(self, test_address: lldb.value) -> str:
+        buffer = lldb.value(test_address.sbvalue.GetChildAtIndex(0))
+        return interaction_type_as_string(buffer, "address")
+    
+class TestTokenIdentifier(Handler):
+    def summary(self, test_address: lldb.value) -> str:
+        buffer = lldb.value(test_address.sbvalue.GetChildAtIndex(0))
+        return interaction_type_as_string(buffer, "str")
 
 class OptionalValue(Handler):
     def summary(self, optional_value: lldb.value) -> str:
@@ -500,16 +510,19 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     (TOKEN_IDENTIFIER_TYPE, TokenIdentifier),
     (MANAGED_ADDRESS_TYPE, ManagedAddress),
     (MANAGED_BYTE_ARRAY_TYPE, ManagedByteArray),
-    (MANAGED_OPTION_TYPE, ManagedOption),
     (ESDT_TOKEN_PAYMENT_TYPE, EsdtTokenPayment),
     (EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE, EgldOrEsdtTokenIdentifier),
+    (MANAGED_OPTION_TYPE, ManagedOption),
     (MANAGED_VEC_TYPE, ManagedVec),
     # 4. SC wasm - Managed multi value types
     # 5. SC wasm - heap
     (HEAP_ADDRESS_TYPE, HeapAddress),
-    (TEST_SC_ADDRESS_TYPE, TestSCAddress),
     (BOXED_BYTES_TYPE, BoxedBytes),
-    # 6. MultiversX codec - Multi-types
+    # 6. MultiversX interaction expression
+    (TEST_SC_ADDRESS_TYPE, TestSCAddress),
+    (TEST_ADDRESS_TYPE, TestAddress),
+    (TEST_TOKEN_IDENTIFIER_TYPE, TestTokenIdentifier),
+    # 7. MultiversX codec - Multi-types
     (OPTIONAL_VALUE_TYPE, OptionalValue),
 ]
 

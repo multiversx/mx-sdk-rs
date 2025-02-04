@@ -57,6 +57,12 @@ fn main() {
     let test_sc_address: TestSCAddress = TestSCAddress::new("multi-transfer");
     push!(to_check, test_sc_address, "\"sc:multi-transfer\"");
 
+    let test_address: TestAddress = TestAddress::new("owner-test");
+    push!(to_check, test_address, "\"address:owner-test\"");
+
+    let test_token_identifier: TestTokenIdentifier = TestTokenIdentifier::new("TEST-123456");
+    push!(to_check, test_token_identifier, "\"str:TEST-123456\"");
+
     let token_identifier: TokenIdentifier<DebugApi> = TokenIdentifier::from("MYTOK-123456");
     push!(to_check, token_identifier, "\"MYTOK-123456\"");
 
