@@ -26,3 +26,7 @@ home = "0.5.2"
 
 [workspace]
 members = ["."]
+
+[dependencies]
+hex = "0.4"
+
