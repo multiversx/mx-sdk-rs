@@ -39,5 +39,5 @@ ctr = "0.9.2"
 uuid = {version = "1.10.0", features = ["v4"]}
 
 [dependencies.multiversx-chain-core]
-version = "=0.13.0"
+version = "=0.13.1"
 path = "../../chain/core"

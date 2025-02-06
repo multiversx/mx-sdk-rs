@@ -2398,7 +2398,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-core"
-version = "0.13.0"
+version = "0.13.1"
 dependencies = [
  "bitflags",
  "multiversx-sc-codec",
@@ -2419,7 +2419,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm"
-version = "0.13.0"
+version = "0.13.1"
 dependencies = [
  "bitflags",
  "colored",

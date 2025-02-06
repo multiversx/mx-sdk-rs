@@ -39,5 +39,5 @@ path = "../../data/codec"
 features = ["derive"]
 
 [dependencies.multiversx-chain-core]
-version = "=0.13.0"
+version = "=0.13.1"
 path = "../../chain/core"
