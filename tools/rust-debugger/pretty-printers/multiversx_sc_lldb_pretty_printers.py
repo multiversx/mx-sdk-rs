@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import struct
 
+VM_TYPE_ADDRESS = "0000000050"
 DEBUG_API_TYPE = "multiversx_sc_scenario::api::impl_vh::vm_hooks_api::VMHooksApi<multiversx_sc_scenario::api::impl_vh::debug_api::DebugApiBackend>"
 ANY_TYPE = ".*"
 SOME_OR_NONE = "(Some|None)"
@@ -189,9 +190,17 @@ def ascii_to_string(buffer_iterator: Iterable[int]) -> str:
     """
     return ''.join(map(chr, buffer_iterator))
 
+def buffer_to_bytes_without_vm_type(buffer: lldb.value) -> List[int]:
+    buffer_ints = buffer_to_bytes(buffer)
+    buffer_vm_type = buffer_to_bytes(VM_TYPE_ADDRESS)
+
+    if buffer_ints[:len(buffer_vm_type)] == buffer_vm_type:
+        return buffer_ints[len(buffer_vm_type):] 
+
+    return buffer_ints
 
 def buffer_as_string(buffer: lldb.value) -> str:
-    buffer_ints = buffer_to_bytes(buffer)
+    buffer_ints = buffer_to_bytes_without_vm_type(buffer)
     buffer_string = ascii_to_string(buffer_ints)
     return f'"{buffer_string}"'
 

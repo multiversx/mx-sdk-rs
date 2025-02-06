@@ -60,6 +60,21 @@ fn main() {
     let test_address: TestAddress = TestAddress::new("owner-test");
     push!(to_check, test_address, "\"address:owner-test\"");
 
+    let hex_esdt_safe: [u8; 32] =
+        hex::decode(b"00000000000000000500657364742d736166655f5f5f5f5f5f5f5f5f5f5f5f5f")
+            .unwrap_or_else(|_| panic!("Unable to decode hexadecimal address"))
+            .try_into()
+            .unwrap_or_else(|address: Vec<u8>| {
+                panic!(
+                    "Invalid length: expected 32 bytes but got {}",
+                    address.len()
+                )
+            });
+    let hex_esdt_safe_address = Address::new(hex_esdt_safe);
+    let esdt_safe_managed_address: ManagedAddress<DebugApi> =
+        ManagedAddress::from(hex_esdt_safe_address);
+    push!(to_check, esdt_safe_managed_address, "\"esdt-safe_____________\" - (32) 0x00000000000000000500657364742d736166655f5f5f5f5f5f5f5f5f5f5f5f5f");
+
     let test_token_identifier: TestTokenIdentifier = TestTokenIdentifier::new("TEST-123456");
     push!(to_check, test_token_identifier, "\"str:TEST-123456\"");
 
