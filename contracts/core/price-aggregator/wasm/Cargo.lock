@@ -22,9 +22,9 @@ checksum = "8f68f53c83ab957f72c32642f3868eec03eb974d1fb82e453128456482613d36"
 
 [[package]]
 name = "bumpalo"
-version = "3.16.0"
+version = "3.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
+checksum = "1628fb46dfa0b37568d12e5edd512553eccf6a22a78e8bde00bb4aed84d5bdbf"
 
 [[package]]
 name = "byteorder"
@@ -93,7 +93,7 @@ checksum = "04cbf5b083de1c7e0222a7a51dbfdba1cbe1c6ab0b15e29fff3f6c077fd9cd9f"
 
 [[package]]
 name = "multiversx-chain-core"
-version = "0.13.0"
+version = "0.13.1"
 dependencies = [
  "bitflags",
  "multiversx-sc-codec",
@@ -101,7 +101,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "arrayvec",
  "getrandom",
@@ -120,7 +120,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -152,7 +152,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -163,14 +163,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "multiversx-sc",
 ]
@@ -195,9 +195,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.20.2"
+version = "1.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
+checksum = "945462a4b81e43c4e3ba96bd7b49d834c6f61198356aa858733bc4acf3cbe62e"
 
 [[package]]
 name = "ppv-lite86"
@@ -285,9 +285,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.14"
+version = "1.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adb9e6ca4f869e1180728b7950e35922a7fc6397f7b641499e8f3ef06e50dc83"
+checksum = "a210d160f08b701c8721ba1c726c11662f877ea6b7094007e1ca9a1041945034"
 
 [[package]]
 name = "unwrap-infallible"
