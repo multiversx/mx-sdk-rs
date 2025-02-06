@@ -32,6 +32,11 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+## [sc 0.56.1, chain 0.13.1] - 2025-02-06
+- Allow setting gas for callback for direct transfers.
+- NestedEncode for interaction types: TestAddress, TestScAddress and TestTokenIdentifier.
+- Bugfix: pretty representation for ManagedAddress when debugging.
+- Upgrade dependency: ruplacer.
 
 ## [sc 0.56.0, chain 0.13.0, sdk 0.8.1] - 2025-01-23
 - Rust VM support for readonly sync calls.
