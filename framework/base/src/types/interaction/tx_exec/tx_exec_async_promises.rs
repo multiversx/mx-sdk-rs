@@ -3,8 +3,8 @@ use crate::{
     contract_base::{ErrorHelper, SendRawWrapper},
     types::{
         interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
-        FunctionCall, ManagedBuffer, OriginalResultMarker, Tx, TxGas, TxGasValue, TxPayment,
-        TxResultHandler, TxScEnv, TxToSpecified,
+        FunctionCall, ManagedBuffer, OriginalResultMarker, Tx, TxData, TxGas, TxGasValue,
+        TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
     },
 };
 
@@ -97,19 +97,18 @@ where
     }
 }
 
-impl<Api, To, Payment, Gas>
-    Tx<TxScEnv<Api>, (), To, Payment, Gas, FunctionCall<Api>, CallbackClosure<Api>>
+impl<Api, To, Payment, Gas, Data> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, CallbackClosure<Api>>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
+    Data: TxData<TxScEnv<Api>>,
 {
     pub fn gas_for_callback(
         self,
         gas: u64,
-    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, FunctionCall<Api>, CallbackClosureWithGas<Api>>
-    {
+    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, CallbackClosureWithGas<Api>> {
         Tx {
             env: self.env,
             from: self.from,
@@ -128,8 +127,7 @@ where
     pub fn with_extra_gas_for_callback(
         self,
         gas: u64,
-    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, FunctionCall<Api>, CallbackClosureWithGas<Api>>
-    {
+    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, CallbackClosureWithGas<Api>> {
         self.gas_for_callback(gas)
     }
 }
