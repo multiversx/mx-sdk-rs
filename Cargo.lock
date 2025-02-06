@@ -3540,9 +3540,9 @@ checksum = "afab94fb28594581f62d981211a9a4d53cc8130bbcbbb89a0440d9b8e81a7746"
 
 [[package]]
 name = "ruplacer"
-version = "0.8.2"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58a26a1b15ff113d31d139357f7422708312978ed69cd5dd47e36d1b80b7eaf3"
+checksum = "5fef5348a445d2e36f8a40e083c3f012646aae7e5a57ad9e1ce4040bcec0d572"
 dependencies = [
  "Inflector",
  "anyhow",
