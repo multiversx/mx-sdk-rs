@@ -2612,7 +2612,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk"
-version = "0.8.1"
+version = "0.8.2"
 dependencies = [
  "aes",
  "anyhow",
@@ -2640,7 +2640,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk-dapp"
-version = "0.8.1"
+version = "0.8.2"
 dependencies = [
  "anyhow",
  "getrandom",
@@ -2657,7 +2657,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk-http"
-version = "0.8.1"
+version = "0.8.2"
 dependencies = [
  "anyhow",
  "hex",
