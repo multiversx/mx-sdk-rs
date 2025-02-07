@@ -2398,7 +2398,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-core"
-version = "0.13.0"
+version = "0.13.1"
 dependencies = [
  "bitflags",
  "multiversx-sc-codec",
@@ -2419,7 +2419,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm"
-version = "0.13.0"
+version = "0.13.1"
 dependencies = [
  "bitflags",
  "colored",
@@ -2445,7 +2445,7 @@ checksum = "51cce7ae386960fbf5e85afe40ca16d63f926f0620ed1a36b019212b28e17219"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "arrayvec",
  "getrandom",
@@ -2466,7 +2466,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -2499,7 +2499,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -2510,7 +2510,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "bip39",
  "clap",
@@ -2535,7 +2535,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta-lib"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "clap",
  "colored",
@@ -2555,14 +2555,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "base64",
  "bech32",
@@ -2586,7 +2586,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "anyhow",
  "base64",
@@ -2605,14 +2605,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sdk"
-version = "0.8.1"
+version = "0.8.2"
 dependencies = [
  "aes",
  "anyhow",
@@ -2640,7 +2640,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk-dapp"
-version = "0.8.1"
+version = "0.8.2"
 dependencies = [
  "anyhow",
  "getrandom",
@@ -2657,7 +2657,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk-http"
-version = "0.8.1"
+version = "0.8.2"
 dependencies = [
  "anyhow",
  "hex",
@@ -2670,7 +2670,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.56.0"
+version = "0.56.1"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
