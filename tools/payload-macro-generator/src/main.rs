@@ -16,8 +16,7 @@ fn main() -> io::Result<()> {
     // Generate add_sub_const_decimals! macro combinations
     for x in MIN..=MAX_X {
         for y in MIN..=MAX_Y {
-            let sum = x + y;
-            writeln!(file, "payload_add!({}usize, {}usize, {}usize);", x, y, sum)?;
+            writeln!(file, "payload_add!({}usize, {}usize);", x, y)?;
         }
     }
 
