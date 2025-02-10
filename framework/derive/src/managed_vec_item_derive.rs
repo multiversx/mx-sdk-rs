@@ -141,7 +141,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
 
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
-            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemNestedTuple>::PAYLOAD;
+            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemStructPlTuple>::StructPayload;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
 

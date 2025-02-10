@@ -174,13 +174,40 @@ macro_rules! payload_add {
     };
 }
 
+pub trait ManagedVecItemPayloadMax<Rhs>: ManagedVecItemPayload
+where
+    Rhs: ManagedVecItemPayload,
+{
+    type Max: ManagedVecItemPayload;
+}
+
+impl<P> ManagedVecItemPayloadMax<ManagedVecItemEmptyPayload> for P
+where
+    P: ManagedVecItemPayload,
+{
+    type Max = Self;
+}
+
+macro_rules! payload_max_first {
+    ($dec1:expr, $dec2:expr) => {
+        impl ManagedVecItemPayloadMax<ManagedVecItemPayloadBuffer<$dec2>>
+            for ManagedVecItemPayloadBuffer<$dec1>
+        {
+            type Max = ManagedVecItemPayloadBuffer<$dec1>;
+        }
+    };
+}
+
 macro_rules! payload_ops {
     ($( ($dec1:expr, $($decn:expr),*) )+) => {
         $(
             payload_add!($dec1, $dec1);
+            payload_max_first!($dec1, $dec1);
+
             $(
                 payload_add!($dec1, $decn);
                 payload_add!($decn, $dec1);
+                payload_max_first!($dec1, $decn);
             )*
         )+
     }
