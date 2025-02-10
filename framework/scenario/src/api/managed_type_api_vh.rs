@@ -94,4 +94,28 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
             )
         });
     }
+
+    fn drop_managed_buffer(&self, handle: Self::ManagedBufferHandle) {
+        self.with_vm_hooks_ctx_1(&handle, |vh| {
+            vh.drop_managed_buffer(handle.get_raw_handle_unchecked())
+        });
+    }
+    fn drop_big_float(&self, handle: Self::BigFloatHandle) {
+        self.with_vm_hooks_ctx_1(&handle, |vh| {
+            vh.drop_big_float(handle.get_raw_handle_unchecked())
+        });
+    }
+    fn drop_big_int(&self, handle: Self::BigIntHandle) {
+        self.with_vm_hooks_ctx_1(&handle, |vh| {
+            vh.drop_big_int(handle.get_raw_handle_unchecked())
+        });
+    }
+    fn drop_elliptic_curve(&self, _handle: Self::EllipticCurveHandle) {
+        // TODO
+    }
+    fn drop_managed_map(&self, handle: Self::ManagedMapHandle) {
+        self.with_vm_hooks_ctx_1(&handle, |vh| {
+            vh.drop_managed_map(handle.get_raw_handle_unchecked())
+        });
+    }
 }

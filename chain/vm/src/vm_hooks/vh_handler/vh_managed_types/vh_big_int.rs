@@ -160,4 +160,8 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
         let result = bi_x.shl(bits);
         self.m_types_lock().bi_overwrite(dest, result);
     }
+
+    fn bi_drop(&self, map_handle: RawHandle) {
+        self.m_types_lock().bi_remove(map_handle);
+    }
 }
