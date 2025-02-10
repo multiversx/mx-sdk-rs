@@ -13,7 +13,7 @@ fn main() -> io::Result<()> {
     let mut file = File::create("output.rs")?;
 
     // Generate add_sub_const_decimals! macro combinations
-    writeln!(file, "payload_ops!{{")?;
+    writeln!(file, "payload_ops! {{")?;
 
     for dec1 in MIN..=MAX {
         write!(file, "    ({dec1}usize")?;

@@ -186,7 +186,7 @@ macro_rules! payload_ops {
     }
 }
 
-payload_ops!{
+payload_ops! {
     (1usize,)
     (2usize, 1usize)
     (3usize, 2usize, 1usize)
