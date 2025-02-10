@@ -1,11 +1,12 @@
 use std::fs::File;
 
-use multiversx_sc::abi::ContractAbi;
-
 use crate::cli::GenerateSnippetsArgs;
 
 use super::{
     super::meta_config::MetaConfig,
+    snippet_abi_check::{
+        add_new_endpoints_to_file, check_abi_differences, create_prev_abi_file, ShortContractAbi,
+    },
     snippet_crate_gen::{
         create_and_get_lib_file, create_config_rust_file, create_config_toml_file,
         create_main_file, create_sc_config_file, create_snippets_cargo_toml,
@@ -26,18 +27,31 @@ impl MetaConfig {
     pub fn generate_rust_snippets(&self, args: &GenerateSnippetsArgs) {
         let main_contract = self.sc_config.main_contract();
         let crate_name = &main_contract.contract_name.replace("-", "_");
-        let mut file =
-            create_snippets_crate_and_get_lib_file(&self.snippets_dir, crate_name, args.overwrite);
-        write_snippets_to_file(&mut file, &self.original_contract_abi, crate_name);
-        let mut config_file = create_config_and_get_file(&self.snippets_dir);
-        write_config_to_file(&mut config_file);
-        let (mut interactor_test_file, mut chain_sim_test_file) =
-            create_test_folder_and_get_files(&self.snippets_dir);
-        write_tests_to_files(
-            &mut interactor_test_file,
-            &mut chain_sim_test_file,
-            crate_name,
-        );
+        let original_contract_abi = ShortContractAbi::from(self.original_contract_abi.clone());
+        let diff_abi =
+            check_abi_differences(&original_contract_abi, &self.snippets_dir, args.overwrite);
+        if &diff_abi == &original_contract_abi {
+            let mut file = create_snippets_crate_and_get_lib_file(
+                &self.snippets_dir,
+                crate_name,
+                args.overwrite,
+            );
+            write_snippets_to_file(&mut file, &original_contract_abi, crate_name);
+            let mut config_file = create_config_and_get_file(&self.snippets_dir);
+            write_config_to_file(&mut config_file);
+            let (mut interactor_test_file, mut chain_sim_test_file) =
+                create_test_folder_and_get_files(&self.snippets_dir);
+            write_tests_to_files(
+                &mut interactor_test_file,
+                &mut chain_sim_test_file,
+                crate_name,
+            );
+        } else {
+            add_new_endpoints_to_file(&self.snippets_dir, &diff_abi);
+        }
+
+        // create prev-abi.json file
+        create_prev_abi_file(&self.snippets_dir, &self.original_contract_abi);
     }
 }
 
@@ -62,7 +76,7 @@ fn create_config_and_get_file(snippets_folder_path: &str) -> File {
     create_config_rust_file(snippets_folder_path)
 }
 
-fn write_snippets_to_file(file: &mut File, abi: &ContractAbi, crate_name: &str) {
+fn write_snippets_to_file(file: &mut File, abi: &ShortContractAbi, crate_name: &str) {
     write_snippet_imports(file);
     write_snippet_constants(file);
     write_snippet_main_function(file, abi, crate_name);

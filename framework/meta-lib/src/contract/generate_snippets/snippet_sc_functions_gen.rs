@@ -1,12 +1,19 @@
 use std::{fs::File, io::Write};
 
-use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi};
+use multiversx_sc::abi::{EndpointAbi, EndpointMutabilityAbi, InputAbi};
 
-use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to_rust_type};
+use super::{
+    snippet_abi_check::ShortContractAbi, snippet_gen_common::write_newline,
+    snippet_type_map::map_abi_type_to_rust_type,
+};
 
-const DEFAULT_GAS: &str = "30_000_000u64";
+pub(crate) const DEFAULT_GAS: &str = "30_000_000u64";
 
-pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, crate_name: &str) {
+pub(crate) fn write_interact_struct_impl(
+    file: &mut File,
+    abi: &ShortContractAbi,
+    crate_name: &str,
+) {
     let crate_path = crate_name.replace("_", "-");
     let wasm_output_file_path_expr = format!("\"mxsc:../output/{crate_path}.mxsc.json\"");
 
@@ -55,7 +62,7 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
     writeln!(file, "}}").unwrap();
 }
 
-fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &String) {
+pub(crate) fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &String) {
     write_method_declaration(file, "deploy");
     write_endpoint_args_declaration(file, &init_abi.inputs);
     let proxy_name = format!("{}Proxy", name);
@@ -88,7 +95,11 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
     write_newline(file);
 }
 
-fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name: &String) {
+pub(crate) fn write_upgrade_endpoint_impl(
+    file: &mut File,
+    upgrade_abi: &EndpointAbi,
+    name: &String,
+) {
     write_method_declaration(file, "upgrade");
     write_endpoint_args_declaration(file, &upgrade_abi.inputs);
     let proxy_name = format!("{}Proxy", name);
@@ -120,7 +131,7 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
     write_newline(file);
 }
 
-fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi, name: &String) {
+pub(crate) fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi, name: &String) {
     write_method_declaration(file, &endpoint_abi.rust_method_name);
     write_payments_declaration(file, &endpoint_abi.payable_in_tokens);
     write_endpoint_args_declaration(file, &endpoint_abi.inputs);
@@ -135,11 +146,11 @@ fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
     write_newline(file);
 }
 
-fn write_method_declaration(file: &mut File, endpoint_name: &str) {
+pub(crate) fn write_method_declaration(file: &mut File, endpoint_name: &str) {
     writeln!(file, "    pub async fn {endpoint_name}(&mut self) {{").unwrap();
 }
 
-fn write_payments_declaration(file: &mut File, accepted_tokens: &[String]) {
+pub(crate) fn write_payments_declaration(file: &mut File, accepted_tokens: &[String]) {
     if accepted_tokens.is_empty() {
         return;
     }
@@ -187,7 +198,7 @@ fn write_endpoint_args_declaration(file: &mut File, inputs: &[InputAbi]) {
     write_newline(file);
 }
 
-fn endpoint_args_when_called(inputs: &[InputAbi]) -> String {
+pub(crate) fn endpoint_args_when_called(inputs: &[InputAbi]) -> String {
     let mut result = String::new();
     for input in inputs {
         if !result.is_empty() {

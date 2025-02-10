@@ -1,8 +1,9 @@
 use alloc::string::{String, ToString};
+use serde::Deserialize;
 
 use super::{TypeAbi, TypeDescriptionContainerImpl, TypeName};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Deserialize)]
 pub struct EsdtAttributeAbi {
     pub ticker: String,
     pub ty: TypeName,
