@@ -104,7 +104,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
 
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
-            type PAYLOAD = multiversx_sc::types::ManagedVecItemPayloadBuffer<1>;
+            type PAYLOAD = multiversx_sc::types::ManagedVecItemPayloadBuffer1;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
 

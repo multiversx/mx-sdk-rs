@@ -1,5 +1,9 @@
 use core::borrow::Borrow;
 
+use generic_array::{
+    typenum::{U1, U2, U4, U8},
+    GenericArray,
+};
 use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
 use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 
@@ -96,35 +100,35 @@ pub unsafe fn managed_vec_item_save_to_payload_index<T, P>(
 }
 
 macro_rules! impl_int {
-    ($ty:ident, $payload_size:expr) => {
+    ($ty:ident, $payload_size:ident) => {
         impl ManagedVecItem for $ty {
             type PAYLOAD = ManagedVecItemPayloadBuffer<$payload_size>;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
 
             fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-                $ty::from_be_bytes(payload.buffer)
+                $ty::from_be_bytes(payload.buffer.into_array())
             }
 
             unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-                $ty::from_be_bytes(payload.buffer)
+                $ty::from_be_bytes(payload.buffer.into_array())
             }
 
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
-                payload.buffer = self.to_be_bytes();
+                payload.buffer = GenericArray::from_array(self.to_be_bytes());
             }
         }
     };
 }
-impl_int! {u8, 1}
-impl_int! {u16, 2}
-impl_int! {u32, 4}
-impl_int! {u64, 8}
-impl_int! {i32, 4}
-impl_int! {i64, 8}
+impl_int! {u8,  U1}
+impl_int! {u16, U2}
+impl_int! {u32, U4}
+impl_int! {u64, U8}
+impl_int! {i32, U4}
+impl_int! {i64, U8}
 
 impl ManagedVecItem for usize {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>;
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
@@ -142,7 +146,7 @@ impl ManagedVecItem for usize {
 }
 
 impl ManagedVecItem for bool {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U1>;
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
@@ -163,15 +167,16 @@ impl ManagedVecItem for bool {
 
 impl<T> ManagedVecItem for Option<T>
 where
-    ManagedVecItemPayloadBuffer<1>: ManagedVecItemPayloadAdd<T::PAYLOAD>,
+    ManagedVecItemPayloadBuffer<U1>: ManagedVecItemPayloadAdd<T::PAYLOAD>,
     T: ManagedVecItem,
 {
-    type PAYLOAD = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
+    type PAYLOAD =
+        <ManagedVecItemPayloadBuffer<U1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedVecRef<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        let (p1, p2) = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<
+        let (p1, p2) = <ManagedVecItemPayloadBuffer<U1> as ManagedVecItemPayloadAdd<
             T::PAYLOAD,
         >>::split_from_add(payload);
 
@@ -188,7 +193,7 @@ where
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
-        let (p1, p2) = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<
+        let (p1, p2) = <ManagedVecItemPayloadBuffer<U1> as ManagedVecItemPayloadAdd<
             T::PAYLOAD,
         >>::split_mut_from_add(payload);
 
@@ -202,7 +207,7 @@ where
 macro_rules! impl_managed_type {
     ($ty:ident) => {
         impl<M: ManagedTypeApi> ManagedVecItem for $ty<M> {
-            type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
+            type PAYLOAD = ManagedVecItemPayloadBuffer<U4>;
             const SKIPS_RESERIALIZATION: bool = false;
             type Ref<'a> = ManagedRef<'a, M, Self>;
 
@@ -236,7 +241,7 @@ impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
@@ -261,7 +266,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
@@ -282,7 +287,7 @@ where
 }
 
 impl ManagedVecItem for EsdtTokenType {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U1>;
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
@@ -300,7 +305,7 @@ impl ManagedVecItem for EsdtTokenType {
 }
 
 impl ManagedVecItem for EsdtLocalRole {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<2>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U2>;
     const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
     type Ref<'a> = Self;
 
