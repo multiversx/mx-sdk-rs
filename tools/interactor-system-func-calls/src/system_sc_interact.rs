@@ -467,7 +467,10 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    pub async fn get_roles(&mut self, token_id: &[u8]) {
+    pub async fn get_roles(
+        &mut self,
+        token_id: &[u8],
+    ) -> MultiValueEncoded<StaticApi, SpecialRolesForAddress<StaticApi>> {
         println!("Retrieving special roles for {token_id:?}");
 
         let result = self
@@ -478,11 +481,13 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .get_special_roles(TokenIdentifier::from(token_id))
-            .returns(ReturnsRawResult)
+            .returns(ReturnsResult)
             .run()
             .await;
 
-        println!("raw result for roles {result:?}");
+        // println!("raw result for roles {:?}", result.clone());
+
+        result
     }
 
     pub async fn change_to_dynamic(&mut self, token_id: &[u8]) {
