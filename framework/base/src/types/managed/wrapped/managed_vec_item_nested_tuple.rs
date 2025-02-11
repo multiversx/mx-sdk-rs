@@ -1,3 +1,5 @@
+use generic_array::typenum::U1;
+
 use super::{
     ManagedVecItem, ManagedVecItemEmptyPayload, ManagedVecItemPayload, ManagedVecItemPayloadAdd,
     ManagedVecItemPayloadBuffer, ManagedVecItemPayloadMax,
@@ -20,7 +22,7 @@ impl ManagedVecItemStructPlTuple for () {
 
 /// End of the list.
 impl ManagedVecItemEnumPlTuple for () {
-    type EnumPayload = ManagedVecItemPayloadBuffer<1usize>; // for the discriminant
+    type EnumPayload = ManagedVecItemPayloadBuffer<U1>; // for the discriminant
 }
 
 impl<Head, Tail> ManagedVecItemStructPlTuple for (Head, Tail)
@@ -36,12 +38,12 @@ impl<Head, Tail> ManagedVecItemEnumPlTuple for (Head, Tail)
 where
     Head: ManagedVecItem,
     Tail: ManagedVecItemStructPlTuple,
-    Head::PAYLOAD: ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<1usize>>,
-    <Head::PAYLOAD as ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<1usize>>>::Output:
+    Head::PAYLOAD: ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<U1>>,
+    <Head::PAYLOAD as ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<U1>>>::Output:
         ManagedVecItemPayloadMax<Tail::StructPayload>,
 {
     type EnumPayload = <<Head::PAYLOAD as ManagedVecItemPayloadAdd<
-        ManagedVecItemPayloadBuffer<1usize>,
+        ManagedVecItemPayloadBuffer<U1>,
     >>::Output as ManagedVecItemPayloadMax<Tail::StructPayload>>::Max;
 }
 
