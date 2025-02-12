@@ -20,6 +20,11 @@ fn payable_all_transfers_go() {
 }
 
 #[test]
+fn payable_all_transfers_2_go() {
+    world().run("scenarios/payable_all_transfers_2.scen.json");
+}
+
+#[test]
 fn payable_any_1_go() {
     world().run("scenarios/payable_any_1.scen.json");
 }
