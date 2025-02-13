@@ -72,7 +72,7 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.adder_owner_address.clone())
-            .gas(6_000_000)
+            .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u64)
             .code(ADDER_CODE_PATH)
@@ -122,6 +122,22 @@ impl AdderInteract {
             .await;
 
         println!("Successfully performed add");
+    }
+
+    pub async fn get_addresses_with_transfer_role(&mut self, token_id: &str) {
+        let result = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_adder_address())
+            .gas(50_000_000u64)
+            .typed(adder_proxy::AdderProxy)
+            .get_addresses_with_transfer_role(TokenIdentifier::from_esdt_bytes(token_id))
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        println!("result is {:?}", result);
     }
 
     pub async fn get_sum(&mut self) -> RustBigUint {

@@ -121,3 +121,16 @@ async fn set_state_from_file_cs_test() {
 
     println!("mike's storage keys in chain simulator {:#?}", storage);
 }
+
+// TEST-498800
+#[tokio::test]
+#[serial]
+async fn roles_for_token_test() {
+    let mut real_chain_interact = AdderInteract::new(Config::load_config()).await;
+
+    real_chain_interact.deploy().await;
+
+    real_chain_interact
+        .get_addresses_with_transfer_role("TEST-498800")
+        .await;
+}

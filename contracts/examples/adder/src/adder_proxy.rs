@@ -98,6 +98,19 @@ where
             .original_result()
     }
 
+    pub fn get_addresses_with_transfer_role<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+    >(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_addresses_with_transfer_role")
+            .argument(&token_id)
+            .original_result()
+    }
+
     /// Add desired amount to the storage variable. 
     pub fn add<
         Arg0: ProxyArg<BigUint<Env::Api>>,
