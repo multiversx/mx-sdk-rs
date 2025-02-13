@@ -84,10 +84,10 @@ fn v_0_39_replace_in_files(sc_crate_path: &Path) {
         sc_crate_path,
         "*Cargo.toml",
         &[
-            Query::substring("elrond-wasm-debug", "multiversx-sc-scenario"),
-            Query::substring("elrond-wasm-modules", "multiversx-sc-modules"),
-            Query::substring("elrond-wasm-node", "multiversx-sc-wasm-adapter"),
-            Query::substring("elrond-wasm", "multiversx-sc"),
+            Query::simple("elrond-wasm-debug", "multiversx-sc-scenario"),
+            Query::simple("elrond-wasm-modules", "multiversx-sc-modules"),
+            Query::simple("elrond-wasm-node", "multiversx-sc-wasm-adapter"),
+            Query::simple("elrond-wasm", "multiversx-sc"),
         ][..],
     );
 
@@ -95,27 +95,27 @@ fn v_0_39_replace_in_files(sc_crate_path: &Path) {
         sc_crate_path,
         "*rs",
         &[
-            Query::substring("elrond_codec", "codec"),
-            Query::substring(
+            Query::simple("elrond_codec", "codec"),
+            Query::simple(
                 "elrond_wasm_debug::meta::perform",
                 "multiversx_sc_meta::cli_main",
             ),
-            Query::substring(
+            Query::simple(
                 "elrond_wasm_debug::mandos_go",
                 "multiversx_sc_scenario::run_go",
             ),
-            Query::substring(
+            Query::simple(
                 "elrond_wasm_debug::mandos_rs",
                 "multiversx_sc_scenario::run_rs",
             ),
-            Query::substring("elrond_wasm_debug", "multiversx_sc_scenario"),
-            Query::substring("elrond_wasm_modules", "multiversx_sc_modules"),
-            Query::substring("elrond_wasm_node", "multiversx_sc_wasm_adapter"),
-            Query::substring("elrond_wasm", "multiversx_sc"),
-            Query::substring("BlockchainMock", "ScenarioWorld"),
-            Query::substring("testing_framework", "whitebox"),
-            Query::substring("tx_mock", "whitebox"),
-            Query::substring("register_contract_builder", "register_contract"),
+            Query::simple("elrond_wasm_debug", "multiversx_sc_scenario"),
+            Query::simple("elrond_wasm_modules", "multiversx_sc_modules"),
+            Query::simple("elrond_wasm_node", "multiversx_sc_wasm_adapter"),
+            Query::simple("elrond_wasm", "multiversx_sc"),
+            Query::simple("BlockchainMock", "ScenarioWorld"),
+            Query::simple("testing_framework", "whitebox"),
+            Query::simple("tx_mock", "whitebox"),
+            Query::simple("register_contract_builder", "register_contract"),
         ][..],
     );
 }

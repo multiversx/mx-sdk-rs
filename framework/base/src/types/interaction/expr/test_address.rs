@@ -1,6 +1,8 @@
 use core::ptr;
 
-use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{
+    EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
+};
 
 use crate::{
     abi::TypeAbiFrom,
@@ -122,6 +124,17 @@ impl TopEncode for TestAddress<'_> {
         H: EncodeErrorHandler,
     {
         self.eval_to_array().top_encode_or_handle_err(output, h)
+    }
+}
+
+impl NestedEncode for TestAddress<'_> {
+    #[inline]
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.eval_to_array().dep_encode_or_handle_err(dest, h)
     }
 }
 

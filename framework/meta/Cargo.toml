@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.56.0"
+version = "0.56.1"
 edition = "2021"
 
 authors = [
@@ -34,7 +34,7 @@ toml = { version = "0.8.6", features = ["preserve_order"] }
 colored = "2.2"
 convert_case = "0.7.1"
 semver = "1.0.20"
-ruplacer = { version = "0.8.1", default-features = false }
+ruplacer = { version = "0.10.0", default-features = false }
 reqwest = { version = "0.12", features = ["blocking", "json"] }
 zip = { version = "2.1", features = ["deflate"], default-features = false }
 copy_dir = "0.1.2"
@@ -45,14 +45,14 @@ bip39 = "2.0.0"
 home = "=0.5.9"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.56.0"
+version = "=0.56.1"
 path = "../meta-lib"
 
 [dependencies.multiversx-sc]
-version = "=0.56.0"
+version = "=0.56.1"
 path = "../base"
 features = ["alloc", "num-bigint"]
 
 [dependencies.multiversx-sc-snippets]
-version = "=0.56.0"
+version = "=0.56.1"
 path = "../snippets"

@@ -3,7 +3,7 @@ use crate::folder_structure::RelevantDirectory;
 use ruplacer::Query;
 use std::path::Path;
 
-/// Migrate `0.30` to `0.31.0`, including the version bump.
+/// Migrate `0.31` to `0.32.0`, including the version bump.
 pub fn upgrade_to_32_0(dir: &RelevantDirectory) {
     v_0_32_replace_in_files(dir.path.as_ref());
 
@@ -15,7 +15,7 @@ fn v_0_32_replace_in_files(sc_crate_path: &Path) {
     replace_in_files(
         sc_crate_path,
         "*rs",
-        &[Query::substring(
+        &[Query::simple(
             "TokenIdentifier::egld()",
             "EgldOrEsdtTokenIdentifier::egld()",
         )][..],

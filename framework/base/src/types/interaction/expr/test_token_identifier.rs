@@ -1,4 +1,6 @@
-use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{
+    EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
+};
 
 use crate::{
     abi::TypeAbiFrom,
@@ -71,6 +73,17 @@ impl TopEncode for TestTokenIdentifier<'_> {
         H: EncodeErrorHandler,
     {
         self.name.top_encode_or_handle_err(output, h)
+    }
+}
+
+impl NestedEncode for TestTokenIdentifier<'_> {
+    #[inline]
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.name.dep_encode_or_handle_err(dest, h)
     }
 }
 
