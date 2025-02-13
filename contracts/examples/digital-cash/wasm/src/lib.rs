@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           12
+// Endpoints:                           11
 // Async Callback (empty):               1
-// Total number of exported functions:  14
+// Total number of exported functions:  13
 
 #![no_std]
 
@@ -22,8 +22,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         blacklistFeeToken => blacklist_fee_token
         claimFees => claim_fees
         getAmount => get_amount
-        payFeeAndFundESDT => pay_fee_and_fund_esdt
-        payFeeAndFundEGLD => pay_fee_and_fund_egld
+        payFeeAndFund => pay_fee_and_fund
         fund => fund
         depositFees => deposit_fees
         withdraw => withdraw
