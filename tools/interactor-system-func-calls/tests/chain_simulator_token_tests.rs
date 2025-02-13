@@ -291,14 +291,36 @@ async fn transfer_role() {
         )
         .await;
 
+    // issue all roles
+    // let dynamic_nft_token_id = interact
+    //     .issue_token_all_roles(
+    //         RustBigUint::from(ISSUE_COST),
+    //         b"TESTNFT",
+    //         b"TEST",
+    //         0usize,
+    //         EsdtTokenType::DynamicNFT,
+    //     )
+    //     .await;
+
     // set roles
     interact
         .set_roles(
             dynamic_nft_token_id.as_bytes(),
-            vec![EsdtLocalRole::Transfer],
+            vec![EsdtLocalRole::Transfer, EsdtLocalRole::ModifyRoyalties],
+        )
+        .await;
+
+    // set roles for other address
+    interact
+        .set_roles_for_other(
+            dynamic_nft_token_id.as_bytes(),
+            vec![EsdtLocalRole::NftCreate, EsdtLocalRole::ModifyCreator],
         )
         .await;
 
     // get roles
-    interact.get_roles(dynamic_nft_token_id.as_bytes()).await;
+    let roles_vec = interact.get_roles(dynamic_nft_token_id.as_bytes()).await;
+    for role in roles_vec {
+        println!("address: {:?} roles: {:?}", role.address, role.roles);
+    }
 }

@@ -8,6 +8,7 @@ mod egld_or_multi_esdt_payment;
 mod encoded_managed_vec_item;
 mod esdt_token_data;
 mod esdt_token_payment;
+mod local_role_entry;
 mod managed_address;
 mod managed_buffer_read_to_end;
 mod managed_byte_array;
@@ -40,6 +41,7 @@ pub use egld_or_multi_esdt_payment::{EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaym
 pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPayment};
+pub use local_role_entry::*;
 pub use managed_address::ManagedAddress;
 pub use managed_buffer_read_to_end::*;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
