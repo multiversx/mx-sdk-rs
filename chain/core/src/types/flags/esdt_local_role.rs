@@ -18,8 +18,11 @@ const ESDT_ROLE_MODIFY_CREATOR: &str = "ESDTRoleModifyCreator";
 const ESDT_ROLE_NFT_RECREATE: &str = "ESDTRoleNFTRecreate";
 const ESDT_ROLE_TRANSFER: &str = "ESDTTransferRole";
 
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
+#[derive(
+    TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy, Default,
+)]
 pub enum EsdtLocalRole {
+    #[default]
     None,
     Mint,
     Burn,

@@ -4,9 +4,8 @@ use crate::{
     api::CallTypeApi,
     types::{
         BigUint, EgldPayment, EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress,
-        ManagedBuffer, MultiValueEncoded, NotPayable, OriginalResultMarker, ProxyArg,
-        SpecialRolesForAddress, SpecialRolesResult, TokenIdentifier, Tx, TxEnv, TxFrom, TxGas,
-        TxProxyTrait, TxTo, TxTypedCall,
+        ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, SpecialRolesResult,
+        TokenIdentifier, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
     },
 };
 
