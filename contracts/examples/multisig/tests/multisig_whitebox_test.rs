@@ -627,11 +627,7 @@ fn test_deploy_and_upgrade_from_source() {
     const ADDER_PATH_EXPR: MxscPath = MxscPath::new("mxsc:test-contracts/adder.mxsc.json");
 
     world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
-    world.set_state_step(SetStateStep::new().new_address(
-        MULTISIG_ADDRESS.eval_to_expr().as_str(),
-        0,
-        NEW_ADDER_ADDRESS.eval_to_expr().as_str(),
-    ));
+    world.new_address(MULTISIG_ADDRESS, 0, NEW_ADDER_ADDRESS);
 
     world.account(ADDER_OWNER_ADDRESS).nonce(1);
 
