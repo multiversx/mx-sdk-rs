@@ -16,6 +16,8 @@ bitflags! {
         const MODIFY_CREATOR        = 0b00000001_00000000;
         const MODIFY_ROYALTIES      = 0b00000010_00000000;
         const SET_NEW_URI           = 0b00000100_00000000;
+        //TODO: check this flag after barnard
+        const TRANSFER              = 0b00001000_00000000;
     }
 }
 
