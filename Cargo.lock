@@ -16,9 +16,9 @@ dependencies = [
 name = "abi-tester"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-meta-lib",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -26,15 +26,15 @@ name = "abi-tester-meta"
 version = "0.0.0"
 dependencies = [
  "abi-tester",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "adder"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -42,7 +42,7 @@ name = "adder-meta"
 version = "0.0.0"
 dependencies = [
  "adder",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -85,8 +85,8 @@ name = "alloc-features"
 version = "0.0.0"
 dependencies = [
  "esdt-system-sc-mock",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -94,7 +94,7 @@ name = "alloc-features-meta"
 version = "0.0.0"
 dependencies = [
  "alloc-features",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -218,9 +218,9 @@ name = "basic-features"
 version = "0.0.0"
 dependencies = [
  "esdt-system-sc-mock",
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -240,7 +240,7 @@ name = "basic-features-meta"
 version = "0.0.0"
 dependencies = [
  "basic-features",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -266,8 +266,8 @@ checksum = "d965446196e3b7decd44aa7ee49e31d630118f90ef12f97900f262eb915c951d"
 name = "benchmark-common"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -275,8 +275,8 @@ name = "big-float-features"
 version = "0.0.0"
 dependencies = [
  "esdt-system-sc-mock",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -284,7 +284,7 @@ name = "big-float-features-meta"
 version = "0.0.0"
 dependencies = [
  "big-float-features",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -344,9 +344,9 @@ dependencies = [
 name = "bonding-curve-contract"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -354,7 +354,7 @@ name = "bonding-curve-contract-meta"
 version = "0.0.0"
 dependencies = [
  "bonding-curve-contract",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -377,8 +377,8 @@ dependencies = [
 name = "builtin-func-features"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -386,7 +386,7 @@ name = "builtin-func-features-meta"
 version = "0.0.0"
 dependencies = [
  "builtin-func-features",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -432,9 +432,9 @@ checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 name = "check-pause"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
  "num-bigint",
 ]
 
@@ -443,15 +443,15 @@ name = "check-pause-meta"
 version = "0.0.0"
 dependencies = [
  "check-pause",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "child"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -459,8 +459,8 @@ name = "child-meta"
 version = "0.0.0"
 dependencies = [
  "child",
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -544,8 +544,8 @@ dependencies = [
  "forwarder-legacy",
  "forwarder-queue",
  "forwarder-raw",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "promises-features",
  "proxy-test-first",
  "proxy-test-second",
@@ -661,8 +661,8 @@ name = "crowdfunding-erc20"
 version = "0.0.0"
 dependencies = [
  "erc20",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -670,7 +670,7 @@ name = "crowdfunding-erc20-meta"
 version = "0.0.0"
 dependencies = [
  "crowdfunding-erc20",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -678,8 +678,8 @@ name = "crowdfunding-esdt"
 version = "0.0.0"
 dependencies = [
  "hex",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-sc-scenario 0.56.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-bigint",
  "num-traits",
 ]
@@ -689,15 +689,15 @@ name = "crowdfunding-esdt-meta"
 version = "0.0.0"
 dependencies = [
  "crowdfunding-esdt",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "crypto-bubbles"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -705,7 +705,7 @@ name = "crypto-bubbles-meta"
 version = "0.0.0"
 dependencies = [
  "crypto-bubbles",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -722,8 +722,8 @@ dependencies = [
 name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -731,7 +731,7 @@ name = "crypto-zombies-meta"
 version = "0.0.0"
 dependencies = [
  "crypto-zombies",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -806,8 +806,8 @@ dependencies = [
 name = "digital-cash"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -815,7 +815,7 @@ name = "digital-cash-meta"
 version = "0.0.0"
 dependencies = [
  "digital-cash",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -863,8 +863,8 @@ checksum = "60b1af1c220855b6ceac025d3f6ecdd2b7c4894bfe9cd9bda4fbb4bc7c0d4cf0"
 name = "empty"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "num-bigint",
 ]
 
@@ -873,7 +873,7 @@ name = "empty-meta"
 version = "0.0.0"
 dependencies = [
  "empty",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -925,8 +925,8 @@ name = "erc1155"
 version = "0.0.0"
 dependencies = [
  "erc1155-user-mock",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -934,8 +934,8 @@ name = "erc1155-marketplace"
 version = "0.0.0"
 dependencies = [
  "erc1155",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -943,7 +943,7 @@ name = "erc1155-marketplace-meta"
 version = "0.0.0"
 dependencies = [
  "erc1155-marketplace",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -951,15 +951,15 @@ name = "erc1155-meta"
 version = "0.0.0"
 dependencies = [
  "erc1155",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "erc1155-user-mock"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -967,15 +967,15 @@ name = "erc1155-user-mock-meta"
 version = "0.0.0"
 dependencies = [
  "erc1155-user-mock",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "erc20"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -983,15 +983,15 @@ name = "erc20-meta"
 version = "0.0.0"
 dependencies = [
  "erc20",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "erc721"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -999,7 +999,7 @@ name = "erc721-meta"
 version = "0.0.0"
 dependencies = [
  "erc721",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -1017,8 +1017,8 @@ name = "esdt-contract-pair"
 version = "0.0.0"
 dependencies = [
  "first-contract",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "second-contract",
 ]
 
@@ -1026,8 +1026,8 @@ dependencies = [
 name = "esdt-system-sc-mock"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1035,15 +1035,15 @@ name = "esdt-system-sc-mock-meta"
 version = "0.0.0"
 dependencies = [
  "esdt-system-sc-mock",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "esdt-transfer-with-fee"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1051,15 +1051,15 @@ name = "esdt-transfer-with-fee-meta"
 version = "0.0.0"
 dependencies = [
  "esdt-transfer-with-fee",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "exchange-features"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1067,15 +1067,15 @@ name = "exchange-features-meta"
 version = "0.0.0"
 dependencies = [
  "exchange-features",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "factorial"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1083,14 +1083,14 @@ name = "factorial-meta"
 version = "0.0.0"
 dependencies = [
  "factorial",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "factory-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "order-book-factory",
 ]
 
@@ -1110,8 +1110,8 @@ checksum = "28dea519a9695b9977216879a3ebfddf92f1c08c05d984f8996aecd6ecdc811d"
 name = "first-contract"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1119,8 +1119,8 @@ name = "first-contract-meta"
 version = "0.0.0"
 dependencies = [
  "first-contract",
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -1173,8 +1173,8 @@ dependencies = [
 name = "formatted-message-features"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1182,15 +1182,15 @@ name = "formatted-message-features-meta"
 version = "0.0.0"
 dependencies = [
  "formatted-message-features",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "forwarder"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1199,7 +1199,7 @@ version = "0.0.0"
 dependencies = [
  "clap",
  "forwarder",
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-snippets",
  "serde",
  "toml",
@@ -1209,8 +1209,8 @@ dependencies = [
 name = "forwarder-legacy"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "vault",
 ]
 
@@ -1219,7 +1219,7 @@ name = "forwarder-legacy-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder-legacy",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -1227,15 +1227,15 @@ name = "forwarder-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "forwarder-queue"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "multiversx-sc-wasm-adapter",
 ]
 
@@ -1244,15 +1244,15 @@ name = "forwarder-queue-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder-queue",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "forwarder-raw"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1260,16 +1260,16 @@ name = "forwarder-raw-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder-raw",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "fractional-nfts"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -1277,7 +1277,7 @@ name = "fractional-nfts-meta"
 version = "0.0.0"
 dependencies = [
  "fractional-nfts",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2026,7 +2026,7 @@ name = "interact"
 version = "0.0.0"
 dependencies = [
  "clap",
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-snippets",
  "serde",
  "tokio",
@@ -2083,7 +2083,7 @@ dependencies = [
 name = "kitty"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "random",
 ]
 
@@ -2093,8 +2093,8 @@ version = "0.0.0"
 dependencies = [
  "kitty",
  "kitty-ownership",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2102,7 +2102,7 @@ name = "kitty-auction-meta"
 version = "0.0.0"
 dependencies = [
  "kitty-auction",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2110,8 +2110,8 @@ name = "kitty-genetic-alg"
 version = "0.0.0"
 dependencies = [
  "kitty",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "random",
 ]
 
@@ -2120,7 +2120,7 @@ name = "kitty-genetic-alg-meta"
 version = "0.0.0"
 dependencies = [
  "kitty-genetic-alg",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2129,8 +2129,8 @@ version = "0.0.0"
 dependencies = [
  "kitty",
  "kitty-genetic-alg",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "random",
 ]
 
@@ -2139,15 +2139,15 @@ name = "kitty-ownership-meta"
 version = "0.0.0"
 dependencies = [
  "kitty-ownership",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "large-storage"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2155,7 +2155,7 @@ name = "large-storage-meta"
 version = "0.0.0"
 dependencies = [
  "large-storage",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2181,8 +2181,8 @@ name = "linked-list-repeat"
 version = "0.0.0"
 dependencies = [
  "benchmark-common",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2190,7 +2190,7 @@ name = "linked-list-repeat-meta"
 version = "0.0.0"
 dependencies = [
  "linked-list-repeat",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2209,8 +2209,8 @@ checksum = "4ee93343901ab17bd981295f2cf0026d4ad018c7c31ba84549a4ddbb47a45104"
 name = "local-esdt-and-nft"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2218,7 +2218,7 @@ name = "local-esdt-and-nft-meta"
 version = "0.0.0"
 dependencies = [
  "local-esdt-and-nft",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2248,8 +2248,8 @@ name = "lottery-erc20"
 version = "0.0.0"
 dependencies = [
  "erc20",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2257,15 +2257,15 @@ name = "lottery-erc20-meta"
 version = "0.0.0"
 dependencies = [
  "lottery-erc20",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
 name = "lottery-esdt"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2273,7 +2273,7 @@ name = "lottery-esdt-meta"
 version = "0.0.0"
 dependencies = [
  "lottery-esdt",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2281,8 +2281,8 @@ name = "managed-map-features"
 version = "0.0.0"
 dependencies = [
  "esdt-system-sc-mock",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2290,7 +2290,7 @@ name = "managed-map-features-meta"
 version = "0.0.0"
 dependencies = [
  "managed-map-features",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2298,8 +2298,8 @@ name = "map-repeat"
 version = "0.0.0"
 dependencies = [
  "benchmark-common",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2307,7 +2307,7 @@ name = "map-repeat-meta"
 version = "0.0.0"
 dependencies = [
  "map-repeat",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2346,8 +2346,8 @@ dependencies = [
 name = "multi-contract-features"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -2355,7 +2355,7 @@ name = "multi-contract-features-meta"
 version = "0.0.0"
 dependencies = [
  "multi-contract-features",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2365,9 +2365,9 @@ dependencies = [
  "adder",
  "factorial",
  "hex",
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
  "multiversx-wegld-swap-sc",
  "num-bigint",
  "num-traits",
@@ -2379,9 +2379,9 @@ version = "0.0.0"
 dependencies = [
  "clap",
  "multisig",
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
  "multiversx-sc-snippets",
  "serde",
  "tokio",
@@ -2393,7 +2393,7 @@ name = "multisig-meta"
 version = "0.0.0"
 dependencies = [
  "multisig",
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2401,12 +2401,37 @@ name = "multiversx-chain-core"
 version = "0.13.1"
 dependencies = [
  "bitflags",
- "multiversx-sc-codec",
+ "multiversx-sc-codec 0.21.2",
+]
+
+[[package]]
+name = "multiversx-chain-core"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a8ab9d45ed03ac64de2ba5136cff2af8131e4b01e18769f498a92e5079444b28"
+dependencies = [
+ "bitflags",
+ "multiversx-sc-codec 0.21.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "multiversx-chain-scenario-format"
 version = "0.23.0"
+dependencies = [
+ "bech32",
+ "hex",
+ "num-bigint",
+ "num-traits",
+ "serde",
+ "serde_json",
+ "sha3",
+]
+
+[[package]]
+name = "multiversx-chain-scenario-format"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dcca77966bf5eb9c9f96d0597f17a4fa7b64681cc7b83e39bdf31f8c6ca04d44"
 dependencies = [
  "bech32",
  "hex",
@@ -2427,7 +2452,29 @@ dependencies = [
  "hex",
  "hex-literal",
  "itertools",
- "multiversx-chain-core",
+ "multiversx-chain-core 0.13.1",
+ "multiversx-chain-vm-executor",
+ "num-bigint",
+ "num-traits",
+ "rand",
+ "rand_seeder",
+ "sha2",
+ "sha3",
+]
+
+[[package]]
+name = "multiversx-chain-vm"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3dfd9121e85869964cbe02b5c0ca7fcce200918229feddab76375126cc557c30"
+dependencies = [
+ "bitflags",
+ "colored",
+ "ed25519-dalek",
+ "hex",
+ "hex-literal",
+ "itertools",
+ "multiversx-chain-core 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "multiversx-chain-vm-executor",
  "num-bigint",
  "num-traits",
@@ -2449,9 +2496,9 @@ version = "0.56.1"
 dependencies = [
  "arrayvec",
  "getrandom",
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
  "rand",
 ]
 
@@ -2460,8 +2507,8 @@ name = "multiversx-price-aggregator-sc-meta"
 version = "0.0.0"
 dependencies = [
  "multiversx-price-aggregator-sc",
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
 ]
 
 [[package]]
@@ -2470,9 +2517,24 @@ version = "0.56.1"
 dependencies = [
  "bitflags",
  "hex-literal",
- "multiversx-chain-core",
- "multiversx-sc-codec",
- "multiversx-sc-derive",
+ "multiversx-chain-core 0.13.1",
+ "multiversx-sc-codec 0.21.2",
+ "multiversx-sc-derive 0.56.1",
+ "num-traits",
+ "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc"
+version = "0.56.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0c6b6a8b6f7d041c4f5fd2723c524e30a97c5994396d5c6fc0e9978421459cb6"
+dependencies = [
+ "bitflags",
+ "hex-literal",
+ "multiversx-chain-core 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-sc-codec 0.21.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-sc-derive 0.56.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits",
  "unwrap-infallible",
 ]
@@ -2482,7 +2544,19 @@ name = "multiversx-sc-codec"
 version = "0.21.2"
 dependencies = [
  "arrayvec",
- "multiversx-sc-codec-derive",
+ "multiversx-sc-codec-derive 0.21.2",
+ "num-bigint",
+ "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-codec"
+version = "0.21.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f0df6c337692e14e5b9ea2448216cc5a75d3e891ebfe327eccaaee31dfd119e3"
+dependencies = [
+ "arrayvec",
+ "multiversx-sc-codec-derive 0.21.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-bigint",
  "unwrap-infallible",
 ]
@@ -2490,6 +2564,18 @@ dependencies = [
 [[package]]
 name = "multiversx-sc-codec-derive"
 version = "0.21.2"
+dependencies = [
+ "hex",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.95",
+]
+
+[[package]]
+name = "multiversx-sc-codec-derive"
+version = "0.21.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2571c0afb65e504fe80a431f3b6a288c50dd3e7cd38d6cef18f8b47e5c8e8796"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -2509,6 +2595,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "multiversx-sc-derive"
+version = "0.56.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a11c53690988856d234e29b3b35047feb450c781957886f0398928e1d153db4"
+dependencies = [
+ "hex",
+ "proc-macro2",
+ "quote",
+ "radix_trie",
+ "syn 2.0.95",
+]
+
+[[package]]
 name = "multiversx-sc-meta"
 version = "0.56.1"
 dependencies = [
@@ -2519,8 +2618,8 @@ dependencies = [
  "convert_case",
  "copy_dir",
  "home",
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
  "multiversx-sc-snippets",
  "pathdiff",
  "reqwest",
@@ -2542,7 +2641,29 @@ dependencies = [
  "convert_case",
  "hex",
  "lazy_static",
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
+ "rustc_version",
+ "semver",
+ "serde",
+ "serde_json",
+ "toml",
+ "wasmparser",
+ "wasmprinter",
+ "wat",
+]
+
+[[package]]
+name = "multiversx-sc-meta-lib"
+version = "0.56.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "603c7ecef20537401593deab9d19e9278cfa214ce4bdcd00898674c398d0b9cd"
+dependencies = [
+ "clap",
+ "colored",
+ "convert_case",
+ "hex",
+ "lazy_static",
+ "multiversx-sc 0.56.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc_version",
  "semver",
  "serde",
@@ -2557,7 +2678,7 @@ dependencies = [
 name = "multiversx-sc-modules"
 version = "0.56.1"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
 ]
 
 [[package]]
@@ -2570,11 +2691,37 @@ dependencies = [
  "hex",
  "itertools",
  "log",
- "multiversx-chain-scenario-format",
- "multiversx-chain-vm",
+ "multiversx-chain-scenario-format 0.23.0",
+ "multiversx-chain-vm 0.13.1",
  "multiversx-chain-vm-executor",
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
+ "num-bigint",
+ "num-traits",
+ "pathdiff",
+ "serde",
+ "serde_json",
+ "sha2",
+ "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-scenario"
+version = "0.56.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c193183531c9e32b052d1dd6696e13173f701780d586a4c5a822783235024511"
+dependencies = [
+ "base64",
+ "bech32",
+ "colored",
+ "hex",
+ "itertools",
+ "log",
+ "multiversx-chain-scenario-format 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-chain-vm 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-chain-vm-executor",
+ "multiversx-sc 0.56.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-sc-meta-lib 0.56.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-bigint",
  "num-traits",
  "pathdiff",
@@ -2594,8 +2741,8 @@ dependencies = [
  "futures",
  "hex",
  "log",
- "multiversx-chain-scenario-format",
- "multiversx-sc-scenario",
+ "multiversx-chain-scenario-format 0.23.0",
+ "multiversx-sc-scenario 0.56.1",
  "multiversx-sdk",
  "multiversx-sdk-dapp",
  "multiversx-sdk-http",
@@ -2607,7 +2754,7 @@ dependencies = [
 name = "multiversx-sc-wasm-adapter"
 version = "0.56.1"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
 ]
 
 [[package]]
@@ -2624,7 +2771,7 @@ dependencies = [
  "hmac",
  "itertools",
  "log",
- "multiversx-chain-core",
+ "multiversx-chain-core 0.13.1",
  "pbkdf2",
  "pem",
  "rand",
@@ -2672,17 +2819,17 @@ dependencies = [
 name = "multiversx-wegld-swap-sc"
 version = "0.56.1"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "multiversx-wegld-swap-sc-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
  "multiversx-wegld-swap-sc",
 ]
 
@@ -2692,7 +2839,7 @@ version = "0.0.0"
 dependencies = [
  "bech32",
  "hex",
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "num-bigint",
  "num-traits",
 ]
@@ -2718,15 +2865,15 @@ dependencies = [
 name = "nft-minter"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "nft-minter-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "nft-minter",
 ]
 
@@ -2734,15 +2881,15 @@ dependencies = [
 name = "nft-storage-prepay"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "nft-storage-prepay-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "nft-storage-prepay",
 ]
 
@@ -2750,16 +2897,16 @@ dependencies = [
 name = "nft-subscription"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "nft-subscription-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "nft-subscription",
 ]
 
@@ -2873,23 +3020,23 @@ dependencies = [
 name = "order-book-factory"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "order-book-pair"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "pair-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "order-book-pair",
 ]
 
@@ -2897,15 +3044,15 @@ dependencies = [
 name = "panic-message-features"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "panic-message-features-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "panic-message-features",
 ]
 
@@ -2913,16 +3060,16 @@ dependencies = [
 name = "parent"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "parent-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
  "parent",
 ]
 
@@ -2970,15 +3117,15 @@ checksum = "df94ce210e5bc13cb6651479fa48d14f601d9858cfe0467f43ae157023b938d3"
 name = "payable-features"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "payable-features-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "payable-features",
 ]
 
@@ -3076,8 +3223,8 @@ dependencies = [
 name = "ping-pong-egld"
 version = "0.0.2"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
@@ -3096,7 +3243,7 @@ dependencies = [
 name = "ping-pong-egld-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "ping-pong-egld",
 ]
 
@@ -3200,14 +3347,14 @@ dependencies = [
 name = "promises-features"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
 ]
 
 [[package]]
 name = "promises-features-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "promises-features",
 ]
 
@@ -3216,15 +3363,15 @@ name = "proxy-pause"
 version = "0.0.0"
 dependencies = [
  "check-pause",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "proxy-pause-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "proxy-pause",
 ]
 
@@ -3233,15 +3380,15 @@ name = "proxy-test-first"
 version = "0.0.0"
 dependencies = [
  "hex-literal",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "proxy-test-first-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "proxy-test-first",
 ]
 
@@ -3249,15 +3396,15 @@ dependencies = [
 name = "proxy-test-second"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "proxy-test-second-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "proxy-test-second",
 ]
 
@@ -3266,15 +3413,15 @@ name = "queue-repeat"
 version = "0.0.0"
 dependencies = [
  "benchmark-common",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "queue-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "queue-repeat",
 ]
 
@@ -3392,15 +3539,15 @@ dependencies = [
 name = "random"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
 ]
 
 [[package]]
 name = "recursive-caller"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "vault",
 ]
 
@@ -3408,7 +3555,7 @@ dependencies = [
 name = "recursive-caller-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "recursive-caller",
 ]
 
@@ -3504,16 +3651,16 @@ dependencies = [
 name = "rewards-distribution"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "rewards-distribution-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "rewards-distribution",
 ]
 
@@ -3556,15 +3703,15 @@ dependencies = [
 name = "rust-snippets-generator-test"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "rust-snippets-generator-test-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "rust-snippets-generator-test",
 ]
 
@@ -3576,8 +3723,8 @@ dependencies = [
  "basic-features",
  "forwarder",
  "hex",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
  "num-bigint",
  "num-traits",
  "vault",
@@ -3587,7 +3734,7 @@ dependencies = [
 name = "rust-testing-framework-tester-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "rust-testing-framework-tester",
 ]
 
@@ -3711,15 +3858,15 @@ dependencies = [
 name = "scenario-tester"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "scenario-tester-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "scenario-tester",
 ]
 
@@ -3760,16 +3907,16 @@ checksum = "478f121bb72bbf63c52c93011ea1791dca40140dfe13f8336c4c5ac952c33aa9"
 name = "second-contract"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "second-contract-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
  "second-contract",
 ]
 
@@ -3800,16 +3947,16 @@ dependencies = [
 name = "seed-nft-minter"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "seed-nft-minter-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "seed-nft-minter",
 ]
 
@@ -3823,15 +3970,15 @@ checksum = "f79dfe2d285b0488816f30e700a7438c5a73d816b5b7d3ac72fbc48b0d185e03"
 name = "send-tx-repeat"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "send-tx-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "send-tx-repeat",
 ]
 
@@ -3941,15 +4088,15 @@ name = "set-repeat"
 version = "0.0.0"
 dependencies = [
  "benchmark-common",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "set-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "set-repeat",
 ]
 
@@ -4009,15 +4156,15 @@ name = "single-value-repeat"
 version = "0.0.0"
 dependencies = [
  "benchmark-common",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "single-value-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "single-value-repeat",
 ]
 
@@ -4072,15 +4219,15 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 name = "str-repeat"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "str-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "str-repeat",
 ]
 
@@ -4262,15 +4409,15 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 name = "token-release"
 version = "0.0.1"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "token-release-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "token-release",
 ]
 
@@ -4444,9 +4591,9 @@ dependencies = [
 name = "transfer-role-features"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
+ "multiversx-sc 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
  "vault",
 ]
 
@@ -4454,7 +4601,7 @@ dependencies = [
 name = "transfer-role-features-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "transfer-role-features",
 ]
 
@@ -4524,17 +4671,17 @@ dependencies = [
 name = "use-module"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-meta-lib",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-meta-lib 0.56.1",
  "multiversx-sc-modules",
- "multiversx-sc-scenario",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "use-module-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "use-module",
 ]
 
@@ -4569,15 +4716,15 @@ dependencies = [
 name = "vault"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "vault-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "vault",
 ]
 
@@ -4592,15 +4739,15 @@ name = "vec-repeat"
 version = "0.0.0"
 dependencies = [
  "benchmark-common",
- "multiversx-sc",
- "multiversx-sc-scenario",
+ "multiversx-sc 0.56.1",
+ "multiversx-sc-scenario 0.56.1",
 ]
 
 [[package]]
 name = "vec-repeat-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc-meta-lib",
+ "multiversx-sc-meta-lib 0.56.1",
  "vec-repeat",
 ]
 
