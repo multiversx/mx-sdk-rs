@@ -16,4 +16,6 @@ pub enum InteractCliCommand {
     Deploy,
     #[command(name = "at", about = "Check all transfers")]
     AllTransfers,
+    #[command(name = "mt", about = "Check multi transfer with one EGLD")]
+    MultiTransferWithOneEGLD,
 }
