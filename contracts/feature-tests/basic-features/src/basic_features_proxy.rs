@@ -162,6 +162,19 @@ where
             .raw_call("returns_egld_decimal")
             .original_result()
     }
+
+    pub fn token_has_transfer_role<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+    >(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+    self.wrapped_tx
+        .payment(NotPayable)
+        .raw_call("token_has_transfer_role")
+        .argument(&token_id)
+        .original_result()
+    }
 }
 
 #[type_abi]
