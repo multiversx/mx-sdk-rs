@@ -6,38 +6,38 @@ use super::{
 };
 
 /// Syntactic sugar, that allows us to more easily represent struct payloads as nested tuples.
-pub trait ManagedVecItemStructPlTuple {
+pub trait ManagedVecItemStructPayloadTuple {
     type StructPayload: ManagedVecItemPayload;
 }
 
 /// Syntactic sugar, it allows us to get the maximum payload length in a list at compile time.
-pub trait ManagedVecItemMaxPlTuple {
+pub trait ManagedVecItemMaxPayloadTuple {
     type MaxPayload: ManagedVecItemPayload;
 }
 
 /// End of the list.
-impl ManagedVecItemStructPlTuple for () {
+impl ManagedVecItemStructPayloadTuple for () {
     type StructPayload = ManagedVecItemEmptyPayload;
 }
 
 /// End of the list.
-impl ManagedVecItemMaxPlTuple for () {
+impl ManagedVecItemMaxPayloadTuple for () {
     type MaxPayload = ManagedVecItemEmptyPayload; // for the discriminant
 }
 
-impl<Head, Tail> ManagedVecItemStructPlTuple for (Head, Tail)
+impl<Head, Tail> ManagedVecItemStructPayloadTuple for (Head, Tail)
 where
     Head: ManagedVecItem,
-    Tail: ManagedVecItemStructPlTuple,
+    Tail: ManagedVecItemStructPayloadTuple,
     Head::PAYLOAD: ManagedVecItemPayloadAdd<Tail::StructPayload>,
 {
     type StructPayload = <Head::PAYLOAD as ManagedVecItemPayloadAdd<Tail::StructPayload>>::Output;
 }
 
-impl<Head, Tail> ManagedVecItemMaxPlTuple for (Head, Tail)
+impl<Head, Tail> ManagedVecItemMaxPayloadTuple for (Head, Tail)
 where
     Head: ManagedVecItem,
-    Tail: ManagedVecItemStructPlTuple,
+    Tail: ManagedVecItemStructPayloadTuple,
     Head::PAYLOAD: ManagedVecItemPayloadMax<Tail::StructPayload>,
 {
     type MaxPayload = <Head::PAYLOAD as ManagedVecItemPayloadMax<Tail::StructPayload>>::Max;
@@ -46,13 +46,13 @@ where
 /// Syntactic sugar, that allows us to more easily represent enum payloads as nested tuples.
 ///
 /// It is always the maximum payload length + 1.
-pub trait ManagedVecItemEnumPlTuple {
+pub trait ManagedVecItemEnumPayloadTuple {
     type EnumPayload: ManagedVecItemPayload;
 }
 
-impl<T> ManagedVecItemEnumPlTuple for T
+impl<T> ManagedVecItemEnumPayloadTuple for T
 where
-    T: ManagedVecItemMaxPlTuple,
+    T: ManagedVecItemMaxPayloadTuple,
     T::MaxPayload: ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<U1>>,
 {
     type EnumPayload =
@@ -72,7 +72,7 @@ pub mod tests {
         assert_struct_payload_size::<(Option<usize>, ())>(5);
     }
 
-    fn assert_struct_payload_size<N: ManagedVecItemStructPlTuple>(expected_size: usize) {
+    fn assert_struct_payload_size<N: ManagedVecItemStructPayloadTuple>(expected_size: usize) {
         assert_eq!(N::StructPayload::payload_size(), expected_size);
     }
 
@@ -86,7 +86,7 @@ pub mod tests {
         assert_enum_payload_size::<(Option<usize>, ())>(6);
     }
 
-    fn assert_enum_payload_size<N: ManagedVecItemEnumPlTuple>(expected_size: usize) {
+    fn assert_enum_payload_size<N: ManagedVecItemEnumPayloadTuple>(expected_size: usize) {
         assert_eq!(N::EnumPayload::payload_size(), expected_size);
     }
 }

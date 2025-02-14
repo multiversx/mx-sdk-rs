@@ -57,7 +57,7 @@ pub use managed_vec_item::{
     ManagedVecItem,
 };
 pub use managed_vec_item_nested_tuple::{
-    ManagedVecItemEnumPlTuple, ManagedVecItemMaxPlTuple, ManagedVecItemStructPlTuple,
+    ManagedVecItemEnumPayloadTuple, ManagedVecItemMaxPayloadTuple, ManagedVecItemStructPayloadTuple,
 };
 pub use managed_vec_item_payload::*;
 pub use managed_vec_iter_owned::ManagedVecOwnedIterator;

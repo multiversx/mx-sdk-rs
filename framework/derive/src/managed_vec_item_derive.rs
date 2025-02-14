@@ -154,7 +154,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
 
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
-            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemEnumPlTuple>::EnumPayload;
+            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemEnumPayloadTuple>::EnumPayload;
             const SKIPS_RESERIALIZATION: bool = #skips_reserialization;
             type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
 
@@ -219,7 +219,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
 
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
-            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemStructPlTuple>::StructPayload;
+            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemStructPayloadTuple>::StructPayload;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
 

@@ -17,7 +17,7 @@ use crate::{
 
 use super::{
     EgldOrEsdtTokenIdentifier, ManagedVecItemPayload, ManagedVecItemPayloadAdd,
-    ManagedVecItemPayloadBuffer, ManagedVecItemStructPlTuple, ManagedVecRef,
+    ManagedVecItemPayloadBuffer, ManagedVecItemStructPayloadTuple, ManagedVecRef,
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
@@ -326,9 +326,9 @@ impl<T1, T2> ManagedVecItem for MultiValue2<T1, T2>
 where
     T1: ManagedVecItem,
     T2: ManagedVecItem,
-    (T1, (T2, ())): ManagedVecItemStructPlTuple,
+    (T1, (T2, ())): ManagedVecItemStructPayloadTuple,
 {
-    type PAYLOAD = <(T1, (T2, ())) as ManagedVecItemStructPlTuple>::StructPayload;
+    type PAYLOAD = <(T1, (T2, ())) as ManagedVecItemStructPayloadTuple>::StructPayload;
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
     type Ref<'a> = ManagedVecRef<'a, Self>;
 
@@ -363,9 +363,9 @@ where
     T1: ManagedVecItem,
     T2: ManagedVecItem,
     T3: ManagedVecItem,
-    (T1, (T2, (T3, ()))): ManagedVecItemStructPlTuple,
+    (T1, (T2, (T3, ()))): ManagedVecItemStructPayloadTuple,
 {
-    type PAYLOAD = <(T1, (T2, (T3, ()))) as ManagedVecItemStructPlTuple>::StructPayload;
+    type PAYLOAD = <(T1, (T2, (T3, ()))) as ManagedVecItemStructPayloadTuple>::StructPayload;
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
     type Ref<'a> = ManagedVecRef<'a, Self>;
 
