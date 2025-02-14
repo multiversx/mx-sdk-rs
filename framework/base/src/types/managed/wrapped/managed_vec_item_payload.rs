@@ -141,9 +141,9 @@ where
     fn split_mut_from_add(payload: &mut Self::Output) -> (&mut Self, &mut Rhs);
 }
 
-impl<P> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload> for P
+impl<N> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload> for ManagedVecItemPayloadBuffer<N>
 where
-    P: ManagedVecItemPayload,
+    N: ArrayLength,
 {
     type Output = Self;
 
@@ -154,6 +154,28 @@ where
     fn split_mut_from_add(
         _payload: &mut Self::Output,
     ) -> (&mut Self, &mut ManagedVecItemEmptyPayload) {
+        unimplemented!()
+    }
+}
+
+impl<N> ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<N>> for ManagedVecItemEmptyPayload
+where
+    N: ArrayLength,
+{
+    type Output = ManagedVecItemPayloadBuffer<N>;
+
+    fn split_from_add(
+        payload: &Self::Output,
+    ) -> (&ManagedVecItemEmptyPayload, &ManagedVecItemPayloadBuffer<N>) {
+        (&ManagedVecItemEmptyPayload, payload)
+    }
+
+    fn split_mut_from_add(
+        _payload: &mut Self::Output,
+    ) -> (
+        &mut ManagedVecItemEmptyPayload,
+        &mut ManagedVecItemPayloadBuffer<N>,
+    ) {
         unimplemented!()
     }
 }

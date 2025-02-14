@@ -50,11 +50,6 @@ pub trait ManagedVecItemEnumPlTuple {
     type EnumPayload: ManagedVecItemPayload;
 }
 
-// TODO: only implemented explicitly because ManagedVecItemPayloadAdd is missing 0 + 1 for now.
-impl ManagedVecItemEnumPlTuple for () {
-    type EnumPayload = ManagedVecItemPayloadBuffer<U1>; // for the discriminant
-}
-
 impl<T> ManagedVecItemEnumPlTuple for T
 where
     T: ManagedVecItemMaxPlTuple,
