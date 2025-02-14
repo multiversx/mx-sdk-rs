@@ -10,9 +10,9 @@ pub trait ManagedVecItemStructPlTuple {
     type StructPayload: ManagedVecItemPayload;
 }
 
-/// Syntactic sugar, that allows us to more easily represent enum payloads as nested tuples.
-pub trait ManagedVecItemEnumPlTuple {
-    type EnumPayload: ManagedVecItemPayload;
+/// Syntactic sugar, it allows us to get the maximum payload length in a list at compile time.
+pub trait ManagedVecItemMaxPlTuple {
+    type MaxPayload: ManagedVecItemPayload;
 }
 
 /// End of the list.
@@ -21,8 +21,8 @@ impl ManagedVecItemStructPlTuple for () {
 }
 
 /// End of the list.
-impl ManagedVecItemEnumPlTuple for () {
-    type EnumPayload = ManagedVecItemPayloadBuffer<U1>; // for the discriminant
+impl ManagedVecItemMaxPlTuple for () {
+    type MaxPayload = ManagedVecItemEmptyPayload; // for the discriminant
 }
 
 impl<Head, Tail> ManagedVecItemStructPlTuple for (Head, Tail)
@@ -34,17 +34,34 @@ where
     type StructPayload = <Head::PAYLOAD as ManagedVecItemPayloadAdd<Tail::StructPayload>>::Output;
 }
 
-impl<Head, Tail> ManagedVecItemEnumPlTuple for (Head, Tail)
+impl<Head, Tail> ManagedVecItemMaxPlTuple for (Head, Tail)
 where
     Head: ManagedVecItem,
     Tail: ManagedVecItemStructPlTuple,
-    Head::PAYLOAD: ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<U1>>,
-    <Head::PAYLOAD as ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<U1>>>::Output:
-        ManagedVecItemPayloadMax<Tail::StructPayload>,
+    Head::PAYLOAD: ManagedVecItemPayloadMax<Tail::StructPayload>,
 {
-    type EnumPayload = <<Head::PAYLOAD as ManagedVecItemPayloadAdd<
-        ManagedVecItemPayloadBuffer<U1>,
-    >>::Output as ManagedVecItemPayloadMax<Tail::StructPayload>>::Max;
+    type MaxPayload = <Head::PAYLOAD as ManagedVecItemPayloadMax<Tail::StructPayload>>::Max;
+}
+
+/// Syntactic sugar, that allows us to more easily represent enum payloads as nested tuples.
+///
+/// It is always the maximum payload length + 1.
+pub trait ManagedVecItemEnumPlTuple {
+    type EnumPayload: ManagedVecItemPayload;
+}
+
+// TODO: only implemented explicitly because ManagedVecItemPayloadAdd is missing 0 + 1 for now.
+impl ManagedVecItemEnumPlTuple for () {
+    type EnumPayload = ManagedVecItemPayloadBuffer<U1>; // for the discriminant
+}
+
+impl<T> ManagedVecItemEnumPlTuple for T
+where
+    T: ManagedVecItemMaxPlTuple,
+    T::MaxPayload: ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<U1>>,
+{
+    type EnumPayload =
+        <T::MaxPayload as ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<U1>>>::Output;
 }
 
 #[cfg(test)]
@@ -68,6 +85,7 @@ pub mod tests {
     fn managed_vec_item_nested_tuple_enum_test() {
         assert_enum_payload_size::<()>(1);
         assert_enum_payload_size::<(u8, ())>(2);
+        assert_enum_payload_size::<(u32, (i64, ()))>(9);
         assert_enum_payload_size::<(usize, ())>(5);
         assert_enum_payload_size::<(usize, (usize, ()))>(5);
         assert_enum_payload_size::<(Option<usize>, ())>(6);

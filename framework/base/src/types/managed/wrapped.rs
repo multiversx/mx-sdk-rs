@@ -56,7 +56,9 @@ pub use managed_vec_item::{
     managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     ManagedVecItem,
 };
-pub use managed_vec_item_nested_tuple::{ManagedVecItemEnumPlTuple, ManagedVecItemStructPlTuple};
+pub use managed_vec_item_nested_tuple::{
+    ManagedVecItemEnumPlTuple, ManagedVecItemMaxPlTuple, ManagedVecItemStructPlTuple,
+};
 pub use managed_vec_item_payload::*;
 pub use managed_vec_iter_owned::ManagedVecOwnedIterator;
 pub use managed_vec_iter_payload::ManagedVecPayloadIterator;
