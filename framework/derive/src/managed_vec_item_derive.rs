@@ -156,7 +156,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemEnumPlTuple>::EnumPayload;
             const SKIPS_RESERIALIZATION: bool = #skips_reserialization;
-            type Ref<'a> = Self;
+            type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
 
             fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let mut index = 0;
@@ -174,7 +174,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
             }
 
             unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-                Self::read_from_payload(payload)
+                multiversx_sc::types::ManagedVecRef::new(Self::read_from_payload(payload))
             }
 
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
