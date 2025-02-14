@@ -1,5 +1,3 @@
-use crate::with_shared::Shareable;
-
 use super::TxContext;
 
 use std::sync::{Arc, Mutex};
@@ -36,18 +34,18 @@ impl TxContextStack {
     /// Manages the stack.
     ///
     /// Pushes the context to the stack, executes closure, pops after.
-    pub fn execute_on_vm_stack<F, R>(tx_context_sh: &mut Shareable<TxContext>, f: F) -> R
+    pub fn execute_on_vm_stack<F>(tx_context: TxContext, f: F) -> TxContext
     where
-        F: FnOnce() -> R,
+        F: FnOnce(),
     {
-        tx_context_sh.with_shared(|tx_context_arc| {
-            TxContextStack::static_push(tx_context_arc);
+        let tx_context_arc = Arc::new(tx_context);
+        TxContextStack::static_push(tx_context_arc);
 
-            let result = f();
+        f();
 
-            let _ = TxContextStack::static_pop();
+        let tx_context_arc = TxContextStack::static_pop();
 
-            result
-        })
+        Arc::into_inner(tx_context_arc)
+            .expect("cannot extract final TxContext from stack because of lingering references")
     }
 }

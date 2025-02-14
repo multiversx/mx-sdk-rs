@@ -1,5 +1,5 @@
 use crate::types::ManagedVecItem;
-use core::{borrow::Borrow, marker::PhantomData, mem::ManuallyDrop, ops::Deref};
+use core::{borrow::Borrow, fmt::Debug, marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
 pub struct ManagedVecRef<'a, T>
 where
@@ -55,5 +55,24 @@ where
 {
     fn borrow(&self) -> &T {
         self.deref()
+    }
+}
+
+impl<T> Debug for ManagedVecRef<'_, T>
+where
+    T: ManagedVecItem + Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.item.deref().fmt(f)
+    }
+}
+
+impl<T1, T2> PartialEq<ManagedVecRef<'_, T2>> for ManagedVecRef<'_, T1>
+where
+    T1: ManagedVecItem + PartialEq<T2>,
+    T2: ManagedVecItem,
+{
+    fn eq(&self, other: &ManagedVecRef<'_, T2>) -> bool {
+        self.deref().eq(other.deref())
     }
 }

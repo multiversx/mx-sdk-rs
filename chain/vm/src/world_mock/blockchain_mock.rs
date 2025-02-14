@@ -1,19 +1,19 @@
-use crate::{tx_execution::BlockchainVMRef, with_shared::Shareable};
+use crate::tx_execution::BlockchainVMRef;
 use multiversx_chain_vm_executor::Executor;
 use std::{fmt::Debug, ops::Deref};
 
-use super::{BlockchainState, FailingExecutor};
+use super::{BlockchainStateRef, FailingExecutor};
 
 pub struct BlockchainMock {
     pub vm: BlockchainVMRef,
-    pub state: Shareable<BlockchainState>,
+    pub state: BlockchainStateRef,
 }
 
 impl BlockchainMock {
     pub fn new(executor: Box<dyn Executor + Send + Sync>) -> Self {
         BlockchainMock {
             vm: BlockchainVMRef::new(executor),
-            state: Shareable::default(),
+            state: Default::default(),
         }
     }
 }

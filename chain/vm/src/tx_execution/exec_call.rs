@@ -5,8 +5,7 @@ use crate::{
         TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMCodeMetadata,
-    with_shared::Shareable,
-    world_mock::{AccountData, AccountEsdt, BlockchainState},
+    world_mock::{AccountData, AccountEsdt, BlockchainStateRef},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -30,7 +29,7 @@ impl BlockchainVMRef {
     pub fn execute_sc_query_lambda<F>(
         &self,
         tx_input: TxInput,
-        state: &mut Shareable<BlockchainState>,
+        state: &mut BlockchainStateRef,
         f: F,
     ) -> TxResult
     where
@@ -43,19 +42,16 @@ impl BlockchainVMRef {
     pub fn execute_in_debugger<F>(
         &self,
         tx_input: TxInput,
-        state: &mut Shareable<BlockchainState>,
+        state: &mut BlockchainStateRef,
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
         F: FnOnce(),
     {
-        state.with_shared(|state_arc| {
-            let tx_cache = TxCache::new(state_arc);
-            let mut tx_context_sh =
-                Shareable::new(TxContext::new(self.clone(), tx_input, tx_cache));
-            TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
-            tx_context_sh.into_inner().into_results()
-        })
+        let tx_cache = TxCache::new(state.get_arc());
+        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
+        let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
+        tx_context.into_results()
     }
 
     pub fn execute_builtin_function_or_default<F>(
@@ -79,7 +75,7 @@ impl BlockchainVMRef {
     pub fn execute_sc_call_lambda<F>(
         &self,
         tx_input: TxInput,
-        state: &mut Shareable<BlockchainState>,
+        state: &mut BlockchainStateRef,
         f: F,
     ) -> TxResult
     where
@@ -87,10 +83,9 @@ impl BlockchainVMRef {
     {
         state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
-        let (tx_result, blockchain_updates) = state.with_shared(|state_arc| {
-            let tx_cache = TxCache::new(state_arc);
-            self.execute_builtin_function_or_default(tx_input, tx_cache, f)
-        });
+        let tx_cache = TxCache::new(state.get_arc());
+        let (tx_result, blockchain_updates) =
+            self.execute_builtin_function_or_default(tx_input, tx_cache, f);
 
         if tx_result.result_status.is_success() {
             blockchain_updates.apply(state);
@@ -102,7 +97,7 @@ impl BlockchainVMRef {
     pub fn execute_async_call_and_callback(
         &self,
         async_data: AsyncCallTxData,
-        state: &mut Shareable<BlockchainState>,
+        state: &mut BlockchainStateRef,
     ) -> (TxResult, TxResult) {
         if state.accounts.contains_key(&async_data.to) {
             let async_input = async_call_tx_input(&async_data, CallType::AsyncCall);
@@ -141,7 +136,7 @@ impl BlockchainVMRef {
     pub fn sc_call_with_async_and_callback<F>(
         &self,
         tx_input: TxInput,
-        state: &mut Shareable<BlockchainState>,
+        state: &mut BlockchainStateRef,
         f: F,
     ) -> TxResult
     where
@@ -183,7 +178,7 @@ impl BlockchainVMRef {
     pub fn execute_promise_call_and_callback(
         &self,
         promise: &Promise,
-        state: &mut Shareable<BlockchainState>,
+        state: &mut BlockchainStateRef,
     ) -> (TxResult, TxResult) {
         if state.accounts.contains_key(&promise.call.to) {
             let async_input = async_call_tx_input(&promise.call, CallType::AsyncCall);
@@ -210,7 +205,7 @@ impl BlockchainVMRef {
         &self,
         async_result: &TxResult,
         promise: &Promise,
-        state: &mut Shareable<BlockchainState>,
+        state: &mut BlockchainStateRef,
     ) -> TxResult {
         if !promise.has_callback() {
             return TxResult::empty();
@@ -230,24 +225,22 @@ impl BlockchainVMRef {
     fn insert_ghost_account(
         &self,
         async_data: &AsyncCallTxData,
-        state: &mut Shareable<BlockchainState>,
+        state: &mut BlockchainStateRef,
     ) -> Result<BlockchainUpdate, TxPanic> {
-        state.with_shared(|state_arc| {
-            let tx_cache = TxCache::new(state_arc);
-            tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value)?;
-            tx_cache.insert_account(AccountData {
-                address: async_data.to.clone(),
-                nonce: 0,
-                egld_balance: async_data.call_value.clone(),
-                esdt: AccountEsdt::default(),
-                username: Vec::new(),
-                storage: HashMap::new(),
-                contract_path: None,
-                code_metadata: VMCodeMetadata::empty(),
-                contract_owner: None,
-                developer_rewards: BigUint::zero(),
-            });
-            Ok(tx_cache.into_blockchain_updates())
-        })
+        let tx_cache = TxCache::new(state.get_arc());
+        tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value)?;
+        tx_cache.insert_account(AccountData {
+            address: async_data.to.clone(),
+            nonce: 0,
+            egld_balance: async_data.call_value.clone(),
+            esdt: AccountEsdt::default(),
+            username: Vec::new(),
+            storage: HashMap::new(),
+            contract_path: None,
+            code_metadata: VMCodeMetadata::empty(),
+            contract_owner: None,
+            developer_rewards: BigUint::zero(),
+        });
+        Ok(tx_cache.into_blockchain_updates())
     }
 }

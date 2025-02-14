@@ -3,8 +3,7 @@ use crate::scenario::model::{TransferStep, TxTransfer, ValidatorRewardStep};
 use multiversx_chain_vm::{
     tx_execution::{execute_current_tx_context_input, BlockchainVMRef},
     tx_mock::{TxFunctionName, TxInput},
-    with_shared::Shareable,
-    world_mock::BlockchainState,
+    world_mock::BlockchainStateRef,
 };
 
 impl ScenarioVMRunner {
@@ -38,7 +37,7 @@ fn tx_input_from_transfer(tx_transfer: &TxTransfer) -> TxInput {
     }
 }
 
-fn execute(vm: BlockchainVMRef, state: &mut Shareable<BlockchainState>, tx_transfer: &TxTransfer) {
+fn execute(vm: BlockchainVMRef, state: &mut BlockchainStateRef, tx_transfer: &TxTransfer) {
     let tx_input = tx_input_from_transfer(tx_transfer);
 
     // nonce gets increased irrespective of whether the tx fails or not

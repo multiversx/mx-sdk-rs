@@ -67,7 +67,7 @@ fn struct_to_bytes_writer() {
         s,
         &mut payload,
     );
-    assert_eq!(payload.buffer, expected);
+    assert_eq!(payload.into_array(), expected);
 }
 
 #[test]

@@ -1,3 +1,4 @@
+use generic_array::typenum::U16;
 use multiversx_sc_codec::IntoMultiValue;
 
 use crate::{
@@ -203,7 +204,7 @@ impl<'a, M: ManagedTypeApi> EgldOrEsdtTokenPaymentRefs<'a, M> {
 }
 
 impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPayment<M> {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<16>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U16>;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedVecRef<'a, Self>;
 

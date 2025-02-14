@@ -72,7 +72,7 @@ mod module_1 {
             match fn_name {
                 "callBack" => {
                     self.callback();
-                    return true;
+                    true
                 },
                 "version" => {
                     self.call_version();
@@ -319,7 +319,7 @@ mod sample_adder {
             match fn_name {
                 "callBack" => {
                     self::EndpointWrappers::callback(self);
-                    return true;
+                    true
                 },
                 "init"
                     if <Self::Api as multiversx_sc::api::VMApi>::external_view_init_override() =>
@@ -327,7 +327,7 @@ mod sample_adder {
                     multiversx_sc::external_view_contract::external_view_contract_constructor::<
                         Self::Api,
                     >();
-                    return true;
+                    true
                 },
                 "getSum" => {
                     self.call_sum();
