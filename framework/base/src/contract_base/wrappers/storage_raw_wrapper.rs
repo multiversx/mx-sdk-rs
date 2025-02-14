@@ -5,6 +5,7 @@ use unwrap_infallible::UnwrapInfallible;
 use crate::api::HandleConstraints;
 use crate::codec::{TopDecode, TopEncode};
 
+use crate::types::{SystemSCAddress, TokenIdentifier};
 use crate::{
     api::{
         const_handles::MBUF_TEMPORARY_1, use_raw_handle, ErrorApi, ManagedTypeApi, StorageReadApi,
@@ -85,5 +86,19 @@ where
     {
         let key: StorageKey<A> = storage_key.into();
         storage_set(key.as_ref(), value);
+    }
+
+    pub fn token_has_transfer_role(&self, token_identifier: TokenIdentifier<A>) -> bool {
+        let key = ManagedBuffer::<A>::new_from_bytes(b"ELRONDtransferesdt");
+        let base_key = key.concat(token_identifier.into_managed_buffer());
+
+        // Decoding the response needs more research
+        // Empty response means no address has transferRole for the token
+        let result = self.read_from_address::<StorageKey<A>, ManagedBuffer<A>>(
+            &SystemSCAddress.to_managed_address(),
+            StorageKey::<A>::from(base_key),
+        );
+
+        !result.is_empty()
     }
 }

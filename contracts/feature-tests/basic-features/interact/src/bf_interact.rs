@@ -306,4 +306,30 @@ impl BasicFeaturesInteract {
             },
         }
     }
+
+    pub async fn token_has_transfer_role(&mut self, token_id: &str) -> bool {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.bf_contract())
+            .gas(50_000_000)
+            .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
+            .token_has_transfer_role(TokenIdentifier::from_esdt_bytes(token_id))
+            .returns(ReturnsResult)
+            .run()
+            .await
+    }
+
+    pub async fn storage_raw_token_has_transfer_role(&mut self, token_id: &str) -> bool {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.bf_contract())
+            .gas(50_000_000)
+            .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
+            .storage_raw_token_has_transfer_role(TokenIdentifier::from_esdt_bytes(token_id))
+            .returns(ReturnsResult)
+            .run()
+            .await
+    }
 }

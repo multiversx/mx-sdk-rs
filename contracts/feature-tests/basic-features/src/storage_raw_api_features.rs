@@ -20,4 +20,9 @@ pub trait StorageRawApiFeatures {
     ) -> ManagedBuffer {
         self.storage_raw().read_from_address(&address, storage_key)
     }
+
+    #[endpoint]
+    fn storage_raw_token_has_transfer_role(&self, token_id: TokenIdentifier) -> bool {
+        self.storage_raw().token_has_transfer_role(token_id)
+    }
 }
