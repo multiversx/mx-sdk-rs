@@ -133,6 +133,19 @@ where
             .original_result()
     }
 
+    pub fn storage_raw_token_has_transfer_role<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+    >(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("storage_raw_token_has_transfer_role")
+            .argument(&token_id)
+            .original_result()
+    }
+
     pub fn load_bytes(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
@@ -155,25 +168,25 @@ where
             .original_result()
     }
 
-    pub fn returns_egld_decimal(
-        self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedDecimal<Env::Api, ConstDecimals<18>>> {
-        self.wrapped_tx
-            .raw_call("returns_egld_decimal")
-            .original_result()
-    }
-
     pub fn token_has_transfer_role<
         Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
-    self.wrapped_tx
-        .payment(NotPayable)
-        .raw_call("token_has_transfer_role")
-        .argument(&token_id)
-        .original_result()
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("token_has_transfer_role")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    pub fn returns_egld_decimal(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedDecimal<Env::Api, ConstDecimals<18>>> {
+        self.wrapped_tx
+            .raw_call("returns_egld_decimal")
+            .original_result()
     }
 }
 
