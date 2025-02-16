@@ -1,5 +1,3 @@
-[settings]
-
 [[proxy]]
 path = "../crowdfunding-erc20/src/erc20_proxy.rs"
 

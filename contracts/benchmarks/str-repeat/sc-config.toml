@@ -1,6 +1,3 @@
-[settings]
-main = "str-repeat"
-
 [contracts.str-repeat]
 allocator = "leaking"
 

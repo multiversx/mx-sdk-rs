@@ -1,6 +1,3 @@
-[settings]
-main = "main"
-
 [contracts.main]
 name = "use-module"
 
