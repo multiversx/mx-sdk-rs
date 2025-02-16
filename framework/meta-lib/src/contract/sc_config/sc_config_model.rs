@@ -16,53 +16,18 @@ pub const SC_CONFIG_FILE_NAMES: &[&str] = &["sc-config.toml", "multicontract.tom
 /// It can contain one or several contract variants.
 #[derive(Debug)]
 pub struct ScConfig {
-    pub default_contract_config_name: String,
     pub contracts: Vec<ContractVariant>,
     pub proxy_configs: Vec<ProxyConfig>,
 }
 
 impl ScConfig {
-    pub fn main_contract(&self) -> &ContractVariant {
-        self.contracts
-            .iter()
-            .find(|contract| contract.main)
-            .unwrap_or_else(|| {
-                panic!(
-                    "Could not find default contract '{}' among the contract variants.",
-                    self.default_contract_config_name
-                )
-            })
-    }
-
-    pub fn main_contract_mut(&mut self) -> &mut ContractVariant {
-        self.contracts
-            .iter_mut()
-            .find(|contract| contract.main)
-            .unwrap_or_else(|| {
-                panic!(
-                    "Could not find default contract '{}' among the contract variants.",
-                    self.default_contract_config_name
-                )
-            })
-    }
-
-    pub fn secondary_contracts(&self) -> impl Iterator<Item = &ContractVariant> {
-        self.contracts.iter().filter(move |contract| !contract.main)
-    }
-
-    pub fn secondary_contracts_mut(&mut self) -> impl Iterator<Item = &mut ContractVariant> {
-        self.contracts
-            .iter_mut()
-            .filter(move |contract| !contract.main)
-    }
-
-    pub fn get_contract_by_id(&self, contract_id: String) -> Option<&ContractVariant> {
+    pub fn get_contract_by_id(&self, contract_id: &str) -> Option<&ContractVariant> {
         self.contracts
             .iter()
             .find(|contract| contract.contract_id == contract_id)
     }
 
-    pub fn get_contract_by_name(&self, contract_name: String) -> Option<&ContractVariant> {
+    pub fn get_contract_by_name(&self, contract_name: &str) -> Option<&ContractVariant> {
         self.contracts
             .iter()
             .find(|contract| contract.contract_name == contract_name)

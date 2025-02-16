@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 use multiversx_sc_meta_lib::contract::sc_config::{ScConfig, ScConfigSerde};
 
@@ -90,34 +92,27 @@ fn test_sc_config() {
     let serde = get_serialized_toml();
     let abi = get_contract_abi();
 
-    let contract_config = ScConfig::load_from_config(&serde, &abi);
+    let contract_config = ScConfig::load_from_config(PathBuf::default().as_path(), &serde, &abi);
 
-    assert_eq!(
-        contract_config.default_contract_config_name,
-        "main-contract"
-    );
     assert_eq!(contract_config.contracts.len(), 2);
     assert!(contract_config
-        .get_contract_by_id("secondary-contract".to_string())
+        .get_contract_by_id("secondary-contract")
         .is_some());
     assert!(contract_config
-        .get_contract_by_id("unexisting-contract]".to_string())
+        .get_contract_by_id("unexisting-contract]")
         .is_none());
     assert!(contract_config
-        .get_contract_by_name("contract2-name".to_string())
+        .get_contract_by_name("contract2-name")
         .is_some());
     assert!(contract_config
-        .get_contract_by_name("contract-wrong-name]".to_string())
+        .get_contract_by_name("contract-wrong-name]")
         .is_none());
 
-    let main_contract = contract_config.main_contract();
-    assert_eq!(main_contract.contract_id, "main-contract");
-    assert_eq!(main_contract.contract_name, "main-contract");
-
+    let main_contract = contract_config.get_contract_by_id("main-contract").unwrap();
     assert_eq!(main_contract.endpoint_names(), ["endpoint5", "endpoint1"]);
     assert_eq!(
         contract_config
-            .get_contract_by_name("contract2-name".to_string())
+            .get_contract_by_name("contract2-name")
             .unwrap()
             .endpoint_names(),
         ["endpoint1", "endpoint2", "endpoint3", "endpoint4"]

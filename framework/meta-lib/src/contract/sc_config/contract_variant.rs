@@ -8,9 +8,15 @@ use multiversx_sc::abi::ContractAbi;
 ///
 /// It might have only some of the endpoints written by the developer and maybe some other function.
 pub struct ContractVariant {
-    /// If it is the main contract, then the wasm crate is called just `wasm`,
-    ///and the wasm `Cargo.toml` is provided by the dev.
-    pub main: bool,
+    /// Initially, there was only 1 wasm crate, called `wasm`.
+    ///
+    /// Then, we got multi-contracts, but the wasm crate became the "main" one.
+    ///
+    /// Then we removed that mechanism completely, and it remained purely cosmetic,
+    /// being named just `wasm`, instead of `wasm-{contract-name}`.
+    ///
+    /// We are still keeping this around for contracts with only one output contract, for the cosmetic bit.
+    pub wasm_dir_short_name: bool,
 
     /// The contract id is defined in `multicontract.toml`. It has no effect on the produced assets.
     ///
@@ -39,7 +45,7 @@ impl ContractVariant {
         let default_contract_config_name = abi.build_info.contract_crate.name.to_string();
         let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
         ContractVariant {
-            main: true,
+            wasm_dir_short_name: true,
             settings: ContractVariantSettings::default(),
             contract_id: default_contract_config_name.clone(),
             contract_name: default_contract_config_name,
@@ -56,7 +62,7 @@ impl ContractVariant {
     ///
     /// Note this does not necessarily have to match the wasm crate name defined in Cargo.toml.
     pub fn wasm_crate_dir_name(&self) -> String {
-        if self.main {
+        if self.wasm_dir_short_name {
             "wasm".to_string()
         } else {
             format!("wasm-{}", &self.contract_name)
@@ -181,7 +187,7 @@ impl ContractVariant {
 impl std::fmt::Debug for ContractVariant {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ContractVariant")
-            .field("main", &self.main)
+            .field("wasm_dir_short_name", &self.wasm_dir_short_name)
             .field("config_name", &self.contract_id)
             .field("public_name", &self.contract_name)
             .field("num-constructors", &self.abi.constructors.len())

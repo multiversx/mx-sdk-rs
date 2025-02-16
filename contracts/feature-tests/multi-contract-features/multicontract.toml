@@ -1,8 +1,5 @@
 # Keeping one file called `multicontract.toml` to test the backwards compatibility.
 
-[settings]
-main = "multi-contract-main"
-
 [contracts.multi-contract-main]
 # main contract can have any id and any name
 name = "multi-contract-features"
