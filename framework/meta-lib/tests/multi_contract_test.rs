@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 use multiversx_sc_meta_lib::contract::sc_config::{ScConfig, ScConfigSerde};
 
@@ -90,12 +92,8 @@ fn test_sc_config() {
     let serde = get_serialized_toml();
     let abi = get_contract_abi();
 
-    let contract_config = ScConfig::load_from_config(&serde, &abi);
+    let contract_config = ScConfig::load_from_config(PathBuf::default().as_path(), &serde, &abi);
 
-    assert_eq!(
-        contract_config.default_contract_config_name,
-        "main-contract"
-    );
     assert_eq!(contract_config.contracts.len(), 2);
     assert!(contract_config
         .get_contract_by_id("secondary-contract".to_string())
@@ -110,7 +108,7 @@ fn test_sc_config() {
         .get_contract_by_name("contract-wrong-name]".to_string())
         .is_none());
 
-    let main_contract = contract_config.main_contract();
+    let main_contract = contract_config.first_contract();
     assert_eq!(main_contract.contract_id, "main-contract");
     assert_eq!(main_contract.contract_name, "main-contract");
 
