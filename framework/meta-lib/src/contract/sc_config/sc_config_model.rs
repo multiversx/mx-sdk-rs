@@ -21,20 +21,13 @@ pub struct ScConfig {
 }
 
 impl ScConfig {
-    /// For when we don't know which output contract to pick.
-    pub fn first_contract(&self) -> &ContractVariant {
-        self.contracts
-            .first()
-            .expect("no contracts found in SC project")
-    }
-
-    pub fn get_contract_by_id(&self, contract_id: String) -> Option<&ContractVariant> {
+    pub fn get_contract_by_id(&self, contract_id: &str) -> Option<&ContractVariant> {
         self.contracts
             .iter()
             .find(|contract| contract.contract_id == contract_id)
     }
 
-    pub fn get_contract_by_name(&self, contract_name: String) -> Option<&ContractVariant> {
+    pub fn get_contract_by_name(&self, contract_name: &str) -> Option<&ContractVariant> {
         self.contracts
             .iter()
             .find(|contract| contract.contract_name == contract_name)
