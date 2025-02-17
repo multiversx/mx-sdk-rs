@@ -3,6 +3,7 @@ use std::io::Read;
 
 /// Config file
 const CONFIG_FILE: &str = "config.toml";
+pub const CHAIN_SIMULATOR_GATEWAY: &str = "http://localhost:8085";
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -29,7 +30,7 @@ impl Config {
 
     pub fn chain_simulator_config() -> Self {
         Config {
-            gateway_uri: "http://localhost:8085".to_owned(),
+            gateway_uri: CHAIN_SIMULATOR_GATEWAY.to_owned(),
             chain_type: ChainType::Simulator,
         }
     }
