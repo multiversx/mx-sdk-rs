@@ -36,7 +36,7 @@ fn enum_to_bytes_writer() {
         &mut payload,
     );
 
-    assert_eq!(payload.buffer, [0]);
+    assert_eq!(payload.into_array(), [0]);
 }
 
 #[test]

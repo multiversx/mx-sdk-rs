@@ -1,6 +1,11 @@
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap, fmt::Debug};
+use std::{
+    collections::HashMap,
+    fmt::Debug,
+    ops::{Deref, DerefMut},
+    sync::Arc,
+};
 
 use crate::{tx_mock::BlockchainUpdate, types::VMAddress};
 
@@ -89,5 +94,32 @@ impl Debug for BlockchainState {
             .field("new_addresses", &self.new_addresses)
             .field("current_block_info", &self.current_block_info)
             .finish()
+    }
+}
+
+#[derive(Default, Clone)]
+pub struct BlockchainStateRef(Arc<BlockchainState>);
+
+impl BlockchainStateRef {
+    pub fn mut_state(&mut self) -> &mut BlockchainState {
+        Arc::get_mut(&mut self.0).expect("cannot change state, since object is currently shared")
+    }
+
+    pub fn get_arc(&self) -> Arc<BlockchainState> {
+        self.0.clone()
+    }
+}
+
+impl Deref for BlockchainStateRef {
+    type Target = BlockchainState;
+
+    fn deref(&self) -> &Self::Target {
+        self.0.deref()
+    }
+}
+
+impl DerefMut for BlockchainStateRef {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        Arc::get_mut(&mut self.0).expect("cannot change state, since object is currently shared")
     }
 }

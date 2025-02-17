@@ -1,6 +1,3 @@
-[settings]
-main = "basic-features"
-
 [contracts.basic-features]
 
 [contracts.basic-features.profile]

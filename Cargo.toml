@@ -22,7 +22,6 @@ members = [
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",
-  "tools/payload-macro-generator",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
 

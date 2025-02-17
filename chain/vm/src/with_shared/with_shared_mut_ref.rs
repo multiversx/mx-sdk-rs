@@ -9,6 +9,10 @@ use std::rc::Rc;
 /// The `Clone` of the argument is not used, except to preserve memory consistency in case of failure.
 ///
 /// See the `Shared` type for a safer implementation, which does not require `Clone`.
+#[deprecated(
+    since = "0.57.0",
+    note = "not currently used, has not been used in some time, only kept for reference"
+)]
 pub fn with_shared_mut_ref<T, F, R>(t: &mut T, f: F) -> R
 where
     T: Clone,

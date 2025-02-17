@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use generic_array::typenum::U4;
+
 use crate::{
     abi::TypeAbiFrom,
     api::HandleConstraints,
@@ -200,7 +202,7 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + 'static,
 {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 

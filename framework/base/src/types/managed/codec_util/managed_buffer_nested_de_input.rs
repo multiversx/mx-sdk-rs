@@ -8,8 +8,7 @@ use crate::codec::{
 use crate::{
     api::ManagedTypeApi,
     types::{
-        managed::{preloaded_managed_buffer::PreloadedManagedBuffer, ManagedBufferSizeContext},
-        BigInt, BigUint, ManagedBuffer, ManagedBufferReadToEnd,
+        managed::ManagedBufferSizeContext, BigInt, BigUint, ManagedBuffer, ManagedBufferReadToEnd,
     },
 };
 
@@ -19,7 +18,7 @@ pub struct ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,
 {
-    buffer: PreloadedManagedBuffer<M>,
+    buffer: ManagedBuffer<M>,
     decode_index: usize,
     buffer_len: usize,
     _phantom: PhantomData<M>,
@@ -33,11 +32,10 @@ where
         // retrieves buffer length eagerly because:
         // - it always gets called anyway at the end to check that no leftover bytes remain
         // - it is sometimes required multiple times during serialization
-        let buffer = PreloadedManagedBuffer::new(managed_buffer);
-        let buffer_len = buffer.buffer_len;
+        let buffer_len = managed_buffer.len();
 
         ManagedBufferNestedDecodeInput {
-            buffer,
+            buffer: managed_buffer,
             decode_index: 0,
             buffer_len,
             _phantom: PhantomData,

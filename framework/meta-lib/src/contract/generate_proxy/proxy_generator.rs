@@ -644,7 +644,7 @@ pub mod tests {
         let mut proxy_generator = ProxyGenerator {
             meta_config: &meta_config,
             file: None,
-            proxy_config: &ProxyConfig::new_with_default_path(original_contract_abi),
+            proxy_config: &ProxyConfig::output_dir_proxy_config(original_contract_abi),
         };
 
         let cleaned_path_unsanitized = proxy_generator.clean_paths(
@@ -675,7 +675,7 @@ pub mod tests {
         let mut proxy_generator = ProxyGenerator {
             meta_config: &meta_config,
             file: None,
-            proxy_config: &ProxyConfig::new_with_default_path(original_contract_abi),
+            proxy_config: &ProxyConfig::output_dir_proxy_config(original_contract_abi),
         };
 
         let cleaned_path_sanitized = proxy_generator.clean_paths(
