@@ -6,10 +6,10 @@ use lottery_esdt::*;
 pub const LOTTERY_PATH_EXPR: &str = "mxsc:output/lottery-esdt.mxsc.json";
 
 pub const MY_ADDRESS: &str = "my_address";
-pub const OTHER_SHARD_ADDRESS: &str = "other_shard_address#00";
+pub const OTHER_SHARD_ADDRESS: &str = "other_shard_address";
 pub const ACCOUNT1_ADDRESS: &str = "acc1";
 pub const ACCOUNT2_ADDRESS: &str = "acc2";
-pub const SC_LOTTERY_ADDRESS: &str = "lottery#01";
+pub const SC_LOTTERY_ADDRESS: &str = "lottery";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
