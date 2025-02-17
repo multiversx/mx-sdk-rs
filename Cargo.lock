@@ -2277,6 +2277,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "lottery-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "lottery-esdt",
+ "multiversx-sc-snippets",
+ "serde",
+ "serial_test",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "managed-map-features"
 version = "0.0.0"
 dependencies = [

@@ -62,6 +62,25 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    pub fn upgrade(
+        self,
+    ) -> TxTypedUpgrade<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_upgrade()
+            .original_result()
+    }
+}
+
+#[rustfmt::skip]
+impl<Env, From, To, Gas> LotteryProxyMethods<Env, From, To, Gas>
+where
+    Env: TxEnv,
+    Env::Api: VMApi,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
     pub fn determine_winner<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
