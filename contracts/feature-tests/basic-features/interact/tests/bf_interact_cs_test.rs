@@ -233,11 +233,4 @@ async fn chain_simulator_bf_get_special_roles_test() {
             .token_has_transfer_role(&dynamic_nft_token_id)
             .await
     );
-
-    // retrieve transfer role from sc storage raw wrapper
-    assert!(
-        bf_interact
-            .storage_raw_token_has_transfer_role(&dynamic_nft_token_id)
-            .await
-    );
 }

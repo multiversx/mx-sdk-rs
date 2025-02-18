@@ -133,19 +133,6 @@ where
             .original_result()
     }
 
-    pub fn storage_raw_token_has_transfer_role<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
-    >(
-        self,
-        token_id: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("storage_raw_token_has_transfer_role")
-            .argument(&token_id)
-            .original_result()
-    }
-
     pub fn load_bytes(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
@@ -172,12 +159,12 @@ where
         Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
-        token_id: Arg0,
+        token_identifier: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("token_has_transfer_role")
-            .argument(&token_id)
+            .argument(&token_identifier)
             .original_result()
     }
 
