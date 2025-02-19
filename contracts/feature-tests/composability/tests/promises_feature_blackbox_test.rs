@@ -94,7 +94,12 @@ fn test_back_transfers_reset() {
         .from(USER_ADDRESS)
         .to(PROMISES_FEATURE_ADDRESS)
         .typed(promises_feature_proxy::PromisesFeaturesProxy)
-        .forward_sync_retrieve_funds_bt_reset_twice(VAULT_ADDRESS, TOKEN_ID, 0u64, &half_token_amount)
+        .forward_sync_retrieve_funds_bt_reset_twice(
+            VAULT_ADDRESS,
+            TOKEN_ID,
+            0u64,
+            &half_token_amount,
+        )
         .run();
 
     state
