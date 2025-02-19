@@ -361,6 +361,11 @@ fn small_num_overflow_rs() {
 }
 
 #[test]
+fn send_esdt_to_nonexisting_account_rs() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}
+
+#[test]
 fn storage_big_int_rs() {
     world().run("scenarios/storage_big_int.scen.json");
 }
