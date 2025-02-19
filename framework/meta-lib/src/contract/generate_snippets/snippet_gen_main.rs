@@ -30,7 +30,7 @@ impl MetaConfig {
         let original_contract_abi = ShortContractAbi::from(self.original_contract_abi.clone());
         let diff_abi =
             check_abi_differences(&original_contract_abi, &self.snippets_dir, args.overwrite);
-        if &diff_abi == &original_contract_abi {
+        if diff_abi == original_contract_abi {
             let mut file = create_snippets_crate_and_get_lib_file(
                 &self.snippets_dir,
                 crate_name,

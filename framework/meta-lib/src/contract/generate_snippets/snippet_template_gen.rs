@@ -50,7 +50,7 @@ pub async fn {crate_name}_cli() {{
     // all contracts have a deploy snippet
     writeln!(file, r#"        "deploy" => interact.deploy().await,"#).unwrap();
 
-    for upgrade_endpoint in &abi.upgrade_constructors {
+    for upgrade_endpoint in &abi.upgrade_constructor {
         writeln!(
             file,
             r#"        "{}" => interact.{}().await,"#,
