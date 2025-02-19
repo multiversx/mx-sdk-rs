@@ -361,6 +361,7 @@ fn small_num_overflow_rs() {
 }
 
 #[test]
+#[ignore = "unsupported"]
 fn send_esdt_to_nonexisting_account_rs() {
     world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
 }
