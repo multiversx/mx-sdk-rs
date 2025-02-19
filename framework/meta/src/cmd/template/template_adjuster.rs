@@ -118,16 +118,16 @@ impl TemplateAdjuster {
             &self.target.contract_dir(),
             "*rs",
             &[
-                Query::substring(old_trait, &new_trait),
-                Query::substring(&old_package, &new_package),
-                Query::substring(&old_proxy_mod, &new_proxy_mod),
+                Query::simple(old_trait, &new_trait),
+                Query::simple(&old_package, &new_package),
+                Query::simple(&old_proxy_mod, &new_proxy_mod),
             ][..],
         );
 
         replace_in_files(
             &self.target.contract_dir(),
             "*sc-config.toml",
-            &[Query::substring(&old_proxy_mod, &new_proxy_mod)][..],
+            &[Query::simple(&old_proxy_mod, &new_proxy_mod)][..],
         );
     }
 
@@ -139,11 +139,11 @@ impl TemplateAdjuster {
             &self.target.contract_dir(),
             "*Cargo.toml",
             &[
-                Query::substring(
+                Query::simple(
                     &package_name_expr(&self.metadata.name),
                     &package_name_expr(&self.target.new_name),
                 ),
-                Query::substring(&old_path, &new_path),
+                Query::simple(&old_path, &new_path),
             ][..],
         );
     }
@@ -156,10 +156,10 @@ impl TemplateAdjuster {
             &self.target.contract_dir(),
             "*Cargo.toml",
             &[
-                Query::substring(&package_name_expr(&old_meta), &package_name_expr(&new_meta)),
-                Query::substring(
-                    &dependecy_decl_expr(&self.metadata.name),
-                    &dependecy_decl_expr(&self.target.new_name),
+                Query::simple(&package_name_expr(&old_meta), &package_name_expr(&new_meta)),
+                Query::simple(
+                    &dependency_decl_expr(&self.metadata.name),
+                    &dependency_decl_expr(&self.target.new_name),
                 ),
             ][..],
         );
@@ -173,10 +173,10 @@ impl TemplateAdjuster {
             &self.target.contract_dir(),
             "*Cargo.toml",
             &[
-                Query::substring(&package_name_expr(&old_wasm), &package_name_expr(&new_wasm)),
-                Query::substring(
-                    &dependecy_decl_expr(&self.metadata.name),
-                    &dependecy_decl_expr(&self.target.new_name),
+                Query::simple(&package_name_expr(&old_wasm), &package_name_expr(&new_wasm)),
+                Query::simple(
+                    &dependency_decl_expr(&self.metadata.name),
+                    &dependency_decl_expr(&self.target.new_name),
                 ),
             ][..],
         );
@@ -188,16 +188,16 @@ impl TemplateAdjuster {
 
         let mut queries = Vec::<Query>::new();
         for (old, new) in self.metadata.rename_pairs.iter() {
-            queries.push(Query::substring(old, new))
+            queries.push(Query::simple(old, new))
         }
 
         let new_path = as_path(&self.target.new_name);
         let old_path = as_path(&self.metadata.name);
-        queries.push(Query::substring(&old_path, &new_path));
+        queries.push(Query::simple(&old_path, &new_path));
 
         let new_scenarios = scenario_path(&new_name);
         let old_scenarios = scenario_path(&old_name);
-        queries.push(Query::substring(&old_scenarios, &new_scenarios));
+        queries.push(Query::simple(&old_scenarios, &new_scenarios));
 
         let old_wasm = wasm_file_name(&self.metadata.name);
         let new_wasm = wasm_file_name(&self.target.new_name);
@@ -208,8 +208,8 @@ impl TemplateAdjuster {
         self.rename_in_scenarios(&old_wasm, &new_wasm);
         self.rename_in_scenarios(&old_mxsc, &new_mxsc);
 
-        queries.push(Query::substring(&old_wasm, &new_wasm));
-        queries.push(Query::substring(&old_mxsc, &new_mxsc));
+        queries.push(Query::simple(&old_wasm, &new_wasm));
+        queries.push(Query::simple(&old_mxsc, &new_mxsc));
 
         replace_in_files(
             &self.target.contract_dir().join(TEST_DIRECTORY),
@@ -222,13 +222,13 @@ impl TemplateAdjuster {
         replace_in_files(
             &self.target.contract_dir(),
             "*.scen.json",
-            &[Query::substring(old, new)][..],
+            &[Query::simple(old, new)][..],
         );
 
         replace_in_files(
             &self.target.contract_dir(),
             "*.steps.json",
-            &[Query::substring(old, new)][..],
+            &[Query::simple(old, new)][..],
         );
     }
 
@@ -236,7 +236,7 @@ impl TemplateAdjuster {
         let old_mxsc = mxsc_file_name(&self.metadata.name);
         let new_mxsc = mxsc_file_name(&self.target.new_name);
 
-        let queries = vec![Query::substring(&old_mxsc, &new_mxsc)];
+        let queries = vec![Query::simple(&old_mxsc, &new_mxsc)];
 
         replace_in_files(
             &self.target.contract_dir().join(INTERACT_DIRECTORY),
@@ -279,7 +279,7 @@ fn as_path(name: &str) -> String {
 fn package_name_expr(template: &str) -> String {
     format!("name = \"{template}\"")
 }
-fn dependecy_decl_expr(template: &str) -> String {
+fn dependency_decl_expr(template: &str) -> String {
     format!("dependencies.{template}")
 }
 
