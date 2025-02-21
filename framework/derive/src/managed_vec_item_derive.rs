@@ -152,7 +152,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
         }
     }
 
-    let gen = quote! {
+    let result = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemEnumPayloadTuple>::EnumPayload;
             const SKIPS_RESERIALIZATION: bool = #skips_reserialization;
@@ -188,7 +188,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
             }
         }
     };
-    gen.into()
+    result.into()
 }
 
 fn single_fields_type(fields: &syn::Fields) -> Option<syn::Type> {
@@ -217,7 +217,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
     let read_from_payload_snippets = generate_read_from_payload_snippets(&data_struct.fields);
     let save_to_payload_snippets = generate_save_to_payload_snippets(&data_struct.fields);
 
-    let gen = quote! {
+    let result = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemStructPayloadTuple>::StructPayload;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
@@ -245,5 +245,5 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
             }
         }
     };
-    gen.into()
+    result.into()
 }
