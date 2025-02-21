@@ -16,7 +16,7 @@ jobs:
     name: Contracts
     uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v4.2.2
     with:
-      rust-toolchain: 1.84
+      rust-toolchain: 1.85
       path-to-sc-meta: framework/meta
       mx-scenario-go-version: v3.0.0
       enable-interactor-tests: true
