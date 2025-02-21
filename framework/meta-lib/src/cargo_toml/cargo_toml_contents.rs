@@ -347,7 +347,11 @@ mod tests {
 
     #[test]
     fn test_change_from_base_to_adapter_path() {
-        let base_path = Path::new("..").join("..").join("..");
+        let base_path = Path::new("..")
+            .join("..")
+            .join("..")
+            .join("framework")
+            .join("base");
         let adapter_path = Path::new("..")
             .join("..")
             .join("..")
