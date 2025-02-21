@@ -328,11 +328,10 @@ fn is_dep_path_above(dep: &Value) -> bool {
     false
 }
 
-pub fn change_from_base_to_adapter_path(base_path: &str) -> String {
-    format!(
-        "../{}",
-        base_path.to_string().replace("base", "wasm-adapter")
-    )
+pub fn change_from_base_to_adapter_path(base_path: &Path) -> PathBuf {
+    let path = base_path.to_string_lossy().replace("base", "wasm-adapter");
+
+    Path::new("..").join(path)
 }
 
 /// TODO: still useful?
@@ -348,10 +347,16 @@ mod tests {
 
     #[test]
     fn test_change_from_base_to_adapter_path() {
-        let base_path = "../../../framework/base";
-        let adapter_path = "../../../../framework/wasm-adapter".to_string();
+        let base_path = Path::new("..").join("..").join("..");
+        let adapter_path = Path::new("..")
+            .join("..")
+            .join("..")
+            .join("..")
+            .join("framework")
+            .join("wasm-adapter");
+
         assert_eq!(
-            super::change_from_base_to_adapter_path(base_path),
+            super::change_from_base_to_adapter_path(&base_path),
             adapter_path
         );
     }
@@ -379,7 +384,7 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
 
     #[test]
     fn test_dependency_value() {
-        let cargo_toml = CargoTomlContents::parse_string(CARGO_TOML_RAW, "/test".as_ref());
+        let cargo_toml = CargoTomlContents::parse_string(CARGO_TOML_RAW, Path::new("test"));
 
         // version
         let raw_value = cargo_toml.dependency_raw_value("by-version-1").unwrap();
@@ -479,30 +484,26 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
 
         // path
         let raw_value = cargo_toml.dependency_raw_value("by-path-1").unwrap();
+        let path = Path::new("a").join("b").join("c");
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                path: Some("a/b/c".to_owned()),
+                path: Some(path.clone()),
                 ..Default::default()
             },
         );
-        assert_eq!(
-            raw_value.interpret(),
-            DependencyReference::Path("a/b/c".to_owned()),
-        );
+        assert_eq!(raw_value.interpret(), DependencyReference::Path(path),);
 
         // path, compact
         let raw_value = cargo_toml.dependency_raw_value("by-path-2").unwrap();
+        let path = Path::new("d").join("e").join("f");
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                path: Some("d/e/f".to_owned()),
+                path: Some(path.clone()),
                 ..Default::default()
             },
         );
-        assert_eq!(
-            raw_value.interpret(),
-            DependencyReference::Path("d/e/f".to_owned()),
-        );
+        assert_eq!(raw_value.interpret(), DependencyReference::Path(path),);
     }
 }

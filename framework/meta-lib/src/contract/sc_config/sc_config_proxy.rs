@@ -1,6 +1,6 @@
-use serde::Deserialize;
+use std::path::Path;
 
-const DEFAULT_PATH: &str = "/output/proxy.rs";
+use serde::Deserialize;
 
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -33,8 +33,9 @@ pub struct ProxyConfigSerde {
 
 impl ProxyConfigSerde {
     pub fn new() -> Self {
+        let default_path = Path::new("output").join("proxy.rs");
         Self {
-            path: DEFAULT_PATH.to_string(),
+            path: default_path.to_string_lossy().to_string(),
             override_import: None,
             path_rename: None,
             variant: None,

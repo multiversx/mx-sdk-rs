@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use super::{contract_variant_builder::default_wasm_crate_name, ContractVariantSettings};
 use crate::cli::BuildArgs;
@@ -63,46 +63,42 @@ impl ContractVariant {
         }
     }
 
-    pub fn wasm_crate_path(&self) -> String {
-        format!("../{}", &self.wasm_crate_dir_name())
+    pub fn wasm_crate_path(&self) -> PathBuf {
+        Path::new("..").join(self.wasm_crate_dir_name())
     }
 
-    pub fn cargo_toml_path(&self) -> String {
-        format!("{}/Cargo.toml", &self.wasm_crate_path())
+    pub fn cargo_toml_path(&self) -> PathBuf {
+        Path::new(&self.wasm_crate_path()).join("Cargo.toml")
     }
 
-    pub fn some_other_test_path(&self) -> String {
-        format!("{}/test-Cargo.toml", &self.wasm_crate_path())
+    pub fn some_other_test_path(&self) -> PathBuf {
+        Path::new(&self.wasm_crate_path()).join("test-Cargo.toml")
     }
 
     pub fn wasm_crate_name_snake_case(&self) -> String {
         self.wasm_crate_name.replace('-', "_")
     }
 
-    pub fn resolve_wasm_target_dir(&self, explicit_target_dir: &Option<String>) -> String {
+    pub fn resolve_wasm_target_dir(&self, explicit_target_dir: &Option<String>) -> PathBuf {
         let wasm_crate_path = self.wasm_crate_path();
         if let Some(explicit_target_dir) = explicit_target_dir {
             // usually the explicit_target_dir is absolute,
             // but if it isn't, we need to take the path of the wasm crate into account
-            PathBuf::from(wasm_crate_path)
-                .join(explicit_target_dir)
-                .to_str()
-                .unwrap()
-                .to_string()
+            Path::new(&wasm_crate_path).join(explicit_target_dir)
         } else {
-            format!("{}/target", &wasm_crate_path)
+            Path::new(&wasm_crate_path).join("target")
         }
     }
 
     /// This is where Rust will initially compile the WASM binary.
-    pub fn wasm_compilation_output_path(&self, explicit_target_dir: &Option<String>) -> String {
+    pub fn wasm_compilation_output_path(&self, explicit_target_dir: &Option<String>) -> PathBuf {
         let target_dir = self.resolve_wasm_target_dir(explicit_target_dir);
+        let wasm_file_name = format!("{}.wasm", &self.wasm_crate_name_snake_case());
 
-        format!(
-            "{}/wasm32-unknown-unknown/release/{}.wasm",
-            &target_dir,
-            &self.wasm_crate_name_snake_case(),
-        )
+        Path::new(&target_dir)
+            .join("wasm32-unknown-unknown")
+            .join("release")
+            .join(wasm_file_name)
     }
 
     pub fn abi_output_name(&self) -> String {

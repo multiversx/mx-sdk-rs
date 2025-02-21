@@ -1,4 +1,7 @@
-use std::fs::File;
+use std::{
+    fs::File,
+    path::{Path, PathBuf},
+};
 
 use multiversx_sc::abi::ContractAbi;
 
@@ -43,7 +46,7 @@ impl MetaConfig {
 
 #[must_use]
 fn create_snippets_crate_and_get_lib_file(
-    snippets_folder_path: &str,
+    snippets_folder_path: &PathBuf,
     contract_crate_name: &str,
     overwrite: bool,
 ) -> File {
@@ -57,7 +60,7 @@ fn create_snippets_crate_and_get_lib_file(
 }
 
 #[must_use]
-fn create_config_and_get_file(snippets_folder_path: &str) -> File {
+fn create_config_and_get_file(snippets_folder_path: &Path) -> File {
     create_config_toml_file(snippets_folder_path);
     create_config_rust_file(snippets_folder_path)
 }
