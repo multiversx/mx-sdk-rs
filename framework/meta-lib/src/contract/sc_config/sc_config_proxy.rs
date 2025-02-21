@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
@@ -6,7 +6,7 @@ use serde::Deserialize;
 #[serde(deny_unknown_fields)]
 pub struct ProxyConfigSerde {
     #[serde(default)]
-    pub path: String,
+    pub path: PathBuf,
 
     #[serde(default)]
     #[serde(rename = "override-import")]
@@ -33,9 +33,8 @@ pub struct ProxyConfigSerde {
 
 impl ProxyConfigSerde {
     pub fn new() -> Self {
-        let default_path = Path::new("output").join("proxy.rs");
         Self {
-            path: default_path.to_string_lossy().to_string(),
+            path: Path::new("output").join("proxy.rs"),
             override_import: None,
             path_rename: None,
             variant: None,

@@ -313,7 +313,10 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                 let mut contract_builder = ContractVariantBuilder::default();
                 alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
 
-                contract_builders.insert(proxy_config.path.clone(), contract_builder);
+                contract_builders.insert(
+                    proxy_config.path.to_string_lossy().to_string(),
+                    contract_builder,
+                );
             },
         }
 

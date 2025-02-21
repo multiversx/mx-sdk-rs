@@ -191,14 +191,12 @@ pub(crate) fn create_sc_config_file(overwrite: bool) {
         file
     };
 
-    let full_proxy_entry = format!(
-        r#"[[proxy]]
-path = "{}""#,
-        &Path::new("interactor")
-            .join("src")
-            .join(PROXY_FILE_NAME)
-            .to_string_lossy()
-    );
+    // will be deserialized into a PathBuf, which normalizes the path depending on the platform
+    // when deserializing from toml, backwards slashes are not allowed
+    let full_proxy_entry = r#"
+[[proxy]]
+path = "interactor/src/proxy.rs"
+"#;
 
     // write full proxy toml entry to the file
     writeln!(&mut file, "\n{full_proxy_entry}").unwrap();
