@@ -37,6 +37,6 @@ impl KittyGenes {
 
 impl Color {
     pub fn as_u64(&self) -> u64 {
-        ((((self.r.to_be() as u64) << 8) | self.r.to_be() as u64) << 8) | self.r.to_be() as u64
+        ((((self.r as u64) << 16) | self.g as u64) << 8) | self.b as u64
     }
 }
