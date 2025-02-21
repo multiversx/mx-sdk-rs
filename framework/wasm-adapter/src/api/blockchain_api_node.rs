@@ -9,7 +9,7 @@ use multiversx_sc::{
     types::heap::{Address, Box, H256},
 };
 
-extern "C" {
+unsafe extern "C" {
     // address utils
     fn getSCAddress(resultOffset: *mut u8);
 
