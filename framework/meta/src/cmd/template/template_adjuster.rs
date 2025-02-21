@@ -13,10 +13,7 @@ use toml::value::Table;
 
 const TEST_DIRECTORY_NAME: &str = "tests";
 const INTERACT_DIRECTORY_NAME: &str = "interact";
-const ROOT_CARGO_TOML_NAME: &str = "Cargo.toml";
-const META_CARGO_TOML_NAME: &str = "meta/Cargo.toml";
-const WASM_CARGO_TOML_NAME: &str = "wasm/Cargo.toml";
-const INTERACT_CARGO_TOML_NAME: &str = "interactor/Cargo.toml";
+const CARGO_TOML: &str = "Cargo.toml";
 const DEFAULT_AUTHOR: &str = "you";
 
 pub struct TemplateAdjuster {
@@ -38,7 +35,7 @@ impl TemplateAdjuster {
     }
 
     fn update_cargo_toml_root(&self, author: String) {
-        let cargo_toml_path = self.target.contract_dir().join(ROOT_CARGO_TOML_NAME);
+        let cargo_toml_path = self.target.contract_dir().join(CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
@@ -55,11 +52,7 @@ impl TemplateAdjuster {
     }
 
     fn update_cargo_toml_meta(&self) {
-        let cargo_toml_path = self
-            .target
-            .contract_dir()
-            .join("meta")
-            .join(META_CARGO_TOML_NAME);
+        let cargo_toml_path = self.target.contract_dir().join("meta").join(CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
@@ -74,11 +67,7 @@ impl TemplateAdjuster {
             return;
         }
 
-        let cargo_toml_path = self
-            .target
-            .contract_dir()
-            .join("wasm")
-            .join(WASM_CARGO_TOML_NAME);
+        let cargo_toml_path = self.target.contract_dir().join("wasm").join(CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
@@ -97,7 +86,7 @@ impl TemplateAdjuster {
             .target
             .contract_dir()
             .join("interactor")
-            .join(INTERACT_CARGO_TOML_NAME);
+            .join(CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
