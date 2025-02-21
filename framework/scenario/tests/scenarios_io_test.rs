@@ -16,7 +16,7 @@ use multiversx_sc_scenario::{
 fn test_scenario_low_to_low_ser_de() {
     let contents_path = Path::new("tests")
         .join("scenarios-io")
-        .join("examples_raw.scen.json");
+        .join("example_raw.scen.json");
     let contents = fs::read_to_string(contents_path).unwrap();
     let scenario_raw = ScenarioRaw::from_json_str(contents.as_str());
 
