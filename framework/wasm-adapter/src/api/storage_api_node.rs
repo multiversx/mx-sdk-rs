@@ -3,7 +3,7 @@ use multiversx_sc::api::{
     StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
 
-extern "C" {
+unsafe extern "C" {
     // managed buffer API
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;

@@ -110,7 +110,7 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
     let top_decode_body = top_decode_method_body(ast);
     let auto_default = auto_default(ast);
 
-    let gen = quote! {
+    let result = quote! {
         impl #impl_generics codec::TopDecode for #name #ty_generics #where_clause {
             fn top_decode_or_handle_err<I, H>(top_input: I, __h__: H) -> core::result::Result<Self, H::HandledErr>
             where
@@ -123,7 +123,7 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
 
-    gen.into()
+    result.into()
 }
 
 pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
@@ -131,7 +131,7 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     let top_decode_body = top_decode_method_body(ast);
 
-    let gen = quote! {
+    let result = quote! {
         impl #impl_generics codec::TopDecode for #name #ty_generics #where_clause {
             fn top_decode_or_handle_err<I, H>(top_input: I, __h__: H) -> core::result::Result<Self, H::HandledErr>
             where
@@ -147,5 +147,5 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
 
-    gen.into()
+    result.into()
 }

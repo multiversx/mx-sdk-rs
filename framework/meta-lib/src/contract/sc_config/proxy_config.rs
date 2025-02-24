@@ -27,7 +27,7 @@ impl ProxyConfig {
         }
     }
 
-    pub fn new_with_default_path(abi: ContractAbi) -> Self {
+    pub fn output_dir_proxy_config(abi: ContractAbi) -> Self {
         let default_path = Path::new("output").join("proxy.rs");
         ProxyConfig {
             path: default_path,

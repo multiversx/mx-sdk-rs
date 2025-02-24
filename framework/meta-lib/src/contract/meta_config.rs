@@ -6,8 +6,10 @@ use std::{
 use multiversx_sc::abi::ContractAbi;
 
 use crate::{
-    cargo_toml::CargoTomlContents, cli::BuildArgs, print_util::print_workspace_target_dir,
-    tools::check_tools_installed, tools::find_current_workspace,
+    cargo_toml::CargoTomlContents,
+    cli::BuildArgs,
+    print_util::{print_removing_wasm_crate, print_workspace_target_dir},
+    tools::{check_tools_installed, find_current_workspace},
 };
 
 use super::{
@@ -127,7 +129,7 @@ impl MetaConfig {
     }
 
     fn is_expected_crate(&self, dir_name: &str) -> bool {
-        if !dir_name.starts_with("wasm-") {
+        if !dir_name.starts_with("wasm") {
             return true;
         }
 
@@ -136,7 +138,8 @@ impl MetaConfig {
         }
 
         self.sc_config
-            .secondary_contracts()
+            .contracts
+            .iter()
             .any(|contract| contract.wasm_crate_dir_name().as_str() == dir_name)
     }
 
@@ -152,7 +155,7 @@ impl MetaConfig {
                 let file_name = path.file_name();
                 let dir_name = file_name.to_str().expect("error processing dir name");
                 if !self.is_expected_crate(dir_name) {
-                    println!("Removing crate {dir_name}");
+                    print_removing_wasm_crate(dir_name);
                     fs::remove_dir_all(path.path()).unwrap_or_else(|_| {
                         panic!("failed to remove unexpected directory {dir_name}")
                     });
