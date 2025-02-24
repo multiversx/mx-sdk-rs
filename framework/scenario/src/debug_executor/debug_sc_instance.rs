@@ -1,85 +1,34 @@
-use multiversx_chain_vm::tx_mock::{TxFunctionName, TxPanic};
+use multiversx_chain_vm::tx_mock::{TxContextRef, TxFunctionName, TxPanic};
 use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
-use multiversx_sc::{chain_core::types::ReturnCode, contract_base::CallableContract};
+use multiversx_sc::chain_core::types::ReturnCode;
 use std::sync::Arc;
 
-use crate::DebugApi;
+use crate::api::DebugApiBackend;
 
-use super::{catch_tx_panic, StaticVarStack};
+use super::{catch_tx_panic, ContractContainerRef, StaticVarData};
 
-/// Contains a reference to a contract implementation.
-///
-/// It can optionally also contain an allowed endpoint whitelist, to simulate multi-contract.
-pub struct ContractContainer {
-    callable: Box<dyn CallableContract>,
-    function_whitelist: Option<Vec<String>>,
-    pub panic_message: bool,
+pub struct DebugSCInstance {
+    pub tx_context_ref: TxContextRef,
+    pub contract_container_ref: ContractContainerRef,
+    pub static_var_data_ref: Arc<StaticVarData>,
 }
 
-impl ContractContainer {
-    pub fn new(
-        callable: Box<dyn CallableContract>,
-        function_whitelist: Option<Vec<String>>,
-        panic_message: bool,
-    ) -> Self {
-        ContractContainer {
-            callable,
-            function_whitelist,
-            panic_message,
-        }
-    }
-
-    pub fn validate_function_name(&self, function_name: &TxFunctionName) -> bool {
-        if let Some(function_whitelist) = &self.function_whitelist {
-            function_whitelist
-                .iter()
-                .any(|whitelisted_endpoint| whitelisted_endpoint.as_str() == function_name.as_str())
-        } else {
-            true
-        }
-    }
-
-    pub fn call(&self, function_name: &TxFunctionName) -> bool {
-        if self.validate_function_name(function_name) {
-            self.callable.call(function_name.as_str())
-        } else {
-            false
+impl DebugSCInstance {
+    pub fn new(tx_context_ref: TxContextRef, contract_container: ContractContainerRef) -> Self {
+        DebugSCInstance {
+            tx_context_ref,
+            contract_container_ref: contract_container,
+            static_var_data_ref: Arc::new(StaticVarData::default()),
         }
     }
 }
 
-/// Prepares the StaticVarStack and catches panics.
-/// The result of the panics is written to the top of the TxContext stack.
-pub fn contract_instance_wrapped_execution<F>(panic_message: bool, f: F)
-where
-    F: FnOnce() -> Result<(), TxPanic>,
-{
-    StaticVarStack::static_push();
-
-    let result = catch_tx_panic(panic_message, f);
-
-    if let Err(tx_panic) = result {
-        DebugApi::get_current_tx_context_ref().replace_tx_result_with_error(tx_panic);
-    }
-
-    StaticVarStack::static_pop();
-}
-
-#[derive(Clone)]
-pub struct ContractContainerRef(pub(crate) Arc<ContractContainer>);
-
-impl ContractContainerRef {
-    pub fn new(contract_container: ContractContainer) -> Self {
-        ContractContainerRef(Arc::new(contract_container))
-    }
-}
-
-impl Instance for ContractContainerRef {
+impl Instance for DebugSCInstance {
     fn call(&self, func_name: &str) -> Result<(), String> {
         let tx_func_name = TxFunctionName::from(func_name);
 
-        contract_instance_wrapped_execution(self.0.panic_message, || {
-            let call_successful = self.0.call(&tx_func_name);
+        let result = catch_tx_panic(self.contract_container_ref.0.panic_message, || {
+            let call_successful = self.contract_container_ref.0.call(&tx_func_name);
             if call_successful {
                 Ok(())
             } else {
@@ -90,6 +39,12 @@ impl Instance for ContractContainerRef {
             }
         });
 
+        if let Err(tx_panic) = result {
+            self.tx_context_ref
+                .clone()
+                .replace_tx_result_with_error(tx_panic);
+        }
+
         Ok(())
     }
 
@@ -98,8 +53,7 @@ impl Instance for ContractContainerRef {
     }
 
     fn has_function(&self, func_name: &str) -> bool {
-        let tx_func_name = TxFunctionName::from(func_name);
-        self.0.validate_function_name(&tx_func_name)
+        self.contract_container_ref.has_function(func_name)
     }
 
     fn get_exported_function_names(&self) -> Vec<String> {
@@ -158,7 +112,13 @@ impl Instance for ContractContainerRef {
         panic!("ContractContainerRef cache not supported")
     }
 
-    fn on_stack_top_enter(&self) {}
+    fn on_stack_top_enter(&self) {
+        DebugApiBackend::replace_current_tx_context(Some(self.tx_context_ref.clone()));
+        DebugApiBackend::replace_static_var_data(Some(self.static_var_data_ref.clone()));
+    }
 
-    fn on_stack_top_leave(&self) {}
+    fn on_stack_top_leave(&self) {
+        DebugApiBackend::replace_current_tx_context(None);
+        DebugApiBackend::replace_static_var_data(None);
+    }
 }

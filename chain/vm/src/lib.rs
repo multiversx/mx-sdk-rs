@@ -1,3 +1,5 @@
+#![allow(unused_imports)] // TODO: temporary
+
 pub mod crypto_functions;
 pub mod display_util;
 pub mod mem_conv;

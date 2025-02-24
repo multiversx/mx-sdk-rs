@@ -2,16 +2,16 @@ use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
-        TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
+        TxContextRef, TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMCodeMetadata,
     world_mock::{AccountData, AccountEsdt, BlockchainStateRef},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
-use super::BlockchainVMRef;
+use super::{BlockchainVMRef, StackItem};
 
 /// Executes the SC endpoint, as given by the current TxInput in the current TxContext.
 ///
@@ -49,7 +49,7 @@ impl BlockchainVMRef {
         F: FnOnce(),
     {
         let tx_cache = TxCache::new(state.get_arc());
-        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
+        let tx_context = TxContext::new_old(self.clone(), tx_input, tx_cache);
         let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
         tx_context.into_results()
     }

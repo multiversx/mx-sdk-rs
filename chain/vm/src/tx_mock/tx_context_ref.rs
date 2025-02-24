@@ -7,7 +7,7 @@ use super::{BlockchainUpdate, TxContextStack, TxPanic};
 /// The VM API implementation based on a blockchain mock written in Rust.
 /// Implemented as a smart pointer to a TxContext structure, which tracks a blockchain transaction.
 #[derive(Debug)]
-pub struct TxContextRef(Arc<TxContext>);
+pub struct TxContextRef(pub Arc<TxContext>);
 
 impl Deref for TxContextRef {
     type Target = TxContext;
@@ -24,11 +24,6 @@ impl Clone for TxContextRef {
 
 impl TxContextRef {
     pub fn new(tx_context_arc: Arc<TxContext>) -> Self {
-        Self(tx_context_arc)
-    }
-
-    pub fn new_from_static() -> Self {
-        let tx_context_arc = TxContextStack::static_peek();
         Self(tx_context_arc)
     }
 

@@ -117,7 +117,7 @@ impl BlockchainVMRef {
         let (mut tx_result, blockchain_updates) = if is_system_sc_address(&tx_input.to) {
             execute_system_sc(tx_input, tx_cache)
         } else if should_execute_sc_call(&tx_input) {
-            let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
+            let tx_context = TxContext::new_old(self.clone(), tx_input, tx_cache);
 
             let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
 
@@ -148,7 +148,7 @@ impl BlockchainVMRef {
         let new_address = tx_cache.get_new_address(&tx_input.from);
         tx_input.to = new_address.clone();
         tx_input.func_name = TxFunctionName::INIT;
-        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
+        let tx_context = TxContext::new_old(self.clone(), tx_input, tx_cache);
         let tx_input_ref = tx_context.input_ref();
 
         if let Err(err) = tx_context

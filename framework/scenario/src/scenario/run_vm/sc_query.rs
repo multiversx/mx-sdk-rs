@@ -11,10 +11,21 @@ impl ScenarioVMRunner {
     ///
     /// The result of the operation gets saved back in the step's response field.
     pub fn perform_sc_query_update_results(&mut self, step: &mut ScQueryStep) {
-        let tx_result =
-            self.perform_sc_query_lambda_and_check(step, execute_current_tx_context_input);
+        let tx_result = self.perform_sc_query_debugger(step);
         let response = TxResponse::from_tx_result(tx_result);
         step.save_response(response);
+    }
+
+    pub fn perform_sc_query_debugger(&mut self, step: &ScQueryStep) -> TxResult {
+        let tx_input = tx_input_from_query(step);
+        let runtime = self.create_debugger_runtime();
+        let (tx_result, _) = runtime.execute_in_runtime(tx_input, &mut self.blockchain_mock.state);
+
+        assert!(
+            tx_result.pending_calls.no_calls(),
+            "Can't query a view function that performs an async call"
+        );
+        tx_result
     }
 
     pub fn perform_sc_query_lambda<F>(&mut self, step: &ScQueryStep, f: F) -> TxResult

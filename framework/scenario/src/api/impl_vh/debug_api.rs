@@ -1,4 +1,7 @@
-use std::sync::Arc;
+use std::{
+    ops::DerefMut,
+    sync::{Arc, Mutex},
+};
 
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
@@ -11,8 +14,54 @@ use crate::debug_executor::{StaticVarData, StaticVarStack};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
+thread_local!(
+    static CURRENT_TX_CONTEXT: Mutex<Option<TxContextRef>> = Mutex::new(None)
+);
+
+thread_local!(
+    static STATIC_VAR_DATA: Mutex<Option<Arc<StaticVarData>>> = Mutex::new(None)
+);
+
 #[derive(Clone)]
 pub struct DebugApiBackend;
+
+impl DebugApiBackend {
+    pub fn get_current_tx_context() -> Arc<TxContext> {
+        let value = CURRENT_TX_CONTEXT.with(|cell| {
+            let opt = cell.lock().unwrap();
+            (*opt).clone()
+        });
+        if let Some(tx_context) = value {
+            tx_context.0
+        } else {
+            // TODO: temporary fallback
+            TxContextStack::static_peek()
+        }
+    }
+
+    pub fn replace_current_tx_context(value: Option<TxContextRef>) -> Option<TxContextRef> {
+        CURRENT_TX_CONTEXT.with(|cell| {
+            let mut opt = cell.lock().unwrap();
+            core::mem::replace(opt.deref_mut(), value)
+        })
+    }
+
+    pub fn get_static_var_data() -> Option<Arc<StaticVarData>> {
+        STATIC_VAR_DATA.with(|cell| {
+            let opt = cell.lock().unwrap();
+            (*opt).clone()
+        })
+    }
+
+    pub fn replace_static_var_data(
+        value: Option<Arc<StaticVarData>>,
+    ) -> Option<Arc<StaticVarData>> {
+        STATIC_VAR_DATA.with(|cell| {
+            let mut opt = cell.lock().unwrap();
+            core::mem::replace(opt.deref_mut(), value)
+        })
+    }
+}
 
 impl VMHooksApiBackend for DebugApiBackend {
     type HandleType = DebugHandle;
@@ -21,7 +70,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        let top_context = TxContextStack::static_peek();
+        let top_context = Self::get_current_tx_context();
         let wrapper = DebugApiVMHooksHandler::new(top_context);
         let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
         f(&dispatcher)
@@ -70,8 +119,13 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&StaticVarData) -> R,
     {
-        let top_context = StaticVarStack::static_peek();
-        f(&top_context)
+        if let Some(static_var_data) = Self::get_static_var_data() {
+            f(&static_var_data)
+        } else {
+            // TODO: temporary fallback
+            let top_context = StaticVarStack::static_peek();
+            f(&top_context)
+        }
     }
 }
 
@@ -85,6 +139,14 @@ impl DebugApi {
         TxContextStack::static_push(tx_context_arc);
         StaticVarStack::static_push();
     }
+
+    pub fn get_current_tx_context() -> Arc<TxContext> {
+        DebugApiBackend::get_current_tx_context()
+    }
+
+    pub fn get_current_tx_context_ref() -> TxContextRef {
+        TxContextRef(DebugApiBackend::get_current_tx_context())
+    }
 }
 
 impl std::fmt::Debug for DebugApi {
@@ -94,7 +156,8 @@ impl std::fmt::Debug for DebugApi {
 }
 
 fn debugger_panic(status: ReturnCode, message: &str) {
-    TxContextRef::new_from_static().replace_tx_result_with_error(TxPanic::new(status, message));
+    DebugApi::get_current_tx_context_ref()
+        .replace_tx_result_with_error(TxPanic::new(status, message));
     std::panic::panic_any(BreakpointValue::SignalError);
 }
 

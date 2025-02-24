@@ -1,8 +1,11 @@
-use std::{ops::Deref, sync::Arc};
+use std::{
+    ops::Deref,
+    sync::{Arc, Mutex},
+};
 
 use multiversx_chain_vm_executor::Executor;
 
-use super::BuiltinFunctionContainer;
+use super::{BuiltinFunctionContainer, Stack};
 
 pub struct BlockchainVM {
     pub builtin_functions: BuiltinFunctionContainer,
