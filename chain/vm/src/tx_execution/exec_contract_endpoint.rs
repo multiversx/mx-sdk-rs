@@ -3,7 +3,6 @@ use multiversx_chain_vm_executor::{CompilationOptions, Instance};
 use crate::{
     display_util::address_hex,
     tx_mock::{TxContext, TxContextStack},
-    with_shared::Shareable,
 };
 
 use super::{execute_current_tx_context_input, BlockchainVMRef};
@@ -23,9 +22,7 @@ impl BlockchainVMRef {
     /// The endpoint name is taken from the tx context.
     /// Catches and wraps any panics thrown in the contract.
     pub fn execute_tx_context(&self, tx_context: TxContext) -> TxContext {
-        let mut tx_context_sh = Shareable::new(tx_context);
-        TxContextStack::execute_on_vm_stack(&mut tx_context_sh, execute_current_tx_context_input);
-        tx_context_sh.into_inner()
+        TxContextStack::execute_on_vm_stack(tx_context, execute_current_tx_context_input)
     }
 
     pub fn get_contract_instance(&self, tx_context: &TxContext) -> Box<dyn Instance> {

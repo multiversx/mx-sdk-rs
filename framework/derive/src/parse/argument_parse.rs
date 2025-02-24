@@ -11,7 +11,7 @@ pub fn extract_method_args(m: &syn::TraitItemFn) -> Vec<MethodArgument> {
         .inputs
         .iter()
         .filter_map(|arg| match arg {
-            syn::FnArg::Receiver(ref selfref) => {
+            syn::FnArg::Receiver(selfref) => {
                 if selfref.mutability.is_some() || receiver_processed {
                     missing_self_panic(m);
                 }

@@ -1,7 +1,7 @@
 use multiversx_sc::abi::ContractAbi;
 
 use super::sc_config_proxy::PathRename;
-const DEFAULT_PATH: &str = "/output/proxy.rs";
+const OUTPUT_DIR_PROXY_PATH: &str = "/output/proxy.rs";
 
 #[derive(Debug)]
 pub struct ProxyConfig {
@@ -26,9 +26,9 @@ impl ProxyConfig {
         }
     }
 
-    pub fn new_with_default_path(abi: ContractAbi) -> Self {
+    pub fn output_dir_proxy_config(abi: ContractAbi) -> Self {
         ProxyConfig {
-            path: DEFAULT_PATH.to_string(),
+            path: OUTPUT_DIR_PROXY_PATH.to_string(),
             override_import: String::new(),
             path_rename: Vec::new(),
             abi,
