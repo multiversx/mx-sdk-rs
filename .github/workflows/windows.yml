@@ -18,35 +18,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Cache VS Build Tools
-        uses: actions/cache@v3
-        with:
-          path: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools
-          key: vs-build-tools-${{ runner.os }}
-          restore-keys: vs-build-tools-
-
-      - name: Check if required components are already installed
+      - name: Check if required Visual Studio components are installed
         id: check_vs_tools
+        shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
           $vs_installer = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
           if (Test-Path $vs_installer) {
-            $installed = & $vs_installer -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+            $installed = & $vs_installer -latest -products * `
+              -requires Microsoft.VisualStudio.Workload.VCTools `
+              Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+              Microsoft.VisualStudio.Component.Windows10SDK `
+              Microsoft.VisualStudio.Component.Windows11SDK `
+              Microsoft.VisualStudio.Component.CMake `
+              -property installationPath
+
             if ($installed) {
-              echo "Found installed Visual Studio components"
+              echo "All required components are installed"
               echo "VS_INSTALLED=true" >> $GITHUB_ENV
-            }
-            else {
+            } else {
               echo "VS_INSTALLED=false" >> $GITHUB_ENV
             }
           } else {
             echo "VS_INSTALLED=false" >> $GITHUB_ENV
           }
 
-      - name: Install VS Build Tools
+      - name: Install VS Build Tools (if missing)
         if: env.VS_INSTALLED != 'true'
+        shell: pwsh
         run: |
-          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.WindowsSDK.10 --add Microsoft.VisualStudio.Component.WindowsSDK.11 --add Microsoft.VisualStudio.Component.CMake --includeRecommended --includeOptional --quiet --wait"
+          choco install visualstudio2022buildtools --package-parameters `
+            "--add Microsoft.VisualStudio.Workload.VCTools `
+            --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+            --add Microsoft.VisualStudio.Component.Windows10SDK `
+            --add Microsoft.VisualStudio.Component.Windows11SDK `
+            --add Microsoft.VisualStudio.Component.CMake `
+            --includeRecommended --quiet --wait"
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -59,7 +66,7 @@ jobs:
 
       - name: Run sc-meta commands
         run: |
-          cd contracts
+          cd contracts/examples
           sc-meta all build
           sc-meta all proxy
           sc-meta all snippets
