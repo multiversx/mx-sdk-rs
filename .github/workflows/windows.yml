@@ -14,15 +14,39 @@ jobs:
   windows_build_and_test:
     name: Build and test on Windows
     runs-on: windows-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install C++ Build Tools
+      - name: Cache VS Build Tools
+        uses: actions/cache@v3
+        with:
+          path: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools
+          key: vs-build-tools-${{ runner.os }}
+          restore-keys: vs-build-tools-
+
+      - name: Check if required components are already installed
+        id: check_vs_tools
         run: |
-          choco install visualstudio2022buildtools -y --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
-          echo "C++ Build Tools installed"
+          $ErrorActionPreference = "Stop"
+          $vs_installer = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (Test-Path $vs_installer) {
+            $installed = & $vs_installer -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+            if ($installed) {
+              echo "Found installed Visual Studio components"
+              echo "VS_INSTALLED=true" >> $GITHUB_ENV
+            }
+            else {
+              echo "VS_INSTALLED=false" >> $GITHUB_ENV
+            }
+          } else {
+            echo "VS_INSTALLED=false" >> $GITHUB_ENV
+          }
+
+      - name: Install VS Build Tools
+        if: env.VS_INSTALLED != 'true'
+        run: |
+          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.WindowsSDK.10 --add Microsoft.VisualStudio.Component.WindowsSDK.11 --add Microsoft.VisualStudio.Component.CMake --includeRecommended --includeOptional --quiet --wait"
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
