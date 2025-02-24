@@ -43,7 +43,7 @@ jobs:
             echo "VS_INSTALLED=false" >> $GITHUB_ENV
           }
 
-      - name: Install VS Build Tools (if missing)
+      - name: Install VS Build Tools
         if: env.VS_INSTALLED != 'true'
         shell: pwsh
         run: |
@@ -66,8 +66,9 @@ jobs:
 
       - name: Run sc-meta commands
         run: |
-          cd contracts/examples
+          cd contracts/feature-tests/basic-features
           sc-meta all build
           sc-meta all proxy
           sc-meta all snippets
-          sc-meta new --template empty --name windows-test-sc
+          cd ../
+          sc-meta new --template empty --name windows-template-test-sc
