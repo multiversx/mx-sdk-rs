@@ -5,7 +5,7 @@ use std::{
     sync::{Arc, Mutex, Weak},
 };
 
-use multiversx_chain_vm_executor::Executor;
+use multiversx_chain_vm_executor::{Executor, Instance};
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
@@ -121,6 +121,10 @@ impl RuntimeWeakRef {
     }
 }
 
+fn instance_call(instance: &dyn Instance, func_name: &str) {
+    instance.call(func_name).expect("execution error");
+}
+
 impl RuntimeRef {
     /// TODO: shorten to just execute when cleaning up
     pub fn execute_in_runtime(
@@ -128,6 +132,18 @@ impl RuntimeRef {
         tx_input: TxInput,
         state: &mut BlockchainStateRef,
     ) -> (TxResult, BlockchainUpdate) {
+        self.execute_lambda_in_runtime(tx_input, state, instance_call)
+    }
+
+    pub fn execute_lambda_in_runtime<F>(
+        &self,
+        tx_input: TxInput,
+        state: &mut BlockchainStateRef,
+        call_lambda: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(&dyn Instance, &str),
+    {
         let func_name = tx_input.func_name.clone();
         let tx_cache = TxCache::new(state.get_arc());
         let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
@@ -147,9 +163,8 @@ impl RuntimeRef {
             tx_context_ref: tx_context_ref.clone(),
         });
 
-        instance_ref
-            .call(func_name.as_str())
-            .expect("execution error");
+        call_lambda(&**instance_ref, func_name.as_str());
+
         std::mem::drop(instance_ref);
 
         let stack_item = self.stack_pop();
