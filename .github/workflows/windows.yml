@@ -18,7 +18,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Check if required Visual Studio components are installed
+      - name: Cache VS Build Tools
+        uses: actions/cache@v3
+        with:
+          path: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools
+          key: vs-build-tools-${{ runner.os }}
+          restore-keys: vs-build-tools-
+
+      - name: Check if the required Visual Studio components are installed
         id: check_vs_tools
         shell: pwsh
         run: |
@@ -35,11 +42,11 @@ jobs:
             if ($installed_vctools -and $installed_vc -and ($installed_sdk10 -or $installed_sdk11) -and $installed_cmake) {
                 echo "All required components are installed"
                 echo "VS_INSTALLED=true" >> $GITHUB_ENV
-              } else {
-                echo "VS_INSTALLED=false" >> $GITHUB_ENV
-              }
+            } else {
+                  echo "VS_INSTALLED=false" >> $GITHUB_ENV
+            }
           } else {
-            echo "VS_INSTALLED=false" >> $GITHUB_ENV
+              echo "VS_INSTALLED=false" >> $GITHUB_ENV
           }
 
       - name: Install missing VS Build Tools components
