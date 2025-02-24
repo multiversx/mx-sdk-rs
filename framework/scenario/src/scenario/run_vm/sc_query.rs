@@ -48,34 +48,6 @@ impl ScenarioVMRunner {
         );
         tx_result
     }
-
-    pub fn perform_sc_query_lambda<F>(&mut self, step: &ScQueryStep, f: F) -> TxResult
-    where
-        F: FnOnce(),
-    {
-        let tx_input = tx_input_from_query(step);
-        let tx_result = self.blockchain_mock.vm.execute_sc_query_lambda(
-            tx_input,
-            &mut self.blockchain_mock.state,
-            f,
-        );
-        assert!(
-            tx_result.pending_calls.no_calls(),
-            "Can't query a view function that performs an async call"
-        );
-        tx_result
-    }
-
-    pub fn perform_sc_query_lambda_and_check<F>(&mut self, step: &ScQueryStep, f: F) -> TxResult
-    where
-        F: FnOnce(),
-    {
-        let tx_result = self.perform_sc_query_lambda(step, f);
-        if let Some(tx_expect) = &step.expect {
-            check_tx_output(&step.id, tx_expect, &tx_result);
-        }
-        tx_result
-    }
 }
 
 fn tx_input_from_query(sc_query_step: &ScQueryStep) -> TxInput {
