@@ -112,7 +112,7 @@ fn configure_vscode() {
     let command_script_line =
         "command script import ".to_owned() + script_full_path.to_str().unwrap();
 
-    if let serde_json::Value::Array(ref mut array) = init_commands {
+    if let serde_json::Value::Array(array) = init_commands {
         if let Some(pos) = array.iter().position(|v| {
             if let serde_json::Value::String(s) = v {
                 s.contains(SCRIPT_NAME) // Replace with your substring

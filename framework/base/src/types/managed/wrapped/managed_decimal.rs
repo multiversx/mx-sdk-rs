@@ -14,6 +14,7 @@ mod managed_decimal_op_sub_signed;
 mod managed_decimal_signed;
 
 pub use decimals::{ConstDecimals, Decimals, NumDecimals};
+use generic_array::typenum::{U4, U8};
 pub use managed_decimal_signed::ManagedDecimalSigned;
 
 use crate::{
@@ -141,7 +142,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
 }
 
 impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimal<M, NumDecimals> {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<8>; // 4 bigUint + 4 usize
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U8>; // 4 bigUint + 4 usize
 
     const SKIPS_RESERIALIZATION: bool = false;
 
@@ -173,7 +174,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimal<M, NumDecimals> {
 impl<M: ManagedTypeApi, const N: NumDecimals> ManagedVecItem
     for ManagedDecimal<M, ConstDecimals<N>>
 {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<4>; // data only
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>; // data only
 
     const SKIPS_RESERIALIZATION: bool = false;
 

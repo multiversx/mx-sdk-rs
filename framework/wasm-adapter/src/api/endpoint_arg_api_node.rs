@@ -4,7 +4,7 @@ use multiversx_sc::{
     types::heap::BoxedBytes,
 };
 
-extern "C" {
+unsafe extern "C" {
     fn getNumArguments() -> i32;
     fn getArgumentLength(id: i32) -> i32;
     fn getArgument(id: i32, dstOffset: *mut u8) -> i32;

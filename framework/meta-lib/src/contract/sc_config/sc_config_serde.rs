@@ -69,6 +69,7 @@ pub struct ContractVariantSerde {
 #[derive(Deserialize, Default, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct MultiContractGeneralSettingsSerde {
+    #[serde(default)]
     pub main: Option<String>,
 }
 

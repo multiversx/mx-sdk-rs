@@ -2,7 +2,7 @@ use core::cmp::Ordering;
 
 use multiversx_sc::api::{BigIntApiImpl, Sign};
 
-extern "C" {
+unsafe extern "C" {
     fn bigIntNew(value: i64) -> i32;
 
     fn bigIntSetInt64(destination: i32, value: i64);
