@@ -1,7 +1,7 @@
 use bip39::Mnemonic;
 
 use multiversx_chain_core::types::Address;
-use multiversx_sdk::bech32;
+use multiversx_sdk::{bech32, test_wallets};
 use multiversx_sdk::{crypto::public_key::PublicKey, wallet::Wallet};
 use std::fs::{self, File};
 use std::io::Write;
@@ -59,6 +59,23 @@ fn test_load_from_pem() {
         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         bech32::encode(&address)
     );
+}
+#[test]
+fn test_get_shard() {
+    let alice = test_wallets::alice();
+    assert_eq!(0, alice.get_shard());
+
+    let bob = test_wallets::bob();
+    assert_eq!(2, bob.get_shard());
+
+    let carol = test_wallets::carol();
+    assert_eq!(0, carol.get_shard());
+
+    let heidi = test_wallets::heidi();
+    assert_eq!(1, heidi.get_shard());
+
+    let mike = test_wallets::mike();
+    assert_eq!(0, mike.get_shard());
 }
 
 fn write_to_file(content: &str, file: &str) {
