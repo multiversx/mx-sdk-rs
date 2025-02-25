@@ -1,7 +1,7 @@
 use super::VmApiImpl;
 use multiversx_sc::api::{LogApi, LogApiImpl};
 
-extern "C" {
+unsafe extern "C" {
     fn managedWriteLog(topicsHandle: i32, dataHandle: i32);
 }
 

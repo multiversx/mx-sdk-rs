@@ -3,6 +3,21 @@
 version = 4
 
 [[package]]
+name = "abi-tester"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+]
+
+[[package]]
+name = "abi-tester-wasm"
+version = "0.0.0"
+dependencies = [
+ "abi-tester",
+ "multiversx-sc-wasm-adapter",
+]
+
+[[package]]
 name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -27,6 +42,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c34f04666d835ff5d62e058c3995147c06f42fe86ff053337632bca83e42702d"
 
 [[package]]
+name = "generic-array"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8c8444bc9d71b935156cc0ccab7f622180808af7867b1daae6547d773591703"
+dependencies = [
+ "typenum",
+]
+
+[[package]]
 name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -37,22 +61,6 @@ name = "hex-literal"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
-
-[[package]]
-name = "multisig"
-version = "1.0.0"
-dependencies = [
- "multiversx-sc",
- "multiversx-sc-modules",
-]
-
-[[package]]
-name = "multisig-wasm"
-version = "0.0.0"
-dependencies = [
- "multisig",
- "multiversx-sc-wasm-adapter",
-]
 
 [[package]]
 name = "multiversx-chain-core"
@@ -67,6 +75,7 @@ name = "multiversx-sc"
 version = "0.56.1"
 dependencies = [
  "bitflags",
+ "generic-array",
  "hex-literal",
  "multiversx-chain-core",
  "multiversx-sc-codec",
@@ -103,13 +112,6 @@ dependencies = [
  "quote",
  "radix_trie",
  "syn",
-]
-
-[[package]]
-name = "multiversx-sc-modules"
-version = "0.56.1"
-dependencies = [
- "multiversx-sc",
 ]
 
 [[package]]
@@ -167,9 +169,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.13.2"
+version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
+checksum = "7fcf8323ef1faaee30a44a340193b1ac6814fd9b7b4e88e9d4519a3e4abe1cfd"
 
 [[package]]
 name = "syn"
@@ -181,6 +183,12 @@ dependencies = [
  "quote",
  "unicode-ident",
 ]
+
+[[package]]
+name = "typenum"
+version = "1.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
 name = "unicode-ident"

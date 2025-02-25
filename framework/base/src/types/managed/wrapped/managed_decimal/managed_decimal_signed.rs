@@ -13,6 +13,7 @@ use crate::{
 };
 
 use alloc::string::ToString;
+use generic_array::typenum::{U4, U8};
 use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -191,7 +192,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<f32>
 }
 
 impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<8>; // 4 bigInt + 4 usize
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U8>; // 4 bigInt + 4 usize
 
     const SKIPS_RESERIALIZATION: bool = false;
 
@@ -223,7 +224,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
 impl<M: ManagedTypeApi, const N: NumDecimals> ManagedVecItem
     for ManagedDecimalSigned<M, ConstDecimals<N>>
 {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<4>; // data only
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>; // data only
 
     const SKIPS_RESERIALIZATION: bool = false;
 
