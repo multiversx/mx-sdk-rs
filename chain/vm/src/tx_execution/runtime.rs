@@ -30,6 +30,11 @@ pub struct RuntimeRef(pub Arc<Runtime>);
 #[derive(Clone)]
 pub struct RuntimeWeakRef(pub Weak<Runtime>);
 
+pub struct RuntimeInstanceCall<'a> {
+    pub instance: &'a dyn Instance,
+    pub func_name: &'a str,
+}
+
 impl Runtime {
     pub fn new(vm_ref: BlockchainVMRef) -> Self {
         Runtime {
@@ -121,8 +126,11 @@ impl RuntimeWeakRef {
     }
 }
 
-pub fn instance_call(instance: &dyn Instance, func_name: &str) {
-    instance.call(func_name).expect("execution error");
+pub fn instance_call(instance_call: RuntimeInstanceCall<'_>) {
+    instance_call
+        .instance
+        .call(instance_call.func_name)
+        .expect("execution error");
 }
 
 impl RuntimeRef {
@@ -143,7 +151,7 @@ impl RuntimeRef {
         call_lambda: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(&dyn Instance, &str),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let tx_context = self.execute_tx_context_in_runtime(tx_context, call_lambda);
         tx_context.into_results()
@@ -155,7 +163,7 @@ impl RuntimeRef {
         call_lambda: F,
     ) -> TxContext
     where
-        F: FnOnce(&dyn Instance, &str),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let func_name = tx_context.tx_input_box.func_name.clone();
         // let tx_cache = TxCache::new(state.get_arc());
@@ -176,7 +184,10 @@ impl RuntimeRef {
             tx_context_ref: tx_context_ref.clone(),
         });
 
-        call_lambda(&**instance_ref, func_name.as_str());
+        call_lambda(RuntimeInstanceCall {
+            instance: &**instance_ref,
+            func_name: func_name.as_str(),
+        });
 
         std::mem::drop(instance_ref);
 

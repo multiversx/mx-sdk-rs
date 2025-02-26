@@ -3,7 +3,7 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::{execute_current_tx_context_input, instance_call},
+    tx_execution::{execute_current_tx_context_input, instance_call, RuntimeInstanceCall},
     tx_mock::{TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
 };
@@ -28,7 +28,7 @@ impl ScenarioVMRunner {
         f: F,
     ) -> (Address, TxResult)
     where
-        F: FnOnce(&dyn Instance, &str),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let tx_input = tx_input_from_deploy(sc_deploy_step);
         let runtime = self.create_debugger_runtime();
@@ -53,7 +53,7 @@ impl ScenarioVMRunner {
         f: F,
     ) -> (Address, TxResult)
     where
-        F: FnOnce(&dyn Instance, &str),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let (new_address, tx_result) = self.perform_sc_deploy_lambda(sc_deploy_step, f);
         if let Some(tx_expect) = &sc_deploy_step.expect {

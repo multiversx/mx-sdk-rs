@@ -10,7 +10,9 @@ use crate::{
     types::{top_encode_big_uint, VMAddress, VMCodeMetadata},
 };
 
-use super::{is_system_sc_address, runtime, BlockchainVMRef, Runtime, RuntimeRef};
+use super::{
+    is_system_sc_address, runtime, BlockchainVMRef, Runtime, RuntimeInstanceCall, RuntimeRef,
+};
 
 fn should_execute_sc_call(tx_input: &TxInput) -> bool {
     // execute whitebox calls no matter what
@@ -146,7 +148,7 @@ impl RuntimeRef {
         f: F,
     ) -> (TxResult, VMAddress, BlockchainUpdate)
     where
-        F: FnOnce(&dyn Instance, &str),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let new_address = tx_cache.get_new_address(&tx_input.from);
         tx_input.to = new_address.clone();

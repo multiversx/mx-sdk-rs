@@ -61,8 +61,8 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_deploy_lambda(&step_wrapper.step, |instance, func_name| {
-                ScenarioVMRunner::wrap_lambda_call(instance, func_name, || {
+            .perform_sc_deploy_lambda(&step_wrapper.step, |instance_call| {
+                ScenarioVMRunner::wrap_lambda_call(instance_call, || {
                     f(contract_obj);
                 });
             });

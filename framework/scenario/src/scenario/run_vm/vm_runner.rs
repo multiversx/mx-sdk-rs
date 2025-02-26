@@ -1,7 +1,7 @@
 use std::{any::Any, cell::RefCell, sync::Arc};
 
 use multiversx_chain_vm::{
-    tx_execution::{Runtime, RuntimeRef, RuntimeWeakRef},
+    tx_execution::{Runtime, RuntimeInstanceCall, RuntimeRef, RuntimeWeakRef},
     tx_mock::TxFunctionName,
 };
 use multiversx_chain_vm_executor::Instance;
@@ -45,12 +45,13 @@ impl ScenarioVMRunner {
         RuntimeRef(runtime_arc)
     }
 
-    pub fn wrap_lambda_call<F>(_instance: &dyn Instance, func_name: &str, f: F)
+    pub fn wrap_lambda_call<F>(instance_call: RuntimeInstanceCall<'_>, f: F)
     where
         F: FnOnce(),
     {
         assert!(
-            func_name == TxFunctionName::WHITEBOX_CALL.as_str() || func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
+            instance_call.func_name == TxFunctionName::WHITEBOX_CALL.as_str()
+                || instance_call.func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
             "misconfigured whitebox call"
         );
 
