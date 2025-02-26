@@ -1,8 +1,5 @@
 use super::*;
 
-use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
-};
 use std::{
     collections::HashMap,
     fmt,
@@ -78,34 +75,5 @@ impl ContractMapRef {
 
     pub fn lock(&self) -> MutexGuard<ContractMap> {
         self.0.lock().unwrap()
-    }
-}
-
-impl Executor for ContractMapRef {
-    fn set_vm_hooks_ptr(
-        &mut self,
-        _vm_hooks_ptr: *mut std::ffi::c_void,
-    ) -> Result<(), ExecutorError> {
-        todo!()
-    }
-
-    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        Ok(())
-    }
-
-    fn new_instance(
-        &self,
-        wasm_bytes: &[u8],
-        _compilation_options: &CompilationOptions,
-    ) -> Result<Box<dyn Instance>, ExecutorError> {
-        Ok(Box::new(self.lock().get_contract(wasm_bytes)))
-    }
-
-    fn new_instance_from_cache(
-        &self,
-        _cache_bytes: &[u8],
-        _compilation_options: &CompilationOptions,
-    ) -> Result<Box<dyn Instance>, ExecutorError> {
-        panic!("ContractMap new_instance_from_cache not supported")
     }
 }

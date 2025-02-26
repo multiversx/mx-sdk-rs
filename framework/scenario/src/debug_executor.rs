@@ -11,9 +11,7 @@ mod tx_static_vars;
 
 pub use catch_tx_panic::catch_tx_panic;
 pub use composite_executor::*;
-pub use contract_container::{
-    contract_instance_wrapped_execution, ContractContainer, ContractContainerRef,
-};
+pub use contract_container::{ContractContainer, ContractContainerRef};
 pub use contract_map::{ContractMap, ContractMapRef};
 pub use debug_sc_executor::DebugSCExecutor;
 pub use debug_sc_instance::DebugSCInstance;
