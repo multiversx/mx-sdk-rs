@@ -121,7 +121,7 @@ impl RuntimeWeakRef {
     }
 }
 
-fn instance_call(instance: &dyn Instance, func_name: &str) {
+pub fn instance_call(instance: &dyn Instance, func_name: &str) {
     instance.call(func_name).expect("execution error");
 }
 
@@ -132,21 +132,34 @@ impl RuntimeRef {
         tx_input: TxInput,
         state: &mut BlockchainStateRef,
     ) -> (TxResult, BlockchainUpdate) {
-        self.execute_lambda_in_runtime(tx_input, state, instance_call)
+        let tx_cache = TxCache::new(state.get_arc());
+        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
+        self.execute_lambda_in_runtime(tx_context, instance_call)
     }
 
     pub fn execute_lambda_in_runtime<F>(
         &self,
-        tx_input: TxInput,
-        state: &mut BlockchainStateRef,
+        tx_context: TxContext,
         call_lambda: F,
     ) -> (TxResult, BlockchainUpdate)
     where
         F: FnOnce(&dyn Instance, &str),
     {
-        let func_name = tx_input.func_name.clone();
-        let tx_cache = TxCache::new(state.get_arc());
-        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
+        let tx_context = self.execute_tx_context_in_runtime(tx_context, call_lambda);
+        tx_context.into_results()
+    }
+
+    pub fn execute_tx_context_in_runtime<F>(
+        &self,
+        tx_context: TxContext,
+        call_lambda: F,
+    ) -> TxContext
+    where
+        F: FnOnce(&dyn Instance, &str),
+    {
+        let func_name = tx_context.tx_input_box.func_name.clone();
+        // let tx_cache = TxCache::new(state.get_arc());
+        // let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
         let contract_code = get_contract_identifier(&tx_context);
         let tx_context_ref = TxContextRef::new(Arc::new(tx_context));
 
@@ -171,9 +184,7 @@ impl RuntimeRef {
         std::mem::drop(stack_item);
         self.set_current_context(self.top_tx_context_ref());
 
-        let tx_context = Arc::into_inner(tx_context_ref.0)
-            .expect("cannot extract final TxContext from stack because of lingering references");
-
-        tx_context.into_results()
+        Arc::into_inner(tx_context_ref.0)
+            .expect("cannot extract final TxContext from stack because of lingering references")
     }
 }

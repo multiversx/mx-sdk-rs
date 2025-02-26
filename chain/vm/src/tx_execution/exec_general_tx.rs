@@ -1,3 +1,4 @@
+use multiversx_chain_vm_executor::Instance;
 use num_traits::Zero;
 
 use crate::{
@@ -9,7 +10,7 @@ use crate::{
     types::{top_encode_big_uint, VMAddress, VMCodeMetadata},
 };
 
-use super::{is_system_sc_address, BlockchainVMRef};
+use super::{is_system_sc_address, runtime, BlockchainVMRef, Runtime, RuntimeRef};
 
 fn should_execute_sc_call(tx_input: &TxInput) -> bool {
     // execute whitebox calls no matter what
@@ -133,7 +134,9 @@ impl BlockchainVMRef {
 
         (tx_result, blockchain_updates)
     }
+}
 
+impl RuntimeRef {
     pub fn deploy_contract<F>(
         &self,
         mut tx_input: TxInput,
@@ -143,12 +146,12 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, VMAddress, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(&dyn Instance, &str),
     {
         let new_address = tx_cache.get_new_address(&tx_input.from);
         tx_input.to = new_address.clone();
         tx_input.func_name = TxFunctionName::INIT;
-        let tx_context = TxContext::new_old(self.clone(), tx_input, tx_cache);
+        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
         let tx_input_ref = tx_context.input_ref();
 
         if let Err(err) = tx_context
@@ -171,7 +174,7 @@ impl BlockchainVMRef {
             .tx_cache
             .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
-        let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
+        let tx_context = self.execute_tx_context_in_runtime(tx_context, f);
 
         let (tx_result, blockchain_updates) = tx_context.into_results();
         (tx_result, new_address, blockchain_updates)

@@ -1,12 +1,14 @@
+use multiversx_chain_vm_executor::Instance;
+
 use crate::{
     tx_mock::{TxCache, TxInput, TxResult},
     types::{VMAddress, VMCodeMetadata},
     world_mock::BlockchainStateRef,
 };
 
-use super::BlockchainVMRef;
+use super::RuntimeRef;
 
-impl BlockchainVMRef {
+impl RuntimeRef {
     pub fn sc_create<F>(
         &self,
         tx_input: TxInput,
@@ -16,7 +18,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> (VMAddress, TxResult)
     where
-        F: FnOnce(),
+        F: FnOnce(&dyn Instance, &str),
     {
         // nonce gets increased irrespective of whether the tx fails or not
         // must be done after computing the new address

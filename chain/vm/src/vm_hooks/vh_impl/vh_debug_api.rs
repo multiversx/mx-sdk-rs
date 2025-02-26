@@ -6,7 +6,7 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
-    tx_execution::execute_current_tx_context_input,
+    tx_execution::{execute_current_tx_context_input, instance_call},
     tx_mock::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, TxCache,
         TxContext, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
@@ -188,13 +188,18 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
 
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         tx_cache.increase_acount_nonce(contract_address);
-        let (tx_result, new_address, blockchain_updates) = self.0.vm_ref.deploy_contract(
-            tx_input,
-            contract_code,
-            code_metadata,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
+        let (tx_result, new_address, blockchain_updates) = self
+            .0
+            .runtime_ref
+            .as_ref()
+            .expect("runtime not initialized")
+            .deploy_contract(
+                tx_input,
+                contract_code,
+                code_metadata,
+                tx_cache,
+                instance_call,
+            );
 
         match tx_result.result_status {
             ReturnCode::Success => (

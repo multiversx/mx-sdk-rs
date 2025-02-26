@@ -49,9 +49,8 @@ impl ScenarioVMRunner {
     where
         F: FnOnce(),
     {
-        assert_eq!(
-            func_name,
-            TxFunctionName::WHITEBOX_CALL.as_str(),
+        assert!(
+            func_name == TxFunctionName::WHITEBOX_CALL.as_str() || func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
             "misconfigured whitebox call"
         );
 

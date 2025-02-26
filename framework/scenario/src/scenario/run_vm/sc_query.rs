@@ -1,7 +1,7 @@
 use crate::{num_bigint::BigUint, scenario::model::ScQueryStep, scenario_model::TxResponse};
 use multiversx_chain_vm::{
     tx_execution::execute_current_tx_context_input,
-    tx_mock::{TxInput, TxResult},
+    tx_mock::{TxCache, TxContext, TxInput, TxResult},
 };
 
 use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
@@ -33,14 +33,13 @@ impl ScenarioVMRunner {
         F: FnOnce(),
     {
         let tx_input = tx_input_from_query(step);
+        let tx_cache = TxCache::new(self.blockchain_mock.state.get_arc());
         let runtime = self.create_debugger_runtime();
-        let (tx_result, _) = runtime.execute_lambda_in_runtime(
-            tx_input,
-            &mut self.blockchain_mock.state,
-            |instance, func_name| {
+        let tx_context = TxContext::new(runtime.clone(), tx_input, tx_cache);
+        let (tx_result, _) =
+            runtime.execute_lambda_in_runtime(tx_context, |instance, func_name| {
                 ScenarioVMRunner::wrap_lambda_call(instance, func_name, f);
-            },
-        );
+            });
 
         assert!(
             tx_result.pending_calls.no_calls(),
