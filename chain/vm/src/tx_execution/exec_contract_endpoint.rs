@@ -2,7 +2,6 @@ use multiversx_chain_vm_executor::CompilationOptions;
 
 use crate::{display_util::address_hex, tx_mock::TxContext};
 
-
 pub const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     gas_limit: 1,
     unmetered_locals: 0,

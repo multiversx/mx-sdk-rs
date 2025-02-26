@@ -19,16 +19,16 @@ use super::{
 
 pub struct Runtime {
     pub vm_ref: BlockchainVMRef,
-    pub override_executor: Option<Box<dyn Executor + Send + Sync>>,
+    pub executor: Box<dyn Executor + Send + Sync>,
     pub stack: RefCell<Stack>,
     pub current_context_cell: RefCell<Option<TxContextRef>>,
 }
 
 #[derive(Clone)]
-pub struct RuntimeRef(pub Arc<Runtime>);
+pub struct RuntimeRef(Arc<Runtime>);
 
 #[derive(Clone)]
-pub struct RuntimeWeakRef(pub Weak<Runtime>);
+pub struct RuntimeWeakRef(Weak<Runtime>);
 
 pub struct RuntimeInstanceCall<'a> {
     pub instance: &'a dyn Instance,
@@ -36,20 +36,13 @@ pub struct RuntimeInstanceCall<'a> {
 }
 
 impl Runtime {
-    pub fn new(vm_ref: BlockchainVMRef) -> Self {
+    pub fn new(vm_ref: BlockchainVMRef, executor: Box<dyn Executor + Send + Sync>) -> Self {
         Runtime {
             vm_ref,
-            override_executor: None,
+            executor,
             stack: Default::default(),
             current_context_cell: RefCell::new(None),
         }
-    }
-
-    pub fn executor(&self) -> &(dyn Executor + Send + Sync) {
-        self.override_executor
-            .as_ref()
-            .expect("missing executor")
-            .deref()
     }
 
     fn stack_push(&self, stack_item: StackItem) {
@@ -93,8 +86,8 @@ impl Runtime {
 }
 
 impl RuntimeRef {
-    pub fn new(vm_ref: BlockchainVMRef) -> Self {
-        RuntimeRef(Arc::new(Runtime::new(vm_ref)))
+    pub fn new(vm_ref: BlockchainVMRef, executor: Box<dyn Executor + Send + Sync>) -> Self {
+        RuntimeRef(Arc::new(Runtime::new(vm_ref, executor)))
     }
 
     pub fn downgrade(&self) -> RuntimeWeakRef {
@@ -105,6 +98,19 @@ impl RuntimeRef {
         Arc::get_mut(&mut self.0).expect(
             "RuntimeRef cannot grant mutable access, because more than one strong reference exists",
         )
+    }
+
+    /// Helpful for initializing a runtime that contain executors
+    /// that need to reference back to the runtime itself.
+    ///
+    /// The initializer function receives weak pointer references,
+    /// because circular strong references ensure a memory leak.
+    pub fn new_cyclic<F>(init_fn: F) -> RuntimeRef
+    where
+        F: FnOnce(RuntimeWeakRef) -> Runtime,
+    {
+        let runtime_arc = Arc::new_cyclic(|weak| init_fn(RuntimeWeakRef(weak.clone())));
+        RuntimeRef(runtime_arc)
     }
 }
 
@@ -174,7 +180,7 @@ impl RuntimeRef {
         self.set_current_context(Some(tx_context_ref.clone()));
 
         let instance = self
-            .executor()
+            .executor
             .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
             .expect("error instantiating executor instance");
         let instance_ref = Rc::new(instance);

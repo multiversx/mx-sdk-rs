@@ -1,6 +1,4 @@
-use std::{cell::RefCell, sync::Arc};
-
-use multiversx_chain_vm::tx_execution::{Runtime, RuntimeInstanceCall, RuntimeRef, RuntimeWeakRef};
+use multiversx_chain_vm::tx_execution::{Runtime, RuntimeInstanceCall, RuntimeRef};
 
 use crate::{
     debug_executor::{catch_tx_panic, ContractMapRef, DebugSCExecutor},
@@ -28,17 +26,10 @@ impl ScenarioVMRunner {
     }
 
     pub fn create_debugger_runtime(&self) -> RuntimeRef {
-        let runtime_arc = Arc::new_cyclic(|weak| {
-            let executor =
-                DebugSCExecutor::new(RuntimeWeakRef(weak.clone()), self.contract_map_ref.clone());
-            Runtime {
-                vm_ref: self.blockchain_mock.vm.clone(),
-                override_executor: Some(Box::new(executor)),
-                stack: Default::default(),
-                current_context_cell: RefCell::new(None),
-            }
-        });
-        RuntimeRef(runtime_arc)
+        RuntimeRef::new_cyclic(|weak| {
+            let executor = DebugSCExecutor::new(weak, self.contract_map_ref.clone());
+            Runtime::new(self.blockchain_mock.vm.clone(), Box::new(executor))
+        })
     }
 
     pub fn wrap_lambda_call<F>(

@@ -1,7 +1,7 @@
 use crate::{
     tx_execution::{BlockchainVMRef, RuntimeRef},
     types::{VMAddress, VMCodeMetadata},
-    world_mock::{AccountData, AccountEsdt, BlockchainState},
+    world_mock::{AccountData, AccountEsdt, BlockchainState, FailingExecutor},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -64,7 +64,7 @@ impl TxContext {
         let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
         let vm_ref = BlockchainVMRef::new();
         TxContext {
-            runtime_ref: RuntimeRef::new(vm_ref),
+            runtime_ref: RuntimeRef::new(vm_ref, Box::new(FailingExecutor)),
             tx_input_box: Box::new(tx_input),
             tx_cache: Arc::new(tx_cache),
             managed_types: Mutex::new(TxManagedTypes::new()),

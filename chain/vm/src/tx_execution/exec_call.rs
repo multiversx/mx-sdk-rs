@@ -2,7 +2,8 @@ use crate::{
     tx_execution::instance_call,
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
-        merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext, TxInput, TxPanic, TxResult, TxResultCalls,
+        merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
+        TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMCodeMetadata,
     world_mock::{AccountData, AccountEsdt, BlockchainStateRef},
