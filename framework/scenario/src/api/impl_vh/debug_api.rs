@@ -10,7 +10,7 @@ use multiversx_chain_vm::{
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::{StaticVarData, StaticVarStack};
+use crate::debug_executor::StaticVarData;
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
@@ -45,10 +45,12 @@ impl DebugApiBackend {
         })
     }
 
-    pub fn get_static_var_data() -> Option<Arc<StaticVarData>> {
+    pub fn get_static_var_data() -> Arc<StaticVarData> {
         STATIC_VAR_DATA.with(|cell| {
             let opt = cell.lock().unwrap();
-            (*opt).clone()
+            opt.as_ref()
+                .expect("Uninitialized DebugApi (static var data missing)")
+                .clone()
         })
     }
 
@@ -118,13 +120,8 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&StaticVarData) -> R,
     {
-        if let Some(static_var_data) = Self::get_static_var_data() {
-            f(&static_var_data)
-        } else {
-            // TODO: temporary fallback
-            let top_context = StaticVarStack::static_peek();
-            f(&top_context)
-        }
+        let static_var_data = Self::get_static_var_data();
+        f(&static_var_data)
     }
 }
 
