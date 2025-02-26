@@ -1,4 +1,7 @@
-use multiversx_chain_vm::tx_mock::{TxContextRef, TxFunctionName, TxPanic};
+use multiversx_chain_vm::{
+    tx_execution::RuntimeInstanceCall,
+    tx_mock::{TxContextRef, TxFunctionName, TxPanic},
+};
 use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
 use multiversx_sc::chain_core::types::ReturnCode;
 use std::sync::Arc;
@@ -19,6 +22,32 @@ impl DebugSCInstance {
             tx_context_ref,
             contract_container_ref: contract_container,
             static_var_data_ref: Arc::new(StaticVarData::default()),
+        }
+    }
+
+    pub fn wrap_lambda_call<F>(
+        panic_message_flag: bool,
+        _instance_call: RuntimeInstanceCall<'_>,
+        f: F,
+    ) where
+        F: FnOnce(),
+    {
+        // assert!(
+        //     instance_call.func_name == TxFunctionName::WHITEBOX_CALL.as_str()
+        //         || instance_call.func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
+        //     "misconfigured whitebox call: {}",
+        //     instance_call.func_name,
+        // );
+
+        // TODO: figure out a way to also validate the instance?
+
+        let result = catch_tx_panic(panic_message_flag, || {
+            f();
+            Ok(())
+        });
+
+        if let Err(tx_panic) = result {
+            DebugApiBackend::get_current_tx_context().replace_tx_result_with_error(tx_panic);
         }
     }
 }

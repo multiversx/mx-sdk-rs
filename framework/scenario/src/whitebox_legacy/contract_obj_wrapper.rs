@@ -2,13 +2,12 @@ use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Arc};
 
 use crate::{
     api::{DebugApi, DebugApiBackend},
-    debug_executor::{ContractContainer, StaticVarData},
+    debug_executor::{ContractContainer, DebugSCInstance, StaticVarData},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
         types::{heap::Address, EsdtLocalRole},
     },
-    scenario::run_vm::ScenarioVMRunner,
     scenario_model::{Account, BytesValue, ScCallStep, SetStateStep},
     testing_framework::raw_converter::bytes_to_hex,
     ScenarioWorld,
@@ -630,7 +629,7 @@ impl BlockchainStateWrapper {
             .get_mut_debugger_backend()
             .vm_runner
             .perform_sc_call_lambda_and_check(&sc_call_step, |instance_call| {
-                ScenarioVMRunner::wrap_lambda_call(false, instance_call, || {
+                DebugSCInstance::wrap_lambda_call(false, instance_call, || {
                     tx_fn(sc);
                 });
             });

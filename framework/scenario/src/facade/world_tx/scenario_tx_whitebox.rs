@@ -1,4 +1,4 @@
-use crate::scenario::run_vm::ScenarioVMRunner;
+use crate::debug_executor::DebugSCInstance;
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::{
     imports::StaticApi, scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec,
@@ -61,7 +61,7 @@ where
             .get_mut_debugger_backend()
             .vm_runner
             .perform_sc_deploy_lambda(&step_wrapper.step, |instance_call| {
-                ScenarioVMRunner::wrap_lambda_call(true, instance_call, || {
+                DebugSCInstance::wrap_lambda_call(true, instance_call, || {
                     f(contract_obj);
                 });
             });
@@ -133,7 +133,7 @@ where
             .get_mut_debugger_backend()
             .vm_runner
             .perform_sc_call_lambda(&step_wrapper.step, |instance_call| {
-                ScenarioVMRunner::wrap_lambda_call(true, instance_call, || {
+                DebugSCInstance::wrap_lambda_call(true, instance_call, || {
                     f(contract_obj);
                 });
             });

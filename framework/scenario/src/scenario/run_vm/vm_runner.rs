@@ -1,10 +1,9 @@
-use multiversx_chain_vm::tx_execution::{Runtime, RuntimeInstanceCall, RuntimeRef};
+use multiversx_chain_vm::tx_execution::{Runtime, RuntimeRef};
 
 use crate::{
-    debug_executor::{catch_tx_panic, ContractMapRef, DebugSCExecutor},
+    debug_executor::{ContractMapRef, DebugSCExecutor},
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
-    DebugApi,
 };
 
 /// Wraps calls to the blockchain mock,
@@ -30,32 +29,6 @@ impl ScenarioVMRunner {
             let executor = DebugSCExecutor::new(weak, self.contract_map_ref.clone());
             Runtime::new(self.blockchain_mock.vm.clone(), Box::new(executor))
         })
-    }
-
-    pub fn wrap_lambda_call<F>(
-        panic_message_flag: bool,
-        _instance_call: RuntimeInstanceCall<'_>,
-        f: F,
-    ) where
-        F: FnOnce(),
-    {
-        // assert!(
-        //     instance_call.func_name == TxFunctionName::WHITEBOX_CALL.as_str()
-        //         || instance_call.func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
-        //     "misconfigured whitebox call: {}",
-        //     instance_call.func_name,
-        // );
-
-        // TODO: figure out a way to also validate the instance?
-
-        let result = catch_tx_panic(panic_message_flag, || {
-            f();
-            Ok(())
-        });
-
-        if let Err(tx_panic) = result {
-            DebugApi::get_current_tx_context().replace_tx_result_with_error(tx_panic);
-        }
     }
 }
 
