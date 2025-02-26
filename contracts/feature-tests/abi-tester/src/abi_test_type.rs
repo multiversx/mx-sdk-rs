@@ -1,4 +1,5 @@
 use crate::only_nested::*;
+use bitflags::bitflags;
 use multiversx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, Box, ConstDecimals, ManagedBuffer, ManagedBufferReadToEnd, ManagedDecimal},
@@ -58,4 +59,15 @@ pub struct AbiWithManagedBufferReadToEnd<M: ManagedTypeApi> {
     pub endpoint: ManagedBuffer<M>,
     pub gas: u64,
     pub flush: ManagedBufferReadToEnd<M>,
+}
+
+bitflags! {
+    #[type_abi]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub struct Permission: u32 {
+        const NONE = 0;
+        const OWNER = 1;
+        const ADMIN = 2;
+        const PAUSE = 4;
+    }
 }

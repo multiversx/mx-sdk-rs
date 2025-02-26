@@ -279,6 +279,15 @@
                 }
             ]
         },
+        "BitField": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "0",
+                    "type": "u32"
+                }
+            ]
+        },
         "EsdtLocalRole": {
             "type": "enum",
             "variants": [

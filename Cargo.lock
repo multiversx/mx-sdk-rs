@@ -16,6 +16,7 @@ dependencies = [
 name = "abi-tester"
 version = "0.0.0"
 dependencies = [
+ "bitflags",
  "multiversx-sc",
  "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",
@@ -863,7 +864,6 @@ checksum = "60b1af1c220855b6ceac025d3f6ecdd2b7c4894bfe9cd9bda4fbb4bc7c0d4cf0"
 name = "empty"
 version = "0.0.0"
 dependencies = [
- "bitflags",
  "multiversx-sc",
  "multiversx-sc-scenario",
  "num-bigint",

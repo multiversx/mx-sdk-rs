@@ -18,6 +18,3 @@ path = "../../../framework/scenario"
 
 [dev-dependencies]
 num-bigint = "0.4"
-
-[dependencies]
-bitflags = "=2.8.0"

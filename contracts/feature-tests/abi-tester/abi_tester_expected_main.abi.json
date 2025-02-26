@@ -204,6 +204,16 @@
             ]
         },
         {
+            "name": "bitfield_arg",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BitField"
+                }
+            ]
+        },
+        {
             "name": "address_vs_h256",
             "mutability": "mutable",
             "inputs": [
@@ -656,6 +666,15 @@
                 {
                     "name": "flush",
                     "type": "bytes-read-to-end"
+                }
+            ]
+        },
+        "BitField": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "0",
+                    "type": "u32"
                 }
             ]
         },
