@@ -1,5 +1,4 @@
 #![allow(clippy::type_complexity)]
-#![allow(unused_imports)] // TODO: TEMP
 
 pub mod api;
 pub mod bech32;

@@ -1,5 +1,5 @@
 use crate::{
-    tx_execution::{BlockchainVMRef, Runtime, RuntimeRef},
+    tx_execution::{BlockchainVMRef, RuntimeRef},
     types::{VMAddress, VMCodeMetadata},
     world_mock::{AccountData, AccountEsdt, BlockchainState, FailingExecutor},
 };

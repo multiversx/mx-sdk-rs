@@ -1,4 +1,3 @@
-use crate::debug_executor::contract_instance_wrapped_execution;
 use crate::scenario::run_vm::ScenarioVMRunner;
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::{

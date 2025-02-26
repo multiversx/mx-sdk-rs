@@ -1,8 +1,6 @@
 use crate::{
     chain_core::builtin_func_names::ESDT_NFT_TRANSFER_FUNC_NAME,
-    tx_execution::{
-        BlockchainVMRef, BuiltinFunctionEsdtTransferInfo, RuntimeInstanceCall, RuntimeRef,
-    },
+    tx_execution::{BuiltinFunctionEsdtTransferInfo, RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     types::VMAddress,
 };

@@ -1,5 +1,3 @@
-use multiversx_chain_vm_executor::Instance;
-
 use super::{
     builtin_func_trait::BuiltinFunction,
     esdt_nft::{
@@ -12,7 +10,7 @@ use super::{
 };
 
 use crate::{
-    tx_execution::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef},
+    tx_execution::{RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::EsdtLocalRole,
 };

@@ -2,7 +2,7 @@ use std::{ops::Deref, sync::Arc};
 
 use crate::tx_mock::{TxContext, TxResult};
 
-use super::{BlockchainUpdate, TxContextStack, TxPanic};
+use super::{BlockchainUpdate, TxPanic};
 
 /// The VM API implementation based on a blockchain mock written in Rust.
 /// Implemented as a smart pointer to a TxContext structure, which tracks a blockchain transaction.

@@ -1,5 +1,5 @@
 use crate::chain_core::builtin_func_names::MIGRATE_USERNAME_FUNC_NAME;
-use crate::tx_execution::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef};
+use crate::tx_execution::{RuntimeInstanceCall, RuntimeRef};
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 
 use super::super::builtin_func_trait::BuiltinFunction;

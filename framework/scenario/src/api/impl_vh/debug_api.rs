@@ -5,7 +5,7 @@ use std::{
 
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
-    tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
+    tx_mock::{TxContext, TxContextRef, TxPanic},
     vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};

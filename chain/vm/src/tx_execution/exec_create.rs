@@ -1,5 +1,3 @@
-use multiversx_chain_vm_executor::Instance;
-
 use crate::{
     tx_mock::{TxCache, TxInput, TxResult},
     types::{VMAddress, VMCodeMetadata},

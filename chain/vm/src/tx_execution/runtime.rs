@@ -2,7 +2,7 @@ use std::{
     cell::RefCell,
     ops::Deref,
     rc::Rc,
-    sync::{Arc, Mutex, Weak},
+    sync::{Arc, Weak},
 };
 
 use multiversx_chain_vm_executor::{Executor, Instance};

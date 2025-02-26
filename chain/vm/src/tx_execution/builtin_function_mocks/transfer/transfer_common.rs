@@ -1,7 +1,7 @@
 use crate::{
     tx_execution::{
         builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
-        BlockchainVMRef, RuntimeInstanceCall, RuntimeRef,
+        RuntimeInstanceCall, RuntimeRef,
     },
     tx_mock::{
         BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxLog, TxResult,

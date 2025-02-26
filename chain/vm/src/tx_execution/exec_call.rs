@@ -3,17 +3,16 @@ use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
-        TxContextRef, TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
+        TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMCodeMetadata,
     world_mock::{AccountData, AccountEsdt, BlockchainStateRef},
 };
-use multiversx_chain_vm_executor::Instance;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
 
-use super::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef, StackItem};
+use super::{RuntimeInstanceCall, RuntimeRef};
 
 /// Executes the SC endpoint, as given by the current TxInput in the current TxContext.
 ///

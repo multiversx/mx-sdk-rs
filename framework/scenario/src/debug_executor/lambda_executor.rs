@@ -4,8 +4,6 @@ use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };
 
-use super::{ExecutorDeclinedError, LambdaInstance};
-
 pub const LAMBDA_CODE_MARKER: &str = "<LAMBDA>";
 
 pub struct LambdaExecutor<F>

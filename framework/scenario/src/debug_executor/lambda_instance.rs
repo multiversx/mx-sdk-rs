@@ -1,9 +1,6 @@
 use std::sync::Mutex;
 
-use multiversx_chain_vm_executor::{
-    BreakpointValue, CompilationOptions, Executor, ExecutorError, Instance, MemLength, MemPtr,
-    OpcodeCost,
-};
+use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
 
 pub const LAMBDA_FUNCTION_MARKER: &str = "<LAMBDA>";
 

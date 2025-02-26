@@ -2,9 +2,7 @@ use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Arc};
 
 use crate::{
     api::{DebugApi, DebugApiBackend},
-    debug_executor::{
-        contract_instance_wrapped_execution, ContractContainer, StaticVarData, StaticVarStack,
-    },
+    debug_executor::{ContractContainer, StaticVarData},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -16,9 +14,7 @@ use crate::{
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::tx_mock::{
-    TxContext, TxContextRef, TxContextStack, TxFunctionName, TxResult,
-};
+use multiversx_chain_vm::tx_mock::{TxContext, TxContextRef, TxFunctionName, TxResult};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 

@@ -1,13 +1,9 @@
-use std::{any::Any, cell::RefCell, sync::Arc};
+use std::{cell::RefCell, sync::Arc};
 
-use multiversx_chain_vm::{
-    tx_execution::{Runtime, RuntimeInstanceCall, RuntimeRef, RuntimeWeakRef},
-    tx_mock::TxFunctionName,
-};
-use multiversx_chain_vm_executor::Instance;
+use multiversx_chain_vm::tx_execution::{Runtime, RuntimeInstanceCall, RuntimeRef, RuntimeWeakRef};
 
 use crate::{
-    debug_executor::{catch_tx_panic, ContractMapRef, DebugSCExecutor, DebugSCInstance},
+    debug_executor::{catch_tx_panic, ContractMapRef, DebugSCExecutor},
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
     DebugApi,

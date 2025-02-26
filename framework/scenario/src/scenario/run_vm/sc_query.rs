@@ -1,7 +1,7 @@
 use crate::{num_bigint::BigUint, scenario::model::ScQueryStep, scenario_model::TxResponse};
 use multiversx_chain_vm::tx_mock::{TxCache, TxContext, TxInput, TxResult};
 
-use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
+use super::{tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
 impl ScenarioVMRunner {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.

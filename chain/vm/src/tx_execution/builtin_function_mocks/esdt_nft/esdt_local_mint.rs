@@ -3,7 +3,7 @@ use num_bigint::BigUint;
 
 use crate::{
     chain_core::builtin_func_names::ESDT_LOCAL_MINT_FUNC_NAME,
-    tx_execution::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef},
+    tx_execution::{RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     world_mock::EsdtInstanceMetadata,
 };

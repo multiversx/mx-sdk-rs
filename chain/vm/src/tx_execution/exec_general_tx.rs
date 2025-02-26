@@ -1,18 +1,14 @@
-use multiversx_chain_vm_executor::Instance;
 use num_traits::Zero;
 
 use crate::{
     tx_execution::execute_system_sc,
     tx_mock::{
-        BlockchainUpdate, CallType, TxCache, TxContext, TxContextStack, TxFunctionName, TxInput,
-        TxLog, TxResult,
+        BlockchainUpdate, CallType, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult,
     },
     types::{top_encode_big_uint, VMAddress, VMCodeMetadata},
 };
 
-use super::{
-    is_system_sc_address, runtime, BlockchainVMRef, Runtime, RuntimeInstanceCall, RuntimeRef,
-};
+use super::{is_system_sc_address, RuntimeInstanceCall, RuntimeRef};
 
 fn should_execute_sc_call(tx_input: &TxInput) -> bool {
     // execute whitebox calls no matter what

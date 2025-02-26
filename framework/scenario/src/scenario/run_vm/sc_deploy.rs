@@ -7,7 +7,6 @@ use multiversx_chain_vm::{
     tx_mock::{TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
 };
-use multiversx_chain_vm_executor::Instance;
 
 use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
