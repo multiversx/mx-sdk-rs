@@ -10,6 +10,10 @@ use crate::api::DebugApiBackend;
 
 use super::{catch_tx_panic, ContractContainerRef, StaticVarData};
 
+/// Used as a flag to check the instance under lambda calls.
+/// Since it is an invalid function name, any other instance should reject it.
+const DEBUG_SC_INSTANCE_FLAG: &str = "<DebugSCInstanceFlag>";
+
 pub struct DebugSCInstance {
     pub tx_context_ref: TxContextRef,
     pub contract_container_ref: ContractContainerRef,
@@ -27,7 +31,7 @@ impl DebugSCInstance {
 
     pub fn wrap_lambda_call<F>(
         panic_message_flag: bool,
-        _instance_call: RuntimeInstanceCall<'_>,
+        instance_call: RuntimeInstanceCall<'_>,
         f: F,
     ) where
         F: FnOnce(),
@@ -39,7 +43,10 @@ impl DebugSCInstance {
         //     instance_call.func_name,
         // );
 
-        // TODO: figure out a way to also validate the instance?
+        assert!(
+            instance_call.instance.has_function(DEBUG_SC_INSTANCE_FLAG),
+            "lambda call is not running on top of a DebugSCInstance instance"
+        );
 
         let result = catch_tx_panic(panic_message_flag, || {
             f();
@@ -82,6 +89,10 @@ impl Instance for DebugSCInstance {
     }
 
     fn has_function(&self, func_name: &str) -> bool {
+        if func_name == DEBUG_SC_INSTANCE_FLAG {
+            return true;
+        }
+
         self.contract_container_ref.has_function(func_name)
     }
 
