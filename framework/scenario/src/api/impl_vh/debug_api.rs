@@ -26,16 +26,13 @@ thread_local!(
 pub struct DebugApiBackend;
 
 impl DebugApiBackend {
-    pub fn get_current_tx_context() -> Arc<TxContext> {
-        let value = CURRENT_TX_CONTEXT.with(|cell| {
+    pub fn get_current_tx_context() -> TxContextRef {
+        CURRENT_TX_CONTEXT.with(|cell| {
             let opt = cell.lock().unwrap();
-            (*opt).clone()
-        });
-        if let Some(tx_context) = value {
-            tx_context.0
-        } else {
-            panic!("Uninitialized DebugApi (current context missing)")
-        }
+            opt.as_ref()
+                .expect("Uninitialized DebugApi (current tx context missing)")
+                .clone()
+        })
     }
 
     pub fn replace_current_tx_context(value: Option<TxContextRef>) -> Option<TxContextRef> {
@@ -137,12 +134,8 @@ impl DebugApi {
         DebugApiBackend::replace_static_var_data(Some(Arc::new(StaticVarData::default())));
     }
 
-    pub fn get_current_tx_context() -> Arc<TxContext> {
+    pub fn get_current_tx_context() -> TxContextRef {
         DebugApiBackend::get_current_tx_context()
-    }
-
-    pub fn get_current_tx_context_ref() -> TxContextRef {
-        TxContextRef(DebugApiBackend::get_current_tx_context())
     }
 }
 
@@ -153,8 +146,7 @@ impl std::fmt::Debug for DebugApi {
 }
 
 fn debugger_panic(status: ReturnCode, message: &str) {
-    DebugApi::get_current_tx_context_ref()
-        .replace_tx_result_with_error(TxPanic::new(status, message));
+    DebugApi::get_current_tx_context().replace_tx_result_with_error(TxPanic::new(status, message));
     std::panic::panic_any(BreakpointValue::SignalError);
 }
 

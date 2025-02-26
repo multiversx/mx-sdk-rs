@@ -1,4 +1,4 @@
-use std::sync::{Arc, MutexGuard};
+use std::sync::MutexGuard;
 
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::BreakpointValue;
@@ -9,7 +9,7 @@ use crate::{
     tx_execution::instance_call,
     tx_mock::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, TxCache,
-        TxContext, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
+        TxContextRef, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
     },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
@@ -26,11 +26,11 @@ use crate::{
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug)]
-pub struct DebugApiVMHooksHandler(Arc<TxContext>);
+pub struct DebugApiVMHooksHandler(TxContextRef);
 
 impl DebugApiVMHooksHandler {
-    pub fn new(tx_context_arc: Arc<TxContext>) -> Self {
-        DebugApiVMHooksHandler(tx_context_arc)
+    pub fn new(tx_context_ref: TxContextRef) -> Self {
+        DebugApiVMHooksHandler(tx_context_ref)
     }
 }
 

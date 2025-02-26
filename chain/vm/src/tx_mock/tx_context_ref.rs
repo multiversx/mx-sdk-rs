@@ -52,4 +52,9 @@ impl TxContextRef {
             TxResult::from_panic_obj(&tx_panic),
         );
     }
+
+    /// Returns true if the references point to the same `TxContext`.
+    pub fn ptr_eq(this: &Self, other: &Self) -> bool {
+        Arc::ptr_eq(&this.0, &other.0)
+    }
 }

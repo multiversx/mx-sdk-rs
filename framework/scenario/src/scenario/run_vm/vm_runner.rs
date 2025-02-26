@@ -54,7 +54,7 @@ impl ScenarioVMRunner {
         });
 
         if let Err(tx_panic) = result {
-            DebugApi::get_current_tx_context_ref().replace_tx_result_with_error(tx_panic);
+            DebugApi::get_current_tx_context().replace_tx_result_with_error(tx_panic);
         }
     }
 }
