@@ -3,7 +3,7 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::{execute_current_tx_context_input, instance_call, RuntimeInstanceCall},
+    tx_execution::{instance_call, RuntimeInstanceCall},
     tx_mock::{TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
 };

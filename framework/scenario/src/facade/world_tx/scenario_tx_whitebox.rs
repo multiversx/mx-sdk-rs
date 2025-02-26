@@ -62,7 +62,7 @@ where
             .get_mut_debugger_backend()
             .vm_runner
             .perform_sc_deploy_lambda(&step_wrapper.step, |instance_call| {
-                ScenarioVMRunner::wrap_lambda_call(instance_call, || {
+                ScenarioVMRunner::wrap_lambda_call(true, instance_call, || {
                     f(contract_obj);
                 });
             });
@@ -133,10 +133,9 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda(&step_wrapper.step, || {
-                contract_instance_wrapped_execution(true, || {
+            .perform_sc_call_lambda(&step_wrapper.step, |instance_call| {
+                ScenarioVMRunner::wrap_lambda_call(true, instance_call, || {
                     f(contract_obj);
-                    Ok(())
                 });
             });
 

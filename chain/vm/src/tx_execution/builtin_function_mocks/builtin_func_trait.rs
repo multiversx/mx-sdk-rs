@@ -1,5 +1,7 @@
+use multiversx_chain_vm_executor::Instance;
+
 use crate::{
-    tx_execution::BlockchainVMRef,
+    tx_execution::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer},
     types::VMAddress,
 };
@@ -23,11 +25,11 @@ pub trait BuiltinFunction {
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-        vm: &BlockchainVMRef,
+        runtime: &RuntimeRef,
         lambda: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce();
+        F: FnOnce(RuntimeInstanceCall<'_>);
 }
 
 /// Contains a builtin function call ESDT transfers (if any) and the real recipient of the transfer

@@ -5,7 +5,7 @@ use crate::{
     tx_mock::{TxContext, TxContextStack},
 };
 
-use super::{execute_current_tx_context_input, BlockchainVMRef};
+use super::BlockchainVMRef;
 
 pub const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     gas_limit: 1,

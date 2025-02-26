@@ -1,19 +1,24 @@
 use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Arc};
 
 use crate::{
-    api::DebugApi,
-    debug_executor::{contract_instance_wrapped_execution, ContractContainer, StaticVarStack},
+    api::{DebugApi, DebugApiBackend},
+    debug_executor::{
+        contract_instance_wrapped_execution, ContractContainer, StaticVarData, StaticVarStack,
+    },
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
         types::{heap::Address, EsdtLocalRole},
     },
+    scenario::run_vm::ScenarioVMRunner,
     scenario_model::{Account, BytesValue, ScCallStep, SetStateStep},
     testing_framework::raw_converter::bytes_to_hex,
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::tx_mock::{TxContext, TxContextStack, TxFunctionName, TxResult};
+use multiversx_chain_vm::tx_mock::{
+    TxContext, TxContextRef, TxContextStack, TxFunctionName, TxResult,
+};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 
@@ -628,27 +633,31 @@ impl BlockchainStateWrapper {
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda_and_check(&sc_call_step, || {
-                contract_instance_wrapped_execution(false, || {
+            .perform_sc_call_lambda_and_check(&sc_call_step, |instance_call| {
+                ScenarioVMRunner::wrap_lambda_call(false, instance_call, || {
                     tx_fn(sc);
-                    Ok(())
                 });
             });
 
         tx_result
     }
 
+    /// Creates a temporary DebugApi context to run lambda function.
+    ///
+    /// Restores previous context (if any) after finishing execution.
     pub fn execute_in_managed_environment<T, F>(&self, f: F) -> T
     where
         F: FnOnce() -> T,
     {
         let tx_context = TxContext::dummy();
         let tx_context_arc = Arc::new(tx_context);
-        TxContextStack::static_push(tx_context_arc);
-        StaticVarStack::static_push();
+        let bkp_tx_context =
+            DebugApiBackend::replace_current_tx_context(Some(TxContextRef(tx_context_arc)));
+        let bkp_static_var =
+            DebugApiBackend::replace_static_var_data(Some(Arc::new(StaticVarData::default())));
         let result = f();
-        let _ = TxContextStack::static_pop();
-        let _ = StaticVarStack::static_pop();
+        DebugApiBackend::replace_current_tx_context(bkp_tx_context);
+        DebugApiBackend::replace_static_var_data(bkp_static_var);
 
         result
     }

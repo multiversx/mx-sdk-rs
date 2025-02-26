@@ -6,7 +6,7 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
-    tx_execution::{execute_current_tx_context_input, instance_call},
+    tx_execution::instance_call,
     tx_mock::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, TxCache,
         TxContext, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
@@ -125,11 +125,12 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
-            tx_input,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
+        let (tx_result, blockchain_updates) = self
+            .0
+            .runtime_ref
+            .as_ref()
+            .unwrap()
+            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         if tx_result.result_status.is_success() {
             self.sync_call_post_processing(tx_result, blockchain_updates)
@@ -150,11 +151,12 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         let mut tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         tx_input.readonly = true;
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
-            tx_input,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
+        let (tx_result, blockchain_updates) = self
+            .0
+            .runtime_ref
+            .as_ref()
+            .unwrap()
+            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         if tx_result.result_status.is_success() {
             self.sync_call_post_processing(tx_result, blockchain_updates)
@@ -225,11 +227,12 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         }
 
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
-            tx_input,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
+        let (tx_result, blockchain_updates) = self
+            .0
+            .runtime_ref
+            .as_ref()
+            .unwrap()
+            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         match tx_result.result_status {
             ReturnCode::Success => {

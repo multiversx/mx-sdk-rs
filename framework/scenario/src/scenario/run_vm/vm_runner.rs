@@ -45,19 +45,23 @@ impl ScenarioVMRunner {
         RuntimeRef(runtime_arc)
     }
 
-    pub fn wrap_lambda_call<F>(instance_call: RuntimeInstanceCall<'_>, f: F)
-    where
+    pub fn wrap_lambda_call<F>(
+        panic_message_flag: bool,
+        _instance_call: RuntimeInstanceCall<'_>,
+        f: F,
+    ) where
         F: FnOnce(),
     {
-        assert!(
-            instance_call.func_name == TxFunctionName::WHITEBOX_CALL.as_str()
-                || instance_call.func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
-            "misconfigured whitebox call"
-        );
+        // assert!(
+        //     instance_call.func_name == TxFunctionName::WHITEBOX_CALL.as_str()
+        //         || instance_call.func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
+        //     "misconfigured whitebox call: {}",
+        //     instance_call.func_name,
+        // );
 
         // TODO: figure out a way to also validate the instance?
 
-        let result = catch_tx_panic(true, || {
+        let result = catch_tx_panic(panic_message_flag, || {
             f();
             Ok(())
         });

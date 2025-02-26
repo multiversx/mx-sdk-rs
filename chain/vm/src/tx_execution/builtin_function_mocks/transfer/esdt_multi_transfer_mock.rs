@@ -1,6 +1,6 @@
 use crate::{
     chain_core::builtin_func_names::ESDT_MULTI_TRANSFER_FUNC_NAME,
-    tx_execution::BlockchainVMRef,
+    tx_execution::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef},
     tx_mock::TxLog,
     types::{top_decode_u64, top_encode_u64},
 };
@@ -39,16 +39,16 @@ impl BuiltinFunction for ESDTMultiTransfer {
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-        vm: &BlockchainVMRef,
+        runtime: &RuntimeRef,
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         match try_parse_input(&tx_input) {
             Ok(parsed_tx) => {
                 let log = build_log(&tx_input, &parsed_tx);
-                execute_transfer_builtin_func(vm, parsed_tx, tx_input, tx_cache, log, f)
+                execute_transfer_builtin_func(runtime, parsed_tx, tx_input, tx_cache, log, f)
             },
             Err(message) => {
                 let err_result = TxResult::from_vm_error(message);

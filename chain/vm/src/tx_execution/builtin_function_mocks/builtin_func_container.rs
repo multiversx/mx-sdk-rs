@@ -1,3 +1,5 @@
+use multiversx_chain_vm_executor::Instance;
+
 use super::{
     builtin_func_trait::BuiltinFunction,
     esdt_nft::{
@@ -10,7 +12,7 @@ use super::{
 };
 
 use crate::{
-    tx_execution::BlockchainVMRef,
+    tx_execution::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::EsdtLocalRole,
 };
@@ -28,17 +30,17 @@ impl BuiltinFunctionContainer {
     /// It also checks that the appropriate roles are set, where applicable.
     pub fn execute_builtin_function_or_else<F, Else>(
         &self,
-        vm: &BlockchainVMRef,
+        runtime: &RuntimeRef,
         tx_input: TxInput,
         tx_cache: TxCache,
         f: F,
         or_else: Else,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
         Else: FnOnce(TxInput, TxCache, F) -> (TxResult, BlockchainUpdate),
     {
-        BuiltinFunctionCall::new(vm, tx_input, tx_cache).execute_or_else(f, or_else)
+        BuiltinFunctionCall::new(runtime, tx_input, tx_cache).execute_or_else(f, or_else)
     }
 
     /// Provides data on the builtin functions that perform ESDT token transfers.
@@ -62,15 +64,15 @@ where
 /// Syntax helper for the big builtin function match in `execute_or_else`.
 /// Thanks to it we do not need to write out the arguments for each match arm.
 struct BuiltinFunctionCall<'a> {
-    vm: &'a BlockchainVMRef,
+    runtime: &'a RuntimeRef,
     tx_input: TxInput,
     tx_cache: TxCache,
 }
 
 impl<'a> BuiltinFunctionCall<'a> {
-    pub fn new(vm: &'a BlockchainVMRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
+    pub fn new(runtime: &'a RuntimeRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
         BuiltinFunctionCall {
-            vm,
+            runtime,
             tx_input,
             tx_cache,
         }
@@ -78,7 +80,7 @@ impl<'a> BuiltinFunctionCall<'a> {
 
     pub fn execute_or_else<F, Else>(self, f: F, or_else: Else) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
         Else: FnOnce(TxInput, TxCache, F) -> (TxResult, BlockchainUpdate),
     {
         match self.tx_input.func_name.as_str() {
@@ -124,9 +126,9 @@ impl<'a> BuiltinFunctionCall<'a> {
     fn execute_bf<B, F>(self, builtin_func: B, f: F) -> (TxResult, BlockchainUpdate)
     where
         B: BuiltinFunction,
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
-        builtin_func.execute(self.tx_input, self.tx_cache, self.vm, f)
+        builtin_func.execute(self.tx_input, self.tx_cache, self.runtime, f)
     }
 
     fn check_role_and_execute<B, F>(
@@ -137,7 +139,7 @@ impl<'a> BuiltinFunctionCall<'a> {
     ) -> (TxResult, BlockchainUpdate)
     where
         B: BuiltinFunction,
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         if check_allowed_to_execute(role, &self.tx_input, &self.tx_cache) {
             self.execute_bf(builtin_func, f)

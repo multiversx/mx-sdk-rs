@@ -1,5 +1,5 @@
 use crate::chain_core::builtin_func_names::MIGRATE_USERNAME_FUNC_NAME;
-use crate::tx_execution::BlockchainVMRef;
+use crate::tx_execution::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef};
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 
 use super::super::builtin_func_trait::BuiltinFunction;
@@ -17,11 +17,11 @@ impl BuiltinFunction for MigrateUserName {
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-        _vm: &BlockchainVMRef,
+        _runtime: &RuntimeRef,
         _f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         self.execute_with_result(tx_input, tx_cache)
             .unwrap_or_else(|err_result| (err_result, BlockchainUpdate::empty()))

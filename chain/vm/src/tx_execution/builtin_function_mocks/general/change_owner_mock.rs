@@ -1,6 +1,6 @@
 use crate::{
     chain_core::builtin_func_names::CHANGE_OWNER_BUILTIN_FUNC_NAME,
-    tx_execution::BlockchainVMRef,
+    tx_execution::{BlockchainVMRef, RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
@@ -18,11 +18,11 @@ impl BuiltinFunction for ChangeOwner {
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-        _vm: &BlockchainVMRef,
+        _runtime: &RuntimeRef,
         _f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         if tx_input.args.len() != 1 {
             return (

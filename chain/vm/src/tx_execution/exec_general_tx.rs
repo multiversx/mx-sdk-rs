@@ -80,7 +80,7 @@ pub(crate) fn create_transfer_value_log(tx_input: &TxInput, call_type: CallType)
     }
 }
 
-impl BlockchainVMRef {
+impl RuntimeRef {
     /// Executes without builtin functions, directly on the contract or the given lambda closure.
     pub fn default_execution<F>(
         &self,
@@ -89,7 +89,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         if let Err(err) =
             tx_cache.transfer_egld_balance(&tx_input.from, &tx_input.to, &tx_input.egld_value)
@@ -120,9 +120,9 @@ impl BlockchainVMRef {
         let (mut tx_result, blockchain_updates) = if is_system_sc_address(&tx_input.to) {
             execute_system_sc(tx_input, tx_cache)
         } else if should_execute_sc_call(&tx_input) {
-            let tx_context = TxContext::new_old(self.clone(), tx_input, tx_cache);
+            let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
 
-            let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
+            let tx_context = self.execute_tx_context_in_runtime(tx_context, f);
 
             tx_context.into_results()
         } else {

@@ -34,8 +34,7 @@ impl DebugApiBackend {
         if let Some(tx_context) = value {
             tx_context.0
         } else {
-            // TODO: temporary fallback
-            TxContextStack::static_peek()
+            panic!("Uninitialized DebugApi (current context missing)")
         }
     }
 
@@ -132,12 +131,13 @@ impl VMHooksApiBackend for DebugApiBackend {
 pub type DebugApi = VMHooksApi<DebugApiBackend>;
 
 impl DebugApi {
+    /// WARNING: this does not clean up after itself, must fix!!!
     pub fn dummy() {
         let tx_context = TxContext::dummy();
         let tx_context_arc = Arc::new(tx_context);
-        // TODO: WARNING: this does not clean up after itself, must fix!!!
-        TxContextStack::static_push(tx_context_arc);
-        StaticVarStack::static_push();
+
+        DebugApiBackend::replace_current_tx_context(Some(TxContextRef(tx_context_arc)));
+        DebugApiBackend::replace_static_var_data(Some(Arc::new(StaticVarData::default())));
     }
 
     pub fn get_current_tx_context() -> Arc<TxContext> {
