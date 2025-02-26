@@ -128,8 +128,6 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         let (tx_result, blockchain_updates) = self
             .0
             .runtime_ref
-            .as_ref()
-            .unwrap()
             .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         if tx_result.result_status.is_success() {
@@ -154,8 +152,6 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         let (tx_result, blockchain_updates) = self
             .0
             .runtime_ref
-            .as_ref()
-            .unwrap()
             .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         if tx_result.result_status.is_success() {
@@ -190,18 +186,13 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
 
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         tx_cache.increase_acount_nonce(contract_address);
-        let (tx_result, new_address, blockchain_updates) = self
-            .0
-            .runtime_ref
-            .as_ref()
-            .expect("runtime not initialized")
-            .deploy_contract(
-                tx_input,
-                contract_code,
-                code_metadata,
-                tx_cache,
-                instance_call,
-            );
+        let (tx_result, new_address, blockchain_updates) = self.0.runtime_ref.deploy_contract(
+            tx_input,
+            contract_code,
+            code_metadata,
+            tx_cache,
+            instance_call,
+        );
 
         match tx_result.result_status {
             ReturnCode::Success => (
@@ -230,8 +221,6 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         let (tx_result, blockchain_updates) = self
             .0
             .runtime_ref
-            .as_ref()
-            .unwrap()
             .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         match tx_result.result_status {
@@ -276,7 +265,7 @@ impl DebugApiVMHooksHandler {
         self.0.result_lock().merge_after_sync_call(&tx_result);
 
         let contract_address = &self.0.input_ref().to;
-        let builtin_functions = &self.0.vm_ref.builtin_functions;
+        let builtin_functions = &self.0.runtime_ref.vm_ref.builtin_functions;
         self.back_transfers_lock()
             .new_from_result(contract_address, &tx_result, builtin_functions);
 
@@ -302,7 +291,7 @@ impl DebugApiVMHooksHandler {
             return false;
         }
 
-        let builtin_functions = &self.0.vm_ref.builtin_functions;
+        let builtin_functions = &self.0.runtime_ref.vm_ref.builtin_functions;
         let token_transfers = builtin_functions.extract_token_transfers(tx_input);
         &token_transfers.real_recipient == caller_address
     }

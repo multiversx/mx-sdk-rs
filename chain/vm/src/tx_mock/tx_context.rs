@@ -15,8 +15,7 @@ use super::{
 };
 
 pub struct TxContext {
-    pub vm_ref: BlockchainVMRef,
-    pub runtime_ref: Option<RuntimeRef>,
+    pub runtime_ref: RuntimeRef,
     pub tx_input_box: Box<TxInput>,
     pub tx_cache: Arc<TxCache>,
     pub managed_types: Mutex<TxManagedTypes>,
@@ -26,26 +25,10 @@ pub struct TxContext {
 }
 
 impl TxContext {
-    pub fn new_old(vm_ref: BlockchainVMRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
-        let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
-        TxContext {
-            vm_ref,
-            runtime_ref: None,
-            tx_input_box: Box::new(tx_input),
-            tx_cache: Arc::new(tx_cache),
-            managed_types: Mutex::new(TxManagedTypes::new()),
-            back_transfers: Mutex::default(),
-            tx_result_cell: Mutex::new(TxResult::empty()),
-            b_rng,
-        }
-    }
-
     pub fn new(runtime_ref: RuntimeRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
         let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
-        let vm_ref = runtime_ref.vm_ref.clone();
         TxContext {
-            vm_ref,
-            runtime_ref: Some(runtime_ref),
+            runtime_ref: runtime_ref,
             tx_input_box: Box::new(tx_input),
             tx_cache: Arc::new(tx_cache),
             managed_types: Mutex::new(TxManagedTypes::new()),
@@ -79,9 +62,9 @@ impl TxContext {
         };
 
         let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
+        let vm_ref = BlockchainVMRef::new(Box::new(FailingExecutor));
         TxContext {
-            vm_ref: BlockchainVMRef::new(Box::new(FailingExecutor)),
-            runtime_ref: None,
+            runtime_ref: RuntimeRef::new(vm_ref),
             tx_input_box: Box::new(tx_input),
             tx_cache: Arc::new(tx_cache),
             managed_types: Mutex::new(TxManagedTypes::new()),

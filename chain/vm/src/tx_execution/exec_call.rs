@@ -22,7 +22,10 @@ use super::{RuntimeInstanceCall, RuntimeRef};
 pub fn execute_current_tx_context_input() {
     let tx_context_arc = TxContextStack::static_peek();
     let func_name = tx_context_arc.input_ref().func_name.clone();
-    let instance = tx_context_arc.vm_ref.get_contract_instance(&tx_context_arc);
+    let instance = tx_context_arc
+        .runtime_ref
+        .vm_ref
+        .get_contract_instance(&tx_context_arc);
     instance.call(func_name.as_str()).expect("execution error");
 }
 
