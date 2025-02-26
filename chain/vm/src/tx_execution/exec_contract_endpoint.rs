@@ -1,8 +1,7 @@
-use multiversx_chain_vm_executor::{CompilationOptions, Instance};
+use multiversx_chain_vm_executor::CompilationOptions;
 
 use crate::{display_util::address_hex, tx_mock::TxContext};
 
-use super::BlockchainVMRef;
 
 pub const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     gas_limit: 1,
@@ -13,15 +12,6 @@ pub const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     metering: false,
     runtime_breakpoints: false,
 };
-
-impl BlockchainVMRef {
-    pub fn get_contract_instance(&self, tx_context: &TxContext) -> Box<dyn Instance> {
-        let contract_code = get_contract_identifier(tx_context);
-        self.executor
-            .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
-            .expect("error instantiating executor instance")
-    }
-}
 
 pub fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
     tx_context

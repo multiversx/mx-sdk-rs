@@ -20,7 +20,7 @@ pub struct ScenarioVMRunner {
 impl ScenarioVMRunner {
     pub fn new() -> Self {
         let contract_map_ref = ContractMapRef::new();
-        let blockchain_mock = BlockchainMock::new(Box::new(contract_map_ref.clone()));
+        let blockchain_mock = BlockchainMock::default();
         ScenarioVMRunner {
             contract_map_ref,
             blockchain_mock,

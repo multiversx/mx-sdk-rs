@@ -48,7 +48,7 @@ impl Runtime {
     pub fn executor(&self) -> &(dyn Executor + Send + Sync) {
         self.override_executor
             .as_ref()
-            .unwrap_or(&self.vm_ref.executor)
+            .expect("missing executor")
             .deref()
     }
 

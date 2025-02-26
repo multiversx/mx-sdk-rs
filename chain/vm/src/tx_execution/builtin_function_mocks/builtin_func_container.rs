@@ -20,6 +20,7 @@ use crate::chain_core::builtin_func_names::*;
 /// Container for builtin function logic.
 ///
 /// Currently has no data, but could conceivably be configurable in the future.
+#[derive(Default)]
 pub struct BuiltinFunctionContainer;
 
 impl BuiltinFunctionContainer {

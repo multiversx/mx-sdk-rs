@@ -2,8 +2,7 @@ use crate::{
     tx_execution::instance_call,
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
-        merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
-        TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
+        merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext, TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMCodeMetadata,
     world_mock::{AccountData, AccountEsdt, BlockchainStateRef},
@@ -13,21 +12,6 @@ use num_traits::Zero;
 use std::collections::HashMap;
 
 use super::{RuntimeInstanceCall, RuntimeRef};
-
-/// Executes the SC endpoint, as given by the current TxInput in the current TxContext.
-///
-/// Works directly with the top of the execution stack, that is why it takes no arguments.
-///
-/// It expectes that the stack is properly set up.
-pub fn execute_current_tx_context_input() {
-    let tx_context_arc = TxContextStack::static_peek();
-    let func_name = tx_context_arc.input_ref().func_name.clone();
-    let instance = tx_context_arc
-        .runtime_ref
-        .vm_ref
-        .get_contract_instance(&tx_context_arc);
-    instance.call(func_name.as_str()).expect("execution error");
-}
 
 impl RuntimeRef {
     pub fn execute_sc_query_lambda<F>(
