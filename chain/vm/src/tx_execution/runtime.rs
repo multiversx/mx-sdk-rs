@@ -172,8 +172,6 @@ impl RuntimeRef {
         F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let func_name = tx_context.tx_input_box.func_name.clone();
-        // let tx_cache = TxCache::new(state.get_arc());
-        // let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
         let contract_code = get_contract_identifier(&tx_context);
         let tx_context_ref = TxContextRef::new(Arc::new(tx_context));
 

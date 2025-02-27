@@ -1,7 +1,4 @@
-use std::{
-    ops::DerefMut,
-    sync::{Arc, Mutex},
-};
+use std::sync::Arc;
 
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
@@ -10,62 +7,12 @@ use multiversx_chain_vm::{
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::StaticVarData;
+use crate::debug_executor::{StaticVarData, StaticVarStack, TxContextStack};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
-thread_local!(
-    static CURRENT_TX_CONTEXT: Mutex<Option<TxContextRef>> = Mutex::new(None)
-);
-
-thread_local!(
-    static STATIC_VAR_DATA: Mutex<Option<Arc<StaticVarData>>> = Mutex::new(None)
-);
-
 #[derive(Clone)]
 pub struct DebugApiBackend;
-
-impl DebugApiBackend {
-    pub fn get_current_tx_context() -> TxContextRef {
-        let opt_ref = CURRENT_TX_CONTEXT.with(|cell| {
-            let opt = cell
-                .lock()
-                .expect("error accessing the DebugApiBackend current context mutex contents");
-            opt.clone()
-        });
-        opt_ref.expect("Uninitialized DebugApiBackend (current tx context missing)")
-    }
-
-    pub fn replace_current_tx_context(value: Option<TxContextRef>) -> Option<TxContextRef> {
-        CURRENT_TX_CONTEXT.with(|cell| {
-            let mut opt = cell
-                .lock()
-                .expect("error replacing the DebugApiBackend current context mutex contents");
-            core::mem::replace(opt.deref_mut(), value)
-        })
-    }
-
-    pub fn get_static_var_data() -> Arc<StaticVarData> {
-        let opt_ref = STATIC_VAR_DATA.with(|cell| {
-            let opt = cell
-                .lock()
-                .expect("error accessing the DebugApiBackend current static var contents");
-            opt.clone()
-        });
-        opt_ref.expect("Uninitialized DebugApiBackend (static var data missing)")
-    }
-
-    pub fn replace_static_var_data(
-        value: Option<Arc<StaticVarData>>,
-    ) -> Option<Arc<StaticVarData>> {
-        STATIC_VAR_DATA.with(|cell| {
-            let mut opt = cell
-                .lock()
-                .expect("error replacing the DebugApiBackend current static var contents");
-            core::mem::replace(opt.deref_mut(), value)
-        })
-    }
-}
 
 impl VMHooksApiBackend for DebugApiBackend {
     type HandleType = DebugHandle;
@@ -74,7 +21,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        let top_context = Self::get_current_tx_context();
+        let top_context = TxContextStack::static_peek();
         let wrapper = DebugApiVMHooksHandler::new(top_context);
         let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
         f(&dispatcher)
@@ -123,8 +70,8 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&StaticVarData) -> R,
     {
-        let static_var_data = Self::get_static_var_data();
-        f(&static_var_data)
+        let top_context = StaticVarStack::static_peek();
+        f(&top_context)
     }
 }
 
@@ -134,14 +81,9 @@ impl DebugApi {
     /// WARNING: this does not clean up after itself, must fix!!!
     pub fn dummy() {
         let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-
-        DebugApiBackend::replace_current_tx_context(Some(TxContextRef(tx_context_arc)));
-        DebugApiBackend::replace_static_var_data(Some(Arc::new(StaticVarData::default())));
-    }
-
-    pub fn get_current_tx_context() -> TxContextRef {
-        DebugApiBackend::get_current_tx_context()
+        // TODO: WARNING: this does not clean up after itself, must fix!!!
+        TxContextStack::static_push(TxContextRef::new(Arc::new(tx_context)));
+        StaticVarStack::static_push();
     }
 }
 
@@ -152,7 +94,8 @@ impl std::fmt::Debug for DebugApi {
 }
 
 fn debugger_panic(status: ReturnCode, message: &str) {
-    DebugApi::get_current_tx_context().replace_tx_result_with_error(TxPanic::new(status, message));
+    TxContextStack::static_peek().replace_tx_result_with_error(TxPanic::new(status, message));
+    // DebugApi::get_current_tx_context().replace_tx_result_with_error(TxPanic::new(status, message));
     std::panic::panic_any(BreakpointValue::SignalError);
 }
 

@@ -6,13 +6,14 @@ use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, Mem
 use multiversx_sc::chain_core::types::ReturnCode;
 use std::sync::Arc;
 
-use crate::api::DebugApiBackend;
+use crate::debug_executor::TxContextStack;
 
-use super::{catch_tx_panic, ContractContainerRef, StaticVarData};
+use super::{catch_tx_panic, ContractContainerRef, StaticVarData, StaticVarStack};
 
 /// Used as a flag to check the instance under lambda calls.
 /// Since it is an invalid function name, any other instance should reject it.
-const DEBUG_SC_INSTANCE_FLAG: &str = "<DebugSCInstanceFlag>";
+const DEBUG_SC_INSTANCE_CONTEXT_PUSH: &str = "<DebugSCInstance-PushContext>";
+const DEBUG_SC_INSTANCE_CONTEXT_POP: &str = "<DebugSCInstance-PopContext>";
 
 pub struct DebugSCInstance {
     pub tx_context_ref: TxContextRef,
@@ -44,9 +45,13 @@ impl DebugSCInstance {
         // );
 
         assert!(
-            instance_call.instance.has_function(DEBUG_SC_INSTANCE_FLAG),
+            instance_call
+                .instance
+                .has_function(DEBUG_SC_INSTANCE_CONTEXT_PUSH),
             "lambda call is not running on top of a DebugSCInstance instance"
         );
+
+        let _ = instance_call.instance.call(DEBUG_SC_INSTANCE_CONTEXT_PUSH);
 
         let result = catch_tx_panic(panic_message_flag, || {
             f();
@@ -54,14 +59,17 @@ impl DebugSCInstance {
         });
 
         if let Err(tx_panic) = result {
-            DebugApiBackend::get_current_tx_context().replace_tx_result_with_error(tx_panic);
+            TxContextStack::static_peek().replace_tx_result_with_error(tx_panic);
         }
-    }
-}
 
-impl Instance for DebugSCInstance {
-    fn call(&self, func_name: &str) -> Result<(), String> {
+        let _ = instance_call.instance.call(DEBUG_SC_INSTANCE_CONTEXT_POP);
+    }
+
+    fn call_endpoint(&self, func_name: &str) -> Result<(), String> {
         let tx_func_name = TxFunctionName::from(func_name);
+
+        TxContextStack::static_push(self.tx_context_ref.clone());
+        StaticVarStack::static_push();
 
         let result = catch_tx_panic(self.contract_container_ref.0.panic_message, || {
             let call_successful = self.contract_container_ref.0.call(&tx_func_name);
@@ -81,7 +89,28 @@ impl Instance for DebugSCInstance {
                 .replace_tx_result_with_error(tx_panic);
         }
 
+        TxContextStack::static_pop();
+        StaticVarStack::static_pop();
+
         Ok(())
+    }
+}
+
+impl Instance for DebugSCInstance {
+    fn call(&self, func_name: &str) -> Result<(), String> {
+        match func_name {
+            DEBUG_SC_INSTANCE_CONTEXT_PUSH => {
+                TxContextStack::static_push(self.tx_context_ref.clone());
+                StaticVarStack::static_push();
+                Ok(())
+            },
+            DEBUG_SC_INSTANCE_CONTEXT_POP => {
+                TxContextStack::static_pop();
+                StaticVarStack::static_pop();
+                Ok(())
+            },
+            _ => self.call_endpoint(func_name),
+        }
     }
 
     fn check_signatures(&self) -> bool {
@@ -89,11 +118,11 @@ impl Instance for DebugSCInstance {
     }
 
     fn has_function(&self, func_name: &str) -> bool {
-        if func_name == DEBUG_SC_INSTANCE_FLAG {
-            return true;
+        match func_name {
+            DEBUG_SC_INSTANCE_CONTEXT_PUSH => true,
+            DEBUG_SC_INSTANCE_CONTEXT_POP => true,
+            _ => self.contract_container_ref.has_function(func_name),
         }
-
-        self.contract_container_ref.has_function(func_name)
     }
 
     fn get_exported_function_names(&self) -> Vec<String> {
@@ -152,13 +181,7 @@ impl Instance for DebugSCInstance {
         panic!("ContractContainerRef cache not supported")
     }
 
-    fn on_stack_top_enter(&self) {
-        DebugApiBackend::replace_current_tx_context(Some(self.tx_context_ref.clone()));
-        DebugApiBackend::replace_static_var_data(Some(self.static_var_data_ref.clone()));
-    }
+    fn on_stack_top_enter(&self) {}
 
-    fn on_stack_top_leave(&self) {
-        DebugApiBackend::replace_current_tx_context(None);
-        DebugApiBackend::replace_static_var_data(None);
-    }
+    fn on_stack_top_leave(&self) {}
 }

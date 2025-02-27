@@ -27,6 +27,10 @@ impl TxContextRef {
         Self(tx_context_arc)
     }
 
+    pub fn dummy() -> Self {
+        Self::new(Arc::new(TxContext::dummy()))
+    }
+
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
         let tx_context = Arc::try_unwrap(self.0).unwrap();
         let tx_cache = Arc::try_unwrap(tx_context.tx_cache).unwrap();

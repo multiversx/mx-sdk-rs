@@ -6,7 +6,8 @@ mod debug_sc_executor;
 mod debug_sc_instance;
 mod lambda_executor;
 mod lambda_instance;
-mod static_var_data;
+mod static_var_stack;
+mod tx_context_stack;
 mod tx_static_vars;
 
 pub use catch_tx_panic::catch_tx_panic;
@@ -17,5 +18,6 @@ pub use debug_sc_executor::DebugSCExecutor;
 pub use debug_sc_instance::DebugSCInstance;
 pub use lambda_executor::*;
 pub use lambda_instance::*;
-pub use static_var_data::StaticVarData;
+pub use static_var_stack::{StaticVarData, StaticVarStack};
+pub use tx_context_stack::TxContextStack;
 pub use tx_static_vars::TxStaticVars;

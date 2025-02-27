@@ -4,7 +4,7 @@ use multiversx_sc::{
     codec::TryStaticCast,
 };
 
-use super::DebugApi;
+use crate::debug_executor::TxContextStack;
 
 #[derive(Clone)]
 pub struct DebugHandle {
@@ -14,7 +14,7 @@ pub struct DebugHandle {
 
 impl DebugHandle {
     pub fn is_on_current_context(&self) -> bool {
-        TxContextRef::ptr_eq(&self.context, &DebugApi::get_current_tx_context())
+        TxContextRef::ptr_eq(&self.context, &TxContextStack::static_peek())
     }
 
     pub fn is_on_same_context(&self, other: &DebugHandle) -> bool {
@@ -38,7 +38,7 @@ impl core::fmt::Debug for DebugHandle {
 impl HandleConstraints for DebugHandle {
     fn new(handle: multiversx_sc::api::RawHandle) -> Self {
         Self {
-            context: DebugApi::get_current_tx_context(),
+            context: TxContextStack::static_peek(),
             raw_handle: handle,
         }
     }

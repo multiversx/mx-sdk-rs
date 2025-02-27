@@ -1,8 +1,8 @@
-use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
-    api::{DebugApi, DebugApiBackend},
-    debug_executor::{ContractContainer, DebugSCInstance, StaticVarData},
+    api::DebugApi,
+    debug_executor::{ContractContainer, DebugSCInstance, StaticVarStack, TxContextStack},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -13,7 +13,7 @@ use crate::{
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::tx_mock::{TxContext, TxContextRef, TxFunctionName, TxResult};
+use multiversx_chain_vm::tx_mock::{TxContextRef, TxFunctionName, TxResult};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 
@@ -644,15 +644,11 @@ impl BlockchainStateWrapper {
     where
         F: FnOnce() -> T,
     {
-        let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-        let bkp_tx_context =
-            DebugApiBackend::replace_current_tx_context(Some(TxContextRef(tx_context_arc)));
-        let bkp_static_var =
-            DebugApiBackend::replace_static_var_data(Some(Arc::new(StaticVarData::default())));
+        TxContextStack::static_push(TxContextRef::dummy());
+        StaticVarStack::static_push();
         let result = f();
-        DebugApiBackend::replace_current_tx_context(bkp_tx_context);
-        DebugApiBackend::replace_static_var_data(bkp_static_var);
+        let _ = TxContextStack::static_pop();
+        let _ = StaticVarStack::static_pop();
 
         result
     }
