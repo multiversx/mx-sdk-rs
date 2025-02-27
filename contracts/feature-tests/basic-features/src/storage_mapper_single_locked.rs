@@ -13,12 +13,6 @@ pub trait SingleValueMapperLockedFeatures {
     #[storage_mapper_with_timelock("svm_with_timelock_annotation")]
     fn svm_with_timelock_annotation(&self) -> SingleValueMapper<BigUint, CurrentStorageLocked>;
 
-    #[storage_mapper_from_address("svm_with_timelock_from_address")]
-    fn svm_with_timelock_from_address(
-        &self,
-        address: ManagedAddress,
-    ) -> SingleValueMapper<BigUint, ManagedAddress>;
-
     #[storage_mapper("svm_with_timelock_and_key")]
     fn svm_with_timelock_and_key(
         &self,
@@ -85,21 +79,5 @@ pub trait SingleValueMapperLockedFeatures {
     #[endpoint]
     fn svm_with_timelock_and_key_set(&self, key: usize, value: ManagedBuffer) -> bool {
         self.svm_with_timelock_and_key(key).set_if_unlocked(value)
-    }
-
-    #[endpoint]
-    fn svm_with_timelock_is_empty_at_address(&self, address: ManagedAddress) -> bool {
-        self.svm_with_timelock_from_address(address).is_empty()
-    }
-
-    #[endpoint]
-    fn svm_with_timelock_get_from_address(&self, address: ManagedAddress) -> BigUint {
-        self.svm_with_timelock_from_address(address).get()
-    }
-
-    #[endpoint]
-    fn svm_with_timelock_get_unlock_timestamp_from_address(&self, address: ManagedAddress) -> u64 {
-        self.svm_with_timelock_from_address(address)
-            .get_unlock_timestamp()
     }
 }
