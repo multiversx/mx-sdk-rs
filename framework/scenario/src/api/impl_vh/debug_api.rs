@@ -27,35 +27,41 @@ pub struct DebugApiBackend;
 
 impl DebugApiBackend {
     pub fn get_current_tx_context() -> TxContextRef {
-        CURRENT_TX_CONTEXT.with(|cell| {
-            let opt = cell.lock().unwrap();
-            opt.as_ref()
-                .expect("Uninitialized DebugApi (current tx context missing)")
-                .clone()
-        })
+        let opt_ref = CURRENT_TX_CONTEXT.with(|cell| {
+            let opt = cell
+                .lock()
+                .expect("error accessing the DebugApiBackend current context mutex contents");
+            opt.clone()
+        });
+        opt_ref.expect("Uninitialized DebugApiBackend (current tx context missing)")
     }
 
     pub fn replace_current_tx_context(value: Option<TxContextRef>) -> Option<TxContextRef> {
         CURRENT_TX_CONTEXT.with(|cell| {
-            let mut opt = cell.lock().unwrap();
+            let mut opt = cell
+                .lock()
+                .expect("error replacing the DebugApiBackend current context mutex contents");
             core::mem::replace(opt.deref_mut(), value)
         })
     }
 
     pub fn get_static_var_data() -> Arc<StaticVarData> {
-        STATIC_VAR_DATA.with(|cell| {
-            let opt = cell.lock().unwrap();
-            opt.as_ref()
-                .expect("Uninitialized DebugApi (static var data missing)")
-                .clone()
-        })
+        let opt_ref = STATIC_VAR_DATA.with(|cell| {
+            let opt = cell
+                .lock()
+                .expect("error accessing the DebugApiBackend current static var contents");
+            opt.clone()
+        });
+        opt_ref.expect("Uninitialized DebugApiBackend (static var data missing)")
     }
 
     pub fn replace_static_var_data(
         value: Option<Arc<StaticVarData>>,
     ) -> Option<Arc<StaticVarData>> {
         STATIC_VAR_DATA.with(|cell| {
-            let mut opt = cell.lock().unwrap();
+            let mut opt = cell
+                .lock()
+                .expect("error replacing the DebugApiBackend current static var contents");
             core::mem::replace(opt.deref_mut(), value)
         })
     }
