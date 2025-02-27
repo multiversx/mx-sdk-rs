@@ -1,11 +1,6 @@
-use std::rc::Rc;
-
-use multiversx_chain_vm_executor::Instance;
-
 use crate::tx_mock::TxContextRef;
 
 pub struct StackItem {
-    pub instance_ref: Rc<Box<dyn Instance>>,
     pub tx_context_ref: TxContextRef,
 }
 

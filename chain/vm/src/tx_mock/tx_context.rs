@@ -28,7 +28,7 @@ impl TxContext {
     pub fn new(runtime_ref: RuntimeRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
         let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
-            runtime_ref: runtime_ref,
+            runtime_ref,
             tx_input_box: Box::new(tx_input),
             tx_cache: Arc::new(tx_cache),
             managed_types: Mutex::new(TxManagedTypes::new()),

@@ -1,8 +1,6 @@
 use std::{
-    cell::RefCell,
     ops::Deref,
-    rc::Rc,
-    sync::{Arc, Weak},
+    sync::{Arc, Mutex, Weak},
 };
 
 use multiversx_chain_vm_executor::{Executor, Instance};
@@ -20,8 +18,8 @@ use super::{
 pub struct Runtime {
     pub vm_ref: BlockchainVMRef,
     pub executor: Box<dyn Executor + Send + Sync>,
-    pub stack: RefCell<Stack>,
-    pub current_context_cell: RefCell<Option<TxContextRef>>,
+    pub stack: Mutex<Stack>,
+    pub current_context_cell: Mutex<Option<TxContextRef>>,
 }
 
 #[derive(Clone)]
@@ -41,26 +39,29 @@ impl Runtime {
             vm_ref,
             executor,
             stack: Default::default(),
-            current_context_cell: RefCell::new(None),
+            current_context_cell: Mutex::new(None),
         }
     }
 
     pub fn top_tx_context_ref(&self) -> Option<TxContextRef> {
         self.stack
-            .borrow()
+            .lock()
+            .unwrap()
             .peek()
             .map(|stack_item| stack_item.tx_context_ref.clone())
     }
 
     pub fn current_context(&self) -> TxContextRef {
         self.current_context_cell
-            .borrow()
+            .lock()
+            .unwrap()
             .clone()
             .expect("no current context")
     }
 
     fn set_current_context(&self, value: Option<TxContextRef>) {
-        *self.current_context_cell.borrow_mut() = value;
+        let mut cell_ref = self.current_context_cell.lock().unwrap();
+        *cell_ref = value;
     }
 }
 
@@ -160,21 +161,19 @@ impl RuntimeRef {
             .executor
             .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
             .expect("error instantiating executor instance");
-        let instance_ref = Rc::new(instance);
 
-        self.stack.borrow_mut().push(StackItem {
-            instance_ref: instance_ref.clone(),
+        self.stack.lock().unwrap().push(StackItem {
             tx_context_ref: tx_context_ref.clone(),
         });
 
         call_lambda(RuntimeInstanceCall {
-            instance: &**instance_ref,
+            instance: &*instance,
             func_name: func_name.as_str(),
         });
 
-        std::mem::drop(instance_ref);
+        std::mem::drop(instance);
 
-        let stack_item: StackItem = self.stack.borrow_mut().pop();
+        let stack_item: StackItem = self.stack.lock().unwrap().pop();
         std::mem::drop(stack_item);
         self.set_current_context(self.top_tx_context_ref());
 
