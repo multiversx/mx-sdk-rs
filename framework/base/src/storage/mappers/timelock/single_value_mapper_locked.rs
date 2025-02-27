@@ -1,8 +1,8 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
 pub use crate::storage::mappers::{
-    set_mapper::{CurrentStorage, CurrentStorageLocked},
     single_value_mapper::{SingleValue, SingleValueMapper},
+    source::{CurrentStorage, CurrentStorageLocked},
     StorageMapper, StorageMapperWithTimelock,
 };
 use crate::{
