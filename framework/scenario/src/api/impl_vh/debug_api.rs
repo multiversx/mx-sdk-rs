@@ -1,8 +1,6 @@
-use std::sync::Arc;
-
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
-    tx_mock::{TxContext, TxContextRef, TxPanic},
+    tx_mock::{TxContextRef, TxPanic},
     vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
@@ -80,9 +78,7 @@ pub type DebugApi = VMHooksApi<DebugApiBackend>;
 impl DebugApi {
     /// WARNING: this does not clean up after itself, must fix!!!
     pub fn dummy() {
-        let tx_context = TxContext::dummy();
-        // TODO: WARNING: this does not clean up after itself, must fix!!!
-        TxContextStack::static_push(TxContextRef::new(Arc::new(tx_context)));
+        TxContextStack::static_push(TxContextRef::dummy());
         StaticVarStack::static_push();
     }
 }
@@ -95,7 +91,6 @@ impl std::fmt::Debug for DebugApi {
 
 fn debugger_panic(status: ReturnCode, message: &str) {
     TxContextStack::static_peek().replace_tx_result_with_error(TxPanic::new(status, message));
-    // DebugApi::get_current_tx_context().replace_tx_result_with_error(TxPanic::new(status, message));
     std::panic::panic_any(BreakpointValue::SignalError);
 }
 
