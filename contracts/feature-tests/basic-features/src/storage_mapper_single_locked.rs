@@ -9,10 +9,6 @@ pub trait SingleValueMapperLockedFeatures {
         &self,
     ) -> SingleValueMapperWithTimelock<Self::Api, BigUint>;
 
-    #[view]
-    #[storage_mapper_with_timelock("svm_with_timelock_annotation")]
-    fn svm_with_timelock_annotation(&self) -> SingleValueMapper<BigUint, CurrentStorageLocked>;
-
     #[storage_mapper("svm_with_timelock_and_key")]
     fn svm_with_timelock_and_key(
         &self,
@@ -28,12 +24,6 @@ pub trait SingleValueMapperLockedFeatures {
     #[endpoint]
     fn svm_with_timelock_increment(&self, amount: BigUint) -> bool {
         let svm = self.single_value_mapper_with_timelock();
-        svm.set_if_unlocked(svm.get() + amount)
-    }
-
-    #[endpoint]
-    fn svm_with_timelock_annotation_increment(&self, amount: BigUint) -> bool {
-        let svm = self.svm_with_timelock_annotation();
         svm.set_if_unlocked(svm.get() + amount)
     }
 
