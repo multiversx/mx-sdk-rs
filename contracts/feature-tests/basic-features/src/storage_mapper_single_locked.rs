@@ -37,7 +37,7 @@ pub trait SingleValueMapperLockedFeatures {
     // For example, when subtracting from a balance, we must first check that we have enough funds
     // The closure can return a Result, which can be propagated (either directly, or via sc_try!)
     #[endpoint]
-    fn svm_with_timelock_subtract_with_require(&self, amount: &BigUint) {
+    fn svm_with_timelock_subtract_with_require(&self, amount: &BigUint) -> BigUint {
         let svm = self.single_value_mapper_with_timelock();
         svm.update_if_unlocked(|value| {
             require!(*value >= *amount, "not enough funds");

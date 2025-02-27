@@ -8,6 +8,7 @@ mod ordered_binary_tree_mapper;
 mod queue_mapper;
 mod set_mapper;
 mod single_value_mapper;
+mod timelock;
 mod token;
 mod unique_id_mapper;
 mod unordered_set_mapper;
@@ -28,7 +29,8 @@ pub use ordered_binary_tree_mapper::{
 };
 pub use queue_mapper::QueueMapper;
 pub use set_mapper::{CurrentStorageLocked, SetMapper};
-pub use single_value_mapper::{SingleValue, SingleValueMapper, SingleValueMapperWithTimelock};
+pub use single_value_mapper::{SingleValue, SingleValueMapper};
+pub use timelock::*;
 pub use token::*;
 pub use unique_id_mapper::{UniqueId, UniqueIdMapper};
 pub use unordered_set_mapper::UnorderedSetMapper;
