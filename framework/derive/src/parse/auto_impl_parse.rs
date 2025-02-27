@@ -87,6 +87,17 @@ pub fn process_storage_mapper_from_address_attribute(
         .is_some()
 }
 
+pub fn process_storage_mapper_with_timelock(attr: &syn::Attribute, method: &mut Method) -> bool {
+    StorageMapperWithTimelockAttribute::parse(attr)
+        .map(|storage_mapper_with_timelock| {
+            assert_no_other_auto_impl(&*method);
+            method.implementation = MethodImpl::Generated(AutoImpl::StorageMapperWithTimelock {
+                identifier: storage_mapper_with_timelock.identifier,
+            });
+        })
+        .is_some()
+}
+
 pub fn process_storage_is_empty_attribute(attr: &syn::Attribute, method: &mut Method) -> bool {
     StorageIsEmptyAttribute::parse(attr)
         .map(|storage_is_empty| {

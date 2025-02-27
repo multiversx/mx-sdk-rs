@@ -20,13 +20,15 @@ pub use bi_di_mapper::BiDiMapper;
 pub use linked_list_mapper::{LinkedListMapper, LinkedListNode};
 pub use map_mapper::MapMapper;
 pub use map_storage_mapper::MapStorageMapper;
-pub use mapper::{StorageClearable, StorageMapper, StorageMapperFromAddress};
+pub use mapper::{
+    StorageClearable, StorageMapper, StorageMapperFromAddress, StorageMapperWithTimelock,
+};
 pub use ordered_binary_tree_mapper::{
     NodeId, OrderedBinaryTreeMapper, OrderedBinaryTreeNode, NULL_NODE_ID,
 };
 pub use queue_mapper::QueueMapper;
-pub use set_mapper::SetMapper;
-pub use single_value_mapper::{SingleValue, SingleValueMapper};
+pub use set_mapper::{CurrentStorageLocked, SetMapper};
+pub use single_value_mapper::{SingleValue, SingleValueMapper, SingleValueMapperWithTimelock};
 pub use token::*;
 pub use unique_id_mapper::{UniqueId, UniqueIdMapper};
 pub use unordered_set_mapper::UnorderedSetMapper;

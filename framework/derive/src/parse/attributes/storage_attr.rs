@@ -36,6 +36,20 @@ impl StorageMapperAttribute {
     }
 }
 
+pub struct StorageMapperWithTimelockAttribute {
+    pub identifier: String,
+}
+
+impl StorageMapperWithTimelockAttribute {
+    pub fn parse(attr: &syn::Attribute) -> Option<Self> {
+        is_attr_one_string_arg(attr, ATTR_STORAGE_MAPPER_WITH_TIMELOCK).map(|arg_str| {
+            StorageMapperWithTimelockAttribute {
+                identifier: arg_str,
+            }
+        })
+    }
+}
+
 pub struct StorageMapperFromAddressAttribute {
     pub identifier: String,
 }

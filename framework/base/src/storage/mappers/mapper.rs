@@ -1,5 +1,4 @@
 use crate::{api::StorageMapperApi, storage::StorageKey, types::ManagedAddress};
-
 pub trait StorageMapper<SA>: 'static
 where
     SA: StorageMapperApi,
@@ -15,6 +14,16 @@ where
     /// Will be called automatically by the `#[storage_mapper_from_address]`
     /// annotation generated code.
     fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self;
+}
+
+pub trait StorageMapperWithTimelock<SA>: 'static
+where
+    SA: StorageMapperApi,
+{
+    /// Will be called automatically by the `#[storage_mapper_with_timelock]`
+    /// annotation generated code.
+    /// Will create a timelocked resouce.
+    fn new_locked(unlock_timestamp: u64, base_key: StorageKey<SA>) -> Self;
 }
 
 pub trait StorageClearable {

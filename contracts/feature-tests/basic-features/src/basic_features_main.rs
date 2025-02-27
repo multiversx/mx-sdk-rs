@@ -33,6 +33,7 @@ pub mod storage_mapper_non_fungible_token;
 pub mod storage_mapper_queue;
 pub mod storage_mapper_set;
 pub mod storage_mapper_single;
+pub mod storage_mapper_single_locked;
 pub mod storage_mapper_token_attributes;
 pub mod storage_mapper_unique_id_mapper;
 pub mod storage_mapper_unordered_set;
@@ -62,6 +63,7 @@ pub trait BasicFeatures:
     + storage_raw_api_features::StorageRawApiFeatures
     + storage_direct_load::StorageLoadFeatures
     + storage_direct_store::StorageStoreFeatures
+    + storage_mapper_single_locked::SingleValueMapperLockedFeatures
     + storage_mapper_address_to_id::AddressToIdMapperFeatures
     + storage_mapper_linked_list::LinkedListMapperFeatures
     + storage_mapper_queue::QueueMapperFeatures
