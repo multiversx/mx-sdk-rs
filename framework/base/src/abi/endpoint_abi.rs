@@ -4,15 +4,16 @@ use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
+use serde::Deserialize;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Deserialize)]
 pub struct InputAbi {
     pub arg_name: String,
     pub type_names: TypeNames,
     pub multi_arg: bool,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Deserialize)]
 pub struct OutputAbi {
     pub output_name: String,
     pub type_names: TypeNames,
@@ -21,7 +22,7 @@ pub struct OutputAbi {
 
 pub type OutputAbis = Vec<OutputAbi>;
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq, Deserialize)]
 pub enum EndpointMutabilityAbi {
     #[default]
     Mutable,
@@ -29,7 +30,7 @@ pub enum EndpointMutabilityAbi {
     Pure,
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq, Deserialize)]
 pub enum EndpointTypeAbi {
     #[default]
     Init,
@@ -38,7 +39,7 @@ pub enum EndpointTypeAbi {
     PromisesCallback,
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq, Deserialize)]
 pub struct EndpointAbi {
     pub docs: Vec<String>,
     pub name: String,
