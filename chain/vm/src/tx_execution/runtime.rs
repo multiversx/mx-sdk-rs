@@ -45,27 +45,6 @@ impl Runtime {
         }
     }
 
-    fn stack_push(&self, stack_item: StackItem) {
-        if let Some(top) = self.stack.borrow().peek() {
-            top.on_stack_top_leave();
-        }
-        self.stack.borrow_mut().push(stack_item);
-        if let Some(top) = self.stack.borrow().peek() {
-            top.on_stack_top_enter();
-        }
-    }
-
-    fn stack_pop(&self) -> StackItem {
-        if let Some(top) = self.stack.borrow().peek() {
-            top.on_stack_top_leave();
-        }
-        let popped = self.stack.borrow_mut().pop();
-        if let Some(top) = self.stack.borrow().peek() {
-            top.on_stack_top_enter();
-        }
-        popped
-    }
-
     pub fn top_tx_context_ref(&self) -> Option<TxContextRef> {
         self.stack
             .borrow()
@@ -183,7 +162,7 @@ impl RuntimeRef {
             .expect("error instantiating executor instance");
         let instance_ref = Rc::new(instance);
 
-        self.stack_push(StackItem {
+        self.stack.borrow_mut().push(StackItem {
             instance_ref: instance_ref.clone(),
             tx_context_ref: tx_context_ref.clone(),
         });
@@ -195,7 +174,7 @@ impl RuntimeRef {
 
         std::mem::drop(instance_ref);
 
-        let stack_item = self.stack_pop();
+        let stack_item: StackItem = self.stack.borrow_mut().pop();
         std::mem::drop(stack_item);
         self.set_current_context(self.top_tx_context_ref());
 

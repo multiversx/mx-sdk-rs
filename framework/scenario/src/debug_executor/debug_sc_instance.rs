@@ -180,8 +180,4 @@ impl Instance for DebugSCInstance {
     fn cache(&self) -> Result<Vec<u8>, String> {
         panic!("ContractContainerRef cache not supported")
     }
-
-    fn on_stack_top_enter(&self) {}
-
-    fn on_stack_top_leave(&self) {}
 }
