@@ -4,11 +4,10 @@ use multiversx_chain_vm::{
 };
 use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
 use multiversx_sc::chain_core::types::ReturnCode;
-use std::sync::Arc;
 
 use crate::debug_executor::TxContextStack;
 
-use super::{catch_tx_panic, ContractContainerRef, StaticVarData, StaticVarStack};
+use super::{catch_tx_panic, ContractContainerRef, StaticVarStack};
 
 /// Used as a flag to check the instance under lambda calls.
 /// Since it is an invalid function name, any other instance should reject it.
@@ -18,7 +17,6 @@ const DEBUG_SC_INSTANCE_CONTEXT_POP: &str = "<DebugSCInstance-PopContext>";
 pub struct DebugSCInstance {
     pub tx_context_ref: TxContextRef,
     pub contract_container_ref: ContractContainerRef,
-    pub static_var_data_ref: Arc<StaticVarData>,
 }
 
 impl DebugSCInstance {
@@ -26,7 +24,6 @@ impl DebugSCInstance {
         DebugSCInstance {
             tx_context_ref,
             contract_container_ref: contract_container,
-            static_var_data_ref: Arc::new(StaticVarData::default()),
         }
     }
 
