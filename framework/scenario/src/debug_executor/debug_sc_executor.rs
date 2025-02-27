@@ -11,9 +11,6 @@ pub struct DebugSCExecutor {
     contract_map_ref: ContractMapRef,
 }
 
-unsafe impl Sync for DebugSCExecutor {} // TODO: temp
-unsafe impl Send for DebugSCExecutor {} // TODO: temp
-
 impl fmt::Debug for DebugSCExecutor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("DebugSCExecutor").finish()
