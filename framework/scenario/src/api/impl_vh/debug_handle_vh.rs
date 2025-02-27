@@ -1,4 +1,6 @@
-use multiversx_chain_vm::tx_mock::TxContextRef;
+use std::sync::Arc;
+
+use multiversx_chain_vm::tx_mock::TxContext;
 use multiversx_sc::{
     api::{HandleConstraints, RawHandle},
     codec::TryStaticCast,
@@ -8,17 +10,19 @@ use crate::debug_executor::TxContextStack;
 
 #[derive(Clone)]
 pub struct DebugHandle {
-    pub(crate) context: TxContextRef,
+    /// TODO: would be nice to be an actual TxContextRef,
+    /// but that requires changing the debugger scripts
+    pub(crate) context: Arc<TxContext>,
     raw_handle: RawHandle,
 }
 
 impl DebugHandle {
     pub fn is_on_current_context(&self) -> bool {
-        TxContextRef::ptr_eq(&self.context, &TxContextStack::static_peek())
+        Arc::ptr_eq(&self.context, &TxContextStack::static_peek().into_ref())
     }
 
     pub fn is_on_same_context(&self, other: &DebugHandle) -> bool {
-        TxContextRef::ptr_eq(&self.context, &other.context)
+        Arc::ptr_eq(&self.context, &other.context)
     }
 
     pub fn assert_current_context(&self) {
@@ -38,7 +42,7 @@ impl core::fmt::Debug for DebugHandle {
 impl HandleConstraints for DebugHandle {
     fn new(handle: multiversx_sc::api::RawHandle) -> Self {
         Self {
-            context: TxContextStack::static_peek(),
+            context: TxContextStack::static_peek().into_ref(),
             raw_handle: handle,
         }
     }
@@ -66,7 +70,7 @@ impl PartialEq<RawHandle> for DebugHandle {
 
 impl PartialEq<DebugHandle> for DebugHandle {
     fn eq(&self, other: &DebugHandle) -> bool {
-        TxContextRef::ptr_eq(&self.context, &other.context) && self.raw_handle == other.raw_handle
+        Arc::ptr_eq(&self.context, &other.context) && self.raw_handle == other.raw_handle
     }
 }
 

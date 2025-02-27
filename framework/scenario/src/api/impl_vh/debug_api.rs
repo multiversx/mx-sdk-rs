@@ -31,7 +31,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        let wrapper = DebugApiVMHooksHandler::new(handle.context);
+        let wrapper = DebugApiVMHooksHandler::new(TxContextRef::new(handle.context));
         let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
         f(&dispatcher)
     }
