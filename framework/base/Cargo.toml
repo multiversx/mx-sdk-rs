@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc"
-version = "0.56.0"
+version = "0.56.1"
 edition = "2021"
 rust-version = "1.78"
 
@@ -42,7 +42,7 @@ serde = { version = "1.0.217", features = [
 ], default-features = false }
 
 [dependencies.multiversx-sc-derive]
-version = "=0.56.0"
+version = "=0.56.1"
 path = "../derive"
 
 [dependencies.multiversx-sc-codec]
@@ -51,5 +51,5 @@ path = "../../data/codec"
 features = ["derive"]
 
 [dependencies.multiversx-chain-core]
-version = "=0.13.0"
+version = "=0.13.1"
 path = "../../chain/core"

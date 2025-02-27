@@ -15,6 +15,6 @@ fn v_0_31_replace_in_files(sc_crate_path: &Path) {
     replace_in_files(
         sc_crate_path,
         "*rs",
-        &[Query::substring("#[var_args]", "")][..],
+        &[Query::simple("#[var_args]", "")][..],
     );
 }
