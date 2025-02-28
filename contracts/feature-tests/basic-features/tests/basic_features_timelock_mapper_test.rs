@@ -166,11 +166,11 @@ fn timelock_mapper_test() {
     state.set_unlock_timestamp(10u64, future_value.clone());
 
     // unlock timestamp and future value are now filled
-    assert!(&state.get_future_value() == &future_value);
+    assert!(state.get_future_value() == future_value);
     assert!(state.get_unlock_timestamp() == 10u64);
 
     // current value still initial value
-    assert!(&state.get_current_value() == &initial_value);
+    assert!(state.get_current_value() == initial_value);
 
     // move now at 9
     state.set_env_timestamp(9u64);
@@ -216,17 +216,14 @@ fn timelock_mapper_at_address_test() {
 
     // setup bf
     state.set_initial_value(initial_value.clone());
-    assert!(&state.get_current_value() == &initial_value);
+    assert!(state.get_current_value() == initial_value);
 
     // unlocks for commit at 10
     state.set_unlock_timestamp(10u64, future_value.clone());
 
     // check bf values from other-bf
-    assert_eq!(
-        &state.get_current_value_at_address(BASIC_FEATURES_ADDRESS),
-        &initial_value
-    );
-    assert!(&state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == &future_value);
+    assert!(state.get_current_value_at_address(BASIC_FEATURES_ADDRESS) == initial_value);
+    assert!(state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == future_value);
     assert!(state.get_unlock_timestamp_at_address(BASIC_FEATURES_ADDRESS) == 10u64);
 
     // move now to 12
@@ -236,7 +233,7 @@ fn timelock_mapper_at_address_test() {
     state.commit();
 
     // check bf values from other-bf
-    assert!(&state.get_current_value_at_address(BASIC_FEATURES_ADDRESS) == &future_value);
+    assert!(state.get_current_value_at_address(BASIC_FEATURES_ADDRESS) == future_value);
     assert!(state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == BigUint::zero());
     assert!(state.get_unlock_timestamp_at_address(BASIC_FEATURES_ADDRESS) == 10u64);
 
