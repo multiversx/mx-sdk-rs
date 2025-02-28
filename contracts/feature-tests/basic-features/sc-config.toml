@@ -27,5 +27,6 @@ add-endpoints = [
     "load_bytes",
     "returns_egld_decimal",
     "echo_managed_option",
+    "token_has_transfer_role",
 ]
 add-labels = ["crypto-ei-1.4"]

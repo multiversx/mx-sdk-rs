@@ -72,7 +72,7 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.adder_owner_address.clone())
-            .gas(6_000_000)
+            .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u64)
             .code(ADDER_CODE_PATH)

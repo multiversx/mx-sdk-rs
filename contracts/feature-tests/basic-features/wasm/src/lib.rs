@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          414
+// Endpoints:                          415
 // Async Callback:                       1
-// Total number of exported functions: 416
+// Total number of exported functions: 417
 
 #![no_std]
 
@@ -259,6 +259,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         store_reserved_i64 => store_reserved_i64
         store_reserved_big_uint => store_reserved_big_uint
         store_reserved_vec_u8 => store_reserved_vec_u8
+        token_has_transfer_role => token_has_transfer_role
         address_to_id_mapper_get_id => address_to_id_mapper_get_id
         address_to_id_mapper_get_id_non_zero => address_to_id_mapper_get_id_non_zero
         address_to_id_mapper_get_address => address_to_id_mapper_get_address
