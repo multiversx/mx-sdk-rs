@@ -450,6 +450,16 @@ fn storage_mapper_single_value_go() {
 }
 
 #[test]
+fn storage_mapper_timelock_go() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_at_address_go() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
+}
+
+#[test]
 fn storage_mapper_token_attributes_go() {
     world().run("scenarios/storage_mapper_token_attributes.scen.json");
 }

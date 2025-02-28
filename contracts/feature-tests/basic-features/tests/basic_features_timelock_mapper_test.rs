@@ -17,6 +17,7 @@ impl BasicFeaturesState {
     fn new() -> Self {
         let mut world = world();
 
+        world.start_trace();
         world.account(OWNER_ADDRESS).nonce(1).balance(100);
         world
             .account(BASIC_FEATURES_ADDRESS)
@@ -198,6 +199,10 @@ fn timelock_mapper_test() {
     // future value and unlock timestamp are empty
     assert!(state.get_future_value() == BigUint::zero());
     assert!(state.get_unlock_timestamp() == 0u64);
+
+    state
+        .world
+        .write_scenario_trace("scenarios/timelock_mapper.scen.json");
 }
 
 #[test]
@@ -217,7 +222,10 @@ fn timelock_mapper_at_address_test() {
     state.set_unlock_timestamp(10u64, future_value.clone());
 
     // check bf values from other-bf
-    assert_eq!(&state.get_current_value_at_address(BASIC_FEATURES_ADDRESS), &initial_value);
+    assert_eq!(
+        &state.get_current_value_at_address(BASIC_FEATURES_ADDRESS),
+        &initial_value
+    );
     assert!(&state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == &future_value);
     assert!(state.get_unlock_timestamp_at_address(BASIC_FEATURES_ADDRESS) == 10u64);
 
@@ -239,4 +247,8 @@ fn timelock_mapper_at_address_test() {
     assert!(state.get_current_value_at_address(BASIC_FEATURES_ADDRESS) == future_value);
     assert!(state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == BigUint::zero());
     assert!(state.get_unlock_timestamp_at_address(BASIC_FEATURES_ADDRESS) == 0u64);
+
+    state
+        .world
+        .write_scenario_trace("scenarios/timelock_mapper_at_address.scen.json");
 }
