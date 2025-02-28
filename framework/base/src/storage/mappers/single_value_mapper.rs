@@ -1,8 +1,7 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
-use super::SingleValueMapperWithTimelock;
 pub use super::{
-    source::{CurrentStorage, CurrentStorageLocked, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
@@ -23,11 +22,11 @@ where
     A: StorageAddress<SA>,
     T: TopEncode + TopDecode + 'static,
 {
-    pub(crate) address: A,
-    pub(crate) unlock_timestamp: u64,
-    pub(crate) key: StorageKey<SA>,
-    pub(crate) _phantom_api: PhantomData<SA>,
-    pub(crate) _phantom_item: PhantomData<T>,
+    address: A,
+    unlock_timestamp: u64,
+    key: StorageKey<SA>,
+    _phantom_api: PhantomData<SA>,
+    _phantom_item: PhantomData<T>,
 }
 
 impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T, CurrentStorage>
@@ -58,22 +57,6 @@ where
             address,
             unlock_timestamp: 0u64,
             key: base_key,
-            _phantom_api: PhantomData,
-            _phantom_item: PhantomData,
-        }
-    }
-}
-
-impl<SA, T> SingleValueMapper<SA, T, CurrentStorage>
-where
-    SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
-{
-    pub fn lock(self) -> SingleValueMapperWithTimelock<SA, T> {
-        SingleValueMapper {
-            address: CurrentStorageLocked,
-            unlock_timestamp: self.unlock_timestamp,
-            key: self.key,
             _phantom_api: PhantomData,
             _phantom_item: PhantomData,
         }

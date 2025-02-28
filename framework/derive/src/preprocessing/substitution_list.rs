@@ -121,6 +121,7 @@ fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
     add_storage_mapper(substitutions, &quote!(SetMapper));
     add_storage_mapper(substitutions, &quote!(UnorderedSetMapper));
     add_storage_mapper(substitutions, &quote!(SingleValueMapper));
+    add_storage_mapper(substitutions, &quote!(TimelockMapper));
     add_storage_mapper(substitutions, &quote!(VecMapper));
     add_storage_mapper(substitutions, &quote!(QueueMapper));
     add_storage_mapper(substitutions, &quote!(WhitelistMapper));

@@ -17,22 +17,8 @@ where
 }
 
 pub struct CurrentStorage;
-pub struct CurrentStorageLocked;
 
 impl<SA> StorageAddress<SA> for CurrentStorage
-where
-    SA: StorageMapperApi,
-{
-    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
-        storage_get(key)
-    }
-
-    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize {
-        storage_get_len(key)
-    }
-}
-
-impl<SA> StorageAddress<SA> for CurrentStorageLocked
 where
     SA: StorageMapperApi,
 {

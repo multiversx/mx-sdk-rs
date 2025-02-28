@@ -1,3 +1,3 @@
-mod single_value_mapper_locked;
+mod timelock_mapper;
 
-pub use single_value_mapper_locked::SingleValueMapperWithTimelock;
+pub use timelock_mapper::TimelockMapper;
