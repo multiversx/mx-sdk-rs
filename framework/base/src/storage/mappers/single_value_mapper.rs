@@ -1,5 +1,6 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
+use super::TimelockMapper;
 pub use super::{
     source::{CurrentStorage, StorageAddress},
     StorageMapper, StorageMapperFromAddress,
@@ -23,7 +24,6 @@ where
     T: TopEncode + TopDecode + 'static,
 {
     address: A,
-    unlock_timestamp: u64,
     key: StorageKey<SA>,
     _phantom_api: PhantomData<SA>,
     _phantom_item: PhantomData<T>,
@@ -38,7 +38,6 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
             address: CurrentStorage,
-            unlock_timestamp: 0u64,
             key: base_key,
             _phantom_api: PhantomData,
             _phantom_item: PhantomData,
@@ -55,7 +54,6 @@ where
     fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
             address,
-            unlock_timestamp: 0u64,
             key: base_key,
             _phantom_api: PhantomData,
             _phantom_item: PhantomData,
@@ -82,11 +80,6 @@ where
     pub fn raw_byte_length(&self) -> usize {
         self.address.address_storage_get_len(self.key.as_ref())
     }
-
-    /// Returns the unlock_timestamp field value.
-    pub fn get_unlock_timestamp(&self) -> u64 {
-        self.unlock_timestamp
-    }
 }
 
 impl<SA, T> SingleValueMapper<SA, T, CurrentStorage>
@@ -94,6 +87,11 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
+    /// Adds a timelock component to the mapper, consuming self.
+    pub fn lock(self) -> TimelockMapper<SA, T> {
+        TimelockMapper::new(self.key)
+    }
+
     /// Saves argument to storage.
     ///
     /// Accepts owned item of type `T`, or any borrowed form of it, such as `&T`.

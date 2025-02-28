@@ -10,7 +10,7 @@ use crate::{
         multi_types::PlaceholderOutput, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti,
         TopEncodeMultiOutput,
     },
-    imports::StorageMapperFromAddress,
+    imports::{SingleValueMapper, StorageMapperFromAddress},
     storage::{
         mappers::source::StorageAddress, storage_clear, storage_overwrite, storage_set, StorageKey,
     },
@@ -54,6 +54,13 @@ where
     SA: StorageMapperApi + BlockchainApi,
     T: TopEncode + TopDecode,
 {
+    /// Removes the timelock component of the mapper, consuming self.
+    pub fn unlock(self) -> SingleValueMapper<SA, T> {
+        storage_clear(self.get_future_value_key().as_ref());
+        storage_clear(self.get_unlock_timestamp_key().as_ref());
+        SingleValueMapper::new(self.key)
+    }
+
     /// Sets the `current value` without taking into account the timelock component.
     /// Meant to be used in constructors.
     pub fn set<BT>(&self, new_current_value: BT)
