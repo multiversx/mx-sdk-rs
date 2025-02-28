@@ -35,7 +35,7 @@
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
@@ -47,12 +47,14 @@
             },
             "expect": {
                 "out": [],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
@@ -64,12 +66,14 @@
                 "out": [
                     "0x0a"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
@@ -82,12 +86,14 @@
             },
             "expect": {
                 "out": [],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -101,12 +107,14 @@
                 "out": [
                     "0x0a"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "5",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -120,12 +128,14 @@
                 "out": [
                     "0x0f"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "6",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -139,7 +149,9 @@
                 "out": [
                     "0x0a"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -150,7 +162,7 @@
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "7",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
@@ -162,12 +174,14 @@
                 "out": [
                     "0x01"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "8",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -181,12 +195,14 @@
                 "out": [
                     "0x0f"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "9",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -200,12 +216,14 @@
                 "out": [
                     "0x"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "10",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -219,12 +237,14 @@
                 "out": [
                     "0x0a"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "11",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
@@ -234,12 +254,14 @@
             },
             "expect": {
                 "out": [],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "12",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -253,12 +275,14 @@
                 "out": [
                     "0x0f"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "13",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -272,12 +296,14 @@
                 "out": [
                     "0x"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "14",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:other-basic-features",
@@ -291,7 +317,9 @@
                 "out": [
                     "0x"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         }
     ]

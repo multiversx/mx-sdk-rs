@@ -35,7 +35,7 @@
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "1",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
@@ -43,16 +43,18 @@
                 "arguments": [
                     "0x0a"
                 ],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "2",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
@@ -61,62 +63,70 @@
                     "0x0a",
                     "0x0f"
                 ],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "3",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_get_future_value",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x0f"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "4",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_get_unlock_timestamp",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x0a"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "5",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_mapper",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x0a"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -127,19 +137,21 @@
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "6",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_commit_action",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -150,58 +162,64 @@
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "7",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_commit_action",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x01"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "8",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_mapper",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x0f"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "9",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_get_future_value",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "10",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
@@ -210,60 +228,68 @@
                     "0x12",
                     "0x0a"
                 ],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "11",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_unlock",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "12",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_get_future_value",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
             "step": "scCall",
-            "id": "",
+            "id": "13",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:basic-features",
                 "function": "timelock_get_unlock_timestamp",
                 "arguments": [],
-                "gasLimit": "5,000,000"
+                "gasLimit": "30,000,000"
             },
             "expect": {
                 "out": [
                     "0x"
                 ],
-                "status": "0"
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
             }
         }
     ]
