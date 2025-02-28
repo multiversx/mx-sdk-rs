@@ -4,8 +4,8 @@ use crate::{
     api::CallTypeApi,
     types::{
         BigUint, EgldPayment, EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress,
-        ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, TokenIdentifier, Tx, TxEnv,
-        TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+        ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, SpecialRolesResult,
+        TokenIdentifier, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
     },
 };
 
@@ -567,7 +567,7 @@ where
     pub fn get_special_roles<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
         token_identifier: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, SpecialRolesResult<Env::Api>> {
         let tx = self
             .wrapped_tx
             .payment(NotPayable)

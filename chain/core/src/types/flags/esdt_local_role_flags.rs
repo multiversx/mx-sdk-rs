@@ -46,6 +46,8 @@ pub mod tests {
         assert!(!flags.has_role(&EsdtLocalRole::Mint));
         let flags = EsdtLocalRoleFlags::BURN;
         assert!(!flags.has_role(&EsdtLocalRole::Mint));
+        let flags = EsdtLocalRoleFlags::TRANSFER;
+        assert!(flags.has_role(&EsdtLocalRole::Transfer));
     }
 
     #[test]
