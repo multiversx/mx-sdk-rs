@@ -10,7 +10,7 @@ pub trait SingleValueMapperLockedFeatures {
     #[storage_mapper("timelock_mapper_with_key")]
     fn timelock_mapper_with_key(&self, extra_key: usize) -> TimelockMapper<ManagedBuffer>;
 
-    #[storage_mapper_from_address("timelock_mapper_from_address")]
+    #[storage_mapper_from_address("timelock_mapper")]
     fn timelock_mapper_from_address(
         &self,
         address: ManagedAddress,
