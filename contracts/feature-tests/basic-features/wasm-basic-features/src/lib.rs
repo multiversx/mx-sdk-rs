@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          429
+// Endpoints:                          424
 // Async Callback:                       1
-// Total number of exported functions: 431
+// Total number of exported functions: 426
 
 #![no_std]
 
@@ -260,10 +260,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         store_reserved_big_uint => store_reserved_big_uint
         store_reserved_vec_u8 => store_reserved_vec_u8
         single_value_mapper_with_timelock => single_value_mapper_with_timelock
-        svm_with_timelock_annotation => svm_with_timelock_annotation
         svm_with_timelock_set_unlock_timestamp => svm_with_timelock_set_unlock_timestamp
         svm_with_timelock_increment => svm_with_timelock_increment
-        svm_with_timelock_annotation_increment => svm_with_timelock_annotation_increment
         svm_with_timelock_update => svm_with_timelock_update
         svm_with_timelock_subtract_with_require => svm_with_timelock_subtract_with_require
         svm_with_timelock_clear => svm_with_timelock_clear
@@ -271,9 +269,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         svm_with_timelock_is_empty => svm_with_timelock_is_empty
         svm_with_timelock_raw_byte_len => svm_with_timelock_raw_byte_len
         svm_with_timelock_and_key_set => svm_with_timelock_and_key_set
-        svm_with_timelock_is_empty_at_address => svm_with_timelock_is_empty_at_address
-        svm_with_timelock_get_from_address => svm_with_timelock_get_from_address
-        svm_with_timelock_get_unlock_timestamp_from_address => svm_with_timelock_get_unlock_timestamp_from_address
         address_to_id_mapper_get_id => address_to_id_mapper_get_id
         address_to_id_mapper_get_id_non_zero => address_to_id_mapper_get_id_non_zero
         address_to_id_mapper_get_address => address_to_id_mapper_get_address

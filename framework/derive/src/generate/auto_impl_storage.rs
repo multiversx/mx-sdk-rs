@@ -107,29 +107,6 @@ pub fn generate_mapper_from_address_impl(m: &Method, identifier: &str) -> proc_m
     }
 }
 
-pub fn generate_mapper_with_timelock_impl(
-    m: &Method,
-    identifier: &str,
-) -> proc_macro2::TokenStream {
-    let msig = method_gen::generate_sig_with_attributes(m);
-
-    let key_snippet = generate_key_snippet(m.method_args.as_slice(), identifier);
-    match m.return_type.clone() {
-        syn::ReturnType::Default => panic!("getter with timelock should return some value"),
-        syn::ReturnType::Type(_, ty) => {
-            quote! {
-                #msig {
-                    #key_snippet
-                    <#ty as multiversx_sc::storage::mappers::StorageMapperWithTimelock<Self::Api>>::new_locked(
-                        0u64,
-                        ___key___
-                    )
-                }
-            }
-        },
-    }
-}
-
 pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
     let msig = method_gen::generate_sig_with_attributes(m);
     let key_snippet = generate_key_snippet(m.method_args.as_slice(), identifier);

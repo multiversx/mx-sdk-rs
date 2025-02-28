@@ -9,16 +9,6 @@ pub trait SingleValueMapperLockedFeatures {
         &self,
     ) -> SingleValueMapperWithTimelock<Self::Api, BigUint>;
 
-    #[view]
-    #[storage_mapper_with_timelock("svm_with_timelock_annotation")]
-    fn svm_with_timelock_annotation(&self) -> SingleValueMapper<BigUint, CurrentStorageLocked>;
-
-    #[storage_mapper_from_address("svm_with_timelock_from_address")]
-    fn svm_with_timelock_from_address(
-        &self,
-        address: ManagedAddress,
-    ) -> SingleValueMapper<BigUint, ManagedAddress>;
-
     #[storage_mapper("svm_with_timelock_and_key")]
     fn svm_with_timelock_and_key(
         &self,
@@ -38,12 +28,6 @@ pub trait SingleValueMapperLockedFeatures {
     }
 
     #[endpoint]
-    fn svm_with_timelock_annotation_increment(&self, amount: BigUint) -> bool {
-        let svm = self.svm_with_timelock_annotation();
-        svm.set_if_unlocked(svm.get() + amount)
-    }
-
-    #[endpoint]
     fn svm_with_timelock_update(&self, amount: &BigUint) {
         let svm = self.single_value_mapper_with_timelock();
         svm.update_if_unlocked(|value| *value += amount);
@@ -53,7 +37,7 @@ pub trait SingleValueMapperLockedFeatures {
     // For example, when subtracting from a balance, we must first check that we have enough funds
     // The closure can return a Result, which can be propagated (either directly, or via sc_try!)
     #[endpoint]
-    fn svm_with_timelock_subtract_with_require(&self, amount: &BigUint) {
+    fn svm_with_timelock_subtract_with_require(&self, amount: &BigUint) -> BigUint {
         let svm = self.single_value_mapper_with_timelock();
         svm.update_if_unlocked(|value| {
             require!(*value >= *amount, "not enough funds");
@@ -85,21 +69,5 @@ pub trait SingleValueMapperLockedFeatures {
     #[endpoint]
     fn svm_with_timelock_and_key_set(&self, key: usize, value: ManagedBuffer) -> bool {
         self.svm_with_timelock_and_key(key).set_if_unlocked(value)
-    }
-
-    #[endpoint]
-    fn svm_with_timelock_is_empty_at_address(&self, address: ManagedAddress) -> bool {
-        self.svm_with_timelock_from_address(address).is_empty()
-    }
-
-    #[endpoint]
-    fn svm_with_timelock_get_from_address(&self, address: ManagedAddress) -> BigUint {
-        self.svm_with_timelock_from_address(address).get()
-    }
-
-    #[endpoint]
-    fn svm_with_timelock_get_unlock_timestamp_from_address(&self, address: ManagedAddress) -> u64 {
-        self.svm_with_timelock_from_address(address)
-            .get_unlock_timestamp()
     }
 }

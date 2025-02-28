@@ -1,0 +1,3 @@
+mod single_value_mapper_locked;
+
+pub use single_value_mapper_locked::SingleValueMapperWithTimelock;
