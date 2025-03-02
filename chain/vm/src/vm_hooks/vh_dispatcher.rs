@@ -1056,11 +1056,13 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_get_unsigned_argument(&self, id: i32, destination_handle: i32) {
-        self.handler.load_argument_big_int_unsigned(id, destination_handle);
+        self.handler
+            .load_argument_big_int_unsigned(id, destination_handle);
     }
 
     fn big_int_get_signed_argument(&self, id: i32, destination_handle: i32) {
-        self.handler.load_argument_big_int_signed(id, destination_handle);
+        self.handler
+            .load_argument_big_int_signed(id, destination_handle);
     }
 
     fn big_int_storage_store_unsigned(
