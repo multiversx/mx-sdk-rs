@@ -15,10 +15,48 @@ pub fn test_managed_decimal() {
     let fixed_3 = ManagedDecimal::<StaticApi, ConstDecimals<4>>::from(BigUint::from(8u64));
 
     let addition = fixed.clone() + fixed_2.clone();
+
     assert_eq!(
         addition,
         ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(6u64))
     );
+    assert_eq!(addition.into_raw_units(), &BigUint::from(600u64));
+    assert_eq!(addition.trunc(), BigUint::from(6u64));
+
+    let subtraction = addition - fixed;
+    assert_eq!(
+        subtraction,
+        ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(5u64))
+    );
+
+    let multiplication = fixed_3.clone() * fixed_2;
+    assert_eq!(
+        multiplication,
+        ManagedDecimal::<StaticApi, ConstDecimals<6>>::from(BigUint::from(40u64))
+    );
+
+    let division = multiplication / fixed_3;
+    assert_eq!(
+        division,
+        ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(5u64))
+    );
+}
+
+#[test]
+pub fn test_managed_decimal_mixed() {
+    let fixed =
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(100u64), 2usize);
+    let fixed_2 = ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(5u64));
+    let fixed_3 =
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(80000u64), 4usize);
+
+    let addition = fixed.clone() + fixed_2.clone();
+
+    assert_eq!(
+        addition,
+        ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(6u64))
+    );
+
     assert_eq!(addition.into_raw_units(), &BigUint::from(600u64));
     assert_eq!(addition.trunc(), BigUint::from(6u64));
 
@@ -557,4 +595,60 @@ fn test_managed_decimal_log2() {
     let log2_hp_frac = high_prec_frac.log2().unwrap();
 
     assert_eq!(log2_hp_frac.to_string(), "8.823953218");
+}
+
+#[test]
+pub fn test_managed_decimal_mul_mix_decimals_type() {
+    let dynamic: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(10000000u64), 5usize);
+    let constant: ManagedDecimal<StaticApi, ConstDecimals<5>> =
+        ManagedDecimal::from(BigUint::from(100u64));
+
+    let result = dynamic * constant;
+
+    let expected :  ManagedDecimal<StaticApi, ConstDecimals<10>> = ManagedDecimal::from(BigUint::from(10000u64));
+
+    assert_eq!(result, expected)
+}
+
+#[test]
+pub fn test_managed_decimal_mul_mix_decimals_type_reverse() {
+    let dynamic: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(100u64), 5usize);
+    let constant: ManagedDecimal<StaticApi, ConstDecimals<5>> =
+        ManagedDecimal::from(BigUint::from(100u64));
+
+    let result = constant * dynamic;
+
+    let expected = ManagedDecimal::from_raw_units(BigUint::from(1000000000u64), 10usize);
+
+    assert_eq!(result, expected)
+}
+
+#[test]
+pub fn test_managed_decimal_div_mix_decimals_type() {
+    let dynamic: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(100u64), 5usize);
+    let constant: ManagedDecimal<StaticApi, ConstDecimals<10>> =
+        ManagedDecimal::from(BigUint::from(100u64));
+
+    let result = constant / dynamic;
+
+    let expected = ManagedDecimal::from_raw_units(BigUint::from(10000000000u64), 5usize);
+
+    assert_eq!(result, expected)
+}
+
+#[test]
+pub fn test_managed_decimal_div_mix_decimals_type_reverse() {
+    let dynamic: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(100u64), 10usize);
+    let constant: ManagedDecimal<StaticApi, ConstDecimals<10>> =
+        ManagedDecimal::from(BigUint::from(100u64));
+
+    let result = dynamic / constant;
+
+    let expected = ManagedDecimal::from_raw_units(BigUint::from(0u64), 0usize);
+
+    assert_eq!(result, expected)
 }

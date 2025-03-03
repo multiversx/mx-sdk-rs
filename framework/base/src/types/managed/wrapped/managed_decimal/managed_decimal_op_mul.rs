@@ -5,6 +5,8 @@ use crate::{
 
 use core::ops::{Add, Deref, Mul, MulAssign};
 
+use super::{ConstDecimals, NumDecimals};
+
 impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> MulAssign<&ManagedDecimal<M, D2>>
     for ManagedDecimal<M, D1>
 {
@@ -50,5 +52,27 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
             decimals: self.decimals.num_decimals() + other.decimals.num_decimals(),
         };
         result.rescale(precision)
+    }
+}
+
+// var + const
+impl<const DECIMALS: usize, M: ManagedTypeApi> Mul<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+    for ManagedDecimal<M, NumDecimals>
+{
+    type Output = ManagedDecimal<M, NumDecimals>;
+
+    fn mul(self, rhs: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
+        self * rhs.into_var_decimals()
+    }
+}
+
+// const + var
+impl<const DECIMALS: usize, M: ManagedTypeApi> Mul<ManagedDecimal<M, NumDecimals>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+{
+    type Output = ManagedDecimal<M, NumDecimals>;
+
+    fn mul(self, rhs: ManagedDecimal<M, NumDecimals>) -> Self::Output {
+        self.into_var_decimals() * rhs
     }
 }
