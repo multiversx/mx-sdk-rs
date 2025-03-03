@@ -177,15 +177,6 @@ where
             .original_result()
     }
 
-    pub fn timelock_unlock(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("timelock_unlock")
-            .original_result()
-    }
-
     pub fn timelock_set_unlock_timestamp<
         Arg0: ProxyArg<u64>,
         Arg1: ProxyArg<BigUint<Env::Api>>,

@@ -1,6 +1,5 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
-use super::TimelockMapper;
 pub use super::{
     source::{CurrentStorage, StorageAddress},
     StorageMapper, StorageMapperFromAddress,
@@ -87,11 +86,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
-    /// Adds a timelock component to the mapper, consuming self.
-    pub fn lock(self) -> TimelockMapper<SA, T> {
-        TimelockMapper::new(self.key)
-    }
-
     /// Saves argument to storage.
     ///
     /// Accepts owned item of type `T`, or any borrowed form of it, such as `&T`.

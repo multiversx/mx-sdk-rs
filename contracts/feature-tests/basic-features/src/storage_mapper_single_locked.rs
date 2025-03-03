@@ -22,11 +22,6 @@ pub trait SingleValueMapperLockedFeatures {
     }
 
     #[endpoint]
-    fn timelock_unlock(&self) {
-        self.timelock_mapper().unlock();
-    }
-
-    #[endpoint]
     fn timelock_set_unlock_timestamp(&self, unlock_timestamp: u64, future_value: BigUint) {
         let timelock = self.timelock_mapper();
         timelock.set_unlock_timestamp(unlock_timestamp, future_value);

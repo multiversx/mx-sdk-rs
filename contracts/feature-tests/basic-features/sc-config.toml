@@ -26,7 +26,6 @@ add-endpoints = [
     "echo_managed_option",
     "timelock_mapper",
     "timelock_set_initial_value",
-    "timelock_unlock",
     "timelock_set_unlock_timestamp",
     "timelock_commit_action",
     "timelock_get_unlock_timestamp",

@@ -42,16 +42,6 @@ impl BasicFeaturesState {
             .run();
     }
 
-    fn unlock(&mut self) {
-        self.world
-            .tx()
-            .from(OWNER_ADDRESS)
-            .to(BASIC_FEATURES_ADDRESS)
-            .typed(basic_features_proxy::BasicFeaturesProxy)
-            .timelock_unlock()
-            .run();
-    }
-
     fn set_unlock_timestamp(&mut self, unlock_timestamp: u64, future_value: BigUint<StaticApi>) {
         self.world
             .tx()
@@ -190,16 +180,6 @@ fn timelock_mapper_test() {
     // future value is empty
     assert!(state.get_future_value() == BigUint::zero());
 
-    // reset
-    state.set_unlock_timestamp(18u64, initial_value);
-
-    // unlock the mapper, turns into a single value mapper, deletes future and timestamp entries
-    state.unlock();
-
-    // future value and unlock timestamp are empty
-    assert!(state.get_future_value() == BigUint::zero());
-    assert!(state.get_unlock_timestamp() == 0u64);
-
     state
         .world
         .write_scenario_trace("scenarios/timelock_mapper.scen.json");
@@ -236,14 +216,6 @@ fn timelock_mapper_at_address_test() {
     assert!(state.get_current_value_at_address(BASIC_FEATURES_ADDRESS) == future_value);
     assert!(state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == BigUint::zero());
     assert!(state.get_unlock_timestamp_at_address(BASIC_FEATURES_ADDRESS) == 10u64);
-
-    // unlock mapper in bf
-    state.unlock();
-
-    // check bf values from other-bf
-    assert!(state.get_current_value_at_address(BASIC_FEATURES_ADDRESS) == future_value);
-    assert!(state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == BigUint::zero());
-    assert!(state.get_unlock_timestamp_at_address(BASIC_FEATURES_ADDRESS) == 0u64);
 
     state
         .world
