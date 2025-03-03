@@ -1,5 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
+    typenum::Unsigned,
     types::{Decimals, ManagedDecimalSigned},
 };
 
@@ -56,7 +57,7 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
 }
 
 // var + const
-impl<const DECIMALS: usize, M: ManagedTypeApi> Mul<ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>>
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Mul<ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>>
     for ManagedDecimalSigned<M, NumDecimals>
 {
     type Output = ManagedDecimalSigned<M, NumDecimals>;
@@ -67,7 +68,7 @@ impl<const DECIMALS: usize, M: ManagedTypeApi> Mul<ManagedDecimalSigned<M, Const
 }
 
 // const + var
-impl<const DECIMALS: usize, M: ManagedTypeApi> Mul<ManagedDecimalSigned<M, NumDecimals>>
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Mul<ManagedDecimalSigned<M, NumDecimals>>
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     type Output = ManagedDecimalSigned<M, NumDecimals>;

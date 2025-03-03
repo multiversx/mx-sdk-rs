@@ -1,5 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
+    typenum::Unsigned,
     types::{BigUint, Decimals, ManagedDecimal, NumDecimals},
 };
 
@@ -53,7 +54,7 @@ where
 }
 
 // var + const
-impl<const DECIMALS: usize, M: ManagedTypeApi> Div<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Div<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
     for ManagedDecimal<M, NumDecimals>
 {
     type Output = ManagedDecimal<M, NumDecimals>;
@@ -64,7 +65,7 @@ impl<const DECIMALS: usize, M: ManagedTypeApi> Div<ManagedDecimal<M, ConstDecima
 }
 
 // const + var
-impl<const DECIMALS: usize, M: ManagedTypeApi> Div<ManagedDecimal<M, NumDecimals>>
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Div<ManagedDecimal<M, NumDecimals>>
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     type Output = ManagedDecimal<M, NumDecimals>;
