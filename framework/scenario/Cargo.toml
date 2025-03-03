@@ -55,11 +55,6 @@ version = "0.3.0"
 git = "https://github.com/multiversx/mx-vm-executor-rs"
 rev = "3bf87c858383902c7077a72fd79b57d85bb69800"
 
-[dependencies.multiversx-chain-vm-executor-wasmer]
-version = "0.3.0"
-git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "3bf87c858383902c7077a72fd79b57d85bb69800"
-
 [dependencies.multiversx-chain-vm]
 version = "=0.13.1"
 path = "../../chain/vm"

@@ -8,8 +8,6 @@ mod dummy_instance;
 mod static_var_stack;
 mod tx_context_stack;
 mod tx_static_vars;
-mod wasmer_alt_executor;
-mod wrapped_instance;
 
 pub use catch_tx_panic::catch_tx_panic;
 pub use composite_executor::*;
@@ -21,5 +19,3 @@ pub use dummy_instance::DummyInstance;
 pub use static_var_stack::{StaticVarData, StaticVarStack};
 pub use tx_context_stack::TxContextStack;
 pub use tx_static_vars::TxStaticVars;
-pub use wasmer_alt_executor::WasmerAltExecutor;
-pub use wrapped_instance::WrappedInstance;

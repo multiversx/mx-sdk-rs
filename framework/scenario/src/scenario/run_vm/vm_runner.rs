@@ -1,8 +1,11 @@
-use multiversx_chain_vm::tx_execution::{Runtime, RuntimeRef, RuntimeWeakRef};
+use multiversx_chain_vm::{
+    tx_execution::{Runtime, RuntimeRef, RuntimeWeakRef},
+    wasmer::WasmerAltExecutor,
+};
 use multiversx_chain_vm_executor::Executor;
 
 use crate::{
-    debug_executor::{ContractMapRef, DebugSCExecutor, WasmerAltExecutor},
+    debug_executor::{ContractMapRef, DebugSCExecutor},
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
 };

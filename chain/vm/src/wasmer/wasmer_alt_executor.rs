@@ -1,13 +1,13 @@
-use std::{cell::RefCell, fmt, rc::Rc};
-
-use multiversx_chain_vm::{
-    tx_execution::RuntimeWeakRef,
-    vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
-};
 use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };
 use multiversx_chain_vm_executor_wasmer::{WasmerExecutorData, WasmerInstance};
+use std::{cell::RefCell, fmt, rc::Rc};
+
+use crate::{
+    tx_execution::RuntimeWeakRef,
+    vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
+};
 
 use super::WrappedInstance;
 

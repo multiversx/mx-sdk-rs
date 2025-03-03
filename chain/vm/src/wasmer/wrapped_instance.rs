@@ -1,5 +1,4 @@
-use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance};
-use multiversx_chain_vm_executor::{MemLength, MemPtr};
+use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
 
 use std::rc::Rc;
 
