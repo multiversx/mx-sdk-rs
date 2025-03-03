@@ -19,6 +19,7 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 [features]
 # not supported when compiling to wasm
 wasm-incompatible = ["rand"]
+wasmer = ["multiversx-chain-vm-executor-wasmer"]
 
 [dependencies]
 num-bigint = "0.4"
@@ -45,5 +46,6 @@ rev = "3bf87c858383902c7077a72fd79b57d85bb69800"
 
 [dependencies.multiversx-chain-vm-executor-wasmer]
 version = "0.3.0"
+optional = true
 git = "https://github.com/multiversx/mx-vm-executor-rs"
 rev = "3bf87c858383902c7077a72fd79b57d85bb69800"
