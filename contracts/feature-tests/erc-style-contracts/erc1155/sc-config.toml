@@ -1,6 +1,3 @@
-[settings]
-main = "erc1155"
-
 [[proxy]]
 path = "../erc1155-marketplace/src/erc1155_proxy.rs"
 

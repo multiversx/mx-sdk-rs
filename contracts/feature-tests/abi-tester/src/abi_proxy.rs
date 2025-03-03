@@ -237,7 +237,7 @@ where
     }
 
     pub fn process_managed_decimal<
-        Arg0: ProxyArg<ManagedDecimal<Env::Api, ConstDecimals<10>>>,
+        Arg0: ProxyArg<ManagedDecimal<Env::Api, ConstDecimals<U10>>>,
     >(
         self,
         input: Arg0,
@@ -595,5 +595,5 @@ pub struct ManagedDecimalWrapper<Api>
 where
     Api: ManagedTypeApi,
 {
-    pub field: ManagedDecimal<Api, ConstDecimals<2>>,
+    pub field: ManagedDecimal<Api, ConstDecimals<U2>>,
 }

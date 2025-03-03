@@ -38,7 +38,7 @@ fn variant_dep_encode_snippets(
 pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-    let gen = match &ast.data {
+    let result = match &ast.data {
         syn::Data::Struct(data_struct) => {
             let field_dep_encode_snippets = fields_snippets(&data_struct.fields, |index, field| {
                 dep_encode_snippet(&self_field_expr(index, field))
@@ -79,5 +79,5 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
         syn::Data::Union(_) => panic!("Union not supported"),
     };
 
-    gen.into()
+    result.into()
 }

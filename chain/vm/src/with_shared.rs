@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 mod shareable;
 mod with_shared_mut_ref;
 

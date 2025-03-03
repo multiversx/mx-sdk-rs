@@ -30,12 +30,12 @@ pub(crate) fn allocator_status_after_comparing(
         return format!("{}", has_allocator);
     }
 
-    let allocator_status = format!("{} :arrow-right: {}", compared_has_allocator, has_allocator);
+    let allocator_status = format!("{} :arrow_right: {}", compared_has_allocator, has_allocator);
 
     if !has_allocator {
-        format!("{allocator_status} :green-circle:")
+        format!("{allocator_status} :green_circle:")
     } else {
-        format!("{allocator_status} :red-circle:")
+        format!("{allocator_status} :red_circle:")
     }
 }
 
@@ -47,10 +47,10 @@ pub(crate) fn panic_status_after_comparing(
         return has_panic.to_string();
     }
 
-    let panic_status = format!("{} :arrow-right: {}", compared_has_panic, has_panic);
+    let panic_status = format!("{} :arrow_right: {}", compared_has_panic, has_panic);
 
     if has_panic == "none" {
-        return format!("{panic_status} :green-circle:");
+        return format!("{panic_status} :green_circle:");
     }
 
     panic_status

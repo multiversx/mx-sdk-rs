@@ -1,6 +1,3 @@
-[settings]
-main = "forwarder-raw"
-
 [contracts.forwarder-raw]
 name = "forwarder-raw"
 

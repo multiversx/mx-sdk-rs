@@ -14,7 +14,7 @@ pub mod reserved;
 pub use account_data::*;
 pub use block_info::*;
 pub use blockchain_mock::*;
-pub use blockchain_state::BlockchainState;
+pub use blockchain_state::{BlockchainState, BlockchainStateRef};
 pub use esdt_data::*;
 pub use esdt_instance::*;
 pub use esdt_instance_metadata::*;

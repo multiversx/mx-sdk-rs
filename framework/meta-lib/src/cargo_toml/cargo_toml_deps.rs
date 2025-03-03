@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::version::FrameworkVersion;
 
 use super::{DependencyRawValue, VersionReq};
@@ -30,7 +32,7 @@ pub enum DependencyReference {
     GitCommit(GitCommitReference),
     GitBranch(GitBranchReference),
     GitTag(GitTagReference),
-    Path(String),
+    Path(PathBuf),
     Unsupported(String),
 }
 
