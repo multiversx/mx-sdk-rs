@@ -339,7 +339,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbi for ManagedDecimal<M, ConstD
 
     fn type_name_rust() -> TypeName {
         TypeName::from(alloc::format!(
-            "ManagedDecimal<$API, ConstDecimals<{}>>",
+            "ManagedDecimal<$API, ConstDecimals<U{}>>",
             DECIMALS::to_usize()
         ))
     }
