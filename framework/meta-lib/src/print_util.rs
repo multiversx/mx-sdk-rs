@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::{path::Path, process::Command};
 
 use colored::Colorize;
 
@@ -95,4 +95,19 @@ pub fn print_workspace_target_dir(target_path_str: &str) {
     println_green(format!(
         "Using workspace target directory: {target_path_str} ..."
     ));
+}
+
+pub fn print_removing_wasm_crate(dir_name: &str) {
+    println!("{}", format!("Removing wasm crate: {dir_name}").red(),);
+}
+
+pub fn print_sc_config_main_deprecated(path: &Path) {
+    println!(
+        "{}",
+        format!(
+            "In {}: `main` field under `[settings]` is now deprecated",
+            path.display()
+        )
+        .yellow(),
+    );
 }
