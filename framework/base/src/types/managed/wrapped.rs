@@ -45,7 +45,8 @@ pub use managed_buffer_read_to_end::*;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;
 pub use managed_decimal::{
-    ConstDecimals, Decimals, ManagedDecimal, ManagedDecimalSigned, NumDecimals,
+    ConstDecimals, Decimals, EgldDecimals, LnDecimals, ManagedDecimal, ManagedDecimalSigned,
+    NumDecimals,
 };
 pub use managed_map_encoded::ManagedMapEncoded;
 pub use managed_option::ManagedOption;
