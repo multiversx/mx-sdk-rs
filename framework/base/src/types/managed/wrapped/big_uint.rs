@@ -12,6 +12,7 @@ use crate::{
     },
     contract_base::ErrorHelper,
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
+    typenum::U9,
     types::{
         heap::BoxedBytes, BigInt, ConstDecimals, Decimals, ManagedBuffer,
         ManagedBufferCachedBuilder, ManagedDecimal, ManagedRef, ManagedType,
@@ -286,14 +287,14 @@ impl<M: ManagedTypeApi> BigUint<M> {
     /// Natural logarithm of a number.
     ///
     /// Returns `None` for 0.
-    pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<9>>> {
+    pub fn ln(&self) -> Option<ManagedDecimal<M, ConstDecimals<U9>>> {
         // start with aproximation, based on position of the most significant bit
         let Some(log2_floor) = self.log2_floor() else {
             // means the input was zero
             return None;
         };
 
-        let scaling_factor_9 = ConstDecimals::<9>.scaling_factor();
+        let scaling_factor_9 = ConstDecimals::<U9>::new().scaling_factor();
         let divisor = BigUint::from(1u64) << log2_floor as usize;
         let normalized = self * &*scaling_factor_9 / divisor;
 

@@ -5,6 +5,7 @@ use multiversx_sc::{
         derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     },
     derive::ManagedVecItem,
+    typenum::U4,
     types::{
         BigInt, BigUint, ConstDecimals, ManagedDecimal, ManagedDecimalSigned,
         ManagedVecItemPayload, NumDecimals,
@@ -20,9 +21,9 @@ use multiversx_sc_scenario::api::StaticApi;
 )]
 pub struct ManagedStructWithDecimal<M: ManagedTypeApi> {
     pub var_dec: ManagedDecimal<M, NumDecimals>,
-    pub const_dec: ManagedDecimal<M, ConstDecimals<4>>,
+    pub const_dec: ManagedDecimal<M, ConstDecimals<U4>>,
     pub var_dec_signed: ManagedDecimalSigned<M, NumDecimals>,
-    pub const_dec_signed: ManagedDecimalSigned<M, ConstDecimals<4>>,
+    pub const_dec_signed: ManagedDecimalSigned<M, ConstDecimals<U4>>,
 }
 
 #[test]
@@ -44,11 +45,11 @@ fn struct_with_decimal_read_write() {
     let num_dec_2 = 5;
     let s = ManagedStructWithDecimal::<StaticApi> {
         var_dec: ManagedDecimal::from_raw_units(BigUint::from(123_000u32), num_dec_1),
-        const_dec: ManagedDecimal::from_raw_units(BigUint::from(124_000u32), ConstDecimals),
+        const_dec: ManagedDecimal::from_raw_units(BigUint::from(124_000u32), ConstDecimals::new()),
         var_dec_signed: ManagedDecimalSigned::from_raw_units(BigInt::from(125_000), num_dec_2),
         const_dec_signed: ManagedDecimalSigned::from_raw_units(
             BigInt::from(-126_000),
-            ConstDecimals,
+            ConstDecimals::new(),
         ),
     };
 

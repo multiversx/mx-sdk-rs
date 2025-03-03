@@ -79,7 +79,7 @@ pub fn draw_md_ln_error(
 }
 
 fn managed_decimal_ln(x: f32) -> f32 {
-    let dec = ManagedDecimalSigned::<StaticApi, ConstDecimals<9>>::from(x);
+    let dec = ManagedDecimalSigned::<StaticApi, ConstDecimals<U9>>::from(x);
     if let Some(ln_dec) = dec.ln() {
         ln_dec.to_big_float().to_f64() as f32
     } else {
