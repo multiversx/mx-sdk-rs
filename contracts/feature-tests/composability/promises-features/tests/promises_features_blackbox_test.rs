@@ -23,8 +23,6 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-// type PromisesFeatureContract = ContractInfo<promises_features::Proxy<StaticApi>>;
-
 struct PromisesFeaturesTestState {
     world: ScenarioWorld,
 }
