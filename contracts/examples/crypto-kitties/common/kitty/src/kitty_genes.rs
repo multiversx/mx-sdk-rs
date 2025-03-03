@@ -23,7 +23,7 @@ impl Randomizeable for KittyGenes {
 
 impl KittyGenes {
     pub fn get_as_u64(&self) -> u64 {
-        (self.fur_color.as_u64() << 12 | self.eye_color.as_u64()) << 4
+        (((self.fur_color.as_u64() << 12) | self.eye_color.as_u64()) << 4)
             | self.meow_power.to_be() as u64
     }
 }
