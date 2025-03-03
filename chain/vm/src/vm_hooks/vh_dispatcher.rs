@@ -1152,7 +1152,7 @@ impl VMHooks for VMHooksDispatcher {
         byte_length: MemLength,
     ) {
         unsafe {
-            mem_conv::with_bytes_mut(byte_offset, byte_length, |bytes| {
+            mem_conv::with_bytes(byte_offset, byte_length, |bytes| {
                 self.handler
                     .bi_set_unsigned_bytes(destination_handle, bytes);
             })
@@ -1166,7 +1166,7 @@ impl VMHooks for VMHooksDispatcher {
         byte_length: MemLength,
     ) {
         unsafe {
-            mem_conv::with_bytes_mut(byte_offset, byte_length, |bytes| {
+            mem_conv::with_bytes(byte_offset, byte_length, |bytes| {
                 self.handler.bi_set_signed_bytes(destination_handle, bytes);
             })
         }
@@ -1294,7 +1294,7 @@ impl VMHooks for VMHooksDispatcher {
 
     fn mbuffer_new_from_bytes(&self, data_offset: MemPtr, data_length: MemLength) -> i32 {
         unsafe {
-            mem_conv::with_bytes_mut(data_offset, data_length, |bytes| {
+            mem_conv::with_bytes(data_offset, data_length, |bytes| {
                 self.handler.mb_new_from_bytes(bytes)
             })
         }
