@@ -1,5 +1,7 @@
 use crate::DrawResult;
-use multiversx_sc::types::{ConstDecimals, ManagedDecimalSigned};
+use multiversx_sc::{
+    types::{LnDecimals, ManagedDecimalSigned},
+};
 use multiversx_sc_scenario::api::StaticApi;
 use plotters::prelude::*;
 use plotters_canvas::CanvasBackend;
@@ -79,7 +81,7 @@ pub fn draw_md_log2_error(
 }
 
 fn managed_decimal_log2(x: f32) -> f32 {
-    let dec = ManagedDecimalSigned::<StaticApi, ConstDecimals<U9>>::from(x);
+    let dec = ManagedDecimalSigned::<StaticApi, LnDecimals>::from(x);
     if let Some(ln_dec) = dec.log2() {
         ln_dec.to_big_float().to_f64() as f32
     } else {

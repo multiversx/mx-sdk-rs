@@ -12,7 +12,7 @@ mod managed_decimal_op_sub;
 mod managed_decimal_op_sub_signed;
 mod managed_decimal_signed;
 
-pub use decimals::{ConstDecimals, Decimals, NumDecimals};
+pub use decimals::{ConstDecimals, Decimals, EgldDecimals, LnDecimals, NumDecimals};
 pub use managed_decimal_signed::ManagedDecimalSigned;
 
 use crate::{

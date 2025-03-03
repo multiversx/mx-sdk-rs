@@ -1,7 +1,7 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
 use multiversx_sc_snippets::imports::{
-    BigUint, ConstDecimals, ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec, RustBigUint,
-    StaticApi, U18,
+    BigUint, EgldDecimals, ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec, RustBigUint,
+    StaticApi,
 };
 
 #[tokio::test]
@@ -18,9 +18,7 @@ async fn simulator_basic_features_test() {
     bf_interact.deploy().await;
 
     let expected_return_egld_decimal =
-        ManagedDecimal::<StaticApi, ConstDecimals<U18>>::const_decimals_from_raw(BigUint::from(
-            5u64,
-        ));
+        ManagedDecimal::<StaticApi, EgldDecimals>::const_decimals_from_raw(BigUint::from(5u64));
     let return_egld_decimal = bf_interact.returns_egld_decimal(5).await;
     assert_eq!(expected_return_egld_decimal, return_egld_decimal);
 

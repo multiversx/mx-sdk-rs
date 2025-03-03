@@ -44,16 +44,16 @@ pub trait ManagedDecimalFeatures {
     #[endpoint]
     fn managed_decimal_ln(
         &self,
-        x: ManagedDecimal<Self::Api, ConstDecimals<U9>>,
-    ) -> ManagedDecimalSigned<Self::Api, ConstDecimals<U9>> {
+        x: ManagedDecimal<Self::Api, LnDecimals>,
+    ) -> ManagedDecimalSigned<Self::Api, LnDecimals> {
         x.ln().unwrap_or_else(|| sc_panic!("cannot be zero"))
     }
 
     #[endpoint]
     fn managed_decimal_log2(
         &self,
-        x: ManagedDecimal<Self::Api, ConstDecimals<U9>>,
-    ) -> ManagedDecimalSigned<Self::Api, ConstDecimals<U9>> {
+        x: ManagedDecimal<Self::Api, LnDecimals>,
+    ) -> ManagedDecimalSigned<Self::Api, LnDecimals> {
         x.log2().unwrap_or_else(|| sc_panic!("cannot be zero"))
     }
 
@@ -88,7 +88,7 @@ pub trait ManagedDecimalFeatures {
     fn managed_decimal_ln_var(
         &self,
         x: ManagedDecimal<Self::Api, NumDecimals>,
-    ) -> ManagedDecimalSigned<Self::Api, ConstDecimals<U9>> {
+    ) -> ManagedDecimalSigned<Self::Api, LnDecimals> {
         x.ln().unwrap_or_else(|| sc_panic!("cannot be zero"))
     }
 
@@ -96,7 +96,7 @@ pub trait ManagedDecimalFeatures {
     fn managed_decimal_log2_var(
         &self,
         x: ManagedDecimal<Self::Api, NumDecimals>,
-    ) -> ManagedDecimalSigned<Self::Api, ConstDecimals<U9>> {
+    ) -> ManagedDecimalSigned<Self::Api, LnDecimals> {
         x.log2().unwrap_or_else(|| sc_panic!("cannot be zero"))
     }
 }

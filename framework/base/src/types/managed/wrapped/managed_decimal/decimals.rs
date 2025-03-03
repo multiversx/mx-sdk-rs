@@ -5,7 +5,7 @@ use core::{
 
 use crate::{
     api::{const_handles, use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
-    typenum::Unsigned,
+    typenum::{Unsigned, U18, U9},
     types::{BigUint, ManagedRef},
 };
 
@@ -36,6 +36,14 @@ impl Decimals for NumDecimals {
 pub struct ConstDecimals<DECIMALS: Unsigned> {
     _phantom: PhantomData<DECIMALS>,
 }
+
+/// Alias of the const decimal type that we use to compute the logarithm.
+///
+/// We always compute it with 9 decimals.
+pub type LnDecimals = ConstDecimals<U9>;
+
+/// Alias of the type that represents the number of decimal of the EGLD, which is 18.
+pub type EgldDecimals = ConstDecimals<U18>;
 
 impl<DECIMALS: Unsigned> ConstDecimals<DECIMALS> {
     pub fn new() -> Self {
