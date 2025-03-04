@@ -88,8 +88,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
 
 fn format_result_message(message: &CheckValue<BytesValue>) -> String {
     let mut formatted_message = message.to_string();
-    formatted_message.pop(); // remove " from the end
-    formatted_message.remove(0); // remove " from the beginning
+    let _ = formatted_message.trim();
     formatted_message.remove(0); // remove s from the beginning
     formatted_message.remove(0); // remove t from the beginning
     formatted_message.remove(0); // remove r from the beginning
