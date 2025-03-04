@@ -1,6 +1,9 @@
 #[cfg(test)]
 pub mod tests {
-    use std::collections::{HashMap, HashSet};
+    use std::{
+        collections::{HashMap, HashSet},
+        path::Path,
+    };
 
     use wat::Parser;
 
@@ -409,7 +412,7 @@ pub mod tests {
     fn test_empty() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
             let wasm_info =
-                populate_wasm_info(String::new(), content.to_vec(), false, &None, Vec::new())
+                populate_wasm_info(Path::new(""), content.to_vec(), false, &None, Vec::new())
                     .expect("Unable to parse WASM content.");
             assert!(!wasm_info.memory_grow_flag);
             assert!(!wasm_info.report.has_allocator);
@@ -424,7 +427,7 @@ pub mod tests {
     fn test_empty_with_mem_grow() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_MEM_GROW.as_bytes()) {
             let wasm_info =
-                populate_wasm_info(String::new(), content.to_vec(), false, &None, Vec::new())
+                populate_wasm_info(Path::new(""), content.to_vec(), false, &None, Vec::new())
                     .expect("Unable to parse WASM content.");
             assert!(wasm_info.memory_grow_flag);
             assert!(!wasm_info.report.has_allocator);
@@ -439,7 +442,7 @@ pub mod tests {
     fn test_empty_with_fail_allocator() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_FAIL_ALLOCATOR.as_bytes()) {
             let wasm_info =
-                populate_wasm_info(String::new(), content.to_vec(), false, &None, Vec::new())
+                populate_wasm_info(Path::new(""), content.to_vec(), false, &None, Vec::new())
                     .expect("Unable to parse WASM content.");
             assert!(!wasm_info.memory_grow_flag);
             assert!(wasm_info.report.has_allocator);
@@ -483,7 +486,7 @@ pub mod tests {
 
         if let Ok(content) = Parser::new().parse_bytes(None, ADDER_WITH_ERR_IN_VIEW.as_bytes()) {
             let wasm_info = populate_wasm_info(
-                String::new(),
+                Path::new(""),
                 content.to_vec(),
                 false,
                 &None,

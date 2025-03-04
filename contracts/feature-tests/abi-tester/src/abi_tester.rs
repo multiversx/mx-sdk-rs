@@ -113,7 +113,7 @@ pub trait AbiTester {
     #[endpoint]
     fn process_managed_decimal(
         &self,
-        input: ManagedDecimal<Self::Api, ConstDecimals<10>>,
+        input: ManagedDecimal<Self::Api, ConstDecimals<U10>>,
     ) -> ManagedDecimal<Self::Api, usize> {
         input.into()
     }
