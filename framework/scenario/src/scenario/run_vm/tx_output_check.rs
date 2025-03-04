@@ -92,7 +92,6 @@ fn format_result_message(message: &CheckValue<BytesValue>) -> String {
     formatted_message.remove(0); // remove s from the beginning
     formatted_message.remove(0); // remove t from the beginning
     formatted_message.remove(0); // remove r from the beginning
-    formatted_message.remove(0); // remove : from the beginning
     formatted_message
 }
 
