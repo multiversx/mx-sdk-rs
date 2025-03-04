@@ -1,10 +1,6 @@
-use crate::{
-    imports::BytesValue,
-    scenario::{
-        model::{CheckLogs, Checkable, TxExpect},
-        run_vm::errors::{default_error, error_no_message, unexpected_log},
-    },
-    scenario_model::CheckValue,
+use crate::scenario::{
+    model::{CheckLogs, Checkable, TxExpect},
+    run_vm::errors::{default_error, error_no_message, unexpected_log},
 };
 
 use multiversx_chain_vm::{
@@ -43,7 +39,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
         error_no_message(
             "result message mismatch.",
             tx_id,
-            format_result_message(&tx_expect.message),
+            tx_expect.message.pretty_str(),
             have_str.to_string()
         )
     );
@@ -84,18 +80,6 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
             }
         },
     }
-}
-
-fn format_result_message(message: &CheckValue<BytesValue>) -> String {
-    let mut formatted_message = message.to_string();
-    if formatted_message.is_empty() {
-        return formatted_message;
-    }
-    formatted_message.pop(); // remove " from the end
-    formatted_message
-        .strip_prefix("\"str:")
-        .unwrap()
-        .to_string() // remove "str: from the beginning
 }
 
 fn scenario_check(
