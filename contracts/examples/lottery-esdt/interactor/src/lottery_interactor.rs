@@ -24,10 +24,6 @@ pub async fn lottery_cli() {
         Some(lottery_interactor_cli::InteractCliCommand::Deploy) => {
             lottery_interact.deploy().await;
         },
-        Some(lottery_interactor_cli::InteractCliCommand::Upgrade) => {
-            let owner_address = lottery_interact.lottery_owner_address.clone();
-            lottery_interact.upgrade(&owner_address, None).await
-        },
         Some(lottery_interactor_cli::InteractCliCommand::CreateLotteryPool(args)) => {
             lottery_interact
                 .create_lottery_pool(
@@ -63,10 +59,17 @@ pub async fn lottery_cli() {
     }
 }
 
+pub struct AddressWithShard {
+    pub address: Bech32Address,
+    pub shard: u8,
+}
+
 pub struct LotteryInteract {
     pub interactor: Interactor,
-    pub lottery_owner_address: Bech32Address,
-    pub wallet_address: Bech32Address,
+    pub lottery_owner: AddressWithShard,
+    pub account_1: AddressWithShard,
+    pub account_2: AddressWithShard,
+    pub other_shard_account: AddressWithShard,
     pub state: State,
 }
 
@@ -77,15 +80,36 @@ impl LotteryInteract {
             .use_chain_simulator(config.use_chain_simulator());
         interactor.set_current_dir_from_workspace("contracts/examples/lottery-esdt/interactor");
 
-        let lottery_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
-        let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
+        let lottery_owner_wallet = test_wallets::heidi();
+        let account_1_wallet = test_wallets::heidi();
+        let account_2_wallet = test_wallets::heidi();
+        let other_shard_wallet = test_wallets::heidi();
+
+        let lottery_owner_address = interactor.register_wallet(lottery_owner_wallet).await;
+        let account_1_address = interactor.register_wallet(account_1_wallet).await;
+        let account_2_address = interactor.register_wallet(account_2_wallet).await;
+        let other_shard_address = interactor.register_wallet(other_shard_wallet).await;
 
         interactor.generate_blocks(30u64).await.unwrap();
 
         LotteryInteract {
             interactor,
-            lottery_owner_address: lottery_owner_address.into(),
-            wallet_address: wallet_address.into(),
+            lottery_owner: AddressWithShard {
+                address: lottery_owner_address.clone().into(),
+                shard: lottery_owner_wallet.get_shard(),
+            },
+            account_1: AddressWithShard {
+                address: account_1_address.into(),
+                shard: account_1_wallet.get_shard(),
+            },
+            account_2: AddressWithShard {
+                address: account_2_address.into(),
+                shard: account_2_wallet.get_shard(),
+            },
+            other_shard_account: AddressWithShard {
+                address: other_shard_address.into(),
+                shard: other_shard_wallet.get_shard(),
+            },
             state: State::load_state(),
         }
     }
@@ -94,7 +118,7 @@ impl LotteryInteract {
         let new_address = self
             .interactor
             .tx()
-            .from(&self.lottery_owner_address.clone())
+            .from(&self.lottery_owner.address)
             .gas(50_000_000)
             .typed(lottery_proxy::LotteryProxy)
             .init()
@@ -105,32 +129,6 @@ impl LotteryInteract {
 
         println!("new address: {new_address}");
         self.state.set_lottery_address(new_address);
-    }
-
-    pub async fn upgrade(&mut self, sender: &Bech32Address, err: Option<&str>) {
-        let response = self
-            .interactor
-            .tx()
-            .from(sender)
-            .to(self.state.current_lottery_address())
-            .gas(6_000_000)
-            .typed(lottery_proxy::LotteryProxy)
-            .upgrade()
-            .code(LOTTERY_CODE_PATH)
-            .code_metadata(CodeMetadata::UPGRADEABLE)
-            .returns(ReturnsHandledOrError::new())
-            .run()
-            .await;
-
-        match response {
-            Ok(_) => {
-                println!("Contract successfully upgraded.");
-            },
-            Err(tx_err) => {
-                println!("Contract failed upgrade with error: {}", tx_err.message);
-                assert_eq!(tx_err.message, err.unwrap_or_default());
-            },
-        }
     }
 
     pub async fn create_lottery_pool(
@@ -147,7 +145,7 @@ impl LotteryInteract {
     ) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.account_1.address)
             .to(self.state.current_lottery_address())
             .gas(6_000_000u64)
             .typed(lottery_proxy::LotteryProxy)
@@ -171,7 +169,7 @@ impl LotteryInteract {
     pub async fn buy_ticket(&mut self, lottery_name: &String) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.account_1.address)
             .to(self.state.current_lottery_address())
             .gas(6_000_000u64)
             .typed(lottery_proxy::LotteryProxy)
@@ -185,7 +183,7 @@ impl LotteryInteract {
     pub async fn determine_winner(&mut self, lottery_name: &String) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.account_1.address)
             .to(self.state.current_lottery_address())
             .gas(6_000_000u64)
             .typed(lottery_proxy::LotteryProxy)
@@ -201,7 +199,7 @@ impl LotteryInteract {
     ) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.account_1.address)
             .to(self.state.current_lottery_address())
             .gas(6_000_000u64)
             .typed(lottery_proxy::LotteryProxy)

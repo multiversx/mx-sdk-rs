@@ -15,8 +15,6 @@ pub struct InteractCli {
 pub enum InteractCliCommand {
     #[command(name = "deploy", about = "Deploy contract")]
     Deploy,
-    #[command(name = "upgrade", about = "Upgrade contract")]
-    Upgrade,
     #[command(name = "create_lottery_pool", about = "Create Lottery Pool")]
     CreateLotteryPool(CreateLotteryPollArgs),
     #[command(name = "buy_ticket", about = "Buy Ticket")]
