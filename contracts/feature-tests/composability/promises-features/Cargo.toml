@@ -12,3 +12,7 @@ path = "src/promises_main.rs"
 version = "0.56.1"
 path = "../../../../framework/base"
 
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.56.1"
+path = "../../../../framework/scenario"
