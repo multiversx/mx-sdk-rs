@@ -4,7 +4,7 @@ use multiversx_sc::{
     types::MessageHashType,
 };
 
-extern "C" {
+unsafe extern "C" {
     fn managedSha256(inputHandle: i32, outputHandle: i32) -> i32;
 
     fn managedKeccak256(inputHandle: i32, outputHandle: i32) -> i32;

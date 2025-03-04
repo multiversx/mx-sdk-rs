@@ -6,7 +6,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::ei::parse_check_ei;
+use crate::{ei::parse_check_ei, print_util::print_sc_config_main_deprecated};
 
 use super::{
     contract_variant_settings::{parse_allocator, parse_stack_size},
@@ -211,7 +211,7 @@ fn build_contract(builder: ContractVariantBuilder, original_abi: &ContractAbi) -
     let contract_name = builder.wasm_name().clone();
     let wasm_crate_name = default_wasm_crate_name(&contract_name);
     ContractVariant {
-        main: false,
+        wasm_dir_short_name: false,
         settings: builder.settings.clone(),
         contract_id: builder.contract_id.clone(),
         contract_name,
@@ -220,39 +220,12 @@ fn build_contract(builder: ContractVariantBuilder, original_abi: &ContractAbi) -
     }
 }
 
-fn set_main_contract_flag(
-    contracts: &mut [ContractVariant],
-    default_contract_config_name_opt: &Option<String>,
-) {
-    if let Some(default_contract_config_name) = default_contract_config_name_opt {
-        for contract in contracts.iter_mut() {
-            if &contract.contract_id == default_contract_config_name {
-                contract.main = true;
-                return;
-            }
-        }
-
-        panic!(
-            "Could not find default contract '{}' among the output contracts. Available contracts are: {:?}",
-            default_contract_config_name,
-            contracts.iter().map(|contract| &contract.contract_id).collect::<Vec<_>>(),
-        )
-    } else {
-        let first_contract = contracts.get_mut(0).unwrap_or_else(|| {
-            panic!("Cannot set default contract because no output contract was specified.")
-        });
-        first_contract.main = true;
+fn set_wasm_dir_short_name(contracts: &mut [ContractVariant]) {
+    if contracts.len() != 1 {
+        return;
     }
-}
-
-fn validate_contract_variants(contracts: &[ContractVariant]) {
-    for contract in contracts {
-        if contract.main {
-            assert!(
-                contract.settings.features.is_empty(),
-                "features not supported for main contract"
-            );
-        }
+    if let Some(first_contract) = contracts.first_mut() {
+        first_contract.wasm_dir_short_name = true;
     }
 }
 
@@ -277,8 +250,7 @@ fn process_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<
     if contracts.is_empty() {
         contracts.push(ContractVariant::default_from_abi(original_abi));
     }
-    set_main_contract_flag(&mut contracts, &config.settings.main);
-    validate_contract_variants(&contracts);
+    set_wasm_dir_short_name(&mut contracts);
 
     contracts
 }
@@ -286,12 +258,7 @@ fn process_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<
 fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<ProxyConfig> {
     let mut proxy_contracts = Vec::new();
 
-    let main_contract = process_contracts(config, original_abi)
-        .into_iter()
-        .find(|contract| contract.main)
-        .unwrap();
-
-    proxy_contracts.push(ProxyConfig::new_with_default_path(main_contract.abi));
+    proxy_contracts.push(ProxyConfig::output_dir_proxy_config(original_abi.clone()));
 
     for proxy_config in &config.proxy {
         let mut contract_builders = HashMap::new();
@@ -313,7 +280,10 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                 let mut contract_builder = ContractVariantBuilder::default();
                 alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
 
-                contract_builders.insert(proxy_config.path.clone(), contract_builder);
+                contract_builders.insert(
+                    proxy_config.path.to_string_lossy().to_string(),
+                    contract_builder,
+                );
             },
         }
 
@@ -326,7 +296,7 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
             let contract = build_contract(builder, original_abi);
 
             proxy_contracts.push(ProxyConfig::new(
-                proxy_config.path.to_owned(),
+                PathBuf::from(&proxy_config.path),
                 proxy_config.override_import.to_owned(),
                 proxy_config.path_rename.to_owned(),
                 contract.abi,
@@ -341,10 +311,16 @@ impl ScConfig {
     /// Assembles an `ContractVariantConfig` from a raw config object that was loaded via Serde.
     ///
     /// In most cases the config will be loaded from a .toml file, use `load_from_file` for that.
-    pub fn load_from_config(config: &ScConfigSerde, original_abi: &ContractAbi) -> Self {
-        let default_contract_config_name = config.settings.main.clone().unwrap_or_default();
+    pub fn load_from_config(
+        path: &Path,
+        config: &ScConfigSerde,
+        original_abi: &ContractAbi,
+    ) -> Self {
+        if config.settings.main.is_some() {
+            print_sc_config_main_deprecated(path);
+        }
+
         ScConfig {
-            default_contract_config_name,
             contracts: process_contracts(config, original_abi),
             proxy_configs: process_proxy_contracts(config, original_abi),
         }
@@ -383,9 +359,8 @@ impl ScConfig {
         let default_contract_config_name = original_abi.build_info.contract_crate.name.to_string();
         let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
         ScConfig {
-            default_contract_config_name: default_contract_config_name.clone(),
             contracts: vec![ContractVariant {
-                main: true,
+                wasm_dir_short_name: true,
                 settings: ContractVariantSettings::default(),
                 contract_id: default_contract_config_name.clone(),
                 contract_name: default_contract_config_name,
@@ -399,10 +374,14 @@ impl ScConfig {
     /// Loads a contract configuration from file. Will return `None` if the file is not found.
     pub fn load_from_file<P: AsRef<Path>>(path: P, original_abi: &ContractAbi) -> Option<Self> {
         match fs::read_to_string(path.as_ref()) {
-            Ok(s) => {
-                let config_serde: ScConfigSerde = toml::from_str(s.as_str())
+            Ok(raw_contents) => {
+                let config_serde: ScConfigSerde = toml::from_str(&raw_contents)
                     .unwrap_or_else(|error| panic!("error parsing multicontract.toml: {error}"));
-                Some(Self::load_from_config(&config_serde, original_abi))
+                Some(Self::load_from_config(
+                    path.as_ref(),
+                    &config_serde,
+                    original_abi,
+                ))
             },
             Err(_) => None,
         }

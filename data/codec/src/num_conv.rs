@@ -28,7 +28,7 @@ pub fn top_encode_number(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuffe
 /// This function is hyper-optimized to not contain any jumps. There are no ifs or loops in this,
 /// the entire algorithm is performed via arithmetic, boolean and bitwise operations.
 fn fill_buffer_find_offset(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuffer) -> usize {
-    let b0 = (x >> 56 & 0xff) as u8;
+    let b0 = ((x >> 56) & 0xff) as u8;
 
     let negative = signed && msbit_is_one(b0);
     let skippable_byte = skippable_byte(negative);
@@ -39,27 +39,27 @@ fn fill_buffer_find_offset(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuf
     change_one_to_zero_unless(&mut cursor, b0 == skippable_byte);
     offset += cursor;
 
-    let b1 = (x >> 48 & 0xff) as u8;
+    let b1 = ((x >> 48) & 0xff) as u8;
     change_one_to_zero_unless(&mut cursor, b1 == skippable_byte);
     offset += cursor;
 
-    let b2 = (x >> 40 & 0xff) as u8;
+    let b2 = ((x >> 40) & 0xff) as u8;
     change_one_to_zero_unless(&mut cursor, b2 == skippable_byte);
     offset += cursor;
 
-    let b3 = (x >> 32 & 0xff) as u8;
+    let b3 = ((x >> 32) & 0xff) as u8;
     change_one_to_zero_unless(&mut cursor, b3 == skippable_byte);
     offset += cursor;
 
-    let b4 = (x >> 24 & 0xff) as u8;
+    let b4 = ((x >> 24) & 0xff) as u8;
     change_one_to_zero_unless(&mut cursor, b4 == skippable_byte);
     offset += cursor;
 
-    let b5 = (x >> 16 & 0xff) as u8;
+    let b5 = ((x >> 16) & 0xff) as u8;
     change_one_to_zero_unless(&mut cursor, b5 == skippable_byte);
     offset += cursor;
 
-    let b6 = (x >> 8 & 0xff) as u8;
+    let b6 = ((x >> 8) & 0xff) as u8;
     change_one_to_zero_unless(&mut cursor, b6 == skippable_byte);
     offset += cursor;
 

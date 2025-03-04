@@ -141,6 +141,12 @@ impl Wallet {
         Ok(Self { priv_key: pri_key })
     }
 
+    pub fn get_shard(&self) -> u8 {
+        let address = self.to_address();
+        let address_bytes = address.as_bytes();
+        address_bytes[address_bytes.len() - 1] % 3
+    }
+
     pub fn get_pem_decoded_content(file: &str) -> Vec<u8> {
         let pem_content = fs::read_to_string(file).unwrap();
         let lines: Vec<&str> = pem_content.split('\n').collect();
