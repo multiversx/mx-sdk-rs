@@ -42,3 +42,7 @@ pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     let result = verifying_key.verify(message, &sig);
     result.is_ok()
 }
+
+pub fn verify_bls_aggregated_signature(_key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+    true
+}

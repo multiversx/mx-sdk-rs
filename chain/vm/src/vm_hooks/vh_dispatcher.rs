@@ -1913,6 +1913,9 @@ impl VMHooks for VMHooksDispatcher {
         message_handle: i32,
         sig_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_verify_blsaggregated_signature")
+        self.handler
+            .verify_bls_aggregated_signature(key_handle, message_handle, sig_handle);
+
+        0
     }
 }
