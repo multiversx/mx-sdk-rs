@@ -13,9 +13,9 @@ pub(crate) fn default_error(
     format!(
         r#"
     Error: {}
-    Tx id: '{}'. 
-    Want: {}. 
-    Have: {}.
+    Tx id: '{}'
+    Want: {}
+    Have: {}
     Message: {}"#,
         error, tx_id, want, have, message
     )
@@ -25,9 +25,9 @@ pub(crate) fn error_no_message(error: &str, tx_id: &str, want: String, have: Str
     format!(
         r#"
     Error: {}
-    Tx id: '{}'. 
-    Want: {}. 
-    Have: {}."#,
+    Tx id: '{}'
+    Want: {}
+    Have: {}"#,
         error, tx_id, want, have
     )
 }
@@ -43,12 +43,12 @@ pub(crate) fn unexpected_log(
     format!(
         r#"
     Error: unexpected log,
-    Tx id: '{}'. 
-    Index: {}.
-    Address: {}. 
-    Endpoints: {}. 
-    Topics: {}. 
-    Data: {}."#,
+    Tx id: '{}'
+    Index: {}
+    Address: {}
+    Endpoints: {}
+    Topics: {}
+    Data: {}"#,
         tx_id, index, address, endpoints, topics, data,
     )
 }
