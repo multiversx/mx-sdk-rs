@@ -13,6 +13,9 @@ pub use crate::{
     non_zero_util::*,
     require, sc_format, sc_panic, sc_print,
     storage::mappers::*,
+    typenum::{
+        self, U0, U1, U10, U11, U12, U13, U14, U15, U16, U17, U18, U2, U3, U4, U5, U6, U7, U8, U9,
+    },
     types::{system_proxy::*, *},
 };
 

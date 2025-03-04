@@ -81,7 +81,7 @@ pub fn create_report(compile_args: &CompileArgs) {
     }
 }
 
-fn generate_new_report(path: &PathBuf) -> Vec<CodeReportJson> {
+fn generate_new_report(path: &Path) -> Vec<CodeReportJson> {
     let directors = RelevantDirectories::find_all(path, &["".to_owned()]);
 
     assemble_report_vec(directors)

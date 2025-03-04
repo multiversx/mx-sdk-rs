@@ -1,5 +1,5 @@
 use imports::{MxscPath, ReturnsResult, TestAddress, TestSCAddress};
-use multiversx_sc::types::{BigUint, ConstDecimals, ManagedDecimal};
+use multiversx_sc::types::{BigUint, EgldDecimals, ManagedDecimal};
 use multiversx_sc_scenario::{api::StaticApi, imports, ScenarioTxRun, ScenarioWorld};
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
@@ -50,8 +50,6 @@ fn egld_decimal_blackbox_test() {
 
     assert_eq!(
         egld_decimal_result,
-        ManagedDecimal::<StaticApi, ConstDecimals<18>>::const_decimals_from_raw(BigUint::from(
-            5u64
-        ))
+        ManagedDecimal::<StaticApi, EgldDecimals>::const_decimals_from_raw(BigUint::from(5u64))
     );
 }

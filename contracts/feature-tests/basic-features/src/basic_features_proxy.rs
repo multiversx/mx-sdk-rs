@@ -170,7 +170,7 @@ where
 
     pub fn returns_egld_decimal(
         self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedDecimal<Env::Api, ConstDecimals<18>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedDecimal<Env::Api, ConstDecimals<U18>>> {
         self.wrapped_tx
             .raw_call("returns_egld_decimal")
             .original_result()

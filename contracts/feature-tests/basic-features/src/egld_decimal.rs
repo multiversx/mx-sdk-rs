@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 pub trait EgldDecimal {
     #[payable("EGLD")]
     #[endpoint]
-    fn returns_egld_decimal(&self) -> ManagedDecimal<Self::Api, ConstDecimals<18>> {
+    fn returns_egld_decimal(&self) -> ManagedDecimal<Self::Api, EgldDecimals> {
         self.call_value().egld_decimal()
     }
 }

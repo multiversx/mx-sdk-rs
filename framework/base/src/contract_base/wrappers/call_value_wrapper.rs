@@ -9,7 +9,7 @@ use crate::{
     },
     err_msg,
     types::{
-        big_num_cmp::bi_gt_zero, BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier,
+        big_num_cmp::bi_gt_zero, BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier,
         EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal,
         ManagedRef, ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload,
         ManagedVecPayloadIterator, ManagedVecRef, TokenIdentifier,
@@ -102,8 +102,8 @@ where
     }
 
     /// Returns the EGLD call value from the VM as ManagedDecimal
-    pub fn egld_decimal(&self) -> ManagedDecimal<A, ConstDecimals<18>> {
-        ManagedDecimal::<A, ConstDecimals<18>>::const_decimals_from_raw(self.egld_value().clone())
+    pub fn egld_decimal(&self) -> ManagedDecimal<A, EgldDecimals> {
+        ManagedDecimal::<A, EgldDecimals>::const_decimals_from_raw(self.egld_value().clone())
     }
 
     /// Returns all ESDT transfers that accompany this SC call.

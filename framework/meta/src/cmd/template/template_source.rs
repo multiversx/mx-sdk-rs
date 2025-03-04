@@ -7,7 +7,6 @@ use crate::{folder_structure::RelevantDirectories, version::FrameworkVersion};
 
 use super::{copy_util::whitelisted_deep_copy, template_metadata::TemplateMetadata, RepoSource};
 
-const TEMPLATES_PATH_IN_REPO: &str = "contracts/examples";
 const TEMPLATE_TOML_FILE_NAME: &str = "mxsc-template.toml";
 
 pub struct TemplateSource<'a> {
@@ -28,8 +27,8 @@ impl TemplateSource<'_> {
 }
 
 pub fn template_sources(repo_temp_dir: &RepoSource) -> Vec<TemplateSource<'_>> {
-    let templates_path = repo_temp_dir.repo_path().join(TEMPLATES_PATH_IN_REPO);
-    let dirs = RelevantDirectories::find_all(templates_path, &[]);
+    let templates_path = repo_temp_dir.repo_path().join("contracts").join("examples");
+    let dirs = RelevantDirectories::find_all(&templates_path, &[]);
     let mut sources = Vec::new();
     for dir in dirs.iter_contract_crates() {
         let template_metadata_path = dir.path.join(TEMPLATE_TOML_FILE_NAME);

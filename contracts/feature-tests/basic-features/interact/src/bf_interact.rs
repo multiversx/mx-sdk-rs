@@ -184,7 +184,7 @@ impl BasicFeaturesInteract {
     pub async fn returns_egld_decimal(
         &mut self,
         egld: u64,
-    ) -> ManagedDecimal<StaticApi, ConstDecimals<18>> {
+    ) -> ManagedDecimal<StaticApi, EgldDecimals> {
         self.interactor
             .tx()
             .from(&self.wallet_address)
