@@ -1,8 +1,13 @@
+use blst::{
+    min_pk::{AggregatePublicKey, PublicKey, Signature},
+    BLST_ERROR,
+};
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
 
 pub const SHA256_RESULT_LEN: usize = 32;
 pub const KECCAK256_RESULT_LEN: usize = 32;
+pub const BLS_DST_VALUE: &[u8] = b"BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
 
 pub fn sha256(data: &[u8]) -> [u8; SHA256_RESULT_LEN] {
     let mut hasher = Sha256::new();
@@ -43,6 +48,36 @@ pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     result.is_ok()
 }
 
-pub fn verify_bls_aggregated_signature(_key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
-    true
+pub fn verify_bls_aggregated_signature(
+    keys: Vec<Vec<u8>>,
+    message: &[u8],
+    signature: &[u8],
+) -> bool {
+    let mut aggregate_pk = AggregatePublicKey::from_public_key(&PublicKey::default());
+
+    for (i, key) in keys.iter().enumerate() {
+        let public_key = PublicKey::from_bytes(key).unwrap_or_else(|e| {
+            panic!("Failed to deserialize public key at index {i}: {key:?}. Error: {e:?}")
+        });
+
+        aggregate_pk
+            .add_public_key(&public_key, true)
+            .unwrap_or_else(|e| {
+                panic!("Failed to add public key at index {i} to aggregate. Error: {e:?}")
+            });
+    }
+
+    let signature = Signature::from_bytes(signature)
+        .unwrap_or_else(|e| panic!("Failed to deserialize signature: {signature:?}. Error: {e:?}"));
+
+    let verify_response = signature.verify(
+        true,
+        message,
+        BLS_DST_VALUE,
+        &[],
+        &aggregate_pk.to_public_key(),
+        true,
+    );
+
+    matches!(verify_response, BLST_ERROR::BLST_SUCCESS)
 }

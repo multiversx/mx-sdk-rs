@@ -38,7 +38,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
         signature: RawHandle,
     ) {
         let types = self.m_types_lock();
-        let key = types.mb_get(key);
+        let key = types.mb_get_vec_of_bytes(key);
         let message = types.mb_get(message);
         let signature = types.mb_get(signature);
         let sig_valid = crypto_functions::verify_bls_aggregated_signature(key, message, signature);
