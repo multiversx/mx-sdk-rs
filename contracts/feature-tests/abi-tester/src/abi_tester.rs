@@ -152,6 +152,12 @@ pub trait AbiTester {
         ManagedVec::new()
     }
 
+
+    #[view]
+    fn echo_permission(&self, p: Permission) -> Permission {
+        p
+    }
+
     #[view]
     fn item_for_array(&self, _array: &[OnlyShowsUpAsNestedInArray; 5]) {}
 

@@ -279,15 +279,6 @@
                 }
             ]
         },
-        "BitField": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "0",
-                    "type": "u32"
-                }
-            ]
-        },
         "EsdtLocalRole": {
             "type": "enum",
             "variants": [
@@ -648,6 +639,15 @@
                         "indicates that operation was interrupted prematurely, due to low gas"
                     ],
                     "name": "interrupted"
+                }
+            ]
+        },
+        "Permission": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "0",
+                    "type": "u32"
                 }
             ]
         }

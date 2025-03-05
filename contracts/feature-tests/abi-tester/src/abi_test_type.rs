@@ -63,7 +63,7 @@ pub struct AbiWithManagedBufferReadToEnd<M: ManagedTypeApi> {
 
 bitflags! {
     #[type_abi]
-    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, NestedDecode, NestedEncode, TopEncode, TopDecode)]
     pub struct Permission: u32 {
         const NONE = 0;
         const OWNER = 1;
