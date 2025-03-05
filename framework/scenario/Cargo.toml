@@ -32,7 +32,7 @@ colored = "2.2"             # TODO: doesn't support >v2.2 (can't build on nightl
 unwrap-infallible = "0.1.5"
 
 [features]
-default = ["wasm-incompatible"]
+default = ["wasm-incompatible", "wasmer"] # TODO: wasmer temporarily default
 wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
 run-go-tests = []
 wasmer = ["multiversx-chain-vm/wasmer"]
@@ -54,7 +54,7 @@ path = "../../sdk/scenario-format"
 [dependencies.multiversx-chain-vm-executor]
 version = "0.3.0"
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "3bf87c858383902c7077a72fd79b57d85bb69800"
+rev = "2a267cf459ed48720d4db06fedb9c22ed8fc0106"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.13.1"

@@ -18,6 +18,7 @@ pub use crate::{
             ScDeployStep, ScQueryStep, Scenario, SetStateStep, TransferStep, TxESDT, TxExpect,
             TypedResponse, TypedScDeploy,
         },
+        run_vm::ScenarioExecutorConfig,
         ScenarioRunner,
     },
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},

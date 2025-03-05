@@ -2,8 +2,6 @@ use std::ffi::c_void;
 
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooks};
 
-use crate::mem_conv;
-
 use super::VMHooksHandler;
 
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
@@ -44,25 +42,22 @@ impl VMHooks for VMHooksDispatcher {
 
     fn get_shard_of_address(&self, address_offset: MemPtr) -> i32 {
         unsafe {
-            mem_conv::with_bytes(address_offset, 32, |address_bytes| {
-                self.handler.get_shard_of_address(address_bytes)
-            })
+            let address_bytes = self.handler.memory_load(address_offset, 32);
+            self.handler.get_shard_of_address(address_bytes)
         }
     }
 
     fn is_smart_contract(&self, address_offset: MemPtr) -> i32 {
         unsafe {
-            bool_to_i32(mem_conv::with_bytes(address_offset, 32, |address_bytes| {
-                self.handler.is_smart_contract(address_bytes)
-            }))
+            let address_bytes = self.handler.memory_load(address_offset, 32);
+            bool_to_i32(self.handler.is_smart_contract(address_bytes))
         }
     }
 
     fn signal_error(&self, message_offset: MemPtr, message_length: MemLength) {
         unsafe {
-            mem_conv::with_bytes(message_offset, message_length, |message| {
-                self.handler.signal_error(message);
-            });
+            let message = self.handler.memory_load(message_offset, message_length);
+            self.handler.signal_error(message);
         }
     }
 
@@ -399,13 +394,10 @@ impl VMHooks for VMHooksDispatcher {
         token_id_len: MemLength,
     ) -> i64 {
         unsafe {
-            mem_conv::with_bytes(address_offset, 32, |address_bytes| {
-                mem_conv::with_bytes(token_id_offset, token_id_len, |token_id_bytes| {
-                    self.handler
-                        .get_current_esdt_nft_nonce(address_bytes, token_id_bytes)
-                        as i64
-                })
-            })
+            let address_bytes = self.handler.memory_load(address_offset, 32);
+            let token_id_bytes = self.handler.memory_load(token_id_offset, token_id_len);
+            self.handler
+                .get_current_esdt_nft_nonce(address_bytes, token_id_bytes) as i64
         }
     }
 
@@ -505,9 +497,8 @@ impl VMHooks for VMHooksDispatcher {
 
     fn finish(&self, pointer: MemPtr, length: MemLength) {
         unsafe {
-            mem_conv::with_bytes(pointer, length, |bytes| {
-                self.handler.finish_slice_u8(bytes);
-            })
+            let bytes = self.handler.memory_load(pointer, length);
+            self.handler.finish_slice_u8(bytes);
         }
     }
 
@@ -728,21 +719,19 @@ impl VMHooks for VMHooksDispatcher {
         callback_closure_handle: i32,
     ) -> i32 {
         unsafe {
-            mem_conv::with_bytes(success_offset, success_length, |success_callback| {
-                mem_conv::with_bytes(error_offset, error_length, |error_callback| {
-                    self.handler.create_async_call_raw(
-                        dest_handle,
-                        value_handle,
-                        function_handle,
-                        arguments_handle,
-                        success_callback,
-                        error_callback,
-                        gas as u64,
-                        extra_gas_for_callback as u64,
-                        callback_closure_handle,
-                    );
-                })
-            })
+            let success_callback = self.handler.memory_load(success_offset, success_length);
+            let error_callback = self.handler.memory_load(error_offset, error_length);
+            self.handler.create_async_call_raw(
+                dest_handle,
+                value_handle,
+                function_handle,
+                arguments_handle,
+                success_callback,
+                error_callback,
+                gas as u64,
+                extra_gas_for_callback as u64,
+                callback_closure_handle,
+            );
         }
         0
     }
@@ -1097,9 +1086,8 @@ impl VMHooks for VMHooksDispatcher {
 
     fn big_int_get_external_balance(&self, address_offset: MemPtr, result: i32) {
         unsafe {
-            mem_conv::with_bytes(address_offset, 32, |address_bytes| {
-                self.handler.load_balance(address_bytes, result);
-            })
+            let address_bytes = self.handler.memory_load(address_offset, 32);
+            self.handler.load_balance(address_bytes, result);
         }
     }
 
@@ -1112,16 +1100,14 @@ impl VMHooks for VMHooksDispatcher {
         result_handle: i32,
     ) {
         unsafe {
-            mem_conv::with_bytes(address_offset, 32, |address_bytes| {
-                mem_conv::with_bytes(token_id_offset, token_id_len, |token_id_bytes| {
-                    self.handler.big_int_get_esdt_external_balance(
-                        address_bytes,
-                        token_id_bytes,
-                        nonce as u64,
-                        result_handle,
-                    );
-                })
-            })
+            let address_bytes = self.handler.memory_load(address_offset, 32);
+            let token_id_bytes = self.handler.memory_load(token_id_offset, token_id_len);
+            self.handler.big_int_get_esdt_external_balance(
+                address_bytes,
+                token_id_bytes,
+                nonce as u64,
+                result_handle,
+            );
         }
     }
 
@@ -1152,10 +1138,9 @@ impl VMHooks for VMHooksDispatcher {
         byte_length: MemLength,
     ) {
         unsafe {
-            mem_conv::with_bytes(byte_offset, byte_length, |bytes| {
-                self.handler
-                    .bi_set_unsigned_bytes(destination_handle, bytes);
-            })
+            let bytes = self.handler.memory_load(byte_offset, byte_length);
+            self.handler
+                .bi_set_unsigned_bytes(destination_handle, bytes);
         }
     }
 
@@ -1166,9 +1151,8 @@ impl VMHooks for VMHooksDispatcher {
         byte_length: MemLength,
     ) {
         unsafe {
-            mem_conv::with_bytes(byte_offset, byte_length, |bytes| {
-                self.handler.bi_set_signed_bytes(destination_handle, bytes);
-            })
+            let bytes = self.handler.memory_load(byte_offset, byte_length);
+            self.handler.bi_set_signed_bytes(destination_handle, bytes);
         }
     }
 
@@ -1294,9 +1278,8 @@ impl VMHooks for VMHooksDispatcher {
 
     fn mbuffer_new_from_bytes(&self, data_offset: MemPtr, data_length: MemLength) -> i32 {
         unsafe {
-            mem_conv::with_bytes(data_offset, data_length, |bytes| {
-                self.handler.mb_new_from_bytes(bytes)
-            })
+            let bytes = self.handler.memory_load(data_offset, data_length);
+            self.handler.mb_new_from_bytes(bytes)
         }
     }
 
@@ -1306,8 +1289,11 @@ impl VMHooks for VMHooksDispatcher {
 
     fn mbuffer_get_bytes(&self, m_buffer_handle: i32, result_offset: MemPtr) -> i32 {
         unsafe {
-            self.handler
-                .mb_copy_bytes(m_buffer_handle, result_offset as *mut u8) as i32
+            let bytes = self.handler.mb_get_bytes(m_buffer_handle);
+            unsafe {
+                self.handler.memory_store(result_offset, &bytes);
+            }
+            bytes.len() as i32
         }
     }
 
@@ -1318,11 +1304,18 @@ impl VMHooks for VMHooksDispatcher {
         slice_length: i32,
         result_offset: MemPtr,
     ) -> i32 {
-        unsafe {
-            mem_conv::with_bytes_mut(result_offset, slice_length as isize, |bytes| {
-                self.handler
-                    .mb_load_slice(source_handle, starting_position as usize, bytes)
-            })
+        if let Ok(bytes) = self.handler.mb_get_slice(
+            source_handle,
+            starting_position as usize,
+            slice_length as usize,
+        ) {
+            assert_eq!(bytes.len(), slice_length as usize);
+            unsafe {
+                self.handler.memory_store(result_offset, &bytes);
+            }
+            0
+        } else {
+            1
         }
     }
 
@@ -1352,9 +1345,8 @@ impl VMHooks for VMHooksDispatcher {
         data_length: MemLength,
     ) -> i32 {
         unsafe {
-            mem_conv::with_bytes(data_offset, data_length, |bytes| {
-                self.handler.mb_set(m_buffer_handle, bytes);
-            });
+            let bytes = self.handler.memory_load(data_offset, data_length);
+            self.handler.mb_set(m_buffer_handle, bytes);
         }
         0
     }
@@ -1367,10 +1359,9 @@ impl VMHooks for VMHooksDispatcher {
         data_offset: MemPtr,
     ) -> i32 {
         unsafe {
-            mem_conv::with_bytes(data_offset, data_length, |bytes| {
-                self.handler
-                    .mb_set_slice(m_buffer_handle, starting_position as usize, bytes)
-            })
+            let bytes = self.handler.memory_load(data_offset, data_length);
+            self.handler
+                .mb_set_slice(m_buffer_handle, starting_position as usize, bytes)
         }
     }
 
@@ -1386,9 +1377,8 @@ impl VMHooks for VMHooksDispatcher {
         data_length: MemLength,
     ) -> i32 {
         unsafe {
-            mem_conv::with_bytes(data_offset, data_length, |bytes| {
-                self.handler.mb_append_bytes(accumulator_handle, bytes);
-            });
+            let bytes = self.handler.memory_load(data_offset, data_length);
+            self.handler.mb_append_bytes(accumulator_handle, bytes);
         }
         0
     }

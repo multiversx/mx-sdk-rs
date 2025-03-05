@@ -1,9 +1,9 @@
-use std::fmt::Debug;
 use std::rc::Weak;
 use std::sync::MutexGuard;
+use std::{fmt::Debug, ops::Deref};
 
 use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::{BreakpointValue, Instance};
+use multiversx_chain_vm_executor::{BreakpointValue, Instance, MemLength, MemPtr};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -36,6 +36,21 @@ impl TxContextVMHooksHandler {
             instance_ref,
         }
     }
+
+    fn instance_box_ref(&self) -> &dyn Instance {
+        assert!(
+            self.instance_ref.strong_count() > 0,
+            "instance reference dropped"
+        );
+        unsafe {
+            let box_ref = self
+                .instance_ref
+                .as_ptr()
+                .as_ref()
+                .expect("null instance pointer");
+            box_ref.deref()
+        }
+    }
 }
 
 impl Debug for TxContextVMHooksHandler {
@@ -45,6 +60,18 @@ impl Debug for TxContextVMHooksHandler {
 }
 
 impl VMHooksHandlerSource for TxContextVMHooksHandler {
+    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
+        self.instance_box_ref()
+            .memory_load(offset, length)
+            .expect("error loading memory from wasmer instance")
+    }
+
+    unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) {
+        self.instance_box_ref()
+            .memory_store(mem_ptr, data)
+            .expect("error writing to wasmer instance memory");
+    }
+
     fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
         self.tx_context_ref.m_types_lock()
     }

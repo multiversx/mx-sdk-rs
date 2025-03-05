@@ -1,6 +1,7 @@
 use std::sync::{Mutex, MutexGuard};
 
 use multiversx_chain_core::types::ReturnCode;
+use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use crate::{
     tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
@@ -14,6 +15,8 @@ use crate::{
     world_mock::{AccountData, BlockInfo},
 };
 
+use super::DebugApiVMHooksHandler;
+
 /// A simple wrapper around a managed type container Mutex.
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
@@ -26,6 +29,18 @@ impl StaticApiVMHooksHandler {
 }
 
 impl VMHooksHandlerSource for StaticApiVMHooksHandler {
+    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
+        // TODO: switch to the DebugSCInstance method
+        unsafe { DebugApiVMHooksHandler::main_memory_load(offset, length) }
+    }
+
+    unsafe fn memory_store(&self, offset: MemPtr, data: &[u8]) {
+        // TODO: switch to the DebugSCInstance method
+        unsafe {
+            DebugApiVMHooksHandler::main_memory_store(offset, data);
+        }
+    }
+
     fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
         self.0.lock().unwrap()
     }
