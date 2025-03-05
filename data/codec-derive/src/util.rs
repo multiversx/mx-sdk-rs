@@ -1,10 +1,11 @@
-use quote::quote;
+use quote::{quote, ToTokens};
 use syn::{punctuated::Punctuated, token::Comma, Variant};
 
 pub struct ExplicitDiscriminant {
     pub variant_index: usize,
     pub value: u8,
 }
+const BITFLAGS_PATH: &str = ":: __private :: PublicFlags > :: Internal";
 
 pub fn is_fieldless_enum(data_enum: &syn::DataEnum) -> bool {
     data_enum
@@ -14,14 +15,16 @@ pub fn is_fieldless_enum(data_enum: &syn::DataEnum) -> bool {
 }
 
 pub fn self_field_expr(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
-    if let Some(ident) = &field.ident {
-        quote! {
-            self.#ident
-        }
-    } else {
-        let index_lit = proc_macro2::Literal::usize_unsuffixed(index);
-        quote! {
-            self.#index_lit
+    match &field.ident {
+        Some(ident) => quote!(self.#ident),
+        None => {
+            let index_lit = proc_macro2::Literal::usize_unsuffixed(index);
+            
+            if field.ty.to_token_stream().to_string().contains(BITFLAGS_PATH) {
+                quote!(self.#index_lit.bits())
+            } else {
+                quote!(self.#index_lit)
+            }
         }
     }
 }
