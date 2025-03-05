@@ -3,6 +3,8 @@ use quote::quote;
 
 use crate::{nested_de_derive::*, util::*};
 
+const BITFLAGS_PRIMITIVE_PATH: &str = ":: __private :: PublicFlags > :: Primitive";
+
 fn fieldless_enum_match_arm_result_ok(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
@@ -58,9 +60,10 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                     dep_decode_snippet(index, field, &quote! {&mut nested_buffer})
                 });
 
+            let decode_body = top_decode_body(name, &field_dep_decode_snippets);
             quote! {
                 let mut nested_buffer = top_input.into_nested_buffer();
-                let result = #name #field_dep_decode_snippets ;
+                let result = #decode_body;
                 if !codec::NestedDecodeInput::is_depleted(&nested_buffer) {
                     return core::result::Result::Err(__h__.handle_error(codec::DecodeError::INPUT_TOO_LONG));
                 }
@@ -148,4 +151,21 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
     };
 
     result.into()
+}
+
+fn top_decode_body(
+    name: &proc_macro2::Ident,
+    field_dep_decode_snippets: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
+    if field_dep_decode_snippets
+        .to_string()
+        .contains(BITFLAGS_PRIMITIVE_PATH)
+    {
+        return quote! (
+            #name::from_bits #field_dep_decode_snippets
+                .ok_or(__h__.handle_error(codec::DecodeError::INVALID_VALUE))?
+        );
+    }
+
+    quote!(#name #field_dep_decode_snippets)
 }
