@@ -33,5 +33,6 @@ jobs:
           sc-meta all build
           sc-meta all proxy
           sc-meta all snippets
+          sc-meta test
           cd ../
           sc-meta new --template empty --name windows-template-test-sc
