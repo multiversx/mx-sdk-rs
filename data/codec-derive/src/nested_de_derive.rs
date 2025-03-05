@@ -1,14 +1,18 @@
+use crate::util::*;
 use proc_macro::TokenStream;
 use quote::quote;
+use quote::ToTokens;
 
-use crate::util::*;
+const BITFLAGS_PATH: &str = ":: __private :: PublicFlags :: Internal";
+const BITFLAGS_PRIMITIVE_PATH: &str = ":: __private :: PublicFlags > :: Primitive";
+const PRIMITIVE: &str = "Primitive";
 
 pub fn dep_decode_snippet(
     _index: usize,
     field: &syn::Field,
     input_value: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
-    let ty = &field.ty;
+    let ty = sanitize_type_path(field.ty.clone());
     if let Some(ident) = &field.ident {
         quote! {
             #ident: <#ty as codec::NestedDecode>::dep_decode_or_handle_err(#input_value, __h__)?
@@ -52,6 +56,9 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
                 fields_decl_syntax(&data_struct.fields, |index, field| {
                     dep_decode_snippet(index, field, &quote! {input})
                 });
+
+            let decode_body = dep_decode_body(name, &field_dep_decode_snippets);
+
             quote! {
                 impl #impl_generics codec::NestedDecode for #name #ty_generics #where_clause {
                     fn dep_decode_or_handle_err<I, H>(input: &mut I, __h__: H) -> core::result::Result<Self, H::HandledErr>
@@ -59,9 +66,7 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
                         I: codec::NestedDecodeInput,
                         H: codec::DecodeErrorHandler,
                     {
-                        core::result::Result::Ok(
-                            #name #field_dep_decode_snippets
-                        )
+                        #decode_body
                     }
                 }
             }
@@ -91,4 +96,40 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
     };
 
     result.into()
+}
+
+fn sanitize_type_path(mut field: syn::Type) -> proc_macro2::TokenStream {
+    if let syn::Type::Path(ref mut p) = field {
+        if p.path.to_token_stream().to_string().contains(BITFLAGS_PATH) {
+            let modified_path = p.path.segments.last_mut().unwrap();
+            modified_path.ident = syn::Ident::new(PRIMITIVE, modified_path.ident.span());
+        }
+    }
+
+    quote! (#field)
+}
+
+fn dep_decode_body(
+    name: &proc_macro2::Ident,
+    field_dep_decode_snippets: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
+    let decode_body = if field_dep_decode_snippets
+        .to_string()
+        .contains(BITFLAGS_PRIMITIVE_PATH)
+    {
+        quote! {
+            core::result::Result::Ok(
+                #name::from_bits #field_dep_decode_snippets
+                    .ok_or(__h__.handle_error(codec::DecodeError::INVALID_VALUE))?,
+            )
+        }
+    } else {
+        quote! {
+            core::result::Result::Ok(
+                #name #field_dep_decode_snippets
+            )
+        }
+    };
+
+    return decode_body;
 }
