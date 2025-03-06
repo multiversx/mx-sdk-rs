@@ -83,6 +83,34 @@ fn test_verify_bls_aggregated_signature() {
 }
 
 #[test]
+fn test_verify_bls_signature() {
+    let public_key_hex = b"82eb2ddfa71f1673fbfbd17952838cbca3816d5e60bf5cdb220d8cad6cb800e2ed18bb747ef45b17c9b8cbc971c6b980";
+    let message = b"hello";
+    let signature_hex = b"979a97882bd59dd97d860c99f9c4295e7d63e3fede1823b942d31d71ea3707d8c179ab733d38f7497b53bfa1535fe5e202f2a1c6e4df1dbc97dbe315dccd51676dbef31af1fe60d4b11c304db61913dc1d39e929f80f2cd10b72cbc661235048";
+
+    let public_key_bytes: Vec<u8> = FromHex::from_hex(public_key_hex).unwrap();
+    let signature_bytes: Vec<u8> = FromHex::from_hex(signature_hex).unwrap();
+
+    let success = crypto_functions::verify_bls(&public_key_bytes, message, &signature_bytes);
+
+    assert!(success);
+}
+
+#[test]
+fn test_verify_bls_signature_bad_sig() {
+    let public_key_hex = b"82eb2ddfa71f1673fbfbd17952838cbca3816d5e60bf5cdb220d8cad6cb800e2ed18bb747ef45b17c9b8cbc971c6b980";
+    let message = b"hello";
+    let signature_hex = b"979b87882bd59dd97d860c99f9c4295e7d63e3fede1823b942d31d71ea3707d8c179ab733d38f7497b53bfa1535fe5e202f2a1c6e4df1dbc97dbe315dccd51676dbef31af1fe60d4b11c304db61913dc1d39e929f80f2cd10b72cbc661235048";
+
+    let public_key_bytes: Vec<u8> = FromHex::from_hex(public_key_hex).unwrap();
+    let signature_bytes: Vec<u8> = FromHex::from_hex(signature_hex).unwrap();
+
+    let success = crypto_functions::verify_bls(&public_key_bytes, message, &signature_bytes);
+
+    assert!(!success);
+}
+
+#[test]
 fn test_verify_bls_aggregated_signature_bad_sig() {
     let message = b"hello";
 

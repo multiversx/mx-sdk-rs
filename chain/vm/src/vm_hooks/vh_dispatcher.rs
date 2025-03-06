@@ -1582,7 +1582,9 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_verify_bls(&self, key_handle: i32, message_handle: i32, sig_handle: i32) -> i32 {
-        panic!("Unavailable: managed_verify_bls")
+        self.handler
+            .verify_bls_managed(key_handle, message_handle, sig_handle);
+        0
     }
 
     fn verify_ed25519(
@@ -1915,7 +1917,6 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         self.handler
             .verify_bls_aggregated_signature(key_handle, message_handle, sig_handle);
-
         0
     }
 }

@@ -48,6 +48,18 @@ pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     result.is_ok()
 }
 
+pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+    let public_key = PublicKey::from_bytes(key)
+        .unwrap_or_else(|e| panic!("Failed to deserialize public key: {key:?}. Error: {e:?}"));
+
+    let sig = Signature::from_bytes(signature)
+        .unwrap_or_else(|e| panic!("Failed to deserialize signature: {signature:?}. Error: {e:?}"));
+
+    let verify_response = sig.verify(true, message, BLS_DST_VALUE, &[], &public_key, true);
+
+    matches!(verify_response, BLST_ERROR::BLST_SUCCESS)
+}
+
 pub fn verify_bls_aggregated_signature(
     keys: Vec<Vec<u8>>,
     message: &[u8],

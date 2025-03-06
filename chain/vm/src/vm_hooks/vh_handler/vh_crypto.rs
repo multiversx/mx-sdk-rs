@@ -31,6 +31,17 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
         }
     }
 
+    fn verify_bls_managed(&self, key: RawHandle, message: RawHandle, signature: RawHandle) {
+        let types = self.m_types_lock();
+        let key = types.mb_get(key);
+        let message = types.mb_get(message);
+        let signature = types.mb_get(signature);
+        let sig_valid = crypto_functions::verify_bls(key, message, signature);
+        if !sig_valid {
+            self.vm_error("invalid signature");
+        }
+    }
+
     fn verify_bls_aggregated_signature(
         &self,
         key: RawHandle,
