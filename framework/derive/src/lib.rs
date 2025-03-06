@@ -81,7 +81,7 @@ pub fn semver_tuple(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 #[proc_macro]
 pub fn const_managed_decimal(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as syn::LitStr);
-    let (raw_int, decimals) = format::extract_number_data(input);
+    let (raw_int, decimals) = format::extract_number_type(input);
 
     let expanded = quote! {
         multiversx_sc::types::ManagedDecimal::<<Self as ContractBase>::Api, multiversx_sc::types::ConstDecimals<#decimals>>::const_decimals_from_raw(multiversx_sc::types::BigUint::from(#raw_int))
@@ -105,7 +105,7 @@ pub fn managed_decimal(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
 #[proc_macro]
 pub fn debug_const_managed_decimal(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as syn::LitStr);
-    let (raw_int, decimals) = format::extract_number_data(input);
+    let (raw_int, decimals) = format::extract_number_type(input);
 
     let expanded = quote! {
         multiversx_sc::types::ManagedDecimal::<multiversx_sc_scenario::imports::StaticApi, multiversx_sc::types::ConstDecimals<#decimals>>::const_decimals_from_raw(multiversx_sc::types::BigUint::from(#raw_int))
