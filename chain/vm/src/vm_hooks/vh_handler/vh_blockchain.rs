@@ -163,7 +163,8 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             self.vm_error(&format!(
                 "account not found: {}",
                 hex::encode(address.as_bytes())
-            ))
+            ));
+            return;
         };
         let code_metadata_bytes = data.code_metadata.to_byte_array();
         self.m_types_lock()

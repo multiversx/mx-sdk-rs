@@ -93,7 +93,10 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
     fn bi_get_int64(&self, destination_handle: RawHandle) -> i64 {
         self.m_types_lock()
             .bi_to_i64(destination_handle)
-            .unwrap_or_else(|| self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE))
+            .unwrap_or_else(|| {
+                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+                0
+            })
     }
 
     binary_op_method! {bi_add, add}

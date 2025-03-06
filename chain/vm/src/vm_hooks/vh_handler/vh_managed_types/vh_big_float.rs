@@ -109,7 +109,10 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
             Some(Ordering::Less) => -1,
             Some(Ordering::Equal) => 0,
             Some(Ordering::Greater) => 1,
-            None => self.vm_error(vm_err_msg::CANNOT_COMPARE_VALUES),
+            None => {
+                self.vm_error(vm_err_msg::CANNOT_COMPARE_VALUES);
+                -2
+            },
         }
     }
 

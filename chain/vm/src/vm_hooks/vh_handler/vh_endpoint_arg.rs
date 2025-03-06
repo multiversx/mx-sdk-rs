@@ -42,6 +42,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
             v
         } else {
             self.vm_error("argument out of range");
+            0
         }
     }
 
@@ -53,6 +54,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
             v
         } else {
             self.vm_error("argument out of range");
+            0
         }
     }
 

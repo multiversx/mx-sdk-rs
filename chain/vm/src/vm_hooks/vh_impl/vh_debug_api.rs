@@ -75,7 +75,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         self.0.m_types_lock()
     }
 
-    fn halt_with_error(&self, status: ReturnCode, message: &str) -> ! {
+    fn halt_with_error(&self, status: ReturnCode, message: &str) {
         *self.0.result_lock() = TxResult::from_panic_obj(&TxPanic::new(status, message));
         let breakpoint = match status {
             ReturnCode::UserError => BreakpointValue::SignalError,
@@ -170,7 +170,8 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
             self.sync_call_post_processing(tx_result, blockchain_updates)
         } else {
             // also kill current execution
-            self.halt_with_error(tx_result.result_status, &tx_result.result_message)
+            self.halt_with_error(tx_result.result_status, &tx_result.result_message);
+            Vec::new()
         }
     }
 
@@ -194,7 +195,8 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
             self.sync_call_post_processing(tx_result, blockchain_updates)
         } else {
             // also kill current execution
-            self.halt_with_error(tx_result.result_status, &tx_result.result_message)
+            self.halt_with_error(tx_result.result_status, &tx_result.result_message);
+            Vec::new()
         }
     }
 
@@ -235,8 +237,16 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
                 new_address,
                 self.sync_call_post_processing(tx_result, blockchain_updates),
             ),
-            ReturnCode::ExecutionFailed => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
-            _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
+            ReturnCode::ExecutionFailed => {
+                // TODO: not sure it's the right condition, it catches insufficient funds
+                self.vm_error(&tx_result.result_message);
+                (VMAddress::zero(), Vec::new())
+            },
+            _ => {
+                self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
+
+                (VMAddress::zero(), Vec::new())
+            },
         }
     }
 
