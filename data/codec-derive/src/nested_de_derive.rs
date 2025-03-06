@@ -3,8 +3,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use quote::ToTokens;
 
-const BITFLAGS_PATH: &str = ":: __private :: PublicFlags :: Internal";
-const BITFLAGS_PRIMITIVE_PATH: &str = ":: __private :: PublicFlags > :: Primitive";
+const BITFLAGS_INTERNAL: &str = ":: __private :: PublicFlags :: Internal";
 const PRIMITIVE: &str = "Primitive";
 
 pub fn dep_decode_snippet(
@@ -100,7 +99,11 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
 fn sanitize_type_path(mut field: syn::Type) -> proc_macro2::TokenStream {
     if let syn::Type::Path(ref mut p) = field {
-        if p.path.to_token_stream().to_string().contains(BITFLAGS_PATH) {
+        if p.path
+            .to_token_stream()
+            .to_string()
+            .contains(BITFLAGS_INTERNAL)
+        {
             let modified_path = p.path.segments.last_mut().unwrap();
             modified_path.ident = syn::Ident::new(PRIMITIVE, modified_path.ident.span());
         }
@@ -113,23 +116,21 @@ fn dep_decode_body(
     name: &proc_macro2::Ident,
     field_dep_decode_snippets: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
-    let decode_body = if field_dep_decode_snippets
+    if field_dep_decode_snippets
         .to_string()
-        .contains(BITFLAGS_PRIMITIVE_PATH)
+        .contains(BITFLAGS_PRIMITIVE)
     {
-        quote! {
-            core::result::Result::Ok(
-                #name::from_bits #field_dep_decode_snippets
-                    .ok_or(__h__.handle_error(codec::DecodeError::INVALID_VALUE))?,
-            )
-        }
-    } else {
-        quote! {
-            core::result::Result::Ok(
-                #name #field_dep_decode_snippets
-            )
-        }
-    };
+        return quote!(
+            match #name::from_bits #field_dep_decode_snippets {
+                Some(r) => core::result::Result::Ok(r),
+                None => Err(__h__.handle_error(codec::DecodeError::INVALID_VALUE))
+            }
+        );
+    }
 
-    return decode_body;
+    quote! (
+        core::result::Result::Ok(
+            #name #field_dep_decode_snippets
+        )
+    )
 }

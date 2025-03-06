@@ -3,8 +3,6 @@ use quote::quote;
 
 use crate::{nested_de_derive::*, util::*};
 
-const BITFLAGS_PRIMITIVE_PATH: &str = ":: __private :: PublicFlags > :: Primitive";
-
 fn fieldless_enum_match_arm_result_ok(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
@@ -159,7 +157,7 @@ fn top_decode_body(
 ) -> proc_macro2::TokenStream {
     if field_dep_decode_snippets
         .to_string()
-        .contains(BITFLAGS_PRIMITIVE_PATH)
+        .contains(BITFLAGS_PRIMITIVE)
     {
         return quote! (
             #name::from_bits #field_dep_decode_snippets
