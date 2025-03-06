@@ -152,7 +152,6 @@ pub trait AbiTester {
         ManagedVec::new()
     }
 
-
     #[view]
     fn echo_permission(&self, p: Permission) -> Permission {
         p
