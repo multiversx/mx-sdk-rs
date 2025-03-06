@@ -1,7 +1,7 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
 use multiversx_sc_snippets::{
     imports::{
-        BigUint, EgldDecimals, ESDTSystemSCAddress, ESDTSystemSCProxy, EsdtTokenPayment,
+        BigUint, ESDTSystemSCAddress, ESDTSystemSCProxy, EgldDecimals, EsdtTokenPayment,
         FungibleTokenProperties, ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec,
         ReturnsNewTokenIdentifier, RustBigUint, StaticApi, TokenIdentifier,
     },
