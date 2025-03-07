@@ -24,6 +24,7 @@ add-endpoints = [
     "load_bytes",
     "returns_egld_decimal",
     "echo_managed_option",
+    "token_has_transfer_role",
     "timelock_mapper",
     "timelock_set_initial_value",
     "timelock_set_unlock_timestamp",

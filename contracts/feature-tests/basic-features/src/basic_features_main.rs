@@ -21,6 +21,7 @@ pub mod managed_decimal_features;
 pub mod managed_vec_features;
 pub mod non_zero_features;
 pub mod small_num_overflow_test_ops;
+pub mod special_roles_from_system_account;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_address_to_id;
@@ -63,6 +64,7 @@ pub trait BasicFeatures:
     + storage_raw_api_features::StorageRawApiFeatures
     + storage_direct_load::StorageLoadFeatures
     + storage_direct_store::StorageStoreFeatures
+    + special_roles_from_system_account::RetrieveSpecialRoles
     + storage_mapper_single_locked::SingleValueMapperLockedFeatures
     + storage_mapper_address_to_id::AddressToIdMapperFeatures
     + storage_mapper_linked_list::LinkedListMapperFeatures
