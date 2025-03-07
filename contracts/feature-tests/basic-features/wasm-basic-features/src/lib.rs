@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          415
+// Endpoints:                          424
 // Async Callback:                       1
-// Total number of exported functions: 417
+// Total number of exported functions: 426
 
 #![no_std]
 
@@ -260,6 +260,15 @@ multiversx_sc_wasm_adapter::endpoints! {
         store_reserved_big_uint => store_reserved_big_uint
         store_reserved_vec_u8 => store_reserved_vec_u8
         token_has_transfer_role => token_has_transfer_role
+        timelock_mapper => timelock_mapper
+        timelock_set_initial_value => timelock_set_initial_value
+        timelock_set_unlock_timestamp => timelock_set_unlock_timestamp
+        timelock_commit_action => timelock_commit_action
+        timelock_get_unlock_timestamp => timelock_get_unlock_timestamp
+        timelock_get_future_value => timelock_get_future_value
+        timelock_get_current_value_at_address => timelock_get_current_value_at_address
+        timelock_get_unlock_timestamp_at_address => timelock_get_unlock_timestamp_at_address
+        timelock_get_future_value_at_address => timelock_get_future_value_at_address
         address_to_id_mapper_get_id => address_to_id_mapper_get_id
         address_to_id_mapper_get_id_non_zero => address_to_id_mapper_get_id_non_zero
         address_to_id_mapper_get_address => address_to_id_mapper_get_address
