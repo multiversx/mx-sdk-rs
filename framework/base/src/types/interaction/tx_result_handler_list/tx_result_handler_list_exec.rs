@@ -17,9 +17,7 @@ where
     /// which represents the "expect" field produces by the other result handlers.
     ///
     /// The default behavior is to leave it unchanged.
-    ///
-    /// TODO: rename to `item_preprocessing` on next minor release.
-    fn item_tx_expect(&self, prev: Env::RHExpect) -> Env::RHExpect {
+    fn item_preprocessing(&self, prev: Env::RHExpect) -> Env::RHExpect {
         prev
     }
 
@@ -38,7 +36,7 @@ where
     /// The operation starts with the default "expect" field, which normally has all fields unspecified, except
     /// for the "status", which is by default set to "0". This means that failing transactions will cause a panic
     /// unless explicitly stated in one of the result handlers.
-    fn list_tx_expect(&self) -> Env::RHExpect;
+    fn list_preprocessing(&self) -> Env::RHExpect;
 
     /// Aggregates the executions of all result handlers, as configured for a transaction.
     fn list_process_result(self, raw_result: &RawResult) -> Self::ListReturns;
@@ -48,7 +46,7 @@ impl<RawResult, Env> RHListExec<RawResult, Env> for ()
 where
     Env: TxEnv,
 {
-    fn list_tx_expect(&self) -> Env::RHExpect {
+    fn list_preprocessing(&self) -> Env::RHExpect {
         Env::RHExpect::default()
     }
 
@@ -59,7 +57,7 @@ impl<RawResult, Env, O> RHListExec<RawResult, Env> for OriginalResultMarker<O>
 where
     Env: TxEnv,
 {
-    fn list_tx_expect(&self) -> Env::RHExpect {
+    fn list_preprocessing(&self) -> Env::RHExpect {
         Env::RHExpect::default()
     }
 
@@ -72,8 +70,8 @@ where
     Head: RHListItemExec<RawResult, Env, Tail::OriginalResult>,
     Tail: RHListExec<RawResult, Env>,
 {
-    fn list_tx_expect(&self) -> Env::RHExpect {
-        self.head.item_tx_expect(self.tail.list_tx_expect())
+    fn list_preprocessing(&self) -> Env::RHExpect {
+        self.head.item_preprocessing(self.tail.list_preprocessing())
     }
 
     fn list_process_result(self, raw_result: &RawResult) -> Self::ListReturns {
@@ -89,8 +87,8 @@ where
     Head: RHListItemExec<RawResult, Env, Tail::OriginalResult, Returns = ()>,
     Tail: RHListExec<RawResult, Env>,
 {
-    fn list_tx_expect(&self) -> Env::RHExpect {
-        self.head.item_tx_expect(self.tail.list_tx_expect())
+    fn list_preprocessing(&self) -> Env::RHExpect {
+        self.head.item_preprocessing(self.tail.list_preprocessing())
     }
 
     fn list_process_result(self, raw_result: &RawResult) -> Self::ListReturns {

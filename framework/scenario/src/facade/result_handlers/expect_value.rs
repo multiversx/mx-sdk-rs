@@ -26,7 +26,7 @@ where
     T: TopEncodeMulti,
     Original: TypeAbiFrom<T>,
 {
-    fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+    fn item_preprocessing(&self, mut prev: TxExpect) -> TxExpect {
         let mut encoded = Vec::<Vec<u8>>::new();
         self.0.multi_encode(&mut encoded).expect("encoding error");
         let out_values = encoded
