@@ -10,11 +10,13 @@ pub type RawHandle = i32;
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-pub(crate) fn top_encode_u64(value: u64) -> Vec<u8> {
+/// Helper function to quickly encode a u64 value, according to the MultiversX codec format.
+pub fn top_encode_u64(value: u64) -> Vec<u8> {
     top_encode_big_uint(&BigUint::from(value))
 }
 
-pub(crate) fn top_encode_big_uint(value: &BigUint) -> Vec<u8> {
+/// Helper function to quickly encode a BigUint value, according to the MultiversX codec format.
+pub fn top_encode_big_uint(value: &BigUint) -> Vec<u8> {
     if value.is_zero() {
         Vec::new()
     } else {

@@ -1,6 +1,5 @@
 #![no_std]
 #![allow(deprecated)]
-
 pub use multiversx_sc_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types
@@ -14,6 +13,9 @@ pub use multiversx_chain_core as chain_core;
 
 /// Reexported for convenience.
 pub use crate::codec::arrayvec;
+
+/// Reexported for convenience.
+pub use generic_array::typenum;
 
 pub mod abi;
 pub mod api;

@@ -1,13 +1,13 @@
-use crate::api::{ErrorApi, ManagedTypeApi};
-
-use super::CallbackClosureForDeser;
-
 /// Used internally between the `callback` and `callback_selector` methods.
 /// It is likely to be removed in the future.
-pub enum CallbackSelectorResult<A>
-where
-    A: ManagedTypeApi + ErrorApi,
-{
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum CallbackSelectorResult {
     Processed,
-    NotProcessed(CallbackClosureForDeser<A>),
+    NotProcessed,
+}
+
+impl CallbackSelectorResult {
+    pub fn is_processed(self) -> bool {
+        matches!(self, CallbackSelectorResult::Processed)
+    }
 }

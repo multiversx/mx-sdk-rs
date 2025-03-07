@@ -24,7 +24,8 @@ multiversx_sc::derive_imports!();
 /// * cancelling a subscription
 /// * getting the expiration
 ///
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct SubscriptionAttributes<T: NestedEncode + NestedDecode + TypeAbi> {
     pub expiration: u64,
     pub attributes: T,

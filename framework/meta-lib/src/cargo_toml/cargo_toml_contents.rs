@@ -328,11 +328,10 @@ fn is_dep_path_above(dep: &Value) -> bool {
     false
 }
 
-pub fn change_from_base_to_adapter_path(base_path: &str) -> String {
-    format!(
-        "../{}",
-        base_path.to_string().replace("base", "wasm-adapter")
-    )
+pub fn change_from_base_to_adapter_path(base_path: &Path) -> PathBuf {
+    let path = base_path.to_string_lossy().replace("base", "wasm-adapter");
+
+    Path::new("..").join(path)
 }
 
 /// TODO: still useful?
@@ -348,20 +347,30 @@ mod tests {
 
     #[test]
     fn test_change_from_base_to_adapter_path() {
-        let base_path = "../../../framework/base";
-        let adapter_path = "../../../../framework/wasm-adapter".to_string();
+        let base_path = Path::new("..")
+            .join("..")
+            .join("..")
+            .join("framework")
+            .join("base");
+        let adapter_path = Path::new("..")
+            .join("..")
+            .join("..")
+            .join("..")
+            .join("framework")
+            .join("wasm-adapter");
+
         assert_eq!(
-            super::change_from_base_to_adapter_path(base_path),
+            super::change_from_base_to_adapter_path(&base_path),
             adapter_path
         );
     }
 
     const CARGO_TOML_RAW: &str = r#"
 [dependencies.by-version-1]
-version = "1.2.30"
+version = "0.54.0"
 
 [dependencies.by-version-1-strict]
-version = "=1.2.31"
+version = "=0.54.1"
 
 [dependencies.by-git-commit-1]
 git = "https://github.com/multiversx/repo1"
@@ -371,28 +380,28 @@ rev = "85c31b9ce730bd5ffe41589c353d935a14baaa96"
 path = "a/b/c"
 
 [dependencies]
-by-version-2 = "4.5.60"
-by-version-2-strict = "=4.5.61"
+by-version-2 = "0.54.2"
+by-version-2-strict = "=0.54.3"
 by-path-2 = { path = "d/e/f" }
 by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be823f26d1e7f59c71536d337b7240dc3fa2" }
     "#;
 
     #[test]
     fn test_dependency_value() {
-        let cargo_toml = CargoTomlContents::parse_string(CARGO_TOML_RAW, "/test".as_ref());
+        let cargo_toml = CargoTomlContents::parse_string(CARGO_TOML_RAW, Path::new("test"));
 
         // version
         let raw_value = cargo_toml.dependency_raw_value("by-version-1").unwrap();
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                version: Some("1.2.30".to_owned()),
+                version: Some("0.54.0".to_owned()),
                 ..Default::default()
             },
         );
         assert_eq!(
             raw_value.interpret(),
-            DependencyReference::Version(VersionReq::from_version_str("1.2.30")),
+            DependencyReference::Version(VersionReq::from_version_str("0.54.0").unwrap()),
         );
 
         // version, strict
@@ -402,13 +411,13 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                version: Some("=1.2.31".to_owned()),
+                version: Some("=0.54.1".to_owned()),
                 ..Default::default()
             },
         );
         assert_eq!(
             raw_value.interpret(),
-            DependencyReference::Version(VersionReq::from_version_str("1.2.31").strict()),
+            DependencyReference::Version(VersionReq::from_version_str("0.54.1").unwrap().strict()),
         );
 
         // version, compact
@@ -416,13 +425,13 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                version: Some("4.5.60".to_owned()),
+                version: Some("0.54.2".to_owned()),
                 ..Default::default()
             },
         );
         assert_eq!(
             raw_value.interpret(),
-            DependencyReference::Version(VersionReq::from_version_str("4.5.60")),
+            DependencyReference::Version(VersionReq::from_version_str("0.54.2").unwrap()),
         );
 
         // version, compact, strict
@@ -432,13 +441,13 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                version: Some("=4.5.61".to_owned()),
+                version: Some("=0.54.3".to_owned()),
                 ..Default::default()
             },
         );
         assert_eq!(
             raw_value.interpret(),
-            DependencyReference::Version(VersionReq::from_version_str("4.5.61").strict()),
+            DependencyReference::Version(VersionReq::from_version_str("0.54.3").unwrap().strict()),
         );
 
         // git
@@ -479,30 +488,26 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
 
         // path
         let raw_value = cargo_toml.dependency_raw_value("by-path-1").unwrap();
+        let path = Path::new("a").join("b").join("c");
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                path: Some("a/b/c".to_owned()),
+                path: Some(path.clone()),
                 ..Default::default()
             },
         );
-        assert_eq!(
-            raw_value.interpret(),
-            DependencyReference::Path("a/b/c".to_owned()),
-        );
+        assert_eq!(raw_value.interpret(), DependencyReference::Path(path),);
 
         // path, compact
         let raw_value = cargo_toml.dependency_raw_value("by-path-2").unwrap();
+        let path = Path::new("d").join("e").join("f");
         assert_eq!(
             raw_value,
             DependencyRawValue {
-                path: Some("d/e/f".to_owned()),
+                path: Some(path.clone()),
                 ..Default::default()
             },
         );
-        assert_eq!(
-            raw_value.interpret(),
-            DependencyReference::Path("d/e/f".to_owned()),
-        );
+        assert_eq!(raw_value.interpret(), DependencyReference::Path(path),);
     }
 }

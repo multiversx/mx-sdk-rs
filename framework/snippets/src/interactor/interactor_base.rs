@@ -5,9 +5,11 @@ use multiversx_sc_scenario::{
     meta::tools::find_current_workspace,
     multiversx_sc::types::Address,
 };
-use multiversx_sdk::gateway::{GatewayAsyncService, NetworkConfigRequest};
+use multiversx_sdk::gateway::{GatewayAsyncService, NetworkConfigRequest, SetStateAccount};
 use std::{
     collections::HashMap,
+    fs::File,
+    io::BufReader,
     path::{Path, PathBuf},
     time::Duration,
 };
@@ -15,6 +17,7 @@ use std::{
 use crate::{account_tool::retrieve_account_as_scenario_set_state, Sender};
 
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
+pub const INTERACTOR_SET_STATE_PATH: &str = "set_state.json";
 
 pub struct InteractorBase<GatewayProxy>
 where
@@ -37,12 +40,12 @@ where
     GatewayProxy: GatewayAsyncService,
 {
     /// Not yet changed for backwards compatibility.
-    pub async fn new(gateway_uri: &str, use_chain_simulator: bool) -> Self {
+    pub async fn new(gateway_uri: &str) -> Self {
         let proxy = GatewayProxy::from_uri(gateway_uri);
         let network_config = proxy.request(NetworkConfigRequest).await.unwrap();
         Self {
             proxy,
-            use_chain_simulator,
+            use_chain_simulator: false,
             network_config,
             sender_map: HashMap::new(),
             waiting_time_ms: 0,
@@ -50,6 +53,11 @@ where
             post_runners: ScenarioRunnerList::empty(),
             current_dir: PathBuf::default(),
         }
+    }
+
+    pub fn use_chain_simulator(mut self, use_chain_simulator: bool) -> Self {
+        self.use_chain_simulator = use_chain_simulator;
+        self
     }
 
     pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
@@ -80,9 +88,33 @@ where
     }
 
     pub async fn retrieve_account(&mut self, wallet_address: &Bech32Address) {
-        let set_state = retrieve_account_as_scenario_set_state(&self.proxy, wallet_address).await;
-        self.pre_runners.run_set_state_step(&set_state);
-        self.post_runners.run_set_state_step(&set_state);
+        let (set_state_account, set_state_step) =
+            retrieve_account_as_scenario_set_state(&self.proxy, wallet_address).await;
+        self.pre_runners.run_set_state_step(&set_state_step);
+        self.post_runners.run_set_state_step(&set_state_step);
+
+        let path = self.get_state_file_path();
+        set_state_account.add_to_state_file(path.as_path());
+    }
+
+    pub fn get_state_file_path(&self) -> PathBuf {
+        self.current_dir.join(INTERACTOR_SET_STATE_PATH)
+    }
+
+    pub fn get_accounts_from_file(&self) -> Vec<SetStateAccount> {
+        let file_path = self.get_state_file_path();
+
+        if !file_path.exists() {
+            return Vec::new();
+        }
+
+        let file = File::open(file_path).expect("Failed to open state file");
+        let reader = BufReader::new(file);
+
+        serde_json::from_reader(reader).unwrap_or_else(|_| {
+            println!("Failed to parse state file; returning an empty list of accounts");
+            Vec::new()
+        })
     }
 
     /// Tells the interactor where the crate lies relative to the workspace.

@@ -1,7 +1,7 @@
 use super::VmApiImpl;
 use multiversx_sc::api::{CallValueApi, CallValueApiImpl};
 
-extern "C" {
+unsafe extern "C" {
     fn checkNoPayment();
 
     fn bigIntGetCallValue(dest: i32);

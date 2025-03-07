@@ -82,6 +82,13 @@ pub trait VMHooksHandlerSource: Debug {
         args: Vec<Vec<u8>>,
     ) -> Vec<Vec<u8>>;
 
+    fn perform_execute_on_dest_context_readonly(
+        &self,
+        to: VMAddress,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>>;
+
     fn perform_deploy(
         &self,
         egld_value: num_bigint::BigUint,

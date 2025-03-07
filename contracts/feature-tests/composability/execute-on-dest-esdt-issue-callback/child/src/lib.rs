@@ -17,11 +17,11 @@ pub trait Child {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 &initial_supply,
@@ -46,7 +46,7 @@ pub trait Child {
     #[callback]
     fn esdt_issue_callback(&self, #[call_result] _result: IgnoreValue) {
         let (token_identifier, _amount) = self.call_value().single_fungible_esdt();
-        self.wrapped_egld_token_identifier().set(&token_identifier);
+        self.wrapped_egld_token_identifier().set(token_identifier);
     }
 
     // storage

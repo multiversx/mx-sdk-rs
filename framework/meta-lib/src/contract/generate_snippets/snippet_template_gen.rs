@@ -9,8 +9,8 @@ pub(crate) fn write_snippet_imports(file: &mut File) {
         file,
         "#![allow(non_snake_case)]
 
+pub mod config;
 mod proxy;
-mod config;
 
 use config::Config;
 use multiversx_sc_snippets::imports::*;
@@ -18,8 +18,7 @@ use serde::{{Deserialize, Serialize}};
 use std::{{
     io::{{Read, Write}},
     path::Path,
-}};
-"
+}};"
     )
     .unwrap();
 
@@ -28,21 +27,20 @@ use std::{{
 
 pub(crate) fn write_snippet_constants(file: &mut File) {
     writeln!(file, "const STATE_FILE: &str = \"state.toml\";").unwrap();
-
-    write_newline(file);
 }
 
-pub(crate) fn write_snippet_main_function(file: &mut File, abi: &ContractAbi) {
+pub(crate) fn write_snippet_main_function(file: &mut File, abi: &ContractAbi, crate_name: &str) {
     writeln!(
         file,
-        "#[tokio::main]
-async fn main() {{
+        "
+pub async fn {crate_name}_cli() {{
     env_logger::init();
 
     let mut args = std::env::args();
     let _ = args.next();
     let cmd = args.next().expect(\"at least one argument required\");
-    let mut interact = ContractInteract::new().await;
+    let config = Config::new();
+    let mut interact = ContractInteract::new(config).await;
     match cmd.as_str() {{"
     )
     .unwrap();
@@ -76,14 +74,12 @@ async fn main() {{
 }}"
     )
     .unwrap();
-
-    write_newline(file);
 }
 
 pub(crate) fn write_interact_struct_declaration(file: &mut File) {
     writeln!(
         file,
-        "struct ContractInteract {{
+        "pub struct ContractInteract {{
     interactor: Interactor,
     wallet_address: Address,
     contract_code: BytesValue,
@@ -100,7 +96,7 @@ pub(crate) fn write_state_struct_declaration(file: &mut File) {
         file,
         "
 #[derive(Debug, Default, Serialize, Deserialize)]
-struct State {{
+pub struct State {{
     contract_address: Option<Bech32Address>
 }}"
     )
@@ -162,8 +158,6 @@ use std::io::Read;
 "
     )
     .unwrap();
-
-    write_newline(file);
 }
 
 pub(crate) fn write_config_constants(file: &mut File) {
@@ -174,8 +168,6 @@ const CONFIG_FILE: &str = \"config.toml\";
 "
     )
     .unwrap();
-
-    write_newline(file);
 }
 
 pub(crate) fn write_config_struct_declaration(file: &mut File) {
@@ -186,19 +178,17 @@ pub(crate) fn write_config_struct_declaration(file: &mut File) {
 pub enum ChainType {{
     Real,
     Simulator,
-    }}
+}}
 
 /// Contract Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {{
     pub gateway_uri: String,
     pub chain_type: ChainType,
-    }}
+}}
 "#
     )
     .unwrap();
-
-    write_newline(file);
 }
 
 pub(crate) fn write_config_struct_impl(file: &mut File) {
@@ -217,7 +207,7 @@ pub(crate) fn write_config_struct_impl(file: &mut File) {
         Config {{
             gateway_uri: "http://localhost:8085".to_owned(),
             chain_type: ChainType::Simulator,
-    }}
+        }}
     }}
 
     // Returns the gateway URI
@@ -230,12 +220,49 @@ pub(crate) fn write_config_struct_impl(file: &mut File) {
         match self.chain_type {{
             ChainType::Real => false,
             ChainType::Simulator => true,
+        }}
     }}
-    }}
-    }}
-"#
+}}"#
     )
     .unwrap();
+}
 
-    write_newline(file);
+pub(crate) fn write_chain_sim_test_to_file(file: &mut File, crate_name: &str) {
+    writeln!(
+        file,
+        r#"use multiversx_sc_snippets::imports::*;
+use rust_interact::{{config::Config, ContractInteract}};
+
+// Simple deploy test that runs using the chain simulator configuration.
+// In order for this test to work, make sure that the `config.toml` file contains the chain simulator config (or choose it manually)
+// The chain simulator should already be installed and running before attempting to run this test.
+// The chain-simulator-tests feature should be present in Cargo.toml.
+// Can be run with `sc-meta test -c`.
+#[tokio::test]
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+async fn deploy_test_{crate_name}_cs() {{
+    let mut interactor = ContractInteract::new(Config::chain_simulator_config()).await;
+
+    interactor.deploy().await;
+}}"#
+    ).unwrap()
+}
+
+pub(crate) fn write_interactor_test_to_file(file: &mut File, crate_name: &str) {
+    writeln!(
+        file,
+        r#"use multiversx_sc_snippets::imports::*;
+use rust_interact::{{config::Config, ContractInteract}};
+
+// Simple deploy test that runs on the real blockchain configuration.
+// In order for this test to work, make sure that the `config.toml` file contains the real blockchain config (or choose it manually)
+// Can be run with `sc-meta test`.
+#[tokio::test]
+#[ignore = "run on demand, relies on real blockchain state"]
+async fn deploy_test_{crate_name}() {{
+    let mut interactor = ContractInteract::new(Config::new()).await;
+
+    interactor.deploy().await;
+}}"#
+    ).unwrap()
 }

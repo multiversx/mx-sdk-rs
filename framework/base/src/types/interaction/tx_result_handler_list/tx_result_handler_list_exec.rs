@@ -17,6 +17,8 @@ where
     /// which represents the "expect" field produces by the other result handlers.
     ///
     /// The default behavior is to leave it unchanged.
+    ///
+    /// TODO: rename to `item_preprocessing` on next minor release.
     fn item_tx_expect(&self, prev: Env::RHExpect) -> Env::RHExpect {
         prev
     }

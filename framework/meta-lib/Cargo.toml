@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta-lib"
-version = "0.54.0"
+version = "0.56.1"
 edition = "2021"
 
 authors = [
@@ -22,16 +22,16 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rustc_version = "0.4"
 toml = { version = "0.8.6", features = ["preserve_order"] }
-colored = "2.0"
+colored = "2.2"                                             # TODO: doesn't support >v2.2 (can't build on nightly)
 lazy_static = "1.4.0"
-convert_case = "0.6.0"
+convert_case = "0.7.1"
 hex = "0.4"
-wasmparser = "0.216"
-wasmprinter = "0.216"
+wasmparser = "0.224"
+wasmprinter = "0.224"
 semver = "1.0.20"
 wat = "1.217.0"
 
 [dependencies.multiversx-sc]
-version = "=0.54.0"
+version = "=0.56.1"
 path = "../base"
 features = ["alloc", "num-bigint"]

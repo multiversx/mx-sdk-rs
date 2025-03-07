@@ -236,6 +236,19 @@ where
             .original_result()
     }
 
+    pub fn process_managed_decimal<
+        Arg0: ProxyArg<ManagedDecimal<Env::Api, ConstDecimals<U10>>>,
+    >(
+        self,
+        input: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedDecimal<Env::Api, usize>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("process_managed_decimal")
+            .argument(&input)
+            .original_result()
+    }
+
     pub fn esdt_local_role(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EsdtLocalRole> {
@@ -438,7 +451,7 @@ pub struct OnlyShowsUpAsNested02 {
 
 #[rustfmt::skip]
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum AbiEnum {
     Nothing,
     Something(i32),
@@ -553,7 +566,7 @@ pub struct OnlyShowsUpInEsdtAttr {
 pub struct OnlyShowsUpAsNested10 {}
 
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
     Zero,
     Thirty,
@@ -564,7 +577,7 @@ pub enum ExplicitDiscriminant {
 
 #[rustfmt::skip]
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminantMixed {
     Zero,
     Unit,
@@ -582,5 +595,5 @@ pub struct ManagedDecimalWrapper<Api>
 where
     Api: ManagedTypeApi,
 {
-    pub field: ManagedDecimal<Api, ConstDecimals<2>>,
+    pub field: ManagedDecimal<Api, ConstDecimals<U2>>,
 }
