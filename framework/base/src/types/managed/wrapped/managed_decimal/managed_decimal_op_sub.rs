@@ -1,5 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
+    typenum::Unsigned,
     types::{ConstDecimals, Decimals, ManagedDecimal, NumDecimals},
 };
 
@@ -24,7 +25,7 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> SubAssign<ManagedDecimal<M, 
 }
 
 // const + const
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> Sub<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     type Output = Self;
@@ -56,7 +57,7 @@ impl<M: ManagedTypeApi> Sub<ManagedDecimal<M, NumDecimals>> for ManagedDecimal<M
 }
 
 // var + const
-impl<const DECIMALS: usize, M: ManagedTypeApi> Sub<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Sub<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
     for ManagedDecimal<M, NumDecimals>
 {
     type Output = ManagedDecimal<M, NumDecimals>;
@@ -67,7 +68,7 @@ impl<const DECIMALS: usize, M: ManagedTypeApi> Sub<ManagedDecimal<M, ConstDecima
 }
 
 // const + var
-impl<const DECIMALS: usize, M: ManagedTypeApi> Sub<ManagedDecimal<M, NumDecimals>>
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Sub<ManagedDecimal<M, NumDecimals>>
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     type Output = ManagedDecimal<M, NumDecimals>;

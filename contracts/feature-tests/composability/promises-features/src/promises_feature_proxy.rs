@@ -151,6 +151,24 @@ where
             .original_result()
     }
 
+    pub fn promise_raw_single_token_to_user<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<u64>,
+    >(
+        self,
+        to: Arg0,
+        gas_limit: Arg1,
+        extra_gas_for_callback: Arg2,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("promise_raw_single_token_to_user")
+            .argument(&to)
+            .argument(&gas_limit)
+            .argument(&extra_gas_for_callback)
+            .original_result()
+    }
+
     pub fn promise_raw_single_token<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,

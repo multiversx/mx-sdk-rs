@@ -5,7 +5,7 @@ use crate::{
     api::ErrorApiImpl,
     codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     storage::mappers::{
-        set_mapper::{CurrentStorage, StorageAddress},
+        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
     },
     storage_clear, storage_get, storage_get_len, storage_set,

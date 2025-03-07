@@ -1,5 +1,11 @@
+use core::{
+    marker::PhantomData,
+    ops::{Add, Sub},
+};
+
 use crate::{
     api::{const_handles, use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
+    typenum::{Unsigned, U18, U9},
     types::{BigUint, ManagedRef},
 };
 
@@ -26,16 +32,58 @@ impl Decimals for NumDecimals {
 /// Zero-sized constant number of decimals.
 ///
 /// Ideal if the number of decimals is known at compile time.
-#[derive(Clone, Debug)]
-pub struct ConstDecimals<const DECIMALS: NumDecimals>;
+#[derive(Clone, Default, Debug)]
+pub struct ConstDecimals<DECIMALS: Unsigned> {
+    _phantom: PhantomData<DECIMALS>,
+}
 
-impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
+/// Alias of the const decimal type that we use to compute the logarithm.
+///
+/// We always compute it with 9 decimals.
+pub type LnDecimals = ConstDecimals<U9>;
+
+/// Alias of the type that represents the number of decimal of the EGLD, which is 18.
+pub type EgldDecimals = ConstDecimals<U18>;
+
+impl<DECIMALS: Unsigned> ConstDecimals<DECIMALS> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl<DECIMALS: Unsigned> Decimals for ConstDecimals<DECIMALS> {
     fn num_decimals(&self) -> NumDecimals {
-        DECIMALS
+        DECIMALS::to_usize()
     }
 
     fn scaling_factor<M: ManagedTypeApi>(&self) -> ManagedRef<'static, M, BigUint<M>> {
         scaling_factor(self.num_decimals())
+    }
+}
+
+impl<DEC1, DEC2> Add<ConstDecimals<DEC2>> for ConstDecimals<DEC1>
+where
+    DEC1: Unsigned,
+    DEC2: Unsigned,
+    DEC1: Add<DEC2>,
+    <DEC1 as Add<DEC2>>::Output: Unsigned,
+{
+    type Output = ConstDecimals<<DEC1 as Add<DEC2>>::Output>;
+    fn add(self, _rhs: ConstDecimals<DEC2>) -> Self::Output {
+        ConstDecimals::new()
+    }
+}
+
+impl<DEC1, DEC2> Sub<ConstDecimals<DEC2>> for ConstDecimals<DEC1>
+where
+    DEC1: Unsigned,
+    DEC2: Unsigned,
+    DEC1: Sub<DEC2>,
+    <DEC1 as Sub<DEC2>>::Output: Unsigned,
+{
+    type Output = ConstDecimals<<DEC1 as Sub<DEC2>>::Output>;
+    fn sub(self, _rhs: ConstDecimals<DEC2>) -> Self::Output {
+        ConstDecimals::new()
     }
 }
 

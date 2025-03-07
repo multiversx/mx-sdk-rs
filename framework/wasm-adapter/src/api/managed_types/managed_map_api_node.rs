@@ -1,7 +1,7 @@
 use multiversx_sc::api::ManagedMapApiImpl;
 
 #[allow(dead_code)]
-extern "C" {
+unsafe extern "C" {
     fn managedMapNew() -> i32;
     fn managedMapPut(map_handle: i32, key_handle: i32, value_handle: i32) -> i32;
     fn managedMapGet(map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32;
