@@ -17,7 +17,7 @@ keywords = ["multiversx", "blockchain", "vm", "tools"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
-bitflags = "=2.8.0"
+bitflags = "=2.9.0"
 
 [dependencies.multiversx-sc-codec]
 version = "=0.21.2"
