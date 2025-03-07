@@ -28,7 +28,7 @@ serde = "1.0"
 serde_json = "1.0"
 pathdiff = "0.2.1"
 itertools = "0.14.0"
-colored = "2.2"             # TODO: doesn't support >v2.2 (can't build on nightly)
+colored = "3.0"
 unwrap-infallible = "0.1.5"
 
 [features]
