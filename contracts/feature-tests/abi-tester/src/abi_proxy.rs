@@ -535,7 +535,7 @@ pub struct AbiManagedVecItem {
 
 #[type_abi]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, NestedDecode, NestedEncode, TopEncode, TopDecode)]
-pub struct Permission (u32);
+pub struct Permission(u32);
 
 #[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]

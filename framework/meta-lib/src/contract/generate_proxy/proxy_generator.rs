@@ -444,14 +444,13 @@ where
         }
 
         self.start_write_type("enum", type_description, name);
-        self.write("{");
 
         if enum_variants.is_empty() {
-            self.writeln("}");
+            self.writeln(" {}");
             return;
         }
 
-        self.writeln("");
+        self.insert_open_brace(name);
 
         for variant in enum_variants {
             self.write(format!("    {}", variant.name));
@@ -478,16 +477,16 @@ where
         self.start_write_type("struct", type_description, name);
 
         if struct_fields.is_empty() {
-            self.writeln("{}");
+            self.writeln(" {}");
             return;
         }
 
         if struct_fields.len() == 1 && struct_fields[0].name == ZERO {
-            self.write_tuple_in_variant(&struct_fields, SEMICOLON);
+            self.write_tuple_in_variant(struct_fields, SEMICOLON);
             return;
         }
 
-        self.writeln("{");
+        self.insert_open_brace(name);
 
         for field in struct_fields {
             let adjusted_type_name = self.adjust_type_name_with_api(&field.field_type.rust);
@@ -537,8 +536,6 @@ where
         type_description: &TypeDescription,
         name: &str,
     ) {
-        self.writeln("");
-        self.writeln("#[type_abi]");
         self.write_macro_attributes(&type_description.macro_attributes);
         self.write(format!(r#"pub {type_type} {name}"#));
 
@@ -548,12 +545,18 @@ where
 where
     Api: ManagedTypeApi,",
             );
-        } else {
-            self.write(" ");
         }
     }
 
-    pub fn write_macro_attributes(&mut self, macro_attributes: &[String]) {
+    fn insert_open_brace(&mut self, name: &str) {
+        let brace = if name.contains("<Api>") { "{" } else { " {" };
+        self.writeln(brace);
+    }
+
+    fn write_macro_attributes(&mut self, macro_attributes: &[String]) {
+        self.writeln("");
+        self.writeln("#[type_abi]");
+
         if macro_attributes.is_empty() {
             self.writeln("#[derive(TopEncode, TopDecode)]");
         } else {
