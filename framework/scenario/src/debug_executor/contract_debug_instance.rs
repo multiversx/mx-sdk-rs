@@ -11,17 +11,17 @@ use super::{catch_tx_panic, ContractContainerRef, StaticVarStack};
 
 /// Used as a flag to check the instance under lambda calls.
 /// Since it is an invalid function name, any other instance should reject it.
-const DEBUG_SC_INSTANCE_CONTEXT_PUSH: &str = "<DebugSCInstance-PushContext>";
-const DEBUG_SC_INSTANCE_CONTEXT_POP: &str = "<DebugSCInstance-PopContext>";
+const FUNC_CONTEXT_PUSH: &str = "<ContractDebugInstance-PushContext>";
+const FUNC_CONTEXT_POP: &str = "<ContractDebugInstance-PopContext>";
 
-pub struct DebugSCInstance {
+pub struct ContractDebugInstance {
     pub tx_context_ref: TxContextRef,
     pub contract_container_ref: ContractContainerRef,
 }
 
-impl DebugSCInstance {
+impl ContractDebugInstance {
     pub fn new(tx_context_ref: TxContextRef, contract_container: ContractContainerRef) -> Self {
-        DebugSCInstance {
+        ContractDebugInstance {
             tx_context_ref,
             contract_container_ref: contract_container,
         }
@@ -42,13 +42,11 @@ impl DebugSCInstance {
         // );
 
         assert!(
-            instance_call
-                .instance
-                .has_function(DEBUG_SC_INSTANCE_CONTEXT_PUSH),
+            instance_call.instance.has_function(FUNC_CONTEXT_PUSH),
             "lambda call is not running on top of a DebugSCInstance instance"
         );
 
-        let _ = instance_call.instance.call(DEBUG_SC_INSTANCE_CONTEXT_PUSH);
+        let _ = instance_call.instance.call(FUNC_CONTEXT_PUSH);
 
         let result = catch_tx_panic(panic_message_flag, || {
             f();
@@ -59,7 +57,7 @@ impl DebugSCInstance {
             TxContextStack::static_peek().replace_tx_result_with_error(tx_panic);
         }
 
-        let _ = instance_call.instance.call(DEBUG_SC_INSTANCE_CONTEXT_POP);
+        let _ = instance_call.instance.call(FUNC_CONTEXT_POP);
     }
 
     fn call_endpoint(&self, func_name: &str) -> Result<(), String> {
@@ -93,15 +91,15 @@ impl DebugSCInstance {
     }
 }
 
-impl Instance for DebugSCInstance {
+impl Instance for ContractDebugInstance {
     fn call(&self, func_name: &str) -> Result<(), String> {
         match func_name {
-            DEBUG_SC_INSTANCE_CONTEXT_PUSH => {
+            FUNC_CONTEXT_PUSH => {
                 TxContextStack::static_push(self.tx_context_ref.clone());
                 StaticVarStack::static_push();
                 Ok(())
             },
-            DEBUG_SC_INSTANCE_CONTEXT_POP => {
+            FUNC_CONTEXT_POP => {
                 TxContextStack::static_pop();
                 StaticVarStack::static_pop();
                 Ok(())
@@ -116,8 +114,8 @@ impl Instance for DebugSCInstance {
 
     fn has_function(&self, func_name: &str) -> bool {
         match func_name {
-            DEBUG_SC_INSTANCE_CONTEXT_PUSH => true,
-            DEBUG_SC_INSTANCE_CONTEXT_POP => true,
+            FUNC_CONTEXT_PUSH => true,
+            FUNC_CONTEXT_POP => true,
             _ => self.contract_container_ref.has_function(func_name),
         }
     }

@@ -6,28 +6,27 @@ use multiversx_chain_vm_executor::{
 };
 use std::fmt;
 
-pub struct DebugSCExecutor {
+pub struct ContractDebugExecutor {
     runtime_ref: RuntimeWeakRef,
     contract_map_ref: ContractMapRef,
 }
 
-impl fmt::Debug for DebugSCExecutor {
+impl fmt::Debug for ContractDebugExecutor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("DebugSCExecutor").finish()
     }
 }
 
-impl DebugSCExecutor {
+impl ContractDebugExecutor {
     pub fn new(runtime_ref: RuntimeWeakRef, contract_map_ref: ContractMapRef) -> Self {
-        DebugSCExecutor {
+        ContractDebugExecutor {
             runtime_ref,
             contract_map_ref,
-            // next_tx_context: None,
         }
     }
 }
 
-impl Executor for DebugSCExecutor {
+impl Executor for ContractDebugExecutor {
     fn set_vm_hooks_ptr(
         &mut self,
         _vm_hooks_ptr: *mut std::ffi::c_void,
@@ -46,7 +45,7 @@ impl Executor for DebugSCExecutor {
     ) -> Result<Box<dyn Instance>, ExecutorError> {
         let contract_container = self.contract_map_ref.lock().get_contract(wasm_bytes);
         let tx_context_ref = self.runtime_ref.upgrade().current_context();
-        let instance = DebugSCInstance::new(tx_context_ref, contract_container);
+        let instance = ContractDebugInstance::new(tx_context_ref, contract_container);
         Ok(Box::new(instance))
     }
 
