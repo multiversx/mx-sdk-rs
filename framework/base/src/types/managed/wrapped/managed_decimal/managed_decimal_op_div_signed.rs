@@ -1,9 +1,12 @@
 use crate::{
     api::ManagedTypeApi,
+    typenum::Unsigned,
     types::{BigUint, Decimals, ManagedDecimalSigned, NumDecimals},
 };
 
 use core::ops::{Div, DivAssign, Sub};
+
+use super::ConstDecimals;
 
 impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> DivAssign<&ManagedDecimalSigned<M, D2>>
     for ManagedDecimalSigned<M, D1>
@@ -47,5 +50,27 @@ where
             data: self.data / other.data,
             decimals: self.decimals - other.decimals,
         }
+    }
+}
+
+// var + const
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Div<ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>>
+    for ManagedDecimalSigned<M, NumDecimals>
+{
+    type Output = ManagedDecimalSigned<M, NumDecimals>;
+
+    fn div(self, rhs: ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>) -> Self::Output {
+        self / rhs.into_var_decimals()
+    }
+}
+
+// const + var
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Div<ManagedDecimalSigned<M, NumDecimals>>
+    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
+{
+    type Output = ManagedDecimalSigned<M, NumDecimals>;
+
+    fn div(self, rhs: ManagedDecimalSigned<M, NumDecimals>) -> Self::Output {
+        self.into_var_decimals() / rhs
     }
 }

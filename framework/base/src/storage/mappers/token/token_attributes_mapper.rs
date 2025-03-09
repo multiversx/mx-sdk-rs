@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     codec::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     storage::mappers::{
-        set_mapper::{CurrentStorage, StorageAddress},
+        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
     },
     types::ManagedAddress,

@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use crate::{
     api::{InvalidSliceError, ManagedTypeApi},
     types::{ManagedBuffer, StaticBufferRef},

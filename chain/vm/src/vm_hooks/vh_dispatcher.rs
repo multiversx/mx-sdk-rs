@@ -848,7 +848,14 @@ impl VMHooks for VMHooksDispatcher {
         arguments_handle: i32,
         result_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_execute_read_only")
+        self.handler.execute_on_dest_context_readonly_raw(
+            gas as u64,
+            address_handle,
+            function_handle,
+            arguments_handle,
+            result_handle,
+        );
+        0
     }
 
     fn managed_execute_on_same_context(

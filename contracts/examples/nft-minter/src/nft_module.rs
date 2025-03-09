@@ -21,11 +21,11 @@ pub trait NftModule {
     fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
         require!(self.nft_token_id().is_empty(), "Token already issued");
 
-        let payment_amount = self.call_value().egld_value();
+        let payment_amount = self.call_value().egld();
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                payment_amount.clone_value(),
+                payment_amount.clone(),
                 &token_name,
                 &token_ticker,
                 NonFungibleTokenProperties {

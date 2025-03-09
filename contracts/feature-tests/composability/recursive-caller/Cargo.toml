@@ -12,9 +12,9 @@ path = "src/recursive_caller.rs"
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.54.5"
+version = "0.56.1"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.5"
+version = "0.56.1"
 path = "../../../../framework/scenario"

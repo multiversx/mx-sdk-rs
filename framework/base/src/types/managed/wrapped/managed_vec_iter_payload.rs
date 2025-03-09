@@ -9,7 +9,7 @@ where
     M: ManagedTypeApi,
     P: ManagedVecItemPayload,
 {
-    pub(super) vec_handle: M::ManagedBufferHandle,
+    vec_handle: M::ManagedBufferHandle,
     byte_start: usize,
     byte_end: usize,
     _phantom: PhantomData<P>,
@@ -41,7 +41,7 @@ where
         }
     }
 
-    pub(crate) fn remaining(&self) -> usize {
+    pub(crate) fn remaining_count(&self) -> usize {
         (self.byte_end - self.byte_start) / P::payload_size()
     }
 
@@ -76,7 +76,7 @@ where
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let remaining = self.remaining();
+        let remaining = self.remaining_count();
         (remaining, Some(remaining))
     }
 }
@@ -87,7 +87,7 @@ where
     P: ManagedVecItemPayload,
 {
     fn len(&self) -> usize {
-        self.remaining()
+        self.remaining_count()
     }
 }
 

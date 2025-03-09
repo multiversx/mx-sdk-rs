@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.54.5"
+version = "0.56.1"
 edition = "2021"
 
 authors = [
@@ -23,6 +23,7 @@ path = "src/main.rs"
 [features]
 template-test-current = []
 template-test-released = []
+chain-simulator-tests = []
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
@@ -30,27 +31,28 @@ tokio = { version = "1.24", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 toml = { version = "0.8.6", features = ["preserve_order"] }
-colored = "2.0"
-convert_case = "0.6.0"
+colored = "2.2"
+convert_case = "0.7.1"
 semver = "1.0.20"
-ruplacer = { version = "0.8.1", default-features = false }
+ruplacer = { version = "0.10.0", default-features = false }
 reqwest = { version = "0.12", features = ["blocking", "json"] }
 zip = { version = "2.1", features = ["deflate"], default-features = false }
 copy_dir = "0.1.2"
 pathdiff = "0.2.1"
 common-path = "1.0.0"
 bip39 = "2.0.0"
-home = "0.5.2"
+# TODO: 0.5.11 doesn't support rustc 1.80, needs >= 1.81 (issue on ci/cd for nightly builds)
+home = "=0.5.9"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.54.5"
+version = "=0.56.1"
 path = "../meta-lib"
 
 [dependencies.multiversx-sc]
-version = "=0.54.5"
+version = "=0.56.1"
 path = "../base"
 features = ["alloc", "num-bigint"]
 
 [dependencies.multiversx-sc-snippets]
-version = "=0.54.5"
+version = "=0.56.1"
 path = "../snippets"

@@ -22,7 +22,6 @@ members = [
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",
-  "tools/payload-macro-generator",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
 
@@ -133,6 +132,7 @@ members = [
   "contracts/feature-tests/composability/execute-on-dest-esdt-issue-callback/child",
   "contracts/feature-tests/composability/execute-on-dest-esdt-issue-callback/child/meta",
   "contracts/feature-tests/composability/forwarder",
+  "contracts/feature-tests/composability/forwarder-interactor",
   "contracts/feature-tests/composability/forwarder/meta",
   "contracts/feature-tests/composability/forwarder-legacy",
   "contracts/feature-tests/composability/forwarder-legacy/meta",
@@ -181,6 +181,7 @@ members = [
   "contracts/feature-tests/panic-message-features",
   "contracts/feature-tests/panic-message-features/meta",
   "contracts/feature-tests/payable-features",
+  "contracts/feature-tests/payable-features/interactor",
   "contracts/feature-tests/payable-features/meta",
   "contracts/feature-tests/rust-snippets-generator-test",
   "contracts/feature-tests/rust-snippets-generator-test/meta",

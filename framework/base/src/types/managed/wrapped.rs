@@ -12,6 +12,7 @@ mod managed_address;
 mod managed_buffer_read_to_end;
 mod managed_byte_array;
 mod managed_decimal;
+mod managed_map_encoded;
 mod managed_option;
 mod managed_ref;
 mod managed_ref_mut;
@@ -32,7 +33,9 @@ mod traits;
 pub use big_uint::BigUint;
 pub use builder::*;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
-pub use egld_or_esdt_token_payment::{EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs};
+pub use egld_or_esdt_token_payment::{
+    EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs, MultiEgldOrEsdtPayment,
+};
 pub use egld_or_multi_esdt_payment::{EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs};
 pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
@@ -42,8 +45,10 @@ pub use managed_buffer_read_to_end::*;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;
 pub use managed_decimal::{
-    ConstDecimals, Decimals, ManagedDecimal, ManagedDecimalSigned, NumDecimals,
+    ConstDecimals, Decimals, EgldDecimals, LnDecimals, ManagedDecimal, ManagedDecimalSigned,
+    NumDecimals,
 };
+pub use managed_map_encoded::ManagedMapEncoded;
 pub use managed_option::ManagedOption;
 pub use managed_ref::ManagedRef;
 pub use managed_ref_mut::ManagedRefMut;
@@ -52,7 +57,9 @@ pub use managed_vec_item::{
     managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     ManagedVecItem,
 };
-pub use managed_vec_item_nested_tuple::ManagedVecItemNestedTuple;
+pub use managed_vec_item_nested_tuple::{
+    ManagedVecItemEnumPayloadTuple, ManagedVecItemMaxPayloadTuple, ManagedVecItemStructPayloadTuple,
+};
 pub use managed_vec_item_payload::*;
 pub use managed_vec_iter_owned::ManagedVecOwnedIterator;
 pub use managed_vec_iter_payload::ManagedVecPayloadIterator;

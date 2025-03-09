@@ -62,9 +62,17 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn echo_call_value(
+    pub fn echo_call_value_legacy(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, ManagedVec<Env::Api, EsdtTokenPayment<Env::Api>>>> {
+        self.wrapped_tx
+            .raw_call("echo_call_value_legacy")
+            .original_result()
+    }
+
+    pub fn echo_call_value(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedVec<Env::Api, EgldOrEsdtTokenPayment<Env::Api>>> {
         self.wrapped_tx
             .raw_call("echo_call_value")
             .original_result()
@@ -78,11 +86,27 @@ where
             .original_result()
     }
 
-    pub fn payment_array_3(
+    pub fn payable_all_transfers(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedVec<Env::Api, EgldOrEsdtTokenPayment<Env::Api>>> {
+        self.wrapped_tx
+            .raw_call("payable_all_transfers")
+            .original_result()
+    }
+
+    pub fn payment_array_esdt_3(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue3<EsdtTokenPayment<Env::Api>, EsdtTokenPayment<Env::Api>, EsdtTokenPayment<Env::Api>>> {
         self.wrapped_tx
-            .raw_call("payment_array_3")
+            .raw_call("payment_array_esdt_3")
+            .original_result()
+    }
+
+    pub fn payment_array_egld_esdt_3(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue3<EgldOrEsdtTokenPayment<Env::Api>, EgldOrEsdtTokenPayment<Env::Api>, EgldOrEsdtTokenPayment<Env::Api>>> {
+        self.wrapped_tx
+            .raw_call("payment_array_egld_esdt_3")
             .original_result()
     }
 

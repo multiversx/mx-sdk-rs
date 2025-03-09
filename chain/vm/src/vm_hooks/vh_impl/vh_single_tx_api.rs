@@ -127,6 +127,15 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
+    fn perform_execute_on_dest_context_readonly(
+        &self,
+        _to: VMAddress,
+        _func_name: TxFunctionName,
+        _arguments: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>> {
+        panic!("cannot launch contract calls in the SingleTxApi")
+    }
+
     fn perform_deploy(
         &self,
         _egld_value: num_bigint::BigUint,

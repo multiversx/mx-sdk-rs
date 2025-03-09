@@ -50,12 +50,12 @@ async fn set_state_cs_test() {
         .interactor
         .get_account(&account_address.to_address())
         .await;
-    let keys = real_chain_interact
+    let pairs = real_chain_interact
         .interactor
         .get_account_storage(&account_address.to_address())
         .await;
 
-    let set_state_account = SetStateAccount::from(account).with_keys(keys);
+    let set_state_account = SetStateAccount::from(account).with_storage(pairs);
     let vec_state = vec![set_state_account];
 
     let set_state_response = simulator_interact.interactor.set_state(vec_state).await;
@@ -67,6 +67,15 @@ async fn set_state_cs_test() {
         .unwrap();
 
     assert!(set_state_response.is_ok());
+
+    let storage = simulator_interact
+        .interactor
+        .get_account_storage(&account_address.to_address())
+        .await;
+
+    assert!(storage.len() > 1);
+
+    println!("mike's storage keys in chain simulator {:#?}", storage);
 }
 
 #[tokio::test]
@@ -102,4 +111,13 @@ async fn set_state_from_file_cs_test() {
         .unwrap();
 
     assert!(set_state_response.is_ok());
+
+    let storage = simulator_interact
+        .interactor
+        .get_account_storage(&account_address.to_address())
+        .await;
+
+    assert!(storage.len() > 1);
+
+    println!("mike's storage keys in chain simulator {:#?}", storage);
 }

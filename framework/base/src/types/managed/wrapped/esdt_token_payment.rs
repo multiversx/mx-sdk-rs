@@ -1,6 +1,11 @@
+use generic_array::typenum::U16;
+
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedVecItem, TokenIdentifier},
+    types::{
+        BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType, ManagedVecItem,
+        TokenIdentifier,
+    },
 };
 
 use crate as multiversx_sc; // needed by the codec and TypeAbi generated code
@@ -14,8 +19,9 @@ use crate::{
 };
 
 use super::{
-    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, ManagedVec,
-    ManagedVecItemPayloadBuffer, ManagedVecRef,
+    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
+    EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, ManagedVec, ManagedVecItemPayloadBuffer,
+    ManagedVecRef, MultiEgldOrEsdtPayment,
 };
 
 #[type_abi]
@@ -56,6 +62,22 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     #[inline]
     pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
+    }
+
+    /// Zero-cost conversion that loosens the EGLD restriction.
+    ///
+    /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
+    pub fn as_egld_or_esdt_payment(&self) -> &EgldOrEsdtTokenPayment<M> {
+        unsafe { core::mem::transmute(self) }
+    }
+
+    /// Conversion that loosens the EGLD restriction.
+    pub fn into_multi_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
+        EgldOrEsdtTokenPayment {
+            token_identifier: EgldOrEsdtTokenIdentifier::esdt(self.token_identifier),
+            token_nonce: self.token_nonce,
+            amount: self.amount,
+        }
     }
 }
 
@@ -166,7 +188,7 @@ impl<M: ManagedTypeApi> IntoMultiValue for EsdtTokenPayment<M> {
 }
 
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<16>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U16>;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedVecRef<'a, Self>;
 
@@ -230,6 +252,22 @@ impl<'a, M: ManagedTypeApi> EsdtTokenPaymentRefs<'a, M> {
             token_nonce: self.token_nonce,
             amount: self.amount.clone(),
         }
+    }
+}
+
+impl<M: ManagedTypeApi> MultiEsdtPayment<M> {
+    /// Zero-cost conversion that loosens the EGLD restriction.
+    ///
+    /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
+    pub fn as_multi_egld_or_esdt_payment(&self) -> &MultiEgldOrEsdtPayment<M> {
+        unsafe { core::mem::transmute(self) }
+    }
+
+    /// Zero-cost conversion that loosens the EGLD restriction.
+    ///
+    /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
+    pub fn into_multi_egld_or_esdt_payment(self) -> MultiEgldOrEsdtPayment<M> {
+        unsafe { MultiEgldOrEsdtPayment::from_handle(self.forget_into_handle()) }
     }
 }
 

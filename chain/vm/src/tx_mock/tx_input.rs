@@ -18,6 +18,7 @@ pub struct TxInput {
     pub func_name: TxFunctionName,
     pub args: Vec<Vec<u8>>,
     pub call_type: CallType,
+    pub readonly: bool, // should probably be in TxContext, but it is easier to keep it here, for now
     pub gas_limit: u64,
     pub gas_price: u64,
     pub tx_hash: H256,
@@ -35,6 +36,7 @@ impl Default for TxInput {
             func_name: TxFunctionName::EMPTY,
             args: Vec::new(),
             call_type: CallType::DirectCall,
+            readonly: false,
             gas_limit: 0,
             gas_price: 0,
             tx_hash: H256::zero(),

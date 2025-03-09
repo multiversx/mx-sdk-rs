@@ -41,7 +41,7 @@ fn struct_to_bytes_writer() {
     };
 
     #[rustfmt::skip]
-    let expected_payload = &[
+    let expected_payload = [
         /* u_8  */ 0x01,
         /* u_16 */ 0x00, 0x02,
         /* u_32 */ 0x00, 0x00, 0x00, 0x03,
@@ -53,7 +53,7 @@ fn struct_to_bytes_writer() {
 
     let mut payload = ManagedVecItemPayloadBuffer::new_buffer();
     <Struct2 as multiversx_sc::types::ManagedVecItem>::save_to_payload(s, &mut payload);
-    assert_eq!(payload.buffer, &expected_payload[..]);
+    assert_eq!(payload.into_array(), expected_payload);
 }
 
 #[test]

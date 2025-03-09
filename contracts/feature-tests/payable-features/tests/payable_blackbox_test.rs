@@ -18,7 +18,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn payable_multi() {
+fn payable_multi_legacy() {
     let mut world = world();
 
     world
@@ -43,7 +43,7 @@ fn payable_multi() {
         .from(USER)
         .to(PAYABLE_FEATURES_ADDRESS)
         .typed(payable_features_proxy::PayableFeaturesProxy)
-        .echo_call_value()
+        .echo_call_value_legacy()
         .esdt(TestEsdtTransfer(TOKEN_1, 0, 100))
         .esdt(TestEsdtTransfer(TOKEN_2, 0, 400))
         .returns(ReturnsResultUnmanaged)

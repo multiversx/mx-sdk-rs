@@ -1,4 +1,2 @@
-[settings]
-
 [[proxy]]
 path = "src/scenario_tester_proxy.rs"

@@ -17,8 +17,8 @@ use std::{
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LocalDeps {
-    pub root: String,
-    pub contract_path: String,
+    pub root: PathBuf,
+    pub contract_path: PathBuf,
     pub common_dependency_path: Option<String>,
     pub dependencies: Vec<LocalDep>,
 }
@@ -40,16 +40,16 @@ impl LocalDep {
 
 pub fn local_deps(args: &LocalDepsArgs) {
     let path = if let Some(some_path) = &args.path {
-        some_path.as_str()
+        Path::new(some_path)
     } else {
-        "./"
+        // current directory cross-platform
+        Path::new("./")
     };
 
     perform_local_deps(path, args.ignore.as_slice());
 }
 
-fn perform_local_deps(path: impl AsRef<Path>, ignore: &[String]) {
-    let root_path = path.as_ref();
+fn perform_local_deps(root_path: &Path, ignore: &[String]) {
     let dirs = RelevantDirectories::find_all(root_path, ignore);
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 
@@ -64,8 +64,8 @@ fn perform_local_deps(path: impl AsRef<Path>, ignore: &[String]) {
         let common_dependency_path = common_path_all(dep_map.keys().map(|pbuf| pbuf.as_path()));
 
         let deps_contents = LocalDeps {
-            root: root_path.to_string_lossy().to_string(),
-            contract_path: contract_dir.path.to_string_lossy().to_string(),
+            root: root_path.to_path_buf(),
+            contract_path: contract_dir.path.clone(),
             common_dependency_path: common_dependency_path
                 .map(|pbuf| pbuf.to_string_lossy().to_string()),
             dependencies: dep_map.values().cloned().collect(),
