@@ -1,10 +1,6 @@
 use crate::util::*;
 use proc_macro::TokenStream;
 use quote::quote;
-use quote::ToTokens;
-
-const BITFLAGS_INTERNAL: &str = ":: __private :: PublicFlags :: Internal";
-const PRIMITIVE: &str = "Primitive";
 
 pub fn dep_decode_snippet(
     _index: usize,
@@ -95,21 +91,6 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
     };
 
     result.into()
-}
-
-fn sanitize_type_path(mut field: syn::Type) -> proc_macro2::TokenStream {
-    if let syn::Type::Path(ref mut p) = field {
-        if p.path
-            .to_token_stream()
-            .to_string()
-            .contains(BITFLAGS_INTERNAL)
-        {
-            let modified_path = p.path.segments.last_mut().unwrap();
-            modified_path.ident = syn::Ident::new(PRIMITIVE, modified_path.ident.span());
-        }
-    }
-
-    quote! (#field)
 }
 
 fn dep_decode_body(

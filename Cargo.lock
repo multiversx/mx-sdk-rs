@@ -2505,6 +2505,7 @@ name = "multiversx-sc-codec"
 version = "0.21.2"
 dependencies = [
  "arrayvec",
+ "bitflags",
  "multiversx-sc-codec-derive",
  "num-bigint",
  "unwrap-infallible",
