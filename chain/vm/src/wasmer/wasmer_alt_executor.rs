@@ -44,7 +44,7 @@ impl Executor for WasmerAltExecutor {
         wasm_bytes: &[u8],
         compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
-        let tx_context_ref = self.runtime_ref.upgrade().current_context();
+        let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
 
         let inner_instance_ref = Rc::new_cyclic(|weak| {
             let vh_handler = TxContextVMHooksHandler::new(tx_context_ref, weak.clone());

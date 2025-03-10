@@ -12,14 +12,13 @@ use crate::{
 
 use super::{
     exec_contract_endpoint::{get_contract_identifier, COMPILATION_OPTIONS},
-    BlockchainVMRef, Stack, StackItem,
+    BlockchainVMRef,
 };
 
 pub struct Runtime {
     pub vm_ref: BlockchainVMRef,
     pub executor: Box<dyn Executor + Send + Sync>,
-    pub stack: Mutex<Stack>,
-    pub current_context_cell: Mutex<Option<TxContextRef>>,
+    pub executor_context_cell: Mutex<Option<TxContextRef>>,
 }
 
 #[derive(Clone)]
@@ -39,29 +38,20 @@ impl Runtime {
         Runtime {
             vm_ref,
             executor,
-            stack: Default::default(),
-            current_context_cell: Mutex::new(None),
+            executor_context_cell: Mutex::new(None),
         }
     }
 
-    pub fn top_tx_context_ref(&self) -> Option<TxContextRef> {
-        self.stack
-            .lock()
-            .unwrap()
-            .peek()
-            .map(|stack_item| stack_item.tx_context_ref.clone())
-    }
-
-    pub fn current_context(&self) -> TxContextRef {
-        self.current_context_cell
+    pub fn get_executor_context(&self) -> TxContextRef {
+        self.executor_context_cell
             .lock()
             .unwrap()
             .clone()
-            .expect("no current context")
+            .expect("no executor context configured")
     }
 
-    fn set_current_context(&self, value: Option<TxContextRef>) {
-        let mut cell_ref = self.current_context_cell.lock().unwrap();
+    fn set_executor_context(&self, value: Option<TxContextRef>) {
+        let mut cell_ref = self.executor_context_cell.lock().unwrap();
         *cell_ref = value;
     }
 }
@@ -168,16 +158,14 @@ impl RuntimeRef {
         let contract_code = get_contract_identifier(&tx_context);
         let tx_context_ref = TxContextRef::new(Arc::new(tx_context));
 
-        self.set_current_context(Some(tx_context_ref.clone()));
+        self.set_executor_context(Some(tx_context_ref.clone()));
 
         let instance = self
             .executor
             .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
             .expect("error instantiating executor instance");
 
-        self.stack.lock().unwrap().push(StackItem {
-            tx_context_ref: tx_context_ref.clone(),
-        });
+        self.set_executor_context(None);
 
         call_lambda(RuntimeInstanceCall {
             instance: &*instance,
@@ -186,10 +174,6 @@ impl RuntimeRef {
         });
 
         std::mem::drop(instance);
-
-        let stack_item: StackItem = self.stack.lock().unwrap().pop();
-        std::mem::drop(stack_item);
-        self.set_current_context(self.top_tx_context_ref());
 
         Arc::into_inner(tx_context_ref.0)
             .expect("cannot extract final TxContext from stack because of lingering references")
