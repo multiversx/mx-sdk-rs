@@ -79,7 +79,7 @@ where
     NHList: RHListExec<TxResponse, Env>,
     NHList::ListReturns: NestedTupleFlatten,
 {
-    fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+    fn item_preprocessing(&self, mut prev: TxExpect) -> TxExpect {
         prev.status = CheckValue::Star;
         prev.message = CheckValue::Star;
         prev

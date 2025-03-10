@@ -232,6 +232,7 @@ dependencies = [
  "multiversx-sc-snippets",
  "serde",
  "serial_test",
+ "system-sc-interact",
  "tokio",
  "toml",
 ]

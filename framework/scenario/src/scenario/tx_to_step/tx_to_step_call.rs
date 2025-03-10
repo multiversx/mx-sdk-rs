@@ -29,7 +29,7 @@ where
             self.data,
         );
         step.explicit_tx_hash = self.env.take_tx_hash();
-        step.expect = Some(self.result_handler.list_tx_expect());
+        step.expect = Some(self.result_handler.list_preprocessing());
 
         StepWrapper {
             env: self.env,

@@ -18,7 +18,7 @@ impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ExpectStatus
 where
     Env: TxEnv<RHExpect = TxExpect>,
 {
-    fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+    fn item_preprocessing(&self, mut prev: TxExpect) -> TxExpect {
         prev.status = CheckValue::Equal(self.0.into());
         prev
     }

@@ -1,13 +1,12 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
-use multiversx_sc_snippets::{
-    imports::{
-        BigUint, ESDTSystemSCAddress, ESDTSystemSCProxy, EgldDecimals, EsdtTokenPayment,
-        FungibleTokenProperties, ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec,
-        ReturnsNewTokenIdentifier, RustBigUint, StaticApi, TokenIdentifier,
-    },
-    test_wallets, InteractorRunAsync,
+use multiversx_sc_snippets::imports::{
+    BigUint, EgldDecimals, EsdtLocalRole, EsdtTokenType, ManagedBuffer, ManagedDecimal,
+    ManagedOption, ManagedVec, RustBigUint, StaticApi,
 };
 use serial_test::serial;
+use system_sc_interact::SysFuncCallsInteract;
+
+const ISSUE_COST: u64 = 50000000000000000u64;
 
 #[tokio::test]
 #[serial]
@@ -248,4 +247,42 @@ async fn verify_bls_aggregated_signature(interact: &mut BasicFeaturesInteract) {
             Some("aggregate signature is invalid"),
         )
         .await;
+}
+
+#[tokio::test]
+#[serial]
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+async fn chain_simulator_bf_get_special_roles_test() {
+    let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+    let mut system_interact =
+        SysFuncCallsInteract::init(system_sc_interact::Config::chain_simulator_config()).await;
+
+    // issue dynamic NFT
+    let dynamic_nft_token_id = system_interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            EsdtTokenType::DynamicNFT,
+            0usize,
+        )
+        .await;
+
+    // set transfer role
+    system_interact
+        .set_roles(
+            dynamic_nft_token_id.as_bytes(),
+            vec![EsdtLocalRole::Transfer],
+        )
+        .await;
+
+    // deploy bf
+    bf_interact.deploy().await;
+
+    // retrieve transfer role from sc explicit call
+    assert!(
+        bf_interact
+            .token_has_transfer_role(&dynamic_nft_token_id)
+            .await
+    );
 }

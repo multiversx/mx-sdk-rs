@@ -49,9 +49,9 @@ fn payable_multi_legacy() {
         .returns(ReturnsResultUnmanaged)
         .run();
 
-    assert_eq!(result.0 .0, RustBigUint::from(0u32));
+    assert_eq!(result.as_tuple().0, RustBigUint::from(0u32));
     assert_eq!(
-        result.0 .1,
+        result.as_tuple().1,
         vec![
             EsdtTokenPayment::new(TOKEN_1.to_token_identifier(), 0, BigUint::from(100u32)),
             EsdtTokenPayment::new(TOKEN_2.to_token_identifier(), 0, BigUint::from(400u32))
