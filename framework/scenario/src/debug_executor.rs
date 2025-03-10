@@ -6,7 +6,7 @@ mod contract_debug_instance;
 mod contract_debug_stack;
 mod contract_map;
 mod dummy_instance;
-mod static_var_stack;
+mod static_var_data;
 mod tx_static_vars;
 
 pub use catch_tx_panic::catch_tx_panic;
@@ -17,5 +17,5 @@ pub use contract_debug_instance::ContractDebugInstance;
 pub use contract_debug_stack::ContractDebugStack;
 pub use contract_map::{ContractMap, ContractMapRef};
 pub use dummy_instance::DummyInstance;
-pub use static_var_stack::StaticVarData;
+pub use static_var_data::StaticVarData;
 pub use tx_static_vars::TxStaticVars;
