@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use multiversx_chain_vm::{
     tx_execution::RuntimeInstanceCall,
     tx_mock::{TxContextRef, TxFunctionName, TxPanic},
@@ -6,7 +8,7 @@ use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, Mem
 use multiversx_sc::chain_core::types::ReturnCode;
 
 use super::{
-    catch_tx_panic, ContractContainer, ContractContainerRef, ContractDebugStack, StaticVarStack,
+    catch_tx_panic, ContractContainer, ContractContainerRef, ContractDebugStack, StaticVarData,
 };
 
 /// Used as a flag to check the instance under lambda calls.
@@ -18,6 +20,7 @@ const FUNC_CONTEXT_POP: &str = "<ContractDebugInstance-PopContext>";
 pub struct ContractDebugInstance {
     pub tx_context_ref: TxContextRef,
     pub contract_container_ref: ContractContainerRef,
+    pub static_var_ref: Rc<StaticVarData>,
 }
 
 impl ContractDebugInstance {
@@ -25,6 +28,7 @@ impl ContractDebugInstance {
         ContractDebugInstance {
             tx_context_ref,
             contract_container_ref: contract_container,
+            static_var_ref: Default::default(),
         }
     }
 
@@ -33,6 +37,7 @@ impl ContractDebugInstance {
         ContractDebugInstance {
             tx_context_ref: TxContextRef::dummy(),
             contract_container_ref: ContractContainerRef::new(ContractContainer::dummy()),
+            static_var_ref: Default::default(),
         }
     }
 
@@ -99,7 +104,6 @@ impl ContractDebugInstance {
         let tx_func_name = TxFunctionName::from(func_name);
 
         ContractDebugStack::static_push(self.clone());
-        StaticVarStack::static_push();
 
         let result = catch_tx_panic(self.contract_container_ref.0.panic_message, || {
             let call_successful = self.contract_container_ref.0.call(&tx_func_name);
@@ -120,7 +124,6 @@ impl ContractDebugInstance {
         }
 
         ContractDebugStack::static_pop();
-        StaticVarStack::static_pop();
 
         Ok(())
     }
@@ -131,12 +134,10 @@ impl Instance for ContractDebugInstance {
         match func_name {
             FUNC_CONTEXT_PUSH => {
                 ContractDebugStack::static_push(self.clone());
-                StaticVarStack::static_push();
                 Ok(())
             },
             FUNC_CONTEXT_POP => {
                 ContractDebugStack::static_pop();
-                StaticVarStack::static_pop();
                 Ok(())
             },
             _ => self.call_endpoint(func_name),

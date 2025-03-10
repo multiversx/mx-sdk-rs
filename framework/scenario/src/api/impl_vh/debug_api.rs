@@ -8,9 +8,7 @@ use multiversx_chain_vm::{
 use multiversx_chain_vm_executor::Instance;
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::{
-    ContractDebugInstance, ContractDebugStack, StaticVarData, StaticVarStack,
-};
+use crate::debug_executor::{ContractDebugInstance, ContractDebugStack, StaticVarData};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
@@ -82,8 +80,8 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&StaticVarData) -> R,
     {
-        let top_context = StaticVarStack::static_peek();
-        f(&top_context)
+        let top_static_vars = ContractDebugStack::static_peek().static_var_ref;
+        f(&top_static_vars)
     }
 }
 
@@ -93,7 +91,6 @@ impl DebugApi {
     /// WARNING: this does not clean up after itself, must fix!!!
     pub fn dummy() {
         ContractDebugStack::static_push(ContractDebugInstance::dummy());
-        StaticVarStack::static_push();
     }
 }
 

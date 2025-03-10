@@ -2,9 +2,7 @@ use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{
-        ContractContainer, ContractDebugInstance, ContractDebugStack, StaticVarStack,
-    },
+    debug_executor::{ContractContainer, ContractDebugInstance, ContractDebugStack},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -647,10 +645,8 @@ impl BlockchainStateWrapper {
         F: FnOnce() -> T,
     {
         ContractDebugStack::static_push(ContractDebugInstance::dummy());
-        StaticVarStack::static_push();
         let result = f();
         let _ = ContractDebugStack::static_pop();
-        let _ = StaticVarStack::static_pop();
 
         result
     }

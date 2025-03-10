@@ -17,5 +17,5 @@ pub use contract_debug_instance::ContractDebugInstance;
 pub use contract_debug_stack::ContractDebugStack;
 pub use contract_map::{ContractMap, ContractMapRef};
 pub use dummy_instance::DummyInstance;
-pub use static_var_stack::{StaticVarData, StaticVarStack};
+pub use static_var_stack::StaticVarData;
 pub use tx_static_vars::TxStaticVars;
