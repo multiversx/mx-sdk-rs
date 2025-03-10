@@ -641,6 +641,15 @@
                     "name": "interrupted"
                 }
             ]
+        },
+        "Permission": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "0",
+                    "type": "u32"
+                }
+            ]
         }
     }
 }

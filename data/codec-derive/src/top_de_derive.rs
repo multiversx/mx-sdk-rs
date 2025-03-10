@@ -53,18 +53,30 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let name = &ast.ident;
     match &ast.data {
         syn::Data::Struct(data_struct) => {
-            let field_dep_decode_snippets =
-                fields_decl_syntax(&data_struct.fields, |index, field| {
-                    dep_decode_snippet(index, field, &quote! {&mut nested_buffer})
-                });
+            if is_bitflags_struct(data_struct) {
+                let field_top_decode_snippets =
+                    fields_decl_syntax(&data_struct.fields, |_, field| top_decode_snippet(field));
 
-            quote! {
-                let mut nested_buffer = top_input.into_nested_buffer();
-                let result = #name #field_dep_decode_snippets ;
-                if !codec::NestedDecodeInput::is_depleted(&nested_buffer) {
-                    return core::result::Result::Err(__h__.handle_error(codec::DecodeError::INPUT_TOO_LONG));
+                quote! {
+                    match #name::from_bits #field_top_decode_snippets {
+                        Some(result) => core::result::Result::Ok(result),
+                        None => Err(__h__.handle_error(codec::DecodeError::INVALID_VALUE))
+                    }
                 }
-                core::result::Result::Ok(result)
+            } else {
+                let field_dep_decode_snippets =
+                    fields_decl_syntax(&data_struct.fields, |index, field| {
+                        dep_decode_snippet(index, field, &quote! {&mut nested_buffer})
+                    });
+
+                quote! {
+                    let mut nested_buffer = top_input.into_nested_buffer();
+                    let result = #name #field_dep_decode_snippets;
+                    if !codec::NestedDecodeInput::is_depleted(&nested_buffer) {
+                        return core::result::Result::Err(__h__.handle_error(codec::DecodeError::INPUT_TOO_LONG));
+                    }
+                    core::result::Result::Ok(result)
+                }
             }
         },
         syn::Data::Enum(data_enum) => {
@@ -148,4 +160,17 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
     };
 
     result.into()
+}
+
+pub fn top_decode_snippet(field: &syn::Field) -> proc_macro2::TokenStream {
+    let ty = sanitize_type_path(field.ty.clone());
+    if let Some(ident) = &field.ident {
+        quote! {
+            #ident: <#ty as codec::TopDecode>::top_decode_or_handle_err(top_input, __h__)?
+        }
+    } else {
+        quote! {
+            <#ty as codec::TopDecode>::top_decode_or_handle_err(top_input, __h__)?
+        }
+    }
 }
