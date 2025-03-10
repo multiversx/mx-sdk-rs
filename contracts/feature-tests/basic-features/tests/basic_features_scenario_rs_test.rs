@@ -473,6 +473,16 @@ fn storage_mapper_single_value_rs() {
 }
 
 #[test]
+fn storage_mapper_timelock_rs() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_at_address_rs() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
+}
+
+#[test]
 fn storage_mapper_token_attributes_rs() {
     world().run("scenarios/storage_mapper_token_attributes.scen.json");
 }

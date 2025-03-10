@@ -1,7 +1,8 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{self, CurrentStorage, StorageAddress},
+    set_mapper::{self},
+    source::{CurrentStorage, StorageAddress},
     SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
