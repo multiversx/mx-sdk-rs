@@ -30,12 +30,10 @@ impl StaticApiVMHooksHandler {
 
 impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
-        // TODO: switch to the DebugSCInstance method
         unsafe { ContractDebugInstance::main_memory_load(offset, length) }
     }
 
     unsafe fn memory_store(&self, offset: MemPtr, data: &[u8]) {
-        // TODO: switch to the DebugSCInstance method
         unsafe {
             ContractDebugInstance::main_memory_store(offset, data);
         }
