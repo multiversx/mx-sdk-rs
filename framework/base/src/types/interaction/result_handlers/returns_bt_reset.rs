@@ -20,7 +20,7 @@ impl<RawResult, Env, Original> RHListItemExec<RawResult, Env, Original>
 where
     Env: TxEnv,
 {
-    fn item_tx_expect(&self, prev: Env::RHExpect) -> Env::RHExpect {
+    fn item_preprocessing(&self, prev: Env::RHExpect) -> Env::RHExpect {
         // retrieval resets back-transfers
         // the result is of no interest
         let _ = BlockchainWrapper::<Env::Api>::new().get_back_transfers();

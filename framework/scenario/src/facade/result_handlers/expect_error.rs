@@ -19,7 +19,7 @@ impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ExpectError<'_
 where
     Env: TxEnv<RHExpect = TxExpect>,
 {
-    fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+    fn item_preprocessing(&self, mut prev: TxExpect) -> TxExpect {
         prev.status = CheckValue::Equal(self.0.into());
         let expect_message_expr = BytesValue {
             value: self.1.to_string().into_bytes(),
