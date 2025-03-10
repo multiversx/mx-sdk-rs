@@ -1,7 +1,12 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
-use multiversx_sc_snippets::imports::{
-    BigUint, EgldDecimals, EsdtLocalRole, EsdtTokenType, ManagedBuffer, ManagedDecimal,
-    ManagedOption, ManagedVec, RustBigUint, StaticApi,
+use multiversx_sc_snippets::{
+    imports::{
+        BigUint, ESDTSystemSCAddress, ESDTSystemSCProxy, EgldDecimals, EsdtLocalRole,
+        EsdtTokenPayment, EsdtTokenType, FungibleTokenProperties, ManagedBuffer, ManagedDecimal,
+        ManagedOption, ManagedVec, ReturnsNewTokenIdentifier, RustBigUint, StaticApi,
+        TokenIdentifier,
+    },
+    test_wallets, InteractorRunAsync,
 };
 use serial_test::serial;
 use system_sc_interact::SysFuncCallsInteract;
