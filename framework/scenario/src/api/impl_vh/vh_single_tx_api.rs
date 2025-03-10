@@ -3,10 +3,10 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 
-use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
-use crate::{
+use multiversx_chain_vm::{
+    chain_core::types::ReturnCode,
     tx_mock::{BackTransfers, TxFunctionName, TxInput, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata},
     vm_hooks::{
@@ -18,7 +18,7 @@ use crate::{
     world_mock::{AccountData, BlockInfo},
 };
 
-use super::DebugApiVMHooksHandler;
+use crate::debug_executor::ContractDebugInstance;
 
 #[derive(Default, Debug)]
 pub struct SingleTxApiData {
@@ -60,13 +60,13 @@ impl SingleTxApiVMHooksHandler {
 impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
         // TODO: switch to the DebugSCInstance method
-        unsafe { DebugApiVMHooksHandler::main_memory_load(offset, length) }
+        unsafe { ContractDebugInstance::main_memory_load(offset, length) }
     }
 
     unsafe fn memory_store(&self, offset: MemPtr, data: &[u8]) {
         // TODO: switch to the DebugSCInstance method
         unsafe {
-            DebugApiVMHooksHandler::main_memory_store(offset, data);
+            ContractDebugInstance::main_memory_store(offset, data);
         }
     }
 
