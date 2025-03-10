@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                           30
+// Endpoints:                           31
 // Async Callback (empty):               1
-// Total number of exported functions:  33
+// Total number of exported functions:  34
 
 #![no_std]
 
@@ -39,6 +39,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         item_for_vec => item_for_vec
         item_for_array_vec => item_for_array_vec
         item_for_managed_vec => item_for_managed_vec
+        echo_permission => echo_permission
         item_for_array => item_for_array
         item_for_box => item_for_box
         item_for_boxed_slice => item_for_boxed_slice

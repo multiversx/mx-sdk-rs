@@ -312,6 +312,19 @@ where
             .original_result()
     }
 
+    pub fn echo_permission<
+        Arg0: ProxyArg<Permission>,
+    >(
+        self,
+        p: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Permission> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("echo_permission")
+            .argument(&p)
+            .original_result()
+    }
+
     pub fn item_for_array<
         Arg0: ProxyArg<[OnlyShowsUpAsNestedInArray; 5]>,
     >(
@@ -519,6 +532,10 @@ pub struct AbiManagedVecItem {
     pub value1: u32,
     pub value2: u32,
 }
+
+#[type_abi]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NestedDecode, NestedEncode, TopEncode, TopDecode)]
+pub struct Permission(u32);
 
 #[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]

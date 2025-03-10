@@ -30,6 +30,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         promise_raw_single_token => promise_raw_single_token
         promise_raw_multi_transfer => promise_raw_multi_transfer
         forward_sync_retrieve_funds_bt => forward_sync_retrieve_funds_bt
+        forward_sync_retrieve_funds_bt_reset_twice => forward_sync_retrieve_funds_bt_reset_twice
         forward_sync_retrieve_funds_bt_twice => forward_sync_retrieve_funds_bt_twice
         forward_promise_retrieve_funds_back_transfers => forward_promise_retrieve_funds_back_transfers
         retrieve_funds_callback => retrieve_funds_callback

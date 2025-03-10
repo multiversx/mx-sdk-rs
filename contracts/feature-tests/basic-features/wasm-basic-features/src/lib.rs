@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          423
+// Endpoints:                          424
 // Async Callback:                       1
-// Total number of exported functions: 425
+// Total number of exported functions: 426
 
 #![no_std]
 
@@ -259,6 +259,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         store_reserved_i64 => store_reserved_i64
         store_reserved_big_uint => store_reserved_big_uint
         store_reserved_vec_u8 => store_reserved_vec_u8
+        token_has_transfer_role => token_has_transfer_role
         timelock_mapper => timelock_mapper
         timelock_set_initial_value => timelock_set_initial_value
         timelock_set_unlock_timestamp => timelock_set_unlock_timestamp

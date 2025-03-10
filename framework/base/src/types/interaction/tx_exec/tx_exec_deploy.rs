@@ -98,6 +98,7 @@ where
 {
     /// Synchronously deploys a contract.
     pub fn sync_call(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
+        self.result_handler.list_preprocessing();
         let (new_address, raw_results, result_handler) = self.execute_deploy_raw();
 
         let deploy_raw_result = DeployRawResult {
@@ -129,6 +130,7 @@ where
 {
     /// Synchronously deploys a contract from source.
     pub fn sync_call(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
+        self.result_handler.list_preprocessing();
         let (new_address, raw_results, result_handler) = self.execute_deploy_from_source_raw();
 
         let deploy_raw_result = DeployRawResult {

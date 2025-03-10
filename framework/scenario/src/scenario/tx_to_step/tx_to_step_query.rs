@@ -16,7 +16,7 @@ where
 
     fn tx_to_query_step(self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step = tx_to_sc_query_step(&self.env, self.to, self.data);
-        step.expect = Some(self.result_handler.list_tx_expect());
+        step.expect = Some(self.result_handler.list_preprocessing());
 
         StepWrapper {
             env: self.env,

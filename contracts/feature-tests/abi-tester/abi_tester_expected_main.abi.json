@@ -333,6 +333,21 @@
             ]
         },
         {
+            "name": "echo_permission",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "p",
+                    "type": "Permission"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Permission"
+                }
+            ]
+        },
+        {
             "name": "item_for_array",
             "mutability": "readonly",
             "inputs": [
@@ -1019,6 +1034,15 @@
                         "indicates that operation was interrupted prematurely, due to low gas"
                     ],
                     "name": "interrupted"
+                }
+            ]
+        },
+        "Permission": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "0",
+                    "type": "u32"
                 }
             ]
         }

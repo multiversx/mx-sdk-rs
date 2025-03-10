@@ -25,7 +25,7 @@ where
     fn tx_to_step(self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step =
             tx_to_sc_call_upgrade_step(&self.env, self.from, self.to, self.gas, self.data);
-        step.expect = Some(self.result_handler.list_tx_expect());
+        step.expect = Some(self.result_handler.list_preprocessing());
 
         StepWrapper {
             env: self.env,
