@@ -5,7 +5,6 @@ mod contract_debug_executor;
 mod contract_debug_instance;
 mod contract_debug_stack;
 mod contract_map;
-mod dummy_instance;
 mod static_var_data;
 mod tx_static_vars;
 
@@ -16,6 +15,5 @@ pub use contract_debug_executor::ContractDebugExecutor;
 pub use contract_debug_instance::ContractDebugInstance;
 pub use contract_debug_stack::ContractDebugStack;
 pub use contract_map::{ContractMap, ContractMapRef};
-pub use dummy_instance::DummyInstance;
 pub use static_var_data::StaticVarData;
 pub use tx_static_vars::TxStaticVars;
