@@ -51,7 +51,7 @@
             "id": "buy-ticket-acc1",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -77,7 +77,7 @@
             "id": "buy-ticket-acc2",
             "tx": {
                 "from": "address:acc2",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -103,7 +103,7 @@
             "id": "buy-ticket-acc3",
             "tx": {
                 "from": "address:acc3",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -129,7 +129,7 @@
             "id": "buy-ticket-acc4",
             "tx": {
                 "from": "address:acc4",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -155,7 +155,7 @@
             "id": "buy-ticket-acc5",
             "tx": {
                 "from": "address:acc5",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -184,6 +184,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
                 "address:acc1": {
                     "nonce": "1",
                     "balance": "1,000,000",
@@ -209,7 +214,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -223,19 +228,31 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:1",
                             "5-prize_distribution": "u32:2|u8:75|u8:25",
-                            "6-prize_pool": "biguint:500"
+                            "6-prize_pool": "biguint:500",
+                            "7-unawarded_amount": "biguint:500"
                         },
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "5",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:2": "address:acc2",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:3": "address:acc3",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:4": "address:acc4",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:5": "address:acc5",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc2": "1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc3": "1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc4": "1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc5": "1",
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "1",
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:2": "2",
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:3": "3",
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:4": "4",
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:5": "5",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|u64:1": "1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|u64:2": "1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|u64:3": "1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|u64:4": "1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|u64:5": "1",
+                        "str:addressToIdMapper|str:lastId": "5",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1",
+                        "str:addressToIdMapper|str:addr|address:acc2": "2",
+                        "str:addressToIdMapper|str:addrId|u64:2": "address:acc2",
+                        "str:addressToIdMapper|str:addr|address:acc3": "3",
+                        "str:addressToIdMapper|str:addrId|u64:3": "address:acc3",
+                        "str:addressToIdMapper|str:addr|address:acc4": "4",
+                        "str:addressToIdMapper|str:addrId|u64:4": "address:acc4",
+                        "str:addressToIdMapper|str:addr|address:acc5": "5",
+                        "str:addressToIdMapper|str:addrId|u64:5": "address:acc5",
                         "+": ""
                     },
                     "code": "mxsc:../output/lottery-esdt.mxsc.json"
