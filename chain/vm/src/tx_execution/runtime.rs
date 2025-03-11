@@ -6,14 +6,12 @@ use std::{
 use multiversx_chain_vm_executor::{BreakpointValue, Executor, Instance};
 
 use crate::{
+    display_util::address_hex,
     tx_mock::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
     world_mock::BlockchainStateRef,
 };
 
-use super::{
-    exec_contract_endpoint::{get_contract_identifier, COMPILATION_OPTIONS},
-    BlockchainVMRef,
-};
+use super::BlockchainVMRef;
 
 pub struct Runtime {
     pub vm_ref: BlockchainVMRef,
@@ -162,7 +160,7 @@ impl RuntimeRef {
 
         let instance = self
             .executor
-            .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
+            .new_instance(contract_code.as_slice(), &self.vm_ref.compilation_options)
             .expect("error instantiating executor instance");
 
         self.set_executor_context(None);
@@ -178,4 +176,17 @@ impl RuntimeRef {
         Arc::into_inner(tx_context_ref.0)
             .expect("cannot extract final TxContext from stack because of lingering references")
     }
+}
+
+fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
+    tx_context
+        .tx_cache
+        .with_account(&tx_context.tx_input_box.to, |account| {
+            account.contract_path.clone().unwrap_or_else(|| {
+                panic!(
+                    "Recipient account is not a smart contract {}",
+                    address_hex(&tx_context.tx_input_box.to)
+                )
+            })
+        })
 }

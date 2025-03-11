@@ -1,7 +1,6 @@
 mod blockchain_vm;
 mod builtin_function_mocks;
 mod exec_call;
-mod exec_contract_endpoint;
 mod exec_create;
 mod exec_general_tx;
 mod runtime;
