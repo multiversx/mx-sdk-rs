@@ -31,8 +31,8 @@ tokio = { version = "1.24", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 toml = { version = "0.8.6", features = ["preserve_order"] }
-colored = "2.2"
-convert_case = "0.7.1"
+colored = "3.0"
+convert_case = "0.8"
 semver = "1.0.20"
 ruplacer = { version = "0.10.0", default-features = false }
 reqwest = { version = "0.12", features = ["blocking", "json"] }
@@ -41,8 +41,7 @@ copy_dir = "0.1.2"
 pathdiff = "0.2.1"
 common-path = "1.0.0"
 bip39 = "2.0.0"
-# TODO: 0.5.11 doesn't support rustc 1.80, needs >= 1.81 (issue on ci/cd for nightly builds)
-home = "=0.5.9"
+home = "=0.5.11"
 
 [dependencies.multiversx-sc-meta-lib]
 version = "=0.56.1"

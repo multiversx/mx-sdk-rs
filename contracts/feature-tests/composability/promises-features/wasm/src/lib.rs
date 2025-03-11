@@ -5,10 +5,10 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           12
+// Endpoints:                           13
 // Async Callback (empty):               1
-// Promise callbacks:                    4
-// Total number of exported functions:  18
+// Promise callbacks:                    5
+// Total number of exported functions:  20
 
 #![no_std]
 
@@ -26,14 +26,17 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_promise_retrieve_funds => forward_promise_retrieve_funds
         forward_payment_callback => forward_payment_callback
         forward_payment_gas_for_callback => forward_payment_gas_for_callback
+        promise_raw_single_token_to_user => promise_raw_single_token_to_user
         promise_raw_single_token => promise_raw_single_token
         promise_raw_multi_transfer => promise_raw_multi_transfer
         forward_sync_retrieve_funds_bt => forward_sync_retrieve_funds_bt
+        forward_sync_retrieve_funds_bt_reset_twice => forward_sync_retrieve_funds_bt_reset_twice
         forward_sync_retrieve_funds_bt_twice => forward_sync_retrieve_funds_bt_twice
         forward_promise_retrieve_funds_back_transfers => forward_promise_retrieve_funds_back_transfers
         retrieve_funds_callback => retrieve_funds_callback
         transfer_callback => transfer_callback
         the_one_callback => the_one_callback
+        retrieve_esdt_callback => retrieve_esdt_callback
         retrieve_funds_back_transfers_callback => retrieve_funds_back_transfers_callback
     )
 }

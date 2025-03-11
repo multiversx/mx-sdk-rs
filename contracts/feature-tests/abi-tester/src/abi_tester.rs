@@ -113,7 +113,7 @@ pub trait AbiTester {
     #[endpoint]
     fn process_managed_decimal(
         &self,
-        input: ManagedDecimal<Self::Api, ConstDecimals<10>>,
+        input: ManagedDecimal<Self::Api, ConstDecimals<U10>>,
     ) -> ManagedDecimal<Self::Api, usize> {
         input.into()
     }
@@ -150,6 +150,11 @@ pub trait AbiTester {
     #[view]
     fn item_for_managed_vec(&self) -> ManagedVec<AbiManagedVecItem> {
         ManagedVec::new()
+    }
+
+    #[view]
+    fn echo_permission(&self, p: Permission) -> Permission {
+        p
     }
 
     #[view]

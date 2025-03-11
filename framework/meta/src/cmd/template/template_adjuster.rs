@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use super::{template_metadata::TemplateMetadata, ContractCreatorTarget};
 use crate::{
     cmd::upgrade::upgrade_common::{rename_files, replace_in_files},
@@ -9,12 +11,9 @@ use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 use ruplacer::Query;
 use toml::value::Table;
 
-const TEST_DIRECTORY: &str = "./tests";
-const INTERACT_DIRECTORY: &str = "./interact";
-const ROOT_CARGO_TOML: &str = "./Cargo.toml";
-const META_CARGO_TOML: &str = "./meta/Cargo.toml";
-const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
-const INTERACT_CARGO_TOML: &str = "./interactor/Cargo.toml";
+const TEST_DIRECTORY_NAME: &str = "tests";
+const INTERACT_DIRECTORY_NAME: &str = "interact";
+const CARGO_TOML: &str = "Cargo.toml";
 const DEFAULT_AUTHOR: &str = "you";
 
 pub struct TemplateAdjuster {
@@ -36,7 +35,7 @@ impl TemplateAdjuster {
     }
 
     fn update_cargo_toml_root(&self, author: String) {
-        let cargo_toml_path = self.target.contract_dir().join(ROOT_CARGO_TOML);
+        let cargo_toml_path = self.target.contract_dir().join(CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
@@ -53,7 +52,7 @@ impl TemplateAdjuster {
     }
 
     fn update_cargo_toml_meta(&self) {
-        let cargo_toml_path = self.target.contract_dir().join(META_CARGO_TOML);
+        let cargo_toml_path = self.target.contract_dir().join("meta").join(CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
@@ -68,7 +67,7 @@ impl TemplateAdjuster {
             return;
         }
 
-        let cargo_toml_path = self.target.contract_dir().join(WASM_CARGO_TOML);
+        let cargo_toml_path = self.target.contract_dir().join("wasm").join(CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
@@ -83,7 +82,11 @@ impl TemplateAdjuster {
             return;
         }
 
-        let cargo_toml_path = self.target.contract_dir().join(INTERACT_CARGO_TOML);
+        let cargo_toml_path = self
+            .target
+            .contract_dir()
+            .join("interactor")
+            .join(CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
@@ -212,7 +215,7 @@ impl TemplateAdjuster {
         queries.push(Query::simple(&old_mxsc, &new_mxsc));
 
         replace_in_files(
-            &self.target.contract_dir().join(TEST_DIRECTORY),
+            &self.target.contract_dir().join(TEST_DIRECTORY_NAME),
             "*.rs",
             &queries,
         );
@@ -239,7 +242,7 @@ impl TemplateAdjuster {
         let queries = vec![Query::simple(&old_mxsc, &new_mxsc)];
 
         replace_in_files(
-            &self.target.contract_dir().join(INTERACT_DIRECTORY),
+            &self.target.contract_dir().join(INTERACT_DIRECTORY_NAME),
             "*.rs",
             &queries,
         );
@@ -270,7 +273,10 @@ fn rs_file_name(name: &str) -> String {
 }
 
 fn scenario_path(path: &str) -> String {
-    format!("scenarios/{path}",)
+    Path::new("scenarios")
+        .join(path)
+        .to_string_lossy()
+        .to_string()
 }
 
 fn as_path(name: &str) -> String {

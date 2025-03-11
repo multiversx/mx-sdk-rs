@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::{
     cli::UpgradeArgs,
     cmd::{print_util::print_tree_dir_metadata, upgrade::upgrade_settings::UpgradeSettings},
@@ -19,9 +21,9 @@ use super::{
 
 pub fn upgrade_sc(args: &UpgradeArgs) {
     let path = if let Some(some_path) = &args.path {
-        some_path.as_str()
+        Path::new(some_path)
     } else {
-        "./"
+        Path::new("./")
     };
 
     let settings = UpgradeSettings::new(args.no_check);
