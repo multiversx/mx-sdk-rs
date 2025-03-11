@@ -8,11 +8,11 @@ use crate::{
     },
     codec::TopDecode,
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
-    storage::{self},
+    storage,
     types::{
         BackTransfers, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags,
         EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray,
-        ManagedRefMut, ManagedType, ManagedVec, TokenIdentifier,
+        ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress, TokenIdentifier,
     },
 };
 
@@ -475,6 +475,34 @@ where
         let result = unsafe { BigUint::new_uninit() };
         A::managed_type_impl().mb_to_big_int_unsigned(temp_handle_2, result.get_handle());
         result
+    }
+
+    pub fn token_has_transfer_role(&self, token_identifier: TokenIdentifier<A>) -> bool {
+        // Prepare key
+        let key_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::managed_type_impl().mb_overwrite(key_handle.clone(), b"ELRONDtransferesdt");
+
+        // Append token identifier
+        A::managed_type_impl().mb_append(
+            key_handle.clone(),
+            token_identifier.into_managed_buffer().get_handle(),
+        );
+
+        // Prepare result
+        let result_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_2);
+
+        // Read storage from address
+        A::storage_read_api_impl().storage_load_from_address(
+            SystemSCAddress.to_managed_address::<A>().get_handle(),
+            key_handle,
+            result_handle.clone(),
+        );
+
+        let result = unsafe { ManagedBuffer::<A>::from_handle(result_handle) };
+
+        // Decoding the response needs more research
+        // Empty response means no address has transferRole for the token
+        !result.is_empty()
     }
 }
 
