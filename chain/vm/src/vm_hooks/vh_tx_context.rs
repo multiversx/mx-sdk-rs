@@ -7,6 +7,7 @@ use multiversx_chain_vm_executor::{BreakpointValue, Instance, MemLength, MemPtr}
 use num_bigint::BigUint;
 use num_traits::Zero;
 
+use crate::tx_execution::execute_builtin_function_or_default;
 use crate::{
     tx_execution::instance_call,
     tx_mock::{
@@ -163,10 +164,12 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self
-            .tx_context_ref
-            .runtime_ref
-            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
+        let (tx_result, blockchain_updates) = execute_builtin_function_or_default(
+            tx_input,
+            tx_cache,
+            &self.tx_context_ref.runtime_ref,
+            instance_call,
+        );
 
         if tx_result.result_status.is_success() {
             self.sync_call_post_processing(tx_result, blockchain_updates)
@@ -188,10 +191,12 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         let mut tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         tx_input.readonly = true;
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self
-            .tx_context_ref
-            .runtime_ref
-            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
+        let (tx_result, blockchain_updates) = execute_builtin_function_or_default(
+            tx_input,
+            tx_cache,
+            &self.tx_context_ref.runtime_ref,
+            instance_call,
+        );
 
         if tx_result.result_status.is_success() {
             self.sync_call_post_processing(tx_result, blockchain_updates)
@@ -267,10 +272,12 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         }
 
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self
-            .tx_context_ref
-            .runtime_ref
-            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
+        let (tx_result, blockchain_updates) = execute_builtin_function_or_default(
+            tx_input,
+            tx_cache,
+            &self.tx_context_ref.runtime_ref,
+            instance_call,
+        );
 
         match tx_result.result_status {
             ReturnCode::Success => {
