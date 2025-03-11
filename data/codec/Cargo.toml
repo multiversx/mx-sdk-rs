@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-codec"
-version = "0.21.2"
+version = "0.22.0"
 edition = "2021"
 
 authors = [
@@ -26,7 +26,7 @@ derive = ["multiversx-sc-codec-derive"]
 
 [dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.21.2"
+version = "=0.22.0"
 optional = true
 
 [dependencies]
@@ -37,4 +37,4 @@ bitflags = "=2.9.0"
 
 [dev-dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.21.2"
+version = "=0.22.0"
