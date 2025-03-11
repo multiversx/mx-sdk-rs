@@ -2,7 +2,7 @@ use crate::{
     tx_execution::instance_call,
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
-        merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
+        merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache,
         TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMCodeMetadata,
@@ -15,34 +15,6 @@ use std::collections::HashMap;
 use super::{RuntimeInstanceCall, RuntimeRef};
 
 impl RuntimeRef {
-    pub fn execute_sc_query_lambda<F>(
-        &self,
-        tx_input: TxInput,
-        state: &mut BlockchainStateRef,
-        f: F,
-    ) -> TxResult
-    where
-        F: FnOnce(RuntimeInstanceCall<'_>),
-    {
-        let (tx_result, _) = self.execute_in_debugger(tx_input, state, f);
-        tx_result
-    }
-
-    pub fn execute_in_debugger<F>(
-        &self,
-        tx_input: TxInput,
-        state: &mut BlockchainStateRef,
-        f: F,
-    ) -> (TxResult, BlockchainUpdate)
-    where
-        F: FnOnce(RuntimeInstanceCall<'_>),
-    {
-        let tx_cache = TxCache::new(state.get_arc());
-        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
-        let tx_context = self.execute_tx_context_in_runtime(tx_context, f);
-        tx_context.into_results()
-    }
-
     pub fn execute_builtin_function_or_default<F>(
         &self,
         tx_input: TxInput,
