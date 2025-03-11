@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.56.1"
+version = "0.57.0"
 edition = "2021"
 
 authors = [
@@ -44,14 +44,14 @@ bip39 = "2.0.0"
 home = "=0.5.11"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.56.1"
+version = "=0.57.0"
 path = "../meta-lib"
 
 [dependencies.multiversx-sc]
-version = "=0.56.1"
+version = "=0.57.0"
 path = "../base"
 features = ["alloc", "num-bigint"]
 
 [dependencies.multiversx-sc-snippets]
-version = "=0.56.1"
+version = "=0.57.0"
 path = "../snippets"
