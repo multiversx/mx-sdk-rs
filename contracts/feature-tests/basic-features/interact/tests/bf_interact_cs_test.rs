@@ -1,7 +1,12 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
-use multiversx_sc_snippets::imports::{
-    BigUint, EgldDecimals, EsdtLocalRole, EsdtTokenType, ManagedBuffer, ManagedDecimal,
-    ManagedOption, ManagedVec, RustBigUint, StaticApi,
+use multiversx_sc_snippets::{
+    imports::{
+        BigUint, ESDTSystemSCAddress, ESDTSystemSCProxy, EgldDecimals, EsdtLocalRole,
+        EsdtTokenPayment, EsdtTokenType, FungibleTokenProperties, ManagedBuffer, ManagedDecimal,
+        ManagedOption, ManagedVec, ReturnsNewTokenIdentifier, RustBigUint, StaticApi,
+        TokenIdentifier,
+    },
+    test_wallets, InteractorRunAsync,
 };
 use serial_test::serial;
 use system_sc_interact::SysFuncCallsInteract;
@@ -35,6 +40,60 @@ async fn simulator_basic_features_test() {
 }
 
 #[tokio::test]
+#[serial]
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+async fn send_esdt_to_non_existent_address_test() {
+    let registered_wallet_address = test_wallets::mike().to_address();
+    let not_registered_wallet_address = test_wallets::alice().to_address();
+
+    let mut chain_simulator_interact =
+        BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+
+    let token = chain_simulator_interact
+        .interactor
+        .tx()
+        .from(&registered_wallet_address)
+        .to(ESDTSystemSCAddress)
+        .gas(100_000_000u64)
+        .typed(ESDTSystemSCProxy)
+        .issue_fungible(
+            BigUint::from(50000000000000000u64),
+            "test",
+            "TEST",
+            100u16,
+            FungibleTokenProperties {
+                num_decimals: 0usize,
+                can_freeze: true,
+                can_wipe: true,
+                can_pause: true,
+                can_mint: true,
+                can_burn: true,
+                can_change_owner: true,
+                can_upgrade: true,
+                can_add_special_roles: true,
+            },
+        )
+        .returns(ReturnsNewTokenIdentifier)
+        .run()
+        .await;
+
+    // send to not registered address
+    chain_simulator_interact
+        .interactor
+        .tx()
+        .from(&registered_wallet_address)
+        .to(&not_registered_wallet_address)
+        .esdt(EsdtTokenPayment::new(
+            TokenIdentifier::from_esdt_bytes(token.clone()),
+            1,
+            BigUint::from(10u16),
+        ))
+        .run()
+        .await;
+}
+
+#[tokio::test]
+#[serial]
 #[ignore = "signature verification is currently unavailable"]
 async fn simulator_crypto_test() {
     let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
