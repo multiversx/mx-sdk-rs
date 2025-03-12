@@ -7,7 +7,7 @@ use multiversx_chain_vm_executor::{BreakpointValue, Instance, MemLength, MemPtr}
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::tx_execution::execute_builtin_function_or_default;
+use crate::tx_execution::{deploy_contract, execute_builtin_function_or_default};
 use crate::{
     tx_execution::instance_call,
     tx_mock::{
@@ -231,14 +231,14 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
 
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
         tx_cache.increase_acount_nonce(contract_address);
-        let (tx_result, new_address, blockchain_updates) =
-            self.tx_context_ref.runtime_ref.deploy_contract(
-                tx_input,
-                contract_code,
-                code_metadata,
-                tx_cache,
-                instance_call,
-            );
+        let (tx_result, new_address, blockchain_updates) = deploy_contract(
+            tx_input,
+            contract_code,
+            code_metadata,
+            tx_cache,
+            &self.tx_context_ref.runtime_ref,
+            instance_call,
+        );
 
         match tx_result.result_status {
             ReturnCode::Success => (

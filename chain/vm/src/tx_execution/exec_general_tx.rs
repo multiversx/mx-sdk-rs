@@ -5,7 +5,7 @@ use crate::{
     tx_mock::{
         BlockchainUpdate, CallType, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult,
     },
-    types::{top_encode_big_uint, VMAddress, VMCodeMetadata},
+    types::top_encode_big_uint,
 };
 
 use super::{is_system_sc_address, RuntimeInstanceCall, RuntimeRef};
@@ -131,50 +131,5 @@ impl RuntimeRef {
         }
 
         (tx_result, blockchain_updates)
-    }
-}
-
-impl RuntimeRef {
-    pub fn deploy_contract<F>(
-        &self,
-        mut tx_input: TxInput,
-        contract_path: Vec<u8>,
-        code_metadata: VMCodeMetadata,
-        tx_cache: TxCache,
-        f: F,
-    ) -> (TxResult, VMAddress, BlockchainUpdate)
-    where
-        F: FnOnce(RuntimeInstanceCall<'_>),
-    {
-        let new_address = tx_cache.get_new_address(&tx_input.from);
-        tx_input.to = new_address.clone();
-        tx_input.func_name = TxFunctionName::INIT;
-        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
-        let tx_input_ref = tx_context.input_ref();
-
-        if let Err(err) = tx_context
-            .tx_cache
-            .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value)
-        {
-            return (
-                TxResult::from_panic_obj(&err),
-                VMAddress::zero(),
-                BlockchainUpdate::empty(),
-            );
-        }
-        tx_context.create_new_contract(
-            &new_address,
-            contract_path,
-            code_metadata,
-            tx_input_ref.from.clone(),
-        );
-        tx_context
-            .tx_cache
-            .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
-
-        let tx_context = self.execute_tx_context_in_runtime(tx_context, f);
-
-        let (tx_result, blockchain_updates) = tx_context.into_results();
-        (tx_result, new_address, blockchain_updates)
     }
 }
