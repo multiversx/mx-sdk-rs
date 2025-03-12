@@ -44,7 +44,7 @@ impl Executor for ContractDebugExecutor {
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
         let contract_container = self.contract_map_ref.lock().get_contract(wasm_bytes);
-        let tx_context_ref = self.runtime_ref.upgrade().current_context();
+        let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
         let instance = ContractDebugInstance::new(tx_context_ref, contract_container);
         Ok(Box::new(instance))
     }

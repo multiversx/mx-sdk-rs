@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use multiversx_chain_vm::{
     tx_execution::RuntimeInstanceCall,
     tx_mock::{TxContextRef, TxFunctionName, TxPanic},
@@ -5,18 +7,20 @@ use multiversx_chain_vm::{
 use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
 use multiversx_sc::chain_core::types::ReturnCode;
 
-use crate::debug_executor::TxContextStack;
-
-use super::{catch_tx_panic, ContractContainerRef, StaticVarStack};
+use super::{
+    catch_tx_panic, ContractContainer, ContractContainerRef, ContractDebugStack, StaticVarData,
+};
 
 /// Used as a flag to check the instance under lambda calls.
 /// Since it is an invalid function name, any other instance should reject it.
 const FUNC_CONTEXT_PUSH: &str = "<ContractDebugInstance-PushContext>";
 const FUNC_CONTEXT_POP: &str = "<ContractDebugInstance-PopContext>";
 
+#[derive(Clone, Debug)]
 pub struct ContractDebugInstance {
     pub tx_context_ref: TxContextRef,
     pub contract_container_ref: ContractContainerRef,
+    pub static_var_ref: Rc<StaticVarData>,
 }
 
 impl ContractDebugInstance {
@@ -24,6 +28,40 @@ impl ContractDebugInstance {
         ContractDebugInstance {
             tx_context_ref,
             contract_container_ref: contract_container,
+            static_var_ref: Default::default(),
+        }
+    }
+
+    /// Dummy instance for tests where no proper context is created on stack.
+    pub fn dummy() -> Self {
+        ContractDebugInstance {
+            tx_context_ref: TxContextRef::dummy(),
+            contract_container_ref: ContractContainerRef::new(ContractContainer::dummy()),
+            static_var_ref: Default::default(),
+        }
+    }
+
+    /// Interprets the input as a regular pointer.
+    ///
+    /// ## Safety
+    ///
+    /// The offset and the length must point to valid memory.
+    pub unsafe fn main_memory_load(mem_ptr: MemPtr, mem_length: MemLength) -> &'static [u8] {
+        unsafe {
+            let bytes_ptr =
+                std::ptr::slice_from_raw_parts(mem_ptr as *const u8, mem_length as usize);
+            &*bytes_ptr
+        }
+    }
+
+    /// Interprets the input as a regular pointer and writes to current memory.
+    ///
+    /// ## Safety
+    ///
+    /// The offset and the length must point to valid memory.
+    pub unsafe fn main_memory_store(offset: MemPtr, data: &[u8]) {
+        unsafe {
+            std::ptr::copy(data.as_ptr(), offset as *mut u8, data.len());
         }
     }
 
@@ -54,7 +92,9 @@ impl ContractDebugInstance {
         });
 
         if let Err(tx_panic) = result {
-            TxContextStack::static_peek().replace_tx_result_with_error(tx_panic);
+            ContractDebugStack::static_peek()
+                .tx_context_ref
+                .replace_tx_result_with_error(tx_panic);
         }
 
         let _ = instance_call.instance.call(FUNC_CONTEXT_POP);
@@ -63,8 +103,7 @@ impl ContractDebugInstance {
     fn call_endpoint(&self, func_name: &str) -> Result<(), String> {
         let tx_func_name = TxFunctionName::from(func_name);
 
-        TxContextStack::static_push(self.tx_context_ref.clone());
-        StaticVarStack::static_push();
+        ContractDebugStack::static_push(self.clone());
 
         let result = catch_tx_panic(self.contract_container_ref.0.panic_message, || {
             let call_successful = self.contract_container_ref.0.call(&tx_func_name);
@@ -84,8 +123,7 @@ impl ContractDebugInstance {
                 .replace_tx_result_with_error(tx_panic);
         }
 
-        TxContextStack::static_pop();
-        StaticVarStack::static_pop();
+        ContractDebugStack::static_pop();
 
         Ok(())
     }
@@ -95,13 +133,11 @@ impl Instance for ContractDebugInstance {
     fn call(&self, func_name: &str) -> Result<(), String> {
         match func_name {
             FUNC_CONTEXT_PUSH => {
-                TxContextStack::static_push(self.tx_context_ref.clone());
-                StaticVarStack::static_push();
+                ContractDebugStack::static_push(self.clone());
                 Ok(())
             },
             FUNC_CONTEXT_POP => {
-                TxContextStack::static_pop();
-                StaticVarStack::static_pop();
+                ContractDebugStack::static_pop();
                 Ok(())
             },
             _ => self.call_endpoint(func_name),
@@ -144,24 +180,24 @@ impl Instance for ContractDebugInstance {
         panic!("ContractContainerRef memory_ptr not supported")
     }
 
-    fn memory_load(
-        &self,
-        _mem_ptr: MemPtr,
-        _mem_length: MemLength,
-    ) -> Result<&[u8], ExecutorError> {
-        panic!("ContractContainerRef memory_load not supported")
+    fn memory_load(&self, mem_ptr: MemPtr, mem_length: MemLength) -> Result<&[u8], ExecutorError> {
+        let data = unsafe { Self::main_memory_load(mem_ptr, mem_length) };
+        Ok(data)
     }
 
-    fn memory_store(&self, _mem_ptr: MemPtr, _data: &[u8]) -> Result<(), ExecutorError> {
-        panic!("ContractContainerRef memory_store not supported")
+    fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) -> Result<(), ExecutorError> {
+        unsafe {
+            Self::main_memory_store(mem_ptr, data);
+        }
+        Ok(())
     }
 
     fn memory_grow(&self, _by_num_pages: u32) -> Result<u32, ExecutorError> {
         panic!("ContractContainerRef memory_grow not supported")
     }
 
-    fn set_breakpoint_value(&self, _value: BreakpointValue) -> Result<(), String> {
-        panic!("ContractContainerRef set_breakpoint_value not supported")
+    fn set_breakpoint_value(&self, breakpoint_value: BreakpointValue) -> Result<(), String> {
+        std::panic::panic_any(breakpoint_value)
     }
 
     fn get_breakpoint_value(&self) -> Result<BreakpointValue, String> {

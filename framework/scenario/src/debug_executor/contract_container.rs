@@ -24,6 +24,15 @@ impl ContractContainer {
         }
     }
 
+    /// Dummy object for tests where no proper context is created on stack.
+    pub fn dummy() -> Self {
+        ContractContainer {
+            callable: Box::new(DummyCallableContract),
+            function_whitelist: Some(Vec::new()),
+            panic_message: true,
+        }
+    }
+
     pub fn validate_function_name(&self, function_name: &TxFunctionName) -> bool {
         if let Some(function_whitelist) = &self.function_whitelist {
             function_whitelist
@@ -43,7 +52,7 @@ impl ContractContainer {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ContractContainerRef(pub(crate) Arc<ContractContainer>);
 
 impl ContractContainerRef {
@@ -54,5 +63,21 @@ impl ContractContainerRef {
     pub fn has_function(&self, func_name: &str) -> bool {
         let tx_func_name = TxFunctionName::from(func_name);
         self.0.validate_function_name(&tx_func_name)
+    }
+}
+
+impl core::fmt::Debug for ContractContainer {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("ContractContainer")
+            .field("function_whitelist", &self.function_whitelist)
+            .finish()
+    }
+}
+
+pub struct DummyCallableContract;
+
+impl CallableContract for DummyCallableContract {
+    fn call(&self, _fn_name: &str) -> bool {
+        false
     }
 }

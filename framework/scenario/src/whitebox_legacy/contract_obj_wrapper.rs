@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{ContractContainer, ContractDebugInstance, StaticVarStack, TxContextStack},
+    debug_executor::{ContractContainer, ContractDebugInstance, ContractDebugStack},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -13,7 +13,7 @@ use crate::{
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::tx_mock::{TxContextRef, TxFunctionName, TxResult};
+use multiversx_chain_vm::tx_mock::{TxFunctionName, TxResult};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 
@@ -644,11 +644,9 @@ impl BlockchainStateWrapper {
     where
         F: FnOnce() -> T,
     {
-        TxContextStack::static_push(TxContextRef::dummy());
-        StaticVarStack::static_push();
+        ContractDebugStack::static_push(ContractDebugInstance::dummy());
         let result = f();
-        let _ = TxContextStack::static_pop();
-        let _ = StaticVarStack::static_pop();
+        let _ = ContractDebugStack::static_pop();
 
         result
     }

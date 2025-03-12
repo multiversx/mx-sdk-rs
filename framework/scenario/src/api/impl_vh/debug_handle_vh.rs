@@ -6,7 +6,7 @@ use multiversx_sc::{
     codec::TryStaticCast,
 };
 
-use crate::debug_executor::TxContextStack;
+use crate::debug_executor::ContractDebugStack;
 
 #[derive(Clone)]
 pub struct DebugHandle {
@@ -18,7 +18,10 @@ pub struct DebugHandle {
 
 impl DebugHandle {
     pub fn is_on_current_context(&self) -> bool {
-        Arc::ptr_eq(&self.context, &TxContextStack::static_peek().into_ref())
+        Arc::ptr_eq(
+            &self.context,
+            &ContractDebugStack::static_peek().tx_context_ref.into_ref(),
+        )
     }
 
     pub fn is_on_same_context(&self, other: &DebugHandle) -> bool {
@@ -42,7 +45,7 @@ impl core::fmt::Debug for DebugHandle {
 impl HandleConstraints for DebugHandle {
     fn new(handle: multiversx_sc::api::RawHandle) -> Self {
         Self {
-            context: TxContextStack::static_peek().into_ref(),
+            context: ContractDebugStack::static_peek().tx_context_ref.into_ref(),
             raw_handle: handle,
         }
     }
