@@ -184,7 +184,7 @@ impl BasicFeaturesInteract {
     pub async fn returns_egld_decimal(
         &mut self,
         egld: u64,
-    ) -> ManagedDecimal<StaticApi, ConstDecimals<18>> {
+    ) -> ManagedDecimal<StaticApi, EgldDecimals> {
         self.interactor
             .tx()
             .from(&self.wallet_address)
@@ -305,5 +305,18 @@ impl BasicFeaturesInteract {
                 assert_eq!(err_msg.unwrap_or_default(), err.message);
             },
         }
+    }
+
+    pub async fn token_has_transfer_role(&mut self, token_id: &str) -> bool {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.bf_contract())
+            .gas(50_000_000)
+            .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
+            .token_has_transfer_role(TokenIdentifier::from_esdt_bytes(token_id))
+            .returns(ReturnsResult)
+            .run()
+            .await
     }
 }

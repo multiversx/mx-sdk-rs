@@ -19,7 +19,7 @@ impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ExpectMessage<
 where
     Env: TxEnv<RHExpect = TxExpect>,
 {
-    fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+    fn item_preprocessing(&self, mut prev: TxExpect) -> TxExpect {
         if prev.status.is_equal_to(U64Value::empty()) {
             prev.status = CheckValue::Star;
         }

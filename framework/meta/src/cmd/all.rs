@@ -7,15 +7,15 @@ use std::{path::Path, process::Command};
 
 pub fn call_all_meta(args: &AllArgs) {
     let path = if let Some(some_path) = &args.path {
-        some_path.as_str()
+        Path::new(some_path)
     } else {
-        "./"
+        Path::new("./")
     };
 
     perform_call_all_meta(path, args.ignore.as_slice(), args.to_cargo_run_args());
 }
 
-fn perform_call_all_meta(path: impl AsRef<Path>, ignore: &[String], raw_args: Vec<String>) {
+fn perform_call_all_meta(path: &Path, ignore: &[String], raw_args: Vec<String>) {
     let dirs = RelevantDirectories::find_all(path, ignore);
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 

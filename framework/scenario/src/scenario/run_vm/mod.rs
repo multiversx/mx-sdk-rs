@@ -1,4 +1,5 @@
 mod check_state;
+mod errors;
 pub mod sc_call;
 pub mod sc_deploy;
 pub mod sc_query;

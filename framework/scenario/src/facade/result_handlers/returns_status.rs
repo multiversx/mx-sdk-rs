@@ -18,7 +18,7 @@ impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsStatus
 where
     Env: TxEnv<RHExpect = TxExpect>,
 {
-    fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+    fn item_preprocessing(&self, mut prev: TxExpect) -> TxExpect {
         if let CheckValue::Equal(U64Value {
             value: 0,
             original: _,
