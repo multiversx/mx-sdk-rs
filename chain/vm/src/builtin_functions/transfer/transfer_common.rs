@@ -84,7 +84,6 @@ where
     let (mut tx_result, blockchain_updates) = execute_default(exec_input, tx_cache, runtime, f);
 
     // prepends esdt log
-    // tx_result.result_logs = [builtin_logs.as_slice(), tx_result.result_logs.as_slice()].concat();
     tx_result.result_logs.insert(0, log);
 
     (tx_result, blockchain_updates)
