@@ -1,7 +1,7 @@
 use crate::{
     blockchain::{
         state::{AccountData, AccountEsdt, BlockchainState},
-        BlockchainVMRef, FailingExecutor,
+        BlockchainVMRef,
     },
     host::runtime::RuntimeRef,
     types::{VMAddress, VMCodeMetadata},
@@ -14,7 +14,8 @@ use std::{
 };
 
 use super::{
-    BackTransfers, BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult,
+    BackTransfers, BlockchainRng, BlockchainUpdate, FailingExecutor, TxCache, TxInput,
+    TxManagedTypes, TxResult,
 };
 
 pub struct TxContext {

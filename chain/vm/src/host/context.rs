@@ -1,6 +1,7 @@
 #![allow(clippy::type_complexity)]
 
 mod blockchain_update;
+mod failing_executor;
 mod tx_async_call_data;
 mod tx_async_promise;
 mod tx_back_transfers;
@@ -19,6 +20,7 @@ mod tx_result;
 mod tx_result_calls;
 
 pub use blockchain_update::BlockchainUpdate;
+pub use failing_executor::FailingExecutor;
 pub use tx_async_call_data::*;
 pub use tx_async_promise::*;
 pub use tx_back_transfers::*;
