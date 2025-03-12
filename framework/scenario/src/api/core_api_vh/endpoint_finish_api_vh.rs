@@ -1,7 +1,9 @@
-use multiversx_chain_vm::mem_conv;
 use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl, HandleConstraints};
 
-use crate::api::{VMHooksApi, VMHooksApiBackend};
+use crate::{
+    api::{VMHooksApi, VMHooksApiBackend},
+    debug_executor::ContractDebugInstance,
+};
 
 impl<VHB: VMHooksApiBackend> EndpointFinishApi for VMHooksApi<VHB> {
     type EndpointFinishApiImpl = Self;
@@ -13,10 +15,9 @@ impl<VHB: VMHooksApiBackend> EndpointFinishApi for VMHooksApi<VHB> {
 
 impl<VHB: VMHooksApiBackend> EndpointFinishApiImpl for VMHooksApi<VHB> {
     fn finish_slice_u8(&self, bytes: &[u8]) {
+        let (offset, length) = ContractDebugInstance::main_memory_ptr(bytes);
         self.with_vm_hooks(|vh| {
-            mem_conv::with_mem_ptr(bytes, |offset, length| {
-                vh.finish(offset, length);
-            })
+            vh.finish(offset, length);
         })
     }
 

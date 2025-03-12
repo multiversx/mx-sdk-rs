@@ -65,6 +65,14 @@ impl ContractDebugInstance {
         }
     }
 
+    pub fn main_memory_ptr(bytes: &[u8]) -> (MemPtr, MemLength) {
+        (bytes.as_ptr() as MemPtr, bytes.len() as MemLength)
+    }
+
+    pub fn main_memory_mut_ptr(bytes: &mut [u8]) -> (MemPtr, MemLength) {
+        (bytes.as_ptr() as MemPtr, bytes.len() as MemLength)
+    }
+
     pub fn wrap_lambda_call<F>(
         panic_message_flag: bool,
         instance_call: RuntimeInstanceCall<'_>,
@@ -210,5 +218,39 @@ impl Instance for ContractDebugInstance {
 
     fn cache(&self) -> Result<Vec<u8>, String> {
         panic!("ContractContainerRef cache not supported")
+    }
+}
+
+#[cfg(test)]
+#[allow(deprecated)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_mem_ptr_conversion() {
+        assert_mem_load_sound(vec![]);
+        assert_mem_load_sound(vec![1]);
+        assert_mem_load_sound(vec![1, 2, 3]);
+
+        assert_mem_store_sound(vec![]);
+        assert_mem_store_sound(vec![1]);
+        assert_mem_store_sound(vec![1, 2, 3]);
+    }
+
+    fn assert_mem_load_sound(data: Vec<u8>) {
+        let (offset, length) = ContractDebugInstance::main_memory_ptr(&data);
+        let re_slice = unsafe { ContractDebugInstance::main_memory_load(offset, length) };
+        let cloned = re_slice.to_vec();
+        assert_eq!(data, cloned);
+    }
+
+    fn assert_mem_store_sound(mut data: Vec<u8>) {
+        let new_data: Vec<u8> = data.iter().map(|x| x * 2).collect();
+        let (offset, length) = ContractDebugInstance::main_memory_mut_ptr(&mut data);
+        assert_eq!(length, data.len() as isize);
+        unsafe {
+            ContractDebugInstance::main_memory_store(offset, &new_data);
+        }
+        assert_eq!(data, new_data);
     }
 }
