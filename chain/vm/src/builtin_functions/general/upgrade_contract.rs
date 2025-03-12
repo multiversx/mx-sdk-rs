@@ -1,7 +1,7 @@
 use crate::{
     chain_core::builtin_func_names::UPGRADE_CONTRACT_FUNC_NAME,
     host::context::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult},
-    host::execution::{create_transfer_value_log, execute_default},
+    host::execution,
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::VMCodeMetadata,
 };
@@ -46,7 +46,8 @@ impl BuiltinFunction for UpgradeContract {
             account.code_metadata = code_metadata;
         });
 
-        let transfer_value_log = create_transfer_value_log(&tx_input, CallType::UpgradeFromSource);
+        let transfer_value_log =
+            execution::create_transfer_value_log(&tx_input, CallType::UpgradeFromSource);
 
         let exec_input = TxInput {
             from: tx_input.from,
@@ -62,7 +63,8 @@ impl BuiltinFunction for UpgradeContract {
             ..Default::default()
         };
 
-        let (mut tx_result, blockchain_updates) = execute_default(exec_input, tx_cache, runtime, f);
+        let (mut tx_result, blockchain_updates) =
+            execution::execute_default(exec_input, tx_cache, runtime, f);
         adjust_upgrade_log_endpoint(&mut tx_result);
         tx_result.result_logs.insert(0, transfer_value_log);
         (tx_result, blockchain_updates)

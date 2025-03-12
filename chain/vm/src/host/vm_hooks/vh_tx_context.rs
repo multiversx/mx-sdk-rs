@@ -7,7 +7,6 @@ use multiversx_chain_vm_executor::{BreakpointValue, Instance, MemLength, MemPtr}
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::host::execution::{execute_builtin_function_or_default, execute_deploy};
 use crate::{
     blockchain::{
         reserved::STORAGE_RESERVED_PREFIX,
@@ -17,6 +16,7 @@ use crate::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType,
         ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxPanic, TxResult,
     },
+    host::execution,
     host::runtime::instance_call,
     host::vm_hooks::{
         VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
@@ -167,7 +167,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = execute_builtin_function_or_default(
+        let (tx_result, blockchain_updates) = execution::execute_builtin_function_or_default(
             tx_input,
             tx_cache,
             &self.tx_context_ref.runtime_ref,
@@ -194,7 +194,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         let mut tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         tx_input.readonly = true;
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = execute_builtin_function_or_default(
+        let (tx_result, blockchain_updates) = execution::execute_builtin_function_or_default(
             tx_input,
             tx_cache,
             &self.tx_context_ref.runtime_ref,
@@ -234,7 +234,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
 
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
         tx_cache.increase_acount_nonce(contract_address);
-        let (tx_result, new_address, blockchain_updates) = execute_deploy(
+        let (tx_result, new_address, blockchain_updates) = execution::execute_deploy(
             tx_input,
             contract_code,
             code_metadata,
@@ -275,7 +275,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         }
 
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = execute_builtin_function_or_default(
+        let (tx_result, blockchain_updates) = execution::execute_builtin_function_or_default(
             tx_input,
             tx_cache,
             &self.tx_context_ref.runtime_ref,

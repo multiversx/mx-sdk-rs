@@ -3,7 +3,7 @@ use crate::scenario::model::{TransferStep, TxTransfer, ValidatorRewardStep};
 use multiversx_chain_vm::{
     blockchain::state::BlockchainStateRef,
     host::context::{TxFunctionName, TxInput},
-    host::execution::commit_call,
+    host::execution,
     host::runtime::{instance_call, RuntimeRef},
 };
 
@@ -41,6 +41,6 @@ fn execute(runtime: &RuntimeRef, state: &mut BlockchainStateRef, tx_transfer: &T
     // nonce gets increased irrespective of whether the tx fails or not
     state.increase_account_nonce(&tx_input.from);
 
-    let tx_result = commit_call(tx_input, state, runtime, instance_call);
+    let tx_result = execution::commit_call(tx_input, state, runtime, instance_call);
     tx_result.assert_ok();
 }

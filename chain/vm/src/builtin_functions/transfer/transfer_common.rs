@@ -4,7 +4,7 @@ use crate::{
         BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxLog, TxResult,
         TxTokenTransfer,
     },
-    host::execution::execute_default,
+    host::execution,
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::{top_decode_u64, VMAddress},
 };
@@ -81,7 +81,8 @@ where
         ..Default::default()
     };
 
-    let (mut tx_result, blockchain_updates) = execute_default(exec_input, tx_cache, runtime, f);
+    let (mut tx_result, blockchain_updates) =
+        execution::execute_default(exec_input, tx_cache, runtime, f);
 
     // prepends esdt log
     tx_result.result_logs.insert(0, log);
