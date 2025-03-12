@@ -9,7 +9,10 @@ use num_traits::Zero;
 
 use crate::host::execution::{execute_builtin_function_or_default, execute_deploy};
 use crate::{
-    blockchain::{reserved::STORAGE_RESERVED_PREFIX, AccountData, BlockInfo},
+    blockchain::{
+        reserved::STORAGE_RESERVED_PREFIX,
+        state::{AccountData, BlockInfo},
+    },
     host::context::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, TxCache,
         TxContextRef, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,

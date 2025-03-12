@@ -1,5 +1,5 @@
 use crate::{
-    blockchain::{AccountData, BlockchainState},
+    blockchain::state::{AccountData, BlockchainState},
     types::VMAddress,
 };
 

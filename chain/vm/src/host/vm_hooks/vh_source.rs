@@ -4,7 +4,7 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use crate::{
-    blockchain::{AccountData, BlockInfo},
+    blockchain::state::{AccountData, BlockInfo},
     host::context::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata, H256},
 };

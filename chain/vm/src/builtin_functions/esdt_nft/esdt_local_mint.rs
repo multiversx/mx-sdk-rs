@@ -2,7 +2,7 @@ use multiversx_chain_core::types::ReturnCode;
 use num_bigint::BigUint;
 
 use crate::{
-    blockchain::EsdtInstanceMetadata,
+    blockchain::state::EsdtInstanceMetadata,
     chain_core::builtin_func_names::ESDT_LOCAL_MINT_FUNC_NAME,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},

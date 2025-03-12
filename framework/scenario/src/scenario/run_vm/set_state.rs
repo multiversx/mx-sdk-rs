@@ -1,7 +1,7 @@
 use crate::scenario::model::SetStateStep;
 
 use multiversx_chain_vm::{
-    blockchain::{
+    blockchain::state::{
         AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainState, EsdtData,
         EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
     },

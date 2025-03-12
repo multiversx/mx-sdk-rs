@@ -1,5 +1,5 @@
 use crate::{
-    blockchain::{EsdtData, EsdtInstance},
+    blockchain::state::{EsdtData, EsdtInstance},
     chain_core::builtin_func_names::*,
     host::vm_hooks::VMHooksHandlerSource,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},

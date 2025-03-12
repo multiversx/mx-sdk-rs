@@ -1,7 +1,8 @@
 use std::sync::Mutex;
 
 use multiversx_chain_vm::{
-    blockchain::AccountData, executor::VMHooks, host::vm_hooks::VMHooksDispatcher, types::VMAddress,
+    blockchain::state::AccountData, executor::VMHooks, host::vm_hooks::VMHooksDispatcher,
+    types::VMAddress,
 };
 use multiversx_sc::api::RawHandle;
 

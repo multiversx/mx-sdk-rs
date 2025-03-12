@@ -12,7 +12,7 @@ use crate::{
     scenario_model::U64Value,
 };
 use multiversx_chain_vm::{
-    blockchain::{AccountData, EsdtData},
+    blockchain::state::{AccountData, EsdtData},
     types::VMAddress,
 };
 use num_traits::Zero;

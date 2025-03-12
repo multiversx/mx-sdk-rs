@@ -3,7 +3,7 @@ use std::sync::{Mutex, MutexGuard};
 use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use multiversx_chain_vm::{
-    blockchain::{AccountData, BlockInfo},
+    blockchain::state::{AccountData, BlockInfo},
     chain_core::types::ReturnCode,
     host::context::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     host::vm_hooks::{

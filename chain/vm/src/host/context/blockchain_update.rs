@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    blockchain::{AccountData, BlockchainState},
+    blockchain::state::{AccountData, BlockchainState},
     types::VMAddress,
 };
 

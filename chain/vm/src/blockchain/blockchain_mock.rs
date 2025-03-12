@@ -1,6 +1,6 @@
 use std::{fmt::Debug, ops::Deref};
 
-use super::{BlockchainStateRef, BlockchainVMRef};
+use super::{state::BlockchainStateRef, BlockchainVMRef};
 
 #[derive(Default)]
 pub struct BlockchainMock {

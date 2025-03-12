@@ -1,4 +1,4 @@
-use multiversx_chain_vm::blockchain::BlockchainState;
+use multiversx_chain_vm::blockchain::state::BlockchainState;
 
 use crate::{
     scenario::{

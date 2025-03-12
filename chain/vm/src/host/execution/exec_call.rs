@@ -1,5 +1,5 @@
 use crate::{
-    blockchain::{AccountData, AccountEsdt, BlockchainStateRef},
+    blockchain::state::{AccountData, AccountEsdt, BlockchainStateRef},
     host::context::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxInput,

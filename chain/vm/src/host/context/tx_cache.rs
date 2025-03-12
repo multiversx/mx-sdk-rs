@@ -7,7 +7,7 @@ use std::{
 use colored::Colorize;
 
 use crate::{
-    blockchain::{AccountData, BlockchainState},
+    blockchain::state::{AccountData, BlockchainState},
     display_util::address_hex,
     types::VMAddress,
 };

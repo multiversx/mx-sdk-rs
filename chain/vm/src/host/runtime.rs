@@ -6,7 +6,7 @@ use std::{
 use multiversx_chain_vm_executor::{BreakpointValue, Executor, Instance};
 
 use crate::{
-    blockchain::{BlockchainStateRef, BlockchainVMRef},
+    blockchain::{state::BlockchainStateRef, BlockchainVMRef},
     display_util::address_hex,
     host::context::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
 };

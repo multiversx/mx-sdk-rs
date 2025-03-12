@@ -1,5 +1,5 @@
 use crate::{
-    blockchain::BlockchainStateRef,
+    blockchain::state::BlockchainStateRef,
     host::context::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::{VMAddress, VMCodeMetadata},

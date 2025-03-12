@@ -7,9 +7,11 @@ use std::{
     sync::Arc,
 };
 
-use crate::{host::context::BlockchainUpdate, types::VMAddress};
+use crate::{
+    blockchain::reserved::STORAGE_REWARD_KEY, host::context::BlockchainUpdate, types::VMAddress,
+};
 
-use super::{reserved::STORAGE_REWARD_KEY, AccountData, BlockInfo};
+use super::{AccountData, BlockInfo};
 
 #[derive(Default, Clone)]
 pub struct BlockchainState {
