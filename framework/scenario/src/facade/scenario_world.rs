@@ -1,7 +1,10 @@
 use multiversx_chain_vm::world_mock::BlockchainState;
 
 use crate::{
-    scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
+    scenario::{
+        run_trace::ScenarioTrace,
+        run_vm::{ScenarioExecutorConfig, ScenarioVMRunner},
+    },
     vm_go_tool::run_mx_scenario_go,
 };
 use multiversx_sc_meta_lib::tools::find_current_workspace;
@@ -45,6 +48,11 @@ impl ScenarioWorld {
     /// Backwards compatibility only.
     pub fn new() -> Self {
         Self::debugger()
+    }
+
+    pub fn executor_config(mut self, config: ScenarioExecutorConfig) -> Self {
+        self.get_mut_debugger_backend().vm_runner.executor_config = config;
+        self
     }
 
     pub fn vm_go() -> Self {

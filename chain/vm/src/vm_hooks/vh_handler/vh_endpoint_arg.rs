@@ -24,6 +24,16 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         self.m_types_lock().mb_set(dest, arg_bytes);
     }
 
+    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: RawHandle) {
+        let arg_bytes = self.input_ref().get_argument_vec_u8(arg_index);
+        self.m_types_lock().bi_set_unsigned_bytes(dest, &arg_bytes);
+    }
+
+    fn load_argument_big_int_signed(&self, arg_index: i32, dest: RawHandle) {
+        let arg_bytes = self.input_ref().get_argument_vec_u8(arg_index);
+        self.m_types_lock().bi_set_signed_bytes(dest, &arg_bytes);
+    }
+
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
         // specific implementation provided, in order to simulate the VM error (status 10 instead of 4)
         let bytes = self.input_ref().get_argument_vec_u8(arg_index);
