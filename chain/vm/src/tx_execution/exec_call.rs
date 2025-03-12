@@ -12,28 +12,7 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 use std::collections::HashMap;
 
-use super::{RuntimeInstanceCall, RuntimeRef};
-
-pub fn execute_builtin_function_or_default<F>(
-    tx_input: TxInput,
-    tx_cache: TxCache,
-    runtime: &RuntimeRef,
-    f: F,
-) -> (TxResult, BlockchainUpdate)
-where
-    F: FnOnce(RuntimeInstanceCall<'_>),
-{
-    runtime
-        .vm_ref
-        .builtin_functions
-        .execute_builtin_function_or_else(
-            runtime,
-            tx_input,
-            tx_cache,
-            f,
-            |tx_input, tx_cache, f| runtime.default_execution(tx_input, tx_cache, f),
-        )
-}
+use super::{execute_builtin_function_or_default, RuntimeInstanceCall, RuntimeRef};
 
 pub fn execute_sc_call_lambda<F>(
     tx_input: TxInput,
