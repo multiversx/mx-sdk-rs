@@ -2,7 +2,7 @@ use multiversx_chain_vm::tx_execution::{Runtime, RuntimeRef, RuntimeWeakRef};
 use multiversx_chain_vm_executor::Executor;
 
 use crate::{
-    debug_executor::{ContractMapRef, DebugSCExecutor},
+    debug_executor::{ContractDebugExecutor, ContractMapRef},
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
 };
@@ -51,9 +51,10 @@ impl ScenarioVMRunner {
         weak: RuntimeWeakRef,
     ) -> Box<dyn Executor + Send + Sync> {
         match config {
-            ScenarioExecutorConfig::Debugger => {
-                Box::new(DebugSCExecutor::new(weak, self.contract_map_ref.clone()))
-            },
+            ScenarioExecutorConfig::Debugger => Box::new(ContractDebugExecutor::new(
+                weak,
+                self.contract_map_ref.clone(),
+            )),
             ScenarioExecutorConfig::Wasmer => wasmer_executor(weak),
         }
     }

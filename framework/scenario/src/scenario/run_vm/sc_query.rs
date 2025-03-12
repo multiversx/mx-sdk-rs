@@ -1,5 +1,5 @@
 use crate::{
-    debug_executor::DebugSCInstance, num_bigint::BigUint, scenario::model::ScQueryStep,
+    debug_executor::ContractDebugInstance, num_bigint::BigUint, scenario::model::ScQueryStep,
     scenario_model::TxResponse,
 };
 use multiversx_chain_vm::tx_mock::{TxCache, TxContext, TxInput, TxResult};
@@ -37,7 +37,7 @@ impl ScenarioVMRunner {
         let runtime = self.create_debugger_runtime();
         let tx_context = TxContext::new(runtime.clone(), tx_input, tx_cache);
         let (tx_result, _) = runtime.execute_lambda_in_runtime(tx_context, |instance_call| {
-            DebugSCInstance::wrap_lambda_call(true, instance_call, f);
+            ContractDebugInstance::wrap_lambda_call(true, instance_call, f);
         });
 
         assert!(
