@@ -27,9 +27,9 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn m_types_lock(&self) -> MutexGuard<TxManagedTypes>;
 
-    fn halt_with_error(&self, status: ReturnCode, message: &str) -> !;
+    fn halt_with_error(&self, status: ReturnCode, message: &str);
 
-    fn vm_error(&self, message: &str) -> ! {
+    fn vm_error(&self, message: &str) {
         self.halt_with_error(ReturnCode::ExecutionFailed, message)
     }
 

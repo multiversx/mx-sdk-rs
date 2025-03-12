@@ -45,7 +45,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         self.0.lock().unwrap()
     }
 
-    fn halt_with_error(&self, status: ReturnCode, message: &str) -> ! {
+    fn halt_with_error(&self, status: ReturnCode, message: &str) {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 

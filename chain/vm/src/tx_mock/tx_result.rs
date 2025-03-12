@@ -2,6 +2,8 @@ use std::fmt;
 
 use multiversx_chain_core::types::ReturnCode;
 
+use crate::vm_err_msg;
+
 use super::{AsyncCallTxData, TxLog, TxPanic, TxResultCalls};
 
 #[derive(Clone, Debug)]
@@ -76,6 +78,14 @@ impl TxResult {
         TxResult {
             result_status: ReturnCode::ExecutionFailed,
             result_message: result_message.into(),
+            ..Default::default()
+        }
+    }
+
+    pub fn from_function_not_found() -> Self {
+        TxResult {
+            result_status: ReturnCode::FunctionNotFound,
+            result_message: vm_err_msg::FUNCTION_NOT_FOUND.to_owned(),
             ..Default::default()
         }
     }

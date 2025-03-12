@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, Mutex, Weak},
 };
 
-use multiversx_chain_vm_executor::{Executor, Instance};
+use multiversx_chain_vm_executor::{BreakpointValue, Executor, Instance};
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
@@ -31,6 +31,7 @@ pub struct RuntimeWeakRef(Weak<Runtime>);
 pub struct RuntimeInstanceCall<'a> {
     pub instance: &'a dyn Instance,
     pub func_name: &'a str,
+    pub tx_context_ref: &'a TxContextRef,
 }
 
 impl Runtime {
@@ -113,10 +114,22 @@ impl RuntimeWeakRef {
 }
 
 pub fn instance_call(instance_call: RuntimeInstanceCall<'_>) {
-    instance_call
-        .instance
-        .call(instance_call.func_name)
-        .expect("execution error");
+    if !instance_call.instance.has_function(instance_call.func_name) {
+        *instance_call.tx_context_ref.result_lock() = TxResult::from_function_not_found();
+        return;
+    }
+
+    let result = instance_call.instance.call(instance_call.func_name);
+    if let Err(err) = result {
+        let breakpoint = instance_call
+            .instance
+            .get_breakpoint_value()
+            .expect("error retrieving instance breakpoint value");
+        println!("breakpoint: {breakpoint:?}");
+        if breakpoint == BreakpointValue::None {
+            *instance_call.tx_context_ref.result_lock() = TxResult::from_vm_error(err);
+        }
+    }
 }
 
 impl RuntimeRef {
@@ -169,6 +182,7 @@ impl RuntimeRef {
         call_lambda(RuntimeInstanceCall {
             instance: &*instance,
             func_name: func_name.as_str(),
+            tx_context_ref: &tx_context_ref,
         });
 
         std::mem::drop(instance);
