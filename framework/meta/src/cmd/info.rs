@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::{
     cli::InfoArgs,
     folder_structure::{dir_pretty_print, RelevantDirectories},
@@ -8,9 +10,9 @@ use super::print_util::print_tree_dir_metadata;
 
 pub fn call_info(args: &InfoArgs) {
     let path = if let Some(some_path) = &args.path {
-        some_path.as_str()
+        Path::new(some_path)
     } else {
-        "./"
+        Path::new("./")
     };
 
     let dirs = RelevantDirectories::find_all(path, args.ignore.as_slice());

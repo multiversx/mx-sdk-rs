@@ -52,8 +52,7 @@ impl RelevantDirectory {
 pub struct RelevantDirectories(pub(crate) Vec<RelevantDirectory>);
 
 impl RelevantDirectories {
-    pub fn find_all(path: impl AsRef<Path>, ignore: &[String]) -> Self {
-        let path_ref = path.as_ref();
+    pub fn find_all(path_ref: &Path, ignore: &[String]) -> Self {
         let canonicalized = fs::canonicalize(path_ref).unwrap_or_else(|err| {
             panic!(
                 "error canonicalizing input path {}: {}",

@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.56.1"
+version = "0.57.0"
 edition = "2021"
 
 authors = [
@@ -28,7 +28,7 @@ serde = "1.0"
 serde_json = "1.0"
 pathdiff = "0.2.1"
 itertools = "0.14.0"
-colored = "2.2"             # TODO: doesn't support >v2.2 (can't build on nightly)
+colored = "3.0"
 unwrap-infallible = "0.1.5"
 
 [features]
@@ -38,16 +38,16 @@ run-go-tests = []
 wasmer = ["multiversx-chain-vm/wasmer"]
 
 [dependencies.multiversx-sc]
-version = "=0.56.1"
+version = "=0.57.0"
 features = ["alloc", "num-bigint"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.56.1"
+version = "=0.57.0"
 path = "../meta-lib"
 
 [dependencies.multiversx-chain-scenario-format]
-version = "0.23.0"
+version = "0.23.1"
 path = "../../sdk/scenario-format"
 
 
@@ -57,5 +57,5 @@ git = "https://github.com/multiversx/mx-vm-executor-rs"
 rev = "2a267cf459ed48720d4db06fedb9c22ed8fc0106"
 
 [dependencies.multiversx-chain-vm]
-version = "=0.13.1"
+version = "=0.14.0"
 path = "../../chain/vm"

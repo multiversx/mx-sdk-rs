@@ -10,7 +10,7 @@ use crate::{
 };
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     unordered_set_mapper, StorageMapper, StorageMapperFromAddress, UnorderedSetMapper,
 };
 use crate::{

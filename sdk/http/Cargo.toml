@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk-http"
-version = "0.8.2"
+version = "0.9.0"
 edition = "2021"
 
 authors = [
@@ -30,5 +30,5 @@ itertools = "0.14.0"
 log = "0.4.17"
 
 [dependencies.multiversx-sdk]
-version = "=0.8.2"
+version = "=0.9.0"
 path = "../core"

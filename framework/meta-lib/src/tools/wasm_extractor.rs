@@ -2,6 +2,7 @@ use colored::Colorize;
 use std::{
     collections::{HashMap, HashSet},
     fs,
+    path::{Path, PathBuf},
 };
 use wasmparser::{
     BinaryReaderError, DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader,
@@ -37,7 +38,7 @@ pub struct WasmInfo {
 
 impl WasmInfo {
     pub fn extract_wasm_info(
-        output_wasm_path: &str,
+        output_wasm_path: &PathBuf,
         extract_imports_enabled: bool,
         check_ei: &Option<EIVersion>,
         view_endpoints: Vec<&str>,
@@ -46,7 +47,7 @@ impl WasmInfo {
             .expect("error occured while extracting information from .wasm: file not found");
 
         let wasm_info = populate_wasm_info(
-            output_wasm_path.to_string(),
+            output_wasm_path,
             wasm_data,
             extract_imports_enabled,
             check_ei,
@@ -134,7 +135,7 @@ impl WasmInfo {
 }
 
 pub(crate) fn populate_wasm_info(
-    path: String,
+    path: &Path,
     wasm_data: Vec<u8>,
     import_extraction_enabled: bool,
     check_ei: &Option<EIVersion>,
@@ -167,7 +168,7 @@ pub(crate) fn populate_wasm_info(
     wasm_info.detect_write_operations_in_views();
 
     let report = ReportCreator {
-        path,
+        path: path.to_path_buf(),
         has_allocator: wasm_info.report.has_allocator,
         has_panic: wasm_info.report.has_panic,
     };

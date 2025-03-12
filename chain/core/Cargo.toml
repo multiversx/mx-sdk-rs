@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-chain-core"
-version = "0.13.1"
+version = "0.14.0"
 edition = "2021"
 
 authors = [
@@ -17,9 +17,9 @@ keywords = ["multiversx", "blockchain", "vm", "tools"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
-bitflags = "=2.8.0"
+bitflags = "=2.9.0"
 
 [dependencies.multiversx-sc-codec]
-version = "=0.21.2"
+version = "=0.22.0"
 path = "../../data/codec"
 features = ["derive"]

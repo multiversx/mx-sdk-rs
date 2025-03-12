@@ -6,6 +6,7 @@ use crate::{
     },
     err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
+    typenum::{Unsigned, U4, U8},
     types::{
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigFloat,
         BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, ManagedVecRef, Sign,
@@ -13,7 +14,6 @@ use crate::{
 };
 
 use alloc::string::ToString;
-use generic_array::typenum::{U4, U8};
 use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -95,13 +95,11 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
-    ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
-{
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedDecimalSigned<M, ConstDecimals<DECIMALS>> {
     pub fn const_decimals_from_raw(data: BigInt<M>) -> Self {
         ManagedDecimalSigned {
             data,
-            decimals: ConstDecimals,
+            decimals: ConstDecimals::new(),
         }
     }
 
@@ -109,16 +107,16 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
     pub fn into_var_decimals(self) -> ManagedDecimalSigned<M, NumDecimals> {
         ManagedDecimalSigned {
             data: self.data,
-            decimals: DECIMALS,
+            decimals: DECIMALS::to_usize(),
         }
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigInt<M>>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<BigInt<M>>
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     fn from(mut value: BigInt<M>) -> Self {
-        let decimals = ConstDecimals;
+        let decimals = ConstDecimals::new();
         value *= decimals.scaling_factor().as_big_int();
         ManagedDecimalSigned {
             data: value,
@@ -127,7 +125,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigInt<M>>
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<i64>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<i64>
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     fn from(value: i64) -> Self {
@@ -158,15 +156,15 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<&BigFloat<M>>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<&BigFloat<M>>
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     fn from(value: &BigFloat<M>) -> Self {
-        Self::from_big_float(value, ConstDecimals)
+        Self::from_big_float(value, ConstDecimals::new())
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigFloat<M>>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<BigFloat<M>>
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     #[inline]
@@ -175,7 +173,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigFloat<M>>
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<f64>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<f64>
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     fn from(x: f64) -> Self {
@@ -183,7 +181,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<f64>
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<f32>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<f32>
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     fn from(x: f32) -> Self {
@@ -221,8 +219,8 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
     }
 }
 
-impl<M: ManagedTypeApi, const N: NumDecimals> ManagedVecItem
-    for ManagedDecimalSigned<M, ConstDecimals<N>>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
+    for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     type PAYLOAD = ManagedVecItemPayloadBuffer<U4>; // data only
 
@@ -243,7 +241,7 @@ impl<M: ManagedTypeApi, const N: NumDecimals> ManagedVecItem
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> TopEncode
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     #[inline]
@@ -256,7 +254,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> TopDecode
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
@@ -270,7 +268,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> NestedEncode
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -284,7 +282,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedDecode
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> NestedDecode
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -372,24 +370,27 @@ impl<M: ManagedTypeApi> TypeAbi for ManagedDecimalSigned<M, NumDecimals> {
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbiFrom<Self>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbiFrom<Self>
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbi
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        TypeName::from(alloc::format!("ManagedDecimalSigned<{}>", DECIMALS))
+        TypeName::from(alloc::format!(
+            "ManagedDecimalSigned<{}>",
+            DECIMALS::to_usize()
+        ))
     }
 
     fn type_name_rust() -> TypeName {
         TypeName::from(alloc::format!(
             "ManagedDecimalSigned<$API, ConstDecimals<{}>>",
-            DECIMALS
+            DECIMALS::to_usize()
         ))
     }
 

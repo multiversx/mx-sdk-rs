@@ -3,7 +3,7 @@ use unwrap_infallible::UnwrapInfallible;
 use crate::{
     api::{
         const_handles, use_raw_handle, ErrorApi, ManagedBufferApiImpl, ManagedTypeApi,
-        StorageWriteApi, StorageWriteApiImpl,
+        StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },
     codec::*,
     contract_base::ExitCodecErrorHandler,
@@ -105,4 +105,21 @@ where
     A::managed_type_impl().mb_overwrite(value_handle.clone(), &[]);
 
     A::storage_write_api_impl().storage_store_managed_buffer_raw(key.get_handle(), value_handle);
+}
+
+/// Useful for storage mappers.
+/// Replaces the content from a key to another without decoding.
+pub fn storage_overwrite<A>(
+    from_key: ManagedRef<'_, A, StorageKey<A>>,
+    to_key: ManagedRef<'_, A, StorageKey<A>>,
+) where
+    A: StorageWriteApi + StorageReadApi + ManagedTypeApi + ErrorApi,
+{
+    let from_buffer_handle: A::ManagedBufferHandle =
+        use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+
+    A::storage_read_api_impl()
+        .storage_load_managed_buffer_raw(from_key.get_handle(), from_buffer_handle.clone());
+    A::storage_write_api_impl()
+        .storage_store_managed_buffer_raw(to_key.get_handle(), from_buffer_handle);
 }

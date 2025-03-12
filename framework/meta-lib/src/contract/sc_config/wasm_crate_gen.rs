@@ -3,7 +3,7 @@ use rustc_version::Version;
 use std::{
     fs::{self, File},
     io::Write,
-    path::PathBuf,
+    path::{Path, PathBuf},
     str::FromStr,
 };
 
@@ -73,7 +73,9 @@ impl ContractVariant {
 
     /// Generates the wasm crate lib.rs source, st the given path.
     pub fn generate_wasm_src_lib_file(&self) {
-        let lib_path = format!("{}/src/lib.rs", &self.wasm_crate_path());
+        let lib_path = Path::new(&self.wasm_crate_path())
+            .join("src")
+            .join("lib.rs");
         let mut wasm_lib_file = File::create(lib_path).unwrap();
         self.write_wasm_src_lib_contents(&mut wasm_lib_file);
     }
