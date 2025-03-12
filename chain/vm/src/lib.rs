@@ -1,4 +1,4 @@
-pub mod builtin_function_mocks;
+pub mod builtin_functions;
 pub mod crypto_functions;
 pub mod display_util;
 pub mod host;

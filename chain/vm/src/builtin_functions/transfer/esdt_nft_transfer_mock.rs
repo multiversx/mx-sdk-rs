@@ -1,5 +1,5 @@
 use crate::{
-    builtin_function_mocks::BuiltinFunctionEsdtTransferInfo,
+    builtin_functions::BuiltinFunctionEsdtTransferInfo,
     chain_core::builtin_func_names::ESDT_NFT_TRANSFER_FUNC_NAME,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},

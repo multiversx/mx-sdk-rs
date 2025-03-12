@@ -2,7 +2,7 @@ use std::{ops::Deref, sync::Arc};
 
 use multiversx_chain_vm_executor::CompilationOptions;
 
-use crate::builtin_function_mocks::BuiltinFunctionContainer;
+use crate::builtin_functions::BuiltinFunctionContainer;
 
 pub const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     gas_limit: 1,

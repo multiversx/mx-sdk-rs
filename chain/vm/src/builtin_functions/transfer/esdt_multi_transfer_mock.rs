@@ -6,7 +6,7 @@ use crate::{
 };
 
 use crate::{
-    builtin_function_mocks::BuiltinFunctionEsdtTransferInfo,
+    builtin_functions::BuiltinFunctionEsdtTransferInfo,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
