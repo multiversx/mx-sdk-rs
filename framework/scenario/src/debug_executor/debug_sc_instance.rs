@@ -1,0 +1,180 @@
+use multiversx_chain_vm::{
+    tx_execution::RuntimeInstanceCall,
+    tx_mock::{TxContextRef, TxFunctionName, TxPanic},
+};
+use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
+use multiversx_sc::chain_core::types::ReturnCode;
+
+use crate::debug_executor::TxContextStack;
+
+use super::{catch_tx_panic, ContractContainerRef, StaticVarStack};
+
+/// Used as a flag to check the instance under lambda calls.
+/// Since it is an invalid function name, any other instance should reject it.
+const DEBUG_SC_INSTANCE_CONTEXT_PUSH: &str = "<DebugSCInstance-PushContext>";
+const DEBUG_SC_INSTANCE_CONTEXT_POP: &str = "<DebugSCInstance-PopContext>";
+
+pub struct DebugSCInstance {
+    pub tx_context_ref: TxContextRef,
+    pub contract_container_ref: ContractContainerRef,
+}
+
+impl DebugSCInstance {
+    pub fn new(tx_context_ref: TxContextRef, contract_container: ContractContainerRef) -> Self {
+        DebugSCInstance {
+            tx_context_ref,
+            contract_container_ref: contract_container,
+        }
+    }
+
+    pub fn wrap_lambda_call<F>(
+        panic_message_flag: bool,
+        instance_call: RuntimeInstanceCall<'_>,
+        f: F,
+    ) where
+        F: FnOnce(),
+    {
+        // assert!(
+        //     instance_call.func_name == TxFunctionName::WHITEBOX_CALL.as_str()
+        //         || instance_call.func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
+        //     "misconfigured whitebox call: {}",
+        //     instance_call.func_name,
+        // );
+
+        assert!(
+            instance_call
+                .instance
+                .has_function(DEBUG_SC_INSTANCE_CONTEXT_PUSH),
+            "lambda call is not running on top of a DebugSCInstance instance"
+        );
+
+        let _ = instance_call.instance.call(DEBUG_SC_INSTANCE_CONTEXT_PUSH);
+
+        let result = catch_tx_panic(panic_message_flag, || {
+            f();
+            Ok(())
+        });
+
+        if let Err(tx_panic) = result {
+            TxContextStack::static_peek().replace_tx_result_with_error(tx_panic);
+        }
+
+        let _ = instance_call.instance.call(DEBUG_SC_INSTANCE_CONTEXT_POP);
+    }
+
+    fn call_endpoint(&self, func_name: &str) -> Result<(), String> {
+        let tx_func_name = TxFunctionName::from(func_name);
+
+        TxContextStack::static_push(self.tx_context_ref.clone());
+        StaticVarStack::static_push();
+
+        let result = catch_tx_panic(self.contract_container_ref.0.panic_message, || {
+            let call_successful = self.contract_container_ref.0.call(&tx_func_name);
+            if call_successful {
+                Ok(())
+            } else {
+                Err(TxPanic::new(
+                    ReturnCode::FunctionNotFound,
+                    "invalid function (not found)",
+                ))
+            }
+        });
+
+        if let Err(tx_panic) = result {
+            self.tx_context_ref
+                .clone()
+                .replace_tx_result_with_error(tx_panic);
+        }
+
+        TxContextStack::static_pop();
+        StaticVarStack::static_pop();
+
+        Ok(())
+    }
+}
+
+impl Instance for DebugSCInstance {
+    fn call(&self, func_name: &str) -> Result<(), String> {
+        match func_name {
+            DEBUG_SC_INSTANCE_CONTEXT_PUSH => {
+                TxContextStack::static_push(self.tx_context_ref.clone());
+                StaticVarStack::static_push();
+                Ok(())
+            },
+            DEBUG_SC_INSTANCE_CONTEXT_POP => {
+                TxContextStack::static_pop();
+                StaticVarStack::static_pop();
+                Ok(())
+            },
+            _ => self.call_endpoint(func_name),
+        }
+    }
+
+    fn check_signatures(&self) -> bool {
+        true
+    }
+
+    fn has_function(&self, func_name: &str) -> bool {
+        match func_name {
+            DEBUG_SC_INSTANCE_CONTEXT_PUSH => true,
+            DEBUG_SC_INSTANCE_CONTEXT_POP => true,
+            _ => self.contract_container_ref.has_function(func_name),
+        }
+    }
+
+    fn get_exported_function_names(&self) -> Vec<String> {
+        panic!("ContractContainer get_exported_function_names not yet supported")
+    }
+
+    fn set_points_limit(&self, _limit: u64) -> Result<(), String> {
+        panic!("ContractContainerRef set_points_limit not supported")
+    }
+
+    fn set_points_used(&self, _points: u64) -> Result<(), String> {
+        panic!("ContractContainerRef set_points_used not supported")
+    }
+
+    fn get_points_used(&self) -> Result<u64, String> {
+        panic!("ContractContainerRef get_points_used not supported")
+    }
+
+    fn memory_length(&self) -> Result<u64, String> {
+        panic!("ContractContainerRef memory_length not supported")
+    }
+
+    fn memory_ptr(&self) -> Result<*mut u8, String> {
+        panic!("ContractContainerRef memory_ptr not supported")
+    }
+
+    fn memory_load(
+        &self,
+        _mem_ptr: MemPtr,
+        _mem_length: MemLength,
+    ) -> Result<&[u8], ExecutorError> {
+        panic!("ContractContainerRef memory_load not supported")
+    }
+
+    fn memory_store(&self, _mem_ptr: MemPtr, _data: &[u8]) -> Result<(), ExecutorError> {
+        panic!("ContractContainerRef memory_store not supported")
+    }
+
+    fn memory_grow(&self, _by_num_pages: u32) -> Result<u32, ExecutorError> {
+        panic!("ContractContainerRef memory_grow not supported")
+    }
+
+    fn set_breakpoint_value(&self, _value: BreakpointValue) -> Result<(), String> {
+        panic!("ContractContainerRef set_breakpoint_value not supported")
+    }
+
+    fn get_breakpoint_value(&self) -> Result<BreakpointValue, String> {
+        panic!("ContractContainerRef get_breakpoint_value not supported")
+    }
+
+    fn reset(&self) -> Result<(), String> {
+        panic!("ContractContainerRef reset not supported")
+    }
+
+    fn cache(&self) -> Result<Vec<u8>, String> {
+        panic!("ContractContainerRef cache not supported")
+    }
+}

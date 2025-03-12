@@ -1,8 +1,8 @@
-use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{contract_instance_wrapped_execution, ContractContainer, StaticVarStack},
+    debug_executor::{ContractContainer, DebugSCInstance, StaticVarStack, TxContextStack},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -13,7 +13,7 @@ use crate::{
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::tx_mock::{TxContext, TxContextStack, TxFunctionName, TxResult};
+use multiversx_chain_vm::tx_mock::{TxContextRef, TxFunctionName, TxResult};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 
@@ -628,23 +628,23 @@ impl BlockchainStateWrapper {
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda_and_check(&sc_call_step, || {
-                contract_instance_wrapped_execution(false, || {
+            .perform_sc_call_lambda_and_check(&sc_call_step, |instance_call| {
+                DebugSCInstance::wrap_lambda_call(false, instance_call, || {
                     tx_fn(sc);
-                    Ok(())
                 });
             });
 
         tx_result
     }
 
+    /// Creates a temporary DebugApi context to run lambda function.
+    ///
+    /// Restores previous context (if any) after finishing execution.
     pub fn execute_in_managed_environment<T, F>(&self, f: F) -> T
     where
         F: FnOnce() -> T,
     {
-        let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-        TxContextStack::static_push(tx_context_arc);
+        TxContextStack::static_push(TxContextRef::dummy());
         StaticVarStack::static_push();
         let result = f();
         let _ = TxContextStack::static_pop();

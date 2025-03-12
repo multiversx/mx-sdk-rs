@@ -3,13 +3,12 @@ use num_traits::Zero;
 use crate::{
     tx_execution::execute_system_sc,
     tx_mock::{
-        BlockchainUpdate, CallType, TxCache, TxContext, TxContextStack, TxFunctionName, TxInput,
-        TxLog, TxResult,
+        BlockchainUpdate, CallType, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult,
     },
     types::{top_encode_big_uint, VMAddress, VMCodeMetadata},
 };
 
-use super::{is_system_sc_address, BlockchainVMRef};
+use super::{is_system_sc_address, RuntimeInstanceCall, RuntimeRef};
 
 fn should_execute_sc_call(tx_input: &TxInput) -> bool {
     // execute whitebox calls no matter what
@@ -77,7 +76,7 @@ pub(crate) fn create_transfer_value_log(tx_input: &TxInput, call_type: CallType)
     }
 }
 
-impl BlockchainVMRef {
+impl RuntimeRef {
     /// Executes without builtin functions, directly on the contract or the given lambda closure.
     pub fn default_execution<F>(
         &self,
@@ -86,7 +85,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         if let Err(err) =
             tx_cache.transfer_egld_balance(&tx_input.from, &tx_input.to, &tx_input.egld_value)
@@ -119,7 +118,7 @@ impl BlockchainVMRef {
         } else if should_execute_sc_call(&tx_input) {
             let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
 
-            let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
+            let tx_context = self.execute_tx_context_in_runtime(tx_context, f);
 
             tx_context.into_results()
         } else {
@@ -133,7 +132,9 @@ impl BlockchainVMRef {
 
         (tx_result, blockchain_updates)
     }
+}
 
+impl RuntimeRef {
     pub fn deploy_contract<F>(
         &self,
         mut tx_input: TxInput,
@@ -143,7 +144,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, VMAddress, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let new_address = tx_cache.get_new_address(&tx_input.from);
         tx_input.to = new_address.clone();
@@ -171,7 +172,7 @@ impl BlockchainVMRef {
             .tx_cache
             .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
-        let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
+        let tx_context = self.execute_tx_context_in_runtime(tx_context, f);
 
         let (tx_result, blockchain_updates) = tx_context.into_results();
         (tx_result, new_address, blockchain_updates)

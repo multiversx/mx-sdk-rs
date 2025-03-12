@@ -1,8 +1,9 @@
 use crate::{
+    tx_execution::instance_call,
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
-        TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
+        TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMCodeMetadata,
     world_mock::{AccountData, AccountEsdt, BlockchainStateRef},
@@ -11,21 +12,9 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 use std::collections::HashMap;
 
-use super::BlockchainVMRef;
+use super::{RuntimeInstanceCall, RuntimeRef};
 
-/// Executes the SC endpoint, as given by the current TxInput in the current TxContext.
-///
-/// Works directly with the top of the execution stack, that is why it takes no arguments.
-///
-/// It expectes that the stack is properly set up.
-pub fn execute_current_tx_context_input() {
-    let tx_context_arc = TxContextStack::static_peek();
-    let func_name = tx_context_arc.input_ref().func_name.clone();
-    let instance = tx_context_arc.vm_ref.get_contract_instance(&tx_context_arc);
-    instance.call(func_name.as_str()).expect("execution error");
-}
-
-impl BlockchainVMRef {
+impl RuntimeRef {
     pub fn execute_sc_query_lambda<F>(
         &self,
         tx_input: TxInput,
@@ -33,7 +22,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let (tx_result, _) = self.execute_in_debugger(tx_input, state, f);
         tx_result
@@ -46,11 +35,11 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let tx_cache = TxCache::new(state.get_arc());
         let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
-        let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
+        let tx_context = self.execute_tx_context_in_runtime(tx_context, f);
         tx_context.into_results()
     }
 
@@ -61,15 +50,17 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
-        self.builtin_functions.execute_builtin_function_or_else(
-            self,
-            tx_input,
-            tx_cache,
-            f,
-            |tx_input, tx_cache, f| self.default_execution(tx_input, tx_cache, f),
-        )
+        self.vm_ref
+            .builtin_functions
+            .execute_builtin_function_or_else(
+                self,
+                tx_input,
+                tx_cache,
+                f,
+                |tx_input, tx_cache, f| self.default_execution(tx_input, tx_cache, f),
+            )
     }
 
     pub fn execute_sc_call_lambda<F>(
@@ -79,7 +70,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
@@ -102,19 +93,12 @@ impl BlockchainVMRef {
         if state.accounts.contains_key(&async_data.to) {
             let async_input = async_call_tx_input(&async_data, CallType::AsyncCall);
 
-            let async_result = self.sc_call_with_async_and_callback(
-                async_input,
-                state,
-                execute_current_tx_context_input,
-            );
+            let async_result =
+                self.sc_call_with_async_and_callback(async_input, state, instance_call);
 
             let callback_input =
-                async_callback_tx_input(&async_data, &async_result, &self.builtin_functions);
-            let callback_result = self.execute_sc_call_lambda(
-                callback_input,
-                state,
-                execute_current_tx_context_input,
-            );
+                async_callback_tx_input(&async_data, &async_result, &self.vm_ref.builtin_functions);
+            let callback_result = self.execute_sc_call_lambda(callback_input, state, instance_call);
             assert!(
                 callback_result.pending_calls.async_call.is_none(),
                 "successive asyncs currently not supported"
@@ -140,7 +124,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         // main call
         let mut tx_result = self.execute_sc_call_lambda(tx_input, state, f);
@@ -182,11 +166,8 @@ impl BlockchainVMRef {
     ) -> (TxResult, TxResult) {
         if state.accounts.contains_key(&promise.call.to) {
             let async_input = async_call_tx_input(&promise.call, CallType::AsyncCall);
-            let async_result = self.sc_call_with_async_and_callback(
-                async_input,
-                state,
-                execute_current_tx_context_input,
-            );
+            let async_result =
+                self.sc_call_with_async_and_callback(async_input, state, instance_call);
             let callback_result = self.execute_promises_callback(&async_result, promise, state);
             (async_result, callback_result)
         } else {
@@ -211,9 +192,8 @@ impl BlockchainVMRef {
             return TxResult::empty();
         }
         let callback_input =
-            async_promise_callback_tx_input(promise, async_result, &self.builtin_functions);
-        let callback_result =
-            self.execute_sc_call_lambda(callback_input, state, execute_current_tx_context_input);
+            async_promise_callback_tx_input(promise, async_result, &self.vm_ref.builtin_functions);
+        let callback_result = self.execute_sc_call_lambda(callback_input, state, instance_call);
         assert!(
             callback_result.pending_calls.promises.is_empty(),
             "successive promises currently not supported"

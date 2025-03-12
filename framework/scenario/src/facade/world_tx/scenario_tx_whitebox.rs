@@ -1,4 +1,4 @@
-use crate::debug_executor::contract_instance_wrapped_execution;
+use crate::debug_executor::DebugSCInstance;
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::{
     imports::StaticApi, scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec,
@@ -60,10 +60,9 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_deploy_lambda(&step_wrapper.step, || {
-                contract_instance_wrapped_execution(true, || {
+            .perform_sc_deploy_lambda(&step_wrapper.step, |instance_call| {
+                DebugSCInstance::wrap_lambda_call(true, instance_call, || {
                     f(contract_obj);
-                    Ok(())
                 });
             });
 
@@ -133,10 +132,9 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda(&step_wrapper.step, || {
-                contract_instance_wrapped_execution(true, || {
+            .perform_sc_call_lambda(&step_wrapper.step, |instance_call| {
+                DebugSCInstance::wrap_lambda_call(true, instance_call, || {
                     f(contract_obj);
-                    Ok(())
                 });
             });
 
@@ -203,11 +201,8 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_query_lambda(&step_wrapper.step, || {
-                contract_instance_wrapped_execution(true, || {
-                    f(contract_obj);
-                    Ok(())
-                });
+            .perform_sc_query_lambda_in_debugger(&step_wrapper.step, || {
+                f(contract_obj);
             });
 
         let response = TxResponse::from_tx_result(tx_result);

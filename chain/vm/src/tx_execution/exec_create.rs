@@ -4,9 +4,9 @@ use crate::{
     world_mock::BlockchainStateRef,
 };
 
-use super::BlockchainVMRef;
+use super::{RuntimeInstanceCall, RuntimeRef};
 
-impl BlockchainVMRef {
+impl RuntimeRef {
     pub fn sc_create<F>(
         &self,
         tx_input: TxInput,
@@ -16,7 +16,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> (VMAddress, TxResult)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         // nonce gets increased irrespective of whether the tx fails or not
         // must be done after computing the new address

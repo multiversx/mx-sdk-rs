@@ -3,7 +3,7 @@ use num_bigint::BigUint;
 
 use crate::{
     chain_core::builtin_func_names::ESDT_NFT_BURN_FUNC_NAME,
-    tx_execution::BlockchainVMRef,
+    tx_execution::{RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     types::{top_decode_u64, top_encode_u64},
 };
@@ -21,11 +21,11 @@ impl BuiltinFunction for ESDTNftBurn {
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-        _vm: &BlockchainVMRef,
+        _runtime: &RuntimeRef,
         _f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         if tx_input.args.len() != 3 {
             let err_result = TxResult::from_vm_error("ESDTNFTBurn expects 3 arguments");

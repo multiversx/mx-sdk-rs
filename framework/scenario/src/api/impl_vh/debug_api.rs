@@ -1,13 +1,11 @@
-use std::sync::Arc;
-
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
-    tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
+    tx_mock::{TxContextRef, TxPanic},
     vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::{StaticVarData, StaticVarStack};
+use crate::debug_executor::{StaticVarData, StaticVarStack, TxContextStack};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
@@ -31,7 +29,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        let wrapper = DebugApiVMHooksHandler::new(handle.context);
+        let wrapper = DebugApiVMHooksHandler::new(TxContextRef::new(handle.context));
         let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
         f(&dispatcher)
     }
@@ -78,11 +76,9 @@ impl VMHooksApiBackend for DebugApiBackend {
 pub type DebugApi = VMHooksApi<DebugApiBackend>;
 
 impl DebugApi {
+    /// WARNING: this does not clean up after itself, must fix!!!
     pub fn dummy() {
-        let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-        // TODO: WARNING: this does not clean up after itself, must fix!!!
-        TxContextStack::static_push(tx_context_arc);
+        TxContextStack::static_push(TxContextRef::dummy());
         StaticVarStack::static_push();
     }
 }
@@ -94,7 +90,7 @@ impl std::fmt::Debug for DebugApi {
 }
 
 fn debugger_panic(status: ReturnCode, message: &str) {
-    TxContextRef::new_from_static().replace_tx_result_with_error(TxPanic::new(status, message));
+    TxContextStack::static_peek().replace_tx_result_with_error(TxPanic::new(status, message));
     std::panic::panic_any(BreakpointValue::SignalError);
 }
 

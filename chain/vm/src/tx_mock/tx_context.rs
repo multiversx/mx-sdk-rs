@@ -1,5 +1,5 @@
 use crate::{
-    tx_execution::BlockchainVMRef,
+    tx_execution::{BlockchainVMRef, RuntimeRef},
     types::{VMAddress, VMCodeMetadata},
     world_mock::{AccountData, AccountEsdt, BlockchainState, FailingExecutor},
 };
@@ -15,7 +15,7 @@ use super::{
 };
 
 pub struct TxContext {
-    pub vm_ref: BlockchainVMRef,
+    pub runtime_ref: RuntimeRef,
     pub tx_input_box: Box<TxInput>,
     pub tx_cache: Arc<TxCache>,
     pub managed_types: Mutex<TxManagedTypes>,
@@ -25,10 +25,10 @@ pub struct TxContext {
 }
 
 impl TxContext {
-    pub fn new(vm_ref: BlockchainVMRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
+    pub fn new(runtime_ref: RuntimeRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
         let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
-            vm_ref,
+            runtime_ref,
             tx_input_box: Box::new(tx_input),
             tx_cache: Arc::new(tx_cache),
             managed_types: Mutex::new(TxManagedTypes::new()),
@@ -62,8 +62,9 @@ impl TxContext {
         };
 
         let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
+        let vm_ref = BlockchainVMRef::new();
         TxContext {
-            vm_ref: BlockchainVMRef::new(Box::new(FailingExecutor)),
+            runtime_ref: RuntimeRef::new(vm_ref, Box::new(FailingExecutor)),
             tx_input_box: Box::new(tx_input),
             tx_cache: Arc::new(tx_cache),
             managed_types: Mutex::new(TxManagedTypes::new()),

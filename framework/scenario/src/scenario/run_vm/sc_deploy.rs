@@ -3,7 +3,7 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::execute_current_tx_context_input,
+    tx_execution::{instance_call, RuntimeInstanceCall},
     tx_mock::{TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
 };
@@ -15,8 +15,7 @@ impl ScenarioVMRunner {
     ///
     /// The result of the operation gets saved back in the step's response field.
     pub fn perform_sc_deploy_update_results(&mut self, step: &mut ScDeployStep) {
-        let (new_address, tx_result) =
-            self.perform_sc_deploy_lambda_and_check(step, execute_current_tx_context_input);
+        let (new_address, tx_result) = self.perform_sc_deploy_lambda_and_check(step, instance_call);
         let mut response = TxResponse::from_tx_result(tx_result);
         response.new_deployed_address = Some(new_address);
         step.save_response(response);
@@ -28,11 +27,12 @@ impl ScenarioVMRunner {
         f: F,
     ) -> (Address, TxResult)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let tx_input = tx_input_from_deploy(sc_deploy_step);
+        let runtime = self.create_debugger_runtime();
         let contract_code = &sc_deploy_step.tx.contract_code.value;
-        let (new_address, tx_result) = self.blockchain_mock.vm.sc_create(
+        let (new_address, tx_result) = runtime.sc_create(
             tx_input,
             contract_code,
             VMCodeMetadata::from(sc_deploy_step.tx.code_metadata.bits()),
@@ -52,7 +52,7 @@ impl ScenarioVMRunner {
         f: F,
     ) -> (Address, TxResult)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         let (new_address, tx_result) = self.perform_sc_deploy_lambda(sc_deploy_step, f);
         if let Some(tx_expect) = &sc_deploy_step.expect {

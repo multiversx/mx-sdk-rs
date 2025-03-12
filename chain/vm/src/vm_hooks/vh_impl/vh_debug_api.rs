@@ -1,4 +1,4 @@
-use std::sync::{Arc, MutexGuard};
+use std::sync::MutexGuard;
 
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::BreakpointValue;
@@ -6,10 +6,10 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::{
-    tx_execution::execute_current_tx_context_input,
+    tx_execution::instance_call,
     tx_mock::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, TxCache,
-        TxContext, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
+        TxContextRef, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
     },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
@@ -26,11 +26,11 @@ use crate::{
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug)]
-pub struct DebugApiVMHooksHandler(Arc<TxContext>);
+pub struct DebugApiVMHooksHandler(TxContextRef);
 
 impl DebugApiVMHooksHandler {
-    pub fn new(tx_context_arc: Arc<TxContext>) -> Self {
-        DebugApiVMHooksHandler(tx_context_arc)
+    pub fn new(tx_context_ref: TxContextRef) -> Self {
+        DebugApiVMHooksHandler(tx_context_ref)
     }
 }
 
@@ -125,11 +125,10 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
-            tx_input,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
+        let (tx_result, blockchain_updates) = self
+            .0
+            .runtime_ref
+            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         if tx_result.result_status.is_success() {
             self.sync_call_post_processing(tx_result, blockchain_updates)
@@ -150,11 +149,10 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         let mut tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         tx_input.readonly = true;
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
-            tx_input,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
+        let (tx_result, blockchain_updates) = self
+            .0
+            .runtime_ref
+            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         if tx_result.result_status.is_success() {
             self.sync_call_post_processing(tx_result, blockchain_updates)
@@ -188,12 +186,12 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
 
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         tx_cache.increase_acount_nonce(contract_address);
-        let (tx_result, new_address, blockchain_updates) = self.0.vm_ref.deploy_contract(
+        let (tx_result, new_address, blockchain_updates) = self.0.runtime_ref.deploy_contract(
             tx_input,
             contract_code,
             code_metadata,
             tx_cache,
-            execute_current_tx_context_input,
+            instance_call,
         );
 
         match tx_result.result_status {
@@ -220,11 +218,10 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         }
 
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
-        let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
-            tx_input,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
+        let (tx_result, blockchain_updates) = self
+            .0
+            .runtime_ref
+            .execute_builtin_function_or_default(tx_input, tx_cache, instance_call);
 
         match tx_result.result_status {
             ReturnCode::Success => {
@@ -268,7 +265,7 @@ impl DebugApiVMHooksHandler {
         self.0.result_lock().merge_after_sync_call(&tx_result);
 
         let contract_address = &self.0.input_ref().to;
-        let builtin_functions = &self.0.vm_ref.builtin_functions;
+        let builtin_functions = &self.0.runtime_ref.vm_ref.builtin_functions;
         self.back_transfers_lock()
             .new_from_result(contract_address, &tx_result, builtin_functions);
 
@@ -294,7 +291,7 @@ impl DebugApiVMHooksHandler {
             return false;
         }
 
-        let builtin_functions = &self.0.vm_ref.builtin_functions;
+        let builtin_functions = &self.0.runtime_ref.vm_ref.builtin_functions;
         let token_transfers = builtin_functions.extract_token_transfers(tx_input);
         &token_transfers.real_recipient == caller_address
     }

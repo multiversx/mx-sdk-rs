@@ -1,6 +1,6 @@
 use crate::{
     chain_core::builtin_func_names::UPGRADE_CONTRACT_FUNC_NAME,
-    tx_execution::{create_transfer_value_log, BlockchainVMRef},
+    tx_execution::{create_transfer_value_log, RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
 };
@@ -18,11 +18,11 @@ impl BuiltinFunction for UpgradeContract {
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-        vm: &BlockchainVMRef,
+        runtime: &RuntimeRef,
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         if tx_input.args.len() < 2 {
             return (
@@ -61,7 +61,8 @@ impl BuiltinFunction for UpgradeContract {
             ..Default::default()
         };
 
-        let (mut tx_result, blockchain_updates) = vm.default_execution(exec_input, tx_cache, f);
+        let (mut tx_result, blockchain_updates) =
+            runtime.default_execution(exec_input, tx_cache, f);
         adjust_upgrade_log_endpoint(&mut tx_result);
         tx_result.result_logs.insert(0, transfer_value_log);
         (tx_result, blockchain_updates)

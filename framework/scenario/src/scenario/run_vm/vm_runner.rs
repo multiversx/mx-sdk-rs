@@ -1,5 +1,7 @@
+use multiversx_chain_vm::tx_execution::{Runtime, RuntimeRef};
+
 use crate::{
-    debug_executor::ContractMapRef,
+    debug_executor::{ContractMapRef, DebugSCExecutor},
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
 };
@@ -15,11 +17,18 @@ pub struct ScenarioVMRunner {
 impl ScenarioVMRunner {
     pub fn new() -> Self {
         let contract_map_ref = ContractMapRef::new();
-        let blockchain_mock = BlockchainMock::new(Box::new(contract_map_ref.clone()));
+        let blockchain_mock = BlockchainMock::default();
         ScenarioVMRunner {
             contract_map_ref,
             blockchain_mock,
         }
+    }
+
+    pub fn create_debugger_runtime(&self) -> RuntimeRef {
+        RuntimeRef::new_cyclic(|weak| {
+            let executor = DebugSCExecutor::new(weak, self.contract_map_ref.clone());
+            Runtime::new(self.blockchain_mock.vm.clone(), Box::new(executor))
+        })
     }
 }
 

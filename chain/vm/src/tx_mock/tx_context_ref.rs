@@ -2,12 +2,12 @@ use std::{ops::Deref, sync::Arc};
 
 use crate::tx_mock::{TxContext, TxResult};
 
-use super::{BlockchainUpdate, TxContextStack, TxPanic};
+use super::{BlockchainUpdate, TxPanic};
 
 /// The VM API implementation based on a blockchain mock written in Rust.
 /// Implemented as a smart pointer to a TxContext structure, which tracks a blockchain transaction.
 #[derive(Debug)]
-pub struct TxContextRef(Arc<TxContext>);
+pub struct TxContextRef(pub Arc<TxContext>);
 
 impl Deref for TxContextRef {
     type Target = TxContext;
@@ -27,17 +27,8 @@ impl TxContextRef {
         Self(tx_context_arc)
     }
 
-    pub fn new_from_static() -> Self {
-        let tx_context_arc = TxContextStack::static_peek();
-        Self(tx_context_arc)
-    }
-
     pub fn dummy() -> Self {
-        let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-        // TODO: WARNING: this does not clean up after itself, must fix!!!
-        TxContextStack::static_push(tx_context_arc.clone());
-        Self(tx_context_arc)
+        Self::new(Arc::new(TxContext::dummy()))
     }
 
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
@@ -64,5 +55,14 @@ impl TxContextRef {
             &mut *self.tx_result_cell.lock().unwrap(),
             TxResult::from_panic_obj(&tx_panic),
         );
+    }
+
+    /// Returns true if the references point to the same `TxContext`.
+    pub fn ptr_eq(this: &Self, other: &Self) -> bool {
+        Arc::ptr_eq(&this.0, &other.0)
+    }
+
+    pub fn into_ref(self) -> Arc<TxContext> {
+        self.0
     }
 }

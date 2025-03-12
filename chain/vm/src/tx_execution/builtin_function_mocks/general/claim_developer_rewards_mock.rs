@@ -3,7 +3,7 @@ use num_traits::Zero;
 
 use crate::{
     chain_core::builtin_func_names::CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
-    tx_execution::BlockchainVMRef,
+    tx_execution::{RuntimeInstanceCall, RuntimeRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
 };
 
@@ -20,11 +20,11 @@ impl BuiltinFunction for ClaimDeveloperRewards {
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-        _vm: &BlockchainVMRef,
+        _runtime: &RuntimeRef,
         _f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(),
+        F: FnOnce(RuntimeInstanceCall<'_>),
     {
         if !tx_input.args.is_empty() {
             return (
