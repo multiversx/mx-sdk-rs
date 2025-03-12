@@ -1,4 +1,4 @@
-use crate::host::tx_mock::InvalidSliceError;
+use crate::host::context::InvalidSliceError;
 use crate::types::RawHandle;
 
 use crate::host::vm_hooks::VMHooksHandlerSource;

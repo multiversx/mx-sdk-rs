@@ -1,8 +1,8 @@
 use std::rc::Rc;
 
 use multiversx_chain_vm::{
+    host::context::{TxContextRef, TxFunctionName, TxPanic},
     host::runtime::RuntimeInstanceCall,
-    host::tx_mock::{TxContextRef, TxFunctionName, TxPanic},
 };
 use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
 use multiversx_sc::chain_core::types::ReturnCode;

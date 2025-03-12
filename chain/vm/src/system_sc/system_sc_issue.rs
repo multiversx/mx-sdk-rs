@@ -2,7 +2,7 @@ use num_bigint::BigUint;
 
 use crate::{
     crypto_functions::keccak256,
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::{top_decode_u64, VMTokenType},
 };
 

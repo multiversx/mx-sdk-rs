@@ -3,7 +3,7 @@ use crate::{
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
         UPGRADE_CONTRACT_FUNC_NAME,
     },
-    host::tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
+    host::context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
     host::vm_hooks::VMHooksHandlerSource,
     types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
     vm_err_msg,

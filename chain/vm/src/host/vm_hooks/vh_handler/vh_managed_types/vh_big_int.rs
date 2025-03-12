@@ -1,5 +1,5 @@
 use crate::{
-    host::tx_mock::big_int_to_i64,
+    host::context::big_int_to_i64,
     host::vm_hooks::{VMHooksError, VMHooksHandlerSource},
     types::RawHandle,
     vm_err_msg,

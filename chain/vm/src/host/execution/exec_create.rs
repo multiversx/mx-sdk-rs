@@ -1,6 +1,6 @@
 use crate::{
+    host::context::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxResult},
     types::{VMAddress, VMCodeMetadata},
     world_mock::BlockchainStateRef,
 };

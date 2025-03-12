@@ -1,6 +1,6 @@
 #![allow(unused_variables)]
 
-use crate::host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
+use crate::host::context::{BlockchainUpdate, TxCache, TxInput, TxResult};
 
 /// Every unimplemented fn will be implemented and moved to its corresponding file.
 ///

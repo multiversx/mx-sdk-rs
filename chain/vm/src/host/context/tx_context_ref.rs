@@ -1,6 +1,6 @@
 use std::{ops::Deref, sync::Arc};
 
-use crate::host::tx_mock::{TxContext, TxResult};
+use crate::host::context::{TxContext, TxResult};
 
 use super::{BlockchainUpdate, TxPanic};
 

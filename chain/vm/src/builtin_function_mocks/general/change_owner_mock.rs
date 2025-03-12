@@ -1,7 +1,7 @@
 use crate::{
     chain_core::builtin_func_names::CHANGE_OWNER_BUILTIN_FUNC_NAME,
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
 

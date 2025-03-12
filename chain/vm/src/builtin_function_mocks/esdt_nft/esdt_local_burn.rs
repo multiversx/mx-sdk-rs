@@ -3,8 +3,8 @@ use num_bigint::BigUint;
 
 use crate::{
     chain_core::builtin_func_names::ESDT_LOCAL_BURN_FUNC_NAME,
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
 };
 
 use super::super::builtin_func_trait::BuiltinFunction;

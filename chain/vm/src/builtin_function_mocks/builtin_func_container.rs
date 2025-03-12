@@ -10,8 +10,8 @@ use super::{
 };
 
 use crate::{
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::EsdtLocalRole,
 };
 

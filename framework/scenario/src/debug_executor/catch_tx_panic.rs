@@ -1,4 +1,4 @@
-use multiversx_chain_vm::host::tx_mock::TxPanic;
+use multiversx_chain_vm::host::context::TxPanic;
 use multiversx_chain_vm_executor::BreakpointValue;
 use multiversx_sc::err_msg;
 

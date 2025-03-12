@@ -3,9 +3,9 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
+    host::context::{TxFunctionName, TxInput, TxResult},
+    host::execution::commit_deploy,
     host::runtime::{instance_call, RuntimeInstanceCall},
-    host::tx_execution::commit_deploy,
-    host::tx_mock::{TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
 };
 

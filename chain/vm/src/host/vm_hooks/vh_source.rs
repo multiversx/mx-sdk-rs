@@ -4,7 +4,7 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use crate::{
-    host::tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
+    host::context::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata, H256},
     world_mock::{AccountData, BlockInfo},
 };

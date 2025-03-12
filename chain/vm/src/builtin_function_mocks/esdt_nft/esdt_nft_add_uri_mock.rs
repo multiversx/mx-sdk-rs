@@ -2,8 +2,8 @@ use multiversx_chain_core::types::ReturnCode;
 
 use crate::{
     chain_core::builtin_func_names::ESDT_NFT_ADD_URI_FUNC_NAME,
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     types::{top_decode_u64, top_encode_u64},
 };
 

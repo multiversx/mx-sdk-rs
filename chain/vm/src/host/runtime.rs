@@ -7,7 +7,7 @@ use multiversx_chain_vm_executor::{BreakpointValue, Executor, Instance};
 
 use crate::{
     display_util::address_hex,
-    host::tx_mock::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
+    host::context::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
     world_mock::{BlockchainStateRef, BlockchainVMRef},
 };
 

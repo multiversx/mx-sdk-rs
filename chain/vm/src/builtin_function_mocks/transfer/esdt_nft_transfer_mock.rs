@@ -1,8 +1,8 @@
 use crate::{
     builtin_function_mocks::BuiltinFunctionEsdtTransferInfo,
     chain_core::builtin_func_names::ESDT_NFT_TRANSFER_FUNC_NAME,
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     types::VMAddress,
 };
 

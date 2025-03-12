@@ -1,6 +1,6 @@
 use crate::chain_core::builtin_func_names::SET_USERNAME_FUNC_NAME;
+use crate::host::context::{BlockchainUpdate, TxCache, TxInput, TxResult};
 use crate::host::runtime::{RuntimeInstanceCall, RuntimeRef};
-use crate::host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 

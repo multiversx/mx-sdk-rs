@@ -7,13 +7,13 @@ use multiversx_chain_vm_executor::{BreakpointValue, Instance, MemLength, MemPtr}
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::host::tx_execution::{execute_builtin_function_or_default, execute_deploy};
+use crate::host::execution::{execute_builtin_function_or_default, execute_deploy};
 use crate::{
-    host::runtime::instance_call,
-    host::tx_mock::{
+    host::context::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, TxCache,
         TxContextRef, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
     },
+    host::runtime::instance_call,
     host::vm_hooks::{
         VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
         VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,

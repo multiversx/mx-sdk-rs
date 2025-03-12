@@ -1,11 +1,11 @@
 use crate::{
     builtin_function_mocks::BuiltinFunctionEsdtTransferInfo,
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_execution::execute_default,
-    host::tx_mock::{
+    host::context::{
         BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxLog, TxResult,
         TxTokenTransfer,
     },
+    host::execution::execute_default,
+    host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::{top_decode_u64, VMAddress},
 };
 use num_bigint::BigUint;

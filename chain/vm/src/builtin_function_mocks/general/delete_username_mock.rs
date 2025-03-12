@@ -1,7 +1,7 @@
 use crate::{
     chain_core::builtin_func_names::DELETE_USERNAME_FUNC_NAME,
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
 };
 
 use super::super::builtin_func_trait::BuiltinFunction;

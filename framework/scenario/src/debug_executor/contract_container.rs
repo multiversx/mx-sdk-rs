@@ -1,4 +1,4 @@
-use multiversx_chain_vm::host::tx_mock::TxFunctionName;
+use multiversx_chain_vm::host::context::TxFunctionName;
 use multiversx_sc::contract_base::CallableContract;
 use std::sync::Arc;
 

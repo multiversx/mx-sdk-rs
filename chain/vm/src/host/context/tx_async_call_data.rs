@@ -1,6 +1,6 @@
 use crate::{
     builtin_function_mocks::BuiltinFunctionContainer,
-    host::tx_mock::{TxInput, TxResult},
+    host::context::{TxInput, TxResult},
     types::{top_encode_u64, VMAddress, H256},
 };
 

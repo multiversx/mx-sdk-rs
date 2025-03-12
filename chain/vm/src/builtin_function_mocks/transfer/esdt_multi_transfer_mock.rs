@@ -1,13 +1,13 @@
 use crate::{
     chain_core::builtin_func_names::ESDT_MULTI_TRANSFER_FUNC_NAME,
+    host::context::TxLog,
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::TxLog,
     types::{top_decode_u64, top_encode_u64},
 };
 
 use crate::{
     builtin_function_mocks::BuiltinFunctionEsdtTransferInfo,
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
 

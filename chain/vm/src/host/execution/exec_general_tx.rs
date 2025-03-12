@@ -2,11 +2,11 @@ use num_traits::Zero;
 
 use crate::{
     host::{
-        runtime::{RuntimeInstanceCall, RuntimeRef},
-        tx_mock::{
+        context::{
             BlockchainUpdate, CallType, TxCache, TxContext, TxFunctionName, TxInput, TxLog,
             TxResult,
         },
+        runtime::{RuntimeInstanceCall, RuntimeRef},
     },
     system_sc::{execute_system_sc, is_system_sc_address},
     types::top_encode_big_uint,

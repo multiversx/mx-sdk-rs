@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
-    host::tx_mock::{TxContextRef, TxPanic},
+    host::context::{TxContextRef, TxPanic},
     host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
 };
 use multiversx_chain_vm_executor::Instance;

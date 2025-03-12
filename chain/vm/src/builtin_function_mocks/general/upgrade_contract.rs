@@ -1,8 +1,8 @@
 use crate::{
     chain_core::builtin_func_names::UPGRADE_CONTRACT_FUNC_NAME,
+    host::context::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult},
+    host::execution::{create_transfer_value_log, execute_default},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_execution::{create_transfer_value_log, execute_default},
-    host::tx_mock::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
 };
 

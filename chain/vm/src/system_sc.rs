@@ -3,7 +3,7 @@ mod system_sc_special_roles;
 mod system_sc_unimplemented;
 
 use crate::{
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
 use hex_literal::hex;

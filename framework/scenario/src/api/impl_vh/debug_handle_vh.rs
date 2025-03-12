@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use multiversx_chain_vm::host::tx_mock::TxContext;
+use multiversx_chain_vm::host::context::TxContext;
 use multiversx_sc::{
     api::{HandleConstraints, RawHandle},
     codec::TryStaticCast,

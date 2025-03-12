@@ -1,11 +1,11 @@
 use crate::{
-    host::runtime::instance_call,
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
-    host::tx_mock::{
+    host::context::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxInput,
         TxPanic, TxResult, TxResultCalls,
     },
+    host::runtime::instance_call,
+    host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::VMCodeMetadata,
     world_mock::{AccountData, AccountEsdt, BlockchainStateRef},
 };

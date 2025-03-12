@@ -1,5 +1,5 @@
 use crate::{
-    host::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
 

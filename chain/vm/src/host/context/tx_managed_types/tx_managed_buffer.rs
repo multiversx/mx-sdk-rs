@@ -1,5 +1,5 @@
 use crate::{
-    host::tx_mock::{TxFunctionName, TxTokenTransfer},
+    host::context::{TxFunctionName, TxTokenTransfer},
     types::{RawHandle, VMAddress, VMCodeMetadata},
 };
 

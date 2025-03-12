@@ -1,4 +1,4 @@
-use crate::{host::tx_mock::TxLog, host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
+use crate::{host::context::TxLog, host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
 
 pub trait VMHooksLog: VMHooksHandlerSource {
     fn managed_write_log(&self, topics_handle: RawHandle, data_handle: RawHandle) {

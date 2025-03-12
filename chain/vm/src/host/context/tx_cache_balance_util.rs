@@ -2,7 +2,7 @@ use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 use num_bigint::BigUint;
 
 use crate::{
-    host::tx_mock::TxPanic, system_sc::is_system_sc_address, types::VMAddress,
+    host::context::TxPanic, system_sc::is_system_sc_address, types::VMAddress,
     world_mock::EsdtInstanceMetadata,
 };
 

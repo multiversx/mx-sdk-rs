@@ -1,4 +1,4 @@
-use multiversx_chain_vm::{host::tx_mock::TxResult, types::H256};
+use multiversx_chain_vm::{host::context::TxResult, types::H256};
 use multiversx_sc::types::Address;
 
 use super::{Log, TxExpect, TxResponseStatus};
