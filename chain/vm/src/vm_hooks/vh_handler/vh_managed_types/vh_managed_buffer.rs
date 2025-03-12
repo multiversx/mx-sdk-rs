@@ -1,3 +1,4 @@
+use crate::tx_mock::InvalidSliceError;
 use crate::types::RawHandle;
 
 use crate::vm_hooks::VMHooksHandlerSource;
@@ -20,31 +21,18 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         self.m_types_lock().mb_set(handle, value.to_vec());
     }
 
-    /// Copies bytes from a stored managed buffer to the given pointer.
-    ///
-    /// # Safety
-    ///
-    /// Argument `dest_ptr` should point to a valid location in memory, that has been pre-allocated with the appropriate size.
-    unsafe fn mb_copy_bytes(&self, handle: RawHandle, dest_ptr: *mut u8) -> usize {
-        let bytes = self.m_types_lock().mb_get(handle).to_vec();
-        std::ptr::copy(bytes.as_ptr(), dest_ptr, bytes.len());
-        bytes.len()
+    fn mb_get_bytes(&self, source_handle: RawHandle) -> Vec<u8> {
+        self.m_types_lock().mb_get(source_handle).to_vec()
     }
 
-    fn mb_load_slice(
+    fn mb_get_slice(
         &self,
         source_handle: RawHandle,
         starting_position: usize,
-        dest_slice: &mut [u8],
-    ) -> i32 {
-        let result =
-            self.m_types_lock()
-                .mb_load_slice(source_handle, starting_position, dest_slice);
-        if result.is_ok() {
-            0
-        } else {
-            1
-        }
+        slice_len: usize,
+    ) -> Result<Vec<u8>, InvalidSliceError> {
+        self.m_types_lock()
+            .mb_get_slice(source_handle, starting_position, slice_len)
     }
 
     fn mb_copy_slice(

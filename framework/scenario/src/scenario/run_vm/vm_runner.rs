@@ -11,6 +11,7 @@ use crate::{
 pub enum ScenarioExecutorConfig {
     #[default]
     Debugger,
+    // #[default]
     Wasmer,
 }
 

@@ -19,6 +19,7 @@ where
 /// # Safety
 ///
 /// Should only be called with arguments that originate from `with_mem_ptr`.
+#[deprecated]
 pub unsafe fn with_bytes<F, R>(offset: MemPtr, length: MemLength, f: F) -> R
 where
     F: FnOnce(&[u8]) -> R,
@@ -32,6 +33,7 @@ where
 /// # Safety
 ///
 /// Should only be called with arguments that originate from `with_mem_ptr_mut`.
+#[deprecated]
 pub unsafe fn with_bytes_mut<F, R>(offset: MemPtr, length: MemLength, f: F) -> R
 where
     F: FnOnce(&mut [u8]) -> R,
@@ -41,6 +43,7 @@ where
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod test {
     use super::*;
 

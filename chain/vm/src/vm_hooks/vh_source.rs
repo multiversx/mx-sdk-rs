@@ -1,6 +1,7 @@
 use std::{fmt::Debug, sync::MutexGuard};
 
 use multiversx_chain_core::types::ReturnCode;
+use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use crate::{
     tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
@@ -10,6 +11,20 @@ use crate::{
 
 /// Abstracts away the borrowing of a managed types structure.
 pub trait VMHooksHandlerSource: Debug {
+    /// Loads a slice of memory from the instance.
+    ///
+    /// ## Safety
+    ///
+    /// Thr offset and the length must point to valid instance memory.
+    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8];
+
+    /// Writes to instance memory.
+    ///
+    /// ## Safety
+    ///
+    /// Thr offset and the length must point to valid instance memory.
+    unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]);
+
     fn m_types_lock(&self) -> MutexGuard<TxManagedTypes>;
 
     fn halt_with_error(&self, status: ReturnCode, message: &str) -> !;

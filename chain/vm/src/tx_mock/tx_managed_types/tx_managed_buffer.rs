@@ -43,21 +43,11 @@ impl TxManagedTypes {
     ) -> Result<Vec<u8>, InvalidSliceError> {
         let all_bytes = self.mb_get(source_handle);
         if starting_position + slice_len <= all_bytes.len() {
-            Ok(all_bytes[starting_position..starting_position + slice_len].to_vec())
+            let slice = &all_bytes[starting_position..starting_position + slice_len];
+            Ok(slice.to_vec())
         } else {
             Err(InvalidSliceError)
         }
-    }
-
-    pub fn mb_load_slice(
-        &self,
-        source_handle: RawHandle,
-        starting_position: usize,
-        dest_slice: &mut [u8],
-    ) -> Result<(), InvalidSliceError> {
-        let slice = self.mb_get_slice(source_handle, starting_position, dest_slice.len())?;
-        dest_slice.copy_from_slice(slice.as_slice());
-        Ok(())
     }
 
     pub fn mb_set(&mut self, handle: RawHandle, value: Vec<u8>) {

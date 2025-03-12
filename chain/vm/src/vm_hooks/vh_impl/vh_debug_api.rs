@@ -1,7 +1,7 @@
 use std::sync::MutexGuard;
 
 use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::BreakpointValue;
+use multiversx_chain_vm_executor::{BreakpointValue, MemLength, MemPtr};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -32,9 +32,45 @@ impl DebugApiVMHooksHandler {
     pub fn new(tx_context_ref: TxContextRef) -> Self {
         DebugApiVMHooksHandler(tx_context_ref)
     }
+
+    /// Interprets the input as a regular pointer.
+    ///
+    /// ## Safety
+    ///
+    /// Thr offset and the length must point to valid memory.
+    pub unsafe fn main_memory_load(mem_ptr: MemPtr, mem_length: MemLength) -> &'static [u8] {
+        unsafe {
+            let bytes_ptr =
+                std::ptr::slice_from_raw_parts(mem_ptr as *const u8, mem_length as usize);
+            &*bytes_ptr
+        }
+    }
+
+    /// Interprets the input as a regular pointer and writes to current memory.
+    ///
+    /// ## Safety
+    ///
+    /// The offset and the length must point to valid memory.
+    pub unsafe fn main_memory_store(offset: MemPtr, data: &[u8]) {
+        unsafe {
+            std::ptr::copy(data.as_ptr(), offset as *mut u8, data.len());
+        }
+    }
 }
 
 impl VMHooksHandlerSource for DebugApiVMHooksHandler {
+    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
+        // TODO: switch to the DebugSCInstance method
+        unsafe { DebugApiVMHooksHandler::main_memory_load(offset, length) }
+    }
+
+    unsafe fn memory_store(&self, offset: MemPtr, data: &[u8]) {
+        // TODO: switch to the DebugSCInstance method
+        unsafe {
+            DebugApiVMHooksHandler::main_memory_store(offset, data);
+        }
+    }
+
     fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
         self.0.m_types_lock()
     }
