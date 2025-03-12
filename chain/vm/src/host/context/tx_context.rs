@@ -14,15 +14,15 @@ use std::{
 };
 
 use super::{
-    BackTransfers, BlockchainRng, BlockchainUpdate, FailingExecutor, TxCache, TxInput,
-    TxManagedTypes, TxResult,
+    BackTransfers, BlockchainRng, BlockchainUpdate, FailingExecutor, ManagedTypeContainer, TxCache,
+    TxInput, TxResult,
 };
 
 pub struct TxContext {
     pub runtime_ref: RuntimeRef,
     pub tx_input_box: Box<TxInput>,
     pub tx_cache: Arc<TxCache>,
-    pub managed_types: Mutex<TxManagedTypes>,
+    pub managed_types: Mutex<ManagedTypeContainer>,
     pub back_transfers: Mutex<BackTransfers>,
     pub tx_result_cell: Mutex<TxResult>,
     pub b_rng: Mutex<BlockchainRng>,
@@ -35,7 +35,7 @@ impl TxContext {
             runtime_ref,
             tx_input_box: Box::new(tx_input),
             tx_cache: Arc::new(tx_cache),
-            managed_types: Mutex::new(TxManagedTypes::new()),
+            managed_types: Mutex::new(ManagedTypeContainer::new()),
             back_transfers: Mutex::default(),
             tx_result_cell: Mutex::new(TxResult::empty()),
             b_rng,
@@ -71,7 +71,7 @@ impl TxContext {
             runtime_ref: RuntimeRef::new(vm_ref, Box::new(FailingExecutor)),
             tx_input_box: Box::new(tx_input),
             tx_cache: Arc::new(tx_cache),
-            managed_types: Mutex::new(TxManagedTypes::new()),
+            managed_types: Mutex::new(ManagedTypeContainer::new()),
             back_transfers: Mutex::default(),
             tx_result_cell: Mutex::new(TxResult::empty()),
             b_rng,
@@ -130,7 +130,7 @@ impl TxContext {
         self.with_account_mut(&self.tx_input_box.to, f)
     }
 
-    pub fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+    pub fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
         self.managed_types.lock().unwrap()
     }
 

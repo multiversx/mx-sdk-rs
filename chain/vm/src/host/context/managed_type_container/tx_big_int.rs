@@ -4,9 +4,9 @@ use crate::types::RawHandle;
 use num_bigint::Sign;
 use num_traits::Zero;
 
-use super::TxManagedTypes;
+use super::ManagedTypeContainer;
 
-impl TxManagedTypes {
+impl ManagedTypeContainer {
     pub fn bi_new_from_big_int(&mut self, value: num_bigint::BigInt) -> RawHandle {
         self.big_int_map.insert_new_handle_raw(value)
     }

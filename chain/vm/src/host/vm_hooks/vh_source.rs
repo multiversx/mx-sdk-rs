@@ -5,7 +5,9 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use crate::{
     blockchain::state::{AccountData, BlockInfo},
-    host::context::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
+    host::context::{
+        BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
+    },
     types::{VMAddress, VMCodeMetadata, H256},
 };
 
@@ -25,7 +27,7 @@ pub trait VMHooksHandlerSource: Debug {
     /// Thr offset and the length must point to valid instance memory.
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]);
 
-    fn m_types_lock(&self) -> MutexGuard<TxManagedTypes>;
+    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer>;
 
     fn halt_with_error(&self, status: ReturnCode, message: &str);
 

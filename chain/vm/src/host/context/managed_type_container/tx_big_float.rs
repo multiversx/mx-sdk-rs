@@ -1,8 +1,8 @@
 use crate::types::RawHandle;
 
-use super::TxManagedTypes;
+use super::ManagedTypeContainer;
 
-impl TxManagedTypes {
+impl ManagedTypeContainer {
     pub fn bf_get_f64(&self, handle: RawHandle) -> f64 {
         *self.big_float_map.get(handle)
     }

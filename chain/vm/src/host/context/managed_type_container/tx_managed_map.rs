@@ -1,8 +1,8 @@
 use crate::types::RawHandle;
 
-use super::{ManagedMapImpl, TxManagedTypes};
+use super::{ManagedMapImpl, ManagedTypeContainer};
 
-impl TxManagedTypes {
+impl ManagedTypeContainer {
     pub fn mm_new(&mut self) -> RawHandle {
         self.managed_map_map
             .insert_new_handle_raw(ManagedMapImpl::new())

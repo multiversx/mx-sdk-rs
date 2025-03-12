@@ -14,8 +14,8 @@ use crate::{
         state::{AccountData, BlockInfo},
     },
     host::context::{
-        async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, TxCache,
-        TxContextRef, TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
+        async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType,
+        ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxPanic, TxResult,
     },
     host::runtime::instance_call,
     host::vm_hooks::{
@@ -76,7 +76,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             .expect("error writing to wasmer instance memory");
     }
 
-    fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
         self.tx_context_ref.m_types_lock()
     }
 

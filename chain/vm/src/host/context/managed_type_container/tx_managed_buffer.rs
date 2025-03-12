@@ -3,13 +3,13 @@ use crate::{
     types::{RawHandle, VMAddress, VMCodeMetadata},
 };
 
-use super::TxManagedTypes;
+use super::ManagedTypeContainer;
 
 /// Returned if load/copy slice could not be performed.
 /// No further data needed.
 pub struct InvalidSliceError;
 
-impl TxManagedTypes {
+impl ManagedTypeContainer {
     pub fn mb_get(&self, handle: RawHandle) -> &[u8] {
         self.managed_buffer_map.get(handle).as_slice()
     }
@@ -167,7 +167,7 @@ pub mod tests {
 
     #[test]
     fn test_vec_of_bytes() {
-        let mut m_types = TxManagedTypes::new();
+        let mut m_types = ManagedTypeContainer::new();
         let handle = m_types.mb_new(vec![]);
         let data = vec![b"abc".to_vec(), b"defghi".to_vec(), b"jk".to_vec()];
         m_types.mb_set_vec_of_bytes(handle, data.clone());
@@ -177,7 +177,7 @@ pub mod tests {
 
     #[test]
     fn test_vec_of_esdt_payments() {
-        let mut m_types = TxManagedTypes::new();
+        let mut m_types = ManagedTypeContainer::new();
         let handle = m_types.mb_new(vec![]);
         let transfers = vec![TxTokenTransfer {
             token_identifier: b"TOKEN-12345".to_vec(),
