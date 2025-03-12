@@ -27,7 +27,7 @@ where
             tx_input,
             tx_cache,
             f,
-            |tx_input, tx_cache, f| default_execution(tx_input, tx_cache, runtime, f),
+            |tx_input, tx_cache, f| execute_default(tx_input, tx_cache, runtime, f),
         )
 }
 
@@ -98,7 +98,7 @@ pub(crate) fn create_transfer_value_log(tx_input: &TxInput, call_type: CallType)
 }
 
 /// Executes without builtin functions, directly on the contract or the given lambda closure.
-pub fn default_execution<F>(
+pub fn execute_default<F>(
     tx_input: TxInput,
     tx_cache: TxCache,
     runtime: &RuntimeRef,

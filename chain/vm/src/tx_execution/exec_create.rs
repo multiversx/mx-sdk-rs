@@ -6,7 +6,8 @@ use crate::{
 
 use super::{RuntimeInstanceCall, RuntimeRef};
 
-pub fn sc_create<F>(
+/// Executes deploy transaction and commits changes back to the underlying blockchain state.
+pub fn commit_deploy<F>(
     tx_input: TxInput,
     contract_path: &[u8],
     code_metadata: VMCodeMetadata,
@@ -24,7 +25,7 @@ where
 
     let tx_cache = TxCache::new(state.get_arc());
 
-    let (tx_result, new_address, blockchain_updates) = deploy_contract(
+    let (tx_result, new_address, blockchain_updates) = execute_deploy(
         tx_input,
         contract_path.to_vec(),
         code_metadata,
@@ -38,7 +39,8 @@ where
     (new_address, tx_result)
 }
 
-pub fn deploy_contract<F>(
+/// Runs transaction and produces a `TxResult`.
+pub fn execute_deploy<F>(
     mut tx_input: TxInput,
     contract_path: Vec<u8>,
     code_metadata: VMCodeMetadata,

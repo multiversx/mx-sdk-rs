@@ -1,7 +1,7 @@
 use crate::{
     tx_execution::{
         builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
-        default_execution, RuntimeInstanceCall, RuntimeRef,
+        execute_default, RuntimeInstanceCall, RuntimeRef,
     },
     tx_mock::{
         BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxLog, TxResult,
@@ -82,7 +82,7 @@ where
         ..Default::default()
     };
 
-    let (mut tx_result, blockchain_updates) = default_execution(exec_input, tx_cache, runtime, f);
+    let (mut tx_result, blockchain_updates) = execute_default(exec_input, tx_cache, runtime, f);
 
     // prepends esdt log
     // tx_result.result_logs = [builtin_logs.as_slice(), tx_result.result_logs.as_slice()].concat();
