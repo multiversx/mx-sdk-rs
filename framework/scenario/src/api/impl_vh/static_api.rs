@@ -1,6 +1,6 @@
 use multiversx_chain_vm::{
     executor::VMHooks,
-    vm_hooks::{VMHooksDispatcher, VMHooksHandler},
+    host::vm_hooks::{VMHooksDispatcher, VMHooksHandler},
 };
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;

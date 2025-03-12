@@ -7,7 +7,7 @@ use std::{
     sync::Arc,
 };
 
-use crate::{tx_mock::BlockchainUpdate, types::VMAddress};
+use crate::{host::tx_mock::BlockchainUpdate, types::VMAddress};
 
 use super::{reserved::STORAGE_REWARD_KEY, AccountData, BlockInfo};
 

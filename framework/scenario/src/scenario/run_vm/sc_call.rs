@@ -5,8 +5,9 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::{commit_call_with_async_and_callback, instance_call, RuntimeInstanceCall},
-    tx_mock::{TxInput, TxResult, TxTokenTransfer},
+    host::runtime::{instance_call, RuntimeInstanceCall},
+    host::tx_execution::commit_call_with_async_and_callback,
+    host::tx_mock::{TxInput, TxResult, TxTokenTransfer},
 };
 use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti};
 

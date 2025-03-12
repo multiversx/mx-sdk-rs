@@ -1,8 +1,9 @@
 use super::{sc_call::tx_esdt_transfers_from_scenario, ScenarioVMRunner};
 use crate::scenario::model::{TransferStep, TxTransfer, ValidatorRewardStep};
 use multiversx_chain_vm::{
-    tx_execution::{commit_call, instance_call, RuntimeRef},
-    tx_mock::{TxFunctionName, TxInput},
+    host::runtime::{instance_call, RuntimeRef},
+    host::tx_execution::commit_call,
+    host::tx_mock::{TxFunctionName, TxInput},
     world_mock::BlockchainStateRef,
 };
 

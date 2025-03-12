@@ -1,6 +1,6 @@
 use super::*;
 
-use multiversx_chain_vm::tx_execution::RuntimeWeakRef;
+use multiversx_chain_vm::host::runtime::RuntimeWeakRef;
 use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };

@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
 use multiversx_chain_vm::{
-    executor::VMHooks, types::VMAddress, vm_hooks::VMHooksDispatcher, world_mock::AccountData,
+    executor::VMHooks, host::vm_hooks::VMHooksDispatcher, types::VMAddress, world_mock::AccountData,
 };
 use multiversx_sc::api::RawHandle;
 

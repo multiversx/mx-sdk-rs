@@ -7,14 +7,14 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use multiversx_chain_vm::{
     chain_core::types::ReturnCode,
-    tx_mock::{BackTransfers, TxFunctionName, TxInput, TxManagedTypes, TxResult},
-    types::{VMAddress, VMCodeMetadata},
-    vm_hooks::{
+    host::tx_mock::{BackTransfers, TxFunctionName, TxInput, TxManagedTypes, TxResult},
+    host::vm_hooks::{
         VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
         VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
         VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
         VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
     },
+    types::{VMAddress, VMCodeMetadata},
     world_mock::{AccountData, BlockInfo},
 };
 

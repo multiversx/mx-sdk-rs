@@ -2,7 +2,7 @@ use crate::scenario::model::{CheckLogs, Checkable, TxExpect};
 
 use multiversx_chain_vm::{
     display_util::{address_hex, verbose_hex_list},
-    tx_mock::{TxLog, TxResult},
+    host::tx_mock::{TxLog, TxResult},
 };
 
 pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {

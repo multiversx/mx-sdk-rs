@@ -1,7 +1,6 @@
-use crate::tx_execution::BlockchainVMRef;
 use std::{fmt::Debug, ops::Deref};
 
-use super::BlockchainStateRef;
+use super::{BlockchainStateRef, BlockchainVMRef};
 
 #[derive(Default)]
 pub struct BlockchainMock {

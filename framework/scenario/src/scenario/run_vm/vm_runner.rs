@@ -1,4 +1,4 @@
-use multiversx_chain_vm::tx_execution::{Runtime, RuntimeRef, RuntimeWeakRef};
+use multiversx_chain_vm::host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef};
 use multiversx_chain_vm_executor::Executor;
 
 use crate::{

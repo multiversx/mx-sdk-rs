@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use multiversx_chain_vm::tx_mock::TxContextRef;
+use multiversx_chain_vm::host::tx_mock::TxContextRef;
 
 use super::ContractDebugInstance;
 

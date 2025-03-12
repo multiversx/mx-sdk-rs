@@ -13,7 +13,7 @@ use crate::{
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::tx_mock::{TxFunctionName, TxResult};
+use multiversx_chain_vm::host::tx_mock::{TxFunctionName, TxResult};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 
@@ -22,7 +22,7 @@ use super::{
     AddressFactory, MandosGenerator, ScQueryMandos,
 };
 
-pub use multiversx_chain_vm::tx_mock::TxTokenTransfer;
+pub use multiversx_chain_vm::host::tx_mock::TxTokenTransfer;
 
 #[derive(Clone)]
 pub struct ContractObjWrapper<
