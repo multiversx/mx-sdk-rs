@@ -1,0 +1,54 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:ping-pong"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/ping-pong-egld.mxsc.json",
+                "arguments": [
+                    "0x01",
+                    "0x64",
+                    "0x01000000000002ba31",
+                    "0x64"
+                ],
+                "gasLimit": "5,000,000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:ping-pong": {
+                    "storage": {
+                        "str:activationTimestamp": "178737",
+                        "str:deadline": "178837"
+                    },
+                    "code": "*",
+                    "owner": "*"
+                }
+            }
+        }
+    ]
+}

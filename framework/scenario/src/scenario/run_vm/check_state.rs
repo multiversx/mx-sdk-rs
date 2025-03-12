@@ -95,14 +95,12 @@ fn execute(state: &BlockchainState, accounts: &CheckAccounts) {
                 }
 
                 let default_check_value = CheckValue::Equal(BytesValue::empty());
-                for (actual_key, actual_value) in account.storage.iter() {
-                    let expected_value = eq
-                        .storages
-                        .get(&actual_key.clone().into())
-                        .unwrap_or(&default_check_value);
-                    if expected_value.to_string() == default_check_value.to_string()
-                        && !eq.other_storages_allowed
-                    {
+                if eq.other_storages_allowed {
+                    for (actual_key, actual_value) in account.storage.iter() {
+                        let expected_value = eq
+                            .storages
+                            .get(&actual_key.clone().into())
+                            .unwrap_or(&default_check_value);
                         assert!(
                             expected_value.check(actual_value),
                             "bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
