@@ -14,15 +14,15 @@ pub const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     runtime_breakpoints: false,
 };
 
-pub struct BlockchainVM {
+pub struct VMConfig {
     pub builtin_functions: BuiltinFunctionContainer,
     pub compilation_options: CompilationOptions,
 }
 
 #[derive(Clone, Default)]
-pub struct BlockchainVMRef(Arc<BlockchainVM>);
+pub struct VMConfigRef(Arc<VMConfig>);
 
-impl Default for BlockchainVM {
+impl Default for VMConfig {
     fn default() -> Self {
         Self {
             builtin_functions: Default::default(),
@@ -31,20 +31,20 @@ impl Default for BlockchainVM {
     }
 }
 
-impl BlockchainVM {
+impl VMConfig {
     pub fn new() -> Self {
         Self::default()
     }
 }
 
-impl BlockchainVMRef {
+impl VMConfigRef {
     pub fn new() -> Self {
-        BlockchainVMRef(Arc::new(BlockchainVM::new()))
+        VMConfigRef(Arc::new(VMConfig::new()))
     }
 }
 
-impl Deref for BlockchainVMRef {
-    type Target = BlockchainVM;
+impl Deref for VMConfigRef {
+    type Target = VMConfig;
 
     fn deref(&self) -> &Self::Target {
         self.0.deref()

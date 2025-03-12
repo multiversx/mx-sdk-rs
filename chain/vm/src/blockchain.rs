@@ -1,7 +1,7 @@
 mod blockchain_mock;
-mod blockchain_vm;
 pub mod reserved;
 pub mod state;
+mod vm_config;
 
 pub use blockchain_mock::*;
-pub use blockchain_vm::*;
+pub use vm_config::*;

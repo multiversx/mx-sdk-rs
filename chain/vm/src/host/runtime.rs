@@ -6,13 +6,13 @@ use std::{
 use multiversx_chain_vm_executor::{BreakpointValue, Executor, Instance};
 
 use crate::{
-    blockchain::{state::BlockchainStateRef, BlockchainVMRef},
+    blockchain::{state::BlockchainStateRef, VMConfigRef},
     display_util::address_hex,
     host::context::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
 };
 
 pub struct Runtime {
-    pub vm_ref: BlockchainVMRef,
+    pub vm_ref: VMConfigRef,
     pub executor: Box<dyn Executor + Send + Sync>,
     pub executor_context_cell: Mutex<Option<TxContextRef>>,
 }
@@ -30,7 +30,7 @@ pub struct RuntimeInstanceCall<'a> {
 }
 
 impl Runtime {
-    pub fn new(vm_ref: BlockchainVMRef, executor: Box<dyn Executor + Send + Sync>) -> Self {
+    pub fn new(vm_ref: VMConfigRef, executor: Box<dyn Executor + Send + Sync>) -> Self {
         Runtime {
             vm_ref,
             executor,
@@ -53,7 +53,7 @@ impl Runtime {
 }
 
 impl RuntimeRef {
-    pub fn new(vm_ref: BlockchainVMRef, executor: Box<dyn Executor + Send + Sync>) -> Self {
+    pub fn new(vm_ref: VMConfigRef, executor: Box<dyn Executor + Send + Sync>) -> Self {
         RuntimeRef(Arc::new(Runtime::new(vm_ref, executor)))
     }
 

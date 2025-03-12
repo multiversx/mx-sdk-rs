@@ -1,7 +1,7 @@
 use crate::{
     blockchain::{
         state::{AccountData, AccountEsdt, BlockchainState},
-        BlockchainVMRef,
+        VMConfigRef,
     },
     host::runtime::RuntimeRef,
     types::{VMAddress, VMCodeMetadata},
@@ -66,7 +66,7 @@ impl TxContext {
         };
 
         let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
-        let vm_ref = BlockchainVMRef::new();
+        let vm_ref = VMConfigRef::new();
         TxContext {
             runtime_ref: RuntimeRef::new(vm_ref, Box::new(FailingExecutor)),
             tx_input_box: Box::new(tx_input),
