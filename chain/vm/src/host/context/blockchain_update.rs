@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
+    blockchain::{AccountData, BlockchainState},
     types::VMAddress,
-    world_mock::{AccountData, BlockchainState},
 };
 
 #[derive(Default)]

@@ -4,9 +4,9 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use crate::{
+    blockchain::{AccountData, BlockInfo},
     host::context::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata, H256},
-    world_mock::{AccountData, BlockInfo},
 };
 
 /// Abstracts away the borrowing of a managed types structure.

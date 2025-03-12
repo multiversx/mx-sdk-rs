@@ -2,11 +2,11 @@ use multiversx_chain_core::types::ReturnCode;
 use num_bigint::BigUint;
 
 use crate::{
+    blockchain::{EsdtInstance, EsdtInstanceMetadata},
     chain_core::builtin_func_names::ESDT_NFT_CREATE_FUNC_NAME,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::{top_decode_u64, top_encode_u64},
-    world_mock::{EsdtInstance, EsdtInstanceMetadata},
 };
 
 use super::super::builtin_func_trait::BuiltinFunction;

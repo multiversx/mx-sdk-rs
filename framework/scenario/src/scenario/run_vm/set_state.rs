@@ -1,11 +1,11 @@
 use crate::scenario::model::SetStateStep;
 
 use multiversx_chain_vm::{
-    types::VMCodeMetadata,
-    world_mock::{
+    blockchain::{
         AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainState, EsdtData,
         EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
     },
+    types::VMCodeMetadata,
 };
 
 use super::ScenarioVMRunner;

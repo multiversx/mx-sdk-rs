@@ -1,8 +1,8 @@
 use crate::{
+    blockchain::BlockchainStateRef,
     host::context::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::{VMAddress, VMCodeMetadata},
-    world_mock::BlockchainStateRef,
 };
 
 /// Executes deploy transaction and commits changes back to the underlying blockchain state.

@@ -7,7 +7,7 @@ use crate::{
 use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use super::{raw_converter::*, ScCallMandos, ScQueryMandos, TxExpectMandos};
-use multiversx_chain_vm::world_mock::AccountData;
+use multiversx_chain_vm::blockchain::AccountData;
 
 pub(crate) struct MandosGenerator<'a> {
     scenario: &'a mut Scenario,

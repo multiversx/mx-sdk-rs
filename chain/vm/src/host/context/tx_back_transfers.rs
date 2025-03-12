@@ -1,6 +1,6 @@
 use num_bigint::BigUint;
 
-use crate::{builtin_function_mocks::BuiltinFunctionContainer, types::VMAddress};
+use crate::{builtin_functions::BuiltinFunctionContainer, types::VMAddress};
 
 use super::{async_call_tx_input, CallType, TxResult, TxTokenTransfer};
 

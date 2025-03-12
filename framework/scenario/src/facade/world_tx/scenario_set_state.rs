@@ -12,7 +12,7 @@ use crate::{
     ScenarioTxEnvData, ScenarioWorld,
 };
 
-use multiversx_chain_vm::world_mock::EsdtInstanceMetadata;
+use multiversx_chain_vm::blockchain::EsdtInstanceMetadata;
 use multiversx_sc::{
     proxy_imports::TopEncode,
     types::{AnnotatedValue, BigUint, EsdtLocalRole, ManagedAddress},

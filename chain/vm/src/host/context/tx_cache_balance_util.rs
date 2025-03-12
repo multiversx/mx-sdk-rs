@@ -2,8 +2,8 @@ use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 use num_bigint::BigUint;
 
 use crate::{
-    host::context::TxPanic, system_sc::is_system_sc_address, types::VMAddress,
-    world_mock::EsdtInstanceMetadata,
+    blockchain::EsdtInstanceMetadata, host::context::TxPanic, system_sc::is_system_sc_address,
+    types::VMAddress,
 };
 
 use super::TxCache;

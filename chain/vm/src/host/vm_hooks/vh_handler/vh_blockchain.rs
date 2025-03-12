@@ -1,8 +1,8 @@
 use crate::{
+    blockchain::{EsdtData, EsdtInstance},
     chain_core::builtin_func_names::*,
     host::vm_hooks::VMHooksHandlerSource,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
-    world_mock::{EsdtData, EsdtInstance},
 };
 use num_bigint::BigInt;
 use num_traits::Zero;

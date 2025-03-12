@@ -6,6 +6,7 @@ use std::{
 use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use multiversx_chain_vm::{
+    blockchain::{AccountData, BlockInfo},
     chain_core::types::ReturnCode,
     host::context::{BackTransfers, TxFunctionName, TxInput, TxManagedTypes, TxResult},
     host::vm_hooks::{
@@ -15,7 +16,6 @@ use multiversx_chain_vm::{
         VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
     },
     types::{VMAddress, VMCodeMetadata},
-    world_mock::{AccountData, BlockInfo},
 };
 
 use crate::debug_executor::ContractDebugInstance;

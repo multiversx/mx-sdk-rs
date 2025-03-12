@@ -1,6 +1,6 @@
 use crate::{
+    blockchain::{AccountData, BlockchainState},
     types::VMAddress,
-    world_mock::{AccountData, BlockchainState},
 };
 
 use super::TxCache;

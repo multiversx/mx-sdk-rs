@@ -1,7 +1,7 @@
 use crate::{
+    blockchain::{AccountData, AccountEsdt, BlockchainState, BlockchainVMRef, FailingExecutor},
     host::runtime::RuntimeRef,
     types::{VMAddress, VMCodeMetadata},
-    world_mock::{AccountData, AccountEsdt, BlockchainState, BlockchainVMRef, FailingExecutor},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;

@@ -12,8 +12,8 @@ use crate::{
     scenario_model::U64Value,
 };
 use multiversx_chain_vm::{
+    blockchain::{AccountData, EsdtData},
     types::VMAddress,
-    world_mock::{AccountData, EsdtData},
 };
 use num_traits::Zero;
 

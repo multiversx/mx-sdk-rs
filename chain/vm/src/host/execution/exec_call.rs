@@ -1,4 +1,5 @@
 use crate::{
+    blockchain::{AccountData, AccountEsdt, BlockchainStateRef},
     host::context::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxInput,
@@ -7,7 +8,6 @@ use crate::{
     host::runtime::instance_call,
     host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::VMCodeMetadata,
-    world_mock::{AccountData, AccountEsdt, BlockchainStateRef},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
