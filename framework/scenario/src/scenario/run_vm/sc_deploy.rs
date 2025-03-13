@@ -3,7 +3,7 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::{instance_call, RuntimeInstanceCall},
+    tx_execution::{commit_deploy, instance_call, RuntimeInstanceCall},
     tx_mock::{TxFunctionName, TxInput, TxResult},
     types::VMCodeMetadata,
 };
@@ -32,11 +32,12 @@ impl ScenarioVMRunner {
         let tx_input = tx_input_from_deploy(sc_deploy_step);
         let runtime = self.create_debugger_runtime();
         let contract_code = &sc_deploy_step.tx.contract_code.value;
-        let (new_address, tx_result) = runtime.sc_create(
+        let (new_address, tx_result) = commit_deploy(
             tx_input,
             contract_code,
             VMCodeMetadata::from(sc_deploy_step.tx.code_metadata.bits()),
             &mut self.blockchain_mock.state,
+            &runtime,
             f,
         );
         assert!(
