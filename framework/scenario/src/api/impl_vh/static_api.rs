@@ -1,11 +1,11 @@
 use multiversx_chain_vm::{
     executor::VMHooks,
-    vm_hooks::{VMHooksDispatcher, VMHooksHandler},
+    host::vm_hooks::{VMHooksDispatcher, VMHooksHandler},
 };
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;
 
-use crate::debug_executor::StaticVarData;
+use crate::executor::debug::StaticVarData;
 
 use super::{StaticApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
 

@@ -5,8 +5,8 @@ use multiversx_chain_vm_executor_wasmer::{WasmerExecutorData, WasmerInstance};
 use std::{cell::RefCell, fmt, rc::Rc};
 
 use crate::{
-    tx_execution::RuntimeWeakRef,
-    vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
+    host::runtime::RuntimeWeakRef,
+    host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
 };
 
 use super::WrappedInstance;

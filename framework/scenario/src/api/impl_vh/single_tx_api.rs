@@ -1,11 +1,12 @@
 use std::sync::Mutex;
 
 use multiversx_chain_vm::{
-    executor::VMHooks, types::VMAddress, vm_hooks::VMHooksDispatcher, world_mock::AccountData,
+    blockchain::state::AccountData, executor::VMHooks, host::vm_hooks::VMHooksDispatcher,
+    types::VMAddress,
 };
 use multiversx_sc::api::RawHandle;
 
-use crate::debug_executor::StaticVarData;
+use crate::executor::debug::StaticVarData;
 
 use super::{SingleTxApiData, SingleTxApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
 

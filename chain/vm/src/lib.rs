@@ -1,14 +1,14 @@
+pub mod blockchain;
+pub mod builtin_functions;
 pub mod crypto_functions;
 pub mod display_util;
-pub mod tx_execution;
-pub mod tx_mock;
+pub mod host;
+pub mod system_sc;
 pub mod types;
 pub mod vm_err_msg;
-pub mod vm_hooks;
 pub mod with_shared;
-pub mod world_mock;
 
-pub use world_mock::BlockchainMock;
+pub use blockchain::BlockchainMock;
 
 #[cfg(feature = "wasmer")]
 pub mod wasmer;

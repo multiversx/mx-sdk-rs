@@ -2,7 +2,7 @@ use multiversx_sc::api::{const_handles, RawHandle, SendApi, SendApiImpl};
 
 use crate::{
     api::{VMHooksApi, VMHooksApiBackend},
-    debug_executor::ContractDebugInstance,
+    executor::debug::ContractDebugInstance,
 };
 
 impl<VHB: VMHooksApiBackend> SendApi for VMHooksApi<VHB> {

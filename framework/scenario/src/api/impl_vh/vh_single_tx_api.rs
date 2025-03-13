@@ -6,25 +6,25 @@ use std::{
 use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use multiversx_chain_vm::{
+    blockchain::state::{AccountData, BlockInfo},
     chain_core::types::ReturnCode,
-    tx_mock::{BackTransfers, TxFunctionName, TxInput, TxManagedTypes, TxResult},
-    types::{VMAddress, VMCodeMetadata},
-    vm_hooks::{
+    host::context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
+    host::vm_hooks::{
         VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
         VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
         VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
         VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
     },
-    world_mock::{AccountData, BlockInfo},
+    types::{VMAddress, VMCodeMetadata},
 };
 
-use crate::debug_executor::ContractDebugInstance;
+use crate::executor::debug::ContractDebugInstance;
 
 #[derive(Default, Debug)]
 pub struct SingleTxApiData {
     pub tx_input_box: Box<TxInput>,
     pub accounts: Mutex<HashMap<VMAddress, AccountData>>,
-    pub managed_types: Mutex<TxManagedTypes>,
+    pub managed_types: Mutex<ManagedTypeContainer>,
     pub tx_result_cell: Mutex<TxResult>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
@@ -68,7 +68,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         }
     }
 
-    fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
         self.0.managed_types.lock().unwrap()
     }
 

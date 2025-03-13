@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
-use multiversx_chain_vm::tx_mock::TxContext;
+use multiversx_chain_vm::host::context::TxContext;
 use multiversx_sc::{
     api::{HandleConstraints, RawHandle},
     codec::TryStaticCast,
 };
 
-use crate::debug_executor::ContractDebugStack;
+use crate::executor::debug::ContractDebugStack;
 
 #[derive(Clone)]
 pub struct DebugHandle {

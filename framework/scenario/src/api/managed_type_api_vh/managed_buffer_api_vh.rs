@@ -1,6 +1,6 @@
 use crate::{
     api::{i32_to_bool, VMHooksApi, VMHooksApiBackend},
-    debug_executor::ContractDebugInstance,
+    executor::debug::ContractDebugInstance,
 };
 use multiversx_chain_vm::executor::MemPtr;
 use multiversx_sc::{

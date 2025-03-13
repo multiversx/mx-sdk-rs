@@ -5,8 +5,9 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::{commit_call_with_async_and_callback, instance_call, RuntimeInstanceCall},
-    tx_mock::{TxInput, TxResult, TxTokenTransfer},
+    host::context::{TxInput, TxResult, TxTokenTransfer},
+    host::execution,
+    host::runtime::{instance_call, RuntimeInstanceCall},
 };
 use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti};
 
@@ -59,7 +60,12 @@ impl ScenarioVMRunner {
             .increase_account_nonce(&tx_input.from);
 
         let runtime = self.create_debugger_runtime();
-        commit_call_with_async_and_callback(tx_input, &mut self.blockchain_mock.state, &runtime, f)
+        execution::commit_call_with_async_and_callback(
+            tx_input,
+            &mut self.blockchain_mock.state,
+            &runtime,
+            f,
+        )
     }
 
     pub fn perform_sc_call_lambda_and_check<F>(

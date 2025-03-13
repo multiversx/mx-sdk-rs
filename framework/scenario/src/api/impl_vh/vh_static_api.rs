@@ -3,25 +3,27 @@ use std::sync::{Mutex, MutexGuard};
 use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 use multiversx_chain_vm::{
+    blockchain::state::{AccountData, BlockInfo},
     chain_core::types::ReturnCode,
-    tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
-    types::{VMAddress, VMCodeMetadata},
-    vm_hooks::{
+    host::context::{
+        BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
+    },
+    host::vm_hooks::{
         VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
         VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
         VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
         VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
     },
-    world_mock::{AccountData, BlockInfo},
+    types::{VMAddress, VMCodeMetadata},
 };
 
-use crate::debug_executor::ContractDebugInstance;
+use crate::executor::debug::ContractDebugInstance;
 
 /// A simple wrapper around a managed type container Mutex.
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug, Default)]
-pub struct StaticApiVMHooksHandler(Mutex<TxManagedTypes>);
+pub struct StaticApiVMHooksHandler(Mutex<ManagedTypeContainer>);
 
 impl StaticApiVMHooksHandler {
     pub const CURRENT_ADDRESS_PLACEHOLDER: VMAddress =
@@ -39,7 +41,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         }
     }
 
-    fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
         self.0.lock().unwrap()
     }
 

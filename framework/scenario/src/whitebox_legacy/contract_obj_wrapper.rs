@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{ContractContainer, ContractDebugInstance, ContractDebugStack},
+    executor::debug::{ContractContainer, ContractDebugInstance, ContractDebugStack},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -13,7 +13,7 @@ use crate::{
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::tx_mock::{TxFunctionName, TxResult};
+use multiversx_chain_vm::host::context::{TxFunctionName, TxResult};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 
@@ -22,7 +22,7 @@ use super::{
     AddressFactory, MandosGenerator, ScQueryMandos,
 };
 
-pub use multiversx_chain_vm::tx_mock::TxTokenTransfer;
+pub use multiversx_chain_vm::host::context::TxTokenTransfer;
 
 #[derive(Clone)]
 pub struct ContractObjWrapper<

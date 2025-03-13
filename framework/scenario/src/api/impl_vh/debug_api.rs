@@ -2,13 +2,13 @@ use std::rc::Rc;
 
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
-    tx_mock::{TxContextRef, TxPanic},
-    vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
+    host::context::{TxContextRef, TxPanic},
+    host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
 };
 use multiversx_chain_vm_executor::Instance;
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::{ContractDebugInstance, ContractDebugStack, StaticVarData};
+use crate::executor::debug::{ContractDebugInstance, ContractDebugStack, StaticVarData};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 

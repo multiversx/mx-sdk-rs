@@ -1,8 +1,8 @@
-use multiversx_chain_vm::tx_execution::{Runtime, RuntimeRef, RuntimeWeakRef};
+use multiversx_chain_vm::host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef};
 use multiversx_chain_vm_executor::Executor;
 
 use crate::{
-    debug_executor::{ContractDebugExecutor, ContractMapRef},
+    executor::debug::{ContractDebugExecutor, ContractMapRef},
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
 };
