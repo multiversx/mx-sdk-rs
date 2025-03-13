@@ -15,8 +15,8 @@ use multiversx_sc_meta_lib::{
 
 use super::render_code_report::CodeReportRender;
 
-pub(crate) const JSON: &str = ".json";
-pub(crate) const MD: &str = ".md";
+pub(crate) const JSON: &str = "json";
+pub(crate) const MD: &str = "md";
 
 pub fn compare_report(compare_args: &CompareArgs) {
     let mut output_file = create_file(&compare_args.output);
