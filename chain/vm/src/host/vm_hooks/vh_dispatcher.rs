@@ -4,6 +4,11 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooks};
 
 use super::VMHooksHandler;
 
+const RESULT_TRUE: i32 = 1;
+const RESULT_FALSE: i32 = 0;
+const RESULT_OK: i32 = 0;
+const RESULT_ERROR: i32 = 1;
+
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
 pub struct VMHooksDispatcher {
@@ -18,9 +23,9 @@ impl VMHooksDispatcher {
 
 fn bool_to_i32(b: bool) -> i32 {
     if b {
-        1
+        RESULT_TRUE
     } else {
-        0
+        RESULT_FALSE
     }
 }
 
@@ -733,7 +738,7 @@ impl VMHooks for VMHooksDispatcher {
                 callback_closure_handle,
             );
         }
-        0
+        RESULT_OK
     }
 
     fn managed_get_callback_closure(&self, callback_closure_handle: i32) {
@@ -804,7 +809,7 @@ impl VMHooks for VMHooksDispatcher {
             result_address_handle,
             result_handle,
         );
-        0
+        RESULT_OK
     }
 
     fn managed_create_contract(
@@ -826,7 +831,7 @@ impl VMHooks for VMHooksDispatcher {
             result_address_handle,
             result_handle,
         );
-        0
+        RESULT_OK
     }
 
     fn managed_execute_read_only(
@@ -844,7 +849,7 @@ impl VMHooks for VMHooksDispatcher {
             arguments_handle,
             result_handle,
         );
-        0
+        RESULT_OK
     }
 
     fn managed_execute_on_same_context(
@@ -876,7 +881,7 @@ impl VMHooks for VMHooksDispatcher {
             arguments_handle,
             result_handle,
         );
-        0
+        RESULT_OK
     }
 
     fn managed_multi_transfer_esdt_nft_execute(
@@ -894,7 +899,7 @@ impl VMHooks for VMHooksDispatcher {
             function_handle,
             arguments_handle,
         );
-        0
+        RESULT_OK
     }
 
     fn managed_transfer_value_execute(
@@ -912,7 +917,7 @@ impl VMHooks for VMHooksDispatcher {
             function_handle,
             arguments_handle,
         );
-        0
+        RESULT_OK
     }
 
     fn managed_is_esdt_frozen(&self, address_handle: i32, token_id_handle: i32, nonce: i64) -> i32 {
@@ -1313,9 +1318,9 @@ impl VMHooks for VMHooksDispatcher {
             unsafe {
                 self.handler.memory_store(result_offset, &bytes);
             }
-            0
+            RESULT_OK
         } else {
-            1
+            RESULT_ERROR
         }
     }
 
@@ -1348,7 +1353,7 @@ impl VMHooks for VMHooksDispatcher {
             let bytes = self.handler.memory_load(data_offset, data_length);
             self.handler.mb_set(m_buffer_handle, bytes);
         }
-        0
+        RESULT_OK
     }
 
     fn mbuffer_set_byte_slice(
@@ -1367,7 +1372,7 @@ impl VMHooks for VMHooksDispatcher {
 
     fn mbuffer_append(&self, accumulator_handle: i32, data_handle: i32) -> i32 {
         self.handler.mb_append(accumulator_handle, data_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_append_bytes(
@@ -1380,31 +1385,31 @@ impl VMHooks for VMHooksDispatcher {
             let bytes = self.handler.memory_load(data_offset, data_length);
             self.handler.mb_append_bytes(accumulator_handle, bytes);
         }
-        0
+        RESULT_OK
     }
 
     fn mbuffer_to_big_int_unsigned(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
         self.handler
             .mb_to_big_int_unsigned(m_buffer_handle, big_int_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_to_big_int_signed(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
         self.handler
             .mb_to_big_int_signed(m_buffer_handle, big_int_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_from_big_int_unsigned(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
         self.handler
             .mb_from_big_int_unsigned(m_buffer_handle, big_int_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_from_big_int_signed(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
         self.handler
             .mb_from_big_int_signed(m_buffer_handle, big_int_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_to_big_float(&self, m_buffer_handle: i32, big_float_handle: i32) -> i32 {
@@ -1418,13 +1423,13 @@ impl VMHooks for VMHooksDispatcher {
     fn mbuffer_storage_store(&self, key_handle: i32, source_handle: i32) -> i32 {
         self.handler
             .storage_store_managed_buffer_raw(key_handle, source_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_storage_load(&self, key_handle: i32, destination_handle: i32) -> i32 {
         self.handler
             .storage_load_managed_buffer_raw(key_handle, destination_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_storage_load_from_address(
@@ -1440,18 +1445,18 @@ impl VMHooks for VMHooksDispatcher {
     fn mbuffer_get_argument(&self, id: i32, destination_handle: i32) -> i32 {
         self.handler
             .load_argument_managed_buffer(id, destination_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_finish(&self, source_handle: i32) -> i32 {
         self.handler.finish_managed_buffer_raw(source_handle);
-        0
+        RESULT_OK
     }
 
     fn mbuffer_set_random(&self, destination_handle: i32, length: i32) -> i32 {
         self.handler
             .mb_set_random(destination_handle, length as usize);
-        0
+        RESULT_OK
     }
 
     fn managed_map_new(&self) -> i32 {
@@ -1460,19 +1465,19 @@ impl VMHooks for VMHooksDispatcher {
 
     fn managed_map_put(&self, map_handle: i32, key_handle: i32, value_handle: i32) -> i32 {
         self.handler.mm_put(map_handle, key_handle, value_handle);
-        0
+        RESULT_OK
     }
 
     fn managed_map_get(&self, map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
         self.handler
             .mm_get(map_handle, key_handle, out_value_handle);
-        0
+        RESULT_OK
     }
 
     fn managed_map_remove(&self, map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
         self.handler
             .mm_remove(map_handle, key_handle, out_value_handle);
-        0
+        RESULT_OK
     }
 
     fn managed_map_contains(&self, map_handle: i32, key_handle: i32) -> i32 {
@@ -1543,7 +1548,7 @@ impl VMHooks for VMHooksDispatcher {
 
     fn managed_sha256(&self, input_handle: i32, output_handle: i32) -> i32 {
         self.handler.sha256_managed(output_handle, input_handle);
-        0
+        RESULT_OK
     }
 
     fn keccak256(&self, data_offset: MemPtr, length: MemLength, result_offset: MemPtr) -> i32 {
@@ -1552,7 +1557,7 @@ impl VMHooks for VMHooksDispatcher {
 
     fn managed_keccak256(&self, input_handle: i32, output_handle: i32) -> i32 {
         self.handler.keccak256_managed(output_handle, input_handle);
-        0
+        RESULT_OK
     }
 
     fn ripemd160(&self, data_offset: MemPtr, length: MemLength, result_offset: MemPtr) -> i32 {
@@ -1590,7 +1595,7 @@ impl VMHooks for VMHooksDispatcher {
     fn managed_verify_ed25519(&self, key_handle: i32, message_handle: i32, sig_handle: i32) -> i32 {
         self.handler
             .verify_ed25519_managed(key_handle, message_handle, sig_handle);
-        0
+        RESULT_OK
     }
 
     fn verify_custom_secp256k1(
