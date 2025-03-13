@@ -42,6 +42,7 @@ pathdiff = "0.2.1"
 common-path = "1.0.0"
 bip39 = "2.0.0"
 home = "=0.5.11"
+regex = { version = "1.11.1" }
 
 [dependencies.multiversx-sc-meta-lib]
 version = "=0.57.0"

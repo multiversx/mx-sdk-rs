@@ -1,4 +1,5 @@
 use convert_case::{Case, Casing};
+use regex::Regex;
 
 use crate::{
     cli::TemplateArgs,
@@ -30,11 +31,16 @@ pub async fn create_contract(args: &TemplateArgs) {
 }
 
 fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
-    let new_name = args
-        .name
-        .clone()
-        .unwrap_or_else(|| args.template.clone())
-        .to_case(Case::Kebab);
+    let valid_name_regex = Regex::new(r"^[a-zA-Z_][a-zA-Z0-9_]*$").unwrap();
+    let new_name = args.name.clone().unwrap_or_else(|| args.template.clone());
+    if !valid_name_regex.is_match(&new_name) {
+        panic!(
+            "Invalid contract name `{}`: Rust crate names must start with a letter or underscore and contain only letters, numbers, and underscores (_). Dots (.) and dashes (-) are not allowed.",
+            new_name
+        );
+    }
+
+    let new_name = new_name.to_case(Case::Kebab);
     let target_path = args.path.clone().unwrap_or_default();
     ContractCreatorTarget {
         target_path,
