@@ -5,7 +5,7 @@ use std::{
 };
 
 use crate::{
-    cli::{CompareArgs, CompileArgs, ConvertArgs},
+    cli::{matches_extension, CompareArgs, CompileArgs, ConvertArgs},
     folder_structure::RelevantDirectories,
 };
 
@@ -15,20 +15,10 @@ use multiversx_sc_meta_lib::{
 
 use super::render_code_report::CodeReportRender;
 
-const JSON: &str = ".json";
-const MD: &str = ".md";
+pub(crate) const JSON: &str = ".json";
+pub(crate) const MD: &str = ".md";
 
 pub fn compare_report(compare_args: &CompareArgs) {
-    if !is_path_ends_with(&compare_args.output, MD) {
-        panic!("Compare output is only available for Markdown file extension.");
-    }
-
-    if !is_path_ends_with(&compare_args.baseline, JSON)
-        && !is_path_ends_with(&compare_args.new, JSON)
-    {
-        panic!("Compare baseline and new are only available for JSON file extension.");
-    }
-
     let mut output_file = create_file(&compare_args.output);
 
     let baseline_reports: Vec<CodeReportJson> = match File::open(&compare_args.baseline) {
@@ -44,14 +34,6 @@ pub fn compare_report(compare_args: &CompareArgs) {
 }
 
 pub fn convert_report(convert_args: &ConvertArgs) {
-    if !is_path_ends_with(&convert_args.output, MD) {
-        panic!("Conversion output is only available for Markdown file extension");
-    }
-
-    if !is_path_ends_with(&convert_args.input, JSON) {
-        panic!("Conversion only available from JSON file extension");
-    }
-
     let mut output_file = create_file(&convert_args.output);
 
     let reports: Vec<CodeReportJson> = extract_reports_from_json(&convert_args.input);
@@ -62,17 +44,11 @@ pub fn convert_report(convert_args: &ConvertArgs) {
 }
 
 pub fn create_report(compile_args: &CompileArgs) {
-    if !is_path_ends_with(&compile_args.output, JSON)
-        && !is_path_ends_with(&compile_args.output, MD)
-    {
-        panic!("Create report is only available for Markdown or JSON output file.")
-    }
-
     let reports = generate_new_report(&compile_args.path);
 
     let mut file = create_file(&compile_args.output);
 
-    if is_path_ends_with(&compile_args.output, MD) {
+    if matches_extension(&compile_args.output, MD) {
         let mut render_code_report = CodeReportRender::new_without_compare(&mut file, &reports);
         render_code_report.render_report();
     } else {
@@ -147,17 +123,9 @@ fn sanitize_output_path_from_report(reports: &mut [CodeReportJson]) {
     })
 }
 
-fn is_path_ends_with(path: &Path, extension: &str) -> bool {
-    path.to_path_buf()
-        .into_os_string()
-        .into_string()
-        .unwrap()
-        .ends_with(extension)
-}
-
 fn extract_reports_from_json(path: &PathBuf) -> Vec<CodeReportJson> {
     let file =
-        File::open(path).unwrap_or_else(|_| panic!("file with path {} not found", path.display()));
+        File::open(path).unwrap_or_else(|_| panic!("File with path {} not found", path.display()));
     let reader = BufReader::new(file);
 
     serde_json::from_reader(reader).unwrap_or_else(|_| vec![])

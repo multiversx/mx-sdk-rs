@@ -16,20 +16,28 @@ use crate::cmd::test_coverage::test_coverage;
 
 use crate::cmd::upgrade::upgrade_sc;
 
+use super::ValidateArgs;
+
 /// Entry point in the program when calling it as a standalone tool.
 pub async fn cli_main_standalone() {
     let cli_args = StandaloneCliArgs::parse();
     match &cli_args.command {
         Some(StandaloneCliAction::Info(args)) => call_info(args),
-        Some(StandaloneCliAction::Install(args)) => install(args).await,
+        Some(StandaloneCliAction::Install(args)) => {
+            args.validate_args();
+            install(args).await;
+        },
         Some(StandaloneCliAction::All(args)) => call_all_meta(args),
         Some(StandaloneCliAction::Upgrade(args)) => {
+            args.validate_args();
             upgrade_sc(args);
         },
         Some(StandaloneCliAction::Template(args)) => {
+            args.validate_args();
             create_contract(args).await;
         },
         Some(StandaloneCliAction::TemplateList(args)) => {
+            args.validate_args();
             print_template_names(args).await;
         },
         Some(StandaloneCliAction::TestGen(args)) => {
@@ -40,9 +48,11 @@ pub async fn cli_main_standalone() {
             test_coverage(args);
         },
         Some(StandaloneCliAction::CodeReportGen(args)) => {
+            args.validate_args();
             report(args);
         },
         Some(StandaloneCliAction::Account(args)) => {
+            args.validate_args();
             retrieve_address(args).await;
         },
         Some(StandaloneCliAction::LocalDeps(args)) => {
