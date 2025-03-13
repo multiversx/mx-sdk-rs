@@ -392,8 +392,6 @@ fn st_blackbox_returns_result_or_error() {
 fn st_blackbox_storage_check_test() {
     let mut world = world();
 
-    world.start_trace();
-
     world.account(OWNER_ADDRESS).nonce(1);
 
     // set value for sum in storage
@@ -422,6 +420,4 @@ fn st_blackbox_storage_check_test() {
     world
         .check_account(ST_ADDRESS)
         .check_storage("str:otherMapper", "str:SomeValueInStorage");
-
-    world.write_scenario_trace("scenarios/st-partial-key-check.scen.json");
 }
