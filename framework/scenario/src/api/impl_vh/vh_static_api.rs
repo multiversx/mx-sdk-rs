@@ -17,7 +17,7 @@ use multiversx_chain_vm::{
     types::{VMAddress, VMCodeMetadata},
 };
 
-use crate::debug_executor::ContractDebugInstance;
+use crate::executor::debug::ContractDebugInstance;
 
 /// A simple wrapper around a managed type container Mutex.
 ///

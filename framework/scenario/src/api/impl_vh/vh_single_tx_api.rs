@@ -18,7 +18,7 @@ use multiversx_chain_vm::{
     types::{VMAddress, VMCodeMetadata},
 };
 
-use crate::debug_executor::ContractDebugInstance;
+use crate::executor::debug::ContractDebugInstance;
 
 #[derive(Default, Debug)]
 pub struct SingleTxApiData {

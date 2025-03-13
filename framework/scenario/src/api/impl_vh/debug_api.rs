@@ -8,7 +8,7 @@ use multiversx_chain_vm::{
 use multiversx_chain_vm_executor::Instance;
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::{ContractDebugInstance, ContractDebugStack, StaticVarData};
+use crate::executor::debug::{ContractDebugInstance, ContractDebugStack, StaticVarData};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 

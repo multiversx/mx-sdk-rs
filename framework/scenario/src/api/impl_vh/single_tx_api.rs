@@ -6,7 +6,7 @@ use multiversx_chain_vm::{
 };
 use multiversx_sc::api::RawHandle;
 
-use crate::debug_executor::StaticVarData;
+use crate::executor::debug::StaticVarData;
 
 use super::{SingleTxApiData, SingleTxApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
 

@@ -5,7 +5,7 @@ use multiversx_chain_vm::{
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;
 
-use crate::debug_executor::StaticVarData;
+use crate::executor::debug::StaticVarData;
 
 use super::{StaticApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
 

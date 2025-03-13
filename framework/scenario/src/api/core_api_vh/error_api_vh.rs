@@ -2,7 +2,7 @@ use multiversx_sc::api::{ErrorApi, ErrorApiImpl, HandleConstraints};
 
 use crate::{
     api::{VMHooksApi, VMHooksApiBackend},
-    debug_executor::ContractDebugInstance,
+    executor::debug::ContractDebugInstance,
 };
 
 impl<VHB: VMHooksApiBackend> ErrorApi for VMHooksApi<VHB> {

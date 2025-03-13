@@ -6,7 +6,7 @@ use multiversx_sc::{
     codec::TryStaticCast,
 };
 
-use crate::debug_executor::ContractDebugStack;
+use crate::executor::debug::ContractDebugStack;
 
 #[derive(Clone)]
 pub struct DebugHandle {

@@ -1,5 +1,5 @@
 use crate::{
-    debug_executor::ContractDebugInstance, num_bigint::BigUint, scenario::model::ScQueryStep,
+    executor::debug::ContractDebugInstance, num_bigint::BigUint, scenario::model::ScQueryStep,
     scenario_model::TxResponse,
 };
 use multiversx_chain_vm::host::context::{TxCache, TxContext, TxInput, TxResult};

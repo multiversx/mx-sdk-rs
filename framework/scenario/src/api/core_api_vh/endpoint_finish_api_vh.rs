@@ -2,7 +2,7 @@ use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl, HandleConstra
 
 use crate::{
     api::{VMHooksApi, VMHooksApiBackend},
-    debug_executor::ContractDebugInstance,
+    executor::debug::ContractDebugInstance,
 };
 
 impl<VHB: VMHooksApiBackend> EndpointFinishApi for VMHooksApi<VHB> {

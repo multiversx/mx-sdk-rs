@@ -1,4 +1,4 @@
-use crate::debug_executor::ContractDebugInstance;
+use crate::executor::debug::ContractDebugInstance;
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::{
     imports::StaticApi, scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec,

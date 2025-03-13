@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{ContractContainer, ContractDebugInstance, ContractDebugStack},
+    executor::debug::{ContractContainer, ContractDebugInstance, ContractDebugStack},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
