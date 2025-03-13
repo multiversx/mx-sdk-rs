@@ -68,7 +68,7 @@
                         "+": ""
                     },
                     "code": "*",
-                    "owner": "*"
+                    "owner": "address:owner"
                 }
             }
         }
