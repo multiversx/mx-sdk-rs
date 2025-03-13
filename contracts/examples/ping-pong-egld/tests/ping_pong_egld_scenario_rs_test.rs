@@ -12,11 +12,6 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn ping_pong_partial_key_check_rs() {
-    world().run("scenarios/ping-pong-partial-key-check.scen.json");
-}
-
-#[test]
 fn ping_pong_call_get_user_addresses_rs() {
     world().run("scenarios/ping-pong-call-get-user-addresses.scen.json");
 }

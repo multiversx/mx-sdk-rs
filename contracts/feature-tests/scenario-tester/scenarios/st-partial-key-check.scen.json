@@ -14,7 +14,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "1",
-                    "newAddress": "sc:ping-pong"
+                    "newAddress": "sc:scenario-tester"
                 }
             ]
         },
@@ -23,12 +23,28 @@
             "id": "",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "mxsc:../output/ping-pong-egld.mxsc.json",
+                "contractCode": "mxsc:../output/scenario-tester.mxsc.json",
                 "arguments": [
-                    "0x01",
-                    "0x64",
-                    "0x01000000000002ba31",
-                    "0x64"
+                    "0x01"
+                ],
+                "gasLimit": "5,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x696e69742d726573756c74"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:scenario-tester",
+                "function": "set_other_mapper",
+                "arguments": [
+                    "0x536f6d6556616c7565496e53746f72616765"
                 ],
                 "gasLimit": "5,000,000"
             },
@@ -40,10 +56,9 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:ping-pong": {
+                "sc:scenario-tester": {
                     "storage": {
-                        "str:activationTimestamp": "178737",
-                        "str:deadline": "178837",
+                        "str:otherMapper": "str:SomeValueInStorage",
                         "+": ""
                     },
                     "code": "*",
