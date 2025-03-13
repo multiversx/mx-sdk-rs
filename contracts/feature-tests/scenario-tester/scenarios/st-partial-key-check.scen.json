@@ -56,6 +56,12 @@
         {
             "step": "checkState",
             "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
                 "sc:scenario-tester": {
                     "storage": {
                         "str:otherMapper": "str:SomeValueInStorage",
