@@ -43,7 +43,8 @@
                 "sc:ping-pong": {
                     "storage": {
                         "str:activationTimestamp": "178737",
-                        "str:deadline": "178837"
+                        "str:deadline": "178837",
+                        "+": ""
                     },
                     "code": "*",
                     "owner": "*"
