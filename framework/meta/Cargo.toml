@@ -23,7 +23,6 @@ path = "src/main.rs"
 [features]
 template-test-current = []
 template-test-released = []
-chain-simulator-tests = []
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
