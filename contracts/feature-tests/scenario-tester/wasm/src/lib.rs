@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                            5
+// Endpoints:                            7
 // Async Callback (empty):               1
-// Total number of exported functions:   8
+// Total number of exported functions:  10
 
 #![no_std]
 
@@ -21,7 +21,9 @@ multiversx_sc_wasm_adapter::endpoints! {
         init => init
         upgrade => upgrade
         getSum => sum
+        getOtherMapper => other_mapper
         add => add
+        set_other_mapper => set_other_mapper
         multi_param => multi_param
         multi_return => multi_return
         sc_panic => sc_panic

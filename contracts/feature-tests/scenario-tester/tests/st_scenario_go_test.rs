@@ -13,3 +13,8 @@ fn interactor_trace_go() {
 fn st_adder_go() {
     world().run("scenarios/st-adder.scen.json");
 }
+
+#[test]
+fn st_partial_key_check_go() {
+    world().run("scenarios/st-partial-key-check.scen.json");
+}

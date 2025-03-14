@@ -387,3 +387,37 @@ fn st_blackbox_returns_result_or_error() {
         ))
     );
 }
+
+#[test]
+fn st_blackbox_storage_check_test() {
+    let mut world = world();
+
+    world.account(OWNER_ADDRESS).nonce(1);
+
+    // set value for sum in storage
+    let new_address = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .init(BigUint::from(1u64))
+        .code(CODE_PATH)
+        .new_address(ST_ADDRESS)
+        .returns(ReturnsNewAddress)
+        .run();
+
+    assert_eq!(new_address, ST_ADDRESS.to_address());
+
+    // set value for otherMapper in storage
+    world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .set_other_mapper(b"SomeValueInStorage")
+        .run();
+
+    // only check value for one key (partial check)
+    world
+        .check_account(ST_ADDRESS)
+        .check_storage("str:otherMapper", "str:SomeValueInStorage");
+}

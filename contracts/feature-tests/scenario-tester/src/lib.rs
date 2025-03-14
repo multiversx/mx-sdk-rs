@@ -12,6 +12,10 @@ pub trait ScenarioTester {
     #[storage_mapper("sum")]
     fn sum(&self) -> SingleValueMapper<BigUint>;
 
+    #[view(getOtherMapper)]
+    #[storage_mapper("otherMapper")]
+    fn other_mapper(&self) -> SingleValueMapper<ManagedBuffer>;
+
     /// Return value for testing reasons.
     #[init]
     fn init(&self, initial_value: BigUint) -> &'static str {
@@ -28,6 +32,12 @@ pub trait ScenarioTester {
     #[endpoint]
     fn add(&self, value: BigUint) {
         self.sum().update(|sum| *sum += value);
+    }
+
+    /// Sets a value at another key
+    #[endpoint]
+    fn set_other_mapper(&self, value: ManagedBuffer) {
+        self.other_mapper().set(value);
     }
 
     /// Tests "from" conversion for MultiValueN parameters

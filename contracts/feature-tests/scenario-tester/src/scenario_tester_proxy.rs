@@ -99,6 +99,15 @@ where
             .original_result()
     }
 
+    pub fn other_mapper(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getOtherMapper")
+            .original_result()
+    }
+
     /// Add desired amount to the storage variable. 
     pub fn add<
         Arg0: ProxyArg<BigUint<Env::Api>>,
@@ -109,6 +118,20 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("add")
+            .argument(&value)
+            .original_result()
+    }
+
+    /// Sets a value at another key 
+    pub fn set_other_mapper<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        value: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("set_other_mapper")
             .argument(&value)
             .original_result()
     }
