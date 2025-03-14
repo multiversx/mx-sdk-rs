@@ -678,6 +678,18 @@ where
             .argument(&token_id)
             .original_result()
     }
+
+    /// Fetches token properties for a specific token.
+    pub fn get_token_properties<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getTokenProperties")
+            .argument(&token_id)
+            .original_result()
+    }
 }
 
 const TRUE_STR: &str = "true";

@@ -302,3 +302,25 @@ async fn transfer_role() {
     // get roles
     interact.get_roles(dynamic_nft_token_id.as_bytes()).await;
 }
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn get_token_properties() {
+    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
+
+    // issue dynamic NFT
+    let dynamic_nft_token_id = interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            EsdtTokenType::DynamicNFT,
+            0usize,
+        )
+        .await;
+
+    // get properties
+    interact
+        .get_token_properties(dynamic_nft_token_id.as_bytes())
+        .await;
+}
