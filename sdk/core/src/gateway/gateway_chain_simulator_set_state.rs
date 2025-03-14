@@ -61,6 +61,14 @@ impl SetStateAccount {
         self
     }
 
+    /// Creates a SetStateAccount from an address
+    pub fn from_address(address: String) -> Self {
+        Self {
+            address,
+            ..Default::default()
+        }
+    }
+
     /// Kept for backwards compatibility.
     #[deprecated(since = "0.56.0", note = "Use `with_storage` instead.")]
     pub fn with_keys(self, keys: HashMap<String, String>) -> Self {

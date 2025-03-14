@@ -66,7 +66,7 @@ const GENERATE_BLOCKS_UNTIL_TX_PROCESSED_ENDPOINT: &str =
 const GENERATE_BLOCKS_UNTIL_EPOCH_REACHED_ENDPOINT: &str =
     "simulator/generate-blocks-until-epoch-reached";
 const SET_STATE_ENDPOINT: &str = "simulator/set-state";
-const SET_STATE_OVERWRITE_ENDPOINT: &str = "/simulator/set-state-overwrite";
+const SET_STATE_OVERWRITE_ENDPOINT: &str = "simulator/set-state-overwrite";
 
 pub enum GatewayRequestType {
     Get,
