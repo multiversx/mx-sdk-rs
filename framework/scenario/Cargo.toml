@@ -30,6 +30,7 @@ pathdiff = "0.2.1"
 itertools = "0.14.0"
 colored = "3.0"
 unwrap-infallible = "0.1.5"
+simple-error = "0.3.1"
 
 [features]
 default = ["wasm-incompatible", "wasmer"] # TODO: wasmer temporarily default
