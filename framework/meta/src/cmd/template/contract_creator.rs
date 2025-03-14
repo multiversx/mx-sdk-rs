@@ -1,10 +1,6 @@
 use convert_case::{Case, Casing};
 
-use crate::{
-    cli::TemplateArgs,
-    version::FrameworkVersion,
-    version_history::{validate_template_tag, LAST_TEMPLATE_VERSION},
-};
+use crate::{cli::TemplateArgs, version::FrameworkVersion, version_history::LAST_TEMPLATE_VERSION};
 
 use super::{
     template_source::{template_sources, TemplateSource},
@@ -32,9 +28,10 @@ pub async fn create_contract(args: &TemplateArgs) {
 fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
     let new_name = args
         .name
-        .clone()
-        .unwrap_or_else(|| args.template.clone())
+        .as_deref()
+        .unwrap_or(&args.template)
         .to_case(Case::Kebab);
+
     let target_path = args.path.clone().unwrap_or_default();
     ContractCreatorTarget {
         target_path,
@@ -44,7 +41,6 @@ fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
 
 pub(crate) fn get_repo_version(args_tag: &Option<String>) -> RepoVersion {
     if let Some(tag) = args_tag {
-        assert!(validate_template_tag(tag), "invalid template tag");
         RepoVersion::Tag(tag.clone())
     } else {
         RepoVersion::Tag(LAST_TEMPLATE_VERSION.to_string())
