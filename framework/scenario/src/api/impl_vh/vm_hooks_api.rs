@@ -1,4 +1,4 @@
-use crate::debug_executor::StaticVarData;
+use crate::executor::debug::StaticVarData;
 
 use super::VMHooksApiBackend;
 

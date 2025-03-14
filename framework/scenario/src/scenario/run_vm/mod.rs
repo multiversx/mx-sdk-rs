@@ -10,4 +10,4 @@ mod tx_output_check;
 mod vm_runner;
 
 use tx_output_check::*;
-pub use vm_runner::ScenarioVMRunner;
+pub use vm_runner::{ScenarioExecutorConfig, ScenarioVMRunner};

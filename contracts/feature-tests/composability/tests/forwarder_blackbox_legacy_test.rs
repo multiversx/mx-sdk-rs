@@ -12,7 +12,7 @@ use multiversx_sc_scenario::{
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const FORWARDER_ADDRESS_EXPR: &str = "sc:forwarder_legacy";
-const FORWARDER_PATH_EXPR: &str = "mxsc:output/forwarder_legacy.mxsc.json";
+const FORWARDER_PATH_EXPR: &str = "mxsc:forwarder-legacy/output/forwarder-legacy.mxsc.json";
 
 const NFT_TOKEN_ID_EXPR: &str = "str:COOL-123456";
 const NFT_TOKEN_ID: &[u8] = b"COOL-123456";

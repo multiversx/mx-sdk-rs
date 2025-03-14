@@ -1,13 +1,14 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
-    tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
-    vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
+    host::context::{TxContextRef, TxPanic},
+    host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
 };
+use multiversx_chain_vm_executor::Instance;
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::{StaticVarData, StaticVarStack};
+use crate::executor::debug::{ContractDebugInstance, ContractDebugStack, StaticVarData};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
@@ -21,19 +22,28 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        let top_context = TxContextStack::static_peek();
-        let wrapper = DebugApiVMHooksHandler::new(top_context);
-        let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
-        f(&dispatcher)
+        let instance = ContractDebugStack::static_peek();
+        let tx_context_ref = instance.tx_context_ref.clone();
+        let instance_rc: Rc<Box<dyn Instance>> = Rc::new(Box::new(instance));
+        let handler = TxContextVMHooksHandler::new(tx_context_ref, Rc::downgrade(&instance_rc));
+        let dispatcher = VMHooksDispatcher::new(Box::new(handler));
+        let result = f(&dispatcher);
+        std::mem::drop(instance_rc); // making sure the strong reference survives long enough
+        result
     }
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        let wrapper = DebugApiVMHooksHandler::new(handle.context);
-        let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
-        f(&dispatcher)
+        let tx_context_ref = TxContextRef(handle.context.clone());
+        let instance = ContractDebugStack::find_by_tx_context(&tx_context_ref);
+        let instance_rc: Rc<Box<dyn Instance>> = Rc::new(Box::new(instance));
+        let handler = TxContextVMHooksHandler::new(tx_context_ref, Rc::downgrade(&instance_rc));
+        let dispatcher = VMHooksDispatcher::new(Box::new(handler));
+        let result = f(&dispatcher);
+        std::mem::drop(instance_rc); // making sure the strong reference survives long enough
+        result
     }
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
@@ -70,20 +80,17 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&StaticVarData) -> R,
     {
-        let top_context = StaticVarStack::static_peek();
-        f(&top_context)
+        let top_static_vars = ContractDebugStack::static_peek().static_var_ref;
+        f(&top_static_vars)
     }
 }
 
 pub type DebugApi = VMHooksApi<DebugApiBackend>;
 
 impl DebugApi {
+    /// WARNING: this does not clean up after itself, must fix!!!
     pub fn dummy() {
-        let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-        // TODO: WARNING: this does not clean up after itself, must fix!!!
-        TxContextStack::static_push(tx_context_arc);
-        StaticVarStack::static_push();
+        ContractDebugStack::static_push(ContractDebugInstance::dummy());
     }
 }
 
@@ -94,7 +101,9 @@ impl std::fmt::Debug for DebugApi {
 }
 
 fn debugger_panic(status: ReturnCode, message: &str) {
-    TxContextRef::new_from_static().replace_tx_result_with_error(TxPanic::new(status, message));
+    ContractDebugStack::static_peek()
+        .tx_context_ref
+        .replace_tx_result_with_error(TxPanic::new(status, message));
     std::panic::panic_any(BreakpointValue::SignalError);
 }
 
