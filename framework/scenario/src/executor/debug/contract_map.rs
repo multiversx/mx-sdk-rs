@@ -23,12 +23,8 @@ impl ContractMap {
         }
     }
 
-    pub fn get_contract(&self, contract_identifier: &[u8]) -> ContractContainerRef {
-        if let Some(contract_contatiner) = self.contract_objs.get(contract_identifier) {
-            contract_contatiner.clone()
-        } else {
-            unknown_contract_panic(contract_identifier)
-        }
+    pub fn get_contract(&self, contract_identifier: &[u8]) -> Option<ContractContainerRef> {
+        self.contract_objs.get(contract_identifier).cloned()
     }
 
     pub fn register_contract(
@@ -45,17 +41,6 @@ impl ContractMap {
 
     pub fn contains_contract(&self, contract_bytes: &[u8]) -> bool {
         self.contract_objs.contains_key(contract_bytes)
-    }
-}
-
-fn unknown_contract_panic(contract_identifier: &[u8]) -> ! {
-    if let Ok(s) = std::str::from_utf8(contract_identifier) {
-        panic!("Unknown contract: {s}")
-    } else {
-        panic!(
-            "Unknown contract of length {} bytes",
-            contract_identifier.len()
-        )
     }
 }
 

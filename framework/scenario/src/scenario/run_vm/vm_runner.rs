@@ -1,8 +1,14 @@
-use multiversx_chain_vm::host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef};
+use multiversx_chain_vm::{
+    host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef},
+    wasmer::WasmerAltExecutor,
+};
 use multiversx_chain_vm_executor::Executor;
 
 use crate::{
-    executor::debug::{ContractDebugExecutor, ContractMapRef},
+    executor::{
+        composite::CompositeExecutor,
+        debug::{ContractDebugExecutor, ContractMapRef},
+    },
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
 };
@@ -11,8 +17,8 @@ use crate::{
 pub enum ScenarioExecutorConfig {
     #[default]
     Debugger,
-    // #[default]
     Wasmer,
+    TryDebuggerThenWasmer,
 }
 
 /// Wraps calls to the blockchain mock,
@@ -22,16 +28,6 @@ pub struct ScenarioVMRunner {
     pub contract_map_ref: ContractMapRef,
     pub blockchain_mock: BlockchainMock,
     pub executor_config: ScenarioExecutorConfig,
-}
-
-#[cfg(feature = "wasmer")]
-fn wasmer_executor(weak: RuntimeWeakRef) -> Box<dyn Executor + Send + Sync> {
-    Box::new(multiversx_chain_vm::wasmer::WasmerAltExecutor::new(weak))
-}
-
-#[cfg(not(feature = "wasmer"))]
-fn wasmer_executor(_: RuntimeWeakRef) -> Box<dyn Executor + Send + Sync> {
-    panic!("Wasmer executor not available, need to add features = [\"wasmer\"] to multiversx-sc-scenario")
 }
 
 impl ScenarioVMRunner {
@@ -55,7 +51,10 @@ impl ScenarioVMRunner {
                 weak,
                 self.contract_map_ref.clone(),
             )),
-            ScenarioExecutorConfig::Wasmer => wasmer_executor(weak),
+            ScenarioExecutorConfig::Wasmer => Box::new(WasmerAltExecutor::new(weak)),
+            ScenarioExecutorConfig::TryDebuggerThenWasmer => Box::new(
+                CompositeExecutor::new_debugger_then_wasmer(weak, self.contract_map_ref.clone()),
+            ),
         }
     }
 

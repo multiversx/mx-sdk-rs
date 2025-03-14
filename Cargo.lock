@@ -2718,8 +2718,6 @@ dependencies = [
 name = "multisig"
 version = "1.0.0"
 dependencies = [
- "adder",
- "factorial",
  "hex",
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -2953,6 +2951,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "simple-error",
  "unwrap-infallible",
 ]
 
@@ -4528,6 +4527,12 @@ name = "simdutf8"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
+
+[[package]]
+name = "simple-error"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e2accd2c41a0e920d2abd91b2badcfa1da784662f54fbc47e0e3a51f1e2e1cf"
 
 [[package]]
 name = "single-value-repeat"

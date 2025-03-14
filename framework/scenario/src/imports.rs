@@ -8,7 +8,7 @@ pub use crate::{
     facade::{
         expr::*, result_handlers::*, world_tx::*, ContractInfo, ScenarioWorld, WhiteboxContract,
     },
-    managed_address, managed_biguint, managed_buffer, managed_token_id, num_bigint,
+    managed_address, managed_biguint, managed_buffer, managed_token_id, meta, num_bigint,
     num_bigint::BigInt as RustBigInt,
     num_bigint::BigUint as RustBigUint,
     rust_biguint,
