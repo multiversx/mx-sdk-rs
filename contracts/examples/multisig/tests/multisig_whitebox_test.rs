@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 mod adder_proxy;
 
 use multiversx_sc_scenario::imports::*;
@@ -110,12 +108,10 @@ fn call_propose(
         ActionRaw::SCUpgradeFromSource { amount, .. } => amount.clone(),
         _ => rust_biguint!(0),
     };
-    let amount_bytes = egld_amount.to_bytes_be();
-    let amount_rust_biguint = num_bigint::BigUint::from_bytes_be(amount_bytes.as_slice());
 
     let mut action_id = 0;
 
-    let mut transaction = world
+    let transaction = world
         .tx()
         .from(PROPOSER_ADDRESS)
         .to(MULTISIG_ADDRESS)
@@ -472,7 +468,7 @@ fn test_transfer_execute_to_user() {
     world.check_account(MULTISIG_ADDRESS).balance(EGLD_AMOUNT);
 
     // failed attempt
-    let action_id = call_propose(
+    let _ = call_propose(
         &mut world,
         ActionRaw::SendTransferExecute(CallActionDataRaw {
             to: NEW_USER_ADDRESS.to_address(),
