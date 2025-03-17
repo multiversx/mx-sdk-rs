@@ -1,0 +1,28 @@
+[package]
+name = "rust-interact"
+version = "0.0.0"
+authors = ["you"]
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "rust-interact"
+path = "src/interactor_main.rs"
+
+[lib]
+path = "src/interact.rs"
+
+[dependencies.promises-features]
+path = ".."
+
+[dependencies.multiversx-sc-snippets]
+version = "0.56.0"
+path = "../../../../../framework/snippets"
+
+[dependencies]
+clap = { version = "4.4.7", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8.6"
+
+[features]
+chain-simulator-tests = []
