@@ -40,7 +40,7 @@ impl Executor for ContractDebugExecutor {
         &mut self,
         _vm_hooks_ptr: *mut std::ffi::c_void,
     ) -> Result<(), ExecutorError> {
-        todo!()
+        Ok(())
     }
 
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {

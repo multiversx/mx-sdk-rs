@@ -1,5 +1,4 @@
 mod catch_tx_panic;
-mod composite_executor;
 mod contract_container;
 mod contract_debug_executor;
 mod contract_debug_executor_err;
@@ -10,7 +9,6 @@ mod static_var_data;
 mod tx_static_vars;
 
 pub use catch_tx_panic::catch_tx_panic;
-pub use composite_executor::*;
 pub use contract_container::{ContractContainer, ContractContainerRef};
 pub use contract_debug_executor::ContractDebugExecutor;
 pub use contract_debug_executor_err::ContractDebugExecutorNotRegisteredError;

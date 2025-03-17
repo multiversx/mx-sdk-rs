@@ -47,7 +47,7 @@ impl Executor for CompositeExecutor {
         &mut self,
         _vm_hooks_ptr: *mut std::ffi::c_void,
     ) -> Result<(), ExecutorError> {
-        todo!()
+        panic!("CompositeExecutor set_vm_hooks_ptr not yet supported")
     }
 
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {

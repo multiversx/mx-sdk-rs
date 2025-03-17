@@ -27,11 +27,11 @@ impl Executor for WasmerAltExecutor {
         &mut self,
         _vm_hooks_ptr: *mut std::ffi::c_void,
     ) -> Result<(), ExecutorError> {
-        todo!()
+        panic!("Wasmer executor not available, need to activate features = [\"wasmer\"] in multiversx-sc-scenario or multiversx-chain-vm")
     }
 
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        Ok(())
+        panic!("Wasmer executor not available, need to activate features = [\"wasmer\"] in multiversx-sc-scenario or multiversx-chain-vm")
     }
 
     fn new_instance(
@@ -39,7 +39,7 @@ impl Executor for WasmerAltExecutor {
         _wasm_bytes: &[u8],
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
-        panic!("Wasmer executor not available, need to activate features = [\"wasmer\"] in multiversx-sc-scenario or multiversx-chain-vm ")
+        panic!("Wasmer executor not available, need to activate features = [\"wasmer\"] in multiversx-sc-scenario or multiversx-chain-vm")
     }
 
     fn new_instance_from_cache(

@@ -571,10 +571,6 @@ fn test_deploy_and_upgrade_from_source() {
     let factorial_address: TestSCAddress = TestSCAddress::new("factorial");
     let factorial_path: MxscPath = MxscPath::new("test-contracts/factorial.mxsc.json");
 
-    // state
-    //     .world
-    //     .register_contract(factorial_path, factorial::ContractBuilder);
-
     state.world.account(factorial_address).code(factorial_path);
 
     let action_id = state.propose_sc_upgrade_from_source(
