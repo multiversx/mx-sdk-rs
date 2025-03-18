@@ -2,7 +2,7 @@ use multiversx_sc_codec::{
     DecodeErrorHandler, TopDecodeInput, TopDecodeMulti, TopDecodeMultiInput,
 };
 
-// const MAX_BUFFER_SIZE: usize = 62;
+const MAX_BUFFER_SIZE: usize = 62;
 
 #[derive(Debug, Clone, Default)]
 pub struct TokenPropertiesResult {
@@ -23,34 +23,26 @@ pub struct TokenPropertiesResult {
 
 impl TokenPropertiesResult {
     fn fetch_struct_field(&mut self, input: &[u8]) {
-        if let Ok(string) = core::str::from_utf8(input) {
-            if let Some((key, value)) = string.split_once('-') {
-                match key {
-                    "NumDecimals" => {
-                        if let Ok(parsed) = value.parse::<usize>() {
-                            self.num_decimals = parsed;
-                        }
-                    },
-                    "IsPaused" => self.is_paused = value == "true",
-                    "CanUpgrade" => self.can_upgrade = value == "true",
-                    "CanMint" => self.can_mint = value == "true",
-                    "CanBurn" => self.can_burn = value == "true",
-                    "CanChangeOwner" => self.can_change_owner = value == "true",
-                    "CanPause" => self.can_pause = value == "true",
-                    "CanFreeze" => self.can_freeze = value == "true",
-                    "CanWipe" => self.can_wipe = value == "true",
-                    "CanAddSpecialRoles" => self.can_add_special_roles = value == "true",
-                    "CanTransferNFTCreateRole" => {
-                        self.can_transfer_nft_create_role = value == "true"
-                    },
-                    "NFTCreateStopped" => self.nft_create_stopped = value == "true",
-                    "NumWiped" => {
-                        if let Ok(parsed) = value.parse::<usize>() {
-                            self.num_wiped = parsed;
-                        }
-                    },
-                    _ => {},
-                }
+        if let Some(pos) = input.iter().position(|&b| b == b'-') {
+            let key = &input[..pos];
+            let value = &input[pos + 1..];
+            let is_true = value == b"true";
+
+            match key {
+                b"NumDecimals" => self.num_decimals = parse_usize(value),
+                b"IsPaused" => self.is_paused = is_true,
+                b"CanUpgrade" => self.can_upgrade = is_true,
+                b"CanMint" => self.can_mint = is_true,
+                b"CanBurn" => self.can_burn = is_true,
+                b"CanChangeOwner" => self.can_change_owner = is_true,
+                b"CanPause" => self.can_pause = is_true,
+                b"CanFreeze" => self.can_freeze = is_true,
+                b"CanWipe" => self.can_wipe = is_true,
+                b"CanAddSpecialRoles" => self.can_add_special_roles = is_true,
+                b"CanTransferNFTCreateRole" => self.can_transfer_nft_create_role = is_true,
+                b"NFTCreateStopped" => self.nft_create_stopped = is_true,
+                b"NumWiped" => self.num_wiped = parse_usize(value),
+                _ => {},
             }
         }
     }
@@ -64,11 +56,21 @@ impl TopDecodeMulti for TokenPropertiesResult {
     {
         let mut token_properties = TokenPropertiesResult::default();
         while input.has_next() {
-            token_properties.fetch_struct_field(&input.next_value_input(h)?.into_boxed_slice_u8());
+            let value = input.next_value_input(h)?;
+            let mut buffer = [0u8; MAX_BUFFER_SIZE];
+            let len = value.into_max_size_buffer_align_right(&mut buffer, h)?;
+            token_properties.fetch_struct_field(&buffer[MAX_BUFFER_SIZE - len..]);
         }
 
         Ok(token_properties)
     }
+}
+
+fn parse_usize(input: &[u8]) -> usize {
+    core::str::from_utf8(input)
+        .ok()
+        .and_then(|s| s.parse::<usize>().ok())
+        .unwrap_or(0)
 }
 
 #[test]
@@ -106,6 +108,16 @@ fn decode_test() {
     let token_properties = TokenPropertiesResult::multi_decode(&mut input).unwrap();
 
     assert!(token_properties.num_decimals == 18usize);
+    assert!(!token_properties.is_paused);
+    assert!(token_properties.can_upgrade);
+    assert!(!token_properties.can_mint);
+    assert!(token_properties.can_burn);
+    assert!(!token_properties.can_change_owner);
+    assert!(!token_properties.can_pause);
     assert!(!token_properties.can_freeze);
-    assert!(token_properties.can_burn)
+    assert!(!token_properties.can_wipe);
+    assert!(token_properties.can_add_special_roles);
+    assert!(!token_properties.can_transfer_nft_create_role);
+    assert!(!token_properties.nft_create_stopped);
+    assert!(token_properties.num_wiped == 0usize);
 }
