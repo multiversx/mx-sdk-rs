@@ -4,8 +4,8 @@ use crate::{
     api::CallTypeApi,
     types::{
         BigUint, EgldPayment, EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress,
-        ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, TokenIdentifier, Tx, TxEnv,
-        TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+        ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, TokenIdentifier,
+        TokenPropertiesResult, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
     },
 };
 
@@ -683,7 +683,7 @@ where
     pub fn get_token_properties<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
         token_id: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenPropertiesResult> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getTokenProperties")

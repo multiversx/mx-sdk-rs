@@ -320,7 +320,7 @@ async fn get_token_properties() {
         .await;
 
     // get properties
-    interact
+    let _properties = interact
         .get_token_properties(dynamic_nft_token_id.as_bytes())
         .await;
 }
