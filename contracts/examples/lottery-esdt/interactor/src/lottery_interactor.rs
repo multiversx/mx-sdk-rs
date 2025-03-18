@@ -59,6 +59,7 @@ pub async fn lottery_cli() {
     }
 }
 
+#[derive(Clone)]
 pub struct AddressWithShard {
     pub address: Bech32Address,
     pub shard: u8,
@@ -80,10 +81,10 @@ impl LotteryInteract {
             .use_chain_simulator(config.use_chain_simulator());
         interactor.set_current_dir_from_workspace("contracts/examples/lottery-esdt/interactor");
 
-        let lottery_owner_wallet = test_wallets::heidi();
-        let account_1_wallet = test_wallets::heidi();
-        let account_2_wallet = test_wallets::heidi();
-        let other_shard_wallet = test_wallets::heidi();
+        let lottery_owner_wallet = test_wallets::heidi(); // shard 1
+        let account_1_wallet = test_wallets::alice(); // shard 0
+        let account_2_wallet = test_wallets::bob(); // shard 2
+        let other_shard_wallet = test_wallets::carol(); // shard 0
 
         let lottery_owner_address = interactor.register_wallet(lottery_owner_wallet).await;
         let account_1_address = interactor.register_wallet(account_1_wallet).await;
@@ -115,7 +116,13 @@ impl LotteryInteract {
     }
 
     pub async fn deploy(&mut self) {
-        let new_address = self
+        let (new_address, shard) = self.handle_different_shard_address().await;
+        println!("new address: {new_address} on shard {shard}");
+        self.state.set_lottery_address(new_address);
+    }
+
+    async fn handle_different_shard_address(&mut self) -> (Bech32Address, u32) {
+        let (new_address, tx_hash) = self
             .interactor
             .tx()
             .from(&self.lottery_owner.address)
@@ -124,11 +131,27 @@ impl LotteryInteract {
             .init()
             .code(LOTTERY_CODE_PATH)
             .returns(ReturnsNewBech32Address)
+            .returns(ReturnsTxHash)
             .run()
             .await;
 
-        println!("new address: {new_address}");
-        self.state.set_lottery_address(new_address);
+        /* let tx_hash_string = String::from_utf8(tx_hash.to_vec()).unwrap();
+        let tx_on_network = self
+            .interactor
+            .proxy
+            .get_transaction_info_with_results(&tx_hash_string)
+            .await
+            .unwrap();
+        let shard = tx_on_network.destination_shard;
+
+        if self.other_shard_account.shard as u32 == shard {
+            // we want to have other_shard_account on another shard than the SC
+            let buffer_address_with_shard = self.other_shard_account.clone();
+            self.other_shard_account = self.account_2.clone();
+            self.account_2 = buffer_address_with_shard;
+        }*/
+
+        return (new_address, 0);
     }
 
     pub async fn create_lottery_pool(
