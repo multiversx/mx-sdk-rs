@@ -141,10 +141,12 @@ impl ScDeployStep {
                 expect.update_from_response(&tx_response)
             }
         }
-        tx_response.tx_hash = self
-            .explicit_tx_hash
-            .as_ref()
-            .map(|vm_hash| vm_hash.as_array().into());
+        if tx_response.tx_hash.is_none() {
+            tx_response.tx_hash = self
+                .explicit_tx_hash
+                .as_ref()
+                .map(|vm_hash| vm_hash.as_array().into());
+        }
         self.response = Some(tx_response);
     }
 }

@@ -96,7 +96,7 @@ impl BasicFeaturesInteract {
     pub async fn deploy(&mut self) {
         self.set_state().await;
 
-        let new_address = self
+        let (new_address, _tx_hash) = self
             .interactor
             .tx()
             .from(&self.wallet_address)
@@ -105,6 +105,7 @@ impl BasicFeaturesInteract {
             .init()
             .code(CODE_EXPR)
             .returns(ReturnsNewBech32Address)
+            .returns(ReturnsTxHash)
             .run()
             .await;
 
@@ -185,7 +186,8 @@ impl BasicFeaturesInteract {
         &mut self,
         egld: u64,
     ) -> ManagedDecimal<StaticApi, EgldDecimals> {
-        self.interactor
+        let (result, _tx_hash) = self
+            .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.bf_contract())
@@ -194,8 +196,11 @@ impl BasicFeaturesInteract {
             .returns_egld_decimal()
             .egld(egld)
             .returns(ReturnsResultUnmanaged)
+            .returns(ReturnsTxHash)
             .run()
-            .await
+            .await;
+
+        result
     }
 
     pub async fn echo_managed_option(
@@ -229,7 +234,7 @@ impl BasicFeaturesInteract {
             .gas(10_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
             .verify_secp256r1_signature(key, message, signature)
-            .returns(ReturnsHandledOrError::new())
+            .returns(ReturnsHandledOrError::new().returns(ReturnsTxHash))
             .run()
             .await;
 
