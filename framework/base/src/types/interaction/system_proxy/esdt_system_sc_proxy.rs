@@ -1,11 +1,11 @@
-use super::token_properties::*;
+use super::{token_properties::*, TokenPropertiesResult};
 
 use crate::{
     api::CallTypeApi,
     types::{
         BigUint, EgldPayment, EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress,
-        ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, TokenIdentifier,
-        TokenPropertiesResult, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+        ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, TokenIdentifier, Tx, TxEnv,
+        TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
     },
 };
 

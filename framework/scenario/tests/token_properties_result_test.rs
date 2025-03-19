@@ -1,4 +1,4 @@
-use multiversx_sc::{codec::TopDecodeMulti, types::TokenPropertiesResult};
+use multiversx_sc::{codec::TopDecodeMulti, imports::TokenPropertiesResult};
 
 fn hex_decode(hex: &[u8]) -> Option<Vec<u8>> {
     if hex.len() % 2 != 0 {
