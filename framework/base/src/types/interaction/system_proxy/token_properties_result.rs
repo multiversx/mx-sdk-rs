@@ -4,6 +4,22 @@ use multiversx_sc_codec::{
 
 const MAX_BUFFER_SIZE: usize = 62;
 
+const PREFIXES: &[&[u8]] = &[
+    b"NumDecimals-",
+    b"IsPaused-",
+    b"CanUpgrade-",
+    b"CanMint-",
+    b"CanBurn-",
+    b"CanChangeOwner-",
+    b"CanPause-",
+    b"CanFreeze-",
+    b"CanWipe-",
+    b"CanAddSpecialRoles-",
+    b"CanTransferNFTCreateRole-",
+    b"NFTCreateStopped-",
+    b"NumWiped-",
+];
+
 #[derive(Debug, Clone, Default)]
 pub struct TokenPropertiesResult {
     pub num_decimals: usize,
@@ -25,32 +41,26 @@ impl TokenPropertiesResult {
     fn fetch_struct_field(&mut self, input: &[u8]) {
         let is_true = |value: &[u8]| value == b"true";
 
-        if let Some(value) = input.strip_prefix(b"NumDecimals-") {
-            self.num_decimals = parse_usize(value);
-        } else if let Some(value) = input.strip_prefix(b"IsPaused-") {
-            self.is_paused = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanUpgrade-") {
-            self.can_upgrade = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanMint-") {
-            self.can_mint = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanBurn-") {
-            self.can_burn = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanChangeOwner-") {
-            self.can_change_owner = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanPause-") {
-            self.can_pause = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanFreeze-") {
-            self.can_freeze = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanWipe-") {
-            self.can_wipe = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanAddSpecialRoles-") {
-            self.can_add_special_roles = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"CanTransferNFTCreateRole-") {
-            self.can_transfer_nft_create_role = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"NFTCreateStopped-") {
-            self.nft_create_stopped = is_true(value);
-        } else if let Some(value) = input.strip_prefix(b"NumWiped-") {
-            self.num_wiped = parse_usize(value);
+        if let Some((prefix, value)) = PREFIXES
+            .iter()
+            .find_map(|&prefix| input.strip_prefix(prefix).map(|value| (prefix, value)))
+        {
+            match prefix {
+                b"NumDecimals-" => self.num_decimals = parse_usize(value),
+                b"IsPaused-" => self.is_paused = is_true(value),
+                b"CanUpgrade-" => self.can_upgrade = is_true(value),
+                b"CanMint-" => self.can_mint = is_true(value),
+                b"CanBurn-" => self.can_burn = is_true(value),
+                b"CanChangeOwner-" => self.can_change_owner = is_true(value),
+                b"CanPause-" => self.can_pause = is_true(value),
+                b"CanFreeze-" => self.can_freeze = is_true(value),
+                b"CanWipe-" => self.can_wipe = is_true(value),
+                b"CanAddSpecialRoles-" => self.can_add_special_roles = is_true(value),
+                b"CanTransferNFTCreateRole-" => self.can_transfer_nft_create_role = is_true(value),
+                b"NFTCreateStopped-" => self.nft_create_stopped = is_true(value),
+                b"NumWiped-" => self.num_wiped = parse_usize(value),
+                _ => {},
+            }
         }
     }
 }
