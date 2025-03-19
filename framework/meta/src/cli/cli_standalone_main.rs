@@ -16,8 +16,6 @@ use crate::cmd::test_coverage::test_coverage;
 
 use crate::cmd::upgrade::upgrade_sc;
 
-use super::ValidateArgs;
-
 /// Entry point in the program when calling it as a standalone tool.
 pub async fn cli_main_standalone() {
     let cli_args = StandaloneCliArgs::parse();
