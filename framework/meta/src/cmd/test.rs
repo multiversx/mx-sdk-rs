@@ -46,7 +46,7 @@ pub fn test(test_args: &TestArgs) {
     );
 
     let status = Command::new(program)
-        .args(args.clone())
+        .args(args)
         .current_dir(path)
         .status()
         .unwrap_or_else(|_| {
