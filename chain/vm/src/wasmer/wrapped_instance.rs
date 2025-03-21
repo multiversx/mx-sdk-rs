@@ -1,4 +1,4 @@
-use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
+use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, InstanceState, MemLength, MemPtr};
 
 use std::rc::Rc;
 
@@ -14,7 +14,7 @@ impl WrappedInstance {
 }
 
 impl Instance for WrappedInstance {
-    fn call(&self, func_name: &str) -> Result<(), String> {
+    fn call(&mut self, func_name: &str) -> Result<(), String> {
         self.inner_instance_ref.call(func_name)
     }
 
@@ -28,6 +28,10 @@ impl Instance for WrappedInstance {
 
     fn get_exported_function_names(&self) -> Vec<String> {
         self.inner_instance_ref.get_exported_function_names()
+    }
+
+    fn state_ref(&mut self) -> Box<dyn InstanceState + '_> {
+        self.inner_instance_ref.state_ref()
     }
 
     fn set_points_limit(&self, limit: u64) -> Result<(), String> {

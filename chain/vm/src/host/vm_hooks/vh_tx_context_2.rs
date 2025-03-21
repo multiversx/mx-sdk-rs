@@ -1,9 +1,8 @@
-use std::rc::Weak;
+use std::fmt::Debug;
 use std::sync::MutexGuard;
-use std::{fmt::Debug, ops::Deref};
 
 use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::{BreakpointValue, Instance, MemLength, MemPtr};
+use multiversx_chain_vm_executor::{BreakpointValue, Instance, InstanceState, MemLength, MemPtr};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -28,50 +27,51 @@ use crate::{
     vm_err_msg,
 };
 
-pub struct TxContextVMHooksHandler {
-    tx_context_ref: TxContextRef,
-    instance_ref: Weak<Box<dyn Instance>>,
+pub struct TxContextVMHooksHandler2<'a> {
+    pub tx_context_ref: TxContextRef,
+    pub instance_ref: Box<dyn InstanceState + 'a>,
 }
 
-impl TxContextVMHooksHandler {
-    pub fn new(tx_context_ref: TxContextRef, instance_ref: Weak<Box<dyn Instance>>) -> Self {
-        TxContextVMHooksHandler {
-            tx_context_ref,
-            instance_ref,
-        }
-    }
+impl TxContextVMHooksHandler2<'_> {
+    // pub fn new(tx_context_ref: TxContextRef, instance_ref: &'a dyn InstanceState) -> Self {
+    //     TxContextVMHooksHandler2 {
+    //         tx_context_ref,
+    //         instance_ref,
+    //     }
+    // }
 
-    fn instance_box_ref(&self) -> &dyn Instance {
-        assert!(
-            self.instance_ref.strong_count() > 0,
-            "instance reference dropped"
-        );
-        unsafe {
-            let box_ref = self
-                .instance_ref
-                .as_ptr()
-                .as_ref()
-                .expect("null instance pointer");
-            box_ref.deref()
-        }
-    }
+    // fn instance_box_ref(&self) -> &dyn InstanceState {
+    //     // assert!(
+    //     //     self.instance_ref.strong_count() > 0,
+    //     //     "instance reference dropped"
+    //     // );
+    //     // unsafe {
+    //     //     let box_ref = self
+    //     //         .instance_ref
+    //     //         .as_ptr()
+    //     //         .as_ref()
+    //     //         .expect("null instance pointer");
+    //     //     box_ref.deref()
+    //     // }
+    //     &self.instance_ref
+    // }
 }
 
-impl Debug for TxContextVMHooksHandler {
+impl Debug for TxContextVMHooksHandler2<'_> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("TxContextVMHooksHandler").finish()
     }
 }
 
-impl VMHooksHandlerSource for TxContextVMHooksHandler {
+impl VMHooksHandlerSource for TxContextVMHooksHandler2<'_> {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
-        self.instance_box_ref()
+        self.instance_ref
             .memory_load(offset, length)
             .expect("error loading memory from wasmer instance")
     }
 
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) {
-        self.instance_box_ref()
+        self.instance_ref
             .memory_store(mem_ptr, data)
             .expect("error writing to wasmer instance memory");
     }
@@ -89,7 +89,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         };
         // let _ = self.instance_box_ref().set_breakpoint_value(breakpoint);
         todo!()
-        }
+    }
 
     fn input_ref(&self) -> &TxInput {
         self.tx_context_ref.input_ref()
@@ -298,7 +298,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
     }
 }
 
-impl TxContextVMHooksHandler {
+impl TxContextVMHooksHandler2<'_> {
     fn create_async_call_data(
         &self,
         to: VMAddress,
@@ -364,22 +364,22 @@ impl TxContextVMHooksHandler {
     }
 }
 
-impl VMHooksBigInt for TxContextVMHooksHandler {}
-impl VMHooksManagedBuffer for TxContextVMHooksHandler {}
-impl VMHooksManagedMap for TxContextVMHooksHandler {}
-impl VMHooksBigFloat for TxContextVMHooksHandler {}
-impl VMHooksManagedTypes for TxContextVMHooksHandler {}
+impl VMHooksBigInt for TxContextVMHooksHandler2<'_> {}
+impl VMHooksManagedBuffer for TxContextVMHooksHandler2<'_> {}
+impl VMHooksManagedMap for TxContextVMHooksHandler2<'_> {}
+impl VMHooksBigFloat for TxContextVMHooksHandler2<'_> {}
+impl VMHooksManagedTypes for TxContextVMHooksHandler2<'_> {}
 
-impl VMHooksCallValue for TxContextVMHooksHandler {}
-impl VMHooksEndpointArgument for TxContextVMHooksHandler {}
-impl VMHooksEndpointFinish for TxContextVMHooksHandler {}
-impl VMHooksError for TxContextVMHooksHandler {}
-impl VMHooksErrorManaged for TxContextVMHooksHandler {}
-impl VMHooksStorageRead for TxContextVMHooksHandler {}
-impl VMHooksStorageWrite for TxContextVMHooksHandler {}
-impl VMHooksCrypto for TxContextVMHooksHandler {}
-impl VMHooksBlockchain for TxContextVMHooksHandler {}
-impl VMHooksLog for TxContextVMHooksHandler {}
-impl VMHooksSend for TxContextVMHooksHandler {}
+impl VMHooksCallValue for TxContextVMHooksHandler2<'_> {}
+impl VMHooksEndpointArgument for TxContextVMHooksHandler2<'_> {}
+impl VMHooksEndpointFinish for TxContextVMHooksHandler2<'_> {}
+impl VMHooksError for TxContextVMHooksHandler2<'_> {}
+impl VMHooksErrorManaged for TxContextVMHooksHandler2<'_> {}
+impl VMHooksStorageRead for TxContextVMHooksHandler2<'_> {}
+impl VMHooksStorageWrite for TxContextVMHooksHandler2<'_> {}
+impl VMHooksCrypto for TxContextVMHooksHandler2<'_> {}
+impl VMHooksBlockchain for TxContextVMHooksHandler2<'_> {}
+impl VMHooksLog for TxContextVMHooksHandler2<'_> {}
+impl VMHooksSend for TxContextVMHooksHandler2<'_> {}
 
-impl VMHooksHandler for TxContextVMHooksHandler {}
+impl VMHooksHandler for TxContextVMHooksHandler2<'_> {}

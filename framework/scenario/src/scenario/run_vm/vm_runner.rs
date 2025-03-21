@@ -1,6 +1,6 @@
 use multiversx_chain_vm::{
     host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef},
-    wasmer::WasmerAltExecutor,
+    wasmer::{Wasmer5Executor, WasmerAltExecutor},
 };
 use multiversx_chain_vm_executor::Executor;
 
@@ -18,6 +18,7 @@ pub enum ScenarioExecutorConfig {
     #[default]
     Debugger,
     Wasmer,
+    Wasmer5,
     TryDebuggerThenWasmer,
 }
 
@@ -52,6 +53,7 @@ impl ScenarioVMRunner {
                 self.contract_map_ref.clone(),
             )),
             ScenarioExecutorConfig::Wasmer => Box::new(WasmerAltExecutor::new(weak)),
+            ScenarioExecutorConfig::Wasmer5 => Box::new(Wasmer5Executor::new(weak)),
             ScenarioExecutorConfig::TryDebuggerThenWasmer => Box::new(
                 CompositeExecutor::new_debugger_then_wasmer(weak, self.contract_map_ref.clone()),
             ),
