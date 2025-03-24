@@ -55,12 +55,15 @@ impl ContractVariant {
         )
     }
 
-    fn panic_handler_macro_invocation(&self) -> &'static str {
-        if self.settings.panic_message {
-            "multiversx_sc_wasm_adapter::panic_handler_with_message!();"
-        } else {
-            "multiversx_sc_wasm_adapter::panic_handler!();"
+    fn panic_handler_macro_invocation(&self, std: bool) -> &'static str {
+        if !std {
+            if self.settings.panic_message {
+                return "multiversx_sc_wasm_adapter::panic_handler_with_message!();";
+            } else {
+                return "multiversx_sc_wasm_adapter::panic_handler!();";
+            }
         }
+        ""
     }
 
     fn endpoint_macro_name(&self) -> &'static str {
@@ -72,20 +75,25 @@ impl ContractVariant {
     }
 
     /// Generates the wasm crate lib.rs source, st the given path.
-    pub fn generate_wasm_src_lib_file(&self) {
+    pub fn generate_wasm_src_lib_file(&self, std: bool) {
         let lib_path = Path::new(&self.wasm_crate_path())
             .join("src")
             .join("lib.rs");
         let mut wasm_lib_file = File::create(lib_path).unwrap();
-        self.write_wasm_src_lib_contents(&mut wasm_lib_file);
+        self.write_wasm_src_lib_contents(&mut wasm_lib_file, std);
     }
 
-    fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File) {
+    fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File, std: bool) {
         writeln!(wasm_lib_file, "{PREFIX_AUTO_GENERATED}").unwrap();
         self.write_stat_comments(wasm_lib_file);
-        write_prefix(wasm_lib_file);
+        write_prefix(wasm_lib_file, std);
         writeln!(wasm_lib_file, "{}", self.allocator_macro_invocation()).unwrap();
-        writeln!(wasm_lib_file, "{}", self.panic_handler_macro_invocation()).unwrap();
+        writeln!(
+            wasm_lib_file,
+            "{}",
+            self.panic_handler_macro_invocation(std)
+        )
+        .unwrap();
 
         if self.settings.external_view {
             write_external_view_init(wasm_lib_file);
@@ -139,19 +147,23 @@ impl ContractVariant {
     }
 }
 
-fn select_features() -> &'static str {
-    let meta = rustc_version::version_meta().unwrap();
-    if meta.semver < Version::from_str(VER_1_71).unwrap() {
-        FEATURES_PRE_RUSTC_1_71
-    } else if meta.semver < Version::from_str(VER_1_73).unwrap() {
-        FEATURES_PRE_RUSTC_1_73
-    } else {
-        FEATURES_DEFAULT
+fn select_features(std: bool) -> &'static str {
+    if !std {
+        let meta = rustc_version::version_meta().unwrap();
+
+        if meta.semver < Version::from_str(VER_1_71).unwrap() {
+            return FEATURES_PRE_RUSTC_1_71;
+        } else if meta.semver < Version::from_str(VER_1_73).unwrap() {
+            return FEATURES_PRE_RUSTC_1_73;
+        } else {
+            return FEATURES_DEFAULT;
+        }
     }
+    ""
 }
 
-fn write_prefix(wasm_lib_file: &mut File) {
-    writeln!(wasm_lib_file, "{}", select_features()).unwrap();
+fn write_prefix(wasm_lib_file: &mut File, std: bool) {
+    writeln!(wasm_lib_file, "{}", select_features(std)).unwrap();
 }
 
 fn write_endpoints_macro<'a, I>(
