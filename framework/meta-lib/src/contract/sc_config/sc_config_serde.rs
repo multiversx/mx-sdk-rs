@@ -15,6 +15,8 @@ pub struct ScConfigSerde {
     #[serde(default)]
     #[serde(rename = "labels-for-contracts")]
     pub labels_for_contracts: HashMap<String, Vec<String>>,
+    #[serde(default)]
+    pub std: bool,
 }
 
 #[derive(Deserialize, Debug)]
