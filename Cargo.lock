@@ -3102,7 +3102,7 @@ dependencies = [
  "multiversx-chain-core",
  "multiversx-chain-vm-executor",
  "multiversx-chain-vm-executor-wasmer",
- "multiversx-chain-vm-executor-wasmer5",
+ "multiversx-chain-vm-executor-wasmer-experimental",
  "num-bigint",
  "num-traits",
  "rand 0.8.5",
@@ -3129,7 +3129,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "multiversx-chain-vm-executor-wasmer5"
+name = "multiversx-chain-vm-executor-wasmer-experimental"
 version = "0.3.0"
 dependencies = [
  "chrono",

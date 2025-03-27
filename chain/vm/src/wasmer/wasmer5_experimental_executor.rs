@@ -1,30 +1,27 @@
 use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };
-use multiversx_chain_vm_executor_wasmer5::{WasmerExecutorData, WasmerInstance};
+use multiversx_chain_vm_executor_wasmer_experimental::{WasmerExecutorData, WasmerInstance};
 use std::{cell::RefCell, fmt, rc::Rc};
 
-use crate::{
-    host::runtime::RuntimeWeakRef,
-    host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
-};
+use crate::host::{runtime::RuntimeWeakRef, vm_hooks::TxContextVMHooksBuilder};
 
-use super::{WasmerAltExecutorFileNotFoundError, WrappedInstance};
+use super::WasmerAltExecutorFileNotFoundError;
 
 /// Executor implementation that produces wasmer instances with correctly injected VM hooks from runtime.
-pub struct Wasmer5Executor {
+pub struct WasmerExperimentalExecutor {
     runtime_ref: RuntimeWeakRef,
 }
 
-impl fmt::Debug for Wasmer5Executor {
+impl fmt::Debug for WasmerExperimentalExecutor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Wasmer5Executor").finish()
+        f.debug_struct("WasmerExperimentalExecutor").finish()
     }
 }
 
-impl Wasmer5Executor {
+impl WasmerExperimentalExecutor {
     pub fn new(runtime_ref: RuntimeWeakRef) -> Self {
-        Wasmer5Executor { runtime_ref }
+        WasmerExperimentalExecutor { runtime_ref }
     }
 
     fn new_instance_from_bytes(
@@ -34,36 +31,23 @@ impl Wasmer5Executor {
     ) -> Box<dyn Instance> {
         let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
 
-        let inner_instance_ref = Rc::new_cyclic(|weak| {
-            let vh_handler = TxContextVMHooksHandler::new(tx_context_ref, weak.clone());
-            let vm_hooks = VMHooksDispatcher::new(Box::new(vh_handler));
-            let executor_data_ref =
-                Rc::new(RefCell::new(WasmerExecutorData::new(Box::new(vm_hooks))));
+        let vm_hooks_builder = TxContextVMHooksBuilder::new(tx_context_ref);
+        let executor_data_ref = Rc::new(RefCell::new(WasmerExecutorData::new(Rc::new(
+            vm_hooks_builder,
+        ))));
 
-            Box::new(
-                WasmerInstance::try_new_instance(
-                    executor_data_ref.clone(),
-                    wasm_bytes,
-                    compilation_options,
-                )
-                .expect("instance init failed"),
+        Box::new(
+            WasmerInstance::try_new_instance(
+                executor_data_ref.clone(),
+                wasm_bytes,
+                compilation_options,
             )
-        });
-
-        let wasmer_instance_ref = WrappedInstance::new(inner_instance_ref);
-
-        Box::new(wasmer_instance_ref)
+            .expect("instance init failed"),
+        )
     }
 }
 
-impl Executor for Wasmer5Executor {
-    fn set_vm_hooks_ptr(
-        &mut self,
-        _vm_hooks_ptr: *mut std::ffi::c_void,
-    ) -> Result<(), ExecutorError> {
-        panic!("WasmerAltExecutor set_vm_hooks_ptr not yet supported")
-    }
-
+impl Executor for WasmerExperimentalExecutor {
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
         Ok(())
     }

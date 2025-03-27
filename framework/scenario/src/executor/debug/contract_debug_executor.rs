@@ -36,13 +36,6 @@ impl ContractDebugExecutor {
 }
 
 impl Executor for ContractDebugExecutor {
-    fn set_vm_hooks_ptr(
-        &mut self,
-        _vm_hooks_ptr: *mut std::ffi::c_void,
-    ) -> Result<(), ExecutorError> {
-        Ok(())
-    }
-
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
         Ok(())
     }

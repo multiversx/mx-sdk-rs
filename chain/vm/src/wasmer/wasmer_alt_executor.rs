@@ -9,7 +9,7 @@ use crate::{
     host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
 };
 
-use super::{WasmerAltExecutorFileNotFoundError, WrappedInstance};
+use super::{WasmerAltExecutorFileNotFoundError, WasmerAltInstance, WasmerAltInstanceState};
 
 /// Executor implementation that produces wasmer instances with correctly injected VM hooks from runtime.
 pub struct WasmerAltExecutor {
@@ -35,35 +35,29 @@ impl WasmerAltExecutor {
         let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
 
         let inner_instance_ref = Rc::new_cyclic(|weak| {
-            let vh_handler = TxContextVMHooksHandler::new(tx_context_ref, weak.clone());
+            let vh_handler = TxContextVMHooksHandler::new(
+                tx_context_ref,
+                Rc::new(WasmerAltInstanceState::new(weak.clone())),
+            );
             let vm_hooks = VMHooksDispatcher::new(Box::new(vh_handler));
             let executor_data_ref =
                 Rc::new(RefCell::new(WasmerExecutorData::new(Box::new(vm_hooks))));
 
-            Box::new(
-                WasmerInstance::try_new_instance(
-                    executor_data_ref.clone(),
-                    wasm_bytes,
-                    compilation_options,
-                )
-                .expect("instance init failed"),
+            WasmerInstance::try_new_instance(
+                executor_data_ref.clone(),
+                wasm_bytes,
+                compilation_options,
             )
+            .expect("instance init failed")
         });
 
-        let wasmer_instance_ref = WrappedInstance::new(inner_instance_ref);
+        let wasmer_instance_ref = WasmerAltInstance::new(inner_instance_ref);
 
         Box::new(wasmer_instance_ref)
     }
 }
 
 impl Executor for WasmerAltExecutor {
-    fn set_vm_hooks_ptr(
-        &mut self,
-        _vm_hooks_ptr: *mut std::ffi::c_void,
-    ) -> Result<(), ExecutorError> {
-        panic!("WasmerAltExecutor set_vm_hooks_ptr not yet supported")
-    }
-
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
         Ok(())
     }

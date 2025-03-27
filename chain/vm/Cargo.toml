@@ -52,7 +52,7 @@ optional = true
 # rev = "2a267cf459ed48720d4db06fedb9c22ed8fc0106"
 path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-wasmer"
 
-[dependencies.multiversx-chain-vm-executor-wasmer5]
+[dependencies.multiversx-chain-vm-executor-wasmer-experimental]
 version = "0.3.0"
 # optional = true
-path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-wasmer5"
+path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-experimental"
