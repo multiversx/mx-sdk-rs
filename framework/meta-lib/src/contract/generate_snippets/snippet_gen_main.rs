@@ -35,11 +35,8 @@ impl MetaConfig {
             .name
             .replace("-", "_");
         let original_contract_abi = ShortContractAbi::from(self.original_contract_abi.clone());
-        let diff_abi = check_abi_differences(
-            &original_contract_abi,
-            &self.snippets_dir.to_string_lossy().to_string(),
-            args.overwrite,
-        );
+        let diff_abi =
+            check_abi_differences(&original_contract_abi, &self.snippets_dir, args.overwrite);
         if diff_abi == original_contract_abi {
             let mut file = create_snippets_crate_and_get_lib_file(
                 &self.snippets_dir,
@@ -57,14 +54,11 @@ impl MetaConfig {
                 crate_name,
             );
         } else {
-            add_new_endpoints_to_file(&self.snippets_dir.to_string_lossy().to_string(), &diff_abi);
+            add_new_endpoints_to_file(&self.snippets_dir, &diff_abi);
         }
 
         // create prev-abi.json file
-        create_prev_abi_file(
-            &self.snippets_dir.to_string_lossy().to_string(),
-            &self.original_contract_abi,
-        );
+        create_prev_abi_file(&self.snippets_dir, &self.original_contract_abi);
     }
 }
 

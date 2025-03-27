@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Write;
+use std::path::Path;
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi, OutputAbi};
 use serde::de::DeserializeOwned;
@@ -10,6 +11,8 @@ use crate::abi_json::{serialize_abi_to_json, ContractAbiJson};
 use super::snippet_crate_gen::LIB_SOURCE_FILE_NAME;
 use super::snippet_type_map::map_abi_type_to_rust_type;
 use crate::contract::generate_snippets::snippet_sc_functions_gen::DEFAULT_GAS;
+
+const PREV_ABI_NAME: &str = "prev-abi.json";
 
 #[derive(PartialEq, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -140,76 +143,71 @@ impl From<ContractAbi> for ShortContractAbi {
     }
 }
 
-const PREV_ABI_NAME: &str = "prev-abi.json";
-
 pub(crate) fn check_abi_differences(
     current_contract_abi: &ShortContractAbi,
-    snippets_dir: &String,
+    snippets_dir: &Path,
     overwrite: bool,
 ) -> ShortContractAbi {
     if !overwrite {
-        let prev_abi_path = format!("{}/prev-abi.json", snippets_dir);
-        if let Ok(prev_abi_content) = std::fs::read_to_string(&prev_abi_path) {
-            if let Ok(prev_abi) = serde_json::from_str::<ShortContractAbi>(&prev_abi_content) {
-                let mut diff_abi = ShortContractAbi {
-                    name: current_contract_abi.name.clone(),
-                    constructor: vec![],
-                    upgrade_constructor: vec![],
-                    endpoints: vec![],
-                };
+        let prev_abi_path = snippets_dir.join(PREV_ABI_NAME);
+        let prev_abi_content = std::fs::read_to_string(&prev_abi_path)
+            .unwrap_or_else(|_| panic!("Failed to read file at path: {:?}", prev_abi_path));
+        let prev_abi = serde_json::from_str::<ShortContractAbi>(&prev_abi_content)
+            .unwrap_or_else(|_| panic!("Failed to deserialize prev-abi.json content"));
 
-                // changed and new constructors
-                for constructor in &current_contract_abi.constructor {
-                    if !prev_abi.constructor.contains(constructor) {
-                        diff_abi.constructor.push(constructor.clone());
-                    }
-                }
+        let mut diff_abi = ShortContractAbi {
+            name: current_contract_abi.name.clone(),
+            constructor: vec![],
+            upgrade_constructor: vec![],
+            endpoints: vec![],
+        };
 
-                // changed and new upgrade constructors
-                for upgrade_constructor in &current_contract_abi.upgrade_constructor {
-                    if !prev_abi.upgrade_constructor.contains(upgrade_constructor) {
-                        diff_abi
-                            .upgrade_constructor
-                            .push(upgrade_constructor.clone());
-                    }
-                }
-
-                // changed and new endpoints
-                for endpoint in &current_contract_abi.endpoints {
-                    if !prev_abi.endpoints.contains(endpoint) {
-                        diff_abi.endpoints.push(endpoint.clone());
-                    }
-                }
-
-                // deleted endpoints
-                // bug here when deleting and diff with no overwrite
-                for endpoint in &prev_abi.endpoints {
-                    if !current_contract_abi.endpoints.contains(endpoint) {
-                        diff_abi.endpoints.retain(|e| e.name != endpoint.name);
-                    }
-                }
-
-                println!("diff_abi {diff_abi:?}");
-                return diff_abi;
-            } else {
-                println!("here")
+        // changed and new constructors
+        for constructor in &current_contract_abi.constructor {
+            if !prev_abi.constructor.contains(constructor) {
+                diff_abi.constructor.push(constructor.clone());
             }
         }
+
+        // changed and new upgrade constructors
+        for upgrade_constructor in &current_contract_abi.upgrade_constructor {
+            if !prev_abi.upgrade_constructor.contains(upgrade_constructor) {
+                diff_abi
+                    .upgrade_constructor
+                    .push(upgrade_constructor.clone());
+            }
+        }
+
+        // changed and new endpoints
+        for endpoint in &current_contract_abi.endpoints {
+            if !prev_abi.endpoints.contains(endpoint) {
+                diff_abi.endpoints.push(endpoint.clone());
+            }
+        }
+
+        // deleted endpoints
+        for endpoint in &prev_abi.endpoints {
+            if !current_contract_abi.endpoints.contains(endpoint) {
+                diff_abi.endpoints.retain(|e| e.name != endpoint.name);
+            }
+        }
+
+        return diff_abi;
     }
     current_contract_abi.clone()
 }
 
-pub(crate) fn create_prev_abi_file(snippets_dir: &String, contract_abi: &ContractAbi) {
+pub(crate) fn create_prev_abi_file(snippets_dir: &Path, contract_abi: &ContractAbi) {
     let abi_json = ContractAbiJson::from(contract_abi);
     let abi_string = serialize_abi_to_json(&abi_json);
+    let abi_file_path = snippets_dir.join(PREV_ABI_NAME);
 
-    let abi_file_path = format!("{snippets_dir}/{PREV_ABI_NAME}");
     let mut abi_file = File::create(abi_file_path).unwrap();
     write!(abi_file, "{abi_string}").unwrap();
 }
 
-pub(crate) fn add_new_endpoints_to_file(snippets_dir: &String, diff_abi: &ShortContractAbi) {
-    let interact_lib_path = format!("{snippets_dir}/src/{LIB_SOURCE_FILE_NAME}");
+pub(crate) fn add_new_endpoints_to_file(snippets_dir: &Path, diff_abi: &ShortContractAbi) {
+    let interact_lib_path = snippets_dir.join("src").join(LIB_SOURCE_FILE_NAME);
     let file_content = std::fs::read_to_string(&interact_lib_path).unwrap();
     let mut updated_content = file_content.clone();
 
@@ -230,7 +228,6 @@ pub(crate) fn add_new_endpoints_to_file(snippets_dir: &String, diff_abi: &ShortC
     std::fs::write(interact_lib_path, updated_content).unwrap();
 }
 
-// this may be buggy
 fn insert_or_replace_function(
     file_content: &str,
     endpoint_abi: &ShortEndpointAbi,
