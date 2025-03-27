@@ -2,10 +2,11 @@ use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
+use serde::Deserialize;
 
 use super::TypeNames;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Deserialize)]
 pub struct TypeDescription {
     pub docs: Vec<String>,
     pub names: TypeNames,
@@ -46,7 +47,7 @@ impl TypeDescription {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Deserialize)]
 pub enum TypeContents {
     NotSpecified,
     Enum(Vec<EnumVariantDescription>),
@@ -60,7 +61,7 @@ impl TypeContents {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 pub struct EnumVariantDescription {
     pub docs: Vec<String>,
     pub name: String,
@@ -87,7 +88,7 @@ impl EnumVariantDescription {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 pub struct StructFieldDescription {
     pub docs: Vec<String>,
     pub name: String,
@@ -110,7 +111,7 @@ impl StructFieldDescription {
 /// This makes it easier for humans to read readable in the transaction output.
 ///
 /// It cannot have data fields, only simple enums allowed.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Deserialize)]
 pub struct ExplicitEnumVariantDescription {
     pub docs: Vec<String>,
     pub name: String,

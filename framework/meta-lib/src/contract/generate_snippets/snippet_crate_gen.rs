@@ -8,7 +8,7 @@ use std::{
 use crate::version_history;
 
 static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
-static LIB_SOURCE_FILE_NAME: &str = "interact.rs";
+pub(crate) static LIB_SOURCE_FILE_NAME: &str = "interact.rs";
 static SC_CONFIG_FILE_NAME: &str = "sc-config.toml";
 static CONFIG_TOML_PATH: &str = "config.toml";
 static CONFIG_SOURCE_FILE_NAME: &str = "config.rs";
