@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use super::wasm_cargo_toml_data::WasmCargoTomlData;
 use crate::cargo_toml::{change_from_base_to_adapter_path, CargoTomlContents, DependencyRawValue};
 
@@ -61,7 +63,7 @@ fn add_wasm_crate_deps(
     cargo_toml_contents.insert_dependency_raw_value(
         crate_name,
         DependencyRawValue {
-            path: Some("..".to_owned()),
+            path: Some(PathBuf::from("..")),
             ..Default::default()
         },
     );

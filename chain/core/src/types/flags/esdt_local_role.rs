@@ -16,6 +16,7 @@ const ESDT_ROLE_SET_NEW_URI: &str = "ESDTRoleSetNewURI";
 const ESDT_ROLE_MODIFY_ROYALTIES: &str = "ESDTRoleModifyRoyalties";
 const ESDT_ROLE_MODIFY_CREATOR: &str = "ESDTRoleModifyCreator";
 const ESDT_ROLE_NFT_RECREATE: &str = "ESDTRoleNFTRecreate";
+const ESDT_ROLE_TRANSFER: &str = "ESDTTransferRole";
 
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
 pub enum EsdtLocalRole {
@@ -31,6 +32,7 @@ pub enum EsdtLocalRole {
     ModifyRoyalties,
     ModifyCreator,
     SetNewUri,
+    Transfer,
 }
 
 impl EsdtLocalRole {
@@ -48,6 +50,7 @@ impl EsdtLocalRole {
             Self::ModifyCreator => 9,
             Self::ModifyRoyalties => 10,
             Self::SetNewUri => 11,
+            Self::Transfer => 12,
         }
     }
 
@@ -69,6 +72,7 @@ impl EsdtLocalRole {
             Self::ModifyRoyalties => ESDT_ROLE_MODIFY_ROYALTIES,
             Self::ModifyCreator => ESDT_ROLE_MODIFY_CREATOR,
             Self::SetNewUri => ESDT_ROLE_SET_NEW_URI,
+            Self::Transfer => ESDT_ROLE_TRANSFER,
         }
     }
 
@@ -86,13 +90,14 @@ impl EsdtLocalRole {
             Self::ModifyRoyalties => EsdtLocalRoleFlags::MODIFY_ROYALTIES,
             Self::ModifyCreator => EsdtLocalRoleFlags::MODIFY_CREATOR,
             Self::SetNewUri => EsdtLocalRoleFlags::SET_NEW_URI,
+            Self::Transfer => EsdtLocalRoleFlags::TRANSFER,
         }
     }
 }
 
 // TODO: can be done with macros, but I didn't find a public library that does it and is no_std
 // we can implement it, it's easy
-const ALL_ROLES: [EsdtLocalRole; 11] = [
+const ALL_ROLES: [EsdtLocalRole; 12] = [
     EsdtLocalRole::Mint,
     EsdtLocalRole::Burn,
     EsdtLocalRole::NftCreate,
@@ -104,6 +109,7 @@ const ALL_ROLES: [EsdtLocalRole; 11] = [
     EsdtLocalRole::ModifyRoyalties,
     EsdtLocalRole::ModifyCreator,
     EsdtLocalRole::SetNewUri,
+    EsdtLocalRole::Transfer,
 ];
 
 impl EsdtLocalRole {
@@ -127,6 +133,7 @@ impl From<u16> for EsdtLocalRole {
             9 => Self::ModifyRoyalties,
             10 => Self::ModifyCreator,
             11 => Self::SetNewUri,
+            12 => Self::Transfer,
             _ => Self::None,
         }
     }
@@ -157,6 +164,8 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
             Self::ModifyCreator
         } else if byte_slice == ESDT_ROLE_SET_NEW_URI.as_bytes() {
             Self::SetNewUri
+        } else if byte_slice == ESDT_ROLE_TRANSFER.as_bytes() {
+            Self::Transfer
         } else {
             Self::None
         }

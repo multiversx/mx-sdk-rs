@@ -76,7 +76,7 @@ where
         },
         _ => Ok(serde_json::from_value(value.clone())
             .map(|single| vec![single])
-            .expect(&format!("error at {value:?}"))), // .map_err(de::Error::custom),
+            .unwrap_or_else(|_| panic!("error at {value:?}"))),
     }
 }
 
@@ -281,7 +281,7 @@ pub(crate) fn write_endpoint_impl_to_string(
     write_payments_declaration_to_string(buffer, &endpoint_abi.payable_in_tokens);
     write_endpoint_args_declaration_to_string(buffer, &endpoint_abi.inputs);
 
-    if endpoint_abi.mutability == "readonly".to_string() {
+    if endpoint_abi.mutability == *"readonly" {
         write_contract_query_to_string(buffer, endpoint_abi, name);
     } else {
         write_contract_call_to_string(buffer, endpoint_abi, name);

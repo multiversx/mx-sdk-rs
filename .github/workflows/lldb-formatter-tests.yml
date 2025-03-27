@@ -16,7 +16,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           default: true
-          toolchain: 1.82
+          toolchain: 1.85
 
       - name: Download vscode-lldb
         uses: robinraju/release-downloader@v1.5
@@ -28,8 +28,8 @@ jobs:
       - name: Setup vscode-lldb
         run: |
           unzip codelldb-linux-x64.vsix -d vscode-lldb
-          mkdir -p $HOME/.vscode/extensions/vadimcn.vscode-lldb-1.11.1/
-          mv vscode-lldb/extension/* $HOME/.vscode/extensions/vadimcn.vscode-lldb-1.11.1/
+          mkdir -p $HOME/.vscode/extensions/vadimcn.vscode-lldb-1.11.3/
+          mv vscode-lldb/extension/* $HOME/.vscode/extensions/vadimcn.vscode-lldb-1.11.3/
 
       - name: Run the rust tests
         run: |

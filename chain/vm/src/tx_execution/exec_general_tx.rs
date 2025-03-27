@@ -7,7 +7,6 @@ use crate::{
         TxLog, TxResult,
     },
     types::{top_encode_big_uint, VMAddress, VMCodeMetadata},
-    with_shared::Shareable,
 };
 
 use super::{is_system_sc_address, BlockchainVMRef};
@@ -119,11 +118,10 @@ impl BlockchainVMRef {
             execute_system_sc(tx_input, tx_cache)
         } else if should_execute_sc_call(&tx_input) {
             let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
-            let mut tx_context_sh = Shareable::new(tx_context);
 
-            TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
+            let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
 
-            tx_context_sh.into_inner().into_results()
+            tx_context.into_results()
         } else {
             // no execution
             (TxResult::empty(), tx_cache.into_blockchain_updates())
@@ -151,10 +149,9 @@ impl BlockchainVMRef {
         tx_input.to = new_address.clone();
         tx_input.func_name = TxFunctionName::INIT;
         let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
-        let mut tx_context_sh = Shareable::new(tx_context);
-        let tx_input_ref = tx_context_sh.input_ref();
+        let tx_input_ref = tx_context.input_ref();
 
-        if let Err(err) = tx_context_sh
+        if let Err(err) = tx_context
             .tx_cache
             .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value)
         {
@@ -164,19 +161,19 @@ impl BlockchainVMRef {
                 BlockchainUpdate::empty(),
             );
         }
-        tx_context_sh.create_new_contract(
+        tx_context.create_new_contract(
             &new_address,
             contract_path,
             code_metadata,
             tx_input_ref.from.clone(),
         );
-        tx_context_sh
+        tx_context
             .tx_cache
             .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
-        TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
+        let tx_context = TxContextStack::execute_on_vm_stack(tx_context, f);
 
-        let (tx_result, blockchain_updates) = tx_context_sh.into_inner().into_results();
+        let (tx_result, blockchain_updates) = tx_context.into_results();
         (tx_result, new_address, blockchain_updates)
     }
 }

@@ -18,7 +18,7 @@ impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsMessage
 where
     Env: TxEnv<RHExpect = TxExpect>,
 {
-    fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+    fn item_preprocessing(&self, mut prev: TxExpect) -> TxExpect {
         prev.message = CheckValue::Star;
         prev
     }

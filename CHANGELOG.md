@@ -32,6 +32,38 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+## [sc 0.57.0, codec 0.22.0, chain 0.14.0, sdk 0.9.0, scenario-format 0.23.1] - 2025-03-11
+- Newer compiler support:
+	- Dropped support for Rust compiler versions older than 1.83.
+	- Support and optimizations for using Rust 1.85.
+- `sc-meta`:
+	- Windows support.
+	- Removed the concept of a "main" contract configuration.
+- Using `typenum`/`generic-array` instead of const generics/macros for:
+	- ManagedVec payloads;
+	- ManagedDecimal const decimals.
+- ManagedDecimal - more arithmetic operator implementations for combinations of const + var decimals.
+- ManagedVecItem can now be derived for enums with fields.
+- Codec and ABI support for bitflags.
+- Storage mappers:
+	- New storage mapper: `TimelockMapper`;
+	- Renamed source type and object.
+- `ESDTTransferRole`:
+	- Reintroduced role after being accidentally dropped;
+	- Added a `token_has_transfer_role` method for checking if it is set on a token, as a workaround until Barnard release.
+- Unified syntax - result handler for back transfers, which resets previous back transfers (`ReturnsBackTransfersReset`).
+- SDK:
+	- Chain simulator - set state overwrite support;
+	- `Wallet` `get_shard` method.
+- Debugger - improved mandos error messages.
+- Dependencies upgraded.
+
+
+## [sc 0.56.1, chain 0.13.1, sdk 0.8.2] - 2025-02-06
+- Allow setting gas for callback for direct transfers.
+- NestedEncode for interaction types: TestAddress, TestScAddress and TestTokenIdentifier.
+- Bugfix: pretty representation for ManagedAddress when debugging.
+- Upgrade dependency: ruplacer.
 
 ## [sc 0.56.0, chain 0.13.0, sdk 0.8.1] - 2025-01-23
 - Rust VM support for readonly sync calls.

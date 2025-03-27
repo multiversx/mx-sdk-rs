@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write};
+use std::{fs::File, io::Write, path::Path};
 
 // use multiversx_sc::abi::{EndpointAbi, EndpointMutabilityAbi, InputAbi};
 
@@ -16,7 +16,11 @@ pub(crate) fn write_interact_struct_impl(
     crate_name: &str,
 ) {
     let crate_path = crate_name.replace("_", "-");
-    let wasm_output_file_path_expr = format!("\"mxsc:../output/{crate_path}.mxsc.json\"");
+    let mxsc_file_name = format!("{crate_path}.mxsc.json");
+    let wasm_output_file_path = Path::new("..").join("output").join(mxsc_file_name);
+
+    let wasm_output_file_path_expr =
+        format!("\"mxsc:{}\"", &wasm_output_file_path.to_string_lossy());
 
     writeln!(
         file,

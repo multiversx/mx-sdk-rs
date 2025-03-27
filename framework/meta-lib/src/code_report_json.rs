@@ -21,7 +21,7 @@ pub struct CodeReportJson {
 impl CodeReportJson {
     pub fn new(report: &ReportCreator, size: usize) -> CodeReportJson {
         CodeReportJson {
-            path: report.path.clone(),
+            path: report.path.to_string_lossy().to_string(),
             size,
             has_allocator: report.has_allocator,
             has_panic: report.has_panic.to_string(),

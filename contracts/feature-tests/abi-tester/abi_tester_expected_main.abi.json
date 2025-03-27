@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.56.0"
+            "version": "0.57.0"
         }
     },
     "docs": [
@@ -329,6 +329,21 @@
             "outputs": [
                 {
                     "type": "List<AbiManagedVecItem>"
+                }
+            ]
+        },
+        {
+            "name": "echo_permission",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "p",
+                    "type": "Permission"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Permission"
                 }
             ]
         },
@@ -1019,6 +1034,15 @@
                         "indicates that operation was interrupted prematurely, due to low gas"
                     ],
                     "name": "interrupted"
+                }
+            ]
+        },
+        "Permission": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "0",
+                    "type": "u32"
                 }
             ]
         }
