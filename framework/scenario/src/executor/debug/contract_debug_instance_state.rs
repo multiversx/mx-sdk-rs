@@ -40,16 +40,16 @@ impl ContractDebugInstanceState {
 }
 
 impl InstanceState for ContractDebugInstanceState {
-    fn set_points_limit(&self, _limit: u64) -> Result<(), String> {
-        panic!("ContractDebugInstanceState set_points_limit not supported")
+    fn get_points_limit(&self) -> Result<u64, String> {
+        Ok(1)
     }
 
     fn set_points_used(&self, _points: u64) -> Result<(), String> {
-        panic!("ContractDebugInstanceState set_points_used not supported")
+        Ok(())
     }
 
     fn get_points_used(&self) -> Result<u64, String> {
-        panic!("ContractDebugInstanceState get_points_used not supported")
+        Ok(0)
     }
 
     fn memory_length(&self) -> Result<u64, String> {

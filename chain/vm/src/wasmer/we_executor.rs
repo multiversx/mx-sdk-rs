@@ -1,27 +1,27 @@
 use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };
-use multiversx_chain_vm_executor_wasmer_experimental::{WasmerExecutorData, WasmerInstance};
-use std::{cell::RefCell, fmt, rc::Rc};
+use multiversx_chain_vm_executor_wasmer_experimental::ExperimentalInstance;
+use std::{fmt, rc::Rc, sync::Arc};
 
 use crate::host::{runtime::RuntimeWeakRef, vm_hooks::TxContextVMHooksBuilder};
 
 use super::WasmerAltExecutorFileNotFoundError;
 
 /// Executor implementation that produces wasmer instances with correctly injected VM hooks from runtime.
-pub struct WasmerExperimentalExecutor {
+pub struct ExperimentalExecutor {
     runtime_ref: RuntimeWeakRef,
 }
 
-impl fmt::Debug for WasmerExperimentalExecutor {
+impl fmt::Debug for ExperimentalExecutor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("WasmerExperimentalExecutor").finish()
     }
 }
 
-impl WasmerExperimentalExecutor {
+impl ExperimentalExecutor {
     pub fn new(runtime_ref: RuntimeWeakRef) -> Self {
-        WasmerExperimentalExecutor { runtime_ref }
+        ExperimentalExecutor { runtime_ref }
     }
 
     fn new_instance_from_bytes(
@@ -32,13 +32,11 @@ impl WasmerExperimentalExecutor {
         let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
 
         let vm_hooks_builder = TxContextVMHooksBuilder::new(tx_context_ref);
-        let executor_data_ref = Rc::new(RefCell::new(WasmerExecutorData::new(Rc::new(
-            vm_hooks_builder,
-        ))));
 
         Box::new(
-            WasmerInstance::try_new_instance(
-                executor_data_ref.clone(),
+            ExperimentalInstance::try_new_instance(
+                Rc::new(vm_hooks_builder),
+                Arc::new(OpcodeCost::default()),
                 wasm_bytes,
                 compilation_options,
             )
@@ -47,7 +45,7 @@ impl WasmerExperimentalExecutor {
     }
 }
 
-impl Executor for WasmerExperimentalExecutor {
+impl Executor for ExperimentalExecutor {
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
         Ok(())
     }

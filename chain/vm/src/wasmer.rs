@@ -1,5 +1,5 @@
-mod wasmer5_experimental_executor;
 mod wasmer_alt_executor_err;
+mod we_executor;
 
 pub use wasmer_alt_executor_err::WasmerAltExecutorFileNotFoundError;
 
@@ -23,4 +23,4 @@ mod wasmer_alt_executor_disabled;
 #[cfg(not(feature = "wasmer"))]
 pub use wasmer_alt_executor_disabled::WasmerAltExecutor;
 
-pub use wasmer5_experimental_executor::WasmerExperimentalExecutor;
+pub use we_executor::ExperimentalExecutor;

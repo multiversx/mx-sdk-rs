@@ -23,8 +23,10 @@ impl WasmerAltInstanceState {
 }
 
 impl InstanceState for WasmerAltInstanceState {
-    fn set_points_limit(&self, limit: u64) -> Result<(), String> {
-        self.instance_rc()?.set_points_limit(limit)
+    fn get_points_limit(&self) -> Result<u64, String> {
+        // InstanceState::get_points_limit(&self)
+        // self.instance_rc()?.get_points_limit()
+        todo!()
     }
 
     fn set_points_used(&self, points: u64) -> Result<(), String> {

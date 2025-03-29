@@ -23,13 +23,6 @@ impl WasmerAltExecutor {
 }
 
 impl Executor for WasmerAltExecutor {
-    fn set_vm_hooks_ptr(
-        &mut self,
-        _vm_hooks_ptr: *mut std::ffi::c_void,
-    ) -> Result<(), ExecutorError> {
-        panic!("Wasmer executor not available, need to activate features = [\"wasmer\"] in multiversx-sc-scenario or multiversx-chain-vm")
-    }
-
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
         panic!("Wasmer executor not available, need to activate features = [\"wasmer\"] in multiversx-sc-scenario or multiversx-chain-vm")
     }
