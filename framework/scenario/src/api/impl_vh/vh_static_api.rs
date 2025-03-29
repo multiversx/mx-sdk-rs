@@ -17,7 +17,7 @@ use multiversx_chain_vm::{
     types::{VMAddress, VMCodeMetadata},
 };
 
-use crate::executor::debug::ContractDebugInstance;
+use crate::executor::debug::ContractDebugInstanceState;
 
 /// A simple wrapper around a managed type container Mutex.
 ///
@@ -32,12 +32,12 @@ impl StaticApiVMHooksHandler {
 
 impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
-        unsafe { ContractDebugInstance::main_memory_load(offset, length) }
+        unsafe { ContractDebugInstanceState::main_memory_load(offset, length) }
     }
 
     unsafe fn memory_store(&self, offset: MemPtr, data: &[u8]) {
         unsafe {
-            ContractDebugInstance::main_memory_store(offset, data);
+            ContractDebugInstanceState::main_memory_store(offset, data);
         }
     }
 

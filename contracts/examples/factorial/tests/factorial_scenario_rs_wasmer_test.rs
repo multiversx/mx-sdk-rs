@@ -2,7 +2,7 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain =
-        ScenarioWorld::new().executor_config(scenario::run_vm::ScenarioExecutorConfig::Wasmer);
+        ScenarioWorld::new().executor_config(scenario::run_vm::ScenarioExecutorConfig::WasmerProd);
 
     blockchain.set_current_dir_from_workspace("contracts/examples/factorial");
     blockchain.register_contract(
