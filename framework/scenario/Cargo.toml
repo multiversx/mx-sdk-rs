@@ -33,10 +33,11 @@ unwrap-infallible = "0.1.5"
 simple-error = "0.3.1"
 
 [features]
-default = ["wasm-incompatible", "wasmer"] # TODO: wasmer temporarily default
+default = ["wasm-incompatible"]
 wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
 run-go-tests = []
-wasmer = ["multiversx-chain-vm/wasmer"]
+wasmer-prod = ["multiversx-chain-vm/wasmer-prod"]
+wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
 
 [dependencies.multiversx-sc]
 version = "=0.57.0"
@@ -53,9 +54,9 @@ path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-chain-vm-executor]
 version = "0.3.0"
-# git = "https://github.com/multiversx/mx-vm-executor-rs"
-# rev = "2a267cf459ed48720d4db06fedb9c22ed8fc0106"
-path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor"
+git = "https://github.com/multiversx/mx-vm-executor-rs"
+rev = "2e6e008b78a382e7d7676a2568d86363ae7e677e"
+# path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.14.0"

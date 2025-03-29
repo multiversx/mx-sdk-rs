@@ -1,7 +1,4 @@
-use multiversx_chain_vm::{
-    host::runtime::RuntimeWeakRef,
-    wasmer::{WasmerAltExecutor, WasmerAltExecutorFileNotFoundError},
-};
+use multiversx_chain_vm::executor_impl::ExecutorFileNotFoundError;
 use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };
@@ -9,8 +6,6 @@ use simple_error::SimpleError;
 use std::fmt;
 
 use crate::executor::debug::ContractDebugExecutorNotRegisteredError;
-
-use super::debug::{ContractDebugExecutor, ContractMapRef};
 
 /// An executor that delegates instance creation to several other executors.
 ///
@@ -26,19 +21,8 @@ impl fmt::Debug for CompositeExecutor {
 }
 
 impl CompositeExecutor {
-    pub fn new_debugger_then_wasmer(
-        runtime_ref: RuntimeWeakRef,
-        contract_map_ref: ContractMapRef,
-    ) -> Self {
-        CompositeExecutor {
-            executors: vec![
-                Box::new(ContractDebugExecutor::new(
-                    runtime_ref.clone(),
-                    contract_map_ref.clone(),
-                )),
-                Box::new(WasmerAltExecutor::new(runtime_ref)),
-            ],
-        }
+    pub fn new(executors: Vec<Box<dyn Executor + Send + Sync>>) -> Self {
+        CompositeExecutor { executors }
     }
 }
 
@@ -81,7 +65,7 @@ fn is_recoverable_error(err: &ExecutorError) -> bool {
     if err.is::<ContractDebugExecutorNotRegisteredError>() {
         return true;
     }
-    if err.is::<WasmerAltExecutorFileNotFoundError>() {
+    if err.is::<ExecutorFileNotFoundError>() {
         return true;
     }
     false

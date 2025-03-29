@@ -5,26 +5,26 @@ use std::fmt;
 
 use crate::host::runtime::RuntimeWeakRef;
 
-/// Conditional compilation variant of the WasmerAltExecutor, for when the "wasmer" feature is disabled and Wasmer cannot be used.
+/// Conditional compilation variant of the WasmerProdExecutor, for when the "wasmer" feature is disabled and Wasmer cannot be used.
 ///
 /// Always fails to produce instances.
-pub struct WasmerAltExecutor;
+pub struct WasmerProdExecutor;
 
-impl fmt::Debug for WasmerAltExecutor {
+impl fmt::Debug for WasmerProdExecutor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("WasmerAltExecutor (disabled)").finish()
+        f.debug_struct("WasmerProdExecutor (disabled)").finish()
     }
 }
 
-impl WasmerAltExecutor {
+impl WasmerProdExecutor {
     pub fn new(_runtime_ref: RuntimeWeakRef) -> Self {
-        WasmerAltExecutor
+        WasmerProdExecutor
     }
 }
 
-impl Executor for WasmerAltExecutor {
+impl Executor for WasmerProdExecutor {
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        panic!("Wasmer executor not available, need to activate features = [\"wasmer\"] in multiversx-sc-scenario or multiversx-chain-vm")
+        panic!("Wasmer executor not available, need to activate features = [\"wasmer-prod\"] in multiversx-sc-scenario or multiversx-chain-vm")
     }
 
     fn new_instance(
@@ -32,7 +32,7 @@ impl Executor for WasmerAltExecutor {
         _wasm_bytes: &[u8],
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
-        panic!("Wasmer executor not available, need to activate features = [\"wasmer\"] in multiversx-sc-scenario or multiversx-chain-vm")
+        panic!("Wasmer executor not available, need to activate features = [\"wasmer-prod\"] in multiversx-sc-scenario or multiversx-chain-vm")
     }
 
     fn new_instance_from_cache(
@@ -40,6 +40,6 @@ impl Executor for WasmerAltExecutor {
         _cache_bytes: &[u8],
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
-        panic!("WasmerAltExecutor new_instance_from_cache not supported")
+        panic!("WasmerProdExecutor new_instance_from_cache not supported")
     }
 }

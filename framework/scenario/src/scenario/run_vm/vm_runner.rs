@@ -1,6 +1,6 @@
 use multiversx_chain_vm::{
+    executor_impl::{ExperimentalExecutor, WasmerProdExecutor},
     host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef},
-    wasmer::{ExperimentalExecutor, WasmerAltExecutor},
 };
 use multiversx_chain_vm_executor::Executor;
 
@@ -17,9 +17,10 @@ use crate::{
 pub enum ScenarioExecutorConfig {
     #[default]
     Debugger,
-    Wasmer,
+    WasmerProd,
     Experimental,
-    TryDebuggerThenWasmer,
+    TryDebuggerThenWasmerProd,
+    TryDebuggerThenExperimental,
 }
 
 /// Wraps calls to the blockchain mock,
@@ -52,11 +53,26 @@ impl ScenarioVMRunner {
                 weak,
                 self.contract_map_ref.clone(),
             )),
-            ScenarioExecutorConfig::Wasmer => Box::new(WasmerAltExecutor::new(weak)),
+            ScenarioExecutorConfig::WasmerProd => Box::new(WasmerProdExecutor::new(weak)),
             ScenarioExecutorConfig::Experimental => Box::new(ExperimentalExecutor::new(weak)),
-            ScenarioExecutorConfig::TryDebuggerThenWasmer => Box::new(
-                CompositeExecutor::new_debugger_then_wasmer(weak, self.contract_map_ref.clone()),
-            ),
+            ScenarioExecutorConfig::TryDebuggerThenWasmerProd => {
+                Box::new(CompositeExecutor::new(vec![
+                    Box::new(ContractDebugExecutor::new(
+                        weak.clone(),
+                        self.contract_map_ref.clone(),
+                    )),
+                    Box::new(WasmerProdExecutor::new(weak)),
+                ]))
+            },
+            ScenarioExecutorConfig::TryDebuggerThenExperimental => {
+                Box::new(CompositeExecutor::new(vec![
+                    Box::new(ContractDebugExecutor::new(
+                        weak.clone(),
+                        self.contract_map_ref.clone(),
+                    )),
+                    Box::new(ExperimentalExecutor::new(weak)),
+                ]))
+            },
         }
     }
 

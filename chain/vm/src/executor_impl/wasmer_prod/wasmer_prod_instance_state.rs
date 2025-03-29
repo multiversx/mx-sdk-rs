@@ -6,13 +6,13 @@ use multiversx_chain_vm_executor_wasmer::WasmerInstance;
 use std::rc::{Rc, Weak};
 
 #[derive(Clone)]
-pub struct WasmerAltInstanceState {
+pub struct WasmerProdInstanceState {
     inner_instance_ref: Weak<WasmerInstance>,
 }
 
-impl WasmerAltInstanceState {
+impl WasmerProdInstanceState {
     pub fn new(inner_instance_ref: Weak<WasmerInstance>) -> Self {
-        WasmerAltInstanceState { inner_instance_ref }
+        WasmerProdInstanceState { inner_instance_ref }
     }
 
     fn instance_rc(&self) -> Result<Rc<WasmerInstance>, String> {
@@ -22,7 +22,7 @@ impl WasmerAltInstanceState {
     }
 }
 
-impl InstanceState for WasmerAltInstanceState {
+impl InstanceState for WasmerProdInstanceState {
     fn get_points_limit(&self) -> Result<u64, String> {
         // InstanceState::get_points_limit(&self)
         // self.instance_rc()?.get_points_limit()

@@ -2,11 +2,11 @@ pub mod blockchain;
 pub mod builtin_functions;
 pub mod crypto_functions;
 pub mod display_util;
+pub mod executor_impl;
 pub mod host;
 pub mod system_sc;
 pub mod types;
 pub mod vm_err_msg;
-pub mod wasmer;
 pub mod with_shared;
 
 pub use blockchain::BlockchainMock;

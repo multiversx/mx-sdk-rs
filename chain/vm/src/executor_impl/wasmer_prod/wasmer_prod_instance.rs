@@ -4,17 +4,17 @@ use multiversx_chain_vm_executor_wasmer::WasmerInstance;
 use std::rc::Rc;
 
 #[derive(Clone)]
-pub struct WasmerAltInstance {
+pub struct WasmerProdInstance {
     inner_instance_ref: Rc<WasmerInstance>,
 }
 
-impl WasmerAltInstance {
+impl WasmerProdInstance {
     pub fn new(inner_instance_ref: Rc<WasmerInstance>) -> Self {
-        WasmerAltInstance { inner_instance_ref }
+        WasmerProdInstance { inner_instance_ref }
     }
 }
 
-impl Instance for WasmerAltInstance {
+impl Instance for WasmerProdInstance {
     fn call(&self, func_name: &str) -> Result<(), String> {
         self.inner_instance_ref.call(func_name)
     }
@@ -51,4 +51,3 @@ impl Instance for WasmerAltInstance {
         self.inner_instance_ref.cache()
     }
 }
-
