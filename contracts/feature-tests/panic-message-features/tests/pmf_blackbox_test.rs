@@ -7,7 +7,8 @@ const SC_PMF: TestSCAddress = TestSCAddress::new("pmf");
 const CODE_EXPR: &str = "mxsc:output/panic-message-features.mxsc.json";
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new().executor_config(ScenarioExecutorConfig::Experimental);
+    let mut blockchain =
+        ScenarioWorld::new().executor_config(ScenarioExecutorConfig::TryExperimentalThenDebugger);
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/panic-message-features");
     blockchain.register_contract(CODE_EXPR, panic_message_features::ContractBuilder);
