@@ -16,3 +16,6 @@ path = "../../../framework/base"
 version = "0.57.0"
 path = "../../../framework/scenario"
 features = ["wasmer-experimental"]
+
+[features]
+run-go-tests = ["multiversx-sc-scenario/run-go-tests"]

@@ -15,8 +15,27 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
+fn prod_then_debugger_world() -> ScenarioWorld {
+    let mut blockchain =
+        ScenarioWorld::new().executor_config(ScenarioExecutorConfig::TryWasmerProdThenDebugger);
+
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/panic-message-features");
+    blockchain.register_contract(CODE_EXPR, panic_message_features::ContractBuilder);
+    blockchain
+}
+
 fn setup() -> ScenarioWorld {
     let mut world = world();
+    let code = world.code_expression(CODE_EXPR);
+
+    world.account(OWNER_ADDRESS).nonce(1);
+    world.account(SC_PMF).code(code);
+
+    world
+}
+
+fn prod_the_debugger_setup() -> ScenarioWorld {
+    let mut world = prod_then_debugger_world();
     let code = world.code_expression(CODE_EXPR);
 
     world.account(OWNER_ADDRESS).nonce(1);
@@ -47,6 +66,24 @@ fn tx_returns_error_test() {
 #[test]
 fn query_returns_error_test() {
     let mut world = setup();
+
+    let (status, message) = world
+        .query()
+        .to(SC_PMF)
+        .typed(pmf_proxy::PanicMessageFeaturesProxy)
+        .sc_panic()
+        .returns(ReturnsStatus)
+        .returns(ReturnsMessage)
+        .run();
+
+    assert_eq!(status, 4);
+    assert_eq!(message, "sc_panic! test");
+}
+
+#[test]
+#[cfg_attr(not(feature = "run-go-tests"), ignore)]
+fn prod_the_debugger_query_returns_error_test() {
+    let mut world = prod_the_debugger_setup();
 
     let (status, message) = world
         .query()
