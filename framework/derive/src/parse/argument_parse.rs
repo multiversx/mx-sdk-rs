@@ -11,10 +11,7 @@ pub fn extract_method_args(m: &syn::TraitItemFn) -> Vec<MethodArgument> {
         .inputs
         .iter()
         .filter_map(|arg| match arg {
-            syn::FnArg::Receiver(selfref) => {
-                if selfref.mutability.is_some() || receiver_processed {
-                    missing_self_panic(m);
-                }
+            syn::FnArg::Receiver(_) => {
                 receiver_processed = true;
                 None
             },
@@ -31,7 +28,7 @@ pub fn extract_method_args(m: &syn::TraitItemFn) -> Vec<MethodArgument> {
 
 fn missing_self_panic(m: &syn::TraitItemFn) -> ! {
     panic!(
-        "Trait method `{}` must have `&self` as its first argument.",
+        "Trait method `{}` must have `&self` or `&mut self` as its first argument.",
         m.sig.ident
     )
 }
