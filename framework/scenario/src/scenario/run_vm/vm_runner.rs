@@ -20,7 +20,9 @@ pub enum ScenarioExecutorConfig {
     WasmerProd,
     Experimental,
     TryDebuggerThenWasmerProd,
+    TryWasmerProdThenDebugger,
     TryDebuggerThenExperimental,
+    TryExperimentalThenDebugger,
 }
 
 /// Wraps calls to the blockchain mock,
@@ -64,6 +66,15 @@ impl ScenarioVMRunner {
                     Box::new(WasmerProdExecutor::new(weak)),
                 ]))
             },
+            ScenarioExecutorConfig::TryWasmerProdThenDebugger => {
+                Box::new(CompositeExecutor::new(vec![
+                    Box::new(WasmerProdExecutor::new(weak.clone())),
+                    Box::new(ContractDebugExecutor::new(
+                        weak,
+                        self.contract_map_ref.clone(),
+                    )),
+                ]))
+            },
             ScenarioExecutorConfig::TryDebuggerThenExperimental => {
                 Box::new(CompositeExecutor::new(vec![
                     Box::new(ContractDebugExecutor::new(
@@ -71,6 +82,15 @@ impl ScenarioVMRunner {
                         self.contract_map_ref.clone(),
                     )),
                     Box::new(ExperimentalExecutor::new(weak)),
+                ]))
+            },
+            ScenarioExecutorConfig::TryExperimentalThenDebugger => {
+                Box::new(CompositeExecutor::new(vec![
+                    Box::new(ExperimentalExecutor::new(weak.clone())),
+                    Box::new(ContractDebugExecutor::new(
+                        weak,
+                        self.contract_map_ref.clone(),
+                    )),
                 ]))
             },
         }
