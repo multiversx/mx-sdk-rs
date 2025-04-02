@@ -29,6 +29,8 @@ pub(crate) struct ShortContractAbi {
     pub upgrade_constructor: Vec<ShortEndpointAbi>,
     #[serde(default)]
     pub endpoints: Vec<ShortEndpointAbi>,
+    #[serde(skip_deserializing)]
+    pub deleted_endpoints: Vec<ShortEndpointAbi>,
 }
 
 #[derive(PartialEq, Deserialize, Clone, Debug)]
@@ -139,6 +141,7 @@ impl From<ContractAbi> for ShortContractAbi {
                 .into_iter()
                 .map(ShortEndpointAbi::from)
                 .collect(),
+            deleted_endpoints: vec![],
         }
     }
 }
@@ -150,49 +153,100 @@ pub(crate) fn check_abi_differences(
 ) -> ShortContractAbi {
     if !overwrite {
         let prev_abi_path = snippets_dir.join(PREV_ABI_NAME);
-        let prev_abi_content = std::fs::read_to_string(&prev_abi_path)
-            .unwrap_or_else(|_| panic!("Failed to read file at path: {:?}", prev_abi_path));
-        let prev_abi = serde_json::from_str::<ShortContractAbi>(&prev_abi_content)
-            .unwrap_or_else(|_| panic!("Failed to deserialize prev-abi.json content"));
 
-        let mut diff_abi = ShortContractAbi {
-            name: current_contract_abi.name.clone(),
-            constructor: vec![],
-            upgrade_constructor: vec![],
-            endpoints: vec![],
-        };
+        if let Ok(prev_abi_content) = std::fs::read_to_string(&prev_abi_path) {
+            if let Ok(mut prev_abi) = serde_json::from_str::<ShortContractAbi>(&prev_abi_content) {
+                if prev_abi.constructor[0].name.is_empty() {
+                    prev_abi.constructor[0].name = "init".to_string();
+                    prev_abi.constructor[0].mutability = "mutable".to_string();
+                    prev_abi.constructor[0].rust_method_name = "init".to_string();
+                }
 
-        // changed and new constructors
-        for constructor in &current_contract_abi.constructor {
-            if !prev_abi.constructor.contains(constructor) {
-                diff_abi.constructor.push(constructor.clone());
+                if prev_abi.upgrade_constructor[0].name.is_empty() {
+                    prev_abi.upgrade_constructor[0].name = "upgrade".to_string();
+                    prev_abi.upgrade_constructor[0].mutability = "mutable".to_string();
+                    prev_abi.upgrade_constructor[0].rust_method_name = "upgrade".to_string();
+                }
+
+                println!("prev ABI constructor {:?}", prev_abi.constructor);
+                println!(
+                    "prev ABI upgrade constructor {:?}",
+                    prev_abi.upgrade_constructor
+                );
+                println!("prev ABI endpdoints {:?}", prev_abi.endpoints);
+                println!("**********");
+                println!(
+                    "CURRENT ABI constructor {:?}",
+                    current_contract_abi.constructor
+                );
+                println!(
+                    "CURRENT ABI upgrade constructor {:?}",
+                    current_contract_abi.upgrade_constructor
+                );
+                println!("CURRENT ABI endpoints {:?}", current_contract_abi.endpoints);
+
+                let mut diff_abi = ShortContractAbi {
+                    name: current_contract_abi.name.clone(),
+                    constructor: vec![],
+                    upgrade_constructor: vec![],
+                    endpoints: vec![],
+                    deleted_endpoints: vec![],
+                };
+
+                // changed and new constructors
+                for constructor in &current_contract_abi.constructor {
+                    if !prev_abi
+                        .constructor
+                        .iter()
+                        .any(|e| e.name == constructor.name)
+                    {
+                        diff_abi.constructor.push(constructor.clone());
+                    }
+                }
+
+                // changed and new upgrade constructors
+                // PartialEq doesn't work
+                for upgrade_constructor in &current_contract_abi.upgrade_constructor {
+                    if !prev_abi
+                        .upgrade_constructor
+                        .iter()
+                        .any(|e| e.name == upgrade_constructor.name)
+                    {
+                        diff_abi
+                            .upgrade_constructor
+                            .push(upgrade_constructor.clone());
+                    }
+                }
+
+                // changed and new endpoints
+                // RUST_METHOD_NAME not inherited from EndpointAbi
+                for endpoint in &current_contract_abi.endpoints {
+                    if !prev_abi.endpoints.iter().any(|e| e.name == endpoint.name) {
+                        diff_abi.endpoints.push(endpoint.clone());
+                    }
+                }
+
+                // deleted endpoints
+                for endpoint in &prev_abi.endpoints {
+                    if !current_contract_abi
+                        .endpoints
+                        .iter()
+                        .any(|e| e.name == endpoint.name)
+                    {
+                        diff_abi.deleted_endpoints.push(endpoint.clone());
+                    }
+                }
+
+                // deleted endpoints arrive in struct without a rust name
+                println!("diff_abi endpoints {:?}", diff_abi.endpoints);
+                println!(
+                    "diff_abi deleted endpoints {:?}",
+                    diff_abi.deleted_endpoints
+                );
+
+                return diff_abi;
             }
         }
-
-        // changed and new upgrade constructors
-        for upgrade_constructor in &current_contract_abi.upgrade_constructor {
-            if !prev_abi.upgrade_constructor.contains(upgrade_constructor) {
-                diff_abi
-                    .upgrade_constructor
-                    .push(upgrade_constructor.clone());
-            }
-        }
-
-        // changed and new endpoints
-        for endpoint in &current_contract_abi.endpoints {
-            if !prev_abi.endpoints.contains(endpoint) {
-                diff_abi.endpoints.push(endpoint.clone());
-            }
-        }
-
-        // deleted endpoints
-        for endpoint in &prev_abi.endpoints {
-            if !current_contract_abi.endpoints.contains(endpoint) {
-                diff_abi.endpoints.retain(|e| e.name != endpoint.name);
-            }
-        }
-
-        return diff_abi;
     }
     current_contract_abi.clone()
 }
@@ -211,30 +265,33 @@ pub(crate) fn add_new_endpoints_to_file(snippets_dir: &Path, diff_abi: &ShortCon
     let file_content = std::fs::read_to_string(&interact_lib_path).unwrap();
     let mut updated_content = file_content.clone();
 
+    for deleted_endpoint in &diff_abi.deleted_endpoints {
+        remove_function2(snippets_dir, deleted_endpoint);
+    }
+
     for endpoint_abi in &diff_abi.endpoints {
-        updated_content =
-            insert_or_replace_function(&updated_content, endpoint_abi, &diff_abi.name);
+        updated_content = insert_function(&updated_content, endpoint_abi, &diff_abi.name);
     }
 
     for constructor in &diff_abi.constructor {
-        updated_content = insert_or_replace_function(&updated_content, constructor, &diff_abi.name);
+        updated_content = insert_function(&updated_content, constructor, &diff_abi.name);
     }
 
     for upgrade_constructor in &diff_abi.upgrade_constructor {
-        updated_content =
-            insert_or_replace_function(&updated_content, upgrade_constructor, &diff_abi.name);
+        updated_content = insert_function(&updated_content, upgrade_constructor, &diff_abi.name);
     }
 
     std::fs::write(interact_lib_path, updated_content).unwrap();
 }
 
-fn insert_or_replace_function(
+fn insert_function(
     file_content: &str,
     endpoint_abi: &ShortEndpointAbi,
     contract_name: &String,
 ) -> String {
-    let function_signature = format!("pub async fn {}", endpoint_abi.rust_method_name);
     let mut updated_content = file_content.to_string();
+
+    println!("Inserting endpoint with name {:?}", endpoint_abi.name);
 
     let new_function = {
         let mut function_buffer = String::new();
@@ -242,31 +299,76 @@ fn insert_or_replace_function(
         function_buffer
     };
 
-    if let Some(start) = file_content.find(&function_signature) {
-        // remove existing function
-        let mut balance = 0;
-        let mut end = start;
-        for (i, c) in file_content[start..].char_indices() {
-            match c {
-                '{' => balance += 1,
-                '}' => {
-                    balance -= 1;
-                    if balance == 0 {
-                        end = start + i + 1;
-                        break;
-                    }
-                },
-                _ => {},
-            }
-        }
-        updated_content.replace_range(start..end, &new_function);
-    } else {
-        // append new function
-        updated_content.push_str("\n\n");
-        updated_content.push_str(&new_function);
-    }
+    updated_content.push_str(&new_function);
+    updated_content.push('\n');
 
     updated_content
+}
+
+pub(crate) fn remove_function2(snippets_dir: &Path, endpoint: &ShortEndpointAbi) {
+    let interact_lib_path = snippets_dir.join("src").join(LIB_SOURCE_FILE_NAME);
+
+    let file_content = std::fs::read_to_string(&interact_lib_path).unwrap();
+
+    // find and remove the function
+    let updated_content = find_and_remove_function(file_content, &endpoint.name);
+
+    // delete the initial file
+    std::fs::remove_file(&interact_lib_path).unwrap();
+
+    // create a new file at the same path with the updated content
+    std::fs::write(&interact_lib_path, &updated_content).unwrap();
+}
+
+pub(crate) fn find_and_remove_function(file_content: String, endpoint_name: &str) -> String {
+    let lines: Vec<&str> = file_content.lines().collect();
+
+    // find the start of the function
+    if let Some(start_index) = lines.iter().position(|line| {
+        !line.starts_with("//")
+            && !line.starts_with("/*")
+            && !line.ends_with("*/")
+            && line.contains(&format!("pub async fn {}", endpoint_name))
+    }) {
+        // find the end of the function by tracking brace balance
+        let mut balance = 0;
+        let mut end_index = start_index;
+
+        for (i, line) in lines.iter().enumerate().skip(start_index) {
+            // count opening and closing braces
+            balance += line.chars().filter(|&c| c == '{').count() as i32;
+            balance -= line.chars().filter(|&c| c == '}').count() as i32;
+
+            if balance == 0 {
+                end_index = i;
+                break;
+            }
+        }
+
+        // remove the function block including whitespace
+        let updated_lines: Vec<&str> = lines
+            .iter()
+            .enumerate()
+            .filter(|&(i, _)| i < start_index || i > end_index)
+            .map(|(_, &line)| line)
+            .collect();
+
+        // join the lines back together
+        let updated_content = updated_lines.join("\n");
+
+        println!("********");
+
+        println!("updated content after deletion {updated_content:?}");
+
+        updated_content
+    } else {
+        println!(
+            "Cannot delete function {:?} from the file. Not found",
+            endpoint_name
+        );
+
+        file_content
+    }
 }
 
 pub(crate) fn write_endpoint_impl_to_string(
@@ -274,6 +376,10 @@ pub(crate) fn write_endpoint_impl_to_string(
     endpoint_abi: &ShortEndpointAbi,
     name: &String,
 ) {
+    println!(
+        "Writing endpoint impl for function with name {:?}",
+        endpoint_abi.rust_method_name
+    );
     write_method_declaration_to_string(buffer, &endpoint_abi.rust_method_name);
     write_payments_declaration_to_string(buffer, &endpoint_abi.payable_in_tokens);
     write_endpoint_args_declaration_to_string(buffer, &endpoint_abi.inputs);
