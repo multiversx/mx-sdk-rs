@@ -2,7 +2,7 @@ use multiversx_sc::api::{const_handles, RawHandle, SendApi, SendApiImpl};
 
 use crate::{
     api::{VMHooksApi, VMHooksApiBackend},
-    executor::debug::ContractDebugInstance,
+    executor::debug::ContractDebugInstanceState,
 };
 
 impl<VHB: VMHooksApiBackend> SendApi for VMHooksApi<VHB> {
@@ -95,9 +95,9 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
         callback_closure_handle: RawHandle,
     ) {
         let (success_offset, success_length) =
-            ContractDebugInstance::main_memory_ptr(success_callback.as_bytes());
+            ContractDebugInstanceState::main_memory_ptr(success_callback.as_bytes());
         let (error_offset, error_length) =
-            ContractDebugInstance::main_memory_ptr(error_callback.as_bytes());
+            ContractDebugInstanceState::main_memory_ptr(error_callback.as_bytes());
         self.with_vm_hooks(|vh| {
             vh.managed_create_async_call(
                 to_handle,

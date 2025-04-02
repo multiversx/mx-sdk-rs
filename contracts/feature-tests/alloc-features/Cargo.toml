@@ -16,6 +16,7 @@ features = ["alloc"]
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.57.0"
 path = "../../../framework/scenario"
+features = ["wasmer-experimental"]
 
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"

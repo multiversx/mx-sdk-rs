@@ -207,7 +207,4 @@ fn test_price_aggregator_submit() {
         100,
         rand::random::<u64>(),
     );
-    state
-        .world
-        .write_scenario_trace("scenarios/stress_submit_test.scen.json");
 }

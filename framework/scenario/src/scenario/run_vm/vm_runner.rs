@@ -1,8 +1,14 @@
-use multiversx_chain_vm::host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef};
+use multiversx_chain_vm::{
+    executor_impl::{ExperimentalExecutor, WasmerProdExecutor},
+    host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef},
+};
 use multiversx_chain_vm_executor::Executor;
 
 use crate::{
-    executor::debug::{ContractDebugExecutor, ContractMapRef},
+    executor::{
+        composite::CompositeExecutor,
+        debug::{ContractDebugExecutor, ContractMapRef},
+    },
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
 };
@@ -11,8 +17,12 @@ use crate::{
 pub enum ScenarioExecutorConfig {
     #[default]
     Debugger,
-    // #[default]
-    Wasmer,
+    WasmerProd,
+    Experimental,
+    TryDebuggerThenWasmerProd,
+    TryWasmerProdThenDebugger,
+    TryDebuggerThenExperimental,
+    TryExperimentalThenDebugger,
 }
 
 /// Wraps calls to the blockchain mock,
@@ -22,16 +32,6 @@ pub struct ScenarioVMRunner {
     pub contract_map_ref: ContractMapRef,
     pub blockchain_mock: BlockchainMock,
     pub executor_config: ScenarioExecutorConfig,
-}
-
-#[cfg(feature = "wasmer")]
-fn wasmer_executor(weak: RuntimeWeakRef) -> Box<dyn Executor + Send + Sync> {
-    Box::new(multiversx_chain_vm::wasmer::WasmerAltExecutor::new(weak))
-}
-
-#[cfg(not(feature = "wasmer"))]
-fn wasmer_executor(_: RuntimeWeakRef) -> Box<dyn Executor + Send + Sync> {
-    panic!("Wasmer executor not available, need to add features = [\"wasmer\"] to multiversx-sc-scenario")
 }
 
 impl ScenarioVMRunner {
@@ -55,7 +55,44 @@ impl ScenarioVMRunner {
                 weak,
                 self.contract_map_ref.clone(),
             )),
-            ScenarioExecutorConfig::Wasmer => wasmer_executor(weak),
+            ScenarioExecutorConfig::WasmerProd => Box::new(WasmerProdExecutor::new(weak)),
+            ScenarioExecutorConfig::Experimental => Box::new(ExperimentalExecutor::new(weak)),
+            ScenarioExecutorConfig::TryDebuggerThenWasmerProd => {
+                Box::new(CompositeExecutor::new(vec![
+                    Box::new(ContractDebugExecutor::new(
+                        weak.clone(),
+                        self.contract_map_ref.clone(),
+                    )),
+                    Box::new(WasmerProdExecutor::new(weak)),
+                ]))
+            },
+            ScenarioExecutorConfig::TryWasmerProdThenDebugger => {
+                Box::new(CompositeExecutor::new(vec![
+                    Box::new(WasmerProdExecutor::new(weak.clone())),
+                    Box::new(ContractDebugExecutor::new(
+                        weak,
+                        self.contract_map_ref.clone(),
+                    )),
+                ]))
+            },
+            ScenarioExecutorConfig::TryDebuggerThenExperimental => {
+                Box::new(CompositeExecutor::new(vec![
+                    Box::new(ContractDebugExecutor::new(
+                        weak.clone(),
+                        self.contract_map_ref.clone(),
+                    )),
+                    Box::new(ExperimentalExecutor::new(weak)),
+                ]))
+            },
+            ScenarioExecutorConfig::TryExperimentalThenDebugger => {
+                Box::new(CompositeExecutor::new(vec![
+                    Box::new(ExperimentalExecutor::new(weak.clone())),
+                    Box::new(ContractDebugExecutor::new(
+                        weak,
+                        self.contract_map_ref.clone(),
+                    )),
+                ]))
+            },
         }
     }
 

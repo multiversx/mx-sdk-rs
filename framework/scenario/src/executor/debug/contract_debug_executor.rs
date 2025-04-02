@@ -24,16 +24,18 @@ impl ContractDebugExecutor {
             contract_map_ref,
         }
     }
+
+    pub fn new_contract_container_instance(
+        &self,
+        contract_container: ContractContainerRef,
+    ) -> Box<dyn Instance> {
+        let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
+        let instance = ContractDebugInstance::new(tx_context_ref, contract_container);
+        Box::new(instance)
+    }
 }
 
 impl Executor for ContractDebugExecutor {
-    fn set_vm_hooks_ptr(
-        &mut self,
-        _vm_hooks_ptr: *mut std::ffi::c_void,
-    ) -> Result<(), ExecutorError> {
-        todo!()
-    }
-
     fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
         Ok(())
     }
@@ -43,10 +45,13 @@ impl Executor for ContractDebugExecutor {
         wasm_bytes: &[u8],
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
-        let contract_container = self.contract_map_ref.lock().get_contract(wasm_bytes);
-        let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
-        let instance = ContractDebugInstance::new(tx_context_ref, contract_container);
-        Ok(Box::new(instance))
+        if let Some(contract_container) = self.contract_map_ref.lock().get_contract(wasm_bytes) {
+            Ok(self.new_contract_container_instance(contract_container))
+        } else {
+            Err(Box::new(ContractDebugExecutorNotRegisteredError::new(
+                wasm_bytes,
+            )))
+        }
     }
 
     fn new_instance_from_cache(

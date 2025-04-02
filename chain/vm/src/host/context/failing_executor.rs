@@ -8,13 +8,6 @@ use multiversx_chain_vm_executor::Executor;
 pub struct FailingExecutor;
 
 impl Executor for FailingExecutor {
-    fn set_vm_hooks_ptr(
-        &mut self,
-        _vm_hooks_ptr: *mut std::ffi::c_void,
-    ) -> Result<(), multiversx_chain_vm_executor::ExecutorError> {
-        panic!("called FailingExecutor")
-    }
-
     fn set_opcode_cost(
         &mut self,
         _opcode_cost: &multiversx_chain_vm_executor::OpcodeCost,

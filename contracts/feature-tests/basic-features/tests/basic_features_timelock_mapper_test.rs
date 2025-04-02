@@ -179,10 +179,6 @@ fn timelock_mapper_test() {
 
     // future value is empty
     assert!(state.get_future_value() == BigUint::zero());
-
-    state
-        .world
-        .write_scenario_trace("scenarios/timelock_mapper.scen.json");
 }
 
 #[test]
@@ -216,8 +212,4 @@ fn timelock_mapper_at_address_test() {
     assert!(state.get_current_value_at_address(BASIC_FEATURES_ADDRESS) == future_value);
     assert!(state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == BigUint::zero());
     assert!(state.get_unlock_timestamp_at_address(BASIC_FEATURES_ADDRESS) == 10u64);
-
-    state
-        .world
-        .write_scenario_trace("scenarios/timelock_mapper_at_address.scen.json");
 }
