@@ -1,37 +1,42 @@
 use super::attributes::*;
-use crate::model::{ArgMetadata, ArgPaymentMetadata, MethodArgument};
+use crate::model::{ArgMetadata, ArgPaymentMetadata, MethodArgument, MethodMutability};
 
-pub fn extract_method_args(m: &syn::TraitItemFn) -> Vec<MethodArgument> {
+pub fn extract_method_args(m: &syn::TraitItemFn) -> (MethodMutability, Vec<MethodArgument>) {
     if m.sig.inputs.is_empty() {
         missing_self_panic(m);
     }
 
-    let mut receiver_processed = false;
-    m.sig
+    let mut receiver_mutability = Option::<MethodMutability>::None;
+    let arguments = m
+        .sig
         .inputs
         .iter()
         .filter_map(|arg| match arg {
             syn::FnArg::Receiver(selfref) => {
-                if selfref.mutability.is_some() || receiver_processed {
-                    missing_self_panic(m);
+                if selfref.mutability.is_some() {
+                    receiver_mutability = Some(MethodMutability::Mutable);
+                } else {
+                    receiver_mutability = Some(MethodMutability::Readonly);
                 }
-                receiver_processed = true;
                 None
             },
             syn::FnArg::Typed(pat_typed) => {
-                if !receiver_processed {
+                if receiver_mutability.is_none() {
                     missing_self_panic(m);
                 }
 
                 Some(extract_method_arg(pat_typed))
             },
         })
-        .collect()
+        .collect();
+
+    let method_mutability = receiver_mutability.unwrap_or_else(|| missing_self_panic(m));
+    (method_mutability, arguments)
 }
 
 fn missing_self_panic(m: &syn::TraitItemFn) -> ! {
     panic!(
-        "Trait method `{}` must have `&self` as its first argument.",
+        "Trait method `{}` must have `&self` or `&mut self` as its first argument.",
         m.sig.ident
     )
 }

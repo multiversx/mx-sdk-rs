@@ -1,4 +1,6 @@
-use crate::model::{Method, MethodImpl, MethodPayableMetadata, PublicRole, TraitProperties};
+use crate::model::{
+    Method, MethodImpl, MethodMutability, MethodPayableMetadata, PublicRole, TraitProperties,
+};
 
 use super::{
     attributes::extract_doc,
@@ -25,7 +27,7 @@ pub struct MethodAttributesPass1 {
 }
 
 pub fn process_method(m: &syn::TraitItemFn, trait_attributes: &TraitProperties) -> Method {
-    let method_args = extract_method_args(m);
+    let (method_mutability, method_args) = extract_method_args(m);
 
     let implementation = if let Some(body) = m.default.clone() {
         MethodImpl::Explicit(body)
@@ -55,6 +57,7 @@ pub fn process_method(m: &syn::TraitItemFn, trait_attributes: &TraitProperties) 
         name: m.sig.ident.clone(),
         generics: m.sig.generics.clone(),
         unprocessed_attributes: Vec::new(),
+        method_mutability,
         method_args,
         title: None,
         output_names: Vec::new(),
@@ -138,12 +141,17 @@ fn process_attribute_second_pass(
 }
 
 fn validate_method(method: &Method) {
+    let method_name = method.name.to_string();
+
+    if !method.accepts_mut_self() {
+        assert!(
+            method.method_mutability == MethodMutability::Readonly,
+            "Method '{method_name}' cannot take &mut self, since it is declared as readonly",
+        );
+    }
+
     assert!(
-        matches!(
-            method.public_role,
-            PublicRole::Init(_) | PublicRole::Endpoint(_) | PublicRole::CallbackPromise(_) | PublicRole::Upgrade(_)
-                ) || method.label_names.is_empty(),
-        "Labels can only be placed on endpoints, constructors, and promises callbacks. Method '{}' is neither.",
-        &method.name.to_string()
+        method.accepts_labels() || method.label_names.is_empty(),
+        "Labels can only be placed on endpoints, constructors, and promises callbacks. Method '{method_name}' is neither",
     )
 }
