@@ -2,12 +2,17 @@ mod system_sc_interact_cli;
 mod system_sc_interact_config;
 mod system_sc_interact_state;
 
+use std::collections::HashMap;
+
 use clap::Parser;
 pub use system_sc_interact_cli::NftDummyAttributes;
 pub use system_sc_interact_config::Config;
 use system_sc_interact_state::State;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{
+    imports::*,
+    sdk::{data::esdt::EsdtBalance, utils::base64_decode},
+};
 
 pub async fn system_sc_interact_cli() {
     env_logger::init();
@@ -131,7 +136,7 @@ pub async fn system_sc_interact_cli() {
                         creation_epoch: 2u64,
                         cool_factor: 3u8,
                     },
-                    Vec::new(),
+                    &Vec::new(),
                 )
                 .await;
         },
@@ -746,12 +751,12 @@ impl SysFuncCallsInteract {
         royalties: u64,
         hash: &[u8],
         attributes: &T,
-        uris: Vec<String>,
+        uris: &[String],
     ) -> u64 {
         println!("Minting NFT...");
 
         let uris = uris
-            .into_iter()
+            .iter()
             .map(ManagedBuffer::from)
             .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
@@ -860,11 +865,11 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    pub async fn set_new_uris(&mut self, token_id: &[u8], nonce: u64, new_uris: Vec<String>) {
+    pub async fn set_new_uris(&mut self, token_id: &[u8], nonce: u64, new_uris: &[String]) {
         println!("Setting new uris for token {token_id:?} with nonce {nonce:?}...");
 
         let uris = new_uris
-            .into_iter()
+            .iter()
             .map(ManagedBuffer::from)
             .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
@@ -917,12 +922,12 @@ impl SysFuncCallsInteract {
         royalties: u64,
         hash: &[u8],
         new_attributes: &T,
-        uris: Vec<String>,
+        uris: &[String],
     ) {
         println!("Recreating the token {token_id:?} with nonce {nonce:?} with new attributes...");
 
         let uris = uris
-            .into_iter()
+            .iter()
             .map(ManagedBuffer::from)
             .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
@@ -946,12 +951,12 @@ impl SysFuncCallsInteract {
         royalties: u64,
         hash: &[u8],
         new_attributes: &T,
-        uris: Vec<String>,
+        uris: &[String],
     ) {
         println!("Updating the token {token_id:?} with nonce {nonce:?} with new attributes...");
 
         let uris = uris
-            .into_iter()
+            .iter()
             .map(ManagedBuffer::from)
             .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
@@ -964,5 +969,48 @@ impl SysFuncCallsInteract {
             .esdt_metadata_update(token_id, nonce, name, royalties, hash, new_attributes, uris)
             .run()
             .await;
+    }
+
+    pub async fn get_account_esdt_tokens(&mut self) -> HashMap<String, EsdtBalance> {
+        println!(
+            "Retrieving ESDT tokens for {}...",
+            self.wallet_address.to_bech32_str()
+        );
+
+        self.interactor
+            .get_account_esdt(&self.wallet_address.to_address())
+            .await
+    }
+
+    pub async fn check_nft_uris(
+        &mut self,
+        token_id: &String,
+        nonce: u64,
+        expected_uris: &[String],
+    ) {
+        let esdt_tokens = self.get_account_esdt_tokens().await;
+        let nft_token_id = if nonce <= 10 {
+            format!("{}-0{:x}", token_id, nonce)
+        } else {
+            format!("{}-{:x}", token_id, nonce)
+        };
+
+        let uris = esdt_tokens
+            .get(&nft_token_id)
+            .expect("nft token not owned by account")
+            .uris
+            .clone();
+
+        if expected_uris.is_empty() {
+            assert_eq!(1, uris.len());
+            assert_eq!(String::new(), uris[0]);
+            return;
+        }
+
+        assert_eq!(expected_uris.len(), uris.len());
+        for (index, uri) in uris.iter().enumerate() {
+            let uri_string = String::from_utf8(base64_decode(uri)).unwrap();
+            assert_eq!(expected_uris[index], uri_string);
+        }
     }
 }

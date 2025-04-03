@@ -7,6 +7,7 @@ use std::collections::HashMap;
 pub struct EsdtBalance {
     pub token_identifier: String,
     pub balance: String,
+    pub uris: Vec<String>,
 }
 
 // EsdtBalanceDataholds the esdt balance data
