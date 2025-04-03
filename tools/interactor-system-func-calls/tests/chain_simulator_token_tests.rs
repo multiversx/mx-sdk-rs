@@ -96,7 +96,7 @@ async fn cs_builtin_func_tokens_test() {
                 creation_epoch: 2u64,
                 cool_factor: 3u8,
             },
-            &Vec::new(),
+            &[],
         )
         .await;
 
@@ -278,7 +278,7 @@ async fn modify_creator() {
                 creation_epoch: 2u64,
                 cool_factor: 3u8,
             },
-            &Vec::new(),
+            &[],
         )
         .await;
 
