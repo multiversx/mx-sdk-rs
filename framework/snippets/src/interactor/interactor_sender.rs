@@ -4,7 +4,10 @@ use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
 use log::debug;
 use multiversx_sc_scenario::multiversx_sc::types::Address;
 use multiversx_sdk::data::account::Account;
-use multiversx_sdk::gateway::{GatewayAsyncService, GetAccountRequest, GetAccountStorageRequest};
+use multiversx_sdk::data::esdt::EsdtBalance;
+use multiversx_sdk::gateway::{
+    GatewayAsyncService, GetAccountEsdtTokensRequest, GetAccountRequest, GetAccountStorageRequest,
+};
 
 use crate::InteractorBase;
 
@@ -38,6 +41,13 @@ where
     pub async fn get_account_storage(&self, address: &Address) -> HashMap<String, String> {
         self.proxy
             .request(GetAccountStorageRequest::new(address))
+            .await
+            .expect("failed to retrieve account")
+    }
+
+    pub async fn get_account_esdt(&self, address: &Address) -> HashMap<String, EsdtBalance> {
+        self.proxy
+            .request(GetAccountEsdtTokensRequest::new(address))
             .await
             .expect("failed to retrieve account")
     }
