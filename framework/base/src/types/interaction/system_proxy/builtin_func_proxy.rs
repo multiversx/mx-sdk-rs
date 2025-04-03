@@ -301,7 +301,7 @@ where
         new_attributes: &T,
         uris: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let tx = self
+        let mut tx = self
             .wrapped_tx
             .payment(NotPayable)
             .raw_call(ESDT_METADATA_RECREATE_FUNC_NAME)
@@ -310,8 +310,18 @@ where
             .argument(&name)
             .argument(&royalties)
             .argument(&hash)
-            .argument(&new_attributes)
-            .argument(&uris);
+            .argument(&new_attributes);
+
+        if uris.is_empty() {
+            // at least one URI is required, so we push an empty one
+            tx = tx.argument(&Empty);
+        } else {
+            // The API function has the last argument as variadic,
+            // so we top-encode each and send as separate argument
+            for uri in uris {
+                tx = tx.argument(&uri);
+            }
+        }
 
         tx.original_result()
     }
@@ -334,7 +344,7 @@ where
         new_attributes: &T,
         uris: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let tx = self
+        let mut tx = self
             .wrapped_tx
             .payment(NotPayable)
             .raw_call(ESDT_METADATA_UPDATE_FUNC_NAME)
@@ -343,8 +353,18 @@ where
             .argument(&name)
             .argument(&royalties)
             .argument(&hash)
-            .argument(&new_attributes)
-            .argument(&uris);
+            .argument(&new_attributes);
+
+        if uris.is_empty() {
+            // at least one URI is required, so we push an empty one
+            tx = tx.argument(&Empty);
+        } else {
+            // The API function has the last argument as variadic,
+            // so we top-encode each and send as separate argument
+            for uri in uris {
+                tx = tx.argument(&uri);
+            }
+        }
 
         tx.original_result()
     }
