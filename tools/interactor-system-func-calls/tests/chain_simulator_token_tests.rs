@@ -174,11 +174,11 @@ async fn cs_builtin_func_tokens_test() {
                 creation_epoch: 100u64,
                 cool_factor: 1u8,
             },
-            &vec![],
+            &[],
         )
         .await;
     interact
-        .check_nft_uris(&dynamic_nft_token_id, nonce, &vec![])
+        .check_nft_uris(&dynamic_nft_token_id, nonce, &[])
         .await;
     println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
 }
