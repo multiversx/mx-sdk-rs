@@ -11,10 +11,8 @@ use crate::cli::{
 use self::install_scenario_go::ScenarioGoInstaller;
 
 pub async fn install(args: &InstallArgs) {
-    let command = args
-        .command
-        .as_ref()
-        .expect("command expected after `install`");
+    // validated before, can unwrap directly
+    let command = args.command.as_ref().unwrap();
 
     match command {
         InstallCommand::All => {

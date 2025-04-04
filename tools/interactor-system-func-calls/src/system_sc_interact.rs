@@ -255,6 +255,26 @@ impl SysFuncCallsInteract {
         }
     }
 
+    pub async fn get_token_properties(&mut self, token_id: &[u8]) -> TokenPropertiesResult {
+        println!("Fetching token properties of token {token_id:?}...");
+
+        let res = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .get_token_properties(token_id)
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        println!("Token properties: {:?}", res);
+
+        res
+    }
+
     pub async fn issue_fungible_token(
         &mut self,
         issue_cost: RustBigUint,
