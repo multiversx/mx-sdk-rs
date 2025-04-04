@@ -328,3 +328,39 @@ async fn transfer_role() {
     // get roles
     interact.get_roles(dynamic_nft_token_id.as_bytes()).await;
 }
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn get_token_properties() {
+    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
+
+    // issue dynamic NFT
+    let dynamic_meta_esdt_token_id = interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTMETA",
+            b"TEST",
+            EsdtTokenType::DynamicMeta,
+            18usize,
+        )
+        .await;
+
+    // get properties
+    let token_properties = interact
+        .get_token_properties(dynamic_meta_esdt_token_id.as_bytes())
+        .await;
+
+    assert!(token_properties.num_decimals == 18usize);
+    assert!(!token_properties.is_paused);
+    assert!(token_properties.can_upgrade);
+    assert!(!token_properties.can_mint);
+    assert!(!token_properties.can_burn);
+    assert!(!token_properties.can_change_owner);
+    assert!(!token_properties.can_pause);
+    assert!(!token_properties.can_freeze);
+    assert!(!token_properties.can_wipe);
+    assert!(token_properties.can_add_special_roles);
+    assert!(!token_properties.can_transfer_nft_create_role);
+    assert!(!token_properties.nft_create_stopped);
+    assert!(token_properties.num_wiped == 0usize);
+}
