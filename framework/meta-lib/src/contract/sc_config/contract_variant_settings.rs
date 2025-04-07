@@ -36,6 +36,9 @@ pub struct ContractVariantSettings {
     pub kill_legacy_callback: bool,
 
     pub profile: ContractVariantProfile,
+
+    /// Allows the contract to be built with std.
+    pub std: bool,
 }
 
 impl Default for ContractVariantSettings {
@@ -50,6 +53,7 @@ impl Default for ContractVariantSettings {
             default_features: None,
             kill_legacy_callback: false,
             profile: Default::default(),
+            std: false,
         }
     }
 }
