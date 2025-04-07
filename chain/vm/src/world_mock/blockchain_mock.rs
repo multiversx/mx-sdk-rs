@@ -1,5 +1,5 @@
 use crate::tx_execution::BlockchainVMRef;
-use multiversx_chain_vm_executor::Executor;
+use multiversx_chain_vm_executor::ExecutorFull;
 use std::{fmt::Debug, ops::Deref};
 
 use super::{BlockchainStateRef, FailingExecutor};
@@ -10,7 +10,7 @@ pub struct BlockchainMock {
 }
 
 impl BlockchainMock {
-    pub fn new(executor: Box<dyn Executor + Send + Sync>) -> Self {
+    pub fn new(executor: Box<dyn ExecutorFull + Send + Sync>) -> Self {
         BlockchainMock {
             vm: BlockchainVMRef::new(executor),
             state: Default::default(),

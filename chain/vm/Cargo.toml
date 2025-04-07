@@ -40,3 +40,5 @@ path = "../core"
 
 [dependencies.multiversx-chain-vm-executor]
 version = "0.3.0"
+git = "https://github.com/multiversx/mx-vm-executor-rs"
+rev = "bc6e8f7d7f9d670b965b39688d0fbe2875f3905f"

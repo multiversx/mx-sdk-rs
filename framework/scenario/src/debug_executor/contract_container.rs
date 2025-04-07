@@ -1,5 +1,7 @@
 use multiversx_chain_vm::tx_mock::{TxContextRef, TxFunctionName, TxPanic};
-use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
+use multiversx_chain_vm_executor::{
+    BreakpointValue, ExecutorError, Instance, InstanceFull, MemLength, MemPtr,
+};
 use multiversx_sc::{chain_core::types::ReturnCode, contract_base::CallableContract};
 use std::sync::Arc;
 
@@ -72,7 +74,7 @@ impl ContractContainerRef {
     }
 }
 
-impl Instance for ContractContainerRef {
+impl InstanceFull for ContractContainerRef {
     fn call(&self, func_name: &str) -> Result<(), String> {
         let tx_func_name = TxFunctionName::from(func_name);
 
@@ -142,6 +144,63 @@ impl Instance for ContractContainerRef {
 
     fn set_breakpoint_value(&self, _value: BreakpointValue) -> Result<(), String> {
         panic!("ContractContainerRef set_breakpoint_value not supported")
+    }
+
+    fn get_breakpoint_value(&self) -> Result<BreakpointValue, String> {
+        panic!("ContractContainerRef get_breakpoint_value not supported")
+    }
+
+    fn reset(&self) -> Result<(), String> {
+        panic!("ContractContainerRef reset not supported")
+    }
+
+    fn cache(&self) -> Result<Vec<u8>, String> {
+        panic!("ContractContainerRef cache not supported")
+    }
+
+    fn state_ref(&self) -> Box<dyn multiversx_chain_vm_executor::InstanceState + '_> {
+        todo!()
+    }
+}
+
+impl Instance for ContractContainerRef {
+    fn call(&self, func_name: &str) -> Result<(), String> {
+        let tx_func_name = TxFunctionName::from(func_name);
+
+        contract_instance_wrapped_execution(self.0.panic_message, || {
+            let call_successful = self.0.call(&tx_func_name);
+            if call_successful {
+                Ok(())
+            } else {
+                Err(TxPanic::new(
+                    ReturnCode::FunctionNotFound,
+                    "invalid function (not found)",
+                ))
+            }
+        });
+
+        Ok(())
+    }
+
+    fn check_signatures(&self) -> bool {
+        true
+    }
+
+    fn has_function(&self, func_name: &str) -> bool {
+        let tx_func_name = TxFunctionName::from(func_name);
+        self.0.validate_function_name(&tx_func_name)
+    }
+
+    fn get_exported_function_names(&self) -> Vec<String> {
+        panic!("ContractContainer get_exported_function_names not yet supported")
+    }
+
+    fn set_points_limit(&self, _limit: u64) -> Result<(), String> {
+        panic!("ContractContainerRef set_points_limit not supported")
+    }
+
+    fn get_points_used(&self) -> Result<u64, String> {
+        panic!("ContractContainerRef get_points_used not supported")
     }
 
     fn get_breakpoint_value(&self) -> Result<BreakpointValue, String> {

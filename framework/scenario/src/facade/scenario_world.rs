@@ -32,6 +32,26 @@ impl Default for ScenarioWorld {
 }
 
 impl ScenarioWorld {
+    pub fn debugger_wasmer2() -> Self {
+        ScenarioWorld {
+            current_dir: std::env::current_dir().unwrap(),
+            backend: Backend::Debugger(Box::new(DebuggerBackend {
+                vm_runner: ScenarioVMRunner::new_wasmer2(),
+                trace: None,
+            })),
+        }
+    }
+
+    pub fn debugger_wasmer5() -> Self {
+        ScenarioWorld {
+            current_dir: std::env::current_dir().unwrap(),
+            backend: Backend::Debugger(Box::new(DebuggerBackend {
+                vm_runner: ScenarioVMRunner::new_wasmer5(),
+                trace: None,
+            })),
+        }
+    }
+
     pub fn debugger() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),

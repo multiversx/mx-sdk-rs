@@ -1,8 +1,10 @@
 use super::*;
 
 use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
+    CompilationOptions, Executor, ExecutorError, ExecutorFull, Instance, InstanceFull, OpcodeCost,
 };
+// use multiversx_chain_vm_executor_wasmer::WasmerInstance;
+// use multiversx_chain_vm_executor_wasmer_experimental::ExperimentalInstance;
 use std::{
     collections::HashMap,
     fmt,
@@ -81,7 +83,7 @@ impl ContractMapRef {
     }
 }
 
-impl Executor for ContractMapRef {
+impl ExecutorFull for ContractMapRef {
     fn set_vm_hooks_ptr(
         &mut self,
         _vm_hooks_ptr: *mut std::ffi::c_void,
@@ -97,7 +99,31 @@ impl Executor for ContractMapRef {
         &self,
         wasm_bytes: &[u8],
         _compilation_options: &CompilationOptions,
+    ) -> Result<Box<dyn InstanceFull>, ExecutorError> {
+        Ok(Box::new(self.lock().get_contract(wasm_bytes)))
+    }
+
+    fn new_instance_from_cache(
+        &self,
+        _cache_bytes: &[u8],
+        _compilation_options: &CompilationOptions,
+    ) -> Result<Box<dyn InstanceFull>, ExecutorError> {
+        panic!("ContractMap new_instance_from_cache not supported")
+    }
+}
+
+impl Executor for ContractMapRef {
+    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
+        Ok(())
+    }
+
+    fn new_instance(
+        &self,
+        wasm_bytes: &[u8],
+        _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
+        // Ok(Box::new(WasmerInstance::try_new_instance(executor_data, wasm_bytes, compilation_options)))
+        // Ok(Box::new(ExperimentalInstance::try_new_instance(vm_hooks_builder, opcode_cost, wasm_bytes, compilation_options)))
         Ok(Box::new(self.lock().get_contract(wasm_bytes)))
     }
 

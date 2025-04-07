@@ -1,3 +1,7 @@
+use multiversx_chain_vm_executor::ExecutorFull;
+use multiversx_chain_vm_executor::{GasSchedule, OpcodeCost};
+use multiversx_chain_vm_executor_wasmer::WasmerExecutor;
+
 use crate::{
     debug_executor::ContractMapRef,
     multiversx_chain_vm::BlockchainMock,
@@ -14,6 +18,27 @@ pub struct ScenarioVMRunner {
 
 impl ScenarioVMRunner {
     pub fn new() -> Self {
+        let contract_map_ref = ContractMapRef::new();
+        let blockchain_mock = BlockchainMock::new(Box::new(contract_map_ref.clone()));
+        ScenarioVMRunner {
+            contract_map_ref,
+            blockchain_mock,
+        }
+    }
+
+    pub fn new_wasmer2() -> Self {
+        let contract_map_ref = ContractMapRef::new();
+        let executor = WasmerExecutor::new(vm_hooks);
+        executor.set_opcode_cost(&OpcodeCost::new(GasSchedule::V8));
+        let blockchain_mock = BlockchainMock::new(Box::new(executor));
+
+        ScenarioVMRunner {
+            contract_map_ref,
+            blockchain_mock,
+        }
+    }
+
+    pub fn new_wasmer5() -> Self {
         let contract_map_ref = ContractMapRef::new();
         let blockchain_mock = BlockchainMock::new(Box::new(contract_map_ref.clone()));
         ScenarioVMRunner {

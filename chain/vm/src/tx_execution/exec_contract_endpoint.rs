@@ -1,4 +1,4 @@
-use multiversx_chain_vm_executor::{CompilationOptions, Instance};
+use multiversx_chain_vm_executor::{CompilationOptions, InstanceFull};
 
 use crate::{
     display_util::address_hex,
@@ -15,7 +15,7 @@ const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     opcode_trace: false,
     metering: false,
     runtime_breakpoints: false,
-};
+}; //
 
 impl BlockchainVMRef {
     /// Runs contract code using the auto-generated function selector.
@@ -25,7 +25,7 @@ impl BlockchainVMRef {
         TxContextStack::execute_on_vm_stack(tx_context, execute_current_tx_context_input)
     }
 
-    pub fn get_contract_instance(&self, tx_context: &TxContext) -> Box<dyn Instance> {
+    pub fn get_contract_instance(&self, tx_context: &TxContext) -> Box<dyn InstanceFull> {
         let contract_code = get_contract_identifier(tx_context);
         self.executor
             .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
