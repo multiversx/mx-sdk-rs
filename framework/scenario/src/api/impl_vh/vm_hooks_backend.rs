@@ -1,7 +1,7 @@
 use multiversx_chain_vm::executor::VMHooks;
 use multiversx_sc::api::HandleConstraints;
 
-use crate::debug_executor::StaticVarData;
+use crate::executor::debug::StaticVarData;
 
 pub trait VMHooksApiBackend: Clone + Send + Sync + 'static {
     /// We use a single handle type for all handles.

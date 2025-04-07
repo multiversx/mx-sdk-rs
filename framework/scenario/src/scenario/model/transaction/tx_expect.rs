@@ -7,7 +7,7 @@ use crate::{
     },
     scenario_model::Checkable,
 };
-use multiversx_chain_vm::tx_mock::result_values_to_string;
+use multiversx_chain_vm::host::context::result_values_to_string;
 use multiversx_sc::chain_core::types::ReturnCode;
 
 #[derive(Debug, Clone)]
