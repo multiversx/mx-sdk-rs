@@ -81,6 +81,7 @@ impl ContractVariantBuilder {
                     default_features: cms.default_features,
                     kill_legacy_callback: cms.kill_legacy_callback,
                     profile: ContractVariantProfile::from_serde(&cms.profile),
+                    std: cms.std.unwrap_or(default.settings.std),
                 },
                 ..default
             },
@@ -315,7 +316,6 @@ impl ScConfig {
         path: &Path,
         config: &ScConfigSerde,
         original_abi: &ContractAbi,
-        std: bool,
     ) -> Self {
         if config.settings.main.is_some() {
             print_sc_config_main_deprecated(path);
@@ -324,7 +324,6 @@ impl ScConfig {
         ScConfig {
             contracts: process_contracts(config, original_abi),
             proxy_configs: process_proxy_contracts(config, original_abi),
-            std,
         }
     }
 }
@@ -370,7 +369,6 @@ impl ScConfig {
                 abi: original_abi.clone(),
             }],
             proxy_configs: Vec::new(),
-            std: false,
         }
     }
 
@@ -384,7 +382,6 @@ impl ScConfig {
                     path.as_ref(),
                     &config_serde,
                     original_abi,
-                    config_serde.std,
                 ))
             },
             Err(_) => None,

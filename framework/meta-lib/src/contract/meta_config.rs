@@ -92,7 +92,7 @@ impl MetaConfig {
 impl MetaConfig {
     fn generate_wasm_src_lib(&self) {
         for contract_variant in &self.sc_config.contracts {
-            contract_variant.generate_wasm_src_lib_file(self.sc_config.std);
+            contract_variant.generate_wasm_src_lib_file();
         }
     }
 

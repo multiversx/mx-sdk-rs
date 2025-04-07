@@ -92,8 +92,7 @@ fn test_sc_config() {
     let serde = get_serialized_toml();
     let abi = get_contract_abi();
 
-    let contract_config =
-        ScConfig::load_from_config(PathBuf::default().as_path(), &serde, &abi, false);
+    let contract_config = ScConfig::load_from_config(PathBuf::default().as_path(), &serde, &abi);
 
     assert_eq!(contract_config.contracts.len(), 2);
     assert!(contract_config
