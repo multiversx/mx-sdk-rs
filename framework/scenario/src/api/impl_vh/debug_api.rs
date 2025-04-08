@@ -5,10 +5,11 @@ use multiversx_chain_vm::{
     host::context::{TxContextRef, TxPanic},
     host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
 };
-use multiversx_chain_vm_executor::Instance;
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::executor::debug::{ContractDebugInstance, ContractDebugStack, StaticVarData};
+use crate::executor::debug::{
+    ContractDebugInstance, ContractDebugInstanceState, ContractDebugStack, StaticVarData,
+};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
@@ -24,12 +25,10 @@ impl VMHooksApiBackend for DebugApiBackend {
     {
         let instance = ContractDebugStack::static_peek();
         let tx_context_ref = instance.tx_context_ref.clone();
-        let instance_rc: Rc<Box<dyn Instance>> = Rc::new(Box::new(instance));
-        let handler = TxContextVMHooksHandler::new(tx_context_ref, Rc::downgrade(&instance_rc));
+        let handler =
+            TxContextVMHooksHandler::new(tx_context_ref, Rc::new(ContractDebugInstanceState));
         let dispatcher = VMHooksDispatcher::new(Box::new(handler));
-        let result = f(&dispatcher);
-        std::mem::drop(instance_rc); // making sure the strong reference survives long enough
-        result
+        f(&dispatcher)
     }
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
@@ -37,13 +36,10 @@ impl VMHooksApiBackend for DebugApiBackend {
         F: FnOnce(&dyn VMHooks) -> R,
     {
         let tx_context_ref = TxContextRef(handle.context.clone());
-        let instance = ContractDebugStack::find_by_tx_context(&tx_context_ref);
-        let instance_rc: Rc<Box<dyn Instance>> = Rc::new(Box::new(instance));
-        let handler = TxContextVMHooksHandler::new(tx_context_ref, Rc::downgrade(&instance_rc));
+        let handler =
+            TxContextVMHooksHandler::new(tx_context_ref, Rc::new(ContractDebugInstanceState));
         let dispatcher = VMHooksDispatcher::new(Box::new(handler));
-        let result = f(&dispatcher);
-        std::mem::drop(instance_rc); // making sure the strong reference survives long enough
-        result
+        f(&dispatcher)
     }
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R

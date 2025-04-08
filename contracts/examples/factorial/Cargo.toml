@@ -18,4 +18,4 @@ path = "../../../framework/base"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.57.0"
 path = "../../../framework/scenario"
-features = ["wasmer"]
+features = ["wasmer-experimental"]

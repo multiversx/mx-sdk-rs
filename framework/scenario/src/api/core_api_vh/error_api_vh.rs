@@ -2,7 +2,7 @@ use multiversx_sc::api::{ErrorApi, ErrorApiImpl, HandleConstraints};
 
 use crate::{
     api::{VMHooksApi, VMHooksApiBackend},
-    executor::debug::ContractDebugInstance,
+    executor::debug::ContractDebugInstanceState,
 };
 
 impl<VHB: VMHooksApiBackend> ErrorApi for VMHooksApi<VHB> {
@@ -15,7 +15,7 @@ impl<VHB: VMHooksApiBackend> ErrorApi for VMHooksApi<VHB> {
 
 impl<VHB: VMHooksApiBackend> ErrorApiImpl for VMHooksApi<VHB> {
     fn signal_error(&self, message: &[u8]) -> ! {
-        let (offset, length) = ContractDebugInstance::main_memory_ptr(message);
+        let (offset, length) = ContractDebugInstanceState::main_memory_ptr(message);
         self.with_vm_hooks(|vh| {
             vh.signal_error(offset, length);
         });

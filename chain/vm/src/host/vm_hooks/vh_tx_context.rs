@@ -1,9 +1,8 @@
-use std::rc::Weak;
 use std::sync::MutexGuard;
-use std::{fmt::Debug, ops::Deref};
+use std::{fmt::Debug, rc::Rc};
 
 use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::{BreakpointValue, Instance, MemLength, MemPtr};
+use multiversx_chain_vm_executor::{BreakpointValue, InstanceState, MemLength, MemPtr};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -30,29 +29,14 @@ use crate::{
 
 pub struct TxContextVMHooksHandler {
     tx_context_ref: TxContextRef,
-    instance_ref: Weak<Box<dyn Instance>>,
+    instance_state_ref: Rc<dyn InstanceState>,
 }
 
 impl TxContextVMHooksHandler {
-    pub fn new(tx_context_ref: TxContextRef, instance_ref: Weak<Box<dyn Instance>>) -> Self {
+    pub fn new(tx_context_ref: TxContextRef, instance_ref: Rc<dyn InstanceState>) -> Self {
         TxContextVMHooksHandler {
             tx_context_ref,
-            instance_ref,
-        }
-    }
-
-    fn instance_box_ref(&self) -> &dyn Instance {
-        assert!(
-            self.instance_ref.strong_count() > 0,
-            "instance reference dropped"
-        );
-        unsafe {
-            let box_ref = self
-                .instance_ref
-                .as_ptr()
-                .as_ref()
-                .expect("null instance pointer");
-            box_ref.deref()
+            instance_state_ref: instance_ref,
         }
     }
 }
@@ -65,13 +49,13 @@ impl Debug for TxContextVMHooksHandler {
 
 impl VMHooksHandlerSource for TxContextVMHooksHandler {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
-        self.instance_box_ref()
+        self.instance_state_ref
             .memory_load(offset, length)
             .expect("error loading memory from wasmer instance")
     }
 
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) {
-        self.instance_box_ref()
+        self.instance_state_ref
             .memory_store(mem_ptr, data)
             .expect("error writing to wasmer instance memory");
     }
@@ -87,7 +71,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             ReturnCode::UserError => BreakpointValue::SignalError,
             _ => BreakpointValue::ExecutionFailed,
         };
-        let _ = self.instance_box_ref().set_breakpoint_value(breakpoint);
+        let _ = self.instance_state_ref.set_breakpoint_value(breakpoint);
     }
 
     fn input_ref(&self) -> &TxInput {
