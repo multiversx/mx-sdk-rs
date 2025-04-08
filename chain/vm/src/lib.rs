@@ -4,6 +4,7 @@ pub mod crypto_functions;
 pub mod display_util;
 pub mod executor_impl;
 pub mod host;
+pub mod schedule;
 pub mod system_sc;
 pub mod types;
 pub mod vm_err_msg;
