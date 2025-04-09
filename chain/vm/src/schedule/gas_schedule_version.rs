@@ -18,6 +18,24 @@ impl fmt::Display for GasScheduleVersion {
     }
 }
 
+impl TryFrom<u16> for GasScheduleVersion {
+    type Error = &'static str;
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            1 => Ok(GasScheduleVersion::V1),
+            2 => Ok(GasScheduleVersion::V2),
+            3 => Ok(GasScheduleVersion::V3),
+            4 => Ok(GasScheduleVersion::V4),
+            5 => Ok(GasScheduleVersion::V5),
+            6 => Ok(GasScheduleVersion::V6),
+            7 => Ok(GasScheduleVersion::V7),
+            8 => Ok(GasScheduleVersion::V8),
+            _ => Err("Gas schedule TOML version must be between 1 and 8"),
+        }
+    }
+}
+
 impl GasScheduleVersion {
     pub fn to_content(&self) -> String {
         match self {

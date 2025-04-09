@@ -10,7 +10,7 @@ use super::{
     },
 };
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct GasSchedule {
     #[serde(rename = "BuiltInCost")]
