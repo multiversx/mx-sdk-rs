@@ -9,560 +9,560 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct BuiltInCost {
-    #[serde(rename = "ChangeOwnerAddress", default)]
+    #[serde(rename = "ChangeOwnerAddress")]
     pub change_owner_address: u64,
-    #[serde(rename = "ClaimDeveloperRewards", default)]
+    #[serde(rename = "ClaimDeveloperRewards")]
     pub claim_developer_rewards: u64,
-    #[serde(rename = "SaveUserName", default)]
+    #[serde(rename = "SaveUserName")]
     pub save_user_name: u64,
-    #[serde(rename = "SaveKeyValue", default)]
+    #[serde(rename = "SaveKeyValue")]
     pub save_key_value: u64,
-    #[serde(rename = "ESDTTransfer", default)]
+    #[serde(rename = "ESDTTransfer")]
     pub esdt_transfer: u64,
-    #[serde(rename = "ESDTBurn", default)]
+    #[serde(rename = "ESDTBurn")]
     pub esdt_burn: u64,
-    #[serde(rename = "ESDTLocalMint", default)]
+    #[serde(rename = "ESDTLocalMint")]
     pub esdt_local_mint: u64,
-    #[serde(rename = "ESDTLocalBurn", default)]
+    #[serde(rename = "ESDTLocalBurn")]
     pub esdt_local_burn: u64,
-    #[serde(rename = "ESDTNFTCreate", default)]
+    #[serde(rename = "ESDTNFTCreate")]
     pub esdtnft_create: u64,
-    #[serde(rename = "ESDTNFTAddQuantity", default)]
+    #[serde(rename = "ESDTNFTAddQuantity")]
     pub esdtnft_add_quantity: u64,
-    #[serde(rename = "ESDTNFTBurn", default)]
+    #[serde(rename = "ESDTNFTBurn")]
     pub esdtnft_burn: u64,
-    #[serde(rename = "ESDTNFTTransfer", default)]
+    #[serde(rename = "ESDTNFTTransfer")]
     pub esdtnft_transfer: u64,
-    #[serde(rename = "ESDTNFTChangeCreateOwner", default)]
+    #[serde(rename = "ESDTNFTChangeCreateOwner")]
     pub esdtnft_change_create_owner: u64,
-    #[serde(rename = "ESDTNFTAddUri", default)]
+    #[serde(rename = "ESDTNFTAddUri")]
     pub esdtnft_add_uri: u64,
-    #[serde(rename = "ESDTNFTUpdateAttributes", default)]
+    #[serde(rename = "ESDTNFTUpdateAttributes")]
     pub esdtnft_update_attributes: u64,
-    #[serde(rename = "ESDTNFTMultiTransfer", default)]
+    #[serde(rename = "ESDTNFTMultiTransfer")]
     pub esdtnft_multi_transfer: u64,
-    #[serde(rename = "MultiESDTNFTTransfer", default)]
+    #[serde(rename = "MultiESDTNFTTransfer")]
     pub multi_esdtnft_transfer: u64,
-    #[serde(rename = "ESDTModifyRoyalties", default)]
+    #[serde(rename = "ESDTModifyRoyalties")]
     pub esdt_modify_royalties: u64,
-    #[serde(rename = "ESDTModifyCreator", default)]
+    #[serde(rename = "ESDTModifyCreator")]
     pub esdt_modify_creator: u64,
-    #[serde(rename = "ESDTNFTRecreate", default)]
+    #[serde(rename = "ESDTNFTRecreate")]
     pub esdtnft_recreate: u64,
-    #[serde(rename = "ESDTNFTUpdate", default)]
+    #[serde(rename = "ESDTNFTUpdate")]
     pub esdtnft_update: u64,
-    #[serde(rename = "ESDTNFTSetNewURIs", default)]
+    #[serde(rename = "ESDTNFTSetNewURIs")]
     pub esdtnft_set_new_ur_is: u64,
-    #[serde(rename = "SetGuardian", default)]
+    #[serde(rename = "SetGuardian")]
     pub set_guardian: u64,
-    #[serde(rename = "GuardAccount", default)]
+    #[serde(rename = "GuardAccount")]
     pub guard_account: u64,
-    #[serde(rename = "UnGuardAccount", default)]
+    #[serde(rename = "UnGuardAccount")]
     pub un_guard_account: u64,
-    #[serde(rename = "TrieLoadPerNode", default)]
+    #[serde(rename = "TrieLoadPerNode")]
     pub trie_load_per_node: u64,
-    #[serde(rename = "TrieStorePerNode", default)]
+    #[serde(rename = "TrieStorePerNode")]
     pub trie_store_per_node: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct MetaChainSystemSCsCost {
-    #[serde(rename = "Stake", default)]
+    #[serde(rename = "Stake")]
     pub stake: u64,
-    #[serde(rename = "UnStake", default)]
+    #[serde(rename = "UnStake")]
     pub un_stake: u64,
-    #[serde(rename = "UnBond", default)]
+    #[serde(rename = "UnBond")]
     pub un_bond: u64,
-    #[serde(rename = "Claim", default)]
+    #[serde(rename = "Claim")]
     pub claim: u64,
-    #[serde(rename = "Get", default)]
+    #[serde(rename = "Get")]
     pub get: u64,
-    #[serde(rename = "ChangeRewardAddress", default)]
+    #[serde(rename = "ChangeRewardAddress")]
     pub change_reward_address: u64,
-    #[serde(rename = "ChangeValidatorKeys", default)]
+    #[serde(rename = "ChangeValidatorKeys")]
     pub change_validator_keys: u64,
-    #[serde(rename = "UnJail", default)]
+    #[serde(rename = "UnJail")]
     pub un_jail: u64,
-    #[serde(rename = "DelegationOps", default)]
+    #[serde(rename = "DelegationOps")]
     pub delegation_ops: u64,
-    #[serde(rename = "DelegationMgrOps", default)]
+    #[serde(rename = "DelegationMgrOps")]
     pub delegation_mgr_ops: u64,
-    #[serde(rename = "ValidatorToDelegation", default)]
+    #[serde(rename = "ValidatorToDelegation")]
     pub validator_to_delegation: u64,
-    #[serde(rename = "ESDTIssue", default)]
+    #[serde(rename = "ESDTIssue")]
     pub esdt_issue: u64,
-    #[serde(rename = "ESDTOperations", default)]
+    #[serde(rename = "ESDTOperations")]
     pub esdt_operations: u64,
-    #[serde(rename = "Proposal", default)]
+    #[serde(rename = "Proposal")]
     pub proposal: u64,
-    #[serde(rename = "Vote", default)]
+    #[serde(rename = "Vote")]
     pub vote: u64,
-    #[serde(rename = "DelegateVote", default)]
+    #[serde(rename = "DelegateVote")]
     pub delegate_vote: u64,
-    #[serde(rename = "RevokeVote", default)]
+    #[serde(rename = "RevokeVote")]
     pub revoke_vote: u64,
-    #[serde(rename = "CloseProposal", default)]
+    #[serde(rename = "CloseProposal")]
     pub close_proposal: u64,
-    #[serde(rename = "GetAllNodeStates", default)]
+    #[serde(rename = "GetAllNodeStates")]
     pub get_all_node_states: u64,
-    #[serde(rename = "UnstakeTokens", default)]
+    #[serde(rename = "UnstakeTokens")]
     pub unstake_tokens: u64,
-    #[serde(rename = "UnbondTokens", default)]
+    #[serde(rename = "UnbondTokens")]
     pub unbond_tokens: u64,
-    #[serde(rename = "GetActiveFund", default)]
+    #[serde(rename = "GetActiveFund")]
     pub get_active_fund: u64,
-    #[serde(rename = "FixWaitingListSize", default)]
+    #[serde(rename = "FixWaitingListSize")]
     pub fix_waiting_list_size: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct BaseOperationCost {
-    #[serde(rename = "StorePerByte", default)]
+    #[serde(rename = "StorePerByte")]
     pub store_per_byte: u64,
-    #[serde(rename = "ReleasePerByte", default)]
+    #[serde(rename = "ReleasePerByte")]
     pub release_per_byte: u64,
-    #[serde(rename = "DataCopyPerByte", default)]
+    #[serde(rename = "DataCopyPerByte")]
     pub data_copy_per_byte: u64,
-    #[serde(rename = "PersistPerByte", default)]
+    #[serde(rename = "PersistPerByte")]
     pub persist_per_byte: u64,
-    #[serde(rename = "CompilePerByte", default)]
+    #[serde(rename = "CompilePerByte")]
     pub compile_per_byte: u64,
-    #[serde(rename = "AoTPreparePerByte", default)]
+    #[serde(rename = "AoTPreparePerByte")]
     pub ao_t_prepare_per_byte: u64,
-    #[serde(rename = "GetCode", default)]
+    #[serde(rename = "GetCode")]
     pub get_code: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct BaseOpsAPICost {
-    #[serde(rename = "GetSCAddress", default)]
+    #[serde(rename = "GetSCAddress")]
     pub get_sc_address: u64,
-    #[serde(rename = "GetOwnerAddress", default)]
+    #[serde(rename = "GetOwnerAddress")]
     pub get_owner_address: u64,
-    #[serde(rename = "IsSmartContract", default)]
+    #[serde(rename = "IsSmartContract")]
     pub is_smart_contract: u64,
-    #[serde(rename = "GetShardOfAddress", default)]
+    #[serde(rename = "GetShardOfAddress")]
     pub get_shard_of_address: u64,
-    #[serde(rename = "GetExternalBalance", default)]
+    #[serde(rename = "GetExternalBalance")]
     pub get_external_balance: u64,
-    #[serde(rename = "GetBlockHash", default)]
+    #[serde(rename = "GetBlockHash")]
     pub get_block_hash: u64,
-    #[serde(rename = "TransferValue", default)]
+    #[serde(rename = "TransferValue")]
     pub transfer_value: u64,
-    #[serde(rename = "GetArgument", default)]
+    #[serde(rename = "GetArgument")]
     pub get_argument: u64,
-    #[serde(rename = "GetFunction", default)]
+    #[serde(rename = "GetFunction")]
     pub get_function: u64,
-    #[serde(rename = "GetNumArguments", default)]
+    #[serde(rename = "GetNumArguments")]
     pub get_num_arguments: u64,
-    #[serde(rename = "StorageStore", default)]
+    #[serde(rename = "StorageStore")]
     pub storage_store: u64,
-    #[serde(rename = "StorageLoad", default)]
+    #[serde(rename = "StorageLoad")]
     pub storage_load: u64,
-    #[serde(rename = "CachedStorageLoad", default)]
+    #[serde(rename = "CachedStorageLoad")]
     pub cached_storage_load: u64,
-    #[serde(rename = "GetCaller", default)]
+    #[serde(rename = "GetCaller")]
     pub get_caller: u64,
-    #[serde(rename = "GetCallValue", default)]
+    #[serde(rename = "GetCallValue")]
     pub get_call_value: u64,
-    #[serde(rename = "Log", default)]
+    #[serde(rename = "Log")]
     pub log: u64,
-    #[serde(rename = "Finish", default)]
+    #[serde(rename = "Finish")]
     pub finish: u64,
-    #[serde(rename = "SignalError", default)]
+    #[serde(rename = "SignalError")]
     pub signal_error: u64,
-    #[serde(rename = "GetBlockTimeStamp", default)]
+    #[serde(rename = "GetBlockTimeStamp")]
     pub get_block_time_stamp: u64,
-    #[serde(rename = "GetGasLeft", default)]
+    #[serde(rename = "GetGasLeft")]
     pub get_gas_left: u64,
-    #[serde(rename = "Int64GetArgument", default)]
+    #[serde(rename = "Int64GetArgument")]
     pub int_64_get_argument: u64,
-    #[serde(rename = "Int64StorageStore", default)]
+    #[serde(rename = "Int64StorageStore")]
     pub int_64_storage_store: u64,
-    #[serde(rename = "Int64StorageLoad", default)]
+    #[serde(rename = "Int64StorageLoad")]
     pub int_64_storage_load: u64,
-    #[serde(rename = "Int64Finish", default)]
+    #[serde(rename = "Int64Finish")]
     pub int_64_finish: u64,
-    #[serde(rename = "GetStateRootHash", default)]
+    #[serde(rename = "GetStateRootHash")]
     pub get_state_root_hash: u64,
-    #[serde(rename = "GetBlockNonce", default)]
+    #[serde(rename = "GetBlockNonce")]
     pub get_block_nonce: u64,
-    #[serde(rename = "GetBlockEpoch", default)]
+    #[serde(rename = "GetBlockEpoch")]
     pub get_block_epoch: u64,
-    #[serde(rename = "GetBlockRound", default)]
+    #[serde(rename = "GetBlockRound")]
     pub get_block_round: u64,
-    #[serde(rename = "GetBlockRandomSeed", default)]
+    #[serde(rename = "GetBlockRandomSeed")]
     pub get_block_random_seed: u64,
-    #[serde(rename = "ExecuteOnSameContext", default)]
+    #[serde(rename = "ExecuteOnSameContext")]
     pub execute_on_same_context: u64,
-    #[serde(rename = "ExecuteOnDestContext", default)]
+    #[serde(rename = "ExecuteOnDestContext")]
     pub execute_on_dest_context: u64,
-    #[serde(rename = "DelegateExecution", default)]
+    #[serde(rename = "DelegateExecution")]
     pub delegate_execution: u64,
-    #[serde(rename = "AsyncCallStep", default)]
+    #[serde(rename = "AsyncCallStep")]
     pub async_call_step: u64,
-    #[serde(rename = "AsyncCallbackGasLock", default)]
+    #[serde(rename = "AsyncCallbackGasLock")]
     pub async_callback_gas_lock: u64,
-    #[serde(rename = "ExecuteReadOnly", default)]
+    #[serde(rename = "ExecuteReadOnly")]
     pub execute_read_only: u64,
-    #[serde(rename = "CreateContract", default)]
+    #[serde(rename = "CreateContract")]
     pub create_contract: u64,
-    #[serde(rename = "GetReturnData", default)]
+    #[serde(rename = "GetReturnData")]
     pub get_return_data: u64,
-    #[serde(rename = "GetNumReturnData", default)]
+    #[serde(rename = "GetNumReturnData")]
     pub get_num_return_data: u64,
-    #[serde(rename = "GetReturnDataSize", default)]
+    #[serde(rename = "GetReturnDataSize")]
     pub get_return_data_size: u64,
-    #[serde(rename = "GetOriginalTxHash", default)]
+    #[serde(rename = "GetOriginalTxHash")]
     pub get_original_tx_hash: u64,
-    #[serde(rename = "CleanReturnData", default)]
+    #[serde(rename = "CleanReturnData")]
     pub clean_return_data: u64,
-    #[serde(rename = "DeleteFromReturnData", default)]
+    #[serde(rename = "DeleteFromReturnData")]
     pub delete_from_return_data: u64,
-    #[serde(rename = "GetPrevTxHash", default)]
+    #[serde(rename = "GetPrevTxHash")]
     pub get_prev_tx_hash: u64,
-    #[serde(rename = "GetCurrentTxHash", default)]
+    #[serde(rename = "GetCurrentTxHash")]
     pub get_current_tx_hash: u64,
-    #[serde(rename = "CreateAsyncCall", default)]
+    #[serde(rename = "CreateAsyncCall")]
     pub create_async_call: u64,
-    #[serde(rename = "SetAsyncCallback", default)]
+    #[serde(rename = "SetAsyncCallback")]
     pub set_async_callback: u64,
-    #[serde(rename = "SetAsyncGroupCallback", default)]
+    #[serde(rename = "SetAsyncGroupCallback")]
     pub set_async_group_callback: u64,
-    #[serde(rename = "SetAsyncContextCallback", default)]
+    #[serde(rename = "SetAsyncContextCallback")]
     pub set_async_context_callback: u64,
-    #[serde(rename = "GetCallbackClosure", default)]
+    #[serde(rename = "GetCallbackClosure")]
     pub get_callback_closure: u64,
-    #[serde(rename = "GetCodeMetadata", default)]
+    #[serde(rename = "GetCodeMetadata")]
     pub get_code_metadata: u64,
-    #[serde(rename = "IsBuiltinFunction", default)]
+    #[serde(rename = "IsBuiltinFunction")]
     pub is_builtin_function: u64,
-    #[serde(rename = "IsReservedFunctionName", default)]
+    #[serde(rename = "IsReservedFunctionName")]
     pub is_reserved_function_name: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct EthAPICost {
-    #[serde(rename = "UseGas", default)]
+    #[serde(rename = "UseGas")]
     pub use_gas: u64,
-    #[serde(rename = "GetAddress", default)]
+    #[serde(rename = "GetAddress")]
     pub get_address: u64,
-    #[serde(rename = "GetExternalBalance", default)]
+    #[serde(rename = "GetExternalBalance")]
     pub get_external_balance: u64,
-    #[serde(rename = "GetBlockHash", default)]
+    #[serde(rename = "GetBlockHash")]
     pub get_block_hash: u64,
-    #[serde(rename = "Call", default)]
+    #[serde(rename = "Call")]
     pub call: u64,
-    #[serde(rename = "CallDataCopy", default)]
+    #[serde(rename = "CallDataCopy")]
     pub call_data_copy: u64,
-    #[serde(rename = "GetCallDataSize", default)]
+    #[serde(rename = "GetCallDataSize")]
     pub get_call_data_size: u64,
-    #[serde(rename = "CallCode", default)]
+    #[serde(rename = "CallCode")]
     pub call_code: u64,
-    #[serde(rename = "CallDelegate", default)]
+    #[serde(rename = "CallDelegate")]
     pub call_delegate: u64,
-    #[serde(rename = "CallStatic", default)]
+    #[serde(rename = "CallStatic")]
     pub call_static: u64,
-    #[serde(rename = "StorageStore", default)]
+    #[serde(rename = "StorageStore")]
     pub storage_store: u64,
-    #[serde(rename = "StorageLoad", default)]
+    #[serde(rename = "StorageLoad")]
     pub storage_load: u64,
-    #[serde(rename = "GetCaller", default)]
+    #[serde(rename = "GetCaller")]
     pub get_caller: u64,
-    #[serde(rename = "GetCallValue", default)]
+    #[serde(rename = "GetCallValue")]
     pub get_call_value: u64,
-    #[serde(rename = "CodeCopy", default)]
+    #[serde(rename = "CodeCopy")]
     pub code_copy: u64,
-    #[serde(rename = "GetCodeSize", default)]
+    #[serde(rename = "GetCodeSize")]
     pub get_code_size: u64,
-    #[serde(rename = "GetBlockCoinbase", default)]
+    #[serde(rename = "GetBlockCoinbase")]
     pub get_block_coinbase: u64,
-    #[serde(rename = "Create", default)]
+    #[serde(rename = "Create")]
     pub create: u64,
-    #[serde(rename = "GetBlockDifficulty", default)]
+    #[serde(rename = "GetBlockDifficulty")]
     pub get_block_difficulty: u64,
-    #[serde(rename = "ExternalCodeCopy", default)]
+    #[serde(rename = "ExternalCodeCopy")]
     pub external_code_copy: u64,
-    #[serde(rename = "GetExternalCodeSize", default)]
+    #[serde(rename = "GetExternalCodeSize")]
     pub get_external_code_size: u64,
-    #[serde(rename = "GetGasLeft", default)]
+    #[serde(rename = "GetGasLeft")]
     pub get_gas_left: u64,
-    #[serde(rename = "GetBlockGasLimit", default)]
+    #[serde(rename = "GetBlockGasLimit")]
     pub get_block_gas_limit: u64,
-    #[serde(rename = "GetTxGasPrice", default)]
+    #[serde(rename = "GetTxGasPrice")]
     pub get_tx_gas_price: u64,
-    #[serde(rename = "Log", default)]
+    #[serde(rename = "Log")]
     pub log: u64,
-    #[serde(rename = "GetBlockNumber", default)]
+    #[serde(rename = "GetBlockNumber")]
     pub get_block_number: u64,
-    #[serde(rename = "GetTxOrigin", default)]
+    #[serde(rename = "GetTxOrigin")]
     pub get_tx_origin: u64,
-    #[serde(rename = "Finish", default)]
+    #[serde(rename = "Finish")]
     pub finish: u64,
-    #[serde(rename = "Revert", default)]
+    #[serde(rename = "Revert")]
     pub revert: u64,
-    #[serde(rename = "GetReturnDataSize", default)]
+    #[serde(rename = "GetReturnDataSize")]
     pub get_return_data_size: u64,
-    #[serde(rename = "ReturnDataCopy", default)]
+    #[serde(rename = "ReturnDataCopy")]
     pub return_data_copy: u64,
-    #[serde(rename = "SelfDestruct", default)]
+    #[serde(rename = "SelfDestruct")]
     pub self_destruct: u64,
-    #[serde(rename = "GetBlockTimeStamp", default)]
+    #[serde(rename = "GetBlockTimeStamp")]
     pub get_block_time_stamp: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct BigIntAPICost {
-    #[serde(rename = "BigIntNew", default)]
+    #[serde(rename = "BigIntNew")]
     pub big_int_new: u64,
-    #[serde(rename = "BigIntByteLength", default)]
+    #[serde(rename = "BigIntByteLength")]
     pub big_int_byte_length: u64,
-    #[serde(rename = "BigIntUnsignedByteLength", default)]
+    #[serde(rename = "BigIntUnsignedByteLength")]
     pub big_int_unsigned_byte_length: u64,
-    #[serde(rename = "BigIntSignedByteLength", default)]
+    #[serde(rename = "BigIntSignedByteLength")]
     pub big_int_signed_byte_length: u64,
-    #[serde(rename = "BigIntGetBytes", default)]
+    #[serde(rename = "BigIntGetBytes")]
     pub big_int_get_bytes: u64,
-    #[serde(rename = "BigIntGetUnsignedBytes", default)]
+    #[serde(rename = "BigIntGetUnsignedBytes")]
     pub big_int_get_unsigned_bytes: u64,
-    #[serde(rename = "BigIntGetSignedBytes", default)]
+    #[serde(rename = "BigIntGetSignedBytes")]
     pub big_int_get_signed_bytes: u64,
-    #[serde(rename = "BigIntSetBytes", default)]
+    #[serde(rename = "BigIntSetBytes")]
     pub big_int_set_bytes: u64,
-    #[serde(rename = "BigIntSetUnsignedBytes", default)]
+    #[serde(rename = "BigIntSetUnsignedBytes")]
     pub big_int_set_unsigned_bytes: u64,
-    #[serde(rename = "BigIntSetSignedBytes", default)]
+    #[serde(rename = "BigIntSetSignedBytes")]
     pub big_int_set_signed_bytes: u64,
-    #[serde(rename = "BigIntIsInt64", default)]
+    #[serde(rename = "BigIntIsInt64")]
     pub big_int_is_int_64: u64,
-    #[serde(rename = "BigIntGetInt64", default)]
+    #[serde(rename = "BigIntGetInt64")]
     pub big_int_get_int_64: u64,
-    #[serde(rename = "BigIntSetInt64", default)]
+    #[serde(rename = "BigIntSetInt64")]
     pub big_int_set_int_64: u64,
-    #[serde(rename = "BigIntAdd", default)]
+    #[serde(rename = "BigIntAdd")]
     pub big_int_add: u64,
-    #[serde(rename = "BigIntSub", default)]
+    #[serde(rename = "BigIntSub")]
     pub big_int_sub: u64,
-    #[serde(rename = "BigIntMul", default)]
+    #[serde(rename = "BigIntMul")]
     pub big_int_mul: u64,
-    #[serde(rename = "BigIntSqrt", default)]
+    #[serde(rename = "BigIntSqrt")]
     pub big_int_sqrt: u64,
-    #[serde(rename = "BigIntPow", default)]
+    #[serde(rename = "BigIntPow")]
     pub big_int_pow: u64,
-    #[serde(rename = "BigIntLog", default)]
+    #[serde(rename = "BigIntLog")]
     pub big_int_log: u64,
-    #[serde(rename = "BigIntTDiv", default)]
+    #[serde(rename = "BigIntTDiv")]
     pub big_int_t_div: u64,
-    #[serde(rename = "BigIntTMod", default)]
+    #[serde(rename = "BigIntTMod")]
     pub big_int_t_mod: u64,
-    #[serde(rename = "BigIntEDiv", default)]
+    #[serde(rename = "BigIntEDiv")]
     pub big_int_e_div: u64,
-    #[serde(rename = "BigIntEMod", default)]
+    #[serde(rename = "BigIntEMod")]
     pub big_int_e_mod: u64,
-    #[serde(rename = "BigIntAbs", default)]
+    #[serde(rename = "BigIntAbs")]
     pub big_int_abs: u64,
-    #[serde(rename = "BigIntNeg", default)]
+    #[serde(rename = "BigIntNeg")]
     pub big_int_neg: u64,
-    #[serde(rename = "BigIntSign", default)]
+    #[serde(rename = "BigIntSign")]
     pub big_int_sign: u64,
-    #[serde(rename = "BigIntCmp", default)]
+    #[serde(rename = "BigIntCmp")]
     pub big_int_cmp: u64,
-    #[serde(rename = "BigIntNot", default)]
+    #[serde(rename = "BigIntNot")]
     pub big_int_not: u64,
-    #[serde(rename = "BigIntAnd", default)]
+    #[serde(rename = "BigIntAnd")]
     pub big_int_and: u64,
-    #[serde(rename = "BigIntOr", default)]
+    #[serde(rename = "BigIntOr")]
     pub big_int_or: u64,
-    #[serde(rename = "BigIntXor", default)]
+    #[serde(rename = "BigIntXor")]
     pub big_int_xor: u64,
-    #[serde(rename = "BigIntShr", default)]
+    #[serde(rename = "BigIntShr")]
     pub big_int_shr: u64,
-    #[serde(rename = "BigIntShl", default)]
+    #[serde(rename = "BigIntShl")]
     pub big_int_shl: u64,
-    #[serde(rename = "BigIntFinishUnsigned", default)]
+    #[serde(rename = "BigIntFinishUnsigned")]
     pub big_int_finish_unsigned: u64,
-    #[serde(rename = "BigIntFinishSigned", default)]
+    #[serde(rename = "BigIntFinishSigned")]
     pub big_int_finish_signed: u64,
-    #[serde(rename = "BigIntStorageLoadUnsigned", default)]
+    #[serde(rename = "BigIntStorageLoadUnsigned")]
     pub big_int_storage_load_unsigned: u64,
-    #[serde(rename = "BigIntStorageStoreUnsigned", default)]
+    #[serde(rename = "BigIntStorageStoreUnsigned")]
     pub big_int_storage_store_unsigned: u64,
-    #[serde(rename = "BigIntGetArgument", default)]
+    #[serde(rename = "BigIntGetArgument")]
     pub big_int_get_argument: u64,
-    #[serde(rename = "BigIntGetUnsignedArgument", default)]
+    #[serde(rename = "BigIntGetUnsignedArgument")]
     pub big_int_get_unsigned_argument: u64,
-    #[serde(rename = "BigIntGetSignedArgument", default)]
+    #[serde(rename = "BigIntGetSignedArgument")]
     pub big_int_get_signed_argument: u64,
-    #[serde(rename = "BigIntGetCallValue", default)]
+    #[serde(rename = "BigIntGetCallValue")]
     pub big_int_get_call_value: u64,
-    #[serde(rename = "BigIntGetExternalBalance", default)]
+    #[serde(rename = "BigIntGetExternalBalance")]
     pub big_int_get_external_balance: u64,
-    #[serde(rename = "CopyPerByteForTooBig", default)]
+    #[serde(rename = "CopyPerByteForTooBig")]
     pub copy_per_byte_for_too_big: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct CryptoAPICost {
-    #[serde(rename = "SHA256", default)]
+    #[serde(rename = "SHA256")]
     pub sha_256: u64,
-    #[serde(rename = "Keccak256", default)]
+    #[serde(rename = "Keccak256")]
     pub keccak_256: u64,
-    #[serde(rename = "Ripemd160", default)]
+    #[serde(rename = "Ripemd160")]
     pub ripemd_160: u64,
-    #[serde(rename = "VerifyBLS", default)]
+    #[serde(rename = "VerifyBLS")]
     pub verify_bls: u64,
-    #[serde(rename = "VerifyEd25519", default)]
+    #[serde(rename = "VerifyEd25519")]
     pub verify_ed_25519: u64,
-    #[serde(rename = "VerifySecp256k1", default)]
+    #[serde(rename = "VerifySecp256k1")]
     pub verify_secp_256_k_1: u64,
-    #[serde(rename = "EllipticCurveNew", default)]
+    #[serde(rename = "EllipticCurveNew")]
     pub elliptic_curve_new: u64,
-    #[serde(rename = "AddECC", default)]
+    #[serde(rename = "AddECC")]
     pub add_ecc: u64,
-    #[serde(rename = "DoubleECC", default)]
+    #[serde(rename = "DoubleECC")]
     pub double_ecc: u64,
-    #[serde(rename = "IsOnCurveECC", default)]
+    #[serde(rename = "IsOnCurveECC")]
     pub is_on_curve_ecc: u64,
-    #[serde(rename = "ScalarMultECC", default)]
+    #[serde(rename = "ScalarMultECC")]
     pub scalar_mult_ecc: u64,
-    #[serde(rename = "MarshalECC", default)]
+    #[serde(rename = "MarshalECC")]
     pub marshal_ecc: u64,
-    #[serde(rename = "MarshalCompressedECC", default)]
+    #[serde(rename = "MarshalCompressedECC")]
     pub marshal_compressed_ecc: u64,
-    #[serde(rename = "UnmarshalECC", default)]
+    #[serde(rename = "UnmarshalECC")]
     pub unmarshal_ecc: u64,
-    #[serde(rename = "UnmarshalCompressedECC", default)]
+    #[serde(rename = "UnmarshalCompressedECC")]
     pub unmarshal_compressed_ecc: u64,
-    #[serde(rename = "GenerateKeyECC", default)]
+    #[serde(rename = "GenerateKeyECC")]
     pub generate_key_ecc: u64,
-    #[serde(rename = "EncodeDERSig", default)]
+    #[serde(rename = "EncodeDERSig")]
     pub encode_der_sig: u64,
-    #[serde(rename = "VerifySecp256r1", default)]
+    #[serde(rename = "VerifySecp256r1")]
     pub verify_secp_256_r_1: u64,
-    #[serde(rename = "VerifyBLSSignatureShare", default)]
+    #[serde(rename = "VerifyBLSSignatureShare")]
     pub verify_bls_signature_share: u64,
-    #[serde(rename = "VerifyBLSMultiSig", default)]
+    #[serde(rename = "VerifyBLSMultiSig")]
     pub verify_bls_multi_sig: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct ManagedBufferAPICost {
-    #[serde(rename = "MBufferNew", default)]
+    #[serde(rename = "MBufferNew")]
     pub m_buffer_new: u64,
-    #[serde(rename = "MBufferNewFromBytes", default)]
+    #[serde(rename = "MBufferNewFromBytes")]
     pub m_buffer_new_from_bytes: u64,
-    #[serde(rename = "MBufferGetLength", default)]
+    #[serde(rename = "MBufferGetLength")]
     pub m_buffer_get_length: u64,
-    #[serde(rename = "MBufferGetBytes", default)]
+    #[serde(rename = "MBufferGetBytes")]
     pub m_buffer_get_bytes: u64,
-    #[serde(rename = "MBufferGetByteSlice", default)]
+    #[serde(rename = "MBufferGetByteSlice")]
     pub m_buffer_get_byte_slice: u64,
-    #[serde(rename = "MBufferCopyByteSlice", default)]
+    #[serde(rename = "MBufferCopyByteSlice")]
     pub m_buffer_copy_byte_slice: u64,
-    #[serde(rename = "MBufferSetBytes", default)]
+    #[serde(rename = "MBufferSetBytes")]
     pub m_buffer_set_bytes: u64,
-    #[serde(rename = "MBufferAppend", default)]
+    #[serde(rename = "MBufferAppend")]
     pub m_buffer_append: u64,
-    #[serde(rename = "MBufferAppendBytes", default)]
+    #[serde(rename = "MBufferAppendBytes")]
     pub m_buffer_append_bytes: u64,
-    #[serde(rename = "MBufferToBigIntUnsigned", default)]
+    #[serde(rename = "MBufferToBigIntUnsigned")]
     pub m_buffer_to_big_int_unsigned: u64,
-    #[serde(rename = "MBufferToBigIntSigned", default)]
+    #[serde(rename = "MBufferToBigIntSigned")]
     pub m_buffer_to_big_int_signed: u64,
-    #[serde(rename = "MBufferFromBigIntUnsigned", default)]
+    #[serde(rename = "MBufferFromBigIntUnsigned")]
     pub m_buffer_from_big_int_unsigned: u64,
-    #[serde(rename = "MBufferFromBigIntSigned", default)]
+    #[serde(rename = "MBufferFromBigIntSigned")]
     pub m_buffer_from_big_int_signed: u64,
-    #[serde(rename = "MBufferStorageStore", default)]
+    #[serde(rename = "MBufferStorageStore")]
     pub m_buffer_storage_store: u64,
-    #[serde(rename = "MBufferStorageLoad", default)]
+    #[serde(rename = "MBufferStorageLoad")]
     pub m_buffer_storage_load: u64,
-    #[serde(rename = "MBufferGetArgument", default)]
+    #[serde(rename = "MBufferGetArgument")]
     pub m_buffer_get_argument: u64,
-    #[serde(rename = "MBufferFinish", default)]
+    #[serde(rename = "MBufferFinish")]
     pub m_buffer_finish: u64,
-    #[serde(rename = "MBufferSetRandom", default)]
+    #[serde(rename = "MBufferSetRandom")]
     pub m_buffer_set_random: u64,
-    #[serde(rename = "MBufferToBigFloat", default)]
+    #[serde(rename = "MBufferToBigFloat")]
     pub m_buffer_to_big_float: u64,
-    #[serde(rename = "MBufferFromBigFloat", default)]
+    #[serde(rename = "MBufferFromBigFloat")]
     pub m_buffer_from_big_float: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct BigFloatAPICost {
-    #[serde(rename = "BigFloatNewFromParts", default)]
+    #[serde(rename = "BigFloatNewFromParts")]
     pub big_float_new_from_parts: u64,
-    #[serde(rename = "BigFloatAdd", default)]
+    #[serde(rename = "BigFloatAdd")]
     pub big_float_add: u64,
-    #[serde(rename = "BigFloatSub", default)]
+    #[serde(rename = "BigFloatSub")]
     pub big_float_sub: u64,
-    #[serde(rename = "BigFloatMul", default)]
+    #[serde(rename = "BigFloatMul")]
     pub big_float_mul: u64,
-    #[serde(rename = "BigFloatDiv", default)]
+    #[serde(rename = "BigFloatDiv")]
     pub big_float_div: u64,
-    #[serde(rename = "BigFloatTruncate", default)]
+    #[serde(rename = "BigFloatTruncate")]
     pub big_float_truncate: u64,
-    #[serde(rename = "BigFloatNeg", default)]
+    #[serde(rename = "BigFloatNeg")]
     pub big_float_neg: u64,
-    #[serde(rename = "BigFloatClone", default)]
+    #[serde(rename = "BigFloatClone")]
     pub big_float_clone: u64,
-    #[serde(rename = "BigFloatCmp", default)]
+    #[serde(rename = "BigFloatCmp")]
     pub big_float_cmp: u64,
-    #[serde(rename = "BigFloatAbs", default)]
+    #[serde(rename = "BigFloatAbs")]
     pub big_float_abs: u64,
-    #[serde(rename = "BigFloatSqrt", default)]
+    #[serde(rename = "BigFloatSqrt")]
     pub big_float_sqrt: u64,
-    #[serde(rename = "BigFloatPow", default)]
+    #[serde(rename = "BigFloatPow")]
     pub big_float_pow: u64,
-    #[serde(rename = "BigFloatFloor", default)]
+    #[serde(rename = "BigFloatFloor")]
     pub big_float_floor: u64,
-    #[serde(rename = "BigFloatCeil", default)]
+    #[serde(rename = "BigFloatCeil")]
     pub big_float_ceil: u64,
-    #[serde(rename = "BigFloatIsInt", default)]
+    #[serde(rename = "BigFloatIsInt")]
     pub big_float_is_int: u64,
-    #[serde(rename = "BigFloatSetBigInt", default)]
+    #[serde(rename = "BigFloatSetBigInt")]
     pub big_float_set_big_int: u64,
-    #[serde(rename = "BigFloatSetInt64", default)]
+    #[serde(rename = "BigFloatSetInt64")]
     pub big_float_set_int_64: u64,
-    #[serde(rename = "BigFloatGetConst", default)]
+    #[serde(rename = "BigFloatGetConst")]
     pub big_float_get_const: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct MaxPerTransaction {
-    #[serde(rename = "MaxBuiltInCallsPerTx", default)]
+    #[serde(rename = "MaxBuiltInCallsPerTx")]
     pub max_built_in_calls_per_tx: u64,
-    #[serde(rename = "MaxNumberOfTransfersPerTx", default)]
+    #[serde(rename = "MaxNumberOfTransfersPerTx")]
     pub max_number_of_transfers_per_tx: u64,
-    #[serde(rename = "MaxNumberOfTrieReadsPerTx", default)]
+    #[serde(rename = "MaxNumberOfTrieReadsPerTx")]
     pub max_number_of_trie_reads_per_tx: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 #[serde(default)]
 pub struct DynamicStorageLoad {
-    #[serde(rename = "QuadraticCoefficient", default)]
+    #[serde(rename = "QuadraticCoefficient")]
     pub quadratic_coefficient: u64,
-    #[serde(rename = "SignOfQuadratic", default)]
+    #[serde(rename = "SignOfQuadratic")]
     pub sign_of_quadratic: u64,
-    #[serde(rename = "LinearCoefficient", default)]
+    #[serde(rename = "LinearCoefficient")]
     pub linear_coefficient: u64,
-    #[serde(rename = "SignOfLinear", default)]
+    #[serde(rename = "SignOfLinear")]
     pub sign_of_linear: u64,
-    #[serde(rename = "ConstantCoefficient", default)]
+    #[serde(rename = "ConstantCoefficient")]
     pub constant_coefficient: u64,
-    #[serde(rename = "SignOfConstant", default)]
+    #[serde(rename = "SignOfConstant")]
     pub sign_of_constant: u64,
-    #[serde(rename = "MinimumGasCost", default)]
+    #[serde(rename = "MinimumGasCost")]
     pub minimum_gas_cost: u64,
 }

@@ -50,10 +50,7 @@ fn generate_section_struct(section_name: &str, entries: &Vec<(String, String)>) 
     for (entry_key, _) in entries {
         let field_name = entry_key.to_case(Case::Snake);
 
-        output.push_str(&format!(
-            "    #[serde(rename = \"{}\", default)]\n",
-            entry_key
-        ));
+        output.push_str(&format!("    #[serde(rename = \"{}\")]\n", entry_key));
         output.push_str(&format!("    pub {}: u64,\n", field_name));
     }
 
