@@ -1,6 +1,7 @@
 use multiversx_chain_vm::{
     executor_impl::{ExperimentalExecutor, WasmerProdExecutor},
     host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef},
+    schedule::GasSchedule,
 };
 use multiversx_chain_vm_executor::Executor;
 
@@ -38,6 +39,16 @@ impl ScenarioVMRunner {
     pub fn new() -> Self {
         let contract_map_ref = ContractMapRef::new();
         let blockchain_mock = BlockchainMock::default();
+        ScenarioVMRunner {
+            contract_map_ref,
+            blockchain_mock,
+            executor_config: ScenarioExecutorConfig::default(),
+        }
+    }
+
+    pub fn new_with_gas(gas_schedule: GasSchedule) -> Self {
+        let contract_map_ref = ContractMapRef::new();
+        let blockchain_mock = BlockchainMock::new_with_gas(gas_schedule);
         ScenarioVMRunner {
             contract_map_ref,
             blockchain_mock,

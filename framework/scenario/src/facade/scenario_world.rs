@@ -1,4 +1,4 @@
-use multiversx_chain_vm::blockchain::state::BlockchainState;
+use multiversx_chain_vm::{blockchain::state::BlockchainState, schedule::GasSchedule};
 
 use crate::{
     scenario::{
@@ -40,6 +40,16 @@ impl ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),
             backend: Backend::Debugger(Box::new(DebuggerBackend {
                 vm_runner: ScenarioVMRunner::new(),
+                trace: None,
+            })),
+        }
+    }
+
+    pub fn debugger_with_gas(gas_schedule: GasSchedule) -> Self {
+        ScenarioWorld {
+            current_dir: std::env::current_dir().unwrap(),
+            backend: Backend::Debugger(Box::new(DebuggerBackend {
+                vm_runner: ScenarioVMRunner::new_with_gas(gas_schedule),
                 trace: None,
             })),
         }
