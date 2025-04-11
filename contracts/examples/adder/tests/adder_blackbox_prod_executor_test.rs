@@ -1,7 +1,4 @@
-use multiversx_sc_scenario::{
-    imports::*,
-    multiversx_chain_vm::schedule::{GasSchedule, GasScheduleVersion},
-};
+use multiversx_sc_scenario::imports::*;
 
 use adder::*;
 
@@ -10,9 +7,9 @@ const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
 const CODE_PATH: MxscPath = MxscPath::new("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
-    let gas_schedule = GasSchedule::new(GasScheduleVersion::V8);
-    let mut blockchain =
-        ScenarioWorld::debugger_with_gas(gas_schedule, ScenarioExecutorConfig::WasmerProd);
+    let mut blockchain = ScenarioWorld::new()
+        .executor_config(ScenarioExecutorConfig::Experimental)
+        .gas_schedule(GasScheduleVersion::V8);
 
     blockchain.set_current_dir_from_workspace("contracts/examples/adder");
     blockchain.register_contract(CODE_PATH, adder::ContractBuilder);

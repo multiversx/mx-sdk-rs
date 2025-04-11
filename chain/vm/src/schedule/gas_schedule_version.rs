@@ -1,7 +1,11 @@
 use std::fmt;
 
-#[derive(Clone, Copy, Debug)]
+use super::GasSchedule;
+
+#[derive(Clone, Copy, Default, Debug)]
 pub enum GasScheduleVersion {
+    #[default]
+    Zero,
     V1,
     V2,
     V3,
@@ -18,35 +22,22 @@ impl fmt::Display for GasScheduleVersion {
     }
 }
 
-impl TryFrom<u16> for GasScheduleVersion {
-    type Error = &'static str;
-
-    fn try_from(value: u16) -> Result<Self, Self::Error> {
-        match value {
-            1 => Ok(GasScheduleVersion::V1),
-            2 => Ok(GasScheduleVersion::V2),
-            3 => Ok(GasScheduleVersion::V3),
-            4 => Ok(GasScheduleVersion::V4),
-            5 => Ok(GasScheduleVersion::V5),
-            6 => Ok(GasScheduleVersion::V6),
-            7 => Ok(GasScheduleVersion::V7),
-            8 => Ok(GasScheduleVersion::V8),
-            _ => Err("Gas schedule TOML version must be between 1 and 8"),
-        }
-    }
+pub fn parse_gas_schedule(content: &str) -> GasSchedule {
+    GasSchedule::from_toml_str(content).expect("error parsing gas schedule toml")
 }
 
 impl GasScheduleVersion {
-    pub fn to_content(&self) -> String {
+    pub fn load_gas_schedule(&self) -> GasSchedule {
         match self {
-            GasScheduleVersion::V1 => include_str!("gas_schedules/gasScheduleV1.toml").to_string(),
-            GasScheduleVersion::V2 => include_str!("gas_schedules/gasScheduleV2.toml").to_string(),
-            GasScheduleVersion::V3 => include_str!("gas_schedules/gasScheduleV3.toml").to_string(),
-            GasScheduleVersion::V4 => include_str!("gas_schedules/gasScheduleV4.toml").to_string(),
-            GasScheduleVersion::V5 => include_str!("gas_schedules/gasScheduleV5.toml").to_string(),
-            GasScheduleVersion::V6 => include_str!("gas_schedules/gasScheduleV6.toml").to_string(),
-            GasScheduleVersion::V7 => include_str!("gas_schedules/gasScheduleV7.toml").to_string(),
-            GasScheduleVersion::V8 => include_str!("gas_schedules/gasScheduleV8.toml").to_string(),
+            GasScheduleVersion::Zero => GasSchedule::default(),
+            GasScheduleVersion::V1 => parse_gas_schedule(super::GAS_SCHEDULE_V1_TOML),
+            GasScheduleVersion::V2 => parse_gas_schedule(super::GAS_SCHEDULE_V2_TOML),
+            GasScheduleVersion::V3 => parse_gas_schedule(super::GAS_SCHEDULE_V3_TOML),
+            GasScheduleVersion::V4 => parse_gas_schedule(super::GAS_SCHEDULE_V4_TOML),
+            GasScheduleVersion::V5 => parse_gas_schedule(super::GAS_SCHEDULE_V5_TOML),
+            GasScheduleVersion::V6 => parse_gas_schedule(super::GAS_SCHEDULE_V6_TOML),
+            GasScheduleVersion::V7 => parse_gas_schedule(super::GAS_SCHEDULE_V7_TOML),
+            GasScheduleVersion::V8 => parse_gas_schedule(super::GAS_SCHEDULE_V8_TOML),
         }
     }
 }

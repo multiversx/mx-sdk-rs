@@ -1,13 +1,10 @@
 use multiversx_chain_vm_executor::OpcodeCost;
 use serde::{Deserialize, Serialize};
 
-use super::{
-    gas_schedule_version::GasScheduleVersion,
-    sections::{
-        BaseOperationCost, BaseOpsAPICost, BigFloatAPICost, BigIntAPICost, BuiltInCost,
-        CryptoAPICost, DynamicStorageLoad, EthAPICost, ManagedBufferAPICost, MaxPerTransaction,
-        MetaChainSystemSCsCost,
-    },
+use super::sections::{
+    BaseOperationCost, BaseOpsAPICost, BigFloatAPICost, BigIntAPICost, BuiltInCost, CryptoAPICost,
+    DynamicStorageLoad, EthAPICost, ManagedBufferAPICost, MaxPerTransaction,
+    MetaChainSystemSCsCost,
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
@@ -40,11 +37,6 @@ pub struct GasSchedule {
 }
 
 impl GasSchedule {
-    pub fn new(gas_schedule: GasScheduleVersion) -> Self {
-        let toml_content = gas_schedule.to_content();
-        Self::from_toml_str(&toml_content).unwrap()
-    }
-
     pub fn from_toml_str(content: &str) -> Result<Self, toml::de::Error> {
         let full_schedule: GasSchedule = toml::from_str(content)?;
         Ok(full_schedule)

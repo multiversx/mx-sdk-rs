@@ -1,4 +1,4 @@
-use multiversx_chain_vm::{blockchain::state::BlockchainState, schedule::GasSchedule};
+use multiversx_chain_vm::{blockchain::state::BlockchainState, schedule::GasScheduleVersion};
 
 use crate::{
     scenario::{
@@ -45,19 +45,6 @@ impl ScenarioWorld {
         }
     }
 
-    pub fn debugger_with_gas(
-        gas_schedule: GasSchedule,
-        executor_config: ScenarioExecutorConfig,
-    ) -> Self {
-        ScenarioWorld {
-            current_dir: std::env::current_dir().unwrap(),
-            backend: Backend::Debugger(Box::new(DebuggerBackend {
-                vm_runner: ScenarioVMRunner::new_with_gas(gas_schedule, executor_config),
-                trace: None,
-            })),
-        }
-    }
-
     /// Backwards compatibility only.
     pub fn new() -> Self {
         Self::debugger()
@@ -65,6 +52,12 @@ impl ScenarioWorld {
 
     pub fn executor_config(mut self, config: ScenarioExecutorConfig) -> Self {
         self.get_mut_debugger_backend().vm_runner.executor_config = config;
+        self
+    }
+
+    pub fn gas_schedule(mut self, gas_schedule: GasScheduleVersion) -> Self {
+        let vm = &mut self.get_mut_debugger_backend().vm_runner.blockchain_mock.vm;
+        vm.change_gas_schedule(gas_schedule.load_gas_schedule());
         self
     }
 

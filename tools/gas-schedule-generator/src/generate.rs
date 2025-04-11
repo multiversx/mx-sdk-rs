@@ -1,12 +1,11 @@
-use multiversx_chain_vm::schedule::GasScheduleVersion;
+use multiversx_chain_vm::schedule::gas_schedule_toml_by_version;
 
 use convert_case::{Case, Casing};
 
 use crate::{get_file_path, parse_toml_sections};
 
 pub fn generate_file_content(toml_version: u16) {
-    let version = GasScheduleVersion::try_from(toml_version).unwrap();
-    let content = version.to_content();
+    let content = gas_schedule_toml_by_version(toml_version);
     let rust_code = generate_structs(&content);
     let output_file = get_file_path();
 

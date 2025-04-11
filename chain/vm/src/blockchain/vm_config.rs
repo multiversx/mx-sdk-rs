@@ -62,8 +62,10 @@ impl VMConfigRef {
         VMConfigRef(Arc::new(VMConfig::new()))
     }
 
-    pub fn new_with_gas(gas_schedule: GasSchedule) -> Self {
-        VMConfigRef(Arc::new(VMConfig::new_with_gas(gas_schedule)))
+    pub fn change_gas_schedule(&mut self, gas_schedule: GasSchedule) {
+        let vm_config =
+            Arc::get_mut(&mut self.0).expect("cannot change gas schedule during execution");
+        vm_config.gas_schedule = gas_schedule;
     }
 }
 
