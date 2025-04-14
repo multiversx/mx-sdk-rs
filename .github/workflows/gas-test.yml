@@ -27,8 +27,6 @@ jobs:
         run: |
           cd contracts/feature-tests/gas-tests
           cargo test --features wasmer-prod 
-
-            gas_test_prod:
           
   gas_test_experimental:    
     name: Gas test (experimental wasmer)
