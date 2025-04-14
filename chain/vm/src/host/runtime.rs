@@ -7,9 +7,9 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{BreakpointValue, CompilationOptions, Executor, Instance};
 
 use crate::{
-    blockchain::{state::BlockchainStateRef, VMConfigRef},
+    blockchain::VMConfigRef,
     display_util::address_hex,
-    host::context::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
+    host::context::{TxContext, TxContextRef, TxResult},
     vm_err_msg,
 };
 
@@ -148,34 +148,11 @@ pub fn instance_call(instance_call: RuntimeInstanceCall<'_>) {
 }
 
 impl RuntimeRef {
-    /// TODO: shorten to just execute when cleaning up
-    pub fn execute_in_runtime(
-        &self,
-        tx_input: TxInput,
-        state: &mut BlockchainStateRef,
-    ) -> (TxResult, BlockchainUpdate) {
-        let tx_cache = TxCache::new(state.get_arc());
-        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
-        self.execute_lambda_in_runtime(tx_context, instance_call)
-    }
-
-    pub fn execute_lambda_in_runtime<F>(
-        &self,
-        tx_context: TxContext,
-        call_lambda: F,
-    ) -> (TxResult, BlockchainUpdate)
-    where
-        F: FnOnce(RuntimeInstanceCall<'_>),
-    {
-        let tx_context = self.execute_tx_context_in_runtime(tx_context, call_lambda);
-        tx_context.into_results()
-    }
-
-    pub fn execute_tx_context_in_runtime<F>(
-        &self,
-        tx_context: TxContext,
-        call_lambda: F,
-    ) -> TxContext
+    /// Executes smart contract call using the given tx context, and the configured executor.
+    ///
+    /// It is possible to customize the specific instance call using the given lambda argument.
+    /// Default it is the `instance_call` function.
+    pub fn execute<F>(&self, tx_context: TxContext, call_lambda: F) -> TxContext
     where
         F: FnOnce(RuntimeInstanceCall<'_>),
     {
