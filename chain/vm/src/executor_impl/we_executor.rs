@@ -29,14 +29,16 @@ impl ExperimentalExecutor {
         wasm_bytes: &[u8],
         compilation_options: &CompilationOptions,
     ) -> Box<dyn Instance> {
-        let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
-
+        let runtime = self.runtime_ref.upgrade();
+        let tx_context_ref = runtime.get_executor_context();
         let vm_hooks_builder = TxContextVMHooksBuilder::new(tx_context_ref);
+
+        let opcode_cost = runtime.vm_ref.gas_schedule.wasm_opcode_cost.clone();
 
         Box::new(
             ExperimentalInstance::try_new_instance(
                 Rc::new(vm_hooks_builder),
-                Arc::new(OpcodeCost::default()),
+                Arc::new(opcode_cost),
                 wasm_bytes,
                 compilation_options,
             )

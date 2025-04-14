@@ -1,4 +1,4 @@
-use multiversx_chain_vm::blockchain::state::BlockchainState;
+use multiversx_chain_vm::{blockchain::state::BlockchainState, schedule::GasScheduleVersion};
 
 use crate::{
     scenario::{
@@ -52,6 +52,12 @@ impl ScenarioWorld {
 
     pub fn executor_config(mut self, config: ScenarioExecutorConfig) -> Self {
         self.get_mut_debugger_backend().vm_runner.executor_config = config;
+        self
+    }
+
+    pub fn gas_schedule(mut self, gas_schedule: GasScheduleVersion) -> Self {
+        let vm = &mut self.get_mut_debugger_backend().vm_runner.blockchain_mock.vm;
+        vm.change_gas_schedule(gas_schedule.load_gas_schedule());
         self
     }
 

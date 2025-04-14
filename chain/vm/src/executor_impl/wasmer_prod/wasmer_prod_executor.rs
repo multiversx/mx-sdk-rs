@@ -35,7 +35,8 @@ impl WasmerProdExecutor {
         wasm_bytes: &[u8],
         compilation_options: &CompilationOptions,
     ) -> Box<dyn Instance> {
-        let tx_context_ref = self.runtime_ref.upgrade().get_executor_context();
+        let runtime = self.runtime_ref.upgrade();
+        let tx_context_ref = runtime.get_executor_context();
 
         let inner_instance_ref = Rc::new_cyclic(|weak| {
             let vh_handler = TxContextVMHooksHandler::new(
@@ -43,8 +44,11 @@ impl WasmerProdExecutor {
                 Rc::new(WasmerProdInstanceState::new(weak.clone())),
             );
             let vm_hooks = VMHooksDispatcher::new(Box::new(vh_handler));
-            let executor_data_ref =
-                Rc::new(RefCell::new(WasmerExecutorData::new(Box::new(vm_hooks))));
+            let executor_data = WasmerExecutorData::new_with_gas(
+                Box::new(vm_hooks),
+                runtime.vm_ref.gas_schedule.wasm_opcode_cost.clone(),
+            );
+            let executor_data_ref = Rc::new(RefCell::new(executor_data));
 
             WasmerInstance::try_new_instance(
                 executor_data_ref.clone(),

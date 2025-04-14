@@ -27,3 +27,5 @@ pub use crate::{
 };
 
 pub use crate::multiversx_sc::chain_core::types::ReturnCode;
+
+pub use multiversx_chain_vm::schedule::GasScheduleVersion;

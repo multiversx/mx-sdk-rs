@@ -1,4 +1,5 @@
 pub const FUNCTION_NOT_FOUND: &str = "invalid function (not found)";
+pub const NOT_ENOUGH_GAS: &str = "not enough gas";
 
 pub const NON_PAYABLE_FUNC_EGLD: &str = "function does not accept EGLD payment";
 pub const NON_PAYABLE_FUNC_ESDT: &str = "function does not accept ESDT payment";

@@ -3,13 +3,17 @@ use std::{
     sync::{Arc, Mutex, Weak},
 };
 
-use multiversx_chain_vm_executor::{BreakpointValue, Executor, Instance};
+use multiversx_chain_core::types::ReturnCode;
+use multiversx_chain_vm_executor::{BreakpointValue, CompilationOptions, Executor, Instance};
 
 use crate::{
     blockchain::{state::BlockchainStateRef, VMConfigRef},
     display_util::address_hex,
     host::context::{BlockchainUpdate, TxCache, TxContext, TxContextRef, TxInput, TxResult},
+    vm_err_msg,
 };
+
+use super::context::GasUsed;
 
 pub struct Runtime {
     pub vm_ref: VMConfigRef,
@@ -99,6 +103,20 @@ impl RuntimeWeakRef {
     }
 }
 
+fn breakpoint_error_result(breakpoint: BreakpointValue, err: String) -> Option<TxResult> {
+    match breakpoint {
+        BreakpointValue::None => Some(TxResult::from_vm_error(err)),
+        BreakpointValue::ExecutionFailed => Some(TxResult::from_vm_error(err)),
+        BreakpointValue::AsyncCall => None,   // not an error
+        BreakpointValue::SignalError => None, // already handled
+        BreakpointValue::OutOfGas => Some(TxResult::from_error(
+            ReturnCode::OutOfGas,
+            vm_err_msg::NOT_ENOUGH_GAS,
+        )),
+        BreakpointValue::MemoryLimit => Some(TxResult::from_vm_error(err)),
+    }
+}
+
 pub fn instance_call(instance_call: RuntimeInstanceCall<'_>) {
     if !instance_call.instance.has_function(instance_call.func_name) {
         *instance_call.tx_context_ref.result_lock() = TxResult::from_function_not_found();
@@ -106,15 +124,26 @@ pub fn instance_call(instance_call: RuntimeInstanceCall<'_>) {
     }
 
     let result = instance_call.instance.call(instance_call.func_name);
+    let mut tx_result_ref = instance_call.tx_context_ref.result_lock();
     if let Err(err) = result {
         let breakpoint = instance_call
             .instance
             .get_breakpoint_value()
             .expect("error retrieving instance breakpoint value");
-        println!("breakpoint: {breakpoint:?}");
-        if breakpoint == BreakpointValue::None {
-            *instance_call.tx_context_ref.result_lock() = TxResult::from_vm_error(err);
+        if let Some(error_tx_result) = breakpoint_error_result(breakpoint, err) {
+            *tx_result_ref = error_tx_result;
         }
+    }
+
+    if tx_result_ref.result_status.is_success() {
+        let gas_used = instance_call
+            .instance
+            .get_points_used()
+            .expect("error retrieving gas used");
+        tx_result_ref.gas_used = GasUsed::SomeGas(gas_used);
+    } else {
+        tx_result_ref.gas_used =
+            GasUsed::AllGas(instance_call.tx_context_ref.tx_input_box.gas_limit);
     }
 }
 
@@ -152,13 +181,25 @@ impl RuntimeRef {
     {
         let func_name = tx_context.tx_input_box.func_name.clone();
         let contract_code = get_contract_identifier(&tx_context);
+        let gas_limit = tx_context.input_ref().gas_limit;
+
         let tx_context_ref = TxContextRef::new(Arc::new(tx_context));
 
         self.set_executor_context(Some(tx_context_ref.clone()));
 
+        let compilation_options = CompilationOptions {
+            gas_limit,
+            unmetered_locals: 0,
+            max_memory_grow: 0,
+            max_memory_grow_delta: 0,
+            opcode_trace: false,
+            metering: true,
+            runtime_breakpoints: true,
+        };
+
         let instance = self
             .executor
-            .new_instance(contract_code.as_slice(), &self.vm_ref.compilation_options)
+            .new_instance(contract_code.as_slice(), &compilation_options)
             .expect("error instantiating executor instance");
 
         self.set_executor_context(None);
