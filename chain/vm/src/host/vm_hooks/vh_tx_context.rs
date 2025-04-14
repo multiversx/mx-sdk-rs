@@ -208,7 +208,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             to: VMAddress::zero(),
             egld_value,
             esdt_values: Vec::new(),
-            func_name: TxFunctionName::EMPTY,
+            func_name: TxFunctionName::INIT,
             args,
             gas_limit: 1000,
             gas_price: 0,
