@@ -43,7 +43,6 @@ impl ScenarioVMRunner {
     {
         let tx_input = tx_input_from_query(step);
         let runtime = self.create_debugger_runtime();
-        // let tx_context = TxContext::new(runtime.clone(), tx_input, tx_cache);
         let tx_result = execution::execute_query(
             tx_input,
             &mut self.blockchain_mock.state,
