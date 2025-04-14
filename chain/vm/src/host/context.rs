@@ -18,6 +18,7 @@ mod tx_log;
 mod tx_panic;
 mod tx_result;
 mod tx_result_calls;
+mod tx_result_gas_used;
 
 pub use blockchain_update::BlockchainUpdate;
 pub use failing_executor::FailingExecutor;
@@ -36,6 +37,7 @@ pub use tx_log::*;
 pub use tx_panic::*;
 pub use tx_result::*;
 pub use tx_result_calls::*;
+pub use tx_result_gas_used::GasUsed;
 
 #[cfg(feature = "wasm-incompatible")]
 mod blockchain_rng;

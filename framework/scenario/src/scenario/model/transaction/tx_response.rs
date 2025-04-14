@@ -43,6 +43,7 @@ impl TxResponse {
                     data: tx_log.data.clone(),
                 })
                 .collect(),
+            gas_used: tx_result.gas_used.as_u64(),
             ..Default::default()
         }
     }

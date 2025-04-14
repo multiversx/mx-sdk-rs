@@ -4,7 +4,7 @@ use multiversx_chain_core::types::ReturnCode;
 
 use crate::vm_err_msg;
 
-use super::{AsyncCallTxData, TxLog, TxPanic, TxResultCalls};
+use super::{AsyncCallTxData, GasUsed, TxLog, TxPanic, TxResultCalls};
 
 #[derive(Clone, Debug)]
 #[must_use]
@@ -13,6 +13,8 @@ pub struct TxResult {
     pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
+
+    pub gas_used: GasUsed,
 
     /// Calls that need to be executed.
     ///
@@ -32,6 +34,7 @@ impl Default for TxResult {
             result_message: String::new(),
             result_values: Vec::new(),
             result_logs: Vec::new(),
+            gas_used: GasUsed::Unknown,
             pending_calls: TxResultCalls::empty(),
             all_calls: Vec::new(),
         }
@@ -48,46 +51,37 @@ impl TxResult {
     }
 
     pub fn from_panic_obj(panic_obj: &TxPanic) -> Self {
-        TxResult {
-            result_status: panic_obj.status,
-            result_message: panic_obj.message.clone(),
-            result_values: Vec::new(),
-            result_logs: Vec::new(),
-            ..Default::default()
-        }
+        TxResult::from_error(panic_obj.status, &panic_obj.message)
     }
 
     pub fn from_panic_string(s: &str) -> Self {
-        TxResult {
-            result_status: ReturnCode::UserError,
-            result_message: s.to_string(),
-            result_values: Vec::new(),
-            result_logs: Vec::new(),
-            ..Default::default()
-        }
+        TxResult::from_error(ReturnCode::UserError, s)
     }
 
     pub fn from_unknown_panic() -> Self {
         Self::from_panic_string("")
     }
 
-    pub fn from_vm_error<S>(result_message: S) -> Self
+    pub fn from_error<S>(return_code: ReturnCode, result_message: S) -> Self
     where
         S: Into<String>,
     {
         TxResult {
-            result_status: ReturnCode::ExecutionFailed,
+            result_status: return_code,
             result_message: result_message.into(),
             ..Default::default()
         }
     }
 
+    pub fn from_vm_error<S>(result_message: S) -> Self
+    where
+        S: Into<String>,
+    {
+        TxResult::from_error(ReturnCode::ExecutionFailed, result_message)
+    }
+
     pub fn from_function_not_found() -> Self {
-        TxResult {
-            result_status: ReturnCode::FunctionNotFound,
-            result_message: vm_err_msg::FUNCTION_NOT_FOUND.to_owned(),
-            ..Default::default()
-        }
+        TxResult::from_error(ReturnCode::FunctionNotFound, vm_err_msg::FUNCTION_NOT_FOUND)
     }
 
     pub fn merge_after_sync_call(&mut self, sync_call_result: &TxResult) {

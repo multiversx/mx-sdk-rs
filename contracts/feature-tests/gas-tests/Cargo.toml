@@ -1,12 +1,11 @@
 [package]
-name = "adder"
+name = "gas_tests"
 version = "0.0.0"
-authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
 edition = "2021"
 publish = false
 
 [lib]
-path = "src/adder.rs"
+path = "src/gas_tests.rs"
 
 [dependencies.multiversx-sc]
 version = "0.57.0"
@@ -15,3 +14,10 @@ path = "../../../framework/base"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.57.0"
 path = "../../../framework/scenario"
+
+[features]
+wasmer-prod = ["multiversx-sc-scenario/wasmer-prod"]
+wasmer-experimental = ["multiversx-sc-scenario/wasmer-experimental"]
+
+[workspace]
+members = ["."]
