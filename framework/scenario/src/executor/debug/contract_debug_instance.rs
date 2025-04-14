@@ -137,15 +137,15 @@ impl Instance for ContractDebugInstance {
     }
 
     fn set_points_limit(&self, _limit: u64) -> Result<(), String> {
-        panic!("ContractDebugInstance set_points_limit not supported")
+        Ok(())
     }
 
     fn get_points_used(&self) -> Result<u64, String> {
-        panic!("ContractDebugInstance get_points_used not supported")
+        Ok(0)
     }
 
     fn get_breakpoint_value(&self) -> Result<BreakpointValue, String> {
-        panic!("ContractDebugInstance get_breakpoint_value not supported")
+        Ok(BreakpointValue::None)
     }
 
     fn reset(&self) -> Result<(), String> {
