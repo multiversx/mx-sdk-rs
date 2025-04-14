@@ -23,14 +23,12 @@ impl ScenarioVMRunner {
     pub fn perform_sc_query_in_debugger(&mut self, step: &ScQueryStep) -> TxResult {
         let tx_input = tx_input_from_query(step);
         let runtime = self.create_debugger_runtime();
-        // let (tx_result, _) = runtime.execute_in_runtime(tx_input, &mut self.blockchain_mock.state);
         let tx_result = execution::execute_query(
             tx_input,
             &mut self.blockchain_mock.state,
             &runtime,
             instance_call,
         );
-        // });
 
         assert!(
             tx_result.pending_calls.no_calls(),
@@ -44,7 +42,6 @@ impl ScenarioVMRunner {
         F: FnOnce(),
     {
         let tx_input = tx_input_from_query(step);
-        // let tx_cache = TxCache::new(self.blockchain_mock.state.get_arc());
         let runtime = self.create_debugger_runtime();
         // let tx_context = TxContext::new(runtime.clone(), tx_input, tx_cache);
         let tx_result = execution::execute_query(
@@ -55,9 +52,6 @@ impl ScenarioVMRunner {
                 ContractDebugInstance::wrap_lambda_call(true, instance_call, f);
             },
         );
-        // let (tx_result, _) = runtime.execute_lambda_in_runtime(tx_context, |instance_call| {
-        //     ContractDebugInstance::wrap_lambda_call(true, instance_call, f);
-        // });
 
         assert!(
             tx_result.pending_calls.no_calls(),
