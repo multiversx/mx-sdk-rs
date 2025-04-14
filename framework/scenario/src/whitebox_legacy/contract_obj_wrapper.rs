@@ -2,7 +2,9 @@ use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    executor::debug::{ContractContainer, ContractDebugInstance, ContractDebugStack},
+    executor::debug::{
+        ContractContainer, ContractDebugInstance, ContractDebugStack, ContractDebugWhiteboxLambda,
+    },
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -628,11 +630,13 @@ impl BlockchainStateWrapper {
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda_and_check(&sc_call_step, |instance_call| {
-                ContractDebugInstance::wrap_lambda_call(false, instance_call, || {
+            .perform_sc_call_lambda_and_check(
+                &sc_call_step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_LEGACY, || {
                     tx_fn(sc);
-                });
-            });
+                })
+                .panic_message(false),
+            );
 
         tx_result
     }

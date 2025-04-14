@@ -1,11 +1,11 @@
 use crate::{
-    executor::debug::ContractDebugInstance, num_bigint::BigUint, scenario::model::ScQueryStep,
-    scenario_model::TxResponse,
+    executor::debug::ContractDebugWhiteboxLambda, num_bigint::BigUint,
+    scenario::model::ScQueryStep, scenario_model::TxResponse,
 };
 use multiversx_chain_vm::host::{
-    context::{TxInput, TxResult},
+    context::{TxFunctionName, TxInput, TxResult},
     execution,
-    runtime::instance_call,
+    runtime::DefaultRuntimeInstanceCallLambda,
 };
 
 use super::{tx_input_util::generate_tx_hash, ScenarioVMRunner};
@@ -27,7 +27,7 @@ impl ScenarioVMRunner {
             tx_input,
             &mut self.blockchain_mock.state,
             &runtime,
-            instance_call,
+            DefaultRuntimeInstanceCallLambda,
         );
 
         assert!(
@@ -37,7 +37,7 @@ impl ScenarioVMRunner {
         tx_result
     }
 
-    pub fn perform_sc_query_lambda_in_debugger<F>(&mut self, step: &ScQueryStep, f: F) -> TxResult
+    pub fn perform_sc_query_whitebox_in_debugger<F>(&mut self, step: &ScQueryStep, f: F) -> TxResult
     where
         F: FnOnce(),
     {
@@ -47,9 +47,7 @@ impl ScenarioVMRunner {
             tx_input,
             &mut self.blockchain_mock.state,
             &runtime,
-            |instance_call| {
-                ContractDebugInstance::wrap_lambda_call(true, instance_call, f);
-            },
+            ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_QUERY, f),
         );
 
         assert!(

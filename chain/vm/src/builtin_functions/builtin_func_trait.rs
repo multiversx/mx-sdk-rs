@@ -1,6 +1,6 @@
 use crate::{
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer},
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
+    host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     types::VMAddress,
 };
 
@@ -27,7 +27,7 @@ pub trait BuiltinFunction {
         lambda: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>);
+        F: RuntimeInstanceCallLambda;
 }
 
 /// Contains a builtin function call ESDT transfers (if any) and the real recipient of the transfer

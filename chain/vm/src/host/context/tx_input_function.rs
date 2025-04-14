@@ -61,7 +61,16 @@ impl TxFunctionName {
     pub const CALLBACK: TxFunctionName = TxFunctionName::from_static("callBack");
 
     /// Not a real function name (in fact it is an illegal name), just a flag to mark whitebox calls.
+    pub const WHITEBOX_INIT: TxFunctionName = TxFunctionName::from_static("<whitebox-init>");
+
+    /// Not a real function name (in fact it is an illegal name), just a flag to mark whitebox calls.
     pub const WHITEBOX_CALL: TxFunctionName = TxFunctionName::from_static("<whitebox-call>");
+
+    /// Not a real function name (in fact it is an illegal name), just a flag to mark whitebox calls.
+    pub const WHITEBOX_QUERY: TxFunctionName = TxFunctionName::from_static("<whitebox-query>");
+
+    /// Not a real function name (in fact it is an illegal name), just a flag to mark whitebox calls.
+    pub const WHITEBOX_LEGACY: TxFunctionName = TxFunctionName::from_static("<whitebox-legacy>");
 
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()

@@ -1,6 +1,6 @@
 use crate::chain_core::builtin_func_names::MIGRATE_USERNAME_FUNC_NAME;
 use crate::host::context::{BlockchainUpdate, TxCache, TxInput, TxResult};
-use crate::host::runtime::{RuntimeInstanceCall, RuntimeRef};
+use crate::host::runtime::{RuntimeInstanceCallLambda, RuntimeRef};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -21,7 +21,7 @@ impl BuiltinFunction for MigrateUserName {
         _f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         self.execute_with_result(tx_input, tx_cache)
             .unwrap_or_else(|err_result| (err_result, BlockchainUpdate::empty()))

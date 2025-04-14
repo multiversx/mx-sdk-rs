@@ -1,4 +1,4 @@
-use crate::executor::debug::ContractDebugInstance;
+use crate::executor::debug::ContractDebugWhiteboxLambda;
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::{
     imports::StaticApi, scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec,
@@ -60,11 +60,12 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_deploy_lambda(&step_wrapper.step, |instance_call| {
-                ContractDebugInstance::wrap_lambda_call(true, instance_call, || {
+            .perform_sc_deploy_lambda(
+                &step_wrapper.step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_INIT, || {
                     f(contract_obj);
-                });
-            });
+                }),
+            );
 
         let mut response = TxResponse::from_tx_result(tx_result);
         response.new_deployed_address = Some(new_address);
@@ -132,11 +133,12 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda(&step_wrapper.step, |instance_call| {
-                ContractDebugInstance::wrap_lambda_call(true, instance_call, || {
+            .perform_sc_call_lambda(
+                &step_wrapper.step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_CALL, || {
                     f(contract_obj);
-                });
-            });
+                }),
+            );
 
         let response = TxResponse::from_tx_result(tx_result);
         step_wrapper.step.save_response(response);
@@ -201,7 +203,7 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_query_lambda_in_debugger(&step_wrapper.step, || {
+            .perform_sc_query_whitebox_in_debugger(&step_wrapper.step, || {
                 f(contract_obj);
             });
 

@@ -13,7 +13,7 @@ use crate::{
     vm_err_msg,
 };
 
-use super::context::GasUsed;
+use super::context::{GasUsed, TxFunctionName};
 
 pub struct Runtime {
     pub vm_ref: VMConfigRef,
@@ -27,7 +27,7 @@ pub struct RuntimeRef(Arc<Runtime>);
 #[derive(Clone)]
 pub struct RuntimeWeakRef(Weak<Runtime>);
 
-pub struct RuntimeInstanceCall<'a> {
+pub struct RuntimeInstanceCallArg<'a> {
     pub instance: &'a dyn Instance,
     pub func_name: &'a str,
     pub tx_context_ref: &'a TxContextRef,
@@ -93,6 +93,24 @@ impl Deref for RuntimeRef {
     }
 }
 
+pub trait RuntimeInstanceCallLambda {
+    fn call(self, instance_call: RuntimeInstanceCallArg<'_>);
+
+    fn override_function_name(&self) -> Option<TxFunctionName>;
+}
+
+pub struct DefaultRuntimeInstanceCallLambda;
+
+impl RuntimeInstanceCallLambda for DefaultRuntimeInstanceCallLambda {
+    fn call(self, ic: RuntimeInstanceCallArg<'_>) {
+        instance_call(ic);
+    }
+
+    fn override_function_name(&self) -> Option<TxFunctionName> {
+        None
+    }
+}
+
 impl RuntimeWeakRef {
     pub fn upgrade(&self) -> RuntimeRef {
         RuntimeRef(
@@ -117,7 +135,7 @@ fn breakpoint_error_result(breakpoint: BreakpointValue, err: String) -> Option<T
     }
 }
 
-pub fn instance_call(instance_call: RuntimeInstanceCall<'_>) {
+pub fn instance_call(instance_call: RuntimeInstanceCallArg<'_>) {
     if !instance_call.instance.has_function(instance_call.func_name) {
         *instance_call.tx_context_ref.result_lock() = TxResult::from_function_not_found();
         return;
@@ -154,7 +172,7 @@ impl RuntimeRef {
     /// Default it is the `instance_call` function.
     pub fn execute<F>(&self, tx_context: TxContext, call_lambda: F) -> TxContext
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         let func_name = tx_context.tx_input_box.func_name.clone();
         let contract_code = get_contract_identifier(&tx_context);
@@ -181,7 +199,7 @@ impl RuntimeRef {
 
         self.set_executor_context(None);
 
-        call_lambda(RuntimeInstanceCall {
+        call_lambda.call(RuntimeInstanceCallArg {
             instance: &*instance,
             func_name: func_name.as_str(),
             tx_context_ref: &tx_context_ref,

@@ -2,7 +2,7 @@ use crate::{
     builtin_functions::BuiltinFunctionEsdtTransferInfo,
     chain_core::builtin_func_names::ESDT_NFT_TRANSFER_FUNC_NAME,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
+    host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     types::VMAddress,
 };
 
@@ -38,7 +38,7 @@ impl BuiltinFunction for ESDTNftTransfer {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         match try_parse_input(&tx_input) {
             Ok(parsed_tx) => {
