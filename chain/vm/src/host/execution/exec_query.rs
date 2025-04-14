@@ -18,7 +18,7 @@ where
 {
     let tx_cache = TxCache::new(state.get_arc());
     let tx_context = TxContext::new(runtime.clone(), tx_input, tx_cache);
-    let tx_context = runtime.execute_tx_context_in_runtime(tx_context, f);
+    let tx_context = runtime.execute(tx_context, f);
     let (tx_result, _) = tx_context.into_results();
     tx_result
 }

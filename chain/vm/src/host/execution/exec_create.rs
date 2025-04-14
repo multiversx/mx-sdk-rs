@@ -76,7 +76,7 @@ where
         .tx_cache
         .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
-    let tx_context = runtime.execute_tx_context_in_runtime(tx_context, f);
+    let tx_context = runtime.execute(tx_context, f);
 
     let (tx_result, blockchain_updates) = tx_context.into_results();
     (tx_result, new_address, blockchain_updates)

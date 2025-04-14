@@ -148,11 +148,11 @@ pub fn instance_call(instance_call: RuntimeInstanceCall<'_>) {
 }
 
 impl RuntimeRef {
-    pub fn execute_tx_context_in_runtime<F>(
-        &self,
-        tx_context: TxContext,
-        call_lambda: F,
-    ) -> TxContext
+    /// Executes smart contract call using the given tx context, and the configured executor.
+    ///
+    /// It is possible to customize the specific instance call using the given lambda argument.
+    /// Default it is the `instance_call` function.
+    pub fn execute<F>(&self, tx_context: TxContext, call_lambda: F) -> TxContext
     where
         F: FnOnce(RuntimeInstanceCall<'_>),
     {
