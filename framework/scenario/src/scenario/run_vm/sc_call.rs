@@ -5,7 +5,7 @@ use crate::{
 };
 
 use multiversx_chain_vm::host::{
-    context::{TxInput, TxResult, TxTokenTransfer},
+    context::{TxFunctionName, TxInput, TxResult, TxTokenTransfer},
     execution,
     runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
 };
@@ -54,7 +54,7 @@ impl ScenarioVMRunner {
     where
         F: RuntimeInstanceCallLambda,
     {
-        let tx_input = tx_input_from_call(sc_call_step);
+        let tx_input = tx_input_from_call(sc_call_step, f.override_function_name());
 
         // nonce gets increased irrespective of whether the tx fails or not
         self.blockchain_mock
@@ -86,14 +86,17 @@ impl ScenarioVMRunner {
     }
 }
 
-fn tx_input_from_call(sc_call_step: &ScCallStep) -> TxInput {
+fn tx_input_from_call(
+    sc_call_step: &ScCallStep,
+    override_func_name: Option<TxFunctionName>,
+) -> TxInput {
     let tx = &sc_call_step.tx;
     TxInput {
         from: tx.from.to_address(),
         to: tx.to.to_address(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: tx_esdt_transfers_from_scenario(tx.esdt_value.as_slice()),
-        func_name: tx.function.clone().into(),
+        func_name: override_func_name.unwrap_or_else(|| tx.function.clone().into()),
         args: tx
             .arguments
             .iter()

@@ -203,9 +203,12 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_query_whitebox_in_debugger(&step_wrapper.step, || {
-                f(contract_obj);
-            });
+            .perform_sc_query_in_debugger(
+                &step_wrapper.step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_QUERY, || {
+                    f(contract_obj);
+                }),
+            );
 
         let response = TxResponse::from_tx_result(tx_result);
         step_wrapper.step.save_response(response);

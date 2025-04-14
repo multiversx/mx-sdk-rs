@@ -1,6 +1,6 @@
 use crate::{
     blockchain::state::BlockchainStateRef,
-    host::context::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxResult},
+    host::context::{BlockchainUpdate, TxCache, TxContext, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     types::{VMAddress, VMCodeMetadata},
 };
@@ -52,7 +52,6 @@ where
 {
     let new_address = tx_cache.get_new_address(&tx_input.from);
     tx_input.to = new_address.clone();
-    tx_input.func_name = TxFunctionName::INIT;
     let tx_context = TxContext::new(runtime.clone(), tx_input, tx_cache);
     let tx_input_ref = tx_context.input_ref();
 

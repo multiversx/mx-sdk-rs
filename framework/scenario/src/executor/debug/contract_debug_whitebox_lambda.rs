@@ -37,6 +37,12 @@ where
     F: FnOnce(),
 {
     fn call(self, instance_call: RuntimeInstanceCall<'_>) {
+        assert_eq!(
+            self.function_name,
+            instance_call.tx_context_ref.input_ref().func_name,
+            "unexpected whitebox function name"
+        );
+
         ContractDebugInstance::wrap_lambda_call(
             self.panic_message_flag,
             instance_call,

@@ -33,7 +33,7 @@ impl ScenarioVMRunner {
     where
         F: RuntimeInstanceCallLambda,
     {
-        let tx_input = tx_input_from_deploy(sc_deploy_step);
+        let tx_input = tx_input_from_deploy(sc_deploy_step, f.override_function_name());
         let runtime = self.create_debugger_runtime();
         let contract_code = &sc_deploy_step.tx.contract_code.value;
         let (new_address, tx_result) = execution::commit_deploy(
@@ -67,14 +67,17 @@ impl ScenarioVMRunner {
     }
 }
 
-fn tx_input_from_deploy(sc_deploy_step: &ScDeployStep) -> TxInput {
+fn tx_input_from_deploy(
+    sc_deploy_step: &ScDeployStep,
+    override_func_name: Option<TxFunctionName>,
+) -> TxInput {
     let tx = &sc_deploy_step.tx;
     TxInput {
         from: tx.from.to_address(),
         to: multiversx_chain_vm::types::VMAddress::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
-        func_name: TxFunctionName::INIT,
+        func_name: override_func_name.unwrap_or(TxFunctionName::INIT),
         args: tx
             .arguments
             .iter()
