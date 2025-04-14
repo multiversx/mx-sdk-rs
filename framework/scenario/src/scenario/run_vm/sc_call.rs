@@ -7,7 +7,7 @@ use crate::{
 use multiversx_chain_vm::host::{
     context::{TxInput, TxResult, TxTokenTransfer},
     execution,
-    runtime::{DefaultRuntimeInstanceCallLambda, RuntimeInstanceCallLambda},
+    runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
 };
 use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti};
 
@@ -19,7 +19,7 @@ impl ScenarioVMRunner {
     /// The result of the operation gets saved back in the step's response field.
     pub fn perform_sc_call_update_results(&mut self, step: &mut ScCallStep) {
         let tx_result =
-            self.perform_sc_call_lambda_and_check(step, DefaultRuntimeInstanceCallLambda);
+            self.perform_sc_call_lambda_and_check(step, RuntimeInstanceCallLambdaDefault);
         let response = TxResponse::from_tx_result(tx_result);
         step.save_response(response);
     }
@@ -45,7 +45,7 @@ impl ScenarioVMRunner {
     {
         let sc_call_step: ScCallStep = typed_sc_call.into();
         let tx_result =
-            self.perform_sc_call_lambda(&sc_call_step, DefaultRuntimeInstanceCallLambda);
+            self.perform_sc_call_lambda(&sc_call_step, RuntimeInstanceCallLambdaDefault);
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }

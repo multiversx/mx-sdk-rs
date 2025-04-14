@@ -1,6 +1,6 @@
 use multiversx_chain_vm::host::{
     context::TxFunctionName,
-    runtime::{RuntimeInstanceCallArg, RuntimeInstanceCallLambda},
+    runtime::{RuntimeInstanceCall, RuntimeInstanceCallLambda},
 };
 
 use crate::executor::debug::ContractDebugInstance;
@@ -36,7 +36,7 @@ impl<F> RuntimeInstanceCallLambda for ContractDebugWhiteboxLambda<F>
 where
     F: FnOnce(),
 {
-    fn call(self, instance_call: RuntimeInstanceCallArg<'_>) {
+    fn call(self, instance_call: RuntimeInstanceCall<'_>) {
         ContractDebugInstance::wrap_lambda_call(
             self.panic_message_flag,
             instance_call,

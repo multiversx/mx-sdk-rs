@@ -5,7 +5,7 @@ use multiversx_chain_vm::{
     host::{
         context::{TxFunctionName, TxInput},
         execution,
-        runtime::{DefaultRuntimeInstanceCallLambda, RuntimeRef},
+        runtime::{RuntimeInstanceCallLambdaDefault, RuntimeRef},
     },
 };
 
@@ -44,6 +44,6 @@ fn execute(runtime: &RuntimeRef, state: &mut BlockchainStateRef, tx_transfer: &T
     state.increase_account_nonce(&tx_input.from);
 
     let tx_result =
-        execution::commit_call(tx_input, state, runtime, DefaultRuntimeInstanceCallLambda);
+        execution::commit_call(tx_input, state, runtime, RuntimeInstanceCallLambdaDefault);
     tx_result.assert_ok();
 }

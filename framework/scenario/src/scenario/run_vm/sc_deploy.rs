@@ -6,7 +6,7 @@ use multiversx_chain_vm::{
     host::{
         context::{TxFunctionName, TxInput, TxResult},
         execution,
-        runtime::{DefaultRuntimeInstanceCallLambda, RuntimeInstanceCallLambda},
+        runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
     },
     types::VMCodeMetadata,
 };
@@ -19,7 +19,7 @@ impl ScenarioVMRunner {
     /// The result of the operation gets saved back in the step's response field.
     pub fn perform_sc_deploy_update_results(&mut self, step: &mut ScDeployStep) {
         let (new_address, tx_result) =
-            self.perform_sc_deploy_lambda_and_check(step, DefaultRuntimeInstanceCallLambda);
+            self.perform_sc_deploy_lambda_and_check(step, RuntimeInstanceCallLambdaDefault);
         let mut response = TxResponse::from_tx_result(tx_result);
         response.new_deployed_address = Some(new_address);
         step.save_response(response);

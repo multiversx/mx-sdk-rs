@@ -5,7 +5,7 @@ use crate::{
 use multiversx_chain_vm::host::{
     context::{TxFunctionName, TxInput, TxResult},
     execution,
-    runtime::DefaultRuntimeInstanceCallLambda,
+    runtime::RuntimeInstanceCallLambdaDefault,
 };
 
 use super::{tx_input_util::generate_tx_hash, ScenarioVMRunner};
@@ -27,7 +27,7 @@ impl ScenarioVMRunner {
             tx_input,
             &mut self.blockchain_mock.state,
             &runtime,
-            DefaultRuntimeInstanceCallLambda,
+            RuntimeInstanceCallLambdaDefault,
         );
 
         assert!(

@@ -6,7 +6,7 @@ use crate::{
             merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxInput,
             TxPanic, TxResult, TxResultCalls,
         },
-        runtime::{DefaultRuntimeInstanceCallLambda, RuntimeInstanceCallLambda, RuntimeRef},
+        runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault, RuntimeRef},
     },
     types::VMCodeMetadata,
 };
@@ -99,7 +99,7 @@ fn commit_async_call_and_callback(
             async_input,
             state,
             runtime,
-            DefaultRuntimeInstanceCallLambda,
+            RuntimeInstanceCallLambdaDefault,
         );
 
         let callback_input = async_callback_tx_input(
@@ -111,7 +111,7 @@ fn commit_async_call_and_callback(
             callback_input,
             state,
             runtime,
-            DefaultRuntimeInstanceCallLambda,
+            RuntimeInstanceCallLambdaDefault,
         );
         assert!(
             callback_result.pending_calls.async_call.is_none(),
@@ -142,7 +142,7 @@ fn commit_promise_call_and_callback(
             async_input,
             state,
             runtime,
-            DefaultRuntimeInstanceCallLambda,
+            RuntimeInstanceCallLambdaDefault,
         );
         let callback_result = commit_promises_callback(&async_result, promise, state, runtime);
         (async_result, callback_result)
@@ -173,7 +173,7 @@ fn commit_promises_callback(
         callback_input,
         state,
         runtime,
-        DefaultRuntimeInstanceCallLambda,
+        RuntimeInstanceCallLambdaDefault,
     );
     assert!(
         callback_result.pending_calls.promises.is_empty(),

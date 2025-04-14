@@ -6,7 +6,7 @@ use multiversx_chain_vm_executor::{BreakpointValue, InstanceState, MemLength, Me
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::host::runtime::DefaultRuntimeInstanceCallLambda;
+use crate::host::runtime::RuntimeInstanceCallLambdaDefault;
 use crate::{
     blockchain::{
         reserved::STORAGE_RESERVED_PREFIX,
@@ -155,7 +155,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             tx_input,
             tx_cache,
             &self.tx_context_ref.runtime_ref,
-            DefaultRuntimeInstanceCallLambda,
+            RuntimeInstanceCallLambdaDefault,
         );
 
         if tx_result.result_status.is_success() {
@@ -182,7 +182,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             tx_input,
             tx_cache,
             &self.tx_context_ref.runtime_ref,
-            DefaultRuntimeInstanceCallLambda,
+            RuntimeInstanceCallLambdaDefault,
         );
 
         if tx_result.result_status.is_success() {
@@ -224,7 +224,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             code_metadata,
             tx_cache,
             &self.tx_context_ref.runtime_ref,
-            DefaultRuntimeInstanceCallLambda,
+            RuntimeInstanceCallLambdaDefault,
         );
 
         match tx_result.result_status {
@@ -263,7 +263,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             tx_input,
             tx_cache,
             &self.tx_context_ref.runtime_ref,
-            DefaultRuntimeInstanceCallLambda,
+            RuntimeInstanceCallLambdaDefault,
         );
 
         match tx_result.result_status {
