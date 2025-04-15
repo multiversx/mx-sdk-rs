@@ -5,7 +5,7 @@ use crate::{
     blockchain::state::{EsdtInstance, EsdtInstanceMetadata},
     chain_core::builtin_func_names::ESDT_NFT_CREATE_FUNC_NAME,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
+    host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     types::{top_decode_u64, top_encode_u64},
 };
 
@@ -26,7 +26,7 @@ impl BuiltinFunction for ESDTNftCreate {
         _f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         if tx_input.args.len() < 7 {
             let err_result = TxResult::from_vm_error("ESDTNFTCreate too few arguments");

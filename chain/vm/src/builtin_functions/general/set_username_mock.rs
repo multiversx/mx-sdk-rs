@@ -1,6 +1,6 @@
 use crate::chain_core::builtin_func_names::SET_USERNAME_FUNC_NAME;
 use crate::host::context::{BlockchainUpdate, TxCache, TxInput, TxResult};
-use crate::host::runtime::{RuntimeInstanceCall, RuntimeRef};
+use crate::host::runtime::{RuntimeInstanceCallLambda, RuntimeRef};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -19,7 +19,7 @@ impl BuiltinFunction for SetUsername {
         _f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         if tx_input.args.len() != 1 {
             return (

@@ -1,8 +1,8 @@
 use std::rc::Rc;
 
-use multiversx_chain_vm::{
-    host::context::{TxContextRef, TxFunctionName, TxPanic},
-    host::runtime::RuntimeInstanceCall,
+use multiversx_chain_vm::host::{
+    context::{TxContextRef, TxFunctionName, TxPanic},
+    runtime::RuntimeInstanceCall,
 };
 use multiversx_chain_vm_executor::{BreakpointValue, Instance};
 use multiversx_sc::chain_core::types::ReturnCode;
@@ -41,9 +41,9 @@ impl ContractDebugInstance {
         }
     }
 
-    pub fn wrap_lambda_call<F>(
+    pub(super) fn wrap_lambda_call<F>(
         panic_message_flag: bool,
-        instance_call: RuntimeInstanceCall<'_>,
+        instance_call: RuntimeInstanceCall,
         f: F,
     ) where
         F: FnOnce(),

@@ -3,9 +3,11 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    host::context::{TxFunctionName, TxInput, TxResult},
-    host::execution,
-    host::runtime::{instance_call, RuntimeInstanceCall},
+    host::{
+        context::{TxFunctionName, TxInput, TxResult},
+        execution,
+        runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
+    },
     types::VMCodeMetadata,
 };
 
@@ -16,7 +18,8 @@ impl ScenarioVMRunner {
     ///
     /// The result of the operation gets saved back in the step's response field.
     pub fn perform_sc_deploy_update_results(&mut self, step: &mut ScDeployStep) {
-        let (new_address, tx_result) = self.perform_sc_deploy_lambda_and_check(step, instance_call);
+        let (new_address, tx_result) =
+            self.perform_sc_deploy_lambda_and_check(step, RuntimeInstanceCallLambdaDefault);
         let mut response = TxResponse::from_tx_result(tx_result);
         response.new_deployed_address = Some(new_address);
         step.save_response(response);
@@ -28,9 +31,9 @@ impl ScenarioVMRunner {
         f: F,
     ) -> (Address, TxResult)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
-        let tx_input = tx_input_from_deploy(sc_deploy_step);
+        let tx_input = tx_input_from_deploy(sc_deploy_step, f.override_function_name());
         let runtime = self.create_debugger_runtime();
         let contract_code = &sc_deploy_step.tx.contract_code.value;
         let (new_address, tx_result) = execution::commit_deploy(
@@ -54,7 +57,7 @@ impl ScenarioVMRunner {
         f: F,
     ) -> (Address, TxResult)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         let (new_address, tx_result) = self.perform_sc_deploy_lambda(sc_deploy_step, f);
         if let Some(tx_expect) = &sc_deploy_step.expect {
@@ -64,14 +67,17 @@ impl ScenarioVMRunner {
     }
 }
 
-fn tx_input_from_deploy(sc_deploy_step: &ScDeployStep) -> TxInput {
+fn tx_input_from_deploy(
+    sc_deploy_step: &ScDeployStep,
+    override_func_name: Option<TxFunctionName>,
+) -> TxInput {
     let tx = &sc_deploy_step.tx;
     TxInput {
         from: tx.from.to_address(),
         to: multiversx_chain_vm::types::VMAddress::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
-        func_name: TxFunctionName::INIT,
+        func_name: override_func_name.unwrap_or(TxFunctionName::INIT),
         args: tx
             .arguments
             .iter()

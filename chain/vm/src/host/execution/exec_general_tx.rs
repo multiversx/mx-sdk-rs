@@ -6,7 +6,7 @@ use crate::{
             BlockchainUpdate, CallType, TxCache, TxContext, TxFunctionName, TxInput, TxLog,
             TxResult,
         },
-        runtime::{RuntimeInstanceCall, RuntimeRef},
+        runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     },
     system_sc::{execute_system_sc, is_system_sc_address},
     types::top_encode_big_uint,
@@ -19,7 +19,7 @@ pub fn execute_builtin_function_or_default<F>(
     f: F,
 ) -> (TxResult, BlockchainUpdate)
 where
-    F: FnOnce(RuntimeInstanceCall<'_>),
+    F: RuntimeInstanceCallLambda,
 {
     runtime
         .vm_ref
@@ -107,7 +107,7 @@ pub fn execute_default<F>(
     f: F,
 ) -> (TxResult, BlockchainUpdate)
 where
-    F: FnOnce(RuntimeInstanceCall<'_>),
+    F: RuntimeInstanceCallLambda,
 {
     if let Err(err) =
         tx_cache.transfer_egld_balance(&tx_input.from, &tx_input.to, &tx_input.egld_value)

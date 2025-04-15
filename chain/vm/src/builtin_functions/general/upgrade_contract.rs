@@ -2,7 +2,7 @@ use crate::{
     chain_core::builtin_func_names::UPGRADE_CONTRACT_FUNC_NAME,
     host::context::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult},
     host::execution,
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
+    host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     types::VMCodeMetadata,
 };
 
@@ -23,7 +23,7 @@ impl BuiltinFunction for UpgradeContract {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         if tx_input.args.len() < 2 {
             return (

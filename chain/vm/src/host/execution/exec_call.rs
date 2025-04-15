@@ -1,12 +1,13 @@
 use crate::{
     blockchain::state::{AccountData, AccountEsdt, BlockchainStateRef},
-    host::context::{
-        async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
-        merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxInput,
-        TxPanic, TxResult, TxResultCalls,
+    host::{
+        context::{
+            async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
+            merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxInput,
+            TxPanic, TxResult, TxResultCalls,
+        },
+        runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault, RuntimeRef},
     },
-    host::runtime::instance_call,
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
     types::VMCodeMetadata,
 };
 use num_bigint::BigUint;
@@ -25,7 +26,7 @@ pub fn commit_call<F>(
     f: F,
 ) -> TxResult
 where
-    F: FnOnce(RuntimeInstanceCall<'_>),
+    F: RuntimeInstanceCallLambda,
 {
     state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
@@ -50,7 +51,7 @@ pub fn commit_call_with_async_and_callback<F>(
     f: F,
 ) -> TxResult
 where
-    F: FnOnce(RuntimeInstanceCall<'_>),
+    F: RuntimeInstanceCallLambda,
 {
     // main call
     let mut tx_result = commit_call(tx_input, state, runtime, f);
@@ -94,15 +95,24 @@ fn commit_async_call_and_callback(
     if state.accounts.contains_key(&async_data.to) {
         let async_input = async_call_tx_input(&async_data, CallType::AsyncCall);
 
-        let async_result =
-            commit_call_with_async_and_callback(async_input, state, runtime, instance_call);
+        let async_result = commit_call_with_async_and_callback(
+            async_input,
+            state,
+            runtime,
+            RuntimeInstanceCallLambdaDefault,
+        );
 
         let callback_input = async_callback_tx_input(
             &async_data,
             &async_result,
             &runtime.vm_ref.builtin_functions,
         );
-        let callback_result = commit_call(callback_input, state, runtime, instance_call);
+        let callback_result = commit_call(
+            callback_input,
+            state,
+            runtime,
+            RuntimeInstanceCallLambdaDefault,
+        );
         assert!(
             callback_result.pending_calls.async_call.is_none(),
             "successive asyncs currently not supported"
@@ -128,8 +138,12 @@ fn commit_promise_call_and_callback(
 ) -> (TxResult, TxResult) {
     if state.accounts.contains_key(&promise.call.to) {
         let async_input = async_call_tx_input(&promise.call, CallType::AsyncCall);
-        let async_result =
-            commit_call_with_async_and_callback(async_input, state, runtime, instance_call);
+        let async_result = commit_call_with_async_and_callback(
+            async_input,
+            state,
+            runtime,
+            RuntimeInstanceCallLambdaDefault,
+        );
         let callback_result = commit_promises_callback(&async_result, promise, state, runtime);
         (async_result, callback_result)
     } else {
@@ -155,7 +169,12 @@ fn commit_promises_callback(
     }
     let callback_input =
         async_promise_callback_tx_input(promise, async_result, &runtime.vm_ref.builtin_functions);
-    let callback_result = commit_call(callback_input, state, runtime, instance_call);
+    let callback_result = commit_call(
+        callback_input,
+        state,
+        runtime,
+        RuntimeInstanceCallLambdaDefault,
+    );
     assert!(
         callback_result.pending_calls.promises.is_empty(),
         "successive promises currently not supported"

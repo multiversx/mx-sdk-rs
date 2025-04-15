@@ -11,7 +11,7 @@ use super::{
 
 use crate::{
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
+    host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     types::EsdtLocalRole,
 };
 
@@ -36,7 +36,7 @@ impl BuiltinFunctionContainer {
         or_else: Else,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
         Else: FnOnce(TxInput, TxCache, F) -> (TxResult, BlockchainUpdate),
     {
         BuiltinFunctionCall::new(runtime, tx_input, tx_cache).execute_or_else(f, or_else)
@@ -79,7 +79,7 @@ impl<'a> BuiltinFunctionCall<'a> {
 
     pub fn execute_or_else<F, Else>(self, f: F, or_else: Else) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
         Else: FnOnce(TxInput, TxCache, F) -> (TxResult, BlockchainUpdate),
     {
         match self.tx_input.func_name.as_str() {
@@ -125,7 +125,7 @@ impl<'a> BuiltinFunctionCall<'a> {
     fn execute_bf<B, F>(self, builtin_func: B, f: F) -> (TxResult, BlockchainUpdate)
     where
         B: BuiltinFunction,
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         builtin_func.execute(self.tx_input, self.tx_cache, self.runtime, f)
     }
@@ -138,7 +138,7 @@ impl<'a> BuiltinFunctionCall<'a> {
     ) -> (TxResult, BlockchainUpdate)
     where
         B: BuiltinFunction,
-        F: FnOnce(RuntimeInstanceCall<'_>),
+        F: RuntimeInstanceCallLambda,
     {
         if check_allowed_to_execute(role, &self.tx_input, &self.tx_cache) {
             self.execute_bf(builtin_func, f)

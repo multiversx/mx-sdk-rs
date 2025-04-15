@@ -1,7 +1,7 @@
 use crate::{
     blockchain::state::BlockchainStateRef,
-    host::context::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxResult},
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
+    host::context::{BlockchainUpdate, TxCache, TxContext, TxInput, TxResult},
+    host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     types::{VMAddress, VMCodeMetadata},
 };
 
@@ -15,7 +15,7 @@ pub fn commit_deploy<F>(
     f: F,
 ) -> (VMAddress, TxResult)
 where
-    F: FnOnce(RuntimeInstanceCall<'_>),
+    F: RuntimeInstanceCallLambda,
 {
     // nonce gets increased irrespective of whether the tx fails or not
     // must be done after computing the new address
@@ -48,11 +48,10 @@ pub fn execute_deploy<F>(
     f: F,
 ) -> (TxResult, VMAddress, BlockchainUpdate)
 where
-    F: FnOnce(RuntimeInstanceCall<'_>),
+    F: RuntimeInstanceCallLambda,
 {
     let new_address = tx_cache.get_new_address(&tx_input.from);
     tx_input.to = new_address.clone();
-    tx_input.func_name = TxFunctionName::INIT;
     let tx_context = TxContext::new(runtime.clone(), tx_input, tx_cache);
     let tx_input_ref = tx_context.input_ref();
 

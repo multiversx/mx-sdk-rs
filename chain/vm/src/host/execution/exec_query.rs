@@ -2,7 +2,7 @@ use crate::{
     blockchain::state::BlockchainStateRef,
     host::{
         context::{TxCache, TxContext, TxInput, TxResult},
-        runtime::{RuntimeInstanceCall, RuntimeRef},
+        runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     },
 };
 
@@ -14,7 +14,7 @@ pub fn execute_query<F>(
     f: F,
 ) -> TxResult
 where
-    F: FnOnce(RuntimeInstanceCall<'_>),
+    F: RuntimeInstanceCallLambda,
 {
     let tx_cache = TxCache::new(state.get_arc());
     let tx_context = TxContext::new(runtime.clone(), tx_input, tx_cache);

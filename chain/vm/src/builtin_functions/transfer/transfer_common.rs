@@ -5,7 +5,7 @@ use crate::{
         TxTokenTransfer,
     },
     host::execution,
-    host::runtime::{RuntimeInstanceCall, RuntimeRef},
+    host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
     types::{top_decode_u64, VMAddress},
 };
 use num_bigint::BigUint;
@@ -66,7 +66,7 @@ pub(super) fn execute_transfer_builtin_func<F>(
     f: F,
 ) -> (TxResult, BlockchainUpdate)
 where
-    F: FnOnce(RuntimeInstanceCall<'_>),
+    F: RuntimeInstanceCallLambda,
 {
     let exec_input = TxInput {
         from: tx_input.from,
