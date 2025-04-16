@@ -47,23 +47,21 @@ impl VMHooks for VMHooksDispatcher {
 
     fn get_shard_of_address(&mut self, address_offset: MemPtr) -> i32 {
         unsafe {
-            let address_bytes = self.handler.memory_load_owned(address_offset, 32);
+            let address_bytes = self.handler.memory_load(address_offset, 32);
             self.handler.get_shard_of_address(&address_bytes)
         }
     }
 
     fn is_smart_contract(&mut self, address_offset: MemPtr) -> i32 {
         unsafe {
-            let address_bytes = self.handler.memory_load_owned(address_offset, 32);
+            let address_bytes = self.handler.memory_load(address_offset, 32);
             bool_to_i32(self.handler.is_smart_contract(&address_bytes))
         }
     }
 
     fn signal_error(&mut self, message_offset: MemPtr, message_length: MemLength) {
         unsafe {
-            let message = self
-                .handler
-                .memory_load_owned(message_offset, message_length);
+            let message = self.handler.memory_load(message_offset, message_length);
             self.handler.signal_error(&message);
         }
     }
@@ -406,10 +404,8 @@ impl VMHooks for VMHooksDispatcher {
         token_id_len: MemLength,
     ) -> i64 {
         unsafe {
-            let address_bytes = self.handler.memory_load_owned(address_offset, 32);
-            let token_id_bytes = self
-                .handler
-                .memory_load_owned(token_id_offset, token_id_len);
+            let address_bytes = self.handler.memory_load(address_offset, 32);
+            let token_id_bytes = self.handler.memory_load(token_id_offset, token_id_len);
             self.handler
                 .get_current_esdt_nft_nonce(&address_bytes, &token_id_bytes) as i64
         }
@@ -511,7 +507,7 @@ impl VMHooks for VMHooksDispatcher {
 
     fn finish(&mut self, pointer: MemPtr, length: MemLength) {
         unsafe {
-            let bytes = self.handler.memory_load_owned(pointer, length);
+            let bytes = self.handler.memory_load(pointer, length);
             self.handler.finish_slice_u8(&bytes);
         }
     }
@@ -737,10 +733,8 @@ impl VMHooks for VMHooksDispatcher {
         callback_closure_handle: i32,
     ) -> i32 {
         unsafe {
-            let success_callback = self
-                .handler
-                .memory_load_owned(success_offset, success_length);
-            let error_callback = self.handler.memory_load_owned(error_offset, error_length);
+            let success_callback = self.handler.memory_load(success_offset, success_length);
+            let error_callback = self.handler.memory_load(error_offset, error_length);
             self.handler.create_async_call_raw(
                 dest_handle,
                 value_handle,
@@ -1111,7 +1105,7 @@ impl VMHooks for VMHooksDispatcher {
 
     fn big_int_get_external_balance(&mut self, address_offset: MemPtr, result: i32) {
         unsafe {
-            let address_bytes = self.handler.memory_load_owned(address_offset, 32);
+            let address_bytes = self.handler.memory_load(address_offset, 32);
             self.handler.load_balance(&address_bytes, result);
         }
     }
@@ -1125,10 +1119,8 @@ impl VMHooks for VMHooksDispatcher {
         result_handle: i32,
     ) {
         unsafe {
-            let address_bytes = self.handler.memory_load_owned(address_offset, 32);
-            let token_id_bytes = self
-                .handler
-                .memory_load_owned(token_id_offset, token_id_len);
+            let address_bytes = self.handler.memory_load(address_offset, 32);
+            let token_id_bytes = self.handler.memory_load(token_id_offset, token_id_len);
             self.handler.big_int_get_esdt_external_balance(
                 &address_bytes,
                 &token_id_bytes,
@@ -1167,7 +1159,7 @@ impl VMHooks for VMHooksDispatcher {
         unsafe {
             let bytes = self.handler.memory_load(byte_offset, byte_length);
             self.handler
-                .bi_set_unsigned_bytes(destination_handle, bytes);
+                .bi_set_unsigned_bytes(destination_handle, &bytes);
         }
     }
 
@@ -1179,7 +1171,7 @@ impl VMHooks for VMHooksDispatcher {
     ) {
         unsafe {
             let bytes = self.handler.memory_load(byte_offset, byte_length);
-            self.handler.bi_set_signed_bytes(destination_handle, bytes);
+            self.handler.bi_set_signed_bytes(destination_handle, &bytes);
         }
     }
 
@@ -1306,7 +1298,7 @@ impl VMHooks for VMHooksDispatcher {
     fn mbuffer_new_from_bytes(&mut self, data_offset: MemPtr, data_length: MemLength) -> i32 {
         unsafe {
             let bytes = self.handler.memory_load(data_offset, data_length);
-            self.handler.mb_new_from_bytes(bytes)
+            self.handler.mb_new_from_bytes(&bytes)
         }
     }
 
@@ -1373,7 +1365,7 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         unsafe {
             let bytes = self.handler.memory_load(data_offset, data_length);
-            self.handler.mb_set(m_buffer_handle, bytes);
+            self.handler.mb_set(m_buffer_handle, &bytes);
         }
         RESULT_OK
     }
@@ -1388,7 +1380,7 @@ impl VMHooks for VMHooksDispatcher {
         unsafe {
             let bytes = self.handler.memory_load(data_offset, data_length);
             self.handler
-                .mb_set_slice(m_buffer_handle, starting_position as usize, bytes)
+                .mb_set_slice(m_buffer_handle, starting_position as usize, &bytes)
         }
     }
 
@@ -1405,7 +1397,7 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         unsafe {
             let bytes = self.handler.memory_load(data_offset, data_length);
-            self.handler.mb_append_bytes(accumulator_handle, bytes);
+            self.handler.mb_append_bytes(accumulator_handle, &bytes);
         }
         RESULT_OK
     }

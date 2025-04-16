@@ -44,7 +44,7 @@ impl InstanceState for ContractDebugInstanceState {
         Ok(1)
     }
 
-    fn set_points_used(&self, _points: u64) -> Result<(), String> {
+    fn set_points_used(&mut self, _points: u64) -> Result<(), String> {
         Ok(())
     }
 
@@ -76,7 +76,7 @@ impl InstanceState for ContractDebugInstanceState {
         panic!("ContractDebugInstanceState memory_grow not supported")
     }
 
-    fn set_breakpoint_value(&self, breakpoint_value: BreakpointValue) -> Result<(), String> {
+    fn set_breakpoint_value(&mut self, breakpoint_value: BreakpointValue) -> Result<(), String> {
         std::panic::panic_any(breakpoint_value)
     }
 }
