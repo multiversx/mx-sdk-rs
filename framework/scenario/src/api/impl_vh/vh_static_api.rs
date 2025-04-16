@@ -35,8 +35,9 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         unsafe { ContractDebugInstanceState::main_memory_load(offset, length) }
     }
 
-    unsafe fn memory_load_owned(&self, _offset: MemPtr, _length: MemLength) -> Vec<u8> {
-        todo!()
+    unsafe fn memory_load_owned(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
+        let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
+        slice.to_vec()
     }
 
     unsafe fn memory_store(&self, offset: MemPtr, data: &[u8]) {
