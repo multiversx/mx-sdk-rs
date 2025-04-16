@@ -41,7 +41,7 @@ impl WasmerProdExecutor {
         let inner_instance_ref = Rc::new_cyclic(|weak| {
             let vh_handler = TxContextVMHooksHandler::new(
                 tx_context_ref,
-                Rc::new(WasmerProdInstanceState::new(weak.clone())),
+                Rc::new(RefCell::new(WasmerProdInstanceState::new(weak.clone()))),
             );
             let vm_hooks = VMHooksDispatcher::new(Box::new(vh_handler));
             let executor_data = WasmerExecutorData::new_with_gas(
