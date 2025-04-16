@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use std::sync::MutexGuard;
 use std::{fmt::Debug, rc::Rc};
 
@@ -29,11 +30,11 @@ use crate::{
 
 pub struct TxContextVMHooksHandler {
     tx_context_ref: TxContextRef,
-    instance_state_ref: Rc<dyn InstanceState>,
+    instance_state_ref: Rc<RefCell<dyn InstanceState>>,
 }
 
 impl TxContextVMHooksHandler {
-    pub fn new(tx_context_ref: TxContextRef, instance_ref: Rc<dyn InstanceState>) -> Self {
+    pub fn new(tx_context_ref: TxContextRef, instance_ref: Rc<RefCell<dyn InstanceState>>) -> Self {
         TxContextVMHooksHandler {
             tx_context_ref,
             instance_state_ref: instance_ref,
@@ -48,14 +49,17 @@ impl Debug for TxContextVMHooksHandler {
 }
 
 impl VMHooksHandlerSource for TxContextVMHooksHandler {
-    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
+    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         self.instance_state_ref
+            .borrow()
             .memory_load(offset, length)
             .expect("error loading memory from wasmer instance")
+            .to_vec()
     }
 
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) {
         self.instance_state_ref
+            .borrow()
             .memory_store(mem_ptr, data)
             .expect("error writing to wasmer instance memory");
     }
@@ -71,7 +75,10 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             ReturnCode::UserError => BreakpointValue::SignalError,
             _ => BreakpointValue::ExecutionFailed,
         };
-        let _ = self.instance_state_ref.set_breakpoint_value(breakpoint);
+        let _ = self
+            .instance_state_ref
+            .borrow_mut()
+            .set_breakpoint_value(breakpoint);
     }
 
     fn input_ref(&self) -> &TxInput {

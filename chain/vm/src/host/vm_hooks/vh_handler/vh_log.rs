@@ -1,7 +1,7 @@
 use crate::{host::context::TxLog, host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
 
 pub trait VMHooksLog: VMHooksHandlerSource {
-    fn managed_write_log(&self, topics_handle: RawHandle, data_handle: RawHandle) {
+    fn managed_write_log(&mut self, topics_handle: RawHandle, data_handle: RawHandle) {
         let topics = self.m_types_lock().mb_get_vec_of_bytes(topics_handle);
         let single_data_field = self.m_types_lock().mb_get(data_handle).to_vec();
         self.push_tx_log(TxLog {

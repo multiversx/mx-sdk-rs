@@ -29,7 +29,7 @@ impl InstanceState for WasmerProdInstanceState {
         todo!()
     }
 
-    fn set_points_used(&self, points: u64) -> Result<(), String> {
+    fn set_points_used(&mut self, points: u64) -> Result<(), String> {
         self.instance_rc()?.set_points_used(points)
     }
 
@@ -69,7 +69,7 @@ impl InstanceState for WasmerProdInstanceState {
         self.instance_rc()?.memory_grow(by_num_pages)
     }
 
-    fn set_breakpoint_value(&self, value: BreakpointValue) -> Result<(), String> {
+    fn set_breakpoint_value(&mut self, value: BreakpointValue) -> Result<(), String> {
         self.instance_rc()?.set_breakpoint_value(value)
     }
 }

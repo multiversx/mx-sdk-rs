@@ -18,7 +18,7 @@ pub trait VMHooksHandlerSource: Debug {
     /// ## Safety
     ///
     /// The offset and the length must point to valid instance memory.
-    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8];
+    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8>;
 
     /// Writes to instance memory.
     ///

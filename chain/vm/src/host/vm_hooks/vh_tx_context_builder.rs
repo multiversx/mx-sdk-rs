@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 use multiversx_chain_vm_executor::{InstanceState, VMHooks, VMHooksBuilder};
 
@@ -17,7 +17,10 @@ impl TxContextVMHooksBuilder {
 }
 
 impl VMHooksBuilder for TxContextVMHooksBuilder {
-    fn create_vm_hooks(&self, instance_state_ref: Rc<dyn InstanceState>) -> Box<dyn VMHooks> {
+    fn create_vm_hooks(
+        &self,
+        instance_state_ref: Rc<RefCell<dyn InstanceState>>,
+    ) -> Box<dyn VMHooks> {
         let handler = TxContextVMHooksHandler::new(self.tx_context_ref.clone(), instance_state_ref);
         Box::new(VMHooksDispatcher::new(Box::new(handler)))
     }

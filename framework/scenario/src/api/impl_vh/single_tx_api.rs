@@ -24,12 +24,12 @@ impl VMHooksApiBackend for SingleTxApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> R,
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
             let handler = cell.lock().unwrap().clone();
-            let dispatcher = VMHooksDispatcher::new(Box::new(handler));
-            f(&dispatcher)
+            let mut dispatcher = VMHooksDispatcher::new(Box::new(handler));
+            f(&mut dispatcher)
         })
     }
 

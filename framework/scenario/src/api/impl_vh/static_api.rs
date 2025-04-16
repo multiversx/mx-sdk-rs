@@ -28,11 +28,11 @@ impl VMHooksApiBackend for StaticApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> R,
     {
         STATIC_API_VH_CELL.with(|vh_mutex| {
-            let vh = vh_mutex.lock().unwrap();
-            f(&*vh)
+            let mut vh = vh_mutex.lock().unwrap();
+            f(&mut *vh)
         })
     }
 

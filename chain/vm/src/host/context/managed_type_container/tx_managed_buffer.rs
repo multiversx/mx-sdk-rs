@@ -10,6 +10,10 @@ use super::ManagedTypeContainer;
 pub struct InvalidSliceError;
 
 impl ManagedTypeContainer {
+    pub fn mb_get_owned(&self, handle: RawHandle) -> Vec<u8> {
+        self.managed_buffer_map.get(handle).to_vec()
+    }
+
     pub fn mb_get(&self, handle: RawHandle) -> &[u8] {
         self.managed_buffer_map.get(handle).as_slice()
     }
