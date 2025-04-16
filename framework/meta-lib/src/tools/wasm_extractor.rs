@@ -1,4 +1,5 @@
 use colored::Colorize;
+use core::panic;
 use std::{
     collections::{HashMap, HashSet},
     fs,
@@ -44,7 +45,7 @@ impl WasmInfo {
         view_endpoints: Vec<&str>,
     ) -> WasmInfo {
         let wasm_data = fs::read(output_wasm_path)
-            .expect("error occured while extracting information from .wasm: file not found");
+            .expect("error occurred while extracting information from .wasm: file not found");
 
         let wasm_info = populate_wasm_info(
             output_wasm_path,
@@ -54,7 +55,7 @@ impl WasmInfo {
             view_endpoints,
         );
 
-        wasm_info.expect("error occured while extracting information from .wasm file")
+        wasm_info.expect("error occurred while extracting information from .wasm file")
     }
 
     fn create_call_graph(&mut self, body: FunctionBody) {
@@ -64,6 +65,16 @@ impl WasmInfo {
 
         let mut call_functions = HashSet::new();
         while let Ok(op) = instructions_reader.read() {
+            if !is_whitelisted(&op) {
+                panic!(
+                    "{}",
+                    "Operator not supported for VM execution"
+                        .to_string()
+                        .red()
+                        .bold()
+                );
+            }
+
             if let Operator::Call { function_index } = op {
                 let function_usize: usize = function_index.try_into().unwrap();
                 call_functions.insert(function_usize);
@@ -261,4 +272,138 @@ fn is_mem_grow(code_section: &FunctionBody) -> bool {
     }
 
     false
+}
+
+fn is_whitelisted(op: &Operator) -> bool {
+    match op {
+        Operator::Block { .. } => true,
+        Operator::Br { .. } => true,
+        Operator::BrIf { .. } => true,
+        Operator::BrTable { .. } => true,
+        Operator::Call { .. } => true,
+        Operator::CallIndirect { .. } => true,
+        Operator::Catch { .. } => true,
+        Operator::CatchAll { .. } => true,
+        Operator::Delegate { .. } => true,
+        Operator::Drop { .. } => true,
+        Operator::Else { .. } => true,
+        Operator::End { .. } => true,
+        Operator::GlobalGet { .. } => true,
+        Operator::GlobalSet { .. } => true,
+        Operator::I32Add { .. } => true,
+        Operator::I32And { .. } => true,
+        Operator::I32Clz { .. } => true,
+        Operator::I32Const { .. } => true,
+        Operator::I32Ctz { .. } => true,
+        Operator::I32DivS { .. } => true,
+        Operator::I32DivU { .. } => true,
+        Operator::I32Eq { .. } => true,
+        Operator::I32Eqz { .. } => true,
+        Operator::I32Extend16S { .. } => true,
+        Operator::I32Extend8S { .. } => true,
+        Operator::I32GeS { .. } => true,
+        Operator::I32GeU { .. } => true,
+        Operator::I32GtS { .. } => true,
+        Operator::I32GtU { .. } => true,
+        Operator::I32LeS { .. } => true,
+        Operator::I32LeU { .. } => true,
+        Operator::I32Load { .. } => true,
+        Operator::I32Load16S { .. } => true,
+        Operator::I32Load16U { .. } => true,
+        Operator::I32Load8S { .. } => true,
+        Operator::I32Load8U { .. } => true,
+        Operator::I32LtS { .. } => true,
+        Operator::I32LtU { .. } => true,
+        Operator::I32Mul { .. } => true,
+        Operator::I32Ne { .. } => true,
+        Operator::I32Or { .. } => true,
+        Operator::I32Popcnt { .. } => true,
+        Operator::I32RemS { .. } => true,
+        Operator::I32RemU { .. } => true,
+        Operator::I32Rotl { .. } => true,
+        Operator::I32Rotr { .. } => true,
+        Operator::I32Shl { .. } => true,
+        Operator::I32ShrS { .. } => true,
+        Operator::I32ShrU { .. } => true,
+        Operator::I32Store { .. } => true,
+        Operator::I32Store16 { .. } => true,
+        Operator::I32Store8 { .. } => true,
+        Operator::I32Sub { .. } => true,
+        Operator::I32WrapI64 { .. } => true,
+        Operator::I32Xor { .. } => true,
+        Operator::I64Add { .. } => true,
+        Operator::I64And { .. } => true,
+        Operator::I64Clz { .. } => true,
+        Operator::I64Const { .. } => true,
+        Operator::I64Ctz { .. } => true,
+        Operator::I64DivS { .. } => true,
+        Operator::I64DivU { .. } => true,
+        Operator::I64Eq { .. } => true,
+        Operator::I64Eqz { .. } => true,
+        Operator::I64Extend16S { .. } => true,
+        Operator::I64Extend32S { .. } => true,
+        Operator::I64Extend8S { .. } => true,
+        Operator::I64ExtendI32S { .. } => true,
+        Operator::I64ExtendI32U { .. } => true,
+        Operator::I64GeS { .. } => true,
+        Operator::I64GeU { .. } => true,
+        Operator::I64GtS { .. } => true,
+        Operator::I64GtU { .. } => true,
+        Operator::I64LeS { .. } => true,
+        Operator::I64LeU { .. } => true,
+        Operator::I64Load { .. } => true,
+        Operator::I64Load16S { .. } => true,
+        Operator::I64Load16U { .. } => true,
+        Operator::I64Load32S { .. } => true,
+        Operator::I64Load32U { .. } => true,
+        Operator::I64Load8S { .. } => true,
+        Operator::I64Load8U { .. } => true,
+        Operator::I64LtS { .. } => true,
+        Operator::I64LtU { .. } => true,
+        Operator::I64Mul { .. } => true,
+        Operator::I64Ne { .. } => true,
+        Operator::I64Or { .. } => true,
+        Operator::I64Popcnt { .. } => true,
+        Operator::I64RemS { .. } => true,
+        Operator::I64RemU { .. } => true,
+        Operator::I64Rotl { .. } => true,
+        Operator::I64Rotr { .. } => true,
+        Operator::I64Shl { .. } => true,
+        Operator::I64ShrS { .. } => true,
+        Operator::I64ShrU { .. } => true,
+        Operator::I64Store { .. } => true,
+        Operator::I64Store16 { .. } => true,
+        Operator::I64Store32 { .. } => true,
+        Operator::I64Store8 { .. } => true,
+        Operator::I64Sub { .. } => true,
+        Operator::I64Xor { .. } => true,
+        Operator::If { .. } => true,
+        Operator::LocalGet { .. } => true,
+        Operator::LocalSet { .. } => true,
+        Operator::LocalTee { .. } => true,
+        // Operator::LocalAllocate { .. } => true,
+        Operator::Loop { .. } => true,
+        Operator::MemoryGrow { .. } => true,
+        Operator::MemorySize { .. } => true,
+        Operator::Nop { .. } => true,
+        Operator::RefFunc { .. } => true,
+        Operator::RefIsNull { .. } => true,
+        Operator::RefNull { .. } => true,
+        Operator::Rethrow { .. } => true,
+        Operator::Return { .. } => true,
+        Operator::ReturnCall { .. } => true,
+        Operator::ReturnCallIndirect { .. } => true,
+        Operator::Select { .. } => true,
+        Operator::TableGet { .. } => true,
+        Operator::TableGrow { .. } => true,
+        Operator::TableInit { .. } => true,
+        Operator::TableSet { .. } => true,
+        Operator::TableSize { .. } => true,
+        Operator::Throw { .. } => true,
+        Operator::Try { .. } => true,
+        Operator::TypedSelect { .. } => true,
+        Operator::Unreachable { .. } => true,
+        // Operator::Unwind { .. } => true,
+        _ => false,
+    }
 }
