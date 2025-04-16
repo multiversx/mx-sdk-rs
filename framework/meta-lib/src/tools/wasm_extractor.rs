@@ -1,18 +1,17 @@
 use colored::Colorize;
-use core::panic;
 use std::{
     collections::{HashMap, HashSet},
     fs,
     path::{Path, PathBuf},
 };
 use wasmparser::{
-    BinaryReaderError, DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader,
-    Operator, Parser, Payload,
+    DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader, Operator, Parser,
+    Payload,
 };
 
 use crate::ei::EIVersion;
 
-use super::report_creator::ReportCreator;
+use super::{errors::WasmError, report_creator::ReportCreator};
 
 type CallGraph = HashMap<usize, HashSet<usize>>;
 
@@ -41,24 +40,22 @@ impl WasmInfo {
     pub fn extract_wasm_info(
         output_wasm_path: &PathBuf,
         extract_imports_enabled: bool,
-        check_ei: &Option<EIVersion>,
-        view_endpoints: Vec<&str>,
-    ) -> WasmInfo {
+        check_ei: Option<&EIVersion>,
+        view_endpoints: &[&str],
+    ) -> Result<WasmInfo, WasmError> {
         let wasm_data = fs::read(output_wasm_path)
             .expect("error occurred while extracting information from .wasm: file not found");
 
-        let wasm_info = populate_wasm_info(
+        populate_wasm_info(
             output_wasm_path,
-            wasm_data,
+            &wasm_data,
             extract_imports_enabled,
             check_ei,
             view_endpoints,
-        );
-
-        wasm_info.expect("error occurred while extracting information from .wasm file")
+        )
     }
 
-    fn create_call_graph(&mut self, body: FunctionBody) {
+    fn create_call_graph(&mut self, body: FunctionBody) -> Result<(), WasmError> {
         let mut instructions_reader = body
             .get_operators_reader()
             .expect("Failed to get operators reader");
@@ -66,13 +63,8 @@ impl WasmInfo {
         let mut call_functions = HashSet::new();
         while let Ok(op) = instructions_reader.read() {
             if !is_whitelisted(&op) {
-                panic!(
-                    "{}",
-                    "Operator not supported for VM execution"
-                        .to_string()
-                        .red()
-                        .bold()
-                );
+                let op_str = format!("{:?}", op);
+                return Err(WasmError::ForbiddenOpcode(op_str));
             }
 
             if let Operator::Call { function_index } = op {
@@ -83,6 +75,8 @@ impl WasmInfo {
 
         self.call_graph
             .insert(self.call_graph.len(), call_functions);
+
+        Ok(())
     }
 
     pub fn process_imports(
@@ -147,31 +141,35 @@ impl WasmInfo {
 
 pub(crate) fn populate_wasm_info(
     path: &Path,
-    wasm_data: Vec<u8>,
+    wasm_data: &[u8],
     import_extraction_enabled: bool,
-    check_ei: &Option<EIVersion>,
-    view_endpoints: Vec<&str>,
-) -> Result<WasmInfo, BinaryReaderError> {
+    check_ei: Option<&EIVersion>,
+    view_endpoints: &[&str],
+) -> Result<WasmInfo, WasmError> {
     let mut wasm_info = WasmInfo::default();
 
     let parser = Parser::new(0);
-    for payload in parser.parse_all(&wasm_data) {
-        match payload? {
-            Payload::ImportSection(import_section) => {
+    for payload in parser.parse_all(wasm_data) {
+        match payload {
+            Ok(Payload::ImportSection(import_section)) => {
                 wasm_info.process_imports(import_section, import_extraction_enabled);
                 wasm_info.ei_check |= is_ei_valid(&wasm_info.imports, check_ei);
             },
-            Payload::DataSection(data_section) => {
+            Ok(Payload::DataSection(data_section)) => {
                 wasm_info.report.has_allocator |= is_fail_allocator_triggered(data_section.clone());
                 wasm_info.report.has_panic.max_severity(data_section);
             },
-            Payload::CodeSectionEntry(code_section) => {
+            Ok(Payload::CodeSectionEntry(code_section)) => {
                 wasm_info.memory_grow_flag |= is_mem_grow(&code_section);
-                wasm_info.create_call_graph(code_section);
+                match wasm_info.create_call_graph(code_section) {
+                    Ok(_) => continue,
+                    Err(e) => return Err(e),
+                }
             },
-            Payload::ExportSection(export_section) => {
-                wasm_info.parse_export_section(export_section, &view_endpoints);
+            Ok(Payload::ExportSection(export_section)) => {
+                wasm_info.parse_export_section(export_section, view_endpoints);
             },
+            Err(err) => return Err(WasmError::WasmParserError(err)),
             _ => (),
         }
     }
@@ -243,7 +241,7 @@ fn mark_write(
     }
 }
 
-fn is_ei_valid(imports: &[String], check_ei: &Option<EIVersion>) -> bool {
+fn is_ei_valid(imports: &[String], check_ei: Option<&EIVersion>) -> bool {
     if let Some(ei) = check_ei {
         let mut num_errors = 0;
         for import in imports {

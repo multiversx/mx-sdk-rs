@@ -2,7 +2,7 @@ use std::{
     ffi::OsStr,
     fs,
     path::{Path, PathBuf},
-    process::Command,
+    process::{self, Command},
 };
 
 use super::ContractVariant;
@@ -14,7 +14,7 @@ use crate::{
     mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
     report_info_json::ReportInfoJson,
-    tools::{self, WasmInfo},
+    tools::{self, errors::WasmError, WasmInfo},
 };
 
 impl ContractVariant {
@@ -31,7 +31,10 @@ impl ContractVariant {
 
         assert!(exit_status.success(), "contract build process failed");
 
-        self.finalize_build(build_args, output_path);
+        if let Err(err) = self.finalize_build(build_args, output_path) {
+            eprintln!("{}", err);
+            process::exit(1);
+        }
     }
 
     fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
@@ -74,13 +77,22 @@ impl ContractVariant {
         rustflags
     }
 
-    fn finalize_build(&self, build_args: &BuildArgs, output_path: &Path) {
+    fn finalize_build(
+        &self,
+        build_args: &BuildArgs,
+        output_path: &Path,
+    ) -> Result<WasmInfo, WasmError> {
         self.copy_contracts_to_output(build_args, output_path);
         self.run_wasm_opt(build_args, output_path);
         self.run_wasm2wat(build_args, output_path);
-        let wasm_info = self.extract_wasm_info(build_args, output_path);
+        let wasm_data = self.extract_wasm_info(build_args, output_path);
         self.run_twiggy(build_args, output_path);
-        self.pack_mxsc_file(build_args, output_path, wasm_info);
+
+        if let Ok(wasm_info) = &wasm_data {
+            self.pack_mxsc_file(build_args, output_path, wasm_info);
+        }
+
+        wasm_data
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &Path) {
@@ -94,7 +106,7 @@ impl ContractVariant {
             .expect("failed to copy compiled contract to output directory");
     }
 
-    fn pack_mxsc_file(&self, build_args: &BuildArgs, output_path: &Path, wasm_info: WasmInfo) {
+    fn pack_mxsc_file(&self, build_args: &BuildArgs, output_path: &Path, wasm_info: &WasmInfo) {
         let output_wasm_path = output_path.join(self.wasm_output_name(build_args));
         let compiled_bytes = fs::read(output_wasm_path).expect("failed to open compiled contract");
         let output_mxsc_path = output_path.join(self.mxsc_file_output_name(build_args));
@@ -103,7 +115,7 @@ impl ContractVariant {
         let mut abi = ContractAbiJson::from(&self.abi);
         let build_info = core::mem::take(&mut abi.build_info).unwrap();
         let ei_check_json = EiCheckJson::new(&self.settings.check_ei, wasm_info.ei_check);
-        let report = ReportInfoJson::new(&wasm_info, ei_check_json, compiled_bytes.len());
+        let report = ReportInfoJson::new(wasm_info, ei_check_json, compiled_bytes.len());
         let mxsc_file_json = MxscFileJson {
             build_info,
             abi,
@@ -143,7 +155,11 @@ impl ContractVariant {
         );
     }
 
-    fn extract_wasm_info(&self, build_args: &BuildArgs, output_path: &Path) -> WasmInfo {
+    fn extract_wasm_info(
+        &self,
+        build_args: &BuildArgs,
+        output_path: &Path,
+    ) -> Result<WasmInfo, WasmError> {
         let output_wasm_path = output_path.join(self.wasm_output_name(build_args));
 
         let abi = ContractAbiJson::from(&self.abi);
@@ -158,8 +174,8 @@ impl ContractVariant {
             return WasmInfo::extract_wasm_info(
                 &output_wasm_path,
                 build_args.extract_imports,
-                &self.settings.check_ei,
-                view_endpoints,
+                self.settings.check_ei.as_ref(),
+                &view_endpoints,
             );
         }
 
@@ -170,12 +186,14 @@ impl ContractVariant {
         let wasm_data = WasmInfo::extract_wasm_info(
             &output_wasm_path,
             true,
-            &self.settings.check_ei,
-            view_endpoints,
+            self.settings.check_ei.as_ref(),
+            &view_endpoints,
         );
 
-        write_imports_output(&output_imports_json_path, wasm_data.imports.as_slice());
-        print_ei_check(&wasm_data, &self.settings.check_ei);
+        if let Ok(wasm_info) = &wasm_data {
+            write_imports_output(&output_imports_json_path, wasm_info.imports.as_slice());
+            print_ei_check(wasm_info, &self.settings.check_ei);
+        };
 
         wasm_data
     }
