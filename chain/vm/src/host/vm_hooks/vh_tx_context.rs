@@ -54,6 +54,13 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
             .expect("error loading memory from wasmer instance")
     }
 
+    unsafe fn memory_load_owned(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
+        self.instance_state_ref
+            .memory_load(offset, length)
+            .expect("error loading memory from wasmer instance")
+            .to_vec()
+    }
+
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) {
         self.instance_state_ref
             .memory_store(mem_ptr, data)

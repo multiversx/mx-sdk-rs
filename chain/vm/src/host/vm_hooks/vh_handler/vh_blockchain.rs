@@ -173,7 +173,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
 
     fn managed_is_builtin_function(&mut self, function_name_handle: i32) -> bool {
         VM_BUILTIN_FUNCTION_NAMES.contains(
-            &mut self
+            &self
                 .m_types_lock()
                 .mb_to_function_name(function_name_handle)
                 .as_str(),

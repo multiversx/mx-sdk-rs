@@ -62,6 +62,10 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         unsafe { ContractDebugInstanceState::main_memory_load(offset, length) }
     }
 
+    unsafe fn memory_load_owned(&self, _offset: MemPtr, _length: MemLength) -> Vec<u8> {
+        todo!()
+    }
+
     unsafe fn memory_store(&self, offset: MemPtr, data: &[u8]) {
         unsafe {
             ContractDebugInstanceState::main_memory_store(offset, data);

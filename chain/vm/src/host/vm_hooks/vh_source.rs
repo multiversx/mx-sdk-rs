@@ -20,6 +20,13 @@ pub trait VMHooksHandlerSource: Debug {
     /// The offset and the length must point to valid instance memory.
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8];
 
+    /// Loads a slice of memory from the instance and returns an owned value.
+    ///
+    /// ## Safety
+    ///
+    /// The offset and the length must point to valid instance memory.
+    unsafe fn memory_load_owned(&self, offset: MemPtr, length: MemLength) -> Vec<u8>;
+
     /// Writes to instance memory.
     ///
     /// ## Safety
