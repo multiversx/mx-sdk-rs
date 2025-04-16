@@ -2,12 +2,12 @@
 pub mod tests {
     use std::{
         collections::{HashMap, HashSet},
-        path::Path,
+        path::{Path, PathBuf},
     };
 
     use wat::Parser;
 
-    use crate::tools::{panic_report::PanicReport, wasm_extractor::populate_wasm_info};
+    use crate::tools::{panic_report::PanicReport, wasm_extractor::populate_wasm_info, WasmInfo};
 
     const ADDER_WITH_ERR_IN_VIEW: &str = r#"
 (module $adder_wasm.wasm
@@ -411,9 +411,8 @@ pub mod tests {
     #[test]
     fn test_empty() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
-            let wasm_info =
-                populate_wasm_info(Path::new(""), content.to_vec(), false, &None, Vec::new())
-                    .expect("Unable to parse WASM content.");
+            let wasm_info = populate_wasm_info(Path::new(""), &content, false, None, &[])
+                .expect("Unable to parse WASM content.");
             assert!(!wasm_info.memory_grow_flag);
             assert!(!wasm_info.report.has_allocator);
             assert_eq!(
@@ -426,9 +425,8 @@ pub mod tests {
     #[test]
     fn test_empty_with_mem_grow() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_MEM_GROW.as_bytes()) {
-            let wasm_info =
-                populate_wasm_info(Path::new(""), content.to_vec(), false, &None, Vec::new())
-                    .expect("Unable to parse WASM content.");
+            let wasm_info = populate_wasm_info(Path::new(""), &content, false, None, &[])
+                .expect("Unable to parse WASM content.");
             assert!(wasm_info.memory_grow_flag);
             assert!(!wasm_info.report.has_allocator);
             assert_eq!(
@@ -441,9 +439,8 @@ pub mod tests {
     #[test]
     fn test_empty_with_fail_allocator() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_FAIL_ALLOCATOR.as_bytes()) {
-            let wasm_info =
-                populate_wasm_info(Path::new(""), content.to_vec(), false, &None, Vec::new())
-                    .expect("Unable to parse WASM content.");
+            let wasm_info = populate_wasm_info(Path::new(""), &content, false, None, &[])
+                .expect("Unable to parse WASM content.");
             assert!(!wasm_info.memory_grow_flag);
             assert!(wasm_info.report.has_allocator);
             assert_eq!(
@@ -485,14 +482,9 @@ pub mod tests {
         ]);
 
         if let Ok(content) = Parser::new().parse_bytes(None, ADDER_WITH_ERR_IN_VIEW.as_bytes()) {
-            let wasm_info = populate_wasm_info(
-                Path::new(""),
-                content.to_vec(),
-                false,
-                &None,
-                view_endpoints,
-            )
-            .expect("Unable to parse WASM content.");
+            let wasm_info =
+                populate_wasm_info(Path::new(""), &content, false, None, &view_endpoints)
+                    .expect("Unable to parse WASM content.");
 
             assert_eq!(
                 expected_write_index_functions,
@@ -501,5 +493,16 @@ pub mod tests {
             assert_eq!(expected_call_graph, wasm_info.call_graph);
             assert_eq!(expected_view_index, wasm_info.view_endpoints);
         }
+    }
+
+    #[test]
+    fn test_data_drop() {
+        // let data_drop_wat = wasm_to_wat("src/tools/forbidden-opcodes/data-drop.wasm", "");
+        WasmInfo::extract_wasm_info(
+            &PathBuf::from("src/tools/forbidden-opcodes/data-drop.wasm"),
+            false,
+            None,
+            &[],
+        );
     }
 }

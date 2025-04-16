@@ -5,13 +5,13 @@ use std::{
     path::{Path, PathBuf},
 };
 use wasmparser::{
-    BinaryReaderError, DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader,
-    Operator, Parser, Payload,
+    DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader, Operator, Parser,
+    Payload,
 };
 
 use crate::ei::EIVersion;
 
-use super::report_creator::ReportCreator;
+use super::{errors::WasmError, report_creator::ReportCreator};
 
 type CallGraph = HashMap<usize, HashSet<usize>>;
 
@@ -40,30 +40,33 @@ impl WasmInfo {
     pub fn extract_wasm_info(
         output_wasm_path: &PathBuf,
         extract_imports_enabled: bool,
-        check_ei: &Option<EIVersion>,
-        view_endpoints: Vec<&str>,
-    ) -> WasmInfo {
+        check_ei: Option<&EIVersion>,
+        view_endpoints: &[&str],
+    ) -> Result<WasmInfo, WasmError> {
         let wasm_data = fs::read(output_wasm_path)
-            .expect("error occured while extracting information from .wasm: file not found");
+            .expect("error occurred while extracting information from .wasm: file not found");
 
-        let wasm_info = populate_wasm_info(
+        populate_wasm_info(
             output_wasm_path,
-            wasm_data,
+            &wasm_data,
             extract_imports_enabled,
             check_ei,
             view_endpoints,
-        );
-
-        wasm_info.expect("error occured while extracting information from .wasm file")
+        )
     }
 
-    fn create_call_graph(&mut self, body: FunctionBody) {
+    fn create_call_graph(&mut self, body: FunctionBody) -> Result<(), WasmError> {
         let mut instructions_reader = body
             .get_operators_reader()
             .expect("Failed to get operators reader");
 
         let mut call_functions = HashSet::new();
         while let Ok(op) = instructions_reader.read() {
+            if !is_whitelisted(&op) {
+                let op_str = format!("{:?}", op);
+                return Err(WasmError::ForbiddenOpcode(op_str));
+            }
+
             if let Operator::Call { function_index } = op {
                 let function_usize: usize = function_index.try_into().unwrap();
                 call_functions.insert(function_usize);
@@ -72,6 +75,8 @@ impl WasmInfo {
 
         self.call_graph
             .insert(self.call_graph.len(), call_functions);
+
+        Ok(())
     }
 
     pub fn process_imports(
@@ -136,31 +141,35 @@ impl WasmInfo {
 
 pub(crate) fn populate_wasm_info(
     path: &Path,
-    wasm_data: Vec<u8>,
+    wasm_data: &[u8],
     import_extraction_enabled: bool,
-    check_ei: &Option<EIVersion>,
-    view_endpoints: Vec<&str>,
-) -> Result<WasmInfo, BinaryReaderError> {
+    check_ei: Option<&EIVersion>,
+    view_endpoints: &[&str],
+) -> Result<WasmInfo, WasmError> {
     let mut wasm_info = WasmInfo::default();
 
     let parser = Parser::new(0);
-    for payload in parser.parse_all(&wasm_data) {
-        match payload? {
-            Payload::ImportSection(import_section) => {
+    for payload in parser.parse_all(wasm_data) {
+        match payload {
+            Ok(Payload::ImportSection(import_section)) => {
                 wasm_info.process_imports(import_section, import_extraction_enabled);
                 wasm_info.ei_check |= is_ei_valid(&wasm_info.imports, check_ei);
             },
-            Payload::DataSection(data_section) => {
+            Ok(Payload::DataSection(data_section)) => {
                 wasm_info.report.has_allocator |= is_fail_allocator_triggered(data_section.clone());
                 wasm_info.report.has_panic.max_severity(data_section);
             },
-            Payload::CodeSectionEntry(code_section) => {
+            Ok(Payload::CodeSectionEntry(code_section)) => {
                 wasm_info.memory_grow_flag |= is_mem_grow(&code_section);
-                wasm_info.create_call_graph(code_section);
+                match wasm_info.create_call_graph(code_section) {
+                    Ok(_) => continue,
+                    Err(e) => return Err(e),
+                }
             },
-            Payload::ExportSection(export_section) => {
-                wasm_info.parse_export_section(export_section, &view_endpoints);
+            Ok(Payload::ExportSection(export_section)) => {
+                wasm_info.parse_export_section(export_section, view_endpoints);
             },
+            Err(err) => return Err(WasmError::WasmParserError(err)),
             _ => (),
         }
     }
@@ -232,7 +241,7 @@ fn mark_write(
     }
 }
 
-fn is_ei_valid(imports: &[String], check_ei: &Option<EIVersion>) -> bool {
+fn is_ei_valid(imports: &[String], check_ei: Option<&EIVersion>) -> bool {
     if let Some(ei) = check_ei {
         let mut num_errors = 0;
         for import in imports {
@@ -261,4 +270,138 @@ fn is_mem_grow(code_section: &FunctionBody) -> bool {
     }
 
     false
+}
+
+fn is_whitelisted(op: &Operator) -> bool {
+    match op {
+        Operator::Block { .. } => true,
+        Operator::Br { .. } => true,
+        Operator::BrIf { .. } => true,
+        Operator::BrTable { .. } => true,
+        Operator::Call { .. } => true,
+        Operator::CallIndirect { .. } => true,
+        Operator::Catch { .. } => true,
+        Operator::CatchAll { .. } => true,
+        Operator::Delegate { .. } => true,
+        Operator::Drop { .. } => true,
+        Operator::Else { .. } => true,
+        Operator::End { .. } => true,
+        Operator::GlobalGet { .. } => true,
+        Operator::GlobalSet { .. } => true,
+        Operator::I32Add { .. } => true,
+        Operator::I32And { .. } => true,
+        Operator::I32Clz { .. } => true,
+        Operator::I32Const { .. } => true,
+        Operator::I32Ctz { .. } => true,
+        Operator::I32DivS { .. } => true,
+        Operator::I32DivU { .. } => true,
+        Operator::I32Eq { .. } => true,
+        Operator::I32Eqz { .. } => true,
+        Operator::I32Extend16S { .. } => true,
+        Operator::I32Extend8S { .. } => true,
+        Operator::I32GeS { .. } => true,
+        Operator::I32GeU { .. } => true,
+        Operator::I32GtS { .. } => true,
+        Operator::I32GtU { .. } => true,
+        Operator::I32LeS { .. } => true,
+        Operator::I32LeU { .. } => true,
+        Operator::I32Load { .. } => true,
+        Operator::I32Load16S { .. } => true,
+        Operator::I32Load16U { .. } => true,
+        Operator::I32Load8S { .. } => true,
+        Operator::I32Load8U { .. } => true,
+        Operator::I32LtS { .. } => true,
+        Operator::I32LtU { .. } => true,
+        Operator::I32Mul { .. } => true,
+        Operator::I32Ne { .. } => true,
+        Operator::I32Or { .. } => true,
+        Operator::I32Popcnt { .. } => true,
+        Operator::I32RemS { .. } => true,
+        Operator::I32RemU { .. } => true,
+        Operator::I32Rotl { .. } => true,
+        Operator::I32Rotr { .. } => true,
+        Operator::I32Shl { .. } => true,
+        Operator::I32ShrS { .. } => true,
+        Operator::I32ShrU { .. } => true,
+        Operator::I32Store { .. } => true,
+        Operator::I32Store16 { .. } => true,
+        Operator::I32Store8 { .. } => true,
+        Operator::I32Sub { .. } => true,
+        Operator::I32WrapI64 { .. } => true,
+        Operator::I32Xor { .. } => true,
+        Operator::I64Add { .. } => true,
+        Operator::I64And { .. } => true,
+        Operator::I64Clz { .. } => true,
+        Operator::I64Const { .. } => true,
+        Operator::I64Ctz { .. } => true,
+        Operator::I64DivS { .. } => true,
+        Operator::I64DivU { .. } => true,
+        Operator::I64Eq { .. } => true,
+        Operator::I64Eqz { .. } => true,
+        Operator::I64Extend16S { .. } => true,
+        Operator::I64Extend32S { .. } => true,
+        Operator::I64Extend8S { .. } => true,
+        Operator::I64ExtendI32S { .. } => true,
+        Operator::I64ExtendI32U { .. } => true,
+        Operator::I64GeS { .. } => true,
+        Operator::I64GeU { .. } => true,
+        Operator::I64GtS { .. } => true,
+        Operator::I64GtU { .. } => true,
+        Operator::I64LeS { .. } => true,
+        Operator::I64LeU { .. } => true,
+        Operator::I64Load { .. } => true,
+        Operator::I64Load16S { .. } => true,
+        Operator::I64Load16U { .. } => true,
+        Operator::I64Load32S { .. } => true,
+        Operator::I64Load32U { .. } => true,
+        Operator::I64Load8S { .. } => true,
+        Operator::I64Load8U { .. } => true,
+        Operator::I64LtS { .. } => true,
+        Operator::I64LtU { .. } => true,
+        Operator::I64Mul { .. } => true,
+        Operator::I64Ne { .. } => true,
+        Operator::I64Or { .. } => true,
+        Operator::I64Popcnt { .. } => true,
+        Operator::I64RemS { .. } => true,
+        Operator::I64RemU { .. } => true,
+        Operator::I64Rotl { .. } => true,
+        Operator::I64Rotr { .. } => true,
+        Operator::I64Shl { .. } => true,
+        Operator::I64ShrS { .. } => true,
+        Operator::I64ShrU { .. } => true,
+        Operator::I64Store { .. } => true,
+        Operator::I64Store16 { .. } => true,
+        Operator::I64Store32 { .. } => true,
+        Operator::I64Store8 { .. } => true,
+        Operator::I64Sub { .. } => true,
+        Operator::I64Xor { .. } => true,
+        Operator::If { .. } => true,
+        Operator::LocalGet { .. } => true,
+        Operator::LocalSet { .. } => true,
+        Operator::LocalTee { .. } => true,
+        // Operator::LocalAllocate { .. } => true,
+        Operator::Loop { .. } => true,
+        Operator::MemoryGrow { .. } => true,
+        Operator::MemorySize { .. } => true,
+        Operator::Nop { .. } => true,
+        Operator::RefFunc { .. } => true,
+        Operator::RefIsNull { .. } => true,
+        Operator::RefNull { .. } => true,
+        Operator::Rethrow { .. } => true,
+        Operator::Return { .. } => true,
+        Operator::ReturnCall { .. } => true,
+        Operator::ReturnCallIndirect { .. } => true,
+        Operator::Select { .. } => true,
+        Operator::TableGet { .. } => true,
+        Operator::TableGrow { .. } => true,
+        Operator::TableInit { .. } => true,
+        Operator::TableSet { .. } => true,
+        Operator::TableSize { .. } => true,
+        Operator::Throw { .. } => true,
+        Operator::Try { .. } => true,
+        Operator::TypedSelect { .. } => true,
+        Operator::Unreachable { .. } => true,
+        // Operator::Unwind { .. } => true,
+        _ => false,
+    }
 }
