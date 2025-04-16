@@ -28,7 +28,8 @@ pub trait VMHooksEndpointFinish: VMHooksHandlerSource + VMHooksManagedTypes {
     }
 
     fn finish_managed_buffer_raw(&mut self, handle: RawHandle) {
-        self.finish_slice_u8(self.m_types_lock().mb_get(handle));
+        let bytes = self.m_types_lock().mb_get_owned(handle);
+        self.finish_slice_u8(&bytes);
     }
 
     fn finish_i64(&mut self, value: i64) {
