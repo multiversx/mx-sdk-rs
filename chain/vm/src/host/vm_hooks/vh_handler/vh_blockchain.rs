@@ -29,22 +29,22 @@ const VM_BUILTIN_FUNCTION_NAMES: [&str; 16] = [
 ];
 
 pub trait VMHooksBlockchain: VMHooksHandlerSource {
-    fn is_contract_address(&self, address_bytes: &[u8]) -> bool {
+    fn is_contract_address(&mut self, address_bytes: &[u8]) -> bool {
         let address = VMAddress::from_slice(address_bytes);
         &address == self.current_address()
     }
 
-    fn managed_caller(&self, dest_handle: RawHandle) {
+    fn managed_caller(&mut self, dest_handle: RawHandle) {
         self.m_types_lock()
             .mb_set(dest_handle, self.input_ref().from.to_vec());
     }
 
-    fn managed_sc_address(&self, dest_handle: RawHandle) {
+    fn managed_sc_address(&mut self, dest_handle: RawHandle) {
         self.m_types_lock()
             .mb_set(dest_handle, self.current_address().to_vec());
     }
 
-    fn managed_owner_address(&self, dest_handle: RawHandle) {
+    fn managed_owner_address(&mut self, dest_handle: RawHandle) {
         self.m_types_lock().mb_set(
             dest_handle,
             self.current_account_data()
@@ -54,15 +54,15 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         );
     }
 
-    fn get_shard_of_address(&self, address_bytes: &[u8]) -> i32 {
+    fn get_shard_of_address(&mut self, address_bytes: &[u8]) -> i32 {
         (address_bytes[address_bytes.len() - 1] % 3).into()
     }
 
-    fn is_smart_contract(&self, address_bytes: &[u8]) -> bool {
+    fn is_smart_contract(&mut self, address_bytes: &[u8]) -> bool {
         VMAddress::from_slice(address_bytes).is_smart_contract_address()
     }
 
-    fn load_balance(&self, address_bytes: &[u8], dest: RawHandle) {
+    fn load_balance(&mut self, address_bytes: &[u8], dest: RawHandle) {
         assert!(
             self.is_contract_address(address_bytes),
             "get balance not yet implemented for accounts other than the contract itself"
@@ -71,62 +71,62 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .bi_overwrite(dest, self.current_account_data().egld_balance.into());
     }
 
-    fn get_tx_hash(&self, dest: RawHandle) {
+    fn get_tx_hash(&mut self, dest: RawHandle) {
         self.m_types_lock()
             .mb_set(dest, self.input_ref().tx_hash.to_vec());
     }
 
-    fn get_gas_left(&self) -> u64 {
+    fn get_gas_left(&mut self) -> u64 {
         self.input_ref().gas_limit
     }
 
-    fn get_block_timestamp(&self) -> u64 {
+    fn get_block_timestamp(&mut self) -> u64 {
         self.get_current_block_info().block_timestamp
     }
 
-    fn get_block_nonce(&self) -> u64 {
+    fn get_block_nonce(&mut self) -> u64 {
         self.get_current_block_info().block_nonce
     }
 
-    fn get_block_round(&self) -> u64 {
+    fn get_block_round(&mut self) -> u64 {
         self.get_current_block_info().block_round
     }
 
-    fn get_block_epoch(&self) -> u64 {
+    fn get_block_epoch(&mut self) -> u64 {
         self.get_current_block_info().block_epoch
     }
 
-    fn get_block_random_seed(&self, dest: RawHandle) {
+    fn get_block_random_seed(&mut self, dest: RawHandle) {
         self.m_types_lock().mb_set(
             dest,
             self.get_current_block_info().block_random_seed.to_vec(),
         );
     }
 
-    fn get_prev_block_timestamp(&self) -> u64 {
+    fn get_prev_block_timestamp(&mut self) -> u64 {
         self.get_previous_block_info().block_timestamp
     }
 
-    fn get_prev_block_nonce(&self) -> u64 {
+    fn get_prev_block_nonce(&mut self) -> u64 {
         self.get_previous_block_info().block_nonce
     }
 
-    fn get_prev_block_round(&self) -> u64 {
+    fn get_prev_block_round(&mut self) -> u64 {
         self.get_previous_block_info().block_round
     }
 
-    fn get_prev_block_epoch(&self) -> u64 {
+    fn get_prev_block_epoch(&mut self) -> u64 {
         self.get_previous_block_info().block_epoch
     }
 
-    fn get_prev_block_random_seed(&self, dest: RawHandle) {
+    fn get_prev_block_random_seed(&mut self, dest: RawHandle) {
         self.m_types_lock().mb_set(
             dest,
             self.get_previous_block_info().block_random_seed.to_vec(),
         );
     }
 
-    fn get_current_esdt_nft_nonce(&self, address_bytes: &[u8], token_id_bytes: &[u8]) -> u64 {
+    fn get_current_esdt_nft_nonce(&mut self, address_bytes: &[u8], token_id_bytes: &[u8]) -> u64 {
         assert!(
             self.is_contract_address(address_bytes),
             "get_current_esdt_nft_nonce not yet implemented for accounts other than the contract itself"
@@ -139,7 +139,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn big_int_get_esdt_external_balance(
-        &self,
+        &mut self,
         address_bytes: &[u8],
         token_id_bytes: &[u8],
         nonce: u64,
@@ -157,7 +157,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         self.m_types_lock().bi_overwrite(dest, esdt_balance.into());
     }
 
-    fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32) {
+    fn managed_get_code_metadata(&mut self, address_handle: i32, response_handle: i32) {
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let Some(data) = self.account_data(&address) else {
             self.vm_error(&format!(
@@ -171,9 +171,9 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .mb_set(response_handle, code_metadata_bytes.to_vec())
     }
 
-    fn managed_is_builtin_function(&self, function_name_handle: i32) -> bool {
+    fn managed_is_builtin_function(&mut self, function_name_handle: i32) -> bool {
         VM_BUILTIN_FUNCTION_NAMES.contains(
-            &self
+            &mut self
                 .m_types_lock()
                 .mb_to_function_name(function_name_handle)
                 .as_str(),
@@ -182,7 +182,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
 
     #[allow(clippy::too_many_arguments)]
     fn managed_get_esdt_token_data(
-        &self,
+        &mut self,
         address_handle: RawHandle,
         token_id_handle: RawHandle,
         nonce: u64,
@@ -232,7 +232,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn managed_get_back_transfers(
-        &self,
+        &mut self,
         esdt_transfer_value_handle: RawHandle,
         call_value_handle: RawHandle,
     ) {
@@ -246,7 +246,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn check_esdt_frozen(
-        &self,
+        &mut self,
         address_handle: RawHandle,
         token_id_handle: RawHandle,
         _nonce: u64,
@@ -262,7 +262,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         false
     }
 
-    fn get_esdt_local_roles_bits(&self, token_id_handle: RawHandle) -> u64 {
+    fn get_esdt_local_roles_bits(&mut self, token_id_handle: RawHandle) -> u64 {
         let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
         let account = self.current_account_data();
         let mut result = EsdtLocalRoleFlags::NONE;
@@ -276,7 +276,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
 
     #[allow(clippy::too_many_arguments)]
     fn set_esdt_data_values(
-        &self,
+        &mut self,
         esdt_data: &EsdtData,
         instance: &EsdtInstance,
         value_handle: RawHandle,
@@ -315,7 +315,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
 
     #[allow(clippy::too_many_arguments)]
     fn reset_esdt_data_values(
-        &self,
+        &mut self,
         value_handle: RawHandle,
         properties_handle: RawHandle,
         hash_handle: RawHandle,

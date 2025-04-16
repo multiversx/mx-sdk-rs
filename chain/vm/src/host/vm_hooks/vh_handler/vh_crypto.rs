@@ -1,7 +1,7 @@
 use crate::{crypto_functions, host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
 
 pub trait VMHooksCrypto: VMHooksHandlerSource {
-    fn sha256_managed(&self, dest: RawHandle, data_handle: RawHandle) {
+    fn sha256_managed(&mut self, dest: RawHandle, data_handle: RawHandle) {
         // default implementation used in debugger
         // the VM has a dedicated hook
         let mut types = self.m_types_lock();
@@ -10,7 +10,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
         types.mb_set(dest, result_bytes[..].to_vec());
     }
 
-    fn keccak256_managed(&self, dest: RawHandle, data_handle: RawHandle) {
+    fn keccak256_managed(&mut self, dest: RawHandle, data_handle: RawHandle) {
         // default implementation used in debugger
         // the VM has a dedicated hook
         let mut types = self.m_types_lock();
@@ -20,7 +20,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
     }
 
     /// Should crash if the signature is invalid.
-    fn verify_ed25519_managed(&self, key: RawHandle, message: RawHandle, signature: RawHandle) {
+    fn verify_ed25519_managed(&mut self, key: RawHandle, message: RawHandle, signature: RawHandle) {
         let types = self.m_types_lock();
         let key = types.mb_get(key);
         let message = types.mb_get(message);

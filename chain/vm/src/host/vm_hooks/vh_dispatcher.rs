@@ -331,7 +331,12 @@ impl VMHooks for VMHooksDispatcher {
         panic!("Unavailable: storage_load_from_address")
     }
 
-    fn storage_load(&mut self, key_offset: MemPtr, key_length: MemLength, data_offset: MemPtr) -> i32 {
+    fn storage_load(
+        &mut self,
+        key_offset: MemPtr,
+        key_length: MemLength,
+        data_offset: MemPtr,
+    ) -> i32 {
         panic!("Unavailable: storage_load")
     }
 
@@ -693,7 +698,11 @@ impl VMHooks for VMHooksDispatcher {
         );
     }
 
-    fn managed_get_back_transfers(&mut self, esdt_transfer_value_handle: i32, call_value_handle: i32) {
+    fn managed_get_back_transfers(
+        &mut self,
+        esdt_transfer_value_handle: i32,
+        call_value_handle: i32,
+    ) {
         self.handler
             .managed_get_back_transfers(esdt_transfer_value_handle, call_value_handle);
     }
@@ -920,7 +929,12 @@ impl VMHooks for VMHooksDispatcher {
         RESULT_OK
     }
 
-    fn managed_is_esdt_frozen(&mut self, address_handle: i32, token_id_handle: i32, nonce: i64) -> i32 {
+    fn managed_is_esdt_frozen(
+        &mut self,
+        address_handle: i32,
+        token_id_handle: i32,
+        nonce: i64,
+    ) -> i32 {
         bool_to_i32(
             self.handler
                 .check_esdt_frozen(address_handle, token_id_handle, nonce as u64),
@@ -1474,7 +1488,12 @@ impl VMHooks for VMHooksDispatcher {
         RESULT_OK
     }
 
-    fn managed_map_remove(&mut self, map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
+    fn managed_map_remove(
+        &mut self,
+        map_handle: i32,
+        key_handle: i32,
+        out_value_handle: i32,
+    ) -> i32 {
         self.handler
             .mm_remove(map_handle, key_handle, out_value_handle);
         RESULT_OK
@@ -1518,7 +1537,11 @@ impl VMHooks for VMHooksDispatcher {
         panic!("Unavailable: small_int_storage_store_signed")
     }
 
-    fn small_int_storage_load_unsigned(&mut self, key_offset: MemPtr, key_length: MemLength) -> i64 {
+    fn small_int_storage_load_unsigned(
+        &mut self,
+        key_offset: MemPtr,
+        key_length: MemLength,
+    ) -> i64 {
         panic!("Unavailable: small_int_storage_load_unsigned")
     }
 
@@ -1592,7 +1615,12 @@ impl VMHooks for VMHooksDispatcher {
         panic!("Unavailable: verify_ed25519")
     }
 
-    fn managed_verify_ed25519(&mut self, key_handle: i32, message_handle: i32, sig_handle: i32) -> i32 {
+    fn managed_verify_ed25519(
+        &mut self,
+        key_handle: i32,
+        message_handle: i32,
+        sig_handle: i32,
+    ) -> i32 {
         self.handler
             .verify_ed25519_managed(key_handle, message_handle, sig_handle);
         RESULT_OK
