@@ -2,7 +2,7 @@ use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };
 use multiversx_chain_vm_executor_wasmer_experimental::ExperimentalInstance;
-use std::{fmt, rc::Rc, sync::Arc};
+use std::{fmt, sync::Arc};
 
 use crate::host::{runtime::RuntimeWeakRef, vm_hooks::TxContextVMHooksBuilder};
 
@@ -37,7 +37,7 @@ impl ExperimentalExecutor {
 
         Box::new(
             ExperimentalInstance::try_new_instance(
-                Rc::new(vm_hooks_builder),
+                Box::new(vm_hooks_builder),
                 Arc::new(opcode_cost),
                 wasm_bytes,
                 compilation_options,

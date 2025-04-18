@@ -43,7 +43,12 @@ macro_rules! unary_op_method_big_int_handle {
 }
 
 pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
-    fn bf_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> RawHandle {
+    fn bf_from_parts(
+        &mut self,
+        integral_part: i32,
+        fractional_part: i32,
+        exponent: i32,
+    ) -> RawHandle {
         if exponent > 0 {
             self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE);
         }
@@ -61,7 +66,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
-    fn bf_from_frac(&self, numerator: i64, denominator: i64) -> RawHandle {
+    fn bf_from_frac(&mut self, numerator: i64, denominator: i64) -> RawHandle {
         if denominator == 0 {
             self.vm_error(vm_err_msg::DIVISION_BY_0);
         }
@@ -77,7 +82,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
-    fn bf_from_sci(&self, significand: i64, exponent: i64) -> RawHandle {
+    fn bf_from_sci(&mut self, significand: i64, exponent: i64) -> RawHandle {
         if exponent > 0 {
             self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE);
         }
@@ -101,7 +106,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     unary_op_method!(bf_abs, abs);
     unary_op_method!(bf_neg, neg);
 
-    fn bf_cmp(&self, x: RawHandle, y: RawHandle) -> i32 {
+    fn bf_cmp(&mut self, x: RawHandle, y: RawHandle) -> i32 {
         let bf_x = self.m_types_lock().bf_get_f64(x);
         let bf_y = self.m_types_lock().bf_get_f64(y);
         let order_opt = bf_x.partial_cmp(&bf_y);
@@ -116,7 +121,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         }
     }
 
-    fn bf_sign(&self, x: RawHandle) -> i32 {
+    fn bf_sign(&mut self, x: RawHandle) -> i32 {
         let bf = self.m_types_lock().bf_get_f64(x);
         if bf.is_zero() {
             return 0;
@@ -138,7 +143,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         self.m_types_lock().bf_overwrite(dest, value);
     }
 
-    fn bf_sqrt(&self, dest: RawHandle, x: RawHandle) {
+    fn bf_sqrt(&mut self, dest: RawHandle, x: RawHandle) {
         let bf_x = self.m_types_lock().bf_get_f64(x);
         if bf_x < 0f64 {
             self.vm_error(vm_err_msg::BAD_BOUNDS_LOWER);

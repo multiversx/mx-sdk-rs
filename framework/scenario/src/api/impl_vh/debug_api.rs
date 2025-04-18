@@ -1,5 +1,3 @@
-use std::{cell::RefCell, rc::Rc};
-
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
     host::context::{TxContextRef, TxPanic},
@@ -25,11 +23,9 @@ impl VMHooksApiBackend for DebugApiBackend {
     {
         let instance = ContractDebugStack::static_peek();
         let tx_context_ref = instance.tx_context_ref.clone();
-        let handler = TxContextVMHooksHandler::new(
-            tx_context_ref,
-            Rc::new(RefCell::new(ContractDebugInstanceState)),
-        );
-        let mut dispatcher = VMHooksDispatcher::new(Box::new(handler));
+        let mut instance_state = ContractDebugInstanceState;
+        let handler = TxContextVMHooksHandler::new(tx_context_ref, &mut instance_state);
+        let mut dispatcher = VMHooksDispatcher::new(handler);
         f(&mut dispatcher)
     }
 
@@ -38,11 +34,9 @@ impl VMHooksApiBackend for DebugApiBackend {
         F: FnOnce(&mut dyn VMHooks) -> R,
     {
         let tx_context_ref = TxContextRef(handle.context.clone());
-        let handler = TxContextVMHooksHandler::new(
-            tx_context_ref,
-            Rc::new(RefCell::new(ContractDebugInstanceState)),
-        );
-        let mut dispatcher = VMHooksDispatcher::new(Box::new(handler));
+        let mut instance_state = ContractDebugInstanceState;
+        let handler = TxContextVMHooksHandler::new(tx_context_ref, &mut instance_state);
+        let mut dispatcher = VMHooksDispatcher::new(handler);
         f(&mut dispatcher)
     }
 

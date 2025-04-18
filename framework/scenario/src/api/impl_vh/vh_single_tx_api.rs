@@ -73,7 +73,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         self.0.managed_types.lock().unwrap()
     }
 
-    fn halt_with_error(&self, status: ReturnCode, message: &str) {
+    fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 
@@ -95,7 +95,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         })
     }
 
-    fn storage_write(&self, key: &[u8], value: &[u8]) {
+    fn storage_write(&mut self, key: &[u8], value: &[u8]) {
         self.0.with_account_mut(&self.0.tx_input_box.to, |account| {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
@@ -122,7 +122,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     }
 
     fn perform_async_call(
-        &self,
+        &mut self,
         _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
@@ -132,7 +132,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     }
 
     fn perform_execute_on_dest_context(
-        &self,
+        &mut self,
         _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
@@ -142,7 +142,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     }
 
     fn perform_execute_on_dest_context_readonly(
-        &self,
+        &mut self,
         _to: VMAddress,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
@@ -151,7 +151,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     }
 
     fn perform_deploy(
-        &self,
+        &mut self,
         _egld_value: num_bigint::BigUint,
         _contract_code: Vec<u8>,
         _code_metadata: VMCodeMetadata,
@@ -161,7 +161,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     }
 
     fn perform_transfer_execute(
-        &self,
+        &mut self,
         _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
