@@ -29,9 +29,9 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer>;
 
-    fn halt_with_error(&self, status: ReturnCode, message: &str);
+    fn halt_with_error(&mut self, status: ReturnCode, message: &str);
 
-    fn vm_error(&self, message: &str) {
+    fn vm_error(&mut self, message: &str) {
         self.halt_with_error(ReturnCode::ExecutionFailed, message)
     }
 
@@ -60,7 +60,7 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8>;
 
-    fn storage_write(&self, key: &[u8], value: &[u8]);
+    fn storage_write(&mut self, key: &[u8], value: &[u8]);
 
     fn get_previous_block_info(&self) -> &BlockInfo;
 
@@ -84,7 +84,7 @@ pub trait VMHooksHandlerSource: Debug {
     fn account_code(&self, address: &VMAddress) -> Vec<u8>;
 
     fn perform_async_call(
-        &self,
+        &mut self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
@@ -92,7 +92,7 @@ pub trait VMHooksHandlerSource: Debug {
     ) -> !;
 
     fn perform_execute_on_dest_context(
-        &self,
+        &mut self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
@@ -100,14 +100,14 @@ pub trait VMHooksHandlerSource: Debug {
     ) -> Vec<Vec<u8>>;
 
     fn perform_execute_on_dest_context_readonly(
-        &self,
+        &mut self,
         to: VMAddress,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) -> Vec<Vec<u8>>;
 
     fn perform_deploy(
-        &self,
+        &mut self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
@@ -115,7 +115,7 @@ pub trait VMHooksHandlerSource: Debug {
     ) -> (VMAddress, Vec<Vec<u8>>);
 
     fn perform_transfer_execute(
-        &self,
+        &mut self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,

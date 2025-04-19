@@ -24,7 +24,7 @@ macro_rules! binary_op_method {
 
 macro_rules! binary_bitwise_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
-        fn $method_name(&self, dest: RawHandle, x: RawHandle, y: RawHandle) {
+        fn $method_name(&mut self, dest: RawHandle, x: RawHandle, y: RawHandle) {
             let bi_x = self.m_types_lock().bi_get(x);
             if bi_x.sign() == num_bigint::Sign::Minus {
                 self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
@@ -90,13 +90,12 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
         }
     }
 
-    fn bi_get_int64(&self, destination_handle: RawHandle) -> i64 {
-        self.m_types_lock()
-            .bi_to_i64(destination_handle)
-            .unwrap_or_else(|| {
-                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
-                0
-            })
+    fn bi_get_int64(&mut self, destination_handle: RawHandle) -> i64 {
+        let opt_i64 = self.m_types_lock().bi_to_i64(destination_handle);
+        opt_i64.unwrap_or_else(|| {
+            self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+            0
+        })
     }
 
     binary_op_method! {bi_add, add}
@@ -146,7 +145,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
     binary_bitwise_op_method! {bi_or, bitor}
     binary_bitwise_op_method! {bi_xor, bitxor}
 
-    fn bi_shr(&self, dest: RawHandle, x: RawHandle, bits: usize) {
+    fn bi_shr(&mut self, dest: RawHandle, x: RawHandle, bits: usize) {
         let bi_x = self.m_types_lock().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
             self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
@@ -155,7 +154,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
         self.m_types_lock().bi_overwrite(dest, result);
     }
 
-    fn bi_shl(&self, dest: RawHandle, x: RawHandle, bits: usize) {
+    fn bi_shl(&mut self, dest: RawHandle, x: RawHandle, bits: usize) {
         let bi_x = self.m_types_lock().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
             self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);

@@ -1,7 +1,4 @@
-use multiversx_chain_vm::{
-    executor::VMHooks,
-    host::vm_hooks::{VMHooksDispatcher, VMHooksHandler},
-};
+use multiversx_chain_vm::{executor::VMHooks, host::vm_hooks::VMHooksDispatcher};
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;
 
@@ -9,13 +6,12 @@ use crate::executor::debug::StaticVarData;
 
 use super::{StaticApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
 
-fn new_static_api_vh() -> VMHooksDispatcher {
-    let vh_handler: Box<dyn VMHooksHandler> = Box::<StaticApiVMHooksHandler>::default();
-    VMHooksDispatcher::new(vh_handler)
+fn new_static_api_vh() -> VMHooksDispatcher<StaticApiVMHooksHandler> {
+    VMHooksDispatcher::new(StaticApiVMHooksHandler::default())
 }
 
 thread_local! {
-    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher> = Mutex::new(new_static_api_vh());
+    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher<StaticApiVMHooksHandler>> = Mutex::new(new_static_api_vh());
 
     static STATIC_API_STATIC_CELL: Mutex<StaticVarData> = Mutex::new(StaticVarData::default());
 }

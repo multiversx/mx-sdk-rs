@@ -21,11 +21,13 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
 
     /// Should crash if the signature is invalid.
     fn verify_ed25519_managed(&mut self, key: RawHandle, message: RawHandle, signature: RawHandle) {
-        let types = self.m_types_lock();
-        let key = types.mb_get(key);
-        let message = types.mb_get(message);
-        let signature = types.mb_get(signature);
-        let sig_valid = crypto_functions::verify_ed25519(key, message, signature);
+        let sig_valid = {
+            let types = self.m_types_lock();
+            let key = types.mb_get(key);
+            let message = types.mb_get(message);
+            let signature = types.mb_get(signature);
+            crypto_functions::verify_ed25519(key, message, signature)
+        };
         if !sig_valid {
             self.vm_error("invalid signature");
         }
