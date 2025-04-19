@@ -3129,6 +3129,7 @@ dependencies = [
 [[package]]
 name = "multiversx-chain-vm-executor"
 version = "0.3.0"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=19c2614ba5bbef146aaa90569c7ad8b7b127a44f#19c2614ba5bbef146aaa90569c7ad8b7b127a44f"
 dependencies = [
  "serde",
  "toml 0.7.8",
@@ -3137,6 +3138,7 @@ dependencies = [
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer"
 version = "0.3.0"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=19c2614ba5bbef146aaa90569c7ad8b7b127a44f#19c2614ba5bbef146aaa90569c7ad8b7b127a44f"
 dependencies = [
  "chrono",
  "log",
@@ -3150,6 +3152,7 @@ dependencies = [
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer-experimental"
 version = "0.3.0"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=19c2614ba5bbef146aaa90569c7ad8b7b127a44f#19c2614ba5bbef146aaa90569c7ad8b7b127a44f"
 dependencies = [
  "chrono",
  "log",

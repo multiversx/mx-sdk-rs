@@ -23,8 +23,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     {
         let instance = ContractDebugStack::static_peek();
         let tx_context_ref = instance.tx_context_ref.clone();
-        let mut instance_state = ContractDebugInstanceState;
-        let handler = TxContextVMHooksHandler::new(tx_context_ref, &mut instance_state);
+        let handler = TxContextVMHooksHandler::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(handler);
         f(&mut dispatcher)
     }
@@ -34,8 +33,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         F: FnOnce(&mut dyn VMHooks) -> R,
     {
         let tx_context_ref = TxContextRef(handle.context.clone());
-        let mut instance_state = ContractDebugInstanceState;
-        let handler = TxContextVMHooksHandler::new(tx_context_ref, &mut instance_state);
+        let handler = TxContextVMHooksHandler::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(handler);
         f(&mut dispatcher)
     }

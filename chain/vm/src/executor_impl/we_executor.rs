@@ -1,10 +1,16 @@
 use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
+    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost, VMHooks,
 };
-use multiversx_chain_vm_executor_wasmer_experimental::ExperimentalInstance;
+use multiversx_chain_vm_executor_wasmer_experimental::{
+    ExperimentalInstance, ExperimentalInstanceState, ExperimentalVMHooksBuilder,
+};
 use std::{fmt, sync::Arc};
 
-use crate::host::{runtime::RuntimeWeakRef, vm_hooks::TxContextVMHooksBuilder};
+use crate::host::{
+    context::TxContextRef,
+    runtime::RuntimeWeakRef,
+    vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
+};
 
 use super::ExecutorFileNotFoundError;
 
@@ -31,7 +37,7 @@ impl ExperimentalExecutor {
     ) -> Box<dyn Instance> {
         let runtime = self.runtime_ref.upgrade();
         let tx_context_ref = runtime.get_executor_context();
-        let vm_hooks_builder = TxContextVMHooksBuilder::new(tx_context_ref);
+        let vm_hooks_builder = ExperimentalTxContextVMHooksBuilder::new(tx_context_ref);
 
         let opcode_cost = runtime.vm_ref.gas_schedule.wasm_opcode_cost.clone();
 
@@ -72,5 +78,27 @@ impl Executor for ExperimentalExecutor {
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
         panic!("WasmerProdExecutor new_instance_from_cache not supported")
+    }
+}
+
+/// Combines the VM's `TxContextRef` with the `ExperimentalInstanceState` from the executor,
+/// to create the `VMHooks.
+pub struct ExperimentalTxContextVMHooksBuilder {
+    tx_context_ref: TxContextRef,
+}
+
+impl ExperimentalTxContextVMHooksBuilder {
+    pub fn new(tx_context_ref: TxContextRef) -> Self {
+        ExperimentalTxContextVMHooksBuilder { tx_context_ref }
+    }
+}
+
+impl ExperimentalVMHooksBuilder for ExperimentalTxContextVMHooksBuilder {
+    fn create_vm_hooks<'b, 'h>(
+        &'b self,
+        instance_state_ref: &'h mut ExperimentalInstanceState,
+    ) -> Box<dyn VMHooks + 'h> {
+        let handler = TxContextVMHooksHandler::new(self.tx_context_ref.clone(), instance_state_ref);
+        Box::new(VMHooksDispatcher::new(handler))
     }
 }
