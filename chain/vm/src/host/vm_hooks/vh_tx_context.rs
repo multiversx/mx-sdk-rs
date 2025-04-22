@@ -50,9 +50,8 @@ impl<S: InstanceState> Debug for TxContextVMHooksHandler<S> {
 impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         self.instance_state_ref
-            .memory_load(offset, length)
+            .memory_load_owned(offset, length)
             .expect("error loading memory from wasmer instance")
-            .to_vec()
     }
 
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) {
