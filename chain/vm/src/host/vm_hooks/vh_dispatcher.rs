@@ -11,12 +11,12 @@ const RESULT_ERROR: i32 = 1;
 
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
-pub struct VMHooksDispatcher {
-    handler: Box<dyn VMHooksHandler>,
+pub struct VMHooksDispatcher<H: VMHooksHandler> {
+    handler: H,
 }
 
-impl VMHooksDispatcher {
-    pub fn new(handler: Box<dyn VMHooksHandler>) -> Self {
+impl<H: VMHooksHandler> VMHooksDispatcher<H> {
+    pub fn new(handler: H) -> Self {
         VMHooksDispatcher { handler }
     }
 }
@@ -30,7 +30,7 @@ fn bool_to_i32(b: bool) -> i32 {
 }
 
 #[allow(unused)]
-impl VMHooks for VMHooksDispatcher {
+impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     fn set_vm_hooks_ptr(&mut self, _vm_hooks_ptr: *mut c_void) {}
 
     fn get_gas_left(&mut self) -> i64 {

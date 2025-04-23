@@ -36,7 +36,7 @@ fn default_instance_call(instance_call: RuntimeInstanceCall<'_>) {
             .instance
             .get_breakpoint_value()
             .expect("error retrieving instance breakpoint value");
-        if let Some(error_tx_result) = breakpoint_error_result(breakpoint, err) {
+        if let Some(error_tx_result) = breakpoint_error_result(breakpoint, err.to_string()) {
             *tx_result_ref = error_tx_result;
         }
     }

@@ -28,7 +28,7 @@ impl VMHooksApiBackend for SingleTxApiBackend {
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
             let handler = cell.lock().unwrap().clone();
-            let mut dispatcher = VMHooksDispatcher::new(Box::new(handler));
+            let mut dispatcher = VMHooksDispatcher::new(handler);
             f(&mut dispatcher)
         })
     }
