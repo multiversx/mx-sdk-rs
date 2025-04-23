@@ -3,11 +3,15 @@ pub mod tests {
     use std::{
         collections::{HashMap, HashSet},
         path::{Path, PathBuf},
+        vec,
     };
 
     use wat::Parser;
 
-    use crate::tools::{panic_report::PanicReport, wasm_extractor::populate_wasm_info, WasmInfo};
+    use crate::tools::{
+        panic_report::PanicReport, wasm_extractor::extractor::populate_wasm_info,
+        ReportCreator, WasmInfo,
+    };
 
     const ADDER_WITH_ERR_IN_VIEW: &str = r#"
 (module $adder_wasm.wasm
@@ -497,12 +501,54 @@ pub mod tests {
 
     #[test]
     fn test_data_drop() {
-        // let data_drop_wat = wasm_to_wat("src/tools/forbidden-opcodes/data-drop.wasm", "");
-        WasmInfo::extract_wasm_info(
-            &PathBuf::from("src/tools/forbidden-opcodes/data-drop.wasm"),
+        let expected_wasm_report = ReportCreator {
+            path: PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/data-drop.wasm"),
+            has_allocator: false,
+            has_panic: PanicReport::None,
+            forbidden_opcodes: vec!["DataDrop".to_string()],
+        };
+        let wasm_info = WasmInfo::extract_wasm_info(
+            &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/data-drop.wasm"),
             false,
             None,
             &[],
         );
+
+        assert_eq!(expected_wasm_report, wasm_info.report);
+    }
+
+    #[test]
+    fn test_memory_copy() {
+        let expected_wasm_report = ReportCreator {
+            path: PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-copy.wasm"),
+            has_allocator: false,
+            has_panic: PanicReport::None,
+            forbidden_opcodes: vec!["MemoryCopy".to_string()],
+        };
+        let wasm_info = WasmInfo::extract_wasm_info(
+            &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-copy.wasm"),
+            false,
+            None,
+            &[],
+        );
+
+        assert_eq!(expected_wasm_report, wasm_info.report);
+    }
+    #[test]
+    fn test_memory_fill() {
+        let expected_wasm_report = ReportCreator {
+            path: PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-fill.wasm"),
+            has_allocator: false,
+            has_panic: PanicReport::None,
+            forbidden_opcodes: vec!["MemoryFill".to_string()],
+        };
+        let wasm_info = WasmInfo::extract_wasm_info(
+            &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-fill.wasm"),
+            false,
+            None,
+            &[],
+        );
+
+        assert_eq!(expected_wasm_report, wasm_info.report);
     }
 }

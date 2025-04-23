@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::tools::report_creator::ReportCreator;
+use crate::tools::ReportCreator;
 
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]

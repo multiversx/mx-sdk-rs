@@ -2,7 +2,7 @@ use std::{
     ffi::OsStr,
     fs,
     path::{Path, PathBuf},
-    process::{self, Command},
+    process::Command,
 };
 
 use super::ContractVariant;
@@ -14,7 +14,7 @@ use crate::{
     mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
     report_info_json::ReportInfoJson,
-    tools::{self, errors::WasmError, WasmInfo},
+    tools::{self, WasmInfo},
 };
 
 impl ContractVariant {
@@ -31,10 +31,7 @@ impl ContractVariant {
 
         assert!(exit_status.success(), "contract build process failed");
 
-        if let Err(err) = self.finalize_build(build_args, output_path) {
-            eprintln!("{}", err);
-            process::exit(1);
-        }
+        self.finalize_build(build_args, output_path);
     }
 
     fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
@@ -77,22 +74,13 @@ impl ContractVariant {
         rustflags
     }
 
-    fn finalize_build(
-        &self,
-        build_args: &BuildArgs,
-        output_path: &Path,
-    ) -> Result<WasmInfo, WasmError> {
+    fn finalize_build(&self, build_args: &BuildArgs, output_path: &Path) {
         self.copy_contracts_to_output(build_args, output_path);
         self.run_wasm_opt(build_args, output_path);
         self.run_wasm2wat(build_args, output_path);
-        let wasm_data = self.extract_wasm_info(build_args, output_path);
+        let wasm_info = self.extract_wasm_info(build_args, output_path);
         self.run_twiggy(build_args, output_path);
-
-        if let Ok(wasm_info) = &wasm_data {
-            self.pack_mxsc_file(build_args, output_path, wasm_info);
-        }
-
-        wasm_data
+        self.pack_mxsc_file(build_args, output_path, &wasm_info);
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &Path) {
@@ -155,11 +143,7 @@ impl ContractVariant {
         );
     }
 
-    fn extract_wasm_info(
-        &self,
-        build_args: &BuildArgs,
-        output_path: &Path,
-    ) -> Result<WasmInfo, WasmError> {
+    fn extract_wasm_info(&self, build_args: &BuildArgs, output_path: &Path) -> WasmInfo {
         let output_wasm_path = output_path.join(self.wasm_output_name(build_args));
 
         let abi = ContractAbiJson::from(&self.abi);
@@ -183,19 +167,17 @@ impl ContractVariant {
 
         print_extract_imports(&output_imports_json_path.to_string_lossy());
 
-        let wasm_data = WasmInfo::extract_wasm_info(
+        let wasm_info = WasmInfo::extract_wasm_info(
             &output_wasm_path,
             true,
             self.settings.check_ei.as_ref(),
             &view_endpoints,
         );
 
-        if let Ok(wasm_info) = &wasm_data {
-            write_imports_output(&output_imports_json_path, wasm_info.imports.as_slice());
-            print_ei_check(wasm_info, &self.settings.check_ei);
-        };
+        write_imports_output(&output_imports_json_path, wasm_info.imports.as_slice());
+        print_ei_check(&wasm_info, &self.settings.check_ei);
 
-        wasm_data
+        wasm_info
     }
 }
 
