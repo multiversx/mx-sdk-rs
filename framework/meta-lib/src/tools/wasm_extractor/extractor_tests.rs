@@ -9,8 +9,8 @@ pub mod tests {
     use wat::Parser;
 
     use crate::tools::{
-        panic_report::PanicReport, wasm_extractor::extractor::populate_wasm_info,
-        ReportCreator, WasmInfo,
+        panic_report::PanicReport,
+        wasm_extractor::extractor::{populate_wasm_info, WasmInfo},
     };
 
     const ADDER_WITH_ERR_IN_VIEW: &str = r#"
@@ -417,11 +417,11 @@ pub mod tests {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
             let wasm_info = populate_wasm_info(Path::new(""), &content, false, None, &[])
                 .expect("Unable to parse WASM content.");
-            assert!(!wasm_info.memory_grow_flag);
-            assert!(!wasm_info.report.has_allocator);
+            assert!(!wasm_info.report.memory_grow_flag);
+            assert!(!wasm_info.report.code.has_allocator);
             assert_eq!(
                 PanicReport::None.to_string(),
-                wasm_info.report.has_panic.to_string()
+                wasm_info.report.code.has_panic.to_string()
             );
         }
     }
@@ -431,11 +431,11 @@ pub mod tests {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_MEM_GROW.as_bytes()) {
             let wasm_info = populate_wasm_info(Path::new(""), &content, false, None, &[])
                 .expect("Unable to parse WASM content.");
-            assert!(wasm_info.memory_grow_flag);
-            assert!(!wasm_info.report.has_allocator);
+            assert!(wasm_info.report.memory_grow_flag);
+            assert!(!wasm_info.report.code.has_allocator);
             assert_eq!(
                 PanicReport::WithoutMessage.to_string(),
-                wasm_info.report.has_panic.to_string()
+                wasm_info.report.code.has_panic.to_string()
             );
         }
     }
@@ -445,11 +445,11 @@ pub mod tests {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_FAIL_ALLOCATOR.as_bytes()) {
             let wasm_info = populate_wasm_info(Path::new(""), &content, false, None, &[])
                 .expect("Unable to parse WASM content.");
-            assert!(!wasm_info.memory_grow_flag);
-            assert!(wasm_info.report.has_allocator);
+            assert!(!wasm_info.report.memory_grow_flag);
+            assert!(wasm_info.report.code.has_allocator);
             assert_eq!(
                 PanicReport::None.to_string(),
-                wasm_info.report.has_panic.to_string()
+                wasm_info.report.code.has_panic.to_string()
             );
         }
     }
@@ -501,54 +501,41 @@ pub mod tests {
 
     #[test]
     fn test_data_drop() {
-        let expected_wasm_report = ReportCreator {
-            path: PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/data-drop.wasm"),
-            has_allocator: false,
-            has_panic: PanicReport::None,
-            forbidden_opcodes: vec!["DataDrop".to_string()],
-        };
-        let wasm_info = WasmInfo::extract_wasm_info(
+        let expected_forbidden_opcodes = vec!["DataDrop".to_string()];
+
+        let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/data-drop.wasm"),
             false,
             None,
             &[],
         );
 
-        assert_eq!(expected_wasm_report, wasm_info.report);
+        assert_eq!(expected_forbidden_opcodes, wasm_report.forbidden_opcodes);
     }
 
     #[test]
     fn test_memory_copy() {
-        let expected_wasm_report = ReportCreator {
-            path: PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-copy.wasm"),
-            has_allocator: false,
-            has_panic: PanicReport::None,
-            forbidden_opcodes: vec!["MemoryCopy".to_string()],
-        };
-        let wasm_info = WasmInfo::extract_wasm_info(
+        let expected_forbidden_opcodes = vec!["MemoryCopy".to_string()];
+        let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-copy.wasm"),
             false,
             None,
             &[],
         );
 
-        assert_eq!(expected_wasm_report, wasm_info.report);
+        assert_eq!(expected_forbidden_opcodes, wasm_report.forbidden_opcodes);
     }
+
     #[test]
     fn test_memory_fill() {
-        let expected_wasm_report = ReportCreator {
-            path: PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-fill.wasm"),
-            has_allocator: false,
-            has_panic: PanicReport::None,
-            forbidden_opcodes: vec!["MemoryFill".to_string()],
-        };
-        let wasm_info = WasmInfo::extract_wasm_info(
+        let expected_forbidden_opcodes = vec!["MemoryFill".to_string()];
+        let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-fill.wasm"),
             false,
             None,
             &[],
         );
 
-        assert_eq!(expected_wasm_report, wasm_info.report);
+        assert_eq!(expected_forbidden_opcodes, wasm_report.forbidden_opcodes);
     }
 }

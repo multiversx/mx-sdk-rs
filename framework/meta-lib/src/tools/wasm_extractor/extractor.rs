@@ -9,10 +9,10 @@ use wasmparser::{
     Operator, Parser, Payload,
 };
 
-use crate::ei::EIVersion;
+use crate::{ei::EIVersion, tools::CodeReport};
 
 use super::{
-    report_creator::ReportCreator,
+    report::WasmReport,
     whitelisted_opcodes::{is_whitelisted, ERROR_FAIL_ALLOCATOR, WRITE_OP},
 };
 
@@ -20,33 +20,32 @@ type CallGraph = HashMap<usize, HashSet<usize>>;
 
 #[derive(Default)]
 pub struct WasmInfo {
-    pub imports: Vec<String>,
-    pub ei_check: bool,
-    pub memory_grow_flag: bool,
-    pub report: ReportCreator,
     pub call_graph: CallGraph,
     pub write_index_functions: HashSet<usize>,
     pub view_endpoints: HashMap<String, usize>,
+    pub report: WasmReport,
 }
 
 impl WasmInfo {
-    pub fn extract_wasm_info(
+    pub fn extract_wasm_report(
         output_wasm_path: &PathBuf,
         extract_imports_enabled: bool,
         check_ei: Option<&EIVersion>,
         view_endpoints: &[&str],
-    ) -> WasmInfo {
+    ) -> WasmReport {
         let wasm_data = fs::read(output_wasm_path)
             .expect("error occurred while extracting information from .wasm: file not found");
 
-        populate_wasm_info(
+        let wasm_info = populate_wasm_info(
             output_wasm_path,
             &wasm_data,
             extract_imports_enabled,
             check_ei,
             view_endpoints,
         )
-        .expect("error occurred while extracting information from .wasm file")
+        .expect("error occurred while extracting information from .wasm file");
+
+        wasm_info.report
     }
 
     fn create_call_graph(&mut self, body: FunctionBody) {
@@ -79,7 +78,7 @@ impl WasmInfo {
     ) {
         for (index, import) in import_section.into_iter().flatten().enumerate() {
             if import_extraction_enabled {
-                self.imports.push(import.name.to_string());
+                self.report.imports.push(import.name.to_string());
             }
             self.call_graph.insert(index, HashSet::new());
             if WRITE_OP.contains(&import.name) {
@@ -87,7 +86,7 @@ impl WasmInfo {
             }
         }
 
-        self.imports.sort();
+        self.report.imports.sort();
     }
 
     pub fn detect_write_operations_in_views(&mut self) {
@@ -148,14 +147,15 @@ pub(crate) fn populate_wasm_info(
         match payload? {
             Payload::ImportSection(import_section) => {
                 wasm_info.process_imports(import_section, import_extraction_enabled);
-                wasm_info.ei_check |= is_ei_valid(&wasm_info.imports, check_ei);
+                wasm_info.report.ei_check |= is_ei_valid(&wasm_info.report.imports, check_ei);
             },
             Payload::DataSection(data_section) => {
-                wasm_info.report.has_allocator |= is_fail_allocator_triggered(data_section.clone());
-                wasm_info.report.has_panic.max_severity(data_section);
+                wasm_info.report.code.has_allocator |=
+                    is_fail_allocator_triggered(data_section.clone());
+                wasm_info.report.code.has_panic.max_severity(data_section);
             },
             Payload::CodeSectionEntry(code_section) => {
-                wasm_info.memory_grow_flag |= is_mem_grow(&code_section);
+                wasm_info.report.memory_grow_flag |= is_mem_grow(&code_section);
                 wasm_info.create_call_graph(code_section);
             },
             Payload::ExportSection(export_section) => {
@@ -167,21 +167,23 @@ pub(crate) fn populate_wasm_info(
 
     wasm_info.detect_write_operations_in_views();
 
-    let report = ReportCreator {
-        path: path.to_path_buf(),
-        has_allocator: wasm_info.report.has_allocator,
-        has_panic: wasm_info.report.has_panic,
+    let report = WasmReport {
+        imports: wasm_info.report.imports,
+        memory_grow_flag: wasm_info.report.memory_grow_flag,
+        ei_check: wasm_info.report.ei_check,
+        code: CodeReport {
+            path: path.to_path_buf(),
+            has_allocator: wasm_info.report.code.has_allocator,
+            has_panic: wasm_info.report.code.has_panic,
+        },
         forbidden_opcodes: wasm_info.report.forbidden_opcodes,
     };
 
     Ok(WasmInfo {
-        imports: wasm_info.imports,
-        ei_check: wasm_info.ei_check,
-        memory_grow_flag: wasm_info.memory_grow_flag,
         call_graph: wasm_info.call_graph,
-        report,
         write_index_functions: wasm_info.write_index_functions,
         view_endpoints: wasm_info.view_endpoints,
+        report,
     })
 }
 

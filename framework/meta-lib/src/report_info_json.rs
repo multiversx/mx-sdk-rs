@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{code_report_json::CodeReportJson, ei_check_json::EiCheckJson, tools::WasmInfo};
+use crate::{code_report_json::CodeReportJson, ei_check_json::EiCheckJson, tools::WasmReport};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -21,18 +21,18 @@ pub struct ReportInfoJson {
 }
 
 impl ReportInfoJson {
-    pub fn new(wasm_info: &WasmInfo, ei_check_info: Option<EiCheckJson>, size: usize) -> Self {
-        let ei_check = if wasm_info.imports.is_empty() {
+    pub fn new(report: &WasmReport, ei_check_info: Option<EiCheckJson>, size: usize) -> Self {
+        let ei_check = if report.imports.is_empty() {
             None
         } else {
             ei_check_info
         };
 
         ReportInfoJson {
-            imports: wasm_info.imports.iter().map(|i| i.to_string()).collect(),
-            is_mem_grow: wasm_info.memory_grow_flag,
+            imports: report.imports.iter().map(|i| i.to_string()).collect(),
+            is_mem_grow: report.memory_grow_flag,
             ei_check,
-            code_report: CodeReportJson::new(&wasm_info.report, size),
+            code_report: CodeReportJson::new(&report.code, size),
         }
     }
 }

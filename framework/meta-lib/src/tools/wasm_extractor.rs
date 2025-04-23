@@ -1,4 +1,5 @@
-pub(crate) mod report_creator;
+pub(crate) mod code_report;
 pub(crate) mod extractor;
 mod extractor_tests;
+pub(crate) mod report;
 mod whitelisted_opcodes;
