@@ -20,3 +20,8 @@ fn interactor_trace_rs() {
 fn st_adder_rs() {
     world().run("scenarios/st-adder.scen.json");
 }
+
+#[test]
+fn st_partial_key_check_rs() {
+    world().run("scenarios/st-partial-key-check.scen.json");
+}

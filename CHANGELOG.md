@@ -32,6 +32,17 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+## [sc 0.57.1, sdk 0.9.1] - 2025-04-04
+- Retrieve token properties using `get_token_properties`;
+- Fixed URIs for `esdt_metadata_recreate` and `esdt_metadata_update`;
+- `sc-meta`:
+  - Fixed `test --chain-simulator` used for running chain-simulator interactor tests;
+  - Added extra checks for argument validity.
+- Interactor:
+  - Fixed `setStateOverwrite`;
+  - Fixed `ReturnsTxHash` result handler.
+- Enhanced `checkState` to allow partial key verification.
+
 ## [sc 0.57.0, codec 0.22.0, chain 0.14.0, sdk 0.9.0, scenario-format 0.23.1] - 2025-03-11
 - Newer compiler support:
 	- Dropped support for Rust compiler versions older than 1.83.

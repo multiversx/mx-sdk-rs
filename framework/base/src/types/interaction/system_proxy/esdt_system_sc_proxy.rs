@@ -1,4 +1,4 @@
-use super::token_properties::*;
+use super::{token_properties::*, TokenPropertiesResult};
 
 use crate::{
     api::CallTypeApi,
@@ -675,6 +675,18 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("updateTokenID")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Fetches token properties for a specific token.
+    pub fn get_token_properties<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenPropertiesResult> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getTokenProperties")
             .argument(&token_id)
             .original_result()
     }

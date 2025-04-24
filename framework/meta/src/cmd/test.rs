@@ -28,7 +28,7 @@ pub fn test(test_args: &TestArgs) {
             args.extend(["--features", "multiversx-sc-scenario/run-go-tests"]);
         }
 
-        if chain_simulator && cfg!(feature = "chain-simulator-tests") {
+        if chain_simulator {
             args.extend(["--features", "chain-simulator-tests"]);
         }
 
@@ -46,7 +46,7 @@ pub fn test(test_args: &TestArgs) {
     );
 
     let status = Command::new(program)
-        .args(args.clone())
+        .args(args)
         .current_dir(path)
         .status()
         .unwrap_or_else(|_| {
