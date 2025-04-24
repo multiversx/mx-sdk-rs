@@ -78,7 +78,7 @@ version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "891477e0c6a8957309ee5c45a6368af3ae14bb510732d2684ffa19af310920f9"
 dependencies = [
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
  "once_cell",
  "version_check",
 ]
@@ -1096,9 +1096,9 @@ dependencies = [
 
 [[package]]
 name = "derive_more"
-version = "0.99.19"
+version = "0.99.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3da29a38df43d6f156149c9b43ded5e018ddff2a855cf2cfd62e8cd7d079c69f"
+checksum = "6edb4b64a43d977b8e99788fe3a04d483834fba1215a7e02caa415b626497f7f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1806,9 +1806,9 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
-version = "0.2.15"
+version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4567c8db10ae91089c99af84c68c38da3ec2f087c3f82960bcdbf3656b6f4d7"
+checksum = "335ff9f135e4384c8150d6f27c6daed433577f86b4750418338c01a1a2528592"
 dependencies = [
  "cfg-if",
  "js-sys",
@@ -3162,10 +3162,10 @@ dependencies = [
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "arrayvec",
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
  "multiversx-sc",
  "multiversx-sc-modules",
  "multiversx-sc-scenario",
@@ -3183,7 +3183,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "bitflags 2.9.0",
  "generic-array 1.2.0",
@@ -3218,7 +3218,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -3229,7 +3229,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "bip39",
  "clap",
@@ -3254,7 +3254,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta-lib"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "clap",
  "colored 3.0.0",
@@ -3274,14 +3274,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "base64",
  "bech32",
@@ -3306,7 +3306,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "anyhow",
  "base64",
@@ -3325,14 +3325,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sdk"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "aes",
  "anyhow",
@@ -3360,10 +3360,10 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk-dapp"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "anyhow",
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
  "gloo-net 0.6.0",
  "hex",
  "itertools 0.14.0",
@@ -3377,7 +3377,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk-http"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "anyhow",
  "hex",
@@ -3390,7 +3390,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.57.0"
+version = "0.57.1"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -3408,18 +3408,18 @@ dependencies = [
 
 [[package]]
 name = "munge"
-version = "0.4.3"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0091202c98cf06da46c279fdf50cccb6b1c43b4521abdf6a27b4c7e71d5d9d7"
+checksum = "9e22e7961c873e8b305b176d2a4e1d41ce7ba31bc1c52d2a107a89568ec74c55"
 dependencies = [
  "munge_macro",
 ]
 
 [[package]]
 name = "munge_macro"
-version = "0.4.3"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "734799cf91479720b2f970c61a22850940dd91e27d4f02b1c6fc792778df2459"
+checksum = "0ac7d860b767c6398e88fe93db73ce53eb496057aa6895ffa4d60cb02e1d1c6b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4291,7 +4291,7 @@ version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
 ]
 
 [[package]]
@@ -4505,7 +4505,7 @@ checksum = "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7"
 dependencies = [
  "cc",
  "cfg-if",
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
  "libc",
  "untrusted",
  "windows-sys 0.52.0",
@@ -5511,9 +5511,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-util"
-version = "0.7.14"
+version = "0.7.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b9590b93e6fcc1739458317cccd391ad3955e2bde8913edf6f95f9e65a8f034"
+checksum = "66a539a9ad6d5d281510d5bd368c973d636c02dbf8a67300bfb6b950696ad7df"
 dependencies = [
  "bytes",
  "futures-core",
@@ -6216,7 +6216,7 @@ dependencies = [
  "bytecheck 0.6.12",
  "enum-iterator",
  "enumset",
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
  "hex",
  "indexmap 2.9.0",
  "more-asserts",
