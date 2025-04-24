@@ -22,7 +22,9 @@ type CallGraph = HashMap<usize, HashSet<usize>>;
 pub struct WasmInfo {
     pub call_graph: CallGraph,
     pub write_index_functions: HashSet<usize>,
+    pub forbidden_index_functions: HashMap<usize, HashSet<String>>,
     pub view_endpoints: HashMap<String, usize>,
+    pub endpoints: HashMap<String, usize>,
     pub report: WasmReport,
 }
 
@@ -32,6 +34,7 @@ impl WasmInfo {
         extract_imports_enabled: bool,
         check_ei: Option<&EIVersion>,
         view_endpoints: &[&str],
+        endpoints: &[&str],
     ) -> WasmReport {
         let wasm_data = fs::read(output_wasm_path)
             .expect("error occurred while extracting information from .wasm: file not found");
@@ -42,6 +45,7 @@ impl WasmInfo {
             extract_imports_enabled,
             check_ei,
             view_endpoints,
+            endpoints,
         )
         .expect("error occurred while extracting information from .wasm file");
 
@@ -54,11 +58,13 @@ impl WasmInfo {
             .expect("Failed to get operators reader");
 
         let mut call_functions = HashSet::new();
+        let mut current_forbidden_opcodes = HashSet::new();
         while let Ok(op) = instructions_reader.read() {
             if !is_whitelisted(&op) {
                 let op_str = format!("{:?}", op);
                 let op_vec: Vec<&str> = op_str.split_whitespace().collect();
                 self.report.forbidden_opcodes.push(op_vec[0].to_owned());
+                current_forbidden_opcodes.insert(op_vec[0].to_owned());
             }
 
             if let Operator::Call { function_index } = op {
@@ -67,6 +73,8 @@ impl WasmInfo {
             }
         }
 
+        self.forbidden_index_functions
+            .insert(self.call_graph.len(), current_forbidden_opcodes);
         self.call_graph
             .insert(self.call_graph.len(), call_functions);
     }
@@ -114,18 +122,57 @@ impl WasmInfo {
         }
     }
 
-    pub fn detect_forbidden_ops(&mut self) {}
+    pub fn detect_forbidden_opcodes(&mut self) {
+        let mut visited: HashSet<usize> = HashSet::new();
+        for index in self.endpoints.values() {
+            mark_forbidden_functions(
+                *index,
+                &self.call_graph,
+                &mut self.forbidden_index_functions,
+                &mut visited,
+            );
+        }
+
+        for (name, index) in &self.endpoints {
+            if self.forbidden_index_functions.contains_key(index) {
+                println!(
+                    "{}{}{} {}",
+                    "Forbidden opcodes detected in endpoint \""
+                        .to_string()
+                        .red()
+                        .bold(),
+                    name.red().bold(),
+                    "\". This are the opcodes:".to_string().red().bold(),
+                    self.forbidden_index_functions
+                        .get(index)
+                        .unwrap()
+                        .iter()
+                        .cloned()
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                        .red()
+                        .bold()
+                );
+            }
+        }
+    }
 
     fn parse_export_section(
         &mut self,
         export_section: ExportSectionReader,
         view_endpoints: &[&str],
+        endpoints: &[&str],
     ) {
         for export in export_section {
             let export = export.expect("Failed to read export section");
             if let wasmparser::ExternalKind::Func = export.kind {
                 if view_endpoints.contains(&export.name) {
                     self.view_endpoints
+                        .insert(export.name.to_owned(), export.index.try_into().unwrap());
+                }
+
+                if endpoints.contains(&export.name) {
+                    self.endpoints
                         .insert(export.name.to_owned(), export.index.try_into().unwrap());
                 }
             }
@@ -139,6 +186,7 @@ pub(crate) fn populate_wasm_info(
     import_extraction_enabled: bool,
     check_ei: Option<&EIVersion>,
     view_endpoints: &[&str],
+    endpoints: &[&str],
 ) -> Result<WasmInfo, BinaryReaderError> {
     let mut wasm_info = WasmInfo::default();
 
@@ -159,13 +207,14 @@ pub(crate) fn populate_wasm_info(
                 wasm_info.create_call_graph(code_section);
             },
             Payload::ExportSection(export_section) => {
-                wasm_info.parse_export_section(export_section, view_endpoints);
+                wasm_info.parse_export_section(export_section, view_endpoints, endpoints);
             },
             _ => (),
         }
     }
 
     wasm_info.detect_write_operations_in_views();
+    wasm_info.detect_forbidden_opcodes();
 
     let report = WasmReport {
         imports: wasm_info.report.imports,
@@ -182,7 +231,9 @@ pub(crate) fn populate_wasm_info(
     Ok(WasmInfo {
         call_graph: wasm_info.call_graph,
         write_index_functions: wasm_info.write_index_functions,
+        forbidden_index_functions: wasm_info.forbidden_index_functions,
         view_endpoints: wasm_info.view_endpoints,
+        endpoints: wasm_info.endpoints,
         report,
     })
 }
@@ -229,6 +280,34 @@ fn mark_write(
                 mark_write(callee, call_graph, write_functions, visited);
                 if write_functions.contains(&callee) {
                     write_functions.insert(func);
+                }
+            }
+        }
+    }
+}
+
+fn mark_forbidden_functions(
+    func: usize,
+    call_graph: &CallGraph,
+    forbidden_function: &mut HashMap<usize, HashSet<String>>,
+    visited: &mut HashSet<usize>,
+) {
+    // Return early to prevent cycles.
+    if visited.contains(&func) {
+        return;
+    }
+
+    visited.insert(func);
+
+    if let Some(callees) = call_graph.get(&func) {
+        for &callee in callees {
+            if forbidden_function.contains_key(&callee) {
+                forbidden_function.insert(func, forbidden_function.get(&callee).unwrap().clone());
+            } else {
+                mark_forbidden_functions(callee, call_graph, forbidden_function, visited);
+                if forbidden_function.contains_key(&callee) {
+                    forbidden_function
+                        .insert(func, forbidden_function.get(&callee).unwrap().clone());
                 }
             }
         }

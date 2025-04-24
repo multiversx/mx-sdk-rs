@@ -148,7 +148,19 @@ impl ContractVariant {
 
         let abi = ContractAbiJson::from(&self.abi);
         let mut view_endpoints: Vec<&str> = Vec::new();
+        let mut endpoints: Vec<&str> = Vec::new();
+
+        if abi.constructor.is_some() {
+            endpoints.push("init");
+        }
+
+        if abi.upgrade_constructor.is_some() {
+            endpoints.push("upgrade");
+        }
+
         for endpoint in &abi.endpoints {
+            endpoints.push(&endpoint.name);
+
             if let crate::abi_json::EndpointMutabilityAbiJson::Readonly = endpoint.mutability {
                 view_endpoints.push(&endpoint.name);
             }
@@ -160,6 +172,7 @@ impl ContractVariant {
                 build_args.extract_imports,
                 self.settings.check_ei.as_ref(),
                 &view_endpoints,
+                &endpoints,
             );
         }
 
@@ -172,6 +185,7 @@ impl ContractVariant {
             true,
             self.settings.check_ei.as_ref(),
             &view_endpoints,
+            &endpoints,
         );
 
         write_imports_output(&output_imports_json_path, wasm_report.imports.as_slice());
