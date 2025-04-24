@@ -41,13 +41,14 @@ impl WasmerProdExecutor {
         let inner_instance_ref = Rc::new_cyclic(|weak| {
             let vh_handler = TxContextVMHooksHandler::new(
                 tx_context_ref,
-                Rc::new(WasmerProdInstanceState::new(weak.clone())),
+                WasmerProdInstanceState::new(weak.clone()),
             );
-            let vm_hooks = VMHooksDispatcher::new(Box::new(vh_handler));
-            let executor_data = WasmerExecutorData::new_with_gas(
-                Box::new(vm_hooks),
-                runtime.vm_ref.gas_schedule.wasm_opcode_cost.clone(),
-            );
+            let vm_hooks = VMHooksDispatcher::new(vh_handler);
+
+            let mut executor_data = WasmerExecutorData::new(Box::new(vm_hooks));
+            executor_data
+                .set_opcode_cost(&runtime.vm_ref.gas_schedule.wasm_opcode_cost)
+                .expect("Could not lock resource. The lock is already held by the current thread.");
             let executor_data_ref = Rc::new(RefCell::new(executor_data));
 
             WasmerInstance::try_new_instance(

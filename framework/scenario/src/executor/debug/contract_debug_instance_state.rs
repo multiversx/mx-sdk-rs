@@ -40,29 +40,31 @@ impl ContractDebugInstanceState {
 }
 
 impl InstanceState for ContractDebugInstanceState {
-    fn get_points_limit(&self) -> Result<u64, String> {
+    fn get_points_limit(&self) -> Result<u64, ExecutorError> {
         Ok(1)
     }
 
-    fn set_points_used(&self, _points: u64) -> Result<(), String> {
+    fn set_points_used(&mut self, _points: u64) -> Result<(), ExecutorError> {
         Ok(())
     }
 
-    fn get_points_used(&self) -> Result<u64, String> {
+    fn get_points_used(&self) -> Result<u64, ExecutorError> {
         Ok(0)
     }
 
-    fn memory_length(&self) -> Result<u64, String> {
-        panic!("ContractDebugInstanceState memory_length not supported")
+    fn memory_load_to_slice(&self, mem_ptr: MemPtr, dest: &mut [u8]) -> Result<(), ExecutorError> {
+        let data = unsafe { Self::main_memory_load(mem_ptr, dest.len() as MemLength) };
+        dest.copy_from_slice(data);
+        Ok(())
     }
 
-    fn memory_ptr(&self) -> Result<*mut u8, String> {
-        panic!("ContractDebugInstanceState memory_ptr not supported")
-    }
-
-    fn memory_load(&self, mem_ptr: MemPtr, mem_length: MemLength) -> Result<&[u8], ExecutorError> {
+    fn memory_load_owned(
+        &self,
+        mem_ptr: MemPtr,
+        mem_length: MemLength,
+    ) -> Result<Vec<u8>, ExecutorError> {
         let data = unsafe { Self::main_memory_load(mem_ptr, mem_length) };
-        Ok(data)
+        Ok(data.to_vec())
     }
 
     fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) -> Result<(), ExecutorError> {
@@ -72,11 +74,10 @@ impl InstanceState for ContractDebugInstanceState {
         Ok(())
     }
 
-    fn memory_grow(&self, _by_num_pages: u32) -> Result<u32, ExecutorError> {
-        panic!("ContractDebugInstanceState memory_grow not supported")
-    }
-
-    fn set_breakpoint_value(&self, breakpoint_value: BreakpointValue) -> Result<(), String> {
+    fn set_breakpoint_value(
+        &mut self,
+        breakpoint_value: BreakpointValue,
+    ) -> Result<(), ExecutorError> {
         std::panic::panic_any(breakpoint_value)
     }
 }
