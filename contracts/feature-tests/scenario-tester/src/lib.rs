@@ -60,6 +60,7 @@ pub trait ScenarioTester {
     // Report available in *.mxsc.json
     #[endpoint]
     #[inline(never)]
+    #[label("forbidden-opcodes")]
     fn mul_floats(&self, arg: i32) -> i32 {
         (arg as f32 * 1.5f32) as i32
     }

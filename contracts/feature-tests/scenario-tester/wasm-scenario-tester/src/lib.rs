@@ -27,7 +27,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         multi_param => multi_param
         multi_return => multi_return
         sc_panic => sc_panic
-        mul_floats => mul_floats
     )
 }
 
