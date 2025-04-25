@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     ffi::OsStr,
     fs,
     path::{Path, PathBuf},
@@ -147,22 +148,21 @@ impl ContractVariant {
         let output_wasm_path = output_path.join(self.wasm_output_name(build_args));
 
         let abi = ContractAbiJson::from(&self.abi);
-        let mut view_endpoints: Vec<&str> = Vec::new();
-        let mut endpoints: Vec<&str> = Vec::new();
+        let mut endpoints: HashMap<&str, bool> = HashMap::new();
 
         if abi.constructor.is_some() {
-            endpoints.push("init");
+            endpoints.insert("init", false);
         }
 
         if abi.upgrade_constructor.is_some() {
-            endpoints.push("upgrade");
+            endpoints.insert("upgrade", false);
         }
 
         for endpoint in &abi.endpoints {
-            endpoints.push(&endpoint.name);
-
             if let crate::abi_json::EndpointMutabilityAbiJson::Readonly = endpoint.mutability {
-                view_endpoints.push(&endpoint.name);
+                endpoints.insert(&endpoint.name, true);
+            } else {
+                endpoints.insert(&endpoint.name, false);
             }
         }
 
@@ -171,7 +171,6 @@ impl ContractVariant {
                 &output_wasm_path,
                 build_args.extract_imports,
                 self.settings.check_ei.as_ref(),
-                &view_endpoints,
                 &endpoints,
             );
         }
@@ -184,7 +183,6 @@ impl ContractVariant {
             &output_wasm_path,
             true,
             self.settings.check_ei.as_ref(),
-            &view_endpoints,
             &endpoints,
         );
 

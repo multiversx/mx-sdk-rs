@@ -10,7 +10,10 @@ pub mod tests {
 
     use crate::tools::{
         panic_report::PanicReport,
-        wasm_extractor::extractor::{populate_wasm_info, WasmInfo},
+        wasm_extractor::{
+            endpoint_info::FunctionInfo,
+            extractor::{get_view_endpoints, populate_wasm_info, WasmInfo},
+        },
     };
 
     const ADDER_WITH_ERR_IN_VIEW: &str = r#"
@@ -415,8 +418,9 @@ pub mod tests {
     #[test]
     fn test_empty() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
-            let wasm_info = populate_wasm_info(Path::new(""), &content, false, None, &[], &[])
-                .expect("Unable to parse WASM content.");
+            let wasm_info =
+                populate_wasm_info(Path::new(""), &content, false, None, &HashMap::new())
+                    .expect("Unable to parse WASM content.");
             assert!(!wasm_info.report.memory_grow_flag);
             assert!(!wasm_info.report.code.has_allocator);
             assert_eq!(
@@ -429,8 +433,9 @@ pub mod tests {
     #[test]
     fn test_empty_with_mem_grow() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_MEM_GROW.as_bytes()) {
-            let wasm_info = populate_wasm_info(Path::new(""), &content, false, None, &[], &[])
-                .expect("Unable to parse WASM content.");
+            let wasm_info =
+                populate_wasm_info(Path::new(""), &content, false, None, &HashMap::new())
+                    .expect("Unable to parse WASM content.");
             assert!(wasm_info.report.memory_grow_flag);
             assert!(!wasm_info.report.code.has_allocator);
             assert_eq!(
@@ -443,9 +448,14 @@ pub mod tests {
     #[test]
     fn test_empty_with_fail_allocator() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_FAIL_ALLOCATOR.as_bytes()) {
-            let wasm_info =
-                populate_wasm_info(Path::new(""), &content, false, None, &[], &["init"])
-                    .expect("Unable to parse WASM content.");
+            let wasm_info = populate_wasm_info(
+                Path::new(""),
+                &content,
+                false,
+                None,
+                &HashMap::from([("init", false)]),
+            )
+            .expect("Unable to parse WASM content.");
             assert!(!wasm_info.report.memory_grow_flag);
             assert!(wasm_info.report.code.has_allocator);
             assert_eq!(
@@ -455,51 +465,63 @@ pub mod tests {
         }
     }
 
+    // should trigger in terminal warning: "Write storage operation in VIEW endpoint: add"
     #[test]
     fn test_adder_with_write_op_in_view() {
-        let view_endpoints: Vec<&str> = Vec::from(["getSum", "add"]);
-
-        let expected_view_index: HashMap<String, usize> =
-            HashMap::from([("getSum".to_string(), 18), ("add".to_string(), 19)]);
+        let expected_view_index: HashMap<&str, usize> =
+            HashMap::from([("getSum", 18), ("add", 19)]);
         let expected_write_index_functions: HashSet<usize> = HashSet::from([4, 19, 14]);
-        let expected_call_graph: HashMap<usize, HashSet<usize>> = HashMap::from([
-            (0, HashSet::new()),
-            (1, HashSet::new()),
-            (2, HashSet::new()),
-            (3, HashSet::new()),
-            (4, HashSet::new()),
-            (5, HashSet::new()),
-            (6, HashSet::new()),
-            (7, HashSet::new()),
-            (8, HashSet::new()),
-            (9, HashSet::new()),
-            (10, HashSet::new()),
-            (11, HashSet::from([12, 0])),
-            (12, HashSet::new()),
-            (13, HashSet::from([1, 2])),
-            (14, HashSet::from([12, 3, 4])),
-            (15, HashSet::from([12, 5, 6])),
-            (16, HashSet::from([12, 7])),
-            (17, HashSet::from([8, 13, 11, 16, 14])),
-            (18, HashSet::from([8, 13, 16, 15, 9])),
-            (19, HashSet::from([8, 13, 11, 16, 15, 10, 14])),
-            (20, HashSet::new()),
+        let expected_call_graph: HashMap<usize, FunctionInfo> = HashMap::from([
+            (0, FunctionInfo::new()),
+            (1, FunctionInfo::new()),
+            (2, FunctionInfo::new()),
+            (3, FunctionInfo::new()),
+            (4, FunctionInfo::new()),
+            (5, FunctionInfo::new()),
+            (6, FunctionInfo::new()),
+            (7, FunctionInfo::new()),
+            (8, FunctionInfo::new()),
+            (9, FunctionInfo::new()),
+            (10, FunctionInfo::new()),
+            (11, FunctionInfo::new_with_indexes(vec![12, 0])),
+            (12, FunctionInfo::new()),
+            (13, FunctionInfo::new_with_indexes(vec![1, 2])),
+            (14, FunctionInfo::new_with_indexes(vec![12, 3, 4])),
+            (15, FunctionInfo::new_with_indexes(vec![12, 5, 6])),
+            (16, FunctionInfo::new_with_indexes(vec![12, 7])),
+            (17, FunctionInfo::new_with_indexes(vec![8, 13, 11, 16, 14])),
+            (18, FunctionInfo::new_with_indexes(vec![8, 13, 16, 15, 9])),
+            (
+                19,
+                FunctionInfo::new_with_indexes(vec![8, 13, 11, 16, 15, 10, 14]),
+            ),
+            (20, FunctionInfo::new()),
         ]);
 
         if let Ok(content) = Parser::new().parse_bytes(None, ADDER_WITH_ERR_IN_VIEW.as_bytes()) {
-            let wasm_info =
-                populate_wasm_info(Path::new(""), &content, false, None, &view_endpoints, &[])
-                    .expect("Unable to parse WASM content.");
+            let wasm_info = populate_wasm_info(
+                Path::new(""),
+                &content,
+                false,
+                None,
+                &HashMap::from([("getSum", true), ("add", true)]),
+            )
+            .expect("Unable to parse WASM content.");
 
             assert_eq!(
                 expected_write_index_functions,
                 wasm_info.write_index_functions
             );
             assert_eq!(expected_call_graph, wasm_info.call_graph);
-            assert_eq!(expected_view_index, wasm_info.view_endpoints);
+            assert_eq!(
+                expected_view_index,
+                get_view_endpoints(&wasm_info.endpoints)
+            );
         }
     }
 
+    // should trigger in terminal warning:
+    // "Forbidden opcodes detected in endpoint "main". This are the opcodes: DataDrop"
     #[test]
     fn test_data_drop() {
         let expected_forbidden_opcodes = vec!["DataDrop".to_string()];
@@ -508,13 +530,14 @@ pub mod tests {
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/data-drop.wasm"),
             false,
             None,
-            &[],
-            &["main"],
+            &HashMap::from([("main", false)]),
         );
 
         assert_eq!(expected_forbidden_opcodes, wasm_report.forbidden_opcodes);
     }
 
+    // should trigger in terminal warning:
+    // "Forbidden opcodes detected in endpoint "main". This are the opcodes: MemoryCopy"
     #[test]
     fn test_memory_copy() {
         let expected_forbidden_opcodes = vec!["MemoryCopy".to_string()];
@@ -522,13 +545,14 @@ pub mod tests {
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-copy.wasm"),
             false,
             None,
-            &[],
-            &["main"],
+            &HashMap::from([("main", false)]),
         );
 
         assert_eq!(expected_forbidden_opcodes, wasm_report.forbidden_opcodes);
     }
 
+    // should trigger in terminal warning:
+    // "Forbidden opcodes detected in endpoint "main". This are the opcodes: MemoryFill"
     #[test]
     fn test_memory_fill() {
         let expected_forbidden_opcodes = vec!["MemoryFill".to_string()];
@@ -536,8 +560,7 @@ pub mod tests {
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-fill.wasm"),
             false,
             None,
-            &[],
-            &["main"],
+            &HashMap::from([("main", false)]),
         );
 
         assert_eq!(expected_forbidden_opcodes, wasm_report.forbidden_opcodes);
