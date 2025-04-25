@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use multiversx_chain_vm_executor::{
     BreakpointValue, ExecutorError, InstanceFull, InstanceState, MemLength, MemPtr,
 };
@@ -15,61 +16,56 @@ impl WasmerProdInstanceState {
         WasmerProdInstanceState { inner_instance_ref }
     }
 
-    fn instance_rc(&self) -> Result<Rc<WasmerInstance>, String> {
+    fn instance_rc(&self) -> anyhow::Result<Rc<WasmerInstance>> {
         self.inner_instance_ref
             .upgrade()
-            .map_or_else(|| Err("bad wasmer instance pointer".to_owned()), Ok)
+            .map_or_else(|| Err(anyhow!("bad wasmer instance pointer")), Ok)
     }
 }
 
 impl InstanceState for WasmerProdInstanceState {
-    fn get_points_limit(&self) -> Result<u64, String> {
+    fn get_points_limit(&self) -> Result<u64, ExecutorError> {
         // InstanceState::get_points_limit(&self)
         // self.instance_rc()?.get_points_limit()
         todo!()
     }
 
-    fn set_points_used(&self, points: u64) -> Result<(), String> {
-        self.instance_rc()?.set_points_used(points)
+    fn set_points_used(&mut self, points: u64) -> Result<(), ExecutorError> {
+        self.instance_rc()?
+            .set_points_used(points)
+            .map_err(|err| anyhow!("globals error: {err}").into())
     }
 
-    fn get_points_used(&self) -> Result<u64, String> {
-        self.instance_rc()?.get_points_used()
+    fn get_points_used(&self) -> Result<u64, ExecutorError> {
+        self.instance_rc()?
+            .get_points_used()
+            .map_err(|err| anyhow!("globals error: {err}").into())
     }
 
-    fn memory_length(&self) -> Result<u64, String> {
-        self.instance_rc()?.memory_length()
+    fn memory_load_to_slice(&self, mem_ptr: MemPtr, dest: &mut [u8]) -> Result<(), ExecutorError> {
+        let instance_rc = self.instance_rc()?;
+        let slice = instance_rc.memory_load(mem_ptr, dest.len() as MemLength)?;
+        dest.copy_from_slice(slice);
+        Ok(())
     }
 
-    fn memory_ptr(&self) -> Result<*mut u8, String> {
-        self.instance_rc()?.memory_ptr()
-    }
-
-    fn memory_load(&self, mem_ptr: MemPtr, mem_length: MemLength) -> Result<&[u8], ExecutorError> {
-        // TODO: return error
-        assert!(
-            self.inner_instance_ref.strong_count() > 0,
-            "instance reference dropped"
-        );
-        unsafe {
-            let box_ref = self
-                .inner_instance_ref
-                .as_ptr()
-                .as_ref()
-                .expect("null instance pointer");
-            box_ref.memory_load(mem_ptr, mem_length)
-        }
+    fn memory_load_owned(
+        &self,
+        mem_ptr: MemPtr,
+        mem_length: MemLength,
+    ) -> Result<Vec<u8>, ExecutorError> {
+        let instance_rc = self.instance_rc()?;
+        let slice = instance_rc.memory_load(mem_ptr, mem_length)?;
+        Ok(slice.to_vec())
     }
 
     fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]) -> Result<(), ExecutorError> {
         self.instance_rc()?.memory_store(mem_ptr, data)
     }
 
-    fn memory_grow(&self, by_num_pages: u32) -> Result<u32, ExecutorError> {
-        self.instance_rc()?.memory_grow(by_num_pages)
-    }
-
-    fn set_breakpoint_value(&self, value: BreakpointValue) -> Result<(), String> {
-        self.instance_rc()?.set_breakpoint_value(value)
+    fn set_breakpoint_value(&mut self, value: BreakpointValue) -> Result<(), ExecutorError> {
+        self.instance_rc()?
+            .set_breakpoint_value(value)
+            .map_err(|err| anyhow!("globals error: {err}").into())
     }
 }

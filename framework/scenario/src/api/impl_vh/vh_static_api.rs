@@ -31,8 +31,9 @@ impl StaticApiVMHooksHandler {
 }
 
 impl VMHooksHandlerSource for StaticApiVMHooksHandler {
-    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
-        unsafe { ContractDebugInstanceState::main_memory_load(offset, length) }
+    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
+        let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
+        slice.to_vec()
     }
 
     unsafe fn memory_store(&self, offset: MemPtr, data: &[u8]) {
@@ -45,7 +46,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         self.0.lock().unwrap()
     }
 
-    fn halt_with_error(&self, status: ReturnCode, message: &str) {
+    fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 
@@ -73,7 +74,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         panic!("cannot access the storage in the StaticApi")
     }
 
-    fn storage_write(&self, _key: &[u8], _value: &[u8]) {
+    fn storage_write(&mut self, _key: &[u8], _value: &[u8]) {
         panic!("cannot access the storage in the StaticApi")
     }
 
@@ -98,7 +99,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     }
 
     fn perform_async_call(
-        &self,
+        &mut self,
         _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
@@ -108,7 +109,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     }
 
     fn perform_execute_on_dest_context(
-        &self,
+        &mut self,
         _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
@@ -118,7 +119,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     }
 
     fn perform_execute_on_dest_context_readonly(
-        &self,
+        &mut self,
         _to: VMAddress,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
@@ -127,7 +128,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     }
 
     fn perform_deploy(
-        &self,
+        &mut self,
         _egld_value: num_bigint::BigUint,
         _contract_code: Vec<u8>,
         _code_metadata: VMCodeMetadata,
@@ -137,7 +138,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     }
 
     fn perform_transfer_execute(
-        &self,
+        &mut self,
         _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,

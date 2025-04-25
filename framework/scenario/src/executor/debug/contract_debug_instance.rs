@@ -4,7 +4,7 @@ use multiversx_chain_vm::host::{
     context::{TxContextRef, TxFunctionName, TxPanic},
     runtime::RuntimeInstanceCall,
 };
-use multiversx_chain_vm_executor::{BreakpointValue, Instance};
+use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance};
 use multiversx_sc::chain_core::types::ReturnCode;
 
 use super::{
@@ -76,7 +76,7 @@ impl ContractDebugInstance {
         let _ = instance_call.instance.call(FUNC_CONTEXT_POP);
     }
 
-    fn call_endpoint(&self, func_name: &str) -> Result<(), String> {
+    fn call_endpoint(&self, func_name: &str) {
         let tx_func_name = TxFunctionName::from(func_name);
 
         ContractDebugStack::static_push(self.clone());
@@ -100,24 +100,21 @@ impl ContractDebugInstance {
         }
 
         ContractDebugStack::static_pop();
-
-        Ok(())
     }
 }
 
 impl Instance for ContractDebugInstance {
-    fn call(&self, func_name: &str) -> Result<(), String> {
+    fn call(&self, func_name: &str) -> Result<(), ExecutorError> {
         match func_name {
             FUNC_CONTEXT_PUSH => {
                 ContractDebugStack::static_push(self.clone());
-                Ok(())
             },
             FUNC_CONTEXT_POP => {
                 ContractDebugStack::static_pop();
-                Ok(())
             },
             _ => self.call_endpoint(func_name),
         }
+        Ok(())
     }
 
     fn check_signatures(&self) -> bool {
@@ -136,23 +133,23 @@ impl Instance for ContractDebugInstance {
         panic!("ContractDebugInstance get_exported_function_names not yet supported")
     }
 
-    fn set_points_limit(&self, _limit: u64) -> Result<(), String> {
+    fn set_points_limit(&self, _limit: u64) -> Result<(), ExecutorError> {
         Ok(())
     }
 
-    fn get_points_used(&self) -> Result<u64, String> {
+    fn get_points_used(&self) -> Result<u64, ExecutorError> {
         Ok(0)
     }
 
-    fn get_breakpoint_value(&self) -> Result<BreakpointValue, String> {
+    fn get_breakpoint_value(&self) -> Result<BreakpointValue, ExecutorError> {
         Ok(BreakpointValue::None)
     }
 
-    fn reset(&self) -> Result<(), String> {
+    fn reset(&self) -> Result<(), ExecutorError> {
         panic!("ContractDebugInstance reset not supported")
     }
 
-    fn cache(&self) -> Result<Vec<u8>, String> {
+    fn cache(&self) -> Result<Vec<u8>, ExecutorError> {
         panic!("ContractDebugInstance cache not supported")
     }
 }

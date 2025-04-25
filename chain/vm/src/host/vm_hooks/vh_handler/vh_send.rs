@@ -23,7 +23,7 @@ fn append_endpoint_name_and_args(
 
 pub trait VMHooksSend: VMHooksHandlerSource {
     fn perform_transfer_execute_esdt(
-        &self,
+        &mut self,
         to: VMAddress,
         token: Vec<u8>,
         amount: num_bigint::BigUint,
@@ -44,7 +44,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
     #[allow(clippy::too_many_arguments)]
     fn perform_transfer_execute_nft(
-        &self,
+        &mut self,
         to: VMAddress,
         token: Vec<u8>,
         nonce: u64,
@@ -73,7 +73,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn perform_transfer_execute_multi(
-        &self,
+        &mut self,
         to: VMAddress,
         payments: Vec<TxTokenTransfer>,
         _gas_limit: u64,
@@ -104,7 +104,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn perform_upgrade_contract(
-        &self,
+        &mut self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
@@ -117,7 +117,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn transfer_value_execute(
-        &self,
+        &mut self,
         to_handle: RawHandle,
         amount_handle: RawHandle,
         _gas_limit: u64,
@@ -137,7 +137,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn multi_transfer_esdt_nft_execute(
-        &self,
+        &mut self,
         to_handle: RawHandle,
         payments_handle: RawHandle,
         gas_limit: u64,
@@ -181,7 +181,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn async_call_raw(
-        &self,
+        &mut self,
         to_handle: RawHandle,
         egld_value_handle: RawHandle,
         endpoint_name_handle: RawHandle,
@@ -199,7 +199,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
     #[allow(clippy::too_many_arguments)]
     fn create_async_call_raw(
-        &self,
+        &mut self,
         to_handle: RawHandle,
         egld_value_handle: RawHandle,
         endpoint_name_handle: RawHandle,
@@ -248,7 +248,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
     #[allow(clippy::too_many_arguments)]
     fn deploy_contract(
-        &self,
+        &mut self,
         _gas: u64,
         egld_value_handle: RawHandle,
         code_handle: RawHandle,
@@ -275,7 +275,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
     #[allow(clippy::too_many_arguments)]
     fn deploy_from_source_contract(
-        &self,
+        &mut self,
         _gas: u64,
         egld_value_handle: RawHandle,
         source_contract_address_handle: RawHandle,
@@ -304,7 +304,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn upgrade_from_source_contract(
-        &self,
+        &mut self,
         sc_address_handle: RawHandle,
         _gas: u64,
         egld_value_handle: RawHandle,
@@ -333,7 +333,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn upgrade_contract(
-        &self,
+        &mut self,
         sc_address_handle: RawHandle,
         _gas: u64,
         egld_value_handle: RawHandle,
@@ -353,7 +353,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn execute_on_dest_context_raw(
-        &self,
+        &mut self,
         _gas: u64,
         to_handle: RawHandle,
         egld_value_handle: RawHandle,
@@ -376,7 +376,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     fn execute_on_dest_context_readonly_raw(
-        &self,
+        &mut self,
         _gas: u64,
         to_handle: RawHandle,
         endpoint_name_handle: RawHandle,
@@ -395,12 +395,12 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             .mb_set_vec_of_bytes(result_handle, result);
     }
 
-    fn clean_return_data(&self) {
+    fn clean_return_data(&mut self) {
         let mut tx_result = self.result_lock();
         tx_result.result_values.clear();
     }
 
-    fn delete_from_return_data(&self, index: usize) {
+    fn delete_from_return_data(&mut self, index: usize) {
         let mut tx_result = self.result_lock();
         if index > tx_result.result_values.len() {
             return;

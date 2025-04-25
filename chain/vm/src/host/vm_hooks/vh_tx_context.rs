@@ -1,5 +1,5 @@
+use std::fmt::Debug;
 use std::sync::MutexGuard;
-use std::{fmt::Debug, rc::Rc};
 
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{BreakpointValue, InstanceState, MemLength, MemPtr};
@@ -27,30 +27,30 @@ use crate::{
     vm_err_msg,
 };
 
-pub struct TxContextVMHooksHandler {
+pub struct TxContextVMHooksHandler<S: InstanceState> {
     tx_context_ref: TxContextRef,
-    instance_state_ref: Rc<dyn InstanceState>,
+    instance_state_ref: S,
 }
 
-impl TxContextVMHooksHandler {
-    pub fn new(tx_context_ref: TxContextRef, instance_ref: Rc<dyn InstanceState>) -> Self {
+impl<S: InstanceState> TxContextVMHooksHandler<S> {
+    pub fn new(tx_context_ref: TxContextRef, instance_state_ref: S) -> Self {
         TxContextVMHooksHandler {
             tx_context_ref,
-            instance_state_ref: instance_ref,
+            instance_state_ref,
         }
     }
 }
 
-impl Debug for TxContextVMHooksHandler {
+impl<S: InstanceState> Debug for TxContextVMHooksHandler<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("TxContextVMHooksHandler").finish()
     }
 }
 
-impl VMHooksHandlerSource for TxContextVMHooksHandler {
-    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> &[u8] {
+impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
+    unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         self.instance_state_ref
-            .memory_load(offset, length)
+            .memory_load_owned(offset, length)
             .expect("error loading memory from wasmer instance")
     }
 
@@ -64,7 +64,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         self.tx_context_ref.m_types_lock()
     }
 
-    fn halt_with_error(&self, status: ReturnCode, message: &str) {
+    fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
         *self.tx_context_ref.result_lock() =
             TxResult::from_panic_obj(&TxPanic::new(status, message));
         let breakpoint = match status {
@@ -92,7 +92,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
         })
     }
 
-    fn storage_write(&self, key: &[u8], value: &[u8]) {
+    fn storage_write(&mut self, key: &[u8], value: &[u8]) {
         self.check_reserved_key(key);
         self.check_not_readonly();
 
@@ -126,7 +126,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
     }
 
     fn perform_async_call(
-        &self,
+        &mut self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
@@ -142,7 +142,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
     }
 
     fn perform_execute_on_dest_context(
-        &self,
+        &mut self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
@@ -168,7 +168,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
     }
 
     fn perform_execute_on_dest_context_readonly(
-        &self,
+        &mut self,
         to: VMAddress,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -195,7 +195,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
     }
 
     fn perform_deploy(
-        &self,
+        &mut self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
@@ -246,7 +246,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
     }
 
     fn perform_transfer_execute(
-        &self,
+        &mut self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
@@ -281,7 +281,7 @@ impl VMHooksHandlerSource for TxContextVMHooksHandler {
     }
 }
 
-impl TxContextVMHooksHandler {
+impl<S: InstanceState> TxContextVMHooksHandler<S> {
     fn create_async_call_data(
         &self,
         to: VMAddress,
@@ -322,14 +322,14 @@ impl TxContextVMHooksHandler {
         tx_result.result_values
     }
 
-    fn check_reserved_key(&self, key: &[u8]) {
+    fn check_reserved_key(&mut self, key: &[u8]) {
         if key.starts_with(STORAGE_RESERVED_PREFIX) {
             self.vm_error(vm_err_msg::WRITE_RESERVED);
         }
     }
 
     /// TODO: only checked on storage writes, needs more checks for calls, transfers, etc.
-    fn check_not_readonly(&self) {
+    fn check_not_readonly(&mut self) {
         if self.tx_context_ref.input_ref().readonly {
             self.vm_error(vm_err_msg::WRITE_READONLY);
         }
@@ -347,22 +347,22 @@ impl TxContextVMHooksHandler {
     }
 }
 
-impl VMHooksBigInt for TxContextVMHooksHandler {}
-impl VMHooksManagedBuffer for TxContextVMHooksHandler {}
-impl VMHooksManagedMap for TxContextVMHooksHandler {}
-impl VMHooksBigFloat for TxContextVMHooksHandler {}
-impl VMHooksManagedTypes for TxContextVMHooksHandler {}
+impl<S: InstanceState> VMHooksBigInt for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksManagedBuffer for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksManagedMap for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksBigFloat for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksManagedTypes for TxContextVMHooksHandler<S> {}
 
-impl VMHooksCallValue for TxContextVMHooksHandler {}
-impl VMHooksEndpointArgument for TxContextVMHooksHandler {}
-impl VMHooksEndpointFinish for TxContextVMHooksHandler {}
-impl VMHooksError for TxContextVMHooksHandler {}
-impl VMHooksErrorManaged for TxContextVMHooksHandler {}
-impl VMHooksStorageRead for TxContextVMHooksHandler {}
-impl VMHooksStorageWrite for TxContextVMHooksHandler {}
-impl VMHooksCrypto for TxContextVMHooksHandler {}
-impl VMHooksBlockchain for TxContextVMHooksHandler {}
-impl VMHooksLog for TxContextVMHooksHandler {}
-impl VMHooksSend for TxContextVMHooksHandler {}
+impl<S: InstanceState> VMHooksCallValue for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksEndpointArgument for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksEndpointFinish for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksError for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksErrorManaged for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksStorageRead for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksStorageWrite for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksCrypto for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksBlockchain for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksLog for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksSend for TxContextVMHooksHandler<S> {}
 
-impl VMHooksHandler for TxContextVMHooksHandler {}
+impl<S: InstanceState> VMHooksHandler for TxContextVMHooksHandler<S> {}
