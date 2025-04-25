@@ -45,4 +45,12 @@ pub trait ScenarioTester {
     fn sc_panic(&self) {
         sc_panic!("sc_panic! example");
     }
+
+    // Trigger warning message in terminal: "Forbidden opcodes detected in endpoint"
+    // Report available in *.mxsc.json
+    #[endpoint]
+    #[inline(never)]
+    fn mul_floats(&self, arg: i32) -> i32 {
+        (arg as f32 * 1.5f32) as i32
+    }
 }

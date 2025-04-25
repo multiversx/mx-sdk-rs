@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{code_report_json::CodeReportJson, ei_check_json::EiCheckJson, tools::WasmReport};
@@ -17,8 +19,8 @@ pub struct ReportInfoJson {
     pub ei_check: Option<EiCheckJson>,
 
     #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub forbidden_opcodes: Vec<String>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub forbidden_opcodes: HashMap<String, Vec<String>>,
 
     #[serde(default)]
     pub code_report: CodeReportJson,
@@ -39,7 +41,7 @@ impl ReportInfoJson {
             forbidden_opcodes: report
                 .forbidden_opcodes
                 .iter()
-                .map(|i| i.to_string())
+                .map(|(k, v)| (k.to_string(), v.iter().map(|s| s.to_string()).collect()))
                 .collect(),
             code_report: CodeReportJson::new(&report.code, size),
         }

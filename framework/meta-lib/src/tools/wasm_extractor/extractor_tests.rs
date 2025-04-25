@@ -524,7 +524,8 @@ pub mod tests {
     // "Forbidden opcodes detected in endpoint "main". This are the opcodes: DataDrop"
     #[test]
     fn test_data_drop() {
-        let expected_forbidden_opcodes = vec!["DataDrop".to_string()];
+        let expected_forbidden_opcodes =
+            HashMap::from([("main".to_string(), vec!["DataDrop".to_string()])]);
 
         let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/data-drop.wasm"),
@@ -540,7 +541,8 @@ pub mod tests {
     // "Forbidden opcodes detected in endpoint "main". This are the opcodes: MemoryCopy"
     #[test]
     fn test_memory_copy() {
-        let expected_forbidden_opcodes = vec!["MemoryCopy".to_string()];
+        let expected_forbidden_opcodes =
+            HashMap::from([("main".to_string(), vec!["MemoryCopy".to_string()])]);
         let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-copy.wasm"),
             false,
@@ -555,7 +557,9 @@ pub mod tests {
     // "Forbidden opcodes detected in endpoint "main". This are the opcodes: MemoryFill"
     #[test]
     fn test_memory_fill() {
-        let expected_forbidden_opcodes = vec!["MemoryFill".to_string()];
+        let expected_forbidden_opcodes =
+            HashMap::from([("main".to_string(), vec!["MemoryFill".to_string()])]);
+
         let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-fill.wasm"),
             false,

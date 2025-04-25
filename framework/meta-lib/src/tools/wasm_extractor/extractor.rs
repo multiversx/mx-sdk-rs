@@ -62,10 +62,8 @@ impl WasmInfo {
             }
 
             if !is_whitelisted(&op) {
-                let op_str = format!("{:?}", op);
-                let op_vec: Vec<&str> = op_str.split_whitespace().collect();
-                self.report.forbidden_opcodes.push(op_vec[0].to_owned());
-                function_info.add_forbidden_opcode(op_vec[0].to_owned());
+                let opcode = extract_opcode(op);
+                function_info.add_forbidden_opcode(opcode);
             }
         }
 
@@ -125,6 +123,11 @@ impl WasmInfo {
 
         for (name, endpoint_info) in &self.endpoints {
             if !endpoint_info.forbidden_opcodes.is_empty() {
+                self.report.forbidden_opcodes.insert(
+                    name.to_string(),
+                    endpoint_info.forbidden_opcodes.iter().cloned().collect(),
+                );
+
                 println!(
                     "{}{}{} {}",
                     "Forbidden opcodes detected in endpoint \""
@@ -133,11 +136,10 @@ impl WasmInfo {
                         .bold(),
                     name.red().bold(),
                     "\". This are the opcodes:".to_string().red().bold(),
-                    endpoint_info
+                    self.report
                         .forbidden_opcodes
-                        .iter()
-                        .cloned()
-                        .collect::<Vec<_>>()
+                        .get(name)
+                        .unwrap()
                         .join(", ")
                         .red()
                         .bold()
@@ -355,4 +357,11 @@ fn is_mem_grow(code_section: &FunctionBody) -> bool {
     }
 
     false
+}
+
+fn extract_opcode(op: Operator) -> String {
+    let op_str = format!("{:?}", op);
+    let op_vec: Vec<&str> = op_str.split_whitespace().collect();
+
+    op_vec[0].to_owned()
 }

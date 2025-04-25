@@ -7,8 +7,8 @@ use multiversx_sc::imports::*;
 #[multiversx_sc::contract]
 pub trait EmptyContract {
     #[init]
-    #[inline(never)]
-    fn init(&self, arg: i32) -> i32 {
-        (arg as f32 * 1.5f32) as i32
-    }
+    fn init(&self) {}
+
+    #[upgrade]
+    fn upgrade(&self) {}
 }
