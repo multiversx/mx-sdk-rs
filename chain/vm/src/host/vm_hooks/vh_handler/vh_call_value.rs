@@ -5,6 +5,8 @@ use super::VMHooksManagedTypes;
 
 pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
     fn check_not_payable(&mut self) {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_call_value);
+
         if self.input_ref().egld_value > num_bigint::BigUint::zero() {
             self.vm_error(vm_err_msg::NON_PAYABLE_FUNC_EGLD);
         }

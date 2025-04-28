@@ -8,13 +8,12 @@ use crate::{
     host::context::{
         BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
     },
-    schedule::Opcode,
+    schedule::GasSchedule,
     types::{VMAddress, VMCodeMetadata, H256},
 };
 
 /// Abstracts away the borrowing of a managed types structure.
 pub trait VMHooksHandlerSource: Debug {
-    fn use_gas(&mut self, opcode: Opcode);
     /// Loads a slice of memory from the instance.
     ///
     /// ## Safety
@@ -36,6 +35,10 @@ pub trait VMHooksHandlerSource: Debug {
     fn vm_error(&mut self, message: &str) {
         self.halt_with_error(ReturnCode::ExecutionFailed, message)
     }
+
+    fn gas_schedule(&self) -> &GasSchedule;
+
+    fn use_gas(&mut self, gas: u64);
 
     fn input_ref(&self) -> &TxInput;
 

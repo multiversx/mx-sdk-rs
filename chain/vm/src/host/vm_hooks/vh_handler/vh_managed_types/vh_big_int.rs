@@ -3,7 +3,6 @@ use crate::{
         context::big_int_to_i64,
         vm_hooks::{VMHooksError, VMHooksHandlerSource},
     },
-    schedule::Opcode,
     types::RawHandle,
     vm_err_msg,
 };
@@ -55,12 +54,15 @@ macro_rules! unary_op_method {
 /// Provides VM hook implementations for methods that deal big ints.
 pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
     fn bi_new(&mut self, value: i64) -> RawHandle {
-        self.use_gas(Opcode::I64Store);
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new);
+
         self.m_types_lock()
             .bi_new_from_big_int(num_bigint::BigInt::from(value))
     }
 
-    fn bi_set_int64(&self, destination: RawHandle, value: i64) {
+    fn bi_set_int64(&mut self, destination: RawHandle, value: i64) {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64);
+
         self.m_types_lock()
             .bi_overwrite(destination, num_bigint::BigInt::from(value))
     }

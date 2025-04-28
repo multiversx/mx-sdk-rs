@@ -18,11 +18,13 @@ use multiversx_chain_vm::{
             VMHooksStorageWrite,
         },
     },
-    schedule::Opcode,
+    schedule::GasSchedule,
     types::{VMAddress, VMCodeMetadata},
 };
 
 use crate::executor::debug::ContractDebugInstanceState;
+
+const ZERO_GAS_SCHEDULE: GasSchedule = GasSchedule::zeroed();
 
 #[derive(Default, Debug)]
 pub struct SingleTxApiData {
@@ -62,10 +64,6 @@ impl SingleTxApiVMHooksHandler {
 }
 
 impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
-    fn use_gas(&mut self, _opcode: Opcode) {
-        todo!()
-    }
-
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
         slice.to_vec()
@@ -84,6 +82,12 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
         panic!("VM error occured, status: {status}, message: {message}")
     }
+
+    fn gas_schedule(&self) -> &GasSchedule {
+        &ZERO_GAS_SCHEDULE
+    }
+
+    fn use_gas(&mut self, _gas: u64) {}
 
     fn input_ref(&self) -> &TxInput {
         &self.0.tx_input_box

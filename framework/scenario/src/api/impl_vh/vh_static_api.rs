@@ -15,11 +15,13 @@ use multiversx_chain_vm::{
             VMHooksStorageWrite,
         },
     },
-    schedule::Opcode,
+    schedule::GasSchedule,
     types::{VMAddress, VMCodeMetadata},
 };
 
 use crate::executor::debug::ContractDebugInstanceState;
+
+const ZERO_GAS_SCHEDULE: GasSchedule = GasSchedule::zeroed();
 
 /// A simple wrapper around a managed type container Mutex.
 ///
@@ -33,10 +35,6 @@ impl StaticApiVMHooksHandler {
 }
 
 impl VMHooksHandlerSource for StaticApiVMHooksHandler {
-    fn use_gas(&mut self, _opcode: Opcode) {
-        todo!()
-    }
-
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
         slice.to_vec()
@@ -55,6 +53,12 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
         panic!("VM error occured, status: {status}, message: {message}")
     }
+
+    fn gas_schedule(&self) -> &GasSchedule {
+        &ZERO_GAS_SCHEDULE
+    }
+
+    fn use_gas(&mut self, _gas: u64) {}
 
     fn input_ref(&self) -> &TxInput {
         panic!("cannot access tx inputs in the StaticApi")
