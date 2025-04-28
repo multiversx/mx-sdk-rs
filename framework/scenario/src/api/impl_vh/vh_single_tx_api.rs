@@ -8,13 +8,17 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr};
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
     chain_core::types::ReturnCode,
-    host::context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
-    host::vm_hooks::{
-        VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-        VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
-        VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
-        VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
+    host::{
+        context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
+        vm_hooks::{
+            VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
+            VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
+            VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer,
+            VMHooksManagedMap, VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead,
+            VMHooksStorageWrite,
+        },
     },
+    schedule::Opcode,
     types::{VMAddress, VMCodeMetadata},
 };
 
@@ -58,6 +62,10 @@ impl SingleTxApiVMHooksHandler {
 }
 
 impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
+    fn use_gas(&mut self, _opcode: Opcode) {
+        todo!()
+    }
+
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
         slice.to_vec()

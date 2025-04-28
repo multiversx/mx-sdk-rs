@@ -8,11 +8,13 @@ use crate::{
     host::context::{
         BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
     },
+    schedule::Opcode,
     types::{VMAddress, VMCodeMetadata, H256},
 };
 
 /// Abstracts away the borrowing of a managed types structure.
 pub trait VMHooksHandlerSource: Debug {
+    fn use_gas(&mut self, opcode: Opcode);
     /// Loads a slice of memory from the instance.
     ///
     /// ## Safety

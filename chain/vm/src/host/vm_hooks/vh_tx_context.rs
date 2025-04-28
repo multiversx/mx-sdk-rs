@@ -7,6 +7,7 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::host::runtime::RuntimeInstanceCallLambdaDefault;
+use crate::schedule::Opcode;
 use crate::{
     blockchain::{
         reserved::STORAGE_RESERVED_PREFIX,
@@ -48,6 +49,38 @@ impl<S: InstanceState> Debug for TxContextVMHooksHandler<S> {
 }
 
 impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
+    fn use_gas(&mut self, opcode: Opcode) {
+        let state_ref = &mut self.instance_state_ref;
+        let gas_limit = state_ref
+            .get_points_limit()
+            .expect("error fetching points limit from instance state");
+        let gas_used = state_ref
+            .get_points_used()
+            .expect("error fetching points used from instance state");
+
+        let opcode_cost = &self
+            .tx_context_ref
+            .0
+            .runtime_ref
+            .vm_ref
+            .gas_schedule
+            .wasm_opcode_cost;
+
+        let action_gas_cost = opcode.get_cost(opcode_cost);
+        let total_gas_used = gas_used + action_gas_cost;
+
+        if total_gas_used > gas_limit {
+            state_ref
+                .set_breakpoint_value(BreakpointValue::OutOfGas)
+                .expect("error setting breakpoint value in instance");
+            panic!("not enough gas");
+        }
+
+        state_ref
+            .set_points_used(total_gas_used)
+            .expect("error setting points used in instance");
+    }
+
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         self.instance_state_ref
             .memory_load_owned(offset, length)
