@@ -80,17 +80,15 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
     }
 
     fn use_gas(&mut self, gas: u64) {
+        let gas_limit = self.input_ref().gas_limit;
         let state_ref = &mut self.instance_state_ref;
-        let gas_limit = state_ref
-            .get_points_limit()
-            .expect("error fetching points limit from instance state");
         let prev_gas_used = state_ref
             .get_points_used()
             .expect("error fetching points used from instance state");
 
         let next_gas_used = prev_gas_used + gas;
 
-        println!("use gas {gas}: {prev_gas_used} -> {next_gas_used}");
+        // println!("use gas {gas}: {prev_gas_used} -> {next_gas_used}");
 
         if next_gas_used > gas_limit {
             state_ref
