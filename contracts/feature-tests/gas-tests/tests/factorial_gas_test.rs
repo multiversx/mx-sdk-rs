@@ -13,7 +13,7 @@ fn factorial_gas_test(mut world: ScenarioWorld) {
     let (new_address, gas_used) = world
         .tx()
         .from(OWNER_ADDRESS)
-        .gas(100)
+        .gas(1500)
         .typed(factorial_proxy::FactorialProxy)
         .init()
         .code(CODE_PATH)
@@ -22,7 +22,7 @@ fn factorial_gas_test(mut world: ScenarioWorld) {
         .returns(ReturnsGasUsed)
         .run();
 
-    assert_eq!(gas_used, 45);
+    assert_eq!(gas_used, 1045);
     assert_eq!(new_address, SC_ADDRESS.to_address());
 }
 

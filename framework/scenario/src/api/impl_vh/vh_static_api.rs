@@ -5,19 +5,23 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr};
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
     chain_core::types::ReturnCode,
-    host::context::{
-        BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
+    host::{
+        context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult},
+        vm_hooks::{
+            VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
+            VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
+            VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer,
+            VMHooksManagedMap, VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead,
+            VMHooksStorageWrite,
+        },
     },
-    host::vm_hooks::{
-        VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-        VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
-        VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
-        VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
-    },
+    schedule::GasSchedule,
     types::{VMAddress, VMCodeMetadata},
 };
 
 use crate::executor::debug::ContractDebugInstanceState;
+
+const ZERO_GAS_SCHEDULE: GasSchedule = GasSchedule::zeroed();
 
 /// A simple wrapper around a managed type container Mutex.
 ///
@@ -49,6 +53,12 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
         panic!("VM error occured, status: {status}, message: {message}")
     }
+
+    fn gas_schedule(&self) -> &GasSchedule {
+        &ZERO_GAS_SCHEDULE
+    }
+
+    fn use_gas(&mut self, _gas: u64) {}
 
     fn input_ref(&self) -> &TxInput {
         panic!("cannot access tx inputs in the StaticApi")

@@ -7,6 +7,7 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 
 use crate::host::runtime::RuntimeInstanceCallLambdaDefault;
+use crate::schedule::GasSchedule;
 use crate::{
     blockchain::{
         reserved::STORAGE_RESERVED_PREFIX,
@@ -72,6 +73,32 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
             _ => BreakpointValue::ExecutionFailed,
         };
         let _ = self.instance_state_ref.set_breakpoint_value(breakpoint);
+    }
+
+    fn gas_schedule(&self) -> &GasSchedule {
+        &self.tx_context_ref.0.runtime_ref.vm_ref.gas_schedule
+    }
+
+    fn use_gas(&mut self, gas: u64) {
+        let gas_limit = self.input_ref().gas_limit;
+        let state_ref = &mut self.instance_state_ref;
+        let prev_gas_used = state_ref
+            .get_points_used()
+            .expect("error fetching points used from instance state");
+
+        let next_gas_used = prev_gas_used + gas;
+
+        // println!("use gas {gas}: {prev_gas_used} -> {next_gas_used}");
+
+        if next_gas_used > gas_limit {
+            state_ref
+                .set_breakpoint_value(BreakpointValue::OutOfGas)
+                .expect("error setting breakpoint value in instance");
+        } else {
+            state_ref
+                .set_points_used(next_gas_used)
+                .expect("error setting points used in instance");
+        }
     }
 
     fn input_ref(&self) -> &TxInput {
