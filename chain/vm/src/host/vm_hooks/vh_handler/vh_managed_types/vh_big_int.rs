@@ -10,6 +10,7 @@ use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
+use multiversx_chain_vm_executor::VMHooksError;
 use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
 
@@ -29,11 +30,11 @@ macro_rules! binary_bitwise_op_method {
         fn $method_name(&mut self, dest: RawHandle, x: RawHandle, y: RawHandle) {
             let bi_x = self.m_types_lock().bi_get(x);
             if bi_x.sign() == num_bigint::Sign::Minus {
-                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+                self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
             }
             let bi_y = self.m_types_lock().bi_get(y);
             if bi_y.sign() == num_bigint::Sign::Minus {
-                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+                self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
             }
             let result = bi_x.$rust_op_name(bi_y);
             self.m_types_lock().bi_overwrite(dest, result);
@@ -53,18 +54,20 @@ macro_rules! unary_op_method {
 
 /// Provides VM hook implementations for methods that deal big ints.
 pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
-    fn bi_new(&mut self, value: i64) -> RawHandle {
-        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new);
+    fn bi_new(&mut self, value: i64) -> Result<RawHandle, VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new)?;
 
-        self.m_types_lock()
-            .bi_new_from_big_int(num_bigint::BigInt::from(value))
+        Ok(self
+            .m_types_lock()
+            .bi_new_from_big_int(num_bigint::BigInt::from(value)))
     }
 
-    fn bi_set_int64(&mut self, destination: RawHandle, value: i64) {
-        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64);
+    fn bi_set_int64(&mut self, destination: RawHandle, value: i64) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
         self.m_types_lock()
-            .bi_overwrite(destination, num_bigint::BigInt::from(value))
+            .bi_overwrite(destination, num_bigint::BigInt::from(value));
+        Ok(())
     }
 
     fn bi_unsigned_byte_length(&self, handle: RawHandle) -> usize {
@@ -99,7 +102,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
     fn bi_get_int64(&mut self, destination_handle: RawHandle) -> i64 {
         let opt_i64 = self.m_types_lock().bi_to_i64(destination_handle);
         opt_i64.unwrap_or_else(|| {
-            self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+            self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
             0
         })
     }
@@ -154,7 +157,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
     fn bi_shr(&mut self, dest: RawHandle, x: RawHandle, bits: usize) {
         let bi_x = self.m_types_lock().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
-            self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+            self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
         }
         let result = bi_x.shr(bits);
         self.m_types_lock().bi_overwrite(dest, result);
@@ -163,7 +166,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
     fn bi_shl(&mut self, dest: RawHandle, x: RawHandle, bits: usize) {
         let bi_x = self.m_types_lock().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
-            self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+            self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
         }
         let result = bi_x.shl(bits);
         self.m_types_lock().bi_overwrite(dest, result);

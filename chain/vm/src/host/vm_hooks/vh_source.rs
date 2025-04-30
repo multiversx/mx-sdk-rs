@@ -34,13 +34,17 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str);
 
-    fn vm_error(&mut self, message: &str) {
+    fn vm_error(&mut self, message: &str) -> Result<(), VMHooksError> {
+        self.halt_with_error(ReturnCode::ExecutionFailed, message)
+    }
+
+    fn vm_error_legacy(&mut self, message: &str) {
         self.halt_with_error_legacy(ReturnCode::ExecutionFailed, message)
     }
 
     fn gas_schedule(&self) -> &GasSchedule;
 
-    fn use_gas(&mut self, gas: u64);
+    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksError>;
 
     fn input_ref(&self) -> &TxInput;
 

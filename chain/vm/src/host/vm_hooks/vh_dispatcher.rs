@@ -382,8 +382,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn check_no_payment(&mut self) -> Result<(), VMHooksError> {
-        self.handler.check_not_payable();
-        Ok(())
+        self.handler.check_not_payable()
     }
 
     fn get_call_value(&mut self, result_offset: MemPtr) -> Result<i32, VMHooksError> {
@@ -1322,7 +1321,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_int_new(&mut self, small_value: i64) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bi_new(small_value))
+        self.handler.bi_new(small_value)
     }
 
     fn big_int_unsigned_byte_length(&mut self, reference_handle: i32) -> Result<i32, VMHooksError> {
@@ -1389,8 +1388,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         value: i64,
     ) -> Result<(), VMHooksError> {
-        self.handler.bi_set_int64(destination_handle, value);
-        Ok(())
+        self.handler.bi_set_int64(destination_handle, value)
     }
 
     fn big_int_add(

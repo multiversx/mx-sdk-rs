@@ -91,7 +91,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         &self.tx_context_ref.0.runtime_ref.vm_ref.gas_schedule
     }
 
-    fn use_gas(&mut self, gas: u64) {
+    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksError> {
         let gas_limit = self.input_ref().gas_limit;
         let state_ref = &mut self.instance_state_ref;
         let prev_gas_used = state_ref
@@ -103,13 +103,12 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         // println!("use gas {gas}: {prev_gas_used} -> {next_gas_used}");
 
         if next_gas_used > gas_limit {
-            state_ref
-                .set_breakpoint_value(BreakpointValue::OutOfGas)
-                .expect("error setting breakpoint value in instance");
+            Err(VMHooksError::OutOfGas)
         } else {
             state_ref
                 .set_points_used(next_gas_used)
                 .expect("error setting points used in instance");
+            Ok(())
         }
     }
 
@@ -273,11 +272,11 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
             ),
             ReturnCode::ExecutionFailed => {
                 // TODO: not sure it's the right condition, it catches insufficient funds
-                self.vm_error(&tx_result.result_message);
+                self.vm_error_legacy(&tx_result.result_message);
                 (VMAddress::zero(), Vec::new())
             },
             _ => {
-                self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
+                self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
 
                 (VMAddress::zero(), Vec::new())
             },
@@ -314,8 +313,8 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
             },
-            ReturnCode::ExecutionFailed => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
-            _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
+            ReturnCode::ExecutionFailed => self.vm_error_legacy(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
+            _ => self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
 }
@@ -363,14 +362,14 @@ impl<S: InstanceState> TxContextVMHooksHandler<S> {
 
     fn check_reserved_key(&mut self, key: &[u8]) {
         if key.starts_with(STORAGE_RESERVED_PREFIX) {
-            self.vm_error(vm_err_msg::WRITE_RESERVED);
+            self.vm_error_legacy(vm_err_msg::WRITE_RESERVED);
         }
     }
 
     /// TODO: only checked on storage writes, needs more checks for calls, transfers, etc.
     fn check_not_readonly(&mut self) {
         if self.tx_context_ref.input_ref().readonly {
-            self.vm_error(vm_err_msg::WRITE_READONLY);
+            self.vm_error_legacy(vm_err_msg::WRITE_READONLY);
         }
     }
 

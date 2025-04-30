@@ -50,7 +50,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         exponent: i32,
     ) -> RawHandle {
         if exponent > 0 {
-            self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE);
+            self.vm_error_legacy(vm_err_msg::EXPONENT_IS_POSITIVE);
         }
 
         let exponent_multiplier = (10.0_f64).powi(exponent);
@@ -68,7 +68,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
 
     fn bf_from_frac(&mut self, numerator: i64, denominator: i64) -> RawHandle {
         if denominator == 0 {
-            self.vm_error(vm_err_msg::DIVISION_BY_0);
+            self.vm_error_legacy(vm_err_msg::DIVISION_BY_0);
         }
         let value = if let (Some(f_numerator), Some(f_denominator)) =
             (numerator.to_f64(), denominator.to_f64())
@@ -84,7 +84,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
 
     fn bf_from_sci(&mut self, significand: i64, exponent: i64) -> RawHandle {
         if exponent > 0 {
-            self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE);
+            self.vm_error_legacy(vm_err_msg::EXPONENT_IS_POSITIVE);
         }
 
         let value = if let Some(f_significand) = significand.to_f64() {
@@ -115,7 +115,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
             Some(Ordering::Equal) => 0,
             Some(Ordering::Greater) => 1,
             None => {
-                self.vm_error(vm_err_msg::CANNOT_COMPARE_VALUES);
+                self.vm_error_legacy(vm_err_msg::CANNOT_COMPARE_VALUES);
                 -2
             },
         }
@@ -128,7 +128,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         }
 
         if !bf.is_normal() {
-            self.vm_error(vm_err_msg::NUMBER_IS_NOT_NORMAL)
+            self.vm_error_legacy(vm_err_msg::NUMBER_IS_NOT_NORMAL)
         }
 
         if bf.is_sign_positive() {
@@ -146,7 +146,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
     fn bf_sqrt(&mut self, dest: RawHandle, x: RawHandle) {
         let bf_x = self.m_types_lock().bf_get_f64(x);
         if bf_x < 0f64 {
-            self.vm_error(vm_err_msg::BAD_BOUNDS_LOWER);
+            self.vm_error_legacy(vm_err_msg::BAD_BOUNDS_LOWER);
         }
         let result = bf_x.sqrt();
         self.m_types_lock().bf_overwrite(dest, result);

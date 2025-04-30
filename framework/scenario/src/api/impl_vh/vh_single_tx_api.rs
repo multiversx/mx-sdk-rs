@@ -91,7 +91,9 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         &ZERO_GAS_SCHEDULE
     }
 
-    fn use_gas(&mut self, _gas: u64) {}
+    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksError> {
+        Ok(())
+    }
 
     fn input_ref(&self) -> &TxInput {
         &self.0.tx_input_box

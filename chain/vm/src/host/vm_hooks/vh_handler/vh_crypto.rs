@@ -29,7 +29,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
             crypto_functions::verify_ed25519(key, message, signature)
         };
         if !sig_valid {
-            self.vm_error("invalid signature");
+            self.vm_error_legacy("invalid signature");
         }
     }
 }

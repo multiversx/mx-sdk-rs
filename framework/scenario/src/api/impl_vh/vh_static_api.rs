@@ -62,7 +62,9 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         &ZERO_GAS_SCHEDULE
     }
 
-    fn use_gas(&mut self, _gas: u64) {}
+    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksError> {
+        Ok(())
+    }
 
     fn input_ref(&self) -> &TxInput {
         panic!("cannot access tx inputs in the StaticApi")
