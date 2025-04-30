@@ -1,5 +1,5 @@
 use crate::{
-    host::vm_hooks::{VMHooksError, VMHooksHandlerSource},
+    host::vm_hooks::{VMHooksHandlerSource, VMHooksSignalError},
     types::RawHandle,
     vm_err_msg,
 };
@@ -42,7 +42,7 @@ macro_rules! unary_op_method_big_int_handle {
     };
 }
 
-pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
+pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
     fn bf_from_parts(
         &mut self,
         integral_part: i32,

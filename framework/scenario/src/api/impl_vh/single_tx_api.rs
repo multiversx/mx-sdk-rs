@@ -4,9 +4,10 @@ use multiversx_chain_vm::{
     blockchain::state::AccountData, executor::VMHooks, host::vm_hooks::VMHooksDispatcher,
     types::VMAddress,
 };
+use multiversx_chain_vm_executor::VMHooksError;
 use multiversx_sc::api::RawHandle;
 
-use crate::executor::debug::StaticVarData;
+use crate::executor::debug::{ContractDebugInstanceState, StaticVarData};
 
 use super::{SingleTxApiData, SingleTxApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
 
@@ -24,12 +25,13 @@ impl VMHooksApiBackend for SingleTxApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
             let handler = cell.lock().unwrap().clone();
             let mut dispatcher = VMHooksDispatcher::new(handler);
             f(&mut dispatcher)
+                .unwrap_or_else(|err| ContractDebugInstanceState::breakpoint_panic(err))
         })
     }
 

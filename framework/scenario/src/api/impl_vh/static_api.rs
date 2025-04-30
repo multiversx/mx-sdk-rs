@@ -1,8 +1,9 @@
 use multiversx_chain_vm::{executor::VMHooks, host::vm_hooks::VMHooksDispatcher};
+use multiversx_chain_vm_executor::VMHooksError;
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;
 
-use crate::executor::debug::StaticVarData;
+use crate::executor::debug::{ContractDebugInstanceState, StaticVarData};
 
 use super::{StaticApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
 
@@ -24,11 +25,11 @@ impl VMHooksApiBackend for StaticApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
     {
         STATIC_API_VH_CELL.with(|vh_mutex| {
             let mut vh = vh_mutex.lock().unwrap();
-            f(&mut *vh)
+            f(&mut *vh).unwrap_or_else(|err| ContractDebugInstanceState::breakpoint_panic(err))
         })
     }
 

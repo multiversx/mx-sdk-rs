@@ -1,6 +1,6 @@
 use std::sync::{Mutex, MutexGuard};
 
-use multiversx_chain_vm_executor::{MemLength, MemPtr};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksError};
 
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
@@ -9,9 +9,9 @@ use multiversx_chain_vm::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult},
         vm_hooks::{
             VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-            VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
-            VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer,
-            VMHooksManagedMap, VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead,
+            VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksErrorManaged, VMHooksHandler,
+            VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
+            VMHooksManagedTypes, VMHooksSend, VMHooksSignalError, VMHooksStorageRead,
             VMHooksStorageWrite,
         },
     },
@@ -50,7 +50,11 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         self.0.lock().unwrap()
     }
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
+    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError> {
+        panic!("VM error occured, status: {status}, message: {message}")
+    }
+
+    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 
@@ -167,7 +171,7 @@ impl VMHooksManagedTypes for StaticApiVMHooksHandler {}
 impl VMHooksCallValue for StaticApiVMHooksHandler {}
 impl VMHooksEndpointArgument for StaticApiVMHooksHandler {}
 impl VMHooksEndpointFinish for StaticApiVMHooksHandler {}
-impl VMHooksError for StaticApiVMHooksHandler {}
+impl VMHooksSignalError for StaticApiVMHooksHandler {}
 impl VMHooksErrorManaged for StaticApiVMHooksHandler {}
 impl VMHooksStorageRead for StaticApiVMHooksHandler {}
 impl VMHooksStorageWrite for StaticApiVMHooksHandler {}

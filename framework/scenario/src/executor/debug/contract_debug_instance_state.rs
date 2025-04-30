@@ -37,6 +37,10 @@ impl ContractDebugInstanceState {
     pub fn main_memory_mut_ptr(bytes: &mut [u8]) -> (MemPtr, MemLength) {
         (bytes.as_ptr() as MemPtr, bytes.len() as MemLength)
     }
+
+    pub fn breakpoint_panic(breakpoint_value: BreakpointValue) -> ! {
+        std::panic::panic_any(breakpoint_value)
+    }
 }
 
 impl InstanceState for ContractDebugInstanceState {
@@ -78,7 +82,7 @@ impl InstanceState for ContractDebugInstanceState {
         &mut self,
         breakpoint_value: BreakpointValue,
     ) -> Result<(), ExecutorError> {
-        std::panic::panic_any(breakpoint_value)
+        Self::breakpoint_panic(breakpoint_value)
     }
 }
 

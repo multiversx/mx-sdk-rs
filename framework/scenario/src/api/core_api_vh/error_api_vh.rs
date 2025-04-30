@@ -16,9 +16,7 @@ impl<VHB: VMHooksApiBackend> ErrorApi for VMHooksApi<VHB> {
 impl<VHB: VMHooksApiBackend> ErrorApiImpl for VMHooksApi<VHB> {
     fn signal_error(&self, message: &[u8]) -> ! {
         let (offset, length) = ContractDebugInstanceState::main_memory_ptr(message);
-        self.with_vm_hooks(|vh| {
-            vh.signal_error(offset, length);
-        });
+        self.with_vm_hooks(|vh| vh.signal_error(offset, length));
 
         // even though not explicitly stated in the VM hooks definition,
         // `signal_error` is expected to terminate execution

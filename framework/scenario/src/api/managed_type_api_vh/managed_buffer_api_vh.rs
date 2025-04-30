@@ -22,13 +22,13 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
-            vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize
-        })
+            vh.mbuffer_get_length(handle.get_raw_handle_unchecked())
+        }) as usize
     }
 
     fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
-            let len = vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize;
+            let len = vh.mbuffer_get_length(handle.get_raw_handle_unchecked())? as usize;
             let mut res = BoxedBytes::zeros(len);
             if len > 0 {
                 let _ = vh.mbuffer_get_bytes(
@@ -36,7 +36,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
                     res.as_mut_ptr() as MemPtr,
                 );
             }
-            res
+            Ok(res)
         })
     }
 
@@ -87,7 +87,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
             let (offset, length) = ContractDebugInstanceState::main_memory_ptr(value);
-            vh.mbuffer_set_bytes(handle.get_raw_handle_unchecked(), offset, length);
+            vh.mbuffer_set_bytes(handle.get_raw_handle_unchecked(), offset, length)
         });
     }
 
@@ -139,7 +139,8 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
                 accumulator_handle.get_raw_handle_unchecked(),
                 offset,
                 length,
-            );
+            )?;
+            Ok(())
         });
     }
 

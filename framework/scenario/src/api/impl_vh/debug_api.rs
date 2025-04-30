@@ -1,5 +1,5 @@
 use multiversx_chain_vm::{
-    executor::{BreakpointValue, VMHooks},
+    executor::{BreakpointValue, VMHooks, VMHooksError},
     host::context::{TxContextRef, TxPanic},
     host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
 };
@@ -19,28 +19,28 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
     {
         let instance = ContractDebugStack::static_peek();
         let tx_context_ref = instance.tx_context_ref.clone();
         let handler = TxContextVMHooksHandler::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(handler);
-        f(&mut dispatcher)
+        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::breakpoint_panic(err))
     }
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
     {
         let tx_context_ref = TxContextRef(handle.context.clone());
         let handler = TxContextVMHooksHandler::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(handler);
-        f(&mut dispatcher)
+        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::breakpoint_panic(err))
     }
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         Self::with_vm_hooks_ctx_1(handle1, f)
@@ -53,7 +53,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         f: F,
     ) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         assert_handles_on_same_context(&handle1, &handle3);

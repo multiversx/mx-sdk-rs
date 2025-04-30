@@ -1,5 +1,7 @@
 use anyhow::anyhow;
-use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, InstanceFull};
+use multiversx_chain_vm_executor::{
+    BreakpointValue, ExecutorError, Instance, InstanceCallError, InstanceLegacy,
+};
 use multiversx_chain_vm_executor_wasmer::WasmerInstance;
 
 use std::rc::Rc;
@@ -16,10 +18,34 @@ impl WasmerProdInstance {
 }
 
 impl Instance for WasmerProdInstance {
-    fn call(&self, func_name: &str) -> Result<(), ExecutorError> {
-        self.inner_instance_ref
-            .call(func_name)
-            .map_err(|err| anyhow!("wrapped instance error: {err}").into())
+    fn call(&self, func_name: &str) -> Result<(), InstanceCallError> {
+        let result = self.inner_instance_ref.call(func_name);
+
+        match result {
+            Ok(()) => Ok(()),
+            Err(err) => {
+                if err == "function not found" {
+                    return Err(InstanceCallError::FunctionNotFound);
+                }
+
+                let breakpoint_value =
+                    self.inner_instance_ref
+                        .get_breakpoint_value()
+                        .map_err(|err| {
+                            InstanceCallError::RuntimeError(
+                                anyhow!("wrapped instance error: {err}").into(),
+                            )
+                        })?;
+
+                if breakpoint_value != BreakpointValue::None {
+                    return Err(InstanceCallError::Breakpoint(breakpoint_value));
+                }
+
+                Err(InstanceCallError::RuntimeError(
+                    anyhow!("wrapped instance error: {err}").into(),
+                ))
+            },
+        }
     }
 
     fn check_signatures(&self) -> bool {

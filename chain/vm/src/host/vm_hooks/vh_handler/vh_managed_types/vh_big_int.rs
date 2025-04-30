@@ -1,7 +1,7 @@
 use crate::{
     host::{
         context::big_int_to_i64,
-        vm_hooks::{VMHooksError, VMHooksHandlerSource},
+        vm_hooks::{VMHooksHandlerSource, VMHooksSignalError},
     },
     types::RawHandle,
     vm_err_msg,
@@ -52,7 +52,7 @@ macro_rules! unary_op_method {
 }
 
 /// Provides VM hook implementations for methods that deal big ints.
-pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
+pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
     fn bi_new(&mut self, value: i64) -> RawHandle {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new);
 
