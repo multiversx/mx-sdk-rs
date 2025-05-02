@@ -41,7 +41,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         if let Some(v) = bi.to_i64() {
             v
         } else {
-            self.vm_error("argument out of range");
+            self.vm_error_legacy("argument out of range");
             0
         }
     }
@@ -53,7 +53,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         if let Some(v) = bu.to_u64() {
             v
         } else {
-            self.vm_error("argument out of range");
+            self.vm_error_legacy("argument out of range");
             0
         }
     }
@@ -62,7 +62,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         if let Some(closure_data) = &self.input_ref().promise_callback_closure_data {
             self.m_types_lock().mb_set(dest, closure_data.clone());
         } else {
-            self.vm_error(ERROR_NO_CALLBACK_CLOSURE);
+            self.vm_error_legacy(ERROR_NO_CALLBACK_CLOSURE);
         }
     }
 }

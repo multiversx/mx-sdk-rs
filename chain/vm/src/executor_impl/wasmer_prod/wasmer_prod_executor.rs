@@ -1,8 +1,11 @@
-use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
+use multiversx_chain_vm_executor::{CompilationOptions, Executor, ExecutorError, Instance};
+use multiversx_chain_vm_executor_wasmer::WasmerInstance;
+use std::{
+    cell::RefCell,
+    fmt,
+    rc::Rc,
+    sync::{Arc, Mutex},
 };
-use multiversx_chain_vm_executor_wasmer::{WasmerExecutorData, WasmerInstance};
-use std::{cell::RefCell, fmt, rc::Rc};
 
 use crate::{
     executor_impl::ExecutorFileNotFoundError,
@@ -45,14 +48,11 @@ impl WasmerProdExecutor {
             );
             let vm_hooks = VMHooksDispatcher::new(vh_handler);
 
-            let mut executor_data = WasmerExecutorData::new(Box::new(vm_hooks));
-            executor_data
-                .set_opcode_cost(&runtime.vm_ref.gas_schedule.wasm_opcode_cost)
-                .expect("Could not lock resource. The lock is already held by the current thread.");
-            let executor_data_ref = Rc::new(RefCell::new(executor_data));
-
             WasmerInstance::try_new_instance(
-                executor_data_ref.clone(),
+                Rc::new(RefCell::new(Box::new(vm_hooks))),
+                Arc::new(Mutex::new(
+                    runtime.vm_ref.gas_schedule.wasm_opcode_cost.clone(),
+                )),
                 wasm_bytes,
                 compilation_options,
             )
@@ -66,10 +66,6 @@ impl WasmerProdExecutor {
 }
 
 impl Executor for WasmerProdExecutor {
-    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        Ok(())
-    }
-
     fn new_instance(
         &self,
         wasm_bytes: &[u8],

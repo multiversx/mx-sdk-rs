@@ -26,6 +26,21 @@ fn factorial_gas_test(mut world: ScenarioWorld) {
     assert_eq!(new_address, SC_ADDRESS.to_address());
 }
 
+#[allow(unused)]
+fn factorial_user_error(mut world: ScenarioWorld) {
+    world.account(OWNER_ADDRESS).nonce(1);
+
+    world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .gas(1500)
+        .raw_deploy()
+        .argument(&0)
+        .code(CODE_PATH)
+        .returns(ExpectError(4, "wrong number of arguments"))
+        .run();
+}
+
 #[test]
 #[cfg_attr(not(feature = "wasmer-experimental"), ignore)]
 fn factorial_gas_wasmer_experimental() {
@@ -36,10 +51,28 @@ fn factorial_gas_wasmer_experimental() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "wasmer-experimental"), ignore)]
+fn factorial_user_error_wasmer_experimental() {
+    let world = ScenarioWorld::new()
+        .executor_config(ScenarioExecutorConfig::Experimental)
+        .gas_schedule(GasScheduleVersion::V8);
+    factorial_user_error(world);
+}
+
+#[test]
 #[cfg_attr(not(feature = "wasmer-prod"), ignore)]
 fn factorial_gas_wasmer_prod() {
     let world = ScenarioWorld::new()
         .executor_config(ScenarioExecutorConfig::WasmerProd)
         .gas_schedule(GasScheduleVersion::V8);
     factorial_gas_test(world);
+}
+
+#[test]
+#[cfg_attr(not(feature = "wasmer-prod"), ignore)]
+fn factorial_user_error_wasmer_prod() {
+    let world = ScenarioWorld::new()
+        .executor_config(ScenarioExecutorConfig::WasmerProd)
+        .gas_schedule(GasScheduleVersion::V8);
+    factorial_user_error(world);
 }

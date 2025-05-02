@@ -14,7 +14,7 @@ pub use vh_call_value::VMHooksCallValue;
 pub use vh_crypto::VMHooksCrypto;
 pub use vh_endpoint_arg::VMHooksEndpointArgument;
 pub use vh_endpoint_finish::VMHooksEndpointFinish;
-pub use vh_error::{VMHooksError, VMHooksErrorManaged};
+pub use vh_error::{VMHooksErrorManaged, VMHooksSignalError};
 pub use vh_log::VMHooksLog;
 pub use vh_managed_types::{
     VMHooksBigFloat, VMHooksBigInt, VMHooksManagedBuffer, VMHooksManagedMap, VMHooksManagedTypes,
@@ -28,7 +28,7 @@ pub trait VMHooksHandler:
     + VMHooksCallValue
     + VMHooksEndpointArgument
     + VMHooksEndpointFinish
-    + VMHooksError
+    + VMHooksSignalError
     + VMHooksErrorManaged
     + VMHooksStorageRead
     + VMHooksStorageWrite

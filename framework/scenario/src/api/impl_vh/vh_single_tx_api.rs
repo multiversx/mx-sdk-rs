@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 
-use multiversx_chain_vm_executor::{MemLength, MemPtr};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksError};
 
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
@@ -12,9 +12,9 @@ use multiversx_chain_vm::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
         vm_hooks::{
             VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-            VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
-            VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer,
-            VMHooksManagedMap, VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead,
+            VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksErrorManaged, VMHooksHandler,
+            VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
+            VMHooksManagedTypes, VMHooksSend, VMHooksSignalError, VMHooksStorageRead,
             VMHooksStorageWrite,
         },
     },
@@ -79,7 +79,11 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         self.0.managed_types.lock().unwrap()
     }
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
+    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError> {
+        panic!("VM error occured, status: {status}, message: {message}")
+    }
+
+    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 
@@ -87,7 +91,9 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         &ZERO_GAS_SCHEDULE
     }
 
-    fn use_gas(&mut self, _gas: u64) {}
+    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksError> {
+        Ok(())
+    }
 
     fn input_ref(&self) -> &TxInput {
         &self.0.tx_input_box
@@ -192,7 +198,7 @@ impl VMHooksManagedTypes for SingleTxApiVMHooksHandler {}
 impl VMHooksCallValue for SingleTxApiVMHooksHandler {}
 impl VMHooksEndpointArgument for SingleTxApiVMHooksHandler {}
 impl VMHooksEndpointFinish for SingleTxApiVMHooksHandler {}
-impl VMHooksError for SingleTxApiVMHooksHandler {}
+impl VMHooksSignalError for SingleTxApiVMHooksHandler {}
 impl VMHooksErrorManaged for SingleTxApiVMHooksHandler {}
 impl VMHooksStorageRead for SingleTxApiVMHooksHandler {}
 impl VMHooksStorageWrite for SingleTxApiVMHooksHandler {}

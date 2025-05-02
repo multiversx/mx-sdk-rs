@@ -1,5 +1,5 @@
 use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost, VMHooks,
+    CompilationOptions, Executor, ExecutorError, Instance, VMHooks,
 };
 use multiversx_chain_vm_executor_wasmer_experimental::{
     ExperimentalInstance, ExperimentalInstanceState, ExperimentalVMHooksBuilder,
@@ -54,10 +54,6 @@ impl ExperimentalExecutor {
 }
 
 impl Executor for ExperimentalExecutor {
-    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        Ok(())
-    }
-
     fn new_instance(
         &self,
         wasm_bytes: &[u8],

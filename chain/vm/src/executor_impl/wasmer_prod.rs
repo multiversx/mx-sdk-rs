@@ -1,3 +1,4 @@
+mod vh_dispatcher_legacy;
 mod wasmer_prod_executor;
 mod wasmer_prod_instance;
 mod wasmer_prod_instance_state;

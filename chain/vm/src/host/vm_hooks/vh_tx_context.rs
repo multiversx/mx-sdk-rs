@@ -2,7 +2,9 @@ use std::fmt::Debug;
 use std::sync::MutexGuard;
 
 use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::{BreakpointValue, InstanceState, MemLength, MemPtr};
+use multiversx_chain_vm_executor::{
+    BreakpointValue, InstanceState, MemLength, MemPtr, VMHooksError,
+};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -20,9 +22,10 @@ use crate::{
     host::execution,
     host::vm_hooks::{
         VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-        VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
-        VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
-        VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
+        VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksErrorManaged, VMHooksHandler,
+        VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
+        VMHooksManagedTypes, VMHooksSend, VMHooksSignalError, VMHooksStorageRead,
+        VMHooksStorageWrite,
     },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
@@ -30,7 +33,7 @@ use crate::{
 
 pub struct TxContextVMHooksHandler<S: InstanceState> {
     tx_context_ref: TxContextRef,
-    instance_state_ref: S,
+    pub(crate) instance_state_ref: S,
 }
 
 impl<S: InstanceState> TxContextVMHooksHandler<S> {
@@ -38,6 +41,15 @@ impl<S: InstanceState> TxContextVMHooksHandler<S> {
         TxContextVMHooksHandler {
             tx_context_ref,
             instance_state_ref,
+        }
+    }
+
+    fn prepare_error(&self, status: ReturnCode, message: &str) -> BreakpointValue {
+        *self.tx_context_ref.result_lock() =
+            TxResult::from_panic_obj(&TxPanic::new(status, message));
+        match status {
+            ReturnCode::UserError => BreakpointValue::SignalError,
+            _ => BreakpointValue::ExecutionFailed,
         }
     }
 }
@@ -65,13 +77,13 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         self.tx_context_ref.m_types_lock()
     }
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
-        *self.tx_context_ref.result_lock() =
-            TxResult::from_panic_obj(&TxPanic::new(status, message));
-        let breakpoint = match status {
-            ReturnCode::UserError => BreakpointValue::SignalError,
-            _ => BreakpointValue::ExecutionFailed,
-        };
+    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError> {
+        let breakpoint = self.prepare_error(status, message);
+        Err(breakpoint)
+    }
+
+    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
+        let breakpoint = self.prepare_error(status, message);
         let _ = self.instance_state_ref.set_breakpoint_value(breakpoint);
     }
 
@@ -79,7 +91,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         &self.tx_context_ref.0.runtime_ref.vm_ref.gas_schedule
     }
 
-    fn use_gas(&mut self, gas: u64) {
+    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksError> {
         let gas_limit = self.input_ref().gas_limit;
         let state_ref = &mut self.instance_state_ref;
         let prev_gas_used = state_ref
@@ -91,13 +103,12 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         // println!("use gas {gas}: {prev_gas_used} -> {next_gas_used}");
 
         if next_gas_used > gas_limit {
-            state_ref
-                .set_breakpoint_value(BreakpointValue::OutOfGas)
-                .expect("error setting breakpoint value in instance");
+            Err(VMHooksError::OutOfGas)
         } else {
             state_ref
                 .set_points_used(next_gas_used)
                 .expect("error setting points used in instance");
+            Ok(())
         }
     }
 
@@ -189,7 +200,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
             self.sync_call_post_processing(tx_result, blockchain_updates)
         } else {
             // also kill current execution
-            self.halt_with_error(tx_result.result_status, &tx_result.result_message);
+            self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
             Vec::new()
         }
     }
@@ -216,7 +227,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
             self.sync_call_post_processing(tx_result, blockchain_updates)
         } else {
             // also kill current execution
-            self.halt_with_error(tx_result.result_status, &tx_result.result_message);
+            self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
             Vec::new()
         }
     }
@@ -261,11 +272,11 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
             ),
             ReturnCode::ExecutionFailed => {
                 // TODO: not sure it's the right condition, it catches insufficient funds
-                self.vm_error(&tx_result.result_message);
+                self.vm_error_legacy(&tx_result.result_message);
                 (VMAddress::zero(), Vec::new())
             },
             _ => {
-                self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
+                self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
 
                 (VMAddress::zero(), Vec::new())
             },
@@ -302,8 +313,8 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
             },
-            ReturnCode::ExecutionFailed => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
-            _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
+            ReturnCode::ExecutionFailed => self.vm_error_legacy(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
+            _ => self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
 }
@@ -351,14 +362,14 @@ impl<S: InstanceState> TxContextVMHooksHandler<S> {
 
     fn check_reserved_key(&mut self, key: &[u8]) {
         if key.starts_with(STORAGE_RESERVED_PREFIX) {
-            self.vm_error(vm_err_msg::WRITE_RESERVED);
+            self.vm_error_legacy(vm_err_msg::WRITE_RESERVED);
         }
     }
 
     /// TODO: only checked on storage writes, needs more checks for calls, transfers, etc.
     fn check_not_readonly(&mut self) {
         if self.tx_context_ref.input_ref().readonly {
-            self.vm_error(vm_err_msg::WRITE_READONLY);
+            self.vm_error_legacy(vm_err_msg::WRITE_READONLY);
         }
     }
 
@@ -383,7 +394,7 @@ impl<S: InstanceState> VMHooksManagedTypes for TxContextVMHooksHandler<S> {}
 impl<S: InstanceState> VMHooksCallValue for TxContextVMHooksHandler<S> {}
 impl<S: InstanceState> VMHooksEndpointArgument for TxContextVMHooksHandler<S> {}
 impl<S: InstanceState> VMHooksEndpointFinish for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksError for TxContextVMHooksHandler<S> {}
+impl<S: InstanceState> VMHooksSignalError for TxContextVMHooksHandler<S> {}
 impl<S: InstanceState> VMHooksErrorManaged for TxContextVMHooksHandler<S> {}
 impl<S: InstanceState> VMHooksStorageRead for TxContextVMHooksHandler<S> {}
 impl<S: InstanceState> VMHooksStorageWrite for TxContextVMHooksHandler<S> {}

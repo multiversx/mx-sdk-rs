@@ -4,7 +4,7 @@ use multiversx_chain_vm::host::{
     context::{TxContextRef, TxFunctionName, TxPanic},
     runtime::RuntimeInstanceCall,
 };
-use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance};
+use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, InstanceCallError};
 use multiversx_sc::chain_core::types::ReturnCode;
 
 use super::{
@@ -104,7 +104,7 @@ impl ContractDebugInstance {
 }
 
 impl Instance for ContractDebugInstance {
-    fn call(&self, func_name: &str) -> Result<(), ExecutorError> {
+    fn call(&self, func_name: &str) -> Result<(), InstanceCallError> {
         match func_name {
             FUNC_CONTEXT_PUSH => {
                 ContractDebugStack::static_push(self.clone());

@@ -1,6 +1,4 @@
-use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
-};
+use multiversx_chain_vm_executor::{CompilationOptions, Executor, ExecutorError, Instance};
 use std::fmt;
 
 use crate::host::runtime::RuntimeWeakRef;
@@ -23,10 +21,6 @@ impl ExperimentalExecutor {
 }
 
 impl Executor for ExperimentalExecutor {
-    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        panic!("ExperimentalExecutor not available, need to activate features = [\"wasmer-experimental\"] in multiversx-sc-scenario or multiversx-chain-vm")
-    }
-
     fn new_instance(
         &self,
         _wasm_bytes: &[u8],

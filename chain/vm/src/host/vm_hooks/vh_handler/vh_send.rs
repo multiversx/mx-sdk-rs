@@ -219,7 +219,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         if endpoint_name.is_empty() {
             // immitating the behavior of the VM
             // TODO: lift limitation from the VM, then also remove this condition here
-            self.vm_error(vm_err_msg::PROMISES_TOKENIZE_FAILED);
+            self.vm_error_legacy(vm_err_msg::PROMISES_TOKENIZE_FAILED);
         }
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
         let tx_hash = self.tx_hash();

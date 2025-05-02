@@ -12,13 +12,18 @@ use std::fmt::Debug;
 
 use crate::types::RawHandle;
 
-use super::VMHooksError;
+use super::VMHooksSignalError;
 
 /// Provides VM hook implementations for methods that deal with more than one type of managed type.
 ///
 /// It is also the trait that unifies all managed type functionality.
 pub trait VMHooksManagedTypes:
-    VMHooksBigInt + VMHooksManagedBuffer + VMHooksManagedMap + VMHooksBigFloat + VMHooksError + Debug
+    VMHooksBigInt
+    + VMHooksManagedBuffer
+    + VMHooksManagedMap
+    + VMHooksBigFloat
+    + VMHooksSignalError
+    + Debug
 {
     fn mb_to_big_int_unsigned(&mut self, buffer_handle: RawHandle, bi_handle: RawHandle) {
         let bytes = self.m_types_lock().mb_to_bytes(buffer_handle);

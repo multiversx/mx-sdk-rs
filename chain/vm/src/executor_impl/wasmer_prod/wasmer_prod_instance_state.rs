@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use multiversx_chain_vm_executor::{
-    BreakpointValue, ExecutorError, InstanceFull, InstanceState, MemLength, MemPtr,
+    BreakpointValue, ExecutorError, InstanceLegacy, InstanceState, MemLength, MemPtr,
 };
 use multiversx_chain_vm_executor_wasmer::WasmerInstance;
 

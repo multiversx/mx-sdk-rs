@@ -1,7 +1,5 @@
 use multiversx_chain_vm::executor_impl::ExecutorFileNotFoundError;
-use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
-};
+use multiversx_chain_vm_executor::{CompilationOptions, Executor, ExecutorError, Instance};
 use simple_error::SimpleError;
 use std::fmt;
 
@@ -27,10 +25,6 @@ impl CompositeExecutor {
 }
 
 impl Executor for CompositeExecutor {
-    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        Ok(())
-    }
-
     fn new_instance(
         &self,
         wasm_bytes: &[u8],

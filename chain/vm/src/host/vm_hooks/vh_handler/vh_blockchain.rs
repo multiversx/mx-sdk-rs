@@ -160,7 +160,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     fn managed_get_code_metadata(&mut self, address_handle: i32, response_handle: i32) {
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let Some(data) = self.account_data(&address) else {
-            self.vm_error(&format!(
+            self.vm_error_legacy(&format!(
                 "account not found: {}",
                 hex::encode(address.as_bytes())
             ));
