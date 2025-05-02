@@ -1,4 +1,6 @@
-use multiversx_chain_vm_executor::{CompilationOptions, Executor, ExecutorError, Instance};
+use multiversx_chain_vm_executor::{
+    CompilationOptions, Executor, ExecutorError, Instance, VMHooksLegacyAdapter,
+};
 use multiversx_chain_vm_executor_wasmer::WasmerInstance;
 use std::{
     cell::RefCell,
@@ -86,5 +88,13 @@ impl Executor for WasmerProdExecutor {
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
         panic!("WasmerProdExecutor new_instance_from_cache not supported")
+    }
+}
+
+impl VMHooksLegacyAdapter for VMHooksDispatcher<TxContextVMHooksHandler<WasmerProdInstanceState>> {
+    fn set_breakpoint_value(&self, value: multiversx_chain_vm_executor::BreakpointValue) {
+        self.handler
+            .instance_state_ref
+            .set_breakpoint_value_legacy(value);
     }
 }

@@ -21,6 +21,13 @@ impl WasmerProdInstanceState {
             .upgrade()
             .map_or_else(|| Err(anyhow!("bad wasmer instance pointer")), Ok)
     }
+
+    pub fn set_breakpoint_value_legacy(&self, value: BreakpointValue) {
+        self.instance_rc()
+            .unwrap()
+            .set_breakpoint_value(value)
+            .expect("set_breakpoint_value_legacy globals error");
+    }
 }
 
 impl InstanceState for WasmerProdInstanceState {
