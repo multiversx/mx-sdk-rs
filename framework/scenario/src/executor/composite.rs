@@ -1,4 +1,3 @@
-use multiversx_chain_vm::executor_impl::ExecutorFileNotFoundError;
 use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, MissingWasmError,
 };
@@ -59,9 +58,6 @@ impl Executor for CompositeExecutor {
 
 fn is_recoverable_error(err: &ExecutorError) -> bool {
     if err.is::<ContractDebugExecutorNotRegisteredError>() {
-        return true;
-    }
-    if err.is::<ExecutorFileNotFoundError>() {
         return true;
     }
     if err.is::<MissingWasmError>() {
