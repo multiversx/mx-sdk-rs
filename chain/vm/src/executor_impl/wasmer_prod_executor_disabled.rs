@@ -1,5 +1,4 @@
-use multiversx_chain_vm_executor::{CompilationOptions, Executor, ExecutorError, Instance};
-use std::fmt;
+use multiversx_chain_vm_executor::Executor;
 
 use crate::host::runtime::RuntimeWeakRef;
 
