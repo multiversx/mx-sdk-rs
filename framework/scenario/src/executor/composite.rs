@@ -1,5 +1,7 @@
 use multiversx_chain_vm::executor_impl::ExecutorFileNotFoundError;
-use multiversx_chain_vm_executor::{CompilationOptions, Executor, ExecutorError, Instance};
+use multiversx_chain_vm_executor::{
+    CompilationOptions, Executor, ExecutorError, Instance, MissingWasmError,
+};
 use simple_error::SimpleError;
 use std::fmt;
 
@@ -60,6 +62,9 @@ fn is_recoverable_error(err: &ExecutorError) -> bool {
         return true;
     }
     if err.is::<ExecutorFileNotFoundError>() {
+        return true;
+    }
+    if err.is::<MissingWasmError>() {
         return true;
     }
     false

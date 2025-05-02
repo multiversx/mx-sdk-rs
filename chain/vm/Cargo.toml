@@ -21,7 +21,7 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 wasm-incompatible = ["rand"]
 wasmer-prod = ["multiversx-chain-vm-executor-wasmer"]
 wasmer-experimental = ["multiversx-chain-vm-executor-wasmer-experimental"]
-# default = ["wasmer-prod", "wasmer-experimental"]
+default = ["wasmer-prod", "wasmer-experimental"]
 
 [dependencies]
 num-bigint = "0.4"
@@ -46,20 +46,20 @@ path = "../core"
 
 [dependencies.multiversx-chain-vm-executor]
 version = "0.3.0"
-git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "9fd7896fdda750630229546680ae0c5e9fca0de6"
-# path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor"
+# git = "https://github.com/multiversx/mx-vm-executor-rs"
+# rev = "9fd7896fdda750630229546680ae0c5e9fca0de6"
+path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor"
 
 [dependencies.multiversx-chain-vm-executor-wasmer]
 version = "0.3.0"
 optional = true
-git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "9fd7896fdda750630229546680ae0c5e9fca0de6"
-# path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-wasmer"
+# git = "https://github.com/multiversx/mx-vm-executor-rs"
+# rev = "9fd7896fdda750630229546680ae0c5e9fca0de6"
+path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-wasmer"
 
 [dependencies.multiversx-chain-vm-executor-wasmer-experimental]
 version = "0.3.0"
 optional = true
-git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "9fd7896fdda750630229546680ae0c5e9fca0de6"
-# path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-experimental"
+# git = "https://github.com/multiversx/mx-vm-executor-rs"
+# rev = "9fd7896fdda750630229546680ae0c5e9fca0de6"
+path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-experimental"
