@@ -17,7 +17,6 @@ struct CargoToml {
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 #[allow(dead_code)]
-
 enum Dependency {
     Simple(String),
     Detailed(DependencyDetail),
