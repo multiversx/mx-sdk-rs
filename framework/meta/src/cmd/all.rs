@@ -1,4 +1,7 @@
-use super::print_util::{print_all_command, print_all_count, print_all_index};
+use super::{
+    cargo_toml::check_executor,
+    print_util::{print_all_command, print_all_count, print_all_index},
+};
 use crate::{
     cli::AllArgs,
     folder_structure::{dir_pretty_print, RelevantDirectories},
@@ -17,6 +20,9 @@ pub fn call_all_meta(args: &AllArgs) {
 
 fn perform_call_all_meta(path: &Path, ignore: &[String], raw_args: Vec<String>) {
     let dirs = RelevantDirectories::find_all(path, ignore);
+
+    check_executor(&dirs);
+
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 
     let num_contract_crates = dirs.iter_contract_crates().count();
