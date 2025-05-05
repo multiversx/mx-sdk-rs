@@ -31,7 +31,7 @@ impl VMHooksApiBackend for SingleTxApiBackend {
             let handler = cell.lock().unwrap().clone();
             let mut dispatcher = VMHooksDispatcher::new(handler);
             f(&mut dispatcher)
-                .unwrap_or_else(|err| ContractDebugInstanceState::breakpoint_panic(err))
+                .unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
         })
     }
 

@@ -25,7 +25,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         let tx_context_ref = instance.tx_context_ref.clone();
         let handler = TxContextVMHooksHandler::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(handler);
-        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::breakpoint_panic(err))
+        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
     }
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
@@ -35,7 +35,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         let tx_context_ref = TxContextRef(handle.context.clone());
         let handler = TxContextVMHooksHandler::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(handler);
-        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::breakpoint_panic(err))
+        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
     }
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
