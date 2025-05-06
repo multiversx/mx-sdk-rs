@@ -4,6 +4,7 @@ use crate::{
     host::vm_hooks::VMHooksHandlerSource,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
 };
+use multiversx_chain_vm_executor::VMHooksError;
 use num_bigint::BigInt;
 use num_traits::Zero;
 
@@ -34,17 +35,37 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         &address == self.current_address()
     }
 
-    fn managed_caller(&mut self, dest_handle: RawHandle) {
+    fn managed_caller(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes,
+        )?;
+
         self.m_types_lock()
             .mb_set(dest_handle, self.input_ref().from.to_vec());
+        Ok(())
     }
 
-    fn managed_sc_address(&mut self, dest_handle: RawHandle) {
+    fn managed_sc_address(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes,
+        )?;
+
         self.m_types_lock()
             .mb_set(dest_handle, self.current_address().to_vec());
+        Ok(())
     }
 
-    fn managed_owner_address(&mut self, dest_handle: RawHandle) {
+    fn managed_owner_address(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes,
+        )?;
+
         self.m_types_lock().mb_set(
             dest_handle,
             self.current_account_data()
@@ -52,6 +73,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
                 .unwrap_or_else(|| panic!("contract owner address not set"))
                 .to_vec(),
         );
+        Ok(())
     }
 
     fn get_shard_of_address(&mut self, address_bytes: &[u8]) -> i32 {
@@ -62,18 +84,25 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         VMAddress::from_slice(address_bytes).is_smart_contract_address()
     }
 
-    fn load_balance(&mut self, address_bytes: &[u8], dest: RawHandle) {
+    fn load_balance(&mut self, address_bytes: &[u8], dest: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+
         assert!(
             self.is_contract_address(address_bytes),
             "get balance not yet implemented for accounts other than the contract itself"
         );
         self.m_types_lock()
             .bi_overwrite(dest, self.current_account_data().egld_balance.into());
+
+        Ok(())
     }
 
-    fn get_tx_hash(&mut self, dest: RawHandle) {
+    fn get_tx_hash(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_current_tx_hash)?;
+
         self.m_types_lock()
             .mb_set(dest, self.input_ref().tx_hash.to_vec());
+        Ok(())
     }
 
     fn get_gas_left(&mut self) -> u64 {
@@ -96,11 +125,14 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         self.get_current_block_info().block_epoch
     }
 
-    fn get_block_random_seed(&mut self, dest: RawHandle) {
+    fn get_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_random_seed)?;
+
         self.m_types_lock().mb_set(
             dest,
             self.get_current_block_info().block_random_seed.to_vec(),
         );
+        Ok(())
     }
 
     fn get_prev_block_timestamp(&mut self) -> u64 {
@@ -119,11 +151,13 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         self.get_previous_block_info().block_epoch
     }
 
-    fn get_prev_block_random_seed(&mut self, dest: RawHandle) {
+    fn get_prev_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+        //TODO: find exact gas cost
         self.m_types_lock().mb_set(
             dest,
             self.get_previous_block_info().block_random_seed.to_vec(),
         );
+        Ok(())
     }
 
     fn get_current_esdt_nft_nonce(&mut self, address_bytes: &[u8], token_id_bytes: &[u8]) -> u64 {
@@ -144,7 +178,9 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         token_id_bytes: &[u8],
         nonce: u64,
         dest: RawHandle,
-    ) {
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+
         assert!(
             self.is_contract_address(address_bytes),
             "get_esdt_balance not yet implemented for accounts other than the contract itself"
@@ -155,20 +191,38 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .esdt
             .get_esdt_balance(token_id_bytes, nonce);
         self.m_types_lock().bi_overwrite(dest, esdt_balance.into());
+
+        Ok(())
     }
 
-    fn managed_get_code_metadata(&mut self, address_handle: i32, response_handle: i32) {
+    fn managed_get_code_metadata(
+        &mut self,
+        address_handle: i32,
+        response_handle: i32,
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_get_bytes,
+        )?;
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes,
+        )?;
+
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let Some(data) = self.account_data(&address) else {
-            self.vm_error_legacy(&format!(
+            return self.vm_error(&format!(
                 "account not found: {}",
                 hex::encode(address.as_bytes())
             ));
-            return;
         };
         let code_metadata_bytes = data.code_metadata.to_byte_array();
         self.m_types_lock()
-            .mb_set(response_handle, code_metadata_bytes.to_vec())
+            .mb_set(response_handle, code_metadata_bytes.to_vec());
+
+        Ok(())
     }
 
     fn managed_is_builtin_function(&mut self, function_name_handle: i32) -> bool {
@@ -194,7 +248,12 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         creator_handle: RawHandle,
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
-    ) {
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_get_bytes,
+        )?;
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
 
@@ -213,7 +272,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
                         royalties_handle,
                         uris_handle,
                     );
-                    return;
+                    return Err(VMHooksError::ExecutionFailed);
                 }
             }
         }
@@ -229,20 +288,35 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             royalties_handle,
             uris_handle,
         );
+
+        Ok(())
     }
 
     fn managed_get_back_transfers(
         &mut self,
         esdt_transfer_value_handle: RawHandle,
         call_value_handle: RawHandle,
-    ) {
-        let back_transfers = self.back_transfers_lock();
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+
+        let (call_value, esdt_transfers_len, esdt_transfers) = {
+            let back_transfers = self.back_transfers_lock();
+
+            (
+                back_transfers.call_value.clone(),
+                back_transfers.esdt_transfers.len(),
+                back_transfers.esdt_transfers.clone(),
+            )
+        };
+
+        self.use_gas(self.calculate_set_vec_of_esdt_transfers_gas_cost(esdt_transfers_len)?)?;
+
         let mut m_types = self.m_types_lock();
-        m_types.bi_overwrite(call_value_handle, back_transfers.call_value.clone().into());
-        m_types.mb_set_vec_of_esdt_payments(
-            esdt_transfer_value_handle,
-            &back_transfers.esdt_transfers,
-        );
+
+        m_types.bi_overwrite(call_value_handle, call_value.into());
+        m_types.mb_set_vec_of_esdt_payments(esdt_transfer_value_handle, &esdt_transfers);
+
+        Ok(())
     }
 
     fn check_esdt_frozen(

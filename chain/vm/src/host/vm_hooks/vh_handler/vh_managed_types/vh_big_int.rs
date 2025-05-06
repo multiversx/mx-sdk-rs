@@ -16,38 +16,70 @@ use std::convert::TryInto;
 
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
-        fn $method_name(&self, dest: RawHandle, x: RawHandle, y: RawHandle) {
+        fn $method_name(
+            &mut self,
+            dest: RawHandle,
+            x: RawHandle,
+            y: RawHandle,
+        ) -> Result<(), VMHooksError> {
+            self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+            self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+            self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+            // TODO: add big_int_ to rust_op_name
+            // self.use_gas(self.gas_schedule().big_int_api_cost.big_int_$rust_op_name)?;
+
             let bi_x = self.m_types_lock().bi_get(x);
             let bi_y = self.m_types_lock().bi_get(y);
             let result = bi_x.$rust_op_name(bi_y);
             self.m_types_lock().bi_overwrite(dest, result);
+
+            Ok(())
         }
     };
 }
 
 macro_rules! binary_bitwise_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
-        fn $method_name(&mut self, dest: RawHandle, x: RawHandle, y: RawHandle) {
+        fn $method_name(
+            &mut self,
+            dest: RawHandle,
+            x: RawHandle,
+            y: RawHandle,
+        ) -> Result<(), VMHooksError> {
+            self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+            self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+            // TODO: add big_int_ to rust_op_name
+            // self.use_gas(self.gas_schedule().big_int_api_cost.big_int_$rust_op_name)?;
+
             let bi_x = self.m_types_lock().bi_get(x);
             if bi_x.sign() == num_bigint::Sign::Minus {
-                self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
             }
             let bi_y = self.m_types_lock().bi_get(y);
             if bi_y.sign() == num_bigint::Sign::Minus {
-                self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
             }
             let result = bi_x.$rust_op_name(bi_y);
             self.m_types_lock().bi_overwrite(dest, result);
+
+            Ok(())
         }
     };
 }
 
 macro_rules! unary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
-        fn $method_name(&self, dest: RawHandle, x: RawHandle) {
+        fn $method_name(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
+            self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+            self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+            // TODO: add big_int_ to rust_op_name
+            // self.use_gas(self.gas_schedule().big_int_api_cost.big_int_$rust_op_name)?;
+
             let bi_x = self.m_types_lock().bi_get(x);
             let result = bi_x.$rust_op_name();
             self.m_types_lock().bi_overwrite(dest, result);
+
+            Ok(())
         }
     };
 }
@@ -70,41 +102,94 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         Ok(())
     }
 
-    fn bi_unsigned_byte_length(&self, handle: RawHandle) -> usize {
-        self.m_types_lock().bi_get_unsigned_bytes(handle).len()
+    fn bi_unsigned_byte_length(&mut self, handle: RawHandle) -> Result<usize, VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .big_int_api_cost
+                .big_int_unsigned_byte_length,
+        )?;
+
+        Ok(self.m_types_lock().bi_get_unsigned_bytes(handle).len())
     }
 
-    fn bi_get_unsigned_bytes(&self, handle: RawHandle) -> Vec<u8> {
-        self.m_types_lock().bi_get_unsigned_bytes(handle)
+    fn bi_get_unsigned_bytes(&mut self, handle: RawHandle) -> Result<Vec<u8>, VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .big_int_api_cost
+                .big_int_get_unsigned_bytes,
+        )?;
+
+        Ok(self.m_types_lock().bi_get_unsigned_bytes(handle))
     }
 
-    fn bi_set_unsigned_bytes(&self, destination: RawHandle, bytes: &[u8]) {
+    fn bi_set_unsigned_bytes(
+        &mut self,
+        destination: RawHandle,
+        bytes: &[u8],
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .big_int_api_cost
+                .big_int_set_unsigned_bytes,
+        )?;
+
         self.m_types_lock()
             .bi_set_unsigned_bytes(destination, bytes);
+
+        Ok(())
     }
 
-    fn bi_get_signed_bytes(&self, handle: RawHandle) -> Vec<u8> {
-        self.m_types_lock().bi_get_signed_bytes(handle)
+    fn bi_get_signed_bytes(&mut self, handle: RawHandle) -> Result<Vec<u8>, VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .big_int_api_cost
+                .big_int_get_signed_bytes,
+        )?;
+
+        Ok(self.m_types_lock().bi_get_signed_bytes(handle))
     }
 
-    fn bi_set_signed_bytes(&self, destination: RawHandle, bytes: &[u8]) {
+    fn bi_set_signed_bytes(
+        &mut self,
+        destination: RawHandle,
+        bytes: &[u8],
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .big_int_api_cost
+                .big_int_set_signed_bytes,
+        )?;
+
         self.m_types_lock().bi_set_signed_bytes(destination, bytes);
+
+        Ok(())
     }
 
-    fn bi_is_int64(&self, destination_handle: RawHandle) -> i32 {
+    // TODO: check implications of change
+    fn bi_is_int64(&mut self, destination_handle: RawHandle) -> Result<i32, VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_is_int_64)?;
+
         if self.m_types_lock().bi_to_i64(destination_handle).is_some() {
-            1
+            Ok(1)
         } else {
-            0
+            Ok(0)
+            // Err(VMHooksError::ExecutionFailed)
         }
     }
 
-    fn bi_get_int64(&mut self, destination_handle: RawHandle) -> i64 {
+    fn bi_get_int64(&mut self, destination_handle: RawHandle) -> Result<i64, VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+
         let opt_i64 = self.m_types_lock().bi_to_i64(destination_handle);
-        opt_i64.unwrap_or_else(|| {
-            self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
-            0
-        })
+
+        match opt_i64 {
+            Some(value) => Ok(value),
+            None => {
+                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
+                // unreachable if vm_error returns Err
+                Err(VMHooksError::ExecutionFailed)
+            },
+        }
     }
 
     binary_op_method! {bi_add, add}
@@ -137,12 +222,18 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
 
     unary_op_method! {bi_sqrt, sqrt}
 
-    fn bi_pow(&self, dest: RawHandle, x: RawHandle, y: RawHandle) {
+    fn bi_pow(&mut self, dest: RawHandle, x: RawHandle, y: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+
         let bi_x = self.m_types_lock().bi_get(x);
         let bi_y = self.m_types_lock().bi_get(y);
         let exp = big_int_to_i64(&bi_y).unwrap().try_into().unwrap();
         let result = pow(bi_x, exp);
         self.m_types_lock().bi_overwrite(dest, result);
+
+        Ok(())
     }
 
     fn bi_log2(&self, x: RawHandle) -> i32 {
@@ -154,21 +245,31 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
     binary_bitwise_op_method! {bi_or, bitor}
     binary_bitwise_op_method! {bi_xor, bitxor}
 
-    fn bi_shr(&mut self, dest: RawHandle, x: RawHandle, bits: usize) {
+    fn bi_shr(&mut self, dest: RawHandle, x: RawHandle, bits: usize) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+
         let bi_x = self.m_types_lock().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
-            self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+            self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
         }
         let result = bi_x.shr(bits);
         self.m_types_lock().bi_overwrite(dest, result);
+
+        Ok(())
     }
 
-    fn bi_shl(&mut self, dest: RawHandle, x: RawHandle, bits: usize) {
+    fn bi_shl(&mut self, dest: RawHandle, x: RawHandle, bits: usize) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+
         let bi_x = self.m_types_lock().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
-            self.vm_error_legacy(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+            self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
         }
         let result = bi_x.shl(bits);
         self.m_types_lock().bi_overwrite(dest, result);
+
+        Ok(())
     }
 }

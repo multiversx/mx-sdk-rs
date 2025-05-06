@@ -17,15 +17,24 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
         Ok(())
     }
 
-    fn load_egld_value(&mut self, dest: RawHandle) {
+    fn load_egld_value(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+
         let value = self.input_ref().received_egld().clone();
         self.m_types_lock().bi_overwrite(dest, value.into());
+
+        Ok(())
     }
 
-    fn load_all_esdt_transfers(&mut self, dest_handle: RawHandle) {
-        let transfers = self.input_ref().received_esdt();
+    fn load_all_esdt_transfers(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
+        self.use_gas(self.calculate_set_vec_of_esdt_transfers_gas_cost(
+            self.input_ref().received_esdt().len(),
+        )?)?;
+
         self.m_types_lock()
-            .mb_set_vec_of_esdt_payments(dest_handle, transfers);
+            .mb_set_vec_of_esdt_payments(dest_handle, self.input_ref().received_esdt());
+
+        Ok(())
     }
 
     fn esdt_num_transfers(&mut self) -> usize {

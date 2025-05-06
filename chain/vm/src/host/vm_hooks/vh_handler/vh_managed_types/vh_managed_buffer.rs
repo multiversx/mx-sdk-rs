@@ -1,3 +1,5 @@
+use multiversx_chain_vm_executor::VMHooksError;
+
 use crate::host::context::InvalidSliceError;
 use crate::types::RawHandle;
 
@@ -93,9 +95,26 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         }
     }
 
-    fn mb_to_hex(&self, source_handle: RawHandle, dest_handle: RawHandle) {
+    fn mb_to_hex(
+        &mut self,
+        source_handle: RawHandle,
+        dest_handle: RawHandle,
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_get_bytes,
+        )?;
+
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes,
+        )?;
+
         let encoded = hex::encode(self.m_types_lock().mb_get(source_handle));
         self.m_types_lock()
             .mb_set(dest_handle, encoded.into_bytes());
+        Ok(())
     }
 }

@@ -8,6 +8,7 @@ use crate::{
     types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
     vm_err_msg,
 };
+use multiversx_chain_vm_executor::VMHooksError;
 use num_traits::Zero;
 
 fn append_endpoint_name_and_args(
@@ -311,7 +312,16 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         source_contract_address_handle: RawHandle,
         code_metadata_handle: RawHandle,
         arg_buffer_handle: RawHandle,
-    ) {
+    ) -> Result<(), VMHooksError> {
+        // TODO: 4th get is get vec of bytes, calculate exact gas cost
+        self.use_gas(
+            4 * self
+                .gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_get_bytes,
+        )?;
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+
         let to = self.m_types_lock().mb_to_address(sc_address_handle);
         let egld_value = self.m_types_lock().bu_get(egld_value_handle);
         let source_contract_address = self
@@ -340,7 +350,16 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         code_handle: RawHandle,
         code_metadata_handle: RawHandle,
         arg_buffer_handle: RawHandle,
-    ) {
+    ) -> Result<(), VMHooksError> {
+        // TODO: 4th get is get vec of bytes, calculate exact gas cost
+        self.use_gas(
+            4 * self
+                .gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_get_bytes,
+        )?;
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+
         let to = self.m_types_lock().mb_to_address(sc_address_handle);
         let egld_value = self.m_types_lock().bu_get(egld_value_handle);
         let code = self.m_types_lock().mb_get(code_handle).to_vec();
@@ -395,17 +414,19 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             .mb_set_vec_of_bytes(result_handle, result);
     }
 
-    fn clean_return_data(&mut self) {
+    fn clean_return_data(&mut self) -> Result<(), VMHooksError> {
         let mut tx_result = self.result_lock();
         tx_result.result_values.clear();
+        Ok(())
     }
 
-    fn delete_from_return_data(&mut self, index: usize) {
+    fn delete_from_return_data(&mut self, index: usize) -> Result<(), VMHooksError> {
         let mut tx_result = self.result_lock();
         if index > tx_result.result_values.len() {
-            return;
+            return Err(VMHooksError::ExecutionFailed);
         }
 
         let _ = tx_result.result_values.remove(index);
+        Ok(())
     }
 }

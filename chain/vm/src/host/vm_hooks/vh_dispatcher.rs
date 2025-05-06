@@ -533,9 +533,8 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     fn finish(&mut self, pointer: MemPtr, length: MemLength) -> Result<(), VMHooksError> {
         unsafe {
             let bytes = self.handler.memory_load(pointer, length);
-            self.handler.finish_slice_u8(&bytes);
+            self.handler.finish_slice_u8(&bytes)
         }
-        Ok(())
     }
 
     fn execute_on_same_context(
@@ -625,13 +624,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn clean_return_data(&mut self) -> Result<(), VMHooksError> {
-        self.handler.clean_return_data();
-        Ok(())
+        self.handler.clean_return_data()
     }
 
     fn delete_from_return_data(&mut self, result_id: i32) -> Result<(), VMHooksError> {
-        self.handler.delete_from_return_data(result_id as usize);
-        Ok(())
+        self.handler.delete_from_return_data(result_id as usize)
     }
 
     fn get_original_tx_hash(&mut self, data_offset: MemPtr) -> Result<(), VMHooksError> {
@@ -647,18 +644,15 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn managed_sc_address(&mut self, destination_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.managed_sc_address(destination_handle);
-        Ok(())
+        self.handler.managed_sc_address(destination_handle)
     }
 
     fn managed_owner_address(&mut self, destination_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.managed_owner_address(destination_handle);
-        Ok(())
+        self.handler.managed_owner_address(destination_handle)
     }
 
     fn managed_caller(&mut self, destination_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.managed_caller(destination_handle);
-        Ok(())
+        self.handler.managed_caller(destination_handle)
     }
 
     fn managed_signal_error(&mut self, err_handle: i32) -> Result<(), VMHooksError> {
@@ -670,13 +664,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         topics_handle: i32,
         data_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.managed_write_log(topics_handle, data_handle);
-        Ok(())
+        self.handler.managed_write_log(topics_handle, data_handle)
     }
 
     fn managed_get_original_tx_hash(&mut self, result_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.get_tx_hash(result_handle);
-        Ok(())
+        self.handler.get_tx_hash(result_handle)
     }
 
     fn managed_get_state_root_hash(&mut self, result_handle: i32) -> Result<(), VMHooksError> {
@@ -684,16 +676,14 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn managed_get_block_random_seed(&mut self, result_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.get_block_random_seed(result_handle);
-        Ok(())
+        self.handler.get_block_random_seed(result_handle)
     }
 
     fn managed_get_prev_block_random_seed(
         &mut self,
         result_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.get_prev_block_random_seed(result_handle);
-        Ok(())
+        self.handler.get_prev_block_random_seed(result_handle)
     }
 
     fn managed_get_return_data(
@@ -709,8 +699,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         multi_call_value_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .load_all_esdt_transfers(multi_call_value_handle);
-        Ok(())
+            .load_all_esdt_transfers(multi_call_value_handle)
     }
 
     fn managed_get_esdt_balance(
@@ -749,8 +738,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
             creator_handle,
             royalties_handle,
             uris_handle,
-        );
-        Ok(())
+        )
     }
 
     fn managed_get_back_transfers(
@@ -759,8 +747,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         call_value_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .managed_get_back_transfers(esdt_transfer_value_handle, call_value_handle);
-        Ok(())
+            .managed_get_back_transfers(esdt_transfer_value_handle, call_value_handle)
     }
 
     fn managed_async_call(
@@ -811,8 +798,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         callback_closure_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .load_callback_closure_buffer(callback_closure_handle);
-        Ok(())
+            .load_callback_closure_buffer(callback_closure_handle)
     }
 
     fn managed_upgrade_from_source_contract(
@@ -832,8 +818,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
             address_handle,
             code_metadata_handle,
             arguments_handle,
-        );
-        Ok(())
+        )
     }
 
     fn managed_upgrade_contract(
@@ -853,8 +838,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
             code_handle,
             code_metadata_handle,
             arguments_handle,
-        );
-        Ok(())
+        )
     }
 
     fn managed_delete_contract(
@@ -1024,8 +1008,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         source_handle: i32,
         dest_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.mb_to_hex(source_handle, dest_handle);
-        Ok(())
+        self.handler.mb_to_hex(source_handle, dest_handle)
     }
 
     fn managed_get_code_metadata(
@@ -1034,8 +1017,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         response_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .managed_get_code_metadata(address_handle, response_handle);
-        Ok(())
+            .managed_get_code_metadata(address_handle, response_handle)
     }
 
     fn managed_is_builtin_function(
@@ -1082,8 +1064,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bf_add(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bf_add(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_float_sub(
@@ -1093,8 +1074,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bf_sub(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bf_sub(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_float_mul(
@@ -1104,8 +1084,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bf_mul(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bf_mul(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_float_div(
@@ -1115,8 +1094,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bf_div(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bf_div(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_float_neg(
@@ -1124,8 +1102,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         op_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_neg(destination_handle, op_handle);
-        Ok(())
+        self.handler.bf_neg(destination_handle, op_handle)
     }
 
     fn big_float_clone(
@@ -1133,8 +1110,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         op_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_clone(destination_handle, op_handle);
-        Ok(())
+        self.handler.bf_clone(destination_handle, op_handle)
     }
 
     fn big_float_cmp(&mut self, op1_handle: i32, op2_handle: i32) -> Result<i32, VMHooksError> {
@@ -1146,8 +1122,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         op_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_abs(destination_handle, op_handle);
-        Ok(())
+        self.handler.bf_abs(destination_handle, op_handle)
     }
 
     fn big_float_sign(&mut self, op_handle: i32) -> Result<i32, VMHooksError> {
@@ -1159,8 +1134,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         op_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_sqrt(destination_handle, op_handle);
-        Ok(())
+        self.handler.bf_sqrt(destination_handle, op_handle)
     }
 
     fn big_float_pow(
@@ -1169,8 +1143,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op_handle: i32,
         exponent: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_pow(destination_handle, op_handle, exponent);
-        Ok(())
+        self.handler.bf_pow(destination_handle, op_handle, exponent)
     }
 
     fn big_float_floor(
@@ -1178,8 +1151,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         dest_big_int_handle: i32,
         op_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_floor(dest_big_int_handle, op_handle);
-        Ok(())
+        self.handler.bf_floor(dest_big_int_handle, op_handle)
     }
 
     fn big_float_ceil(
@@ -1187,8 +1159,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         dest_big_int_handle: i32,
         op_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_ceil(dest_big_int_handle, op_handle);
-        Ok(())
+        self.handler.bf_ceil(dest_big_int_handle, op_handle)
     }
 
     fn big_float_truncate(
@@ -1196,8 +1167,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         dest_big_int_handle: i32,
         op_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_trunc(dest_big_int_handle, op_handle);
-        Ok(())
+        self.handler.bf_trunc(dest_big_int_handle, op_handle)
     }
 
     fn big_float_set_int64(
@@ -1205,8 +1175,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         value: i64,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_set_i64(destination_handle, value);
-        Ok(())
+        self.handler.bf_set_i64(destination_handle, value)
     }
 
     fn big_float_is_int(&mut self, op_handle: i32) -> Result<i32, VMHooksError> {
@@ -1218,18 +1187,15 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         big_int_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bf_set_bi(destination_handle, big_int_handle);
-        Ok(())
+        self.handler.bf_set_bi(destination_handle, big_int_handle)
     }
 
     fn big_float_get_const_pi(&mut self, destination_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.bf_get_const_pi(destination_handle);
-        Ok(())
+        self.handler.bf_get_const_pi(destination_handle)
     }
 
     fn big_float_get_const_e(&mut self, destination_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.bf_get_const_e(destination_handle);
-        Ok(())
+        self.handler.bf_get_const_e(destination_handle)
     }
 
     fn big_int_get_unsigned_argument(
@@ -1238,8 +1204,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .load_argument_big_int_unsigned(id, destination_handle);
-        Ok(())
+            .load_argument_big_int_unsigned(id, destination_handle)
     }
 
     fn big_int_get_signed_argument(
@@ -1248,8 +1213,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .load_argument_big_int_signed(id, destination_handle);
-        Ok(())
+            .load_argument_big_int_signed(id, destination_handle)
     }
 
     fn big_int_storage_store_unsigned(
@@ -1271,8 +1235,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_int_get_call_value(&mut self, destination_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.load_egld_value(destination_handle);
-        Ok(())
+        self.handler.load_egld_value(destination_handle)
     }
 
     fn big_int_get_esdt_call_value(&mut self, destination: i32) -> Result<(), VMHooksError> {
@@ -1294,9 +1257,8 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     ) -> Result<(), VMHooksError> {
         unsafe {
             let address_bytes = self.handler.memory_load(address_offset, 32);
-            self.handler.load_balance(&address_bytes, result);
+            self.handler.load_balance(&address_bytes, result)
         }
-        Ok(())
     }
 
     fn big_int_get_esdt_external_balance(
@@ -1315,9 +1277,8 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
                 &token_id_bytes,
                 nonce as u64,
                 result_handle,
-            );
+            )
         }
-        Ok(())
     }
 
     fn big_int_new(&mut self, small_value: i64) -> Result<i32, VMHooksError> {
@@ -1357,9 +1318,8 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         unsafe {
             let bytes = self.handler.memory_load(byte_offset, byte_length);
             self.handler
-                .bi_set_unsigned_bytes(destination_handle, &bytes);
+                .bi_set_unsigned_bytes(destination_handle, &bytes)
         }
-        Ok(())
     }
 
     fn big_int_set_signed_bytes(
@@ -1370,17 +1330,16 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     ) -> Result<(), VMHooksError> {
         unsafe {
             let bytes = self.handler.memory_load(byte_offset, byte_length);
-            self.handler.bi_set_signed_bytes(destination_handle, &bytes);
+            self.handler.bi_set_signed_bytes(destination_handle, &bytes)
         }
-        Ok(())
     }
 
     fn big_int_is_int64(&mut self, destination_handle: i32) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bi_is_int64(destination_handle))
+        self.handler.bi_is_int64(destination_handle)
     }
 
     fn big_int_get_int64(&mut self, destination_handle: i32) -> Result<i64, VMHooksError> {
-        Ok(self.handler.bi_get_int64(destination_handle))
+        self.handler.bi_get_int64(destination_handle)
     }
 
     fn big_int_set_int64(
@@ -1398,8 +1357,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_add(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_add(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_sub(
@@ -1409,8 +1367,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_sub(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_sub(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_mul(
@@ -1420,8 +1377,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_mul(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_mul(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_tdiv(
@@ -1431,8 +1387,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_t_div(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_t_div(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_tmod(
@@ -1442,8 +1397,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_t_mod(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_t_mod(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_ediv(
@@ -1469,8 +1423,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         op_handle: i32,
     ) -> Result<(), VMHooksError> {
-        self.handler.bi_sqrt(destination_handle, op_handle);
-        Ok(())
+        self.handler.bi_sqrt(destination_handle, op_handle)
     }
 
     fn big_int_pow(
@@ -1480,8 +1433,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_pow(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_pow(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_log2(&mut self, op_handle: i32) -> Result<i32, VMHooksError> {
@@ -1489,13 +1441,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_int_abs(&mut self, destination_handle: i32, op_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.bi_abs(destination_handle, op_handle);
-        Ok(())
+        self.handler.bi_abs(destination_handle, op_handle)
     }
 
     fn big_int_neg(&mut self, destination_handle: i32, op_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.bi_neg(destination_handle, op_handle);
-        Ok(())
+        self.handler.bi_neg(destination_handle, op_handle)
     }
 
     fn big_int_sign(&mut self, op_handle: i32) -> Result<i32, VMHooksError> {
@@ -1517,8 +1467,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_and(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_and(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_or(
@@ -1528,8 +1477,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_or(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_or(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_xor(
@@ -1539,8 +1487,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         op2_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_xor(destination_handle, op1_handle, op2_handle);
-        Ok(())
+            .bi_xor(destination_handle, op1_handle, op2_handle)
     }
 
     fn big_int_shr(
@@ -1550,8 +1497,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         bits: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_shr(destination_handle, op_handle, bits as usize);
-        Ok(())
+            .bi_shr(destination_handle, op_handle, bits as usize)
     }
 
     fn big_int_shl(
@@ -1561,18 +1507,15 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         bits: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_shl(destination_handle, op_handle, bits as usize);
-        Ok(())
+            .bi_shl(destination_handle, op_handle, bits as usize)
     }
 
     fn big_int_finish_unsigned(&mut self, reference_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.finish_big_uint_raw(reference_handle);
-        Ok(())
+        self.handler.finish_big_uint_raw(reference_handle)
     }
 
     fn big_int_finish_signed(&mut self, reference_handle: i32) -> Result<(), VMHooksError> {
-        self.handler.finish_big_int_raw(reference_handle);
-        Ok(())
+        self.handler.finish_big_int_raw(reference_handle)
     }
 
     fn big_int_to_string(
@@ -1581,8 +1524,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .bi_to_string(big_int_handle, destination_handle);
-        Ok(())
+            .bi_to_string(big_int_handle, destination_handle)
     }
 
     fn mbuffer_new(&mut self) -> Result<i32, VMHooksError> {
@@ -1716,9 +1658,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         m_buffer_handle: i32,
         big_int_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .mb_to_big_int_unsigned(m_buffer_handle, big_int_handle);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .mb_to_big_int_unsigned(m_buffer_handle, big_int_handle)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_to_big_int_signed(
@@ -1726,9 +1672,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         m_buffer_handle: i32,
         big_int_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .mb_to_big_int_signed(m_buffer_handle, big_int_handle);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .mb_to_big_int_signed(m_buffer_handle, big_int_handle)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_from_big_int_unsigned(
@@ -1736,9 +1686,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         m_buffer_handle: i32,
         big_int_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .mb_from_big_int_unsigned(m_buffer_handle, big_int_handle);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .mb_from_big_int_unsigned(m_buffer_handle, big_int_handle)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_from_big_int_signed(
@@ -1746,9 +1700,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         m_buffer_handle: i32,
         big_int_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .mb_from_big_int_signed(m_buffer_handle, big_int_handle);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .mb_from_big_int_signed(m_buffer_handle, big_int_handle)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_to_big_float(
@@ -1794,8 +1752,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
     ) -> Result<(), VMHooksError> {
         self.handler
-            .storage_load_from_address(address_handle, key_handle, destination_handle);
-        Ok(())
+            .storage_load_from_address(address_handle, key_handle, destination_handle)
     }
 
     fn mbuffer_get_argument(
@@ -1803,14 +1760,20 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         id: i32,
         destination_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .load_argument_managed_buffer(id, destination_handle);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .load_argument_managed_buffer(id, destination_handle)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_finish(&mut self, source_handle: i32) -> Result<i32, VMHooksError> {
-        self.handler.finish_managed_buffer_raw(source_handle);
-        Ok(RESULT_OK)
+        match self.handler.finish_managed_buffer_raw(source_handle) {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_set_random(
@@ -1818,9 +1781,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         destination_handle: i32,
         length: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .mb_set_random(destination_handle, length as usize);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .mb_set_random(destination_handle, length as usize)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn managed_map_new(&mut self) -> Result<i32, VMHooksError> {
@@ -1876,13 +1843,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn small_int_finish_unsigned(&mut self, value: i64) -> Result<(), VMHooksError> {
-        self.handler.finish_u64(value as u64);
-        Ok(())
+        self.handler.finish_u64(value as u64)
     }
 
     fn small_int_finish_signed(&mut self, value: i64) -> Result<(), VMHooksError> {
-        self.handler.finish_i64(value);
-        Ok(())
+        self.handler.finish_i64(value)
     }
 
     fn small_int_storage_store_unsigned(

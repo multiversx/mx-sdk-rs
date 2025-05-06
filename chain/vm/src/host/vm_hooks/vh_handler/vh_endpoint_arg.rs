@@ -1,3 +1,4 @@
+use multiversx_chain_vm_executor::VMHooksError;
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
@@ -19,19 +20,55 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         arg.len()
     }
 
-    fn load_argument_managed_buffer(&mut self, arg_index: i32, dest: RawHandle) {
+    fn load_argument_managed_buffer(
+        &mut self,
+        arg_index: i32,
+        dest: RawHandle,
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes,
+        )?;
+
         let arg_bytes = self.input_ref().get_argument_vec_u8(arg_index);
         self.m_types_lock().mb_set(dest, arg_bytes);
+
+        Ok(())
     }
 
-    fn load_argument_big_int_unsigned(&mut self, arg_index: i32, dest: RawHandle) {
+    fn load_argument_big_int_unsigned(
+        &mut self,
+        arg_index: i32,
+        dest: RawHandle,
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .big_int_api_cost
+                .big_int_set_unsigned_bytes,
+        )?;
+
         let arg_bytes = self.input_ref().get_argument_vec_u8(arg_index);
         self.m_types_lock().bi_set_unsigned_bytes(dest, &arg_bytes);
+
+        Ok(())
     }
 
-    fn load_argument_big_int_signed(&mut self, arg_index: i32, dest: RawHandle) {
+    fn load_argument_big_int_signed(
+        &mut self,
+        arg_index: i32,
+        dest: RawHandle,
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .big_int_api_cost
+                .big_int_set_signed_bytes,
+        )?;
+
         let arg_bytes = self.input_ref().get_argument_vec_u8(arg_index);
         self.m_types_lock().bi_set_signed_bytes(dest, &arg_bytes);
+
+        Ok(())
     }
 
     fn get_argument_i64(&mut self, arg_index: i32) -> i64 {
@@ -58,11 +95,27 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         }
     }
 
-    fn load_callback_closure_buffer(&mut self, dest: RawHandle) {
-        if let Some(closure_data) = &self.input_ref().promise_callback_closure_data {
-            self.m_types_lock().mb_set(dest, closure_data.clone());
+    fn load_callback_closure_buffer(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+        let has_closure_data = self.input_ref().promise_callback_closure_data.is_some();
+
+        if has_closure_data {
+            self.use_gas(
+                self.gas_schedule()
+                    .managed_buffer_api_cost
+                    .m_buffer_set_bytes,
+            )?;
+
+            let closure_data = self
+                .input_ref()
+                .promise_callback_closure_data
+                .clone()
+                .unwrap();
+
+            self.m_types_lock().mb_set(dest, closure_data)
         } else {
-            self.vm_error_legacy(ERROR_NO_CALLBACK_CLOSURE);
+            self.vm_error(ERROR_NO_CALLBACK_CLOSURE)?
         }
+
+        Ok(())
     }
 }

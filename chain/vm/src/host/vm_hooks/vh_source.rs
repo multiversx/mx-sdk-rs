@@ -94,6 +94,32 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn account_code(&self, address: &VMAddress) -> Vec<u8>;
 
+    /// Utility function used in set_vec_of_esdt_transfers (present in multiple interfaces)
+    /// Will probably be moved in future commits.
+    fn calculate_set_vec_of_esdt_transfers_gas_cost(
+        &self,
+        transfers_len: usize,
+    ) -> Result<u64, VMHooksError> {
+        let transfers_len_u64 = match u64::try_from(transfers_len) {
+            Ok(len) => len,
+            Err(_) => return Err(VMHooksError::OutOfGas),
+        };
+
+        let total_gas = self
+            .gas_schedule()
+            .managed_buffer_api_cost
+            .m_buffer_set_bytes
+            + transfers_len_u64 * self.gas_schedule().managed_buffer_api_cost.m_buffer_new
+            + transfers_len_u64 * self.gas_schedule().big_int_api_cost.big_int_new
+            + 3 * transfers_len_u64
+                * self
+                    .gas_schedule()
+                    .managed_buffer_api_cost
+                    .m_buffer_append_bytes;
+
+        Ok(total_gas)
+    }
+
     fn perform_async_call(
         &mut self,
         to: VMAddress,
