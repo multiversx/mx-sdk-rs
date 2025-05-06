@@ -120,6 +120,23 @@ pub trait VMHooksHandlerSource: Debug {
         Ok(total_gas)
     }
 
+    /// Utility function used in set_vec_of_esdt_transfers (present in multiple interfaces)
+    /// Will probably be moved in future commits.
+    fn calculate_set_vec_of_bytes_gas_cost(&self, len: usize) -> Result<u64, VMHooksError> {
+        let len_u64 = match u64::try_from(len) {
+            Ok(len) => len,
+            Err(_) => return Err(VMHooksError::OutOfGas),
+        };
+
+        let total_gas = len_u64 * self.gas_schedule().managed_buffer_api_cost.m_buffer_new
+            + self
+                .gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes;
+
+        Ok(total_gas)
+    }
+
     fn perform_async_call(
         &mut self,
         to: VMAddress,

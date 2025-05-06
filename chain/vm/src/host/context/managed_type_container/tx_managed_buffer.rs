@@ -110,6 +110,7 @@ impl ManagedTypeContainer {
     pub fn mb_set_vec_of_bytes(&mut self, destination_handle: RawHandle, data: Vec<Vec<u8>>) {
         let mut m_vec_raw_data = Vec::new();
         for item in data.into_iter() {
+            // mb_new
             let handle = self.managed_buffer_map.insert_new_handle_raw(item);
             m_vec_raw_data.extend_from_slice(handle.to_be_bytes().as_slice());
         }

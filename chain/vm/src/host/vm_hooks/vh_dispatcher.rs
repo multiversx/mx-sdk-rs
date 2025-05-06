@@ -26,7 +26,7 @@ fn bool_to_i32(b: bool) -> Result<i32, VMHooksError> {
 #[allow(unused_variables)]
 impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     fn get_gas_left(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_gas_left() as i64)
+        self.handler.get_gas_left()
     }
 
     fn get_sc_address(&mut self, result_offset: MemPtr) -> Result<(), VMHooksError> {
@@ -40,14 +40,14 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     fn get_shard_of_address(&mut self, address_offset: MemPtr) -> Result<i32, VMHooksError> {
         unsafe {
             let address_bytes = self.handler.memory_load(address_offset, 32);
-            Ok(self.handler.get_shard_of_address(&address_bytes))
+            self.handler.get_shard_of_address(&address_bytes)
         }
     }
 
     fn is_smart_contract(&mut self, address_offset: MemPtr) -> Result<i32, VMHooksError> {
         unsafe {
             let address_bytes = self.handler.memory_load(address_offset, 32);
-            bool_to_i32(self.handler.is_smart_contract(&address_bytes))
+            bool_to_i32(self.handler.is_smart_contract(&address_bytes)?)
         }
     }
 
@@ -134,7 +134,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn get_esdt_local_roles(&mut self, token_id_handle: i32) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_esdt_local_roles_bits(token_id_handle) as i64)
+        self.handler.get_esdt_local_roles_bits(token_id_handle)
     }
 
     fn validate_token_identifier(&mut self, token_id_handle: i32) -> Result<i32, VMHooksError> {
@@ -430,9 +430,8 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         unsafe {
             let address_bytes = self.handler.memory_load(address_offset, 32);
             let token_id_bytes = self.handler.memory_load(token_id_offset, token_id_len);
-            Ok(self
-                .handler
-                .get_current_esdt_nft_nonce(&address_bytes, &token_id_bytes) as i64)
+            self.handler
+                .get_current_esdt_nft_nonce(&address_bytes, &token_id_bytes)
         }
     }
 
@@ -487,19 +486,19 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn get_block_timestamp(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_block_timestamp() as i64)
+        self.handler.get_block_timestamp()
     }
 
     fn get_block_nonce(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_block_nonce() as i64)
+        self.handler.get_block_nonce()
     }
 
     fn get_block_round(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_block_round() as i64)
+        self.handler.get_block_round()
     }
 
     fn get_block_epoch(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_block_epoch() as i64)
+        self.handler.get_block_epoch()
     }
 
     fn get_block_random_seed(&mut self, pointer: MemPtr) -> Result<(), VMHooksError> {
@@ -511,19 +510,19 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn get_prev_block_timestamp(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_prev_block_timestamp() as i64)
+        self.handler.get_prev_block_timestamp()
     }
 
     fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_prev_block_nonce() as i64)
+        self.handler.get_prev_block_nonce()
     }
 
     fn get_prev_block_round(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_prev_block_round() as i64)
+        self.handler.get_prev_block_round()
     }
 
     fn get_prev_block_epoch(&mut self) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_prev_block_epoch() as i64)
+        self.handler.get_prev_block_epoch()
     }
 
     fn get_prev_block_random_seed(&mut self, pointer: MemPtr) -> Result<(), VMHooksError> {
@@ -986,10 +985,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         token_id_handle: i32,
         nonce: i64,
     ) -> Result<i32, VMHooksError> {
-        bool_to_i32(
-            self.handler
-                .check_esdt_frozen(address_handle, token_id_handle, nonce as u64),
-        )
+        bool_to_i32(self.handler.check_esdt_frozen(
+            address_handle,
+            token_id_handle,
+            nonce as u64,
+        )?)
     }
 
     fn managed_is_esdt_limited_transfer(

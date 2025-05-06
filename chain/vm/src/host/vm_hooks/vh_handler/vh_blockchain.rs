@@ -30,9 +30,11 @@ const VM_BUILTIN_FUNCTION_NAMES: [&str; 16] = [
 ];
 
 pub trait VMHooksBlockchain: VMHooksHandlerSource {
-    fn is_contract_address(&mut self, address_bytes: &[u8]) -> bool {
+    fn is_contract_address(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
+
         let address = VMAddress::from_slice(address_bytes);
-        &address == self.current_address()
+        Ok(&address == self.current_address())
     }
 
     fn managed_caller(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
@@ -76,19 +78,23 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn get_shard_of_address(&mut self, address_bytes: &[u8]) -> i32 {
-        (address_bytes[address_bytes.len() - 1] % 3).into()
+    fn get_shard_of_address(&mut self, address_bytes: &[u8]) -> Result<i32, VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_shard_of_address)?;
+
+        Ok((address_bytes[address_bytes.len() - 1] % 3).into())
     }
 
-    fn is_smart_contract(&mut self, address_bytes: &[u8]) -> bool {
-        VMAddress::from_slice(address_bytes).is_smart_contract_address()
+    fn is_smart_contract(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
+
+        Ok(VMAddress::from_slice(address_bytes).is_smart_contract_address())
     }
 
     fn load_balance(&mut self, address_bytes: &[u8], dest: RawHandle) -> Result<(), VMHooksError> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
         assert!(
-            self.is_contract_address(address_bytes),
+            self.is_contract_address(address_bytes)?,
             "get balance not yet implemented for accounts other than the contract itself"
         );
         self.m_types_lock()
@@ -105,24 +111,34 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn get_gas_left(&mut self) -> u64 {
-        self.input_ref().gas_limit
+    fn get_gas_left(&mut self) -> Result<i64, VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_gas_left)?;
+
+        Ok(self.input_ref().gas_limit as i64)
     }
 
-    fn get_block_timestamp(&mut self) -> u64 {
-        self.get_current_block_info().block_timestamp
+    fn get_block_timestamp(&mut self) -> Result<i64, VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
+
+        Ok(self.get_current_block_info().block_timestamp as i64)
     }
 
-    fn get_block_nonce(&mut self) -> u64 {
-        self.get_current_block_info().block_nonce
+    fn get_block_nonce(&mut self) -> Result<i64, VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
+
+        Ok(self.get_current_block_info().block_nonce as i64)
     }
 
-    fn get_block_round(&mut self) -> u64 {
-        self.get_current_block_info().block_round
+    fn get_block_round(&mut self) -> Result<i64, VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
+
+        Ok(self.get_current_block_info().block_round as i64)
     }
 
-    fn get_block_epoch(&mut self) -> u64 {
-        self.get_current_block_info().block_epoch
+    fn get_block_epoch(&mut self) -> Result<i64, VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_epoch)?;
+
+        Ok(self.get_current_block_info().block_epoch as i64)
     }
 
     fn get_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
@@ -135,24 +151,38 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn get_prev_block_timestamp(&mut self) -> u64 {
-        self.get_previous_block_info().block_timestamp
+    fn get_prev_block_timestamp(&mut self) -> Result<i64, VMHooksError> {
+        //TODO: check opcode. Only prev_tx_hash available
+        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+
+        Ok(self.get_previous_block_info().block_timestamp as i64)
     }
 
-    fn get_prev_block_nonce(&mut self) -> u64 {
-        self.get_previous_block_info().block_nonce
+    fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksError> {
+        //TODO: check opcode. Only prev_tx_hash available
+        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+
+        Ok(self.get_previous_block_info().block_nonce as i64)
     }
 
-    fn get_prev_block_round(&mut self) -> u64 {
-        self.get_previous_block_info().block_round
+    fn get_prev_block_round(&mut self) -> Result<i64, VMHooksError> {
+        //TODO: check opcode. Only prev_tx_hash available
+        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+
+        Ok(self.get_previous_block_info().block_round as i64)
     }
 
-    fn get_prev_block_epoch(&mut self) -> u64 {
-        self.get_previous_block_info().block_epoch
+    fn get_prev_block_epoch(&mut self) -> Result<i64, VMHooksError> {
+        //TODO: check opcode. Only prev_tx_hash available
+        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+
+        Ok(self.get_previous_block_info().block_epoch as i64)
     }
 
     fn get_prev_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
-        //TODO: find exact gas cost
+        //TODO: check opcode. Only prev_tx_hash available
+        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+
         self.m_types_lock().mb_set(
             dest,
             self.get_previous_block_info().block_random_seed.to_vec(),
@@ -160,16 +190,21 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn get_current_esdt_nft_nonce(&mut self, address_bytes: &[u8], token_id_bytes: &[u8]) -> u64 {
+    fn get_current_esdt_nft_nonce(
+        &mut self,
+        address_bytes: &[u8],
+        token_id_bytes: &[u8],
+    ) -> Result<i64, VMHooksError> {
         assert!(
-            self.is_contract_address(address_bytes),
+            self.is_contract_address(address_bytes)?,
             "get_current_esdt_nft_nonce not yet implemented for accounts other than the contract itself"
         );
 
-        self.current_account_data()
+        Ok(self
+            .current_account_data()
             .esdt
             .get_by_identifier_or_default(token_id_bytes)
-            .last_nonce
+            .last_nonce as i64)
     }
 
     fn big_int_get_esdt_external_balance(
@@ -182,7 +217,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
         assert!(
-            self.is_contract_address(address_bytes),
+            self.is_contract_address(address_bytes)?,
             "get_esdt_balance not yet implemented for accounts other than the contract itself"
         );
 
@@ -271,8 +306,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
                         creator_handle,
                         royalties_handle,
                         uris_handle,
-                    );
-                    return Err(VMHooksError::ExecutionFailed);
+                    )?
                 }
             }
         }
@@ -287,7 +321,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             creator_handle,
             royalties_handle,
             uris_handle,
-        );
+        )?;
 
         Ok(())
     }
@@ -324,19 +358,36 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         address_handle: RawHandle,
         token_id_handle: RawHandle,
         _nonce: u64,
-    ) -> bool {
+    ) -> Result<bool, VMHooksError> {
+        self.use_gas(
+            2 * self
+                .gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_get_bytes,
+        )?;
+
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
         if let Some(account) = self.account_data(&address) {
             if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
-                return esdt_data.frozen;
+                return Ok(esdt_data.frozen);
             }
         }
 
-        false
+        // Might be better to return Err and check
+        Ok(false)
     }
 
-    fn get_esdt_local_roles_bits(&mut self, token_id_handle: RawHandle) -> u64 {
+    fn get_esdt_local_roles_bits(
+        &mut self,
+        token_id_handle: RawHandle,
+    ) -> Result<i64, VMHooksError> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_get_bytes,
+        )?;
+
         let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
         let account = self.current_account_data();
         let mut result = EsdtLocalRoleFlags::NONE;
@@ -345,7 +396,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
                 result |= EsdtLocalRole::from(role_name.as_slice()).to_flag();
             }
         }
-        result.bits()
+        Ok(result.bits() as i64)
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -361,7 +412,16 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         creator_handle: RawHandle,
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
-    ) {
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(2 * self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+        self.use_gas(
+            5 * self
+                .gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes,
+        )?;
+        self.use_gas(self.calculate_set_vec_of_bytes_gas_cost(instance.metadata.uri.len())?)?;
+
         let mut m_types = self.m_types_lock();
         m_types.bi_overwrite(value_handle, instance.balance.clone().into());
         if esdt_data.frozen {
@@ -385,6 +445,8 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             num_bigint::BigInt::from(instance.metadata.royalties),
         );
         m_types.mb_set_vec_of_bytes(uris_handle, instance.metadata.uri.clone());
+
+        Ok(())
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -398,8 +460,16 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         creator_handle: RawHandle,
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
-    ) {
+    ) -> Result<(), VMHooksError> {
         if ESDT_TOKEN_DATA_FUNC_RESETS_VALUES {
+            self.use_gas(3 * self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
+            self.use_gas(
+                5 * self
+                    .gas_schedule()
+                    .managed_buffer_api_cost
+                    .m_buffer_set_bytes,
+            )?;
+
             let mut m_types = self.m_types_lock();
             m_types.bi_overwrite(value_handle, BigInt::zero());
             m_types.mb_set(properties_handle, vec![0, 0]);
@@ -410,5 +480,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             m_types.bi_overwrite(royalties_handle, BigInt::zero());
             m_types.bi_overwrite(uris_handle, BigInt::zero());
         }
+
+        Ok(())
     }
 }
