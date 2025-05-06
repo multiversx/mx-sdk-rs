@@ -1026,7 +1026,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     ) -> Result<i32, VMHooksError> {
         bool_to_i32(
             self.handler
-                .managed_is_builtin_function(function_name_handle),
+                .managed_is_builtin_function(function_name_handle)?,
         )
     }
 
