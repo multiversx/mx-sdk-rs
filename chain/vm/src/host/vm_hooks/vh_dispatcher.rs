@@ -1436,7 +1436,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_int_log2(&mut self, op_handle: i32) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bi_log2(op_handle))
+        self.handler.bi_log2(op_handle)
     }
 
     fn big_int_abs(&mut self, destination_handle: i32, op_handle: i32) -> Result<(), VMHooksError> {
@@ -1448,11 +1448,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_int_sign(&mut self, op_handle: i32) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bi_sign(op_handle))
+        self.handler.bi_sign(op_handle)
     }
 
     fn big_int_cmp(&mut self, op1_handle: i32, op2_handle: i32) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bi_cmp(op1_handle, op2_handle))
+        self.handler.bi_cmp(op1_handle, op2_handle)
     }
 
     fn big_int_not(&mut self, destination_handle: i32, op_handle: i32) -> Result<(), VMHooksError> {
