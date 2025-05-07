@@ -304,7 +304,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn get_num_arguments(&mut self) -> Result<i32, VMHooksError> {
-        Ok(self.handler.get_num_arguments())
+        self.handler.get_num_arguments()
     }
 
     fn storage_store(
@@ -1835,11 +1835,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn small_int_get_unsigned_argument(&mut self, id: i32) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_argument_u64(id) as i64)
+        Ok(self.handler.get_argument_u64(id)? as i64)
     }
 
     fn small_int_get_signed_argument(&mut self, id: i32) -> Result<i64, VMHooksError> {
-        Ok(self.handler.get_argument_i64(id))
+        self.handler.get_argument_i64(id)
     }
 
     fn small_int_finish_unsigned(&mut self, value: i64) -> Result<(), VMHooksError> {
