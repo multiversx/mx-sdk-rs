@@ -1923,8 +1923,10 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         input_handle: i32,
         output_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler.sha256_managed(output_handle, input_handle);
-        Ok(RESULT_OK)
+        match self.handler.sha256_managed(output_handle, input_handle) {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn keccak256(
@@ -1941,8 +1943,10 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         input_handle: i32,
         output_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler.keccak256_managed(output_handle, input_handle);
-        Ok(RESULT_OK)
+        match self.handler.keccak256_managed(output_handle, input_handle) {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn ripemd160(
@@ -1997,9 +2001,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         message_handle: i32,
         sig_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .verify_ed25519_managed(key_handle, message_handle, sig_handle);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .verify_ed25519_managed(key_handle, message_handle, sig_handle)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn verify_custom_secp256k1(
