@@ -1527,7 +1527,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn mbuffer_new(&mut self) -> Result<i32, VMHooksError> {
-        Ok(self.handler.mb_new_empty())
+        self.handler.mb_new_empty()
     }
 
     fn mbuffer_new_from_bytes(
@@ -1537,12 +1537,12 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     ) -> Result<i32, VMHooksError> {
         unsafe {
             let bytes = self.handler.memory_load(data_offset, data_length);
-            Ok(self.handler.mb_new_from_bytes(&bytes))
+            self.handler.mb_new_from_bytes(&bytes)
         }
     }
 
     fn mbuffer_get_length(&mut self, m_buffer_handle: i32) -> Result<i32, VMHooksError> {
-        Ok(self.handler.mb_len(m_buffer_handle) as i32)
+        Ok(self.handler.mb_len(m_buffer_handle)? as i32)
     }
 
     fn mbuffer_get_bytes(
@@ -1550,7 +1550,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         m_buffer_handle: i32,
         result_offset: MemPtr,
     ) -> Result<i32, VMHooksError> {
-        let bytes = self.handler.mb_get_bytes(m_buffer_handle);
+        let bytes = self.handler.mb_get_bytes(m_buffer_handle)?;
         unsafe {
             self.handler.memory_store(result_offset, &bytes);
         }
@@ -1586,12 +1586,12 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         slice_length: i32,
         destination_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        Ok(self.handler.mb_copy_slice(
+        self.handler.mb_copy_slice(
             source_handle,
             starting_position as usize,
             slice_length as usize,
             destination_handle,
-        ))
+        )
     }
 
     fn mbuffer_eq(
@@ -1599,7 +1599,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         m_buffer_handle1: i32,
         m_buffer_handle2: i32,
     ) -> Result<i32, VMHooksError> {
-        Ok(self.handler.mb_eq(m_buffer_handle1, m_buffer_handle2))
+        self.handler.mb_eq(m_buffer_handle1, m_buffer_handle2)
     }
 
     fn mbuffer_set_bytes(
@@ -1610,9 +1610,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     ) -> Result<i32, VMHooksError> {
         unsafe {
             let bytes = self.handler.memory_load(data_offset, data_length);
-            self.handler.mb_set(m_buffer_handle, &bytes);
+            match self.handler.mb_set(m_buffer_handle, &bytes) {
+                Ok(_) => Ok(RESULT_OK),
+                Err(e) => Err(e),
+            }
         }
-        Ok(RESULT_OK)
     }
 
     fn mbuffer_set_byte_slice(
@@ -1624,9 +1626,8 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     ) -> Result<i32, VMHooksError> {
         unsafe {
             let bytes = self.handler.memory_load(data_offset, data_length);
-            Ok(self
-                .handler
-                .mb_set_slice(m_buffer_handle, starting_position as usize, &bytes))
+            self.handler
+                .mb_set_slice(m_buffer_handle, starting_position as usize, &bytes)
         }
     }
 
@@ -1635,8 +1636,10 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         accumulator_handle: i32,
         data_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler.mb_append(accumulator_handle, data_handle);
-        Ok(RESULT_OK)
+        match self.handler.mb_append(accumulator_handle, data_handle) {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_append_bytes(
@@ -1647,9 +1650,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     ) -> Result<i32, VMHooksError> {
         unsafe {
             let bytes = self.handler.memory_load(data_offset, data_length);
-            self.handler.mb_append_bytes(accumulator_handle, &bytes);
+            match self.handler.mb_append_bytes(accumulator_handle, &bytes) {
+                Ok(_) => Ok(RESULT_OK),
+                Err(e) => Err(e),
+            }
         }
-        Ok(RESULT_OK)
     }
 
     fn mbuffer_to_big_int_unsigned(

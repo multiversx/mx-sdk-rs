@@ -123,7 +123,7 @@ pub trait VMHooksManagedTypes:
         )?;
 
         let bytes = self.random_next_bytes(length);
-        self.mb_set(dest_handle, bytes.as_slice());
+        self.mb_set(dest_handle, bytes.as_slice())?;
 
         Ok(())
     }
