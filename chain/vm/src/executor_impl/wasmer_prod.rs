@@ -1,8 +1,39 @@
-mod vh_dispatcher_legacy;
-mod wasmer_prod_executor;
-mod wasmer_prod_instance;
-mod wasmer_prod_instance_state;
+use std::sync::{Arc, Mutex};
 
-pub use wasmer_prod_executor::WasmerProdExecutor;
-pub use wasmer_prod_instance::WasmerProdInstance;
-pub use wasmer_prod_instance_state::WasmerProdInstanceState;
+use multiversx_chain_vm_executor::{Executor, OpcodeCost, VMHooksLegacy, VMHooksLegacyAdapter};
+use multiversx_chain_vm_executor_wasmer::new_traits::{
+    WasmerProdExecutor, WasmerProdInstanceState, WasmerProdRuntimeRef,
+};
+
+use crate::host::{
+    runtime::RuntimeWeakRef,
+    vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
+};
+
+pub fn new_prod_executor(runtime_ref: RuntimeWeakRef) -> Box<dyn Executor + Send + Sync> {
+    Box::new(WasmerProdExecutor::new(Box::new(runtime_ref)))
+}
+
+impl VMHooksLegacyAdapter for VMHooksDispatcher<TxContextVMHooksHandler<WasmerProdInstanceState>> {
+    fn set_breakpoint_value(&self, value: multiversx_chain_vm_executor::BreakpointValue) {
+        self.handler
+            .instance_state_ref
+            .set_breakpoint_value_legacy(value);
+    }
+}
+
+impl WasmerProdRuntimeRef for RuntimeWeakRef {
+    fn vm_hooks(&self, instance_state: WasmerProdInstanceState) -> Box<dyn VMHooksLegacy> {
+        let runtime = self.upgrade();
+        let tx_context_ref = runtime.get_executor_context();
+        let vh_handler = TxContextVMHooksHandler::new(tx_context_ref, instance_state);
+        Box::new(VMHooksDispatcher::new(vh_handler))
+    }
+
+    fn opcode_cost(&self) -> std::sync::Arc<std::sync::Mutex<OpcodeCost>> {
+        let runtime = self.upgrade();
+        Arc::new(Mutex::new(
+            runtime.vm_ref.gas_schedule.wasm_opcode_cost.clone(),
+        ))
+    }
+}
