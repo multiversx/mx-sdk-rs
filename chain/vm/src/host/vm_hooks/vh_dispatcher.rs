@@ -1730,9 +1730,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         key_handle: i32,
         source_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .storage_store_managed_buffer_raw(key_handle, source_handle);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .storage_store_managed_buffer_raw(key_handle, source_handle)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_storage_load(
@@ -1740,9 +1744,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         key_handle: i32,
         destination_handle: i32,
     ) -> Result<i32, VMHooksError> {
-        self.handler
-            .storage_load_managed_buffer_raw(key_handle, destination_handle);
-        Ok(RESULT_OK)
+        match self
+            .handler
+            .storage_load_managed_buffer_raw(key_handle, destination_handle)
+        {
+            Ok(_) => Ok(RESULT_OK),
+            Err(e) => Err(e),
+        }
     }
 
     fn mbuffer_storage_load_from_address(

@@ -8,9 +8,17 @@ use crate::{
 use super::VMHooksManagedTypes;
 
 pub trait VMHooksStorageRead: VMHooksHandlerSource {
-    fn storage_load_managed_buffer_raw(&mut self, key_handle: RawHandle, dest: RawHandle) {
+    fn storage_load_managed_buffer_raw(
+        &mut self,
+        key_handle: RawHandle,
+        dest: RawHandle,
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.storage_load)?;
+
         let value = self.storage_read(self.m_types_lock().mb_get(key_handle));
         self.m_types_lock().mb_set(dest, value);
+
+        Ok(())
     }
 
     fn storage_load_from_address(
@@ -19,17 +27,7 @@ pub trait VMHooksStorageRead: VMHooksHandlerSource {
         key_handle: RawHandle,
         dest: RawHandle,
     ) -> Result<(), VMHooksError> {
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_get_bytes,
-        )?;
         self.use_gas(self.gas_schedule().base_ops_api_cost.storage_load)?;
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_set_bytes,
-        )?;
 
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let value = self.storage_read_any_address(&address, self.m_types_lock().mb_get(key_handle));
@@ -40,11 +38,19 @@ pub trait VMHooksStorageRead: VMHooksHandlerSource {
 }
 
 pub trait VMHooksStorageWrite: VMHooksHandlerSource + VMHooksManagedTypes {
-    fn storage_store_managed_buffer_raw(&mut self, key_handle: RawHandle, value_handle: RawHandle) {
+    fn storage_store_managed_buffer_raw(
+        &mut self,
+        key_handle: RawHandle,
+        value_handle: RawHandle,
+    ) -> Result<(), VMHooksError> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.storage_store)?;
+
         let types = self.m_types_lock();
         let key_bytes = types.mb_get_owned(key_handle);
         let value_bytes = types.mb_get_owned(value_handle);
         std::mem::drop(types);
         self.storage_write(&key_bytes, &value_bytes);
+
+        Ok(())
     }
 }
