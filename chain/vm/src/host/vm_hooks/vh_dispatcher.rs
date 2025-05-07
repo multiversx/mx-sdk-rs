@@ -1036,9 +1036,8 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         fractional_part: i32,
         exponent: i32,
     ) -> Result<i32, VMHooksError> {
-        Ok(self
-            .handler
-            .bf_from_parts(integral_part, fractional_part, exponent))
+        self.handler
+            .bf_from_parts(integral_part, fractional_part, exponent)
     }
 
     fn big_float_new_from_frac(
@@ -1046,7 +1045,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         numerator: i64,
         denominator: i64,
     ) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bf_from_frac(numerator, denominator))
+        self.handler.bf_from_frac(numerator, denominator)
     }
 
     fn big_float_new_from_sci(
@@ -1054,7 +1053,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         significand: i64,
         exponent: i64,
     ) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bf_from_sci(significand, exponent))
+        self.handler.bf_from_sci(significand, exponent)
     }
 
     fn big_float_add(
@@ -1114,7 +1113,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_float_cmp(&mut self, op1_handle: i32, op2_handle: i32) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bf_cmp(op1_handle, op2_handle))
+        self.handler.bf_cmp(op1_handle, op2_handle)
     }
 
     fn big_float_abs(
@@ -1126,7 +1125,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_float_sign(&mut self, op_handle: i32) -> Result<i32, VMHooksError> {
-        Ok(self.handler.bf_sign(op_handle))
+        self.handler.bf_sign(op_handle)
     }
 
     fn big_float_sqrt(
@@ -1179,7 +1178,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_float_is_int(&mut self, op_handle: i32) -> Result<i32, VMHooksError> {
-        bool_to_i32(self.handler.bf_is_bi(op_handle))
+        bool_to_i32(self.handler.bf_is_bi(op_handle)?)
     }
 
     fn big_float_set_big_int(

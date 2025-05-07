@@ -13,18 +13,14 @@ use num_traits::{ToPrimitive, Zero};
 use std::convert::TryInto;
 
 macro_rules! binary_op_method {
-    ($method_name:ident, $rust_op_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
         fn $method_name(
             &mut self,
             dest: RawHandle,
             x: RawHandle,
             y: RawHandle,
         ) -> Result<(), VMHooksError> {
-            self.use_gas(2 * self.gas_schedule().big_float_api_cost.big_float_get_const)?;
-            //TODO: check if it's bigint or i64
-            self.use_gas(self.gas_schedule().big_float_api_cost.big_float_set_big_int)?;
-            // TODO: add big_float_ to rust_op_name
-            // self.use_gas(self.gas_schedule().big_float_api_cost.big_float_$rust_op_name)?;
+            self.use_gas(self.gas_schedule().big_float_api_cost.$opcode_name)?;
 
             let bf_x = self.m_types_lock().bf_get_f64(x);
             let bf_y = self.m_types_lock().bf_get_f64(y);
@@ -37,12 +33,9 @@ macro_rules! binary_op_method {
 }
 
 macro_rules! unary_op_method {
-    ($method_name:ident, $rust_op_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
         fn $method_name(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
-            self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
-            self.use_gas(self.gas_schedule().big_float_api_cost.big_float_set_big_int)?;
-            // TODO: add big_float_ to rust_op_name
-            // self.use_gas(self.gas_schedule().big_float_api_cost.big_float_$rust_op_name)?;
+            self.use_gas(self.gas_schedule().big_float_api_cost.$opcode_name)?;
 
             let bf_x = self.m_types_lock().bf_get_f64(x);
             let result = bf_x.$rust_op_name();
@@ -53,12 +46,9 @@ macro_rules! unary_op_method {
     };
 }
 macro_rules! unary_op_method_big_int_handle {
-    ($method_name:ident, $rust_op_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
         fn $method_name(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
-            self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
-            self.use_gas(self.gas_schedule().big_float_api_cost.big_float_set_big_int)?;
-            // TODO: add big_float_ to rust_op_name
-            // self.use_gas(self.gas_schedule().big_float_api_cost.big_float_$rust_op_name)?;
+            self.use_gas(self.gas_schedule().big_float_api_cost.$opcode_name)?;
 
             let bf_x = self.m_types_lock().bf_get_f64(x);
             let result = bf_x.$rust_op_name();
@@ -76,10 +66,16 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         integral_part: i32,
         fractional_part: i32,
         exponent: i32,
-    ) -> RawHandle {
+    ) -> Result<RawHandle, VMHooksError> {
         if exponent > 0 {
-            self.vm_error_legacy(vm_err_msg::EXPONENT_IS_POSITIVE);
+            self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE)?;
         }
+
+        self.use_gas(
+            self.gas_schedule()
+                .big_float_api_cost
+                .big_float_new_from_parts,
+        )?;
 
         let exponent_multiplier = (10.0_f64).powi(exponent);
         let fractional_part = f64::from(fractional_part) * exponent_multiplier;
@@ -91,13 +87,22 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         }
 
         let mut managed_types = self.m_types_lock();
-        managed_types.big_float_map.insert_new_handle_raw(value)
+
+        Ok(managed_types.big_float_map.insert_new_handle_raw(value))
     }
 
-    fn bf_from_frac(&mut self, numerator: i64, denominator: i64) -> RawHandle {
+    fn bf_from_frac(
+        &mut self,
+        numerator: i64,
+        denominator: i64,
+    ) -> Result<RawHandle, VMHooksError> {
         if denominator == 0 {
-            self.vm_error_legacy(vm_err_msg::DIVISION_BY_0);
+            self.vm_error(vm_err_msg::DIVISION_BY_0)?;
         }
+
+        //TODO: check exact gas cost, opcode not present
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new)?;
+
         let value = if let (Some(f_numerator), Some(f_denominator)) =
             (numerator.to_f64(), denominator.to_f64())
         {
@@ -107,13 +112,15 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         };
 
         let mut managed_types = self.m_types_lock();
-        managed_types.big_float_map.insert_new_handle_raw(value)
+        Ok(managed_types.big_float_map.insert_new_handle_raw(value))
     }
 
-    fn bf_from_sci(&mut self, significand: i64, exponent: i64) -> RawHandle {
+    fn bf_from_sci(&mut self, significand: i64, exponent: i64) -> Result<RawHandle, VMHooksError> {
         if exponent > 0 {
-            self.vm_error_legacy(vm_err_msg::EXPONENT_IS_POSITIVE);
+            self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE)?;
         }
+        //TODO: check exact gas cost, opcode not present
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new)?;
 
         let value = if let Some(f_significand) = significand.to_f64() {
             let exponent_multiplier = (10.0_f64).powi(exponent.try_into().unwrap());
@@ -123,53 +130,56 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         };
 
         let mut managed_types = self.m_types_lock();
-        managed_types.big_float_map.insert_new_handle_raw(value)
+        Ok(managed_types.big_float_map.insert_new_handle_raw(value))
     }
 
-    binary_op_method!(bf_add, add);
-    binary_op_method!(bf_sub, sub);
-    binary_op_method!(bf_mul, mul);
-    binary_op_method!(bf_div, div);
+    binary_op_method!(bf_add, add, big_float_add);
+    binary_op_method!(bf_sub, sub, big_float_sub);
+    binary_op_method!(bf_mul, mul, big_float_mul);
+    binary_op_method!(bf_div, div, big_float_div);
 
-    unary_op_method!(bf_abs, abs);
-    unary_op_method!(bf_neg, neg);
+    unary_op_method!(bf_abs, abs, big_float_abs);
+    unary_op_method!(bf_neg, neg, big_float_neg);
 
-    fn bf_cmp(&mut self, x: RawHandle, y: RawHandle) -> i32 {
+    fn bf_cmp(&mut self, x: RawHandle, y: RawHandle) -> Result<i32, VMHooksError> {
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_cmp)?;
+
         let bf_x = self.m_types_lock().bf_get_f64(x);
         let bf_y = self.m_types_lock().bf_get_f64(y);
         let order_opt = bf_x.partial_cmp(&bf_y);
         match order_opt {
-            Some(Ordering::Less) => -1,
-            Some(Ordering::Equal) => 0,
-            Some(Ordering::Greater) => 1,
+            Some(Ordering::Less) => Ok(-1),
+            Some(Ordering::Equal) => Ok(0),
+            Some(Ordering::Greater) => Ok(1),
             None => {
-                self.vm_error_legacy(vm_err_msg::CANNOT_COMPARE_VALUES);
-                -2
+                self.vm_error(vm_err_msg::CANNOT_COMPARE_VALUES)?;
+                Ok(-2)
             },
         }
     }
 
-    fn bf_sign(&mut self, x: RawHandle) -> i32 {
+    fn bf_sign(&mut self, x: RawHandle) -> Result<i32, VMHooksError> {
+        //TODO: check exact gas cost, opcode not present
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
+
         let bf = self.m_types_lock().bf_get_f64(x);
         if bf.is_zero() {
-            return 0;
+            return Ok(0);
         }
 
         if !bf.is_normal() {
-            self.vm_error_legacy(vm_err_msg::NUMBER_IS_NOT_NORMAL)
+            self.vm_error(vm_err_msg::NUMBER_IS_NOT_NORMAL)?;
         }
 
         if bf.is_sign_positive() {
-            1
+            Ok(1)
         } else {
-            -1
+            Ok(-1)
         }
     }
 
     fn bf_clone(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
-        //TODO: check if it's bigint or i64
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_set_int_64)?;
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_clone)?;
 
         let value = self.m_types_lock().bf_get_f64(x);
         self.m_types_lock().bf_overwrite(dest, value);
@@ -178,9 +188,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
     }
 
     fn bf_sqrt(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
-        //TODO: check if it's i64 or bigint
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_set_int_64)?;
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_sqrt)?;
 
         let bf_x = self.m_types_lock().bf_get_f64(x);
         if bf_x < 0f64 {
@@ -193,9 +201,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
     }
 
     fn bf_pow(&mut self, dest: RawHandle, x: RawHandle, exp: i32) -> Result<(), VMHooksError> {
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
-        //TODO: check if it's i64 or bigint
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_set_big_int)?;
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_pow)?;
 
         let value = self.m_types_lock().bf_get_f64(x);
         self.m_types_lock().bf_overwrite(dest, value.powi(exp));
@@ -203,15 +209,18 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         Ok(())
     }
 
-    unary_op_method_big_int_handle!(bf_floor, floor);
-    unary_op_method_big_int_handle!(bf_ceil, ceil);
-    unary_op_method_big_int_handle!(bf_trunc, trunc);
+    unary_op_method_big_int_handle!(bf_floor, floor, big_float_floor);
+    unary_op_method_big_int_handle!(bf_ceil, ceil, big_float_ceil);
+    unary_op_method_big_int_handle!(bf_trunc, trunc, big_float_truncate);
 
-    fn bf_is_bi(&self, x: RawHandle) -> bool {
+    fn bf_is_bi(&mut self, x: RawHandle) -> Result<bool, VMHooksError> {
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_is_int)?;
+
         let bf_x = self.m_types_lock().bf_get_f64(x);
         let trunc_x = bf_x.trunc();
         let float_trunc_x = trunc_x.to_f64().unwrap();
-        bf_x == float_trunc_x
+
+        Ok(bf_x == float_trunc_x)
     }
 
     fn bf_set_i64(&mut self, dest: RawHandle, value: i64) -> Result<(), VMHooksError> {
@@ -233,7 +242,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
     }
 
     fn bf_get_const_pi(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_set_int_64)?;
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
 
         self.m_types_lock().bf_overwrite(dest, std::f64::consts::PI);
 
@@ -241,7 +250,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
     }
 
     fn bf_get_const_e(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_set_int_64)?;
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
 
         self.m_types_lock().bf_overwrite(dest, std::f64::consts::E);
 
