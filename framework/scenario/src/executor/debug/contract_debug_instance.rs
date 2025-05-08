@@ -4,7 +4,7 @@ use multiversx_chain_vm::host::{
     context::{TxContextRef, TxFunctionName, TxPanic},
     runtime::RuntimeInstanceCall,
 };
-use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, InstanceCallError};
+use multiversx_chain_vm_executor::{ExecutorError, Instance, InstanceCallError};
 use multiversx_sc::chain_core::types::ReturnCode;
 
 use super::{
@@ -133,16 +133,8 @@ impl Instance for ContractDebugInstance {
         panic!("ContractDebugInstance get_exported_function_names not yet supported")
     }
 
-    fn set_points_limit(&self, _limit: u64) -> Result<(), ExecutorError> {
-        Ok(())
-    }
-
     fn get_points_used(&self) -> Result<u64, ExecutorError> {
         Ok(0)
-    }
-
-    fn get_breakpoint_value(&self) -> Result<BreakpointValue, ExecutorError> {
-        Ok(BreakpointValue::None)
     }
 
     fn reset(&self) -> Result<(), ExecutorError> {

@@ -1,4 +1,5 @@
 mod vh_dispatcher;
+pub mod vh_early_exit;
 mod vh_handler;
 mod vh_source;
 mod vh_tx_context;
