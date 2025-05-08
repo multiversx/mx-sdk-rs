@@ -1,6 +1,8 @@
 use std::sync::{Arc, Mutex};
 
-use multiversx_chain_vm_executor::{Executor, OpcodeCost, VMHooksLegacy, VMHooksLegacyAdapter};
+use multiversx_chain_vm_executor::{
+    Executor, OpcodeCost, VMHooksEarlyExit, VMHooksLegacy, VMHooksLegacyAdapter,
+};
 use multiversx_chain_vm_executor_wasmer::new_traits::{
     WasmerProdExecutor, WasmerProdInstanceState, WasmerProdRuntimeRef,
 };
@@ -15,10 +17,8 @@ pub fn new_prod_executor(runtime_ref: RuntimeWeakRef) -> Box<dyn Executor + Send
 }
 
 impl VMHooksLegacyAdapter for VMHooksDispatcher<TxContextVMHooksHandler<WasmerProdInstanceState>> {
-    fn set_breakpoint_value(&self, value: multiversx_chain_vm_executor::BreakpointValue) {
-        self.handler
-            .instance_state_ref
-            .set_breakpoint_value_legacy(value);
+    fn set_early_exit(&self, early_exit: VMHooksEarlyExit) {
+        self.handler.instance_state_ref.set_early_exit(early_exit);
     }
 }
 
