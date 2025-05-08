@@ -1,5 +1,5 @@
 use multiversx_chain_vm_executor::{
-    BreakpointValue, ExecutorError, InstanceState, MemLength, MemPtr,
+    BreakpointValue, ExecutorError, InstanceState, MemLength, MemPtr, VMHooksEarlyExit,
 };
 
 #[derive(Clone, Debug)]
@@ -36,6 +36,10 @@ impl ContractDebugInstanceState {
 
     pub fn main_memory_mut_ptr(bytes: &mut [u8]) -> (MemPtr, MemLength) {
         (bytes.as_ptr() as MemPtr, bytes.len() as MemLength)
+    }
+
+    pub fn early_exit_panic(early_exit: VMHooksEarlyExit) -> ! {
+        std::panic::panic_any(early_exit)
     }
 
     pub fn breakpoint_panic(breakpoint_value: BreakpointValue) -> ! {

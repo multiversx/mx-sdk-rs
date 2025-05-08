@@ -1,5 +1,5 @@
 use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::{BreakpointValue, InstanceCallError};
+use multiversx_chain_vm_executor::{BreakpointValue, InstanceCallError, VMHooksEarlyExit};
 
 use crate::{
     host::context::{GasUsed, TxFunctionName, TxResult},
@@ -67,12 +67,22 @@ fn instance_call_error_result(call_error: InstanceCallError) -> Option<TxResult>
     match call_error {
         InstanceCallError::FunctionNotFound => Some(TxResult::from_function_not_found()),
         InstanceCallError::RuntimeError(error) => Some(TxResult::from_vm_error(error.to_string())),
-        InstanceCallError::VMHooksError(breakpoint_value) => {
-            // TODO: change type
-            breakpoint_error_result(breakpoint_value, "VMHooksError".to_owned())
+        InstanceCallError::VMHooksEarlyExit(vm_hooks_early_exit) => {
+            vm_hooks_early_exit_result(vm_hooks_early_exit)
         },
         InstanceCallError::Breakpoint(breakpoint_value) => {
             breakpoint_error_result(breakpoint_value, "breakpoint".to_owned())
         },
+    }
+}
+
+fn vm_hooks_early_exit_result(vm_hooks_early_exit: VMHooksEarlyExit) -> Option<TxResult> {
+    if vm_hooks_early_exit.code == BreakpointValue::AsyncCall.as_u64() {
+        None
+    } else {
+        Some(TxResult::from_error(
+            ReturnCode::from_u64(vm_hooks_early_exit.code).expect("invalid return code"),
+            vm_hooks_early_exit.message.into_owned(),
+        ))
     }
 }
