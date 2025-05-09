@@ -31,6 +31,8 @@ use crate::{
     vm_err_msg,
 };
 
+use super::vh_early_exit::early_exit_async_call;
+
 pub struct TxContextVMHooksHandler<S: InstanceState> {
     tx_context_ref: TxContextRef,
     pub(crate) instance_state_ref: S,
@@ -175,14 +177,13 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> ! {
+    ) -> Result<(), VMHooksEarlyExit> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.result_lock();
         tx_result.all_calls.push(async_call_data.clone());
         tx_result.pending_calls.async_call = Some(async_call_data);
-        drop(tx_result); // this avoid to poison the mutex
-        std::panic::panic_any(BreakpointValue::AsyncCall);
+        Err(early_exit_async_call())
     }
 
     fn perform_execute_on_dest_context(
@@ -191,7 +192,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
@@ -203,11 +204,13 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         );
 
         if tx_result.result_status.is_success() {
-            self.sync_call_post_processing(tx_result, blockchain_updates)
+            Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
         } else {
             // also kill current execution
-            self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
-            Vec::new()
+            Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
+                .with_message(tx_result.result_message.clone()))
+            // self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
+            // Vec::new()
         }
     }
 

@@ -764,7 +764,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         arguments_handle: i32,
     ) -> Result<(), VMHooksEarlyExit> {
         self.handler
-            .async_call_raw(dest_handle, value_handle, function_handle, arguments_handle);
+            .async_call_raw(dest_handle, value_handle, function_handle, arguments_handle)
     }
 
     fn managed_create_async_call(
@@ -794,7 +794,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
                 gas as u64,
                 extra_gas_for_callback as u64,
                 callback_closure_handle,
-            );
+            )?;
         }
         Ok(RESULT_OK)
     }
@@ -874,7 +874,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
             arguments_handle,
             result_address_handle,
             result_handle,
-        );
+        )?;
         Ok(RESULT_OK)
     }
 
@@ -896,7 +896,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
             arguments_handle,
             result_address_handle,
             result_handle,
-        );
+        )?;
         Ok(RESULT_OK)
     }
 
@@ -914,7 +914,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
             function_handle,
             arguments_handle,
             result_handle,
-        );
+        )?;
         Ok(RESULT_OK)
     }
 
@@ -946,7 +946,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
             function_handle,
             arguments_handle,
             result_handle,
-        );
+        )?;
         Ok(RESULT_OK)
     }
 
@@ -964,7 +964,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
             gas_limit as u64,
             function_handle,
             arguments_handle,
-        );
+        )?;
         Ok(RESULT_OK)
     }
 

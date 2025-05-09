@@ -145,7 +145,7 @@ pub trait VMHooksHandlerSource: Debug {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
-    ) -> !;
+    ) -> Result<(), VMHooksEarlyExit>;
 
     fn perform_execute_on_dest_context(
         &mut self,
@@ -153,7 +153,7 @@ pub trait VMHooksHandlerSource: Debug {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>>;
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit>;
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,

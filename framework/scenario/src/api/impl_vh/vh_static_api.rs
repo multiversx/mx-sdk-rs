@@ -124,7 +124,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> ! {
+    ) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 
@@ -134,7 +134,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 

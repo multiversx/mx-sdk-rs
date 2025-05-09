@@ -2,7 +2,10 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{BreakpointValue, InstanceCallError, VMHooksEarlyExit};
 
 use crate::{
-    host::context::{GasUsed, TxFunctionName, TxResult},
+    host::{
+        context::{GasUsed, TxFunctionName, TxResult},
+        vm_hooks::vh_early_exit::ASYNC_CALL_EARLY_EXIT_CODE,
+    },
     vm_err_msg,
 };
 
@@ -77,7 +80,7 @@ fn instance_call_error_result(call_error: InstanceCallError) -> Option<TxResult>
 }
 
 fn vm_hooks_early_exit_result(vm_hooks_early_exit: VMHooksEarlyExit) -> Option<TxResult> {
-    if vm_hooks_early_exit.code == BreakpointValue::AsyncCall.as_u64() {
+    if vm_hooks_early_exit.code == ASYNC_CALL_EARLY_EXIT_CODE {
         None
     } else {
         Some(TxResult::from_error(
