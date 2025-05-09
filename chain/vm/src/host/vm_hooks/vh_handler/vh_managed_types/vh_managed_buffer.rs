@@ -73,7 +73,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
             self.m_types_lock()
                 .mb_get_slice(source_handle, starting_position, slice_length)
         {
-            assert_eq!(bytes.len(), slice_length as usize);
+            assert_eq!(bytes.len(), slice_length);
             unsafe {
                 self.memory_store(result_offset, &bytes);
             }
