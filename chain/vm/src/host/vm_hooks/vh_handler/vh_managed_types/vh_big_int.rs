@@ -1,7 +1,7 @@
 use crate::{
     host::{
         context::big_int_to_i64,
-        vm_hooks::{VMHooksHandlerSource, VMHooksSignalError},
+        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource, VMHooksSignalError},
     },
     types::RawHandle,
     vm_err_msg,
@@ -15,14 +15,14 @@ use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
 
 macro_rules! binary_op_method {
-    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
         fn $method_name(
             &mut self,
             dest: RawHandle,
             x: RawHandle,
             y: RawHandle,
         ) -> Result<(), VMHooksError> {
-            self.use_gas(self.gas_schedule().big_int_api_cost.$opcode_name)?;
+            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
 
             let bi_x = self.m_types_lock().bi_get(x);
             let bi_y = self.m_types_lock().bi_get(y);
@@ -35,14 +35,14 @@ macro_rules! binary_op_method {
 }
 
 macro_rules! binary_bitwise_op_method {
-    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
         fn $method_name(
             &mut self,
             dest: RawHandle,
             x: RawHandle,
             y: RawHandle,
         ) -> Result<(), VMHooksError> {
-            self.use_gas(self.gas_schedule().big_int_api_cost.$opcode_name)?;
+            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
 
             let bi_x = self.m_types_lock().bi_get(x);
             if bi_x.sign() == num_bigint::Sign::Minus {
@@ -61,9 +61,9 @@ macro_rules! binary_bitwise_op_method {
 }
 
 macro_rules! unary_op_method {
-    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
         fn $method_name(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
-            self.use_gas(self.gas_schedule().big_int_api_cost.$opcode_name)?;
+            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
 
             let bi_x = self.m_types_lock().bi_get(x);
             let result = bi_x.$rust_op_name();
@@ -172,11 +172,9 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
 
         match opt_i64 {
             Some(value) => Ok(value),
-            None => {
-                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
-                // unreachable if vm_error returns Err
-                Err(VMHooksError::ExecutionFailed)
-            },
+            None => Err(early_exit_vm_error(
+                vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
+            )),
         }
     }
 

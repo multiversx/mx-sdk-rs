@@ -423,7 +423,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     fn delete_from_return_data(&mut self, index: usize) -> Result<(), VMHooksError> {
         let mut tx_result = self.result_lock();
         if index > tx_result.result_values.len() {
-            return Err(VMHooksError::ExecutionFailed);
+            return Ok(());
         }
 
         let _ = tx_result.result_values.remove(index);

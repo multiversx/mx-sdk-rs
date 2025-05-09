@@ -12,6 +12,8 @@ use crate::{
     types::{VMAddress, VMCodeMetadata, H256},
 };
 
+use super::vh_early_exit::early_exit_out_of_gas;
+
 /// Abstracts away the borrowing of a managed types structure.
 pub trait VMHooksHandlerSource: Debug {
     /// Loads a slice of memory from the instance.
@@ -102,7 +104,7 @@ pub trait VMHooksHandlerSource: Debug {
     ) -> Result<u64, VMHooksError> {
         let transfers_len_u64 = match u64::try_from(transfers_len) {
             Ok(len) => len,
-            Err(_) => return Err(VMHooksError::OutOfGas),
+            Err(_) => return Err(early_exit_out_of_gas()),
         };
 
         let total_gas = self
@@ -125,7 +127,7 @@ pub trait VMHooksHandlerSource: Debug {
     fn calculate_set_vec_of_bytes_gas_cost(&self, len: usize) -> Result<u64, VMHooksError> {
         let len_u64 = match u64::try_from(len) {
             Ok(len) => len,
-            Err(_) => return Err(VMHooksError::OutOfGas),
+            Err(_) => return Err(early_exit_out_of_gas()),
         };
 
         let total_gas = len_u64 * self.gas_schedule().managed_buffer_api_cost.m_buffer_new

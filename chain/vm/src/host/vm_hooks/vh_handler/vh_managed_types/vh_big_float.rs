@@ -13,14 +13,14 @@ use num_traits::{ToPrimitive, Zero};
 use std::convert::TryInto;
 
 macro_rules! binary_op_method {
-    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
         fn $method_name(
             &mut self,
             dest: RawHandle,
             x: RawHandle,
             y: RawHandle,
         ) -> Result<(), VMHooksError> {
-            self.use_gas(self.gas_schedule().big_float_api_cost.$opcode_name)?;
+            self.use_gas(self.gas_schedule().big_float_api_cost.$gas_cost_field)?;
 
             let bf_x = self.m_types_lock().bf_get_f64(x);
             let bf_y = self.m_types_lock().bf_get_f64(y);
@@ -33,9 +33,9 @@ macro_rules! binary_op_method {
 }
 
 macro_rules! unary_op_method {
-    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
         fn $method_name(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
-            self.use_gas(self.gas_schedule().big_float_api_cost.$opcode_name)?;
+            self.use_gas(self.gas_schedule().big_float_api_cost.$gas_cost_field)?;
 
             let bf_x = self.m_types_lock().bf_get_f64(x);
             let result = bf_x.$rust_op_name();
@@ -46,9 +46,9 @@ macro_rules! unary_op_method {
     };
 }
 macro_rules! unary_op_method_big_int_handle {
-    ($method_name:ident, $rust_op_name:ident, $opcode_name:ident) => {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
         fn $method_name(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
-            self.use_gas(self.gas_schedule().big_float_api_cost.$opcode_name)?;
+            self.use_gas(self.gas_schedule().big_float_api_cost.$gas_cost_field)?;
 
             let bf_x = self.m_types_lock().bf_get_f64(x);
             let result = bf_x.$rust_op_name();

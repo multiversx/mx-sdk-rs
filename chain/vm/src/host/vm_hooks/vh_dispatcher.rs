@@ -2,10 +2,10 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooks, VMHooksError};
 
 use super::VMHooksHandler;
 
-const RESULT_TRUE: i32 = 1;
-const RESULT_FALSE: i32 = 0;
-const RESULT_OK: i32 = 0;
-const RESULT_ERROR: i32 = 1;
+pub(super) const RESULT_TRUE: i32 = 1;
+pub(super) const RESULT_FALSE: i32 = 0;
+pub(super) const RESULT_OK: i32 = 0;
+pub(super) const RESULT_ERROR: i32 = 1;
 
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
@@ -1564,19 +1564,12 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         slice_length: i32,
         result_offset: MemPtr,
     ) -> Result<i32, VMHooksError> {
-        if let Ok(bytes) = self.handler.mb_get_slice(
+        self.handler.mb_get_slice(
             source_handle,
             starting_position as usize,
             slice_length as usize,
-        ) {
-            assert_eq!(bytes.len(), slice_length as usize);
-            unsafe {
-                self.handler.memory_store(result_offset, &bytes);
-            }
-            Ok(RESULT_OK)
-        } else {
-            Ok(RESULT_ERROR)
-        }
+            result_offset,
+        )
     }
 
     fn mbuffer_copy_byte_slice(

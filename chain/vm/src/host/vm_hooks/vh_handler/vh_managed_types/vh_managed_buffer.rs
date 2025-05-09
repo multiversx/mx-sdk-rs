@@ -1,5 +1,6 @@
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::{MemPtr, VMHooksError};
 
+use crate::host::vm_hooks::vh_dispatcher::{RESULT_ERROR, RESULT_OK};
 // use crate::host::context::InvalidSliceError;
 use crate::types::RawHandle;
 
@@ -59,21 +60,26 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         &mut self,
         source_handle: RawHandle,
         starting_position: usize,
-        slice_len: usize,
-    ) -> Result<Vec<u8>, VMHooksError> {
+        slice_length: usize,
+        result_offset: MemPtr,
+    ) -> Result<i32, VMHooksError> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
                 .m_buffer_get_byte_slice,
         )?;
 
-        //TODO: give a more accurate error. From InvalidSliceError to VMHooksError
-        match self
-            .m_types_lock()
-            .mb_get_slice(source_handle, starting_position, slice_len)
+        if let Ok(bytes) =
+            self.m_types_lock()
+                .mb_get_slice(source_handle, starting_position, slice_length)
         {
-            Ok(slice) => Ok(slice),
-            Err(_) => Err(VMHooksError::ExecutionFailed),
+            assert_eq!(bytes.len(), slice_length as usize);
+            unsafe {
+                self.memory_store(result_offset, &bytes);
+            }
+            Ok(RESULT_OK)
+        } else {
+            Ok(RESULT_ERROR)
         }
     }
 
@@ -95,9 +101,9 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
             .mb_get_slice(source_handle, starting_position, slice_len);
         if let Ok(slice) = result {
             self.m_types_lock().mb_set(dest_handle, slice);
-            Ok(0)
+            Ok(RESULT_OK)
         } else {
-            Ok(1)
+            Ok(RESULT_ERROR)
         }
     }
 
@@ -117,9 +123,9 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
             .m_types_lock()
             .mb_set_slice(dest_handle, starting_position, source_slice);
         if result.is_ok() {
-            Ok(0)
+            Ok(RESULT_OK)
         } else {
-            Ok(1)
+            Ok(RESULT_ERROR)
         }
     }
 
@@ -168,9 +174,9 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         let bytes1 = managed_types.mb_get(handle1);
         let bytes2 = managed_types.mb_get(handle2);
         if bytes1 == bytes2 {
-            Ok(1)
+            Ok(RESULT_ERROR)
         } else {
-            Ok(0)
+            Ok(RESULT_OK)
         }
     }
 
