@@ -40,9 +40,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             num_bigint::BigUint::zero(),
             ESDT_TRANSFER_FUNC_NAME.into(),
             args,
-        );
-
-        Ok(())
+        )
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -72,9 +70,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             num_bigint::BigUint::zero(),
             ESDT_NFT_TRANSFER_FUNC_NAME.into(),
             args,
-        );
-
-        Ok(())
+        )
     }
 
     fn perform_transfer_execute_multi(
@@ -105,9 +101,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             num_bigint::BigUint::zero(),
             ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
             args,
-        );
-
-        Ok(())
+        )
     }
 
     fn perform_upgrade_contract(
@@ -138,9 +132,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
-        self.perform_transfer_execute(recipient, egld_value, endpoint_name, arg_buffer);
-
-        Ok(())
+        self.perform_transfer_execute(recipient, egld_value, endpoint_name, arg_buffer)
     }
 
     fn multi_transfer_esdt_nft_execute(
@@ -274,7 +266,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         let (new_address, result) =
-            self.perform_deploy(egld_value, code, code_metadata, arg_buffer);
+            self.perform_deploy(egld_value, code, code_metadata, arg_buffer)?;
 
         self.m_types_lock()
             .mb_set(new_address_handle, new_address.to_vec());
@@ -306,7 +298,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         let (new_address, result) =
-            self.perform_deploy(egld_value, source_contract_code, code_metadata, arg_buffer);
+            self.perform_deploy(egld_value, source_contract_code, code_metadata, arg_buffer)?;
 
         self.m_types_lock()
             .mb_set(new_address_handle, new_address.to_vec());
@@ -422,7 +414,8 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
-        let result = self.perform_execute_on_dest_context_readonly(to, endpoint_name, arg_buffer);
+        let result =
+            self.perform_execute_on_dest_context_readonly(to, endpoint_name, arg_buffer)?;
 
         self.m_types_lock()
             .mb_set_vec_of_bytes(result_handle, result);

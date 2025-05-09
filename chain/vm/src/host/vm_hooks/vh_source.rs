@@ -160,7 +160,7 @@ pub trait VMHooksHandlerSource: Debug {
         to: VMAddress,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>>;
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit>;
 
     fn perform_deploy(
         &mut self,
@@ -168,7 +168,7 @@ pub trait VMHooksHandlerSource: Debug {
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> (VMAddress, Vec<Vec<u8>>);
+    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit>;
 
     fn perform_transfer_execute(
         &mut self,
@@ -176,5 +176,5 @@ pub trait VMHooksHandlerSource: Debug {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    );
+    ) -> Result<(), VMHooksEarlyExit>;
 }

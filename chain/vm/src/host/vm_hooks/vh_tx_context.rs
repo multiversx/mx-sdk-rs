@@ -219,7 +219,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         to: VMAddress,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         let async_call_data =
             self.create_async_call_data(to, BigUint::zero(), func_name, arguments);
         let mut tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
@@ -233,11 +233,13 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         );
 
         if tx_result.result_status.is_success() {
-            self.sync_call_post_processing(tx_result, blockchain_updates)
+            Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
         } else {
             // also kill current execution
-            self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
-            Vec::new()
+            // self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
+            // Vec::new()
+            Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
+                .with_message(tx_result.result_message.clone()))
         }
     }
 
@@ -247,7 +249,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> (VMAddress, Vec<Vec<u8>>) {
+    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
         let contract_address = self.current_address();
         let tx_hash = self.tx_hash();
         let tx_input = TxInput {
@@ -275,20 +277,17 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         );
 
         match tx_result.result_status {
-            ReturnCode::Success => (
+            ReturnCode::Success => Ok((
                 new_address,
                 self.sync_call_post_processing(tx_result, blockchain_updates),
-            ),
+            )),
             ReturnCode::ExecutionFailed => {
                 // TODO: not sure it's the right condition, it catches insufficient funds
-                self.vm_error_legacy(&tx_result.result_message);
-                (VMAddress::zero(), Vec::new())
+                Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+                    .with_message(tx_result.result_message.clone()))
             },
-            _ => {
-                self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
-
-                (VMAddress::zero(), Vec::new())
-            },
+            _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+                .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }
     }
 
@@ -298,7 +297,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) {
+    ) -> Result<(), VMHooksEarlyExit> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let mut tx_input = async_call_tx_input(&async_call_data, CallType::TransferExecute);
         if self.is_back_transfer(&tx_input) {
@@ -321,9 +320,24 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
                     .push(async_call_data);
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
+                Ok(())
             },
-            ReturnCode::ExecutionFailed => self.vm_error_legacy(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
-            _ => self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
+            // ReturnCode::ExecutionFailed => {
+            //     // TODO: not sure it's the right condition, it catches insufficient funds
+            //     Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+            //         .with_message(tx_result.result_message.clone()))
+            // },
+            // _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+            //     .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
+            ReturnCode::ExecutionFailed => {
+                // TODO: not sure it's the right condition, it catches insufficient funds
+                self.vm_error_legacy(&tx_result.result_message);
+                Ok(())
+            },
+            _ => {
+                self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
+                Ok(())
+            },
         }
     }
 }
