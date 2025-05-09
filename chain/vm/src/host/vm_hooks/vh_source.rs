@@ -1,7 +1,7 @@
 use std::{fmt::Debug, sync::MutexGuard};
 
 use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksError};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use crate::{
     blockchain::state::{AccountData, BlockInfo},
@@ -32,11 +32,15 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer>;
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError>;
+    fn halt_with_error(
+        &mut self,
+        status: ReturnCode,
+        message: &str,
+    ) -> Result<(), VMHooksEarlyExit>;
 
     fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str);
 
-    fn vm_error(&mut self, message: &str) -> Result<(), VMHooksError> {
+    fn vm_error(&mut self, message: &str) -> Result<(), VMHooksEarlyExit> {
         self.halt_with_error(ReturnCode::ExecutionFailed, message)
     }
 
@@ -46,7 +50,7 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn gas_schedule(&self) -> &GasSchedule;
 
-    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksError>;
+    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksEarlyExit>;
 
     fn input_ref(&self) -> &TxInput;
 
@@ -101,7 +105,7 @@ pub trait VMHooksHandlerSource: Debug {
     fn calculate_set_vec_of_esdt_transfers_gas_cost(
         &self,
         transfers_len: usize,
-    ) -> Result<u64, VMHooksError> {
+    ) -> Result<u64, VMHooksEarlyExit> {
         let transfers_len_u64 = match u64::try_from(transfers_len) {
             Ok(len) => len,
             Err(_) => return Err(early_exit_out_of_gas()),
@@ -124,7 +128,7 @@ pub trait VMHooksHandlerSource: Debug {
 
     /// Utility function used in set_vec_of_esdt_transfers (present in multiple interfaces)
     /// Will probably be moved in future commits.
-    fn calculate_set_vec_of_bytes_gas_cost(&self, len: usize) -> Result<u64, VMHooksError> {
+    fn calculate_set_vec_of_bytes_gas_cost(&self, len: usize) -> Result<u64, VMHooksEarlyExit> {
         let len_u64 = len as u64;
         let total_gas = len_u64 * self.gas_schedule().managed_buffer_api_cost.m_buffer_new
             + self

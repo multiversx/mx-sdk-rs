@@ -1,5 +1,5 @@
 use multiversx_chain_vm::{
-    executor::{BreakpointValue, VMHooks, VMHooksError},
+    executor::{BreakpointValue, VMHooks, VMHooksEarlyExit},
     host::context::{TxContextRef, TxPanic},
     host::vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
 };
@@ -19,7 +19,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         let instance = ContractDebugStack::static_peek();
         let tx_context_ref = instance.tx_context_ref.clone();
@@ -30,7 +30,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         let tx_context_ref = TxContextRef(handle.context.clone());
         let handler = TxContextVMHooksHandler::new(tx_context_ref, ContractDebugInstanceState);
@@ -40,7 +40,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         Self::with_vm_hooks_ctx_1(handle1, f)
@@ -53,7 +53,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         f: F,
     ) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         assert_handles_on_same_context(&handle1, &handle3);

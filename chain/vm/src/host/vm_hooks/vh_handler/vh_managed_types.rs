@@ -3,7 +3,7 @@ mod vh_big_int;
 mod vh_managed_buffer;
 mod vh_managed_map;
 
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 pub use vh_big_float::VMHooksBigFloat;
 pub use vh_big_int::VMHooksBigInt;
 pub use vh_managed_buffer::VMHooksManagedBuffer;
@@ -30,7 +30,7 @@ pub trait VMHooksManagedTypes:
         &mut self,
         buffer_handle: RawHandle,
         bi_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -48,7 +48,7 @@ pub trait VMHooksManagedTypes:
         &mut self,
         buffer_handle: RawHandle,
         bi_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -66,7 +66,7 @@ pub trait VMHooksManagedTypes:
         &mut self,
         buffer_handle: RawHandle,
         bi_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -83,7 +83,7 @@ pub trait VMHooksManagedTypes:
         &mut self,
         buffer_handle: RawHandle,
         bi_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -100,7 +100,7 @@ pub trait VMHooksManagedTypes:
         &mut self,
         bi_handle: RawHandle,
         str_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
         self.use_gas(
             self.gas_schedule()
@@ -115,7 +115,11 @@ pub trait VMHooksManagedTypes:
         Ok(())
     }
 
-    fn mb_set_random(&mut self, dest_handle: RawHandle, length: usize) -> Result<(), VMHooksError> {
+    fn mb_set_random(
+        &mut self,
+        dest_handle: RawHandle,
+        length: usize,
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost

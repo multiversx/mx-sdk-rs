@@ -4,7 +4,7 @@ use crate::{
     host::vm_hooks::VMHooksHandlerSource,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
 };
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_bigint::BigInt;
 use num_traits::Zero;
 
@@ -30,14 +30,14 @@ const VM_BUILTIN_FUNCTION_NAMES: [&str; 16] = [
 ];
 
 pub trait VMHooksBlockchain: VMHooksHandlerSource {
-    fn is_contract_address(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksError> {
+    fn is_contract_address(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
 
         let address = VMAddress::from_slice(address_bytes);
         Ok(&address == self.current_address())
     }
 
-    fn managed_caller(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
+    fn managed_caller(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -49,7 +49,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn managed_sc_address(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
+    fn managed_sc_address(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -61,7 +61,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn managed_owner_address(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
+    fn managed_owner_address(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -78,19 +78,23 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn get_shard_of_address(&mut self, address_bytes: &[u8]) -> Result<i32, VMHooksError> {
+    fn get_shard_of_address(&mut self, address_bytes: &[u8]) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_shard_of_address)?;
 
         Ok((address_bytes[address_bytes.len() - 1] % 3).into())
     }
 
-    fn is_smart_contract(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksError> {
+    fn is_smart_contract(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
 
         Ok(VMAddress::from_slice(address_bytes).is_smart_contract_address())
     }
 
-    fn load_balance(&mut self, address_bytes: &[u8], dest: RawHandle) -> Result<(), VMHooksError> {
+    fn load_balance(
+        &mut self,
+        address_bytes: &[u8],
+        dest: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
         assert!(
@@ -103,7 +107,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn get_tx_hash(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+    fn get_tx_hash(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_current_tx_hash)?;
 
         self.m_types_lock()
@@ -111,37 +115,37 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn get_gas_left(&mut self) -> Result<i64, VMHooksError> {
+    fn get_gas_left(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_gas_left)?;
 
         Ok(self.input_ref().gas_limit as i64)
     }
 
-    fn get_block_timestamp(&mut self) -> Result<i64, VMHooksError> {
+    fn get_block_timestamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
 
         Ok(self.get_current_block_info().block_timestamp as i64)
     }
 
-    fn get_block_nonce(&mut self) -> Result<i64, VMHooksError> {
+    fn get_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
 
         Ok(self.get_current_block_info().block_nonce as i64)
     }
 
-    fn get_block_round(&mut self) -> Result<i64, VMHooksError> {
+    fn get_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
 
         Ok(self.get_current_block_info().block_round as i64)
     }
 
-    fn get_block_epoch(&mut self) -> Result<i64, VMHooksError> {
+    fn get_block_epoch(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_epoch)?;
 
         Ok(self.get_current_block_info().block_epoch as i64)
     }
 
-    fn get_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+    fn get_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_random_seed)?;
 
         self.m_types_lock().mb_set(
@@ -151,35 +155,35 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn get_prev_block_timestamp(&mut self) -> Result<i64, VMHooksError> {
+    fn get_prev_block_timestamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
         //TODO: check opcode. Only prev_tx_hash available
         // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
 
         Ok(self.get_previous_block_info().block_timestamp as i64)
     }
 
-    fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksError> {
+    fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
         //TODO: check opcode. Only prev_tx_hash available
         // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
 
         Ok(self.get_previous_block_info().block_nonce as i64)
     }
 
-    fn get_prev_block_round(&mut self) -> Result<i64, VMHooksError> {
+    fn get_prev_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
         //TODO: check opcode. Only prev_tx_hash available
         // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
 
         Ok(self.get_previous_block_info().block_round as i64)
     }
 
-    fn get_prev_block_epoch(&mut self) -> Result<i64, VMHooksError> {
+    fn get_prev_block_epoch(&mut self) -> Result<i64, VMHooksEarlyExit> {
         //TODO: check opcode. Only prev_tx_hash available
         // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
 
         Ok(self.get_previous_block_info().block_epoch as i64)
     }
 
-    fn get_prev_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+    fn get_prev_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
         //TODO: check opcode. Only prev_tx_hash available
         // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
 
@@ -194,7 +198,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         &mut self,
         address_bytes: &[u8],
         token_id_bytes: &[u8],
-    ) -> Result<i64, VMHooksError> {
+    ) -> Result<i64, VMHooksEarlyExit> {
         assert!(
             self.is_contract_address(address_bytes)?,
             "get_current_esdt_nft_nonce not yet implemented for accounts other than the contract itself"
@@ -213,7 +217,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         token_id_bytes: &[u8],
         nonce: u64,
         dest: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
         assert!(
@@ -234,7 +238,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         &mut self,
         address_handle: i32,
         response_handle: i32,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -263,7 +267,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     fn managed_is_builtin_function(
         &mut self,
         function_name_handle: i32,
-    ) -> Result<bool, VMHooksError> {
+    ) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.is_builtin_function)?;
 
         Ok(VM_BUILTIN_FUNCTION_NAMES.contains(
@@ -288,7 +292,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         creator_handle: RawHandle,
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -335,7 +339,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         &mut self,
         esdt_transfer_value_handle: RawHandle,
         call_value_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
         let (call_value, esdt_transfers_len, esdt_transfers) = {
@@ -363,7 +367,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         address_handle: RawHandle,
         token_id_handle: RawHandle,
         _nonce: u64,
-    ) -> Result<bool, VMHooksError> {
+    ) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(
             2 * self
                 .gas_schedule()
@@ -386,7 +390,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     fn get_esdt_local_roles_bits(
         &mut self,
         token_id_handle: RawHandle,
-    ) -> Result<i64, VMHooksError> {
+    ) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -417,7 +421,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         creator_handle: RawHandle,
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(2 * self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
         self.use_gas(
             5 * self
@@ -465,7 +469,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         creator_handle: RawHandle,
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         if ESDT_TOKEN_DATA_FUNC_RESETS_VALUES {
             self.use_gas(3 * self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
             self.use_gas(

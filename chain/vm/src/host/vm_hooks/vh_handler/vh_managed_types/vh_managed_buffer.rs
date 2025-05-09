@@ -1,4 +1,4 @@
-use multiversx_chain_vm_executor::{MemPtr, VMHooksError};
+use multiversx_chain_vm_executor::{MemPtr, VMHooksEarlyExit};
 
 use crate::host::vm_hooks::vh_dispatcher::{RESULT_ERROR, RESULT_OK};
 // use crate::host::context::InvalidSliceError;
@@ -8,13 +8,13 @@ use crate::host::vm_hooks::VMHooksHandlerSource;
 
 /// Provides VM hook implementations for methods that deal managed buffers.
 pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
-    fn mb_new_empty(&mut self) -> Result<RawHandle, VMHooksError> {
+    fn mb_new_empty(&mut self) -> Result<RawHandle, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().managed_buffer_api_cost.m_buffer_new)?;
 
         Ok(self.m_types_lock().mb_new(Vec::new()))
     }
 
-    fn mb_new_from_bytes(&mut self, bytes: &[u8]) -> Result<RawHandle, VMHooksError> {
+    fn mb_new_from_bytes(&mut self, bytes: &[u8]) -> Result<RawHandle, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -24,7 +24,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         Ok(self.m_types_lock().mb_new(Vec::from(bytes)))
     }
 
-    fn mb_len(&mut self, handle: RawHandle) -> Result<usize, VMHooksError> {
+    fn mb_len(&mut self, handle: RawHandle) -> Result<usize, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -34,7 +34,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         Ok(self.m_types_lock().mb_len(handle))
     }
 
-    fn mb_set(&mut self, handle: RawHandle, value: &[u8]) -> Result<(), VMHooksError> {
+    fn mb_set(&mut self, handle: RawHandle, value: &[u8]) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -46,7 +46,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn mb_get_bytes(&mut self, source_handle: RawHandle) -> Result<Vec<u8>, VMHooksError> {
+    fn mb_get_bytes(&mut self, source_handle: RawHandle) -> Result<Vec<u8>, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -62,7 +62,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         starting_position: usize,
         slice_length: usize,
         result_offset: MemPtr,
-    ) -> Result<i32, VMHooksError> {
+    ) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -89,7 +89,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         starting_position: usize,
         slice_len: usize,
         dest_handle: RawHandle,
-    ) -> Result<i32, VMHooksError> {
+    ) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -112,7 +112,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         dest_handle: RawHandle,
         starting_position: usize,
         source_slice: &[u8],
-    ) -> Result<i32, VMHooksError> {
+    ) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -133,7 +133,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         &mut self,
         accumulator_handle: RawHandle,
         data_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().managed_buffer_api_cost.m_buffer_append)?;
 
         let mut data = self.m_types_lock().mb_get(data_handle).to_vec();
@@ -149,7 +149,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         &mut self,
         accumulator_handle: RawHandle,
         bytes: &[u8],
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
@@ -162,7 +162,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn mb_eq(&mut self, handle1: RawHandle, handle2: RawHandle) -> Result<i32, VMHooksError> {
+    fn mb_eq(&mut self, handle1: RawHandle, handle2: RawHandle) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(
             2 * self
                 .gas_schedule()
@@ -184,7 +184,7 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         &mut self,
         source_handle: RawHandle,
         dest_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost

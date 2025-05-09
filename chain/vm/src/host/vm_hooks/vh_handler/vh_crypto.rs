@@ -1,4 +1,4 @@
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{crypto_functions, host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
 
@@ -7,7 +7,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
         &mut self,
         dest: RawHandle,
         data_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().crypto_api_cost.sha_256)?;
 
         // default implementation used in debugger
@@ -24,7 +24,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
         &mut self,
         dest: RawHandle,
         data_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().crypto_api_cost.keccak_256)?;
 
         // default implementation used in debugger
@@ -43,7 +43,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
         key: RawHandle,
         message: RawHandle,
         signature: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         let sig_valid = {
             self.use_gas(self.gas_schedule().crypto_api_cost.verify_ed_25519)?;
 

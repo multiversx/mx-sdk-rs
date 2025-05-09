@@ -1,4 +1,4 @@
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{host::context::TxLog, host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
 
@@ -7,7 +7,7 @@ pub trait VMHooksLog: VMHooksHandlerSource {
         &mut self,
         topics_handle: RawHandle,
         data_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         //TODO: check exact cost
         self.use_gas(
             2 * self

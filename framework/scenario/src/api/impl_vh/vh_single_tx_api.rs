@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 
-use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksError};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
@@ -79,7 +79,11 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         self.0.managed_types.lock().unwrap()
     }
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError> {
+    fn halt_with_error(
+        &mut self,
+        status: ReturnCode,
+        message: &str,
+    ) -> Result<(), VMHooksEarlyExit> {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 
@@ -91,7 +95,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         &ZERO_GAS_SCHEDULE
     }
 
-    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksError> {
+    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksEarlyExit> {
         Ok(())
     }
 

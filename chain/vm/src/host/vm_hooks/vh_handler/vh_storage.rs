@@ -1,4 +1,4 @@
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
     host::vm_hooks::VMHooksHandlerSource,
@@ -12,7 +12,7 @@ pub trait VMHooksStorageRead: VMHooksHandlerSource {
         &mut self,
         key_handle: RawHandle,
         dest: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.storage_load)?;
 
         let value = self.storage_read(self.m_types_lock().mb_get(key_handle));
@@ -26,7 +26,7 @@ pub trait VMHooksStorageRead: VMHooksHandlerSource {
         address_handle: RawHandle,
         key_handle: RawHandle,
         dest: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.storage_load)?;
 
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
@@ -42,7 +42,7 @@ pub trait VMHooksStorageWrite: VMHooksHandlerSource + VMHooksManagedTypes {
         &mut self,
         key_handle: RawHandle,
         value_handle: RawHandle,
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.storage_store)?;
 
         let types = self.m_types_lock();

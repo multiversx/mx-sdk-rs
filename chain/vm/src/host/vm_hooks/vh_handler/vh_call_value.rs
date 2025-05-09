@@ -1,11 +1,11 @@
 use crate::{host::vm_hooks::VMHooksHandlerSource, types::RawHandle, vm_err_msg};
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_traits::Zero;
 
 use super::VMHooksManagedTypes;
 
 pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
-    fn check_not_payable(&mut self) -> Result<(), VMHooksError> {
+    fn check_not_payable(&mut self) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_call_value)?;
 
         if self.input_ref().egld_value > num_bigint::BigUint::zero() {
@@ -17,7 +17,7 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
         Ok(())
     }
 
-    fn load_egld_value(&mut self, dest: RawHandle) -> Result<(), VMHooksError> {
+    fn load_egld_value(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
         let value = self.input_ref().received_egld().clone();
@@ -26,7 +26,7 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
         Ok(())
     }
 
-    fn load_all_esdt_transfers(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksError> {
+    fn load_all_esdt_transfers(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.calculate_set_vec_of_esdt_transfers_gas_cost(
             self.input_ref().received_esdt().len(),
         )?)?;

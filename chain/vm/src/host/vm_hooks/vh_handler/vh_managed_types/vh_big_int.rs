@@ -10,7 +10,7 @@ use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
 
@@ -21,7 +21,7 @@ macro_rules! binary_op_method {
             dest: RawHandle,
             x: RawHandle,
             y: RawHandle,
-        ) -> Result<(), VMHooksError> {
+        ) -> Result<(), VMHooksEarlyExit> {
             self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
 
             let bi_x = self.m_types_lock().bi_get(x);
@@ -41,7 +41,7 @@ macro_rules! binary_bitwise_op_method {
             dest: RawHandle,
             x: RawHandle,
             y: RawHandle,
-        ) -> Result<(), VMHooksError> {
+        ) -> Result<(), VMHooksEarlyExit> {
             self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
 
             let bi_x = self.m_types_lock().bi_get(x);
@@ -62,7 +62,7 @@ macro_rules! binary_bitwise_op_method {
 
 macro_rules! unary_op_method {
     ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
-        fn $method_name(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksError> {
+        fn $method_name(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksEarlyExit> {
             self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
 
             let bi_x = self.m_types_lock().bi_get(x);
@@ -76,7 +76,7 @@ macro_rules! unary_op_method {
 
 /// Provides VM hook implementations for methods that deal big ints.
 pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
-    fn bi_new(&mut self, value: i64) -> Result<RawHandle, VMHooksError> {
+    fn bi_new(&mut self, value: i64) -> Result<RawHandle, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new)?;
 
         Ok(self
@@ -84,7 +84,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
             .bi_new_from_big_int(num_bigint::BigInt::from(value)))
     }
 
-    fn bi_set_int64(&mut self, destination: RawHandle, value: i64) -> Result<(), VMHooksError> {
+    fn bi_set_int64(&mut self, destination: RawHandle, value: i64) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
         self.m_types_lock()
@@ -92,7 +92,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         Ok(())
     }
 
-    fn bi_unsigned_byte_length(&mut self, handle: RawHandle) -> Result<usize, VMHooksError> {
+    fn bi_unsigned_byte_length(&mut self, handle: RawHandle) -> Result<usize, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .big_int_api_cost
@@ -102,7 +102,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         Ok(self.m_types_lock().bi_get_unsigned_bytes(handle).len())
     }
 
-    fn bi_get_unsigned_bytes(&mut self, handle: RawHandle) -> Result<Vec<u8>, VMHooksError> {
+    fn bi_get_unsigned_bytes(&mut self, handle: RawHandle) -> Result<Vec<u8>, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .big_int_api_cost
@@ -116,7 +116,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         &mut self,
         destination: RawHandle,
         bytes: &[u8],
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .big_int_api_cost
@@ -129,7 +129,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         Ok(())
     }
 
-    fn bi_get_signed_bytes(&mut self, handle: RawHandle) -> Result<Vec<u8>, VMHooksError> {
+    fn bi_get_signed_bytes(&mut self, handle: RawHandle) -> Result<Vec<u8>, VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .big_int_api_cost
@@ -143,7 +143,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         &mut self,
         destination: RawHandle,
         bytes: &[u8],
-    ) -> Result<(), VMHooksError> {
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(
             self.gas_schedule()
                 .big_int_api_cost
@@ -155,7 +155,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         Ok(())
     }
 
-    fn bi_is_int64(&mut self, destination_handle: RawHandle) -> Result<i32, VMHooksError> {
+    fn bi_is_int64(&mut self, destination_handle: RawHandle) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_is_int_64)?;
 
         if self.m_types_lock().bi_to_i64(destination_handle).is_some() {
@@ -165,7 +165,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         }
     }
 
-    fn bi_get_int64(&mut self, destination_handle: RawHandle) -> Result<i64, VMHooksError> {
+    fn bi_get_int64(&mut self, destination_handle: RawHandle) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
 
         let opt_i64 = self.m_types_lock().bi_to_i64(destination_handle);
@@ -187,7 +187,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
     unary_op_method! {bi_abs, abs, big_int_abs}
     unary_op_method! {bi_neg, neg, big_int_neg}
 
-    fn bi_sign(&mut self, x: RawHandle) -> Result<i32, VMHooksError> {
+    fn bi_sign(&mut self, x: RawHandle) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_sign)?;
 
         let bi = self.m_types_lock().bi_get(x);
@@ -198,7 +198,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         }
     }
 
-    fn bi_cmp(&mut self, x: RawHandle, y: RawHandle) -> Result<i32, VMHooksError> {
+    fn bi_cmp(&mut self, x: RawHandle, y: RawHandle) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_cmp)?;
 
         let bi_x = self.m_types_lock().bi_get(x);
@@ -212,7 +212,12 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
 
     unary_op_method! {bi_sqrt, sqrt, big_int_sqrt}
 
-    fn bi_pow(&mut self, dest: RawHandle, x: RawHandle, y: RawHandle) -> Result<(), VMHooksError> {
+    fn bi_pow(
+        &mut self,
+        dest: RawHandle,
+        x: RawHandle,
+        y: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_pow)?;
 
         let bi_x = self.m_types_lock().bi_get(x);
@@ -224,7 +229,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         Ok(())
     }
 
-    fn bi_log2(&mut self, x: RawHandle) -> Result<i32, VMHooksError> {
+    fn bi_log2(&mut self, x: RawHandle) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_log)?;
 
         let bi_x = self.m_types_lock().bi_get(x);
@@ -235,7 +240,12 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
     binary_bitwise_op_method! {bi_or, bitor, big_int_or}
     binary_bitwise_op_method! {bi_xor, bitxor, big_int_xor}
 
-    fn bi_shr(&mut self, dest: RawHandle, x: RawHandle, bits: usize) -> Result<(), VMHooksError> {
+    fn bi_shr(
+        &mut self,
+        dest: RawHandle,
+        x: RawHandle,
+        bits: usize,
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_shr)?;
 
         let bi_x = self.m_types_lock().bi_get(x);
@@ -248,7 +258,12 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
         Ok(())
     }
 
-    fn bi_shl(&mut self, dest: RawHandle, x: RawHandle, bits: usize) -> Result<(), VMHooksError> {
+    fn bi_shl(
+        &mut self,
+        dest: RawHandle,
+        x: RawHandle,
+        bits: usize,
+    ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_shl)?;
 
         let bi_x = self.m_types_lock().bi_get(x);
