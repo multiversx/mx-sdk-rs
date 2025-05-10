@@ -68,17 +68,6 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         self.tx_context_ref.m_types_lock()
     }
 
-    fn halt_with_error(
-        &mut self,
-        status: ReturnCode,
-        message: &str,
-    ) -> Result<(), VMHooksEarlyExit> {
-        Err(VMHooksEarlyExit {
-            code: status.as_u64(),
-            message: message.to_owned().into(),
-        })
-    }
-
     fn gas_schedule(&self) -> &GasSchedule {
         &self.tx_context_ref.0.runtime_ref.vm_ref.gas_schedule
     }

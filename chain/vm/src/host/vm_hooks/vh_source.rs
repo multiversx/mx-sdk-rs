@@ -1,6 +1,5 @@
 use std::{fmt::Debug, sync::MutexGuard};
 
-use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use crate::{
@@ -31,16 +30,6 @@ pub trait VMHooksHandlerSource: Debug {
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]);
 
     fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer>;
-
-    fn halt_with_error(
-        &mut self,
-        status: ReturnCode,
-        message: &str,
-    ) -> Result<(), VMHooksEarlyExit>;
-
-    fn vm_error(&mut self, message: &str) -> Result<(), VMHooksEarlyExit> {
-        self.halt_with_error(ReturnCode::ExecutionFailed, message)
-    }
 
     fn gas_schedule(&self) -> &GasSchedule;
 

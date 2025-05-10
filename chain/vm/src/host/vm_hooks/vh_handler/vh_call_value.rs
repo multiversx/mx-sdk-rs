@@ -1,4 +1,8 @@
-use crate::{host::vm_hooks::VMHooksHandlerSource, types::RawHandle, vm_err_msg};
+use crate::{
+    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+    types::RawHandle,
+    vm_err_msg,
+};
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_traits::Zero;
 
@@ -9,10 +13,10 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_call_value)?;
 
         if self.input_ref().egld_value > num_bigint::BigUint::zero() {
-            self.vm_error(vm_err_msg::NON_PAYABLE_FUNC_EGLD)?;
+            return Err(early_exit_vm_error(vm_err_msg::NON_PAYABLE_FUNC_EGLD));
         }
         if self.esdt_num_transfers() > 0 {
-            self.vm_error(vm_err_msg::NON_PAYABLE_FUNC_ESDT)?;
+            return Err(early_exit_vm_error(vm_err_msg::NON_PAYABLE_FUNC_ESDT));
         }
         Ok(())
     }

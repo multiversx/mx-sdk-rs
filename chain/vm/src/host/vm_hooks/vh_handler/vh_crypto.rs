@@ -1,6 +1,11 @@
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
-use crate::{crypto_functions, host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
+use crate::{
+    crypto_functions,
+    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+    types::RawHandle,
+    vm_err_msg,
+};
 
 pub trait VMHooksCrypto: VMHooksHandlerSource {
     fn sha256_managed(
@@ -54,7 +59,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
             crypto_functions::verify_ed25519(key, message, signature)
         };
         if !sig_valid {
-            return self.vm_error("invalid signature");
+            return Err(early_exit_vm_error(vm_err_msg::CRYPTO_INVALID_SIGNATURE));
         }
 
         Ok(())

@@ -46,11 +46,15 @@ macro_rules! binary_bitwise_op_method {
 
             let bi_x = self.m_types_lock().bi_get(x);
             if bi_x.sign() == num_bigint::Sign::Minus {
-                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
+                return Err(early_exit_vm_error(
+                    vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
+                ));
             }
             let bi_y = self.m_types_lock().bi_get(y);
             if bi_y.sign() == num_bigint::Sign::Minus {
-                self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
+                return Err(early_exit_vm_error(
+                    vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
+                ));
             }
             let result = bi_x.$rust_op_name(bi_y);
             self.m_types_lock().bi_overwrite(dest, result);
@@ -250,7 +254,9 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
 
         let bi_x = self.m_types_lock().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
-            self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
+            return Err(early_exit_vm_error(
+                vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
+            ));
         }
         let result = bi_x.shr(bits);
         self.m_types_lock().bi_overwrite(dest, result);
@@ -268,7 +274,9 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksSignalError {
 
         let bi_x = self.m_types_lock().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
-            self.vm_error(vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE)?;
+            return Err(early_exit_vm_error(
+                vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
+            ));
         }
         let result = bi_x.shl(bits);
         self.m_types_lock().bi_overwrite(dest, result);

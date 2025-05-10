@@ -4,6 +4,7 @@ use crate::{
     host::vm_hooks::VMHooksHandlerSource,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
 };
+use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_bigint::BigInt;
 use num_traits::Zero;
@@ -252,10 +253,12 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
 
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let Some(data) = self.account_data(&address) else {
-            return self.vm_error(&format!(
-                "account not found: {}",
-                hex::encode(address.as_bytes())
-            ));
+            return Err(
+                VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64()).with_message(format!(
+                    "account not found: {}",
+                    hex::encode(address.as_bytes())
+                )),
+            );
         };
         let code_metadata_bytes = data.code_metadata.to_byte_array();
         self.m_types_lock()

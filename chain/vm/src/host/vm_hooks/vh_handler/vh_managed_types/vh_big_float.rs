@@ -1,5 +1,7 @@
 use crate::{
-    host::vm_hooks::{VMHooksHandlerSource, VMHooksSignalError},
+    host::vm_hooks::{
+        vh_early_exit::early_exit_vm_error, VMHooksHandlerSource, VMHooksSignalError,
+    },
     types::RawHandle,
     vm_err_msg,
 };
@@ -68,7 +70,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         exponent: i32,
     ) -> Result<RawHandle, VMHooksEarlyExit> {
         if exponent > 0 {
-            self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE)?;
+            return Err(early_exit_vm_error(vm_err_msg::EXPONENT_IS_POSITIVE));
         }
 
         self.use_gas(
@@ -97,7 +99,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         denominator: i64,
     ) -> Result<RawHandle, VMHooksEarlyExit> {
         if denominator == 0 {
-            self.vm_error(vm_err_msg::DIVISION_BY_0)?;
+            return Err(early_exit_vm_error(vm_err_msg::DIVISION_BY_0));
         }
 
         //TODO: check exact gas cost, opcode not present
@@ -121,7 +123,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         exponent: i64,
     ) -> Result<RawHandle, VMHooksEarlyExit> {
         if exponent > 0 {
-            self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE)?;
+            return Err(early_exit_vm_error(vm_err_msg::EXPONENT_IS_POSITIVE));
         }
         //TODO: check exact gas cost, opcode not present
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new)?;
@@ -155,10 +157,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
             Some(Ordering::Less) => Ok(-1),
             Some(Ordering::Equal) => Ok(0),
             Some(Ordering::Greater) => Ok(1),
-            None => {
-                self.vm_error(vm_err_msg::CANNOT_COMPARE_VALUES)?;
-                Ok(-2)
-            },
+            None => Err(early_exit_vm_error(vm_err_msg::CANNOT_COMPARE_VALUES)),
         }
     }
 
@@ -172,7 +171,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         }
 
         if !bf.is_normal() {
-            self.vm_error(vm_err_msg::NUMBER_IS_NOT_NORMAL)?;
+            return Err(early_exit_vm_error(vm_err_msg::NUMBER_IS_NOT_NORMAL));
         }
 
         if bf.is_sign_positive() {
@@ -196,7 +195,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
 
         let bf_x = self.m_types_lock().bf_get_f64(x);
         if bf_x < 0f64 {
-            return self.vm_error(vm_err_msg::BAD_BOUNDS_LOWER);
+            return Err(early_exit_vm_error(vm_err_msg::BAD_BOUNDS_LOWER));
         }
         let result = bf_x.sqrt();
         self.m_types_lock().bf_overwrite(dest, result);

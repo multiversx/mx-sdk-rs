@@ -1,7 +1,10 @@
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
-use crate::{host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
+use crate::{
+    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+    types::RawHandle,
+};
 
 use super::VMHooksManagedTypes;
 
@@ -11,7 +14,13 @@ pub trait VMHooksSignalError: VMHooksHandlerSource {
         // run `clear & cargo test -- --nocapture` to see the output
         println!("{}", std::str::from_utf8(message).unwrap());
 
-        self.halt_with_error(ReturnCode::UserError, std::str::from_utf8(message).unwrap())
+        match String::from_utf8(message.to_owned()) {
+            Ok(message_string) => {
+                Err(VMHooksEarlyExit::new(ReturnCode::UserError.as_u64())
+                    .with_message(message_string))
+            },
+            Err(_) => Err(early_exit_vm_error("error message utf-8 error")),
+        }
     }
 }
 

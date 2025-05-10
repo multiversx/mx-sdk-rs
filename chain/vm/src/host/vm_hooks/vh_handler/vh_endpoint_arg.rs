@@ -2,7 +2,9 @@ use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
-use crate::{host::vm_hooks::VMHooksHandlerSource, vm_err_msg::ERROR_NO_CALLBACK_CLOSURE};
+use crate::host::vm_hooks::vh_early_exit::early_exit_vm_error;
+use crate::host::vm_hooks::VMHooksHandlerSource;
+use crate::vm_err_msg;
 
 use crate::types::RawHandle;
 
@@ -78,9 +80,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         if let Some(v) = bi.to_i64() {
             Ok(v)
         } else {
-            self.vm_error("argument out of range")?;
-
-            Ok(0)
+            Err(early_exit_vm_error(vm_err_msg::ARG_OUT_OF_RANGE))
         }
     }
 
@@ -91,9 +91,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         if let Some(v) = bu.to_u64() {
             Ok(v)
         } else {
-            self.vm_error("argument out of range")?;
-
-            Ok(0)
+            Err(early_exit_vm_error(vm_err_msg::ARG_OUT_OF_RANGE))
         }
     }
 
@@ -113,11 +111,10 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
                 .clone()
                 .unwrap();
 
-            self.m_types_lock().mb_set(dest, closure_data)
+            self.m_types_lock().mb_set(dest, closure_data);
+            Ok(())
         } else {
-            self.vm_error(ERROR_NO_CALLBACK_CLOSURE)?
+            Err(early_exit_vm_error(vm_err_msg::ERROR_NO_CALLBACK_CLOSURE))
         }
-
-        Ok(())
     }
 }

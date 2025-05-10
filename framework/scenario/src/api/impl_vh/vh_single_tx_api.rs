@@ -7,7 +7,6 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
-    chain_core::types::ReturnCode,
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
         vm_hooks::{
@@ -77,14 +76,6 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
 
     fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
         self.0.managed_types.lock().unwrap()
-    }
-
-    fn halt_with_error(
-        &mut self,
-        status: ReturnCode,
-        message: &str,
-    ) -> Result<(), VMHooksEarlyExit> {
-        panic!("VM error occured, status: {status}, message: {message}")
     }
 
     fn gas_schedule(&self) -> &GasSchedule {
