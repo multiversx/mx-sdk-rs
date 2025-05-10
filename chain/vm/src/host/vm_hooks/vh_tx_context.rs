@@ -209,8 +209,6 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
             // also kill current execution
             Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
                 .with_message(tx_result.result_message.clone()))
-            // self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
-            // Vec::new()
         }
     }
 
@@ -236,8 +234,6 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
             Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
         } else {
             // also kill current execution
-            // self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
-            // Vec::new()
             Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
                 .with_message(tx_result.result_message.clone()))
         }
@@ -322,22 +318,13 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
                 Ok(())
             },
-            // ReturnCode::ExecutionFailed => {
-            //     // TODO: not sure it's the right condition, it catches insufficient funds
-            //     Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
-            //         .with_message(tx_result.result_message.clone()))
-            // },
-            // _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
-            //     .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
             ReturnCode::ExecutionFailed => {
                 // TODO: not sure it's the right condition, it catches insufficient funds
-                self.vm_error_legacy(&tx_result.result_message);
-                Ok(())
+                Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+                    .with_message(tx_result.result_message.clone()))
             },
-            _ => {
-                self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
-                Ok(())
-            },
+            _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+                .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),            
         }
     }
 }

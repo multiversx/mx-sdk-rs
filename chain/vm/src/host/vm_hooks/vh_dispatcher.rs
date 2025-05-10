@@ -976,13 +976,13 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         function_handle: i32,
         arguments_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        let _ = self.handler.transfer_value_execute(
+        self.handler.transfer_value_execute(
             dst_handle,
             value_handle,
             gas_limit as u64,
             function_handle,
             arguments_handle,
-        );
+        )?;
         Ok(RESULT_OK)
     }
 
