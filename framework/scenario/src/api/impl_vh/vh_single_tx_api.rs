@@ -87,10 +87,6 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 
-    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
-        panic!("VM error occured, status: {status}, message: {message}")
-    }
-
     fn gas_schedule(&self) -> &GasSchedule {
         &ZERO_GAS_SCHEDULE
     }
@@ -117,10 +113,11 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         })
     }
 
-    fn storage_write(&mut self, key: &[u8], value: &[u8]) {
+    fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit> {
         self.0.with_account_mut(&self.0.tx_input_box.to, |account| {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
+        Ok(())
     }
 
     fn get_previous_block_info(&self) -> &BlockInfo {

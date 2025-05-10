@@ -38,14 +38,8 @@ pub trait VMHooksHandlerSource: Debug {
         message: &str,
     ) -> Result<(), VMHooksEarlyExit>;
 
-    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str);
-
     fn vm_error(&mut self, message: &str) -> Result<(), VMHooksEarlyExit> {
         self.halt_with_error(ReturnCode::ExecutionFailed, message)
-    }
-
-    fn vm_error_legacy(&mut self, message: &str) {
-        self.halt_with_error_legacy(ReturnCode::ExecutionFailed, message)
     }
 
     fn gas_schedule(&self) -> &GasSchedule;
@@ -77,7 +71,7 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8>;
 
-    fn storage_write(&mut self, key: &[u8], value: &[u8]);
+    fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit>;
 
     fn get_previous_block_info(&self) -> &BlockInfo;
 

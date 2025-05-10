@@ -58,10 +58,6 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         panic!("VM error occured, status: {status}, message: {message}")
     }
 
-    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
-        panic!("VM error occured, status: {status}, message: {message}")
-    }
-
     fn gas_schedule(&self) -> &GasSchedule {
         &ZERO_GAS_SCHEDULE
     }
@@ -94,7 +90,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         panic!("cannot access the storage in the StaticApi")
     }
 
-    fn storage_write(&mut self, _key: &[u8], _value: &[u8]) {
+    fn storage_write(&mut self, _key: &[u8], _value: &[u8]) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot access the storage in the StaticApi")
     }
 

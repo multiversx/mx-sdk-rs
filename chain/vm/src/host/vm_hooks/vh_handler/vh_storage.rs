@@ -49,8 +49,6 @@ pub trait VMHooksStorageWrite: VMHooksHandlerSource + VMHooksManagedTypes {
         let key_bytes = types.mb_get_owned(key_handle);
         let value_bytes = types.mb_get_owned(value_handle);
         std::mem::drop(types);
-        self.storage_write(&key_bytes, &value_bytes);
-
-        Ok(())
+        self.storage_write(&key_bytes, &value_bytes)
     }
 }

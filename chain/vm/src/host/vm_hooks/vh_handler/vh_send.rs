@@ -3,8 +3,10 @@ use crate::{
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
         UPGRADE_CONTRACT_FUNC_NAME,
     },
-    host::context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-    host::vm_hooks::VMHooksHandlerSource,
+    host::{
+        context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
+        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+    },
     types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
     vm_err_msg,
 };
@@ -218,7 +220,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         if endpoint_name.is_empty() {
             // immitating the behavior of the VM
             // TODO: lift limitation from the VM, then also remove this condition here
-            self.vm_error_legacy(vm_err_msg::PROMISES_TOKENIZE_FAILED);
+            return Err(early_exit_vm_error(vm_err_msg::PROMISES_TOKENIZE_FAILED));
         }
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
         let tx_hash = self.tx_hash();
