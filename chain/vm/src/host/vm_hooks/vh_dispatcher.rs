@@ -19,8 +19,8 @@ impl<H: VMHooksHandler> VMHooksDispatcher<H> {
     }
 }
 
-fn bool_to_i32(b: bool) -> Result<i32, VMHooksEarlyExit> {
-    Ok(if b { RESULT_TRUE } else { RESULT_FALSE })
+fn map_bool_to_i32(result: Result<bool, VMHooksEarlyExit>) -> Result<i32, VMHooksEarlyExit> {
+    result.map(|b| if b { RESULT_TRUE } else { RESULT_FALSE })
 }
 
 #[allow(unused_variables)]
@@ -47,7 +47,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     fn is_smart_contract(&mut self, address_offset: MemPtr) -> Result<i32, VMHooksEarlyExit> {
         unsafe {
             let address_bytes = self.handler.memory_load(address_offset, 32);
-            bool_to_i32(self.handler.is_smart_contract(&address_bytes)?)
+            map_bool_to_i32(self.handler.is_smart_contract(&address_bytes))
         }
     }
 
@@ -992,22 +992,22 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         token_id_handle: i32,
         nonce: i64,
     ) -> Result<i32, VMHooksEarlyExit> {
-        bool_to_i32(self.handler.check_esdt_frozen(
+        map_bool_to_i32(self.handler.check_esdt_frozen(
             address_handle,
             token_id_handle,
             nonce as u64,
-        )?)
+        ))
     }
 
     fn managed_is_esdt_limited_transfer(
         &mut self,
         _token_id_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        bool_to_i32(false)
+        map_bool_to_i32(Ok(false))
     }
 
     fn managed_is_esdt_paused(&mut self, _token_id_handle: i32) -> Result<i32, VMHooksEarlyExit> {
-        bool_to_i32(false)
+        map_bool_to_i32(Ok(false))
     }
 
     fn managed_buffer_to_hex(
@@ -1031,9 +1031,9 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         &mut self,
         function_name_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        bool_to_i32(
+        map_bool_to_i32(
             self.handler
-                .managed_is_builtin_function(function_name_handle)?,
+                .managed_is_builtin_function(function_name_handle),
         )
     }
 
@@ -1185,7 +1185,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn big_float_is_int(&mut self, op_handle: i32) -> Result<i32, VMHooksEarlyExit> {
-        bool_to_i32(self.handler.bf_is_bi(op_handle)?)
+        map_bool_to_i32(self.handler.bf_is_bi(op_handle))
     }
 
     fn big_float_set_big_int(
@@ -1861,7 +1861,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         map_handle: i32,
         key_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        bool_to_i32(self.handler.mm_contains(map_handle, key_handle))
+        map_bool_to_i32(Ok(self.handler.mm_contains(map_handle, key_handle)))
     }
 
     fn small_int_get_unsigned_argument(&mut self, id: i32) -> Result<i64, VMHooksEarlyExit> {
