@@ -8,15 +8,13 @@ pub trait VMHooksLog: VMHooksHandlerSource {
         topics_handle: RawHandle,
         data_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        //TODO: check exact cost
-        self.use_gas(
-            2 * self
-                .gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_get_bytes,
-        )?;
-        let topics = self.m_types_lock().mb_get_vec_of_bytes(topics_handle);
+        self.use_gas(self.gas_schedule().base_ops_api_cost.log)?;
+
+        let (topics, topic_bytes_copied) = self.m_types_lock().mb_get_vec_of_bytes(topics_handle);
         let single_data_field = self.m_types_lock().mb_get(data_handle).to_vec();
+
+        self.use_gas_for_data_copy(topic_bytes_copied + single_data_field.len())?;
+
         self.push_tx_log(TxLog {
             address: self.current_address().clone(),
             endpoint: self.input_ref().func_name.clone(),

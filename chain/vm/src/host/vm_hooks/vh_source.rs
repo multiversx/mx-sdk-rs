@@ -35,6 +35,13 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksEarlyExit>;
 
+    /// Shortcut for consuming gas for data copies, based on copied data length.
+    fn use_gas_for_data_copy(&mut self, num_bytes_copied: usize) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(
+            num_bytes_copied as u64 * self.gas_schedule().base_operation_cost.data_copy_per_byte,
+        )
+    }
+
     fn input_ref(&self) -> &TxInput;
 
     fn current_address(&self) -> &VMAddress {

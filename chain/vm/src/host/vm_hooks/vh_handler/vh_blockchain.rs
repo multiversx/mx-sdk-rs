@@ -355,7 +355,10 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         let mut m_types = self.m_types_lock();
 
         m_types.bi_overwrite(call_value_handle, call_value.into());
-        m_types.mb_set_vec_of_esdt_payments(esdt_transfer_value_handle, &esdt_transfers);
+        let num_bytes_copied =
+            m_types.mb_set_vec_of_esdt_payments(esdt_transfer_value_handle, &esdt_transfers);
+        std::mem::drop(m_types);
+        self.use_gas_for_data_copy(num_bytes_copied)?;
 
         Ok(())
     }
@@ -451,7 +454,11 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             royalties_handle,
             num_bigint::BigInt::from(instance.metadata.royalties),
         );
-        m_types.mb_set_vec_of_bytes(uris_handle, instance.metadata.uri.clone());
+
+        let num_bytes_copied =
+            m_types.mb_set_vec_of_bytes(uris_handle, instance.metadata.uri.clone());
+        std::mem::drop(m_types);
+        self.use_gas_for_data_copy(num_bytes_copied)?;
 
         Ok(())
     }

@@ -98,7 +98,11 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         numerator: i64,
         denominator: i64,
     ) -> Result<RawHandle, VMHooksEarlyExit> {
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_new_from_parts)?;
+        self.use_gas(
+            self.gas_schedule()
+                .big_float_api_cost
+                .big_float_new_from_parts,
+        )?;
 
         if denominator == 0 {
             return Err(early_exit_vm_error(vm_err_msg::DIVISION_BY_0));
@@ -121,7 +125,11 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         significand: i64,
         exponent: i64,
     ) -> Result<RawHandle, VMHooksEarlyExit> {
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_new_from_parts)?;
+        self.use_gas(
+            self.gas_schedule()
+                .big_float_api_cost
+                .big_float_new_from_parts,
+        )?;
 
         if exponent > 0 {
             return Err(early_exit_vm_error(vm_err_msg::EXPONENT_IS_POSITIVE));

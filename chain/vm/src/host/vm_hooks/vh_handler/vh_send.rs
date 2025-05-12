@@ -132,7 +132,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let endpoint_name = self
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         self.perform_transfer_execute(recipient, egld_value, endpoint_name, arg_buffer)
     }
@@ -146,13 +146,14 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         arg_buffer_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
         let to = self.m_types_lock().mb_to_address(to_handle);
-        let payments = self
+        let (payments, num_bytes_copied) = self
             .m_types_lock()
             .mb_get_vec_of_esdt_payments(payments_handle);
+        self.use_gas_for_data_copy(num_bytes_copied)?;
         let endpoint_name = self
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         if payments.len() == 1 {
             let payment = payments[0].clone();
@@ -193,7 +194,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let endpoint_name = self
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         self.perform_async_call(to, egld_value, endpoint_name, arg_buffer)
     }
@@ -222,7 +223,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             // TODO: lift limitation from the VM, then also remove this condition here
             return Err(early_exit_vm_error(vm_err_msg::PROMISES_TOKENIZE_FAILED));
         }
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
         let tx_hash = self.tx_hash();
         let callback_closure_data = self.m_types_lock().mb_get(callback_closure_handle).to_vec();
 
@@ -265,15 +266,14 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let code_metadata = self
             .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         let (new_address, result) =
             self.perform_deploy(egld_value, code, code_metadata, arg_buffer)?;
 
         self.m_types_lock()
             .mb_set(new_address_handle, new_address.to_vec());
-        self.m_types_lock()
-            .mb_set_vec_of_bytes(result_handle, result);
+        self.set_return_data(result_handle, result)?;
 
         Ok(())
     }
@@ -297,15 +297,15 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let code_metadata = self
             .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         let (new_address, result) =
             self.perform_deploy(egld_value, source_contract_code, code_metadata, arg_buffer)?;
 
         self.m_types_lock()
             .mb_set(new_address_handle, new_address.to_vec());
-        self.m_types_lock()
-            .mb_set_vec_of_bytes(result_handle, result);
+
+        self.set_return_data(result_handle, result)?;
 
         Ok(())
     }
@@ -337,7 +337,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let code_metadata = self
             .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         self.perform_upgrade_contract(
             to,
@@ -372,7 +372,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let code_metadata = self
             .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         self.perform_upgrade_contract(to, egld_value, code, code_metadata, arg_buffer)
     }
@@ -391,13 +391,12 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let endpoint_name = self
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         let result =
             self.perform_execute_on_dest_context(to, egld_value, endpoint_name, arg_buffer)?;
 
-        self.m_types_lock()
-            .mb_set_vec_of_bytes(result_handle, result);
+        self.set_return_data(result_handle, result)?;
 
         Ok(())
     }
@@ -414,15 +413,37 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let endpoint_name = self
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         let result =
             self.perform_execute_on_dest_context_readonly(to, endpoint_name, arg_buffer)?;
 
-        self.m_types_lock()
-            .mb_set_vec_of_bytes(result_handle, result);
+        self.set_return_data(result_handle, result)?;
 
         Ok(())
+    }
+
+    fn load_arg_data(
+        &mut self,
+        arg_buffer_handle: RawHandle,
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
+        let (arg_buffer, num_bytes_copied) =
+            self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+
+        self.use_gas_for_data_copy(num_bytes_copied)?;
+        Ok(arg_buffer)
+    }
+
+    fn set_return_data(
+        &mut self,
+        result_handle: RawHandle,
+        result: Vec<Vec<u8>>,
+    ) -> Result<(), VMHooksEarlyExit> {
+        let num_bytes_copied = self
+            .m_types_lock()
+            .mb_set_vec_of_bytes(result_handle, result);
+
+        self.use_gas_for_data_copy(num_bytes_copied)
     }
 
     fn clean_return_data(&mut self) -> Result<(), VMHooksEarlyExit> {

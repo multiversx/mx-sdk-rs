@@ -35,8 +35,10 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
             self.input_ref().received_esdt().len(),
         )?)?;
 
-        self.m_types_lock()
+        let num_bytes_copied = self
+            .m_types_lock()
             .mb_set_vec_of_esdt_payments(dest_handle, self.input_ref().received_esdt());
+        self.use_gas_for_data_copy(num_bytes_copied)?;
 
         Ok(())
     }
