@@ -7,10 +7,12 @@ use std::collections::HashMap;
 pub struct EsdtBalance {
     pub token_identifier: String,
     pub balance: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub uris: Vec<String>,
 }
 
-// EsdtBalanceDataholds the esdt balance data
+// EsdtBalanceData holds the esdt balance data
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EsdtBalanceData {
     pub esdts: HashMap<String, EsdtBalance>,
