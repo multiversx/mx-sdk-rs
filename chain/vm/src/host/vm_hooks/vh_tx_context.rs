@@ -3,7 +3,7 @@ use std::sync::MutexGuard;
 
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{
-    BreakpointValue, InstanceState, MemLength, MemPtr, VMHooksError,
+    BreakpointValue, InstanceState, MemLength, MemPtr, VMHooksEarlyExit, VMHooksError,
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -78,8 +78,10 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
     }
 
     fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError> {
-        let breakpoint = self.prepare_error(status, message);
-        Err(breakpoint)
+        Err(VMHooksError {
+            code: status.as_u64(),
+            message: message.to_owned().into(),
+        })
     }
 
     fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
@@ -103,7 +105,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         // println!("use gas {gas}: {prev_gas_used} -> {next_gas_used}");
 
         if next_gas_used > gas_limit {
-            Err(VMHooksError::OutOfGas)
+            Err(VMHooksEarlyExit::new(ReturnCode::OutOfGas.as_u64()))
         } else {
             state_ref
                 .set_points_used(next_gas_used)

@@ -1,5 +1,5 @@
 use multiversx_chain_vm::{
-    executor_impl::{ExperimentalExecutor, WasmerProdExecutor},
+    executor_impl::{new_experimental_executor, new_prod_executor},
     host::runtime::{Runtime, RuntimeRef, RuntimeWeakRef},
 };
 use multiversx_chain_vm_executor::Executor;
@@ -55,20 +55,20 @@ impl ScenarioVMRunner {
                 weak,
                 self.contract_map_ref.clone(),
             )),
-            ScenarioExecutorConfig::WasmerProd => Box::new(WasmerProdExecutor::new(weak)),
-            ScenarioExecutorConfig::Experimental => Box::new(ExperimentalExecutor::new(weak)),
+            ScenarioExecutorConfig::WasmerProd => new_prod_executor(weak),
+            ScenarioExecutorConfig::Experimental => new_experimental_executor(weak),
             ScenarioExecutorConfig::TryDebuggerThenWasmerProd => {
                 Box::new(CompositeExecutor::new(vec![
                     Box::new(ContractDebugExecutor::new(
                         weak.clone(),
                         self.contract_map_ref.clone(),
                     )),
-                    Box::new(WasmerProdExecutor::new(weak)),
+                    new_prod_executor(weak),
                 ]))
             },
             ScenarioExecutorConfig::TryWasmerProdThenDebugger => {
                 Box::new(CompositeExecutor::new(vec![
-                    Box::new(WasmerProdExecutor::new(weak.clone())),
+                    new_prod_executor(weak.clone()),
                     Box::new(ContractDebugExecutor::new(
                         weak,
                         self.contract_map_ref.clone(),
@@ -81,12 +81,12 @@ impl ScenarioVMRunner {
                         weak.clone(),
                         self.contract_map_ref.clone(),
                     )),
-                    Box::new(ExperimentalExecutor::new(weak)),
+                    new_experimental_executor(weak),
                 ]))
             },
             ScenarioExecutorConfig::TryExperimentalThenDebugger => {
                 Box::new(CompositeExecutor::new(vec![
-                    Box::new(ExperimentalExecutor::new(weak.clone())),
+                    new_experimental_executor(weak.clone()),
                     Box::new(ContractDebugExecutor::new(
                         weak,
                         self.contract_map_ref.clone(),
