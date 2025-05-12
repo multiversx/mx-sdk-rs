@@ -157,36 +157,31 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn get_prev_block_timestamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        //TODO: check opcode. Only prev_tx_hash available
-        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
 
         Ok(self.get_previous_block_info().block_timestamp as i64)
     }
 
     fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        //TODO: check opcode. Only prev_tx_hash available
-        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
 
         Ok(self.get_previous_block_info().block_nonce as i64)
     }
 
     fn get_prev_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        //TODO: check opcode. Only prev_tx_hash available
-        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
 
         Ok(self.get_previous_block_info().block_round as i64)
     }
 
     fn get_prev_block_epoch(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        //TODO: check opcode. Only prev_tx_hash available
-        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_epoch)?;
 
         Ok(self.get_previous_block_info().block_epoch as i64)
     }
 
     fn get_prev_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
-        //TODO: check opcode. Only prev_tx_hash available
-        // self.use_gas(self.gas_schedule().base_ops_api_cost)?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_random_seed)?;
 
         self.m_types_lock().mb_set(
             dest,

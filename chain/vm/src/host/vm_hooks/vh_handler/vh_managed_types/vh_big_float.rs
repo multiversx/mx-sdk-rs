@@ -98,12 +98,11 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         numerator: i64,
         denominator: i64,
     ) -> Result<RawHandle, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_new_from_parts)?;
+
         if denominator == 0 {
             return Err(early_exit_vm_error(vm_err_msg::DIVISION_BY_0));
         }
-
-        //TODO: check exact gas cost, opcode not present
-        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new)?;
 
         let value = if let (Some(f_numerator), Some(f_denominator)) =
             (numerator.to_f64(), denominator.to_f64())
@@ -122,11 +121,11 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
         significand: i64,
         exponent: i64,
     ) -> Result<RawHandle, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_new_from_parts)?;
+
         if exponent > 0 {
             return Err(early_exit_vm_error(vm_err_msg::EXPONENT_IS_POSITIVE));
         }
-        //TODO: check exact gas cost, opcode not present
-        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new)?;
 
         let value = if let Some(f_significand) = significand.to_f64() {
             let exponent_multiplier = (10.0_f64).powi(exponent.try_into().unwrap());
@@ -162,8 +161,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksSignalError {
     }
 
     fn bf_sign(&mut self, x: RawHandle) -> Result<i32, VMHooksEarlyExit> {
-        //TODO: check exact gas cost, opcode not present
-        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_get_const)?;
+        self.use_gas(self.gas_schedule().big_float_api_cost.big_float_abs)?;
 
         let bf = self.m_types_lock().bf_get_f64(x);
         if bf.is_zero() {
