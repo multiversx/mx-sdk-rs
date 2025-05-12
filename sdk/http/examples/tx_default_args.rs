@@ -15,5 +15,6 @@ async fn main() {
         .await
         .unwrap();
 
+    assert!(arg.rcv_addr.to_bech32_string().is_ok());
     println!("default tx arg: {arg:#?}");
 }

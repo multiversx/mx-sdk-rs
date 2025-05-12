@@ -14,5 +14,6 @@ async fn main() {
         args: vec![],
     };
     let result = blockchain.execute_vmquery(&req).await;
+    assert!(result.is_ok());
     println!("{result:#?}");
 }
