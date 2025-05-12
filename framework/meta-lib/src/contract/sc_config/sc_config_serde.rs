@@ -64,6 +64,9 @@ pub struct ContractVariantSerde {
 
     #[serde(default)]
     pub profile: Option<ContractVariantProfileSerde>,
+
+    #[serde(default)]
+    pub std: Option<bool>,
 }
 
 #[derive(Deserialize, Default, Debug)]
