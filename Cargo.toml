@@ -24,6 +24,9 @@ members = [
   "tools/mxpy-snippet-generator",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
+  "tools/git-scraper/",
+
+
 
   "contracts/modules",
 
