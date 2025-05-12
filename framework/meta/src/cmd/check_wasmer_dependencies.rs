@@ -9,8 +9,8 @@ use std::{
 
 use colored::Colorize;
 
-const WASMER_PRODUCT: &str = "multiversx-chain-vm-executor-wasmer ";
-const WASMER_EXPERIMENTAL: &str = "multiversx-chain-vm-executor-wasmer-experimental ";
+const WASMER_CRATE_NAME: &str = "multiversx-chain-vm-executor-wasmer ";
+const WASMER_EXPERIMENTAL_CRATE_NAME: &str = "multiversx-chain-vm-executor-wasmer-experimental ";
 
 #[derive(Debug)]
 pub enum ExecuteCommandError {
@@ -34,7 +34,7 @@ impl Display for ExecuteCommandError {
     }
 }
 
-pub fn check_wasmer_executor(path: &Path) {
+pub fn check_wasmer_dependencies(path: &Path) {
     let cargo = env::var_os("CARGO").unwrap_or_else(|| OsString::from("cargo"));
 
     let mut command = Command::new(cargo);
@@ -42,10 +42,11 @@ pub fn check_wasmer_executor(path: &Path) {
 
     match execute_command(&mut command, path, "cargo") {
         Ok(output) => {
-            if output.contains(WASMER_PRODUCT) && output.contains(WASMER_EXPERIMENTAL) {
+            if output.contains(WASMER_CRATE_NAME) && output.contains(WASMER_EXPERIMENTAL_CRATE_NAME)
+            {
                 println!(
                     "{}",
-                    "Cannot import two different executors: found multiple wasmer components."
+                    "WARNING: Importing both wasmer and wasmer-experimental will crash on some operating systems."
                         .to_string()
                         .red()
                         .bold(),

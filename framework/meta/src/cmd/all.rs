@@ -1,5 +1,5 @@
 use super::{
-    check_executor::check_wasmer_executor,
+    check_wasmer_dependencies::check_wasmer_dependencies,
     print_util::{print_all_command, print_all_count, print_all_index},
 };
 use crate::{
@@ -21,7 +21,7 @@ pub fn call_all_meta(args: &AllArgs) {
 fn perform_call_all_meta(path: &Path, ignore: &[String], raw_args: Vec<String>) {
     let dirs = RelevantDirectories::find_all(path, ignore);
 
-    check_wasmer_executor(path);
+    check_wasmer_dependencies(path);
 
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 
