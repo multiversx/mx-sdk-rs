@@ -19,9 +19,9 @@ pub fn call_all_meta(args: &AllArgs) {
 }
 
 fn perform_call_all_meta(path: &Path, ignore: &[String], raw_args: Vec<String>) {
-    let dirs = RelevantDirectories::find_all(path, ignore);
-
     check_wasmer_dependencies(path);
+
+    let dirs = RelevantDirectories::find_all(path, ignore);
 
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 
