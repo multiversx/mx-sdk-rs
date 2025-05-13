@@ -1,4 +1,8 @@
+use std::process;
+
 use crate::{network_response, InteractorBase};
+use anyhow::Error;
+use colored::Colorize;
 use log::info;
 use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
@@ -19,7 +23,14 @@ where
         S: AsMut<ScCallStep>,
     {
         let sc_call_step = sc_call_step.as_mut();
-        let tx_hash = self.launch_sc_call(sc_call_step).await;
+        let tx_hash = match self.launch_sc_call(sc_call_step).await {
+            Ok(hash) => hash,
+            Err(err) => {
+                sc_call_err_message(&err);
+                process::exit(1);
+            },
+        };
+
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
@@ -39,20 +50,19 @@ where
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    async fn launch_sc_call(&mut self, sc_call_step: &mut ScCallStep) -> String {
+    async fn launch_sc_call(&mut self, sc_call_step: &mut ScCallStep) -> Result<String, Error> {
         self.pre_runners.run_sc_call_step(sc_call_step);
 
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
-        let tx_hash = self
-            .proxy
-            .request(SendTxRequest(&transaction))
-            .await
-            .expect("Launch sc call failed");
-        println!("sc call tx hash: {tx_hash}");
-        info!("sc call tx hash: {}", tx_hash);
+        let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
+
+        if let Ok(tx_hash) = tx_hash.as_ref() {
+            println!("sc call tx hash: {tx_hash}");
+            info!("sc call tx hash: {tx_hash}");
+        }
 
         tx_hash
     }
@@ -80,4 +90,12 @@ where
             options: 0,
         }
     }
+}
+
+fn sc_call_err_message(err: &anyhow::Error) {
+    eprintln!(
+        "{}{}",
+        "Call failed: ".to_string().red().bold(),
+        err.to_string().red().bold()
+    );
 }

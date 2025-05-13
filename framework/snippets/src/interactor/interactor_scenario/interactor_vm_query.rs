@@ -1,6 +1,9 @@
 #![allow(deprecated)]
 
+use std::process;
+
 use crate::InteractorBase;
+use colored::Colorize;
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -35,11 +38,13 @@ where
                 .map(|arg| hex::encode(&arg.value))
                 .collect(),
         };
-        let result = self
-            .proxy
-            .request(VMQueryRequest(&req))
-            .await
-            .expect("error executing VM query");
+        let result = match self.proxy.request(VMQueryRequest(&req)).await {
+            Ok(r) => r,
+            Err(err) => {
+                query_err_message(&err);
+                process::exit(1);
+            },
+        };
 
         info!("{:#?}", result);
 
@@ -59,4 +64,12 @@ where
     {
         self.quick_query(contract_call).await
     }
+}
+
+fn query_err_message(err: &anyhow::Error) {
+    eprintln!(
+        "{}{}",
+        "Query failed: ".to_string().red().bold(),
+        err.to_string().red().bold()
+    );
 }

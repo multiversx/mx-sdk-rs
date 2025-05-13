@@ -1,4 +1,7 @@
+use std::process;
+
 use crate::InteractorBase;
+use colored::Colorize;
 use log::info;
 use multiversx_sc_scenario::{scenario::ScenarioRunner, scenario_model::TransferStep};
 use multiversx_sdk::{
@@ -17,11 +20,13 @@ where
         let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
-        let tx_hash = self
-            .proxy
-            .request(SendTxRequest(&transaction))
-            .await
-            .unwrap();
+        let tx_hash = match self.proxy.request(SendTxRequest(&transaction)).await {
+            Ok(hash) => hash,
+            Err(err) => {
+                transfer_err_message(&err);
+                process::exit(1);
+            },
+        };
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
@@ -35,4 +40,12 @@ where
 
         tx_hash
     }
+}
+
+fn transfer_err_message(err: &anyhow::Error) {
+    eprintln!(
+        "{}{}",
+        "Transfer failed: ".to_string().red().bold(),
+        err.to_string().red().bold()
+    );
 }
