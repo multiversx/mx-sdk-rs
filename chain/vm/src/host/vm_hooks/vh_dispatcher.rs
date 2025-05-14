@@ -296,7 +296,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn get_argument_length(&mut self, id: i32) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: get_argument_length")
+        self.handler.get_argument_len(id).map(|len| len as i32)
     }
 
     fn get_argument(&mut self, id: i32, arg_offset: MemPtr) -> Result<i32, VMHooksEarlyExit> {
