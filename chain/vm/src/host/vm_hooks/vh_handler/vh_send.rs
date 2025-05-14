@@ -319,14 +319,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         code_metadata_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        // TODO: 4th get is get vec of bytes, calculate exact gas cost
-        self.use_gas(
-            4 * self
-                .gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_get_bytes,
-        )?;
-        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.create_contract)?;
 
         let to = self.m_types_lock().mb_to_address(sc_address_handle);
         let egld_value = self.m_types_lock().bu_get(egld_value_handle);
@@ -357,14 +350,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         code_metadata_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        // TODO: 4th get is get vec of bytes, calculate exact gas cost
-        self.use_gas(
-            4 * self
-                .gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_get_bytes,
-        )?;
-        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_get_int_64)?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.create_contract)?;
 
         let to = self.m_types_lock().mb_to_address(sc_address_handle);
         let egld_value = self.m_types_lock().bu_get(egld_value_handle);
