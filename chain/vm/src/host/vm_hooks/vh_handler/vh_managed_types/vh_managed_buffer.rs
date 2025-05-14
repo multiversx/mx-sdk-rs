@@ -1,10 +1,8 @@
 use multiversx_chain_vm_executor::{MemPtr, VMHooksEarlyExit};
 
 use crate::host::vm_hooks::vh_dispatcher::{RESULT_ERROR, RESULT_OK};
-// use crate::host::context::InvalidSliceError;
-use crate::types::RawHandle;
-
 use crate::host::vm_hooks::VMHooksHandlerSource;
+use crate::types::RawHandle;
 
 /// Provides VM hook implementations for methods that deal managed buffers.
 pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
