@@ -400,6 +400,17 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         Ok(result.bits() as i64)
     }
 
+    fn validate_token_identifier(
+        &mut self,
+        token_id_handle: RawHandle,
+    ) -> Result<bool, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_argument)?;
+
+        let m_types = self.m_types_lock();
+        let token_id = m_types.mb_get(token_id_handle);
+        Ok(multiversx_chain_core::token_identifier_util::validate_token_identifier(token_id))
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn set_esdt_data_values(
         &mut self,

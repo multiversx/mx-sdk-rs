@@ -142,7 +142,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     }
 
     fn validate_token_identifier(&mut self, token_id_handle: i32) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: validate_token_identifier")
+        map_bool_to_i32(self.handler.validate_token_identifier(token_id_handle))
     }
 
     fn transfer_value(
