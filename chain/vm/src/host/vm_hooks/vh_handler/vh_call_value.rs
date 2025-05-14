@@ -31,10 +31,6 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
     }
 
     fn load_all_esdt_transfers(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(self.calculate_set_vec_of_esdt_transfers_gas_cost(
-            self.input_ref().received_esdt().len(),
-        )?)?;
-
         let num_bytes_copied = self
             .m_types_lock()
             .mb_set_vec_of_esdt_payments(dest_handle, self.input_ref().received_esdt());

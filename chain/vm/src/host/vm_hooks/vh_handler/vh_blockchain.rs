@@ -340,24 +340,15 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_set_int_64)?;
 
-        let (call_value, esdt_transfers_len, esdt_transfers) = {
-            let back_transfers = self.back_transfers_lock();
-
-            (
-                back_transfers.call_value.clone(),
-                back_transfers.esdt_transfers.len(),
-                back_transfers.esdt_transfers.clone(),
-            )
-        };
-
-        self.use_gas(self.calculate_set_vec_of_esdt_transfers_gas_cost(esdt_transfers_len)?)?;
-
+        let back_transfers = self.back_transfers_lock();
         let mut m_types = self.m_types_lock();
-
-        m_types.bi_overwrite(call_value_handle, call_value.into());
-        let num_bytes_copied =
-            m_types.mb_set_vec_of_esdt_payments(esdt_transfer_value_handle, &esdt_transfers);
+        m_types.bi_overwrite(call_value_handle, back_transfers.call_value.clone().into());
+        let num_bytes_copied = m_types.mb_set_vec_of_esdt_payments(
+            esdt_transfer_value_handle,
+            &back_transfers.esdt_transfers,
+        );
         std::mem::drop(m_types);
+        std::mem::drop(back_transfers);
         self.use_gas_for_data_copy(num_bytes_copied)?;
 
         Ok(())

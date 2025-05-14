@@ -11,8 +11,6 @@ use crate::{
     types::{VMAddress, VMCodeMetadata, H256},
 };
 
-use super::vh_early_exit::early_exit_out_of_gas;
-
 /// Abstracts away the borrowing of a managed types structure.
 pub trait VMHooksHandlerSource: Debug {
     /// Loads a slice of memory from the instance.
@@ -89,32 +87,6 @@ pub trait VMHooksHandlerSource: Debug {
     }
 
     fn account_code(&self, address: &VMAddress) -> Vec<u8>;
-
-    /// Utility function used in set_vec_of_esdt_transfers (present in multiple interfaces)
-    /// Will probably be moved in future commits.
-    fn calculate_set_vec_of_esdt_transfers_gas_cost(
-        &self,
-        transfers_len: usize,
-    ) -> Result<u64, VMHooksEarlyExit> {
-        let transfers_len_u64 = match u64::try_from(transfers_len) {
-            Ok(len) => len,
-            Err(_) => return Err(early_exit_out_of_gas()),
-        };
-
-        let total_gas = self
-            .gas_schedule()
-            .managed_buffer_api_cost
-            .m_buffer_set_bytes
-            + transfers_len_u64 * self.gas_schedule().managed_buffer_api_cost.m_buffer_new
-            + transfers_len_u64 * self.gas_schedule().big_int_api_cost.big_int_new
-            + 3 * transfers_len_u64
-                * self
-                    .gas_schedule()
-                    .managed_buffer_api_cost
-                    .m_buffer_append_bytes;
-
-        Ok(total_gas)
-    }
 
     /// Utility function used in set_vec_of_esdt_transfers (present in multiple interfaces)
     /// Will probably be moved in future commits.
