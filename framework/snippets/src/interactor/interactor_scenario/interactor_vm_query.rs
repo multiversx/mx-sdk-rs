@@ -2,8 +2,8 @@
 
 use std::process;
 
+use super::error_message::query_err_message;
 use crate::InteractorBase;
-use colored::Colorize;
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -64,12 +64,4 @@ where
     {
         self.quick_query(contract_call).await
     }
-}
-
-fn query_err_message(err: &anyhow::Error) {
-    eprintln!(
-        "{}{}",
-        "Query failed: ".to_string().red().bold(),
-        err.to_string().red().bold()
-    );
 }

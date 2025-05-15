@@ -1,8 +1,8 @@
 use std::process;
 
+use super::error_message::sc_call_err_message;
 use crate::{network_response, InteractorBase};
 use anyhow::Error;
-use colored::Colorize;
 use log::info;
 use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
@@ -90,12 +90,4 @@ where
             options: 0,
         }
     }
-}
-
-fn sc_call_err_message(err: &anyhow::Error) {
-    eprintln!(
-        "{}{}",
-        "Call failed: ".to_string().red().bold(),
-        err.to_string().red().bold()
-    );
 }

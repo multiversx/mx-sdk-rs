@@ -1,8 +1,8 @@
 use std::process;
 
+use super::error_message::deploy_err_message;
 use crate::{network_response, InteractorBase};
 use anyhow::Error;
-use colored::Colorize;
 use log::info;
 use multiversx_sc_scenario::{
     imports::{Address, Bech32Address},
@@ -92,12 +92,4 @@ where
 
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
     }
-}
-
-fn deploy_err_message(err: &anyhow::Error) {
-    eprintln!(
-        "{}{}",
-        "Deploy failed: ".to_string().red().bold(),
-        err.to_string().red().bold()
-    );
 }

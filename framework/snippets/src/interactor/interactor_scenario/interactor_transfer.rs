@@ -1,7 +1,7 @@
 use std::process;
 
+use super::error_message::transfer_err_message;
 use crate::InteractorBase;
-use colored::Colorize;
 use log::info;
 use multiversx_sc_scenario::{scenario::ScenarioRunner, scenario_model::TransferStep};
 use multiversx_sdk::{
@@ -40,12 +40,4 @@ where
 
         tx_hash
     }
-}
-
-fn transfer_err_message(err: &anyhow::Error) {
-    eprintln!(
-        "{}{}",
-        "Transfer failed: ".to_string().red().bold(),
-        err.to_string().red().bold()
-    );
 }
