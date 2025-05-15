@@ -1,7 +1,6 @@
 use std::{fmt::Debug, sync::MutexGuard};
 
-use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksError};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use crate::{
     blockchain::state::{AccountData, BlockInfo},
@@ -30,21 +29,16 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer>;
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError>;
-
-    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str);
-
-    fn vm_error(&mut self, message: &str) -> Result<(), VMHooksError> {
-        self.halt_with_error(ReturnCode::ExecutionFailed, message)
-    }
-
-    fn vm_error_legacy(&mut self, message: &str) {
-        self.halt_with_error_legacy(ReturnCode::ExecutionFailed, message)
-    }
-
     fn gas_schedule(&self) -> &GasSchedule;
 
-    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksError>;
+    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksEarlyExit>;
+
+    /// Shortcut for consuming gas for data copies, based on copied data length.
+    fn use_gas_for_data_copy(&mut self, num_bytes_copied: usize) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(
+            num_bytes_copied as u64 * self.gas_schedule().base_operation_cost.data_copy_per_byte,
+        )
+    }
 
     fn input_ref(&self) -> &TxInput;
 
@@ -71,7 +65,7 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8>;
 
-    fn storage_write(&mut self, key: &[u8], value: &[u8]);
+    fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit>;
 
     fn get_previous_block_info(&self) -> &BlockInfo;
 
@@ -94,13 +88,26 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn account_code(&self, address: &VMAddress) -> Vec<u8>;
 
+    /// Utility function used in set_vec_of_esdt_transfers (present in multiple interfaces)
+    /// Will probably be moved in future commits.
+    fn calculate_set_vec_of_bytes_gas_cost(&self, len: usize) -> Result<u64, VMHooksEarlyExit> {
+        let len_u64 = len as u64;
+        let total_gas = len_u64 * self.gas_schedule().managed_buffer_api_cost.m_buffer_new
+            + self
+                .gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_set_bytes;
+
+        Ok(total_gas)
+    }
+
     fn perform_async_call(
         &mut self,
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
-    ) -> !;
+    ) -> Result<(), VMHooksEarlyExit>;
 
     fn perform_execute_on_dest_context(
         &mut self,
@@ -108,14 +115,14 @@ pub trait VMHooksHandlerSource: Debug {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>>;
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit>;
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,
         to: VMAddress,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>>;
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit>;
 
     fn perform_deploy(
         &mut self,
@@ -123,7 +130,7 @@ pub trait VMHooksHandlerSource: Debug {
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> (VMAddress, Vec<Vec<u8>>);
+    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit>;
 
     fn perform_transfer_execute(
         &mut self,
@@ -131,5 +138,5 @@ pub trait VMHooksHandlerSource: Debug {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    );
+    ) -> Result<(), VMHooksEarlyExit>;
 }

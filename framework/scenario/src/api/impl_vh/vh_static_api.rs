@@ -1,10 +1,9 @@
 use std::sync::{Mutex, MutexGuard};
 
-use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksError};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
-    chain_core::types::ReturnCode,
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult},
         vm_hooks::{
@@ -50,19 +49,11 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         self.0.lock().unwrap()
     }
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError> {
-        panic!("VM error occured, status: {status}, message: {message}")
-    }
-
-    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
-        panic!("VM error occured, status: {status}, message: {message}")
-    }
-
     fn gas_schedule(&self) -> &GasSchedule {
         &ZERO_GAS_SCHEDULE
     }
 
-    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksError> {
+    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksEarlyExit> {
         Ok(())
     }
 
@@ -90,7 +81,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         panic!("cannot access the storage in the StaticApi")
     }
 
-    fn storage_write(&mut self, _key: &[u8], _value: &[u8]) {
+    fn storage_write(&mut self, _key: &[u8], _value: &[u8]) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot access the storage in the StaticApi")
     }
 
@@ -120,7 +111,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> ! {
+    ) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 
@@ -130,7 +121,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 
@@ -139,7 +130,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         _to: VMAddress,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 
@@ -149,7 +140,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         _contract_code: Vec<u8>,
         _code_metadata: VMCodeMetadata,
         _args: Vec<Vec<u8>>,
-    ) -> (VMAddress, Vec<Vec<u8>>) {
+    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 
@@ -159,7 +150,7 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
-    ) {
+    ) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 }

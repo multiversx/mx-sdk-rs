@@ -1,5 +1,5 @@
 use multiversx_chain_vm::{executor::VMHooks, host::vm_hooks::VMHooksDispatcher};
-use multiversx_chain_vm_executor::VMHooksError;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;
 
@@ -25,7 +25,7 @@ impl VMHooksApiBackend for StaticApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksError>,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         STATIC_API_VH_CELL.with(|vh_mutex| {
             let mut vh = vh_mutex.lock().unwrap();

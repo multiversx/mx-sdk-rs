@@ -19,10 +19,14 @@ where
                 // breakpoints are considered to be already handled
                 Ok(())
             } else if let Some(early_exit) = panic_any.downcast_ref::<VMHooksEarlyExit>() {
-                Err(TxPanic::new(
-                    ReturnCode::from_u64(early_exit.code).unwrap(),
-                    &early_exit.message,
-                ))
+                if early_exit.code == 0 {
+                    Ok(())
+                } else {
+                    Err(TxPanic::new(
+                        ReturnCode::from_u64(early_exit.code).unwrap(),
+                        &early_exit.message,
+                    ))
+                }
             } else {
                 // fallback, general panics
                 Err(interpret_panic_as_tx_panic(panic_any, panic_message_flag))

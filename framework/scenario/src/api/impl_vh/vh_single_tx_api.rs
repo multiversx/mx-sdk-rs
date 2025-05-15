@@ -3,11 +3,10 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 
-use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksError};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
-    chain_core::types::ReturnCode,
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
         vm_hooks::{
@@ -79,19 +78,11 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         self.0.managed_types.lock().unwrap()
     }
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError> {
-        panic!("VM error occured, status: {status}, message: {message}")
-    }
-
-    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
-        panic!("VM error occured, status: {status}, message: {message}")
-    }
-
     fn gas_schedule(&self) -> &GasSchedule {
         &ZERO_GAS_SCHEDULE
     }
 
-    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksError> {
+    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksEarlyExit> {
         Ok(())
     }
 
@@ -113,10 +104,11 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         })
     }
 
-    fn storage_write(&mut self, key: &[u8], value: &[u8]) {
+    fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit> {
         self.0.with_account_mut(&self.0.tx_input_box.to, |account| {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
+        Ok(())
     }
 
     fn get_previous_block_info(&self) -> &BlockInfo {
@@ -145,7 +137,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> ! {
+    ) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
@@ -155,7 +147,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
@@ -164,7 +156,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _to: VMAddress,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
@@ -174,7 +166,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _contract_code: Vec<u8>,
         _code_metadata: VMCodeMetadata,
         _args: Vec<Vec<u8>>,
-    ) -> (VMAddress, Vec<Vec<u8>>) {
+    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
@@ -184,7 +176,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
-    ) {
+    ) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 }

@@ -2,9 +2,7 @@ use std::fmt::Debug;
 use std::sync::MutexGuard;
 
 use multiversx_chain_core::types::ReturnCode;
-use multiversx_chain_vm_executor::{
-    BreakpointValue, InstanceState, MemLength, MemPtr, VMHooksEarlyExit, VMHooksError,
-};
+use multiversx_chain_vm_executor::{InstanceState, MemLength, MemPtr, VMHooksEarlyExit};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -17,7 +15,7 @@ use crate::{
     },
     host::context::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType,
-        ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxPanic, TxResult,
+        ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxResult,
     },
     host::execution,
     host::vm_hooks::{
@@ -31,6 +29,8 @@ use crate::{
     vm_err_msg,
 };
 
+use super::vh_early_exit::{early_exit_async_call, early_exit_vm_error};
+
 pub struct TxContextVMHooksHandler<S: InstanceState> {
     tx_context_ref: TxContextRef,
     pub(crate) instance_state_ref: S,
@@ -41,15 +41,6 @@ impl<S: InstanceState> TxContextVMHooksHandler<S> {
         TxContextVMHooksHandler {
             tx_context_ref,
             instance_state_ref,
-        }
-    }
-
-    fn prepare_error(&self, status: ReturnCode, message: &str) -> BreakpointValue {
-        *self.tx_context_ref.result_lock() =
-            TxResult::from_panic_obj(&TxPanic::new(status, message));
-        match status {
-            ReturnCode::UserError => BreakpointValue::SignalError,
-            _ => BreakpointValue::ExecutionFailed,
         }
     }
 }
@@ -77,23 +68,11 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         self.tx_context_ref.m_types_lock()
     }
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) -> Result<(), VMHooksError> {
-        Err(VMHooksError {
-            code: status.as_u64(),
-            message: message.to_owned().into(),
-        })
-    }
-
-    fn halt_with_error_legacy(&mut self, status: ReturnCode, message: &str) {
-        let breakpoint = self.prepare_error(status, message);
-        let _ = self.instance_state_ref.set_breakpoint_value(breakpoint);
-    }
-
     fn gas_schedule(&self) -> &GasSchedule {
         &self.tx_context_ref.0.runtime_ref.vm_ref.gas_schedule
     }
 
-    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksError> {
+    fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksEarlyExit> {
         let gas_limit = self.input_ref().gas_limit;
         let state_ref = &mut self.instance_state_ref;
         let prev_gas_used = state_ref
@@ -132,13 +111,14 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         })
     }
 
-    fn storage_write(&mut self, key: &[u8], value: &[u8]) {
-        self.check_reserved_key(key);
-        self.check_not_readonly();
+    fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit> {
+        self.check_reserved_key(key)?;
+        self.check_not_readonly()?;
 
         self.tx_context_ref.with_contract_account_mut(|account| {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
+        Ok(())
     }
 
     fn get_previous_block_info(&self) -> &BlockInfo {
@@ -171,14 +151,13 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> ! {
+    ) -> Result<(), VMHooksEarlyExit> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         // the cell is no longer needed, since we end in a panic
         let mut tx_result = self.result_lock();
         tx_result.all_calls.push(async_call_data.clone());
         tx_result.pending_calls.async_call = Some(async_call_data);
-        drop(tx_result); // this avoid to poison the mutex
-        std::panic::panic_any(BreakpointValue::AsyncCall);
+        Err(early_exit_async_call())
     }
 
     fn perform_execute_on_dest_context(
@@ -187,7 +166,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
@@ -199,11 +178,11 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         );
 
         if tx_result.result_status.is_success() {
-            self.sync_call_post_processing(tx_result, blockchain_updates)
+            Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
         } else {
             // also kill current execution
-            self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
-            Vec::new()
+            Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
+                .with_message(tx_result.result_message.clone()))
         }
     }
 
@@ -212,7 +191,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         to: VMAddress,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         let async_call_data =
             self.create_async_call_data(to, BigUint::zero(), func_name, arguments);
         let mut tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
@@ -226,11 +205,11 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         );
 
         if tx_result.result_status.is_success() {
-            self.sync_call_post_processing(tx_result, blockchain_updates)
+            Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
         } else {
             // also kill current execution
-            self.halt_with_error_legacy(tx_result.result_status, &tx_result.result_message);
-            Vec::new()
+            Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
+                .with_message(tx_result.result_message.clone()))
         }
     }
 
@@ -240,7 +219,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> (VMAddress, Vec<Vec<u8>>) {
+    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
         let contract_address = self.current_address();
         let tx_hash = self.tx_hash();
         let tx_input = TxInput {
@@ -268,20 +247,17 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         );
 
         match tx_result.result_status {
-            ReturnCode::Success => (
+            ReturnCode::Success => Ok((
                 new_address,
                 self.sync_call_post_processing(tx_result, blockchain_updates),
-            ),
+            )),
             ReturnCode::ExecutionFailed => {
                 // TODO: not sure it's the right condition, it catches insufficient funds
-                self.vm_error_legacy(&tx_result.result_message);
-                (VMAddress::zero(), Vec::new())
+                Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+                    .with_message(tx_result.result_message.clone()))
             },
-            _ => {
-                self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT);
-
-                (VMAddress::zero(), Vec::new())
-            },
+            _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+                .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }
     }
 
@@ -291,7 +267,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) {
+    ) -> Result<(), VMHooksEarlyExit> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let mut tx_input = async_call_tx_input(&async_call_data, CallType::TransferExecute);
         if self.is_back_transfer(&tx_input) {
@@ -314,9 +290,15 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
                     .push(async_call_data);
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
+                Ok(())
             },
-            ReturnCode::ExecutionFailed => self.vm_error_legacy(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
-            _ => self.vm_error_legacy(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
+            ReturnCode::ExecutionFailed => {
+                // TODO: not sure it's the right condition, it catches insufficient funds
+                Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+                    .with_message(tx_result.result_message.clone()))
+            },
+            _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
+                .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }
     }
 }
@@ -362,17 +344,19 @@ impl<S: InstanceState> TxContextVMHooksHandler<S> {
         tx_result.result_values
     }
 
-    fn check_reserved_key(&mut self, key: &[u8]) {
+    fn check_reserved_key(&mut self, key: &[u8]) -> Result<(), VMHooksEarlyExit> {
         if key.starts_with(STORAGE_RESERVED_PREFIX) {
-            self.vm_error_legacy(vm_err_msg::WRITE_RESERVED);
+            return Err(early_exit_vm_error(vm_err_msg::WRITE_RESERVED));
         }
+        Ok(())
     }
 
     /// TODO: only checked on storage writes, needs more checks for calls, transfers, etc.
-    fn check_not_readonly(&mut self) {
+    fn check_not_readonly(&mut self) -> Result<(), VMHooksEarlyExit> {
         if self.tx_context_ref.input_ref().readonly {
-            self.vm_error_legacy(vm_err_msg::WRITE_READONLY);
+            return Err(early_exit_vm_error(vm_err_msg::WRITE_READONLY));
         }
+        Ok(())
     }
 
     fn is_back_transfer(&self, tx_input: &TxInput) -> bool {
