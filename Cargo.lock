@@ -2637,6 +2637,7 @@ version = "0.57.1"
 dependencies = [
  "anyhow",
  "base64",
+ "colored 3.0.0",
  "env_logger",
  "futures",
  "hex",
