@@ -1,7 +1,7 @@
 use crate::{
     blockchain::state::{EsdtData, EsdtInstance},
     chain_core::builtin_func_names::*,
-    host::vm_hooks::VMHooksHandlerSource,
+    host::vm_hooks::VMHooksContext,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
 };
 use multiversx_chain_core::types::ReturnCode;
@@ -32,7 +32,7 @@ const VM_BUILTIN_FUNCTION_NAMES: [&str; 16] = [
     UPGRADE_CONTRACT_FUNC_NAME,
 ];
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn is_contract_address(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
 

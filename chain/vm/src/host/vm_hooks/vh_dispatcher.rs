@@ -1,6 +1,6 @@
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooks, VMHooksEarlyExit};
 
-use super::{VMHooksHandler, VMHooksHandlerSource};
+use super::{VMHooksContext, VMHooksHandler};
 
 pub(super) const RESULT_TRUE: i32 = 1;
 pub(super) const RESULT_FALSE: i32 = 0;
@@ -9,11 +9,11 @@ pub(super) const RESULT_ERROR: i32 = 1;
 
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
-pub struct VMHooksDispatcher<S: VMHooksHandlerSource> {
+pub struct VMHooksDispatcher<S: VMHooksContext> {
     pub(crate) handler: VMHooksHandler<S>,
 }
 
-impl<C: VMHooksHandlerSource> VMHooksDispatcher<C> {
+impl<C: VMHooksContext> VMHooksDispatcher<C> {
     pub fn new(source: C) -> Self {
         VMHooksDispatcher {
             handler: VMHooksHandler::new(source),
@@ -26,7 +26,7 @@ fn map_bool_to_i32(result: Result<bool, VMHooksEarlyExit>) -> Result<i32, VMHook
 }
 
 #[allow(unused_variables)]
-impl<C: VMHooksHandlerSource> VMHooks for VMHooksDispatcher<C> {
+impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     fn get_gas_left(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.handler.get_gas_left()
     }

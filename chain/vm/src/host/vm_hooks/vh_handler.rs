@@ -13,15 +13,15 @@ use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{blockchain::state::AccountData, schedule::GasSchedule};
 
-use super::VMHooksHandlerSource;
+use super::VMHooksContext;
 
 /// Defines all methods that can handle VM hooks. They are spread out over several files.
 #[derive(Debug)]
-pub struct VMHooksHandler<C: VMHooksHandlerSource> {
+pub struct VMHooksHandler<C: VMHooksContext> {
     pub(crate) context: C,
 }
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn new(context: C) -> Self {
         VMHooksHandler { context }
     }

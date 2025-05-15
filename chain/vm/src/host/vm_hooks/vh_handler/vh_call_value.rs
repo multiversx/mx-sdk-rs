@@ -1,5 +1,5 @@
 use crate::{
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
     types::RawHandle,
     vm_err_msg,
 };
@@ -8,7 +8,7 @@ use num_traits::Zero;
 
 use super::VMHooksHandler;
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn check_not_payable(&mut self) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_call_value)?;
 

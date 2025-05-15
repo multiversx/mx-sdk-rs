@@ -5,14 +5,14 @@ mod vh_managed_map;
 
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
-use crate::{host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
+use crate::{host::vm_hooks::VMHooksContext, types::RawHandle};
 
 use super::VMHooksHandler;
 
 /// Provides VM hook implementations for methods that deal with more than one type of managed type.
 ///
 /// It is also the trait that unifies all managed type functionality.
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn mb_to_big_int_unsigned(
         &mut self,
         buffer_handle: RawHandle,

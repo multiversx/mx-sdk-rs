@@ -8,7 +8,7 @@ use std::sync::Arc;
 use crate::host::{
     context::TxContextRef,
     runtime::RuntimeWeakRef,
-    vm_hooks::{TxContextVMHooksHandler, VMHooksDispatcher},
+    vm_hooks::{TxVMHooksContext, VMHooksDispatcher},
 };
 
 pub fn new_experimental_executor(runtime_ref: RuntimeWeakRef) -> Box<dyn Executor + Send + Sync> {
@@ -45,7 +45,7 @@ impl ExperimentalVMHooksBuilder for ExperimentalTxContextVMHooksBuilder {
         &'b self,
         instance_state_ref: &'h mut ExperimentalInstanceState,
     ) -> Box<dyn VMHooks + 'h> {
-        let handler = TxContextVMHooksHandler::new(self.tx_context_ref.clone(), instance_state_ref);
+        let handler = TxVMHooksContext::new(self.tx_context_ref.clone(), instance_state_ref);
         Box::new(VMHooksDispatcher::new(handler))
     }
 }

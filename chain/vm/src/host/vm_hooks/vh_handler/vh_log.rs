@@ -1,10 +1,10 @@
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
-use crate::{host::context::TxLog, host::vm_hooks::VMHooksHandlerSource, types::RawHandle};
+use crate::{host::context::TxLog, host::vm_hooks::VMHooksContext, types::RawHandle};
 
 use super::VMHooksHandler;
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn managed_write_log(
         &mut self,
         topics_handle: RawHandle,

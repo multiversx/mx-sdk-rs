@@ -2,14 +2,14 @@ use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
     crypto_functions,
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
     types::RawHandle,
     vm_err_msg,
 };
 
 use super::VMHooksHandler;
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn sha256_managed(
         &mut self,
         dest: RawHandle,

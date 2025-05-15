@@ -9,7 +9,7 @@ use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
-        vm_hooks::VMHooksHandlerSource,
+        vm_hooks::VMHooksContext,
     },
     schedule::GasSchedule,
     types::{VMAddress, VMCodeMetadata},
@@ -43,9 +43,9 @@ impl SingleTxApiData {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct SingleTxApiVMHooksHandler(Arc<SingleTxApiData>);
+pub struct SingleTxApiVMHooksContext(Arc<SingleTxApiData>);
 
-impl SingleTxApiVMHooksHandler {
+impl SingleTxApiVMHooksContext {
     pub fn with_mut_data<F, R>(&mut self, f: F) -> R
     where
         F: FnOnce(&mut SingleTxApiData) -> R,
@@ -56,7 +56,7 @@ impl SingleTxApiVMHooksHandler {
     }
 }
 
-impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
+impl VMHooksContext for SingleTxApiVMHooksContext {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
         slice.to_vec()

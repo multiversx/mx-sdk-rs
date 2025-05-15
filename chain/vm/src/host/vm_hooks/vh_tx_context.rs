@@ -23,29 +23,29 @@ use crate::{
 };
 
 use super::vh_early_exit::{early_exit_async_call, early_exit_vm_error};
-use super::VMHooksHandlerSource;
+use super::VMHooksContext;
 
-pub struct TxContextVMHooksHandler<S: InstanceState> {
+pub struct TxVMHooksContext<S: InstanceState> {
     tx_context_ref: TxContextRef,
     pub(crate) instance_state_ref: S,
 }
 
-impl<S: InstanceState> TxContextVMHooksHandler<S> {
+impl<S: InstanceState> TxVMHooksContext<S> {
     pub fn new(tx_context_ref: TxContextRef, instance_state_ref: S) -> Self {
-        TxContextVMHooksHandler {
+        TxVMHooksContext {
             tx_context_ref,
             instance_state_ref,
         }
     }
 }
 
-impl<S: InstanceState> Debug for TxContextVMHooksHandler<S> {
+impl<S: InstanceState> Debug for TxVMHooksContext<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("TxContextVMHooksHandler").finish()
     }
 }
 
-impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
+impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         self.instance_state_ref
             .memory_load_owned(offset, length)
@@ -297,7 +297,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
     }
 }
 
-impl<S: InstanceState> TxContextVMHooksHandler<S> {
+impl<S: InstanceState> TxVMHooksContext<S> {
     fn create_async_call_data(
         &self,
         to: VMAddress,

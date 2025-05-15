@@ -1,7 +1,7 @@
 use crate::{
     host::{
         context::big_int_to_i64,
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandler, VMHooksHandlerSource},
+        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext, VMHooksHandler},
     },
     types::RawHandle,
     vm_err_msg,
@@ -83,7 +83,7 @@ macro_rules! unary_op_method {
 }
 
 /// Provides VM hook implementations for methods that deal big ints.
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn bi_new(&mut self, value: i64) -> Result<RawHandle, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_new)?;
 

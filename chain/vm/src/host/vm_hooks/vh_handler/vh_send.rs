@@ -5,7 +5,7 @@ use crate::{
     },
     host::{
         context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
     },
     types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
     vm_err_msg,
@@ -26,7 +26,7 @@ fn append_endpoint_name_and_args(
     }
 }
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     fn perform_transfer_execute_esdt(
         &mut self,
         to: VMAddress,

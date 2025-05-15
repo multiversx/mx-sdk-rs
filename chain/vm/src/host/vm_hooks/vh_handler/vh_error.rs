@@ -2,13 +2,13 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
     types::RawHandle,
 };
 
 use super::VMHooksHandler;
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn signal_error(&mut self, message: &[u8]) -> Result<(), VMHooksEarlyExit> {
         // can sometimes help in tests
         // run `clear & cargo test -- --nocapture` to see the output

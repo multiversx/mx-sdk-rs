@@ -1,13 +1,13 @@
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
-    host::vm_hooks::VMHooksHandlerSource,
+    host::vm_hooks::VMHooksContext,
     types::{RawHandle, VMAddress},
 };
 
 use super::VMHooksHandler;
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn storage_load_managed_buffer_raw(
         &mut self,
         key_handle: RawHandle,

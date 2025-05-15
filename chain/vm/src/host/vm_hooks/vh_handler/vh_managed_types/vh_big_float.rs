@@ -1,5 +1,5 @@
 use crate::{
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandler, VMHooksHandlerSource},
+    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext, VMHooksHandler},
     types::RawHandle,
     vm_err_msg,
 };
@@ -69,7 +69,7 @@ macro_rules! unary_op_method_big_int_handle {
     };
 }
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn bf_from_parts(
         &mut self,
         integral_part: i32,

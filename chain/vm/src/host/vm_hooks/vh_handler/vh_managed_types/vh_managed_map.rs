@@ -1,9 +1,9 @@
 use crate::{
-    host::vm_hooks::{VMHooksHandler, VMHooksHandlerSource},
+    host::vm_hooks::{VMHooksContext, VMHooksHandler},
     types::RawHandle,
 };
 
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn mm_new(&self) -> RawHandle {
         self.context.m_types_lock().mm_new()
     }

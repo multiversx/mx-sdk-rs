@@ -6,7 +6,7 @@ use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult},
-        vm_hooks::VMHooksHandlerSource,
+        vm_hooks::VMHooksContext,
     },
     schedule::GasSchedule,
     types::{VMAddress, VMCodeMetadata},
@@ -20,14 +20,14 @@ const ZERO_GAS_SCHEDULE: GasSchedule = GasSchedule::zeroed();
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug, Default)]
-pub struct StaticApiVMHooksHandler(Mutex<ManagedTypeContainer>);
+pub struct StaticApiVMHooksContext(Mutex<ManagedTypeContainer>);
 
-impl StaticApiVMHooksHandler {
+impl StaticApiVMHooksContext {
     pub const CURRENT_ADDRESS_PLACEHOLDER: VMAddress =
         VMAddress::new(*b"STATIC_API_CURRENT_ADDRESS______");
 }
 
-impl VMHooksHandlerSource for StaticApiVMHooksHandler {
+impl VMHooksContext for StaticApiVMHooksContext {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
         slice.to_vec()

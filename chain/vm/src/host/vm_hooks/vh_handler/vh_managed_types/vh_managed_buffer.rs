@@ -1,11 +1,11 @@
 use multiversx_chain_vm_executor::{MemPtr, VMHooksEarlyExit};
 
 use crate::host::vm_hooks::vh_dispatcher::{RESULT_ERROR, RESULT_OK};
-use crate::host::vm_hooks::{VMHooksHandler, VMHooksHandlerSource};
+use crate::host::vm_hooks::{VMHooksContext, VMHooksHandler};
 use crate::types::RawHandle;
 
 /// Provides VM hook implementations for methods that deal managed buffers.
-impl<C: VMHooksHandlerSource> VMHooksHandler<C> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn mb_new_empty(&mut self) -> Result<RawHandle, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().managed_buffer_api_cost.m_buffer_new)?;
 

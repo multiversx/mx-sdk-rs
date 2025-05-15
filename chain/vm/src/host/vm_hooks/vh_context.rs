@@ -12,7 +12,7 @@ use crate::{
 };
 
 /// Abstracts away the borrowing of a managed types structure.
-pub trait VMHooksHandlerSource: Debug {
+pub trait VMHooksContext: Debug {
     /// Loads a slice of memory from the instance.
     ///
     /// ## Safety
