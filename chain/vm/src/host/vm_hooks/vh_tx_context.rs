@@ -18,18 +18,12 @@ use crate::{
         ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxResult,
     },
     host::execution,
-    host::vm_hooks::{
-        VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-        VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksErrorManaged, VMHooksHandler,
-        VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
-        VMHooksManagedTypes, VMHooksSend, VMHooksSignalError, VMHooksStorageRead,
-        VMHooksStorageWrite,
-    },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
 };
 
 use super::vh_early_exit::{early_exit_async_call, early_exit_vm_error};
+use super::VMHooksHandlerSource;
 
 pub struct TxContextVMHooksHandler<S: InstanceState> {
     tx_context_ref: TxContextRef,
@@ -370,23 +364,3 @@ impl<S: InstanceState> TxContextVMHooksHandler<S> {
         &token_transfers.real_recipient == caller_address
     }
 }
-
-impl<S: InstanceState> VMHooksBigInt for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksManagedBuffer for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksManagedMap for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksBigFloat for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksManagedTypes for TxContextVMHooksHandler<S> {}
-
-impl<S: InstanceState> VMHooksCallValue for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksEndpointArgument for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksEndpointFinish for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksSignalError for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksErrorManaged for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksStorageRead for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksStorageWrite for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksCrypto for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksBlockchain for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksLog for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksSend for TxContextVMHooksHandler<S> {}
-
-impl<S: InstanceState> VMHooksHandler for TxContextVMHooksHandler<S> {}
