@@ -81,13 +81,6 @@ impl InstanceState for ContractDebugInstanceState {
         }
         Ok(())
     }
-
-    fn set_breakpoint_value(
-        &mut self,
-        breakpoint_value: BreakpointValue,
-    ) -> Result<(), ExecutorError> {
-        Self::breakpoint_panic(breakpoint_value)
-    }
 }
 
 #[cfg(test)]
