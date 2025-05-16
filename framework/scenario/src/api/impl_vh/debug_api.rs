@@ -1,6 +1,6 @@
 use multiversx_chain_vm::{
-    executor::{BreakpointValue, VMHooks, VMHooksEarlyExit},
-    host::context::{TxContextRef, TxPanic},
+    executor::{VMHooks, VMHooksEarlyExit},
+    host::context::TxContextRef,
     host::vm_hooks::{TxVMHooksContext, VMHooksDispatcher},
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
@@ -62,9 +62,9 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn assert_live_handle(handle: &Self::HandleType) {
         if !handle.is_on_current_context() {
-            debugger_panic(
-                ReturnCode::DebugApiError,
-                err_msg::DEBUG_API_ERR_HANDLE_STALE,
+            ContractDebugInstanceState::early_exit_panic(
+                VMHooksEarlyExit::new(ReturnCode::DebugApiError.as_u64())
+                    .with_const_message(err_msg::DEBUG_API_ERR_HANDLE_STALE),
             );
         }
     }
@@ -92,18 +92,11 @@ impl std::fmt::Debug for DebugApi {
     }
 }
 
-fn debugger_panic(status: ReturnCode, message: &str) {
-    ContractDebugStack::static_peek()
-        .tx_context_ref
-        .replace_tx_result_with_error(TxPanic::new(status, message));
-    std::panic::panic_any(BreakpointValue::SignalError);
-}
-
 fn assert_handles_on_same_context(handle1: &DebugHandle, handle2: &DebugHandle) {
     if !handle1.is_on_same_context(handle2) {
-        debugger_panic(
-            ReturnCode::DebugApiError,
-            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
+        ContractDebugInstanceState::early_exit_panic(
+            VMHooksEarlyExit::new(ReturnCode::DebugApiError.as_u64())
+                .with_const_message(err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH),
         );
     }
 }
