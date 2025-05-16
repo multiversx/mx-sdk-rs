@@ -9,14 +9,14 @@ pub(super) const RESULT_ERROR: i32 = 1;
 
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
-pub struct VMHooksDispatcher<S: VMHooksContext> {
-    pub(crate) handler: VMHooksHandler<S>,
+pub struct VMHooksDispatcher<C: VMHooksContext> {
+    pub(crate) handler: VMHooksHandler<C>,
 }
 
 impl<C: VMHooksContext> VMHooksDispatcher<C> {
-    pub fn new(source: C) -> Self {
+    pub fn new(vh_context: C) -> Self {
         VMHooksDispatcher {
-            handler: VMHooksHandler::new(source),
+            handler: VMHooksHandler::new(vh_context),
         }
     }
 }

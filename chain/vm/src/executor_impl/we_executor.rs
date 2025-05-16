@@ -45,7 +45,7 @@ impl ExperimentalVMHooksBuilder for ExperimentalTxContextVMHooksBuilder {
         &'b self,
         instance_state_ref: &'h mut ExperimentalInstanceState,
     ) -> Box<dyn VMHooks + 'h> {
-        let handler = TxVMHooksContext::new(self.tx_context_ref.clone(), instance_state_ref);
-        Box::new(VMHooksDispatcher::new(handler))
+        let vh_context = TxVMHooksContext::new(self.tx_context_ref.clone(), instance_state_ref);
+        Box::new(VMHooksDispatcher::new(vh_context))
     }
 }
