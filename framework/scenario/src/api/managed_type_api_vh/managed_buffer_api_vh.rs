@@ -1,5 +1,8 @@
-use crate::api::{i32_to_bool, VMHooksApi, VMHooksApiBackend};
-use multiversx_chain_vm::{executor::MemPtr, mem_conv};
+use crate::{
+    api::{i32_to_bool, VMHooksApi, VMHooksApiBackend},
+    executor::debug::ContractDebugInstanceState,
+};
+use multiversx_chain_vm::executor::MemPtr;
 use multiversx_sc::{
     api::{use_raw_handle, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl},
     types::BoxedBytes,
@@ -12,23 +15,20 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     }
 
     fn mb_new_from_bytes(&self, bytes: &[u8]) -> Self::ManagedBufferHandle {
-        let raw_handle = self.with_vm_hooks(|vh| {
-            mem_conv::with_mem_ptr(bytes, |offset, length| {
-                vh.mbuffer_new_from_bytes(offset, length)
-            })
-        });
+        let (offset, length) = ContractDebugInstanceState::main_memory_ptr(bytes);
+        let raw_handle = self.with_vm_hooks(|vh| vh.mbuffer_new_from_bytes(offset, length));
         use_raw_handle(raw_handle)
     }
 
     fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
-            vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize
-        })
+            vh.mbuffer_get_length(handle.get_raw_handle_unchecked())
+        }) as usize
     }
 
     fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
-            let len = vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize;
+            let len = vh.mbuffer_get_length(handle.get_raw_handle_unchecked())? as usize;
             let mut res = BoxedBytes::zeros(len);
             if len > 0 {
                 let _ = vh.mbuffer_get_bytes(
@@ -36,7 +36,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
                     res.as_mut_ptr() as MemPtr,
                 );
             }
-            res
+            Ok(res)
         })
     }
 
@@ -46,15 +46,14 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
+        let (offset, length) = ContractDebugInstanceState::main_memory_mut_ptr(dest_slice);
         let err = self.with_vm_hooks_ctx_1(&source_handle, |vh| {
-            mem_conv::with_mem_ptr_mut(dest_slice, |offset, length| {
-                vh.mbuffer_get_byte_slice(
-                    source_handle.get_raw_handle_unchecked(),
-                    starting_position as i32,
-                    length as i32,
-                    offset,
-                )
-            })
+            vh.mbuffer_get_byte_slice(
+                source_handle.get_raw_handle_unchecked(),
+                starting_position as i32,
+                length as i32,
+                offset,
+            )
         });
         if err == 0 {
             Ok(())
@@ -87,9 +86,8 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
-            mem_conv::with_mem_ptr(value, |offset, length| {
-                vh.mbuffer_set_bytes(handle.get_raw_handle_unchecked(), offset, length);
-            })
+            let (offset, length) = ContractDebugInstanceState::main_memory_ptr(value);
+            vh.mbuffer_set_bytes(handle.get_raw_handle_unchecked(), offset, length)
         });
     }
 
@@ -99,15 +97,14 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         starting_position: usize,
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
+        let (offset, length) = ContractDebugInstanceState::main_memory_ptr(source_slice);
         let err = self.with_vm_hooks_ctx_1(&dest_handle, |vh| {
-            mem_conv::with_mem_ptr(source_slice, |offset, length| {
-                vh.mbuffer_set_byte_slice(
-                    dest_handle.get_raw_handle_unchecked(),
-                    starting_position as i32,
-                    length,
-                    offset,
-                )
-            })
+            vh.mbuffer_set_byte_slice(
+                dest_handle.get_raw_handle_unchecked(),
+                starting_position as i32,
+                length,
+                offset,
+            )
         });
         if err == 0 {
             Ok(())
@@ -136,14 +133,14 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     }
 
     fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]) {
+        let (offset, length) = ContractDebugInstanceState::main_memory_ptr(bytes);
         self.with_vm_hooks_ctx_1(&accumulator_handle, |vh| {
-            mem_conv::with_mem_ptr(bytes, |offset, length| {
-                let _ = vh.mbuffer_append_bytes(
-                    accumulator_handle.get_raw_handle_unchecked(),
-                    offset,
-                    length,
-                );
-            })
+            let _ = vh.mbuffer_append_bytes(
+                accumulator_handle.get_raw_handle_unchecked(),
+                offset,
+                length,
+            )?;
+            Ok(())
         });
     }
 

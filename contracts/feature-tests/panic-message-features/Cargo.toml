@@ -15,3 +15,7 @@ path = "../../../framework/base"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.57.1"
 path = "../../../framework/scenario"
+features = ["wasmer-experimental"]
+
+[features]
+run-go-tests = ["multiversx-sc-scenario/run-go-tests"]

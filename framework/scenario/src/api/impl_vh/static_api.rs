@@ -1,21 +1,18 @@
-use multiversx_chain_vm::{
-    executor::VMHooks,
-    vm_hooks::{StaticApiVMHooksHandler, VMHooksDispatcher, VMHooksHandler},
-};
+use multiversx_chain_vm::{executor::VMHooks, host::vm_hooks::VMHooksDispatcher};
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;
 
-use crate::debug_executor::StaticVarData;
+use crate::executor::debug::{ContractDebugInstanceState, StaticVarData};
 
-use super::{VMHooksApi, VMHooksApiBackend};
+use super::{StaticApiVMHooksContext, VMHooksApi, VMHooksApiBackend};
 
-fn new_static_api_vh() -> VMHooksDispatcher {
-    let vh_handler: Box<dyn VMHooksHandler> = Box::<StaticApiVMHooksHandler>::default();
-    VMHooksDispatcher::new(vh_handler)
+fn new_static_api_vh() -> VMHooksDispatcher<StaticApiVMHooksContext> {
+    VMHooksDispatcher::new(StaticApiVMHooksContext::default())
 }
 
 thread_local! {
-    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher> = Mutex::new(new_static_api_vh());
+    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher<StaticApiVMHooksContext>> = Mutex::new(new_static_api_vh());
 
     static STATIC_API_STATIC_CELL: Mutex<StaticVarData> = Mutex::new(StaticVarData::default());
 }
@@ -28,11 +25,11 @@ impl VMHooksApiBackend for StaticApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         STATIC_API_VH_CELL.with(|vh_mutex| {
-            let vh = vh_mutex.lock().unwrap();
-            f(&*vh)
+            let mut vh = vh_mutex.lock().unwrap();
+            f(&mut *vh).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
         })
     }
 
@@ -55,7 +52,7 @@ impl StaticApi {
     ///
     /// This placeholder then needs to be converted to something useful.
     pub fn is_current_address_placeholder(address: &Address) -> bool {
-        address == &StaticApiVMHooksHandler::CURRENT_ADDRESS_PLACEHOLDER
+        address == &StaticApiVMHooksContext::CURRENT_ADDRESS_PLACEHOLDER
     }
 
     pub fn reset() {

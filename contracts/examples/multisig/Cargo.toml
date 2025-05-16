@@ -18,17 +18,8 @@ path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.57.1"
+features = ["wasmer-experimental"]
 path = "../../../framework/scenario"
-
-[dev-dependencies.adder]
-path = "../adder"
-
-[dev-dependencies.factorial]
-path = "../factorial"
-
-[dev-dependencies.multiversx-wegld-swap-sc]
-version = "0.57.1"
-path = "../../core/wegld-swap"
 
 [dev-dependencies]
 num-bigint = "0.4"

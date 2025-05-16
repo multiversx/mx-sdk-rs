@@ -62,7 +62,7 @@ pub enum ReturnCode {
 }
 
 impl ReturnCode {
-    pub fn as_u64(self) -> u64 {
+    pub const fn as_u64(self) -> u64 {
         self as u64
     }
 

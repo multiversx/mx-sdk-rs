@@ -1,7 +1,9 @@
-use multiversx_chain_vm::mem_conv;
 use multiversx_sc::api::{ErrorApi, ErrorApiImpl, HandleConstraints};
 
-use crate::api::{VMHooksApi, VMHooksApiBackend};
+use crate::{
+    api::{VMHooksApi, VMHooksApiBackend},
+    executor::debug::ContractDebugInstanceState,
+};
 
 impl<VHB: VMHooksApiBackend> ErrorApi for VMHooksApi<VHB> {
     type ErrorApiImpl = Self;
@@ -13,11 +15,8 @@ impl<VHB: VMHooksApiBackend> ErrorApi for VMHooksApi<VHB> {
 
 impl<VHB: VMHooksApiBackend> ErrorApiImpl for VMHooksApi<VHB> {
     fn signal_error(&self, message: &[u8]) -> ! {
-        self.with_vm_hooks(|vh| {
-            mem_conv::with_mem_ptr(message, |offset, length| {
-                vh.signal_error(offset, length);
-            })
-        });
+        let (offset, length) = ContractDebugInstanceState::main_memory_ptr(message);
+        self.with_vm_hooks(|vh| vh.signal_error(offset, length));
 
         // even though not explicitly stated in the VM hooks definition,
         // `signal_error` is expected to terminate execution

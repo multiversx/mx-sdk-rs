@@ -1,8 +1,10 @@
-use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{contract_instance_wrapped_execution, ContractContainer, StaticVarStack},
+    executor::debug::{
+        ContractContainer, ContractDebugInstance, ContractDebugStack, ContractDebugWhiteboxLambda,
+    },
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -13,7 +15,7 @@ use crate::{
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::tx_mock::{TxContext, TxContextStack, TxFunctionName, TxResult};
+use multiversx_chain_vm::host::context::{TxFunctionName, TxResult};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 
@@ -22,7 +24,7 @@ use super::{
     AddressFactory, MandosGenerator, ScQueryMandos,
 };
 
-pub use multiversx_chain_vm::tx_mock::TxTokenTransfer;
+pub use multiversx_chain_vm::host::context::TxTokenTransfer;
 
 #[derive(Clone)]
 pub struct ContractObjWrapper<
@@ -628,27 +630,27 @@ impl BlockchainStateWrapper {
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda_and_check(&sc_call_step, || {
-                contract_instance_wrapped_execution(false, || {
+            .perform_sc_call_lambda_and_check(
+                &sc_call_step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_LEGACY, || {
                     tx_fn(sc);
-                    Ok(())
-                });
-            });
+                })
+                .panic_message(false),
+            );
 
         tx_result
     }
 
+    /// Creates a temporary DebugApi context to run lambda function.
+    ///
+    /// Restores previous context (if any) after finishing execution.
     pub fn execute_in_managed_environment<T, F>(&self, f: F) -> T
     where
         F: FnOnce() -> T,
     {
-        let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-        TxContextStack::static_push(tx_context_arc);
-        StaticVarStack::static_push();
+        ContractDebugStack::static_push(ContractDebugInstance::dummy());
         let result = f();
-        let _ = TxContextStack::static_pop();
-        let _ = StaticVarStack::static_pop();
+        let _ = ContractDebugStack::static_pop();
 
         result
     }
