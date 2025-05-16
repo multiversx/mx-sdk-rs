@@ -5,13 +5,15 @@ use crate::{
     },
     host::{
         context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
     },
     types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
     vm_err_msg,
 };
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_traits::Zero;
+
+use super::VMHooksHandler;
 
 fn append_endpoint_name_and_args(
     args: &mut Vec<Vec<u8>>,
@@ -24,7 +26,7 @@ fn append_endpoint_name_and_args(
     }
 }
 
-pub trait VMHooksSend: VMHooksHandlerSource {
+impl<C: VMHooksContext> VMHooksHandler<C> {
     fn perform_transfer_execute_esdt(
         &mut self,
         to: VMAddress,
@@ -37,7 +39,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         let mut args = vec![token, amount.to_bytes_be()];
         append_endpoint_name_and_args(&mut args, func_name, arguments);
 
-        self.perform_transfer_execute(
+        self.context.perform_transfer_execute(
             to,
             num_bigint::BigUint::zero(),
             ESDT_TRANSFER_FUNC_NAME.into(),
@@ -56,7 +58,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) -> Result<(), VMHooksEarlyExit> {
-        let contract_address = self.current_address().clone();
+        let contract_address = self.context.current_address().clone();
 
         let mut args = vec![
             token,
@@ -67,7 +69,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
         append_endpoint_name_and_args(&mut args, func_name, arguments);
 
-        self.perform_transfer_execute(
+        self.context.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
             ESDT_NFT_TRANSFER_FUNC_NAME.into(),
@@ -83,7 +85,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         endpoint_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) -> Result<(), VMHooksEarlyExit> {
-        let contract_address = self.current_address().clone();
+        let contract_address = self.context.current_address().clone();
 
         let mut args = vec![to.to_vec(), top_encode_u64(payments.len() as u64)];
 
@@ -98,7 +100,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
         append_endpoint_name_and_args(&mut args, endpoint_name, arguments);
 
-        self.perform_transfer_execute(
+        self.context.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
             ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
@@ -116,10 +118,15 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     ) -> Result<(), VMHooksEarlyExit> {
         let mut arguments = vec![contract_code, code_metadata.to_vec()];
         arguments.extend(args);
-        self.perform_async_call(to, egld_value, UPGRADE_CONTRACT_FUNC_NAME.into(), arguments)
+        self.context.perform_async_call(
+            to,
+            egld_value,
+            UPGRADE_CONTRACT_FUNC_NAME.into(),
+            arguments,
+        )
     }
 
-    fn transfer_value_execute(
+    pub fn transfer_value_execute(
         &mut self,
         to_handle: RawHandle,
         amount_handle: RawHandle,
@@ -127,17 +134,19 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let recipient = self.m_types_lock().mb_to_address(to_handle);
-        let egld_value = self.m_types_lock().bu_get(amount_handle);
+        let recipient = self.context.m_types_lock().mb_to_address(to_handle);
+        let egld_value = self.context.m_types_lock().bu_get(amount_handle);
         let endpoint_name = self
+            .context
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
-        self.perform_transfer_execute(recipient, egld_value, endpoint_name, arg_buffer)
+        self.context
+            .perform_transfer_execute(recipient, egld_value, endpoint_name, arg_buffer)
     }
 
-    fn multi_transfer_esdt_nft_execute(
+    pub fn multi_transfer_esdt_nft_execute(
         &mut self,
         to_handle: RawHandle,
         payments_handle: RawHandle,
@@ -145,12 +154,14 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let to = self.m_types_lock().mb_to_address(to_handle);
+        let to = self.context.m_types_lock().mb_to_address(to_handle);
         let (payments, num_bytes_copied) = self
+            .context
             .m_types_lock()
             .mb_get_vec_of_esdt_payments(payments_handle);
         self.use_gas_for_data_copy(num_bytes_copied)?;
         let endpoint_name = self
+            .context
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
@@ -182,25 +193,27 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         }
     }
 
-    fn async_call_raw(
+    pub fn async_call_raw(
         &mut self,
         to_handle: RawHandle,
         egld_value_handle: RawHandle,
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let to = self.m_types_lock().mb_to_address(to_handle);
-        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
+        let to = self.context.m_types_lock().mb_to_address(to_handle);
+        let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
+            .context
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
-        self.perform_async_call(to, egld_value, endpoint_name, arg_buffer)
+        self.context
+            .perform_async_call(to, egld_value, endpoint_name, arg_buffer)
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn create_async_call_raw(
+    pub fn create_async_call_raw(
         &mut self,
         to_handle: RawHandle,
         egld_value_handle: RawHandle,
@@ -212,10 +225,11 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         _extra_gas_for_callback: u64,
         callback_closure_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let contract_address = self.current_address().clone();
-        let to = self.m_types_lock().mb_to_address(to_handle);
-        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
+        let contract_address = self.context.current_address().clone();
+        let to = self.context.m_types_lock().mb_to_address(to_handle);
+        let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
+            .context
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
         if endpoint_name.is_empty() {
@@ -224,8 +238,12 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             return Err(early_exit_vm_error(vm_err_msg::PROMISES_TOKENIZE_FAILED));
         }
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
-        let tx_hash = self.tx_hash();
-        let callback_closure_data = self.m_types_lock().mb_get(callback_closure_handle).to_vec();
+        let tx_hash = self.context.tx_hash();
+        let callback_closure_data = self
+            .context
+            .m_types_lock()
+            .mb_get(callback_closure_handle)
+            .to_vec();
 
         let call = AsyncCallTxData {
             from: contract_address,
@@ -243,7 +261,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             callback_closure_data,
         };
 
-        let mut tx_result = self.result_lock();
+        let mut tx_result = self.context.result_lock();
         tx_result.all_calls.push(promise.call.clone());
         tx_result.pending_calls.promises.push(promise);
 
@@ -251,7 +269,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn deploy_contract(
+    pub fn deploy_contract(
         &mut self,
         _gas: u64,
         egld_value_handle: RawHandle,
@@ -261,17 +279,20 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         new_address_handle: RawHandle,
         result_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
-        let code = self.m_types_lock().mb_get(code_handle).to_vec();
+        let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
+        let code = self.context.m_types_lock().mb_get(code_handle).to_vec();
         let code_metadata = self
+            .context
             .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         let (new_address, result) =
-            self.perform_deploy(egld_value, code, code_metadata, arg_buffer)?;
+            self.context
+                .perform_deploy(egld_value, code, code_metadata, arg_buffer)?;
 
-        self.m_types_lock()
+        self.context
+            .m_types_lock()
             .mb_set(new_address_handle, new_address.to_vec());
         self.set_return_data(result_handle, result)?;
 
@@ -279,7 +300,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn deploy_from_source_contract(
+    pub fn deploy_from_source_contract(
         &mut self,
         _gas: u64,
         egld_value_handle: RawHandle,
@@ -289,20 +310,27 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         new_address_handle: RawHandle,
         result_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
+        let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let source_contract_address = self
+            .context
             .m_types_lock()
             .mb_to_address(source_contract_address_handle);
-        let source_contract_code = self.account_code(&source_contract_address);
+        let source_contract_code = self.context.account_code(&source_contract_address);
         let code_metadata = self
+            .context
             .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
-        let (new_address, result) =
-            self.perform_deploy(egld_value, source_contract_code, code_metadata, arg_buffer)?;
+        let (new_address, result) = self.context.perform_deploy(
+            egld_value,
+            source_contract_code,
+            code_metadata,
+            arg_buffer,
+        )?;
 
-        self.m_types_lock()
+        self.context
+            .m_types_lock()
             .mb_set(new_address_handle, new_address.to_vec());
 
         self.set_return_data(result_handle, result)?;
@@ -310,7 +338,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         Ok(())
     }
 
-    fn upgrade_from_source_contract(
+    pub fn upgrade_from_source_contract(
         &mut self,
         sc_address_handle: RawHandle,
         _gas: u64,
@@ -321,13 +349,15 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.create_contract)?;
 
-        let to = self.m_types_lock().mb_to_address(sc_address_handle);
-        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
+        let to = self.context.m_types_lock().mb_to_address(sc_address_handle);
+        let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let source_contract_address = self
+            .context
             .m_types_lock()
             .mb_to_address(source_contract_address_handle);
-        let source_contract_code = self.account_code(&source_contract_address);
+        let source_contract_code = self.context.account_code(&source_contract_address);
         let code_metadata = self
+            .context
             .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
@@ -341,7 +371,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         )
     }
 
-    fn upgrade_contract(
+    pub fn upgrade_contract(
         &mut self,
         sc_address_handle: RawHandle,
         _gas: u64,
@@ -352,10 +382,11 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.create_contract)?;
 
-        let to = self.m_types_lock().mb_to_address(sc_address_handle);
-        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
-        let code = self.m_types_lock().mb_get(code_handle).to_vec();
+        let to = self.context.m_types_lock().mb_to_address(sc_address_handle);
+        let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
+        let code = self.context.m_types_lock().mb_get(code_handle).to_vec();
         let code_metadata = self
+            .context
             .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
@@ -363,7 +394,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         self.perform_upgrade_contract(to, egld_value, code, code_metadata, arg_buffer)
     }
 
-    fn execute_on_dest_context_raw(
+    pub fn execute_on_dest_context_raw(
         &mut self,
         _gas: u64,
         to_handle: RawHandle,
@@ -372,22 +403,27 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         arg_buffer_handle: RawHandle,
         result_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let to = self.m_types_lock().mb_to_address(to_handle);
-        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
+        let to = self.context.m_types_lock().mb_to_address(to_handle);
+        let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
+            .context
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
-        let result =
-            self.perform_execute_on_dest_context(to, egld_value, endpoint_name, arg_buffer)?;
+        let result = self.context.perform_execute_on_dest_context(
+            to,
+            egld_value,
+            endpoint_name,
+            arg_buffer,
+        )?;
 
         self.set_return_data(result_handle, result)?;
 
         Ok(())
     }
 
-    fn execute_on_dest_context_readonly_raw(
+    pub fn execute_on_dest_context_readonly_raw(
         &mut self,
         _gas: u64,
         to_handle: RawHandle,
@@ -395,14 +431,16 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         arg_buffer_handle: RawHandle,
         result_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let to = self.m_types_lock().mb_to_address(to_handle);
+        let to = self.context.m_types_lock().mb_to_address(to_handle);
         let endpoint_name = self
+            .context
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
         let result =
-            self.perform_execute_on_dest_context_readonly(to, endpoint_name, arg_buffer)?;
+            self.context
+                .perform_execute_on_dest_context_readonly(to, endpoint_name, arg_buffer)?;
 
         self.set_return_data(result_handle, result)?;
 
@@ -413,8 +451,10 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         &mut self,
         arg_buffer_handle: RawHandle,
     ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
-        let (arg_buffer, num_bytes_copied) =
-            self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
+        let (arg_buffer, num_bytes_copied) = self
+            .context
+            .m_types_lock()
+            .mb_get_vec_of_bytes(arg_buffer_handle);
 
         self.use_gas_for_data_copy(num_bytes_copied)?;
         Ok(arg_buffer)
@@ -426,20 +466,21 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         result: Vec<Vec<u8>>,
     ) -> Result<(), VMHooksEarlyExit> {
         let num_bytes_copied = self
+            .context
             .m_types_lock()
             .mb_set_vec_of_bytes(result_handle, result);
 
         self.use_gas_for_data_copy(num_bytes_copied)
     }
 
-    fn clean_return_data(&mut self) -> Result<(), VMHooksEarlyExit> {
-        let mut tx_result = self.result_lock();
+    pub fn clean_return_data(&mut self) -> Result<(), VMHooksEarlyExit> {
+        let mut tx_result = self.context.result_lock();
         tx_result.result_values.clear();
         Ok(())
     }
 
-    fn delete_from_return_data(&mut self, index: usize) -> Result<(), VMHooksEarlyExit> {
-        let mut tx_result = self.result_lock();
+    pub fn delete_from_return_data(&mut self, index: usize) -> Result<(), VMHooksEarlyExit> {
+        let mut tx_result = self.context.result_lock();
         if index > tx_result.result_values.len() {
             return Ok(());
         }

@@ -18,40 +18,34 @@ use crate::{
         ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxResult,
     },
     host::execution,
-    host::vm_hooks::{
-        VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-        VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksErrorManaged, VMHooksHandler,
-        VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
-        VMHooksManagedTypes, VMHooksSend, VMHooksSignalError, VMHooksStorageRead,
-        VMHooksStorageWrite,
-    },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
 };
 
 use super::vh_early_exit::{early_exit_async_call, early_exit_vm_error};
+use super::VMHooksContext;
 
-pub struct TxContextVMHooksHandler<S: InstanceState> {
+pub struct TxVMHooksContext<S: InstanceState> {
     tx_context_ref: TxContextRef,
     pub(crate) instance_state_ref: S,
 }
 
-impl<S: InstanceState> TxContextVMHooksHandler<S> {
+impl<S: InstanceState> TxVMHooksContext<S> {
     pub fn new(tx_context_ref: TxContextRef, instance_state_ref: S) -> Self {
-        TxContextVMHooksHandler {
+        TxVMHooksContext {
             tx_context_ref,
             instance_state_ref,
         }
     }
 }
 
-impl<S: InstanceState> Debug for TxContextVMHooksHandler<S> {
+impl<S: InstanceState> Debug for TxVMHooksContext<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("TxContextVMHooksHandler").finish()
     }
 }
 
-impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
+impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         self.instance_state_ref
             .memory_load_owned(offset, length)
@@ -303,7 +297,7 @@ impl<S: InstanceState> VMHooksHandlerSource for TxContextVMHooksHandler<S> {
     }
 }
 
-impl<S: InstanceState> TxContextVMHooksHandler<S> {
+impl<S: InstanceState> TxVMHooksContext<S> {
     fn create_async_call_data(
         &self,
         to: VMAddress,
@@ -370,23 +364,3 @@ impl<S: InstanceState> TxContextVMHooksHandler<S> {
         &token_transfers.real_recipient == caller_address
     }
 }
-
-impl<S: InstanceState> VMHooksBigInt for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksManagedBuffer for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksManagedMap for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksBigFloat for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksManagedTypes for TxContextVMHooksHandler<S> {}
-
-impl<S: InstanceState> VMHooksCallValue for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksEndpointArgument for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksEndpointFinish for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksSignalError for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksErrorManaged for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksStorageRead for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksStorageWrite for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksCrypto for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksBlockchain for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksLog for TxContextVMHooksHandler<S> {}
-impl<S: InstanceState> VMHooksSend for TxContextVMHooksHandler<S> {}
-
-impl<S: InstanceState> VMHooksHandler for TxContextVMHooksHandler<S> {}

@@ -12,7 +12,7 @@ use crate::{
 };
 
 /// Abstracts away the borrowing of a managed types structure.
-pub trait VMHooksHandlerSource: Debug {
+pub trait VMHooksContext: Debug {
     /// Loads a slice of memory from the instance.
     ///
     /// ## Safety
@@ -32,13 +32,6 @@ pub trait VMHooksHandlerSource: Debug {
     fn gas_schedule(&self) -> &GasSchedule;
 
     fn use_gas(&mut self, gas: u64) -> Result<(), VMHooksEarlyExit>;
-
-    /// Shortcut for consuming gas for data copies, based on copied data length.
-    fn use_gas_for_data_copy(&mut self, num_bytes_copied: usize) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(
-            num_bytes_copied as u64 * self.gas_schedule().base_operation_cost.data_copy_per_byte,
-        )
-    }
 
     fn input_ref(&self) -> &TxInput;
 
@@ -78,28 +71,7 @@ pub trait VMHooksHandlerSource: Debug {
     /// Can be optimized, but is not a priority right now.
     fn account_data(&self, address: &VMAddress) -> Option<AccountData>;
 
-    /// For ownership reasons, needs to return a clone.
-    ///
-    /// Can be optimized, but is not a priority right now.
-    fn current_account_data(&self) -> AccountData {
-        self.account_data(&self.input_ref().to)
-            .expect("missing current account")
-    }
-
     fn account_code(&self, address: &VMAddress) -> Vec<u8>;
-
-    /// Utility function used in set_vec_of_esdt_transfers (present in multiple interfaces)
-    /// Will probably be moved in future commits.
-    fn calculate_set_vec_of_bytes_gas_cost(&self, len: usize) -> Result<u64, VMHooksEarlyExit> {
-        let len_u64 = len as u64;
-        let total_gas = len_u64 * self.gas_schedule().managed_buffer_api_cost.m_buffer_new
-            + self
-                .gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_set_bytes;
-
-        Ok(total_gas)
-    }
 
     fn perform_async_call(
         &mut self,

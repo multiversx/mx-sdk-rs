@@ -1,6 +1,6 @@
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooks, VMHooksEarlyExit};
 
-use super::VMHooksHandler;
+use super::{VMHooksContext, VMHooksHandler};
 
 pub(super) const RESULT_TRUE: i32 = 1;
 pub(super) const RESULT_FALSE: i32 = 0;
@@ -9,13 +9,15 @@ pub(super) const RESULT_ERROR: i32 = 1;
 
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
-pub struct VMHooksDispatcher<H: VMHooksHandler> {
-    pub(crate) handler: H,
+pub struct VMHooksDispatcher<C: VMHooksContext> {
+    pub(crate) handler: VMHooksHandler<C>,
 }
 
-impl<H: VMHooksHandler> VMHooksDispatcher<H> {
-    pub fn new(handler: H) -> Self {
-        VMHooksDispatcher { handler }
+impl<C: VMHooksContext> VMHooksDispatcher<C> {
+    pub fn new(vh_context: C) -> Self {
+        VMHooksDispatcher {
+            handler: VMHooksHandler::new(vh_context),
+        }
     }
 }
 
@@ -24,7 +26,7 @@ fn map_bool_to_i32(result: Result<bool, VMHooksEarlyExit>) -> Result<i32, VMHook
 }
 
 #[allow(unused_variables)]
-impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
+impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     fn get_gas_left(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.handler.get_gas_left()
     }
@@ -39,14 +41,14 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
 
     fn get_shard_of_address(&mut self, address_offset: MemPtr) -> Result<i32, VMHooksEarlyExit> {
         unsafe {
-            let address_bytes = self.handler.memory_load(address_offset, 32);
+            let address_bytes = self.handler.context.memory_load(address_offset, 32);
             self.handler.get_shard_of_address(&address_bytes)
         }
     }
 
     fn is_smart_contract(&mut self, address_offset: MemPtr) -> Result<i32, VMHooksEarlyExit> {
         unsafe {
-            let address_bytes = self.handler.memory_load(address_offset, 32);
+            let address_bytes = self.handler.context.memory_load(address_offset, 32);
             map_bool_to_i32(self.handler.is_smart_contract(&address_bytes))
         }
     }
@@ -57,7 +59,10 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         message_length: MemLength,
     ) -> Result<(), VMHooksEarlyExit> {
         unsafe {
-            let message = self.handler.memory_load(message_offset, message_length);
+            let message = self
+                .handler
+                .context
+                .memory_load(message_offset, message_length);
             self.handler.signal_error(&message)
         }
     }
@@ -432,8 +437,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         token_id_len: MemLength,
     ) -> Result<i64, VMHooksEarlyExit> {
         unsafe {
-            let address_bytes = self.handler.memory_load(address_offset, 32);
-            let token_id_bytes = self.handler.memory_load(token_id_offset, token_id_len);
+            let address_bytes = self.handler.context.memory_load(address_offset, 32);
+            let token_id_bytes = self
+                .handler
+                .context
+                .memory_load(token_id_offset, token_id_len);
             self.handler
                 .get_current_esdt_nft_nonce(&address_bytes, &token_id_bytes)
         }
@@ -535,7 +543,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
 
     fn finish(&mut self, pointer: MemPtr, length: MemLength) -> Result<(), VMHooksEarlyExit> {
         unsafe {
-            let bytes = self.handler.memory_load(pointer, length);
+            let bytes = self.handler.context.memory_load(pointer, length);
             self.handler.finish_slice_u8(&bytes)
         }
     }
@@ -782,8 +790,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         callback_closure_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
         unsafe {
-            let success_callback = self.handler.memory_load(success_offset, success_length);
-            let error_callback = self.handler.memory_load(error_offset, error_length);
+            let success_callback = self
+                .handler
+                .context
+                .memory_load(success_offset, success_length);
+            let error_callback = self.handler.context.memory_load(error_offset, error_length);
             self.handler.create_async_call_raw(
                 dest_handle,
                 value_handle,
@@ -1262,7 +1273,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         result: i32,
     ) -> Result<(), VMHooksEarlyExit> {
         unsafe {
-            let address_bytes = self.handler.memory_load(address_offset, 32);
+            let address_bytes = self.handler.context.memory_load(address_offset, 32);
             self.handler.load_balance(&address_bytes, result)
         }
     }
@@ -1276,8 +1287,11 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         result_handle: i32,
     ) -> Result<(), VMHooksEarlyExit> {
         unsafe {
-            let address_bytes = self.handler.memory_load(address_offset, 32);
-            let token_id_bytes = self.handler.memory_load(token_id_offset, token_id_len);
+            let address_bytes = self.handler.context.memory_load(address_offset, 32);
+            let token_id_bytes = self
+                .handler
+                .context
+                .memory_load(token_id_offset, token_id_len);
             self.handler.big_int_get_esdt_external_balance(
                 &address_bytes,
                 &token_id_bytes,
@@ -1328,7 +1342,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         byte_length: MemLength,
     ) -> Result<(), VMHooksEarlyExit> {
         unsafe {
-            let bytes = self.handler.memory_load(byte_offset, byte_length);
+            let bytes = self.handler.context.memory_load(byte_offset, byte_length);
             self.handler
                 .bi_set_unsigned_bytes(destination_handle, &bytes)
         }
@@ -1341,7 +1355,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         byte_length: MemLength,
     ) -> Result<(), VMHooksEarlyExit> {
         unsafe {
-            let bytes = self.handler.memory_load(byte_offset, byte_length);
+            let bytes = self.handler.context.memory_load(byte_offset, byte_length);
             self.handler.bi_set_signed_bytes(destination_handle, &bytes)
         }
     }
@@ -1561,7 +1575,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         data_length: MemLength,
     ) -> Result<i32, VMHooksEarlyExit> {
         unsafe {
-            let bytes = self.handler.memory_load(data_offset, data_length);
+            let bytes = self.handler.context.memory_load(data_offset, data_length);
             self.handler.mb_new_from_bytes(&bytes)
         }
     }
@@ -1577,7 +1591,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
     ) -> Result<i32, VMHooksEarlyExit> {
         let bytes = self.handler.mb_get_bytes(m_buffer_handle)?;
         unsafe {
-            self.handler.memory_store(result_offset, &bytes);
+            self.handler.context.memory_store(result_offset, &bytes);
         }
         Ok(bytes.len() as i32)
     }
@@ -1627,7 +1641,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         data_length: MemLength,
     ) -> Result<i32, VMHooksEarlyExit> {
         unsafe {
-            let bytes = self.handler.memory_load(data_offset, data_length);
+            let bytes = self.handler.context.memory_load(data_offset, data_length);
             match self.handler.mb_set(m_buffer_handle, &bytes) {
                 Ok(_) => Ok(RESULT_OK),
                 Err(e) => Err(e),
@@ -1643,7 +1657,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         data_offset: MemPtr,
     ) -> Result<i32, VMHooksEarlyExit> {
         unsafe {
-            let bytes = self.handler.memory_load(data_offset, data_length);
+            let bytes = self.handler.context.memory_load(data_offset, data_length);
             self.handler
                 .mb_set_slice(m_buffer_handle, starting_position as usize, &bytes)
         }
@@ -1667,7 +1681,7 @@ impl<H: VMHooksHandler> VMHooks for VMHooksDispatcher<H> {
         data_length: MemLength,
     ) -> Result<i32, VMHooksEarlyExit> {
         unsafe {
-            let bytes = self.handler.memory_load(data_offset, data_length);
+            let bytes = self.handler.context.memory_load(data_offset, data_length);
             match self.handler.mb_append_bytes(accumulator_handle, &bytes) {
                 Ok(_) => Ok(RESULT_OK),
                 Err(e) => Err(e),

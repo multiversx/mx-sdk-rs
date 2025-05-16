@@ -5,14 +5,14 @@ use std::sync::Mutex;
 
 use crate::executor::debug::{ContractDebugInstanceState, StaticVarData};
 
-use super::{StaticApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
+use super::{StaticApiVMHooksContext, VMHooksApi, VMHooksApiBackend};
 
-fn new_static_api_vh() -> VMHooksDispatcher<StaticApiVMHooksHandler> {
-    VMHooksDispatcher::new(StaticApiVMHooksHandler::default())
+fn new_static_api_vh() -> VMHooksDispatcher<StaticApiVMHooksContext> {
+    VMHooksDispatcher::new(StaticApiVMHooksContext::default())
 }
 
 thread_local! {
-    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher<StaticApiVMHooksHandler>> = Mutex::new(new_static_api_vh());
+    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher<StaticApiVMHooksContext>> = Mutex::new(new_static_api_vh());
 
     static STATIC_API_STATIC_CELL: Mutex<StaticVarData> = Mutex::new(StaticVarData::default());
 }
@@ -52,7 +52,7 @@ impl StaticApi {
     ///
     /// This placeholder then needs to be converted to something useful.
     pub fn is_current_address_placeholder(address: &Address) -> bool {
-        address == &StaticApiVMHooksHandler::CURRENT_ADDRESS_PLACEHOLDER
+        address == &StaticApiVMHooksContext::CURRENT_ADDRESS_PLACEHOLDER
     }
 
     pub fn reset() {

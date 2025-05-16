@@ -9,10 +9,10 @@ use multiversx_sc::api::RawHandle;
 
 use crate::executor::debug::{ContractDebugInstanceState, StaticVarData};
 
-use super::{SingleTxApiData, SingleTxApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
+use super::{SingleTxApiData, SingleTxApiVMHooksContext, VMHooksApi, VMHooksApiBackend};
 
 thread_local! {
-    static SINGLE_TX_API_VH_CELL: Mutex<SingleTxApiVMHooksHandler> = Mutex::default();
+    static SINGLE_TX_API_VH_CELL: Mutex<SingleTxApiVMHooksContext> = Mutex::default();
 
     static SINGLE_TX_API_STATIC_CELL: StaticVarData = StaticVarData::default();
 }
@@ -28,8 +28,8 @@ impl VMHooksApiBackend for SingleTxApiBackend {
         F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
-            let handler = cell.lock().unwrap().clone();
-            let mut dispatcher = VMHooksDispatcher::new(handler);
+            let vh_context = cell.lock().unwrap().clone();
+            let mut dispatcher = VMHooksDispatcher::new(vh_context);
             f(&mut dispatcher)
                 .unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
         })

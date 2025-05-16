@@ -9,13 +9,7 @@ use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
-        vm_hooks::{
-            VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-            VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksErrorManaged, VMHooksHandler,
-            VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
-            VMHooksManagedTypes, VMHooksSend, VMHooksSignalError, VMHooksStorageRead,
-            VMHooksStorageWrite,
-        },
+        vm_hooks::VMHooksContext,
     },
     schedule::GasSchedule,
     types::{VMAddress, VMCodeMetadata},
@@ -49,9 +43,9 @@ impl SingleTxApiData {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct SingleTxApiVMHooksHandler(Arc<SingleTxApiData>);
+pub struct SingleTxApiVMHooksContext(Arc<SingleTxApiData>);
 
-impl SingleTxApiVMHooksHandler {
+impl SingleTxApiVMHooksContext {
     pub fn with_mut_data<F, R>(&mut self, f: F) -> R
     where
         F: FnOnce(&mut SingleTxApiData) -> R,
@@ -62,7 +56,7 @@ impl SingleTxApiVMHooksHandler {
     }
 }
 
-impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
+impl VMHooksContext for SingleTxApiVMHooksContext {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
         slice.to_vec()
@@ -180,23 +174,3 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 }
-
-impl VMHooksBigInt for SingleTxApiVMHooksHandler {}
-impl VMHooksManagedBuffer for SingleTxApiVMHooksHandler {}
-impl VMHooksManagedMap for SingleTxApiVMHooksHandler {}
-impl VMHooksBigFloat for SingleTxApiVMHooksHandler {}
-impl VMHooksManagedTypes for SingleTxApiVMHooksHandler {}
-
-impl VMHooksCallValue for SingleTxApiVMHooksHandler {}
-impl VMHooksEndpointArgument for SingleTxApiVMHooksHandler {}
-impl VMHooksEndpointFinish for SingleTxApiVMHooksHandler {}
-impl VMHooksSignalError for SingleTxApiVMHooksHandler {}
-impl VMHooksErrorManaged for SingleTxApiVMHooksHandler {}
-impl VMHooksStorageRead for SingleTxApiVMHooksHandler {}
-impl VMHooksStorageWrite for SingleTxApiVMHooksHandler {}
-impl VMHooksCrypto for SingleTxApiVMHooksHandler {}
-impl VMHooksBlockchain for SingleTxApiVMHooksHandler {}
-impl VMHooksLog for SingleTxApiVMHooksHandler {}
-impl VMHooksSend for SingleTxApiVMHooksHandler {}
-
-impl VMHooksHandler for SingleTxApiVMHooksHandler {}

@@ -2,14 +2,14 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksHandlerSource},
+    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
     types::RawHandle,
 };
 
-use super::VMHooksManagedTypes;
+use super::VMHooksHandler;
 
-pub trait VMHooksSignalError: VMHooksHandlerSource {
-    fn signal_error(&mut self, message: &[u8]) -> Result<(), VMHooksEarlyExit> {
+impl<C: VMHooksContext> VMHooksHandler<C> {
+    pub fn signal_error(&mut self, message: &[u8]) -> Result<(), VMHooksEarlyExit> {
         // can sometimes help in tests
         // run `clear & cargo test -- --nocapture` to see the output
         println!("{}", std::str::from_utf8(message).unwrap());
@@ -22,14 +22,12 @@ pub trait VMHooksSignalError: VMHooksHandlerSource {
             Err(_) => Err(early_exit_vm_error("error message utf-8 error")),
         }
     }
-}
 
-pub trait VMHooksErrorManaged: VMHooksManagedTypes + VMHooksSignalError {
-    fn signal_error_from_buffer(
+    pub fn signal_error_from_buffer(
         &mut self,
         message_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        let bytes = self.m_types_lock().mb_get_owned(message_handle);
+        let bytes = self.context.m_types_lock().mb_get_owned(message_handle);
         self.signal_error(&bytes)
     }
 }
