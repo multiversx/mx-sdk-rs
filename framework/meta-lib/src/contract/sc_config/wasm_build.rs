@@ -37,7 +37,9 @@ impl ContractVariant {
     fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
         let mut command = Command::new("cargo");
         command
-            .args(["build", "--target=wasm32-unknown-unknown", "--release"])
+            .arg("build")
+            .arg(format!("--target={}", &self.settings.rustc_target))
+            .arg("--release")
             .current_dir(self.wasm_crate_path());
         if build_args.locked {
             command.arg("--locked");

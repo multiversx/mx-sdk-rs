@@ -1,3 +1,4 @@
+pub mod build_target;
 mod find_workspace;
 mod git_describe;
 pub(crate) mod panic_report;
