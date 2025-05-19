@@ -1,10 +1,15 @@
+use crate::contract::sc_config::execute_command::execute_command;
+use colored::Colorize;
+use std::process::{exit, ExitStatus};
 use std::{
-    ffi::OsStr,
+    env,
+    ffi::{OsStr, OsString},
     fs,
     path::{Path, PathBuf},
     process::Command,
 };
 
+use super::execute_command::{execute_spawn_command, ExecuteCommandError};
 use super::ContractVariant;
 use crate::{
     abi_json::ContractAbiJson,
@@ -18,20 +23,40 @@ use crate::{
 };
 
 impl ContractVariant {
-    pub fn build_contract(&self, build_args: &BuildArgs, output_path: &Path) {
-        let mut command = self.compose_build_command(build_args);
+    pub fn build_contract(
+        &self,
+        build_args: &BuildArgs,
+        output_path: &Path,
+    ) -> Result<(), ExecuteCommandError> {
+        let mut build_command = self.compose_build_command(build_args);
 
-        print_build_command(self.wasm_output_name(build_args), &command);
+        print_build_command(self.wasm_output_name(build_args), &build_command);
 
-        let exit_status = command
-            .spawn()
-            .expect("failed to spawn contract build process")
-            .wait()
-            .expect("contract build process was not running");
+        let output_build_command = execute_spawn_command(&mut build_command, "cargo");
 
-        assert!(exit_status.success(), "contract build process failed");
+        if let Err(ExecuteCommandError::JobFailed(_)) = output_build_command {
+            let mut rustup_command = self.compose_rustup_command(vec!["list", "--installed"]);
+
+            let output_rustup_command = execute_command(&mut rustup_command, "rustup");
+
+            let str_output_rustup = match output_rustup_command {
+                Ok(output) => output,
+                Err(err) => {
+                    println!("\n{}", err.to_string().red().bold());
+                    exit(1);
+                },
+            };
+
+            let rustc_target_str = self.settings.rustc_target.as_str();
+
+            if !str_output_rustup.contains(rustc_target_str) {
+                self.install_wasm_target(rustc_target_str, build_command)?;
+            }
+        }
 
         self.finalize_build(build_args, output_path);
+
+        Ok(())
     }
 
     fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
@@ -51,6 +76,19 @@ impl ContractVariant {
         if !rustflags.is_empty() {
             command.env("RUSTFLAGS", rustflags);
         }
+        command
+    }
+
+    fn compose_rustup_command(&self, arguments: Vec<&str>) -> Command {
+        let rustup = env::var_os("RUSTUP").unwrap_or_else(|| OsString::from("rustup"));
+
+        let mut command = Command::new(rustup);
+        command.arg("target");
+
+        for argument in arguments {
+            command.arg(argument);
+        }
+
         command
     }
 
@@ -74,6 +112,25 @@ impl ContractVariant {
             rustflags.push_flag("--emit=llvm-ir");
         }
         rustflags
+    }
+
+    fn install_wasm_target(
+        &self,
+        target: &str,
+        mut build_command: Command,
+    ) -> Result<ExitStatus, ExecuteCommandError> {
+        println!(
+            "\n{}{}{}",
+            "Installing target \"".yellow(),
+            target.yellow(),
+            "\"...".yellow()
+        );
+
+        let mut rustup_install = self.compose_rustup_command(vec!["add", target]);
+
+        execute_spawn_command(&mut rustup_install, "rustup")?;
+
+        execute_spawn_command(&mut build_command, "cargo")
     }
 
     fn finalize_build(&self, build_args: &BuildArgs, output_path: &Path) {
