@@ -12,6 +12,7 @@ mod wasm_to_wat;
 pub use find_workspace::{find_current_workspace, find_workspace};
 pub use git_describe::git_describe;
 pub use wasm_extractor::WasmInfo;
+pub use wasm_opt::install_wasm_opt;
 pub use wasm_opt::run_wasm_opt;
 pub use wasm_to_wat::wasm_to_wat;
 

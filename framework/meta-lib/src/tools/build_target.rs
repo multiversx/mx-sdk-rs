@@ -1,3 +1,5 @@
+use std::process::Command;
+
 use rustc_version::{version_meta, Version};
 
 pub const WASM32_TARGET: &str = "wasm32-unknown-unknown";
@@ -21,4 +23,15 @@ pub fn is_wasm32v1_available() -> bool {
     };
 
     version.semver >= FIRST_RUSTC_VERSION_WITH_WASM32V1_TARGET
+}
+
+pub fn install_target(target_name: &str) {
+    let cmd = Command::new("rustup")
+        .args(["target", "add", target_name])
+        .status()
+        .expect("failed to execute `rustup`");
+
+    assert!(cmd.success(), "failed to install {target_name} target");
+
+    println!("{target_name} target installed successfully");
 }

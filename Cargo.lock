@@ -2492,7 +2492,6 @@ checksum = "51cce7ae386960fbf5e85afe40ca16d63f926f0620ed1a36b019212b28e17219"
 name = "multiversx-price-aggregator-sc"
 version = "0.57.1"
 dependencies = [
- "arrayvec",
  "getrandom 0.2.15",
  "multiversx-sc",
  "multiversx-sc-modules",

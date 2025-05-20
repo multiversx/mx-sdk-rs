@@ -1,4 +1,5 @@
 use crate::contract::sc_config::execute_command::execute_command;
+use crate::tools::build_target;
 use colored::Colorize;
 use std::process::{exit, ExitStatus};
 use std::{
@@ -35,9 +36,10 @@ impl ContractVariant {
         let output_build_command = execute_spawn_command(&mut build_command, "cargo");
 
         if let Err(ExecuteCommandError::JobFailed(_)) = output_build_command {
-            let mut rustup_command = self.compose_rustup_command(vec!["list", "--installed"]);
+            let mut rustup = self.rustup_target_command();
+            let mut target_list = rustup.arg("list").arg("--installed");
 
-            let output_rustup_command = execute_command(&mut rustup_command, "rustup");
+            let output_rustup_command = execute_command(&mut target_list, "rustup");
 
             let str_output_rustup = match output_rustup_command {
                 Ok(output) => output,
@@ -79,15 +81,11 @@ impl ContractVariant {
         command
     }
 
-    fn compose_rustup_command(&self, arguments: Vec<&str>) -> Command {
+    fn rustup_target_command(&self) -> Command {
         let rustup = env::var_os("RUSTUP").unwrap_or_else(|| OsString::from("rustup"));
 
         let mut command = Command::new(rustup);
         command.arg("target");
-
-        for argument in arguments {
-            command.arg(argument);
-        }
 
         command
     }
@@ -126,9 +124,11 @@ impl ContractVariant {
             "\"...".yellow()
         );
 
-        let mut rustup_install = self.compose_rustup_command(vec!["add", target]);
-
-        execute_spawn_command(&mut rustup_install, "rustup")?;
+        if target == build_target::WASM32V1_TARGET {
+            build_target::install_target(tools::build_target::WASM32V1_TARGET);
+        } else {
+            build_target::install_target(tools::build_target::WASM32_TARGET);
+        }
 
         execute_spawn_command(&mut build_command, "cargo")
     }
