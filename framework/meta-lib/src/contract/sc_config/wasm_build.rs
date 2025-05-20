@@ -37,9 +37,9 @@ impl ContractVariant {
 
         if let Err(ExecuteCommandError::JobFailed(_)) = output_build_command {
             let mut rustup = self.rustup_target_command();
-            let mut target_list = rustup.arg("list").arg("--installed");
+            let target_list = rustup.arg("list").arg("--installed");
 
-            let output_rustup_command = execute_command(&mut target_list, "rustup");
+            let output_rustup_command = execute_command(target_list, "rustup");
 
             let str_output_rustup = match output_rustup_command {
                 Ok(output) => output,
