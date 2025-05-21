@@ -68,7 +68,7 @@ impl<'a> CodeReportRender<'a> {
     ) {
         self.writeln(format!(
             "| {} | {} | {} | {} |",
-            path.split('/').last().unwrap_or(path),
+            path.split('/').next_back().unwrap_or(path),
             size,
             has_allocator,
             has_panic

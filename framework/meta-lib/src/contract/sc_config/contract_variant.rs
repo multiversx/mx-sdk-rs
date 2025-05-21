@@ -102,7 +102,7 @@ impl ContractVariant {
         let wasm_file_name = format!("{}.wasm", &self.wasm_crate_name_snake_case());
 
         Path::new(&target_dir)
-            .join("wasm32-unknown-unknown")
+            .join(&self.settings.rustc_target)
             .join("release")
             .join(wasm_file_name)
     }
