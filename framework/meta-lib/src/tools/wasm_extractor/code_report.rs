@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use crate::tools::panic_report::PanicReport;
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct CodeReport {
     pub path: PathBuf,
     pub has_allocator: bool,

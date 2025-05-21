@@ -19,12 +19,13 @@ use super::{
 
 type CallGraph = HashMap<usize, FunctionInfo>;
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct WasmInfo {
     pub call_graph: CallGraph,
     pub write_index_functions: HashSet<usize>,
     pub endpoints: HashMap<String, EndpointInfo>,
     pub report: WasmReport,
+    pub data: Vec<u8>,
 }
 
 impl WasmInfo {
@@ -37,16 +38,83 @@ impl WasmInfo {
         let wasm_data = fs::read(output_wasm_path)
             .expect("error occurred while extracting information from .wasm: file not found");
 
-        let wasm_info = populate_wasm_info(
-            output_wasm_path,
-            &wasm_data,
-            extract_imports_enabled,
-            check_ei,
-            endpoints,
-        )
-        .expect("error occurred while extracting information from .wasm file");
+        let wasm_info = WasmInfo::default()
+            .add_endpoints(endpoints)
+            .add_path(output_wasm_path)
+            .add_wasm_data(&wasm_data)
+            .populate_wasm_info(extract_imports_enabled, check_ei)
+            .expect("error occurred while extracting information from .wasm file");
 
         wasm_info.report
+    }
+
+    pub(crate) fn populate_wasm_info(
+        self,
+        import_extraction_enabled: bool,
+        check_ei: Option<&EIVersion>,
+    ) -> Result<WasmInfo, BinaryReaderError> {
+        let parser = Parser::new(0);
+        let mut wasm_info = self.clone();
+
+        for payload in parser.parse_all(&self.data) {
+            match payload? {
+                Payload::ImportSection(import_section) => {
+                    wasm_info.process_imports(import_section, import_extraction_enabled);
+                    wasm_info.report.ei_check |= is_ei_valid(&wasm_info.report.imports, check_ei);
+                },
+                Payload::DataSection(data_section) => {
+                    wasm_info.report.code.has_allocator |=
+                        is_fail_allocator_triggered(data_section.clone());
+                    wasm_info.report.code.has_panic.max_severity(data_section);
+                },
+                Payload::CodeSectionEntry(code_section) => {
+                    wasm_info.report.memory_grow_flag |= is_mem_grow(&code_section);
+                    wasm_info.create_call_graph(code_section);
+                },
+                Payload::ExportSection(export_section) => {
+                    wasm_info.parse_export_section(export_section);
+                },
+                _ => (),
+            }
+        }
+
+        wasm_info.detect_write_operations_in_views();
+        wasm_info.detect_forbidden_opcodes();
+
+        Ok(wasm_info)
+    }
+
+    pub(crate) fn add_endpoints(self, endpoints: &HashMap<&str, bool>) -> Self {
+        let mut endpoints_map = HashMap::new();
+
+        for (name, readonly) in endpoints {
+            endpoints_map.insert(name.to_string(), EndpointInfo::default(*readonly));
+        }
+
+        WasmInfo {
+            endpoints: endpoints_map,
+            ..self
+        }
+    }
+
+    pub(crate) fn add_wasm_data(self, data: &[u8]) -> Self {
+        WasmInfo {
+            data: data.to_vec(),
+            ..self
+        }
+    }
+
+    fn add_path(self, path: &Path) -> Self {
+        WasmInfo {
+            report: WasmReport {
+                code: CodeReport {
+                    path: path.to_path_buf(),
+                    ..self.report.code
+                },
+                ..self.report
+            },
+            ..self
+        }
     }
 
     fn create_call_graph(&mut self, body: FunctionBody) {
@@ -184,67 +252,6 @@ pub(crate) fn get_view_endpoints(
     }
 
     view_endpoints
-}
-
-pub(crate) fn populate_wasm_info(
-    path: &Path,
-    wasm_data: &[u8],
-    import_extraction_enabled: bool,
-    check_ei: Option<&EIVersion>,
-    endpoints: &HashMap<&str, bool>,
-) -> Result<WasmInfo, BinaryReaderError> {
-    let mut wasm_info = WasmInfo::default();
-
-    for (name, readonly) in endpoints {
-        wasm_info
-            .endpoints
-            .insert(name.to_string(), EndpointInfo::default(*readonly));
-    }
-
-    let parser = Parser::new(0);
-    for payload in parser.parse_all(wasm_data) {
-        match payload? {
-            Payload::ImportSection(import_section) => {
-                wasm_info.process_imports(import_section, import_extraction_enabled);
-                wasm_info.report.ei_check |= is_ei_valid(&wasm_info.report.imports, check_ei);
-            },
-            Payload::DataSection(data_section) => {
-                wasm_info.report.code.has_allocator |=
-                    is_fail_allocator_triggered(data_section.clone());
-                wasm_info.report.code.has_panic.max_severity(data_section);
-            },
-            Payload::CodeSectionEntry(code_section) => {
-                wasm_info.report.memory_grow_flag |= is_mem_grow(&code_section);
-                wasm_info.create_call_graph(code_section);
-            },
-            Payload::ExportSection(export_section) => {
-                wasm_info.parse_export_section(export_section);
-            },
-            _ => (),
-        }
-    }
-
-    wasm_info.detect_write_operations_in_views();
-    wasm_info.detect_forbidden_opcodes();
-
-    let report = WasmReport {
-        imports: wasm_info.report.imports,
-        memory_grow_flag: wasm_info.report.memory_grow_flag,
-        ei_check: wasm_info.report.ei_check,
-        code: CodeReport {
-            path: path.to_path_buf(),
-            has_allocator: wasm_info.report.code.has_allocator,
-            has_panic: wasm_info.report.code.has_panic,
-        },
-        forbidden_opcodes: wasm_info.report.forbidden_opcodes,
-    };
-
-    Ok(WasmInfo {
-        call_graph: wasm_info.call_graph,
-        write_index_functions: wasm_info.write_index_functions,
-        endpoints: wasm_info.endpoints,
-        report,
-    })
 }
 
 fn is_fail_allocator_triggered(data_section: DataSectionReader) -> bool {

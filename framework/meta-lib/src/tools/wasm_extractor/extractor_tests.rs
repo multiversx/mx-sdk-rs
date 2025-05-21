@@ -2,7 +2,7 @@
 pub mod tests {
     use std::{
         collections::{HashMap, HashSet},
-        path::{Path, PathBuf},
+        path::PathBuf,
         vec,
     };
 
@@ -12,7 +12,7 @@ pub mod tests {
         panic_report::PanicReport,
         wasm_extractor::{
             endpoint_info::FunctionInfo,
-            extractor::{get_view_endpoints, populate_wasm_info, WasmInfo},
+            extractor::{get_view_endpoints, WasmInfo},
         },
     };
 
@@ -418,9 +418,10 @@ pub mod tests {
     #[test]
     fn test_empty() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
-            let wasm_info =
-                populate_wasm_info(Path::new(""), &content, false, None, &HashMap::new())
-                    .expect("Unable to parse WASM content.");
+            let wasm_info = WasmInfo::default()
+                .add_wasm_data(&content)
+                .populate_wasm_info(false, None)
+                .expect("Unable to parse WASM content.");
             assert!(!wasm_info.report.memory_grow_flag);
             assert!(!wasm_info.report.code.has_allocator);
             assert_eq!(
@@ -433,9 +434,10 @@ pub mod tests {
     #[test]
     fn test_empty_with_mem_grow() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_MEM_GROW.as_bytes()) {
-            let wasm_info =
-                populate_wasm_info(Path::new(""), &content, false, None, &HashMap::new())
-                    .expect("Unable to parse WASM content.");
+            let wasm_info = WasmInfo::default()
+                .add_wasm_data(&content)
+                .populate_wasm_info(false, None)
+                .expect("Unable to parse WASM content.");
             assert!(wasm_info.report.memory_grow_flag);
             assert!(!wasm_info.report.code.has_allocator);
             assert_eq!(
@@ -448,14 +450,11 @@ pub mod tests {
     #[test]
     fn test_empty_with_fail_allocator() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_FAIL_ALLOCATOR.as_bytes()) {
-            let wasm_info = populate_wasm_info(
-                Path::new(""),
-                &content,
-                false,
-                None,
-                &HashMap::from([("init", false)]),
-            )
-            .expect("Unable to parse WASM content.");
+            let wasm_info = WasmInfo::default()
+                .add_endpoints(&HashMap::from([("init", false)]))
+                .add_wasm_data(&content)
+                .populate_wasm_info(false, None)
+                .expect("Unable to parse WASM content.");
             assert!(!wasm_info.report.memory_grow_flag);
             assert!(wasm_info.report.code.has_allocator);
             assert_eq!(
@@ -499,14 +498,11 @@ pub mod tests {
         ]);
 
         if let Ok(content) = Parser::new().parse_bytes(None, ADDER_WITH_ERR_IN_VIEW.as_bytes()) {
-            let wasm_info = populate_wasm_info(
-                Path::new(""),
-                &content,
-                false,
-                None,
-                &HashMap::from([("getSum", true), ("add", true)]),
-            )
-            .expect("Unable to parse WASM content.");
+            let wasm_info = WasmInfo::default()
+                .add_endpoints(&HashMap::from([("getSum", true), ("add", true)]))
+                .add_wasm_data(&content)
+                .populate_wasm_info(false, None)
+                .expect("Unable to parse WASM content.");
 
             assert_eq!(
                 expected_write_index_functions,

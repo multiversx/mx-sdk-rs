@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-#[derive(Debug, PartialEq, Eq, Default)]
+#[derive(Debug, PartialEq, Eq, Default, Clone)]
 pub struct FunctionInfo {
     pub indexes: HashSet<usize>,
     pub forbidden_opcodes: HashSet<String>,
@@ -36,7 +36,7 @@ impl FunctionInfo {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct EndpointInfo {
     pub index: usize,
     pub readonly: bool,
