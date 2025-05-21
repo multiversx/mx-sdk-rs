@@ -1,9 +1,7 @@
 use super::*;
 
 use multiversx_chain_vm::host::runtime::RuntimeWeakRef;
-use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
-};
+use multiversx_chain_vm_executor::{CompilationOptions, Executor, ExecutorError, Instance};
 use std::fmt;
 
 pub struct ContractDebugExecutor {
@@ -36,10 +34,6 @@ impl ContractDebugExecutor {
 }
 
 impl Executor for ContractDebugExecutor {
-    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        Ok(())
-    }
-
     fn new_instance(
         &self,
         wasm_bytes: &[u8],

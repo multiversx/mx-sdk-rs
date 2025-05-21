@@ -111,7 +111,7 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
                 gas as i64,
                 extra_gas_for_callback as i64,
                 callback_closure_handle,
-            );
+            )
         });
     }
 

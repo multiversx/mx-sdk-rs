@@ -1,17 +1,18 @@
 use multiversx_chain_vm::{executor::VMHooks, host::vm_hooks::VMHooksDispatcher};
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;
 
-use crate::executor::debug::StaticVarData;
+use crate::executor::debug::{ContractDebugInstanceState, StaticVarData};
 
-use super::{StaticApiVMHooksHandler, VMHooksApi, VMHooksApiBackend};
+use super::{StaticApiVMHooksContext, VMHooksApi, VMHooksApiBackend};
 
-fn new_static_api_vh() -> VMHooksDispatcher<StaticApiVMHooksHandler> {
-    VMHooksDispatcher::new(StaticApiVMHooksHandler::default())
+fn new_static_api_vh() -> VMHooksDispatcher<StaticApiVMHooksContext> {
+    VMHooksDispatcher::new(StaticApiVMHooksContext::default())
 }
 
 thread_local! {
-    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher<StaticApiVMHooksHandler>> = Mutex::new(new_static_api_vh());
+    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher<StaticApiVMHooksContext>> = Mutex::new(new_static_api_vh());
 
     static STATIC_API_STATIC_CELL: Mutex<StaticVarData> = Mutex::new(StaticVarData::default());
 }
@@ -24,11 +25,11 @@ impl VMHooksApiBackend for StaticApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         STATIC_API_VH_CELL.with(|vh_mutex| {
             let mut vh = vh_mutex.lock().unwrap();
-            f(&mut *vh)
+            f(&mut *vh).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
         })
     }
 
@@ -51,7 +52,7 @@ impl StaticApi {
     ///
     /// This placeholder then needs to be converted to something useful.
     pub fn is_current_address_placeholder(address: &Address) -> bool {
-        address == &StaticApiVMHooksHandler::CURRENT_ADDRESS_PLACEHOLDER
+        address == &StaticApiVMHooksContext::CURRENT_ADDRESS_PLACEHOLDER
     }
 
     pub fn reset() {

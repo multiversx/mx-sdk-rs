@@ -16,9 +16,7 @@ impl<VHB: VMHooksApiBackend> EndpointFinishApi for VMHooksApi<VHB> {
 impl<VHB: VMHooksApiBackend> EndpointFinishApiImpl for VMHooksApi<VHB> {
     fn finish_slice_u8(&self, bytes: &[u8]) {
         let (offset, length) = ContractDebugInstanceState::main_memory_ptr(bytes);
-        self.with_vm_hooks(|vh| {
-            vh.finish(offset, length);
-        })
+        self.with_vm_hooks(|vh| vh.finish(offset, length))
     }
 
     fn finish_big_int_raw(&self, handle: Self::BigIntHandle) {

@@ -3,22 +3,21 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 
-use multiversx_chain_vm_executor::{MemLength, MemPtr};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, BlockInfo},
-    chain_core::types::ReturnCode,
-    host::context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
-    host::vm_hooks::{
-        VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-        VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
-        VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
-        VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
+    host::{
+        context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
+        vm_hooks::VMHooksContext,
     },
+    schedule::GasSchedule,
     types::{VMAddress, VMCodeMetadata},
 };
 
 use crate::executor::debug::ContractDebugInstanceState;
+
+const ZERO_GAS_SCHEDULE: GasSchedule = GasSchedule::zeroed();
 
 #[derive(Default, Debug)]
 pub struct SingleTxApiData {
@@ -44,9 +43,9 @@ impl SingleTxApiData {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct SingleTxApiVMHooksHandler(Arc<SingleTxApiData>);
+pub struct SingleTxApiVMHooksContext(Arc<SingleTxApiData>);
 
-impl SingleTxApiVMHooksHandler {
+impl SingleTxApiVMHooksContext {
     pub fn with_mut_data<F, R>(&mut self, f: F) -> R
     where
         F: FnOnce(&mut SingleTxApiData) -> R,
@@ -57,7 +56,7 @@ impl SingleTxApiVMHooksHandler {
     }
 }
 
-impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
+impl VMHooksContext for SingleTxApiVMHooksContext {
     unsafe fn memory_load(&self, offset: MemPtr, length: MemLength) -> Vec<u8> {
         let slice = unsafe { ContractDebugInstanceState::main_memory_load(offset, length) };
         slice.to_vec()
@@ -73,8 +72,12 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         self.0.managed_types.lock().unwrap()
     }
 
-    fn halt_with_error(&mut self, status: ReturnCode, message: &str) {
-        panic!("VM error occured, status: {status}, message: {message}")
+    fn gas_schedule(&self) -> &GasSchedule {
+        &ZERO_GAS_SCHEDULE
+    }
+
+    fn use_gas(&mut self, _gas: u64) -> Result<(), VMHooksEarlyExit> {
+        Ok(())
     }
 
     fn input_ref(&self) -> &TxInput {
@@ -95,10 +98,11 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         })
     }
 
-    fn storage_write(&mut self, key: &[u8], value: &[u8]) {
+    fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit> {
         self.0.with_account_mut(&self.0.tx_input_box.to, |account| {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
+        Ok(())
     }
 
     fn get_previous_block_info(&self) -> &BlockInfo {
@@ -127,7 +131,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> ! {
+    ) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
@@ -137,7 +141,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
@@ -146,7 +150,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _to: VMAddress,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
-    ) -> Vec<Vec<u8>> {
+    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
@@ -156,7 +160,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _contract_code: Vec<u8>,
         _code_metadata: VMCodeMetadata,
         _args: Vec<Vec<u8>>,
-    ) -> (VMAddress, Vec<Vec<u8>>) {
+    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
@@ -166,27 +170,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
-    ) {
+    ) -> Result<(), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 }
-
-impl VMHooksBigInt for SingleTxApiVMHooksHandler {}
-impl VMHooksManagedBuffer for SingleTxApiVMHooksHandler {}
-impl VMHooksManagedMap for SingleTxApiVMHooksHandler {}
-impl VMHooksBigFloat for SingleTxApiVMHooksHandler {}
-impl VMHooksManagedTypes for SingleTxApiVMHooksHandler {}
-
-impl VMHooksCallValue for SingleTxApiVMHooksHandler {}
-impl VMHooksEndpointArgument for SingleTxApiVMHooksHandler {}
-impl VMHooksEndpointFinish for SingleTxApiVMHooksHandler {}
-impl VMHooksError for SingleTxApiVMHooksHandler {}
-impl VMHooksErrorManaged for SingleTxApiVMHooksHandler {}
-impl VMHooksStorageRead for SingleTxApiVMHooksHandler {}
-impl VMHooksStorageWrite for SingleTxApiVMHooksHandler {}
-impl VMHooksCrypto for SingleTxApiVMHooksHandler {}
-impl VMHooksBlockchain for SingleTxApiVMHooksHandler {}
-impl VMHooksLog for SingleTxApiVMHooksHandler {}
-impl VMHooksSend for SingleTxApiVMHooksHandler {}
-
-impl VMHooksHandler for SingleTxApiVMHooksHandler {}

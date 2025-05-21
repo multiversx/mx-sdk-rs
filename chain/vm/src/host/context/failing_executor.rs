@@ -8,13 +8,6 @@ use multiversx_chain_vm_executor::Executor;
 pub struct FailingExecutor;
 
 impl Executor for FailingExecutor {
-    fn set_opcode_cost(
-        &mut self,
-        _opcode_cost: &multiversx_chain_vm_executor::OpcodeCost,
-    ) -> Result<(), multiversx_chain_vm_executor::ExecutorError> {
-        panic!("called FailingExecutor")
-    }
-
     fn new_instance(
         &self,
         _wasm_bytes: &[u8],

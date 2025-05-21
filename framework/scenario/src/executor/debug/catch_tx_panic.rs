@@ -1,6 +1,6 @@
 use multiversx_chain_vm::host::context::TxPanic;
-use multiversx_chain_vm_executor::BreakpointValue;
-use multiversx_sc::err_msg;
+use multiversx_chain_vm_executor::{BreakpointValue, VMHooksEarlyExit};
+use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
 /// Catches all thrown panics, as follows:
 /// - BreakpointValue is considered expected abortion of execution and already handled, for them it returns Ok;
@@ -18,6 +18,15 @@ where
             if panic_any.downcast_ref::<BreakpointValue>().is_some() {
                 // breakpoints are considered to be already handled
                 Ok(())
+            } else if let Some(early_exit) = panic_any.downcast_ref::<VMHooksEarlyExit>() {
+                if early_exit.code == 0 {
+                    Ok(())
+                } else {
+                    Err(TxPanic::new(
+                        ReturnCode::from_u64(early_exit.code).unwrap(),
+                        &early_exit.message,
+                    ))
+                }
             } else {
                 // fallback, general panics
                 Err(interpret_panic_as_tx_panic(panic_any, panic_message_flag))

@@ -92,8 +92,9 @@ impl ManagedTypeContainer {
 
     /// Retrieves data saved in the format of a ManagedVec<ManagedBuffer>,
     /// i.e. the main data structure encodes the handles of other buffers.
-    pub fn mb_get_vec_of_bytes(&self, source_handle: RawHandle) -> Vec<Vec<u8>> {
+    pub fn mb_get_vec_of_bytes(&self, source_handle: RawHandle) -> (Vec<Vec<u8>>, usize) {
         let mut result = Vec::new();
+        let mut num_bytes_copied = 0;
         let data = self.mb_get(source_handle);
         assert!(
             data.len() % 4 == 0,
@@ -101,23 +102,36 @@ impl ManagedTypeContainer {
         );
         for chunk in data.chunks(4) {
             let item_handle = i32::from_be_bytes(chunk.try_into().unwrap());
-            result.push(self.mb_get(item_handle).to_vec());
+            let data = self.mb_get(item_handle).to_vec();
+            num_bytes_copied += data.len();
+            result.push(data);
         }
-        result
+        (result, num_bytes_copied)
     }
 
     /// Creates the underlying structure of a ManagedVec<ManagedBuffer> from memory..
-    pub fn mb_set_vec_of_bytes(&mut self, destination_handle: RawHandle, data: Vec<Vec<u8>>) {
+    pub fn mb_set_vec_of_bytes(
+        &mut self,
+        destination_handle: RawHandle,
+        data: Vec<Vec<u8>>,
+    ) -> usize {
         let mut m_vec_raw_data = Vec::new();
+        let mut num_bytes_copied = 0;
         for item in data.into_iter() {
+            num_bytes_copied += item.len();
             let handle = self.managed_buffer_map.insert_new_handle_raw(item);
             m_vec_raw_data.extend_from_slice(handle.to_be_bytes().as_slice());
         }
         self.mb_set(destination_handle, m_vec_raw_data);
+        num_bytes_copied
     }
 
-    pub fn mb_get_vec_of_esdt_payments(&self, source_handle: RawHandle) -> Vec<TxTokenTransfer> {
+    pub fn mb_get_vec_of_esdt_payments(
+        &self,
+        source_handle: RawHandle,
+    ) -> (Vec<TxTokenTransfer>, usize) {
         let mut result = Vec::new();
+        let mut num_bytes_copied = 0;
         let data = self.mb_get(source_handle);
         assert!(
             data.len() % 16 == 0,
@@ -126,29 +140,37 @@ impl ManagedTypeContainer {
         for chunk in data.chunks(16) {
             let token_id_handle = i32::from_be_bytes(chunk[0..4].try_into().unwrap());
             let token_id = self.mb_get(token_id_handle).to_vec();
+            num_bytes_copied += token_id.len();
 
             let nonce = u64::from_be_bytes(chunk[4..12].try_into().unwrap());
 
             let amount_handle = i32::from_be_bytes(chunk[12..16].try_into().unwrap());
             let amount = self.bu_get(amount_handle);
+            num_bytes_copied += (amount.bits() / 8) as usize;
+
             result.push(TxTokenTransfer {
                 token_identifier: token_id,
                 nonce,
                 value: amount,
             });
         }
-        result
+        (result, num_bytes_copied)
     }
 
     pub fn mb_set_vec_of_esdt_payments(
         &mut self,
         dest_handle: RawHandle,
         transfers: &[TxTokenTransfer],
-    ) {
+    ) -> usize {
+        let mut num_bytes_copied = 0;
+
         self.mb_set(dest_handle, vec![]);
 
         for transfer in transfers {
+            num_bytes_copied += transfer.token_identifier.len();
             let token_identifier_handle = self.mb_new(transfer.token_identifier.clone());
+
+            num_bytes_copied += (transfer.value.bits() / 8) as usize;
             let amount_handle = self.bi_new_from_big_int(transfer.value.clone().into());
 
             self.mb_append_bytes(
@@ -158,6 +180,8 @@ impl ManagedTypeContainer {
             self.mb_append_bytes(dest_handle, &transfer.nonce.to_be_bytes()[..]);
             self.mb_append_bytes(dest_handle, &handle_to_be_bytes(amount_handle)[..]);
         }
+
+        num_bytes_copied
     }
 }
 
@@ -174,8 +198,8 @@ pub mod tests {
         let mut m_types = ManagedTypeContainer::new();
         let handle = m_types.mb_new(vec![]);
         let data = vec![b"abc".to_vec(), b"defghi".to_vec(), b"jk".to_vec()];
-        m_types.mb_set_vec_of_bytes(handle, data.clone());
-        let retrieved = m_types.mb_get_vec_of_bytes(handle);
+        let _ = m_types.mb_set_vec_of_bytes(handle, data.clone());
+        let (retrieved, _) = m_types.mb_get_vec_of_bytes(handle);
         assert_eq!(data, retrieved);
     }
 
@@ -188,8 +212,8 @@ pub mod tests {
             nonce: 6,
             value: 789u32.into(),
         }];
-        m_types.mb_set_vec_of_esdt_payments(handle, transfers.as_slice());
-        let retrieved = m_types.mb_get_vec_of_esdt_payments(handle);
+        let _ = m_types.mb_set_vec_of_esdt_payments(handle, transfers.as_slice());
+        let (retrieved, _) = m_types.mb_get_vec_of_esdt_payments(handle);
         assert_eq!(transfers, retrieved);
     }
 }

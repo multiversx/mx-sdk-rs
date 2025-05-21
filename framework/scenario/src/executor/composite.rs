@@ -1,6 +1,5 @@
-use multiversx_chain_vm::executor_impl::ExecutorFileNotFoundError;
 use multiversx_chain_vm_executor::{
-    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
+    CompilationOptions, Executor, ExecutorError, Instance, MissingWasmError,
 };
 use simple_error::SimpleError;
 use std::fmt;
@@ -27,10 +26,6 @@ impl CompositeExecutor {
 }
 
 impl Executor for CompositeExecutor {
-    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
-        Ok(())
-    }
-
     fn new_instance(
         &self,
         wasm_bytes: &[u8],
@@ -65,7 +60,7 @@ fn is_recoverable_error(err: &ExecutorError) -> bool {
     if err.is::<ContractDebugExecutorNotRegisteredError>() {
         return true;
     }
-    if err.is::<ExecutorFileNotFoundError>() {
+    if err.is::<MissingWasmError>() {
         return true;
     }
     false

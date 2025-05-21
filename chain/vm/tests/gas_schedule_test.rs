@@ -17,3 +17,11 @@ fn serialize_deserialize_test() {
 
     assert_eq!(gas_schedule_v8, deserialized);
 }
+
+#[test]
+fn zeroed_schedule_test() {
+    const ZERO_GAS_SCHEDULE: GasSchedule = GasSchedule::zeroed();
+    assert_eq!(ZERO_GAS_SCHEDULE.wasm_opcode_cost.opcode_unreachable, 0);
+    assert_eq!(ZERO_GAS_SCHEDULE.wasm_opcode_cost.opcode_nop, 0);
+    assert_eq!(ZERO_GAS_SCHEDULE.wasm_opcode_cost.opcode_block, 0);
+}

@@ -1,3 +1,5 @@
+use std::mem::MaybeUninit;
+
 use multiversx_chain_vm_executor::OpcodeCost;
 use serde::{Deserialize, Serialize};
 
@@ -40,5 +42,10 @@ impl GasSchedule {
     pub fn from_toml_str(content: &str) -> Result<Self, toml::de::Error> {
         let full_schedule: GasSchedule = toml::from_str(content)?;
         Ok(full_schedule)
+    }
+
+    /// TODO: safer to replace with auto-generated zero const initializer
+    pub const fn zeroed() -> GasSchedule {
+        unsafe { MaybeUninit::zeroed().assume_init() }
     }
 }
