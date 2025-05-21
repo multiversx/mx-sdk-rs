@@ -1,18 +1,19 @@
 use std::path::PathBuf;
 
-use super::panic_report::PanicReport;
+use crate::tools::panic_report::PanicReport;
 
-pub struct ReportCreator {
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct CodeReport {
     pub path: PathBuf,
     pub has_allocator: bool,
     pub has_panic: PanicReport,
 }
 
-impl ReportCreator {}
+impl CodeReport {}
 
-impl Default for ReportCreator {
+impl Default for CodeReport {
     fn default() -> Self {
-        ReportCreator {
+        CodeReport {
             path: PathBuf::from(""),
             has_allocator: false,
             has_panic: PanicReport::None,
