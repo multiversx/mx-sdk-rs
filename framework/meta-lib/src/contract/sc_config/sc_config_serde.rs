@@ -64,6 +64,10 @@ pub struct ContractVariantSerde {
 
     #[serde(default)]
     pub profile: Option<ContractVariantProfileSerde>,
+
+    #[serde(default)]
+    #[serde(rename = "rustc-target")]
+    pub rustc_target: Option<String>,
 }
 
 #[derive(Deserialize, Default, Debug)]

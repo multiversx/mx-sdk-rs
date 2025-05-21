@@ -6,7 +6,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{ei::parse_check_ei, print_util::print_sc_config_main_deprecated};
+use crate::{ei::parse_check_ei, print_util::print_sc_config_main_deprecated, tools};
 
 use super::{
     contract_variant_settings::{parse_allocator, parse_stack_size},
@@ -81,6 +81,10 @@ impl ContractVariantBuilder {
                     default_features: cms.default_features,
                     kill_legacy_callback: cms.kill_legacy_callback,
                     profile: ContractVariantProfile::from_serde(&cms.profile),
+                    rustc_target: cms
+                        .rustc_target
+                        .clone()
+                        .unwrap_or_else(|| tools::build_target::default_target().to_owned()),
                 },
                 ..default
             },
