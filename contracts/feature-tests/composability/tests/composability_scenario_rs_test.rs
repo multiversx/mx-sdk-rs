@@ -279,6 +279,11 @@ fn forwarder_call_sync_accept_multi_transfer_rs() {
 }
 
 #[test]
+fn forwarder_call_sync_accept_multi_transfer_egld_rs() {
+    world().run("scenarios/forwarder_call_sync_accept_multi_transfer_egld.scen.json");
+}
+
+#[test]
 fn forwarder_call_sync_accept_nft_rs() {
     world().run("scenarios/forwarder_call_sync_accept_nft.scen.json");
 }
