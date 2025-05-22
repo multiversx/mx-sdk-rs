@@ -4,7 +4,7 @@ use multiversx_chain_vm::host::{
     context::{TxContextRef, TxFunctionName, TxPanic},
     runtime::RuntimeInstanceCall,
 };
-use multiversx_chain_vm_executor::{ExecutorError, Instance, InstanceCallError};
+use multiversx_chain_vm_executor::{ExecutorError, Instance, InstanceCallResult};
 use multiversx_sc::chain_core::types::ReturnCode;
 
 use super::{
@@ -15,6 +15,7 @@ use super::{
 /// Since it is an invalid function name, any other instance should reject it.
 const FUNC_CONTEXT_PUSH: &str = "<ContractDebugInstance-PushContext>";
 const FUNC_CONTEXT_POP: &str = "<ContractDebugInstance-PopContext>";
+const DEBUG_GAS_LIMIT: u64 = 0;
 
 #[derive(Clone, Debug)]
 pub struct ContractDebugInstance {
@@ -48,19 +49,14 @@ impl ContractDebugInstance {
     ) where
         F: FnOnce(),
     {
-        // assert!(
-        //     instance_call.func_name == TxFunctionName::WHITEBOX_CALL.as_str()
-        //         || instance_call.func_name == "init", // TODO make it also WHITEBOX_CALL or some whitebox init
-        //     "misconfigured whitebox call: {}",
-        //     instance_call.func_name,
-        // );
-
         assert!(
             instance_call.instance.has_function(FUNC_CONTEXT_PUSH),
             "lambda call is not running on top of a DebugSCInstance instance"
         );
 
-        let _ = instance_call.instance.call(FUNC_CONTEXT_PUSH);
+        let _ = instance_call
+            .instance
+            .call(FUNC_CONTEXT_PUSH, DEBUG_GAS_LIMIT);
 
         let result = catch_tx_panic(panic_message_flag, || {
             f();
@@ -73,7 +69,9 @@ impl ContractDebugInstance {
                 .replace_tx_result_with_error(tx_panic);
         }
 
-        let _ = instance_call.instance.call(FUNC_CONTEXT_POP);
+        let _ = instance_call
+            .instance
+            .call(FUNC_CONTEXT_POP, DEBUG_GAS_LIMIT);
     }
 
     fn call_endpoint(&self, func_name: &str) {
@@ -104,7 +102,7 @@ impl ContractDebugInstance {
 }
 
 impl Instance for ContractDebugInstance {
-    fn call(&self, func_name: &str) -> Result<(), InstanceCallError> {
+    fn call(&mut self, func_name: &str, _points_limit: u64) -> InstanceCallResult {
         match func_name {
             FUNC_CONTEXT_PUSH => {
                 ContractDebugStack::static_push(self.clone());
@@ -114,7 +112,7 @@ impl Instance for ContractDebugInstance {
             },
             _ => self.call_endpoint(func_name),
         }
-        Ok(())
+        InstanceCallResult::Ok
     }
 
     fn check_signatures(&self) -> bool {
@@ -133,7 +131,7 @@ impl Instance for ContractDebugInstance {
         panic!("ContractDebugInstance get_exported_function_names not yet supported")
     }
 
-    fn get_points_used(&self) -> Result<u64, ExecutorError> {
+    fn get_points_used(&mut self) -> Result<u64, ExecutorError> {
         Ok(0)
     }
 

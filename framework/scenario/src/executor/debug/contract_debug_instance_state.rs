@@ -48,16 +48,12 @@ impl ContractDebugInstanceState {
 }
 
 impl InstanceState for ContractDebugInstanceState {
-    fn get_points_limit(&self) -> Result<u64, ExecutorError> {
-        Ok(1)
+    fn get_points_used(&mut self) -> Result<u64, ExecutorError> {
+        Ok(0)
     }
 
     fn set_points_used(&mut self, _points: u64) -> Result<(), ExecutorError> {
         Ok(())
-    }
-
-    fn get_points_used(&self) -> Result<u64, ExecutorError> {
-        Ok(0)
     }
 
     fn memory_load_to_slice(&self, mem_ptr: MemPtr, dest: &mut [u8]) -> Result<(), ExecutorError> {
@@ -80,13 +76,6 @@ impl InstanceState for ContractDebugInstanceState {
             Self::main_memory_store(mem_ptr, data);
         }
         Ok(())
-    }
-
-    fn set_breakpoint_value(
-        &mut self,
-        breakpoint_value: BreakpointValue,
-    ) -> Result<(), ExecutorError> {
-        Self::breakpoint_panic(breakpoint_value)
     }
 }
 

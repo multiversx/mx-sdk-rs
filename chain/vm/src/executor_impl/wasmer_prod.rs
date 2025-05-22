@@ -2,6 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use multiversx_chain_vm_executor::{
     Executor, OpcodeCost, VMHooksEarlyExit, VMHooksLegacy, VMHooksLegacyAdapter,
+    VMHooksSetEarlyExit,
 };
 use multiversx_chain_vm_executor_wasmer::new_traits::{
     WasmerProdExecutor, WasmerProdInstanceState, WasmerProdRuntimeRef,
@@ -16,7 +17,7 @@ pub fn new_prod_executor(runtime_ref: RuntimeWeakRef) -> Box<dyn Executor + Send
     Box::new(WasmerProdExecutor::new(Box::new(runtime_ref)))
 }
 
-impl VMHooksLegacyAdapter for VMHooksDispatcher<TxVMHooksContext<WasmerProdInstanceState>> {
+impl VMHooksSetEarlyExit for VMHooksDispatcher<TxVMHooksContext<WasmerProdInstanceState>> {
     fn set_early_exit(&self, early_exit: VMHooksEarlyExit) {
         self.handler
             .context
@@ -30,7 +31,9 @@ impl WasmerProdRuntimeRef for RuntimeWeakRef {
         let runtime = self.upgrade();
         let tx_context_ref = runtime.get_executor_context();
         let vh_handler = TxVMHooksContext::new(tx_context_ref, instance_state);
-        Box::new(VMHooksDispatcher::new(vh_handler))
+        Box::new(VMHooksLegacyAdapter::new(VMHooksDispatcher::new(
+            vh_handler,
+        )))
     }
 
     fn opcode_cost(&self) -> std::sync::Arc<std::sync::Mutex<OpcodeCost>> {
