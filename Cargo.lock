@@ -3116,7 +3116,7 @@ dependencies = [
 [[package]]
 name = "multiversx-chain-vm-executor"
 version = "0.3.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=0d747c02a2e84470289f02e9d9b8b0d216e335fe#0d747c02a2e84470289f02e9d9b8b0d216e335fe"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=a74ac13dd2a2bf07766efc199df2e5a6ff507f01#a74ac13dd2a2bf07766efc199df2e5a6ff507f01"
 dependencies = [
  "serde",
  "toml 0.7.8",
@@ -3125,13 +3125,13 @@ dependencies = [
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer"
 version = "0.3.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=0d747c02a2e84470289f02e9d9b8b0d216e335fe#0d747c02a2e84470289f02e9d9b8b0d216e335fe"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=a74ac13dd2a2bf07766efc199df2e5a6ff507f01#a74ac13dd2a2bf07766efc199df2e5a6ff507f01"
 dependencies = [
- "anyhow",
  "chrono",
  "log",
  "loupe",
  "multiversx-chain-vm-executor",
+ "thiserror 2.0.12",
  "wasmer 2.2.1",
  "wasmer-types 2.2.1",
  "wasmer-vm 2.2.1",
@@ -3140,14 +3140,14 @@ dependencies = [
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer-experimental"
 version = "0.3.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=0d747c02a2e84470289f02e9d9b8b0d216e335fe#0d747c02a2e84470289f02e9d9b8b0d216e335fe"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=a74ac13dd2a2bf07766efc199df2e5a6ff507f01#a74ac13dd2a2bf07766efc199df2e5a6ff507f01"
 dependencies = [
- "anyhow",
  "chrono",
  "log",
  "loupe",
  "multiversx-chain-vm-executor",
  "rc-new-cyclic-fallible",
+ "thiserror 2.0.12",
  "wasmer 6.0.1",
  "wasmer-types 6.0.1",
 ]
