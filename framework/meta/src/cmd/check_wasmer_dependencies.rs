@@ -1,38 +1,15 @@
 use std::{
     env,
-    error::Error,
     ffi::OsString,
-    fmt::{Display, Formatter},
     path::Path,
-    process::{Command, ExitStatus, Stdio},
+    process::{Command, Stdio},
 };
 
 use colored::Colorize;
+use multiversx_sc_meta_lib::contract::sc_config::ExecuteCommandError;
 
 const WASMER_CRATE_NAME: &str = "multiversx-chain-vm-executor-wasmer ";
 const WASMER_EXPERIMENTAL_CRATE_NAME: &str = "multiversx-chain-vm-executor-wasmer-experimental ";
-
-#[derive(Debug)]
-pub enum ExecuteCommandError {
-    ErrorRunning(String),
-    JobFailed(String, ExitStatus),
-    ErrorParsing(String),
-}
-
-impl Error for ExecuteCommandError {}
-
-impl Display for ExecuteCommandError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let message = match self {
-            ExecuteCommandError::ErrorRunning(job) => format!("Error running {}", job),
-            ExecuteCommandError::JobFailed(job, status) => {
-                format!("Command {} returned {}", job, status)
-            },
-            ExecuteCommandError::ErrorParsing(job) => format!("Error parsing {} output", job),
-        };
-        write!(f, "ExecuteCommandError: {}", message)
-    }
-}
 
 pub fn check_wasmer_dependencies(path: &Path) {
     let cargo = env::var_os("CARGO").unwrap_or_else(|| OsString::from("cargo"));
@@ -71,10 +48,7 @@ fn execute_command(
         .map_err(|_| ExecuteCommandError::ErrorRunning(job.to_string()))?;
 
     if !output.status.success() {
-        return Err(ExecuteCommandError::JobFailed(
-            job.to_string(),
-            output.status,
-        ));
+        return Err(ExecuteCommandError::JobFailed(job.to_string()));
     }
 
     String::from_utf8(output.stdout).map_err(|_| ExecuteCommandError::ErrorParsing(job.to_string()))
