@@ -1,6 +1,6 @@
 # MultiversX blockchain base types, interfaces and builtin function names
 
-It provides various types and contants referring to the MultiversX blockchain base implementation.
+It provides various types and constants referring to the MultiversX blockchain base implementation.
 
 This functionality is designed to be minimal and to be used from both smart contract code and VM implementations.
 

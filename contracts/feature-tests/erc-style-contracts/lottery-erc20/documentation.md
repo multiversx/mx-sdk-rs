@@ -10,7 +10,7 @@ Now that that’s out of the way, there’s not much else to say in this section
 
 There is no difference in rights between users. Everyone is equal in the eyes of the lottery SC.
 
-Deployment of the lottery SC requires the addresss of the erc20 SC as argument.
+Deployment of the lottery SC requires the address of the erc20 SC as argument.
 
 # Actions after deploy
 

@@ -150,7 +150,7 @@ They are:
 		- `multiversx-sdk` - only contains the specifications of the gateway API, without a mechanism to call the API;
 		- `multiversx-sdk-http` - functionality to call the gateway via reqwest;
 		- `multiversx-sdk-dapp` - functionality to call the gateway via wasm-bindgen, to be used in WebAssembly front-ends;
-	- Major improvements in the retrieving of transactions and other blockchain data fron the API, many bugs fixed;
+	- Major improvements in the retrieving of transactions and other blockchain data from the API, many bugs fixed;
 	- Support for writing integration tests for interactors, using the Chain Simulator;
 		- Also added support for test-related `chain-simulator-tests` feature flag in `sc-meta`;
 	- Interactors on the front-end:
