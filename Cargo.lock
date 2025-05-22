@@ -2519,6 +2519,7 @@ dependencies = [
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
+ "serde",
  "unwrap-infallible",
 ]
 
