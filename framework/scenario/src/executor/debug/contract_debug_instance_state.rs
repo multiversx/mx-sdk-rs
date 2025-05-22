@@ -51,7 +51,7 @@ impl InstanceState for ContractDebugInstanceState {
     fn get_points_used(&mut self) -> Result<u64, ExecutorError> {
         Ok(0)
     }
-    
+
     fn set_points_used(&mut self, _points: u64) -> Result<(), ExecutorError> {
         Ok(())
     }
