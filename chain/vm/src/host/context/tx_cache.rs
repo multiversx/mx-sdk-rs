@@ -92,7 +92,7 @@ impl TxCache {
             .insert(account_data.address.clone(), account_data);
     }
 
-    pub fn increase_acount_nonce(&self, address: &VMAddress) {
+    pub fn increase_account_nonce(&self, address: &VMAddress) {
         self.with_account_mut(address, |account| {
             account.nonce += 1;
         });

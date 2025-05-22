@@ -43,7 +43,7 @@ For CLI use, insert one of the numbers below for the `token-type` parameter
 
 #### Set/Unset roles
 
-Before trying to make any kind of interaction with a token (e.g. Mint, Burn, Transfer) you should set the neccessary roles, even if you are the owner of the token. For CLI use, insert one or more numbers from below for the `roles` parameter, each corresponding to a role, each separated by one comma `e.g. --roles 1,2,8`
+Before trying to make any kind of interaction with a token (e.g. Mint, Burn, Transfer) you should set the necessary roles, even if you are the owner of the token. For CLI use, insert one or more numbers from below for the `roles` parameter, each corresponding to a role, each separated by one comma `e.g. --roles 1,2,8`
 
 - 1 => `Mint`
 - 2 => `Burn`

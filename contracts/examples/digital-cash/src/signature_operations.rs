@@ -48,14 +48,14 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
 
         let block_round = self.blockchain().get_block_round();
         let deposit = deposit_mapper.take();
-        let num_tokens_transfered = deposit.funds.len();
+        let num_tokens_transferred = deposit.funds.len();
         let mut deposited_fee = deposit.fees.value;
 
         let fee_token = deposited_fee.token_identifier.clone();
         let fee = self.fee(&fee_token).get();
         require!(deposit.expiration_round >= block_round, "deposit expired");
 
-        let fee_cost = fee * num_tokens_transfered as u64;
+        let fee_cost = fee * num_tokens_transferred as u64;
         deposited_fee.amount -= &fee_cost;
 
         self.collected_fees(&fee_token)

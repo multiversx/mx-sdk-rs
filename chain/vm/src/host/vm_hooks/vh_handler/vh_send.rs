@@ -233,7 +233,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
         if endpoint_name.is_empty() {
-            // immitating the behavior of the VM
+            // imitating the behavior of the VM
             // TODO: lift limitation from the VM, then also remove this condition here
             return Err(early_exit_vm_error(vm_err_msg::PROMISES_TOKENIZE_FAILED));
         }

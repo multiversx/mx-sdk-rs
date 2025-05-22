@@ -474,8 +474,8 @@ fn forwarder_sync_echo_rs() {
 }
 
 #[test]
-fn forwarder_tranfer_esdt_with_fees_rs() {
-    world().run("scenarios/forwarder_tranfer_esdt_with_fees.scen.json");
+fn forwarder_transfer_esdt_with_fees_rs() {
+    world().run("scenarios/forwarder_transfer_esdt_with_fees.scen.json");
 }
 
 #[test]

@@ -13,7 +13,7 @@ fn compute_ln<M: ManagedTypeApi>(
     data: &BigUint<M>,
     num_decimals: NumDecimals,
 ) -> Option<ManagedDecimalSigned<M, LnDecimals>> {
-    // start with aproximation, based on position of the most significant bit
+    // start with approximation, based on position of the most significant bit
     let Some(log2_floor) = data.log2_floor() else {
         // means the input was zero
         return None;
@@ -45,7 +45,7 @@ fn compute_log2<M: ManagedTypeApi>(
     data: &BigUint<M>,
     num_decimals: NumDecimals,
 ) -> Option<ManagedDecimalSigned<M, LnDecimals>> {
-    // start with aproximation, based on position of the most significant bit
+    // start with approximation, based on position of the most significant bit
     let Some(log2_floor) = data.log2_floor() else {
         // means the input was zero
         return None;

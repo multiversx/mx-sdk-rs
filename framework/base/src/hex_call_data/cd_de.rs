@@ -8,7 +8,7 @@ use alloc::{boxed::Box, vec::Vec};
 
 /// Deserializes from the MultiversX smart contract call format.
 ///
-/// This format consists of the function name, followed by '@', follwed by hex-encoded argument bytes separated by '@' characters.
+/// This format consists of the function name, followed by '@', followed by hex-encoded argument bytes separated by '@' characters.
 /// Example: "funcName@00000@aaaa@1234@@".
 /// Arguments can be empty.
 /// Argument hex encodings must always have an even number of digits.

@@ -334,43 +334,43 @@ pub fn test_managed_decimal_signed_rescale_down_3() {
 }
 
 #[test]
-pub fn test_substraction_managed_decimal_signed() {
+pub fn test_subtraction_managed_decimal_signed() {
     let fixed_1 = ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(1i64));
     let fixed_2 = ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(3i64));
     let fixed_3 = ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(-5i64));
     let fixed_4 = ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(-2i64));
 
-    let substraction_1 = fixed_2.clone() - fixed_1.clone();
+    let subtraction_1 = fixed_2.clone() - fixed_1.clone();
     assert_eq!(
-        substraction_1,
+        subtraction_1,
         ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(2i64))
     );
-    assert_eq!(substraction_1.into_raw_units(), &BigInt::from(200i64));
-    assert_eq!(substraction_1.trunc(), BigInt::from(2i64));
+    assert_eq!(subtraction_1.into_raw_units(), &BigInt::from(200i64));
+    assert_eq!(subtraction_1.trunc(), BigInt::from(2i64));
 
-    let substraction_2 = fixed_1.clone() - fixed_2.clone();
+    let subtraction_2 = fixed_1.clone() - fixed_2.clone();
     assert_eq!(
-        substraction_2,
+        subtraction_2,
         ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(-2i64))
     );
-    assert_eq!(substraction_2.into_raw_units(), &BigInt::from(-200i64));
-    assert_eq!(substraction_2.trunc(), BigInt::from(-2i64));
+    assert_eq!(subtraction_2.into_raw_units(), &BigInt::from(-200i64));
+    assert_eq!(subtraction_2.trunc(), BigInt::from(-2i64));
 
-    let substraction_3 = substraction_2 - fixed_3.clone();
+    let subtraction_3 = subtraction_2 - fixed_3.clone();
     assert_eq!(
-        substraction_3,
+        subtraction_3,
         ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(3i64))
     );
-    assert_eq!(substraction_3.into_raw_units(), &BigInt::from(300i64));
-    assert_eq!(substraction_3.trunc(), BigInt::from(3i64));
+    assert_eq!(subtraction_3.into_raw_units(), &BigInt::from(300i64));
+    assert_eq!(subtraction_3.trunc(), BigInt::from(3i64));
 
-    let substraction_4 = fixed_3.clone() - fixed_4.clone();
+    let subtraction_4 = fixed_3.clone() - fixed_4.clone();
     assert_eq!(
-        substraction_4,
+        subtraction_4,
         ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(-3i64))
     );
-    assert_eq!(substraction_4.into_raw_units(), &BigInt::from(-300i64));
-    assert_eq!(substraction_4.trunc(), BigInt::from(-3i64));
+    assert_eq!(subtraction_4.into_raw_units(), &BigInt::from(-300i64));
+    assert_eq!(subtraction_4.trunc(), BigInt::from(-3i64));
 }
 
 #[test]
@@ -400,7 +400,7 @@ pub fn test_multiplication_managed_decimal_signed() {
 }
 
 #[test]
-pub fn test_devision_managed_decimal_signed() {
+pub fn test_division_managed_decimal_signed() {
     let fixed_1 = ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(6i64));
     let fixed_2 = ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(2i64));
     let fixed_3 = ManagedDecimalSigned::<StaticApi, ConstDecimals<U2>>::from(BigInt::from(-8i64));
