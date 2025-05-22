@@ -3156,7 +3156,6 @@ dependencies = [
 name = "multiversx-price-aggregator-sc"
 version = "0.57.1"
 dependencies = [
- "arrayvec",
  "getrandom 0.2.16",
  "multiversx-sc",
  "multiversx-sc-modules",

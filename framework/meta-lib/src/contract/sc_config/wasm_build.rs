@@ -3,9 +3,9 @@ use crate::tools::build_target;
 use colored::Colorize;
 use std::process::{exit, ExitStatus};
 use std::{
+    collections::HashMap,
     env,
     ffi::{OsStr, OsString},
-    collections::HashMap,
     fs,
     path::{Path, PathBuf},
     process::Command,
