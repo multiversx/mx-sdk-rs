@@ -6,7 +6,7 @@ pub use runtime_instance_call_default::RuntimeInstanceCallLambdaDefault;
 
 use std::{
     ops::Deref,
-    sync::{Arc, Mutex, Weak},
+    sync::{Arc, RwLock, Weak},
 };
 
 use multiversx_chain_vm_executor::{CompilationOptions, Executor};
@@ -19,8 +19,8 @@ use crate::{
 
 pub struct Runtime {
     pub vm_ref: VMConfigRef,
-    pub executor: Box<dyn Executor + Send + Sync>,
-    pub executor_context_cell: Mutex<Option<TxContextRef>>,
+    executor: Box<dyn Executor + Send + Sync>,
+    context_cell: RwLock<Option<TxContextRef>>,
 }
 
 #[derive(Clone)]
@@ -34,20 +34,20 @@ impl Runtime {
         Runtime {
             vm_ref,
             executor,
-            executor_context_cell: Mutex::new(None),
+            context_cell: RwLock::new(None),
         }
     }
 
     pub fn get_executor_context(&self) -> TxContextRef {
-        self.executor_context_cell
-            .lock()
+        self.context_cell
+            .read()
             .unwrap()
             .clone()
             .expect("no executor context configured")
     }
 
     fn set_executor_context(&self, value: Option<TxContextRef>) {
-        let mut cell_ref = self.executor_context_cell.lock().unwrap();
+        let mut cell_ref = self.context_cell.write().unwrap();
         *cell_ref = value;
     }
 }
