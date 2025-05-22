@@ -117,13 +117,10 @@ impl RuntimeRef {
         self.set_executor_context(Some(tx_context_ref.clone()));
 
         let compilation_options = CompilationOptions {
-            gas_limit,
             unmetered_locals: 0,
             max_memory_grow: 0,
             max_memory_grow_delta: 0,
             opcode_trace: false,
-            metering: true,
-            runtime_breakpoints: true,
         };
 
         let mut instance = self
