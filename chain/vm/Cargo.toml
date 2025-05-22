@@ -47,19 +47,19 @@ path = "../core"
 [dependencies.multiversx-chain-vm-executor]
 version = "0.3.0"
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "8ff542983c753335f9b9189b7411b746bed0f926"
+rev = "0d747c02a2e84470289f02e9d9b8b0d216e335fe"
 # path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor"
 
 [dependencies.multiversx-chain-vm-executor-wasmer]
 version = "0.3.0"
 optional = true
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "8ff542983c753335f9b9189b7411b746bed0f926"
+rev = "0d747c02a2e84470289f02e9d9b8b0d216e335fe"
 # path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-wasmer"
 
 [dependencies.multiversx-chain-vm-executor-wasmer-experimental]
 version = "0.3.0"
 optional = true
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "8ff542983c753335f9b9189b7411b746bed0f926"
+rev = "0d747c02a2e84470289f02e9d9b8b0d216e335fe"
 # path = "/Users/andreim/multiversx/vm/mx-vm-executor-rs/vm-executor-experimental"

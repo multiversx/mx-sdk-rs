@@ -126,7 +126,7 @@ impl RuntimeRef {
             runtime_breakpoints: true,
         };
 
-        let instance = self
+        let mut instance = self
             .executor
             .new_instance(contract_code.as_slice(), &compilation_options)
             .expect("error instantiating executor instance");
@@ -134,8 +134,9 @@ impl RuntimeRef {
         self.set_executor_context(None);
 
         call_lambda.call(RuntimeInstanceCall {
-            instance: &*instance,
+            instance: &mut *instance,
             func_name: func_name.as_str(),
+            gas_limit,
             tx_context_ref: &tx_context_ref,
         });
 

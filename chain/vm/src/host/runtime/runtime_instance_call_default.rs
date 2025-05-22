@@ -32,7 +32,9 @@ fn default_instance_call(instance_call: RuntimeInstanceCall<'_>) {
         return;
     }
 
-    let result = instance_call.instance.call(instance_call.func_name);
+    let result = instance_call
+        .instance
+        .call(instance_call.func_name, instance_call.gas_limit);
     let mut tx_result_ref = instance_call.tx_context_ref.result_lock();
     if let Some(error_tx_result) = instance_call_error_result(result) {
         *tx_result_ref = error_tx_result;
