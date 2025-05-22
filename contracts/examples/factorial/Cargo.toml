@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/factorial.rs"
 
+[features]
+run-go-tests = ["multiversx-sc-scenario/run-go-tests"]
+
 [dependencies.multiversx-sc]
 version = "0.57.1"
 path = "../../../framework/base"
@@ -15,3 +18,4 @@ path = "../../../framework/base"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.57.1"
 path = "../../../framework/scenario"
+features = ["wasmer-experimental"]

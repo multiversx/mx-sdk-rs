@@ -1,19 +1,27 @@
-use multiversx_chain_vm::tx_mock::{TxContext, TxContextStack};
+use std::sync::Arc;
+
+use multiversx_chain_vm::host::context::TxContext;
 use multiversx_sc::{
     api::{HandleConstraints, RawHandle},
     codec::TryStaticCast,
 };
-use std::sync::Arc;
+
+use crate::executor::debug::ContractDebugStack;
 
 #[derive(Clone)]
 pub struct DebugHandle {
+    /// TODO: would be nice to be an actual TxContextRef,
+    /// but that requires changing the debugger scripts
     pub(crate) context: Arc<TxContext>,
     raw_handle: RawHandle,
 }
 
 impl DebugHandle {
     pub fn is_on_current_context(&self) -> bool {
-        Arc::ptr_eq(&self.context, &TxContextStack::static_peek())
+        Arc::ptr_eq(
+            &self.context,
+            &ContractDebugStack::static_peek().tx_context_ref.into_ref(),
+        )
     }
 
     pub fn is_on_same_context(&self, other: &DebugHandle) -> bool {
@@ -37,7 +45,7 @@ impl core::fmt::Debug for DebugHandle {
 impl HandleConstraints for DebugHandle {
     fn new(handle: multiversx_sc::api::RawHandle) -> Self {
         Self {
-            context: TxContextStack::static_peek(),
+            context: ContractDebugStack::static_peek().tx_context_ref.into_ref(),
             raw_handle: handle,
         }
     }

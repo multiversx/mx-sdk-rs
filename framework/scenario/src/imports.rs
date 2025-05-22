@@ -8,7 +8,7 @@ pub use crate::{
     facade::{
         expr::*, result_handlers::*, world_tx::*, ContractInfo, ScenarioWorld, WhiteboxContract,
     },
-    managed_address, managed_biguint, managed_buffer, managed_token_id, num_bigint,
+    managed_address, managed_biguint, managed_buffer, managed_token_id, meta, num_bigint,
     num_bigint::BigInt as RustBigInt,
     num_bigint::BigUint as RustBigUint,
     rust_biguint,
@@ -18,6 +18,7 @@ pub use crate::{
             ScDeployStep, ScQueryStep, Scenario, SetStateStep, TransferStep, TxESDT, TxExpect,
             TypedResponse, TypedScDeploy,
         },
+        run_vm::ScenarioExecutorConfig,
         ScenarioRunner,
     },
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
@@ -26,3 +27,5 @@ pub use crate::{
 };
 
 pub use crate::multiversx_sc::chain_core::types::ReturnCode;
+
+pub use multiversx_chain_vm::schedule::GasScheduleVersion;

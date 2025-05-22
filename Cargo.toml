@@ -24,6 +24,7 @@ members = [
   "tools/mxpy-snippet-generator",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
+  "tools/gas-schedule-generator",
 
   "contracts/modules",
 
@@ -191,4 +192,6 @@ members = [
   "contracts/feature-tests/scenario-tester/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
+
+  # "contracts/feature-tests/gas-tests",
 ]
