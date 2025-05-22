@@ -54,7 +54,7 @@ impl AdderInteract {
             .use_chain_simulator(config.use_chain_simulator());
         interactor.set_current_dir_from_workspace("contracts/examples/adder/interactor");
 
-        let adder_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
+        let adder_owner_address = interactor.register_wallet(test_wallets::mike()).await;
         let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
 
         interactor.generate_blocks(30u64).await.unwrap();

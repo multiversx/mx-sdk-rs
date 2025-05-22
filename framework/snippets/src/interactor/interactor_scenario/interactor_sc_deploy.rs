@@ -1,4 +1,8 @@
+use std::process;
+
+use super::error_message::deploy_err_message;
 use crate::{network_response, InteractorBase};
+use anyhow::Error;
 use log::info;
 use multiversx_sc_scenario::{
     imports::{Address, Bech32Address},
@@ -31,20 +35,22 @@ where
         }
     }
 
-    pub async fn launch_sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) -> String {
+    pub async fn launch_sc_deploy(
+        &mut self,
+        sc_deploy_step: &mut ScDeployStep,
+    ) -> Result<String, Error> {
         self.pre_runners.run_sc_deploy_step(sc_deploy_step);
 
         let sender_address = &sc_deploy_step.tx.from.value;
         let mut transaction = self.sc_deploy_to_blockchain_tx(sc_deploy_step);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
-        let tx_hash = self
-            .proxy
-            .request(SendTxRequest(&transaction))
-            .await
-            .expect("error sending tx (possible API failure)");
-        println!("sc deploy tx hash: {tx_hash}");
-        info!("sc deploy tx hash: {}", tx_hash);
+        let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
+
+        if let Ok(tx_hash) = tx_hash.as_ref() {
+            println!("sc deploy tx hash: {tx_hash}");
+            info!("sc deploy tx hash: {tx_hash}");
+        }
 
         tx_hash
     }
@@ -54,7 +60,14 @@ where
         S: AsMut<ScDeployStep>,
     {
         let sc_deploy_step = sc_deploy_step.as_mut();
-        let tx_hash = self.launch_sc_deploy(sc_deploy_step).await;
+        let tx_hash = match self.launch_sc_deploy(sc_deploy_step).await {
+            Ok(hash) => hash,
+            Err(err) => {
+                deploy_err_message(&err);
+                process::exit(1);
+            },
+        };
+
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
