@@ -175,7 +175,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
                         token_id_len as isize,
                         nonce as i64,
                         dest.get_raw_handle_unchecked(),
-                    );
+                    )
                 })
             })
         });

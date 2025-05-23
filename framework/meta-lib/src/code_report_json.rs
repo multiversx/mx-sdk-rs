@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::tools::report_creator::ReportCreator;
+use crate::tools::CodeReport;
 
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -19,7 +19,7 @@ pub struct CodeReportJson {
 }
 
 impl CodeReportJson {
-    pub fn new(report: &ReportCreator, size: usize) -> CodeReportJson {
+    pub fn new(report: &CodeReport, size: usize) -> CodeReportJson {
         CodeReportJson {
             path: report.path.to_string_lossy().to_string(),
             size,

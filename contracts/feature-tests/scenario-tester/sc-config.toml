@@ -1,2 +1,11 @@
 [[proxy]]
 path = "src/scenario_tester_proxy.rs"
+
+[contracts.scenario-tester]
+add-unlabelled = true
+
+[contracts.invalid]
+name = "forbidden-opcodes"
+add-unlabelled = false
+add-labels = ["forbidden-opcodes"]
+add-endpoints = ["init"]

@@ -4,7 +4,7 @@ use wasmparser::DataSectionReader;
 const PANIC_WITH_MESSAGE: &[u8; 16] = b"panic occurred: ";
 const PANIC_WITHOUT_MESSAGE: &[u8; 14] = b"panic occurred";
 
-#[derive(Default, PartialEq, Clone)]
+#[derive(Default, PartialEq, Clone, Eq, Debug)]
 pub enum PanicReport {
     #[default]
     None,

@@ -5,8 +5,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-// use super::{version_req::VersionReq, DependencyReference, GitReference};
-
 /// Used for retrieving crate versions.
 pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
     "multiversx-sc",

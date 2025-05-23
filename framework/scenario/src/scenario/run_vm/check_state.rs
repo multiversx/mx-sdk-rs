@@ -5,8 +5,8 @@ use crate::scenario::model::{
 use num_traits::Zero;
 
 use multiversx_chain_vm::{
+    blockchain::state::{AccountEsdt, BlockchainState, EsdtData, EsdtInstance, EsdtInstances},
     display_util::{bytes_to_string, verbose_hex, verbose_hex_list},
-    world_mock::{AccountEsdt, BlockchainState, EsdtData, EsdtInstance, EsdtInstances},
 };
 
 use super::ScenarioVMRunner;

@@ -1,4 +1,4 @@
-use multiversx_chain_vm::{tx_mock::TxResult, types::H256};
+use multiversx_chain_vm::{host::context::TxResult, types::H256};
 use multiversx_sc::types::Address;
 
 use super::{Log, TxExpect, TxResponseStatus};
@@ -43,6 +43,7 @@ impl TxResponse {
                     data: tx_log.data.clone(),
                 })
                 .collect(),
+            gas_used: tx_result.gas_used.as_u64(),
             ..Default::default()
         }
     }

@@ -1,13 +1,9 @@
 use crate::api::VmApiImpl;
-use multiversx_sc::{
-    api::{EndpointArgumentApi, EndpointArgumentApiImpl},
-    types::heap::BoxedBytes,
-};
+use multiversx_sc::api::{EndpointArgumentApi, EndpointArgumentApiImpl};
 
 unsafe extern "C" {
     fn getNumArguments() -> i32;
     fn getArgumentLength(id: i32) -> i32;
-    fn getArgument(id: i32, dstOffset: *mut u8) -> i32;
 
     // managed buffer API (currently the main one)
     fn mBufferGetArgument(argId: i32, mBufferHandle: i32) -> i32;
@@ -50,17 +46,6 @@ impl EndpointArgumentApiImpl for VmApiImpl {
     fn load_argument_managed_buffer(&self, arg_index: i32, dest: Self::ManagedBufferHandle) {
         unsafe {
             mBufferGetArgument(arg_index, dest);
-        }
-    }
-
-    fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
-        let len = self.get_argument_len(arg_index);
-        unsafe {
-            let mut res = BoxedBytes::zeros(len);
-            if len > 0 {
-                getArgument(arg_index, res.as_mut_ptr());
-            }
-            res
         }
     }
 
