@@ -21,10 +21,6 @@ pub trait TokenIdentifierFeatures {
         &self,
         opt_back_transfers: Option<BackTransfers<Self::Api>>,
     ) -> Option<BackTransfers<Self::Api>> {
-        opt_back_transfers.map(|back_transfers| {
-            let returned_transfers = back_transfers.clone();
-
-            returned_transfers
-        })
+        opt_back_transfers.map(|back_transfers| back_transfers.clone())
     }
 }
