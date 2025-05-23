@@ -13,7 +13,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-#[cfg_attr(not(feature = "run-go-tests"), ignore)]
+#[cfg_attr(not(feature = "compiled-sc-tests"), ignore)]
 fn factorial_wasmer_rs() {
     world().run("scenarios/factorial.scen.json");
 }

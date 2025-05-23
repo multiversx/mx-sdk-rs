@@ -9,7 +9,7 @@ publish = false
 path = "src/factorial.rs"
 
 [features]
-run-go-tests = ["multiversx-sc-scenario/run-go-tests"]
+compiled-sc-tests = ["multiversx-sc-scenario/compiled-sc-tests"]
 
 [dependencies.multiversx-sc]
 version = "0.57.1"
