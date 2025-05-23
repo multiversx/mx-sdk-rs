@@ -18,8 +18,9 @@ const PROPOSER_BALANCE: u64 = 100_000_000;
 const QUORUM_SIZE: usize = 1;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain =
-        ScenarioWorld::new().executor_config(ScenarioExecutorConfig::TryDebuggerThenExperimental);
+    let mut blockchain = ScenarioWorld::new().executor_config(
+        ScenarioExecutorConfig::Debugger.then(ScenarioExecutorConfig::Experimental),
+    );
 
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
     blockchain.register_contract(MULTISIG_CODE_PATH, multisig::ContractBuilder);

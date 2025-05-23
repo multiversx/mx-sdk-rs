@@ -15,7 +15,6 @@ use crate::{
 
 use super::ScenarioExecutorConfig;
 
-
 /// Wraps calls to the blockchain mock,
 /// while implementing the StepRunner interface.
 #[derive(Default, Debug)]
@@ -38,7 +37,7 @@ impl ScenarioVMRunner {
 
     fn create_executor(
         &self,
-        config: ScenarioExecutorConfig,
+        config: &ScenarioExecutorConfig,
         weak: RuntimeWeakRef,
     ) -> Box<dyn Executor + Send + Sync> {
         match config {
@@ -48,48 +47,17 @@ impl ScenarioVMRunner {
             )),
             ScenarioExecutorConfig::WasmerProd => new_prod_executor(weak),
             ScenarioExecutorConfig::Experimental => new_experimental_executor(weak),
-            ScenarioExecutorConfig::TryDebuggerThenWasmerProd => {
-                Box::new(CompositeExecutor::new(vec![
-                    Box::new(ContractDebugExecutor::new(
-                        weak.clone(),
-                        self.contract_map_ref.clone(),
-                    )),
-                    new_prod_executor(weak),
-                ]))
-            },
-            ScenarioExecutorConfig::TryWasmerProdThenDebugger => {
-                Box::new(CompositeExecutor::new(vec![
-                    new_prod_executor(weak.clone()),
-                    Box::new(ContractDebugExecutor::new(
-                        weak,
-                        self.contract_map_ref.clone(),
-                    )),
-                ]))
-            },
-            ScenarioExecutorConfig::TryDebuggerThenExperimental => {
-                Box::new(CompositeExecutor::new(vec![
-                    Box::new(ContractDebugExecutor::new(
-                        weak.clone(),
-                        self.contract_map_ref.clone(),
-                    )),
-                    new_experimental_executor(weak),
-                ]))
-            },
-            ScenarioExecutorConfig::TryExperimentalThenDebugger => {
-                Box::new(CompositeExecutor::new(vec![
-                    new_experimental_executor(weak.clone()),
-                    Box::new(ContractDebugExecutor::new(
-                        weak,
-                        self.contract_map_ref.clone(),
-                    )),
-                ]))
-            },
+            ScenarioExecutorConfig::Composite(list) => Box::new(CompositeExecutor::new(
+                list.iter()
+                    .map(|sub_config| self.create_executor(sub_config, weak.clone()))
+                    .collect(),
+            )),
         }
     }
 
     pub fn create_debugger_runtime(&self) -> RuntimeRef {
         RuntimeRef::new_cyclic(|weak| {
-            let executor = self.create_executor(self.executor_config, weak);
+            let executor = self.create_executor(&self.executor_config, weak);
             Runtime::new(self.blockchain_mock.vm.clone(), executor)
         })
     }
