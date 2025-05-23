@@ -3,7 +3,7 @@ use multiversx_chain_vm::{blockchain::state::BlockchainState, schedule::GasSched
 use crate::{
     scenario::{
         run_trace::ScenarioTrace,
-        run_vm::{ScenarioExecutorConfig, ScenarioVMRunner},
+        run_vm::{ExecutorConfig, ScenarioVMRunner},
     },
     vm_go_tool::run_mx_scenario_go,
 };
@@ -50,7 +50,7 @@ impl ScenarioWorld {
         Self::debugger()
     }
 
-    pub fn executor_config(mut self, config: ScenarioExecutorConfig) -> Self {
+    pub fn executor_config(mut self, config: ExecutorConfig) -> Self {
         self.get_mut_debugger_backend().vm_runner.executor_config = config;
         self
     }

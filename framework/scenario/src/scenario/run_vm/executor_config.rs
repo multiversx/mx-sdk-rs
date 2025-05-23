@@ -1,13 +1,13 @@
 #[derive(Default, Clone, Debug)]
-pub enum ScenarioExecutorConfig {
+pub enum ExecutorConfig {
     #[default]
     Debugger,
     WasmerProd,
     Experimental,
-    Composite(Vec<ScenarioExecutorConfig>),
+    Composite(Vec<ExecutorConfig>),
 }
 
-impl ScenarioExecutorConfig {
+impl ExecutorConfig {
     /// Try using the current config, if it cannot be used, attempt the same with the next one.
     pub fn then(self, next: Self) -> Self {
         if let Self::Composite(mut list) = self {

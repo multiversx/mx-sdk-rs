@@ -1,7 +1,7 @@
 mod af_proxy;
 use multiversx_sc::types::{TestAddress, TestSCAddress};
 use multiversx_sc_scenario::{
-    imports::ScenarioExecutorConfig, ExpectMessage, ScenarioTxRun, ScenarioWorld,
+    imports::ExecutorConfig, ExpectMessage, ScenarioTxRun, ScenarioWorld,
 };
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
@@ -9,9 +9,8 @@ const CODE_EXPR: &str = "mxsc:output/alloc-features.mxsc.json";
 const SC_AF: TestSCAddress = TestSCAddress::new("alloc-features");
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new().executor_config(
-        ScenarioExecutorConfig::Debugger.then(ScenarioExecutorConfig::Experimental),
-    );
+    let mut blockchain = ScenarioWorld::new()
+        .executor_config(ExecutorConfig::Debugger.then(ExecutorConfig::Experimental));
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/alloc-features");
     blockchain.register_contract(CODE_EXPR, alloc_features::ContractBuilder);

@@ -13,7 +13,7 @@ use crate::{
     scenario::{model::*, ScenarioRunner},
 };
 
-use super::ScenarioExecutorConfig;
+use super::ExecutorConfig;
 
 /// Wraps calls to the blockchain mock,
 /// while implementing the StepRunner interface.
@@ -21,7 +21,7 @@ use super::ScenarioExecutorConfig;
 pub struct ScenarioVMRunner {
     pub contract_map_ref: ContractMapRef,
     pub blockchain_mock: BlockchainMock,
-    pub executor_config: ScenarioExecutorConfig,
+    pub executor_config: ExecutorConfig,
 }
 
 impl ScenarioVMRunner {
@@ -31,23 +31,23 @@ impl ScenarioVMRunner {
         ScenarioVMRunner {
             contract_map_ref,
             blockchain_mock,
-            executor_config: ScenarioExecutorConfig::default(),
+            executor_config: ExecutorConfig::default(),
         }
     }
 
     fn create_executor(
         &self,
-        config: &ScenarioExecutorConfig,
+        config: &ExecutorConfig,
         weak: RuntimeWeakRef,
     ) -> Box<dyn Executor + Send + Sync> {
         match config {
-            ScenarioExecutorConfig::Debugger => Box::new(ContractDebugExecutor::new(
+            ExecutorConfig::Debugger => Box::new(ContractDebugExecutor::new(
                 weak,
                 self.contract_map_ref.clone(),
             )),
-            ScenarioExecutorConfig::WasmerProd => new_prod_executor(weak),
-            ScenarioExecutorConfig::Experimental => new_experimental_executor(weak),
-            ScenarioExecutorConfig::Composite(list) => Box::new(CompositeExecutor::new(
+            ExecutorConfig::WasmerProd => new_prod_executor(weak),
+            ExecutorConfig::Experimental => new_experimental_executor(weak),
+            ExecutorConfig::Composite(list) => Box::new(CompositeExecutor::new(
                 list.iter()
                     .map(|sub_config| self.create_executor(sub_config, weak.clone()))
                     .collect(),
