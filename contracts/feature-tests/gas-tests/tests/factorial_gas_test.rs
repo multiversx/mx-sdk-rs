@@ -45,7 +45,7 @@ fn factorial_user_error(mut world: ScenarioWorld) {
 #[cfg_attr(not(feature = "wasmer-experimental"), ignore)]
 fn factorial_gas_wasmer_experimental() {
     let world = ScenarioWorld::new()
-        .executor_config(ScenarioExecutorConfig::Experimental)
+        .executor_config(ExecutorConfig::Experimental)
         .gas_schedule(GasScheduleVersion::V8);
     factorial_gas_test(world);
 }
@@ -54,7 +54,7 @@ fn factorial_gas_wasmer_experimental() {
 #[cfg_attr(not(feature = "wasmer-experimental"), ignore)]
 fn factorial_user_error_wasmer_experimental() {
     let world = ScenarioWorld::new()
-        .executor_config(ScenarioExecutorConfig::Experimental)
+        .executor_config(ExecutorConfig::Experimental)
         .gas_schedule(GasScheduleVersion::V8);
     factorial_user_error(world);
 }
@@ -63,7 +63,7 @@ fn factorial_user_error_wasmer_experimental() {
 #[cfg_attr(not(feature = "wasmer-prod"), ignore)]
 fn factorial_gas_wasmer_prod() {
     let world = ScenarioWorld::new()
-        .executor_config(ScenarioExecutorConfig::WasmerProd)
+        .executor_config(ExecutorConfig::WasmerProd)
         .gas_schedule(GasScheduleVersion::V8);
     factorial_gas_test(world);
 }
@@ -72,7 +72,7 @@ fn factorial_gas_wasmer_prod() {
 #[cfg_attr(not(feature = "wasmer-prod"), ignore)]
 fn factorial_user_error_wasmer_prod() {
     let world = ScenarioWorld::new()
-        .executor_config(ScenarioExecutorConfig::WasmerProd)
+        .executor_config(ExecutorConfig::WasmerProd)
         .gas_schedule(GasScheduleVersion::V8);
     factorial_user_error(world);
 }

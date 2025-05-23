@@ -3099,7 +3099,7 @@ dependencies = [
  "hex-literal",
  "itertools 0.14.0",
  "multiversx-chain-core",
- "multiversx-chain-vm-executor 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-chain-vm-executor",
  "multiversx-chain-vm-executor-wasmer",
  "multiversx-chain-vm-executor-wasmer-experimental",
  "num-bigint",
@@ -3123,23 +3123,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "multiversx-chain-vm-executor"
-version = "0.4.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=f96755dcf66dd0c82b9c5eb33d11c49b7385758a#f96755dcf66dd0c82b9c5eb33d11c49b7385758a"
-dependencies = [
- "serde",
- "toml 0.7.8",
-]
-
-[[package]]
 name = "multiversx-chain-vm-executor-wasmer"
 version = "0.4.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=f96755dcf66dd0c82b9c5eb33d11c49b7385758a#f96755dcf66dd0c82b9c5eb33d11c49b7385758a"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=163cf65be3cd204408c6d23b264e17aa9a9449e2#163cf65be3cd204408c6d23b264e17aa9a9449e2"
 dependencies = [
  "chrono",
  "log",
  "loupe",
- "multiversx-chain-vm-executor 0.4.0 (git+https://github.com/multiversx/mx-vm-executor-rs?rev=f96755dcf66dd0c82b9c5eb33d11c49b7385758a)",
+ "multiversx-chain-vm-executor",
  "thiserror 2.0.12",
  "wasmer 2.2.1",
  "wasmer-types 2.2.1",
@@ -3155,7 +3146,7 @@ dependencies = [
  "chrono",
  "log",
  "loupe",
- "multiversx-chain-vm-executor 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-chain-vm-executor",
  "rc-new-cyclic-fallible",
  "thiserror 2.0.12",
  "wasmer 6.0.1",
@@ -3292,7 +3283,7 @@ dependencies = [
  "log",
  "multiversx-chain-scenario-format",
  "multiversx-chain-vm",
- "multiversx-chain-vm-executor 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "multiversx-chain-vm-executor",
  "multiversx-sc",
  "multiversx-sc-meta-lib",
  "num-bigint",
