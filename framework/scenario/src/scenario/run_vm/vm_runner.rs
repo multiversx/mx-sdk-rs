@@ -13,17 +13,8 @@ use crate::{
     scenario::{model::*, ScenarioRunner},
 };
 
-#[derive(Default, Clone, Copy, Debug)]
-pub enum ScenarioExecutorConfig {
-    #[default]
-    Debugger,
-    WasmerProd,
-    Experimental,
-    TryDebuggerThenWasmerProd,
-    TryWasmerProdThenDebugger,
-    TryDebuggerThenExperimental,
-    TryExperimentalThenDebugger,
-}
+use super::ScenarioExecutorConfig;
+
 
 /// Wraps calls to the blockchain mock,
 /// while implementing the StepRunner interface.
