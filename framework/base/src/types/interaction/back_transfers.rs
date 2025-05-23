@@ -4,6 +4,7 @@ use crate::{
 };
 
 /// Holding back-transfer data, as retrieved from the VM.
+#[derive(Clone)]
 pub struct BackTransfers<A>
 where
     A: ManagedTypeApi,
