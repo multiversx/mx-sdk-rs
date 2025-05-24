@@ -195,7 +195,7 @@ pub fn cargo_test(target: &ContractCreatorTarget) {
     ];
     if BUILD_CONTRACTS {
         args.push("--features");
-        args.push("multiversx-sc-scenario/compiled-sc-tests");
+        args.push("multiversx-sc-scenario/run-go-tests");
     }
 
     let exit_status = Command::new("cargo")
