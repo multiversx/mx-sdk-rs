@@ -69,7 +69,7 @@ pub const VERSIONS: &[FrameworkVersion] = framework_versions![
     0.48.0,
     0.48.1,
     0.49.0,
-    0.57.1,
+    0.50.0,
     0.50.1,
     0.50.2,
     0.50.3,
