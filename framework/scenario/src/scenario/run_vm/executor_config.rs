@@ -10,10 +10,11 @@ pub enum ExecutorConfig {
     /// Use the compiled contract in the experimental Wasmer 6 executor.
     Experimental,
 
-    /// Use the compiled contract only if feature `compiled-sc-tests` is active. Otherwise use fallback config.
-    ///
-    /// Forwards to the experimental Wasmer 6 executor.
-    CompiledTestsOr(Box<ExecutorConfig>),
+    /// If feature `compiled-sc-tests` is active, use the given config. Otherwise use fallback config.
+    CompiledFeatureIfElse {
+        if_compiled: Box<ExecutorConfig>,
+        fallback: Box<ExecutorConfig>,
+    },
 
     /// Defines a list of executors, to be used in order.
     /// If one of them refuses to execute, the next one is used as fallback.
@@ -38,8 +39,16 @@ impl ExecutorConfig {
     }
 
     /// Use the compiled contract only if feature `compiled-sc-tests` is active. Otherwise use fallback config.
+    pub fn compiled_tests_if_else(if_compiled: Self, fallback: Self) -> Self {
+        Self::CompiledFeatureIfElse {
+            if_compiled: Box::new(if_compiled),
+            fallback: Box::new(fallback),
+        }
+    }
+
+    /// Run the compiled contract with the experimental executor if feature `compiled-sc-tests` is active. Otherwise use fallback config.
     pub fn compiled_tests_or(fallback: Self) -> Self {
-        Self::CompiledTestsOr(Box::new(fallback))
+        Self::compiled_tests_if_else(Self::Experimental, fallback)
     }
 
     /// Tests with:
@@ -115,10 +124,13 @@ mod tests {
     fn executor_config_full_suite() {
         assert_eq!(
             ExecutorConfig::full_suite(),
-            ExecutorConfig::CompiledTestsOr(Box::new(ExecutorConfig::Composite(vec![
-                ExecutorConfig::Debugger,
-                ExecutorConfig::Experimental,
-            ])))
+            ExecutorConfig::CompiledFeatureIfElse {
+                if_compiled: Box::new(ExecutorConfig::Experimental),
+                fallback: Box::new(ExecutorConfig::Composite(vec![
+                    ExecutorConfig::Debugger,
+                    ExecutorConfig::Experimental,
+                ]))
+            }
         );
     }
 }
