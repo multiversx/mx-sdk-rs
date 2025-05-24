@@ -205,11 +205,17 @@ impl ScCallStep {
             .expect("SC call response not yet available")
     }
 
-    pub fn save_response(&mut self, tx_response: TxResponse) {
+    pub fn save_response(&mut self, mut tx_response: TxResponse) {
         if let Some(expect) = &mut self.expect {
             if expect.build_from_response {
                 expect.update_from_response(&tx_response)
             }
+        }
+        if tx_response.tx_hash.is_none() {
+            tx_response.tx_hash = self
+                .explicit_tx_hash
+                .as_ref()
+                .map(|vm_hash| vm_hash.as_array().into());
         }
         self.response = Some(tx_response);
     }

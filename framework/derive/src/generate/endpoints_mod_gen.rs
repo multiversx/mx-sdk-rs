@@ -15,7 +15,7 @@ pub fn generate_endpoints_mod(
             let module_path = &supertrait.module_path;
             let endpoints_alias = generate_endpoints_mod_alias(index);
             quote! {
-                pub use #module_path endpoints as #endpoints_alias;
+                pub use #module_path __wasm__endpoints__ as #endpoints_alias;
             }
         })
         .collect();
@@ -37,7 +37,7 @@ pub fn generate_endpoints_mod(
                 A: multiversx_sc::api::VMApi ,
             {
                 super::EndpointWrappers::callback(
-                    &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                    &mut multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
                 );
             }
         }
@@ -49,7 +49,7 @@ pub fn generate_endpoints_mod(
         #(#endpoint_aliases_decl)*
 
         #[allow(non_snake_case)]
-        pub mod endpoints {
+        pub mod __wasm__endpoints__ {
             use super::EndpointWrappers;
 
             #(#endpoint_aliases_use)*
@@ -93,7 +93,7 @@ fn generate_wasm_endpoint(
             A: multiversx_sc::api::VMApi,
         {
             super::EndpointWrappers::#call_method_ident(
-                &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                &mut multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
             );
         }
     }

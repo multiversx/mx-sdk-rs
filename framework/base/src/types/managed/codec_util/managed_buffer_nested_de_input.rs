@@ -8,8 +8,7 @@ use crate::codec::{
 use crate::{
     api::ManagedTypeApi,
     types::{
-        managed::{preloaded_managed_buffer::PreloadedManagedBuffer, ManagedBufferSizeContext},
-        BigInt, BigUint, ManagedBuffer,
+        managed::ManagedBufferSizeContext, BigInt, BigUint, ManagedBuffer, ManagedBufferReadToEnd,
     },
 };
 
@@ -19,7 +18,7 @@ pub struct ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,
 {
-    buffer: PreloadedManagedBuffer<M>,
+    buffer: ManagedBuffer<M>,
     decode_index: usize,
     buffer_len: usize,
     _phantom: PhantomData<M>,
@@ -33,11 +32,10 @@ where
         // retrieves buffer length eagerly because:
         // - it always gets called anyway at the end to check that no leftover bytes remain
         // - it is sometimes required multiple times during serialization
-        let buffer = PreloadedManagedBuffer::new(managed_buffer);
-        let buffer_len = buffer.buffer_len;
+        let buffer_len = managed_buffer.len();
 
         ManagedBufferNestedDecodeInput {
-            buffer,
+            buffer: managed_buffer,
             decode_index: 0,
             buffer_len,
             _phantom: PhantomData,
@@ -77,6 +75,18 @@ where
             &self.read_managed_buffer(h)?,
         ))
     }
+
+    fn read_managed_buffer_to_end<H>(
+        &mut self,
+        h: H,
+    ) -> Result<ManagedBufferReadToEnd<M>, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        Ok(ManagedBufferReadToEnd::from(
+            self.read_managed_buffer_of_size(self.remaining_len(), h)?,
+        ))
+    }
 }
 
 impl<M> NestedDecodeInput for ManagedBufferNestedDecodeInput<M>
@@ -106,7 +116,10 @@ where
     }
 
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<M>>()
+            || T::type_eq::<ManagedBufferReadToEnd<M>>()
+            || T::type_eq::<BigUint<M>>()
+            || T::type_eq::<BigInt<M>>()
     }
 
     fn read_specialized<T, C, H>(&mut self, context: C, h: H) -> Result<T, H::HandledErr>
@@ -122,6 +135,8 @@ where
                 self.read_managed_buffer(h)
             }
         }) {
+            result
+        } else if let Some(result) = try_execute_then_cast(|| self.read_managed_buffer_to_end(h)) {
             result
         } else if let Some(result) = try_execute_then_cast(|| self.read_big_uint(h)) {
             result

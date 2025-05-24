@@ -1,3 +1,7 @@
+use core::borrow::Borrow;
+
+use multiversx_sc_codec::multi_types::MultiValueVec;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
@@ -5,7 +9,7 @@ use crate::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput, Vec,
     },
-    types::ManagedType,
+    types::{ManagedType, ManagedVecOwnedIterator},
 };
 
 use crate::types::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
@@ -44,7 +48,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         Self(ManagedVec::from_handle(handle))
     }
 
@@ -52,7 +56,15 @@ where
         self.0.get_handle()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.0.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -132,6 +144,20 @@ where
     }
 }
 
+impl<M, T> IntoIterator for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    type Item = T;
+
+    type IntoIter = ManagedVecOwnedIterator<M, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl<'a, M, T> IntoIterator for &'a MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -171,8 +197,8 @@ where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        for elem in self.0.into_iter() {
-            elem.multi_encode_or_handle_err(output, h)?;
+        for elem in &self.0 {
+            elem.borrow().multi_encode_or_handle_err(output, h)?;
         }
         Ok(())
     }
@@ -222,11 +248,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    #[cfg(feature = "alloc")]
-    type Unmanaged = multiversx_sc_codec::multi_types::MultiValueVec<T::Unmanaged>;
-
-    #[cfg(not(feature = "alloc"))]
-    type Unmanaged = Self;
+    type Unmanaged = MultiValueVec<T::Unmanaged>;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()

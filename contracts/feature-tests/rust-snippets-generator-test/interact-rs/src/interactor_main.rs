@@ -54,6 +54,9 @@ struct State {
 impl State {
     async fn new() -> Self {
         let mut interactor = Interactor::new(GATEWAY).await;
+        interact.set_current_dir_from_workspace(
+            "contracts/feature-tests/rust-snippets-generator-test/interact-rs",
+        );
         let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
         let sc_addr_expr = if SC_ADDRESS == "" {
             DEFAULT_ADDRESS_EXPR.to_string()

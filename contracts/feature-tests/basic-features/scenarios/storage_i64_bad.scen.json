@@ -33,7 +33,7 @@
             "expect": {
                 "out": [],
                 "status": "*",
-                "message": "str:storage decode error: argument out of range",
+                "message": "str:storage decode error (key: i64): argument out of range",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

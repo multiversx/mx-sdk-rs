@@ -1,7 +1,5 @@
 multiversx_sc::imports!();
 
-use multiversx_sc::api::{use_raw_handle, HandleTypeInfo};
-
 use crate::types::*;
 
 /// Storage tests: direct load.
@@ -78,16 +76,15 @@ pub trait StorageLoadFeatures {
     #[endpoint]
     fn load_from_address_raw(&self, address: ManagedAddress, key: ManagedBuffer) -> ManagedBuffer {
         // TODO: maybe wrap this kind of functionality in a StorageRawWrapper
-        use multiversx_sc::api::{
-            StaticVarApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
-        };
-        let value_handle: <<Self as ContractBase>::Api as HandleTypeInfo>::ManagedBufferHandle =
-            use_raw_handle(Self::Api::static_var_api_impl().next_handle());
-        Self::Api::storage_read_api_impl().storage_load_from_address(
-            address.get_handle(),
-            key.get_handle(),
-            value_handle.clone(),
-        );
-        ManagedBuffer::from_handle(value_handle)
+        use multiversx_sc::api::{StorageReadApi, StorageReadApiImpl};
+        unsafe {
+            let value = ManagedBuffer::new_uninit();
+            Self::Api::storage_read_api_impl().storage_load_from_address(
+                address.get_handle(),
+                key.get_handle(),
+                value.get_handle(),
+            );
+            value
+        }
     }
 }

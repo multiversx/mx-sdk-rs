@@ -1,0 +1,32 @@
+[[bin]]
+name = "system-sc-interact"
+path = "src/system_sc_main.rs"
+
+[lib]
+path = "src/system_sc_interact.rs"
+
+[package]
+name = "system-sc-interact"
+version = "0.0.0"
+publish = false
+edition = "2021"
+authors = ["you"]
+
+[dependencies]
+toml = "0.8.6"
+tokio = { version = "1.24" }
+
+[dependencies.clap]
+version = "4.4.7"
+features = ["derive"]
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.multiversx-sc-snippets]
+version = "=0.57.1"
+path = "../../framework/snippets"
+
+[features]
+chain-simulator-tests = []

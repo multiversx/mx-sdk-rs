@@ -1,0 +1,25 @@
+[package]
+name = "multiversx-chain-core"
+version = "0.14.0"
+edition = "2021"
+
+authors = [
+    "Andrei Marinica <andrei.marinica@multiversx.com>",
+    "MultiversX <contact@multiversx.com>",
+]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/multiversx/mx-sdk-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.multiversx.com/"
+description = "MultiversX chain interfaces, constants, and base types"
+keywords = ["multiversx", "blockchain", "vm", "tools"]
+categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
+
+[dependencies]
+bitflags = "=2.9.0"
+
+[dependencies.multiversx-sc-codec]
+version = "=0.22.0"
+path = "../../data/codec"
+features = ["derive"]

@@ -32,4 +32,4 @@ pub use test_api::*;
 pub use vm_api::VMApi;
 
 // Backwards compatibility.
-pub use crate::types::system_proxy::builtin_func_names::*;
+pub use crate::chain_core::builtin_func_names::*;

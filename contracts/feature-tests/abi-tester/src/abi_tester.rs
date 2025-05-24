@@ -23,8 +23,10 @@ use only_nested::*;
 #[esdt_attribute("STRUCT1", AbiEnum)]
 #[esdt_attribute("STRUCT2", AbiManagedType<Self::Api>)]
 #[esdt_attribute("OnlyInEsdt", OnlyShowsUpInEsdtAttr)]
-#[esdt_attribute["ExplicitDiscriminant", ExplicitDiscriminant]]
-#[esdt_attribute["ExplicitDiscriminantMixed", ExplicitDiscriminantMixed]]
+#[esdt_attribute("ExplicitDiscriminant", ExplicitDiscriminant)]
+#[esdt_attribute("ExplicitDiscriminantMixed", ExplicitDiscriminantMixed)]
+#[esdt_attribute("ManagedDecimalVar", ManagedDecimal<Self::Api, NumDecimals>)]
+#[esdt_attribute("ManagedDecimalConst", ManagedDecimalWrapper<Self::Api>)]
 pub trait AbiTester {
     /// Contract constructor.
     #[init]
@@ -56,6 +58,7 @@ pub trait AbiTester {
     fn take_managed_type(&self, _arg: AbiManagedType<Self::Api>) {}
 
     #[endpoint]
+    #[title("result-3")]
     #[output_name("multi-result-1")]
     #[output_name("multi-result-2")]
     #[output_name("multi-result-3")]
@@ -108,6 +111,14 @@ pub trait AbiTester {
     }
 
     #[endpoint]
+    fn process_managed_decimal(
+        &self,
+        input: ManagedDecimal<Self::Api, ConstDecimals<U10>>,
+    ) -> ManagedDecimal<Self::Api, usize> {
+        input.into()
+    }
+
+    #[endpoint]
     fn esdt_local_role(&self) -> EsdtLocalRole {
         EsdtLocalRole::None
     }
@@ -142,6 +153,11 @@ pub trait AbiTester {
     }
 
     #[view]
+    fn echo_permission(&self, p: Permission) -> Permission {
+        p
+    }
+
+    #[view]
     fn item_for_array(&self, _array: &[OnlyShowsUpAsNestedInArray; 5]) {}
 
     #[view]
@@ -168,6 +184,14 @@ pub trait AbiTester {
     #[view]
     fn operation_completion_status(&self) -> OperationCompletionStatus {
         OperationCompletionStatus::Completed
+    }
+
+    #[view]
+    fn takes_object_with_managed_buffer_read_to_end(
+        &self,
+        arg: AbiWithManagedBufferReadToEnd<Self::Api>,
+    ) -> ManagedBuffer {
+        arg.flush.into_managed_buffer()
     }
 
     #[endpoint]

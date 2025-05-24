@@ -3,12 +3,18 @@ use multiversx_sc_scenario::*;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/big-float-features");
     blockchain.register_contract(
         "mxsc:output/big-float-features.mxsc.json",
         big_float_features::ContractBuilder,
     );
 
     blockchain
+}
+
+#[test]
+fn big_float_ln_rs() {
+    world().run("scenarios/big_float_ln.scen.json");
 }
 
 #[test]

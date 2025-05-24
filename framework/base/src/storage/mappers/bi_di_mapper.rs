@@ -10,8 +10,8 @@ use crate::{
 };
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
-    unordered_set_mapper, StorageMapper, UnorderedSetMapper,
+    source::{CurrentStorage, StorageAddress},
+    unordered_set_mapper, StorageMapper, StorageMapperFromAddress, UnorderedSetMapper,
 };
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
@@ -66,13 +66,13 @@ where
     }
 }
 
-impl<SA, K, V> BiDiMapper<SA, K, V, ManagedAddress<SA>>
+impl<SA, K, V> StorageMapperFromAddress<SA> for BiDiMapper<SA, K, V, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         let mut id_key = base_key.clone();
         id_key.append_bytes(ID_SUFIX);
 
@@ -264,7 +264,7 @@ where
     }
 }
 
-impl<'a, SA, K, V, A> Iterator for Iter<'a, SA, K, V, A>
+impl<SA, K, V, A> Iterator for Iter<'_, SA, K, V, A>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,

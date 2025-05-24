@@ -218,6 +218,7 @@ impl<'w> CheckStateBuilder<'w> {
             CheckStorage::Star => CheckStorageDetails::default(),
             CheckStorage::Equal(details) => details.clone(),
         };
+        details.other_storages_allowed = true;
         details.storages.insert(
             BytesKey::interpret_from(key, &InterpreterContext::default()),
             CheckValue::Equal(BytesValue::interpret_from(
@@ -230,7 +231,7 @@ impl<'w> CheckStateBuilder<'w> {
     }
 }
 
-impl<'w> Drop for CheckStateBuilder<'w> {
+impl Drop for CheckStateBuilder<'_> {
     fn drop(&mut self) {
         self.commit_accounts();
     }

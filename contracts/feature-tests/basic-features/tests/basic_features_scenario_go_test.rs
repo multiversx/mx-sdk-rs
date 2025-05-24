@@ -85,6 +85,18 @@ fn crypto_verify_bls_go() {
 }
 
 #[test]
+#[ignore = "requires EI 1.4 in mx-scenario-go"]
+fn crypto_verify_bls_aggregated_signature_go() {
+    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
+}
+
+#[test]
+#[ignore = "requires EI 1.4 in mx-scenario-go"]
+fn crypto_verify_bls_share_go() {
+    world().run("scenarios/crypto_verify_bls_share.scen.json");
+}
+
+#[test]
 fn crypto_verify_ed_25519_go() {
     world().run("scenarios/crypto_verify_ed25519.scen.json");
 }
@@ -92,6 +104,12 @@ fn crypto_verify_ed_25519_go() {
 #[test]
 fn crypto_verify_secp_256_k_1_go() {
     world().run("scenarios/crypto_verify_secp256k1.scen.json");
+}
+
+#[test]
+#[ignore = "requires EI 1.4 in mx-scenario-go"]
+fn crypto_verify_secp_256_r_1_go() {
+    world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }
 
 #[test]
@@ -175,6 +193,16 @@ fn echo_usize_go() {
 }
 
 #[test]
+fn echo_varags_vec_with_counted_go() {
+    world().run("scenarios/echo_varags_vec_with_counted.scen.json");
+}
+
+#[test]
+fn echo_varags_vec_with_counted_pairs_go() {
+    world().run("scenarios/echo_varags_vec_with_counted_pairs.scen.json");
+}
+
+#[test]
 fn echo_varargs_managed_eager_go() {
     world().run("scenarios/echo_varargs_managed_eager.scen.json");
 }
@@ -251,6 +279,16 @@ fn managed_buffer_set_random_go() {
 }
 
 #[test]
+fn managed_decimal_go() {
+    world().run("scenarios/managed_decimal.scen.json");
+}
+
+#[test]
+fn managed_decimal_logarithm_go() {
+    world().run("scenarios/managed_decimal_logarithm.scen.json");
+}
+
+#[test]
 fn managed_vec_address_push_go() {
     world().run("scenarios/managed_vec_address_push.scen.json");
 }
@@ -298,6 +336,11 @@ fn sc_properties_go() {
 #[test]
 fn small_num_overflow_go() {
     world().run("scenarios/small_num_overflow.scen.json");
+}
+
+#[test]
+fn send_esdt_to_nonexisting_account_go() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
 }
 
 #[test]
@@ -372,6 +415,11 @@ fn storage_mapper_get_at_address_go() {
 }
 
 #[test]
+fn storage_mapper_get_at_address_extra_key_go() {
+    world().run("scenarios/storage_mapper_get_at_address_extra_key.scen.json");
+}
+
+#[test]
 fn storage_mapper_linked_list_go() {
     world().run("scenarios/storage_mapper_linked_list.scen.json");
 }
@@ -404,6 +452,16 @@ fn storage_mapper_set_go() {
 #[test]
 fn storage_mapper_single_value_go() {
     world().run("scenarios/storage_mapper_single_value.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_go() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_at_address_go() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }
 
 #[test]

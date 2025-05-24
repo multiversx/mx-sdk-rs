@@ -1,7 +1,8 @@
 multiversx_sc::derive_imports!();
 
 /// Copied from multiversx-sc serialization tests.
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExampleEnumWithFields {
     Unit,
     Newtype(u32),

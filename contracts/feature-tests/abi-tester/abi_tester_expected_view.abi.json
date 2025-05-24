@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.50.3"
+            "version": "0.57.1"
         }
     },
     "docs": [
@@ -131,6 +131,14 @@
         {
             "ticker": "ExplicitDiscriminantMixed",
             "type": "ExplicitDiscriminantMixed"
+        },
+        {
+            "ticker": "ManagedDecimalVar",
+            "type": "ManagedDecimal<usize>"
+        },
+        {
+            "ticker": "ManagedDecimalConst",
+            "type": "ManagedDecimalWrapper"
         }
     ],
     "hasCallback": false,
@@ -248,6 +256,26 @@
                     ],
                     "name": "tuple_madness",
                     "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                }
+            ]
+        },
+        "AbiWithManagedBufferReadToEnd": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "name": "endpoint",
+                    "type": "bytes"
+                },
+                {
+                    "name": "gas",
+                    "type": "u64"
+                },
+                {
+                    "name": "flush",
+                    "type": "bytes-read-to-end"
                 }
             ]
         },
@@ -447,6 +475,15 @@
                 }
             ]
         },
+        "ManagedDecimalWrapper": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "field",
+                    "type": "ManagedDecimal<2>"
+                }
+            ]
+        },
         "OnlyShowsUpAsNested01": {
             "type": "struct",
             "docs": [
@@ -602,6 +639,15 @@
                         "indicates that operation was interrupted prematurely, due to low gas"
                     ],
                     "name": "interrupted"
+                }
+            ]
+        },
+        "Permission": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "0",
+                    "type": "u32"
                 }
             ]
         }

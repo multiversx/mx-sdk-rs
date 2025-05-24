@@ -7,8 +7,8 @@ use crate::{
 };
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
-    StorageMapper, VecMapper,
+    source::{CurrentStorage, StorageAddress},
+    StorageMapper, StorageMapperFromAddress, VecMapper,
 };
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
@@ -47,11 +47,11 @@ where
     }
 }
 
-impl<SA> UniqueIdMapper<SA, ManagedAddress<SA>>
+impl<SA> StorageMapperFromAddress<SA> for UniqueIdMapper<SA, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         Self {
             _address: address.clone(),
             base_key: base_key.clone(),
@@ -180,7 +180,7 @@ where
     }
 }
 
-impl<'a, SA, A> Iterator for Iter<'a, SA, A>
+impl<SA, A> Iterator for Iter<'_, SA, A>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,

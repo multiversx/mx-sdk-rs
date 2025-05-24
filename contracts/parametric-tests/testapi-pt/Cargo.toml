@@ -12,10 +12,10 @@ path = "src/testapi_pt.rs"
 num-bigint = "0.4.2"
 
 [dependencies.multiversx-sc]
-version = "0.50.0"
+version = "0.57.1"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.50.0"
+version = "0.57.1"
 path = "../../../framework/scenario"
 

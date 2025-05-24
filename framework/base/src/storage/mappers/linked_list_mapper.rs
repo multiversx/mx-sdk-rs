@@ -1,8 +1,8 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
-    StorageClearable, StorageMapper,
+    source::{CurrentStorage, StorageAddress},
+    StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -118,12 +118,12 @@ where
     }
 }
 
-impl<SA, T> LinkedListMapper<SA, T, ManagedAddress<SA>>
+impl<SA, T> StorageMapperFromAddress<SA> for LinkedListMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         LinkedListMapper {
             _phantom_api: PhantomData,
             address,
@@ -578,7 +578,7 @@ where
     }
 }
 
-impl<'a, SA, T, A> Iterator for Iter<'a, SA, T, A>
+impl<SA, T, A> Iterator for Iter<'_, SA, T, A>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,

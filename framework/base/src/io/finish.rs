@@ -86,7 +86,7 @@ where
             FA::finish_api_impl().finish_managed_buffer_raw(managed_buffer.handle.clone());
             Ok(())
         } else if let Some(big_uint) = value.try_cast_ref::<BigUint<FA>>() {
-            FA::finish_api_impl().finish_big_uint_raw(big_uint.handle.clone());
+            FA::finish_api_impl().finish_big_uint_raw(big_uint.value.handle.clone());
             Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {
             FA::finish_api_impl().finish_big_int_raw(big_int.handle.clone());

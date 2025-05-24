@@ -2,12 +2,12 @@ use std::{fs, process::Command};
 
 use convert_case::{Case, Casing};
 use multiversx_sc_meta::{
-    cmd::standalone::template::{
+    cmd::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
-    find_workspace::find_current_workspace,
     version_history::{self, LAST_TEMPLATE_VERSION},
 };
+use multiversx_sc_meta_lib::tools::find_current_workspace;
 
 const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
 const BUILD_CONTRACTS: bool = true;
@@ -32,7 +32,12 @@ fn test_template_list() {
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_adder() {
-    template_test_current("adder", "examples", "new-adder");
+    template_test_current(
+        "adder",
+        "examples",
+        "new-adder",
+        "Alin Cruceat <alin.cruceat@multiversx.com>",
+    );
 
     cargo_check_interactor("examples", "new-adder");
 }
@@ -40,19 +45,19 @@ fn template_current_adder() {
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_crypto_zombies() {
-    template_test_current("crypto-zombies", "examples", "new-crypto-zombies");
+    template_test_current("crypto-zombies", "examples", "new-crypto-zombies", "");
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_empty() {
-    template_test_current("empty", "examples", "new-empty");
+    template_test_current("empty", "examples", "new-empty", "");
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_ping_pong_egld() {
-    template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld");
+    template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld", "");
 }
 
 #[test]
@@ -63,13 +68,13 @@ fn test_correct_naming() {
         "my-new-42-correct-empty"
     );
 
-    template_test_current("empty", "examples", "my1New2_3-correct_Empty");
+    template_test_current("empty", "examples", "my1New2_3-correct_Empty", "");
 }
 
 /// Recreates the folder structure in `contracts`, on the same level.
 /// This way, the relative paths are still valid in this case,
 /// and we can test the templates with the framework version of the current branch.
-fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
+fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, new_author: &str) {
     let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
@@ -80,11 +85,18 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
 
     prepare_target_dir(&target);
 
+    let author = if new_author.is_empty() {
+        None
+    } else {
+        Some(new_author.to_string())
+    };
+
     ContractCreator::new(
         &repo_source,
         template_name.to_string(),
         target.clone(),
         true,
+        author,
     )
     .create_contract(LAST_TEMPLATE_VERSION);
 
@@ -94,24 +106,29 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     cargo_test(&target);
 }
 
-#[test]
+#[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-fn template_released_adder() {
-    template_test_released("adder", "released-adder");
+async fn template_released_adder() {
+    template_test_released(
+        "adder",
+        "released-adder",
+        "Alin Cruceat <alin.cruceat@multiversx.com>",
+    )
+    .await;
 
     cargo_check_interactor("", "released-adder");
 }
 
-#[test]
+#[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-fn template_released_crypto_zombies() {
-    template_test_released("crypto-zombies", "released-crypto-zombies");
+async fn template_released_crypto_zombies() {
+    template_test_released("crypto-zombies", "released-crypto-zombies", "").await;
 }
 
-#[test]
+#[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-fn template_released_empty() {
-    template_test_released("empty", "released-empty");
+async fn template_released_empty() {
+    template_test_released("empty", "released-empty", "").await;
 }
 
 /// These tests fully replicate the templating process. They
@@ -119,7 +136,7 @@ fn template_released_empty() {
 /// - create proper contracts,
 /// - build the newly created contracts (to wasm)
 /// - run all tests (including Go scenarios) on them.
-fn template_test_released(template_name: &str, new_name: &str) {
+async fn template_test_released(template_name: &str, new_name: &str, new_author: &str) {
     let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
@@ -133,15 +150,23 @@ fn template_test_released(template_name: &str, new_name: &str) {
     let repo_source = RepoSource::download_from_github(
         RepoVersion::Tag(version_history::LAST_TEMPLATE_VERSION.to_string()),
         temp_dir_path,
-    );
+    )
+    .await;
 
     prepare_target_dir(&target);
+
+    let author = if new_author.is_empty() {
+        None
+    } else {
+        Some(new_author.to_string())
+    };
 
     ContractCreator::new(
         &repo_source,
         template_name.to_string(),
         target.clone(),
         false,
+        author,
     )
     .create_contract(LAST_TEMPLATE_VERSION);
 
@@ -209,7 +234,7 @@ fn cargo_check_interactor(sub_path: &str, new_name: &str) {
         .join(TEMPLATE_TEMP_DIR_NAME)
         .join(sub_path)
         .join(new_name)
-        .join("interact");
+        .join("interactor");
 
     let exit_status = Command::new("cargo")
         .arg("check")

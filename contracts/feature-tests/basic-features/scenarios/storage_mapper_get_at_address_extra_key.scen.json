@@ -1,0 +1,90 @@
+{
+    "name": "storage mapper get at address",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "sc:with-storage": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "set single_value_with_keys",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:with-storage",
+                "function": "set_single_value_mapper_with_key",
+                "arguments": [
+                    "5",
+                    "str:to-read"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "check single_value_with_keys",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "get_value_from_address_with_keys",
+                "arguments": [
+                    "sc:with-storage",
+                    "5"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "str:to-read"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "sc:with-storage": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:single_value_mapper_with_key|0x00000005": "str:to-read"
+                    },
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "0"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,38 @@
+name: Windows CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  checks: write
+  pull-requests: write
+
+jobs:
+  windows_build_and_test:
+    name: Build and test on Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+
+      - name: Install sc-meta
+        run: cargo install multiversx-sc-meta
+
+      - name: Run sc-meta commands
+        run: |
+          cd contracts/feature-tests/basic-features
+          sc-meta all build
+          sc-meta all proxy
+          sc-meta all snippets
+          sc-meta test
+          cd ../
+          sc-meta new --template empty --name windows-template-test-sc

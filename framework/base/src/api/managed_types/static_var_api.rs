@@ -1,6 +1,6 @@
 use crate::types::LockableStaticBuffer;
 
-use super::RawHandle;
+use super::{RawHandle, StaticVarApiFlags};
 
 pub trait StaticVarApi {
     type StaticVarApiImpl: StaticVarApiImpl;
@@ -24,11 +24,23 @@ pub trait StaticVarApiImpl {
 
     fn get_num_arguments(&self) -> i32;
 
-    fn set_call_value_egld_handle(&self, handle: RawHandle);
+    fn set_flags(&self, flags: StaticVarApiFlags);
 
-    fn get_call_value_egld_handle(&self) -> RawHandle;
+    fn get_flags(&self) -> StaticVarApiFlags;
 
-    fn set_call_value_multi_esdt_handle(&self, handle: RawHandle);
+    /// Returns true if the flag is set, false if is default (false).
+    ///
+    /// If the flag is unset (false), will set it.
+    fn flag_is_set_or_update(&self, flag: StaticVarApiFlags) -> bool {
+        let mut current_flags = self.get_flags();
+        let contains_flag = current_flags.check_and_set(flag);
+        if !contains_flag {
+            self.set_flags(current_flags);
+        }
+        contains_flag
+    }
 
-    fn get_call_value_multi_esdt_handle(&self) -> RawHandle;
+    fn is_scaling_factor_cached(&self, decimals: usize) -> bool;
+
+    fn set_scaling_factor_cached(&self, decimals: usize);
 }

@@ -236,6 +236,19 @@ where
             .original_result()
     }
 
+    pub fn process_managed_decimal<
+        Arg0: ProxyArg<ManagedDecimal<Env::Api, ConstDecimals<U10>>>,
+    >(
+        self,
+        input: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedDecimal<Env::Api, usize>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("process_managed_decimal")
+            .argument(&input)
+            .original_result()
+    }
+
     pub fn esdt_local_role(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EsdtLocalRole> {
@@ -296,6 +309,19 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("item_for_managed_vec")
+            .original_result()
+    }
+
+    pub fn echo_permission<
+        Arg0: ProxyArg<Permission>,
+    >(
+        self,
+        p: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Permission> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("echo_permission")
+            .argument(&p)
             .original_result()
     }
 
@@ -374,6 +400,19 @@ where
             .original_result()
     }
 
+    pub fn takes_object_with_managed_buffer_read_to_end<
+        Arg0: ProxyArg<AbiWithManagedBufferReadToEnd<Env::Api>>,
+    >(
+        self,
+        arg: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("takes_object_with_managed_buffer_read_to_end")
+            .argument(&arg)
+            .original_result()
+    }
+
     pub fn payable_egld(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
@@ -395,33 +434,6 @@ where
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("payable_any_token")
-            .original_result()
-    }
-
-    pub fn external_view(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("external_view")
-            .original_result()
-    }
-
-    pub fn label_a(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("label_a")
-            .original_result()
-    }
-
-    pub fn label_b(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("label_b")
             .original_result()
     }
 }
@@ -452,7 +464,7 @@ pub struct OnlyShowsUpAsNested02 {
 
 #[rustfmt::skip]
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum AbiEnum {
     Nothing,
     Something(i32),
@@ -522,6 +534,10 @@ pub struct AbiManagedVecItem {
 }
 
 #[type_abi]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NestedDecode, NestedEncode, TopEncode, TopDecode)]
+pub struct Permission(u32);
+
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInArray {}
 
@@ -546,6 +562,17 @@ pub struct OnlyShowsUpAsNestedInSlice {}
 pub struct OnlyShowsUpAsNestedInOption {}
 
 #[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+pub struct AbiWithManagedBufferReadToEnd<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub endpoint: ManagedBuffer<Api>,
+    pub gas: u64,
+    pub flush: ManagedBufferReadToEnd<Api>,
+}
+
+#[type_abi]
 #[derive(TopEncode, TopDecode)]
 pub struct OnlyShowsUpInEsdtAttr {
     pub field: OnlyShowsUpAsNested10,
@@ -556,7 +583,7 @@ pub struct OnlyShowsUpInEsdtAttr {
 pub struct OnlyShowsUpAsNested10 {}
 
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
     Zero,
     Thirty,
@@ -567,7 +594,7 @@ pub enum ExplicitDiscriminant {
 
 #[rustfmt::skip]
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminantMixed {
     Zero,
     Unit,
@@ -577,4 +604,13 @@ pub enum ExplicitDiscriminantMixed {
         a: u8,
         b: u16,
     },
+}
+
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
+pub struct ManagedDecimalWrapper<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub field: ManagedDecimal<Api, ConstDecimals<U2>>,
 }

@@ -1,6 +1,3 @@
-[settings]
-main = "main"
-
 [contracts.main]
 name = "multisig"
 
@@ -17,6 +14,11 @@ add-labels = ["multisig-external-view"]
 
 [[proxy]]
 path = "src/multisig_proxy.rs"
+
+[[proxy]]
+path = "src/multisig_view_proxy.rs"
+add-unlabelled = false
+add-labels = ["multisig-external-view"]
 
 [[proxy]]
 path = "../../parametric-tests/multisig-pt/src/multisig_proxy.rs"

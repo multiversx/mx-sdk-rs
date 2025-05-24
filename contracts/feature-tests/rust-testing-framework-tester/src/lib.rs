@@ -1,11 +1,12 @@
 #![no_std]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::proxy_imports::*;
 
 pub mod dummy_module;
+pub mod rust_testing_framework_tester_proxy;
 
-#[derive(TopEncode, TopDecode, TypeAbi, Clone, Debug, PartialEq, Eq)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, Clone, Debug, PartialEq, Eq)]
 pub struct NftDummyAttributes {
     pub creation_epoch: u64,
     pub cool_factor: u8,
@@ -20,7 +21,7 @@ pub struct StructWithManagedTypes<M: ManagedTypeApi> {
 pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[init]
     fn init(&self) -> ManagedBuffer {
-        self.total_value().set(&BigUint::from(1u32));
+        self.total_value().set(BigUint::from(1u32));
         b"constructor-result".into()
     }
 
@@ -56,13 +57,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("EGLD")]
     #[endpoint]
     fn receive_egld(&self) -> BigUint {
-        self.call_value().egld_value().clone_value()
+        self.call_value().egld().clone()
     }
 
     #[payable("EGLD")]
     #[endpoint]
     fn recieve_egld_half(&self) {
-        let payment_amount = &*self.call_value().egld_value() / 2u32;
+        let payment_amount = &*self.call_value().egld() / 2u32;
         self.tx().to(ToCaller).egld(payment_amount).transfer();
     }
 
@@ -70,7 +71,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn receive_esdt(&self) -> (TokenIdentifier, BigUint) {
         let payment = self.call_value().single_esdt();
-        (payment.token_identifier, payment.amount)
+        (payment.token_identifier.clone(), payment.amount.clone())
     }
 
     #[payable("*")]
@@ -83,7 +84,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn receive_esdt_half(&self) {
         let payment = self.call_value().single_esdt();
-        let amount = payment.amount / 2u32;
+        let amount = &payment.amount / 2u32;
 
         self.tx()
             .to(ToCaller)
@@ -94,7 +95,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("*")]
     #[endpoint]
     fn receive_multi_esdt(&self) -> ManagedVec<EsdtTokenPayment<Self::Api>> {
-        self.call_value().all_esdt_transfers().clone_value()
+        self.call_value().all_esdt_transfers().clone()
     }
 
     #[payable("*")]

@@ -29,10 +29,6 @@ impl AddressKey {
     pub fn to_address(&self) -> Address {
         self.value.clone()
     }
-
-    pub fn to_vm_address(&self) -> multiversx_chain_vm::types::VMAddress {
-        self.value.as_array().into()
-    }
 }
 
 impl Ord for AddressKey {

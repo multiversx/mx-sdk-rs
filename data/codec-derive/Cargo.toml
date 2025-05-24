@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-codec-derive"
-version = "0.19.0"
+version = "0.22.0"
 edition = "2021"
 
 authors = ["dorin.iancu <dorin.iancu@multiversx.com>", "Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
@@ -21,7 +21,7 @@ proc-macro = true
 default = ["syn/full", "syn/parsing", "syn/extra-traits"]
 
 [dependencies]
-proc-macro2 = "=1.0.82"
-quote = "=1.0.36"
-syn = "=2.0.61"
+proc-macro2 = "=1.0.94"
+quote = "=1.0.39"
+syn = "=2.0.100"
 hex = "=0.4.3"

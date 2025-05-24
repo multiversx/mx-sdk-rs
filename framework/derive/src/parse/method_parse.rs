@@ -5,17 +5,18 @@ use super::{
     auto_impl_parse::{
         process_event_attribute, process_proxy_attribute, process_storage_clear_attribute,
         process_storage_get_attribute, process_storage_is_empty_attribute,
-        process_storage_mapper_attribute, process_storage_set_attribute,
+        process_storage_mapper_attribute, process_storage_mapper_from_address_attribute,
+        process_storage_set_attribute,
     },
     extract_method_args, process_allow_multiple_var_args_attribute, process_callback_attribute,
     process_callback_raw_attribute, process_endpoint_attribute, process_external_view_attribute,
     process_init_attribute, process_label_names_attribute, process_only_admin_attribute,
     process_only_owner_attribute, process_only_user_account_attribute,
     process_output_names_attribute, process_payable_attribute, process_promises_callback_attribute,
-    process_upgrade_attribute, process_view_attribute,
+    process_title_attribute, process_upgrade_attribute, process_view_attribute,
 };
 pub struct MethodAttributesPass1 {
-    pub method_name: String,
+    pub _method_name: String,
     pub payable: MethodPayableMetadata,
     pub only_owner: bool,
     pub only_admin: bool,
@@ -33,7 +34,7 @@ pub fn process_method(m: &syn::TraitItemFn, trait_attributes: &TraitProperties) 
     };
 
     let mut first_pass_data = MethodAttributesPass1 {
-        method_name: m.sig.ident.to_string(),
+        _method_name: m.sig.ident.to_string(),
         payable: MethodPayableMetadata::NotPayable,
         only_owner: trait_attributes.only_owner,
         only_admin: trait_attributes.only_admin,
@@ -55,6 +56,7 @@ pub fn process_method(m: &syn::TraitItemFn, trait_attributes: &TraitProperties) 
         generics: m.sig.generics.clone(),
         unprocessed_attributes: Vec::new(),
         method_args,
+        title: None,
         output_names: Vec::new(),
         label_names: Vec::new(),
         return_type: m.sig.output.clone(),
@@ -127,8 +129,10 @@ fn process_attribute_second_pass(
         || process_storage_get_attribute(attr, method)
         || process_storage_set_attribute(attr, method)
         || process_storage_mapper_attribute(attr, method)
+        || process_storage_mapper_from_address_attribute(attr, method)
         || process_storage_is_empty_attribute(attr, method)
         || process_storage_clear_attribute(attr, method)
+        || process_title_attribute(attr, method)
         || process_output_names_attribute(attr, method)
         || process_label_names_attribute(attr, method)
 }

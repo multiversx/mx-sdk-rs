@@ -4,8 +4,7 @@ use multiversx_sc_modules::governance::{
 };
 use multiversx_sc_scenario::imports::*;
 
-const GOV_TOKEN_ID_EXPR: &str = "str:GOV-123456";
-const GOV_TOKEN_ID: &[u8] = b"GOV-123456";
+const GOV_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("GOV-123456");
 const QUORUM: u64 = 1_500;
 const MIN_BALANCE_PROPOSAL: u64 = 500;
 const VOTING_DELAY_BLOCKS: u64 = 10;
@@ -15,13 +14,13 @@ const LOCKING_PERIOD_BLOCKS: u64 = 30;
 const INITIAL_GOV_TOKEN_BALANCE: u64 = 1_000;
 const GAS_LIMIT: u64 = 1_000_000;
 
-const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
-const USE_MODULE_PATH_EXPR: &str = "mxsc:output/use-module.mxsc.json";
+const USE_MODULE_ADDRESS: TestSCAddress = TestSCAddress::new("use-module");
+const USE_MODULE_PATH_EXPR: MxscPath = MxscPath::new("mxsc:output/use-module.mxsc.json");
 
-const OWNER_ADDRESS_EXPR: &str = "address:owner";
-const FIRST_USER_ADDRESS_EXPR: &str = "address:first-user";
-const SECOND_USER_ADDRESS_EXPR: &str = "address:second-user";
-const THIRD_USER_ADDRESS_EXPR: &str = "address:third-user";
+const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
+const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
+const SECOND_USER_ADDRESS: TestAddress = TestAddress::new("second-user");
+const THIRD_USER_ADDRESS: TestAddress = TestAddress::new("third-user");
 
 pub struct Payment {
     pub token: Vec<u8>,
@@ -32,6 +31,7 @@ pub struct Payment {
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/use-module");
     blockchain.register_contract(USE_MODULE_PATH_EXPR, use_module::ContractBuilder);
     blockchain
 }
@@ -39,58 +39,45 @@ fn world() -> ScenarioWorld {
 fn setup() -> ScenarioWorld {
     let mut world = world();
 
-    world.set_state_step(
-        SetStateStep::new()
-            .put_account(
-                OWNER_ADDRESS_EXPR,
-                Account::new()
-                    .nonce(1)
-                    .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE),
-            )
-            .new_address(OWNER_ADDRESS_EXPR, 1, USE_MODULE_ADDRESS_EXPR)
-            .put_account(
-                FIRST_USER_ADDRESS_EXPR,
-                Account::new()
-                    .nonce(1)
-                    .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE),
-            )
-            .put_account(
-                SECOND_USER_ADDRESS_EXPR,
-                Account::new()
-                    .nonce(1)
-                    .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE),
-            )
-            .put_account(
-                THIRD_USER_ADDRESS_EXPR,
-                Account::new()
-                    .nonce(1)
-                    .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE),
-            ),
-    );
+    world
+        .account(OWNER_ADDRESS)
+        .nonce(1)
+        .esdt_balance(GOV_TOKEN_ID, INITIAL_GOV_TOKEN_BALANCE);
+    world
+        .account(FIRST_USER_ADDRESS)
+        .nonce(1)
+        .esdt_balance(GOV_TOKEN_ID, INITIAL_GOV_TOKEN_BALANCE);
+    world
+        .account(SECOND_USER_ADDRESS)
+        .nonce(1)
+        .esdt_balance(GOV_TOKEN_ID, INITIAL_GOV_TOKEN_BALANCE);
+    world
+        .account(THIRD_USER_ADDRESS)
+        .nonce(1)
+        .esdt_balance(GOV_TOKEN_ID, INITIAL_GOV_TOKEN_BALANCE);
 
     // init
-    let use_module_whitebox =
-        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
-    let use_module_code = world.code_expression(USE_MODULE_PATH_EXPR);
-
-    world.whitebox_deploy(
-        &use_module_whitebox,
-        ScDeployStep::new()
-            .from(OWNER_ADDRESS_EXPR)
-            .code(use_module_code),
-        |sc| {
+    let new_address = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .raw_deploy()
+        .code(USE_MODULE_PATH_EXPR)
+        .new_address(USE_MODULE_ADDRESS)
+        .returns(ReturnsNewBech32Address)
+        .whitebox(use_module::contract_obj, |sc| {
             sc.init_governance_module(
-                managed_token_id!(GOV_TOKEN_ID),
-                managed_biguint!(QUORUM),
-                managed_biguint!(MIN_BALANCE_PROPOSAL),
+                TokenIdentifier::from(GOV_TOKEN_ID),
+                BigUint::from(QUORUM),
+                BigUint::from(MIN_BALANCE_PROPOSAL),
                 VOTING_DELAY_BLOCKS,
                 VOTING_PERIOD_BLOCKS,
                 LOCKING_PERIOD_BLOCKS,
             );
-        },
-    );
+        });
 
-    world.set_state_step(SetStateStep::new().block_nonce(10));
+    assert_eq!(new_address.to_address(), USE_MODULE_ADDRESS.to_address());
+
+    world.current_block().block_nonce(10);
 
     world
 }
@@ -103,17 +90,14 @@ pub fn propose(
     endpoint_name: &[u8],
     args: Vec<Vec<u8>>,
 ) -> usize {
-    let use_module_whitebox =
-        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
-
     let mut proposal_id = 0;
 
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(proposer)
-            .esdt_transfer(GOV_TOKEN_ID, 0, gov_token_amount),
-        |sc| {
+    world
+        .tx()
+        .from(proposer)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, gov_token_amount))
+        .whitebox(use_module::contract_obj, |sc| {
             let mut args_managed = ManagedVec::new();
             for arg in args {
                 args_managed.push(managed_buffer!(&arg));
@@ -131,8 +115,7 @@ pub fn propose(
             );
 
             proposal_id = sc.propose(managed_buffer!(b"change quorum"), actions);
-        },
-    );
+        });
 
     proposal_id
 }
@@ -145,16 +128,14 @@ fn test_init() {
 #[test]
 fn test_change_gov_config() {
     let mut world = setup();
-    let use_module_whitebox =
-        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
 
     let mut current_block_nonce = 10;
 
     let proposal_id = propose(
         &mut world,
-        &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
+        &FIRST_USER_ADDRESS.to_address(),
         500,
-        &address_expr_to_address(USE_MODULE_ADDRESS_EXPR),
+        &USE_MODULE_ADDRESS.to_address(),
         b"changeQuorum",
         vec![1_000u64.to_be_bytes().to_vec()],
     );
@@ -162,209 +143,188 @@ fn test_change_gov_config() {
     assert_eq!(proposal_id, 1);
 
     // vote too early
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "999")
-            .no_expect(),
-        |sc| {
+    world
+        .tx()
+        .from(SECOND_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 999))
+        .returns(ExpectError(4u64, "Proposal is not active"))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
-        },
-        |r| {
-            r.assert_user_error("Proposal is not active");
-        },
-    );
+        });
 
     current_block_nonce += VOTING_DELAY_BLOCKS;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.current_block().block_nonce(current_block_nonce);
 
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "999"),
-        |sc| {
+    world
+        .tx()
+        .from(SECOND_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 999))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
-        },
-    );
+        });
 
     // try execute before queue
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .returns(ExpectError(4u64, "Can only execute queued proposals"))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.execute(proposal_id);
-        },
-        |r| {
-            r.assert_user_error("Can only execute queued proposals");
-        },
-    );
+        });
 
     // try queue before voting ends
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .returns(ExpectError(4u64, "Can only queue succeeded proposals"))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.queue(proposal_id);
-        },
-        |r| {
-            r.assert_user_error("Can only queue succeeded proposals");
-        },
-    );
+        });
 
     current_block_nonce += VOTING_PERIOD_BLOCKS;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.current_block().block_nonce(current_block_nonce);
 
     // try queue not enough votes
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .returns(ExpectError(4u64, "Can only queue succeeded proposals"))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.queue(proposal_id);
-        },
-        |r| {
-            r.assert_user_error("Can only queue succeeded proposals");
-        },
-    );
+        });
 
     // user 1 vote again
     current_block_nonce = 20;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(FIRST_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
-        |sc| {
+    world.current_block().block_nonce(current_block_nonce);
+
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
-        },
-    );
+        });
 
     // owner downvote
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(OWNER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
-        |sc| {
+    world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::DownVote);
-        },
-    );
+        });
 
     // try queue too many downvotes
     current_block_nonce = 45;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
+    world.current_block().block_nonce(current_block_nonce);
+
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .returns(ExpectError(4u64, "Can only queue succeeded proposals"))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.queue(proposal_id);
-        },
-        |r| {
-            r.assert_user_error("Can only queue succeeded proposals");
-        },
-    );
+        });
 
     // user 1 vote again
     current_block_nonce = 20;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(FIRST_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "200")
-            .no_expect(),
-        |sc| {
+    world.current_block().block_nonce(current_block_nonce);
+
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
+        .returns(ExpectError(4u64, "Already voted for this proposal"))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
-        },
-        |r| {
-            r.assert_user_error("Already voted for this proposal");
-        },
-    );
+        });
 
     // user 3 vote again
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(THIRD_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
-        |sc| {
+    world
+        .tx()
+        .from(THIRD_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
-        },
-    );
+        });
 
     // queue ok
     current_block_nonce = 45;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
+    world.current_block().block_nonce(current_block_nonce);
+
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .whitebox(use_module::contract_obj, |sc| {
             sc.queue(proposal_id);
-        },
-    );
+        });
 
     // try execute too early
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
-            sc.execute(proposal_id);
-        },
-        |r| {
-            r.assert_user_error("Proposal is in timelock status. Try again later");
-        },
-    );
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .returns(ExpectError(
+            4u64,
+            "Proposal is in timelock status. Try again later",
+        ))
+        .whitebox(use_module::contract_obj, |sc| sc.execute(proposal_id));
 
     // execute ok
     current_block_nonce += LOCKING_PERIOD_BLOCKS;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
-            sc.execute(proposal_id);
-        },
-    );
+    world.current_block().block_nonce(current_block_nonce);
+
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .whitebox(use_module::contract_obj, |sc| sc.execute(proposal_id));
 
     // after execution, quorum changed from 1_500 to the proposed 1_000
-    world.whitebox_query(&use_module_whitebox, |sc| {
-        assert_eq!(sc.quorum().get(), managed_biguint!(1_000));
-        assert!(sc.proposals().item_is_empty(1));
-    });
+    world
+        .query()
+        .to(USE_MODULE_ADDRESS)
+        .whitebox(use_module::contract_obj, |sc| {
+            assert_eq!(sc.quorum().get(), managed_biguint!(1_000));
+            assert!(sc.proposals().item_is_empty(1));
+        });
 
-    world.check_state_step(CheckStateStep::new().put_account(
-        FIRST_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "300"),
-    ));
-    world.check_state_step(CheckStateStep::new().put_account(
-        SECOND_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "1"),
-    ));
-    world.check_state_step(CheckStateStep::new().put_account(
-        THIRD_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "800"),
-    ));
-    world.check_state_step(CheckStateStep::new().put_account(
-        OWNER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "800"),
-    ));
+    world
+        .check_account(FIRST_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(300u64));
+    world
+        .check_account(SECOND_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(1u64));
+    world
+        .check_account(THIRD_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(800u64));
+    world
+        .check_account(OWNER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(800u64));
 }
 
 #[test]
 fn test_down_veto_gov_config() {
     let mut world = setup();
-    let use_module_whitebox =
-        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
 
     let mut current_block_nonce = 10;
 
     let proposal_id = propose(
         &mut world,
-        &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
+        &FIRST_USER_ADDRESS.to_address(),
         500,
-        &address_expr_to_address(USE_MODULE_ADDRESS_EXPR),
+        &USE_MODULE_ADDRESS.to_address(),
         b"changeQuorum",
         vec![1_000u64.to_be_bytes().to_vec()],
     );
@@ -372,81 +332,75 @@ fn test_down_veto_gov_config() {
     assert_eq!(proposal_id, 1);
 
     current_block_nonce += VOTING_DELAY_BLOCKS;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.current_block().block_nonce(current_block_nonce);
 
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(FIRST_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "300"),
-        |sc| {
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 300))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
-        },
-    );
+        });
 
     current_block_nonce = 20;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
-        |sc| {
-            sc.vote(proposal_id, VoteType::UpVote);
-        },
-    );
+    world.current_block().block_nonce(current_block_nonce);
 
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(THIRD_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
-        |sc| {
-            sc.vote(proposal_id, VoteType::DownVetoVote);
-        },
-    );
+    world
+        .tx()
+        .from(SECOND_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
+        .whitebox(use_module::contract_obj, |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        });
+
+    world
+        .tx()
+        .from(THIRD_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 200))
+        .whitebox(use_module::contract_obj, |sc| {
+            sc.vote(proposal_id, VoteType::DownVetoVote)
+        });
 
     // Vote didn't succeed;
     current_block_nonce = 45;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
-            sc.queue(proposal_id);
-        },
-        |r| {
-            r.assert_user_error("Can only queue succeeded proposals");
-        },
-    );
+    world.current_block().block_epoch(current_block_nonce);
 
-    world.check_state_step(CheckStateStep::new().put_account(
-        FIRST_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "200"),
-    ));
-    world.check_state_step(CheckStateStep::new().put_account(
-        SECOND_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "800"),
-    ));
-    world.check_state_step(CheckStateStep::new().put_account(
-        THIRD_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "800"),
-    ));
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .returns(ExpectError(4u64, "Can only queue succeeded proposals"))
+        .whitebox(use_module::contract_obj, |sc| {
+            sc.queue(proposal_id);
+        });
+
+    world
+        .check_account(FIRST_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(200u64));
+
+    world
+        .check_account(SECOND_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(800u64));
+
+    world
+        .check_account(THIRD_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(800u64));
 }
 
 #[test]
 fn test_abstain_vote_gov_config() {
     let mut world = setup();
-    let use_module_whitebox =
-        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
 
     let mut current_block_nonce = 10;
 
     let proposal_id = propose(
         &mut world,
-        &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
+        &FIRST_USER_ADDRESS.to_address(),
         500,
-        &address_expr_to_address(USE_MODULE_ADDRESS_EXPR),
+        &USE_MODULE_ADDRESS.to_address(),
         b"changeQuorum",
         vec![1_000u64.to_be_bytes().to_vec()],
     );
@@ -454,95 +408,93 @@ fn test_abstain_vote_gov_config() {
     assert_eq!(proposal_id, 1);
 
     current_block_nonce += VOTING_DELAY_BLOCKS;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.current_block().block_nonce(current_block_nonce);
 
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(FIRST_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "500"),
-        |sc| {
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 500))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
-        },
-    );
+        });
 
     current_block_nonce = 20;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "400"),
-        |sc| {
-            sc.vote(proposal_id, VoteType::DownVote);
-        },
-    );
+    world.current_block().block_nonce(current_block_nonce);
 
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(THIRD_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "600"),
-        |sc| {
+    world
+        .tx()
+        .from(SECOND_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 400))
+        .whitebox(use_module::contract_obj, |sc| {
+            sc.vote(proposal_id, VoteType::DownVote);
+        });
+
+    world
+        .tx()
+        .from(THIRD_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 600))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.vote(proposal_id, VoteType::AbstainVote);
-        },
-    );
+        });
 
     // Vote didn't succeed;
     current_block_nonce = 45;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
+    world.current_block().block_nonce(current_block_nonce);
+
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .whitebox(use_module::contract_obj, |sc| {
             sc.queue(proposal_id);
-        },
-    );
+        });
 
     // execute ok
     current_block_nonce += LOCKING_PERIOD_BLOCKS;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
+    world.current_block().block_nonce(current_block_nonce);
+
+    world
+        .tx()
+        .from(FIRST_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .whitebox(use_module::contract_obj, |sc| {
             sc.execute(proposal_id);
-        },
-    );
+        });
 
     // after execution, quorum changed from 1_500 to the proposed 1_000
-    world.whitebox_query(&use_module_whitebox, |sc| {
-        assert_eq!(sc.quorum().get(), managed_biguint!(1_000));
-        assert!(sc.proposals().item_is_empty(1));
-    });
+    world
+        .query()
+        .to(USE_MODULE_ADDRESS)
+        .whitebox(use_module::contract_obj, |sc| {
+            assert_eq!(sc.quorum().get(), managed_biguint!(1_000));
+            assert!(sc.proposals().item_is_empty(1));
+        });
 
-    world.check_state_step(CheckStateStep::new().put_account(
-        FIRST_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "0"),
-    ));
-    world.check_state_step(CheckStateStep::new().put_account(
-        SECOND_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "600"),
-    ));
-    world.check_state_step(CheckStateStep::new().put_account(
-        THIRD_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "400"),
-    ));
+    world
+        .check_account(FIRST_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::zero());
+    world
+        .check_account(SECOND_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(600u64));
+    world
+        .check_account(THIRD_USER_ADDRESS)
+        .esdt_balance(GOV_TOKEN_ID, BigUint::from(400u64));
 }
 
 #[test]
 fn test_gov_cancel_defeated_proposal() {
     let mut world = setup();
-    let use_module_whitebox =
-        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
 
     let mut current_block_nonce = 10;
 
     let proposal_id = propose(
         &mut world,
-        &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
+        &FIRST_USER_ADDRESS.to_address(),
         500,
-        &address_expr_to_address(USE_MODULE_ADDRESS_EXPR),
+        &USE_MODULE_ADDRESS.to_address(),
         b"changeQuorum",
         vec![1_000u64.to_be_bytes().to_vec()],
     );
@@ -550,42 +502,33 @@ fn test_gov_cancel_defeated_proposal() {
     assert_eq!(proposal_id, 1);
 
     current_block_nonce += VOTING_DELAY_BLOCKS;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.current_block().block_nonce(current_block_nonce);
 
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new()
-            .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, "999"),
-        |sc| {
-            sc.vote(proposal_id, VoteType::DownVote);
-        },
-    );
+    world
+        .tx()
+        .from(SECOND_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .payment(TestEsdtTransfer(GOV_TOKEN_ID, 0, 999))
+        .whitebox(use_module::contract_obj, |sc| {
+            sc.vote(proposal_id, VoteType::DownVote)
+        });
 
     // try cancel too early
-    world.whitebox_call_check(
-        &use_module_whitebox,
-        ScCallStep::new().from(SECOND_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
+    world
+        .tx()
+        .from(SECOND_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .returns(ExpectError(4u64, "Action may not be cancelled"))
+        .whitebox(use_module::contract_obj, |sc| {
             sc.cancel(proposal_id);
-        },
-        |r| {
-            r.assert_user_error("Action may not be cancelled");
-        },
-    );
+        });
 
     current_block_nonce += VOTING_PERIOD_BLOCKS;
-    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.current_block().block_nonce(current_block_nonce);
 
-    world.whitebox_call(
-        &use_module_whitebox,
-        ScCallStep::new().from(SECOND_USER_ADDRESS_EXPR).no_expect(),
-        |sc| {
-            sc.cancel(proposal_id);
-        },
-    );
-}
-
-fn address_expr_to_address(address_expr: &str) -> Address {
-    AddressValue::from(address_expr).to_address()
+    world
+        .tx()
+        .from(SECOND_USER_ADDRESS)
+        .to(USE_MODULE_ADDRESS)
+        .whitebox(use_module::contract_obj, |sc| sc.cancel(proposal_id));
 }

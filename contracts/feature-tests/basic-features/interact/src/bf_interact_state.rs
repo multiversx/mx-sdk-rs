@@ -1,22 +1,19 @@
-use crate::{ContractInfo, StaticApi};
+use multiversx_sc_snippets::imports::Bech32Address;
 use serde::{Deserialize, Serialize};
 use std::{
     io::{Read, Write},
     path::Path,
 };
 
-const DEFAULT_CONTRACT_ADDRESS: &str =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
-
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type BasicFeaturesContract = ContractInfo<basic_features::Proxy<StaticApi>>;
-
-/// Multisig Interact state
+/// Basic Features Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
-    bf_address: Option<String>,
+    bf_address_storage_bytes: Option<Bech32Address>,
+    bf_address: Option<Bech32Address>,
+    bf_address_crypto: Option<Bech32Address>,
 }
 
 impl State {
@@ -32,23 +29,40 @@ impl State {
         }
     }
 
-    /// Sets the contract address
-    pub fn set_bf_address(&mut self, address: &str) {
-        self.bf_address = Some(String::from(address));
+    /// Sets the contract address for basic-features-storage-bytes
+    pub fn set_bf_address_storage_bytes(&mut self, address: Bech32Address) {
+        self.bf_address_storage_bytes = Some(address);
     }
 
-    /// Returns the contract
-    pub fn bf_contract(&self) -> BasicFeaturesContract {
-        BasicFeaturesContract::new(
-            self.bf_address
-                .clone()
-                .expect("basic-features contract not yet deployed"),
-        )
+    /// Sets the contract address for basic-features-crypto
+    pub fn set_bf_address_crypto(&mut self, address: Bech32Address) {
+        self.bf_address_crypto = Some(address);
     }
 
-    /// Returns the adder contract with default address
-    pub fn default_contract(&self) -> BasicFeaturesContract {
-        BasicFeaturesContract::new(DEFAULT_CONTRACT_ADDRESS)
+    /// Sets the contract address for basic-features
+    pub fn set_bf_address(&mut self, address: Bech32Address) {
+        self.bf_address = Some(address);
+    }
+
+    /// Returns basic-features-storage-bytes contract
+    pub fn bf_storage_bytes_contract(&self) -> &Bech32Address {
+        self.bf_address_storage_bytes
+            .as_ref()
+            .expect("basic-features-storage-bytes contract not yet deployed")
+    }
+
+    /// Returns basic-features-storage-bytes contract
+    pub fn bf_crypto_contract(&self) -> &Bech32Address {
+        self.bf_address_crypto
+            .as_ref()
+            .expect("basic-features-crypto contract not yet deployed")
+    }
+
+    /// Returns basic-features contract
+    pub fn bf_contract(&self) -> &Bech32Address {
+        self.bf_address
+            .as_ref()
+            .expect("basic-features contract not yet deployed")
     }
 }
 

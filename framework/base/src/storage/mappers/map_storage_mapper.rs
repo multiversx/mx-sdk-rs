@@ -1,8 +1,9 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{self, CurrentStorage, StorageAddress},
-    SetMapper, StorageClearable, StorageMapper,
+    set_mapper::{self},
+    source::{CurrentStorage, StorageAddress},
+    SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     api::StorageMapperApi,
@@ -87,13 +88,13 @@ where
     }
 }
 
-impl<SA, K, V> MapStorageMapper<SA, K, V, ManagedAddress<SA>>
+impl<SA, K, V> StorageMapperFromAddress<SA> for MapStorageMapper<SA, K, V, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         MapStorageMapper {
             _phantom_api: PhantomData,
             base_key: base_key.clone(),
@@ -221,7 +222,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> Iterator for Iter<'a, SA, A, K, V>
+impl<SA, A, K, V> Iterator for Iter<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -268,7 +269,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> Iterator for Values<'a, SA, A, K, V>
+impl<SA, A, K, V> Iterator for Values<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -388,7 +389,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> VacantEntry<'a, SA, A, K, V>
+impl<SA, A, K, V> VacantEntry<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -420,7 +421,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> OccupiedEntry<'a, SA, A, K, V>
+impl<SA, A, K, V> OccupiedEntry<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -438,7 +439,7 @@ where
     }
 }
 
-impl<'a, SA, K, V> OccupiedEntry<'a, SA, CurrentStorage, K, V>
+impl<SA, K, V> OccupiedEntry<'_, SA, CurrentStorage, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,

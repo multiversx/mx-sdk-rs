@@ -6,7 +6,7 @@ use crate::{
     tuple_util::NestedTupleFlatten,
     types::{
         decode_result, BackTransfers, ManagedBuffer, ManagedVec, OriginalResultMarker, RHListExec,
-        Tx, TxDataFunctionCall, TxGas, TxPayment, TxScEnv, TxToSpecified,
+        Tx, TxDataFunctionCall, TxGas, TxNoPayment, TxPayment, TxScEnv, TxToSpecified,
     },
 };
 
@@ -52,6 +52,7 @@ where
     ///
     /// Only works with contracts from the same shard.
     pub fn sync_call(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
+        self.result_handler.list_preprocessing();
         let (raw_result, result_handler) = self.execute_sync_call_raw();
         let sync_raw_result = SyncCallRawResult(raw_result);
         let tuple_result = result_handler.list_process_result(&sync_raw_result);
@@ -86,6 +87,7 @@ where
     ///
     /// Only works with contracts from the same shard.
     pub fn sync_call_same_context(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
+        self.result_handler.list_preprocessing();
         let (raw_result, result_handler) = self.execute_sync_call_same_context_raw();
         let sync_raw_result = SyncCallRawResult(raw_result);
         let tuple_result = result_handler.list_process_result(&sync_raw_result);
@@ -93,10 +95,11 @@ where
     }
 }
 
-impl<Api, To, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, (), Gas, FC, RH>
+impl<Api, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, RH>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxNoPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
     RH: RHListExec<SyncCallRawResult<Api>, TxScEnv<Api>>,
@@ -124,6 +127,7 @@ where
     ///
     /// Only works with contracts from the same shard.
     pub fn sync_call_readonly(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
+        self.result_handler.list_preprocessing();
         let (raw_result, result_handler) = self.execute_sync_call_readonly_raw();
         let sync_raw_result = SyncCallRawResult(raw_result);
         let tuple_result = result_handler.list_process_result(&sync_raw_result);

@@ -160,7 +160,7 @@ pub trait Erc1155 {
             self.token_owner(type_id, nft_id).set(to);
         } else {
             self.token_owner(type_id, nft_id)
-                .set(&ManagedAddress::zero());
+                .set(ManagedAddress::zero());
         }
     }
 
@@ -320,7 +320,7 @@ pub trait Erc1155 {
         let amount = BigUint::from(1u32);
         self.decrease_balance(owner, type_id, &amount);
         self.token_owner(type_id, nft_id)
-            .set(&ManagedAddress::zero());
+            .set(ManagedAddress::zero());
     }
 
     /// Range is inclusive for both `start` and `end`

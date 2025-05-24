@@ -45,15 +45,19 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
         }
 
         for esdt_transfer in &back_transfers.esdt_payments {
-            let (token, nonce, payment) = esdt_transfer.into_tuple();
-            let esdt_token_id = EgldOrEsdtTokenIdentifier::esdt(token);
-            self.retrieve_funds_callback_event(&esdt_token_id, nonce, &payment);
+            let esdt_token_id =
+                EgldOrEsdtTokenIdentifier::esdt(esdt_transfer.token_identifier.clone());
+            self.retrieve_funds_callback_event(
+                &esdt_token_id,
+                esdt_transfer.token_nonce,
+                &esdt_transfer.amount,
+            );
 
             let _ = self.callback_data().push(&CallbackData {
                 callback_name: ManagedBuffer::from(b"retrieve_funds_callback"),
                 token_identifier: esdt_token_id,
-                token_nonce: nonce,
-                token_amount: payment,
+                token_nonce: esdt_transfer.token_nonce,
+                token_amount: esdt_transfer.amount.clone(),
                 args: ManagedVec::new(),
             });
         }

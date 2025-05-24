@@ -37,7 +37,7 @@ pub trait BigIntApiImpl: HandleTypeInfo + ErrorApi {
     ) {
         self.bi_sub(dest.clone(), x, y);
         if self.bi_sign(dest) == Sign::Minus {
-            Self::error_api_impl().signal_error(err_msg::BIG_UINT_SUB_NEGATIVE);
+            Self::error_api_impl().signal_error(err_msg::BIG_UINT_SUB_NEGATIVE.as_bytes());
         }
     }
 
@@ -52,7 +52,7 @@ pub trait BigIntApiImpl: HandleTypeInfo + ErrorApi {
 
     fn bi_sqrt(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle);
     fn bi_pow(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
-    fn bi_log2(&self, x: Self::BigIntHandle) -> u32;
+    fn bi_log2(&self, x: Self::BigIntHandle) -> i32;
 
     fn bi_and(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
     fn bi_or(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
