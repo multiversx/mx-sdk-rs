@@ -9,8 +9,7 @@ const CODE_EXPR: &str = "mxsc:output/alloc-features.mxsc.json";
 const SC_AF: TestSCAddress = TestSCAddress::new("alloc-features");
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new()
-        .executor_config(ExecutorConfig::Debugger.then(ExecutorConfig::Experimental));
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/alloc-features");
     blockchain.register_contract(CODE_EXPR, alloc_features::ContractBuilder);

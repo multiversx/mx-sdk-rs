@@ -14,7 +14,5 @@ path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.57.1"
+features = ["wasmer-experimental"]
 path = "../../../framework/scenario"
-
-[dev-dependencies.esdt-system-sc-mock]
-path = "../esdt-system-sc-mock"
