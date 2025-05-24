@@ -47,6 +47,9 @@ impl ScenarioVMRunner {
             )),
             ExecutorConfig::WasmerProd => new_prod_executor(weak),
             ExecutorConfig::Experimental => new_experimental_executor(weak),
+            ExecutorConfig::CompiledTests => {
+                panic!("ExecutorConfig::CompiledTests cannot be used on its own")
+            },
             ExecutorConfig::Composite(list) => Box::new(CompositeExecutor::new(
                 list.iter()
                     .map(|sub_config| self.create_executor(sub_config, weak.clone()))
