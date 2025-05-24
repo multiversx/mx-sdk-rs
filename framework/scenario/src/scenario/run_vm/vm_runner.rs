@@ -47,8 +47,12 @@ impl ScenarioVMRunner {
             )),
             ExecutorConfig::WasmerProd => new_prod_executor(weak),
             ExecutorConfig::Experimental => new_experimental_executor(weak),
-            ExecutorConfig::CompiledTests => {
-                panic!("ExecutorConfig::CompiledTests cannot be used on its own")
+            ExecutorConfig::CompiledTestsOr(fallback) => {
+                if cfg!(feature = "compiled-sc-tests") {
+                    new_experimental_executor(weak)
+                } else {
+                    self.create_executor(fallback, weak)
+                }
             },
             ExecutorConfig::Composite(list) => Box::new(CompositeExecutor::new(
                 list.iter()

@@ -10,12 +10,10 @@ pub enum ExecutorConfig {
     /// Use the compiled contract in the experimental Wasmer 6 executor.
     Experimental,
 
-    /// Use the compiled contract only if feature `compiled-sc-tests` is active.
+    /// Use the compiled contract only if feature `compiled-sc-tests` is active. Otherwise use fallback config.
     ///
     /// Forwards to the experimental Wasmer 6 executor.
-    ///
-    /// Cannot be used on its own.
-    CompiledTests,
+    CompiledTestsOr(Box<ExecutorConfig>),
 
     /// Defines a list of executors, to be used in order.
     /// If one of them refuses to execute, the next one is used as fallback.
@@ -39,16 +37,20 @@ impl ExecutorConfig {
         }
     }
 
+    /// Use the compiled contract only if feature `compiled-sc-tests` is active. Otherwise use fallback config.
+    pub fn compiled_tests_or(fallback: Self) -> Self {
+        Self::CompiledTestsOr(Box::new(fallback))
+    }
+
     /// Tests with:
     /// - compiled tests (if feature `compiled-sc-tests` is active),
-    /// - then tries the debugger,
-    /// - then finally the experimental Wasmer.
+    /// - otherwise:
+    ///     - first try the debugger,
+    ///     - then finally the experimental Wasmer.
     ///
     /// This means contracts will be tested natively in the wasm tests.
     pub fn full_suite() -> Self {
-        Self::CompiledTests
-            .then(Self::Debugger)
-            .then(Self::Experimental)
+        Self::compiled_tests_or(Self::Debugger.then(Self::Experimental))
     }
 
     fn from_list(mut list: Vec<ExecutorConfig>) -> Self {
@@ -61,11 +63,6 @@ impl ExecutorConfig {
 
     fn append_flattened_to_vec(self, destination: &mut Vec<ExecutorConfig>) {
         match self {
-            Self::CompiledTests => {
-                if cfg!(feature = "compiled-sc-tests") {
-                    destination.push(Self::Experimental);
-                }
-            },
             Self::Composite(list) => {
                 for item in list {
                     item.append_flattened_to_vec(destination);
@@ -114,42 +111,14 @@ mod tests {
         );
     }
 
-    #[cfg_attr(feature = "compiled-sc-tests", ignore)]
     #[test]
-    fn executor_config_then_not_compiled_test() {
+    fn executor_config_full_suite() {
         assert_eq!(
-            ExecutorConfig::CompiledTests.then(ExecutorConfig::Debugger),
-            ExecutorConfig::Debugger,
-        );
-
-        assert_eq!(
-            ExecutorConfig::CompiledTests
-                .then(ExecutorConfig::Experimental)
-                .then(ExecutorConfig::Debugger),
-            ExecutorConfig::Composite(vec![ExecutorConfig::Experimental, ExecutorConfig::Debugger])
-        );
-    }
-
-    #[cfg_attr(not(feature = "compiled-sc-tests"), ignore)]
-    #[test]
-    fn executor_config_then_compiled_test() {
-        assert_eq!(
-            ExecutorConfig::CompiledTests.then(ExecutorConfig::Experimental),
-            ExecutorConfig::Composite(vec![
-                ExecutorConfig::CompiledTests,
-                ExecutorConfig::Experimental
-            ])
-        );
-
-        assert_eq!(
-            ExecutorConfig::CompiledTests
-                .then(ExecutorConfig::Experimental)
-                .then(ExecutorConfig::Debugger),
-            ExecutorConfig::Composite(vec![
-                ExecutorConfig::CompiledTests,
+            ExecutorConfig::full_suite(),
+            ExecutorConfig::CompiledTestsOr(Box::new(ExecutorConfig::Composite(vec![
+                ExecutorConfig::Debugger,
                 ExecutorConfig::Experimental,
-                ExecutorConfig::Debugger
-            ])
+            ])))
         );
     }
 }
