@@ -10,9 +10,9 @@ const TOKEN_3: TestTokenIdentifier = TestTokenIdentifier::new("TOK-000003");
 const SFT: TestTokenIdentifier = TestTokenIdentifier::new("SFT-123");
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/paybale-features");
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/payable-features");
     blockchain.register_contract(PF_PATH_EXPR, payable_features::ContractBuilder);
     blockchain
 }

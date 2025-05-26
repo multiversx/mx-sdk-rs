@@ -35,7 +35,8 @@ simple-error = "0.3.1"
 [features]
 default = ["wasm-incompatible"]
 wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
-run-go-tests = []
+compiled-sc-tests = []
+run-go-tests = ["compiled-sc-tests"] # backwards compatibility
 wasmer-prod = ["multiversx-chain-vm/wasmer-prod"]
 wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
 

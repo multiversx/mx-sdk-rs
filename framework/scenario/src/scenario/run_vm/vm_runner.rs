@@ -47,6 +47,16 @@ impl ScenarioVMRunner {
             )),
             ExecutorConfig::WasmerProd => new_prod_executor(weak),
             ExecutorConfig::Experimental => new_experimental_executor(weak),
+            ExecutorConfig::CompiledFeatureIfElse {
+                if_compiled,
+                fallback,
+            } => {
+                if cfg!(feature = "compiled-sc-tests") {
+                    self.create_executor(if_compiled, weak)
+                } else {
+                    self.create_executor(fallback, weak)
+                }
+            },
             ExecutorConfig::Composite(list) => Box::new(CompositeExecutor::new(
                 list.iter()
                     .map(|sub_config| self.create_executor(sub_config, weak.clone()))

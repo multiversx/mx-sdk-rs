@@ -11,15 +11,14 @@ const ADDER_OWNER_ADDRESS: TestAddress = TestAddress::new("adder-owner");
 const ADDER_CODE_PATH: MxscPath = MxscPath::new("test-contracts/adder.mxsc.json");
 const BOARD_MEMBER_ADDRESS: TestAddress = TestAddress::new("board-member");
 const MULTISIG_ADDRESS: TestSCAddress = TestSCAddress::new("multisig");
-const MULTISIG_CODE_PATH: MxscPath = MxscPath::new("output/multisig.mxsc.json");
+const MULTISIG_CODE_PATH: MxscPath = MxscPath::new("output/multisig-full.mxsc.json");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const PROPOSER_ADDRESS: TestAddress = TestAddress::new("proposer");
 const PROPOSER_BALANCE: u64 = 100_000_000;
 const QUORUM_SIZE: usize = 1;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new()
-        .executor_config(ExecutorConfig::Debugger.then(ExecutorConfig::Experimental));
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
     blockchain.register_contract(MULTISIG_CODE_PATH, multisig::ContractBuilder);
