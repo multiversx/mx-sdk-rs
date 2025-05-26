@@ -15,8 +15,12 @@ path = "../../../framework/base"
 version = "0.58.0"
 path = "../../../framework/scenario"
 
+[dependencies.multiversx-chain-vm-wasmer-prod]
+path = "../../../chain/wasmer-prod"
+optional = true
+
 [features]
-wasmer-prod = ["multiversx-sc-scenario/wasmer-prod"]
+wasmer-prod = ["multiversx-chain-vm-wasmer-prod"]
 wasmer-experimental = ["multiversx-sc-scenario/wasmer-experimental"]
 
 [workspace]

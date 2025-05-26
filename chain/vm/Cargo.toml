@@ -19,9 +19,8 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 [features]
 # not supported when compiling to wasm
 wasm-incompatible = ["rand"]
-wasmer-prod = ["multiversx-chain-vm-executor-wasmer"]
 wasmer-experimental = ["multiversx-chain-vm-executor-wasmer-experimental"]
-# default = ["wasmer-prod", "wasmer-experimental"] ## uncomment for easier development
+# default = ["wasmer-experimental"] ## uncomment for easier development
 
 [dependencies]
 num-bigint = "0.4"
@@ -46,14 +45,6 @@ path = "../core"
 
 [dependencies.multiversx-chain-vm-executor]
 version = "0.4.0"
-
-[dependencies.multiversx-chain-vm-executor-wasmer]
-version = "0.4.0"
-optional = true
-default-features = false
-features = ["multiversx-chain-vm-executor-published"]
-git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "163cf65be3cd204408c6d23b264e17aa9a9449e2"
 
 [dependencies.multiversx-chain-vm-executor-wasmer-experimental]
 version = "0.4.0"
