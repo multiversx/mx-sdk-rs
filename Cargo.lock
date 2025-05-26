@@ -3266,7 +3266,7 @@ dependencies = [
  "serde",
  "serde_json",
  "toml 0.8.22",
- "wasmparser 0.230.0",
+ "wasmparser 0.231.0",
  "wasmprinter",
  "wat",
 ]
@@ -6293,13 +6293,13 @@ dependencies = [
 
 [[package]]
 name = "wasmprinter"
-version = "0.230.0"
+version = "0.231.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9dc8e9a1e48f4b2247b006b3a9b0a02ba62a2e52cfcfd4bc4c70785a6104fc32"
+checksum = "4a7edd6cf24de82084a947de7ef493fc0b5a0448affb95a84313823d4f41b1d6"
 dependencies = [
  "anyhow",
  "termcolor",
- "wasmparser 0.230.0",
+ "wasmparser 0.231.0",
 ]
 
 [[package]]
