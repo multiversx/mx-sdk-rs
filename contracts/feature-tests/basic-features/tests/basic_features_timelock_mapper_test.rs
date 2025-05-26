@@ -1,7 +1,5 @@
 use basic_features::basic_features_proxy;
-use imports::{MxscPath, TestAddress, TestSCAddress};
-use multiversx_sc::types::{BigUint, ReturnsResult};
-use multiversx_sc_scenario::{api::StaticApi, imports, ScenarioTxRun, ScenarioWorld};
+use multiversx_sc_scenario::imports::*;
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const BASIC_FEATURES_ADDRESS: TestSCAddress = TestSCAddress::new("basic-features");
@@ -134,7 +132,7 @@ impl BasicFeaturesState {
     }
 }
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
     blockchain.register_contract(BASIC_FEATURES_PATH, basic_features::ContractBuilder);
@@ -179,10 +177,6 @@ fn timelock_mapper_test() {
 
     // future value is empty
     assert!(state.get_future_value() == BigUint::zero());
-
-    state
-        .world
-        .write_scenario_trace("scenarios/timelock_mapper.scen.json");
 }
 
 #[test]
@@ -216,8 +210,4 @@ fn timelock_mapper_at_address_test() {
     assert!(state.get_current_value_at_address(BASIC_FEATURES_ADDRESS) == future_value);
     assert!(state.get_future_value_at_address(BASIC_FEATURES_ADDRESS) == BigUint::zero());
     assert!(state.get_unlock_timestamp_at_address(BASIC_FEATURES_ADDRESS) == 10u64);
-
-    state
-        .world
-        .write_scenario_trace("scenarios/timelock_mapper_at_address.scen.json");
 }

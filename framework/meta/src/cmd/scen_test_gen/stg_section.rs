@@ -9,7 +9,7 @@ pub struct Section {
     pub test_fn: Option<ScenarioTestFn>,
 }
 
-/// Parsed secion.
+/// Parsed section.
 pub struct ScenarioTestFn {
     pub docs: String,
     pub test_line: String,

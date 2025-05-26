@@ -1,7 +1,7 @@
 use multiversx_sc_scenario::imports::*;
 use scenario_tester::*;
 
-const ST_PATH_EXPR: MxscPath = MxscPath::new("mxsc:output/scenario-tester.mxsc.json");
+const ST_PATH_EXPR: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
 const OWNER: TestAddress = TestAddress::new("owner");
 const SCENARIO_TESTER: TestSCAddress = TestSCAddress::new("scenario-tester");
 

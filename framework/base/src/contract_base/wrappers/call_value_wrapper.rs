@@ -49,7 +49,7 @@ where
 
     /// Retrieves the EGLD call value from the VM.
     ///
-    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now posible.
+    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now possible.
     pub fn egld_direct_non_strict(&self) -> ManagedRef<'static, A, BigUint<A>> {
         let call_value_handle: A::BigIntHandle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
         if !A::static_var_api_impl()
@@ -84,7 +84,7 @@ where
 
     /// Retrieves the EGLD call value from the VM.
     ///
-    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now posible.
+    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now possible.
     ///
     /// ## Important!
     ///
@@ -107,7 +107,7 @@ where
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
-    /// Will return 0 results if nothing was transfered, or just EGLD.
+    /// Will return 0 results if nothing was transferred, or just EGLD.
     ///
     /// Will crash for EGLD + ESDT multi transfers.
     pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {

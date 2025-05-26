@@ -20,7 +20,7 @@ Arguments for the init function:
 - `voting_period_in_blocks` - Number of blocks the voting period lasts (voting delay does not count towards this)
 - `lock_time_after_voting_ends_in_blocks` - Number of blocks to wait before a successful proposal can be executed
 
-All of the above parameters execpt the `governance_token_id` can be changed later through proposals.
+All of the above parameters except the `governance_token_id` can be changed later through proposals.
 
 The module also provides events for most actions that happen:
 - `proposalCreated` - triggers when a proposal is created. It also provides all the relevant information, like proposer, actions, etc.
@@ -45,9 +45,9 @@ A maximum of `MAX_GOVERNANCE_PROPOSAL_ACTIONS` may be proposed at a time. All ac
 Additionally, a minimum of `min_token_balance_for_proposal` governance tokens must be deposited at proposal time.
 
 Examples of actions that can be proposed:
-- transfering ESDT tokens to user accounts
+- transferring ESDT tokens to user accounts
 - calling other smart contracts, with or without sending tokens as well
-- calling the goverance contract itself, for the purpose of changing configurable parameters
+- calling the governance contract itself, for the purpose of changing configurable parameters
 
 ## Voting/Downvoting
 

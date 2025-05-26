@@ -540,7 +540,7 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
+        // TODO: in Rust the `0b` prefix appears only when writing "{:#x}", not "{:x}"
         let cast_handle = self.get_handle().cast_or_signal_error::<M, _>();
         let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
         f.append_managed_buffer_binary(&wrap_cast);
