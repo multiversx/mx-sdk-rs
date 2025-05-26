@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.57.1"
+version = "0.58.0"
 edition = "2021"
 
 authors = [
@@ -41,12 +41,12 @@ wasmer-prod = ["multiversx-chain-vm/wasmer-prod"]
 wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
 
 [dependencies.multiversx-sc]
-version = "=0.57.1"
+version = "=0.58.0"
 features = ["alloc", "num-bigint"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.57.1"
+version = "=0.58.0"
 path = "../meta-lib"
 
 [dependencies.multiversx-chain-scenario-format]
@@ -57,5 +57,5 @@ path = "../../sdk/scenario-format"
 version = "0.4.0"
 
 [dependencies.multiversx-chain-vm]
-version = "=0.14.0"
+version = "=0.15.0"
 path = "../../chain/vm"
