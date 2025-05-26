@@ -32,7 +32,7 @@ pub fn ln_polynomial(x: I64Decimal9) -> I64Decimal9 {
     result
 }
 
-/// Just took the coeficients from ln and dividem them all by ln(2).
+/// Just took the coefficients from ln and dividem them all by ln(2).
 pub fn log2_polynomial(x: I64Decimal9) -> I64Decimal9 {
     // x normalized to [1.0, 2.0]
     debug_assert!(x >= DENOMINATOR);

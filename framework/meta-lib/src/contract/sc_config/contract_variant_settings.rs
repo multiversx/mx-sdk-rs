@@ -32,7 +32,7 @@ pub struct ContractVariantSettings {
     /// Allows disabling default features in the contract crate, from wasm.
     pub default_features: Option<bool>,
 
-    /// Forcibly remove the original contrct legacy callback.
+    /// Forcibly remove the original contract legacy callback.
     pub kill_legacy_callback: bool,
 
     pub profile: ContractVariantProfile,

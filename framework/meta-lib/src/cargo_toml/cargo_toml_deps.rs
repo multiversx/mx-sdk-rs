@@ -68,10 +68,10 @@ impl DependencyRawValue {
                 },
 
                 (None, None, None) => DependencyReference::Unsupported(
-                    "need at least one of: git commit, git brach, or git tag".to_owned(),
+                    "need at least one of: git commit, git branch, or git tag".to_owned(),
                 ),
                 _ => DependencyReference::Unsupported(
-                    "can only have one of: git commit, git brach, or git tag".to_owned(),
+                    "can only have one of: git commit, git branch, or git tag".to_owned(),
                 ),
             };
         }

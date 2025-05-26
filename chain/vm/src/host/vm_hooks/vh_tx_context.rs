@@ -230,7 +230,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         };
 
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
-        tx_cache.increase_acount_nonce(contract_address);
+        tx_cache.increase_account_nonce(contract_address);
         let (tx_result, new_address, blockchain_updates) = execution::execute_deploy(
             tx_input,
             contract_code,

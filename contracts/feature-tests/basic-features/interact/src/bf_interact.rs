@@ -149,7 +149,7 @@ impl BasicFeaturesInteract {
             .run()
             .await;
 
-        println!("new address for basic-features-cyrpto: {new_address}");
+        println!("new address for basic-features-crypto: {new_address}");
 
         self.state.set_bf_address_crypto(new_address);
     }

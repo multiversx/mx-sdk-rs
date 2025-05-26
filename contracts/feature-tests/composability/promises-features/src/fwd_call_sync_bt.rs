@@ -122,7 +122,7 @@ pub trait BackTransfersFeatureModule {
         );
     }
 
-    #[event("back_tranfers")]
+    #[event("back_transfers")]
     fn back_transfers_event(
         &self,
         #[indexed] egld_value: &BigUint,

@@ -1,4 +1,4 @@
-//! Duplicated between sdk and scnearios.
+//! Duplicated between sdk and scenarios.
 //!
 //! TODO: de-duplicate, place in chain core crate, if possible.
 
