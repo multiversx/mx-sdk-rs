@@ -3,6 +3,7 @@
 extern crate alloc;
 
 pub mod builtin_func_names;
+pub mod token_identifier_util;
 pub mod types;
 
 /// Re-exported for convenience.

@@ -58,4 +58,8 @@ impl ManagedTypeApiImpl for UncallableApi {
     ) {
         unreachable!()
     }
+
+    fn validate_token_identifier(&self, _token_id_handle: Self::ManagedBufferHandle) -> bool {
+        unreachable!()
+    }
 }

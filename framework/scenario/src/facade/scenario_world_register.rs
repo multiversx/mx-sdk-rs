@@ -1,6 +1,6 @@
 use crate::{
     api::DebugApi,
-    debug_executor::ContractContainer,
+    executor::debug::ContractContainer,
     multiversx_sc::{
         api,
         contract_base::{CallableContractBuilder, ContractAbiProvider},

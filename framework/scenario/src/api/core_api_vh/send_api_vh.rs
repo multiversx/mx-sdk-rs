@@ -1,7 +1,9 @@
-use multiversx_chain_vm::mem_conv;
 use multiversx_sc::api::{const_handles, RawHandle, SendApi, SendApiImpl};
 
-use crate::api::{VMHooksApi, VMHooksApiBackend};
+use crate::{
+    api::{VMHooksApi, VMHooksApiBackend},
+    executor::debug::ContractDebugInstanceState,
+};
 
 impl<VHB: VMHooksApiBackend> SendApi for VMHooksApi<VHB> {
     type SendApiImpl = Self;
@@ -92,29 +94,23 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
         extra_gas_for_callback: u64,
         callback_closure_handle: RawHandle,
     ) {
+        let (success_offset, success_length) =
+            ContractDebugInstanceState::main_memory_ptr(success_callback.as_bytes());
+        let (error_offset, error_length) =
+            ContractDebugInstanceState::main_memory_ptr(error_callback.as_bytes());
         self.with_vm_hooks(|vh| {
-            mem_conv::with_mem_ptr(
-                success_callback.as_bytes(),
-                |success_offset, success_length| {
-                    mem_conv::with_mem_ptr(
-                        error_callback.as_bytes(),
-                        |error_offset, error_length| {
-                            vh.managed_create_async_call(
-                                to_handle,
-                                egld_value_handle,
-                                endpoint_name_handle,
-                                arg_buffer_handle,
-                                success_offset,
-                                success_length,
-                                error_offset,
-                                error_length,
-                                gas as i64,
-                                extra_gas_for_callback as i64,
-                                callback_closure_handle,
-                            );
-                        },
-                    )
-                },
+            vh.managed_create_async_call(
+                to_handle,
+                egld_value_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
+                success_offset,
+                success_length,
+                error_offset,
+                error_length,
+                gas as i64,
+                extra_gas_for_callback as i64,
+                callback_closure_handle,
             )
         });
     }
