@@ -22,4 +22,4 @@ version = "0.57.1"
 path = "../../../framework/meta-lib"
 
 [dependencies]
-bitflags = "=2.9.0"
+bitflags = "2.9"
