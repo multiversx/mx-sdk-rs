@@ -9,30 +9,29 @@ pub fn test(test_args: &TestArgs) {
     let mut program = "cargo";
     let mut args = Vec::new();
 
-    let go = test_args.go;
-    let scen = test_args.scen;
-    let no_capture = test_args.nocapture;
-    let chain_simulator = test_args.chain_simulator;
-
-    if scen {
+    if test_args.scen {
         program = "mx-scenario-go";
         args.extend(["run", "./"]);
 
-        if go {
+        if test_args.go {
             println!("{}", "If scen parameter is true, it will override the go parameter. Executing scenarios...".yellow());
         }
     } else {
         args.push("test");
 
-        if go {
+        if test_args.go {
             args.extend(["--features", "multiversx-sc-scenario/run-go-tests"]);
         }
 
-        if chain_simulator {
+        if test_args.wasm {
+            args.extend(["--features", "multiversx-sc-scenario/compiled-sc-tests"]);
+        }
+
+        if test_args.chain_simulator {
             args.extend(["--features", "chain-simulator-tests"]);
         }
 
-        if no_capture {
+        if test_args.nocapture {
             args.extend(["--", "--nocapture"]);
         }
     }
