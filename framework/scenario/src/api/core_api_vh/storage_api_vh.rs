@@ -42,7 +42,7 @@ impl<VHB: VMHooksApiBackend> StorageReadApiImpl for VMHooksApi<VHB> {
                 address_handle.get_raw_handle_unchecked(),
                 key_handle.get_raw_handle_unchecked(),
                 dest.get_raw_handle_unchecked(),
-            );
+            )
         })
     }
 }
@@ -67,7 +67,7 @@ impl<VHB: VMHooksApiBackend> StorageWriteApiImpl for VMHooksApi<VHB> {
             vh.mbuffer_storage_store(
                 key_handle.get_raw_handle_unchecked(),
                 value_handle.get_raw_handle_unchecked(),
-            );
+            )
         });
     }
 }

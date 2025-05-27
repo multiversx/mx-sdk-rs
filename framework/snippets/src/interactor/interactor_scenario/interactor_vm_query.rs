@@ -1,5 +1,8 @@
 #![allow(deprecated)]
 
+use std::process;
+
+use super::error_message::query_err_message;
 use crate::InteractorBase;
 use log::info;
 use multiversx_sc_scenario::{
@@ -35,11 +38,13 @@ where
                 .map(|arg| hex::encode(&arg.value))
                 .collect(),
         };
-        let result = self
-            .proxy
-            .request(VMQueryRequest(&req))
-            .await
-            .expect("error executing VM query");
+        let result = match self.proxy.request(VMQueryRequest(&req)).await {
+            Ok(r) => r,
+            Err(err) => {
+                query_err_message(&err);
+                process::exit(1);
+            },
+        };
 
         info!("{:#?}", result);
 

@@ -6,11 +6,14 @@ async fn main() {
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
 
     let status = blockchain.get_transaction_status(tx_hash).await;
+    assert!(status.is_ok());
     println!("tx status: {status:?}");
 
     let tx = blockchain.get_transaction_info(tx_hash).await;
+    assert!(tx.is_ok());
     println!("tx: {tx:#?}");
 
     let tx = blockchain.get_transaction_info_with_results(tx_hash).await;
+    assert!(tx.is_ok());
     println!("tx with results: {tx:#?}");
 }

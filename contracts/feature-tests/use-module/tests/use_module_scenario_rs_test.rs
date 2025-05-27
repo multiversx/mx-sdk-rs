@@ -17,10 +17,14 @@ mod dns_mock {
     }
 }
 
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain =
+        ScenarioWorld::new().executor_config(ExecutorConfig::compiled_tests_if_else(
+            ExecutorConfig::Experimental.then(ExecutorConfig::Debugger),
+            ExecutorConfig::Debugger,
+        ));
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/use-module");
     blockchain.register_contract(

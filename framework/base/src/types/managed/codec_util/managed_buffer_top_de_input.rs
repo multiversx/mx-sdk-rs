@@ -60,6 +60,25 @@ where
         Ok(len)
     }
 
+    #[cfg(not(feature = "barnard"))]
+    fn into_i64<H>(self, h: H) -> Result<i64, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        use crate::api::{
+            const_handles, managed_types::BigIntApiImpl, use_raw_handle, ManagedTypeApiImpl,
+        };
+
+        let big_int_temp: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+        M::managed_type_impl().mb_to_big_int_signed(self.handle.clone(), big_int_temp.clone());
+        if let Some(value) = M::managed_type_impl().bi_to_i64(big_int_temp) {
+            Ok(value)
+        } else {
+            Err(h.handle_error(err_msg::ARG_OUT_OF_RANGE.into()))
+        }
+    }
+
+    #[cfg(feature = "barnard")]
     fn into_i64<H>(self, h: H) -> Result<i64, H::HandledErr>
     where
         H: DecodeErrorHandler,
@@ -71,6 +90,7 @@ where
         }
     }
 
+    #[cfg(feature = "barnard")]
     fn into_u64<H>(self, h: H) -> Result<u64, H::HandledErr>
     where
         H: DecodeErrorHandler,

@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 pub use super::vec_mapper::Iter;
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper, StorageMapperFromAddress, VecMapper,
 };
 use crate::{

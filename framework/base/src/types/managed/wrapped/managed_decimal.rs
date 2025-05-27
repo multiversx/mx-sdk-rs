@@ -2,7 +2,6 @@ mod decimals;
 mod managed_decimal_cmp;
 mod managed_decimal_cmp_signed;
 mod managed_decimal_logarithm;
-mod managed_decimal_macros;
 mod managed_decimal_op_add;
 mod managed_decimal_op_add_signed;
 mod managed_decimal_op_div;
@@ -13,13 +12,14 @@ mod managed_decimal_op_sub;
 mod managed_decimal_op_sub_signed;
 mod managed_decimal_signed;
 
-pub use decimals::{ConstDecimals, Decimals, NumDecimals};
+pub use decimals::{ConstDecimals, Decimals, EgldDecimals, LnDecimals, NumDecimals};
 pub use managed_decimal_signed::ManagedDecimalSigned;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
+    typenum::{Unsigned, U4, U8},
     types::BigUint,
 };
 
@@ -31,7 +31,11 @@ use multiversx_sc_codec::{
 
 use core::{cmp::Ordering, ops::Deref};
 
-use super::{ManagedBufferCachedBuilder, ManagedRef};
+use super::{
+    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
+    ManagedBufferCachedBuilder, ManagedRef, ManagedVecItem, ManagedVecItemPayloadBuffer,
+    ManagedVecRef,
+};
 
 /// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
 ///
@@ -98,11 +102,11 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<BigUint<M>>
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     fn from(mut value: BigUint<M>) -> Self {
-        let decimals = ConstDecimals;
+        let decimals = ConstDecimals::new();
         value *= decimals.scaling_factor().deref();
         ManagedDecimal {
             data: value,
@@ -111,11 +115,11 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
     pub fn const_decimals_from_raw(data: BigUint<M>) -> Self {
         ManagedDecimal {
             data,
-            decimals: ConstDecimals,
+            decimals: ConstDecimals::new(),
         }
     }
 
@@ -123,20 +127,72 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDeci
     pub fn into_var_decimals(self) -> ManagedDecimal<M, NumDecimals> {
         ManagedDecimal {
             data: self.data,
-            decimals: DECIMALS,
+            decimals: DECIMALS::to_usize(),
         }
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals>
-    From<ManagedDecimal<M, ConstDecimals<DECIMALS>>> for ManagedDecimal<M, NumDecimals>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+    for ManagedDecimal<M, NumDecimals>
 {
     fn from(value: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self {
         value.into_var_decimals()
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
+impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimal<M, NumDecimals> {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U8>; // 4 bigUint + 4 usize
+
+    const SKIPS_RESERIALIZATION: bool = false;
+
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let mut index = 0;
+        unsafe {
+            Self {
+                data: managed_vec_item_read_from_payload_index(payload, &mut index),
+                decimals: managed_vec_item_read_from_payload_index(payload, &mut index),
+            }
+        }
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let mut index = 0;
+        unsafe {
+            managed_vec_item_save_to_payload_index(self.data, payload, &mut index);
+            managed_vec_item_save_to_payload_index(self.decimals, payload, &mut index);
+        }
+    }
+}
+
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+{
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>; // data only
+
+    const SKIPS_RESERIALIZATION: bool = false;
+
+    type Ref<'a> = ManagedVecRef<'a, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        Self::const_decimals_from_raw(BigUint::read_from_payload(payload))
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        ManagedVecRef::new(Self::read_from_payload(payload))
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.data.save_to_payload(payload);
+    }
+}
+
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> TopEncode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     #[inline]
@@ -149,7 +205,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> TopDecode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
@@ -163,7 +219,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> NestedEncode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -177,7 +233,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedDecode
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> NestedDecode
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -269,24 +325,22 @@ impl<M: ManagedTypeApi> TypeAbi for ManagedDecimal<M, NumDecimals> {
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbiFrom<Self>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbiFrom<Self>
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
-{
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbi for ManagedDecimal<M, ConstDecimals<DECIMALS>> {
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        TypeName::from(alloc::format!("ManagedDecimal<{}>", DECIMALS))
+        TypeName::from(alloc::format!("ManagedDecimal<{}>", DECIMALS::to_usize()))
     }
 
     fn type_name_rust() -> TypeName {
         TypeName::from(alloc::format!(
-            "ManagedDecimal<$API, ConstDecimals<{}>>",
-            DECIMALS
+            "ManagedDecimal<$API, ConstDecimals<U{}>>",
+            DECIMALS::to_usize()
         ))
     }
 

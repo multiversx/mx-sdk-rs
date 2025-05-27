@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
-        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        ManagedTypeApi, RawHandle, StaticVarApiImpl,
     },
     codec::{
         DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -359,7 +359,31 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     /// Convenience method for quickly getting a top-decoded u64 from the managed buffer.
+    ///
+    /// TODO: remove this method once TopDecodeInput is implemented for ManagedBuffer reference.
+    #[cfg(not(feature = "barnard"))]
     pub fn parse_as_u64(&self) -> Option<u64> {
+        const U64_NUM_BYTES: usize = 8;
+        let l = self.len();
+        if l > U64_NUM_BYTES {
+            return None;
+        }
+        let mut bytes = [0u8; U64_NUM_BYTES];
+        if M::managed_type_impl()
+            .mb_load_slice(self.handle.clone(), 0, &mut bytes[U64_NUM_BYTES - l..])
+            .is_err()
+        {
+            None
+        } else {
+            Some(u64::from_be_bytes(bytes))
+        }
+    }
+
+    /// Convenience method for quickly getting a top-decoded u64 from the managed buffer.
+    #[cfg(feature = "barnard")]
+    pub fn parse_as_u64(&self) -> Option<u64> {
+        use crate::api::ManagedTypeApiImpl;
+
         const U64_NUM_BYTES: usize = 8;
         let l = self.len();
         if l > U64_NUM_BYTES {
@@ -370,7 +394,10 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     /// Convenience method for quickly getting a top-decoded i64 from the managed buffer.
+    #[cfg(feature = "barnard")]
     pub fn parse_as_i64(&self) -> Option<i64> {
+        use crate::api::ManagedTypeApiImpl;
+
         const I64_NUM_BYTES: usize = 8;
         let l = self.len();
         if l > I64_NUM_BYTES {
@@ -542,7 +569,7 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
+        // TODO: in Rust the `0b` prefix appears only when writing "{:#x}", not "{:x}"
         let cast_handle = self.get_handle().cast_or_signal_error::<M, _>();
         let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
         f.append_managed_buffer_binary(&wrap_cast);

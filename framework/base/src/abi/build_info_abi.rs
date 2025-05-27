@@ -1,4 +1,4 @@
-/// Deisgned to hold metadata of the contract crate.
+/// Designed to hold metadata of the contract crate.
 /// Must be instanced inside the smart contract crate to work,
 /// that is why a `create` associated method would not make sense here.
 #[derive(Clone, Default, Debug)]

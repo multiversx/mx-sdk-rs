@@ -48,5 +48,7 @@ async fn main() {
     txs.push(unsign_tx.clone());
 
     let tx_hash = blockchain.send_transactions(&txs).await.unwrap();
+
+    assert!(!tx_hash.is_empty());
     println!("tx_hashes {tx_hash:?}");
 }

@@ -33,7 +33,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:storage decode error (key: u64): value too long",
+                "message": "str:storage decode error (key: u64): input too long",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

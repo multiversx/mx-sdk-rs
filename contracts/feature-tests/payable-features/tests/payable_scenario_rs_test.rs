@@ -1,7 +1,8 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
+
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/payable-features");
     blockchain.register_contract(
         "mxsc:output/payable-features.mxsc.json",
@@ -21,8 +22,13 @@ fn call_value_check_multi_egld_rs() {
 }
 
 #[test]
-fn payable_all_transfers_rs() {
-    world().run("scenarios/payable_all_transfers.scen.json");
+fn payable_all_transfers_1_rs() {
+    world().run("scenarios/payable_all_transfers_1.scen.json");
+}
+
+#[test]
+fn payable_all_transfers_2_rs() {
+    world().run("scenarios/payable_all_transfers_2.scen.json");
 }
 
 #[test]

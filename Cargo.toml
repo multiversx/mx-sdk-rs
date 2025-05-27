@@ -22,9 +22,9 @@ members = [
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",
-  "tools/payload-macro-generator",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
+  "tools/gas-schedule-generator",
 
   "contracts/modules",
 
@@ -192,4 +192,8 @@ members = [
   "contracts/feature-tests/scenario-tester/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
+
+
+  # "chain/wasmer-prod", ## not included, references wasmer 2.2
+  # "contracts/feature-tests/gas-tests", ## uncomment for easier development
 ]

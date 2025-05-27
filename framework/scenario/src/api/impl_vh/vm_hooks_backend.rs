@@ -1,7 +1,8 @@
 use multiversx_chain_vm::executor::VMHooks;
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::api::HandleConstraints;
 
-use crate::debug_executor::StaticVarData;
+use crate::executor::debug::StaticVarData;
 
 pub trait VMHooksApiBackend: Clone + Send + Sync + 'static {
     /// We use a single handle type for all handles.
@@ -10,18 +11,18 @@ pub trait VMHooksApiBackend: Clone + Send + Sync + 'static {
     /// All communication with the VM happens via this method.
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R;
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>;
 
     fn with_vm_hooks_ctx_1<R, F>(_handle: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         Self::with_vm_hooks(f)
     }
 
     fn with_vm_hooks_ctx_2<R, F>(_handle1: Self::HandleType, _handle2: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         Self::with_vm_hooks(f)
     }
@@ -33,7 +34,7 @@ pub trait VMHooksApiBackend: Clone + Send + Sync + 'static {
         f: F,
     ) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
     {
         Self::with_vm_hooks(f)
     }

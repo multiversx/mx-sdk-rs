@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct DependencyRawValue {
     pub version: Option<String>,
@@ -5,7 +7,7 @@ pub struct DependencyRawValue {
     pub rev: Option<String>,
     pub branch: Option<String>,
     pub tag: Option<String>,
-    pub path: Option<String>,
+    pub path: Option<PathBuf>,
 }
 
 impl DependencyRawValue {
@@ -25,7 +27,7 @@ impl DependencyRawValue {
                     result.version = Some(version.to_owned());
                 }
                 if let Some(toml::Value::String(path)) = table.get("path") {
-                    result.path = Some(path.to_owned());
+                    result.path = Some(PathBuf::from(path));
                 }
                 if let Some(toml::Value::String(git)) = table.get("git") {
                     result.git = Some(git.to_owned());
@@ -69,7 +71,10 @@ impl DependencyRawValue {
         }
 
         if let Some(path) = self.path {
-            table.insert("path".to_string(), toml::Value::String(path));
+            table.insert(
+                "path".to_string(),
+                toml::Value::String(path.to_string_lossy().into_owned()),
+            );
         }
 
         toml::Value::Table(table)

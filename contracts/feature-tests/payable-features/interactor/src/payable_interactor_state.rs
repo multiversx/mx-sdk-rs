@@ -8,10 +8,10 @@ use std::{
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-/// Adder Interact state
+/// Payable Features Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
-    adder_address: Option<Bech32Address>,
+    payable_features_address: Option<Bech32Address>,
 }
 
 impl State {
@@ -27,16 +27,16 @@ impl State {
         }
     }
 
-    /// Sets the adder address
-    pub fn set_adder_address(&mut self, address: Bech32Address) {
-        self.adder_address = Some(address);
+    /// Sets the payable features address
+    pub fn set_payable_features_address(&mut self, address: Bech32Address) {
+        self.payable_features_address = Some(address);
     }
 
-    /// Returns the adder contract
-    pub fn current_adder_address(&self) -> &Bech32Address {
-        self.adder_address
+    /// Returns the payable features contract
+    pub fn current_payable_features_address(&self) -> &Bech32Address {
+        self.payable_features_address
             .as_ref()
-            .expect("no known adder contract, deploy first")
+            .expect("no known payable features contract, deploy first")
     }
 }
 

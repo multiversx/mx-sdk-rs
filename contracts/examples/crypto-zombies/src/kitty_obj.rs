@@ -30,13 +30,13 @@ pub struct Color {
 
 impl KittyGenes {
     pub fn get_as_u64(&self) -> u64 {
-        (self.fur_color.as_u64() << 24 | self.eye_color.as_u64()) << 8
+        (((self.fur_color.as_u64() << 24) | self.eye_color.as_u64()) << 8)
             | self.meow_power.to_be() as u64
     }
 }
 
 impl Color {
     pub fn as_u64(&self) -> u64 {
-        ((self.r.to_be() as u64) << 8 | self.r.to_be() as u64) << 8 | self.r.to_be() as u64
+        ((((self.r as u64) << 16) | self.g as u64) << 8) | self.b as u64
     }
 }

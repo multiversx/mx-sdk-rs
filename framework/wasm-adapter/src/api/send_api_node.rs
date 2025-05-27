@@ -1,7 +1,7 @@
 use crate::api::VmApiImpl;
 use multiversx_sc::api::{const_handles, RawHandle, SendApi, SendApiImpl};
 
-extern "C" {
+unsafe extern "C" {
     fn managedMultiTransferESDTNFTExecute(
         dstHandle: i32,
         tokenTransfersHandle: i32,

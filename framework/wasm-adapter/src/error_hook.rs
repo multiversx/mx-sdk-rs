@@ -1,4 +1,4 @@
-extern "C" {
+unsafe extern "C" {
     fn signalError(messageOffset: *const u8, messageLength: i32) -> !;
 }
 

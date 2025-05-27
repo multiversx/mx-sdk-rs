@@ -96,7 +96,7 @@ impl BasicFeaturesInteract {
     pub async fn deploy(&mut self) {
         self.set_state().await;
 
-        let new_address = self
+        let (new_address, _tx_hash) = self
             .interactor
             .tx()
             .from(&self.wallet_address)
@@ -105,6 +105,7 @@ impl BasicFeaturesInteract {
             .init()
             .code(CODE_EXPR)
             .returns(ReturnsNewBech32Address)
+            .returns(ReturnsTxHash)
             .run()
             .await;
 
@@ -148,7 +149,7 @@ impl BasicFeaturesInteract {
             .run()
             .await;
 
-        println!("new address for basic-features-cyrpto: {new_address}");
+        println!("new address for basic-features-crypto: {new_address}");
 
         self.state.set_bf_address_crypto(new_address);
     }
@@ -184,8 +185,9 @@ impl BasicFeaturesInteract {
     pub async fn returns_egld_decimal(
         &mut self,
         egld: u64,
-    ) -> ManagedDecimal<StaticApi, ConstDecimals<18>> {
-        self.interactor
+    ) -> ManagedDecimal<StaticApi, EgldDecimals> {
+        let (result, _tx_hash) = self
+            .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.bf_contract())
@@ -194,8 +196,11 @@ impl BasicFeaturesInteract {
             .returns_egld_decimal()
             .egld(egld)
             .returns(ReturnsResultUnmanaged)
+            .returns(ReturnsTxHash)
             .run()
-            .await
+            .await;
+
+        result
     }
 
     pub async fn echo_managed_option(
@@ -229,7 +234,7 @@ impl BasicFeaturesInteract {
             .gas(10_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
             .verify_secp256r1_signature(key, message, signature)
-            .returns(ReturnsHandledOrError::new())
+            .returns(ReturnsHandledOrError::new().returns(ReturnsTxHash))
             .run()
             .await;
 
@@ -305,5 +310,18 @@ impl BasicFeaturesInteract {
                 assert_eq!(err_msg.unwrap_or_default(), err.message);
             },
         }
+    }
+
+    pub async fn token_has_transfer_role(&mut self, token_id: &str) -> bool {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.bf_contract())
+            .gas(50_000_000)
+            .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
+            .token_has_transfer_role(TokenIdentifier::from_esdt_bytes(token_id))
+            .returns(ReturnsResult)
+            .run()
+            .await
     }
 }

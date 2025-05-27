@@ -1,8 +1,8 @@
 [package]
 name = "multiversx-sc"
-version = "0.55.0"
+version = "0.58.0"
 edition = "2021"
-rust-version = "1.78"
+rust-version = "1.83"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
@@ -22,22 +22,24 @@ num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = []
 managed-buffer-builder-cached = []
 esdt-token-payment-legacy-decode = []
+barnard = []
 
 [dependencies]
-hex-literal = "=0.4.1"
-bitflags = "=2.6.0"
+hex-literal = "1.0"
+bitflags = "2.9"
 num-traits = { version = "=0.2.19", default-features = false }
 unwrap-infallible = "0.1.5"
+generic-array = "1.2.0"
 
 [dependencies.multiversx-sc-derive]
-version = "=0.55.0"
+version = "=0.58.0"
 path = "../derive"
 
 [dependencies.multiversx-sc-codec]
-version = "=0.21.2"
+version = "=0.22.1"
 path = "../../data/codec"
 features = ["derive"]
 
 [dependencies.multiversx-chain-core]
-version = "=0.12.0"
+version = "=0.15.0"
 path = "../../chain/core"

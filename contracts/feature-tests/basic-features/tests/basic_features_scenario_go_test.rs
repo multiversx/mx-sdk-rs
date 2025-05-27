@@ -85,13 +85,11 @@ fn crypto_verify_bls_go() {
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_bls_aggregated_signature_go() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_bls_share_go() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
@@ -107,7 +105,6 @@ fn crypto_verify_secp_256_k_1_go() {
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_secp_256_r_1_go() {
     world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }
@@ -339,6 +336,11 @@ fn small_num_overflow_go() {
 }
 
 #[test]
+fn send_esdt_to_nonexisting_account_go() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}
+
+#[test]
 fn storage_big_int_go() {
     world().run("scenarios/storage_big_int.scen.json");
 }
@@ -447,6 +449,16 @@ fn storage_mapper_set_go() {
 #[test]
 fn storage_mapper_single_value_go() {
     world().run("scenarios/storage_mapper_single_value.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_go() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_at_address_go() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }
 
 #[test]

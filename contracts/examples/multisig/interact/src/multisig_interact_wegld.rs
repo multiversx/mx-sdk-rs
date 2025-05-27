@@ -20,7 +20,7 @@ impl MultisigInteract {
         println!("proposing wrap egld...");
         let action_id = self.propose_wrap_egld().await;
 
-        println!("perfoming wrap egld action `{action_id}`...");
+        println!("performing wrap egld action `{action_id}`...");
         self.perform_action(action_id, 15_000_000u64).await;
     }
 
@@ -28,7 +28,7 @@ impl MultisigInteract {
         println!("proposing unwrap egld...");
         let action_id = self.propose_unwrap_egld().await;
 
-        println!("perfoming unwrap egld action `{action_id}`...");
+        println!("performing unwrap egld action `{action_id}`...");
         self.perform_action(action_id, 15_000_000u64).await;
     }
 

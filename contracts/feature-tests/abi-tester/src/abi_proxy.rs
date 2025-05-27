@@ -237,7 +237,7 @@ where
     }
 
     pub fn process_managed_decimal<
-        Arg0: ProxyArg<ManagedDecimal<Env::Api, ConstDecimals<10>>>,
+        Arg0: ProxyArg<ManagedDecimal<Env::Api, ConstDecimals<U10>>>,
     >(
         self,
         input: Arg0,
@@ -309,6 +309,19 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("item_for_managed_vec")
+            .original_result()
+    }
+
+    pub fn echo_permission<
+        Arg0: ProxyArg<Permission>,
+    >(
+        self,
+        p: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Permission> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("echo_permission")
+            .argument(&p)
             .original_result()
     }
 
@@ -521,6 +534,10 @@ pub struct AbiManagedVecItem {
 }
 
 #[type_abi]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NestedDecode, NestedEncode, TopEncode, TopDecode)]
+pub struct Permission(u32);
+
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInArray {}
 
@@ -595,5 +612,5 @@ pub struct ManagedDecimalWrapper<Api>
 where
     Api: ManagedTypeApi,
 {
-    pub field: ManagedDecimal<Api, ConstDecimals<2>>,
+    pub field: ManagedDecimal<Api, ConstDecimals<U2>>,
 }
