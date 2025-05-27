@@ -10,7 +10,8 @@ use crate::{
         context::{big_int_signed_bytes, big_int_to_i64, big_uint_to_u64, big_uint_unsigned_bytes},
         vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
     },
-    types::RawHandle, vm_err_msg,
+    types::RawHandle,
+    vm_err_msg,
 };
 
 use super::VMHooksHandler;
@@ -91,7 +92,10 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         Ok(())
     }
 
-    pub fn mb_to_small_int_unsigned(&self, buffer_handle: RawHandle) -> Result<i64, VMHooksEarlyExit> {
+    pub fn mb_to_small_int_unsigned(
+        &self,
+        buffer_handle: RawHandle,
+    ) -> Result<i64, VMHooksEarlyExit> {
         let bytes = self.context.m_types_lock().mb_to_bytes(buffer_handle);
         let bu = num_bigint::BigUint::from_bytes_be(&bytes);
         if let Some(small) = big_uint_to_u64(&bu) {
@@ -102,7 +106,10 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         // big_uint_to_u64(&bu).unwrap_or_else(|| self.vm_error(vm_err_msg::ERROR_BYTES/_EXCEED_UINT64))
     }
 
-    pub fn mb_to_small_int_signed(&self, buffer_handle: RawHandle) -> Result<i64, VMHooksEarlyExit> {
+    pub fn mb_to_small_int_signed(
+        &self,
+        buffer_handle: RawHandle,
+    ) -> Result<i64, VMHooksEarlyExit> {
         let bytes = self.context.m_types_lock().mb_to_bytes(buffer_handle);
         let bi = num_bigint::BigInt::from_bytes_be(num_bigint::Sign::Plus, &bytes);
         if let Some(small) = big_int_to_i64(&bi) {
@@ -113,14 +120,22 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         // big_int_to_i64(&bi)(|| self.vm_error(vm_err_msg::ERROR_BYTES_EXCEED_INT64))
     }
 
-    pub fn mb_from_small_int_unsigned(&self, buffer_handle: RawHandle, value: u64)  -> Result<(), VMHooksEarlyExit> {
+    pub fn mb_from_small_int_unsigned(
+        &self,
+        buffer_handle: RawHandle,
+        value: u64,
+    ) -> Result<(), VMHooksEarlyExit> {
         let bu = num_bigint::BigUint::from(value);
         let bytes = big_uint_unsigned_bytes(&bu);
         self.context.m_types_lock().mb_set(buffer_handle, bytes);
         Ok(())
     }
 
-    pub fn mb_from_small_int_signed(&self, buffer_handle: RawHandle, value: i64)  -> Result<(), VMHooksEarlyExit> {
+    pub fn mb_from_small_int_signed(
+        &self,
+        buffer_handle: RawHandle,
+        value: i64,
+    ) -> Result<(), VMHooksEarlyExit> {
         let bi = num_bigint::BigInt::from(value);
         let bytes = big_int_signed_bytes(&bi);
         self.context.m_types_lock().mb_set(buffer_handle, bytes);

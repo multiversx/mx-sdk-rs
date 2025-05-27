@@ -724,7 +724,6 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         panic!("Unavailable: managed_get_return_data");
     }
 
-
     fn managed_get_all_transfers_call_value(
         &mut self,
         transfer_call_values_list_handle: i32,
@@ -2480,7 +2479,4 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     ) -> Result<i32, VMHooksEarlyExit> {
         panic!("Unavailable: managed_verify_blsaggregated_signature")
     }
-
-
-   
 }
