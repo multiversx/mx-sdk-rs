@@ -132,7 +132,7 @@ where
         &self,
     ) -> ManagedRef<'static, A, ManagedVec<A, EgldOrEsdtTokenPayment<A>>> {
         use crate::types::big_num_cmp::bi_gt_zero;
-        
+
         let all_transfers_handle: A::ManagedBufferHandle =
             use_raw_handle(const_handles::CALL_VALUE_ALL);
         if !A::static_var_api_impl()
