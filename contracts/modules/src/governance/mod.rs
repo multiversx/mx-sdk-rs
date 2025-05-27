@@ -60,7 +60,7 @@ pub trait GovernanceModule:
         self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::WaitingForFees,
-            "Cannot claim deposited tokens anymore; Proposal is not in WatingForFees state"
+            "Cannot claim deposited tokens anymore; Proposal is not in WaitingForFees state"
         );
 
         require!(
@@ -226,7 +226,7 @@ pub trait GovernanceModule:
 
     /// Queue a proposal for execution.
     /// This can be done only if the proposal has reached the quorum.
-    /// A proposal is considered successful and ready for queing if
+    /// A proposal is considered successful and ready for queuing if
     /// total_votes - total_downvotes >= quorum
     #[endpoint]
     fn queue(&self, proposal_id: usize) {

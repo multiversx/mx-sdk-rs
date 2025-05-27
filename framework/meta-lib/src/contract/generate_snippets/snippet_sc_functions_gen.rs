@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write};
+use std::{fs::File, io::Write, path::Path};
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi};
 
@@ -7,13 +7,17 @@ use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to
 const DEFAULT_GAS: &str = "30_000_000u64";
 
 pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, crate_name: &str) {
-    let wasm_output_file_path_expr = format!("\"mxsc:../output/{crate_name}.mxsc.json\"");
+    let crate_path = crate_name.replace("_", "-");
+    let mxsc_file_name = format!("{crate_path}.mxsc.json");
+    let wasm_output_file_path = Path::new("..").join("output").join(mxsc_file_name);
+
+    let wasm_output_file_path_expr =
+        format!("\"mxsc:{}\"", &wasm_output_file_path.to_string_lossy());
 
     writeln!(
         file,
         r#"impl ContractInteract {{
-    pub async fn new() -> Self {{
-        let config = Config::new();
+    pub async fn new(config: Config) -> Self {{
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
             .use_chain_simulator(config.use_chain_simulator());
@@ -38,7 +42,7 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
         }}
     }}
 "#,
-        crate_name, wasm_output_file_path_expr,
+        crate_path, wasm_output_file_path_expr,
     )
     .unwrap();
     write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
@@ -105,7 +109,7 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
             .upgrade({})
             .code(&self.contract_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
-            .returns(ReturnsNewAddress)
+            .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 

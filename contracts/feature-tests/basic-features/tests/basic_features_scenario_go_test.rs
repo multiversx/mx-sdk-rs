@@ -339,6 +339,11 @@ fn small_num_overflow_go() {
 }
 
 #[test]
+fn send_esdt_to_nonexisting_account_go() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}
+
+#[test]
 fn storage_big_int_go() {
     world().run("scenarios/storage_big_int.scen.json");
 }
@@ -447,6 +452,16 @@ fn storage_mapper_set_go() {
 #[test]
 fn storage_mapper_single_value_go() {
     world().run("scenarios/storage_mapper_single_value.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_go() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_at_address_go() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }
 
 #[test]

@@ -102,7 +102,9 @@ fn configure_vscode() {
 
     let script_full_path = get_script_path(home::home_dir().unwrap().join(TARGET_PATH));
     let json = fs::read_to_string(&path_to_settings).expect("Unable to read settings.json");
-    let mut sub_values: serde_json::Value = serde_json::from_str(&json).unwrap();
+    let mut sub_values: serde_json::Value = serde_json::from_str(&json).unwrap_or_else(
+        |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is located at line {}, column {}. This error might be caused either by a trailing comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
+    );
 
     let init_commands = sub_values
         .as_object_mut()
@@ -112,7 +114,7 @@ fn configure_vscode() {
     let command_script_line =
         "command script import ".to_owned() + script_full_path.to_str().unwrap();
 
-    if let serde_json::Value::Array(ref mut array) = init_commands {
+    if let serde_json::Value::Array(array) = init_commands {
         if let Some(pos) = array.iter().position(|v| {
             if let serde_json::Value::String(s) = v {
                 s.contains(SCRIPT_NAME) // Replace with your substring

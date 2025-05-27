@@ -39,7 +39,7 @@ where
     SA: SendApi + 'static,
 {
     /// Constructor.
-    /// TODO: consider moving this to a new Proxy contructor trait (bonus: better proxy constructor syntax).
+    /// TODO: consider moving this to a new Proxy constructor trait (bonus: better proxy constructor syntax).
     pub fn new_proxy_obj() -> Self {
         ESDTSystemSmartContractProxy {
             _phantom: PhantomData,

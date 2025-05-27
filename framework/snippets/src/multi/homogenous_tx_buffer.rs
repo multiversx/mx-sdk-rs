@@ -39,7 +39,7 @@ where
     }
 }
 
-impl<'w, GatewayProxy, Step, RH> HomogenousTxBuffer<'w, GatewayProxy, Step, RH>
+impl<GatewayProxy, Step, RH> HomogenousTxBuffer<'_, GatewayProxy, Step, RH>
 where
     GatewayProxy: GatewayAsyncService,
     Step: InteractorStep,

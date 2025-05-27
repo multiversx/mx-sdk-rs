@@ -1,5 +1,6 @@
 pub mod all;
 pub mod chain_simulator;
+mod check_wasmer_dependencies;
 pub mod code_report;
 pub mod info;
 pub mod install;

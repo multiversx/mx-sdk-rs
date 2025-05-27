@@ -1,4 +1,7 @@
-use super::print_util::{print_all_command, print_all_count, print_all_index};
+use super::{
+    check_wasmer_dependencies::check_wasmer_dependencies,
+    print_util::{print_all_command, print_all_count, print_all_index},
+};
 use crate::{
     cli::AllArgs,
     folder_structure::{dir_pretty_print, RelevantDirectories},
@@ -7,16 +10,19 @@ use std::{path::Path, process::Command};
 
 pub fn call_all_meta(args: &AllArgs) {
     let path = if let Some(some_path) = &args.path {
-        some_path.as_str()
+        Path::new(some_path)
     } else {
-        "./"
+        Path::new("./")
     };
 
     perform_call_all_meta(path, args.ignore.as_slice(), args.to_cargo_run_args());
 }
 
-fn perform_call_all_meta(path: impl AsRef<Path>, ignore: &[String], raw_args: Vec<String>) {
+fn perform_call_all_meta(path: &Path, ignore: &[String], raw_args: Vec<String>) {
+    check_wasmer_dependencies(path);
+
     let dirs = RelevantDirectories::find_all(path, ignore);
+
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 
     let num_contract_crates = dirs.iter_contract_crates().count();

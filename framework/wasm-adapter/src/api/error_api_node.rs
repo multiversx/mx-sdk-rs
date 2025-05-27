@@ -1,7 +1,7 @@
 use crate::{api::VmApiImpl, error_hook};
 use multiversx_sc::api::{ErrorApi, ErrorApiImpl};
 
-extern "C" {
+unsafe extern "C" {
     fn managedSignalError(messageHandle: i32) -> !;
 }
 

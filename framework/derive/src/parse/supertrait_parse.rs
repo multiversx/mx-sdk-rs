@@ -21,7 +21,7 @@ pub fn parse_supertrait(supertrait: &syn::TypeParamBound) -> Supertrait {
                     module_path: leading_segments,
                 }
             } else {
-                panic!("All contract module supertraits must be specfied with some module specifier (e.g. `path::to::module::ContractName`)");
+                panic!("All contract module supertraits must be specified with some module specifier (e.g. `path::to::module::ContractName`)");
             }
         },
         _ => panic!("Contract trait can only extend other traits."),

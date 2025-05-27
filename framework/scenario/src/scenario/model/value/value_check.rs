@@ -105,6 +105,15 @@ impl IntoRaw<CheckValueListRaw> for CheckValueList {
     }
 }
 
+impl CheckValue<BytesValue> {
+    pub fn pretty_str(&self) -> String {
+        match self {
+            CheckValue::Star => "*".to_string(),
+            CheckValue::Equal(value) => String::from_utf8_lossy(&value.value).into_owned(),
+        }
+    }
+}
+
 impl CheckValueList {
     pub fn pretty_str(&self) -> String {
         match self {

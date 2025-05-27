@@ -1,4 +1,7 @@
-use std::fs::File;
+use std::{
+    fs::File,
+    path::{Path, PathBuf},
+};
 
 use multiversx_sc::abi::ContractAbi;
 
@@ -24,8 +27,12 @@ use super::{
 
 impl MetaConfig {
     pub fn generate_rust_snippets(&self, args: &GenerateSnippetsArgs) {
-        let main_contract = self.sc_config.main_contract();
-        let crate_name = &main_contract.contract_name.replace("-", "_");
+        let crate_name = &self
+            .original_contract_abi
+            .build_info
+            .contract_crate
+            .name
+            .replace("-", "_");
         let mut file =
             create_snippets_crate_and_get_lib_file(&self.snippets_dir, crate_name, args.overwrite);
         write_snippets_to_file(&mut file, &self.original_contract_abi, crate_name);
@@ -43,7 +50,7 @@ impl MetaConfig {
 
 #[must_use]
 fn create_snippets_crate_and_get_lib_file(
-    snippets_folder_path: &str,
+    snippets_folder_path: &PathBuf,
     contract_crate_name: &str,
     overwrite: bool,
 ) -> File {
@@ -57,7 +64,7 @@ fn create_snippets_crate_and_get_lib_file(
 }
 
 #[must_use]
-fn create_config_and_get_file(snippets_folder_path: &str) -> File {
+fn create_config_and_get_file(snippets_folder_path: &Path) -> File {
     create_config_toml_file(snippets_folder_path);
     create_config_rust_file(snippets_folder_path)
 }

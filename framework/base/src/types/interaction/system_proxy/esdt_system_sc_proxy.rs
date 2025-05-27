@@ -1,4 +1,4 @@
-use super::token_properties::*;
+use super::{token_properties::*, TokenPropertiesResult};
 
 use crate::{
     api::CallTypeApi,
@@ -563,6 +563,20 @@ where
         tx.original_result()
     }
 
+    /// This function can be called to retrieve the special roles of a specific token.
+    pub fn get_special_roles<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_identifier: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let tx = self
+            .wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getSpecialRoles")
+            .argument(&token_identifier);
+
+        tx.original_result()
+    }
+
     /// This function can be called only if canSetSpecialRoles was set to true.
     /// The metachain system SC will evaluate the arguments and call “ESDTUnsetRole@tokenId@listOfRoles” for the given address.
     /// This will be actually a cross shard call.
@@ -661,6 +675,18 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("updateTokenID")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Fetches token properties for a specific token.
+    pub fn get_token_properties<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenPropertiesResult> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getTokenProperties")
             .argument(&token_id)
             .original_result()
     }

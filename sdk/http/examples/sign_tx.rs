@@ -36,5 +36,7 @@ async fn main() {
     let signature = wl.sign_tx(&unsign_tx);
     unsign_tx.signature = Some(hex::encode(signature));
     let tx_hash = blockchain.send_transaction(&unsign_tx).await.unwrap();
+
+    assert!(!tx_hash.is_empty());
     println!("tx_hash {tx_hash}");
 }

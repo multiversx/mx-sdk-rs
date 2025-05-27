@@ -1,5 +1,5 @@
 {
-    "name": "transfer approved token succesfully",
+    "name": "transfer approved token successfully",
     "steps": [
         {
             "step": "externalSteps",

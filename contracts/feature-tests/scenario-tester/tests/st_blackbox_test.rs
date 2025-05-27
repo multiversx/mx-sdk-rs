@@ -14,7 +14,7 @@ const TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("TOKEN-123456");
 const NFT_ID: TestTokenIdentifier = TestTokenIdentifier::new("NFT-123456");
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
     blockchain.register_contract(
@@ -386,4 +386,38 @@ fn st_blackbox_returns_result_or_error() {
             "sc_panic! example"
         ))
     );
+}
+
+#[test]
+fn st_blackbox_storage_check_test() {
+    let mut world = world();
+
+    world.account(OWNER_ADDRESS).nonce(1);
+
+    // set value for sum in storage
+    let new_address = world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .init(BigUint::from(1u64))
+        .code(CODE_PATH)
+        .new_address(ST_ADDRESS)
+        .returns(ReturnsNewAddress)
+        .run();
+
+    assert_eq!(new_address, ST_ADDRESS.to_address());
+
+    // set value for otherMapper in storage
+    world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .set_other_mapper(b"SomeValueInStorage")
+        .run();
+
+    // only check value for one key (partial check)
+    world
+        .check_account(ST_ADDRESS)
+        .check_storage("str:otherMapper", "str:SomeValueInStorage");
 }
