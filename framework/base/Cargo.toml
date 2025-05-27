@@ -22,6 +22,7 @@ num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = []
 managed-buffer-builder-cached = []
 esdt-token-payment-legacy-decode = []
+barnard = []
 
 [dependencies]
 hex-literal = "1.0"
