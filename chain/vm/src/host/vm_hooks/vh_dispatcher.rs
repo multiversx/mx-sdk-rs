@@ -726,9 +726,9 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
 
     fn managed_get_all_transfers_call_value(
         &mut self,
-        transfer_call_values_list_handle: i32,
+        all_transfers_handle: i32,
     ) -> Result<(), VMHooksEarlyExit> {
-        panic!("Unavailable: managed_get_all_transfers_call_value")
+        self.handler.load_all_transfers(all_transfers_handle)
     }
 
     fn managed_get_multi_esdt_call_value(
