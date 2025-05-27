@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use crate::{
     DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
     TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
@@ -7,7 +9,10 @@ macro_rules! multi_value_impls_debug {
         ($(($mv_struct:ident $len:tt $($n:tt $name:ident)+) )+) => {
         $(
             #[derive(Clone, Debug, PartialEq)]
-            pub struct $mv_struct<$($name,)+>(pub ($($name,)+));
+            pub struct $mv_struct<$($name,)+>(
+                #[deprecated(since = "0.57.0", note = "use .into_tuple() or .as_tuple() instead")]
+                pub ($($name,)+)
+            );
         )+
     }
 }
@@ -15,7 +20,10 @@ macro_rules! multi_value_impls_no_debug {
         ($(($mv_struct:ident $len:tt $($n:tt $name:ident)+) )+) => {
         $(
             #[derive(Clone)]
-            pub struct $mv_struct<$($name,)+>(pub ($($name,)+));
+            pub struct $mv_struct<$($name,)+>(
+                #[deprecated(since = "0.57.0", note = "use .into_tuple() or .as_tuple() instead")]
+                pub ($($name,)+)
+            );
         )+
     }
 }
@@ -34,6 +42,11 @@ macro_rules! multi_value_impls {
                 #[inline]
                 pub fn into_tuple(self) -> ($($name,)+) {
                     self.0
+                }
+
+                #[inline]
+                pub fn as_tuple(&self) -> &($($name,)+) {
+                    &self.0
                 }
             }
 

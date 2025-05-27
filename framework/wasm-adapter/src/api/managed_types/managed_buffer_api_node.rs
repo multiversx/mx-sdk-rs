@@ -5,7 +5,7 @@ use multiversx_sc::{
 };
 
 #[allow(dead_code)]
-extern "C" {
+unsafe extern "C" {
     fn mBufferNew() -> i32;
     fn mBufferNewFromBytes(byte_ptr: *const u8, byte_len: i32) -> i32;
     fn mBufferGetLength(mBufferHandle: i32) -> i32;

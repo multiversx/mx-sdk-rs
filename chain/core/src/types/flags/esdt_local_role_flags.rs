@@ -1,25 +1,23 @@
-#![allow(clippy::bad_bit_mask)]
-
 use super::EsdtLocalRole;
 use bitflags::bitflags;
 
 bitflags! {
     #[derive(PartialEq, Clone, Copy)]
     pub struct EsdtLocalRoleFlags: u64 {
-        const NONE                  = 0b00000000;
-        const MINT                  = 0b00000001;
-        const BURN                  = 0b00000010;
-        const NFT_CREATE            = 0b00000100;
-        const NFT_ADD_QUANTITY      = 0b00001000;
-        const NFT_BURN              = 0b00010000;
-        const NFT_ADD_URI           = 0b00100000;
-        const NFT_UPDATE_ATTRIBUTES = 0b01000000;
-        const TRANSFER              = 0b10000000;
-        const SET_NEW_URI           = 0b00000001_00000000;
+        const NONE                  = 0b00000000_00000000;
+        const MINT                  = 0b00000000_00000001;
+        const BURN                  = 0b00000000_00000010;
+        const NFT_CREATE            = 0b00000000_00000100;
+        const NFT_ADD_QUANTITY      = 0b00000000_00001000;
+        const NFT_BURN              = 0b00000000_00010000;
+        const NFT_UPDATE_ATTRIBUTES = 0b00000000_00100000;
+        const NFT_ADD_URI           = 0b00000000_01000000;
+        const NFT_RECREATE          = 0b00000000_10000000;
+        const MODIFY_CREATOR        = 0b00000001_00000000;
         const MODIFY_ROYALTIES      = 0b00000010_00000000;
-        const MODIFY_CREATOR        = 0b00000100_00000000;
-        const NFT_RECREATE          = 0b00001000_00000000;
-        const NFT_UPDATE            = 0b00010000_00000000;
+        const SET_NEW_URI           = 0b00000100_00000000;
+        //TODO: check this flag after barnard
+        const TRANSFER              = 0b00001000_00000000;
     }
 }
 

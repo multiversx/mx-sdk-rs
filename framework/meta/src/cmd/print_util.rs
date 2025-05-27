@@ -68,7 +68,10 @@ pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &Framework
             print!(" {}", git_string.truecolor(255, 198, 0));
         },
         DependencyReference::Path(path_buf) => {
-            let git_string = format!("[path: {}]", path_buf.truecolor(255, 127, 0));
+            let git_string = format!(
+                "[path: {}]",
+                path_buf.to_string_lossy().truecolor(255, 127, 0)
+            );
             print!(" {}", git_string.truecolor(255, 198, 0));
         },
         DependencyReference::Unsupported(error) => {

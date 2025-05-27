@@ -10,9 +10,9 @@ const TOKEN_3: TestTokenIdentifier = TestTokenIdentifier::new("TOK-000003");
 const SFT: TestTokenIdentifier = TestTokenIdentifier::new("SFT-123");
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/paybale-features");
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/payable-features");
     blockchain.register_contract(PF_PATH_EXPR, payable_features::ContractBuilder);
     blockchain
 }
@@ -49,9 +49,9 @@ fn payable_multi_legacy() {
         .returns(ReturnsResultUnmanaged)
         .run();
 
-    assert_eq!(result.0 .0, RustBigUint::from(0u32));
+    assert_eq!(result.as_tuple().0, RustBigUint::from(0u32));
     assert_eq!(
-        result.0 .1,
+        result.as_tuple().1,
         vec![
             EsdtTokenPayment::new(TOKEN_1.to_token_identifier(), 0, BigUint::from(100u32)),
             EsdtTokenPayment::new(TOKEN_2.to_token_identifier(), 0, BigUint::from(400u32))

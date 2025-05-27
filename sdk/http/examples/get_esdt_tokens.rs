@@ -11,5 +11,6 @@ async fn main() {
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
     let balances = blockchain.get_account_esdt_tokens(&addr.0).await.unwrap();
 
+    assert!(!balances.is_empty());
     println!("{balances:#?}");
 }

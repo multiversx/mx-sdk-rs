@@ -46,7 +46,7 @@ fn missing_file_value(path_buf: &Path) -> Vec<u8> {
 ///
 /// Source: https://stackoverflow.com/questions/68231306/stdfscanonicalize-for-files-that-dont-exist
 fn normalize_path<P: AsRef<Path>>(path: P) -> PathBuf {
-    let ends_with_slash = path.as_ref().to_str().map_or(false, |s| s.ends_with('/'));
+    let ends_with_slash = path.as_ref().to_str().is_some_and(|s| s.ends_with('/'));
     let mut normalized = PathBuf::new();
     for component in path.as_ref().components() {
         match &component {

@@ -15,8 +15,13 @@ fn call_value_check_multi_egld_go() {
 }
 
 #[test]
-fn payable_all_transfers_go() {
-    world().run("scenarios/payable_all_transfers.scen.json");
+fn payable_all_transfers_1_go() {
+    world().run("scenarios/payable_all_transfers_1.scen.json");
+}
+
+#[test]
+fn payable_all_transfers_2_go() {
+    world().run("scenarios/payable_all_transfers_2.scen.json");
 }
 
 #[test]

@@ -9,7 +9,7 @@ use crate::{
     },
     err_msg,
     types::{
-        big_num_cmp::bi_gt_zero, BigUint, ConstDecimals, EgldOrEsdtTokenIdentifier,
+        big_num_cmp::bi_gt_zero, BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier,
         EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal,
         ManagedRef, ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload,
         ManagedVecPayloadIterator, ManagedVecRef, TokenIdentifier,
@@ -49,7 +49,7 @@ where
 
     /// Retrieves the EGLD call value from the VM.
     ///
-    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now posible.
+    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now possible.
     pub fn egld_direct_non_strict(&self) -> ManagedRef<'static, A, BigUint<A>> {
         let call_value_handle: A::BigIntHandle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
         if !A::static_var_api_impl()
@@ -84,7 +84,7 @@ where
 
     /// Retrieves the EGLD call value from the VM.
     ///
-    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now posible.
+    /// Will return 0 in case of an ESDT transfer, even though EGLD and ESDT transfers are now possible.
     ///
     /// ## Important!
     ///
@@ -102,12 +102,12 @@ where
     }
 
     /// Returns the EGLD call value from the VM as ManagedDecimal
-    pub fn egld_decimal(&self) -> ManagedDecimal<A, ConstDecimals<18>> {
-        ManagedDecimal::<A, ConstDecimals<18>>::const_decimals_from_raw(self.egld_value().clone())
+    pub fn egld_decimal(&self) -> ManagedDecimal<A, EgldDecimals> {
+        ManagedDecimal::<A, EgldDecimals>::const_decimals_from_raw(self.egld_value().clone())
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
-    /// Will return 0 results if nothing was transfered, or just EGLD.
+    /// Will return 0 results if nothing was transferred, or just EGLD.
     ///
     /// Will crash for EGLD + ESDT multi transfers.
     pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {

@@ -1,7 +1,8 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
+
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
     blockchain.register_contract(
@@ -361,6 +362,12 @@ fn small_num_overflow_rs() {
 }
 
 #[test]
+#[ignore = "unsupported"]
+fn send_esdt_to_nonexisting_account_rs() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}
+
+#[test]
 fn storage_big_int_rs() {
     world().run("scenarios/storage_big_int.scen.json");
 }
@@ -470,6 +477,16 @@ fn storage_mapper_set_rs() {
 #[test]
 fn storage_mapper_single_value_rs() {
     world().run("scenarios/storage_mapper_single_value.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_rs() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_at_address_rs() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }
 
 #[test]

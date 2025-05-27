@@ -26,6 +26,11 @@ pub async fn adder_cli() {
         Some(payable_interactor_cli::InteractCliCommand::AllTransfers) => {
             basic_interact.check_all_transfers().await;
         },
+        Some(payable_interactor_cli::InteractCliCommand::MultiTransferWithOneEGLD) => {
+            basic_interact
+                .check_multi_transfer_only_egld_transfer()
+                .await;
+        },
         None => {},
     }
 }
@@ -70,7 +75,27 @@ impl PayableInteract {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_adder_address(new_address);
+        self.state.set_payable_features_address(new_address);
+    }
+
+    pub async fn check_multi_transfer_only_egld_transfer(&mut self) {
+        let mut payment = MultiEgldOrEsdtPayment::new();
+        payment.push(EgldOrEsdtTokenPayment::egld_payment(1_0000u64.into()));
+
+        let result = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_payable_features_address())
+            .gas(6_000_000u64)
+            .typed(payable_features_proxy::PayableFeaturesProxy)
+            .payable_all_transfers()
+            .payment(payment)
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        println!("Result: {result:?}");
     }
 
     pub async fn check_all_transfers(&mut self) {
@@ -82,7 +107,7 @@ impl PayableInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.current_adder_address())
+            .to(self.state.current_payable_features_address())
             .gas(6_000_000u64)
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .payable_all_transfers()
