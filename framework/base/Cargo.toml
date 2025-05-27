@@ -23,7 +23,6 @@ alloc = []
 managed-buffer-builder-cached = []
 esdt-token-payment-legacy-decode = []
 barnard = []
-default = ["barnard"]
 
 [dependencies]
 hex-literal = "1.0"
