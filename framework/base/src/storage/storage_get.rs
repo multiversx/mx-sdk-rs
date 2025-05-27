@@ -103,6 +103,7 @@ where
         self.to_managed_buffer().into_i64(h)
     }
 
+    #[cfg(feature = "barnard")]
     fn into_u64<H>(self, h: H) -> Result<u64, H::HandledErr>
     where
         H: DecodeErrorHandler,

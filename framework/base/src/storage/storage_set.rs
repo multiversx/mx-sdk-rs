@@ -3,8 +3,7 @@ use unwrap_infallible::UnwrapInfallible;
 use crate::{
     api::{
         const_handles, use_raw_handle, ErrorApi, ManagedBufferApiImpl, ManagedTypeApi,
-        ManagedTypeApiImpl, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
-        StorageWriteApiImpl,
+        StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },
     codec::*,
     contract_base::ExitCodecErrorHandler,
@@ -48,14 +47,20 @@ where
         self.set_managed_buffer(&bytes.into())
     }
 
+    #[cfg(feature = "barnard")]
     fn set_u64(self, value: u64) {
+        use crate::api::ManagedTypeApiImpl;
+
         let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_from_small_int_unsigned(handle.clone(), value as i64);
         let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
         self.set_managed_buffer(&managed_buffer);
     }
 
+    #[cfg(feature = "barnard")]
     fn set_i64(self, value: i64) {
+        use crate::api::ManagedTypeApiImpl;
+
         let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_from_small_int_signed(handle.clone(), value);
         let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
