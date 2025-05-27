@@ -12,10 +12,10 @@ path = "src/multisig_pt.rs"
 num-bigint = "0.4.2"
 
 [dependencies.multiversx-sc]
-version = "0.57.1"
+version = "0.58.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.57.1"
+version = "0.58.0"
 path = "../../../framework/scenario"
 
