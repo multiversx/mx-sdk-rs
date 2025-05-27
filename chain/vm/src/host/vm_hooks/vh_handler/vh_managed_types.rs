@@ -103,7 +103,6 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         } else {
             Err(early_exit_vm_error(vm_err_msg::ERROR_BYTES_EXCEED_UINT64))
         }
-        // big_uint_to_u64(&bu).unwrap_or_else(|| self.vm_error(vm_err_msg::ERROR_BYTES/_EXCEED_UINT64))
     }
 
     pub fn mb_to_small_int_signed(
@@ -117,7 +116,6 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         } else {
             Err(early_exit_vm_error(vm_err_msg::ERROR_BYTES_EXCEED_INT64))
         }
-        // big_int_to_i64(&bi)(|| self.vm_error(vm_err_msg::ERROR_BYTES_EXCEED_INT64))
     }
 
     pub fn mb_from_small_int_unsigned(
