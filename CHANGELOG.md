@@ -32,6 +32,30 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+
+## [sc 0.58.0, codec 0.22.1, chain 0.15.0, sdk 0.10.0] - 2025-05-26
+- Rust VM and debugger redesign:
+	- VM major refactoring: runtime, execution, debugger, VM hooks handler;
+	- Integration of the new executor interface: new instance, executor & VM hooks interfaces;
+	- Early exit mechanism for VM hooks;
+	- Integration of Wasmer 2.2 production code, via an adapter;
+	- Integration of Wasmer 6, as an experimental alternative, but more stable in tests;
+	- Mechanism for running blackbox and mandos-rs tests with compiled contracts (.wasm);
+	- Mechanism for running the same test via the debugger as part of the Rust test suite, and via Wasmer as part of the Wasm tests;
+	- Crude metering, as a proof-of-concept, will be refined in the future. Gas schedule can be configured.
+	- New feature `compiled-sc-tests` to replace `run-go-tests`.
+- Build system:
+	- Opcode validator, as a post-build automated process. It detects and signals the usage of non-whitelisted WASM opcodes.
+	- WASM target:
+		- Default target is now `wasmv1-none` instead of `wasm32-unknown-unknown`. This is to allow upgrading to Rust 1.87, which uses LLVM 20 and normally emits bulk memory opcodes, which are currently unsupported on MultiversX. This change prevents these opcodes to be emitted.
+		- A mechanism for overriding the default target, per contract, in `sc-config.toml`.
+		- Target will be autoinstalled upon build, if missing.
+- `sc-meta` new `test` argument: `-w` or `--wasm`, to run tests based on compiled smart contracts; replaces `--go`.
+- Improved interactor error handling.
+- Back-transfer object cloneable.
+- Fixed typos.
+- Updated dependencies.
+
 ## [sc 0.57.1, sdk 0.9.1] - 2025-04-04
 - Retrieve token properties using `get_token_properties`;
 - Fixed URIs for `esdt_metadata_recreate` and `esdt_metadata_update`;

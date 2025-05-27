@@ -193,5 +193,7 @@ members = [
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
 
-  # "contracts/feature-tests/gas-tests",
+
+  # "chain/wasmer-prod", ## not included, references wasmer 2.2
+  # "contracts/feature-tests/gas-tests", ## uncomment for easier development
 ]
