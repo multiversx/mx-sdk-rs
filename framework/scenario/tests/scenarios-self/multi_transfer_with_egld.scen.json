@@ -1,0 +1,72 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "bech32:erd1y3z4vsn2m026glevhsqpwrc5w4v0xzr2qmukc5qde39jnzze324qf4e2r4": {
+                    "nonce": "0",
+                    "balance": "10",
+                    "esdt": {
+                        "str:TEST-6bb410": {
+                            "instances": [
+                                {
+                                    "nonce": "0",
+                                    "balance": "100",
+                                    "royalties": "0",
+                                    "attributes": "0x"
+                                }
+                            ]
+                        }
+                    },
+                    "developerRewards": "0"
+                },
+                "bech32:erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {},
+                    "developerRewards": "0"
+                }
+            }
+        },
+        {
+            "step": "transfer",
+            "id": "",
+            "tx": {
+                "from": "bech32:erd1y3z4vsn2m026glevhsqpwrc5w4v0xzr2qmukc5qde39jnzze324qf4e2r4",
+                "to": "bech32:erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "0x45474c442d303030303030",
+                        "value": "4"
+                    },
+                    {
+                        "tokenIdentifier": "0x544553542d366262343130",
+                        "value": "10"
+                    }
+                ],
+                "gasLimit": "5,000,000"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "bech32:erd1y3z4vsn2m026glevhsqpwrc5w4v0xzr2qmukc5qde39jnzze324qf4e2r4": {
+                    "nonce": "*",
+                    "balance": "6",
+                    "esdt": {
+                        "str:TEST-6bb410": "90"
+                    },
+                    "storage": {}
+                },
+                "bech32:erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa": {
+                    "nonce": "*",
+                    "balance": "4",
+                    "esdt": {
+                        "str:TEST-6bb410": "10"
+                    },
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 {
-    "name": "pay-fee-adn-fund-egld",
+    "name": "pay-fee-and-fund-egld",
     "steps": [
         {
             "step": "externalSteps",
@@ -12,7 +12,7 @@
                 "from": "address:acc3",
                 "to": "sc:the_digital_cash_contract",
                 "egldValue": "10",
-                "function": "payFeeAndFundEGLD",
+                "function": "payFeeAndFund",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
                     "u64:100"
@@ -36,7 +36,7 @@
                 "from": "address:acc3",
                 "to": "sc:the_digital_cash_contract",
                 "egldValue": "1,000",
-                "function": "payFeeAndFundEGLD",
+                "function": "payFeeAndFund",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
                     "u64:100"
@@ -62,11 +62,10 @@
                     "storage": {
                         "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
                             "0-depositor_address": "address:acc3",
-                            "1-esdt_funds": "u32:0",
-                            "2-egld_funds": "biguint:990",
-                            "3-valability": "u64:100",
-                            "4-expiration_round": "u64:16",
-                            "5-fees": {
+                            "1-funds": "u32:1|nested:str:EGLD|u64:0|biguint:990",
+                            "2-valability": "u64:100",
+                            "3-expiration_round": "u64:16",
+                            "4-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
                                     "0-tokenIdentifier": "nested:str:EGLD",

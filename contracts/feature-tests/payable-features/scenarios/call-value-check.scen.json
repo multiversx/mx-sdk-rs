@@ -33,7 +33,7 @@
                 "from": "address:an-account",
                 "to": "sc:payable-features",
                 "egldValue": "100",
-                "function": "echo_call_value",
+                "function": "echo_call_value_legacy",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -61,7 +61,7 @@
                         "value": "100"
                     }
                 ],
-                "function": "echo_call_value",
+                "function": "echo_call_value_legacy",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -100,7 +100,7 @@
                         "value": "10"
                     }
                 ],
-                "function": "echo_call_value",
+                "function": "echo_call_value_legacy",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

@@ -1,7 +1,8 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct RgbColor {
     r: u8,
     g: u8,
@@ -15,10 +16,10 @@ pub trait NonFungibleTokenMapperFeatures:
     #[payable("EGLD")]
     #[endpoint]
     fn issue_and_set_all_roles_meta(&self, token_ticker: ManagedBuffer) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         self.non_fungible_token_mapper().issue_and_set_all_roles(
             EsdtTokenType::Meta,
-            payment.clone_value(),
+            payment.clone(),
             ManagedBuffer::new(),
             token_ticker,
             0,

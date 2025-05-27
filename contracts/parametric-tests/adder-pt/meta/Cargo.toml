@@ -10,6 +10,6 @@ authors = [ "you",]
 [dependencies.adder-pt]
 path = ".."
 
-[dependencies.multiversx-sc-meta]
-version = "0.50.0"
-path = "../../../../framework/meta"
+[dependencies.multiversx-sc-meta-lib]
+version = "0.58.0"
+path = "../../../../framework/meta-lib"

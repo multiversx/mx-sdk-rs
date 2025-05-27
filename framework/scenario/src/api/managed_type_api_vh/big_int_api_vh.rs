@@ -49,13 +49,14 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     }
 
     fn bi_to_i64(&self, reference: Self::BigIntHandle) -> Option<i64> {
+        // TODO: clean up, this is not idiomatic
         self.with_vm_hooks_ctx_1(&reference, |vh| {
-            let is_i64_result = vh.big_int_is_int64(reference.get_raw_handle_unchecked());
-            if i32_to_bool(is_i64_result) {
-                Some(vh.big_int_get_int64(reference.get_raw_handle_unchecked()))
+            let is_i64_result = vh.big_int_is_int64(reference.get_raw_handle_unchecked())?;
+            Ok(if i32_to_bool(is_i64_result) {
+                Some(vh.big_int_get_int64(reference.get_raw_handle_unchecked())?)
             } else {
                 None
-            }
+            })
         })
     }
 
@@ -88,8 +89,8 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     unary_op_method! {bi_sqrt, big_int_sqrt}
     binary_op_method! {bi_pow, big_int_pow}
 
-    fn bi_log2(&self, x: Self::BigIntHandle) -> u32 {
-        self.with_vm_hooks_ctx_1(&x, |vh| vh.big_int_log2(x.get_raw_handle_unchecked())) as u32
+    fn bi_log2(&self, x: Self::BigIntHandle) -> i32 {
+        self.with_vm_hooks_ctx_1(&x, |vh| vh.big_int_log2(x.get_raw_handle_unchecked()))
     }
 
     binary_op_method! {bi_and, big_int_and}

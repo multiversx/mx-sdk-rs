@@ -1,0 +1,2 @@
+[contracts.formatted-message-features]
+allocator = "static64k"

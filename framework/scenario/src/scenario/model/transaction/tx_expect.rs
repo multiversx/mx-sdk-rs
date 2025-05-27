@@ -7,9 +7,8 @@ use crate::{
     },
     scenario_model::Checkable,
 };
-use multiversx_chain_vm::tx_mock::result_values_to_string;
-
-const USER_ERROR_CODE: u64 = 4;
+use multiversx_chain_vm::host::context::result_values_to_string;
+use multiversx_sc::chain_core::types::ReturnCode;
 
 #[derive(Debug, Clone)]
 pub struct TxExpect {
@@ -67,7 +66,7 @@ impl TxExpect {
     where
         BytesValue: From<E>,
     {
-        Self::err(USER_ERROR_CODE, err_msg_expr)
+        Self::err(ReturnCode::UserError, err_msg_expr)
     }
 
     pub fn no_result(mut self) -> Self {
@@ -100,7 +99,7 @@ impl TxExpect {
 
     fn check_response(&self, tx_response: &TxResponse) {
         assert!(
-            self.status.check(tx_response.tx_error.status),
+            self.status.check(tx_response.tx_error.status.as_u64()),
             "{}result code mismatch. Want: {}. Have: {}. Message: {}",
             &self.additional_error_message,
             self.status,
@@ -120,7 +119,7 @@ impl TxExpect {
             self.message.check(tx_response.tx_error.message.as_str()),
             "{}result message mismatch. Want: {}. Have: {}.",
             &self.additional_error_message,
-            &self.status,
+            &self.message,
             &tx_response.tx_error.message,
         );
     }

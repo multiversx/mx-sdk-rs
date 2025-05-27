@@ -8,7 +8,6 @@ use crate::{
 /// Empty structure with an empty bytes representation. Equivalent to `false`, `0` or `[u8; 0]`, but more explicit.
 ///
 /// Note: the unit type `()` would have naturally fit this role, but we decided to make the unit type multi-value only.
-
 impl<T> TopEncode for PhantomData<T> {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
@@ -82,7 +81,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_dep_struc() {
+    fn test_dep_struct() {
         check_dep_encode_decode(
             TestStructWithPhantom::<u64> {
                 x: 42,
@@ -94,7 +93,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_top_struc() {
+    fn test_top_struct() {
         check_top_encode_decode(
             TestStructWithPhantom::<u64> {
                 x: 42,

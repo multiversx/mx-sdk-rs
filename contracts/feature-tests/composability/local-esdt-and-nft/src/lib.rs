@@ -4,7 +4,8 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 // used as mock attributes for NFTs
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct Color {
     r: u8,
     g: u8,
@@ -26,13 +27,13 @@ pub trait LocalEsdtAndEsdtNft {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         let caller = self.blockchain().get_caller();
 
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 &initial_supply,
@@ -67,13 +68,13 @@ pub trait LocalEsdtAndEsdtNft {
     #[payable("EGLD")]
     #[endpoint(nftIssue)]
     fn nft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         let caller = self.blockchain().get_caller();
 
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 NonFungibleTokenProperties {
@@ -173,13 +174,13 @@ pub trait LocalEsdtAndEsdtNft {
     #[payable("EGLD")]
     #[endpoint(sftIssue)]
     fn sft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         let caller = self.blockchain().get_caller();
 
         self.send()
             .esdt_system_sc_proxy()
             .issue_semi_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 SemiFungibleTokenProperties {
@@ -276,8 +277,7 @@ pub trait LocalEsdtAndEsdtNft {
         // so we can get the token identifier and amount from the call data
         match result {
             ManagedAsyncCallResult::Ok(()) => {
-                self.last_issued_token()
-                    .set(&token_identifier.unwrap_esdt());
+                self.last_issued_token().set(token_identifier.unwrap_esdt());
                 self.last_error_message().clear();
             },
             ManagedAsyncCallResult::Err(message) => {

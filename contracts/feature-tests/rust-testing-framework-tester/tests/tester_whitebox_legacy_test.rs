@@ -262,7 +262,7 @@ fn test_sc_half_payment() {
 
     wrapper
         .execute_tx(&caller_addr, &sc_wrapper, &rust_biguint!(1_000), |sc| {
-            sc.recieve_egld_half();
+            sc.receive_egld_half();
         })
         .assert_ok();
 
@@ -294,6 +294,7 @@ fn test_esdt_balance() {
         })
         .assert_ok();
 
+    wrapper.add_mandos_set_account(sc_wrapper.address_ref());
     wrapper.add_mandos_check_account(sc_wrapper.address_ref());
     wrapper.write_mandos_output(TEST_ESDT_OUTPUT_PATH);
 }

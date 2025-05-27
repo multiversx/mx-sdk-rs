@@ -29,7 +29,7 @@ pub fn generate_callback_selector_and_main(
         let cb_main_body = quote! {
             let _ = self::EndpointWrappers::callback_selector(
                 self,
-                multiversx_sc::types::CallbackClosureForDeser::no_callback(),
+                &multiversx_sc::types::CallbackClosureForDeser::no_callback(),
             );
         };
         (cb_selector_body, cb_main_body)
@@ -39,7 +39,7 @@ pub fn generate_callback_selector_and_main(
             module_calls(contract.supertraits.as_slice());
         if match_arms.is_empty() && module_calls.is_empty() {
             let cb_selector_body = quote! {
-                multiversx_sc::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
+                multiversx_sc::types::CallbackSelectorResult::NotProcessed
             };
             let cb_main_body = quote! {};
             (cb_selector_body, cb_main_body)
@@ -47,11 +47,10 @@ pub fn generate_callback_selector_and_main(
             let cb_selector_body = callback_selector_body(match_arms, module_calls);
             let cb_main_body = quote! {
                 if let Some(___cb_closure___) = multiversx_sc::types::CallbackClosureForDeser::storage_load_and_clear::<Self::Api>() {
-                    if let multiversx_sc::types::CallbackSelectorResult::NotProcessed(_) =
-                        self::EndpointWrappers::callback_selector(self, ___cb_closure___) {
+                    if !self::EndpointWrappers::callback_selector(self, &___cb_closure___).is_processed() {
                         multiversx_sc::api::ErrorApiImpl::signal_error(
                             &<Self::Api as multiversx_sc::api::ErrorApi>::error_api_impl(),
-                            err_msg::CALLBACK_BAD_FUNC,
+                            err_msg::CALLBACK_BAD_FUNC.as_bytes(),
                         );
                     }
                 }
@@ -79,7 +78,7 @@ fn callback_selector_body(
         }
         #(#match_arms)*
         #(#module_calls)*
-        multiversx_sc::types::CallbackSelectorResult::NotProcessed(___cb_closure___)
+        multiversx_sc::types::CallbackSelectorResult::NotProcessed
     }
 }
 
@@ -123,13 +122,8 @@ pub fn module_calls(supertraits: &[Supertrait]) -> Vec<proc_macro2::TokenStream>
         .map(|supertrait| {
             let module_path = &supertrait.module_path;
             quote! {
-                match #module_path EndpointWrappers::callback_selector(self, ___cb_closure___) {
-                    multiversx_sc::types::CallbackSelectorResult::Processed => {
-                        return multiversx_sc::types::CallbackSelectorResult::Processed;
-                    },
-                    multiversx_sc::types::CallbackSelectorResult::NotProcessed(recovered_cb_closure) => {
-                        ___cb_closure___ = recovered_cb_closure;
-                    },
+                if #module_path EndpointWrappers::callback_selector(self, ___cb_closure___).is_processed() {
+                    return multiversx_sc::types::CallbackSelectorResult::Processed;
                 }
             }
         })

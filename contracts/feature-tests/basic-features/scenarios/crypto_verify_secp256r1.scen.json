@@ -1,0 +1,67 @@
+{
+    "name": "crypto",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features-crypto": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features-crypto.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "secp256r1 - ok",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features-crypto",
+                "function": "verify_secp256r1_signature",
+                "arguments": [
+                    "0x02bc52274edebbef8878eacc4d1e0ed4fb213e5b0737389701ae8d59c403325720",
+                    "0xbf9facf48b2219db73b50c7ff59ceef2ada56632c71afc555d6bb4072d7634d1d9353acd53517ffb9a06935a89a6454fcaa40c69becf9f8029a271fd252ea55307d00d6e97a30719d48d6b7f993af24e9c54381cba02a113238eaee9d741cababeb21aaf",
+                    "0xc7877497444274267a4ea6f42deefde23a12e44f1ec1b437018e5c0e2834ce376dec1b81ebeacf5fbc6882e69af7cafad47bbb96cfb09e8d77d12afff7543052"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "secp256r1 - fail",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features-crypto",
+                "function": "verify_secp256r1_signature",
+                "arguments": [
+                    "0x02bc52274edebbef8878eacc4d1e0ed4fb213e5b0737389701ae8d59c403325720",
+                    "0xbf9facf48b2219db73b50c7ff59ceef2ada56632c71afc555d6bb4072d7634d1d9353acd53517ffb9a06935a89a6454fcaa40c69becf9f8029a271fd252ea55307d00d6e97a30719d48d6b7f993af24e9c54381cba02a113238eaee9d741cababeb21aaf",
+                    "0x00877497444274267a4ea6f42deefde23a12e44f1ec1b437018e5c0e2834ce376dec1b81ebeacf5fbc6882e69af7cafad47bbb96cfb09e8d77d12afff7543052"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:signature is invalid",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

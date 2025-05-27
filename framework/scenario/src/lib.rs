@@ -2,14 +2,12 @@
 
 pub mod api;
 pub mod bech32;
-pub mod debug_executor;
 pub mod display_util;
+pub mod executor;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;
 pub mod scenario_macros;
-pub mod standalone;
-pub mod test_wallets;
 mod vm_go_tool;
 
 pub mod whitebox_legacy;
@@ -26,7 +24,7 @@ pub use num_bigint;
 
 pub use multiversx_sc;
 
-pub use multiversx_sc_meta as meta;
+pub use multiversx_sc_meta_lib as meta;
 
 /// Exposing the scenario model. Might be moved in the future,
 /// but the export will hopefully remain the same.

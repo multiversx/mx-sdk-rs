@@ -9,7 +9,8 @@ mod nft_module;
 use distribution_module::Distribution;
 use multiversx_sc_modules::default_issue_callbacks;
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct ExampleAttributes {
     pub creation_timestamp: u64,
 }
@@ -26,7 +27,7 @@ pub trait SeedNftMinter:
         marketplaces: ManagedVec<ManagedAddress>,
         distribution: ManagedVec<Distribution<Self::Api>>,
     ) {
-        self.marketplaces().extend(&marketplaces);
+        self.marketplaces().extend(marketplaces);
         self.init_distribution(distribution);
     }
 
@@ -101,7 +102,7 @@ pub trait SeedNftMinter:
             } else {
                 esdt_payments
                     .try_get(0)
-                    .map(|esdt_payment| esdt_payment.amount)
+                    .map(|esdt_payment| esdt_payment.amount.clone())
                     .unwrap_or_default()
             };
             total_amount += amount;

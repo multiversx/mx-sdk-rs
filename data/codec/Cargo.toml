@@ -1,9 +1,12 @@
 [package]
 name = "multiversx-sc-codec"
-version = "0.19.0"
+version = "0.22.1"
 edition = "2021"
 
-authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
+authors = [
+    "Andrei Marinica <andrei.marinica@multiversx.com>",
+    "MultiversX <contact@multiversx.com>",
+]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
@@ -11,22 +14,27 @@ homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
 description = "Lightweight binary serializer/deserializer, written especially for MultiversX smart contracts"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
-categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
+categories = [
+    "no-std",
+    "wasm",
+    "cryptography::cryptocurrencies",
+    "development-tools",
+]
 
 [features]
 derive = ["multiversx-sc-codec-derive"]
-alloc = []
 
 [dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.19.0"
+version = "=0.22.1"
 optional = true
 
 [dependencies]
-arrayvec = { version = "=0.7.4", default-features = false }
-num-bigint = { version = "=0.4.5", optional = true } # can only be used in std contexts
+arrayvec = { version = "=0.7.6", default-features = false }
+num-bigint = { version = "0.4", optional = true }           # can only be used in std contexts
 unwrap-infallible = "0.1.5"
+bitflags = "2.9"
 
 [dev-dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.19.0"
+version = "=0.22.1"

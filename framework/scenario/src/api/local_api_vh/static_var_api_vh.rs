@@ -1,6 +1,6 @@
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 use multiversx_sc::{
-    api::{use_raw_handle, RawHandle, StaticVarApi, StaticVarApiImpl},
+    api::{RawHandle, StaticVarApi, StaticVarApiFlags, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -55,29 +55,23 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
         self.with_static_data(|data| data.static_vars_cell.borrow().num_arguments)
     }
 
-    fn set_call_value_egld_handle(&self, handle: RawHandle) {
+    fn set_flags(&self, flags: StaticVarApiFlags) {
         self.with_static_data(|data| {
-            data.static_vars_cell.borrow_mut().call_value_egld_handle = handle;
+            data.static_vars_cell.borrow_mut().flags = flags;
         })
     }
 
-    fn get_call_value_egld_handle(&self) -> RawHandle {
-        self.with_static_data(|data| {
-            use_raw_handle(data.static_vars_cell.borrow().call_value_egld_handle)
-        })
+    fn get_flags(&self) -> StaticVarApiFlags {
+        self.with_static_data(|data| data.static_vars_cell.borrow().flags)
     }
 
-    fn set_call_value_multi_esdt_handle(&self, handle: RawHandle) {
-        self.with_static_data(|data| {
-            data.static_vars_cell
-                .borrow_mut()
-                .call_value_multi_esdt_handle = handle;
-        })
+    fn is_scaling_factor_cached(&self, decimals: usize) -> bool {
+        self.with_static_data(|data| data.static_vars_cell.borrow().scaling_factor_init[decimals])
     }
 
-    fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
+    fn set_scaling_factor_cached(&self, decimals: usize) {
         self.with_static_data(|data| {
-            use_raw_handle(data.static_vars_cell.borrow().call_value_multi_esdt_handle)
+            data.static_vars_cell.borrow_mut().scaling_factor_init[decimals] = true
         })
     }
 }

@@ -14,12 +14,12 @@ pub trait BigIntMethods {
 
     #[endpoint]
     fn log2_big_uint(&self, a: BigUint) -> u32 {
-        a.log2()
+        a.log2_floor().unwrap_or_default()
     }
 
     #[endpoint]
     fn log2_big_uint_ref(&self, a: &BigUint) -> u32 {
-        a.log2()
+        a.log2_floor().unwrap_or_default()
     }
 
     #[endpoint]
@@ -48,7 +48,7 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn biguint_overwrite_u64(&self, bu: BigUint, small: u64) -> BigUint {
+    fn biguint_overwrite_u64(&self, mut bu: BigUint, small: u64) -> BigUint {
         bu.overwrite_u64(small);
         bu
     }

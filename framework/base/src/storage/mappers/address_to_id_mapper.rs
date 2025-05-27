@@ -1,8 +1,8 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
-    StorageMapper,
+    source::{CurrentStorage, StorageAddress},
+    StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     api::{ErrorApiImpl, StorageMapperApi},
@@ -42,11 +42,11 @@ where
     }
 }
 
-impl<SA> AddressToIdMapper<SA, ManagedAddress<SA>>
+impl<SA> StorageMapperFromAddress<SA> for AddressToIdMapper<SA, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         AddressToIdMapper {
             _phantom_api: PhantomData,
             address,

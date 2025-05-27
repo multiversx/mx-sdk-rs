@@ -38,7 +38,7 @@ impl SetStateBuilderItem for AccountItem {
     }
 }
 
-impl<'w> SetStateBuilder<'w, AccountItem> {
+impl SetStateBuilder<'_, AccountItem> {
     pub fn nonce<N>(mut self, nonce: N) -> Self
     where
         N: AnnotatedValue<ScenarioTxEnvData, u64>,

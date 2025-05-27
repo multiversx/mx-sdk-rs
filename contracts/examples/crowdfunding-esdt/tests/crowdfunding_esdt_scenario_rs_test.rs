@@ -1,8 +1,9 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/crowdfunding-esdt");
     blockchain.register_contract(
         "mxsc:output/crowdfunding-esdt.mxsc.json",
         crowdfunding_esdt::ContractBuilder,

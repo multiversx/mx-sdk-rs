@@ -5,9 +5,8 @@ use crate::bonding_curve::{
     utils::structs::CurveArguments,
 };
 
-#[derive(
-    TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone, Default,
-)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone, Default)]
 pub enum FunctionSelector<M: ManagedTypeApi> {
     Linear(LinearFunction<M>),
     CustomExample(BigUint<M>),
@@ -32,7 +31,7 @@ impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
                 &(&sum * &sum * sum / 3u32) + &arguments.balance + initial_cost.clone()
             },
             FunctionSelector::None => {
-                M::error_api_impl().signal_error(b"Bonding Curve function is not assiged")
+                M::error_api_impl().signal_error(b"Bonding Curve function is not assigned")
             },
         }
     }

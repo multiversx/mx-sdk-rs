@@ -3,12 +3,15 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-#[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub enum SampleEnum {
     Value1,
     Value2,
 }
-#[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct Structure<M: ManagedTypeApi> {
     pub field1: ManagedBuffer<M>,
     pub field2: SampleEnum,

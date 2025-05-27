@@ -1,4 +1,6 @@
-use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{
+    EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
+};
 
 use crate::{
     abi::TypeAbiFrom,
@@ -26,9 +28,21 @@ impl<'a> TestTokenIdentifier<'a> {
     pub fn eval_to_expr(&self) -> alloc::string::String {
         alloc::format!("{STR_PREFIX}{}", self.name)
     }
+
+    pub fn to_token_identifier<Api: ManagedTypeApi>(&self) -> TokenIdentifier<Api> {
+        self.name.into()
+    }
+
+    pub fn as_str(&self) -> &str {
+        self.name
+    }
+
+    pub fn as_bytes(&self) -> &[u8] {
+        self.name.as_bytes()
+    }
 }
 
-impl<'a, Env> AnnotatedValue<Env, TokenIdentifier<Env::Api>> for TestTokenIdentifier<'a>
+impl<Env> AnnotatedValue<Env, TokenIdentifier<Env::Api>> for TestTokenIdentifier<'_>
 where
     Env: TxEnv,
 {
@@ -52,7 +66,7 @@ where
     }
 }
 
-impl<'a> TopEncode for TestTokenIdentifier<'a> {
+impl TopEncode for TestTokenIdentifier<'_> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -62,5 +76,15 @@ impl<'a> TopEncode for TestTokenIdentifier<'a> {
     }
 }
 
-impl<'a, Api> TypeAbiFrom<TestTokenIdentifier<'a>> for TokenIdentifier<Api> where Api: ManagedTypeApi
-{}
+impl NestedEncode for TestTokenIdentifier<'_> {
+    #[inline]
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.name.dep_encode_or_handle_err(dest, h)
+    }
+}
+
+impl<Api> TypeAbiFrom<TestTokenIdentifier<'_>> for TokenIdentifier<Api> where Api: ManagedTypeApi {}

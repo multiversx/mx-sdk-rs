@@ -1,9 +1,20 @@
-# Smart contract meta-programming
+# Smart contract meta-programming tool
 
 [![crates.io](https://img.shields.io/crates/v/multiversx-sc-meta.svg)](https://crates.io/crates/multiversx-sc-meta)
 
-A meta-programming utility that works with smart contract code metadata.
+This is the standalone tool for creating and managing MultiversX smart contract crates.
 
-It is responsible with creating the smart contract ABIs, generating the wasm crates, and, ultimately, building the contract binaries
+## Install
 
-For more about the build process, see https://docs.multiversx.com/developers/developer-reference/sc-build-reference/
+All you need to do to install is:
+
+```
+cargo install multiversx-sc-meta
+```
+
+It works on both stable and nightly Rust, requires rustc 1.78 or greater.
+
+## Documentation
+
+Please see the explanations and CLI specifiations here: https://docs.multiversx.com/developers/meta/sc-meta
+

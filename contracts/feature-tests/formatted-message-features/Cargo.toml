@@ -9,9 +9,11 @@ publish = false
 path = "src/formatted_message_features.rs"
 
 [dependencies.multiversx-sc]
-version = "0.50.3"
+version = "0.58.0"
 path = "../../../framework/base"
+features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.50.3"
+version = "0.58.0"
+features = ["wasmer-experimental"]
 path = "../../../framework/scenario"

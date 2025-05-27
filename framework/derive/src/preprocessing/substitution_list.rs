@@ -56,11 +56,13 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
     add_managed_type(substitutions, &quote!(EsdtTokenPaymentMultiArg));
     add_managed_type(substitutions, &quote!(EsdtTokenPaymentMultiValue));
+    add_managed_type(substitutions, &quote!(EgldOrEsdtTokenPaymentMultiValue));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueEncodedIterator));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueEncoded));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueManagedVecCounted));
+    add_managed_type_with_generics(substitutions, &quote!(MultiValueEncodedCounted));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedVarArgs));
     add_managed_type_with_generics(substitutions, &quote!(ManagedCountedMultiResultVec));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueManagedVec));
@@ -89,6 +91,7 @@ fn add_storage_mapper_single_generic_arg(
     substitutions: &mut SubstitutionsMap,
     mapper_name: &proc_macro2::TokenStream,
 ) {
+    add_managed_type_with_generics(substitutions, mapper_name);
     substitutions.add_substitution(
         quote!(#mapper_name<Self::Api>),
         quote!(#mapper_name<Self::Api>),
@@ -109,6 +112,7 @@ fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
     add_storage_mapper_single_generic_arg(substitutions, &quote!(TokenAttributesMapper));
     add_storage_mapper_single_generic_arg(substitutions, &quote!(UniqueIdMapper));
     add_storage_mapper_single_generic_arg(substitutions, &quote!(UserMapper));
+    add_storage_mapper_single_generic_arg(substitutions, &quote!(AddressToIdMapper));
 
     add_storage_mapper(substitutions, &quote!(BiDiMapper));
     add_storage_mapper(substitutions, &quote!(LinkedListMapper));
@@ -117,6 +121,7 @@ fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
     add_storage_mapper(substitutions, &quote!(SetMapper));
     add_storage_mapper(substitutions, &quote!(UnorderedSetMapper));
     add_storage_mapper(substitutions, &quote!(SingleValueMapper));
+    add_storage_mapper(substitutions, &quote!(TimelockMapper));
     add_storage_mapper(substitutions, &quote!(VecMapper));
     add_storage_mapper(substitutions, &quote!(QueueMapper));
     add_storage_mapper(substitutions, &quote!(WhitelistMapper));

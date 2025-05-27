@@ -4,6 +4,13 @@ use crate::api::{use_raw_handle, BigFloatApiImpl, ManagedTypeApi, StaticVarApiIm
 
 use super::{BigFloat, BigInt};
 
+impl<M: ManagedTypeApi> BigFloat<M> {
+    pub fn is_close(&self, other: &Self, abs_tolerance: &Self) -> bool {
+        // TODO: temp handles
+        &(self - other).abs() <= abs_tolerance
+    }
+}
+
 impl<M: ManagedTypeApi> PartialEq for BigFloat<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {

@@ -2,8 +2,6 @@
 
 multiversx_sc::imports!();
 
-use multiversx_sc::types::String;
-
 /// Legacy, deprecated macros. Will b removed once they get removed.
 ///
 /// Error conversions should be moved to corresponding new formatter-based error tests.

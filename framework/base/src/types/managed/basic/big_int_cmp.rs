@@ -1,8 +1,11 @@
 use core::cmp::Ordering;
 
-use crate::api::{BigIntApiImpl, ManagedTypeApi};
+use crate::{
+    api::{BigIntApiImpl, ManagedTypeApi},
+    types::ManagedType,
+};
 
-use super::{big_num_cmp::cmp_i64, BigInt};
+use super::{big_num_cmp::bi_cmp_i64, BigInt};
 
 impl<M: ManagedTypeApi> PartialEq for BigInt<M> {
     #[inline]
@@ -29,16 +32,25 @@ impl<M: ManagedTypeApi> Ord for BigInt<M> {
     }
 }
 
-impl<M: ManagedTypeApi> PartialEq<i64> for BigInt<M> {
-    #[inline]
-    fn eq(&self, other: &i64) -> bool {
-        cmp_i64(self, *other).is_eq()
-    }
+macro_rules! partial_eq_and_ord {
+    ($small_int_type:ident) => {
+        impl<M: ManagedTypeApi> PartialEq<$small_int_type> for BigInt<M> {
+            #[inline]
+            fn eq(&self, other: &$small_int_type) -> bool {
+                bi_cmp_i64::<M>(self.get_handle(), *other as i64).is_eq()
+            }
+        }
+
+        impl<M: ManagedTypeApi> PartialOrd<$small_int_type> for BigInt<M> {
+            #[inline]
+            fn partial_cmp(&self, other: &$small_int_type) -> Option<Ordering> {
+                Some(bi_cmp_i64::<M>(self.get_handle(), *other as i64))
+            }
+        }
+    };
 }
 
-impl<M: ManagedTypeApi> PartialOrd<i64> for BigInt<M> {
-    #[inline]
-    fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
-        Some(cmp_i64(self, *other))
-    }
-}
+partial_eq_and_ord! {i32}
+partial_eq_and_ord! {i64}
+partial_eq_and_ord! {u32}
+partial_eq_and_ord! {u64}

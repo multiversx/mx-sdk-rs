@@ -1,7 +1,9 @@
+use crate::parse::attributes::util::{clean_string, is_first_char_numeric};
+
 use super::attr_names::*;
 
 pub struct PayableAttribute {
-    pub identifier: Option<String>,
+    pub identifier: String,
 }
 
 impl PayableAttribute {
@@ -22,20 +24,33 @@ impl PayableAttribute {
 
 /// Current implementation only works with 1 token name.
 /// Might be extended in the future.
-fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
+fn extract_token_identifier(attr: &syn::Attribute) -> String {
     match attr.meta.clone() {
         syn::Meta::Path(_) => {
-            panic!("attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")]")
+            // #[payable]
+            "*".to_owned()
         },
         syn::Meta::List(list) => {
             let mut iter = list.tokens.into_iter();
             let ticker = match iter.next() {
                 Some(proc_macro2::TokenTree::Literal(literal)) => {
-                    let clean = literal.to_string().trim_matches('\"').trim().to_string();
+                    let clean = clean_string(literal.to_string());
                     assert!(
                         !clean.is_empty(),
                         "ticker can not be empty. attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")"
                     );
+
+                    assert!(!is_first_char_numeric(&clean), "argument can not be a number");
+
+                    if clean
+                    .chars()
+                    .next()
+                    .is_some_and(|s|
+                        s == '*'
+                    ) {
+                        assert!(clean.len() == 1usize, "attribute needs 1 string argument: \"*\", \"EGLD\" or token identifier");
+                    }
+
                     clean
                 },
                 Some(_) => panic!("expected a string as argument"),
@@ -46,7 +61,7 @@ fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
                 iter.next().is_none(),
                 "too many tokens in attribute argument"
             );
-            Some(ticker)
+            ticker
         },
         syn::Meta::NameValue(_) => panic!(
             "attribute can not be name value. attribute needs 1 string argument: \"*\" or \"EGLD\""

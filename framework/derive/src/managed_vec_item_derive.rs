@@ -9,7 +9,7 @@ pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
     }
 }
 
-fn generate_payload_nested_tuple(fields: &syn::Fields) -> proc_macro2::TokenStream {
+fn generate_struct_payload_nested_tuple(fields: &syn::Fields) -> proc_macro2::TokenStream {
     match fields {
         syn::Fields::Named(fields_named) => {
             let types: Vec<_> = fields_named.named.iter().map(|field| &field.ty).collect();
@@ -23,6 +23,19 @@ fn generate_payload_nested_tuple(fields: &syn::Fields) -> proc_macro2::TokenStre
             panic!("ManagedVecItem only supports named fields")
         },
     }
+}
+
+fn generate_enum_payload_nested_tuple(data_enum: &syn::DataEnum) -> proc_macro2::TokenStream {
+    let types: Vec<_> = data_enum
+        .variants
+        .iter()
+        .filter_map(|variant| single_fields_type(&variant.fields))
+        .collect();
+    let mut result = quote! { () };
+    for ty in types.iter().rev() {
+        result = quote! { (#ty, #result) };
+    }
+    result
 }
 
 fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
@@ -43,20 +56,15 @@ fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_mac
     }
 }
 
-fn generate_from_byte_reader_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+fn generate_read_from_payload_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
     match fields {
         syn::Fields::Named(fields_named) => fields_named
             .named
             .iter()
             .map(|field| {
                 let field_ident = &field.ident;
-                let type_name = &field.ty;
                 quote! {
-                    #field_ident: multiversx_sc::types::ManagedVecItem::from_byte_reader(|bytes| {
-                        let next_index = index + <#type_name as multiversx_sc::types::ManagedVecItem>::payload_size();
-                        bytes.copy_from_slice(&payload_slice[index .. next_index]);
-                        index = next_index;
-                    }),
+                    #field_ident: multiversx_sc::types::managed_vec_item_read_from_payload_index(payload, &mut index),
                 }
             })
             .collect(),
@@ -66,20 +74,15 @@ fn generate_from_byte_reader_snippets(fields: &syn::Fields) -> Vec<proc_macro2::
     }
 }
 
-fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+fn generate_save_to_payload_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
     match fields {
         syn::Fields::Named(fields_named) => fields_named
             .named
             .iter()
             .map(|field| {
                 let field_ident = &field.ident;
-                let type_name = &field.ty;
                 quote! {
-                    multiversx_sc::types::ManagedVecItem::to_byte_writer(&self.#field_ident, |bytes| {
-                        let next_index = index + <#type_name as multiversx_sc::types::ManagedVecItem>::payload_size();
-                        payload_slice[index .. next_index].copy_from_slice(bytes);
-                        index = next_index;
-                    });
+                    multiversx_sc::types::managed_vec_item_save_to_payload_index(self.#field_ident, payload, &mut index);
                 }
             })
             .collect(),
@@ -89,106 +92,158 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
     }
 }
 
-fn generate_payload_buffer_snippet() -> proc_macro2::TokenStream {
-    quote! {
-        let mut payload = <Self::PAYLOAD as multiversx_sc::types::ManagedVecItemPayload>::new_buffer();
-        let payload_slice = multiversx_sc::types::ManagedVecItemPayload::payload_slice_mut(&mut payload);
-    }
+fn variants_have_fields(data_enum: &syn::DataEnum) -> bool {
+    data_enum
+        .variants
+        .iter()
+        .any(|variant| !variant.fields.is_empty())
 }
 
 fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+    let payload_nested_tuple = generate_enum_payload_nested_tuple(data_enum);
+    let skips_reserialization = !variants_have_fields(data_enum);
 
     let mut reader_match_arms = Vec::<proc_macro2::TokenStream>::new();
     let mut writer_match_arms = Vec::<proc_macro2::TokenStream>::new();
+    let last_index = data_enum.variants.len() - 1;
     for (variant_index, variant) in data_enum.variants.iter().enumerate() {
         let variant_index_u8 = variant_index as u8;
         let variant_ident = &variant.ident;
-        assert!(variant.fields.is_empty(), "Only fieldless enums supported");
-        reader_match_arms.push(quote! {
-            #variant_index_u8 => #name::#variant_ident,
-        });
-        writer_match_arms.push(quote! {
-            #name::#variant_ident => #variant_index_u8,
-        });
+        let has_field = single_fields_type(&variant.fields).is_some();
+        let field_init = if has_field {
+            quote! {
+                (multiversx_sc::types::managed_vec_item_read_from_payload_index(
+                    payload,
+                    &mut index
+                ))
+            }
+        } else {
+            quote! {}
+        };
+
+        if variant_index == last_index {
+            // last one gets a `_`
+            // we don't treat bad discrminant errors
+            // (there is currently no error mechanism for ManagedVecItem)
+            reader_match_arms.push(quote! {
+                _ => #name::#variant_ident #field_init ,
+            });
+        } else {
+            reader_match_arms.push(quote! {
+                #variant_index_u8 => #name::#variant_ident #field_init ,
+            });
+        }
+
+        if has_field {
+            writer_match_arms.push(quote! {
+                #name::#variant_ident (__self_0) => {
+                    multiversx_sc::types::managed_vec_item_save_to_payload_index(#variant_index_u8, payload, &mut index);
+                    multiversx_sc::types::managed_vec_item_save_to_payload_index(__self_0, payload, &mut index);
+                }
+            });
+        } else {
+            writer_match_arms.push(quote! {
+                #name::#variant_ident => {
+                    multiversx_sc::types::managed_vec_item_save_to_payload_index(#variant_index_u8, payload, &mut index);
+                }
+            });
+        }
     }
 
-    let first_variant_ident = &data_enum.variants[0];
-    reader_match_arms.push(quote! {
-        _ => #name::#first_variant_ident,
-    });
-
-    let gen = quote! {
+    let result = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
-            type PAYLOAD = multiversx_sc::types::ManagedVecItemPayloadBuffer<1>;
-            const SKIPS_RESERIALIZATION: bool = true;
-            type Ref<'a> = Self;
+            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemEnumPayloadTuple>::EnumPayload;
+            const SKIPS_RESERIALIZATION: bool = #skips_reserialization;
+            type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
 
-            fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-                let mut arr: [u8; 1] = [0u8; 1];
-                reader(&mut arr[..]);
-                match arr[0] {
-                    #(#reader_match_arms)*
+            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+                let mut index = 0;
+
+                unsafe {
+                    let discriminant: u8 = multiversx_sc::types::managed_vec_item_read_from_payload_index(
+                        payload,
+                        &mut index,
+                    );
+
+                    match discriminant {
+                        #(#reader_match_arms)*
+                    }
                 }
             }
 
-            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
-                Self::from_byte_reader(reader)
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                multiversx_sc::types::ManagedVecRef::new(Self::read_from_payload(payload))
             }
 
-            fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-                let mut arr: [u8; 1] = [0u8; 1];
-                arr[0] = match self {
-                    #(#writer_match_arms)*
-                };
-                writer(&arr[..])
+            fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+                let mut index = 0;
+
+                unsafe {
+                    match self {
+                        #(#writer_match_arms)*
+                    };
+                }
             }
         }
     };
-    gen.into()
+    result.into()
+}
+
+fn single_fields_type(fields: &syn::Fields) -> Option<syn::Type> {
+    match fields {
+        syn::Fields::Named(_) => {
+            panic!("named fields currently not supported, only single unnamed fields supported, of type Variant(T)")
+        },
+        syn::Fields::Unnamed(fields_unnamed) => {
+            assert_eq!(
+                fields_unnamed.unnamed.len(),
+                1,
+                "only single unnamed fields supported, of type Variant(T)"
+            );
+            Some(fields_unnamed.unnamed.first().unwrap().ty.clone())
+        },
+        syn::Fields::Unit => None,
+    }
 }
 
 fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-    let payload_nested_tuple = generate_payload_nested_tuple(&data_struct.fields);
+    let payload_nested_tuple = generate_struct_payload_nested_tuple(&data_struct.fields);
     let skips_reserialization_snippets =
         generate_skips_reserialization_snippets(&data_struct.fields);
-    let from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
-    let to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
+    let read_from_payload_snippets = generate_read_from_payload_snippets(&data_struct.fields);
+    let save_to_payload_snippets = generate_save_to_payload_snippets(&data_struct.fields);
 
-    let payload_buffer_snippet = generate_payload_buffer_snippet();
-
-    let gen = quote! {
+    let result = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
-            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemNestedTuple>::PAYLOAD;
+            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemStructPayloadTuple>::StructPayload;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
-            type Ref<'a> = Self;
+            type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
 
-            fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-                #payload_buffer_snippet
-                reader(payload_slice);
+            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let mut index = 0;
 
-                #name {
-                    #(#from_byte_reader_snippets)*
+                unsafe {
+                    #name {
+                        #(#read_from_payload_snippets)*
+                    }
                 }
             }
 
-            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
-                Self::from_byte_reader(reader)
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                multiversx_sc::types::ManagedVecRef::new(Self::read_from_payload(payload))
             }
 
-            fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-                #payload_buffer_snippet
+            fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
                 let mut index = 0;
-
-                #(#to_byte_writer_snippets)*
-
-                writer(&payload_slice[..])
+                unsafe {
+                    #(#save_to_payload_snippets)*
+                }
             }
         }
     };
-    gen.into()
+    result.into()
 }

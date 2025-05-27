@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 /// We are using the multi-contract build system, to avoid having too many SC crates.
 /// We need to generate a separate contract for each of these constructors.
 #[multiversx_sc::module]
-pub trait ForwarderRawAlterativeInit: super::forwarder_raw_common::ForwarderRawCommon {
+pub trait ForwarderRawAlternativeInit: super::forwarder_raw_common::ForwarderRawCommon {
     /// Will not work, only written for VM testing.
     ///
     /// Async calls are explicitly forbidden in constructors.
@@ -52,7 +52,7 @@ pub trait ForwarderRawAlterativeInit: super::forwarder_raw_common::ForwarderRawC
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result = self
