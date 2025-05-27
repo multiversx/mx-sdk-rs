@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-codec"
-version = "0.22.0"
+version = "0.22.1"
 edition = "2021"
 
 authors = [
@@ -26,15 +26,15 @@ derive = ["multiversx-sc-codec-derive"]
 
 [dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.22.0"
+version = "=0.22.1"
 optional = true
 
 [dependencies]
 arrayvec = { version = "=0.7.6", default-features = false }
 num-bigint = { version = "0.4", optional = true }           # can only be used in std contexts
 unwrap-infallible = "0.1.5"
-bitflags = "=2.9.0"
+bitflags = "2.9"
 
 [dev-dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"
-version = "=0.22.0"
+version = "=0.22.1"

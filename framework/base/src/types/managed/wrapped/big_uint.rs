@@ -287,7 +287,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     ///
     /// Returns `None` for 0.
     pub fn ln(&self) -> Option<ManagedDecimal<M, LnDecimals>> {
-        // start with aproximation, based on position of the most significant bit
+        // start with approximation, based on position of the most significant bit
         let Some(log2_floor) = self.log2_floor() else {
             // means the input was zero
             return None;

@@ -218,7 +218,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     }
 }
 
-/// The version of `EsdtTokenPayment` that contains referrences instead of owned fields.
+/// The version of `EsdtTokenPayment` that contains references instead of owned fields.
 pub struct EsdtTokenPaymentRefs<'a, M: ManagedTypeApi> {
     pub token_identifier: &'a TokenIdentifier<M>,
     pub token_nonce: u64,

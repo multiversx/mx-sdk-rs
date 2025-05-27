@@ -78,7 +78,7 @@ where
     }
 
     /// Sets a value and an unlock timestamp for the value.
-    /// Setup needs to be commited after the unlock timestamp has passed.
+    /// Setup needs to be committed after the unlock timestamp has passed.
     /// Unlock timestamp represents the moment in time when the future value can be
     /// updated as current value.
     pub fn set_unlock_timestamp<BT>(&self, unlock_timestamp: u64, future_value: BT)
