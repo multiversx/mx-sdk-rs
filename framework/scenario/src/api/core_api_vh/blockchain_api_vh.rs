@@ -143,7 +143,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn epoch_start_block_timestamp(&self) -> u64 {
-       self.with_vm_hooks(|vh| vh.epoch_start_block_time_stamp()) as u64
+        self.with_vm_hooks(|vh| vh.epoch_start_block_time_stamp()) as u64
     }
 
     fn epoch_start_block_nonce(&self) -> u64 {
