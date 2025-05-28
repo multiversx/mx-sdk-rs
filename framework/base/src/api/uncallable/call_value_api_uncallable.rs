@@ -26,4 +26,8 @@ impl CallValueApiImpl for UncallableApi {
     fn esdt_num_transfers(&self) -> usize {
         unreachable!()
     }
+
+    fn load_all_transfers(&self, _dest_handle: Self::ManagedBufferHandle) {
+        unreachable!()
+    }
 }

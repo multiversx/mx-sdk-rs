@@ -234,6 +234,30 @@ where
         A::blockchain_api_impl().get_block_epoch()
     }
 
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_block_round_time_in_milliseconds(&self) -> u64 {
+        A::blockchain_api_impl().get_block_round_time_in_milliseconds()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_timestamp(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_timestamp()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_nonce(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_nonce()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_round(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_round()
+    }
+
     #[deprecated(
         since = "0.41.0",
         note = "Please use method `get_block_random_seed` instead."
