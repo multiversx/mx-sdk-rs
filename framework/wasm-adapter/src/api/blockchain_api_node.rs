@@ -91,6 +91,7 @@ unsafe extern "C" {
     fn getESDTLocalRoles(tokenhandle: i32) -> i64;
 
     fn managedGetCodeMetadata(addressHandle: i32, resultHandle: i32);
+    fn managedGetCodeHash(addressHandle: i32, codeHashHandle: i32);
 
     fn managedIsBuiltinFunction(function_name_handle: i32) -> bool;
 }
@@ -402,6 +403,16 @@ impl BlockchainApiImpl for VmApiImpl {
     ) {
         unsafe {
             managedGetCodeMetadata(address_handle, response_handle);
+        }
+    }
+
+    fn managed_get_code_hash(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        code_hash_handle: Self::ManagedBufferHandle,
+    ) {
+        unsafe {
+            managedGetCodeHash(address_handle, code_hash_handle);
         }
     }
 }
