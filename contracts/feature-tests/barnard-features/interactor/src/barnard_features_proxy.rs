@@ -67,7 +67,20 @@ where
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<u64, u64, u64, u64>> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("epoch_info")
+            .raw_call("epochInfo")
+            .original_result()
+    }
+
+    pub fn code_hash<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        address: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("codeHash")
+            .argument(&address)
             .original_result()
     }
 }

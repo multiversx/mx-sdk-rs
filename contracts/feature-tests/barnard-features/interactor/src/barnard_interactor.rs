@@ -19,12 +19,17 @@ pub async fn adder_cli() {
     let mut basic_interact = PayableInteract::new(config).await;
 
     let cli = barnard_interactor_cli::InteractCli::parse();
-    match &cli.command {
+    match cli.command {
         Some(barnard_interactor_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
         },
         Some(barnard_interactor_cli::InteractCliCommand::EpochInfo) => {
             basic_interact.epoch_info().await;
+        },
+        Some(barnard_interactor_cli::InteractCliCommand::CodeHash(args)) => {
+            basic_interact
+                .code_hash(Bech32Address::from_bech32_string(args.address))
+                .await;
         },
         None => {},
     }
@@ -87,5 +92,19 @@ impl PayableInteract {
             .await;
 
         println!("Result: {result:?}");
+    }
+
+    pub async fn code_hash(&mut self, address: Bech32Address) {
+        let result_value = self
+            .interactor
+            .query()
+            .to(self.state.current_barnard_features_address())
+            .typed(barnard_features_proxy::BarnardFeaturesProxy)
+            .code_hash(address)
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await;
+
+        println!("Result: {result_value:?}");
     }
 }
