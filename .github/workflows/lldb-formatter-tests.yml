@@ -19,10 +19,10 @@ jobs:
           toolchain: 1.87
 
       - name: Download vscode-lldb
-        uses: robinraju/release-downloader@v1.5
+        uses: robinraju/release-downloader@v1
         with:
           repository: vadimcn/vscode-lldb
-          tag: latest
+          latest: true
           fileName: codelldb-linux-x64.vsix
 
       - name: Setup vscode-lldb
