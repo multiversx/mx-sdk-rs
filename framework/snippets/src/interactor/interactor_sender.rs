@@ -12,7 +12,6 @@ use multiversx_sdk::gateway::{
 use crate::InteractorBase;
 
 /// A user account that can sign transactions (a pem is present).
-#[derive(Debug, Clone)]
 pub struct Sender {
     pub address: Address,
     pub hrp: String,

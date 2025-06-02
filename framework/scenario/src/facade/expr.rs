@@ -1,5 +1,4 @@
 mod bech32_address;
-mod external_bech32_address;
 mod file_path;
 mod mxsc_path;
 mod num_expr;

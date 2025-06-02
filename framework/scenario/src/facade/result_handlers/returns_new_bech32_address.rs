@@ -17,8 +17,6 @@ where
     Env: TxEnv,
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
-        println!("{:#?}", tx_response);
-
         let new_address = tx_response
             .new_deployed_address
             .clone()

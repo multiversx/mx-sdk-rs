@@ -36,7 +36,6 @@ impl SdkAddress {
     }
 
     pub fn to_bech32_string(&self) -> Result<String> {
-        // println!("sdk address: {}", self.0);
         Ok(crate::bech32::encode(&self.0, &self.1))
     }
 

@@ -12,7 +12,6 @@ pub fn decode(bech32_address: &str) -> (String, Address) {
 }
 
 pub fn encode(hrp: &str, address: &Address) -> String {
-    println!("hrp1: {hrp}");
     let hrp = Hrp::parse(hrp).expect("invalid hrp");
     bech32::encode::<Bech32>(hrp, address.as_bytes()).expect("bech32 encode error")
 }

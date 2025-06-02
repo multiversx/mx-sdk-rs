@@ -215,7 +215,6 @@ impl Wallet {
         let mut unsign_tx = unsign_tx.clone();
         unsign_tx.signature = None;
 
-        println!("@@@@@@@ {:#?}", unsign_tx);
         let mut tx_bytes = json!(unsign_tx).to_string().as_bytes().to_vec();
 
         let should_sign_on_tx_hash = unsign_tx.version >= 2 && unsign_tx.options & 1 > 0;

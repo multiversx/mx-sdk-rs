@@ -48,7 +48,6 @@ where
 
         let sender_address = &sc_deploy_step.tx.from.value;
         let mut transaction = self.sc_deploy_to_blockchain_tx(sc_deploy_step);
-        println!("@@@@@@@ sc deploy tx: {transaction:#?}");
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
         let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
@@ -67,10 +66,7 @@ where
     {
         let sc_deploy_step = sc_deploy_step.as_mut();
         let tx_hash = match self.launch_sc_deploy(sc_deploy_step).await {
-            Ok(hash) => {
-                println!("HERE!!!");
-                hash
-            },
+            Ok(hash) => hash,
             Err(err) => {
                 deploy_err_message(&err);
                 process::exit(1);
