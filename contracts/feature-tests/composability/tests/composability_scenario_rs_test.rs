@@ -364,6 +364,12 @@ fn forwarder_call_transf_exec_accept_multi_transfer_egld_rs() {
 }
 
 #[test]
+#[ignore = "failed - tx"]
+fn forwarder_call_transf_exec_accept_multi_transfer_egld_failed_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer_egld_failed.scen.json");
+}
+
+#[test]
 fn forwarder_call_transf_exec_accept_nft_rs() {
     world().run("scenarios/forwarder_call_transf_exec_accept_nft.scen.json");
 }

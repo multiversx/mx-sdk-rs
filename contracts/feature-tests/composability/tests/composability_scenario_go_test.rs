@@ -310,6 +310,11 @@ fn forwarder_call_transf_exec_accept_multi_transfer_egld_go() {
 }
 
 #[test]
+fn forwarder_call_transf_exec_accept_multi_transfer_egld_failed_go() {
+    world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer_egld_failed.scen.json");
+}
+
+#[test]
 fn forwarder_call_transf_exec_accept_nft_go() {
     world().run("scenarios/forwarder_call_transf_exec_accept_nft.scen.json");
 }
