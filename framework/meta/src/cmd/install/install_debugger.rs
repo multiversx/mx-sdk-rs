@@ -125,7 +125,7 @@ fn configure_vscode() {
     let init_commands = sub_values
         .as_object_mut()
         .unwrap()
-        .entry("lldb.launch.initCommands")
+        .entry("lldb.launch.preRunCommands")
         .or_insert_with(|| serde_json::Value::Array(Vec::new()));
     let command_script_line =
         "command script import ".to_owned() + script_full_path.to_str().unwrap();
