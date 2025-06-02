@@ -29,7 +29,7 @@ impl GatewayRequest for GetAccountRequest<'_> {
     fn get_endpoint(&self) -> String {
         format!(
             "{ACCOUNT_ENDPOINT}/{}",
-            crate::bech32::encode(&self.hrp, self.address)
+            crate::bech32::encode(self.hrp, self.address)
         )
     }
 
