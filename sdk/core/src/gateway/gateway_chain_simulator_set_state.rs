@@ -39,6 +39,7 @@ pub struct SetStateAccount {
 
 impl From<Account> for SetStateAccount {
     fn from(value: Account) -> Self {
+        println!("");
         Self {
             address: value.address.to_bech32_string().unwrap_or_default(),
             nonce: value.nonce,

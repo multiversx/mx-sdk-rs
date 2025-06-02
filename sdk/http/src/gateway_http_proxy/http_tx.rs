@@ -52,13 +52,15 @@ impl GatewayHttpProxy {
         address: &Address,
         network_configs: &NetworkConfig,
     ) -> Result<ArgCreateTransaction> {
-        let account = self.get_account(address).await?;
+        let account = self
+            .get_account(&network_configs.address_hrp, address)
+            .await?;
 
         Ok(ArgCreateTransaction {
             nonce: account.nonce,
             value: "".to_string(),
-            rcv_addr: SdkAddress(address.clone()),
-            snd_addr: SdkAddress(address.clone()),
+            rcv_addr: SdkAddress(network_configs.address_hrp.clone(), address.clone()),
+            snd_addr: SdkAddress(network_configs.address_hrp.clone(), address.clone()),
             gas_price: network_configs.min_gas_price,
             gas_limit: network_configs.min_gas_limit,
             data: None,

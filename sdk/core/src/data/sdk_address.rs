@@ -18,35 +18,54 @@ use serde::{
 /// It exists primarily because it is currently inconvenient to provide
 /// bech32 and serde functionality to the base Address directly.
 #[derive(Clone)]
-pub struct SdkAddress(pub Address);
+pub struct SdkAddress(pub String, pub Address);
 
 impl SdkAddress {
-    pub fn from_bytes(bytes: [u8; 32]) -> Self {
-        Self(Address::from(bytes))
+    pub fn from_bytes(hrp: Option<String>, bytes: [u8; 32]) -> Self {
+        let hrp_str = hrp.unwrap_or_else(|| "erd".to_string());
+        Self(hrp_str, Address::from(bytes))
     }
 
     pub fn to_bytes(&self) -> [u8; 32] {
-        *self.0.as_array()
+        *self.1.as_array()
     }
 
     pub fn from_bech32_string(bech32: &str) -> Result<Self> {
-        Ok(SdkAddress(crate::bech32::decode(bech32)))
+        let (hrp, address) = crate::bech32::decode(bech32);
+        Ok(SdkAddress(hrp, address))
     }
 
     pub fn to_bech32_string(&self) -> Result<String> {
-        Ok(crate::bech32::encode(&self.0))
+        // println!("sdk address: {}", self.0);
+        Ok(crate::bech32::encode(&self.0, &self.1))
+    }
+
+    pub fn default_with_hrp(hrp: &str) -> Self {
+        SdkAddress(hrp.to_string(), Address::zero())
     }
 }
 
 impl From<multiversx_chain_core::types::Address> for SdkAddress {
     fn from(value: multiversx_chain_core::types::Address) -> Self {
-        SdkAddress(value)
+        SdkAddress("erd".to_string(), value)
+    }
+}
+
+impl From<(String, multiversx_chain_core::types::Address)> for SdkAddress {
+    fn from(value: (String, multiversx_chain_core::types::Address)) -> Self {
+        SdkAddress(value.0, value.1)
+    }
+}
+
+impl From<(&String, multiversx_chain_core::types::Address)> for SdkAddress {
+    fn from(value: (&String, multiversx_chain_core::types::Address)) -> Self {
+        SdkAddress(value.0.to_string(), value.1)
     }
 }
 
 impl From<SdkAddress> for multiversx_chain_core::types::Address {
     fn from(value: SdkAddress) -> Self {
-        value.0
+        value.1
     }
 }
 
@@ -64,7 +83,7 @@ impl Debug for SdkAddress {
 
 impl Default for SdkAddress {
     fn default() -> Self {
-        SdkAddress(Address::zero())
+        SdkAddress(String::new(), Address::zero())
     }
 }
 

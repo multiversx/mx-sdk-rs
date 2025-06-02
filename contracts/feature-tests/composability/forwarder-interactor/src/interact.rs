@@ -223,7 +223,7 @@ impl ContractInteract {
             .returns(ReturnsNewAddress)
             .run()
             .await;
-        let new_address_bech32 = bech32::encode(&new_address);
+        let new_address_bech32 = bech32::encode(self.interactor.get_hrp(), &new_address);
         self.state.set_address(Bech32Address::from_bech32_string(
             new_address_bech32.clone(),
         ));

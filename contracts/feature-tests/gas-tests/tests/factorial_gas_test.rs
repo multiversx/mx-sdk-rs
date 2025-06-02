@@ -60,19 +60,23 @@ fn factorial_user_error_wasmer_experimental() {
 }
 
 #[test]
-#[cfg_attr(not(feature = "wasmer-prod"), ignore)]
+#[cfg(feature = "wasmer-prod")]
 fn factorial_gas_wasmer_prod() {
     let world = ScenarioWorld::new()
-        .executor_config(ExecutorConfig::WasmerProd)
+        .executor_config(ExecutorConfig::Custom(
+            multiversx_chain_vm_wasmer_prod::new_prod_executor,
+        ))
         .gas_schedule(GasScheduleVersion::V8);
     factorial_gas_test(world);
 }
 
 #[test]
-#[cfg_attr(not(feature = "wasmer-prod"), ignore)]
+#[cfg(feature = "wasmer-prod")]
 fn factorial_user_error_wasmer_prod() {
     let world = ScenarioWorld::new()
-        .executor_config(ExecutorConfig::WasmerProd)
+        .executor_config(ExecutorConfig::Custom(
+            multiversx_chain_vm_wasmer_prod::new_prod_executor,
+        ))
         .gas_schedule(GasScheduleVersion::V8);
     factorial_user_error(world);
 }

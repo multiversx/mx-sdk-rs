@@ -1,11 +1,21 @@
+use multiversx_chain_vm::host::runtime::RuntimeWeakRef;
+use multiversx_chain_vm_executor::Executor;
+
+/// Function that creates an executor from a runtime reference.
+///
+/// Created specifically to avoid referencing the Wasmer 2.2 crate from the VM.
+pub type CustomExecutorFn = fn(RuntimeWeakRef) -> Box<dyn Executor + Send + Sync>;
+
 #[derive(Default, Clone, Debug, PartialEq, Eq)]
 pub enum ExecutorConfig {
     /// Uses the debugger infrastructure: testing the smart contract code directly.
     #[default]
     Debugger,
 
-    /// Use the compiled contract in the legacy Wasmer 2.2 executor.
-    WasmerProd,
+    /// Use to add a custom executor builder function in the contract crate (via dependency inversion).
+    ///
+    /// Created specifically to avoid referencing the Wasmer 2.2 crate from the VM.
+    Custom(CustomExecutorFn),
 
     /// Use the compiled contract in the experimental Wasmer 6 executor.
     Experimental,

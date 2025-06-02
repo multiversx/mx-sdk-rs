@@ -7,12 +7,13 @@ use super::{GatewayRequest, GatewayRequestType};
 
 /// Retrieves an account info from the network (nonce, balance).
 pub struct GetAccountRequest<'a> {
+    pub hrp: &'a str,
     pub address: &'a Address,
 }
 
 impl<'a> GetAccountRequest<'a> {
-    pub fn new(address: &'a Address) -> Self {
-        Self { address }
+    pub fn new(hrp: &'a str, address: &'a Address) -> Self {
+        Self { hrp, address }
     }
 }
 
@@ -26,7 +27,10 @@ impl GatewayRequest for GetAccountRequest<'_> {
     }
 
     fn get_endpoint(&self) -> String {
-        format!("{ACCOUNT_ENDPOINT}/{}", crate::bech32::encode(self.address))
+        format!(
+            "{ACCOUNT_ENDPOINT}/{}",
+            crate::bech32::encode(&self.hrp, self.address)
+        )
     }
 
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result> {

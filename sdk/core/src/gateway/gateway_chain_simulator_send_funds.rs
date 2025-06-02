@@ -14,9 +14,9 @@ pub struct ChainSimulatorSendFundsRequest {
 }
 
 impl ChainSimulatorSendFundsRequest {
-    pub fn to_address(receiver: &Address) -> Self {
+    pub fn to_address(hrp: &str, receiver: &Address) -> Self {
         let mut payload = HashMap::new();
-        payload.insert("receiver", crate::bech32::encode(receiver));
+        payload.insert("receiver", crate::bech32::encode(hrp, receiver));
         Self { payload }
     }
 }

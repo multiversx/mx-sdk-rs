@@ -31,7 +31,7 @@ fn test_private_key_from_mnemonic() {
     );
     assert_eq!(
         "erd1mlh7q3fcgrjeq0et65vaaxcw6m5ky8jhu296pdxpk9g32zga6uhsemxx2a",
-        bech32::encode(&address)
+        bech32::encode("erd", &address)
     );
 
     let private_key = Wallet::get_private_key_from_mnemonic(mnemonic, 0, 1);
@@ -47,7 +47,7 @@ fn test_private_key_from_mnemonic() {
     );
     assert_eq!(
         "erd147877pc2tqv88yfvewhmdfuth845uqpsskky8kaalglzp6unem0qpwh982",
-        bech32::encode(&address)
+        bech32::encode("erd", &address)
     );
 }
 
@@ -57,7 +57,7 @@ fn test_load_from_pem() {
     let address = wallet.to_address();
     assert_eq!(
         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-        bech32::encode(&address)
+        bech32::encode("erd", &address)
     );
 }
 #[test]
@@ -83,7 +83,7 @@ fn write_to_file(content: &str, file: &str) {
     file.write_all(content.as_bytes()).unwrap();
 }
 
-fn create_keystore_file_from_scratch(file: &str) -> Address {
+fn create_keystore_file_from_scratch(hrp: &str, file: &str) -> Address {
     let wallet = Wallet::from_private_key(ALICE_PRIVATE_KEY).unwrap();
     let address = wallet.to_address();
 
@@ -91,6 +91,7 @@ fn create_keystore_file_from_scratch(file: &str) -> Address {
     let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
     let json_result = Wallet::encrypt_keystore(
         hex_decoded_keys.as_slice(),
+        hrp,
         &address,
         ALICE_PUBLIC_KEY,
         KEYSTORE_PASSWORD,
@@ -101,7 +102,7 @@ fn create_keystore_file_from_scratch(file: &str) -> Address {
 
 #[test]
 fn test_wallet_convert_pem_to_keystore() {
-    let _ = create_keystore_file_from_scratch(ALICE_KEYSTORE_PATH_TEST_1);
+    let _ = create_keystore_file_from_scratch("erd", ALICE_KEYSTORE_PATH_TEST_1);
     let (private_key_pem, _public_key_pem) = Wallet::get_wallet_keys_pem(ALICE_PEM_PATH);
     assert_eq!(
         Wallet::get_private_key_from_keystore_secret(ALICE_KEYSTORE_PATH_TEST_1, KEYSTORE_PASSWORD)
@@ -114,7 +115,7 @@ fn test_wallet_convert_pem_to_keystore() {
 
 #[test]
 fn test_wallet_convert_keystore_to_pem() {
-    let address = create_keystore_file_from_scratch(ALICE_KEYSTORE_PATH_TEST_2);
+    let address = create_keystore_file_from_scratch("erd", ALICE_KEYSTORE_PATH_TEST_2);
 
     let private_key =
         Wallet::get_private_key_from_keystore_secret(ALICE_KEYSTORE_PATH_TEST_2, KEYSTORE_PASSWORD)
@@ -123,7 +124,8 @@ fn test_wallet_convert_keystore_to_pem() {
     let public_key = PublicKey::from(&private_key);
     let public_key_str = public_key.to_string();
 
-    let pem_content = Wallet::generate_pem_content(&address, &private_key_str, &public_key_str);
+    let pem_content =
+        Wallet::generate_pem_content("erd", &address, &private_key_str, &public_key_str);
     write_to_file(&pem_content, ALICE_PEM_PATH_TEST);
     assert_eq!(
         private_key_str,

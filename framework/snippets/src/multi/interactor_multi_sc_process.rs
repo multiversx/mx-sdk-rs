@@ -16,7 +16,7 @@ where
     pub(crate) async fn recall_senders_nonce(&mut self, senders: HashSet<Address>) {
         for sender_address in &senders {
             let nonce = self.recall_nonce(sender_address).await;
-            let sender = self
+            let sender: &mut Sender = self
                 .sender_map
                 .get_mut(sender_address)
                 .expect("sender not registered");
