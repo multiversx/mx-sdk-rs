@@ -570,3 +570,8 @@ fn send_egld_go() {
 fn send_esdt_go() {
     world().run("scenarios/send_esdt.scen.json");
 }
+
+#[test]
+fn send_esdt_to_nonexisting_account_go() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}

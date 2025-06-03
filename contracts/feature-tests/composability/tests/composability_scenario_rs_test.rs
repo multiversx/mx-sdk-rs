@@ -626,3 +626,9 @@ fn send_egld_rs() {
 fn send_esdt_rs() {
     world().run("scenarios/send_esdt.scen.json");
 }
+
+#[test]
+#[ignore = "not yet supported"]
+fn send_esdt_to_nonexisting_account_rs() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}
