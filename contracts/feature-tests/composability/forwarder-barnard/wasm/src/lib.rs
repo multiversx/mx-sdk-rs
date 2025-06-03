@@ -18,7 +18,7 @@ multiversx_sc_wasm_adapter::endpoints! {
     forwarder_barnard
     (
         init => init
-        call_execute_on_dest_context_fallible => call_execute_on_dest_context_fallible
+        sync_call_fallible => sync_call_fallible
     )
 }
 

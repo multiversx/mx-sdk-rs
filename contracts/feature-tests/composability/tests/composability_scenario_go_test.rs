@@ -115,6 +115,12 @@ fn forw_raw_sync_egld_go() {
 }
 
 #[test]
+#[ignore = "requires Barnard"]
+fn forw_raw_sync_fallible_go() {
+    world().run("scenarios/forw_raw_sync_fallible.scen.json");
+}
+
+#[test]
 fn forw_raw_sync_readonly_go() {
     world().run("scenarios/forw_raw_sync_readonly.scen.json");
 }

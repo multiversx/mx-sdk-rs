@@ -9,7 +9,7 @@ pub trait ForwarderBarnard {
     fn init(&self) {}
 
     #[endpoint]
-    fn call_execute_on_dest_context_fallible(
+    fn sync_call_fallible(
         &self,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
