@@ -265,6 +265,27 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
         });
     }
 
+    fn execute_on_dest_context_error_return_raw(
+        &self,
+        gas: u64,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> i32 {
+        self.with_vm_hooks(|vh| {
+            vh.managed_execute_on_dest_context_with_error_return(
+                gas as i64,
+                to_handle,
+                egld_value_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
+                result_handle,
+            )
+        })
+    }
+
     fn clean_return_data(&self) {
         self.with_vm_hooks(|vh| vh.clean_return_data());
     }
