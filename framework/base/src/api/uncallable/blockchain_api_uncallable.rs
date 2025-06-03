@@ -182,6 +182,14 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn managed_get_code_hash(
+        &self,
+        _address_handle: Self::ManagedBufferHandle,
+        _code_hash_handle: Self::ManagedBufferHandle,
+    ) {
+        unreachable!()
+    }
+
     fn managed_is_builtin_function(
         &self,
         _function_name_handle: Self::ManagedBufferHandle,

@@ -302,4 +302,17 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
             )
         });
     }
+
+    fn managed_get_code_hash(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        code_hash_handle: Self::ManagedBufferHandle,
+    ) {
+        self.with_vm_hooks(|vh| {
+            vh.managed_get_code_hash(
+                address_handle.get_raw_handle_unchecked(),
+                code_hash_handle.get_raw_handle_unchecked(),
+            )
+        });
+    }
 }

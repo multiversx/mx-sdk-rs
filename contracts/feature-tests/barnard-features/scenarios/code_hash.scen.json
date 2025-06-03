@@ -1,0 +1,54 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:barnard"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "1",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/barnard-features.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:barnard",
+                "function": "codeHash",
+                "arguments": [
+                    "sc:barnard"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0xf21cdafedb3b2bff2c9a6c190d7aaccd2bee842c78cfda71389e057449d9f3fb"
+                ]
+            }
+        }
+    ]
+}
