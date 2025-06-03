@@ -10,7 +10,6 @@ pub use tx_env_sc::*;
 pub use tx_exec_async::*;
 pub use tx_exec_async_promises::*;
 pub use tx_exec_deploy::*;
-pub use tx_exec_sync::*;
 use unwrap_infallible::UnwrapInfallible;
 
 use crate::{

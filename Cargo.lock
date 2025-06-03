@@ -1563,6 +1563,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "forwarder-barnard"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "multiversx-sc-wasm-adapter",
+]
+
+[[package]]
+name = "forwarder-barnard-meta"
+version = "0.0.0"
+dependencies = [
+ "forwarder-barnard",
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
 name = "forwarder-interact"
 version = "0.0.0"
 dependencies = [
