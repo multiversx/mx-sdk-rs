@@ -142,6 +142,17 @@ pub trait SendApiImpl: ManagedTypeApiImpl {
         result_handle: RawHandle,
     );
 
+    /// Same shard, in-line execution of another contract, does not fail in case of error.
+    fn execute_on_dest_context_error_return_raw(
+        &self,
+        gas: u64,
+        address_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> i32;
+
     fn clean_return_data(&self);
 
     fn delete_from_return_data(&self, index: usize);

@@ -99,7 +99,7 @@ where
 
         SendRawWrapper::<SA>::new().clean_return_data();
 
-        decode_result(raw_result)
+        decode_result(raw_result.0)
     }
 
     pub(super) fn execute_on_dest_context_readonly<RequestedResult>(self) -> RequestedResult

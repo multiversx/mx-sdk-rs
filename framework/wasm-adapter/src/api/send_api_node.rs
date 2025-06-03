@@ -44,6 +44,15 @@ unsafe extern "C" {
         resultHandle: i32,
     ) -> i32;
 
+    fn managedExecuteOnDestContextWithErrorReturn(
+        gas: i64,
+        addressHandle: i32,
+        valueHandle: i32,
+        functionHandle: i32,
+        argumentsHandle: i32,
+        resultHandle: i32,
+    ) -> i32;
+
     fn managedCreateContract(
         gas: i64,
         valueHandle: i32,
@@ -370,6 +379,27 @@ impl SendApiImpl for VmApiImpl {
                 arg_buffer_handle,
                 result_handle,
             );
+        }
+    }
+
+    fn execute_on_dest_context_error_return_raw(
+        &self,
+        gas: u64,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> i32 {
+        unsafe {
+            managedExecuteOnDestContextWithErrorReturn(
+                gas as i64,
+                to_handle,
+                egld_value_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
+                result_handle,
+            )
         }
     }
 
