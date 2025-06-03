@@ -62,6 +62,12 @@ impl From<(&String, multiversx_chain_core::types::Address)> for SdkAddress {
     }
 }
 
+impl From<(&str, multiversx_chain_core::types::Address)> for SdkAddress {
+    fn from(value: (&str, multiversx_chain_core::types::Address)) -> Self {
+        SdkAddress(value.0.to_string(), value.1)
+    }
+}
+
 impl From<SdkAddress> for multiversx_chain_core::types::Address {
     fn from(value: SdkAddress) -> Self {
         value.1

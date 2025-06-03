@@ -68,6 +68,7 @@ where
     }
 
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
+        let hrp = self.get_hrp();
         let normalized = tx_call.normalize();
         let contract_call_tx_data = normalized.compute_data_field();
         let data = if contract_call_tx_data.is_empty() {
@@ -79,8 +80,8 @@ where
         Transaction {
             nonce: 0,
             value: normalized.egld_value.value.to_string(),
-            sender: normalized.from.to_address().into(),
-            receiver: normalized.to.to_address().into(),
+            sender: (hrp, normalized.from.to_address()).into(),
+            receiver: (hrp, normalized.to.to_address()).into(),
             gas_price: self.network_config.min_gas_price,
             gas_limit: normalized.gas_limit.value,
             data,
