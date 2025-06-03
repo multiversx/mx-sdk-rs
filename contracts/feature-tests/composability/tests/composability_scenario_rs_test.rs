@@ -520,6 +520,11 @@ fn promises_call_transfer_callback_egld_rs() {
 }
 
 #[test]
+fn promises_call_transfer_callback_call_value_egld_rs() {
+    world().run("scenarios/promises_call_transfer_callback_call_value_egld.scen.json");
+}
+
+#[test]
 fn promises_call_transfer_callback_esdt_rs() {
     world().run("scenarios/promises_call_transfer_callback_esdt.scen.json");
 }

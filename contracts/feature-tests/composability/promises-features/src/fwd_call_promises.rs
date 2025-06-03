@@ -85,6 +85,46 @@ pub trait CallPromisesModule: common::CommonModule {
             .register_promise();
     }
 
+    #[endpoint]
+    #[payable("*")]
+    fn forward_payment_gas_for_raw_async_callback(
+        &self,
+        to: ManagedAddress,
+        value: BigUint,
+        original_caller: ManagedAddress,
+    ) {
+        let payment = self.call_value().any_payment();
+        let half_gas = self.blockchain().get_gas_left() / 3;
+
+        self.tx()
+            .to(&to)
+            .gas(half_gas)
+            .payment(payment)
+            .callback(self.callbacks().raw_async_callback(original_caller, value))
+            .gas_for_callback(half_gas)
+            .register_promise();
+    }
+
+    #[promises_callback]
+    fn raw_async_callback(
+        &self,
+        original_caller: ManagedAddress,
+        original_egld_value: BigUint,
+        #[call_result] result: ManagedAsyncCallResult<IgnoreValue>,
+    ) {
+        match result {
+            ManagedAsyncCallResult::Ok(_) => {
+                let egld_amount = self.call_value().egld_direct_non_strict().clone_value();
+                self.send()
+                    .direct_non_zero_egld(&original_caller, &egld_amount);
+            },
+            ManagedAsyncCallResult::Err(_) => {
+                self.send()
+                    .direct_non_zero_egld(&original_caller, &original_egld_value);
+            },
+        }
+    }
+
     #[promises_callback]
     fn transfer_callback(&self, #[call_result] result: MultiValueEncoded<ManagedBuffer>) {
         self.callback_result(result);

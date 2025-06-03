@@ -468,6 +468,11 @@ fn promises_call_transfer_callback_egld_go() {
 }
 
 #[test]
+fn promises_call_transfer_callback_call_value_egld_go() {
+    world().run("scenarios/promises_call_transfer_callback_call_value_egld.scen.json");
+}
+
+#[test]
 fn promises_call_transfer_callback_esdt_go() {
     world().run("scenarios/promises_call_transfer_callback_esdt.scen.json");
 }
