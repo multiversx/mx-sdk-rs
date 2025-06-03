@@ -11,9 +11,9 @@ use crate::{
 };
 
 /// Defines a type that can be used as raw input for `ReturnsHandledOrError`.
-/// 
+///
 /// Allows the raw input type to define the output types.
-/// 
+///
 /// Currently implemented for:
 /// - SyncCallRawResultOrError - in contracts;
 /// - TxResponse - in tests and interactors.
@@ -22,11 +22,10 @@ pub trait ReturnsHandledOrErrorRawResult {
     type ErrorResult;
 }
 
-
 /// Indicates that a `Result` will be returned, either:
 /// - with the handled result, according to the nested result handlers,
 /// - or with an error in case of a failed transaction.
-/// 
+///
 /// Can be used:
 /// - in contracts, via `sync_call_fallible`;
 /// - in any tests or interactors.
@@ -101,7 +100,8 @@ where
     NHList: RHListExec<RawResult::SuccessResult, Env>,
     NHList::ListReturns: NestedTupleFlatten,
 {
-    type Returns = Result<<NHList::ListReturns as NestedTupleFlatten>::Unpacked, RawResult::ErrorResult>;
+    type Returns =
+        Result<<NHList::ListReturns as NestedTupleFlatten>::Unpacked, RawResult::ErrorResult>;
 }
 
 impl<Api> ReturnsHandledOrErrorRawResult for SyncCallRawResultOrError<Api>
