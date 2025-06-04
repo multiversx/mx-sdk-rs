@@ -1,0 +1,67 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "100"
+                },
+                "address:b_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "egldValue": "75",
+                "function": "forward_payment_gas_for_raw_async_callback",
+                "arguments": [
+                    "sc:vault",
+                    "address:b_user",
+                    "11"
+                ],
+                "gasLimit": "60,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "promiseCheck",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "11"
+                ],
+                "status": "",
+                "logs": []
+            }
+        }
+    ]
+}

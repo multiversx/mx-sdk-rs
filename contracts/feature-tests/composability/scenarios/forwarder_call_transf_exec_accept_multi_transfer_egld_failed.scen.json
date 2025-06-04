@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -9,9 +10,9 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "4000",
+                    "balance": "1000",
                     "esdt": {
-                        "str:FWD-TOKEN": "1000",
+                        "str:FWD-TOKEN": "100",
                         "str:NFT-123456": {
                             "instances": [
                                 {
@@ -40,34 +41,28 @@
         },
         {
             "step": "scCall",
-            "id": "2",
-            "comment": "send all types",
+            "id": "1",
+            "comment": "failed sending EGLD+ESDT",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "send_async_accept_multi_transfer",
+                "function": "transf_exec_multi_accept_funds",
                 "arguments": [
                     "sc:vault",
                     "str:FWD-TOKEN",
                     "0",
-                    "800",
-                    "str:NFT-123456",
-                    "1",
-                    "1",
-                    "str:EGLD-000000",
+                    "10",
+                    "str:EGLD",
                     "0",
-                    "100",
-                    "str:SFT-456789",
-                    "3",
-                    "6"
+                    "1001"
                 ],
-                "gasLimit": "80,000,000",
+                "gasLimit": "1,400,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
-                "status": "0",
-                "message": "",
+                "status": "10",
+                "message": "str:insufficient funds for token EGLD-000000",
                 "gas": "*",
                 "refund": "*"
             }
@@ -83,102 +78,14 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "100",
-                    "esdt": {
-                        "str:FWD-TOKEN": "800",
-                        "str:NFT-123456": {
-                            "instances": [
-                                {
-                                    "nonce": "1",
-                                    "balance": "1"
-                                }
-                            ]
-                        },
-                        "str:SFT-456789": {
-                            "instances": [
-                                {
-                                    "nonce": "3",
-                                    "balance": "6"
-                                }
-                            ]
-                        }
-                    },
-                    "storage": {
-                        "str:call_counts|nested:str:accept_funds": "1"
-                    },
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "3900",
-                    "esdt": {
-                        "str:FWD-TOKEN": "200",
-                        "str:SFT-456789": {
-                            "instances": [
-                                {
-                                    "nonce": "3",
-                                    "balance": "4"
-                                }
-                            ]
-                        }
-                    },
-                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
-                }
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "2",
-            "comment": "send all types",
-            "tx": {
-                "from": "address:a_user",
-                "to": "sc:forwarder",
-                "function": "send_async_accept_multi_transfer",
-                "arguments": [
-                    "sc:vault",
-                    "str:FWD-TOKEN",
-                    "0",
-                    "800",
-                    "str:NFT-123456",
-                    "1",
-                    "1",
-                    "str:EGLD-000000",
-                    "0",
-                    "4100",
-                    "str:SFT-456789",
-                    "3",
-                    "6"
-                ],
-                "gasLimit": "80,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "0",
-                "message": "",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "checkState",
-            "accounts": {
-                "address:a_user": {
-                    "nonce": "*",
                     "balance": "0",
-                    "storage": {},
-                    "code": ""
-                },
-                "sc:vault": {
-                    "nonce": "0",
-                    "balance": "100",
                     "esdt": {
-                        "str:FWD-TOKEN": "800",
+                        "str:FWD-TOKEN": "0",
                         "str:NFT-123456": {
                             "instances": [
                                 {
                                     "nonce": "1",
-                                    "balance": "1"
+                                    "balance": "0"
                                 }
                             ]
                         },
@@ -186,29 +93,40 @@
                             "instances": [
                                 {
                                     "nonce": "3",
-                                    "balance": "6"
+                                    "balance": "0"
                                 }
                             ]
                         }
                     },
                     "storage": {
-                        "str:call_counts|nested:str:accept_funds": "1"
+                        "str:call_counts|nested:str:accept_funds": "0"
                     },
                     "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "3900",
+                    "balance": "1000",
                     "esdt": {
-                        "str:FWD-TOKEN": "200",
+                        "str:FWD-TOKEN": "100",
                         "str:SFT-456789": {
                             "instances": [
                                 {
                                     "nonce": "3",
-                                    "balance": "4"
+                                    "balance": "10"
+                                }
+                            ]
+                        },
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1"
                                 }
                             ]
                         }
+                    },
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "0"
                     },
                     "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }

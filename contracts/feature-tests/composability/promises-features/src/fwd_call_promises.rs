@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 use crate::{
     common::{self, CallbackData},
@@ -85,6 +85,39 @@ pub trait CallPromisesModule: common::CommonModule {
             .register_promise();
     }
 
+    #[endpoint]
+    #[payable("*")]
+    fn forward_payment_gas_for_raw_async_callback(
+        &self,
+        to: ManagedAddress,
+        original_caller: ManagedAddress,
+        value: BigUint,
+    ) {
+        self.promise_check().set(value);
+        let payment = self.call_value().any_payment();
+        let half_gas = self.blockchain().get_gas_left() / 3;
+
+        self.tx()
+            .to(&to)
+            .gas(half_gas)
+            .payment(payment)
+            .callback(self.callbacks().raw_async_callback(original_caller))
+            .gas_for_callback(half_gas)
+            .register_promise();
+    }
+
+    #[promises_callback]
+    fn raw_async_callback(
+        &self,
+        original_caller: ManagedAddress,
+        #[call_result] _result: ManagedAsyncCallResult<IgnoreValue>,
+    ) {
+        let egld_amount = self.call_value().egld_direct_non_strict().clone_value();
+        self.error_check().set(BigUint::from(33u64));
+        self.send()
+            .direct_non_zero_egld(&original_caller, &egld_amount);
+    }
+
     #[promises_callback]
     fn transfer_callback(&self, #[call_result] result: MultiValueEncoded<ManagedBuffer>) {
         self.callback_result(result);
@@ -116,4 +149,12 @@ pub trait CallPromisesModule: common::CommonModule {
             },
         }
     }
+
+    #[view(errorCheck)]
+    #[storage_mapper("errorCheck")]
+    fn error_check(&self) -> SingleValueMapper<BigUint>;
+
+    #[view(promiseCheck)]
+    #[storage_mapper("promiseCheck")]
+    fn promise_check(&self) -> SingleValueMapper<BigUint>;
 }
