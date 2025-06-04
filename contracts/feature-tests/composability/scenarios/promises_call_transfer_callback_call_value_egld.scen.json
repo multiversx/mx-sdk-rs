@@ -18,7 +18,7 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "50",
+                    "balance": "100",
                     "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
                 }
             }
@@ -33,8 +33,8 @@
                 "function": "forward_payment_gas_for_raw_async_callback",
                 "arguments": [
                     "sc:vault",
-                    "10",
-                    "address:b_user"
+                    "address:b_user",
+                    "11"
                 ],
                 "gasLimit": "60,000,000",
                 "gasPrice": "0"
@@ -48,30 +48,19 @@
             }
         },
         {
-            "step": "checkState",
-            "accounts": {
-                "address:a_user": {
-                    "nonce": "*",
-                    "balance": "25",
-                    "storage": {},
-                    "code": ""
-                },
-                "address:b_user": {
-                    "nonce": "*",
-                    "balance": "75",
-                    "storage": {},
-                    "code": ""
-                },
-                "sc:vault": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "50",
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
-                }
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "promiseCheck",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "11"
+                ],
+                "status": "",
+                "logs": []
             }
         }
     ]
