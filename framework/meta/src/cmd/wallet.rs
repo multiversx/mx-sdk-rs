@@ -131,7 +131,8 @@ fn bech32_conversion(bech32_args: &WalletBech32Args) {
             println!("{}", bech32_addr);
         },
         (None, Some(bech32)) => {
-            let hex_addr = Bech32Address::from_bech32_string(bech32.to_string()).to_hex();
+            let bech32_address = Bech32Address::from_bech32_string(bech32.to_string());
+            let hex_addr = hex::encode(&bech32_address.address);
             println!("{}", hex_addr);
         },
         (Some(_), Some(_)) => {

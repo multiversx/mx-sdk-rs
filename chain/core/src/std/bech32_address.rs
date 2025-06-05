@@ -1,15 +1,7 @@
 use std::fmt::Display;
 
-use crate::bech32;
-use multiversx_sc::{
-    abi::TypeAbiFrom,
-    api::ManagedTypeApi,
-    codec::*,
-    types::{
-        Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified,
-        TxTo, TxToSpecified,
-    },
-};
+use crate::{codec::*, types::Address};
+use bech32::{Bech32, Hrp};
 use serde::{Deserialize, Serialize};
 
 const BECH32_PREFIX: &str = "bech32:";
@@ -19,14 +11,31 @@ const BECH32_PREFIX: &str = "bech32:";
 /// In order to avoid repeated conversions, it redundantly keeps the bech32 representation inside.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bech32Address {
-    hrp: String,
-    address: Address,
-    bech32: String,
+    pub address: Address,
+    pub hrp: String,
+    pub bech32: String,
 }
+
+fn decode(bech32_address: &str) -> (String, Address) {
+    let (hrp, dest_address_bytes) = bech32::decode(bech32_address)
+        .unwrap_or_else(|err| panic!("bech32 decode error for {bech32_address}: {err}"));
+    if dest_address_bytes.len() != 32 {
+        panic!("Invalid address length after decoding")
+    }
+
+    (hrp.to_string(), Address::from_slice(&dest_address_bytes))
+}
+
+fn encode(hrp: &str, address: &Address) -> String {
+    let hrp = Hrp::parse(hrp).expect("invalid hrp");
+    bech32::encode::<Bech32>(hrp, address.as_bytes()).expect("bech32 encode error")
+}
+
+impl Bech32Address {}
 
 impl From<Address> for Bech32Address {
     fn from(value: Address) -> Self {
-        let bech32 = bech32::encode("erd", &value);
+        let bech32 = encode("erd", &value);
         Bech32Address {
             hrp: "erd".to_string(),
             address: value,
@@ -37,7 +46,7 @@ impl From<Address> for Bech32Address {
 
 impl From<(&str, Address)> for Bech32Address {
     fn from(value: (&str, Address)) -> Self {
-        let bech32 = bech32::encode(value.0, &value.1);
+        let bech32 = encode(value.0, &value.1);
         Bech32Address {
             hrp: value.0.to_string(),
             address: value.1,
@@ -48,7 +57,7 @@ impl From<(&str, Address)> for Bech32Address {
 
 impl From<(&str, &Address)> for Bech32Address {
     fn from(value: (&str, &Address)) -> Self {
-        let bech32 = bech32::encode(value.0, value.1);
+        let bech32 = encode(value.0, value.1);
         Bech32Address {
             hrp: value.0.to_string(),
             address: value.1.clone(),
@@ -59,7 +68,7 @@ impl From<(&str, &Address)> for Bech32Address {
 
 impl From<&Address> for Bech32Address {
     fn from(value: &Address) -> Self {
-        let bech32 = bech32::encode("erd", value);
+        let bech32 = encode("erd", value);
         Bech32Address {
             hrp: "erd".to_string(),
             address: value.clone(),
@@ -70,7 +79,7 @@ impl From<&Address> for Bech32Address {
 
 impl Bech32Address {
     pub fn from_bech32_string(bech32: String) -> Self {
-        let (hrp, address) = bech32::decode(&bech32);
+        let (hrp, address) = decode(&bech32);
         Bech32Address {
             hrp,
             address,
@@ -84,10 +93,6 @@ impl Bech32Address {
 
     pub fn to_bech32_string(&self) -> String {
         self.bech32.to_owned()
-    }
-
-    pub fn to_hex(&self) -> String {
-        hex::encode(&self.address)
     }
 
     pub fn as_address(&self) -> &Address {
@@ -112,62 +117,6 @@ impl Bech32Address {
 
     pub fn to_bech32_expr(&self) -> String {
         format!("{BECH32_PREFIX}{}", &self.bech32)
-    }
-}
-
-impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for Bech32Address
-where
-    Env: TxEnv,
-{
-    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
-        self.to_bech32_expr().into()
-    }
-
-    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
-        self.address.to_value(env)
-    }
-}
-
-impl<Env> TxFrom<Env> for Bech32Address
-where
-    Env: TxEnv,
-{
-    fn resolve_address(&self, env: &Env) -> ManagedAddress<Env::Api> {
-        self.address.resolve_address(env)
-    }
-}
-impl<Env> TxFromSpecified<Env> for Bech32Address where Env: TxEnv {}
-impl<Env> TxTo<Env> for Bech32Address where Env: TxEnv {}
-impl<Env> TxToSpecified<Env> for Bech32Address where Env: TxEnv {}
-
-impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for &Bech32Address
-where
-    Env: TxEnv,
-{
-    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
-        self.to_bech32_expr().into()
-    }
-
-    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
-        self.address.to_value(env)
-    }
-}
-
-impl<Env> TxFrom<Env> for &Bech32Address
-where
-    Env: TxEnv,
-{
-    fn resolve_address(&self, env: &Env) -> ManagedAddress<Env::Api> {
-        self.address.resolve_address(env)
-    }
-}
-impl<Env> TxFromSpecified<Env> for &Bech32Address where Env: TxEnv {}
-impl<Env> TxTo<Env> for &Bech32Address where Env: TxEnv {}
-impl<Env> TxToSpecified<Env> for &Bech32Address where Env: TxEnv {}
-
-impl Display for Bech32Address {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.bech32)
     }
 }
 
@@ -215,9 +164,6 @@ impl TopDecode for Bech32Address {
     }
 }
 
-impl<M> TypeAbiFrom<Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
-impl<M> TypeAbiFrom<&Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
-
 impl Serialize for Bech32Address {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -238,5 +184,11 @@ impl<'de> Deserialize<'de> for Bech32Address {
             bech32 = stripped.to_string();
         }
         Ok(Bech32Address::from_bech32_string(bech32))
+    }
+}
+
+impl Display for Bech32Address {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.bech32)
     }
 }

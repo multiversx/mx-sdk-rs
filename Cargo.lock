@@ -2974,8 +2974,10 @@ dependencies = [
 name = "multiversx-chain-core"
 version = "0.15.0"
 dependencies = [
+ "bech32",
  "bitflags 2.9.1",
  "multiversx-sc-codec",
+ "serde",
 ]
 
 [[package]]

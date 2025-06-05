@@ -2,6 +2,7 @@ pub use crate::{
     abi::TypeAbi,
     api::{ErrorApiImpl, ManagedTypeApi, VMApi},
     arrayvec::ArrayVec,
+    chain_core::std::Bech32Address,
     codec::{
         multi_types::*, DecodeError, Empty, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
         TopEncode,

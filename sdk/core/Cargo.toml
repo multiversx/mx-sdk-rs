@@ -40,4 +40,5 @@ uuid = {version = "1.10.0", features = ["v4"]}
 
 [dependencies.multiversx-chain-core]
 version = "=0.15.0"
+features = ["std"]
 path = "../../chain/core"

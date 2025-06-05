@@ -41,7 +41,7 @@ wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
 
 [dependencies.multiversx-sc]
 version = "=0.58.0"
-features = ["alloc", "num-bigint"]
+features = ["alloc", "num-bigint", "std"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta-lib]
