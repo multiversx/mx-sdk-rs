@@ -2,7 +2,6 @@ pub use crate::{
     abi::TypeAbi,
     api::{ErrorApiImpl, ManagedTypeApi, VMApi},
     arrayvec::ArrayVec,
-    chain_core::std::Bech32Address,
     codec::{
         multi_types::*, DecodeError, Empty, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
         TopEncode,
@@ -19,6 +18,9 @@ pub use crate::{
     },
     types::{system_proxy::*, *},
 };
+
+#[cfg(feature = "std")]
+pub use multiversx_chain_core::std::Bech32Address;
 
 pub use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
