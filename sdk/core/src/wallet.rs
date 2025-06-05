@@ -203,7 +203,7 @@ impl Wallet {
         since = "0.54.0",
         note = "Renamed to `to_address`, type changed to multiversx_chain_core::types::Address"
     )]
-    pub fn address(&self) -> crate::data::sdk_address::SdkAddress {
+    pub fn address(&self) -> Bech32Address {
         self.to_address().to_bech32_default()
     }
 
