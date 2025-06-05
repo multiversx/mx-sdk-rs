@@ -1,5 +1,5 @@
 use anyhow::Error;
-use multiversx_sc_scenario::imports::Address;
+use multiversx_sc_scenario::imports::Bech32Address;
 use multiversx_sdk::gateway::{
     ChainSimulatorGenerateBlocksRequest, ChainSimulatorSendFundsRequest,
     ChainSimulatorSetStateOverwriteRequest, ChainSimulatorSetStateRequest, GatewayAsyncService,
@@ -12,13 +12,13 @@ impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
-    pub async fn send_user_funds(&self, hrp: &str, receiver: &Address) -> Result<String, Error> {
+    pub async fn send_user_funds(&self, receiver: &Bech32Address) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));
         }
 
         self.proxy
-            .request(ChainSimulatorSendFundsRequest::to_address(hrp, receiver))
+            .request(ChainSimulatorSendFundsRequest::to_address(receiver))
             .await
     }
 

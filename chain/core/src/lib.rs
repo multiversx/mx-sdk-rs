@@ -1,10 +1,13 @@
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 extern crate alloc;
 
 pub mod builtin_func_names;
 pub mod token_identifier_util;
 pub mod types;
+
+#[cfg(feature = "std")]
+pub mod std;
 
 /// Re-exported for convenience.
 pub use multiversx_sc_codec as codec;

@@ -40,7 +40,7 @@ pub struct SetStateAccount {
 impl From<Account> for SetStateAccount {
     fn from(value: Account) -> Self {
         Self {
-            address: value.address.to_bech32_string().unwrap_or_default(),
+            address: value.address.bech32,
             nonce: value.nonce,
             balance: value.balance.to_string(),
             pairs: HashMap::new(),

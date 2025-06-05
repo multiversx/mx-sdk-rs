@@ -1,12 +1,9 @@
 use crate::{
-    data::{
-        sdk_address::SdkAddress,
-        transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
-    },
+    data::transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
     gateway::{GetTxInfo, GetTxProcessStatus},
 };
 use log::info;
-use multiversx_chain_core::types::ReturnCode;
+use multiversx_chain_core::{std::Bech32Address, types::ReturnCode};
 
 use crate::gateway::GatewayAsyncService;
 
@@ -145,9 +142,9 @@ fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
     let mut failed_transaction_info = TransactionOnNetwork::default();
 
     let log: ApiLogs = ApiLogs {
-        address: SdkAddress::default(),
+        address: Bech32Address::zero_default_hrp(),
         events: vec![Events {
-            address: SdkAddress::default(),
+            address: Bech32Address::zero_default_hrp(),
             identifier: LOG_IDENTIFIER_SIGNAL_ERROR.to_string(),
             topics: Some(vec![error_message.to_string()]),
             data: LogData::default(),

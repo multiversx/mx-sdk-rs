@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::anyhow;
-use multiversx_chain_core::types::Address;
+use multiversx_chain_core::std::Bech32Address;
 
 use super::{
     gateway_chain_simulator_blocks::GenerateBlocksResponse, GatewayRequest, GatewayRequestType,
@@ -14,9 +14,9 @@ pub struct ChainSimulatorSendFundsRequest {
 }
 
 impl ChainSimulatorSendFundsRequest {
-    pub fn to_address(hrp: &str, receiver: &Address) -> Self {
+    pub fn to_address(receiver: &Bech32Address) -> Self {
         let mut payload = HashMap::new();
-        payload.insert("receiver", crate::bech32::encode(hrp, receiver));
+        payload.insert("receiver", receiver.bech32.clone());
         Self { payload }
     }
 }

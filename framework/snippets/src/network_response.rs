@@ -72,7 +72,7 @@ fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
             .events
             .iter()
             .map(|event| Log {
-                address: Address::from_slice(&event.address.to_bytes()),
+                address: event.address.address.clone(),
                 endpoint: event.identifier.clone(),
                 topics: extract_topics(event),
                 data: extract_data(event),
@@ -129,10 +129,10 @@ fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
         return None;
     }
 
-    let sender_address_bytes = tx.sender.to_bytes();
+    let sender_address_bytes = tx.sender.address.as_bytes();
     let sender_nonce_bytes = tx.nonce.to_le_bytes();
     let mut bytes_to_hash: Vec<u8> = Vec::new();
-    bytes_to_hash.extend_from_slice(&sender_address_bytes);
+    bytes_to_hash.extend_from_slice(sender_address_bytes);
     bytes_to_hash.extend_from_slice(&sender_nonce_bytes);
 
     let address_keccak = keccak256(&bytes_to_hash);
@@ -151,7 +151,7 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
     let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
 
     for scr in tx.smart_contract_results.iter() {
-        if scr.sender.1 != ESDTSystemSCAddress.to_address() {
+        if scr.sender.address != ESDTSystemSCAddress.to_address() {
             continue;
         }
 

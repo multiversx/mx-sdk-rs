@@ -78,6 +78,20 @@ impl<'a> PartialEq<TestSCAddress<'a>> for Address {
     }
 }
 
+#[cfg(feature = "std")]
+impl PartialEq<multiversx_chain_core::std::Bech32Address> for TestSCAddress<'_> {
+    fn eq(&self, other: &multiversx_chain_core::std::Bech32Address) -> bool {
+        self.to_address() == other.address
+    }
+}
+
+#[cfg(feature = "std")]
+impl<'a> PartialEq<TestSCAddress<'a>> for multiversx_chain_core::std::Bech32Address {
+    fn eq(&self, other: &TestSCAddress<'a>) -> bool {
+        self.address == other.to_address()
+    }
+}
+
 impl<Api: ManagedTypeApi> PartialEq<ManagedAddress<Api>> for TestSCAddress<'_> {
     fn eq(&self, other: &ManagedAddress<Api>) -> bool {
         self.to_address() == other.to_address()
