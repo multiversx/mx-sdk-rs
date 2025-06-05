@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 const BECH32_PREFIX: &str = "bech32:";
 
-const DEFAULT_HRP: &str = "erd1";
+const DEFAULT_HRP: &str = "erd";
 
 /// Wraps and address, and presents it as a bech32 expression wherever possible.
 ///
