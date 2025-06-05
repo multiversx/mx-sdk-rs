@@ -28,8 +28,8 @@ where
         Transaction {
             nonce: 0,
             value: sc_deploy_step.tx.egld_value.value.to_string(),
-            sender: (&hrp, sc_deploy_step.tx.from.to_address()).into(),
-            receiver: SdkAddress::default_with_hrp(&hrp),
+            sender: sc_deploy_step.tx.from.to_address().to_bech32(&hrp),
+            receiver: SdkAddress::zero(&hrp),
             gas_price: self.network_config.min_gas_price,
             gas_limit: sc_deploy_step.tx.gas_limit.value,
             data: Some(base64_encode(sc_deploy_step.tx.to_tx_data())),

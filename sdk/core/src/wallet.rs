@@ -204,7 +204,7 @@ impl Wallet {
         note = "Renamed to `to_address`, type changed to multiversx_chain_core::types::Address"
     )]
     pub fn address(&self) -> crate::data::sdk_address::SdkAddress {
-        crate::data::sdk_address::SdkAddress("erd".to_owned(), self.to_address())
+        self.to_address().to_bech32_default()
     }
 
     pub fn to_address(&self) -> Address {

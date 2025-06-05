@@ -10,13 +10,11 @@ async fn main() {
         nonce: 1,
         value: "50".to_string(),
         receiver: SdkAddress::from_bech32_string(
-            "erd1rh5ws22jxm9pe7dtvhfy6j3uttuupkepferdwtmslms5fydtrh5sx3xr8r",
-        )
-        .unwrap(),
+            "erd1rh5ws22jxm9pe7dtvhfy6j3uttuupkepferdwtmslms5fydtrh5sx3xr8r".to_owned(),
+        ),
         sender: SdkAddress::from_bech32_string(
-            "erd1rh5ws22jxm9pe7dtvhfy6j3uttuupkepferdwtmslms5fydtrh5sx3xr8r",
-        )
-        .unwrap(),
+            "erd1rh5ws22jxm9pe7dtvhfy6j3uttuupkepferdwtmslms5fydtrh5sx3xr8r".to_owned(),
+        ),
         data: Some(base64_encode("hello")),
         chain_id: "1".to_string(),
         version: 1,

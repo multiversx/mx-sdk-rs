@@ -11,6 +11,10 @@ const DEFAULT_HRP: &str = "erd";
 /// Wraps and address, and presents it as a bech32 expression wherever possible.
 ///
 /// In order to avoid repeated conversions, it redundantly keeps the bech32 representation inside.
+///
+/// Provides:
+///- serde serialization/deserialization as bech32
+/// - conversions to/from bech32
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bech32Address {
     pub address: Address,
@@ -47,6 +51,20 @@ impl Bech32Address {
 
     pub fn encode_address_default_hrp(address: Address) -> Self {
         Self::encode_address(DEFAULT_HRP, address)
+    }
+
+    pub fn zero(hrp: &str) -> Self {
+        Bech32Address::encode_address(hrp, Address::zero())
+    }
+
+    pub fn zero_default_hrp() -> Self {
+        Bech32Address::encode_address_default_hrp(Address::zero())
+    }
+}
+
+impl Default for Bech32Address {
+    fn default() -> Self {
+        Self::zero_default_hrp()
     }
 }
 

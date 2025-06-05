@@ -3,7 +3,6 @@ use multiversx_sdk::{
     chain_core::types::Address,
     data::{
         network_config::NetworkConfig,
-        sdk_address::SdkAddress,
         transaction::{
             ArgCreateTransaction, Transaction, TransactionOnNetwork, TxCostResponseData,
         },
@@ -56,11 +55,13 @@ impl GatewayHttpProxy {
             .get_account(&network_configs.address_hrp, address)
             .await?;
 
+        let address_bech32 = address.to_bech32(&network_configs.address_hrp);
+
         Ok(ArgCreateTransaction {
             nonce: account.nonce,
             value: "".to_string(),
-            rcv_addr: SdkAddress(network_configs.address_hrp.clone(), address.clone()),
-            snd_addr: SdkAddress(network_configs.address_hrp.clone(), address.clone()),
+            rcv_addr: address_bech32.clone(),
+            snd_addr: address_bech32,
             gas_price: network_configs.min_gas_price,
             gas_limit: network_configs.min_gas_limit,
             data: None,

@@ -6,15 +6,14 @@ async fn main() {
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
     let network_config = blockchain.get_network_config().await.unwrap();
     let addr = SdkAddress::from_bech32_string(
-        "erd1qqqqqqqqqqqqqpgqfzydqmdw7m2vazsp6u5p95yxz76t2p9rd8ss0zp9ts",
-    )
-    .unwrap();
+        "erd1qqqqqqqqqqqqqpgqfzydqmdw7m2vazsp6u5p95yxz76t2p9rd8ss0zp9ts".to_owned(),
+    );
 
     let arg = blockchain
-        .get_default_transaction_arguments(&addr.1, &network_config)
+        .get_default_transaction_arguments(&addr.address, &network_config)
         .await
         .unwrap();
 
-    assert!(arg.rcv_addr.to_bech32_string().is_ok());
+    let _ = arg.rcv_addr.to_bech32_string();
     println!("default tx arg: {arg:#?}");
 }
