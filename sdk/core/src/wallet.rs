@@ -11,7 +11,7 @@ use anyhow::Result;
 use bip39::{Language, Mnemonic};
 use ctr::{cipher::StreamCipher, Ctr128BE};
 use hmac::{Hmac, Mac};
-use multiversx_chain_core::types::Address;
+use multiversx_chain_core::{std::Bech32Address, types::Address};
 use pbkdf2::pbkdf2;
 use rand::RngCore;
 use scrypt::{scrypt, Params};
@@ -351,7 +351,7 @@ impl Wallet {
             version: KEYSTORE_VERSION,
             kind: "secretKey".to_string(),
             address: public_key.to_string(),
-            bech32: crate::bech32::encode(hrp, address),
+            bech32: address.to_bech32(hrp).bech32,
         };
 
         let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
@@ -376,7 +376,7 @@ impl Wallet {
             .collect::<Vec<&str>>()
             .join("\n");
 
-        let address_bech32 = crate::bech32::encode(hrp, address);
+        let address_bech32 = Bech32Address::encode_address(hrp, address.clone());
         let pem_content = format!(
             "-----BEGIN PRIVATE KEY for {address_bech32}-----\n{formatted_key}\n-----END PRIVATE KEY for {address_bech32}-----\n"
         );

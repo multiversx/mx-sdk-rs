@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 
 const BECH32_PREFIX: &str = "bech32:";
 
+const DEFAULT_HRP: &str = "erd1";
+
 /// Wraps and address, and presents it as a bech32 expression wherever possible.
 ///
 /// In order to avoid repeated conversions, it redundantly keeps the bech32 representation inside.
@@ -16,77 +18,63 @@ pub struct Bech32Address {
     pub bech32: String,
 }
 
-fn decode(bech32_address: &str) -> (String, Address) {
-    let (hrp, dest_address_bytes) = bech32::decode(bech32_address)
-        .unwrap_or_else(|err| panic!("bech32 decode error for {bech32_address}: {err}"));
-    if dest_address_bytes.len() != 32 {
-        panic!("Invalid address length after decoding")
+impl Bech32Address {
+    pub fn from_bech32_string(bech32_string: String) -> Self {
+        let (hrp, dest_address_bytes) = bech32::decode(&bech32_string)
+            .unwrap_or_else(|err| panic!("bech32 decode error for {bech32_string}: {err}"));
+        if dest_address_bytes.len() != 32 {
+            panic!("Invalid address length after decoding")
+        }
+
+        Bech32Address {
+            address: Address::from_slice(&dest_address_bytes),
+            hrp: hrp.to_string(),
+            bech32: bech32_string,
+        }
     }
 
-    (hrp.to_string(), Address::from_slice(&dest_address_bytes))
-}
+    pub fn encode_address(hrp: &str, address: Address) -> Self {
+        let hrp_obj = Hrp::parse(hrp).expect("invalid hrp");
+        let bech32_string =
+            bech32::encode::<Bech32>(hrp_obj, address.as_bytes()).expect("bech32 encode error");
 
-fn encode(hrp: &str, address: &Address) -> String {
-    let hrp = Hrp::parse(hrp).expect("invalid hrp");
-    bech32::encode::<Bech32>(hrp, address.as_bytes()).expect("bech32 encode error")
-}
+        Bech32Address {
+            address,
+            hrp: hrp.to_owned(),
+            bech32: bech32_string,
+        }
+    }
 
-impl Bech32Address {}
+    pub fn encode_address_default_hrp(address: Address) -> Self {
+        Self::encode_address(DEFAULT_HRP, address)
+    }
+}
 
 impl From<Address> for Bech32Address {
     fn from(value: Address) -> Self {
-        let bech32 = encode("erd", &value);
-        Bech32Address {
-            hrp: "erd".to_string(),
-            address: value,
-            bech32,
-        }
-    }
-}
-
-impl From<(&str, Address)> for Bech32Address {
-    fn from(value: (&str, Address)) -> Self {
-        let bech32 = encode(value.0, &value.1);
-        Bech32Address {
-            hrp: value.0.to_string(),
-            address: value.1,
-            bech32,
-        }
-    }
-}
-
-impl From<(&str, &Address)> for Bech32Address {
-    fn from(value: (&str, &Address)) -> Self {
-        let bech32 = encode(value.0, value.1);
-        Bech32Address {
-            hrp: value.0.to_string(),
-            address: value.1.clone(),
-            bech32,
-        }
+        Self::encode_address_default_hrp(value)
     }
 }
 
 impl From<&Address> for Bech32Address {
     fn from(value: &Address) -> Self {
-        let bech32 = encode("erd", value);
-        Bech32Address {
-            hrp: "erd".to_string(),
-            address: value.clone(),
-            bech32,
-        }
+        Self::encode_address_default_hrp(value.clone())
+    }
+}
+
+impl From<(&str, Address)> for Bech32Address {
+    fn from(value: (&str, Address)) -> Self {
+        Self::encode_address(value.0, value.1)
+    }
+}
+
+impl From<(&str, &Address)> for Bech32Address {
+    fn from(value: (&str, &Address)) -> Self {
+        Self::encode_address(value.0, value.1.clone())
     }
 }
 
 impl Bech32Address {
-    pub fn from_bech32_string(bech32: String) -> Self {
-        let (hrp, address) = decode(&bech32);
-        Bech32Address {
-            hrp,
-            address,
-            bech32,
-        }
-    }
-
     pub fn to_bech32_str(&self) -> &str {
         &self.bech32
     }
@@ -190,5 +178,17 @@ impl<'de> Deserialize<'de> for Bech32Address {
 impl Display for Bech32Address {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&self.bech32)
+    }
+}
+
+impl PartialEq<&str> for Bech32Address {
+    fn eq(&self, other: &&str) -> bool {
+        &self.bech32 == other
+    }
+}
+
+impl PartialEq<Address> for Bech32Address {
+    fn eq(&self, other: &Address) -> bool {
+        &self.address == other
     }
 }

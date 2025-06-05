@@ -2,7 +2,6 @@ use core::str;
 
 use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
 use multiversx_sc::types::{self, Address};
-use multiversx_sc_snippets::sdk::bech32;
 use multiversx_sc_snippets::sdk::{crypto::public_key::PublicKey, wallet::Wallet};
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
 use std::{
@@ -157,7 +156,7 @@ fn new(new_args: &WalletNewArgs) {
     let (private_key_str, public_key_str) = Wallet::get_wallet_keys_mnemonic(mnemonic.to_string());
     let address = get_wallet_address(private_key_str.as_str());
 
-    println!("Wallet address: {}", bech32::encode(&hrp, &address));
+    println!("Wallet address: {}", address.to_bech32(&hrp));
 
     match format {
         Some("pem") => {
