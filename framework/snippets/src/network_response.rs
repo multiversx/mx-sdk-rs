@@ -132,7 +132,7 @@ fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
     let sender_address_bytes = tx.sender.address.as_bytes();
     let sender_nonce_bytes = tx.nonce.to_le_bytes();
     let mut bytes_to_hash: Vec<u8> = Vec::new();
-    bytes_to_hash.extend_from_slice(&sender_address_bytes);
+    bytes_to_hash.extend_from_slice(sender_address_bytes);
     bytes_to_hash.extend_from_slice(&sender_nonce_bytes);
 
     let address_keccak = keccak256(&bytes_to_hash);

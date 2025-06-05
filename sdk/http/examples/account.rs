@@ -8,8 +8,7 @@ async fn main() {
     );
 
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
-    let account = blockchain.get_account(&addr.0, &addr.1).await.unwrap();
+    let account = blockchain.get_account(&addr).await.unwrap();
 
-    assert!(account.address.to_bech32_string().is_ok());
     println!("account: {account:#?}");
 }

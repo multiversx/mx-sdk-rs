@@ -8,10 +8,7 @@ async fn main() {
     );
 
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
-    let account_storage = blockchain
-        .get_account_storage_keys(&addr.0, &addr.1)
-        .await
-        .unwrap();
+    let account_storage = blockchain.get_account_storage_keys(&addr).await.unwrap();
 
     assert!(!account_storage.is_empty());
     println!("Account Storage: {account_storage:#?}");

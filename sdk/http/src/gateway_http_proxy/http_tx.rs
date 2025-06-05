@@ -52,7 +52,7 @@ impl GatewayHttpProxy {
         network_configs: &NetworkConfig,
     ) -> Result<ArgCreateTransaction> {
         let account = self
-            .get_account(&network_configs.address_hrp, address)
+            .get_account(&address.to_bech32(&network_configs.address_hrp))
             .await?;
 
         let address_bech32 = address.to_bech32(&network_configs.address_hrp);

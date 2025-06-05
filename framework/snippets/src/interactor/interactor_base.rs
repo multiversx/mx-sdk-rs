@@ -63,7 +63,7 @@ where
     pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
         let address = wallet.to_address();
 
-        self.send_user_funds(self.get_hrp(), &address)
+        self.send_user_funds(&address.to_bech32(self.get_hrp()))
             .await
             .unwrap();
         self.generate_blocks(1).await.unwrap();
