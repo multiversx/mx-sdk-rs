@@ -204,7 +204,7 @@ impl Wallet {
         note = "Renamed to `to_address`, type changed to multiversx_chain_core::types::Address"
     )]
     pub fn address(&self) -> crate::data::sdk_address::SdkAddress {
-        crate::data::sdk_address::SdkAddress(self.to_address())
+        crate::data::sdk_address::SdkAddress("erd".to_owned(), self.to_address())
     }
 
     pub fn to_address(&self) -> Address {
@@ -301,6 +301,7 @@ impl Wallet {
 
     pub fn encrypt_keystore(
         data: &[u8],
+        hrp: &str,
         address: &Address,
         public_key: &str,
         password: &str,
@@ -350,7 +351,7 @@ impl Wallet {
             version: KEYSTORE_VERSION,
             kind: "secretKey".to_string(),
             address: public_key.to_string(),
-            bech32: crate::bech32::encode(address),
+            bech32: crate::bech32::encode(hrp, address),
         };
 
         let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
@@ -358,7 +359,12 @@ impl Wallet {
         keystore_json
     }
 
-    pub fn generate_pem_content(address: &Address, private_key: &str, public_key: &str) -> String {
+    pub fn generate_pem_content(
+        hrp: &str,
+        address: &Address,
+        private_key: &str,
+        public_key: &str,
+    ) -> String {
         let concat_keys = format!("{}{}", private_key, public_key);
         let concat_keys_b64 = base64_encode(concat_keys);
 
@@ -370,7 +376,7 @@ impl Wallet {
             .collect::<Vec<&str>>()
             .join("\n");
 
-        let address_bech32 = crate::bech32::encode(address);
+        let address_bech32 = crate::bech32::encode(hrp, address);
         let pem_content = format!(
             "-----BEGIN PRIVATE KEY for {address_bech32}-----\n{formatted_key}\n-----END PRIVATE KEY for {address_bech32}-----\n"
         );

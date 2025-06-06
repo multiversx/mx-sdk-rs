@@ -7,12 +7,13 @@ use super::{GatewayRequest, GatewayRequestType, ACCOUNT_ENDPOINT};
 
 /// Retrieves an all esdt tokens of an account from the network.
 pub struct GetAccountEsdtTokensRequest<'a> {
+    pub hrp: &'a str,
     pub address: &'a Address,
 }
 
 impl<'a> GetAccountEsdtTokensRequest<'a> {
-    pub fn new(address: &'a Address) -> Self {
-        Self { address }
+    pub fn new(hrp: &'a str, address: &'a Address) -> Self {
+        Self { hrp, address }
     }
 }
 
@@ -28,7 +29,7 @@ impl GatewayRequest for GetAccountEsdtTokensRequest<'_> {
     fn get_endpoint(&self) -> String {
         format!(
             "{ACCOUNT_ENDPOINT}/{}/esdt",
-            crate::bech32::encode(self.address)
+            crate::bech32::encode(self.hrp, self.address)
         )
     }
 

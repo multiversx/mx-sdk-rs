@@ -12,13 +12,13 @@ impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
-    pub async fn send_user_funds(&self, receiver: &Address) -> Result<String, Error> {
+    pub async fn send_user_funds(&self, hrp: &str, receiver: &Address) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));
         }
 
         self.proxy
-            .request(ChainSimulatorSendFundsRequest::to_address(receiver))
+            .request(ChainSimulatorSendFundsRequest::to_address(hrp, receiver))
             .await
     }
 

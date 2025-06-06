@@ -19,15 +19,39 @@ const BECH32_PREFIX: &str = "bech32:";
 /// In order to avoid repeated conversions, it redundantly keeps the bech32 representation inside.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bech32Address {
+    hrp: String,
     address: Address,
     bech32: String,
 }
 
 impl From<Address> for Bech32Address {
     fn from(value: Address) -> Self {
-        let bech32 = bech32::encode(&value);
+        let bech32 = bech32::encode("erd", &value);
         Bech32Address {
+            hrp: "erd".to_string(),
             address: value,
+            bech32,
+        }
+    }
+}
+
+impl From<(&str, Address)> for Bech32Address {
+    fn from(value: (&str, Address)) -> Self {
+        let bech32 = bech32::encode(value.0, &value.1);
+        Bech32Address {
+            hrp: value.0.to_string(),
+            address: value.1,
+            bech32,
+        }
+    }
+}
+
+impl From<(&str, &Address)> for Bech32Address {
+    fn from(value: (&str, &Address)) -> Self {
+        let bech32 = bech32::encode(value.0, value.1);
+        Bech32Address {
+            hrp: value.0.to_string(),
+            address: value.1.clone(),
             bech32,
         }
     }
@@ -35,8 +59,9 @@ impl From<Address> for Bech32Address {
 
 impl From<&Address> for Bech32Address {
     fn from(value: &Address) -> Self {
-        let bech32 = bech32::encode(value);
+        let bech32 = bech32::encode("erd", value);
         Bech32Address {
+            hrp: "erd".to_string(),
             address: value.clone(),
             bech32,
         }
@@ -45,8 +70,12 @@ impl From<&Address> for Bech32Address {
 
 impl Bech32Address {
     pub fn from_bech32_string(bech32: String) -> Self {
-        let address = bech32::decode(&bech32);
-        Bech32Address { address, bech32 }
+        let (hrp, address) = bech32::decode(&bech32);
+        Bech32Address {
+            hrp,
+            address,
+            bech32,
+        }
     }
 
     pub fn to_bech32_str(&self) -> &str {
@@ -67,6 +96,14 @@ impl Bech32Address {
 
     pub fn to_address(&self) -> Address {
         self.address.clone()
+    }
+
+    pub fn as_hrp(&self) -> &str {
+        &self.hrp
+    }
+
+    pub fn to_hrp(&self) -> String {
+        self.hrp.clone()
     }
 
     pub fn into_address(self) -> Address {

@@ -8,8 +8,8 @@ use multiversx_sdk::{
 };
 
 impl GatewayHttpProxy {
-    pub async fn send_user_funds(&self, receiver: &Address) -> Result<String, Error> {
-        self.request(ChainSimulatorSendFundsRequest::to_address(receiver))
+    pub async fn send_user_funds(&self, hrp: &str, receiver: &Address) -> Result<String, Error> {
+        self.request(ChainSimulatorSendFundsRequest::to_address(hrp, receiver))
             .await
     }
 

@@ -57,7 +57,7 @@ fn test_deployed_address() {
     let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
     let opt_address = tx_response
         .new_deployed_address
-        .map(|address| bech32::encode(&address));
+        .map(|address| bech32::encode("erd", &address));
 
     let expected =
         Some("erd1qqqqqqqqqqqqqpgqwpdf84ggxzqzmr2zmw959q4nlf9nz562q33sak25ze".to_string());

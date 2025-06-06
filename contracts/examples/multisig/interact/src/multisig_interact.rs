@@ -122,7 +122,7 @@ impl MultisigInteract {
         for board_member_address in self.board().iter() {
             println!(
                 "board member address: {}",
-                bech32::encode(board_member_address)
+                bech32::encode(self.interactor.get_hrp(), board_member_address)
             );
             self.interactor
                 .retrieve_account(&board_member_address.into())
@@ -297,7 +297,7 @@ impl MultisigInteract {
                 if self.signed(signer, action_id).await {
                     println!(
                         "{} - already signed action `{action_id}`",
-                        bech32::encode(signer)
+                        bech32::encode(self.interactor.get_hrp(), signer)
                     );
                 } else {
                     pending_signers.push((signer.clone(), action_id));

@@ -22,8 +22,8 @@ async fn main() {
     let mut unsign_tx = Transaction {
         nonce: arg.nonce,
         value: "0".to_string(),
-        receiver: SdkAddress(addr.clone()),
-        sender: SdkAddress(addr.clone()),
+        receiver: SdkAddress(network_config.address_hrp.clone(), addr.clone()),
+        sender: SdkAddress(network_config.address_hrp, addr.clone()),
         gas_price: arg.gas_price,
         gas_limit: arg.gas_limit,
         data: arg.data,

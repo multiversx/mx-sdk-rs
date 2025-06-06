@@ -53,15 +53,15 @@ pub fn dns_address_for_name(name: &str) -> Address {
 #[test]
 fn test_compute_dns_address() {
     assert_eq!(
-        bech32::encode(&compute_dns_address_for_shard_id(0)),
+        bech32::encode("erd", &compute_dns_address_for_shard_id(0)),
         "erd1qqqqqqqqqqqqqpgqnhvsujzd95jz6fyv3ldmynlf97tscs9nqqqq49en6w"
     );
     assert_eq!(
-        bech32::encode(&compute_dns_address_for_shard_id(1)),
+        bech32::encode("erd", &compute_dns_address_for_shard_id(1)),
         "erd1qqqqqqqqqqqqqpgqysmcsfkqed279x6jvs694th4e4v50p4pqqqsxwywm0"
     );
     assert_eq!(
-        bech32::encode(&compute_dns_address_for_shard_id(2)),
+        bech32::encode("erd", &compute_dns_address_for_shard_id(2)),
         "erd1qqqqqqqqqqqqqpgqnk5fq8sgg4vc63ffzf7qez550xe2l5jgqqpqe53dcq"
     );
 }
@@ -69,11 +69,11 @@ fn test_compute_dns_address() {
 #[test]
 fn test_dns_for_name() {
     assert_eq!(
-        bech32::encode(&dns_address_for_name("test.elrond")),
+        bech32::encode("erd", &dns_address_for_name("test.elrond")),
         "erd1qqqqqqqqqqqqqpgqx4ca3eu4k6w63hl8pjjyq2cp7ul7a4ukqz0skq6fxj"
     );
     assert_eq!(
-        bech32::encode(&dns_address_for_name("helloworld.elrond")),
+        bech32::encode("erd", &dns_address_for_name("helloworld.elrond")),
         "erd1qqqqqqqqqqqqqpgqhcm9k2xkk75e47wpmvfgj8fuzwaguvzyqqrqsteg8w"
     );
 }

@@ -7,12 +7,13 @@ use super::{GatewayRequest, GatewayRequestType, ACCOUNT_ENDPOINT, KEYS_ENDPOINT}
 
 /// Retrieves an account storage from the network.
 pub struct GetAccountStorageRequest<'a> {
+    pub hrp: &'a str,
     pub address: &'a Address,
 }
 
 impl<'a> GetAccountStorageRequest<'a> {
-    pub fn new(address: &'a Address) -> Self {
-        Self { address }
+    pub fn new(hrp: &'a str, address: &'a Address) -> Self {
+        Self { hrp, address }
     }
 }
 
@@ -28,7 +29,7 @@ impl GatewayRequest for GetAccountStorageRequest<'_> {
     fn get_endpoint(&self) -> String {
         format!(
             "{ACCOUNT_ENDPOINT}/{}/{KEYS_ENDPOINT}",
-            crate::bech32::encode(self.address)
+            crate::bech32::encode(self.hrp, self.address)
         )
     }
 
