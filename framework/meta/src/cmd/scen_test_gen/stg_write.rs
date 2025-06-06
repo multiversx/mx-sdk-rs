@@ -49,6 +49,10 @@ pub fn format_section(test_fn: &ScenarioTestFn, write_test_fn: WriteTestFn) -> S
         section_str.push('\n');
         section_str.push_str(ignore_line);
     }
+    if let Some(should_panic_line) = &test_fn.should_panic_line {
+        section_str.push('\n');
+        section_str.push_str(should_panic_line);
+    }
     section_str.push_str(&write_test_fn(&test_fn.scenario_file_name));
     section_str
 }
