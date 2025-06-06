@@ -13,14 +13,32 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-#[ignore = "`internalVMErrors` logs not implemented"]
 #[test]
+#[ignore = "`internalVMErrors` logs not implemented"]
 fn panic_after_log_rs() {
     world().run("scenarios/panic-after-log.scen.json");
 }
 
-#[ignore = "PanicInfo currently not available, TODO: use std::panic::set_hook"]
 #[test]
+#[ignore = "PanicInfo currently not available, TODO: use std::panic::set_hook"]
 fn panic_message_rs() {
     world().run("scenarios/panic-message.scen.json");
+}
+
+#[test]
+#[should_panic]
+fn should_panic_call_rs() {
+    world().run("scenarios/should-panic-call.scen.json");
+}
+
+#[test]
+#[should_panic]
+fn should_panic_deploy_rs() {
+    world().run("scenarios/should-panic-deploy.scen.json");
+}
+
+#[test]
+#[should_panic]
+fn should_panic_query_rs() {
+    world().run("scenarios/should-panic-query.scen.json");
 }
