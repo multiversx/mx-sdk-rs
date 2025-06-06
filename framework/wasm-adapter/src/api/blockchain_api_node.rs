@@ -37,6 +37,12 @@ unsafe extern "C" {
     fn getPrevBlockRound() -> i64;
     fn getPrevBlockEpoch() -> i64;
     fn getPrevBlockRandomSeed(resultOffset: *const u8);
+
+    fn getBlockRoundTimeInMilliseconds() -> i64;
+    fn epochStartBlockTimeStamp() -> i64;
+    fn epochStartBlockNonce() -> i64;
+    fn epochStartBlockRound() -> i64;
+
     fn getOriginalTxHash(resultOffset: *const u8);
 
     // Managed versions of the above
@@ -85,6 +91,7 @@ unsafe extern "C" {
     fn getESDTLocalRoles(tokenhandle: i32) -> i64;
 
     fn managedGetCodeMetadata(addressHandle: i32, resultHandle: i32);
+    fn managedGetCodeHash(addressHandle: i32, codeHashHandle: i32);
 
     fn managedIsBuiltinFunction(function_name_handle: i32) -> bool;
 }
@@ -264,6 +271,26 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
+    fn get_block_round_time_in_milliseconds(&self) -> u64 {
+        unsafe { getBlockRoundTimeInMilliseconds() as u64 }
+    }
+
+    #[inline]
+    fn epoch_start_block_timestamp(&self) -> u64 {
+        unsafe { epochStartBlockTimeStamp() as u64 }
+    }
+
+    #[inline]
+    fn epoch_start_block_nonce(&self) -> u64 {
+        unsafe { epochStartBlockNonce() as u64 }
+    }
+
+    #[inline]
+    fn epoch_start_block_round(&self) -> u64 {
+        unsafe { epochStartBlockRound() as u64 }
+    }
+
+    #[inline]
     fn get_current_esdt_nft_nonce(
         &self,
         address_handle: Self::ManagedBufferHandle,
@@ -376,6 +403,16 @@ impl BlockchainApiImpl for VmApiImpl {
     ) {
         unsafe {
             managedGetCodeMetadata(address_handle, response_handle);
+        }
+    }
+
+    fn managed_get_code_hash(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        code_hash_handle: Self::ManagedBufferHandle,
+    ) {
+        unsafe {
+            managedGetCodeHash(address_handle, code_hash_handle);
         }
     }
 }

@@ -700,12 +700,35 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         self.handler.get_prev_block_random_seed(result_handle)
     }
 
+    fn get_block_round_time_in_milliseconds(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        panic!("Unavailable: get_block_round_time_in_milliseconds")
+    }
+
+    fn epoch_start_block_time_stamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        panic!("Unavailable: epoch_start_block_time_stamp")
+    }
+
+    fn epoch_start_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        panic!("Unavailable: epoch_start_block_nonce")
+    }
+
+    fn epoch_start_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        panic!("Unavailable: epoch_start_block_round")
+    }
+
     fn managed_get_return_data(
         &mut self,
         result_id: i32,
         result_handle: i32,
     ) -> Result<(), VMHooksEarlyExit> {
         panic!("Unavailable: managed_get_return_data");
+    }
+
+    fn managed_get_all_transfers_call_value(
+        &mut self,
+        all_transfers_handle: i32,
+    ) -> Result<(), VMHooksEarlyExit> {
+        self.handler.load_all_transfers(all_transfers_handle)
     }
 
     fn managed_get_multi_esdt_call_value(
@@ -753,6 +776,16 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
             royalties_handle,
             uris_handle,
         )
+    }
+
+    fn managed_get_esdt_token_type(
+        &mut self,
+        address_handle: i32,
+        token_id_handle: i32,
+        nonce: i64,
+        type_handle: i32,
+    ) -> Result<(), VMHooksEarlyExit> {
+        panic!("Unavailable: managed_get_esdt_token_type")
     }
 
     fn managed_get_back_transfers(
@@ -961,6 +994,18 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         Ok(RESULT_OK)
     }
 
+    fn managed_execute_on_dest_context_with_error_return(
+        &mut self,
+        gas: i64,
+        address_handle: i32,
+        value_handle: i32,
+        function_handle: i32,
+        arguments_handle: i32,
+        result_handle: i32,
+    ) -> Result<i32, VMHooksEarlyExit> {
+        panic!("Unavailable: managed_execute_on_dest_context_with_error_return")
+    }
+
     fn managed_multi_transfer_esdt_nft_execute(
         &mut self,
         dst_handle: i32,
@@ -977,6 +1022,17 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
             arguments_handle,
         )?;
         Ok(RESULT_OK)
+    }
+
+    fn managed_multi_transfer_esdt_nft_execute_with_return(
+        &mut self,
+        dst_handle: i32,
+        token_transfers_handle: i32,
+        gas_limit: i64,
+        function_handle: i32,
+        arguments_handle: i32,
+    ) -> Result<i32, VMHooksEarlyExit> {
+        panic!("Unavailable: managed_multi_transfer_esdt_nft_execute_with_return")
     }
 
     fn managed_transfer_value_execute(
@@ -1036,6 +1092,14 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     ) -> Result<(), VMHooksEarlyExit> {
         self.handler
             .managed_get_code_metadata(address_handle, response_handle)
+    }
+
+    fn managed_get_code_hash(
+        &mut self,
+        address_handle: i32,
+        code_hash_handle: i32,
+    ) -> Result<(), VMHooksEarlyExit> {
+        panic!("Unavailable: managed_get_code_hash")
     }
 
     fn managed_is_builtin_function(
@@ -1743,6 +1807,38 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
             Ok(_) => Ok(RESULT_OK),
             Err(e) => Err(e),
         }
+    }
+
+    fn mbuffer_to_small_int_unsigned(
+        &mut self,
+        m_buffer_handle: i32,
+    ) -> Result<i64, VMHooksEarlyExit> {
+        self.handler.mb_to_small_int_unsigned(m_buffer_handle)
+    }
+
+    fn mbuffer_to_small_int_signed(
+        &mut self,
+        m_buffer_handle: i32,
+    ) -> Result<i64, VMHooksEarlyExit> {
+        self.handler.mb_to_small_int_signed(m_buffer_handle)
+    }
+
+    fn mbuffer_from_small_int_unsigned(
+        &mut self,
+        m_buffer_handle: i32,
+        value: i64,
+    ) -> Result<(), VMHooksEarlyExit> {
+        self.handler
+            .mb_from_small_int_unsigned(m_buffer_handle, value as u64)
+    }
+
+    fn mbuffer_from_small_int_signed(
+        &mut self,
+        m_buffer_handle: i32,
+        value: i64,
+    ) -> Result<(), VMHooksEarlyExit> {
+        self.handler
+            .mb_from_small_int_signed(m_buffer_handle, value)
     }
 
     fn mbuffer_to_big_float(

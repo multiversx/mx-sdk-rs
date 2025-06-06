@@ -38,6 +38,14 @@ pub trait ManagedTypeApiImpl:
         dest: Self::ManagedBufferHandle,
     );
 
+    fn mb_to_small_int_unsigned(&self, buffer_handle: Self::ManagedBufferHandle) -> i64;
+
+    fn mb_to_small_int_signed(&self, buffer_handle: Self::ManagedBufferHandle) -> i64;
+
+    fn mb_from_small_int_unsigned(&self, buffer_handle: Self::ManagedBufferHandle, value: i64);
+
+    fn mb_from_small_int_signed(&self, buffer_handle: Self::ManagedBufferHandle, value: i64);
+
     fn mb_to_big_float(&self, buffer_handle: Self::ManagedBufferHandle, dest: Self::BigFloatHandle);
 
     fn mb_from_big_float(

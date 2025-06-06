@@ -91,6 +91,22 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn get_block_round_time_in_milliseconds(&self) -> u64 {
+        unreachable!()
+    }
+
+    fn epoch_start_block_timestamp(&self) -> u64 {
+        unreachable!()
+    }
+
+    fn epoch_start_block_nonce(&self) -> u64 {
+        unreachable!()
+    }
+
+    fn epoch_start_block_round(&self) -> u64 {
+        unreachable!()
+    }
+
     fn get_current_esdt_nft_nonce(
         &self,
         _address_handle: Self::ManagedBufferHandle,
@@ -162,6 +178,14 @@ impl BlockchainApiImpl for UncallableApi {
         &self,
         _address_handle: Self::ManagedBufferHandle,
         _response_handle: Self::ManagedBufferHandle,
+    ) {
+        unreachable!()
+    }
+
+    fn managed_get_code_hash(
+        &self,
+        _address_handle: Self::ManagedBufferHandle,
+        _code_hash_handle: Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }
