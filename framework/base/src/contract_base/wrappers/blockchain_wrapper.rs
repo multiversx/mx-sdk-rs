@@ -228,6 +228,13 @@ where
         A::blockchain_api_impl().get_block_timestamp()
     }
 
+    /// Block timestamp, in milliseconds.
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_block_timestamp_ms()
+    }
+
     #[inline]
     pub fn get_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().get_block_nonce()
@@ -251,8 +258,8 @@ where
 
     #[cfg(feature = "barnard")]
     #[inline]
-    pub fn epoch_start_block_timestamp(&self) -> u64 {
-        A::blockchain_api_impl().epoch_start_block_timestamp()
+    pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_timestamp_ms()
     }
 
     #[cfg(feature = "barnard")]
@@ -289,6 +296,12 @@ where
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_prev_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_prev_block_timestamp_ms()
     }
 
     #[inline]

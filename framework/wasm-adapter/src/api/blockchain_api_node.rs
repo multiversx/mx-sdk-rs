@@ -29,17 +29,19 @@ unsafe extern "C" {
 
     fn getGasLeft() -> i64;
     fn getBlockTimestamp() -> i64;
+    fn getBlockTimestampMs() -> i64;
     fn getBlockNonce() -> i64;
     fn getBlockRound() -> i64;
     fn getBlockEpoch() -> i64;
     fn getPrevBlockTimestamp() -> i64;
+    fn getPrevBlockTimestampMs() -> i64;
     fn getPrevBlockNonce() -> i64;
     fn getPrevBlockRound() -> i64;
     fn getPrevBlockEpoch() -> i64;
     fn getPrevBlockRandomSeed(resultOffset: *const u8);
 
     fn getBlockRoundTimeInMilliseconds() -> i64;
-    fn epochStartBlockTimeStamp() -> i64;
+    fn epochStartBlockTimeStampMs() -> i64;
     fn epochStartBlockNonce() -> i64;
     fn epochStartBlockRound() -> i64;
 
@@ -213,6 +215,11 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
+    fn get_block_timestamp_ms(&self) -> u64 {
+        unsafe { getBlockTimestampMs() as u64 }
+    }
+
+    #[inline]
     fn get_block_nonce(&self) -> u64 {
         unsafe { getBlockNonce() as u64 }
     }
@@ -237,6 +244,11 @@ impl BlockchainApiImpl for VmApiImpl {
     #[inline]
     fn get_prev_block_timestamp(&self) -> u64 {
         unsafe { getPrevBlockTimestamp() as u64 }
+    }
+
+    #[inline]
+    fn get_prev_block_timestamp_ms(&self) -> u64 {
+        unsafe { getPrevBlockTimestampMs() as u64 }
     }
 
     #[inline]
@@ -276,8 +288,8 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn epoch_start_block_timestamp(&self) -> u64 {
-        unsafe { epochStartBlockTimeStamp() as u64 }
+    fn epoch_start_block_timestamp_ms(&self) -> u64 {
+        unsafe { epochStartBlockTimeStampMs() as u64 }
     }
 
     #[inline]

@@ -501,6 +501,10 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         self.handler.get_block_timestamp()
     }
 
+    fn get_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        panic!("Unavailable: get_block_timestamp_ms");
+    }
+
     fn get_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.handler.get_block_nonce()
     }
@@ -523,6 +527,10 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
 
     fn get_prev_block_timestamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.handler.get_prev_block_timestamp()
+    }
+
+    fn get_prev_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        panic!("Unavailable: get_prev_block_timestamp_ms");
     }
 
     fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
@@ -704,7 +712,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         panic!("Unavailable: get_block_round_time_in_milliseconds")
     }
 
-    fn epoch_start_block_time_stamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
+    fn epoch_start_block_time_stamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
         panic!("Unavailable: epoch_start_block_time_stamp")
     }
 
