@@ -233,6 +233,7 @@ name = "barnard-features"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
+ "multiversx-sc-scenario",
 ]
 
 [[package]]

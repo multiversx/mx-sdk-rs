@@ -502,7 +502,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     }
 
     fn get_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        panic!("Unavailable: get_block_timestamp_ms");
+        self.handler.get_block_timestamp_ms()
     }
 
     fn get_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
@@ -530,7 +530,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     }
 
     fn get_prev_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        panic!("Unavailable: get_prev_block_timestamp_ms");
+        self.handler.get_prev_block_timestamp_ms()
     }
 
     fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
