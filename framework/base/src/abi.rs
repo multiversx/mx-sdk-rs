@@ -39,4 +39,11 @@ impl TypeNames {
             rust: alloc::string::String::new(),
         }
     }
+
+    pub const fn from_abi(abi_name: alloc::string::String) -> Self {
+        TypeNames {
+            abi: abi_name,
+            rust: alloc::string::String::new(),
+        }
+    }
 }
