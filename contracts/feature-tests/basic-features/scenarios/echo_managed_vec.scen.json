@@ -97,7 +97,6 @@
                 "arguments": [
                     [
                         "nested:str:TOKENA-1234",
-                        "nested:str:EGLD",
                         "nested:str:TOKENB-1234"
                     ]
                 ],
@@ -108,11 +107,58 @@
                 "out": [
                     [
                         "nested:str:TOKENA-1234",
-                        "nested:str:EGLD",
                         "nested:str:TOKENB-1234"
                     ]
                 ],
                 "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "echo_managed_vec_of_token_identifier-EGLD",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_managed_vec_of_token_identifier",
+                "arguments": [
+                    [
+                        "nested:str:EGLD"
+                    ]
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:argument decode error (mv): ESDT expected",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "echo_managed_vec_of_token_identifier-EGLD-000000",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "echo_managed_vec_of_token_identifier",
+                "arguments": [
+                    [
+                        "nested:str:EGLD-000000"
+                    ]
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:argument decode error (mv): ESDT expected",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

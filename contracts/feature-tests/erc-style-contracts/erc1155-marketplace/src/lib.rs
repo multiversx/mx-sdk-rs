@@ -7,7 +7,8 @@ pub mod erc1155_proxy;
 
 const PERCENTAGE_TOTAL: u8 = 100;
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct Auction<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub min_bid: BigUint<M>,
@@ -18,7 +19,8 @@ pub struct Auction<M: ManagedTypeApi> {
     pub current_winner: ManagedAddress<M>,
 }
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct AuctionArgument<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub min_bid: BigUint<M>,
@@ -28,7 +30,7 @@ pub struct AuctionArgument<M: ManagedTypeApi> {
 
 #[multiversx_sc::contract]
 pub trait Erc1155Marketplace {
-    /// `bid_cut_percentage` is the cut that the contract takes from any sucessful bid
+    /// `bid_cut_percentage` is the cut that the contract takes from any successful bid
     #[init]
     fn init(&self, token_ownership_contract_address: ManagedAddress, bid_cut_percentage: u8) {
         self.token_ownership_contract_address()

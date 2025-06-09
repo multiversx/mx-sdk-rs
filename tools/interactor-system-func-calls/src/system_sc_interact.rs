@@ -2,24 +2,28 @@ mod system_sc_interact_cli;
 mod system_sc_interact_config;
 mod system_sc_interact_state;
 
+use std::collections::HashMap;
+
 use clap::Parser;
-use system_sc_interact_cli::NftDummyAttributes;
-use system_sc_interact_config::Config;
+pub use system_sc_interact_cli::NftDummyAttributes;
+pub use system_sc_interact_config::Config;
 use system_sc_interact_state::State;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{
+    imports::*,
+    sdk::{data::esdt::EsdtBalance, utils::base64_decode},
+};
 
-#[tokio::main]
-async fn main() {
+pub async fn system_sc_interact_cli() {
     env_logger::init();
 
-    let mut basic_interact = SysFuncCallsInteract::init().await;
+    let mut basic_interact = SysFuncCallsInteract::init(Config::load_config()).await;
 
     let cli = system_sc_interact_cli::InteractCli::parse();
     match &cli.command {
         Some(system_sc_interact_cli::InteractCliCommand::IssueToken(args)) => {
             basic_interact
-                .issue_token(
+                .issue_token_all_roles(
                     args.cost.clone(),
                     args.display_name.as_bytes(),
                     args.ticker.as_bytes(),
@@ -128,6 +132,11 @@ async fn main() {
                     args.name.as_bytes(),
                     args.royalties,
                     args.hash.as_bytes(),
+                    &NftDummyAttributes {
+                        creation_epoch: 2u64,
+                        cool_factor: 3u8,
+                    },
+                    &Vec::new(),
                 )
                 .await;
         },
@@ -217,28 +226,56 @@ async fn main() {
     }
 }
 
-#[allow(unused)]
-struct SysFuncCallsInteract {
+pub struct SysFuncCallsInteract {
     interactor: Interactor,
     wallet_address: Bech32Address,
+    other_wallet_address: Bech32Address,
+    #[allow(unused)]
     state: State,
 }
 
 impl SysFuncCallsInteract {
-    async fn init() -> Self {
-        let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway()).await;
+    pub async fn init(config: Config) -> Self {
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.is_chain_simulator());
 
-        let wallet_address = interactor.register_wallet(test_wallets::alice());
+        interactor.set_current_dir_from_workspace("tools/interactor-system-func-calls");
+        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+        let other_wallet_address = interactor.register_wallet(test_wallets::mike()).await;
+
+        // generate blocks until ESDTSystemSCAddress is enabled
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
 
         Self {
             interactor,
             wallet_address: wallet_address.into(),
+            other_wallet_address: other_wallet_address.into(),
             state: State::load_state(),
         }
     }
 
-    async fn issue_fungible_token(
+    pub async fn get_token_properties(&mut self, token_id: &[u8]) -> TokenPropertiesResult {
+        println!("Fetching token properties of token {token_id:?}...");
+
+        let res = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .get_token_properties(token_id)
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        println!("Token properties: {:?}", res);
+
+        res
+    }
+
+    pub async fn issue_fungible_token(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &[u8],
@@ -257,9 +294,9 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_fungible(
                 issue_cost.into(),
-                &token_display_name,
-                &token_ticker,
-                &initial_supply,
+                token_display_name,
+                token_ticker,
+                initial_supply,
                 FungibleTokenProperties {
                     num_decimals,
                     can_freeze: true,
@@ -273,14 +310,13 @@ impl SysFuncCallsInteract {
                 },
             )
             .returns(ReturnsNewTokenIdentifier)
-            .prepare_async()
             .run()
             .await;
 
         println!("TOKEN ID: {:?}", res);
     }
 
-    async fn issue_non_fungible_collection(
+    pub async fn issue_non_fungible_collection(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &[u8],
@@ -297,8 +333,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_non_fungible(
                 issue_cost.into(),
-                &token_display_name,
-                &token_ticker,
+                token_display_name,
+                token_ticker,
                 NonFungibleTokenProperties {
                     can_freeze: true,
                     can_wipe: true,
@@ -310,14 +346,13 @@ impl SysFuncCallsInteract {
                 },
             )
             .returns(ReturnsNewTokenIdentifier)
-            .prepare_async()
             .run()
             .await;
 
         println!("NFT Collection ID: {:?}", nft_collection_id);
     }
 
-    async fn issue_semi_fungible_collection(
+    pub async fn issue_semi_fungible_collection(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &[u8],
@@ -334,8 +369,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .issue_semi_fungible(
                 issue_cost.into(),
-                &token_display_name,
-                &token_ticker,
+                token_display_name,
+                token_ticker,
                 SemiFungibleTokenProperties {
                     can_freeze: true,
                     can_wipe: true,
@@ -347,22 +382,54 @@ impl SysFuncCallsInteract {
                 },
             )
             .returns(ReturnsNewTokenIdentifier)
-            .prepare_async()
             .run()
             .await;
 
         println!("SFT Collection ID: {:?}", sft_collection_id);
     }
 
-    async fn issue_token(
+    pub async fn issue_dynamic_token(
+        &mut self,
+        issue_cost: RustBigUint,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> String {
+        println!("Registering dynamic token {token_ticker:?} of type {token_type:?}...");
+
+        let token_id = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .issue_dynamic(
+                issue_cost.into(),
+                token_display_name,
+                token_ticker,
+                token_type,
+                num_decimals,
+            )
+            .returns(ReturnsNewTokenIdentifier)
+            .run()
+            .await;
+
+        println!("TOKEN ID: {:?}", token_id);
+
+        token_id
+    }
+
+    pub async fn issue_token_all_roles(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &[u8],
         token_ticker: &[u8],
         num_decimals: usize,
         token_type: EsdtTokenType,
-    ) {
-        println!("Registering token...");
+    ) -> String {
+        println!("Registering and setting all roles for token {token_ticker:?} of type {token_type:?}...");
 
         let token_id = self
             .interactor
@@ -379,16 +446,17 @@ impl SysFuncCallsInteract {
                 num_decimals,
             )
             .returns(ReturnsNewTokenIdentifier)
-            .prepare_async()
             .run()
             .await;
 
         println!("TOKEN ID: {:?}", token_id);
+
+        token_id
     }
 
-    async fn set_roles(&mut self, token_id: &[u8], roles: Vec<EsdtLocalRole>) {
-        let wallet_address = &self.wallet_address.clone().into_address();
-        println!("Setting the following roles: {:?}", roles);
+    pub async fn set_roles_for_other(&mut self, token_id: &[u8], roles: Vec<EsdtLocalRole>) {
+        let wallet_address = &self.other_wallet_address.clone().into_address();
+        println!("Setting the following roles: {roles:?} for {token_id:?} for other_address");
 
         self.interactor
             .tx()
@@ -397,16 +465,80 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .set_special_roles(
-                &ManagedAddress::from_address(wallet_address),
-                &TokenIdentifier::from(token_id),
+                ManagedAddress::from_address(wallet_address),
+                TokenIdentifier::from(token_id),
                 roles.into_iter(),
             )
-            .prepare_async()
             .run()
             .await;
     }
 
-    async fn mint_sft(
+    pub async fn set_roles(&mut self, token_id: &[u8], roles: Vec<EsdtLocalRole>) {
+        let wallet_address = &self.wallet_address.clone().into_address();
+        println!("Setting the following roles: {roles:?} for {token_id:?}");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .set_special_roles(
+                ManagedAddress::from_address(wallet_address),
+                TokenIdentifier::from(token_id),
+                roles.into_iter(),
+            )
+            .run()
+            .await;
+    }
+
+    pub async fn get_roles(&mut self, token_id: &[u8]) {
+        println!("Retrieving special roles for {token_id:?}");
+
+        let result = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .get_special_roles(TokenIdentifier::from(token_id))
+            .returns(ReturnsRawResult)
+            .run()
+            .await;
+
+        println!("raw result for roles {result:?}");
+    }
+
+    pub async fn change_to_dynamic(&mut self, token_id: &[u8]) {
+        println!("Changing the following token {token_id:?} to dynamic...");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .change_to_dynamic(TokenIdentifier::from(token_id))
+            .run()
+            .await;
+    }
+
+    pub async fn update_token(&mut self, token_id: &[u8]) {
+        println!("Updating the following token {token_id:?} to the newest version...");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .update_token(TokenIdentifier::from(token_id))
+            .run()
+            .await;
+    }
+
+    pub async fn mint_sft(
         &mut self,
         token_id: &[u8],
         amount: RustBigUint,
@@ -423,23 +555,22 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
             .esdt_nft_create(
-                &token_id,
-                &amount,
-                &name,
-                &royalties,
-                &hash,
+                token_id,
+                amount,
+                name,
+                royalties,
+                hash,
                 &NftDummyAttributes {
                     creation_epoch: 2104,
                     cool_factor: 5,
                 },
                 &ManagedVec::new(),
             )
-            .prepare_async()
             .run()
             .await;
     }
 
-    async fn register_meta_esdt(
+    pub async fn register_meta_esdt(
         &mut self,
         issue_cost: RustBigUint,
         token_display_name: &[u8],
@@ -457,8 +588,8 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .register_meta_esdt(
                 issue_cost.into(),
-                &token_display_name,
-                &token_ticker,
+                token_display_name,
+                token_ticker,
                 MetaTokenProperties {
                     num_decimals,
                     can_freeze: true,
@@ -471,14 +602,13 @@ impl SysFuncCallsInteract {
                 },
             )
             .returns(ReturnsNewTokenIdentifier)
-            .prepare_async()
             .run()
             .await;
 
         println!("Meta-ESDT ID: {:?}", meta_esdt);
     }
 
-    async fn change_sft_meta_esdt(&mut self, token_id: &[u8], num_decimals: usize) {
+    pub async fn change_sft_meta_esdt(&mut self, token_id: &[u8], num_decimals: usize) {
         println!("Changing SFT to Meta-ESDT...");
 
         self.interactor
@@ -487,13 +617,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .change_sft_to_meta_esdt(&token_id, num_decimals)
-            .prepare_async()
+            .change_sft_to_meta_esdt(token_id, num_decimals)
             .run()
             .await;
     }
 
-    async fn mint_token(&mut self, token_id: &[u8], nonce: u64, amount: RustBigUint) {
+    pub async fn mint_token(&mut self, token_id: &[u8], nonce: u64, amount: RustBigUint) {
         println!("Minting tokens...");
 
         self.interactor
@@ -502,13 +631,12 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_local_mint(&token_id, nonce, &amount)
-            .prepare_async()
+            .esdt_local_mint(token_id, nonce, amount)
             .run()
             .await;
     }
 
-    async fn burn_token(&mut self, token_id: &[u8], nonce: u64, amount: RustBigUint) {
+    pub async fn burn_token(&mut self, token_id: &[u8], nonce: u64, amount: RustBigUint) {
         println!("Burning tokens...");
 
         self.interactor
@@ -517,13 +645,12 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_local_burn(&token_id, nonce, &amount)
-            .prepare_async()
+            .esdt_local_burn(token_id, nonce, amount)
             .run()
             .await;
     }
 
-    async fn pause_token(&mut self, token_id: &[u8]) {
+    pub async fn pause_token(&mut self, token_id: &[u8]) {
         println!("Pausing token...");
 
         self.interactor
@@ -532,13 +659,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .pause(&token_id)
-            .prepare_async()
+            .pause(token_id)
             .run()
             .await;
     }
 
-    async fn unpause_token(&mut self, token_id: &[u8]) {
+    pub async fn unpause_token(&mut self, token_id: &[u8]) {
         println!("Unpausing token...");
 
         self.interactor
@@ -547,13 +673,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unpause(&token_id)
-            .prepare_async()
+            .unpause(token_id)
             .run()
             .await;
     }
 
-    async fn freeze_token(&mut self, token_id: &[u8], address: &Bech32Address) {
+    pub async fn freeze_token(&mut self, token_id: &[u8], address: &Bech32Address) {
         println!("Freezing token...");
 
         self.interactor
@@ -562,13 +687,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .freeze(&token_id, &address)
-            .prepare_async()
+            .freeze(token_id, address)
             .run()
             .await;
     }
 
-    async fn unfreeze_token(&mut self, token_id: &[u8], address: &Bech32Address) {
+    pub async fn unfreeze_token(&mut self, token_id: &[u8], address: &Bech32Address) {
         println!("Unfreezing token...");
 
         self.interactor
@@ -577,13 +701,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unfreeze(&token_id, &address)
-            .prepare_async()
+            .unfreeze(token_id, address)
             .run()
             .await;
     }
 
-    async fn freeze_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
+    pub async fn freeze_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
         println!("Freezing NFT/SFT/Meta-ESDT...");
 
         self.interactor
@@ -592,13 +715,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .freeze_nft(&token_id, nonce, &address)
-            .prepare_async()
+            .freeze_nft(token_id, nonce, address)
             .run()
             .await;
     }
 
-    async fn unfreeze_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
+    pub async fn unfreeze_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
         println!("Unfreezing NFT/SFT/Meta-ESDT...");
 
         self.interactor
@@ -607,13 +729,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unfreeze_nft(&token_id, nonce, &address)
-            .prepare_async()
+            .unfreeze_nft(token_id, nonce, address)
             .run()
             .await;
     }
 
-    async fn wipe_token(&mut self, token_id: &[u8], address: &Bech32Address) {
+    pub async fn wipe_token(&mut self, token_id: &[u8], address: &Bech32Address) {
         println!("Wiping token...");
 
         self.interactor
@@ -622,13 +743,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .wipe(&token_id, &address)
-            .prepare_async()
+            .wipe(token_id, address)
             .run()
             .await;
     }
 
-    async fn wipe_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
+    pub async fn wipe_nft(&mut self, token_id: &[u8], nonce: u64, address: &Bech32Address) {
         println!("Wiping NFT/SFT/Meta-ESDT...");
 
         self.interactor
@@ -637,21 +757,28 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .wipe_nft(&token_id, nonce, &address)
-            .prepare_async()
+            .wipe_nft(token_id, nonce, address)
             .run()
             .await;
     }
 
-    async fn mint_nft(
+    #[allow(clippy::too_many_arguments)]
+    pub async fn mint_nft<T: TopEncode>(
         &mut self,
         token_id: &[u8],
         amount: RustBigUint,
         name: &[u8],
         royalties: u64,
         hash: &[u8],
-    ) {
+        attributes: &T,
+        uris: &[String],
+    ) -> u64 {
         println!("Minting NFT...");
+
+        let uris = uris
+            .iter()
+            .map(ManagedBuffer::from)
+            .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
         self.interactor
             .tx()
@@ -659,24 +786,13 @@ impl SysFuncCallsInteract {
             .to(&self.wallet_address)
             .gas(100_000_000u64)
             .typed(UserBuiltinProxy)
-            .esdt_nft_create(
-                &token_id,
-                &amount,
-                &name,
-                &royalties,
-                &hash,
-                &NftDummyAttributes {
-                    creation_epoch: 2104,
-                    cool_factor: 5,
-                },
-                &ManagedVec::new(),
-            )
-            .prepare_async()
+            .esdt_nft_create(token_id, amount, name, royalties, hash, attributes, &uris)
+            .returns(ReturnsResult)
             .run()
-            .await;
+            .await
     }
 
-    async fn unset_roles(
+    pub async fn unset_roles(
         &mut self,
         address: &Bech32Address,
         token_id: &[u8],
@@ -690,13 +806,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .unset_special_roles(&address, &token_id, roles.into_iter())
-            .prepare_async()
+            .unset_special_roles(address, token_id, roles.into_iter())
             .run()
             .await;
     }
 
-    async fn transfer_ownership(&mut self, token_id: &[u8], new_owner: &Bech32Address) {
+    pub async fn transfer_ownership(&mut self, token_id: &[u8], new_owner: &Bech32Address) {
         println!("Transferring token ownership...");
 
         self.interactor
@@ -705,13 +820,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .transfer_ownership(&token_id, &new_owner)
-            .prepare_async()
+            .transfer_ownership(token_id, new_owner)
             .run()
             .await;
     }
 
-    async fn transfer_nft_create_role(
+    pub async fn transfer_nft_create_role(
         &mut self,
         token_id: &[u8],
         old_owner: &Bech32Address,
@@ -725,13 +839,12 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .transfer_nft_create_role(&token_id, &old_owner, &new_owner)
-            .prepare_async()
+            .transfer_nft_create_role(token_id, old_owner, new_owner)
             .run()
             .await;
     }
 
-    async fn control_changes(&mut self, token_id: &[u8]) {
+    pub async fn control_changes(&mut self, token_id: &[u8]) {
         println!("Control changes");
 
         self.interactor
@@ -741,7 +854,7 @@ impl SysFuncCallsInteract {
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .control_changes(
-                &token_id,
+                token_id,
                 &TokenPropertyArguments {
                     can_freeze: Some(true),
                     can_wipe: Some(true),
@@ -754,8 +867,170 @@ impl SysFuncCallsInteract {
                     can_add_special_roles: Some(true),
                 },
             )
-            .prepare_async()
             .run()
             .await;
+    }
+
+    pub async fn modify_royalties(&mut self, token_id: &[u8], nonce: u64, new_royalty: u64) {
+        println!("Modifying royalties for token {token_id:?} into {new_royalty:?}...");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.wallet_address)
+            .gas(100_000_000u64)
+            .typed(UserBuiltinProxy)
+            .esdt_modify_royalties(token_id, nonce, new_royalty)
+            .run()
+            .await;
+    }
+
+    pub async fn set_new_uris(&mut self, token_id: &[u8], nonce: u64, new_uris: &[String]) {
+        println!("Setting new uris for token {token_id:?} with nonce {nonce:?}...");
+
+        let uris = new_uris
+            .iter()
+            .map(ManagedBuffer::from)
+            .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.wallet_address)
+            .gas(100_000_000u64)
+            .typed(UserBuiltinProxy)
+            .esdt_nft_set_new_uris(token_id, nonce, &uris)
+            .run()
+            .await;
+    }
+
+    pub async fn send_esdt(&mut self, token_id: &[u8], nonce: u64, amount: RustBigUint) {
+        println!("Sending token {token_id:?} with nonce {nonce:?} to other_wallet_address...");
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.other_wallet_address)
+            .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
+            .run()
+            .await;
+    }
+
+    // changes creator into caller
+    pub async fn modify_creator(&mut self, token_id: &[u8], nonce: u64) {
+        println!(
+            "Modifying the creator (into caller - other_wallet_address) for token {token_id:?} with nonce {nonce:?}..."
+        );
+
+        self.interactor
+            .tx()
+            .from(&self.other_wallet_address)
+            .to(&self.other_wallet_address)
+            .gas(100_000_000u64)
+            .typed(UserBuiltinProxy)
+            .esdt_nft_modify_creator(token_id, nonce)
+            .run()
+            .await;
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn metadata_recreate<T: TopEncode>(
+        &mut self,
+        token_id: &[u8],
+        nonce: u64,
+        name: &[u8],
+        royalties: u64,
+        hash: &[u8],
+        new_attributes: &T,
+        uris: &[String],
+    ) {
+        println!("Recreating the token {token_id:?} with nonce {nonce:?} with new attributes...");
+
+        let uris = uris
+            .iter()
+            .map(ManagedBuffer::from)
+            .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.wallet_address)
+            .gas(100_000_000u64)
+            .typed(UserBuiltinProxy)
+            .esdt_metadata_recreate(token_id, nonce, name, royalties, hash, new_attributes, uris)
+            .run()
+            .await;
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn metadata_update<T: TopEncode>(
+        &mut self,
+        token_id: &[u8],
+        nonce: u64,
+        name: &[u8],
+        royalties: u64,
+        hash: &[u8],
+        new_attributes: &T,
+        uris: &[String],
+    ) {
+        println!("Updating the token {token_id:?} with nonce {nonce:?} with new attributes...");
+
+        let uris = uris
+            .iter()
+            .map(ManagedBuffer::from)
+            .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.wallet_address)
+            .gas(100_000_000u64)
+            .typed(UserBuiltinProxy)
+            .esdt_metadata_update(token_id, nonce, name, royalties, hash, new_attributes, uris)
+            .run()
+            .await;
+    }
+
+    pub async fn get_account_esdt_tokens(&mut self) -> HashMap<String, EsdtBalance> {
+        println!(
+            "Retrieving ESDT tokens for {}...",
+            self.wallet_address.to_bech32_str()
+        );
+
+        self.interactor
+            .get_account_esdt(&self.wallet_address.to_address())
+            .await
+    }
+
+    pub async fn check_nft_uris(
+        &mut self,
+        token_id: &String,
+        nonce: u64,
+        expected_uris: &[String],
+    ) {
+        let esdt_tokens = self.get_account_esdt_tokens().await;
+        let nft_token_id = if nonce <= 10 {
+            format!("{}-0{:x}", token_id, nonce)
+        } else {
+            format!("{}-{:x}", token_id, nonce)
+        };
+
+        let uris = esdt_tokens
+            .get(&nft_token_id)
+            .expect("nft token not owned by account")
+            .uris
+            .clone();
+
+        if expected_uris.is_empty() {
+            assert_eq!(1, uris.len());
+            assert_eq!(String::new(), uris[0]);
+            return;
+        }
+
+        assert_eq!(expected_uris.len(), uris.len());
+        for (index, uri) in uris.iter().enumerate() {
+            let uri_string = String::from_utf8(base64_decode(uri)).unwrap();
+            assert_eq!(expected_uris[index], uri_string);
+        }
     }
 }

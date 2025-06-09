@@ -1,3 +1,5 @@
+use core::borrow::Borrow;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
@@ -89,6 +91,28 @@ where
     }
 }
 
+impl<M, T> ManagedVecItem for MultiValueManagedVecCounted<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    type PAYLOAD = <ManagedVec<M, T> as ManagedVecItem>::PAYLOAD;
+    const SKIPS_RESERIALIZATION: bool = false;
+    type Ref<'a> = Self;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        Self::from(ManagedVec::<M, T>::read_from_payload(payload))
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        Self::read_from_payload(payload)
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.contents.save_to_payload(payload);
+    }
+}
+
 impl<M, T> TopEncodeMulti for MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
@@ -100,8 +124,8 @@ where
         H: EncodeErrorHandler,
     {
         self.len().multi_encode_or_handle_err(output, h)?;
-        for elem in self.contents.into_iter() {
-            elem.multi_encode_or_handle_err(output, h)?;
+        for elem in &self.contents {
+            elem.borrow().multi_encode_or_handle_err(output, h)?;
         }
         Ok(())
     }

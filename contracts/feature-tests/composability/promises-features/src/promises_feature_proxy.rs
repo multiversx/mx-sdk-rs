@@ -127,6 +127,48 @@ where
             .original_result()
     }
 
+    pub fn forward_payment_callback<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("forward_payment_callback")
+            .argument(&to)
+            .original_result()
+    }
+
+    pub fn forward_payment_gas_for_callback<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("forward_payment_gas_for_callback")
+            .argument(&to)
+            .original_result()
+    }
+
+    pub fn promise_raw_single_token_to_user<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<u64>,
+    >(
+        self,
+        to: Arg0,
+        gas_limit: Arg1,
+        extra_gas_for_callback: Arg2,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("promise_raw_single_token_to_user")
+            .argument(&to)
+            .argument(&gas_limit)
+            .argument(&extra_gas_for_callback)
+            .original_result()
+    }
+
     pub fn promise_raw_single_token<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
@@ -188,6 +230,28 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("forward_sync_retrieve_funds_bt")
+            .argument(&to)
+            .argument(&token)
+            .argument(&token_nonce)
+            .argument(&amount)
+            .original_result()
+    }
+
+    pub fn forward_sync_retrieve_funds_bt_reset_twice<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+        token: Arg1,
+        token_nonce: Arg2,
+        amount: Arg3,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_retrieve_funds_bt_reset_twice")
             .argument(&to)
             .argument(&token)
             .argument(&token_nonce)

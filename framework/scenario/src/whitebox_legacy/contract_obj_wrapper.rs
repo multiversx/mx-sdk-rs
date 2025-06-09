@@ -1,8 +1,10 @@
-use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{contract_instance_wrapped_execution, ContractContainer, StaticVarStack},
+    executor::debug::{
+        ContractContainer, ContractDebugInstance, ContractDebugStack, ContractDebugWhiteboxLambda,
+    },
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -13,10 +15,7 @@ use crate::{
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::{
-    tx_mock::{TxContext, TxContextStack, TxFunctionName, TxResult},
-    types::VMAddress,
-};
+use multiversx_chain_vm::host::context::{TxFunctionName, TxResult};
 use multiversx_sc::types::{BigUint, H256};
 use num_traits::Zero;
 
@@ -25,7 +24,7 @@ use super::{
     AddressFactory, MandosGenerator, ScQueryMandos,
 };
 
-pub use multiversx_chain_vm::tx_mock::TxTokenTransfer;
+pub use multiversx_chain_vm::host::context::TxTokenTransfer;
 
 #[derive(Clone)]
 pub struct ContractObjWrapper<
@@ -89,7 +88,7 @@ impl BlockchainStateWrapper {
     }
 
     pub fn check_egld_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
-        let actual_balance = match &self.world.get_state().accounts.get(&to_vm_address(address)) {
+        let actual_balance = match &self.world.get_state().accounts.get(address) {
             Some(acc) => acc.egld_balance.clone(),
             None => num_bigint::BigUint::zero(),
         };
@@ -109,7 +108,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         expected_balance: &num_bigint::BigUint,
     ) {
-        let actual_balance = match &self.world.get_state().accounts.get(&to_vm_address(address)) {
+        let actual_balance = match &self.world.get_state().accounts.get(address) {
             Some(acc) => acc.esdt.get_esdt_balance(token_id, 0),
             None => num_bigint::BigUint::zero(),
         };
@@ -135,7 +134,7 @@ impl BlockchainStateWrapper {
         T: TopEncode + TopDecode + PartialEq + core::fmt::Debug,
     {
         let (actual_balance, actual_attributes_serialized) =
-            match &self.world.get_state().accounts.get(&to_vm_address(address)) {
+            match &self.world.get_state().accounts.get(address) {
                 Some(acc) => {
                     let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
                     let opt_instance = esdt_data.instances.get_by_nonce(nonce);
@@ -293,7 +292,7 @@ impl BlockchainStateWrapper {
             .create_account_raw(address, BigUint::from(egld_balance));
     }
 
-    // Has to be used before perfoming a deploy from a SC
+    // Has to be used before performing a deploy from a SC
     // The returned SC wrapper cannot be used before the deploy is actually executed
     pub fn prepare_deploy_from_sc<CB, ContractObjBuilder>(
         &mut self,
@@ -304,20 +303,19 @@ impl BlockchainStateWrapper {
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
-        let deployer_vm_address = to_vm_address(deployer);
         let deployer_acc = self
             .world
             .get_state()
             .accounts
-            .get(&deployer_vm_address)
+            .get(deployer)
             .unwrap()
             .clone();
 
         let new_sc_address = self.address_factory.new_sc_address();
         self.world.get_mut_state().put_new_address(
-            deployer_vm_address,
+            deployer.clone(),
             deployer_acc.nonce,
-            to_vm_address(&new_sc_address),
+            new_sc_address.clone(),
         );
 
         ContractObjWrapper::new(new_sc_address, obj_builder)
@@ -493,8 +491,7 @@ impl BlockchainStateWrapper {
     }
 
     pub fn add_mandos_set_account(&mut self, address: &Address) {
-        let vm_address = to_vm_address(address);
-        if let Some(acc) = self.world.get_state().accounts.get(&vm_address).cloned() {
+        if let Some(acc) = self.world.get_state().accounts.get(address).cloned() {
             let opt_contract_path = self.address_to_code_path.get(address);
             if let Some(trace) = &mut self.world.get_mut_debugger_backend().trace {
                 MandosGenerator::new(&mut trace.scenario_trace, &mut self.current_tx_id)
@@ -504,8 +501,7 @@ impl BlockchainStateWrapper {
     }
 
     pub fn add_mandos_check_account(&mut self, address: &Address) {
-        let vm_address = to_vm_address(address);
-        if let Some(acc) = self.world.get_state().accounts.get(&vm_address).cloned() {
+        if let Some(acc) = self.world.get_state().accounts.get(address).cloned() {
             if let Some(trace) = &mut self.world.get_mut_debugger_backend().trace {
                 MandosGenerator::new(&mut trace.scenario_trace, &mut self.current_tx_id)
                     .check_account(&acc);
@@ -634,27 +630,27 @@ impl BlockchainStateWrapper {
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda_and_check(&sc_call_step, || {
-                contract_instance_wrapped_execution(false, || {
+            .perform_sc_call_lambda_and_check(
+                &sc_call_step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_LEGACY, || {
                     tx_fn(sc);
-                    Ok(())
-                });
-            });
+                })
+                .panic_message(false),
+            );
 
         tx_result
     }
 
+    /// Creates a temporary DebugApi context to run lambda function.
+    ///
+    /// Restores previous context (if any) after finishing execution.
     pub fn execute_in_managed_environment<T, F>(&self, f: F) -> T
     where
         F: FnOnce() -> T,
     {
-        let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-        TxContextStack::static_push(tx_context_arc);
-        StaticVarStack::static_push();
+        ContractDebugStack::static_push(ContractDebugInstance::dummy());
         let result = f();
-        let _ = TxContextStack::static_pop();
-        let _ = StaticVarStack::static_pop();
+        let _ = ContractDebugStack::static_pop();
 
         result
     }
@@ -662,7 +658,7 @@ impl BlockchainStateWrapper {
 
 impl BlockchainStateWrapper {
     pub fn get_egld_balance(&self, address: &Address) -> num_bigint::BigUint {
-        match self.world.get_state().accounts.get(&to_vm_address(address)) {
+        match self.world.get_state().accounts.get(address) {
             Some(acc) => acc.egld_balance.clone(),
             None => panic!(
                 "get_egld_balance: Account {:?} does not exist",
@@ -677,7 +673,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         token_nonce: u64,
     ) -> num_bigint::BigUint {
-        match self.world.get_state().accounts.get(&to_vm_address(address)) {
+        match self.world.get_state().accounts.get(address) {
             Some(acc) => acc.esdt.get_esdt_balance(token_id, token_nonce),
             None => panic!(
                 "get_esdt_balance: Account {:?} does not exist",
@@ -692,7 +688,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         token_nonce: u64,
     ) -> Option<T> {
-        match self.world.get_state().accounts.get(&to_vm_address(address)) {
+        match self.world.get_state().accounts.get(address) {
             Some(acc) => match acc.esdt.get_by_identifier(token_id) {
                 Some(esdt_data) => esdt_data
                     .instances
@@ -708,8 +704,8 @@ impl BlockchainStateWrapper {
     }
 
     pub fn dump_state(&self) {
-        for addr in self.world.get_state().accounts.keys() {
-            self.dump_state_for_account_hex_attributes(&to_framework_address(addr));
+        for address in self.world.get_state().accounts.keys() {
+            self.dump_state_for_account_hex_attributes(address);
             println!();
         }
     }
@@ -725,8 +721,7 @@ impl BlockchainStateWrapper {
         &self,
         address: &Address,
     ) {
-        let vm_address = to_vm_address(address);
-        let account = match self.world.get_state().accounts.get(&vm_address) {
+        let account = match self.world.get_state().accounts.get(address) {
             Some(acc) => acc,
             None => panic!(
                 "dump_state_for_account: Account {:?} does not exist",
@@ -816,12 +811,4 @@ where
 {
     let c_base = func();
     Box::new(c_base)
-}
-
-fn to_vm_address(address: &Address) -> VMAddress {
-    address.as_array().into()
-}
-
-fn to_framework_address(vm_address: &VMAddress) -> Address {
-    vm_address.as_array().into()
 }

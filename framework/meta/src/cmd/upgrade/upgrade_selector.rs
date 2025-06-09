@@ -1,9 +1,11 @@
+use std::path::Path;
+
 use crate::{
     cli::UpgradeArgs,
-    cmd::upgrade::upgrade_settings::UpgradeSettings,
+    cmd::{print_util::print_tree_dir_metadata, upgrade::upgrade_settings::UpgradeSettings},
     folder_structure::{dir_pretty_print, RelevantDirectories, RelevantDirectory},
     version::FrameworkVersion,
-    version_history::{versions_iter, CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION, VERSIONS},
+    version_history::{versions_iter, CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION},
 };
 use multiversx_sc_meta_lib::framework_version;
 
@@ -19,30 +21,18 @@ use super::{
 
 pub fn upgrade_sc(args: &UpgradeArgs) {
     let path = if let Some(some_path) = &args.path {
-        some_path.as_str()
+        Path::new(some_path)
     } else {
-        "./"
+        Path::new("./")
     };
 
     let settings = UpgradeSettings::new(args.no_check);
 
     let last_version = args
         .override_target_version
-        .clone()
-        .map(|override_target_v| {
-            VERSIONS
-                .iter()
-                .find(|v| v.to_string() == override_target_v)
-                .cloned()
-                .unwrap_or(LAST_UPGRADE_VERSION)
-        })
-        .unwrap_or_else(|| LAST_UPGRADE_VERSION);
-
-    assert!(
-        VERSIONS.contains(&last_version),
-        "Invalid requested version: {}",
-        last_version.version,
-    );
+        .as_deref()
+        .map(FrameworkVersion::from_string_template)
+        .unwrap_or(LAST_UPGRADE_VERSION);
 
     let mut dirs = RelevantDirectories::find_all(path, args.ignore.as_slice());
     println!(

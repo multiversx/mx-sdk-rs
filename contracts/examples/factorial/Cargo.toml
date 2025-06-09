@@ -8,10 +8,14 @@ publish = false
 [lib]
 path = "src/factorial.rs"
 
+[features]
+compiled-sc-tests = ["multiversx-sc-scenario/compiled-sc-tests"]
+
 [dependencies.multiversx-sc]
-version = "0.53.0"
+version = "0.58.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.53.0"
+version = "0.58.0"
+features = ["wasmer-experimental"]
 path = "../../../framework/scenario"

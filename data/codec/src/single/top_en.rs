@@ -5,8 +5,8 @@ use crate::{
 use alloc::vec::Vec;
 use unwrap_infallible::UnwrapInfallible;
 
-pub trait TopEncode {
-    /// Attempt to serialize the value to ouput.
+pub trait TopEncode: Sized {
+    /// Attempt to serialize the value to output.
     fn top_encode<O>(&self, output: O) -> Result<(), EncodeError>
     where
         O: TopEncodeOutput,

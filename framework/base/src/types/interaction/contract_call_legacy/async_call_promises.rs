@@ -1,5 +1,7 @@
+use core::ops::DerefMut;
+
 use crate::{
-    api::CallTypeApi,
+    api::{const_handles, CallTypeApi},
     contract_base::SendRawWrapper,
     types::{BigUint, CallbackClosure, FunctionCall, ManagedAddress, ManagedBuffer},
 };
@@ -41,16 +43,14 @@ where
     }
 
     pub fn register_promise(self) {
-        use crate::{api::const_handles, types::ManagedType};
-
         let mut cb_closure_args_serialized =
-            ManagedBuffer::<SA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
+            unsafe { ManagedBuffer::temp_const_ref_mut(const_handles::MBUF_TEMPORARY_1) };
         let callback_name;
         if let Some(callback_call) = self.callback_call {
             callback_name = callback_call.callback_name;
             callback_call
                 .closure_args
-                .serialize_overwrite(&mut cb_closure_args_serialized);
+                .serialize_overwrite(cb_closure_args_serialized.deref_mut());
         } else {
             callback_name = "";
             cb_closure_args_serialized.overwrite(&[]);

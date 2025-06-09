@@ -50,7 +50,7 @@ pub trait NftStoragePrepay {
     #[payable("EGLD")]
     #[endpoint(depositPaymentForStorage)]
     fn deposit_payment_for_storage(&self) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let caller = self.blockchain().get_caller();
         self.deposit(&caller)
             .update(|deposit| *deposit += &*payment);

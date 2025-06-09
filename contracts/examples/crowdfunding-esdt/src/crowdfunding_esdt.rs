@@ -29,7 +29,7 @@ pub trait Crowdfunding {
     }
 
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn fund(&self) {
         let (token, _, payment) = self.call_value().egld_or_single_esdt().into_tuple();
 
@@ -55,6 +55,7 @@ pub trait Crowdfunding {
     }
 
     #[view(getCurrentFunds)]
+    #[title("currentFunds")]
     fn get_current_funds(&self) -> BigUint {
         let token = self.cf_token_identifier().get();
 
@@ -106,18 +107,22 @@ pub trait Crowdfunding {
     // storage
 
     #[view(getTarget)]
+    #[title("target")]
     #[storage_mapper("target")]
     fn target(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getDeadline)]
+    #[title("deadline")]
     #[storage_mapper("deadline")]
     fn deadline(&self) -> SingleValueMapper<u64>;
 
     #[view(getDeposit)]
+    #[title("deposit")]
     #[storage_mapper("deposit")]
     fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[view(getCrowdfundingTokenIdentifier)]
+    #[title("tokenIdentifier")]
     #[storage_mapper("tokenIdentifier")]
     fn cf_token_identifier(&self) -> SingleValueMapper<EgldOrEsdtTokenIdentifier>;
 }

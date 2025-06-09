@@ -4,14 +4,16 @@ multiversx_sc::derive_imports!();
 use super::fwd_storage_legacy;
 
 // used as mock attributes for NFTs
-#[derive(TopEncode, TopDecode, TypeAbi, Clone, Copy, PartialEq, Debug)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
     pub b: u8,
 }
 
-#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone)]
 pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub biguint: BigUint<M>,
     pub vec_u8: ManagedBuffer<M>,
@@ -50,13 +52,13 @@ pub trait ForwarderNftModule: fwd_storage_legacy::ForwarderStorageModule {
     #[payable("EGLD")]
     #[endpoint]
     fn nft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         let caller = self.blockchain().get_caller();
 
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 NonFungibleTokenProperties {

@@ -16,7 +16,7 @@ where
 
 impl<Env> TxPaymentMultiEsdt<Env> for MultiEsdtPayment<Env::Api> where Env: TxEnv {}
 impl<Env> TxPaymentMultiEsdt<Env> for &MultiEsdtPayment<Env::Api> where Env: TxEnv {}
-impl<'a, Env> TxPaymentMultiEsdt<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::Api>> where
+impl<Env> TxPaymentMultiEsdt<Env> for ManagedRef<'_, Env::Api, MultiEsdtPayment<Env::Api>> where
     Env: TxEnv
 {
 }
@@ -62,7 +62,10 @@ where
             0 => ().with_normalized(env, from, to, fc, f),
             1 => self.get(0).as_refs().with_normalized(env, from, to, fc, f),
             _ => to.with_address_ref(env, |to_addr| {
-                let fc_conv = fc.convert_to_multi_transfer_esdt_call(to_addr, self);
+                let fc_conv = fc.convert_to_multi_transfer_esdt_call(
+                    to_addr,
+                    self.as_multi_egld_or_esdt_payment(),
+                );
                 f(&from.resolve_address(env), &*BigUint::zero_ref(), fc_conv)
             }),
         }
@@ -71,12 +74,12 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: self.clone(),
+            multi_esdt: self.as_multi_egld_or_esdt_payment().clone(),
         }
     }
 }
 
-impl<'a, Env> TxPayment<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::Api>>
+impl<Env> TxPayment<Env> for ManagedRef<'_, Env::Api, MultiEsdtPayment<Env::Api>>
 where
     Env: TxEnv,
 {
@@ -159,7 +162,7 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: self,
+            multi_esdt: self.into_multi_egld_or_esdt_payment(),
         }
     }
 }

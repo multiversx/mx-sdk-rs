@@ -3,8 +3,9 @@ use multiversx_sc_scenario::imports::*;
 const ADDER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
     blockchain.register_contract(
         "mxsc:output/scenario-tester.mxsc.json",
         scenario_tester::ContractBuilder,
@@ -29,7 +30,7 @@ fn st_blackbox_upgrade() {
                 .code(&st_code)
                 .argument("5")
                 .gas_limit("5,000,000")
-                .expect(TxExpect::ok().no_result()),
+                .expect(TxExpect::ok().result("str:init-result")),
         )
         .sc_call(
             ScCallStep::new()

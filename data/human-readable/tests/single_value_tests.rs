@@ -137,7 +137,7 @@ fn serialize_single_value_address() {
 
     let address = bech32::decode(TEST_ADDRESS);
 
-    assert_eq!(serialized, address.into_boxed_bytes().into_vec());
+    assert_eq!(serialized, address.to_vec());
 }
 
 #[test]
@@ -145,7 +145,7 @@ fn deserialize_single_value_address() {
     let abi: ContractAbi = deserialize_abi_from_json(EMPTY_ABI_JSON).unwrap().into();
     let address = bech32::decode(TEST_ADDRESS);
 
-    let value = AnyValue::SingleValue(SingleValue::Bytes(address.into_boxed_bytes().into_box()));
+    let value = AnyValue::SingleValue(SingleValue::Bytes(address.as_bytes().into()));
     let result = encode_human_readable_value(&value, "Address", &abi).unwrap();
 
     assert_eq!(result.to_string(), format!("\"{}\"", TEST_ADDRESS));

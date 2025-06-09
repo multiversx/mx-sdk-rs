@@ -58,6 +58,7 @@ pub trait AbiTester {
     fn take_managed_type(&self, _arg: AbiManagedType<Self::Api>) {}
 
     #[endpoint]
+    #[title("result-3")]
     #[output_name("multi-result-1")]
     #[output_name("multi-result-2")]
     #[output_name("multi-result-3")]
@@ -110,6 +111,14 @@ pub trait AbiTester {
     }
 
     #[endpoint]
+    fn process_managed_decimal(
+        &self,
+        input: ManagedDecimal<Self::Api, ConstDecimals<U10>>,
+    ) -> ManagedDecimal<Self::Api, usize> {
+        input.into()
+    }
+
+    #[endpoint]
     fn esdt_local_role(&self) -> EsdtLocalRole {
         EsdtLocalRole::None
     }
@@ -141,6 +150,11 @@ pub trait AbiTester {
     #[view]
     fn item_for_managed_vec(&self) -> ManagedVec<AbiManagedVecItem> {
         ManagedVec::new()
+    }
+
+    #[view]
+    fn echo_permission(&self, p: Permission) -> Permission {
+        p
     }
 
     #[view]

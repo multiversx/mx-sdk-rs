@@ -1,7 +1,8 @@
+mod adder_proxy;
+
 use multiversx_sc::codec::top_encode_to_vec_u8_or_panic;
 use multiversx_sc_scenario::imports::*;
 
-use adder::adder_proxy;
 use multisig::{multisig_proxy, multisig_view_proxy};
 use num_bigint::BigUint;
 
@@ -10,17 +11,17 @@ const ADDER_OWNER_ADDRESS: TestAddress = TestAddress::new("adder-owner");
 const ADDER_CODE_PATH: MxscPath = MxscPath::new("test-contracts/adder.mxsc.json");
 const BOARD_MEMBER_ADDRESS: TestAddress = TestAddress::new("board-member");
 const MULTISIG_ADDRESS: TestSCAddress = TestSCAddress::new("multisig");
-const MULTISIG_CODE_PATH: MxscPath = MxscPath::new("output/multisig.mxsc.json");
+const MULTISIG_CODE_PATH: MxscPath = MxscPath::new("output/multisig-full.mxsc.json");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const PROPOSER_ADDRESS: TestAddress = TestAddress::new("proposer");
 const PROPOSER_BALANCE: u64 = 100_000_000;
 const QUORUM_SIZE: usize = 1;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
     blockchain.register_contract(MULTISIG_CODE_PATH, multisig::ContractBuilder);
-    blockchain.register_contract(ADDER_CODE_PATH, adder::ContractBuilder);
     blockchain
 }
 
@@ -568,10 +569,6 @@ fn test_deploy_and_upgrade_from_source() {
 
     let factorial_address: TestSCAddress = TestSCAddress::new("factorial");
     let factorial_path: MxscPath = MxscPath::new("test-contracts/factorial.mxsc.json");
-
-    state
-        .world
-        .register_contract(factorial_path, factorial::ContractBuilder);
 
     state.world.account(factorial_address).code(factorial_path);
 

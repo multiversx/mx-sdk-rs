@@ -9,6 +9,6 @@ publish = false
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]
-version = "0.53.0"
+version = "0.58.0"
 path = "../../../../../framework/meta-lib"
 default-features = false

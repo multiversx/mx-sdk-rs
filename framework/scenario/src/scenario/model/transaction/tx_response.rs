@@ -1,4 +1,4 @@
-use multiversx_chain_vm::tx_mock::TxResult;
+use multiversx_chain_vm::{host::context::TxResult, types::H256};
 use multiversx_sc::types::Address;
 
 use super::{Log, TxExpect, TxResponseStatus};
@@ -17,9 +17,11 @@ pub struct TxResponse {
     /// The logs of the transaction.
     pub logs: Vec<Log>,
     /// The gas used by the transaction.
-    pub gas: u64,
+    pub gas_used: u64,
     /// The refund of the transaction.
     pub refund: u64,
+    /// The transaction hash, if available.
+    pub tx_hash: Option<H256>,
 }
 
 impl TxResponse {
@@ -35,12 +37,13 @@ impl TxResponse {
                 .result_logs
                 .iter()
                 .map(|tx_log| Log {
-                    address: Address::from_slice(tx_log.address.as_bytes()),
+                    address: tx_log.address.clone(),
                     endpoint: tx_log.endpoint.to_string(),
                     topics: tx_log.topics.clone(),
                     data: tx_log.data.clone(),
                 })
                 .collect(),
+            gas_used: tx_result.gas_used.as_u64(),
             ..Default::default()
         }
     }

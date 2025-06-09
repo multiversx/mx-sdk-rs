@@ -125,6 +125,10 @@ pub struct EndpointAbiJson {
     pub docs: Vec<String>,
     pub name: String,
 
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+
     #[serde(rename = "onlyOwner")]
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -160,6 +164,7 @@ impl From<&EndpointAbi> for EndpointAbiJson {
         EndpointAbiJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
+            title: abi.title.clone(),
             only_owner: if abi.only_owner { Some(true) } else { None },
             only_admin: if abi.only_admin { Some(true) } else { None },
             mutability: match abi.mutability {
@@ -206,6 +211,7 @@ impl From<&EndpointAbiJson> for EndpointAbi {
             labels: abi.labels.clone(),
             allow_multiple_var_args: abi.allow_multiple_var_args.unwrap_or(false),
             rust_method_name: abi.name.clone(),
+            title: None,
             endpoint_type: EndpointTypeAbi::Endpoint,
         }
     }
@@ -235,6 +241,7 @@ impl From<&ConstructorAbiJson> for EndpointAbi {
             labels: vec![],
             allow_multiple_var_args: false,
             rust_method_name: "".to_string(),
+            title: None,
             endpoint_type: EndpointTypeAbi::Init,
         }
     }

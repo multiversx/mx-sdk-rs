@@ -1,5 +1,5 @@
 use colored::Colorize;
-use std::fs;
+use std::{fs, path::Path};
 
 use crate::contract::sc_config::proxy_config::ProxyConfig;
 
@@ -13,7 +13,7 @@ impl MetaConfig {
     pub fn generate_proxy(&mut self) {
         if self.sc_config.proxy_configs.is_empty() {
             let proxy_config_default =
-                ProxyConfig::new_with_default_path(self.original_contract_abi.clone());
+                ProxyConfig::output_dir_proxy_config(self.original_contract_abi.clone());
             write_proxy_with_explicit_path(&proxy_config_default, self);
             return;
         }
@@ -35,7 +35,7 @@ fn compare_proxy_explicit_path(proxy_config: &ProxyConfig, meta_config: &MetaCon
     let mut proxy_generator = ProxyGenerator::new(meta_config, &mut temp, proxy_config);
     proxy_generator.write_proxy_to_file();
 
-    let existent_proxy_path = format!("../{}", proxy_config.path);
+    let existent_proxy_path = Path::new("..").join(&proxy_config.path);
     let existent_proxy = fs::read_to_string(existent_proxy_path);
 
     if let Ok(existent_proxy) = existent_proxy {

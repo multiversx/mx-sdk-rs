@@ -79,7 +79,6 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "0",
                             "str:REC-TOKEN",
                             "0",
                             "1"

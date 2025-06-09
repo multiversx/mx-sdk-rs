@@ -99,7 +99,7 @@ fn decode_single_value(
                 .map_err(|_| Box::new(DecodeError("failed to parse address")))?;
 
             Ok(AnyValue::SingleValue(SingleValue::Bytes(
-                address.into_boxed_bytes().into_box(),
+                address.as_bytes().into()
             )))
         },
         "bool" => {

@@ -11,6 +11,7 @@ use anyhow::Result;
 use bip39::{Language, Mnemonic};
 use ctr::{cipher::StreamCipher, Ctr128BE};
 use hmac::{Hmac, Mac};
+use multiversx_chain_core::types::Address;
 use pbkdf2::pbkdf2;
 use rand::RngCore;
 use scrypt::{scrypt, Params};
@@ -24,7 +25,7 @@ use crate::{
         private_key::{PrivateKey, PRIVATE_KEY_LENGTH},
         public_key::PublicKey,
     },
-    data::{address::Address, keystore::*, transaction::Transaction},
+    data::{keystore::*, transaction::Transaction},
     utils::*,
 };
 
@@ -140,6 +141,12 @@ impl Wallet {
         Ok(Self { priv_key: pri_key })
     }
 
+    pub fn get_shard(&self) -> u8 {
+        let address = self.to_address();
+        let address_bytes = address.as_bytes();
+        address_bytes[address_bytes.len() - 1] % 3
+    }
+
     pub fn get_pem_decoded_content(file: &str) -> Vec<u8> {
         let pem_content = fs::read_to_string(file).unwrap();
         let lines: Vec<&str> = pem_content.split('\n').collect();
@@ -192,9 +199,16 @@ impl Wallet {
         Ok(priv_key)
     }
 
-    pub fn address(&self) -> Address {
-        let public_key = PublicKey::from(&self.priv_key);
-        Address::from(&public_key)
+    #[deprecated(
+        since = "0.54.0",
+        note = "Renamed to `to_address`, type changed to multiversx_chain_core::types::Address"
+    )]
+    pub fn address(&self) -> crate::data::sdk_address::SdkAddress {
+        crate::data::sdk_address::SdkAddress(self.to_address())
+    }
+
+    pub fn to_address(&self) -> Address {
+        PublicKey::from(&self.priv_key).to_address()
     }
 
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> [u8; 64] {
@@ -336,7 +350,7 @@ impl Wallet {
             version: KEYSTORE_VERSION,
             kind: "secretKey".to_string(),
             address: public_key.to_string(),
-            bech32: address.to_string(),
+            bech32: crate::bech32::encode(address),
         };
 
         let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
@@ -356,11 +370,9 @@ impl Wallet {
             .collect::<Vec<&str>>()
             .join("\n");
 
+        let address_bech32 = crate::bech32::encode(address);
         let pem_content = format!(
-            "-----BEGIN PRIVATE KEY for {}-----\n{}\n-----END PRIVATE KEY for {}-----\n",
-            address.to_bech32_string().unwrap(),
-            formatted_key,
-            address.to_bech32_string().unwrap()
+            "-----BEGIN PRIVATE KEY for {address_bech32}-----\n{formatted_key}\n-----END PRIVATE KEY for {address_bech32}-----\n"
         );
 
         pem_content

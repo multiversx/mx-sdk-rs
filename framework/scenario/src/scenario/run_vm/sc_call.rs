@@ -4,9 +4,10 @@ use crate::{
     scenario_model::TxResponse,
 };
 
-use multiversx_chain_vm::{
-    tx_execution::execute_current_tx_context_input,
-    tx_mock::{TxInput, TxResult, TxTokenTransfer},
+use multiversx_chain_vm::host::{
+    context::{TxFunctionName, TxInput, TxResult, TxTokenTransfer},
+    execution,
+    runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
 };
 use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti};
 
@@ -18,7 +19,7 @@ impl ScenarioVMRunner {
     /// The result of the operation gets saved back in the step's response field.
     pub fn perform_sc_call_update_results(&mut self, step: &mut ScCallStep) {
         let tx_result =
-            self.perform_sc_call_lambda_and_check(step, execute_current_tx_context_input);
+            self.perform_sc_call_lambda_and_check(step, RuntimeInstanceCallLambdaDefault);
         let response = TxResponse::from_tx_result(tx_result);
         step.save_response(response);
     }
@@ -44,25 +45,27 @@ impl ScenarioVMRunner {
     {
         let sc_call_step: ScCallStep = typed_sc_call.into();
         let tx_result =
-            self.perform_sc_call_lambda(&sc_call_step, execute_current_tx_context_input);
+            self.perform_sc_call_lambda(&sc_call_step, RuntimeInstanceCallLambdaDefault);
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 
     pub fn perform_sc_call_lambda<F>(&mut self, sc_call_step: &ScCallStep, f: F) -> TxResult
     where
-        F: FnOnce(),
+        F: RuntimeInstanceCallLambda,
     {
-        let tx_input = tx_input_from_call(sc_call_step);
+        let tx_input = tx_input_from_call(sc_call_step, f.override_function_name());
 
         // nonce gets increased irrespective of whether the tx fails or not
         self.blockchain_mock
             .state
             .increase_account_nonce(&tx_input.from);
 
-        self.blockchain_mock.vm.sc_call_with_async_and_callback(
+        let runtime = self.create_debugger_runtime();
+        execution::commit_call_with_async_and_callback(
             tx_input,
             &mut self.blockchain_mock.state,
+            &runtime,
             f,
         )
     }
@@ -73,7 +76,7 @@ impl ScenarioVMRunner {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce(),
+        F: RuntimeInstanceCallLambda,
     {
         let tx_result = self.perform_sc_call_lambda(sc_call_step, f);
         if let Some(tx_expect) = &sc_call_step.expect {
@@ -83,14 +86,17 @@ impl ScenarioVMRunner {
     }
 }
 
-fn tx_input_from_call(sc_call_step: &ScCallStep) -> TxInput {
+fn tx_input_from_call(
+    sc_call_step: &ScCallStep,
+    override_func_name: Option<TxFunctionName>,
+) -> TxInput {
     let tx = &sc_call_step.tx;
     TxInput {
-        from: tx.from.to_vm_address(),
-        to: tx.to.to_vm_address(),
+        from: tx.from.to_address(),
+        to: tx.to.to_address(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: tx_esdt_transfers_from_scenario(tx.esdt_value.as_slice()),
-        func_name: tx.function.clone().into(),
+        func_name: override_func_name.unwrap_or_else(|| tx.function.clone().into()),
         args: tx
             .arguments
             .iter()

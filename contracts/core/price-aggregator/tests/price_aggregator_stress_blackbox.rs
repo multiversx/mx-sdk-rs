@@ -23,6 +23,7 @@ mod price_aggregator_proxy;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/core/price-aggregator");
     blockchain.register_contract(
         PRICE_AGGREGATOR_PATH,
         multiversx_price_aggregator_sc::ContractBuilder,
@@ -206,7 +207,4 @@ fn test_price_aggregator_submit() {
         100,
         rand::random::<u64>(),
     );
-    state
-        .world
-        .write_scenario_trace("scenarios/stress_submit_test.scen.json");
 }

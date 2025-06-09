@@ -1,7 +1,10 @@
-use multiversx_chain_vm::world_mock::BlockchainState;
+use multiversx_chain_vm::{blockchain::state::BlockchainState, schedule::GasScheduleVersion};
 
 use crate::{
-    scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
+    scenario::{
+        run_trace::ScenarioTrace,
+        run_vm::{ExecutorConfig, ScenarioVMRunner},
+    },
     vm_go_tool::run_mx_scenario_go,
 };
 use multiversx_sc_meta_lib::tools::find_current_workspace;
@@ -21,7 +24,7 @@ pub struct ScenarioWorld {
 }
 
 pub(crate) enum Backend {
-    Debugger(DebuggerBackend),
+    Debugger(Box<DebuggerBackend>),
     VmGoBackend,
 }
 
@@ -35,16 +38,27 @@ impl ScenarioWorld {
     pub fn debugger() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),
-            backend: Backend::Debugger(DebuggerBackend {
+            backend: Backend::Debugger(Box::new(DebuggerBackend {
                 vm_runner: ScenarioVMRunner::new(),
                 trace: None,
-            }),
+            })),
         }
     }
 
     /// Backwards compatibility only.
     pub fn new() -> Self {
         Self::debugger()
+    }
+
+    pub fn executor_config(mut self, config: ExecutorConfig) -> Self {
+        self.get_mut_debugger_backend().vm_runner.executor_config = config;
+        self
+    }
+
+    pub fn gas_schedule(mut self, gas_schedule: GasScheduleVersion) -> Self {
+        let vm = &mut self.get_mut_debugger_backend().vm_runner.blockchain_mock.vm;
+        vm.change_gas_schedule(gas_schedule.load_gas_schedule());
+        self
     }
 
     pub fn vm_go() -> Self {
@@ -103,11 +117,8 @@ impl ScenarioWorld {
         self
     }
 
-    /// Older versions of the Rust compiler were setting a wrong path in the environment when debugging.
-    /// This method was made as a workaround to avoid this problem.
-    ///
-    /// Fortunately, the issue was fixed in Rust, and so this function is no longer necessary.
-    #[deprecated(since = "0.50.2", note = "No longer needed, simply delete.")]
+    /// Tells the tests where the crate lies relative to the workspace.
+    /// This ensures that the paths are set correctly, including in debug mode.
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
         let mut path = find_current_workspace().unwrap();
         path.push(relative_path);
