@@ -61,14 +61,14 @@ impl<'w> CheckStateBuilder<'w> {
     where
         A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
-        self.add_current_acount();
+        self.add_current_account();
         let env = self.new_env_data();
         let address_value = address_annotated(&env, &address);
         self.reset_account(address_value.into());
         self
     }
 
-    fn add_current_acount(&mut self) {
+    fn add_current_account(&mut self) {
         if let Entry::Vacant(entry) = self
             .check_state_step
             .accounts
@@ -86,7 +86,7 @@ impl<'w> CheckStateBuilder<'w> {
 
     /// Finished and sets all account in the blockchain mock.
     fn commit_accounts(&mut self) {
-        self.add_current_acount();
+        self.add_current_account();
         self.world.run_check_state_step(&self.check_state_step);
     }
 

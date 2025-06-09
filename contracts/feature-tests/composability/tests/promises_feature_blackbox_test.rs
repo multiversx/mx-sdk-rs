@@ -7,7 +7,7 @@ use promises_features::promises_feature_proxy;
 const USER_ADDRESS: TestAddress = TestAddress::new("user");
 const PROMISES_FEATURE_ADDRESS: TestSCAddress = TestSCAddress::new("promises-feature");
 const PROMISES_FEATURES_PATH: MxscPath =
-    MxscPath::new("promises-features/output/promises-feature.mxsc.json");
+    MxscPath::new("promises-features/output/promises-features.mxsc.json");
 const VAULT_ADDRESS: TestSCAddress = TestSCAddress::new("vault");
 const VAULT_PATH: MxscPath = MxscPath::new("../vault/output/vault.mxsc.json");
 

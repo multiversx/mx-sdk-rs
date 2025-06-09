@@ -117,7 +117,7 @@ fn sanitize_output_path_from_report(reports: &mut [CodeReportJson]) {
         report.path = report
             .path
             .split('/')
-            .last()
+            .next_back()
             .unwrap_or(&report.path)
             .to_string();
     })

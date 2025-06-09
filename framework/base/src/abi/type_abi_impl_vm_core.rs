@@ -63,7 +63,7 @@ impl TypeAbi for CodeMetadata {
 impl TypeAbiFrom<Self> for EsdtTokenType {}
 impl TypeAbiFrom<&Self> for EsdtTokenType {}
 
-// implementation originally geneated via #[type_abi] attribute
+// implementation originally generated via #[type_abi] attribute
 impl TypeAbi for EsdtTokenType {
     type Unmanaged = Self;
     fn type_name() -> TypeName {
@@ -127,7 +127,7 @@ impl TypeAbi for EsdtTokenType {
 impl TypeAbiFrom<Self> for EsdtLocalRole {}
 impl TypeAbiFrom<&Self> for EsdtLocalRole {}
 
-// implementation originally geneated via #[type_abi] attribute
+// implementation originally generated via #[type_abi] attribute
 impl TypeAbi for EsdtLocalRole {
     type Unmanaged = Self;
 

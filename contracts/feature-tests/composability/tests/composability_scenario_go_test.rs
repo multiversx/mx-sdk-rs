@@ -225,6 +225,11 @@ fn forwarder_call_sync_accept_multi_transfer_go() {
 }
 
 #[test]
+fn forwarder_call_sync_accept_multi_transfer_egld_go() {
+    world().run("scenarios/forwarder_call_sync_accept_multi_transfer_egld.scen.json");
+}
+
+#[test]
 fn forwarder_call_sync_accept_nft_go() {
     world().run("scenarios/forwarder_call_sync_accept_nft.scen.json");
 }
@@ -415,8 +420,8 @@ fn forwarder_sync_echo_go() {
 }
 
 #[test]
-fn forwarder_tranfer_esdt_with_fees_go() {
-    world().run("scenarios/forwarder_tranfer_esdt_with_fees.scen.json");
+fn forwarder_transfer_esdt_with_fees_go() {
+    world().run("scenarios/forwarder_transfer_esdt_with_fees.scen.json");
 }
 
 #[test]

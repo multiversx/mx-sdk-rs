@@ -67,6 +67,9 @@ pub struct ContractVariantSerde {
 
     #[serde(default)]
     pub std: Option<bool>,
+
+    #[serde(rename = "rustc-target")]
+    pub rustc_target: Option<String>,
 }
 
 #[derive(Deserialize, Default, Debug)]

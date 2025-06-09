@@ -31,7 +31,7 @@ impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
                 &(&sum * &sum * sum / 3u32) + &arguments.balance + initial_cost.clone()
             },
             FunctionSelector::None => {
-                M::error_api_impl().signal_error(b"Bonding Curve function is not assiged")
+                M::error_api_impl().signal_error(b"Bonding Curve function is not assigned")
             },
         }
     }

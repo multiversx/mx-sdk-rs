@@ -1,4 +1,4 @@
-use multiversx_chain_vm::tx_mock::TxFunctionName;
+use multiversx_chain_vm::host::context::TxFunctionName;
 use multiversx_sc::chain_core::types::ReturnCode;
 
 use crate::scenario_model::{CheckValue, U64Value};
