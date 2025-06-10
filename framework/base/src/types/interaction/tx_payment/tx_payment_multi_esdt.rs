@@ -36,7 +36,7 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        let _ = SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
+        SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
             to,
             self,
             gas_limit,

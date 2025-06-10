@@ -23,7 +23,7 @@ where
     ) {
         if self.token_nonce == 0 {
             // fungible ESDT
-            let _ = SendRawWrapper::<Env::Api>::new().transfer_esdt_execute(
+            SendRawWrapper::<Env::Api>::new().transfer_esdt_execute(
                 to,
                 self.token_identifier,
                 self.amount,
@@ -33,7 +33,7 @@ where
             );
         } else {
             // non-fungible/semi-fungible ESDT
-            let _ = SendRawWrapper::<Env::Api>::new().transfer_esdt_nft_execute(
+            SendRawWrapper::<Env::Api>::new().transfer_esdt_nft_execute(
                 to,
                 self.token_identifier,
                 self.token_nonce,

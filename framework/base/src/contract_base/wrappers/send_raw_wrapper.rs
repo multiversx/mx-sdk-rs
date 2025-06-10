@@ -37,6 +37,9 @@ where
     _phantom: PhantomData<A>,
 }
 
+/// Error type returned when a transfer-execute operation signals that it failed.
+pub struct TransferExecuteFailed;
+
 impl<A> SendRawWrapper<A>
 where
     A: CallTypeApi,
@@ -67,7 +70,7 @@ where
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_overwrite(empty_mb_handle.clone(), &[]);
 
-        let _ = A::send_api_impl().transfer_value_execute(
+        A::send_api_impl().transfer_value_execute(
             to.get_handle().get_raw_handle(),
             egld_value.get_handle().get_raw_handle(),
             0,
@@ -83,14 +86,14 @@ where
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         A::send_api_impl().transfer_value_execute(
             to.get_handle().get_raw_handle(),
             egld_value.get_handle().get_raw_handle(),
             gas_limit,
             endpoint_name.get_handle().get_raw_handle(),
             arg_buffer.get_handle().get_raw_handle(),
-        )
+        );
     }
 
     pub fn transfer_esdt_execute(
@@ -101,8 +104,8 @@ where
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
-        self.transfer_esdt_nft_execute(to, token, 0, value, gas_limit, endpoint_name, arg_buffer)
+    ) {
+        self.transfer_esdt_nft_execute(to, token, 0, value, gas_limit, endpoint_name, arg_buffer);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -115,14 +118,14 @@ where
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         let mut payments: ManagedVec<A, EsdtTokenPayment<A>> = ManagedVec::new();
         payments.push(EsdtTokenPayment::new(
             token.clone(),
             nonce,
             egld_value.clone(),
         ));
-        self.multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
+        self.multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer);
     }
 
     pub fn multi_esdt_transfer_execute(
@@ -132,14 +135,14 @@ where
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         A::send_api_impl().multi_transfer_esdt_nft_execute(
             to.get_handle().get_raw_handle(),
             payments.get_handle().get_raw_handle(),
             gas_limit,
             endpoint_name.get_handle().get_raw_handle(),
             arg_buffer.get_handle().get_raw_handle(),
-        )
+        );
     }
 
     pub fn multi_egld_or_esdt_transfer_execute(
@@ -149,16 +152,17 @@ where
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         if let Some(single_item) = payments.is_single_item() {
             if single_item.token_identifier.is_egld() {
-                return self.direct_egld_execute(
+                self.direct_egld_execute(
                     to,
                     &single_item.amount,
                     gas_limit,
                     endpoint_name,
                     arg_buffer,
                 );
+                return;
             }
         }
         A::send_api_impl().multi_transfer_esdt_nft_execute(
@@ -167,7 +171,43 @@ where
             gas_limit,
             endpoint_name.get_handle().get_raw_handle(),
             arg_buffer.get_handle().get_raw_handle(),
-        )
+        );
+    }
+
+    pub fn multi_egld_or_esdt_transfer_execute_fallible(
+        &self,
+        to: &ManagedAddress<A>,
+        payments: &ManagedVec<A, EgldOrEsdtTokenPayment<A>>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> Result<(), TransferExecuteFailed> {
+        if let Some(single_item) = payments.is_single_item() {
+            if single_item.token_identifier.is_egld() {
+                self.direct_egld_execute(
+                    to,
+                    &single_item.amount,
+                    gas_limit,
+                    endpoint_name,
+                    arg_buffer,
+                );
+                return Ok(());
+            }
+        }
+
+        let ret = A::send_api_impl().multi_transfer_esdt_nft_execute_with_return(
+            to.get_handle().get_raw_handle(),
+            payments.get_handle().get_raw_handle(),
+            gas_limit,
+            endpoint_name.get_handle().get_raw_handle(),
+            arg_buffer.get_handle().get_raw_handle(),
+        );
+
+        if ret == 0 {
+            Ok(())
+        } else {
+            Err(TransferExecuteFailed)
+        }
     }
 
     pub fn async_call_raw(

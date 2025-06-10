@@ -38,7 +38,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         self.0.with_value_ref(env, |egld_value| {
-            let _ = SendRawWrapper::<Env::Api>::new().direct_egld_execute(
+            SendRawWrapper::<Env::Api>::new().direct_egld_execute(
                 to,
                 egld_value,
                 gas_limit,
