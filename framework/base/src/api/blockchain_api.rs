@@ -99,7 +99,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         self.mb_overwrite(dest, self.get_prev_block_random_seed_legacy().as_slice());
     }
 
-    fn get_block_round_time_in_milliseconds(&self) -> u64;
+    fn get_block_round_time_ms(&self) -> u64;
 
     fn epoch_start_block_timestamp_ms(&self) -> u64;
 

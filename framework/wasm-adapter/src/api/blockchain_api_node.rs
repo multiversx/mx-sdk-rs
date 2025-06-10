@@ -40,8 +40,8 @@ unsafe extern "C" {
     fn getPrevBlockEpoch() -> i64;
     fn getPrevBlockRandomSeed(resultOffset: *const u8);
 
-    fn getBlockRoundTimeInMilliseconds() -> i64;
-    fn epochStartBlockTimeStampMs() -> i64;
+    fn getBlockRoundTimeMs() -> i64;
+    fn epochStartBlockTimestampMs() -> i64;
     fn epochStartBlockNonce() -> i64;
     fn epochStartBlockRound() -> i64;
 
@@ -283,13 +283,13 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_block_round_time_in_milliseconds(&self) -> u64 {
-        unsafe { getBlockRoundTimeInMilliseconds() as u64 }
+    fn get_block_round_time_ms(&self) -> u64 {
+        unsafe { getBlockRoundTimeMs() as u64 }
     }
 
     #[inline]
     fn epoch_start_block_timestamp_ms(&self) -> u64 {
-        unsafe { epochStartBlockTimeStampMs() as u64 }
+        unsafe { epochStartBlockTimestampMs() as u64 }
     }
 
     #[inline]

@@ -708,12 +708,12 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         self.handler.get_prev_block_random_seed(result_handle)
     }
 
-    fn get_block_round_time_in_milliseconds(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        panic!("Unavailable: get_block_round_time_in_milliseconds")
+    fn get_block_round_time_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        panic!("Unavailable: get_block_round_time_ms")
     }
 
-    fn epoch_start_block_time_stamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        panic!("Unavailable: epoch_start_block_time_stamp")
+    fn epoch_start_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        panic!("Unavailable: epoch_start_block_timestamp")
     }
 
     fn epoch_start_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {

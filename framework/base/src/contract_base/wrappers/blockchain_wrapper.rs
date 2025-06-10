@@ -252,8 +252,8 @@ where
 
     #[cfg(feature = "barnard")]
     #[inline]
-    pub fn get_block_round_time_in_milliseconds(&self) -> u64 {
-        A::blockchain_api_impl().get_block_round_time_in_milliseconds()
+    pub fn get_block_round_time_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_block_round_time_ms()
     }
 
     #[cfg(feature = "barnard")]

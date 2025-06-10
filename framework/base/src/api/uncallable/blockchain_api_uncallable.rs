@@ -99,7 +99,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_block_round_time_in_milliseconds(&self) -> u64 {
+    fn get_block_round_time_ms(&self) -> u64 {
         unreachable!()
     }
 
