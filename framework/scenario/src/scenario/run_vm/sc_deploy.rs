@@ -19,7 +19,10 @@ impl ScenarioVMRunner {
     /// The result of the operation gets saved back in the step's response field.
     pub fn perform_sc_deploy_update_results(&mut self, step: &mut ScDeployStep) {
         let (new_address, tx_result) =
-            self.perform_sc_deploy_lambda_and_check(step, RuntimeInstanceCallLambdaDefault);
+            self.perform_sc_deploy_lambda(step, RuntimeInstanceCallLambdaDefault);
+        if let Some(tx_expect) = &step.expect {
+            check_tx_output(&step.id, tx_expect, &tx_result);
+        }
         let mut response = TxResponse::from_tx_result(tx_result);
         response.new_deployed_address = Some(new_address);
         step.save_response(response);
@@ -48,21 +51,6 @@ impl ScenarioVMRunner {
             tx_result.pending_calls.no_calls(),
             "Async calls from constructors are currently not supported"
         );
-        (new_address, tx_result)
-    }
-
-    pub fn perform_sc_deploy_lambda_and_check<F>(
-        &mut self,
-        sc_deploy_step: &ScDeployStep,
-        f: F,
-    ) -> (Address, TxResult)
-    where
-        F: RuntimeInstanceCallLambda,
-    {
-        let (new_address, tx_result) = self.perform_sc_deploy_lambda(sc_deploy_step, f);
-        if let Some(tx_expect) = &sc_deploy_step.expect {
-            check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
-        }
         (new_address, tx_result)
     }
 }
