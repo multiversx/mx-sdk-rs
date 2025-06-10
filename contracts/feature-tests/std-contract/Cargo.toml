@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "src/std_contract.rs"
 
 [dependencies.multiversx-sc]
 version = "0.58.0"
