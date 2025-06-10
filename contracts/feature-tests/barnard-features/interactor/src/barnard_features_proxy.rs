@@ -83,4 +83,22 @@ where
             .argument(&address)
             .original_result()
     }
+
+    pub fn get_block_timestamp_ms(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_block_timestamp_ms")
+            .original_result()
+    }
+
+    pub fn get_prev_block_timestamp_ms(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_prev_block_timestamp_ms")
+            .original_result()
+    }
 }
