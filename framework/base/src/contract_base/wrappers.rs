@@ -11,7 +11,7 @@ pub use blockchain_wrapper::BlockchainWrapper;
 pub use call_value_wrapper::CallValueWrapper;
 pub use crypto_wrapper::CryptoWrapper;
 pub use error_helper::ErrorHelper;
-pub use send_raw_wrapper::SendRawWrapper;
+pub use send_raw_wrapper::{SendRawWrapper, SyncCallRawResult, SyncCallRawResultOrError};
 pub use send_wrapper::SendWrapper;
 pub use serializer::{ExitCodecErrorHandler, ManagedSerializer};
 pub use storage_raw_wrapper::StorageRawWrapper;

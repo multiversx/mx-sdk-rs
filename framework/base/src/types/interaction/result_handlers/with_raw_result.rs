@@ -1,7 +1,8 @@
 use core::marker::PhantomData;
 
-use crate::types::{
-    ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, SyncCallRawResult, TxEnv,
+use crate::{
+    contract_base::SyncCallRawResult,
+    types::{ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, TxEnv},
 };
 
 /// Defines a lambda function to be called on the raw result of the transaction.

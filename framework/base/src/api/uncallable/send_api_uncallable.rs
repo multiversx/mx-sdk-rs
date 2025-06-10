@@ -143,6 +143,18 @@ impl SendApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn execute_on_dest_context_error_return_raw(
+        &self,
+        _gas: u64,
+        _address: RawHandle,
+        _value: RawHandle,
+        _endpoint_name_handle: RawHandle,
+        _arg_buffer_handle: RawHandle,
+        _result_handle: RawHandle,
+    ) -> i32 {
+        unreachable!()
+    }
+
     fn clean_return_data(&self) {
         unreachable!()
     }

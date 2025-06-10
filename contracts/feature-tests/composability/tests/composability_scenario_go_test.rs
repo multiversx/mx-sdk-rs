@@ -115,6 +115,12 @@ fn forw_raw_sync_egld_go() {
 }
 
 #[test]
+#[ignore = "requires Barnard"]
+fn forw_raw_sync_fallible_go() {
+    world().run("scenarios/forw_raw_sync_fallible.scen.json");
+}
+
+#[test]
 fn forw_raw_sync_readonly_go() {
     world().run("scenarios/forw_raw_sync_readonly.scen.json");
 }
@@ -563,4 +569,9 @@ fn send_egld_go() {
 #[test]
 fn send_esdt_go() {
     world().run("scenarios/send_esdt.scen.json");
+}
+
+#[test]
+fn send_esdt_to_nonexisting_account_go() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
 }
