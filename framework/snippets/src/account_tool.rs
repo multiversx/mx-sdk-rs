@@ -38,25 +38,27 @@ pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncSe
     api: &GatewayProxy,
     bech32_address: &Bech32Address,
 ) -> (SetStateAccount, SetStateStep) {
-    let address = bech32_address.as_address();
-    let sdk_account = api.request(GetAccountRequest::new(address)).await.unwrap();
+    let sdk_account = api
+        .request(GetAccountRequest::new(bech32_address))
+        .await
+        .unwrap();
 
     let account_esdt = api
-        .request(GetAccountEsdtTokensRequest::new(address))
+        .request(GetAccountEsdtTokensRequest::new(bech32_address))
         .await
         .unwrap_or_else(|err| {
             eprintln!("failed to retrieve ESDT tokens for address {bech32_address}: {err}");
             HashMap::new()
         });
     let account_esdt_roles = api
-        .request(GetAccountEsdtRolesRequest::new(address))
+        .request(GetAccountEsdtRolesRequest::new(bech32_address))
         .await
         .unwrap_or_else(|err| {
             eprintln!("failed to retrieve ESDT roles for address {bech32_address}: {err}");
             HashMap::new()
         });
     let account_storage = api
-        .request(GetAccountStorageRequest::new(address))
+        .request(GetAccountStorageRequest::new(bech32_address))
         .await
         .unwrap_or_else(|err| {
             panic!("failed to retrieve storage for address {bech32_address}: {err}")

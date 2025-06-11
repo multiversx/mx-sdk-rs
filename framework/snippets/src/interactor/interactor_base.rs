@@ -63,12 +63,15 @@ where
     pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
         let address = wallet.to_address();
 
-        self.send_user_funds(&address).await.unwrap();
+        self.send_user_funds(&address.to_bech32(self.get_hrp()))
+            .await
+            .unwrap();
         self.generate_blocks(1).await.unwrap();
         self.sender_map.insert(
             address.clone(),
             Sender {
                 address: address.clone(),
+                hrp: self.network_config.address_hrp.clone(),
                 wallet,
                 current_nonce: None,
             },
@@ -99,6 +102,10 @@ where
 
     pub fn get_state_file_path(&self) -> PathBuf {
         self.current_dir.join(INTERACTOR_SET_STATE_PATH)
+    }
+
+    pub fn get_hrp(&self) -> &str {
+        &self.network_config.address_hrp
     }
 
     pub fn get_accounts_from_file(&self) -> Vec<SetStateAccount> {

@@ -4,7 +4,7 @@ pub use crate::multiversx_sc::codec::test_util::*;
 
 pub use crate::{
     api::{DebugApi, DebugHandle, StaticApi},
-    assert_values_eq, bech32,
+    assert_values_eq,
     facade::{
         expr::*, result_handlers::*, world_tx::*, ContractInfo, ScenarioWorld, WhiteboxContract,
     },
