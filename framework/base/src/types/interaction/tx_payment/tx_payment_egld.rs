@@ -1,5 +1,5 @@
 use crate::{
-    contract_base::SendRawWrapper,
+    contract_base::{SendRawWrapper, TransferExecuteFailed},
     types::{
         AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, ManagedVec, TxFrom, TxToSpecified,
     },
@@ -36,7 +36,7 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
+    ) -> Result<(), TransferExecuteFailed> {
         self.0.with_value_ref(env, |egld_value| {
             SendRawWrapper::<Env::Api>::new().direct_egld_execute(
                 to,
@@ -45,7 +45,10 @@ where
                 &fc.function_name,
                 &fc.arg_buffer,
             );
-        })
+        });
+
+        // Note: EGLD transfer is always infallible, hence always Ok(())
+        Ok(())
     }
 
     #[inline]

@@ -145,14 +145,18 @@ where
         );
     }
 
-    pub fn multi_egld_or_esdt_transfer_execute(
+    /// `multi_transfer_esdt_nft_execute` doesn't work for a single EGLD payment,
+    /// so we need a different strategy in this one particular case.
+    ///
+    /// Returns `true` if single EGLD payment was produced.
+    fn fallback_to_single_egld_if_necessary(
         &self,
         to: &ManagedAddress<A>,
         payments: &ManagedVec<A, EgldOrEsdtTokenPayment<A>>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
-    ) {
+    ) -> bool {
         if let Some(single_item) = payments.is_single_item() {
             if single_item.token_identifier.is_egld() {
                 self.direct_egld_execute(
@@ -162,8 +166,33 @@ where
                     endpoint_name,
                     arg_buffer,
                 );
-                return;
+                return true;
             }
+        }
+
+        false
+    }
+
+    #[deprecated(
+        since = "0.59.0",
+        note = "Use multi_egld_or_esdt_transfer_execute_fallible instead"
+    )]
+    pub fn multi_egld_or_esdt_transfer_execute(
+        &self,
+        to: &ManagedAddress<A>,
+        payments: &ManagedVec<A, EgldOrEsdtTokenPayment<A>>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) {
+        if self.fallback_to_single_egld_if_necessary(
+            to,
+            payments,
+            gas_limit,
+            endpoint_name,
+            arg_buffer,
+        ) {
+            return;
         }
         A::send_api_impl().multi_transfer_esdt_nft_execute(
             to.get_handle().get_raw_handle(),
@@ -174,6 +203,7 @@ where
         );
     }
 
+    #[cfg(feature = "barnard")]
     pub fn multi_egld_or_esdt_transfer_execute_fallible(
         &self,
         to: &ManagedAddress<A>,
@@ -182,19 +212,15 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), TransferExecuteFailed> {
-        if let Some(single_item) = payments.is_single_item() {
-            if single_item.token_identifier.is_egld() {
-                self.direct_egld_execute(
-                    to,
-                    &single_item.amount,
-                    gas_limit,
-                    endpoint_name,
-                    arg_buffer,
-                );
-                return Ok(());
-            }
+        if self.fallback_to_single_egld_if_necessary(
+            to,
+            payments,
+            gas_limit,
+            endpoint_name,
+            arg_buffer,
+        ) {
+            return Ok(());
         }
-
         let ret = A::send_api_impl().multi_transfer_esdt_nft_execute_with_return(
             to.get_handle().get_raw_handle(),
             payments.get_handle().get_raw_handle(),
@@ -208,6 +234,27 @@ where
         } else {
             Err(TransferExecuteFailed)
         }
+    }
+
+    #[cfg(not(feature = "barnard"))]
+    #[allow(deprecated)]
+    pub fn multi_egld_or_esdt_transfer_execute_fallible(
+        &self,
+        to: &ManagedAddress<A>,
+        payments: &ManagedVec<A, EgldOrEsdtTokenPayment<A>>,
+        gas_limit: u64,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.multi_egld_or_esdt_transfer_execute(
+            to,
+            payments,
+            gas_limit,
+            endpoint_name,
+            arg_buffer,
+        );
+        // no fallibility before Barnard
+        Ok(())
     }
 
     pub fn async_call_raw(
