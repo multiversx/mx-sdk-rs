@@ -94,6 +94,10 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         self.with_vm_hooks(|vh| vh.get_block_timestamp()) as u64
     }
 
+    fn get_block_timestamp_ms(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.get_block_timestamp_ms()) as u64
+    }
+
     fn get_block_nonce(&self) -> u64 {
         self.with_vm_hooks(|vh| vh.get_block_nonce()) as u64
     }
@@ -113,6 +117,10 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
 
     fn get_prev_block_timestamp(&self) -> u64 {
         self.with_vm_hooks(|vh| vh.get_prev_block_timestamp()) as u64
+    }
+
+    fn get_prev_block_timestamp_ms(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.get_prev_block_timestamp_ms()) as u64
     }
 
     fn get_prev_block_nonce(&self) -> u64 {
@@ -138,12 +146,12 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         });
     }
 
-    fn get_block_round_time_in_milliseconds(&self) -> u64 {
-        self.with_vm_hooks(|vh| vh.get_block_round_time_in_milliseconds()) as u64
+    fn get_block_round_time_ms(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.get_block_round_time_ms()) as u64
     }
 
-    fn epoch_start_block_timestamp(&self) -> u64 {
-        self.with_vm_hooks(|vh| vh.epoch_start_block_time_stamp()) as u64
+    fn epoch_start_block_timestamp_ms(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.epoch_start_block_timestamp_ms()) as u64
     }
 
     fn epoch_start_block_nonce(&self) -> u64 {

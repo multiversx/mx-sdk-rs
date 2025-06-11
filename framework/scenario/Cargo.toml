@@ -55,7 +55,7 @@ path = "../../sdk/scenario-format"
 [dependencies.multiversx-chain-vm-executor]
 version = "0.4.0"
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "2509b7383368a2cb8d716bf3f43396ff28e9221f"
+rev = "5804799ee7b6446c9e7641b8308acb48ec00d751"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.15.0"

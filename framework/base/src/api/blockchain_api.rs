@@ -73,6 +73,8 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
 
     fn get_block_timestamp(&self) -> u64;
 
+    fn get_block_timestamp_ms(&self) -> u64;
+
     fn get_block_nonce(&self) -> u64;
 
     fn get_block_round(&self) -> u64;
@@ -82,6 +84,8 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle);
 
     fn get_prev_block_timestamp(&self) -> u64;
+
+    fn get_prev_block_timestamp_ms(&self) -> u64;
 
     fn get_prev_block_nonce(&self) -> u64;
 
@@ -95,9 +99,9 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         self.mb_overwrite(dest, self.get_prev_block_random_seed_legacy().as_slice());
     }
 
-    fn get_block_round_time_in_milliseconds(&self) -> u64;
+    fn get_block_round_time_ms(&self) -> u64;
 
-    fn epoch_start_block_timestamp(&self) -> u64;
+    fn epoch_start_block_timestamp_ms(&self) -> u64;
 
     fn epoch_start_block_nonce(&self) -> u64;
 

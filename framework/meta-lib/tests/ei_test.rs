@@ -85,8 +85,10 @@ pub const EI_1_4_ADDED_NAMES: &[&str] = &[
 ];
 
 pub const EI_1_5_ADDED_NAMES: &[&str] = &[
-    "getBlockRoundTimeInMilliseconds",
-    "epochStartBlockTimeStamp",
+    "getBlockTimestampMs",
+    "getPrevBlockTimestampMs",
+    "getBlockRoundTimeMs",
+    "epochStartBlockTimestampMs",
     "epochStartBlockNonce",
     "epochStartBlockRound",
     "managedGetAllTransfersCallValue",

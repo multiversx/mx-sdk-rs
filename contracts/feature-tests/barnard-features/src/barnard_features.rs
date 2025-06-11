@@ -10,8 +10,8 @@ pub trait BarnardFeatures {
     #[view(epochInfo)]
     fn epoch_info(&self) -> MultiValue4<u64, u64, u64, u64> {
         (
-            self.blockchain().get_block_round_time_in_milliseconds(),
-            self.blockchain().epoch_start_block_timestamp(),
+            self.blockchain().get_block_round_time_ms(),
+            self.blockchain().epoch_start_block_timestamp_ms(),
             self.blockchain().epoch_start_block_nonce(),
             self.blockchain().epoch_start_block_round(),
         )
@@ -21,5 +21,15 @@ pub trait BarnardFeatures {
     #[view(codeHash)]
     fn code_hash(&self, address: ManagedAddress) -> ManagedBuffer {
         self.blockchain().get_code_hash(&address)
+    }
+
+    #[view]
+    fn get_block_timestamp_ms(&self) -> u64 {
+        self.blockchain().get_block_timestamp_ms()
+    }
+
+    #[view]
+    fn get_prev_block_timestamp_ms(&self) -> u64 {
+        self.blockchain().get_prev_block_timestamp_ms()
     }
 }

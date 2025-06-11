@@ -12,3 +12,8 @@ path = "src/barnard_features.rs"
 version = "0.58.0"
 features = ["barnard"]
 path = "../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.58.0"
+features = ["wasmer-experimental"]
+path = "../../../framework/scenario"
