@@ -1,7 +1,7 @@
 use bip39::Mnemonic;
 
 use multiversx_chain_core::types::Address;
-use multiversx_sdk::{bech32, test_wallets};
+use multiversx_sdk::test_wallets;
 use multiversx_sdk::{crypto::public_key::PublicKey, wallet::Wallet};
 use std::fs::{self, File};
 use std::io::Write;
@@ -31,7 +31,7 @@ fn test_private_key_from_mnemonic() {
     );
     assert_eq!(
         "erd1mlh7q3fcgrjeq0et65vaaxcw6m5ky8jhu296pdxpk9g32zga6uhsemxx2a",
-        bech32::encode("erd", &address)
+        address.to_bech32_default().bech32
     );
 
     let private_key = Wallet::get_private_key_from_mnemonic(mnemonic, 0, 1);
@@ -47,7 +47,7 @@ fn test_private_key_from_mnemonic() {
     );
     assert_eq!(
         "erd147877pc2tqv88yfvewhmdfuth845uqpsskky8kaalglzp6unem0qpwh982",
-        bech32::encode("erd", &address)
+        address.to_bech32_default().bech32
     );
 }
 
@@ -57,7 +57,7 @@ fn test_load_from_pem() {
     let address = wallet.to_address();
     assert_eq!(
         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-        bech32::encode("erd", &address)
+        address.to_bech32_default().bech32
     );
 }
 #[test]

@@ -32,7 +32,7 @@ fn adder_blackbox() {
         .returns(ReturnsNewAddress)
         .run();
 
-    assert_eq!(new_address, ADDER_ADDRESS.to_address());
+    assert_eq!(new_address, ADDER_ADDRESS);
 
     world
         .query()

@@ -1,4 +1,4 @@
-use super::sdk_address::SdkAddress;
+use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::collections::HashMap;
@@ -26,7 +26,7 @@ pub enum CallType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VMQueryInput {
-    pub sc_address: SdkAddress,
+    pub sc_address: Bech32Address,
     pub func_name: String,
     pub args: Vec<String>,
 }
@@ -36,7 +36,7 @@ pub struct VMQueryInput {
 #[serde(rename_all = "camelCase")]
 pub struct LogEntryApi {
     pub identifier: String,
-    pub address: SdkAddress,
+    pub address: Bech32Address,
     pub topics: Vec<String>,
     pub data: String,
 }
@@ -49,14 +49,14 @@ pub struct OutputTransferApi {
     pub gas_limit: u64,
     pub data: String,
     pub call_type: CallType,
-    pub sender_address: SdkAddress,
+    pub sender_address: Bech32Address,
 }
 
 // OutputAccountApi is a wrapper over vmcommon's OutputAccount
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OutputAccountApi {
-    address: SdkAddress,
+    address: Bech32Address,
     nonce: u64,
 
     // TODO: unknow type of data
