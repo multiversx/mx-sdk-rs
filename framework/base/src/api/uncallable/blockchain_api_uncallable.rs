@@ -55,6 +55,10 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn get_block_timestamp_ms(&self) -> u64 {
+        unreachable!()
+    }
+
     fn get_block_nonce(&self) -> u64 {
         unreachable!()
     }
@@ -75,6 +79,10 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn get_prev_block_timestamp_ms(&self) -> u64 {
+        unreachable!()
+    }
+
     fn get_prev_block_nonce(&self) -> u64 {
         unreachable!()
     }
@@ -91,11 +99,11 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_block_round_time_in_milliseconds(&self) -> u64 {
+    fn get_block_round_time_ms(&self) -> u64 {
         unreachable!()
     }
 
-    fn epoch_start_block_timestamp(&self) -> u64 {
+    fn epoch_start_block_timestamp_ms(&self) -> u64 {
         unreachable!()
     }
 
