@@ -84,7 +84,7 @@ where
             .new_deployed_address
             .clone()
             .unwrap();
-        let deploy_address_bech32 = Bech32Address::from((self.get_hrp(), deploy_address));
+        let deploy_address_bech32 = Bech32Address::encode_address(self.get_hrp(), deploy_address);
 
         let set_state_step = SetStateStep::new().new_address(addr, nonce, &deploy_address_bech32);
 

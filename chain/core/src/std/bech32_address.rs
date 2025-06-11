@@ -80,18 +80,6 @@ impl From<&Address> for Bech32Address {
     }
 }
 
-impl From<(&str, Address)> for Bech32Address {
-    fn from(value: (&str, Address)) -> Self {
-        Self::encode_address(value.0, value.1)
-    }
-}
-
-impl From<(&str, &Address)> for Bech32Address {
-    fn from(value: (&str, &Address)) -> Self {
-        Self::encode_address(value.0, value.1.clone())
-    }
-}
-
 impl Bech32Address {
     pub fn to_bech32_str(&self) -> &str {
         &self.bech32

@@ -5,6 +5,7 @@ use crate::{network_response, InteractorBase};
 use anyhow::Error;
 use log::info;
 use multiversx_sc_scenario::{
+    imports::Bech32Address,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
@@ -80,8 +81,8 @@ where
         Transaction {
             nonce: 0,
             value: normalized.egld_value.value.to_string(),
-            sender: (hrp, normalized.from.to_address()).into(),
-            receiver: (hrp, normalized.to.to_address()).into(),
+            sender: Bech32Address::encode_address(hrp, normalized.from.to_address()),
+            receiver: Bech32Address::encode_address(hrp, normalized.to.to_address()),
             gas_price: self.network_config.min_gas_price,
             gas_limit: normalized.gas_limit.value,
             data,
