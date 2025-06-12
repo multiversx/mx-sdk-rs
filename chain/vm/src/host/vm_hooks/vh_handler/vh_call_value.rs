@@ -1,8 +1,12 @@
 use crate::{
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+    host::{
+        context::TxTokenTransfer,
+        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+    },
     types::RawHandle,
     vm_err_msg,
 };
+use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_traits::Zero;
 
@@ -40,6 +44,23 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .mb_set_vec_of_esdt_payments(dest_handle, self.context.input_ref().received_esdt());
         self.use_gas_for_data_copy(num_bytes_copied)?;
 
+        Ok(())
+    }
+
+    pub fn load_all_transfers(&self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
+        let direct_egld_value = self.context.input_ref().received_egld().clone();
+        let transfers = if !direct_egld_value.is_zero() {
+            vec![TxTokenTransfer {
+                token_identifier: EGLD_000000_TOKEN_IDENTIFIER.as_bytes().to_vec(),
+                nonce: 0,
+                value: direct_egld_value,
+            }]
+        } else {
+            self.context.input_ref().received_esdt().to_owned()
+        };
+        self.context
+            .m_types_lock()
+            .mb_set_vec_of_esdt_payments(dest_handle, &transfers);
         Ok(())
     }
 

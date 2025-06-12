@@ -237,13 +237,13 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("forward_sync_accept_funds_multi_transfer")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -349,13 +349,13 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("send_async_accept_multi_transfer")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -449,13 +449,13 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("transf_exec_multi_accept_funds")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -465,13 +465,13 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("forward_transf_exec_reject_funds_multi_transfer")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -481,13 +481,13 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("transf_exec_multi_reject_funds")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -678,13 +678,13 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("send_esdt_direct_multi_transfer")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 

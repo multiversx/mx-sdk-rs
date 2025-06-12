@@ -17,6 +17,10 @@ fn world() -> ScenarioWorld {
         forwarder::ContractBuilder,
     );
     blockchain.register_contract(
+        "mxsc:forwarder-barnard/output/forwarder-barnard.mxsc.json",
+        forwarder_barnard::ContractBuilder,
+    );
+    blockchain.register_contract(
         "mxsc:forwarder-raw/output/forwarder-raw.mxsc.json",
         forwarder_raw::ContractBuilder,
     );
@@ -163,6 +167,12 @@ fn forw_raw_sync_echo_caller_rs() {
 #[test]
 fn forw_raw_sync_egld_rs() {
     world().run("scenarios/forw_raw_sync_egld.scen.json");
+}
+
+#[test]
+#[ignore = "requires Barnard, unavailable: managed_execute_on_dest_context_with_error_return"]
+fn forw_raw_sync_fallible_rs() {
+    world().run("scenarios/forw_raw_sync_fallible.scen.json");
 }
 
 #[test]
@@ -615,4 +625,10 @@ fn send_egld_rs() {
 #[test]
 fn send_esdt_rs() {
     world().run("scenarios/send_esdt.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn send_esdt_to_nonexisting_account_rs() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
 }

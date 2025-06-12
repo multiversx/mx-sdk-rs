@@ -1,0 +1,60 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "sc:code-hash-sc": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "code": "str:invalid code, but constant - check its code hash"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:barnard"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "1",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/barnard-features.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "2",
+            "tx": {
+                "to": "sc:barnard",
+                "function": "codeHash",
+                "arguments": [
+                    "sc:code-hash-sc"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0x3b29df9a92eba48fb1335b7300c055e812f30a263fe7e300525012fb657617a6"
+                ],
+                "status": ""
+            }
+        }
+    ]
+}

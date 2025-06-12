@@ -191,18 +191,14 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_multi_funds_async(
         &self,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
         let caller = self.blockchain().get_caller();
-        let mut all_payments = ManagedVec::new();
 
-        for multi_arg in token_payments.into_iter() {
-            let (token_id, nonce, amount) = multi_arg.into_tuple();
-
-            all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
-        }
-
-        self.tx().to(caller).payment(all_payments).transfer();
+        self.tx()
+            .to(caller)
+            .payment(payment_args.convert_payment_multi_triples())
+            .transfer();
     }
 
     #[payable("*")]

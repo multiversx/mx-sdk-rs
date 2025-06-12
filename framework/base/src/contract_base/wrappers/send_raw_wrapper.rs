@@ -11,6 +11,24 @@ use crate::{
     },
 };
 
+/// Wraps the result of a sync call.
+///
+/// Is used primarily in result handlers.
+pub struct SyncCallRawResult<Api>(pub ManagedVec<Api, ManagedBuffer<Api>>)
+where
+    Api: CallTypeApi;
+
+/// Wraps the result of a fallible sync call (one that returns the error instead of stopping execution).
+///
+/// Is used primarily in result handlers.
+pub enum SyncCallRawResultOrError<Api>
+where
+    Api: CallTypeApi,
+{
+    Success(SyncCallRawResult<Api>),
+    Error(u32),
+}
+
 #[derive(Default)]
 pub struct SendRawWrapper<A>
 where
@@ -313,7 +331,7 @@ where
         value: &BigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
-    ) -> ManagedVec<A, ManagedBuffer<A>> {
+    ) -> SyncCallRawResult<A> {
         let result_handle = A::static_var_api_impl().next_handle();
         A::send_api_impl().execute_on_dest_context_raw(
             gas,
@@ -323,7 +341,8 @@ where
             arg_buffer.get_handle().get_raw_handle(),
             result_handle,
         );
-        unsafe { ManagedVec::from_raw_handle(result_handle) }
+        let result_vec = unsafe { ManagedVec::from_raw_handle(result_handle) };
+        SyncCallRawResult(result_vec)
     }
 
     pub fn execute_on_same_context_raw(
@@ -365,6 +384,37 @@ where
         unsafe { ManagedVec::from_raw_handle(result_handle) }
     }
 
+    /// Same shard, in-line execution of another contract.
+    pub fn execute_on_dest_context_error_return_raw(
+        &self,
+        gas: u64,
+        address: &ManagedAddress<A>,
+        value: &BigUint<A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> SyncCallRawResultOrError<A> {
+        let result_handle = A::static_var_api_impl().next_handle();
+        let result_code = A::send_api_impl().execute_on_dest_context_error_return_raw(
+            gas,
+            address.get_handle().get_raw_handle(),
+            value.get_handle().get_raw_handle(),
+            endpoint_name.get_handle().get_raw_handle(),
+            arg_buffer.get_handle().get_raw_handle(),
+            result_handle,
+        );
+        if result_code == 0 {
+            let result_vec = unsafe { ManagedVec::from_raw_handle(result_handle) };
+            SyncCallRawResultOrError::Success(SyncCallRawResult(result_vec))
+        } else {
+            SyncCallRawResultOrError::Error(result_code as u32)
+        }
+    }
+}
+
+impl<A> SendRawWrapper<A>
+where
+    A: CallTypeApi,
+{
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
     pub fn call_local_esdt_built_in_function(
         &self,

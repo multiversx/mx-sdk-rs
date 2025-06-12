@@ -55,6 +55,10 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn get_block_timestamp_ms(&self) -> u64 {
+        unreachable!()
+    }
+
     fn get_block_nonce(&self) -> u64 {
         unreachable!()
     }
@@ -75,6 +79,10 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn get_prev_block_timestamp_ms(&self) -> u64 {
+        unreachable!()
+    }
+
     fn get_prev_block_nonce(&self) -> u64 {
         unreachable!()
     }
@@ -88,6 +96,22 @@ impl BlockchainApiImpl for UncallableApi {
     }
 
     fn get_prev_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+        unreachable!()
+    }
+
+    fn get_block_round_time_ms(&self) -> u64 {
+        unreachable!()
+    }
+
+    fn epoch_start_block_timestamp_ms(&self) -> u64 {
+        unreachable!()
+    }
+
+    fn epoch_start_block_nonce(&self) -> u64 {
+        unreachable!()
+    }
+
+    fn epoch_start_block_round(&self) -> u64 {
         unreachable!()
     }
 
@@ -162,6 +186,14 @@ impl BlockchainApiImpl for UncallableApi {
         &self,
         _address_handle: Self::ManagedBufferHandle,
         _response_handle: Self::ManagedBufferHandle,
+    ) {
+        unreachable!()
+    }
+
+    fn managed_get_code_hash(
+        &self,
+        _address_handle: Self::ManagedBufferHandle,
+        _code_hash_handle: Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }
