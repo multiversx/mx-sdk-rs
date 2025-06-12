@@ -212,15 +212,6 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), TransferExecuteFailed> {
-        if self.fallback_to_single_egld_if_necessary(
-            to,
-            payments,
-            gas_limit,
-            endpoint_name,
-            arg_buffer,
-        ) {
-            return Ok(());
-        }
         let ret = A::send_api_impl().multi_transfer_esdt_nft_execute_with_return(
             to.get_handle().get_raw_handle(),
             payments.get_handle().get_raw_handle(),
