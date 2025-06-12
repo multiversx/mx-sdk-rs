@@ -75,7 +75,7 @@ pub const EI_1_5_NAMES: &[&str] = &[
     "getPrevBlockEpoch",
     "getPrevBlockRandomSeed",
     "getBlockRoundTimeMs",
-    "epochStartBlockTimestampMs",
+    "epochStartBlockTimeStampMs",
     "epochStartBlockNonce",
     "epochStartBlockRound",
     "finish",
