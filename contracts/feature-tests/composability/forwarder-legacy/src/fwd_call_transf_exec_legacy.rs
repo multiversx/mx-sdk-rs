@@ -105,21 +105,12 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_accept_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .with_multi_token_transfer(payment_args.convert_payment_multi_triples())
             .transfer_execute()
     }
 
@@ -150,19 +141,10 @@ pub trait ForwarderTransferExecuteModule {
         to: ManagedAddress,
         token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .with_multi_token_transfer(token_payments.convert_payment_multi_triples())
             .transfer_execute()
     }
 
@@ -172,19 +154,10 @@ pub trait ForwarderTransferExecuteModule {
         to: ManagedAddress,
         token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
         self.vault_proxy()
             .contract(to)
             .reject_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .with_multi_token_transfer(token_payments.convert_payment_multi_triples())
             .transfer_execute()
     }
 }
