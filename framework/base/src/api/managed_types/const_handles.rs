@@ -25,7 +25,6 @@ pub const CALL_VALUE_EGLD_FROM_ESDT: RawHandle = -37;
 pub const CALL_VALUE_MULTI_ESDT: RawHandle = -38;
 pub const CALL_VALUE_ALL: RawHandle = -39;
 pub const MBUF_EGLD_000000: RawHandle = -40;
-pub const PAYMENTS_SINGLETON_TEMPORARY: RawHandle = -41;
 
 pub const CALLBACK_CLOSURE_ARGS_BUFFER: RawHandle = -50;
 
