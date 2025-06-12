@@ -190,12 +190,12 @@ where
         Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
-        token_payments: Arg0,
+        payment_args: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("retrieve_multi_funds_async")
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
