@@ -45,30 +45,29 @@ pub trait ForwarderBarnard {
     fn transfer_fallible(
         &self,
         to: ManagedAddress,
-        payments: ManagedVec<EgldOrEsdtTokenPayment>,
+        payments: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
     ) -> bool {
         self.tx()
             .to(&to)
-            .payment(payments)
+            .payment(payments.convert_payment_multi_triples())
             .transfer_fallible()
             .is_ok()
     }
 
+    /// Receiver needs to be an endpoint with no arguments, for simplicity.
     #[endpoint]
     fn transfer_execute_fallible(
         &self,
         to: ManagedAddress,
-        payments: ManagedVec<EgldOrEsdtTokenPayment>,
         endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
+        payments: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
     ) -> bool {
         let half_gas = self.blockchain().get_gas_left() / 2;
         self.tx()
             .to(&to)
-            .payment(payments)
+            .payment(payments.convert_payment_multi_triples())
             .gas(half_gas)
             .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
             .transfer_execute_fallible()
             .is_ok()
     }

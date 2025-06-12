@@ -203,9 +203,33 @@ fn forw_raw_transf_exec_accept_egld_rs() {
     world().run("scenarios/forw_raw_transf_exec_accept_egld.scen.json");
 }
 
+#[ignore = "not yet supported"]
+#[test]
+fn forw_raw_transf_exec_fallible_multi_accept_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_multi_accept.scen.json");
+}
+
+#[ignore = "not yet supported"]
+#[test]
+fn forw_raw_transf_exec_fallible_multi_reject_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_multi_reject.scen.json");
+}
+
 #[test]
 fn forw_raw_transf_exec_reject_egld_rs() {
     world().run("scenarios/forw_raw_transf_exec_reject_egld.scen.json");
+}
+
+#[ignore = "not yet supported"]
+#[test]
+fn forw_raw_transfer_fallible_multi_err_rs() {
+    world().run("scenarios/forw_raw_transfer_fallible_multi_err.scen.json");
+}
+
+#[ignore = "not yet supported"]
+#[test]
+fn forw_raw_transfer_fallible_multi_ok_rs() {
+    world().run("scenarios/forw_raw_transfer_fallible_multi_ok.scen.json");
 }
 
 #[test]
