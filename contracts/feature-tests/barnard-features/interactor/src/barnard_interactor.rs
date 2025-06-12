@@ -7,7 +7,7 @@ pub use barnard_interactor_config::Config;
 use barnard_interactor_state::State;
 use clap::Parser;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{hex, imports::*};
 
 const CODE_PATH: MxscPath = MxscPath::new("../output/barnard-features.mxsc.json");
 
@@ -31,6 +31,9 @@ pub async fn adder_cli() {
                 .code_hash(Bech32Address::from_bech32_string(args.address))
                 .await;
         },
+        Some(barnard_interactor_cli::InteractCliCommand::BlockTimestamps) => {
+            basic_interact.block_timestamps().await;
+        },
         None => {},
     }
 }
@@ -48,8 +51,9 @@ impl PayableInteract {
             .await
             .use_chain_simulator(config.use_chain_simulator());
 
-        let sc_owner_address = interactor.register_wallet(test_wallets::alice()).await;
-        let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
+        let wallet = Wallet::from_pem_file("internal.pem").unwrap();
+        let sc_owner_address = interactor.register_wallet(wallet.clone()).await;
+        let wallet_address = interactor.register_wallet(wallet).await;
 
         interactor.generate_blocks(30u64).await.unwrap();
 
@@ -91,13 +95,27 @@ impl PayableInteract {
             .run()
             .await;
 
-        println!("Result: {result:?}");
+        let (
+            get_block_round_time_ms,
+            epoch_start_block_timestamp_ms,
+            epoch_start_block_nonce,
+            epoch_start_block_round,
+        ) = result.into_tuple();
+
+        println!(
+            "Result:
+    get_block_round_time_ms: {get_block_round_time_ms}
+    epoch_start_block_timestamp_ms: {epoch_start_block_timestamp_ms}
+    epoch_start_block_nonce: {epoch_start_block_nonce}
+    epoch_start_block_round: {epoch_start_block_round}"
+        );
     }
 
     pub async fn code_hash(&mut self, address: Bech32Address) {
         let result_value = self
             .interactor
-            .query()
+            .tx()
+            .from(&self.wallet_address)
             .to(self.state.current_barnard_features_address())
             .typed(barnard_features_proxy::BarnardFeaturesProxy)
             .code_hash(address)
@@ -105,6 +123,30 @@ impl PayableInteract {
             .run()
             .await;
 
-        println!("Result: {result_value:?}");
+        println!("Code hash: {}", hex::encode(result_value));
+    }
+
+    pub async fn block_timestamps(&mut self) {
+        let result = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_barnard_features_address())
+            .gas(3_000_000u64)
+            .typed(barnard_features_proxy::BarnardFeaturesProxy)
+            .get_block_timestamps()
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        let (prev_block_timestamp_ms, prev_block_timestamp, block_timestamp_ms, block_timestamp) =
+            result.into_tuple();
+
+        println!(
+            "Result: 
+    prev_block_timestamp: {prev_block_timestamp_ms} ms ({prev_block_timestamp} s)
+    block_timestamp:      {block_timestamp_ms} ms ({block_timestamp} s)
+        "
+        );
     }
 }
