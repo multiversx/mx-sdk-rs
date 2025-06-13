@@ -3,6 +3,7 @@ mod esdt_system_sc_proxy;
 mod legacy_system_sc_proxy;
 pub(crate) mod token_properties;
 mod token_properties_result;
+mod governance_sc_proxy;
 
 pub use builtin_func_proxy::*;
 pub use esdt_system_sc_proxy::{ESDTSystemSCProxy, ESDTSystemSCProxyMethods, IssueCall};
