@@ -52,7 +52,7 @@ impl PayableInteract {
             .use_chain_simulator(config.use_chain_simulator());
 
         let wallet = Wallet::from_pem_file("internal.pem").unwrap();
-        let sc_owner_address = interactor.register_wallet(wallet.clone()).await;
+        let sc_owner_address = interactor.register_wallet(wallet).await;
         let wallet_address = interactor.register_wallet(wallet).await;
 
         interactor.generate_blocks(30u64).await.unwrap();
