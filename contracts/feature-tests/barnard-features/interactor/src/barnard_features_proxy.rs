@@ -84,6 +84,16 @@ where
             .original_result()
     }
 
+    /// Prev block timestamp (ms, then s), current block timestamp (ms, then s) 
+    pub fn get_block_timestamps(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<u64, u64, u64, u64>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_block_timestamps")
+            .original_result()
+    }
+
     pub fn get_block_timestamp_ms(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {

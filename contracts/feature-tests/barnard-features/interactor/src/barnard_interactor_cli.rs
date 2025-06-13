@@ -18,6 +18,8 @@ pub enum InteractCliCommand {
     EpochInfo,
     #[command(name = "codehash", about = "Code hash test")]
     CodeHash(CodeHashArgs),
+    #[command(name = "blockt", about = "Epoch info")]
+    BlockTimestamps,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
