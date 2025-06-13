@@ -73,7 +73,6 @@
                 "refund": "*"
             }
         },
-
         {
             "step": "scCall",
             "id": "sync_call_fallible-error",

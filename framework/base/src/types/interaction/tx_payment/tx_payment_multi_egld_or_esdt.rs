@@ -1,7 +1,7 @@
 use core::ops::Deref;
 
 use crate::{
-    contract_base::SendRawWrapper,
+    contract_base::{SendRawWrapper, TransferExecuteFailed},
     types::{BigUint, ManagedAddress, ManagedRef, MultiEgldOrEsdtPayment, TxFrom, TxToSpecified},
 };
 
@@ -21,14 +21,14 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        let _ = SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute(
+    ) -> Result<(), TransferExecuteFailed> {
+        SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute_fallible(
             to,
             self,
             gas_limit,
             &fc.function_name,
             &fc.arg_buffer,
-        );
+        )
     }
 
     fn with_normalized<From, To, F, R>(
@@ -74,7 +74,7 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
+    ) -> Result<(), TransferExecuteFailed> {
         self.deref()
             .perform_transfer_execute(env, to, gas_limit, fc)
     }
@@ -117,8 +117,8 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        (&self).perform_transfer_execute(env, to, gas_limit, fc);
+    ) -> Result<(), TransferExecuteFailed> {
+        (&self).perform_transfer_execute(env, to, gas_limit, fc)
     }
 
     #[inline]

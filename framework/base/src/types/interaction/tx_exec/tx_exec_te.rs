@@ -1,9 +1,19 @@
-use crate::api::CallTypeApi;
+use crate::api::{CallTypeApi, ErrorApiImpl};
 
+use crate::contract_base::TransferExecuteFailed;
+use crate::err_msg;
 use crate::types::{
     FunctionCall, Tx, TxData, TxEmptyResultHandler, TxFrom, TxGas, TxPayment, TxScEnv,
     TxToSpecified,
 };
+
+struct TransferExecuteNothingToDo;
+
+fn transfer_execute_signal_error<Api: CallTypeApi>(result: Result<(), TransferExecuteFailed>) {
+    if result.is_err() {
+        Api::error_api_impl().signal_error(err_msg::TRANSFER_EXECUTE_FAILED.as_bytes());
+    }
+}
 
 impl<Api, From, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, From, To, Payment, Gas, FC, RH>
 where
@@ -15,27 +25,42 @@ where
     FC: TxData<TxScEnv<Api>> + Into<FunctionCall<Api>>,
     RH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
-    fn transfer_execute_with_gas(self, gas_limit: u64) {
+    fn transfer_execute_gas_limit(&self) -> Result<u64, TransferExecuteNothingToDo> {
+        if self.data.is_no_call() {
+            if self.payment.is_no_payment(&self.env) {
+                Err(TransferExecuteNothingToDo)
+            } else {
+                Ok(0)
+            }
+        } else {
+            Ok(self.gas.gas_value(&self.env))
+        }
+    }
+
+    fn transfer_execute_with_gas_fallible(
+        self,
+        gas_limit: u64,
+    ) -> Result<(), TransferExecuteFailed> {
         self.to.with_address_ref(&self.env, |to| {
             self.payment
-                .perform_transfer_execute(&self.env, to, gas_limit, self.data.into());
-        });
+                .perform_transfer_execute(&self.env, to, gas_limit, self.data.into())
+        })
     }
 
     /// Sends transaction asynchronously, and doesn't wait for callback ("fire and forget".)
     pub fn transfer_execute(self) {
-        let gas_limit: u64;
-        if self.data.is_no_call() {
-            if self.payment.is_no_payment(&self.env) {
-                return;
-            } else {
-                gas_limit = 0;
-            }
-        } else {
-            gas_limit = self.gas.gas_value(&self.env);
-        }
+        let result = self.transfer_execute_fallible();
+        transfer_execute_signal_error::<Api>(result);
+    }
 
-        self.transfer_execute_with_gas(gas_limit);
+    /// Sends transaction asynchronously, and doesn't wait for callback ("fire and forget".)
+    pub fn transfer_execute_fallible(self) -> Result<(), TransferExecuteFailed> {
+        if let Ok(gas_limit) = self.transfer_execute_gas_limit() {
+            self.transfer_execute_with_gas_fallible(gas_limit)
+        } else {
+            // nothing to do
+            Ok(())
+        }
     }
 }
 
@@ -48,7 +73,13 @@ where
 {
     /// Only allowed for simple transfers.
     pub fn transfer(self) {
-        self.transfer_execute_with_gas(0)
+        let result = self.transfer_fallible();
+        transfer_execute_signal_error::<Api>(result);
+    }
+
+    /// Only allowed for simple transfers.
+    pub fn transfer_fallible(self) -> Result<(), TransferExecuteFailed> {
+        self.transfer_execute_with_gas_fallible(0)
     }
 
     /// Transfers funds, if amount is greater than zero. Does nothing otherwise.

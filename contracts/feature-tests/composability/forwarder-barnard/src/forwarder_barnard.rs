@@ -40,4 +40,35 @@ pub trait ForwarderBarnard {
 
     #[event("sync_call_fallible_error")]
     fn sync_call_fallible_error(&self, error_code: u32);
+
+    #[endpoint]
+    fn transfer_fallible(
+        &self,
+        to: ManagedAddress,
+        payments: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
+    ) -> bool {
+        self.tx()
+            .to(&to)
+            .payment(payments.convert_payment_multi_triples())
+            .transfer_fallible()
+            .is_ok()
+    }
+
+    /// Receiver needs to be an endpoint with no arguments, for simplicity.
+    #[endpoint]
+    fn transfer_execute_fallible(
+        &self,
+        to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        payments: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
+    ) -> bool {
+        let half_gas = self.blockchain().get_gas_left() / 2;
+        self.tx()
+            .to(&to)
+            .payment(payments.convert_payment_multi_triples())
+            .gas(half_gas)
+            .raw_call(endpoint_name)
+            .transfer_execute_fallible()
+            .is_ok()
+    }
 }

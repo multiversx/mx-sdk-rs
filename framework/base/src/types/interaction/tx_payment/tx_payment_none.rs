@@ -1,4 +1,7 @@
-use crate::types::{BigUint, ManagedAddress, TxFrom, TxToSpecified};
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{BigUint, ManagedAddress, TxFrom, TxToSpecified},
+};
 
 use super::{
     Egld, FullPaymentData, FunctionCall, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly,
@@ -20,8 +23,8 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        Egld(BigUint::zero_ref()).perform_transfer_execute(env, to, gas_limit, fc);
+    ) -> Result<(), TransferExecuteFailed> {
+        Egld(BigUint::zero_ref()).perform_transfer_execute(env, to, gas_limit, fc)
     }
 
     #[inline]

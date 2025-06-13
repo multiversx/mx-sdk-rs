@@ -1,4 +1,7 @@
-use crate::types::{BigUint, Egld, EgldOrEsdtTokenPayment, ManagedAddress, TxFrom, TxToSpecified};
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{BigUint, Egld, EgldOrEsdtTokenPayment, ManagedAddress, TxFrom, TxToSpecified},
+};
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
@@ -16,7 +19,7 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
+    ) -> Result<(), TransferExecuteFailed> {
         self.map_ref_egld_or_esdt(
             (to, fc),
             |(to, fc), amount| Egld(amount).perform_transfer_execute(env, to, gas_limit, fc),
@@ -69,7 +72,7 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
+    ) -> Result<(), TransferExecuteFailed> {
         (&self).perform_transfer_execute(env, to, gas_limit, fc)
     }
 
