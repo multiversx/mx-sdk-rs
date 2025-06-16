@@ -303,11 +303,6 @@ fn forwarder_call_sync_accept_multi_transfer_go() {
 }
 
 #[test]
-fn forwarder_call_sync_accept_multi_transfer_egld_go() {
-    world().run("scenarios/forwarder_call_sync_accept_multi_transfer_egld.scen.json");
-}
-
-#[test]
 fn forwarder_call_sync_accept_nft_go() {
     world().run("scenarios/forwarder_call_sync_accept_nft.scen.json");
 }
@@ -325,6 +320,21 @@ fn forwarder_call_sync_accept_then_read_esdt_go() {
 #[test]
 fn forwarder_call_sync_accept_then_read_nft_go() {
     world().run("scenarios/forwarder_call_sync_accept_then_read_nft.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_fallible_multi_transfer_egld_accept_go() {
+    world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_accept.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_fallible_multi_transfer_egld_reject_go() {
+    world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_reject.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_multi_transfer_egld_accept_go() {
+    world().run("scenarios/forwarder_call_sync_multi_transfer_egld_accept.scen.json");
 }
 
 #[test]
