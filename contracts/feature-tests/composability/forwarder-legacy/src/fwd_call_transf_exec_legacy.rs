@@ -136,19 +136,6 @@ pub trait ForwarderTransferExecuteModule {
     }
 
     #[endpoint]
-    fn forward_transf_exec_reject_funds_multi_transfer(
-        &self,
-        to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
-    ) {
-        self.vault_proxy()
-            .contract(to)
-            .accept_funds()
-            .with_multi_token_transfer(token_payments.convert_payment_multi_triples())
-            .transfer_execute()
-    }
-
-    #[endpoint]
     fn transf_exec_multi_reject_funds(
         &self,
         to: ManagedAddress,
