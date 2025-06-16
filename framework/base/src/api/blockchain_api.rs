@@ -172,4 +172,12 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     );
 
     fn managed_is_builtin_function(&self, function_name_handle: Self::ManagedBufferHandle) -> bool;
+
+    fn managed_get_esdt_token_type(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        token_id_handle: Self::ManagedBufferHandle,
+        nonce: u64,
+        type_handle: Self::ManagedBufferHandle,
+    );
 }

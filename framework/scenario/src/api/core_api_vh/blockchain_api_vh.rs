@@ -323,4 +323,21 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
             )
         });
     }
+
+    fn managed_get_esdt_token_type(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        token_id_handle: Self::ManagedBufferHandle,
+        nonce: u64,
+        type_handle: Self::ManagedBufferHandle,
+    ) {
+        self.with_vm_hooks(|vh| {
+            vh.managed_get_esdt_token_type(
+                address_handle.get_raw_handle_unchecked(),
+                token_id_handle.get_raw_handle_unchecked(),
+                nonce as i64,
+                type_handle.get_raw_handle_unchecked(),
+            )
+        });
+    }
 }

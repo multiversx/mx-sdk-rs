@@ -101,4 +101,23 @@ where
             .raw_call("get_prev_block_timestamp_ms")
             .original_result()
     }
+
+    pub fn get_esdt_token_type<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+    >(
+        self,
+        address: Arg0,
+        token_id: Arg1,
+        nonce: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EsdtTokenType> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_esdt_token_type")
+            .argument(&address)
+            .argument(&token_id)
+            .argument(&nonce)
+            .original_result()
+    }
 }

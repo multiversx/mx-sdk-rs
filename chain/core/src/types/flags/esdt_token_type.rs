@@ -1,5 +1,3 @@
-// use multiversx_sc_derive::{type_abi, ManagedVecItem};
-
 use crate::codec::{
     self,
     derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
@@ -99,6 +97,26 @@ impl<'a> From<&'a [u8]> for EsdtTokenType {
             Self::DynamicMeta
         } else {
             Self::Invalid
+        }
+    }
+}
+
+impl From<Option<u64>> for EsdtTokenType {
+    #[inline]
+    fn from(value: Option<u64>) -> Self {
+        if value.is_none() {
+            return Self::Invalid;
+        }
+
+        match value.unwrap() {
+            0 => Self::Fungible,
+            1 => Self::NonFungible,
+            2 => Self::SemiFungible,
+            3 => Self::Meta,
+            4 => Self::DynamicNFT,
+            5 => Self::DynamicSFT,
+            6 => Self::DynamicMeta,
+            _ => Self::Invalid,
         }
     }
 }

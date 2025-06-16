@@ -204,4 +204,14 @@ impl BlockchainApiImpl for UncallableApi {
     ) -> bool {
         unreachable!()
     }
+
+    fn managed_get_esdt_token_type(
+        &self,
+        _address_handle: Self::ManagedBufferHandle,
+        _token_id_handle: Self::ManagedBufferHandle,
+        _nonce: u64,
+        _type_handle: Self::ManagedBufferHandle,
+    ) {
+        unreachable!()
+    }
 }

@@ -158,6 +158,27 @@ where
     }
 
     #[cfg(feature = "barnard")]
+    pub fn get_esdt_token_type(
+        &self,
+        address: &ManagedAddress<A>,
+        token_id: &TokenIdentifier<A>,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        unsafe {
+            let result: ManagedBuffer<A> = ManagedBuffer::new_uninit();
+
+            A::blockchain_api_impl().managed_get_esdt_token_type(
+                address.get_handle(),
+                token_id.get_handle(),
+                nonce,
+                result.get_handle(),
+            );
+
+            EsdtTokenType::from(result.parse_as_u64())
+        }
+    }
+
+    #[cfg(feature = "barnard")]
     pub fn get_code_hash(&self, address: &ManagedAddress<A>) -> ManagedBuffer<A> {
         unsafe {
             let result = ManagedBuffer::new_uninit();
