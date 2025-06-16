@@ -57,6 +57,11 @@ build_and_copy_with_scenarios ./contracts/feature-tests/formatted-message-featur
 build_and_copy_with_scenarios ./contracts/feature-tests/payable-features $VM_REPO_PATH/test/features/payable-features
 build_and_copy_with_scenarios ./contracts/feature-tests/esdt-system-sc-mock $VM_REPO_PATH/test/features/esdt-system-sc-mock
 
+## Bonus:
+rsync -av \
+      ./contracts/feature-tests/payable-features/scenarios-barnard/ \
+      $VM_REPO_PATH/test/features/payable-features/scenarios-barnard/
+
 build_and_copy_composability() {
    contract=$1
    contract_with_underscores="${contract//-/_}"

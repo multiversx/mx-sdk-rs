@@ -1,4 +1,6 @@
 {
+    "name": "payable",
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -6,34 +8,76 @@
                 "sc:payable-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/payable-features.mxsc.json"
+                    "code": "mxsc:../output/payable-features-barnard.mxsc.json"
                 },
                 "address:an-account": {
                     "nonce": "0",
-                    "balance": "10000",
+                    "balance": "1,000,000,000,000",
                     "esdt": {
-                        "str:TOK-123456": "1000",
-                        "str:OTHERTOK-123456": "500",
-                        "str:SFT-123": {
-                            "instances": [
-                                {
-                                    "nonce": "5",
-                                    "balance": "20"
-                                }
-                            ]
-                        }
+                        "str:PAYABLE-FEATURES-TOKEN": "1,000,000,000,000",
+                        "str:OTHER-TOKEN": "1,000,000,000,000"
                     }
                 }
             }
         },
         {
             "step": "scCall",
-            "id": "echo_call_value_legacy",
+            "id": "payable_any_4.1",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "egldValue": "100",
-                "function": "echo_call_value_legacy",
+                "function": "payable_any_4",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0",
+                    "str:EGLD"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_any_4.2",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "egldValue": "5",
+                "function": "payable_any_4",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "5",
+                    "str:EGLD"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_any_4.3",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
+                        "value": "100"
+                    }
+                ],
+                "function": "payable_any_4",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -41,78 +85,7 @@
             "expect": {
                 "out": [
                     "100",
-                    ""
-                ],
-                "status": "",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "call-value-single-esdt",
-            "tx": {
-                "from": "address:an-account",
-                "to": "sc:payable-features",
-                "esdtValue": [
-                    {
-                        "tokenIdentifier": "str:TOK-123456",
-                        "value": "100"
-                    }
-                ],
-                "function": "echo_call_value_legacy",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "0",
-                    [
-                        "nested:str:TOK-123456|u64:0|biguint:100"
-                    ]
-                ],
-                "status": "",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "call-value-multi-esdt",
-            "tx": {
-                "from": "address:an-account",
-                "to": "sc:payable-features",
-                "esdtValue": [
-                    {
-                        "tokenIdentifier": "str:TOK-123456",
-                        "value": "100"
-                    },
-                    {
-                        "tokenIdentifier": "str:OTHERTOK-123456",
-                        "value": "400"
-                    },
-                    {
-                        "tokenIdentifier": "str:SFT-123",
-                        "nonce": "5",
-                        "value": "10"
-                    }
-                ],
-                "function": "echo_call_value_legacy",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "0",
-                    [
-                        "nested:str:TOK-123456|u64:0|biguint:100",
-                        "nested:str:OTHERTOK-123456|u64:0|biguint:400",
-                        "nested:str:SFT-123|u64:5|biguint:10"
-                    ]
+                    "str:PAYABLE-FEATURES-TOKEN"
                 ],
                 "status": "",
                 "logs": "*",

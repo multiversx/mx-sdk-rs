@@ -1,4 +1,5 @@
 {
+    "name": "payable",
     "steps": [
         {
             "step": "setState",
@@ -6,7 +7,7 @@
                 "sc:payable-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/payable-features.mxsc.json"
+                    "code": "mxsc:../output/payable-features-barnard.mxsc.json"
                 },
                 "address:an-account": {
                     "nonce": "0",
@@ -28,19 +29,17 @@
         },
         {
             "step": "scCall",
-            "id": "echo_call_value_legacy",
+            "id": "payable_all_transfers-ZERO",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "egldValue": "100",
-                "function": "echo_call_value_legacy",
+                "function": "payable_all_transfers",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "100",
                     ""
                 ],
                 "status": "",
@@ -51,26 +50,20 @@
         },
         {
             "step": "scCall",
-            "id": "call-value-single-esdt",
+            "id": "payable_all_transfers-EGLD",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
-                "esdtValue": [
-                    {
-                        "tokenIdentifier": "str:TOK-123456",
-                        "value": "100"
-                    }
-                ],
-                "function": "echo_call_value_legacy",
+                "egldValue": "1000",
+                "function": "payable_all_transfers",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0",
                     [
-                        "nested:str:TOK-123456|u64:0|biguint:100"
+                        "nested:str:EGLD|u64:0|biguint:1000"
                     ]
                 ],
                 "status": "",
@@ -81,7 +74,41 @@
         },
         {
             "step": "scCall",
-            "id": "call-value-multi-esdt",
+            "id": "payable_all_transfers-multi-EGLD-2",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "value": "1001"
+                    },
+                    {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "value": "1002"
+                    }
+                ],
+                "function": "payable_all_transfers",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    [
+                        "nested:str:EGLD|u64:0|biguint:1001",
+                        "nested:str:EGLD|u64:0|biguint:1002"
+                    ]
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_all_transfers-EGLD-with-ESDT",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -91,6 +118,10 @@
                         "value": "100"
                     },
                     {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "value": "1005"
+                    },
+                    {
                         "tokenIdentifier": "str:OTHERTOK-123456",
                         "value": "400"
                     },
@@ -98,20 +129,25 @@
                         "tokenIdentifier": "str:SFT-123",
                         "nonce": "5",
                         "value": "10"
+                    },
+                    {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "value": "1006"
                     }
                 ],
-                "function": "echo_call_value_legacy",
+                "function": "payable_all_transfers",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [
-                    "0",
                     [
-                        "nested:str:TOK-123456|u64:0|biguint:100",
+                        "nested:str:TOK-123456|u64:0|biguint:100|",
+                        "nested:str:EGLD|u64:0|biguint:1005",
                         "nested:str:OTHERTOK-123456|u64:0|biguint:400",
-                        "nested:str:SFT-123|u64:5|biguint:10"
+                        "nested:str:SFT-123|u64:5|biguint:10",
+                        "nested:str:EGLD|u64:0|biguint:1006"
                     ]
                 ],
                 "status": "",
