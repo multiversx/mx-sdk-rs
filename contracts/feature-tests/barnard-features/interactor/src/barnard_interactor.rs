@@ -26,13 +26,22 @@ pub async fn adder_cli() {
         Some(barnard_interactor_cli::InteractCliCommand::EpochInfo) => {
             basic_interact.epoch_info().await;
         },
+        Some(barnard_interactor_cli::InteractCliCommand::BlockTimestamps) => {
+            basic_interact.block_timestamps().await;
+        },
         Some(barnard_interactor_cli::InteractCliCommand::CodeHash(args)) => {
             basic_interact
                 .code_hash(Bech32Address::from_bech32_string(args.address))
                 .await;
         },
-        Some(barnard_interactor_cli::InteractCliCommand::BlockTimestamps) => {
-            basic_interact.block_timestamps().await;
+        Some(barnard_interactor_cli::InteractCliCommand::GetESDTTokenType(args)) => {
+            basic_interact
+                .get_esdt_token_type(
+                    Bech32Address::from_bech32_string(args.address),
+                    &args.token_id,
+                    args.nonce,
+                )
+                .await;
         },
         None => {},
     }
@@ -148,5 +157,25 @@ impl PayableInteract {
     block_timestamp:      {block_timestamp_ms} ms ({block_timestamp} s)
         "
         );
+    }
+
+    pub async fn get_esdt_token_type(
+        &mut self,
+        address: Bech32Address,
+        token_id: &str,
+        nonce: u64,
+    ) {
+        let result_value = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_barnard_features_address())
+            .typed(barnard_features_proxy::BarnardFeaturesProxy)
+            .get_esdt_token_type(address, EgldOrEsdtTokenIdentifier::from(token_id), nonce)
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        println!("Result: {result_value:?}");
     }
 }

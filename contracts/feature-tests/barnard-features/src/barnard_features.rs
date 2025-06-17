@@ -44,4 +44,15 @@ pub trait BarnardFeatures {
     fn get_prev_block_timestamp_ms(&self) -> u64 {
         self.blockchain().get_prev_block_timestamp_ms()
     }
+
+    #[view]
+    fn get_esdt_token_type(
+        &self,
+        address: ManagedAddress,
+        token_id: EgldOrEsdtTokenIdentifier,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        self.blockchain()
+            .get_esdt_token_type(&address, &token_id, nonce)
+    }
 }

@@ -16,14 +16,28 @@ pub enum InteractCliCommand {
     Deploy,
     #[command(name = "epoch", about = "Epoch info")]
     EpochInfo,
-    #[command(name = "codehash", about = "Code hash test")]
-    CodeHash(CodeHashArgs),
     #[command(name = "blockt", about = "Epoch info")]
     BlockTimestamps,
+    #[command(name = "codehash", about = "Code hash test")]
+    CodeHash(CodeHashArgs),
+    #[command(name = "token-type", about = "Token type test")]
+    GetESDTTokenType(ESDTTokenTypeArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct CodeHashArgs {
     #[arg(short = 'a', long = "address")]
     pub address: String,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct ESDTTokenTypeArgs {
+    #[arg(short = 'a', long = "address")]
+    pub address: String,
+
+    #[arg(short = 't', long = "token-id")]
+    pub token_id: String,
+
+    #[arg(short = 'n', long = "nonce", default_value = "0")]
+    pub nonce: u64,
 }
