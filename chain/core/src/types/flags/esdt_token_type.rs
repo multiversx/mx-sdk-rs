@@ -104,18 +104,14 @@ impl<'a> From<&'a [u8]> for EsdtTokenType {
 impl From<Option<u64>> for EsdtTokenType {
     #[inline]
     fn from(value: Option<u64>) -> Self {
-        if value.is_none() {
-            return Self::Invalid;
-        }
-
-        match value.unwrap() {
-            0 => Self::Fungible,
-            1 => Self::NonFungible,
-            2 => Self::SemiFungible,
-            3 => Self::Meta,
-            4 => Self::DynamicNFT,
-            5 => Self::DynamicSFT,
-            6 => Self::DynamicMeta,
+        match value {
+            Some(0) => Self::Fungible,
+            Some(1) => Self::NonFungible,
+            Some(2) => Self::SemiFungible,
+            Some(3) => Self::Meta,
+            Some(4) => Self::DynamicNFT,
+            Some(5) => Self::DynamicSFT,
+            Some(6) => Self::DynamicMeta,
             _ => Self::Invalid,
         }
     }
