@@ -15,22 +15,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 
 [[package]]
-name = "basic-features"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "multiversx-sc-modules",
-]
-
-[[package]]
-name = "basic-features-crypto-wasm"
-version = "0.0.0"
-dependencies = [
- "basic-features",
- "multiversx-sc-wasm-adapter",
-]
-
-[[package]]
 name = "bitflags"
 version = "2.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -117,13 +101,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "multiversx-sc-modules"
-version = "0.58.0"
-dependencies = [
- "multiversx-sc",
-]
-
-[[package]]
 name = "multiversx-sc-wasm-adapter"
 version = "0.58.0"
 dependencies = [
@@ -146,6 +123,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
+]
+
+[[package]]
+name = "payable-features"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+]
+
+[[package]]
+name = "payable-features-wasm"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-wasm-adapter",
+ "payable-features",
 ]
 
 [[package]]
@@ -178,15 +170,15 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.15.0"
+version = "1.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8917285742e9f3e1683f0a9c4e6b57960b7314d0b08d30d1ecd426713ee2eee9"
+checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "syn"
-version = "2.0.101"
+version = "2.0.103"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ce2b7fc941b3a24138a0a7cf8e858bfc6a992e7978a068a5c760deb0ed43caf"
+checksum = "e4307e30089d6fd6aff212f2da3a1f9e32f3223b1f010fb09b7c95f90f3ca1e8"
 dependencies = [
  "proc-macro2",
  "quote",

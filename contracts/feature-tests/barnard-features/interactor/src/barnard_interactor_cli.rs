@@ -16,6 +16,8 @@ pub enum InteractCliCommand {
     Deploy,
     #[command(name = "epoch", about = "Epoch info")]
     EpochInfo,
+    #[command(name = "blockt", about = "Epoch info")]
+    BlockTimestamps,
     #[command(name = "codehash", about = "Code hash test")]
     CodeHash(CodeHashArgs),
     #[command(name = "token-type", about = "Token type test")]
