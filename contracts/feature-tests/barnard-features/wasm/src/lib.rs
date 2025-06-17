@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            4
+// Endpoints:                            5
 // Async Callback (empty):               1
-// Total number of exported functions:   6
+// Total number of exported functions:   7
 
 #![no_std]
 
@@ -20,6 +20,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         init => init
         epochInfo => epoch_info
         codeHash => code_hash
+        get_block_timestamps => get_block_timestamps
         get_block_timestamp_ms => get_block_timestamp_ms
         get_prev_block_timestamp_ms => get_prev_block_timestamp_ms
     )
