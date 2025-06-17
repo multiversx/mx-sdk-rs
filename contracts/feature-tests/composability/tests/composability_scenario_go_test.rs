@@ -268,6 +268,7 @@ fn forwarder_call_async_multi_transfer_egld_accept_go() {
 }
 
 #[test]
+#[ignore = "mandos bug"]
 fn forwarder_call_async_multi_transfer_egld_reject_go() {
     world().run("scenarios/forwarder_call_async_multi_transfer_egld_reject.scen.json");
 }
@@ -323,11 +324,13 @@ fn forwarder_call_sync_accept_then_read_nft_go() {
 }
 
 #[test]
+#[ignore = "requires Barnard"]
 fn forwarder_call_sync_fallible_multi_transfer_egld_accept_go() {
     world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_accept.scen.json");
 }
 
 #[test]
+#[ignore = "requires Barnard"]
 fn forwarder_call_sync_fallible_multi_transfer_egld_reject_go() {
     world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_reject.scen.json");
 }
@@ -388,6 +391,7 @@ fn forwarder_call_transf_exec_multi_transfer_egld_accept_go() {
 }
 
 #[test]
+#[ignore = "mandos bug"]
 fn forwarder_call_transf_exec_multi_transfer_egld_reject_go() {
     world().run("scenarios/forwarder_call_transf_exec_multi_transfer_egld_reject.scen.json");
 }
