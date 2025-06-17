@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "basic-features-crypto-wasm"
+name = "basic-features-barnard-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -19,13 +19,14 @@ opt-level = "z"
 lto = true
 debug = false
 panic = "abort"
-overflow-checks = false
+overflow-checks = true
 
 [profile.dev]
 panic = "abort"
 
 [dependencies.basic-features]
 path = ".."
+features = ["barnard"]
 
 [dependencies.multiversx-sc-wasm-adapter]
 version = "0.58.0"
