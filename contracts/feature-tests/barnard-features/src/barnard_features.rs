@@ -23,6 +23,18 @@ pub trait BarnardFeatures {
         self.blockchain().get_code_hash(&address)
     }
 
+    /// Prev block timestamp (ms, then s), current block timestamp (ms, then s)
+    #[view]
+    fn get_block_timestamps(&self) -> MultiValue4<u64, u64, u64, u64> {
+        (
+            self.blockchain().get_prev_block_timestamp_ms(),
+            self.blockchain().get_prev_block_timestamp(),
+            self.blockchain().get_block_timestamp_ms(),
+            self.blockchain().get_block_timestamp(),
+        )
+            .into()
+    }
+
     #[view]
     fn get_block_timestamp_ms(&self) -> u64 {
         self.blockchain().get_block_timestamp_ms()
@@ -31,5 +43,16 @@ pub trait BarnardFeatures {
     #[view]
     fn get_prev_block_timestamp_ms(&self) -> u64 {
         self.blockchain().get_prev_block_timestamp_ms()
+    }
+
+    #[view]
+    fn get_esdt_token_type(
+        &self,
+        address: ManagedAddress,
+        token_id: EgldOrEsdtTokenIdentifier,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        self.blockchain()
+            .get_esdt_token_type(&address, &token_id, nonce)
     }
 }

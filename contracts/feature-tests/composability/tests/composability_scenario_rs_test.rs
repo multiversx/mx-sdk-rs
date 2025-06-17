@@ -203,16 +203,52 @@ fn forw_raw_transf_exec_accept_egld_rs() {
     world().run("scenarios/forw_raw_transf_exec_accept_egld.scen.json");
 }
 
-#[ignore = "not yet supported"]
 #[test]
-fn forw_raw_transf_exec_fallible_multi_accept_rs() {
-    world().run("scenarios/forw_raw_transf_exec_fallible_multi_accept.scen.json");
+#[ignore = "not yet supported"]
+fn forw_raw_transf_exec_fallible_egld_accept_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_egld_accept.scen.json");
 }
 
-#[ignore = "not yet supported"]
 #[test]
-fn forw_raw_transf_exec_fallible_multi_reject_rs() {
-    world().run("scenarios/forw_raw_transf_exec_fallible_multi_reject.scen.json");
+#[ignore = "not yet supported"]
+fn forw_raw_transf_exec_fallible_egld_reject_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_egld_reject.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forw_raw_transf_exec_fallible_esdt_accept_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_esdt_accept.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forw_raw_transf_exec_fallible_esdt_reject_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_esdt_reject.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forw_raw_transf_exec_fallible_multi_egld_accept_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_multi_egld_accept.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forw_raw_transf_exec_fallible_multi_egld_reject_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_multi_egld_reject.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forw_raw_transf_exec_fallible_multi_esdt_accept_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_multi_esdt_accept.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forw_raw_transf_exec_fallible_multi_esdt_reject_rs() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_multi_esdt_reject.scen.json");
 }
 
 #[test]
@@ -220,14 +256,20 @@ fn forw_raw_transf_exec_reject_egld_rs() {
     world().run("scenarios/forw_raw_transf_exec_reject_egld.scen.json");
 }
 
-#[ignore = "not yet supported"]
 #[test]
+#[ignore = "not yet supported"]
+fn forw_raw_transfer_fallible_egld_rs() {
+    world().run("scenarios/forw_raw_transfer_fallible_egld.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
 fn forw_raw_transfer_fallible_multi_err_rs() {
     world().run("scenarios/forw_raw_transfer_fallible_multi_err.scen.json");
 }
 
-#[ignore = "not yet supported"]
 #[test]
+#[ignore = "not yet supported"]
 fn forw_raw_transfer_fallible_multi_ok_rs() {
     world().run("scenarios/forw_raw_transfer_fallible_multi_ok.scen.json");
 }
@@ -278,8 +320,14 @@ fn forwarder_call_async_multi_transfer_rs() {
 }
 
 #[test]
-fn forwarder_call_async_multi_transfer_egld_rs() {
-    world().run("scenarios/forwarder_call_async_multi_transfer_egld.scen.json");
+fn forwarder_call_async_multi_transfer_egld_accept_rs() {
+    world().run("scenarios/forwarder_call_async_multi_transfer_egld_accept.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forwarder_call_async_multi_transfer_egld_reject_rs() {
+    world().run("scenarios/forwarder_call_async_multi_transfer_egld_reject.scen.json");
 }
 
 #[test]
@@ -313,11 +361,6 @@ fn forwarder_call_sync_accept_multi_transfer_rs() {
 }
 
 #[test]
-fn forwarder_call_sync_accept_multi_transfer_egld_rs() {
-    world().run("scenarios/forwarder_call_sync_accept_multi_transfer_egld.scen.json");
-}
-
-#[test]
 fn forwarder_call_sync_accept_nft_rs() {
     world().run("scenarios/forwarder_call_sync_accept_nft.scen.json");
 }
@@ -335,6 +378,23 @@ fn forwarder_call_sync_accept_then_read_esdt_rs() {
 #[test]
 fn forwarder_call_sync_accept_then_read_nft_rs() {
     world().run("scenarios/forwarder_call_sync_accept_then_read_nft.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forwarder_call_sync_fallible_multi_transfer_egld_accept_rs() {
+    world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_accept.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forwarder_call_sync_fallible_multi_transfer_egld_reject_rs() {
+    world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_reject.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_multi_transfer_egld_accept_rs() {
+    world().run("scenarios/forwarder_call_sync_multi_transfer_egld_accept.scen.json");
 }
 
 #[test]
@@ -368,59 +428,63 @@ fn forwarder_call_sync_retrieve_nft_bt_rs() {
 }
 
 #[test]
-fn forwarder_call_transf_exec_accept_egld_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_accept_egld.scen.json");
-}
-
-#[test]
-fn forwarder_call_transf_exec_accept_egld_twice_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_accept_egld_twice.scen.json");
-}
-
-#[test]
-fn forwarder_call_transf_exec_accept_esdt_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_accept_esdt.scen.json");
-}
-
-#[test]
-fn forwarder_call_transf_exec_accept_esdt_twice_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_accept_esdt_twice.scen.json");
-}
-
-#[test]
-fn forwarder_call_transf_exec_accept_multi_transfer_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer.scen.json");
-}
-
-#[ignore = "TODO: fix logs"]
-#[test]
-fn forwarder_call_transf_exec_accept_multi_transfer_egld_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_accept_multi_transfer_egld.scen.json");
-}
-
-#[test]
-fn forwarder_call_transf_exec_accept_nft_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_accept_nft.scen.json");
-}
-
-#[test]
 fn forwarder_call_transf_exec_accept_return_values_rs() {
     world().run("scenarios/forwarder_call_transf_exec_accept_return_values.scen.json");
 }
 
 #[test]
-fn forwarder_call_transf_exec_accept_sft_twice_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_accept_sft_twice.scen.json");
+fn forwarder_call_transf_exec_egld_accept_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_egld_accept.scen.json");
 }
 
 #[test]
-fn forwarder_call_transf_exec_reject_multi_transfer_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_reject_multi_transfer.scen.json");
+fn forwarder_call_transf_exec_egld_accept_twice_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_egld_accept_twice.scen.json");
 }
 
 #[test]
-fn forwarder_call_transf_exec_reject_nft_rs() {
-    world().run("scenarios/forwarder_call_transf_exec_reject_nft.scen.json");
+fn forwarder_call_transf_exec_multi_transfer_egld_accept_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_multi_transfer_egld_accept.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_multi_transfer_egld_reject_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_multi_transfer_egld_reject.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_multi_transfer_esdt_accept_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_multi_transfer_esdt_accept.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_multi_transfer_esdt_reject_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_multi_transfer_esdt_reject.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_single_esdt_accept_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_single_esdt_accept.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_single_esdt_accept_twice_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_single_esdt_accept_twice.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_single_nft_accept_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_single_nft_accept.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_single_nft_reject_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_single_nft_reject.scen.json");
+}
+
+#[test]
+fn forwarder_call_transf_exec_single_sft_twice_accept_rs() {
+    world().run("scenarios/forwarder_call_transf_exec_single_sft_twice_accept.scen.json");
 }
 
 #[test]
