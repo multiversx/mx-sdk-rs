@@ -157,6 +157,12 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> bool {
+        if payments.is_empty() {
+            self.direct_egld_execute(to, &BigUint::zero(), gas_limit, endpoint_name, arg_buffer);
+
+            return true;
+        }
+
         if let Some(single_item) = payments.is_single_item() {
             if single_item.token_identifier.is_egld() {
                 self.direct_egld_execute(
@@ -212,6 +218,12 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), TransferExecuteFailed> {
+        if payments.is_empty() {
+            use crate::{api::ErrorApiImpl, err_msg};
+
+            A::error_api_impl().signal_error(err_msg::TRANSFER_EXECUTE_REQUIRES_PAYMENT.as_bytes());
+        }
+
         let ret = A::send_api_impl().multi_transfer_esdt_nft_execute_with_return(
             to.get_handle().get_raw_handle(),
             payments.get_handle().get_raw_handle(),

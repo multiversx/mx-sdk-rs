@@ -147,6 +147,18 @@ fn forw_raw_transf_exec_accept_egld_go() {
 
 #[test]
 #[ignore = "requires Barnard"]
+fn forw_raw_transf_exec_fallible_0_accept_go() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_0_accept.scen.json");
+}
+
+#[test]
+#[ignore = "requires Barnard"]
+fn forw_raw_transf_exec_fallible_0_reject_go() {
+    world().run("scenarios/forw_raw_transf_exec_fallible_0_reject.scen.json");
+}
+
+#[test]
+#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_egld_accept_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_egld_accept.scen.json");
 }
