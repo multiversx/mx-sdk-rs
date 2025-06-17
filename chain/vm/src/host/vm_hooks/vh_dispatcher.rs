@@ -1040,7 +1040,14 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         function_handle: i32,
         arguments_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_multi_transfer_esdt_nft_execute_with_return")
+        self.handler
+            .managed_multi_transfer_esdt_nft_execute_with_return(
+                dst_handle,
+                token_transfers_handle,
+                gas_limit as u64,
+                function_handle,
+                arguments_handle,
+            )
     }
 
     fn managed_transfer_value_execute(

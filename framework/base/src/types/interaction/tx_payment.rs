@@ -21,6 +21,7 @@ pub use tx_payment_not_payable::NotPayable;
 
 use crate::{
     api::ManagedTypeApi,
+    contract_base::TransferExecuteFailed,
     types::{BigUint, ManagedAddress, ManagedBuffer, MultiEgldOrEsdtPayment},
 };
 
@@ -47,7 +48,7 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    );
+    ) -> Result<(), TransferExecuteFailed>;
 
     /// Converts an ESDT call to a built-in function call, if necessary.
     fn with_normalized<From, To, F, R>(

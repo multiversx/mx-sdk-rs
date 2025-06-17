@@ -187,6 +187,20 @@ pub trait ForwarderAsyncCallModule {
             .async_call_and_exit();
     }
 
+    #[endpoint]
+    fn send_async_reject_multi_transfer(
+        &self,
+        to: ManagedAddress,
+        payment_args: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
+    ) {
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .reject_funds()
+            .payment(payment_args.convert_payment_multi_triples())
+            .async_call_and_exit();
+    }
+
     #[view]
     #[storage_mapper("callback_data")]
     fn callback_data(&self) -> VecMapper<CallbackData<Self::Api>>;
