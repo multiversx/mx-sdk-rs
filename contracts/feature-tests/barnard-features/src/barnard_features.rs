@@ -49,7 +49,7 @@ pub trait BarnardFeatures {
     fn get_esdt_token_type(
         &self,
         address: ManagedAddress,
-        token_id: TokenIdentifier,
+        token_id: EgldOrEsdtTokenIdentifier,
         nonce: u64,
     ) -> EsdtTokenType {
         self.blockchain()

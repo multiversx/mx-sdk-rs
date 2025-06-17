@@ -161,20 +161,23 @@ where
     pub fn get_esdt_token_type(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
     ) -> EsdtTokenType {
         unsafe {
-            let result: ManagedBuffer<A> = ManagedBuffer::new_uninit();
+            let big_int_temp_handle: A::BigIntHandle =
+                use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
 
             A::blockchain_api_impl().managed_get_esdt_token_type(
                 address.get_handle(),
                 token_id.get_handle(),
                 nonce,
-                result.get_handle(),
+                big_int_temp_handle.clone(),
             );
 
-            EsdtTokenType::from(result.parse_as_u64())
+            let bu = BigUint::<A>::from_handle(big_int_temp_handle);
+            // TODO: forget bu
+            EsdtTokenType::from(bu.to_u64())
         }
     }
 

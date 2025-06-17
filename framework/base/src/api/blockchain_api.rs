@@ -178,6 +178,6 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         address_handle: Self::ManagedBufferHandle,
         token_id_handle: Self::ManagedBufferHandle,
         nonce: u64,
-        type_handle: Self::ManagedBufferHandle,
+        dest_handle: Self::BigIntHandle,
     );
 }

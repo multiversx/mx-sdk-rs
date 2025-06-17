@@ -210,7 +210,7 @@ impl BlockchainApiImpl for UncallableApi {
         _address_handle: Self::ManagedBufferHandle,
         _token_id_handle: Self::ManagedBufferHandle,
         _nonce: u64,
-        _type_handle: Self::ManagedBufferHandle,
+        _dest_handle: Self::BigIntHandle,
     ) {
         unreachable!()
     }

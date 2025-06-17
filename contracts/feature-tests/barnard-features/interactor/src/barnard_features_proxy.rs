@@ -114,7 +114,7 @@ where
 
     pub fn get_esdt_token_type<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
     >(
         self,

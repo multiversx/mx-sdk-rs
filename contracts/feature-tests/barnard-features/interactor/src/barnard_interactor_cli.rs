@@ -35,9 +35,9 @@ pub struct ESDTTokenTypeArgs {
     #[arg(short = 'a', long = "address")]
     pub address: String,
 
-    #[arg(short = 'i', long = "token-id")]
+    #[arg(short = 't', long = "token-id")]
     pub token_id: String,
 
-    #[arg(short = 'n', long = "nonce")]
+    #[arg(short = 'n', long = "nonce", default_value = "0")]
     pub nonce: u64,
 }
