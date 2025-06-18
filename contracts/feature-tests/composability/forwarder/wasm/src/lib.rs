@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           78
+// Endpoints:                           79
 // Async Callback:                       1
-// Total number of exported functions:  80
+// Total number of exported functions:  81
 
 #![no_std]
 
@@ -36,6 +36,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_async_accept_funds_half_payment => forward_async_accept_funds_half_payment
         forward_async_accept_funds_with_fees => forward_async_accept_funds_with_fees
         forward_async_retrieve_funds => forward_async_retrieve_funds
+        forward_async_reject_funds => forward_async_reject_funds
         send_funds_twice => send_funds_twice
         send_async_accept_multi_transfer => send_async_accept_multi_transfer
         callback_data => callback_data
