@@ -23,14 +23,33 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
-        ().perform_transfer_execute(env, to, gas_limit, fc)
+        ().perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        ().perform_transfer_fallible(env, to)
+    }
+
+    fn perform_transfer_execute_legacy(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        ().perform_transfer_execute_legacy(env, to, gas_limit, fc);
     }
 
     #[inline]

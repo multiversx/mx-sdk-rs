@@ -14,7 +14,7 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -22,7 +22,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
         self.as_refs()
-            .perform_transfer_execute(env, to, gas_limit, fc)
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -57,7 +57,7 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -65,7 +65,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
         self.as_refs()
-            .perform_transfer_execute(env, to, gas_limit, fc)
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
