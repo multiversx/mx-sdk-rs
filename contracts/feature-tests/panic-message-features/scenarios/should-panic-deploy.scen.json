@@ -1,0 +1,32 @@
+{
+    "name": "panic",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scDeploy",
+            "id": "fail-deploy",
+            "tx": {
+                "from": "address:an_account",
+                "arguments": [
+                    "true"
+                ],
+                "code": "mxsc:../output/panic-message-features.mxsc.json",
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": ""
+            }
+        }
+    ]
+}

@@ -27,9 +27,11 @@ where
     }
 
     pub async fn perform_sc_query(&mut self, step: &mut ScQueryStep) {
-        let sc_address = step.tx.to.to_address();
+        let hrp = self.network_config.address_hrp.clone();
+
+        let sc_address = step.tx.to.to_address().to_bech32(&hrp);
         let req = VMQueryInput {
-            sc_address: sc_address.clone().into(),
+            sc_address,
             func_name: step.tx.function.clone(),
             args: step
                 .tx

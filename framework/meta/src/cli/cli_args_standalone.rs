@@ -489,6 +489,9 @@ pub struct WalletNewArgs {
     /// The name of the wallet to create.
     #[arg(long = "outfile", verbatim_doc_comment)]
     pub outfile: Option<String>,
+
+    #[arg(long = "hrp", verbatim_doc_comment)]
+    pub hrp: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -504,6 +507,9 @@ pub struct WalletConvertArgs {
 
     #[arg(long = "outfile", verbatim_doc_comment)]
     pub outfile: Option<String>,
+
+    #[arg(long = "hrp", verbatim_doc_comment)]
+    pub hrp: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

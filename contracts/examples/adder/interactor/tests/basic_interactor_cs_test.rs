@@ -8,6 +8,12 @@ use serial_test::serial;
 async fn simulator_upgrade_test() {
     let mut basic_interact = AdderInteract::new(Config::chain_simulator_config()).await;
 
+    basic_interact
+        .interactor
+        .generate_blocks(2u64)
+        .await
+        .unwrap();
+
     basic_interact.deploy().await;
     basic_interact.add(1u32).await;
 

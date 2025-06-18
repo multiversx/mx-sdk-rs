@@ -1,7 +1,6 @@
 use multiversx_sc_scenario::imports::{Address, ReturnCode};
 use multiversx_sc_snippets::network_response;
 use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
-use multiversx_sdk::bech32;
 
 #[test]
 fn test_deployed_address() {
@@ -57,7 +56,7 @@ fn test_deployed_address() {
     let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
     let opt_address = tx_response
         .new_deployed_address
-        .map(|address| bech32::encode(&address));
+        .map(|address| address.to_bech32_default().bech32);
 
     let expected =
         Some("erd1qqqqqqqqqqqqqpgqwpdf84ggxzqzmr2zmw959q4nlf9nz562q33sak25ze".to_string());

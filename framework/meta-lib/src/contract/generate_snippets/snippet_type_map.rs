@@ -63,7 +63,7 @@ fn init_rust_types_map() -> HashMap<&'static str, RustTypeString> {
         "Address",
         RustTypeString {
             type_name: "ManagedAddress".to_string() + STATIC_API_SUFFIX,
-            default_value_expr: "bech32::decode(\"\")".to_string(),
+            default_value_expr: "ManagedAddress::<StaticApi>::zero()".to_string(),
             contains_custom_types: false,
         },
     );

@@ -60,7 +60,7 @@ fn st_blackbox() {
         .code(CODE_PATH)
         .returns(ReturnsNewAddress)
         .run();
-    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(new_address, ST_ADDRESS);
 
     let value = world
         .query()
@@ -272,7 +272,7 @@ fn st_blackbox_tx_hash() {
         .returns(ReturnsTxHash)
         .run();
 
-    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(new_address, ST_ADDRESS);
     assert_eq!(tx_hash.as_array(), &[11u8; 32]);
 
     let tx_hash = world
@@ -324,7 +324,7 @@ fn st_blackbox_returns_result_or_error() {
 
     assert_eq!(check_tx_hash.as_array(), &[33u8; 32]);
     let (new_address, out_value, pass_value_1, also_check_tx_hash) = result.unwrap();
-    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(new_address, ST_ADDRESS);
     assert_eq!(out_value, "init-result");
     assert_eq!(pass_value_1, "pass-value-1");
     assert_eq!(also_check_tx_hash.as_array(), &[33u8; 32]);
@@ -405,7 +405,7 @@ fn st_blackbox_storage_check_test() {
         .returns(ReturnsNewAddress)
         .run();
 
-    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(new_address, ST_ADDRESS);
 
     // set value for otherMapper in storage
     world

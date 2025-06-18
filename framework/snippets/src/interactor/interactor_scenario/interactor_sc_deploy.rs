@@ -5,7 +5,7 @@ use crate::{network_response, InteractorBase};
 use anyhow::Error;
 use log::info;
 use multiversx_sc_scenario::{
-    imports::{Address, Bech32Address},
+    imports::Bech32Address,
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
 };
@@ -20,11 +20,13 @@ where
     GatewayProxy: GatewayAsyncService,
 {
     pub(crate) fn sc_deploy_to_blockchain_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
+        let hrp = self.network_config.address_hrp.clone();
+
         Transaction {
             nonce: 0,
             value: sc_deploy_step.tx.egld_value.value.to_string(),
-            sender: sc_deploy_step.tx.from.to_address().into(),
-            receiver: Address::zero().into(),
+            sender: sc_deploy_step.tx.from.to_address().to_bech32(&hrp),
+            receiver: Bech32Address::zero(&hrp),
             gas_price: self.network_config.min_gas_price,
             gas_limit: sc_deploy_step.tx.gas_limit.value,
             data: Some(base64_encode(sc_deploy_step.tx.to_tx_data())),
@@ -82,7 +84,7 @@ where
             .new_deployed_address
             .clone()
             .unwrap();
-        let deploy_address_bech32 = Bech32Address::from(deploy_address);
+        let deploy_address_bech32 = Bech32Address::encode_address(self.get_hrp(), deploy_address);
 
         let set_state_step = SetStateStep::new().new_address(addr, nonce, &deploy_address_bech32);
 

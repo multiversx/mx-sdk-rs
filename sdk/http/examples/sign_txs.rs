@@ -1,7 +1,4 @@
-use multiversx_sdk::{
-    data::{sdk_address::SdkAddress, transaction::Transaction},
-    wallet::Wallet,
-};
+use multiversx_sdk::{data::transaction::Transaction, wallet::Wallet};
 use multiversx_sdk_http::{GatewayHttpProxy, DEVNET_GATEWAY};
 
 #[tokio::main]
@@ -22,8 +19,8 @@ async fn main() {
     let mut unsign_tx = Transaction {
         nonce: arg.nonce,
         value: "1000000000000000000".to_string(),
-        receiver: SdkAddress(addr.clone()),
-        sender: SdkAddress(addr.clone()),
+        receiver: addr.to_bech32(&network_config.address_hrp),
+        sender: addr.to_bech32(&network_config.address_hrp),
         gas_price: arg.gas_price,
         gas_limit: arg.gas_limit,
         data: arg.data,

@@ -37,6 +37,16 @@ impl Address {
 
         Address::from(result)
     }
+
+    #[cfg(feature = "std")]
+    pub fn to_bech32(&self, hrp: &str) -> crate::std::Bech32Address {
+        crate::std::Bech32Address::encode_address(hrp, self.clone())
+    }
+
+    #[cfg(feature = "std")]
+    pub fn to_bech32_default(&self) -> crate::std::Bech32Address {
+        crate::std::Bech32Address::encode_address_default_hrp(self.clone())
+    }
 }
 
 impl From<H256> for Address {
