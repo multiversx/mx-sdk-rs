@@ -30,7 +30,6 @@ where
             .await
             .expect("failed to retrieve account nonce");
 
-        println!("account from recall nonce request: {:?}", account);
         account.nonce
     }
 
