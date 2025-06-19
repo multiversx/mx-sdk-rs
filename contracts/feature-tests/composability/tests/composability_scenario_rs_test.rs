@@ -341,7 +341,6 @@ fn forwarder_call_async_multi_transfer_egld_reject_rs() {
 }
 
 #[test]
-#[ignore = "TODO: fix logs"]
 fn forwarder_call_async_retrieve_egld_rs() {
     world().run("scenarios/forwarder_call_async_retrieve_egld.scen.json");
 }
@@ -409,13 +408,11 @@ fn forwarder_call_sync_multi_transfer_egld_accept_rs() {
 }
 
 #[test]
-#[ignore = "TODO: fix logs"]
 fn forwarder_call_sync_retrieve_egld_rs() {
     world().run("scenarios/forwarder_call_sync_retrieve_egld.scen.json");
 }
 
 #[test]
-#[ignore = "TODO: fix logs"]
 fn forwarder_call_sync_retrieve_egld_bt_rs() {
     world().run("scenarios/forwarder_call_sync_retrieve_egld_bt.scen.json");
 }
@@ -610,7 +607,6 @@ fn promises_call_async_accept_esdt_rs() {
 }
 
 #[test]
-#[ignore = "TODO: fix logs"]
 fn promises_call_async_retrieve_egld_rs() {
     world().run("scenarios/promises_call_async_retrieve_egld.scen.json");
 }

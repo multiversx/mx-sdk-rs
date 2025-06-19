@@ -171,7 +171,6 @@ fn test_multi_call_back_transfers_logs() {
 }
 
 #[test]
-#[ignore = "TODO: fix back transfers"]
 fn test_back_transfers_handlers() {
     let mut state = PromisesFeaturesTestState::new();
     let egld_amount = BigUint::from(2u64);
