@@ -45,13 +45,21 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:transferValueOnly",
+                        "endpoint": "str:MultiESDTNFTTransfer",
                         "topics": [
+                            "str:EGLD-000000",
+                            "0",
                             "100",
                             "sc:vault"
                         ],
                         "data": [
                             "str:TransferAndExecute",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:vault",
+                            "1",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
                             "str:accept_funds"
                         ]
                     },

@@ -29,7 +29,7 @@ where
         self.is_empty()
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         _env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -89,7 +89,7 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -97,7 +97,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
         self.deref()
-            .perform_transfer_execute(env, to, gas_limit, fc)
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -132,14 +132,14 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
-        (&self).perform_transfer_execute(env, to, gas_limit, fc)
+        (&self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]

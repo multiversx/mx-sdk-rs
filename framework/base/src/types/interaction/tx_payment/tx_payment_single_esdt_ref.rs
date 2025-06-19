@@ -14,7 +14,7 @@ where
         self.amount == &0u32
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         _env: &Env,
         to: &ManagedAddress<Env::Api>,
