@@ -89,8 +89,7 @@ impl State {
             )
             .await;
 
-        let new_address_bech32 = bech32::encode(&new_address);
-        println!("new address: {new_address_bech32}");
+        println!("new address: {}", new_address.to_bech32_default());
     }
 
     async fn no_arg_no_result_endpoint(&mut self) {
