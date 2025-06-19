@@ -219,9 +219,9 @@ where
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), TransferExecuteFailed> {
         if payments.is_empty() {
-            use crate::{api::ErrorApiImpl, err_msg};
+            use crate::{api::quick_signal_error, err_msg};
 
-            A::error_api_impl().signal_error(err_msg::TRANSFER_EXECUTE_REQUIRES_PAYMENT.as_bytes());
+            quick_signal_error::<A>(err_msg::TRANSFER_EXECUTE_REQUIRES_PAYMENT);
         }
 
         let ret = A::send_api_impl().multi_transfer_esdt_nft_execute_with_return(

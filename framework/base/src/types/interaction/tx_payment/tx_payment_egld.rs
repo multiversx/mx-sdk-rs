@@ -65,14 +65,9 @@ where
         to: &ManagedAddress<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
         self.0.with_value_ref(env, |egld_value| {
-            if egld_value == &0u64 {
-                // will crash
-                ().perform_transfer_fallible(env, to)
-            } else {
-                SendRawWrapper::<Env::Api>::new().direct_egld(to, egld_value, Empty);
-                Ok(())
-            }
-        })
+            SendRawWrapper::<Env::Api>::new().direct_egld(to, egld_value, Empty);
+        });
+        Ok(())
     }
 
     fn perform_transfer_execute_legacy(
