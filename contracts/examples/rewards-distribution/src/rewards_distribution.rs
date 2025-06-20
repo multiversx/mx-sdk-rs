@@ -279,9 +279,15 @@ pub trait RewardsDistribution:
             }
         }
 
-        self.tx().to(&caller).egld(total_egld_reward).transfer();
-        self.tx().to(&caller).payment(rewards).transfer();
-        self.tx().to(&caller).payment(nfts).transfer();
+        self.tx()
+            .to(&caller)
+            .egld(total_egld_reward)
+            .transfer_if_not_empty();
+        self.tx()
+            .to(&caller)
+            .payment(rewards)
+            .transfer_if_not_empty();
+        self.tx().to(&caller).payment(nfts).transfer_if_not_empty();
     }
 
     fn claim_reward_token(

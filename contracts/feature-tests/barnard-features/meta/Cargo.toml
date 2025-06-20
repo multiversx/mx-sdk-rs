@@ -1,0 +1,14 @@
+[package]
+name = "barnard-features-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.barnard-features]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.58.0"
+path = "../../../../framework/meta-lib"
+default-features = false

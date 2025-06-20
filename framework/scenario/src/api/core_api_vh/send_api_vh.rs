@@ -21,8 +21,8 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
         gas_limit: u64,
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
-    ) -> Result<(), &'static [u8]> {
-        let result = self.with_vm_hooks(|vh| {
+    ) {
+        let _ = self.with_vm_hooks(|vh| {
             vh.managed_transfer_value_execute(
                 to_handle,
                 amount_handle,
@@ -31,11 +31,6 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
                 arg_buffer_handle,
             )
         });
-        if result == 0 {
-            Ok(())
-        } else {
-            Err(b"transferValueExecute failed")
-        }
     }
 
     fn multi_transfer_esdt_nft_execute(
@@ -45,8 +40,8 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
         gas_limit: u64,
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
-    ) -> Result<(), &'static [u8]> {
-        let result = self.with_vm_hooks(|vh| {
+    ) {
+        let _ = self.with_vm_hooks(|vh| {
             vh.managed_multi_transfer_esdt_nft_execute(
                 to_handle,
                 payments_handle,
@@ -55,11 +50,25 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
                 arg_buffer_handle,
             )
         });
-        if result == 0 {
-            Ok(())
-        } else {
-            Err(b"multiTransferESDTNFTExecute failed")
-        }
+    }
+
+    fn multi_transfer_esdt_nft_execute_with_return(
+        &self,
+        to_handle: RawHandle,
+        payments_handle: RawHandle,
+        gas_limit: u64,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+    ) -> i32 {
+        self.with_vm_hooks(|vh| {
+            vh.managed_multi_transfer_esdt_nft_execute_with_return(
+                to_handle,
+                payments_handle,
+                gas_limit as i64,
+                endpoint_name_handle,
+                arg_buffer_handle,
+            )
+        })
     }
 
     fn async_call_raw(
@@ -263,6 +272,27 @@ impl<VHB: VMHooksApiBackend> SendApiImpl for VMHooksApi<VHB> {
                 result_handle,
             )
         });
+    }
+
+    fn execute_on_dest_context_error_return_raw(
+        &self,
+        gas: u64,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> i32 {
+        self.with_vm_hooks(|vh| {
+            vh.managed_execute_on_dest_context_with_error_return(
+                gas as i64,
+                to_handle,
+                egld_value_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
+                result_handle,
+            )
+        })
     }
 
     fn clean_return_data(&self) {

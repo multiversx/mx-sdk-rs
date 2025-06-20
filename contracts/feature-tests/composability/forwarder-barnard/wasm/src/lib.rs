@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            3
+// Endpoints:                            5
 // Async Callback (empty):               1
-// Total number of exported functions:   5
+// Total number of exported functions:   7
 
 #![no_std]
 
@@ -15,12 +15,14 @@ multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
-    basic_features
+    forwarder_barnard
     (
         init => init
-        verify_secp256r1_signature => verify_secp256r1_signature
-        verify_bls_signature_share => verify_bls_signature_share
-        verify_bls_aggregated_signature => verify_bls_aggregated_signature
+        sync_call_fallible => sync_call_fallible
+        forward_sync_fallible_accept_funds_multi_transfer => forward_sync_fallible_accept_funds_multi_transfer
+        forward_sync_reject_funds_multi_transfer => forward_sync_reject_funds_multi_transfer
+        transfer_fallible => transfer_fallible
+        transfer_execute_fallible => transfer_execute_fallible
     )
 }
 

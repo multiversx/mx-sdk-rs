@@ -2,7 +2,8 @@ use multiversx_sc_codec::TopDecodeMulti;
 
 use crate::{
     abi::TypeAbi,
-    types::{interaction::decode_result, RHListItem, RHListItemExec, SyncCallRawResult, TxEnv},
+    contract_base::SyncCallRawResult,
+    types::{interaction::decode_result, RHListItem, RHListItemExec, TxEnv},
 };
 
 /// Indicates that the unmanaged version of the result will be returned.

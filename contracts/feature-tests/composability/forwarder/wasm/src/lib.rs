@@ -38,6 +38,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_async_retrieve_funds => forward_async_retrieve_funds
         send_funds_twice => send_funds_twice
         send_async_accept_multi_transfer => send_async_accept_multi_transfer
+        send_async_reject_multi_transfer => send_async_reject_multi_transfer
         callback_data => callback_data
         callback_data_at_index => callback_data_at_index
         clear_callback_data => clear_callback_data
@@ -46,7 +47,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_transf_exec_accept_funds_twice => forward_transf_exec_accept_funds_twice
         forward_transf_exec_accept_funds_return_values => forward_transf_exec_accept_funds_return_values
         transf_exec_multi_accept_funds => transf_exec_multi_accept_funds
-        forward_transf_exec_reject_funds_multi_transfer => forward_transf_exec_reject_funds_multi_transfer
         transf_exec_multi_reject_funds => transf_exec_multi_reject_funds
         changeOwnerAddress => change_owner
         deploy_contract => deploy_contract

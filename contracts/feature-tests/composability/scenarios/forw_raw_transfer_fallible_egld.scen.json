@@ -1,0 +1,91 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "code": "mxsc:../forwarder-barnard/output/forwarder-barnard.mxsc.json"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "transfer_fallible - egld",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "transfer_fallible",
+                "arguments": [
+                    "sc:vault",
+                    "str:EGLD-000000",
+                    "0",
+                    "100"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:EGLD-000000",
+                            "",
+                            "100",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:DirectCall",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:vault",
+                            "1",
+                            "str:EGLD-000000",
+                            "",
+                            "100"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "900",
+                    "storage": {},
+                    "code": "*"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "100",
+                    "storage": {},
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                }
+            }
+        }
+    ]
+}

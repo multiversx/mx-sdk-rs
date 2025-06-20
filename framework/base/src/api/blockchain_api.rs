@@ -73,6 +73,8 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
 
     fn get_block_timestamp(&self) -> u64;
 
+    fn get_block_timestamp_ms(&self) -> u64;
+
     fn get_block_nonce(&self) -> u64;
 
     fn get_block_round(&self) -> u64;
@@ -82,6 +84,8 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle);
 
     fn get_prev_block_timestamp(&self) -> u64;
+
+    fn get_prev_block_timestamp_ms(&self) -> u64;
 
     fn get_prev_block_nonce(&self) -> u64;
 
@@ -94,6 +98,14 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     fn load_prev_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
         self.mb_overwrite(dest, self.get_prev_block_random_seed_legacy().as_slice());
     }
+
+    fn get_block_round_time_ms(&self) -> u64;
+
+    fn epoch_start_block_timestamp_ms(&self) -> u64;
+
+    fn epoch_start_block_nonce(&self) -> u64;
+
+    fn epoch_start_block_round(&self) -> u64;
 
     fn get_current_esdt_nft_nonce(
         &self,
@@ -153,5 +165,19 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         response_handle: Self::ManagedBufferHandle,
     );
 
+    fn managed_get_code_hash(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        code_hash_handle: Self::ManagedBufferHandle,
+    );
+
     fn managed_is_builtin_function(&self, function_name_handle: Self::ManagedBufferHandle) -> bool;
+
+    fn managed_get_esdt_token_type(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        token_id_handle: Self::ManagedBufferHandle,
+        nonce: u64,
+        dest_handle: Self::BigIntHandle,
+    );
 }
