@@ -3038,8 +3038,10 @@ dependencies = [
 name = "multiversx-chain-core"
 version = "0.15.0"
 dependencies = [
+ "bech32",
  "bitflags 2.9.1",
  "multiversx-sc-codec",
+ "serde",
 ]
 
 [[package]]
@@ -3226,7 +3228,6 @@ name = "multiversx-sc-scenario"
 version = "0.58.0"
 dependencies = [
  "base64",
- "bech32",
  "colored 3.0.0",
  "hex",
  "itertools 0.14.0",
@@ -3280,7 +3281,6 @@ dependencies = [
  "aes",
  "anyhow",
  "base64",
- "bech32",
  "bip39",
  "ctr",
  "hex",
