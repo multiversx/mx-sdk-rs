@@ -1,4 +1,4 @@
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 
 use crate::{
@@ -215,6 +215,18 @@ impl<M: ManagedTypeApi> From<&[u8]> for EgldOrEsdtTokenIdentifier<M> {
         EgldOrEsdtTokenIdentifier {
             buffer: ManagedBuffer::new_from_bytes(bytes),
         }
+    }
+}
+
+impl<M: ManagedTypeApi> From<&str> for EgldOrEsdtTokenIdentifier<M> {
+    fn from(s: &str) -> Self {
+        EgldOrEsdtTokenIdentifier::from(s.as_bytes())
+    }
+}
+
+impl<M: ManagedTypeApi> From<&String> for EgldOrEsdtTokenIdentifier<M> {
+    fn from(s: &String) -> Self {
+        EgldOrEsdtTokenIdentifier::from(s.as_bytes())
     }
 }
 

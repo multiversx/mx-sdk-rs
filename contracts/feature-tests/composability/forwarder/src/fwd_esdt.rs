@@ -73,18 +73,12 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
-        self.tx().to(&to).payment(all_token_payments).transfer();
+        self.tx()
+            .to(&to)
+            .payment(payment_args.convert_payment_multi_triples())
+            .transfer();
     }
 
     #[payable("EGLD")]
