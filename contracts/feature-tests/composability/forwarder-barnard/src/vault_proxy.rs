@@ -238,22 +238,4 @@ where
             .argument(&endpoint)
             .original_result()
     }
-
-    pub fn num_called_retrieve_funds_promises(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("num_called_retrieve_funds_promises")
-            .original_result()
-    }
-
-    pub fn num_async_calls_sent_from_child(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("num_async_calls_sent_from_child")
-            .original_result()
-    }
 }
