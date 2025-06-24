@@ -2,12 +2,12 @@ use multiversx_sc::types::{TestAddress, TestSCAddress, TestTokenIdentifier};
 
 use multiversx_sc_scenario::{imports::*, ScenarioTxRun, ScenarioWorld};
 
-use promises_features::*;
+use forwarder::*;
 
-const PROMISES_FEATURES_CODE_PATH: MxscPath = MxscPath::new("output/promises-features.mxsc.json");
+const FORWARDER_CODE_PATH: MxscPath = MxscPath::new("output/forwarder.mxsc.json");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const USER_ADDRESS: TestAddress = TestAddress::new("user");
-const PROMISES_FEATURES_ADDRESS: TestSCAddress = TestSCAddress::new("multi-transfer");
+const FORWARDER_ADDRESS: TestSCAddress = TestSCAddress::new("multi-transfer");
 const TEST_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("TEST-123456");
 const GAS_LIMIT: u64 = 10_000_000;
 const EXTRA_GAS_FOR_CALLBACK: u64 = 5_000_000;
@@ -15,10 +15,7 @@ const EXTRA_GAS_FOR_CALLBACK: u64 = 5_000_000;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
-    blockchain.register_contract(
-        PROMISES_FEATURES_CODE_PATH,
-        promises_features::ContractBuilder,
-    );
+    blockchain.register_contract(FORWARDER_CODE_PATH, forwarder::ContractBuilder);
 
     blockchain
 }
@@ -45,10 +42,10 @@ impl PromisesFeaturesTestState {
         self.world
             .tx()
             .from(OWNER_ADDRESS)
-            .typed(promises_feature_proxy::PromisesFeaturesProxy)
+            .typed(forwarder_proxy::ForwarderProxy)
             .init()
-            .code(PROMISES_FEATURES_CODE_PATH)
-            .new_address(PROMISES_FEATURES_ADDRESS)
+            .code(FORWARDER_CODE_PATH)
+            .new_address(FORWARDER_ADDRESS)
             .run();
         self
     }
@@ -83,8 +80,8 @@ fn promises_transfer_test() {
         .world
         .tx()
         .from(OWNER_ADDRESS)
-        .to(PROMISES_FEATURES_ADDRESS)
-        .typed(promises_feature_proxy::PromisesFeaturesProxy)
+        .to(FORWARDER_ADDRESS)
+        .typed(forwarder_proxy::ForwarderProxy)
         .promise_raw_single_token_to_user(USER_ADDRESS, GAS_LIMIT, EXTRA_GAS_FOR_CALLBACK)
         .single_esdt(&(TEST_TOKEN_ID.into()), 0, &transfer_amount)
         .returns(ReturnsResult)

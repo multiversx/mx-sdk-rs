@@ -25,10 +25,6 @@ fn world() -> ScenarioWorld {
         forwarder_raw::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:promises-features/output/promises-features.mxsc.json",
-        promises_features::ContractBuilder,
-    );
-    blockchain.register_contract(
         "mxsc:proxy-test-first/output/proxy-test-first.mxsc.json",
         proxy_test_first::ContractBuilder,
     );
