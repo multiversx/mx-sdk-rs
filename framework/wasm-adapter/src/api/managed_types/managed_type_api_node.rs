@@ -6,6 +6,12 @@ unsafe extern "C" {
     fn mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferFromBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferFromBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
+
+    fn mBufferToSmallIntUnsigned(mBufferHandle: i32) -> i64;
+    fn mBufferToSmallIntSigned(mBufferHandle: i32) -> i64;
+    fn mBufferFromSmallIntUnsigned(mBufferHandle: i32, value: i64);
+    fn mBufferFromSmallIntSigned(mBufferHandle: i32, value: i64);
+
     fn mBufferToBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
     fn mBufferFromBigFloat(mBufferHandle: i32, bigFloatHandle: i32) -> i32;
 
@@ -62,6 +68,26 @@ impl ManagedTypeApiImpl for VmApiImpl {
     ) {
         unsafe {
             mBufferFromBigIntSigned(buffer_handle, big_int_handle);
+        }
+    }
+
+    fn mb_to_small_int_unsigned(&self, buffer_handle: Self::ManagedBufferHandle) -> i64 {
+        unsafe { mBufferToSmallIntUnsigned(buffer_handle) }
+    }
+
+    fn mb_to_small_int_signed(&self, buffer_handle: Self::ManagedBufferHandle) -> i64 {
+        unsafe { mBufferToSmallIntSigned(buffer_handle) }
+    }
+
+    fn mb_from_small_int_unsigned(&self, buffer_handle: Self::ManagedBufferHandle, value: i64) {
+        unsafe {
+            mBufferFromSmallIntUnsigned(buffer_handle, value);
+        }
+    }
+
+    fn mb_from_small_int_signed(&self, buffer_handle: Self::ManagedBufferHandle, value: i64) {
+        unsafe {
+            mBufferFromSmallIntSigned(buffer_handle, value);
         }
     }
 

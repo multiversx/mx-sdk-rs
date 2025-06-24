@@ -9,7 +9,7 @@
                 "sc:basic-features-crypto": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/basic-features-crypto.mxsc.json"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -58,7 +58,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:signature is invalid",
+                "message": "str:bls verify error",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

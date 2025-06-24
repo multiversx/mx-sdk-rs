@@ -13,10 +13,6 @@ fn world() -> ScenarioWorld {
         "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
         esdt_system_sc_mock::ContractBuilder,
     );
-    blockchain.register_contract(
-        "mxsc:output/basic-features-crypto.mxsc.json",
-        basic_features::ContractBuilder,
-    );
 
     blockchain
 }

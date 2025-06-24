@@ -32,7 +32,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:this big Float operation is not permitted while doing float.Add"
+                "message": "str:big float decode error"
             }
         },
         {
@@ -72,7 +72,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:this big Float operation is not permitted while doing float.Sub"
+                "message": "str:big float decode error"
             }
         }
     ]

@@ -1,8 +1,8 @@
 use multiversx_sc_codec::TopDecodeMulti;
 
-use crate::types::{
-    interaction::decode_result, DeployRawResult, RHListItem, RHListItemExec, SyncCallRawResult,
-    TxEnv,
+use crate::{
+    contract_base::SyncCallRawResult,
+    types::{interaction::decode_result, DeployRawResult, RHListItem, RHListItemExec, TxEnv},
 };
 
 /// Indicates that result will be returned.

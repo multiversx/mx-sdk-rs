@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           68
+// Endpoints:                           67
 // Async Callback:                       1
-// Total number of exported functions:  70
+// Total number of exported functions:  69
 
 #![no_std]
 
@@ -45,7 +45,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_transf_exec_accept_funds_return_values => forward_transf_exec_accept_funds_return_values
         transf_exec_multi_accept_funds => transf_exec_multi_accept_funds
         transf_exec_multi_accept_funds_v2 => transf_exec_multi_accept_funds_v2
-        forward_transf_exec_reject_funds_multi_transfer => forward_transf_exec_reject_funds_multi_transfer
         transf_exec_multi_reject_funds => transf_exec_multi_reject_funds
         changeOwnerAddress => change_owner
         deploy_contract => deploy_contract

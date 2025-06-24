@@ -153,21 +153,13 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-            all_token_payments.push(payment);
-        }
-
         let () = self
             .vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .with_multi_token_transfer(payment_args.convert_payment_multi_triples())
             .execute_on_dest_context();
     }
 }

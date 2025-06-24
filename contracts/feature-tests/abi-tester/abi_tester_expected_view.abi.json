@@ -97,6 +97,10 @@
                     "indexed": true
                 }
             ]
+        },
+        {
+            "identifier": "empty_identifier_event",
+            "inputs": []
         }
     ],
     "esdtAttributes": [

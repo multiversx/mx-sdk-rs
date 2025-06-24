@@ -1,6 +1,10 @@
+use multiversx_sc_codec::multi_types::MultiValue3;
 use unwrap_infallible::UnwrapInfallible;
 
 use crate::codec::multi_types::MultiValueVec;
+use crate::types::{
+    BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, TokenIdentifier,
+};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
@@ -169,6 +173,44 @@ where
             result.push(serializer.top_decode_from_managed_buffer(&item));
         }
         result
+    }
+}
+
+impl<M> MultiValueEncoded<M, MultiValue3<EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>>>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    /// Convenience function to convert a payment multi-argument into a usable structure.
+    pub fn convert_payment_multi_triples(self) -> ManagedVec<M, EgldOrEsdtTokenPayment<M>> {
+        let mut payments_vec = ManagedVec::new();
+
+        for multi_arg in self.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EgldOrEsdtTokenPayment::new(token_identifier, token_nonce, amount);
+
+            payments_vec.push(payment);
+        }
+
+        payments_vec
+    }
+}
+
+impl<M> MultiValueEncoded<M, MultiValue3<TokenIdentifier<M>, u64, BigUint<M>>>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    /// Convenience function to convert a payment multi-argument into a usable structure.
+    pub fn convert_payment_multi_triples(self) -> ManagedVec<M, EsdtTokenPayment<M>> {
+        let mut payments_vec = ManagedVec::new();
+
+        for multi_arg in self.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
+
+            payments_vec.push(payment);
+        }
+
+        payments_vec
     }
 }
 

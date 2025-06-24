@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
@@ -80,23 +80,25 @@ fn crypto_sha_256_go() {
 }
 
 #[test]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_go() {
     world().run("scenarios/crypto_verify_bls.scen.json");
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_aggregated_signature_go() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_share_go() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
 
 #[test]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_ed_25519_go() {
     world().run("scenarios/crypto_verify_ed25519.scen.json");
 }
@@ -107,7 +109,7 @@ fn crypto_verify_secp_256_k_1_go() {
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_secp_256_r_1_go() {
     world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }

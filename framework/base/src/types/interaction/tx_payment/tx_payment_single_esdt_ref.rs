@@ -1,5 +1,5 @@
 use crate::{
-    contract_base::SendRawWrapper,
+    contract_base::{SendRawWrapper, TransferExecuteFailed},
     types::{BigUint, EsdtTokenPaymentRefs, ManagedAddress, ManagedVec, TxFrom, TxToSpecified},
 };
 
@@ -14,35 +14,25 @@ where
         self.amount == &0u32
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         _env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        if self.token_nonce == 0 {
-            // fungible ESDT
-            let _ = SendRawWrapper::<Env::Api>::new().transfer_esdt_execute(
-                to,
-                self.token_identifier,
-                self.amount,
-                gas_limit,
-                &fc.function_name,
-                &fc.arg_buffer,
-            );
-        } else {
-            // non-fungible/semi-fungible ESDT
-            let _ = SendRawWrapper::<Env::Api>::new().transfer_esdt_nft_execute(
-                to,
-                self.token_identifier,
-                self.token_nonce,
-                self.amount,
-                gas_limit,
-                &fc.function_name,
-                &fc.arg_buffer,
-            );
-        }
+    ) -> Result<(), TransferExecuteFailed> {
+        // TODO: some clones could be avoided?
+        let mut payments = ManagedVec::new();
+        payments.push(self.to_owned_payment().into_multi_egld_or_esdt_payment());
+
+        // using multi-transfer (instead of single ESDT/NFT), because it is the only one that is fallible
+        SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute_fallible(
+            to,
+            &payments,
+            gas_limit,
+            &fc.function_name,
+            &fc.arg_buffer,
+        )
     }
 
     fn with_normalized<From, To, F, R>(

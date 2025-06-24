@@ -1,11 +1,11 @@
-use super::sdk_address::SdkAddress;
+use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
 // Account holds an Account's information
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Account {
-    pub address: SdkAddress,
+    pub address: Bech32Address,
     pub nonce: u64,
     pub balance: String,
     pub username: String,

@@ -14,6 +14,7 @@ use crate::InteractorBase;
 /// A user account that can sign transactions (a pem is present).
 pub struct Sender {
     pub address: Address,
+    pub hrp: String,
     pub wallet: Wallet,
     pub current_nonce: Option<u64>,
 }
@@ -25,29 +26,34 @@ where
     pub async fn recall_nonce(&self, address: &Address) -> u64 {
         let account = self
             .proxy
-            .request(GetAccountRequest::new(address))
+            .request(GetAccountRequest::new(&address.to_bech32(self.get_hrp())))
             .await
             .expect("failed to retrieve account nonce");
+
         account.nonce
     }
 
     pub async fn get_account(&self, address: &Address) -> Account {
         self.proxy
-            .request(GetAccountRequest::new(address))
+            .request(GetAccountRequest::new(&address.to_bech32(self.get_hrp())))
             .await
             .expect("failed to retrieve account")
     }
 
     pub async fn get_account_storage(&self, address: &Address) -> HashMap<String, String> {
         self.proxy
-            .request(GetAccountStorageRequest::new(address))
+            .request(GetAccountStorageRequest::new(
+                &address.to_bech32(self.get_hrp()),
+            ))
             .await
             .expect("failed to retrieve account")
     }
 
     pub async fn get_account_esdt(&self, address: &Address) -> HashMap<String, EsdtBalance> {
         self.proxy
-            .request(GetAccountEsdtTokensRequest::new(address))
+            .request(GetAccountEsdtTokensRequest::new(
+                &address.to_bech32(self.get_hrp()),
+            ))
             .await
             .expect("failed to retrieve account")
     }

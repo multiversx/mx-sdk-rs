@@ -1,0 +1,129 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "1000"
+                    },
+                    "code": "mxsc:../forwarder-barnard/output/forwarder-barnard.mxsc.json"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "transfer_execute_fallible - ok",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "transfer_execute_fallible",
+                "arguments": [
+                    "sc:vault",
+                    "str:accept_funds",
+                    "str:FWD-TOKEN",
+                    "0",
+                    "100",
+                    "str:FWD-TOKEN",
+                    "0",
+                    "200"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0",
+                "message": "",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "200",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:TransferAndExecute",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:vault",
+                            "2",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "200",
+                            "str:accept_funds"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds",
+                        "topics": [
+                            "str:accept_funds",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "200"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "300"
+                    },
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "1"
+                    },
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "700"
+                    },
+                    "storage": {},
+                    "code": "*"
+                }
+            }
+        }
+    ]
+}

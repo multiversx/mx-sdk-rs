@@ -1,0 +1,63 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "code": "mxsc:../forwarder-barnard/output/forwarder-barnard.mxsc.json"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "transfer_execute_fallible - accept - no payment",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "transfer_execute_fallible",
+                "arguments": [
+                    "sc:vault",
+                    "str:accept_funds"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:transfer execute requires payment",
+                "logs": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "code": "mxsc:../forwarder-barnard/output/forwarder-barnard.mxsc.json"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                }
+            }
+        }
+    ]
+}

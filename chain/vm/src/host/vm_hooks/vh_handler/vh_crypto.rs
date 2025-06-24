@@ -61,7 +61,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             crypto_functions::verify_ed25519(key, message, signature)
         };
         if !sig_valid {
-            return Err(early_exit_vm_error(vm_err_msg::CRYPTO_INVALID_SIGNATURE));
+            return Err(early_exit_vm_error(vm_err_msg::CRYPTO_ED25519_ERROR));
         }
 
         Ok(())

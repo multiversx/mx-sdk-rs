@@ -16,8 +16,13 @@ description = "MultiversX chain interfaces, constants, and base types"
 keywords = ["multiversx", "blockchain", "vm", "tools"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
+[features]
+std = ["bech32", "serde"]
+
 [dependencies]
 bitflags = "2.9"
+bech32 = { version = "0.11", optional = true }
+serde = { version = "1.0", features = ["derive"], optional = true }
 
 [dependencies.multiversx-sc-codec]
 version = "=0.22.1"

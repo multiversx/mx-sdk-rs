@@ -137,6 +137,10 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         Ok(self.context.get_current_block_info().block_timestamp as i64)
     }
 
+    pub fn get_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.get_block_timestamp().map(|t| t * 1000)
+    }
+
     pub fn get_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
 
@@ -172,6 +176,10 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
 
         Ok(self.context.get_previous_block_info().block_timestamp as i64)
+    }
+
+    pub fn get_prev_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.get_prev_block_timestamp().map(|t| t * 1000)
     }
 
     pub fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {

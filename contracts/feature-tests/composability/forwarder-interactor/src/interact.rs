@@ -87,11 +87,6 @@ pub async fn forwarder_cli() {
                 .await
         },
         "transf_exec_multi_accept_funds" => interact.transf_exec_multi_accept_funds().await,
-        "forward_transf_exec_reject_funds_multi_transfer" => {
-            interact
-                .forward_transf_exec_reject_funds_multi_transfer()
-                .await
-        },
         "transf_exec_multi_reject_funds" => interact.transf_exec_multi_reject_funds().await,
         "changeOwnerAddress" => interact.change_owner().await,
         "deploy_contract" => interact.deploy_contract().await,
@@ -223,12 +218,9 @@ impl ContractInteract {
             .returns(ReturnsNewAddress)
             .run()
             .await;
-        let new_address_bech32 = bech32::encode(&new_address);
-        self.state.set_address(Bech32Address::from_bech32_string(
-            new_address_bech32.clone(),
-        ));
-
+        let new_address_bech32 = new_address.to_bech32(self.interactor.get_hrp());
         println!("new address: {new_address_bech32}");
+        self.state.set_address(new_address_bech32);
     }
 
     pub async fn send_egld(&mut self) {
@@ -909,33 +901,6 @@ impl ContractInteract {
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .transf_exec_multi_accept_funds(to, token_payments)
-            .returns(ReturnsResultUnmanaged)
-            .run()
-            .await;
-
-        println!("Result: {response:?}");
-    }
-
-    pub async fn forward_transf_exec_reject_funds_multi_transfer(&mut self) {
-        let to = Address::zero();
-        let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
-            u64,
-            BigUint<StaticApi>,
-        >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
-            0u64,
-            BigUint::<StaticApi>::from(0u128),
-        ))]);
-
-        let response = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .to(self.state.current_address())
-            .gas(80_000_000u64)
-            .typed(proxy::ForwarderProxy)
-            .forward_transf_exec_reject_funds_multi_transfer(to, token_payments)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;

@@ -1,0 +1,75 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:barnard-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/barnard-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "previousBlockInfo": {
+                "blockTimestamp": "506",
+                "blockNonce": "521",
+                "blockRound": "532",
+                "blockEpoch": "544",
+                "blockRandomSeed": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "currentBlockInfo": {
+                "blockTimestamp": "511",
+                "blockNonce": "522",
+                "blockRound": "533",
+                "blockEpoch": "544",
+                "blockRandomSeed": "0x123456000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_prev_block_timestamp_ms",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:barnard-features",
+                "function": "get_prev_block_timestamp_ms",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "506000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_block_timestamp_ms",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:barnard-features",
+                "function": "get_block_timestamp_ms",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "511000"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
