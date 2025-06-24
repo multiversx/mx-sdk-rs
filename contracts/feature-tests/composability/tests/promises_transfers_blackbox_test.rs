@@ -15,10 +15,7 @@ const EXTRA_GAS_FOR_CALLBACK: u64 = 5_000_000;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
-    blockchain.register_contract(
-        FORWARDER_CODE_PATH,
-        forwarder::ContractBuilder,
-    );
+    blockchain.register_contract(FORWARDER_CODE_PATH, forwarder::ContractBuilder);
 
     blockchain
 }
