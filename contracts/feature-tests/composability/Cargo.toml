@@ -23,9 +23,6 @@ path = "forwarder-queue"
 [dev-dependencies.forwarder-raw]
 path = "forwarder-raw"
 
-[dev-dependencies.promises-features]
-path = "promises-features"
-
 [dev-dependencies.proxy-test-first]
 path = "proxy-test-first"
 

@@ -5,9 +5,10 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           78
+// Endpoints:                           89
 // Async Callback:                       1
-// Total number of exported functions:  80
+// Promise callbacks:                    5
+// Total number of exported functions:  96
 
 #![no_std]
 
@@ -39,9 +40,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         send_funds_twice => send_funds_twice
         send_async_accept_multi_transfer => send_async_accept_multi_transfer
         send_async_reject_multi_transfer => send_async_reject_multi_transfer
-        callback_data => callback_data
-        callback_data_at_index => callback_data_at_index
-        clear_callback_data => clear_callback_data
         forward_transf_exec_accept_funds => forward_transf_exec_accept_funds
         forward_transf_execu_accept_funds_with_fees => forward_transf_execu_accept_funds_with_fees
         forward_transf_exec_accept_funds_twice => forward_transf_exec_accept_funds_twice
@@ -96,6 +94,25 @@ multiversx_sc_wasm_adapter::endpoints! {
         metadata_update => metadata_update
         lastIssuedToken => last_issued_token
         lastErrorMessage => last_error_message
+        callback_data => callback_data
+        callback_data_at_index => callback_data_at_index
+        clear_callback_data => clear_callback_data
+        forward_promise_accept_funds => forward_promise_accept_funds
+        forward_promise_retrieve_funds => forward_promise_retrieve_funds
+        forward_payment_callback => forward_payment_callback
+        forward_payment_gas_for_callback => forward_payment_gas_for_callback
+        promise_raw_single_token_to_user => promise_raw_single_token_to_user
+        promise_raw_single_token => promise_raw_single_token
+        promise_raw_multi_transfer => promise_raw_multi_transfer
+        forward_sync_retrieve_funds_bt => forward_sync_retrieve_funds_bt
+        forward_sync_retrieve_funds_bt_reset_twice => forward_sync_retrieve_funds_bt_reset_twice
+        forward_sync_retrieve_funds_bt_twice => forward_sync_retrieve_funds_bt_twice
+        forward_promise_retrieve_funds_back_transfers => forward_promise_retrieve_funds_back_transfers
+        retrieve_funds_callback => retrieve_funds_callback
+        transfer_callback => transfer_callback
+        the_one_callback => the_one_callback
+        retrieve_esdt_callback => retrieve_esdt_callback
+        retrieve_funds_back_transfers_callback => retrieve_funds_back_transfers_callback
     )
 }
 
