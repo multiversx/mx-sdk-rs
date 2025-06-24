@@ -57,7 +57,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:signature is invalid",
+                "message": "str:secp256k1 verify error",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
