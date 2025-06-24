@@ -142,10 +142,10 @@ pub trait Vault {
 
     #[endpoint]
     #[payable("*")]
-    fn retrieve_funds_multi_esdt(&self) {
-        let tokens = self.call_value().all_esdt_transfers().clone_value();
+    fn retrieve_received_funds_immmediately(&self) {
+        let tokens = self.call_value().all_transfers();
 
-        self.tx().to(ToCaller).multi_esdt(tokens).transfer();
+        self.tx().to(ToCaller).payment(tokens).transfer();
     }
 
     #[endpoint]
