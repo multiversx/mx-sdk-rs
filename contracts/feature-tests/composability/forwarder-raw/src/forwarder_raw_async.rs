@@ -178,7 +178,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
 
         self.tx()
             .to(&to)
-            .raw_call("retrieve_multi_funds_async")
+            .raw_call("retrieve_funds_multi")
             .arguments_raw(arg_buffer)
             .async_call_and_exit();
     }

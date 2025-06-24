@@ -186,16 +186,16 @@ where
             .original_result()
     }
 
-    pub fn retrieve_multi_funds_async<
-        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    pub fn retrieve_funds_multi<
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
     >(
         self,
-        payment_args: Arg0,
+        transfers: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("retrieve_multi_funds_async")
-            .argument(&payment_args)
+            .raw_call("retrieve_funds_multi")
+            .argument(&transfers)
             .original_result()
     }
 

@@ -149,15 +149,12 @@ pub trait Vault {
     }
 
     #[endpoint]
-    fn retrieve_multi_funds_async(
-        &self,
-        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
-    ) {
-        let caller = self.blockchain().get_caller();
+    fn retrieve_funds_multi(&self, transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>) {
+        self.retrieve_funds_multi_event(&transfers);
 
         self.tx()
-            .to(caller)
-            .payment(payment_args.convert_payment_multi_triples())
+            .to(ToCaller)
+            .payment(transfers.convert_payment())
             .transfer();
     }
 
@@ -223,6 +220,12 @@ pub trait Vault {
         #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] amount: &BigUint,
+    );
+
+    #[event("retrieve_funds_multi")]
+    fn retrieve_funds_multi_event(
+        &self,
+        #[indexed] transfers: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     );
 
     #[endpoint]
