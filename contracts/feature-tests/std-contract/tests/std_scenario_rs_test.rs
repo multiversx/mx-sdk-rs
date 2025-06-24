@@ -12,6 +12,6 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn empty_rs() {
-    world().run("scenarios/empty.scen.json");
+fn std_deploy_rs() {
+    world().run("scenarios/std-deploy.scen.json");
 }

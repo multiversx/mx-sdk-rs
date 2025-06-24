@@ -1,5 +1,4 @@
 {
-    "name": "empty",
     "steps": [
         {
             "step": "setState",

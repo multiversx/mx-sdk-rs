@@ -5,6 +5,6 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn empty_go() {
-    world().run("scenarios/empty.scen.json");
+fn std_deploy_go() {
+    world().run("scenarios/std-deploy.scen.json");
 }
