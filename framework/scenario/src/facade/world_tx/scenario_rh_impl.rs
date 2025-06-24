@@ -1,14 +1,19 @@
 use multiversx_sc::{
     abi::{TypeAbi, TypeAbiFrom},
     codec::TopDecodeMulti,
+    tuple_util::NestedTupleFlatten,
     types::{
-        ManagedAddress, RHListItemExec, ReturnsNewAddress, ReturnsNewManagedAddress,
+        ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
+        ReturnsHandledOrErrorRawResult, ReturnsNewAddress, ReturnsNewManagedAddress,
         ReturnsRawResult, ReturnsResult, ReturnsResultAs, ReturnsResultUnmanaged, TxEnv,
         WithNewAddress, WithResultAs,
     },
 };
 
-use crate::scenario_model::{TxResponse, TypedResponse};
+use crate::{
+    imports::TxExpect,
+    scenario_model::{CheckValue, TxResponse, TxResponseStatus, TypedResponse},
+};
 
 impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResult
 where
@@ -112,5 +117,33 @@ where
             .expect("missing returned address");
 
         (self.f)(&ManagedAddress::from_address(&new_address));
+    }
+}
+
+impl ReturnsHandledOrErrorRawResult for TxResponse {
+    type SuccessResult = TxResponse;
+    type ErrorResult = TxResponseStatus;
+}
+
+impl<Env, Original, NHList> RHListItemExec<TxResponse, Env, Original>
+    for ReturnsHandledOrError<Env, Original, TxResponse, NHList>
+where
+    Env: TxEnv<RHExpect = TxExpect>,
+    NHList: RHListExec<TxResponse, Env>,
+    NHList::ListReturns: NestedTupleFlatten,
+{
+    fn item_preprocessing(&self, mut prev: TxExpect) -> TxExpect {
+        prev.status = CheckValue::Star;
+        prev.message = CheckValue::Star;
+        prev
+    }
+
+    fn item_process_result(self, raw_result: &TxResponse) -> Self::Returns {
+        if raw_result.tx_error.is_success() {
+            let tuple_result = self.nested_handlers.list_process_result(raw_result);
+            Ok(tuple_result.flatten_unpack())
+        } else {
+            Err(raw_result.tx_error.clone())
+        }
     }
 }

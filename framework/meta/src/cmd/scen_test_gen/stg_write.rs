@@ -5,12 +5,12 @@ use super::stg_section::ScenarioTestFn;
 pub type WriteTestFn = fn(&str) -> String;
 
 pub const WORLD_FN_DECLARATION: &str = "fn world() ->";
-pub const DEFAULT_SETUP_GO: &str = "use multiversx_sc_scenario::*;
+pub const DEFAULT_SETUP_GO: &str = "use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
 }";
-pub const DEFAULT_SETUP_RS: &str = "use multiversx_sc_scenario::*;
+pub const DEFAULT_SETUP_RS: &str = "use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     todo!()
@@ -48,6 +48,10 @@ pub fn format_section(test_fn: &ScenarioTestFn, write_test_fn: WriteTestFn) -> S
     if let Some(ignore_line) = &test_fn.ignore_line {
         section_str.push('\n');
         section_str.push_str(ignore_line);
+    }
+    if let Some(should_panic_line) = &test_fn.should_panic_line {
+        section_str.push('\n');
+        section_str.push_str(should_panic_line);
     }
     section_str.push_str(&write_test_fn(&test_fn.scenario_file_name));
     section_str

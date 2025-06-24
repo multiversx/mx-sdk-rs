@@ -145,7 +145,6 @@ where
         }
     }
 
-    #[inline]
     pub fn get_code_metadata(&self, address: &ManagedAddress<A>) -> CodeMetadata {
         let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::blockchain_api_impl()
@@ -156,6 +155,40 @@ where
                 .load_to_byte_array(&mut buffer);
         }
         CodeMetadata::from(buffer)
+    }
+
+    #[cfg(feature = "barnard")]
+    pub fn get_esdt_token_type(
+        &self,
+        address: &ManagedAddress<A>,
+        token_id: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        unsafe {
+            let big_int_temp_handle: A::BigIntHandle =
+                use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+
+            A::blockchain_api_impl().managed_get_esdt_token_type(
+                address.get_handle(),
+                token_id.get_handle(),
+                nonce,
+                big_int_temp_handle.clone(),
+            );
+
+            let bu = BigUint::<A>::from_handle(big_int_temp_handle);
+            // TODO: forget bu
+            EsdtTokenType::from(bu.to_u64())
+        }
+    }
+
+    #[cfg(feature = "barnard")]
+    pub fn get_code_hash(&self, address: &ManagedAddress<A>) -> ManagedBuffer<A> {
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            A::blockchain_api_impl()
+                .managed_get_code_hash(address.get_handle(), result.get_handle());
+            result
+        }
     }
 
     #[inline]
@@ -219,6 +252,13 @@ where
         A::blockchain_api_impl().get_block_timestamp()
     }
 
+    /// Block timestamp, in milliseconds.
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_block_timestamp_ms()
+    }
+
     #[inline]
     pub fn get_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().get_block_nonce()
@@ -232,6 +272,30 @@ where
     #[inline]
     pub fn get_block_epoch(&self) -> u64 {
         A::blockchain_api_impl().get_block_epoch()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_block_round_time_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_block_round_time_ms()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_timestamp_ms()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_nonce(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_nonce()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_round(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_round()
     }
 
     #[deprecated(
@@ -256,6 +320,12 @@ where
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_prev_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_prev_block_timestamp_ms()
     }
 
     #[inline]
