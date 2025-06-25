@@ -105,6 +105,7 @@ pub trait ForwarderTransferExecuteModule {
             .transfer_execute()
     }
 
+    #[payable("*")]
     #[endpoint]
     fn transf_exec_multi_reject_funds(
         &self,

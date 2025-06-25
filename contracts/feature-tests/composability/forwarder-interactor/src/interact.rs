@@ -4,6 +4,7 @@ mod config;
 mod proxy;
 
 pub use config::Config;
+use forwarder::vault_proxy;
 use multiversx_sc_snippets::imports::*;
 pub use proxy::Color;
 use serde::{Deserialize, Serialize};
@@ -23,6 +24,8 @@ pub const FORWARDER_UPDATE_TOKEN_INTERACTOR_TRACE_PATH: &str =
     "scenarios/forwarder_update_token_scenario.scen.json";
 pub const FORWARDER_MODIFY_CREATOR_INTERACTOR_TRACE_PATH: &str =
     "scenarios/forwarder_modify_creator_scenario.scen.json";
+const VAULT_CODE: MxscPath =
+    MxscPath::new("../contracts/feature-tests/composability/vault/output/vault.mxsc.json");
 
 pub async fn forwarder_cli() {
     env_logger::init();
@@ -32,7 +35,7 @@ pub async fn forwarder_cli() {
     let cmd = args.next().expect("at least one argument required");
     let mut interact = ContractInteract::new(Config::new(), None).await;
     match cmd.as_str() {
-        "deploy" => interact.deploy().await,
+        // "deploy" => interact.deploy().await,
         "send_egld" => interact.send_egld().await,
         "echo_arguments_sync" => interact.echo_arguments_sync().await,
         "echo_arguments_sync_twice" => interact.echo_arguments_sync_twice().await,
@@ -87,12 +90,12 @@ pub async fn forwarder_cli() {
                 .await
         },
         "transf_exec_multi_accept_funds" => interact.transf_exec_multi_accept_funds().await,
-        "forward_transf_exec_reject_funds_multi_transfer" => {
-            interact
-                .forward_transf_exec_reject_funds_multi_transfer()
-                .await
-        },
-        "transf_exec_multi_reject_funds" => interact.transf_exec_multi_reject_funds().await,
+        // "forward_transf_exec_reject_funds_multi_transfer" => {
+        //     interact
+        //         .forward_transf_exec_reject_funds_multi_transfer()
+        //         .await
+        // },
+        // "transf_exec_multi_reject_funds" => interact.transf_exec_multi_reject_funds().await,
         "changeOwnerAddress" => interact.change_owner().await,
         "deploy_contract" => interact.deploy_contract().await,
         "deploy_two_contracts" => interact.deploy_two_contracts().await,
@@ -175,7 +178,7 @@ impl Drop for State {
 }
 
 pub struct ContractInteract {
-    interactor: Interactor,
+    pub interactor: Interactor,
     pub wallet_address: Address,
     contract_code: BytesValue,
     pub state: State,
@@ -211,8 +214,8 @@ impl ContractInteract {
         }
     }
 
-    pub async fn deploy(&mut self) {
-        let new_address = self
+    pub async fn deploy(&mut self) -> (Bech32Address, u64) {
+        let (new_address, gas_used) = self
             .interactor
             .tx()
             .from(&self.wallet_address)
@@ -221,14 +224,18 @@ impl ContractInteract {
             .init()
             .code(&self.contract_code)
             .returns(ReturnsNewAddress)
+            .returns(ReturnsGasUsed)
             .run()
             .await;
+
         let new_address_bech32 = bech32::encode(&new_address);
         self.state.set_address(Bech32Address::from_bech32_string(
             new_address_bech32.clone(),
         ));
 
         println!("new address: {new_address_bech32}");
+
+        (new_address.into(), gas_used)
     }
 
     pub async fn send_egld(&mut self) {
@@ -916,58 +923,68 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn forward_transf_exec_reject_funds_multi_transfer(&mut self) {
-        let to = Address::zero();
-        let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
-            u64,
-            BigUint<StaticApi>,
-        >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
-            0u64,
-            BigUint::<StaticApi>::from(0u128),
-        ))]);
+    // pub async fn forward_transf_exec_reject_funds_multi_transfer(&mut self) {
+    //     let to = Address::zero();
+    //     let token_payments = MultiValueVec::from(vec![MultiValue3::<
+    //         TokenIdentifier<StaticApi>,
+    //         u64,
+    //         BigUint<StaticApi>,
+    //     >::from((
+    //         TokenIdentifier::from_esdt_bytes(&b""[..]),
+    //         0u64,
+    //         BigUint::<StaticApi>::from(0u128),
+    //     ))]);
 
-        let response = self
+    //     let response = self
+    //         .interactor
+    //         .tx()
+    //         .from(&self.wallet_address)
+    //         .to(self.state.current_address())
+    //         .gas(80_000_000u64)
+    //         .typed(proxy::ForwarderProxy)
+    //         .forward_transf_exec_reject_funds_multi_transfer(to, token_payments)
+    //         .returns(ReturnsResultUnmanaged)
+    //         .run()
+    //         .await;
+
+    //     println!("Result: {response:?}");
+    // }
+
+    pub async fn transf_exec_multi_reject_funds(
+        &mut self,
+        to: Bech32Address,
+        vec_of_payments: Vec<EgldOrEsdtTokenPayment<StaticApi>>,
+    ) -> u64 {
+        let vec = vec_of_payments
+            .iter()
+            .map(|e| {
+                MultiValue3::from((e.token_identifier.clone(), e.token_nonce, e.amount.clone()))
+            })
+            .collect::<MultiValueEncoded<
+                StaticApi,
+                MultiValue3<EgldOrEsdtTokenIdentifier<StaticApi>, u64, BigUint<StaticApi>>,
+            >>();
+
+        let vec_param =
+            ManagedVec::<StaticApi, EgldOrEsdtTokenPayment<StaticApi>>::from(vec_of_payments);
+
+        let (response, gas_used) = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_address())
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .forward_transf_exec_reject_funds_multi_transfer(to, token_payments)
-            .returns(ReturnsResultUnmanaged)
+            .transf_exec_multi_reject_funds(to, vec)
+            .payment(vec_param)
+            .returns(ExpectMessage("reject_funds"))
+            .returns(ReturnsGasUsed)
             .run()
             .await;
 
         println!("Result: {response:?}");
-    }
 
-    pub async fn transf_exec_multi_reject_funds(&mut self) {
-        let to = Address::zero();
-        let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
-            u64,
-            BigUint<StaticApi>,
-        >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
-            0u64,
-            BigUint::<StaticApi>::from(0u128),
-        ))]);
-
-        let response = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .to(self.state.current_address())
-            .gas(80_000_000u64)
-            .typed(proxy::ForwarderProxy)
-            .transf_exec_multi_reject_funds(to, token_payments)
-            .returns(ReturnsResultUnmanaged)
-            .run()
-            .await;
-
-        println!("Result: {response:?}");
+        gas_used
     }
 
     pub async fn change_owner(&mut self) {
@@ -2101,5 +2118,91 @@ impl ContractInteract {
             .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
             .run()
             .await;
+    }
+
+    pub async fn deploy_vault(&mut self) -> (Bech32Address, u64) {
+        let (new_address, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .gas(300_000_000u64)
+            .typed(vault_proxy::VaultProxy)
+            .init(OptionalValue::<ManagedBuffer<StaticApi>>::None)
+            .code(VAULT_CODE)
+            .returns(ReturnsNewAddress)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+        let new_address_bech32 = bech32::encode(&new_address);
+
+        println!("new vault address: {new_address_bech32}");
+
+        (new_address.into(), gas_used)
+    }
+
+    pub async fn forward_send_async_reject_multi_transfer(
+        &mut self,
+        to: Bech32Address,
+        vec_of_payments: Vec<EgldOrEsdtTokenPayment<StaticApi>>,
+    ) {
+        let vec = vec_of_payments
+            .iter()
+            .map(|e| {
+                MultiValue3::from((e.token_identifier.clone(), e.token_nonce, e.amount.clone()))
+            })
+            .collect::<MultiValueEncoded<
+                StaticApi,
+                MultiValue3<EgldOrEsdtTokenIdentifier<StaticApi>, u64, BigUint<StaticApi>>,
+            >>();
+
+        let vec_param =
+            ManagedVec::<StaticApi, EgldOrEsdtTokenPayment<StaticApi>>::from(vec_of_payments);
+
+        let response = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(80_000_000u64)
+            .typed(proxy::ForwarderProxy)
+            .send_async_reject_multi_transfer(to.into_address(), vec)
+            .payment(vec_param)
+            .returns(ReturnsHandledOrError::new().returns(ExpectMessage("reject_funds")))
+            .run()
+            .await;
+
+        println!("Result: {response:?}");
+    }
+
+    pub async fn issue_fungible_token_from_wallet(
+        &mut self,
+        token_display_name: &[u8],
+        token_ticker: &[u8],
+        initial_supply: u64,
+    ) -> (String, u64) {
+        let egld_amount = BigUint::<StaticApi>::from(5_000_000_000_000_000_0u128);
+
+        let (response, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(80_000_000u64)
+            .typed(system_proxy::ESDTSystemSCProxy)
+            .issue_fungible(
+                egld_amount,
+                token_display_name,
+                token_ticker,
+                BigUint::from(initial_supply),
+                FungibleTokenProperties::default(),
+            )
+            .returns(ReturnsNewTokenIdentifier)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("Result: {response:?}");
+
+        (response, gas_used)
     }
 }

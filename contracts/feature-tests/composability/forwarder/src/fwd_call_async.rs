@@ -187,6 +187,7 @@ pub trait ForwarderAsyncCallModule {
             .async_call_and_exit();
     }
 
+    #[payable("*")]
     #[endpoint]
     fn send_async_reject_multi_transfer(
         &self,

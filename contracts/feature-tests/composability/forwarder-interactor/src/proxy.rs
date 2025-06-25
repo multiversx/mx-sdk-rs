@@ -366,9 +366,8 @@ where
         self,
         to: Arg0,
         payment_args: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .payment(NotPayable)
             .raw_call("send_async_reject_multi_transfer")
             .argument(&to)
             .argument(&payment_args)
@@ -482,9 +481,8 @@ where
         self,
         to: Arg0,
         payment_args: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .payment(NotPayable)
             .raw_call("transf_exec_multi_reject_funds")
             .argument(&to)
             .argument(&payment_args)
