@@ -181,7 +181,7 @@ where
         let zero = &BigUint::zero();
         self.issue(
             issue_cost,
-            EsdtTokenType::Meta,
+            EsdtTokenType::MetaFungible,
             token_display_name,
             token_ticker,
             zero,
@@ -217,8 +217,8 @@ where
             | EsdtTokenType::NonFungibleV2
             | EsdtTokenType::DynamicNFT => "NFT",
             EsdtTokenType::SemiFungible | EsdtTokenType::DynamicSFT => "SFT",
-            EsdtTokenType::Meta | EsdtTokenType::DynamicMeta => "META",
-            EsdtTokenType::Invalid => "",
+            EsdtTokenType::MetaFungible | EsdtTokenType::DynamicMeta => "META",
+            EsdtTokenType::NotSet | EsdtTokenType::Invalid => "",
         };
 
         let endpoint = match token_type {
@@ -226,12 +226,12 @@ where
             | EsdtTokenType::NonFungible
             | EsdtTokenType::NonFungibleV2
             | EsdtTokenType::SemiFungible
-            | EsdtTokenType::Meta => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
+            | EsdtTokenType::MetaFungible => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
             EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
                 REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME
             },
 
-            EsdtTokenType::Invalid => "",
+            EsdtTokenType::NotSet | EsdtTokenType::Invalid => "",
         };
 
         let mut tx = self
@@ -308,7 +308,7 @@ where
             EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
-            EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
+            EsdtTokenType::MetaFungible => REGISTER_META_ESDT_ENDPOINT_NAME,
             _ => "",
         };
 
@@ -322,7 +322,7 @@ where
         if token_type == EsdtTokenType::Fungible {
             tx = tx.argument(&initial_supply);
             tx = tx.argument(&properties.num_decimals);
-        } else if token_type == EsdtTokenType::Meta {
+        } else if token_type == EsdtTokenType::MetaFungible {
             tx = tx.argument(&properties.num_decimals);
         }
 

@@ -3,18 +3,17 @@ use crate::codec::{
     derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
 };
 
-// Note: In the current implementation, SemiFungible is never returned
-
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum EsdtTokenType {
-    Fungible,
-    NonFungible,
-    NonFungibleV2,
-    SemiFungible,
-    Meta,
-    DynamicNFT,
-    DynamicSFT,
-    DynamicMeta,
+    NotSet = 0,
+    Fungible = 1,
+    NonFungible = 2,
+    NonFungibleV2 = 3,
+    MetaFungible = 4,
+    SemiFungible = 5,
+    DynamicNFT = 6,
+    DynamicSFT = 7,
+    DynamicMeta = 8,
     Invalid,
 }
 
@@ -29,15 +28,16 @@ impl EsdtTokenType {
 
     pub fn as_u8(&self) -> u8 {
         match self {
-            Self::Fungible => 0,
-            Self::NonFungible => 1,
-            Self::NonFungibleV2 => 2,
-            Self::SemiFungible => 3,
-            Self::Meta => 4,
-            Self::DynamicNFT => 5,
-            Self::DynamicSFT => 6,
-            Self::DynamicMeta => 7,
-            Self::Invalid => 255,
+            EsdtTokenType::NotSet => 0,
+            EsdtTokenType::Fungible => 1,
+            EsdtTokenType::NonFungible => 2,
+            EsdtTokenType::NonFungibleV2 => 3,
+            EsdtTokenType::MetaFungible => 4,
+            EsdtTokenType::SemiFungible => 5,
+            EsdtTokenType::DynamicNFT => 6,
+            EsdtTokenType::DynamicSFT => 7,
+            EsdtTokenType::DynamicMeta => 8,
+            EsdtTokenType::Invalid => 255,
         }
     }
 }
@@ -46,14 +46,15 @@ impl From<u8> for EsdtTokenType {
     #[inline]
     fn from(value: u8) -> Self {
         match value {
-            0 => EsdtTokenType::Fungible,
-            1 => EsdtTokenType::NonFungible,
-            2 => EsdtTokenType::NonFungibleV2,
-            3 => EsdtTokenType::SemiFungible,
-            4 => EsdtTokenType::Meta,
-            5 => EsdtTokenType::DynamicNFT,
-            6 => EsdtTokenType::DynamicSFT,
-            7 => EsdtTokenType::DynamicMeta,
+            0 => EsdtTokenType::NotSet,
+            1 => EsdtTokenType::Fungible,
+            2 => EsdtTokenType::NonFungible,
+            3 => EsdtTokenType::NonFungibleV2,
+            4 => EsdtTokenType::MetaFungible,
+            5 => EsdtTokenType::SemiFungible,
+            6 => EsdtTokenType::DynamicNFT,
+            7 => EsdtTokenType::DynamicSFT,
+            8 => EsdtTokenType::DynamicMeta,
             _ => EsdtTokenType::Invalid,
         }
     }
@@ -61,16 +62,11 @@ impl From<u8> for EsdtTokenType {
 
 impl From<Option<u64>> for EsdtTokenType {
     #[inline]
-    fn from(value: Option<u64>) -> Self {
-        match value {
-            Some(0) => Self::Fungible,
-            Some(1) => Self::NonFungible,
-            Some(2) => Self::SemiFungible,
-            Some(3) => Self::Meta,
-            Some(4) => Self::DynamicNFT,
-            Some(5) => Self::DynamicSFT,
-            Some(6) => Self::DynamicMeta,
-            _ => Self::Invalid,
+    fn from(opt: Option<u64>) -> Self {
+        if let Some(value) = opt {
+            EsdtTokenType::from(value as u8)
+        } else {
+            EsdtTokenType::Invalid
         }
     }
 }

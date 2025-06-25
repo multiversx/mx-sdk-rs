@@ -204,7 +204,7 @@ async fn change_to_dynamic_test() {
             b"TESTNFT",
             b"TEST",
             18usize,
-            EsdtTokenType::Meta,
+            EsdtTokenType::MetaFungible,
         )
         .await;
 
