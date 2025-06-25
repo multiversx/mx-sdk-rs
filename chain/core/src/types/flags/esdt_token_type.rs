@@ -3,15 +3,6 @@ use crate::codec::{
     derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
 };
 
-const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
-const ESDT_TYPE_NON_FUNGIBLE: &[u8] = b"NonFungibleESDT";
-const ESDT_TYPE_SEMI_FUNGIBLE: &[u8] = b"SemiFungibleESDT";
-const ESDT_TYPE_META: &[u8] = b"MetaESDT";
-const ESDT_TYPE_DYNAMIC_NON_FUNGIBLE: &[u8] = b"DynamicNonFungibleESDT";
-const ESDT_TYPE_DYNAMIC_SEMI_FUNGIBLE: &[u8] = b"DynamicSemiFungibleESDT";
-const ESDT_TYPE_DYNAMIC_META: &[u8] = b"DynamicMetaESDT";
-const ESDT_TYPE_INVALID: &[u8] = &[];
-
 // Note: In the current implementation, SemiFungible is never returned
 
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, Copy, PartialEq, Eq, Debug)]
@@ -49,20 +40,6 @@ impl EsdtTokenType {
             Self::Invalid => 255,
         }
     }
-
-    pub fn as_type_name(&self) -> &'static [u8] {
-        match self {
-            Self::Fungible => ESDT_TYPE_FUNGIBLE,
-            Self::NonFungible => ESDT_TYPE_NON_FUNGIBLE,
-            Self::NonFungibleV2 => ESDT_TYPE_NON_FUNGIBLE,
-            Self::SemiFungible => ESDT_TYPE_SEMI_FUNGIBLE,
-            Self::Meta => ESDT_TYPE_META,
-            Self::DynamicNFT => ESDT_TYPE_DYNAMIC_NON_FUNGIBLE,
-            Self::DynamicSFT => ESDT_TYPE_DYNAMIC_SEMI_FUNGIBLE,
-            Self::DynamicMeta => ESDT_TYPE_DYNAMIC_META,
-            Self::Invalid => ESDT_TYPE_INVALID,
-        }
-    }
 }
 
 impl From<u8> for EsdtTokenType {
@@ -78,29 +55,6 @@ impl From<u8> for EsdtTokenType {
             6 => EsdtTokenType::DynamicSFT,
             7 => EsdtTokenType::DynamicMeta,
             _ => EsdtTokenType::Invalid,
-        }
-    }
-}
-
-impl<'a> From<&'a [u8]> for EsdtTokenType {
-    #[inline]
-    fn from(byte_slice: &'a [u8]) -> Self {
-        if byte_slice == ESDT_TYPE_FUNGIBLE {
-            Self::Fungible
-        } else if byte_slice == ESDT_TYPE_NON_FUNGIBLE {
-            Self::NonFungibleV2
-        } else if byte_slice == ESDT_TYPE_SEMI_FUNGIBLE {
-            Self::SemiFungible
-        } else if byte_slice == ESDT_TYPE_META {
-            Self::Meta
-        } else if byte_slice == ESDT_TYPE_DYNAMIC_NON_FUNGIBLE {
-            Self::DynamicNFT
-        } else if byte_slice == ESDT_TYPE_DYNAMIC_SEMI_FUNGIBLE {
-            Self::DynamicSFT
-        } else if byte_slice == ESDT_TYPE_DYNAMIC_META {
-            Self::DynamicMeta
-        } else {
-            Self::Invalid
         }
     }
 }
