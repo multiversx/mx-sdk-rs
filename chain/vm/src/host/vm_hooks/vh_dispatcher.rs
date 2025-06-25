@@ -793,7 +793,12 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         nonce: i64,
         type_handle: i32,
     ) -> Result<(), VMHooksEarlyExit> {
-        panic!("Unavailable: managed_get_esdt_token_type")
+        self.handler.managed_get_esdt_token_type(
+            address_handle,
+            token_id_handle,
+            nonce,
+            type_handle,
+        )
     }
 
     fn managed_get_back_transfers(

@@ -18,7 +18,7 @@ pub trait NonFungibleTokenMapperFeatures:
     fn issue_and_set_all_roles_meta(&self, token_ticker: ManagedBuffer) {
         let payment = self.call_value().egld();
         self.non_fungible_token_mapper().issue_and_set_all_roles(
-            EsdtTokenType::Meta,
+            EsdtTokenType::MetaFungible,
             payment.clone(),
             ManagedBuffer::new(),
             token_ticker,
