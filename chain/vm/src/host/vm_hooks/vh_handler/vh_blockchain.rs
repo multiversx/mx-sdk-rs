@@ -4,7 +4,7 @@ use crate::{
     host::vm_hooks::VMHooksContext,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
 };
-use multiversx_chain_core::types::ReturnCode;
+use multiversx_chain_core::types::{EsdtTokenType, ReturnCode};
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_bigint::BigInt;
 use num_traits::Zero;
@@ -357,6 +357,22 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             uris_handle,
         )?;
 
+        Ok(())
+    }
+
+    pub fn managed_get_esdt_token_type(
+        &mut self,
+        _address_handle: i32,
+        _token_id_handle: i32,
+        nonce: i64,
+        type_handle: i32,
+    ) -> Result<(), VMHooksEarlyExit> {
+        // TODO: model the token type properly in the VM
+        let token_type = EsdtTokenType::based_on_token_nonce(nonce as u64);
+        self.context.m_types_lock().bi_overwrite(
+            type_handle,
+            num_bigint::BigInt::from(token_type.as_u8() as i32),
+        );
         Ok(())
     }
 
