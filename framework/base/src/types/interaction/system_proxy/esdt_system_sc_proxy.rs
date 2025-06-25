@@ -213,7 +213,9 @@ where
     ) -> IssueCall<Env, From, To, Gas> {
         let token_type_name = match token_type {
             EsdtTokenType::Fungible => "FNG",
-            EsdtTokenType::NonFungible | EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::NonFungible | EsdtTokenType::NonFungibleV2 | EsdtTokenType::DynamicNFT => {
+                "NFT"
+            },
             EsdtTokenType::SemiFungible | EsdtTokenType::DynamicSFT => "SFT",
             EsdtTokenType::Meta | EsdtTokenType::DynamicMeta => "META",
             EsdtTokenType::Invalid => "",
@@ -222,6 +224,7 @@ where
         let endpoint = match token_type {
             EsdtTokenType::Fungible
             | EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
             | EsdtTokenType::SemiFungible
             | EsdtTokenType::Meta => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
             EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {

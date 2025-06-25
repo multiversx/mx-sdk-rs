@@ -18,6 +18,7 @@ const ESDT_TYPE_INVALID: &[u8] = &[];
 pub enum EsdtTokenType {
     Fungible,
     NonFungible,
+    NonFungibleV2,
     SemiFungible,
     Meta,
     DynamicNFT,
@@ -39,12 +40,13 @@ impl EsdtTokenType {
         match self {
             Self::Fungible => 0,
             Self::NonFungible => 1,
-            Self::SemiFungible => 2,
-            Self::Meta => 3,
-            Self::DynamicNFT => 4,
-            Self::DynamicSFT => 5,
-            Self::DynamicMeta => 6,
-            Self::Invalid => 7,
+            Self::NonFungibleV2 => 2,
+            Self::SemiFungible => 3,
+            Self::Meta => 4,
+            Self::DynamicNFT => 5,
+            Self::DynamicSFT => 6,
+            Self::DynamicMeta => 7,
+            Self::Invalid => 255,
         }
     }
 
@@ -52,6 +54,7 @@ impl EsdtTokenType {
         match self {
             Self::Fungible => ESDT_TYPE_FUNGIBLE,
             Self::NonFungible => ESDT_TYPE_NON_FUNGIBLE,
+            Self::NonFungibleV2 => ESDT_TYPE_NON_FUNGIBLE,
             Self::SemiFungible => ESDT_TYPE_SEMI_FUNGIBLE,
             Self::Meta => ESDT_TYPE_META,
             Self::DynamicNFT => ESDT_TYPE_DYNAMIC_NON_FUNGIBLE,
@@ -66,14 +69,15 @@ impl From<u8> for EsdtTokenType {
     #[inline]
     fn from(value: u8) -> Self {
         match value {
-            0 => Self::Fungible,
-            1 => Self::NonFungible,
-            2 => Self::SemiFungible,
-            3 => Self::Meta,
-            4 => Self::DynamicNFT,
-            5 => Self::DynamicSFT,
-            6 => Self::DynamicMeta,
-            _ => Self::Invalid,
+            0 => EsdtTokenType::Fungible,
+            1 => EsdtTokenType::NonFungible,
+            2 => EsdtTokenType::NonFungibleV2,
+            3 => EsdtTokenType::SemiFungible,
+            4 => EsdtTokenType::Meta,
+            5 => EsdtTokenType::DynamicNFT,
+            6 => EsdtTokenType::DynamicSFT,
+            7 => EsdtTokenType::DynamicMeta,
+            _ => EsdtTokenType::Invalid,
         }
     }
 }
@@ -84,7 +88,7 @@ impl<'a> From<&'a [u8]> for EsdtTokenType {
         if byte_slice == ESDT_TYPE_FUNGIBLE {
             Self::Fungible
         } else if byte_slice == ESDT_TYPE_NON_FUNGIBLE {
-            Self::NonFungible
+            Self::NonFungibleV2
         } else if byte_slice == ESDT_TYPE_SEMI_FUNGIBLE {
             Self::SemiFungible
         } else if byte_slice == ESDT_TYPE_META {
