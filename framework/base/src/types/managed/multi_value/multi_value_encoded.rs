@@ -229,6 +229,17 @@ where
 
         payments_vec
     }
+
+    /// Convenience function to convert a payment multi-argument into a usable structure.
+    pub fn from_vec(v: ManagedVec<M, EgldOrEsdtTokenPayment<M>>) -> Self {
+        let mut encoded = MultiValueEncoded::new();
+
+        for payment in v {
+            encoded.push(EgldOrEsdtTokenPaymentMultiValue::from(payment));
+        }
+
+        encoded
+    }
 }
 
 impl<M, T> TopEncodeMulti for &MultiValueEncoded<M, T>

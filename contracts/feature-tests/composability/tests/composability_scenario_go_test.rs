@@ -363,6 +363,11 @@ fn forwarder_call_sync_retrieve_egld_bt_go() {
 }
 
 #[test]
+fn forwarder_call_sync_retrieve_egld_bt_multi_go() {
+    world().run("scenarios/forwarder_call_sync_retrieve_egld_bt_multi.scen.json");
+}
+
+#[test]
 fn forwarder_call_sync_retrieve_esdt_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_esdt.scen.json");
 }
@@ -370,6 +375,16 @@ fn forwarder_call_sync_retrieve_esdt_go() {
 #[test]
 fn forwarder_call_sync_retrieve_esdt_bt_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_esdt_bt.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_esdt_bt_multi_go() {
+    world().run("scenarios/forwarder_call_sync_retrieve_esdt_bt_multi.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_multi_bt_go() {
+    world().run("scenarios/forwarder_call_sync_retrieve_multi_bt.scen.json");
 }
 
 #[test]

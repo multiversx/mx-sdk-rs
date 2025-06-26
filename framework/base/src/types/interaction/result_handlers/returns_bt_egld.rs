@@ -18,8 +18,6 @@ where
     Env: TxEnv,
 {
     fn item_process_result(self, _raw_result: &RawResult) -> Self::Returns {
-        BlockchainWrapper::<Env::Api>::new()
-            .get_back_transfers()
-            .total_egld_amount
+        BlockchainWrapper::<Env::Api>::new().get_back_transfers_egld()
     }
 }

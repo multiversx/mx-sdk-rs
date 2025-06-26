@@ -36,7 +36,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_sync_retrieve_funds_bt",
+                "function": "forward_sync_retrieve_funds_bt_legacy",
                 "arguments": [
                     "sc:vault",
                     "str:NFT-000001",
@@ -98,7 +98,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:forward_sync_retrieve_funds_bt",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_legacy",
                         "topics": [
                             "str:back_transfers",
                             "0",

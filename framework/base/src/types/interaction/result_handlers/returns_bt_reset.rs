@@ -21,9 +21,7 @@ where
     Env: TxEnv,
 {
     fn item_preprocessing(&self, prev: Env::RHExpect) -> Env::RHExpect {
-        // retrieval resets back-transfers
-        // the result is of no interest
-        let _ = BlockchainWrapper::<Env::Api>::new().get_back_transfers();
+        BlockchainWrapper::<Env::Api>::new().reset_back_transfers();
 
         prev
     }

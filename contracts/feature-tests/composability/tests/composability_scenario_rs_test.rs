@@ -414,6 +414,12 @@ fn forwarder_call_sync_retrieve_egld_bt_rs() {
 }
 
 #[test]
+#[ignore = "TODO: fix logs"]
+fn forwarder_call_sync_retrieve_egld_bt_multi_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_egld_bt_multi.scen.json");
+}
+
+#[test]
 fn forwarder_call_sync_retrieve_esdt_rs() {
     world().run("scenarios/forwarder_call_sync_retrieve_esdt.scen.json");
 }
@@ -421,6 +427,17 @@ fn forwarder_call_sync_retrieve_esdt_rs() {
 #[test]
 fn forwarder_call_sync_retrieve_esdt_bt_rs() {
     world().run("scenarios/forwarder_call_sync_retrieve_esdt_bt.scen.json");
+}
+
+#[test]
+#[ignore = "TODO: fix logs"]
+fn forwarder_call_sync_retrieve_esdt_bt_multi_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_esdt_bt_multi.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_multi_bt_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_multi_bt.scen.json");
 }
 
 #[test]

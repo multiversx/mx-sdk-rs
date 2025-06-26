@@ -29,7 +29,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_sync_retrieve_funds_bt_legacy",
+                "function": "forward_sync_retrieve_funds_bt_multi",
                 "arguments": [
                     "sc:vault",
                     "str:TEST-TOKENA",
@@ -52,7 +52,7 @@
                         ],
                         "data": [
                             "str:ExecuteOnDestContext",
-                            "str:retrieve_funds",
+                            "str:retrieve_funds_multi",
                             "str:TEST-TOKENA",
                             "0",
                             "1000"
@@ -60,9 +60,9 @@
                     },
                     {
                         "address": "sc:vault",
-                        "endpoint": "str:retrieve_funds",
+                        "endpoint": "str:retrieve_funds_multi",
                         "topics": [
-                            "str:retrieve_funds",
+                            "str:retrieve_funds_multi",
                             "str:TEST-TOKENA",
                             "0",
                             "1000"
@@ -89,10 +89,9 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:forward_sync_retrieve_funds_bt_legacy",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
                         "topics": [
-                            "str:back_transfers",
-                            "0",
+                            "str:back_transfers_multi",
                             "str:TEST-TOKENA",
                             "0",
                             "1000"

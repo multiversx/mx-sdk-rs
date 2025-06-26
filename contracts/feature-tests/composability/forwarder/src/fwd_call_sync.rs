@@ -87,7 +87,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_funds_egld_or_single_esdt()
+            .retrieve_received_funds_immmediately()
             .egld(payment)
             .returns(ReturnsBackTransfersEGLD)
             .sync_call()
