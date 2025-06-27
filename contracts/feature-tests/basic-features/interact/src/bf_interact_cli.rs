@@ -19,8 +19,6 @@ pub enum InteractCliCommand {
         about = "Deploys storage-bytes contract variant"
     )]
     DeployStorageBytes,
-    #[command(name = "deploy-crypto", about = "Deploys crypto contract variant")]
-    DeployCrypto,
     #[command(
         name = "large-storage",
         about = "Experiment with large storage on storage-bytes contract variant"

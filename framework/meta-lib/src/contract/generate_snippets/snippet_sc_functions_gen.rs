@@ -77,11 +77,9 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
             .returns(ReturnsNewAddress)
             .run()
             .await;
-        let new_address_bech32 = bech32::encode(&new_address);
-        self.state
-            .set_address(Bech32Address::from_bech32_string(new_address_bech32.clone()));
-
-        println!("new address: {{new_address_bech32}}");"#,
+        let new_address_bech32 = new_address.to_bech32_default();
+        println!("new address: {{new_address_bech32}}");
+        self.state.set_address(new_address_bech32);"#,
         proxy_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
     )

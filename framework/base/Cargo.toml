@@ -20,6 +20,7 @@ all-features = true
 [features]
 num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = []
+std = ["multiversx-chain-core/std"]
 managed-buffer-builder-cached = []
 esdt-token-payment-legacy-decode = []
 barnard = []

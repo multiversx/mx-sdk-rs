@@ -1,6 +1,9 @@
-use multiversx_sc::types::{RHListItem, RHListItemExec, TxEnv};
+use multiversx_sc::{
+    chain_core::std::Bech32Address,
+    types::{RHListItem, RHListItemExec, TxEnv},
+};
 
-use crate::{facade::expr::Bech32Address, scenario_model::TxResponse};
+use crate::scenario_model::TxResponse;
 
 /// Indicates that the newly deployed address will be returned after a deploy.
 pub struct ReturnsNewBech32Address;

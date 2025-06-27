@@ -27,3 +27,4 @@ pub const ERROR_BYTES_EXCEED_UINT64: &str = "bytes cannot be parsed as uint64";
 pub const PROMISES_TOKENIZE_FAILED: &str = "tokenize failed";
 
 pub const CRYPTO_INVALID_SIGNATURE: &str = "invalid signature";
+pub const CRYPTO_ED25519_ERROR: &str = "ed25519 verify error";

@@ -64,7 +64,7 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
         to: ManagedAddress,
         payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let _ = self.send_raw().multi_esdt_transfer_execute(
+        self.send_raw().multi_esdt_transfer_execute(
             &to,
             &payment_args.convert_payment_multi_triples(),
             self.blockchain().get_gas_left(),
