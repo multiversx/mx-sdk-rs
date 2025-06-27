@@ -12,6 +12,9 @@ pub const INCORRECT_NUM_ESDT_TRANSFERS: &str = "incorrect number of ESDT transfe
 pub const INCORRECT_NUM_TRANSFERS: &str = "incorrect number of transfers";
 pub const FUNGIBLE_TOKEN_EXPECTED_ERR_MSG: &str = "fungible ESDT token expected";
 pub const TOKEN_IDENTIFIER_ESDT_EXPECTED: &str = "ESDT expected";
+pub const TRANSFER_EXECUTE_FAILED: &str = "transfer execute failed";
+pub const TRANSFER_EXECUTE_REQUIRES_PAYMENT: &str = "transfer execute requires payment";
+pub const TRANSFER_EXECUTE_EMPTY: &str = "empty transfer";
 
 pub const ARG_WRONG_NUMBER: &str = "wrong number of arguments";
 pub const ARG_ASYNC_WRONG_NUMBER: &str = "wrong number of arguments provided to async call";

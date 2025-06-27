@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                           18
+// Endpoints:                           16
 // Async Callback (empty):               1
-// Total number of exported functions:  21
+// Total number of exported functions:  19
 
 #![no_std]
 
@@ -36,8 +36,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         explicit_panic => explicit_panic
         get_owner_address => get_owner_address
         call_counts => call_counts
-        num_called_retrieve_funds_promises => num_called_retrieve_funds_promises
-        num_async_calls_sent_from_child => num_async_calls_sent_from_child
     )
 }
 
