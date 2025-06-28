@@ -3,7 +3,7 @@ use crate::{
     types::{BackTransfers, RHListItem, RHListItemExec, TxEnv},
 };
 
-/// Indicates that back-transfers will be returned.
+/// Indicates that all back-transfers, as list of EGLD and ESDT payments.
 ///
 /// Back-transfers are reset before a call, to avoid unwanted interferences.
 pub struct ReturnsBackTransfersReset;

@@ -155,7 +155,18 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
                         "topics": [
-                            "str:back_transfers_multi",
+                            "str:back_transfers_egld_event",
+                            "100"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
+                        "topics": [
+                            "str:back_transfers_multi_event",
                             "str:FWD-TOKEN",
                             "0",
                             "100",

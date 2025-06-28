@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use crate::vault_proxy;
 
 multiversx_sc::imports!();
@@ -17,7 +19,7 @@ pub trait BackTransfersLegacyModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .returns(ReturnsBackTransfers)
+            .returns(ReturnsBackTransfersLegacy)
             .sync_call();
 
         require!(
@@ -44,7 +46,7 @@ pub trait BackTransfersLegacyModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
-            .returns(ReturnsBackTransfersReset)
+            .returns(ReturnsBackTransfersLegacyReset)
             .sync_call();
 
         require!(
@@ -62,7 +64,7 @@ pub trait BackTransfersLegacyModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .returns(ReturnsBackTransfersReset)
+            .returns(ReturnsBackTransfersLegacyReset)
             .sync_call();
 
         require!(
@@ -89,7 +91,7 @@ pub trait BackTransfersLegacyModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
-            .returns(ReturnsBackTransfers)
+            .returns(ReturnsBackTransfersLegacy)
             .sync_call();
 
         require!(
@@ -107,7 +109,7 @@ pub trait BackTransfersLegacyModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .returns(ReturnsBackTransfers)
+            .returns(ReturnsBackTransfersLegacy)
             .sync_call();
 
         require!(

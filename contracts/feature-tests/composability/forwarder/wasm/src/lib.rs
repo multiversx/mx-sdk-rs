@@ -108,8 +108,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_sync_retrieve_funds_bt_legacy_reset_twice => forward_sync_retrieve_funds_bt_legacy_reset_twice
         forward_sync_retrieve_funds_bt_legacy_twice => forward_sync_retrieve_funds_bt_legacy_twice
         forward_sync_retrieve_funds_bt_multi => forward_sync_retrieve_funds_bt_multi
-        forward_sync_retrieve_funds_bt_multi_reset_twice => forward_sync_retrieve_funds_bt_multi_reset_twice
         forward_sync_retrieve_funds_bt_multi_twice => forward_sync_retrieve_funds_bt_multi_twice
+        forward_sync_retrieve_funds_bt_multi_twice_reset => forward_sync_retrieve_funds_bt_multi_twice_reset
         forward_promise_retrieve_funds_back_transfers => forward_promise_retrieve_funds_back_transfers
         retrieve_funds_callback => retrieve_funds_callback
         transfer_callback => transfer_callback

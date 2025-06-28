@@ -10,9 +10,10 @@ use crate::{
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage,
     types::{
-        BackTransfers, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
-        EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer,
-        ManagedByteArray, ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress, TokenIdentifier,
+        BackTransfers, BackTransfersLegacy, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier,
+        EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress,
+        TokenIdentifier,
     },
 };
 
@@ -459,7 +460,11 @@ where
     /// Works after:
     /// - synchronous calls
     /// - asynchronous calls too, in callbacks.
-    pub fn get_back_transfers(&self) -> BackTransfers<A> {
+    #[deprecated(
+        since = "0.59.0",
+        note = "Does not handle multi-transfers properly, use get_back_transfers instead"
+    )]
+    pub fn get_back_transfers_legacy(&self) -> BackTransfersLegacy<A> {
         let esdt_transfer_value_handle: A::BigIntHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         let call_value_handle: A::BigIntHandle =
@@ -471,7 +476,7 @@ where
         );
 
         unsafe {
-            BackTransfers {
+            BackTransfersLegacy {
                 total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
                 esdt_payments: ManagedVec::from_raw_handle(
                     esdt_transfer_value_handle.get_raw_handle(),
@@ -483,7 +488,7 @@ where
     /// Retrieves all back-transfers as a collection of payments.
     ///
     /// Covers all cases, including EGLD sent via multi-transfer.
-    pub fn get_back_transfers_multi(&self) -> ManagedVec<A, EgldOrEsdtTokenPayment<A>> {
+    pub fn get_back_transfers(&self) -> BackTransfers<A> {
         unsafe {
             let mut all_bt_vec = ManagedVec::new_uninit();
             let bt_direct_egld = BigUint::<A>::new_uninit();
@@ -497,20 +502,8 @@ where
                 all_bt_vec.push(EgldOrEsdtTokenPayment::egld_payment(bt_direct_egld));
             }
 
-            all_bt_vec
+            BackTransfers::new(all_bt_vec)
         }
-    }
-
-    /// Retrieves the sum of all EGLD back-transfers, including EGLD sent via multi-transfer.
-    pub fn get_back_transfers_egld(&self) -> BigUint<A> {
-        let mut bt_egld = BigUint::zero();
-        let bt_multi = self.get_back_transfers_multi();
-        for bt in bt_multi {
-            if bt.token_identifier.is_egld() {
-                bt_egld += bt.amount;
-            }
-        }
-        bt_egld
     }
 
     /// Clears back transfers by retrieving current back transfers and ignoring result.

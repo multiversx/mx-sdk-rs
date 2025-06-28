@@ -3,7 +3,12 @@ use crate::{
     types::{BigUint, RHListItem, RHListItemExec, TxEnv},
 };
 
-/// Indicates that back-transfers will be returned.
+/// Returns the amount of EGLD transfered.
+///
+/// More precisely, it returns the sum of the EGLD transfer amounts,
+/// since multiple EGLD transfers are possible in a multi-transfer.
+///
+/// It is non-exclusive, i. e. it is possible to get other tokens alongside the EGLD.
 pub struct ReturnsBackTransfersEGLD;
 
 impl<Env, Original> RHListItem<Env, Original> for ReturnsBackTransfersEGLD
@@ -18,6 +23,8 @@ where
     Env: TxEnv,
 {
     fn item_process_result(self, _raw_result: &RawResult) -> Self::Returns {
-        BlockchainWrapper::<Env::Api>::new().get_back_transfers_egld()
+        BlockchainWrapper::<Env::Api>::new()
+            .get_back_transfers()
+            .egld_sum()
     }
 }

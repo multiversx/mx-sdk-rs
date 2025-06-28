@@ -1577,22 +1577,7 @@ where
             .original_result()
     }
 
-    pub fn forward_sync_retrieve_funds_bt_multi_reset_twice<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
-    >(
-        self,
-        to: Arg0,
-        transfers: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("forward_sync_retrieve_funds_bt_multi_reset_twice")
-            .argument(&to)
-            .argument(&transfers)
-            .original_result()
-    }
-
+    /// Highlights the behavior when calling back transfers **without** reset. 
     pub fn forward_sync_retrieve_funds_bt_multi_twice<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
@@ -1604,6 +1589,23 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("forward_sync_retrieve_funds_bt_multi_twice")
+            .argument(&to)
+            .argument(&transfers)
+            .original_result()
+    }
+
+    /// Highlights the behavior when calling back transfers **with** reset. 
+    pub fn forward_sync_retrieve_funds_bt_multi_twice_reset<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        transfers: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_retrieve_funds_bt_multi_twice_reset")
             .argument(&to)
             .argument(&transfers)
             .original_result()

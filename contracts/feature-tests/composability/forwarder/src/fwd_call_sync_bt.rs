@@ -10,74 +10,75 @@ pub trait BackTransfersModule {
         to: ManagedAddress,
         transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     ) {
-        let back_transfers = self
+        let bt_multi = self
             .tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds_multi(&transfers)
-            .returns(ReturnsBackTransfersMulti)
+            .returns(ReturnsBackTransfers)
             .sync_call();
 
-        self.back_transfers_multi_event(MultiValueEncoded::from_vec(back_transfers));
+        let egld_sum = bt_multi.egld_sum();
+        if egld_sum > 0u32 {
+            self.back_transfers_egld_event(egld_sum);
+        }
+        self.back_transfers_multi_event(bt_multi.into_multi_value());
     }
 
-    #[endpoint]
-    fn forward_sync_retrieve_funds_bt_multi_reset_twice(
-        &self,
-        to: ManagedAddress,
-        transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
-    ) {
-        let back_transfers = self
-            .tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
-            .retrieve_funds_multi(&transfers)
-            .returns(ReturnsBackTransfersMultiReset)
-            .sync_call();
-
-        self.back_transfers_multi_event(MultiValueEncoded::from_vec(back_transfers));
-
-        let back_transfers = self
-            .tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
-            .retrieve_funds_multi(&transfers)
-            .returns(ReturnsBackTransfersMultiReset)
-            .sync_call();
-
-        self.back_transfers_multi_event(MultiValueEncoded::from_vec(back_transfers));
-    }
-
+    /// Highlights the behavior when calling back transfers **without** reset.
     #[endpoint]
     fn forward_sync_retrieve_funds_bt_multi_twice(
         &self,
         to: ManagedAddress,
         transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     ) {
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_multi(&transfers)
+            .sync_call();
+
         let back_transfers = self
             .tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds_multi(&transfers)
-            .returns(ReturnsBackTransfersMulti)
+            .returns(ReturnsBackTransfers)
             .sync_call();
 
-        self.back_transfers_multi_event(MultiValueEncoded::from_vec(back_transfers));
-
-        let back_transfers = self
-            .tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
-            .retrieve_funds_multi(&transfers)
-            .returns(ReturnsBackTransfersMulti)
-            .sync_call();
-
-        self.back_transfers_multi_event(MultiValueEncoded::from_vec(back_transfers));
+        self.back_transfers_multi_event(back_transfers.into_multi_value());
     }
 
-    #[event("back_transfers_multi")]
+    /// Highlights the behavior when calling back transfers **with** reset.
+    #[endpoint]
+    fn forward_sync_retrieve_funds_bt_multi_twice_reset(
+        &self,
+        to: ManagedAddress,
+        transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+    ) {
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_multi(&transfers)
+            .sync_call();
+
+        let back_transfers = self
+            .tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_multi(&transfers)
+            .returns(ReturnsBackTransfersReset)
+            .sync_call();
+
+        self.back_transfers_multi_event(back_transfers.into_multi_value());
+    }
+
+    #[event("back_transfers_multi_event")]
     fn back_transfers_multi_event(
         &self,
         #[indexed] back_transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     );
+
+    #[event("back_transfers_egld_event")]
+    fn back_transfers_egld_event(&self, #[indexed] egld_value: BigUint);
 }

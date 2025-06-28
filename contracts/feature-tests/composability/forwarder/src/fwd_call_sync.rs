@@ -134,7 +134,7 @@ pub trait ForwarderSyncCallModule {
             .typed(vault_proxy::VaultProxy)
             .retrieve_received_funds_immmediately()
             .payment(payment)
-            .returns(ReturnsBackTransfersMultiESDT)
+            .returns(ReturnsBackTransfersLegacyMultiESDT)
             .sync_call()
     }
 
