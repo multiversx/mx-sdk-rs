@@ -1,0 +1,271 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "4000",
+                    "esdt": {
+                        "str:FWD-TOKEN": "1000",
+                        "str:SFT-456789": {
+                            "instances": [
+                                {
+                                    "nonce": "3",
+                                    "balance": "12"
+                                }
+                            ]
+                        }
+                    },
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "forward_sync_retrieve_funds_bt_multi_twice_reset",
+                "arguments": [
+                    "sc:vault",
+                    "str:FWD-TOKEN",
+                    "0",
+                    "100",
+                    "str:EGLD-000000",
+                    "0",
+                    "100",
+                    "str:SFT-456789",
+                    "3",
+                    "6"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:retrieve_funds_multi",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:retrieve_funds_multi",
+                        "topics": [
+                            "str:retrieve_funds_multi",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:BackTransfer",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:forwarder",
+                            "3",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:retrieve_funds_multi",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:retrieve_funds_multi",
+                        "topics": [
+                            "str:retrieve_funds_multi",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:BackTransfer",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:forwarder",
+                            "3",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD-000000",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_multi_twice_reset",
+                        "topics": [
+                            "str:back_transfers_multi_event",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:EGLD",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "3800",
+                    "esdt": {
+                        "str:FWD-TOKEN": "800",
+                        "str:SFT-456789": {
+                            "instances": [
+                                {
+                                    "nonce": "3",
+                                    "balance": "0"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": {},
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "200",
+                    "esdt": {
+                        "str:FWD-TOKEN": "200",
+                        "str:SFT-456789": {
+                            "instances": [
+                                {
+                                    "nonce": "3",
+                                    "balance": "12"
+                                }
+                            ]
+                        }
+                    },
+                    "storage": "*",
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                }
+            }
+        }
+    ]
+}

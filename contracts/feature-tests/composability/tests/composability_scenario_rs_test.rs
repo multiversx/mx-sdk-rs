@@ -404,13 +404,50 @@ fn forwarder_call_sync_multi_transfer_egld_accept_rs() {
 }
 
 #[test]
-fn forwarder_call_sync_retrieve_egld_rs() {
-    world().run("scenarios/forwarder_call_sync_retrieve_egld.scen.json");
+fn forwarder_call_sync_retrieve_bt_legacy_egld_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_bt_legacy_egld.scen.json");
 }
 
 #[test]
-fn forwarder_call_sync_retrieve_egld_bt_rs() {
-    world().run("scenarios/forwarder_call_sync_retrieve_egld_bt.scen.json");
+fn forwarder_call_sync_retrieve_bt_legacy_esdt_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_bt_legacy_esdt.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_bt_legacy_nft_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_bt_legacy_nft.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_bt_multi_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_bt_multi.scen.json");
+}
+
+#[test]
+#[ignore = "TODO: fix logs"]
+fn forwarder_call_sync_retrieve_bt_multi_egld_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_bt_multi_egld.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_bt_multi_esdt_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_bt_multi_esdt.scen.json");
+}
+
+#[test]
+#[ignore = "back transfers behavior without reset if not reproduced in the Rust VM"]
+fn forwarder_call_sync_retrieve_bt_multi_twice_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_bt_multi_twice.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_bt_multi_twice_reset_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_bt_multi_twice_reset.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_egld_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_egld.scen.json");
 }
 
 #[test]
@@ -419,18 +456,8 @@ fn forwarder_call_sync_retrieve_esdt_rs() {
 }
 
 #[test]
-fn forwarder_call_sync_retrieve_esdt_bt_rs() {
-    world().run("scenarios/forwarder_call_sync_retrieve_esdt_bt.scen.json");
-}
-
-#[test]
 fn forwarder_call_sync_retrieve_nft_rs() {
     world().run("scenarios/forwarder_call_sync_retrieve_nft.scen.json");
-}
-
-#[test]
-fn forwarder_call_sync_retrieve_nft_bt_rs() {
-    world().run("scenarios/forwarder_call_sync_retrieve_nft_bt.scen.json");
 }
 
 #[test]

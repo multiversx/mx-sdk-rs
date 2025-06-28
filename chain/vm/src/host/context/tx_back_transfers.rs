@@ -4,7 +4,7 @@ use crate::{builtin_functions::BuiltinFunctionContainer, types::VMAddress};
 
 use super::{async_call_tx_input, CallType, TxResult, TxTokenTransfer};
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct BackTransfers {
     pub call_value: BigUint,
     pub esdt_transfers: Vec<TxTokenTransfer>,

@@ -25,6 +25,7 @@ mod managed_vec_iter_payload;
 mod managed_vec_iter_ref;
 mod managed_vec_ref;
 mod managed_vec_ref_mut;
+mod multi_egld_or_esdt_token_payment;
 pub(crate) mod preloaded_managed_buffer;
 mod randomness_source;
 mod token_identifier;
@@ -33,9 +34,7 @@ mod traits;
 pub use big_uint::BigUint;
 pub use builder::*;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
-pub use egld_or_esdt_token_payment::{
-    EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs, MultiEgldOrEsdtPayment,
-};
+pub use egld_or_esdt_token_payment::{EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs};
 pub use egld_or_multi_esdt_payment::{EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs};
 pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
@@ -66,6 +65,7 @@ pub use managed_vec_iter_payload::ManagedVecPayloadIterator;
 pub use managed_vec_iter_ref::ManagedVecRefIterator;
 pub use managed_vec_ref::ManagedVecRef;
 pub use managed_vec_ref_mut::ManagedVecRefMut;
+pub use multi_egld_or_esdt_token_payment::MultiEgldOrEsdtPayment;
 pub use randomness_source::RandomnessSource;
 pub use token_identifier::TokenIdentifier;
 
