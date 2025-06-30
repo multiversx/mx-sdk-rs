@@ -45,8 +45,6 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
         }
 
         for esdt_transfer in back_transfers.payments {
-            // let esdt_token_id =
-            //     EgldOrEsdtTokenIdentifier::esdt(esdt_transfer.token_identifier.clone());
             self.retrieve_funds_callback_event(
                 &esdt_transfer.token_identifier,
                 esdt_transfer.token_nonce,

@@ -53,10 +53,13 @@ where
         self.payments.egld_sum()
     }
 
+    /// Requires that back-transfer is a single ESDT payment, and returns it, crashes otherwise.
     pub fn to_single_esdt(self) -> EsdtTokenPayment<A> {
         self.payments.to_single_esdt()
     }
 
+    /// Converts back-transfer to a multi-value object, in this case a multi-value list of triples:
+    /// `[(token identifier, payment, nonce)]`
     pub fn into_multi_value(self) -> MultiValueEncoded<A, EgldOrEsdtTokenPaymentMultiValue<A>> {
         self.payments.into_multi_value()
     }

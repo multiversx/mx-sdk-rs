@@ -25,6 +25,7 @@ where
         sum
     }
 
+    /// Requires that this is a single ESDT payment, and returns it, crashes otherwise.
     pub fn to_single_esdt(self) -> EsdtTokenPayment<M> {
         if self.len() != 1 {
             quick_signal_error::<M>(err_msg::SINGLE_ESDT_EXPECTED)
@@ -34,6 +35,8 @@ where
         payment.unwrap_esdt()
     }
 
+    /// Converts to a multi-value object, in this case a multi-value list of triples:
+    /// `[(token identifier, payment, nonce)]`
     pub fn into_multi_value(self) -> MultiValueEncoded<M, EgldOrEsdtTokenPaymentMultiValue<M>> {
         let mut encoded = MultiValueEncoded::new();
 
