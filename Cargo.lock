@@ -3072,6 +3072,8 @@ dependencies = [
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
+ "serde",
+ "serde_json",
  "unwrap-infallible",
 ]
 
