@@ -230,7 +230,7 @@ where
         payments_vec
     }
 
-    /// Convenience function to convert a payment multi-argument into a usable structure.
+    /// Contrsucts a multi-value from a list of payments.
     pub fn from_vec(v: ManagedVec<M, EgldOrEsdtTokenPayment<M>>) -> Self {
         let mut encoded = MultiValueEncoded::new();
 
