@@ -29,7 +29,7 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
     #[promises_callback]
     fn retrieve_funds_back_transfers_callback(&self) {
         let back_transfers = self.blockchain().get_back_transfers();
-        let egld_transfer = back_transfers.total_egld_amount;
+        let egld_transfer = back_transfers.egld_sum();
 
         if egld_transfer != BigUint::zero() {
             let egld_token_id = EgldOrEsdtTokenIdentifier::egld();
@@ -44,18 +44,16 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
             });
         }
 
-        for esdt_transfer in &back_transfers.esdt_payments {
-            let esdt_token_id =
-                EgldOrEsdtTokenIdentifier::esdt(esdt_transfer.token_identifier.clone());
+        for esdt_transfer in back_transfers.payments {
             self.retrieve_funds_callback_event(
-                &esdt_token_id,
+                &esdt_transfer.token_identifier,
                 esdt_transfer.token_nonce,
                 &esdt_transfer.amount,
             );
 
             let _ = self.callback_data().push(&CallbackData {
                 callback_name: ManagedBuffer::from(b"retrieve_funds_callback"),
-                token_identifier: esdt_token_id,
+                token_identifier: esdt_transfer.token_identifier,
                 token_nonce: esdt_transfer.token_nonce,
                 token_amount: esdt_transfer.amount.clone(),
                 args: ManagedVec::new(),

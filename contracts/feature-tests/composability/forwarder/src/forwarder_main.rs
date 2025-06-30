@@ -9,6 +9,7 @@ pub mod fwd_call_promises;
 pub mod fwd_call_promises_bt;
 pub mod fwd_call_sync;
 pub mod fwd_call_sync_bt;
+pub mod fwd_call_sync_bt_legacy;
 pub mod fwd_call_transf_exec;
 pub mod fwd_change_owner;
 pub mod fwd_deploy;
@@ -42,7 +43,8 @@ pub trait Forwarder:
     + common::CommonModule
     + fwd_call_promises::CallPromisesModule
     + fwd_call_promise_direct::CallPromisesDirectModule
-    + fwd_call_sync_bt::BackTransfersFeatureModule
+    + fwd_call_sync_bt_legacy::BackTransfersLegacyModule
+    + fwd_call_sync_bt::BackTransfersModule
     + fwd_call_promises_bt::CallPromisesBackTransfersModule
 {
     #[init]
