@@ -7,7 +7,7 @@ pub use bf_interact_config::Config;
 use bf_interact_state::State;
 use clap::Parser;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{imports::*, sdk::validator::Validator};
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
@@ -67,6 +67,14 @@ impl BasicFeaturesInteract {
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
 
         interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor
+            .add_key(
+                Validator::from_pem_file("./validatorKey.pem")
+                    .expect("Unable to load validator key")
+                    .private_key,
+            )
+            .await
+            .expect("Failed to add validator key");
 
         Self {
             interactor,

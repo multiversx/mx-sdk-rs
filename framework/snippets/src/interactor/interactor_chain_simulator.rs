@@ -1,9 +1,9 @@
 use anyhow::Error;
 use multiversx_sc_scenario::imports::Bech32Address;
 use multiversx_sdk::gateway::{
-    ChainSimulatorGenerateBlocksRequest, ChainSimulatorSendFundsRequest,
-    ChainSimulatorSetStateOverwriteRequest, ChainSimulatorSetStateRequest, GatewayAsyncService,
-    SetStateAccount,
+    ChainSimulatorAddKeysRequest, ChainSimulatorGenerateBlocksRequest,
+    ChainSimulatorSendFundsRequest, ChainSimulatorSetStateOverwriteRequest,
+    ChainSimulatorSetStateRequest, GatewayAsyncService, SetStateAccount,
 };
 
 use crate::InteractorBase;
@@ -29,6 +29,16 @@ where
 
         self.proxy
             .request(ChainSimulatorGenerateBlocksRequest::num_blocks(num_blocks))
+            .await
+    }
+
+    pub async fn add_key(&self, key: Vec<u8>) -> Result<String, Error> {
+        if !self.use_chain_simulator {
+            return Ok(String::from("no-simulator"));
+        }
+
+        self.proxy
+            .request(ChainSimulatorAddKeysRequest::with_keys(vec![key]))
             .await
     }
 

@@ -5,6 +5,7 @@ pub mod retrieve_tx_on_network;
 pub mod test_wallets;
 pub mod utils;
 pub mod wallet;
+pub mod validator;
 
 pub use multiversx_chain_core as chain_core;
 pub use retrieve_tx_on_network::retrieve_tx_on_network;
