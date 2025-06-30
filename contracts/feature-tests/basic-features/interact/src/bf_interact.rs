@@ -67,14 +67,6 @@ impl BasicFeaturesInteract {
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
 
         interactor.generate_blocks_until_epoch(1).await.unwrap();
-        interactor
-            .add_key(
-                Validator::from_pem_file("./validatorKey.pem")
-                    .expect("Unable to load validator key")
-                    .private_key,
-            )
-            .await
-            .expect("Failed to add validator key");
 
         Self {
             interactor,
@@ -82,6 +74,17 @@ impl BasicFeaturesInteract {
             state: State::load_state(),
             large_storage_payload: Vec::new(),
         }
+    }
+
+    pub async fn add_key(&mut self) {
+        self.interactor
+            .add_key(
+                Validator::from_pem_file("./validatorKey.pem")
+                    .expect("Unable to load validator key")
+                    .private_key,
+            )
+            .await
+            .expect("Failed to add validator key");
     }
 
     pub async fn large_storage(&mut self, size_kb: usize) {
