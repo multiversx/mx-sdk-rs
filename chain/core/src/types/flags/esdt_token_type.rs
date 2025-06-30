@@ -5,15 +5,14 @@ use crate::codec::{
 
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum EsdtTokenType {
-    NotSet = 0,
-    Fungible = 1,
-    NonFungible = 2,
-    NonFungibleV2 = 3,
+    Fungible = 0,
+    NonFungible = 1,
+    NonFungibleV2 = 2,
     MetaFungible = 4,
-    SemiFungible = 5,
-    DynamicNFT = 6,
-    DynamicSFT = 7,
-    DynamicMeta = 8,
+    SemiFungible = 3,
+    DynamicNFT = 5,
+    DynamicSFT = 6,
+    DynamicMeta = 7,
     Invalid,
 }
 
@@ -28,15 +27,14 @@ impl EsdtTokenType {
 
     pub fn as_u8(&self) -> u8 {
         match self {
-            EsdtTokenType::NotSet => 0,
-            EsdtTokenType::Fungible => 1,
-            EsdtTokenType::NonFungible => 2,
-            EsdtTokenType::NonFungibleV2 => 3,
+            EsdtTokenType::Fungible => 0,
+            EsdtTokenType::NonFungible => 1,
+            EsdtTokenType::NonFungibleV2 => 2,
             EsdtTokenType::MetaFungible => 4,
-            EsdtTokenType::SemiFungible => 5,
-            EsdtTokenType::DynamicNFT => 6,
-            EsdtTokenType::DynamicSFT => 7,
-            EsdtTokenType::DynamicMeta => 8,
+            EsdtTokenType::SemiFungible => 3,
+            EsdtTokenType::DynamicNFT => 5,
+            EsdtTokenType::DynamicSFT => 6,
+            EsdtTokenType::DynamicMeta => 7,
             EsdtTokenType::Invalid => 255,
         }
     }
@@ -46,15 +44,14 @@ impl From<u8> for EsdtTokenType {
     #[inline]
     fn from(value: u8) -> Self {
         match value {
-            0 => EsdtTokenType::NotSet,
-            1 => EsdtTokenType::Fungible,
-            2 => EsdtTokenType::NonFungible,
-            3 => EsdtTokenType::NonFungibleV2,
+            0 => EsdtTokenType::Fungible,
+            1 => EsdtTokenType::NonFungible,
+            2 => EsdtTokenType::NonFungibleV2,
             4 => EsdtTokenType::MetaFungible,
-            5 => EsdtTokenType::SemiFungible,
-            6 => EsdtTokenType::DynamicNFT,
-            7 => EsdtTokenType::DynamicSFT,
-            8 => EsdtTokenType::DynamicMeta,
+            3 => EsdtTokenType::SemiFungible,
+            5 => EsdtTokenType::DynamicNFT,
+            6 => EsdtTokenType::DynamicSFT,
+            7 => EsdtTokenType::DynamicMeta,
             _ => EsdtTokenType::Invalid,
         }
     }

@@ -218,7 +218,7 @@ where
             | EsdtTokenType::DynamicNFT => "NFT",
             EsdtTokenType::SemiFungible | EsdtTokenType::DynamicSFT => "SFT",
             EsdtTokenType::MetaFungible | EsdtTokenType::DynamicMeta => "META",
-            EsdtTokenType::NotSet | EsdtTokenType::Invalid => "",
+            EsdtTokenType::Invalid => "",
         };
 
         let endpoint = match token_type {
@@ -230,8 +230,7 @@ where
             EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
                 REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME
             },
-
-            EsdtTokenType::NotSet | EsdtTokenType::Invalid => "",
+            EsdtTokenType::Invalid => "",
         };
 
         let mut tx = self
