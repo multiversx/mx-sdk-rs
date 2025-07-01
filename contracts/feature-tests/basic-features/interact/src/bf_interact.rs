@@ -7,7 +7,7 @@ pub use bf_interact_config::Config;
 use bf_interact_state::State;
 use clap::Parser;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{imports::*, sdk::validator::Validator};
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
@@ -74,6 +74,17 @@ impl BasicFeaturesInteract {
             state: State::load_state(),
             large_storage_payload: Vec::new(),
         }
+    }
+
+    pub async fn add_key(&mut self) {
+        self.interactor
+            .add_key(
+                Validator::from_pem_file("./validatorKey.pem")
+                    .expect("Unable to load validator key")
+                    .private_key,
+            )
+            .await
+            .expect("Failed to add validator key");
     }
 
     pub async fn large_storage(&mut self, size_kb: usize) {
