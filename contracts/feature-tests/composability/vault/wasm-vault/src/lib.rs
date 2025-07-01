@@ -30,8 +30,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         retrieve_funds_with_transfer_exec => retrieve_funds_with_transfer_exec
         retrieve_funds => retrieve_funds
         retrieve_funds_egld_or_single_esdt => retrieve_funds_egld_or_single_esdt
-        retrieve_funds_multi_esdt => retrieve_funds_multi_esdt
-        retrieve_multi_funds_async => retrieve_multi_funds_async
+        retrieve_received_funds_immmediately => retrieve_received_funds_immmediately
+        retrieve_funds_multi => retrieve_funds_multi
         burn_and_create_retrieve_async => burn_and_create_retrieve_async
         explicit_panic => explicit_panic
         get_owner_address => get_owner_address

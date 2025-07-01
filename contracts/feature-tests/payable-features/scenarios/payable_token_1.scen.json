@@ -34,7 +34,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:function expects single ESDT payment",
+                "message": "str:single ESDT payment expected",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -55,7 +55,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:function expects single ESDT payment",
+                "message": "str:single ESDT payment expected",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

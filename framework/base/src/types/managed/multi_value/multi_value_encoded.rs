@@ -3,7 +3,8 @@ use unwrap_infallible::UnwrapInfallible;
 
 use crate::codec::multi_types::MultiValueVec;
 use crate::types::{
-    BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, TokenIdentifier,
+    BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentMultiValue,
+    EsdtTokenPayment, TokenIdentifier,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -211,6 +212,33 @@ where
         }
 
         payments_vec
+    }
+}
+
+impl<M> MultiValueEncoded<M, EgldOrEsdtTokenPaymentMultiValue<M>>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    /// Convenience function to convert a payment multi-argument into a usable structure.
+    pub fn convert_payment(self) -> ManagedVec<M, EgldOrEsdtTokenPayment<M>> {
+        let mut payments_vec = ManagedVec::new();
+
+        for multi_arg in self.into_iter() {
+            payments_vec.push(multi_arg.into_inner());
+        }
+
+        payments_vec
+    }
+
+    /// Contrsucts a multi-value from a list of payments.
+    pub fn from_vec(v: ManagedVec<M, EgldOrEsdtTokenPayment<M>>) -> Self {
+        let mut encoded = MultiValueEncoded::new();
+
+        for payment in v {
+            encoded.push(EgldOrEsdtTokenPaymentMultiValue::from(payment));
+        }
+
+        encoded
     }
 }
 
