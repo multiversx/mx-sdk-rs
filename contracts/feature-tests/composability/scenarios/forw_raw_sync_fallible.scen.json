@@ -1,0 +1,121 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "2000"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../forwarder-barnard/output/forwarder-barnard.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "sync_call_fallible-success",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "sync_call_fallible",
+                "arguments": [
+                    "sc:vault",
+                    "str:echo_arguments",
+                    "1",
+                    "2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:sync_call_fallible",
+                        "topics": [
+                            "str:sync_call_fallible_success"
+                        ],
+                        "data": [
+                            {
+                                "0-echoed-args": [
+                                    "biguint:1",
+                                    "biguint:2"
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "sync_call_fallible-error",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "sync_call_fallible",
+                "arguments": [
+                    "sc:vault",
+                    "str:explicit_panic"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:sync_call_fallible",
+                        "topics": [
+                            "str:sync_call_fallible_error"
+                        ],
+                        "data": [
+                            "1"
+                        ]
+                    },
+                    {
+                        "address": "address:a_user",
+                        "endpoint": "str:internalVMErrors",
+                        "topics": [
+                            "sc:forwarder",
+                            "str:sync_call_fallible"
+                        ],
+                        "data": [
+                            "*"
+                        ]
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

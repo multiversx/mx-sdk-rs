@@ -17,14 +17,14 @@ clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.24" }
 serial_test = { version = "3.2.0" }
-toml = "0.8.6"
+toml = "0.8"
 system-sc-interact = { path = "../../../../tools/interactor-system-func-calls" }
 
 [dependencies.basic-features]
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.57.0"
+version = "0.58.0"
 path = "../../../../framework/snippets"
 
 [features]

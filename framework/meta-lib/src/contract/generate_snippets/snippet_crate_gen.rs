@@ -93,7 +93,7 @@ version = "{last_release_version}"
 [dependencies]
 clap = {{ version = "4.4.7", features = ["derive"] }}
 serde = {{ version = "1.0", features = ["derive"] }}
-toml = "0.8.6"
+toml = "0.8"
 
 [features]
 chain-simulator-tests = []

@@ -1,7 +1,7 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/examples/ping-pong-egld");
     blockchain.register_contract(
@@ -47,8 +47,8 @@ fn ping_pong_call_ping_twice_rs() {
 }
 
 #[test]
-fn ping_pong_call_ping_wrong_ammount_rs() {
-    world().run("scenarios/ping-pong-call-ping-wrong-ammount.scen.json");
+fn ping_pong_call_ping_wrong_amount_rs() {
+    world().run("scenarios/ping-pong-call-ping-wrong-amount.scen.json");
 }
 
 #[test]

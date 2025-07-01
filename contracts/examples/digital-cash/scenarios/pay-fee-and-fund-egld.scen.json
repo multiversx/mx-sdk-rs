@@ -1,5 +1,5 @@
 {
-    "name": "pay-fee-adn-fund-egld",
+    "name": "pay-fee-and-fund-egld",
     "steps": [
         {
             "step": "externalSteps",

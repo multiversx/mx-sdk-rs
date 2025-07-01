@@ -8,10 +8,14 @@ publish = false
 [lib]
 path = "src/payable_features.rs"
 
+[features]
+barnard = ["multiversx-sc/barnard"]
+
 [dependencies.multiversx-sc]
-version = "0.57.0"
+version = "0.58.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.57.0"
+version = "0.58.0"
+features = ["wasmer-experimental"]
 path = "../../../framework/scenario"

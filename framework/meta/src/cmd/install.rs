@@ -1,7 +1,8 @@
 pub mod install_debugger;
 mod install_scenario_go;
-mod install_wasm_tools;
 mod system_info;
+
+use multiversx_sc_meta_lib::tools::{self, build_target::install_target};
 
 use crate::cli::{
     InstallArgs, InstallCommand, InstallDebuggerArgs, InstallMxScenarioGoArgs, InstallWasm32Args,
@@ -11,10 +12,8 @@ use crate::cli::{
 use self::install_scenario_go::ScenarioGoInstaller;
 
 pub async fn install(args: &InstallArgs) {
-    let command = args
-        .command
-        .as_ref()
-        .expect("command expected after `install`");
+    // validated before, can unwrap directly
+    let command = args.command.as_ref().unwrap();
 
     match command {
         InstallCommand::All => {
@@ -37,11 +36,14 @@ async fn install_scenario_go(sg_args: &InstallMxScenarioGoArgs) {
 }
 
 fn install_wasm32(_wasm32_args: &InstallWasm32Args) {
-    install_wasm_tools::install_wasm32_target();
+    install_target(tools::build_target::WASM32_TARGET);
+    if tools::build_target::is_wasm32v1_available() {
+        install_target(tools::build_target::WASM32V1_TARGET);
+    }
 }
 
 fn install_wasm_opt(_wasm_opt_args: &InstallWasmOptArgs) {
-    install_wasm_tools::install_wasm_opt();
+    tools::install_wasm_opt();
 }
 
 async fn install_debugger(_debugger_args: &InstallDebuggerArgs) {

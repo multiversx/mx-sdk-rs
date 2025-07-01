@@ -32,6 +32,41 @@ They are:
 	- `multiversx-sdk-http`
 	- `multiversx-sdk-dapp`
 
+
+## [sc 0.58.0, codec 0.22.1, chain 0.15.0, sdk 0.10.0] - 2025-05-26
+- Rust VM and debugger redesign:
+	- VM major refactoring: runtime, execution, debugger, VM hooks handler;
+	- Integration of the new executor interface: new instance, executor & VM hooks interfaces;
+	- Early exit mechanism for VM hooks;
+	- Integration of Wasmer 2.2 production code, via an adapter;
+	- Integration of Wasmer 6, as an experimental alternative, but more stable in tests;
+	- Mechanism for running blackbox and mandos-rs tests with compiled contracts (.wasm);
+	- Mechanism for running the same test via the debugger as part of the Rust test suite, and via Wasmer as part of the Wasm tests;
+	- Crude metering, as a proof-of-concept, will be refined in the future. Gas schedule can be configured.
+	- New feature `compiled-sc-tests` to replace `run-go-tests`.
+- Build system:
+	- Opcode validator, as a post-build automated process. It detects and signals the usage of non-whitelisted WASM opcodes.
+	- WASM target:
+		- Default target is now `wasmv1-none` instead of `wasm32-unknown-unknown`. This is to allow upgrading to Rust 1.87, which uses LLVM 20 and normally emits bulk memory opcodes, which are currently unsupported on MultiversX. This change prevents these opcodes to be emitted.
+		- A mechanism for overriding the default target, per contract, in `sc-config.toml`.
+		- Target will be autoinstalled upon build, if missing.
+- `sc-meta` new `test` argument: `-w` or `--wasm`, to run tests based on compiled smart contracts; replaces `--go`.
+- Improved interactor error handling.
+- Back-transfer object cloneable.
+- Fixed typos.
+- Updated dependencies.
+
+## [sc 0.57.1, sdk 0.9.1] - 2025-04-04
+- Retrieve token properties using `get_token_properties`;
+- Fixed URIs for `esdt_metadata_recreate` and `esdt_metadata_update`;
+- `sc-meta`:
+  - Fixed `test --chain-simulator` used for running chain-simulator interactor tests;
+  - Added extra checks for argument validity.
+- Interactor:
+  - Fixed `setStateOverwrite`;
+  - Fixed `ReturnsTxHash` result handler.
+- Enhanced `checkState` to allow partial key verification.
+
 ## [sc 0.57.0, codec 0.22.0, chain 0.14.0, sdk 0.9.0, scenario-format 0.23.1] - 2025-03-11
 - Newer compiler support:
 	- Dropped support for Rust compiler versions older than 1.83.
@@ -116,7 +151,7 @@ They are:
 ## [sc 0.54.2, codec 0.21.1, chain 0.11.1, sdk 0.7.1] - 2024-11-15
 - Codec improvements:
 	- `MultiValueX` - `TopDecodeMultiLength` implementation fix;
-	- `ManagedVecItem` implented for MultiValue2 and MultiValue3.
+	- `ManagedVecItem` implemented for MultiValue2 and MultiValue3.
 - `sc-meta snippets` improvements.
 
 ## [sc 0.54.1] - 2024-11-13
@@ -139,7 +174,7 @@ They are:
 		- `multiversx-sdk` - only contains the specifications of the gateway API, without a mechanism to call the API;
 		- `multiversx-sdk-http` - functionality to call the gateway via reqwest;
 		- `multiversx-sdk-dapp` - functionality to call the gateway via wasm-bindgen, to be used in WebAssembly front-ends;
-	- Major improvements in the retrieving of transactions and other blockchain data fron the API, many bugs fixed;
+	- Major improvements in the retrieving of transactions and other blockchain data from the API, many bugs fixed;
 	- Support for writing integration tests for interactors, using the Chain Simulator;
 		- Also added support for test-related `chain-simulator-tests` feature flag in `sc-meta`;
 	- Interactors on the front-end:
@@ -336,7 +371,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Fixed a dependency issue involving ed25519-dalek (downgraded dependency).
 
 ## [sc 0.47.3, sdk 0.3.2] - 2024-02-06
-- SDK: changed the way to retrieve the new deployed address afte deploy/
+- SDK: changed the way to retrieve the new deployed address after deploy/
 - Support for reading from another contract for the following storage mappers: `AddressToIdMapper`, `BiDiMapper`, `LinkedListMapper`, `SetMapper`, `SingleValueMapper`, `UniqueIdMapper`, `UnorderedSetMapper`, `UserMapper`, `VecMapper`, `WhitelistMapper`.
 - Additional methods to access data nodes directly in the `SetMapper` and `QueueMapper`.
 
@@ -530,7 +565,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 ## [sc 0.39.5, vm 0.1.5] - 2023-02-06
 - `multiversx-sc-meta` improvements:
 	- Rust snippet generator fixes. The generator creates compilable code with appropriate argument types.
-	- `local-deps` command: generates a report on the local depedencies of contract crates. Will explore indirect depdencies too.
+	- `local-deps` command: generates a report on the local dependencies of contract crates. Will explore indirect dependencies too.
 	- Upgrade tool minor fix.
 
 ## [sc 0.39.4, vm 0.1.4] - 2023-01-26
@@ -556,7 +591,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 
 ## [sc 0.39.1, codec 0.17.1, vm 0.1.1, scenario-format 0.19.1, sdk 0.1.1] - 2023-01-18
 - `multiversx-sc-meta` can be installed as a standalone tool (`sc-meta`), and used to automatically upgrade contracts.
-- Many depedencies updates across the repo.
+- Many dependencies updates across the repo.
 - Updated readme files.
 
 ## [sc 0.39.0, codec 0.17.0, vm 0.1.0, scenario-format 0.19.0, sdk 0.1.0] - 2023-01-12
@@ -824,7 +859,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Made the generated code in `wasm/lib.rs` more compact with the use of macros.
 
 ## [elrond-wasm 0.22.0] - 2021-11-02
-- Mechanism for generating contract endpoints based on ABI. Previously, all endpoints from all modules from a crate were automaticaly included, now they can be filtered based on what modules are used.
+- Mechanism for generating contract endpoints based on ABI. Previously, all endpoints from all modules from a crate were automatically included, now they can be filtered based on what modules are used.
 - Contract `meta` crates are now capable of building the respective contracts and the ABIs without relying on `erdpy`.
 - Renamed feature `arwen-tests` to `mandos-go-tests`
 
@@ -911,7 +946,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Send API refactored for more consistency and ease of use.
 - High level proxies can be used to deploy contracts.
 - Mandos log syntax updated, to match Arwen.
-- A better `#[only_owner]` annotation, which can be applied directly to endoint methods. This annotation also shows up in the ABI.
+- A better `#[only_owner]` annotation, which can be applied directly to endpoint methods. This annotation also shows up in the ABI.
 - `elrond-wasm-derive` now an optional dependency of `elrond-wasm`. Use `#[elrond_wasm::contract]` instead of `#[elrond_wasm_derive::contract]` now. Same for proxies and modules.
 
 ## [elrond-wasm 0.17.4] - 2021-06-30
@@ -1066,7 +1101,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - ABI generation of endpoint output names
 
 ## [elrond-wasm 0.10.2, elrond-codec 0.4.2] - 2020-12-28
-- Codec type hygene
+- Codec type hygiene
 
 ## [elrond-wasm 0.10.1, elrond-codec 0.4.1, mandos 0.4.1] - 2020-12-23
 - Minor fixes, support for strings
@@ -1221,7 +1256,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Async call contract proxy infrastructure
 
 ## [elrond-wasm 0.1.0] - 2020-02-05 
-- Initial relase of the framework
+- Initial release of the framework
 - Main features at this time:
 	- contract main macro
 	- handling of arguments and results automagically using macros

@@ -98,7 +98,7 @@ async fn send_esdt_to_non_existent_address_test() {
 async fn simulator_crypto_test() {
     let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
 
-    bf_interact.deploy_crypto().await;
+    bf_interact.deploy().await;
 
     verify_secp256r1_signature(&mut bf_interact).await;
     verify_bls_signature(&mut bf_interact).await;
@@ -275,10 +275,7 @@ async fn chain_simulator_bf_get_special_roles_test() {
 
     // set transfer role
     system_interact
-        .set_roles(
-            dynamic_nft_token_id.as_bytes(),
-            vec![EsdtLocalRole::Transfer],
-        )
+        .set_roles(&dynamic_nft_token_id, vec![EsdtLocalRole::Transfer])
         .await;
 
     // deploy bf

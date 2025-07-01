@@ -178,24 +178,24 @@ where
             .original_result()
     }
 
-    pub fn retrieve_funds_multi_esdt(
+    pub fn retrieve_received_funds_immmediately(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .raw_call("retrieve_funds_multi_esdt")
+            .raw_call("retrieve_received_funds_immmediately")
             .original_result()
     }
 
-    pub fn retrieve_multi_funds_async<
-        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    pub fn retrieve_funds_multi<
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
     >(
         self,
-        token_payments: Arg0,
+        transfers: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("retrieve_multi_funds_async")
-            .argument(&token_payments)
+            .raw_call("retrieve_funds_multi")
+            .argument(&transfers)
             .original_result()
     }
 
@@ -236,24 +236,6 @@ where
             .payment(NotPayable)
             .raw_call("call_counts")
             .argument(&endpoint)
-            .original_result()
-    }
-
-    pub fn num_called_retrieve_funds_promises(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("num_called_retrieve_funds_promises")
-            .original_result()
-    }
-
-    pub fn num_async_calls_sent_from_child(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("num_async_calls_sent_from_child")
             .original_result()
     }
 }

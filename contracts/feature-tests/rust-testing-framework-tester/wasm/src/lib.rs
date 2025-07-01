@@ -24,7 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         get_egld_balance => get_egld_balance
         get_esdt_balance => get_esdt_balance
         receive_egld => receive_egld
-        recieve_egld_half => recieve_egld_half
+        receive_egld_half => receive_egld_half
         receive_esdt => receive_esdt
         reject_payment => reject_payment
         receive_esdt_half => receive_esdt_half

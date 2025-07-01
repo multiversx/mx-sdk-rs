@@ -15,7 +15,6 @@ const CODE_EXPR_STORAGE_BYTES: MxscPath =
     MxscPath::new("../output/basic-features-storage-bytes.mxsc.json");
 
 const CODE_EXPR: MxscPath = MxscPath::new("../output/basic-features.mxsc.json");
-const CODE_CRYPTO_EXPR: MxscPath = MxscPath::new("../output/basic-features-crypto.mxsc.json");
 
 pub async fn basic_features_cli() {
     env_logger::init();
@@ -31,9 +30,6 @@ pub async fn basic_features_cli() {
         },
         Some(bf_interact_cli::InteractCliCommand::DeployStorageBytes) => {
             bf_interact.deploy_storage_bytes().await;
-        },
-        Some(bf_interact_cli::InteractCliCommand::DeployCrypto) => {
-            bf_interact.deploy_crypto().await;
         },
         Some(bf_interact_cli::InteractCliCommand::LargeStorage(args)) => {
             bf_interact.large_storage(args.size_kb).await;
@@ -96,7 +92,7 @@ impl BasicFeaturesInteract {
     pub async fn deploy(&mut self) {
         self.set_state().await;
 
-        let new_address = self
+        let (new_address, _tx_hash) = self
             .interactor
             .tx()
             .from(&self.wallet_address)
@@ -105,6 +101,7 @@ impl BasicFeaturesInteract {
             .init()
             .code(CODE_EXPR)
             .returns(ReturnsNewBech32Address)
+            .returns(ReturnsTxHash)
             .run()
             .await;
 
@@ -131,26 +128,6 @@ impl BasicFeaturesInteract {
         println!("new address for basic-features-storage-bytes: {new_address}");
 
         self.state.set_bf_address_storage_bytes(new_address);
-    }
-
-    pub async fn deploy_crypto(&mut self) {
-        self.set_state().await;
-
-        let new_address = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .gas(40_000_000)
-            .typed(basic_features_proxy::BasicFeaturesProxy)
-            .init()
-            .code(CODE_CRYPTO_EXPR)
-            .returns(ReturnsNewBech32Address)
-            .run()
-            .await;
-
-        println!("new address for basic-features-cyrpto: {new_address}");
-
-        self.state.set_bf_address_crypto(new_address);
     }
 
     pub async fn set_large_storage(&mut self, value: &[u8]) {
@@ -185,7 +162,8 @@ impl BasicFeaturesInteract {
         &mut self,
         egld: u64,
     ) -> ManagedDecimal<StaticApi, EgldDecimals> {
-        self.interactor
+        let (result, _tx_hash) = self
+            .interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.bf_contract())
@@ -194,8 +172,11 @@ impl BasicFeaturesInteract {
             .returns_egld_decimal()
             .egld(egld)
             .returns(ReturnsResultUnmanaged)
+            .returns(ReturnsTxHash)
             .run()
-            .await
+            .await;
+
+        result
     }
 
     pub async fn echo_managed_option(
@@ -225,11 +206,11 @@ impl BasicFeaturesInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.bf_crypto_contract())
+            .to(self.state.bf_contract())
             .gas(10_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
             .verify_secp256r1_signature(key, message, signature)
-            .returns(ReturnsHandledOrError::new())
+            .returns(ReturnsHandledOrError::new().returns(ReturnsTxHash))
             .run()
             .await;
 
@@ -256,7 +237,7 @@ impl BasicFeaturesInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.bf_crypto_contract())
+            .to(self.state.bf_contract())
             .gas(10_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
             .verify_bls_signature_share(key, message, signature)
@@ -287,7 +268,7 @@ impl BasicFeaturesInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.bf_crypto_contract())
+            .to(self.state.bf_contract())
             .gas(10_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
             .verify_bls_aggregated_signature(key, message, signature)

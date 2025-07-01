@@ -13,7 +13,7 @@ use super::{
 #[multiversx_sc::module]
 pub trait ValidationModule: common::CommonModule {
     fn require_valid_order_input_amount(&self, params: &OrderInputParams<Self::Api>) {
-        require!(params.amount != BigUint::zero(), "Amout cannot be zero");
+        require!(params.amount != BigUint::zero(), "Amount cannot be zero");
         require!(
             self.calculate_fee_amount(
                 &params.amount,

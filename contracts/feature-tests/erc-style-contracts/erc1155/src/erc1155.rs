@@ -52,7 +52,7 @@ pub trait Erc1155 {
         self.try_reserve_fungible(&from, &type_id, &amount);
 
         if self.blockchain().is_smart_contract(&to) {
-            self.peform_async_call_single_transfer(from, to, type_id, amount, data);
+            self.perform_async_call_single_transfer(from, to, type_id, amount, data);
         } else {
             self.increase_balance(&to, &type_id, &amount);
         }
@@ -69,7 +69,7 @@ pub trait Erc1155 {
         self.try_reserve_non_fungible(&from, &type_id, &nft_id);
 
         if self.blockchain().is_smart_contract(&to) {
-            self.peform_async_call_single_transfer(from, to, type_id, nft_id, data);
+            self.perform_async_call_single_transfer(from, to, type_id, nft_id, data);
         } else {
             let amount = BigUint::from(1u32);
             self.increase_balance(&to, &type_id, &amount);
@@ -101,7 +101,7 @@ pub trait Erc1155 {
         );
         require!(
             type_ids.len() == values.len(),
-            "Id and value lenghts do not match"
+            "Id and value lengths do not match"
         );
 
         // storage edits are rolled back in case of SCError,
@@ -127,7 +127,7 @@ pub trait Erc1155 {
         }
 
         if is_receiver_smart_contract {
-            self.peform_async_call_batch_transfer(from, to, type_ids, values, &data);
+            self.perform_async_call_batch_transfer(from, to, type_ids, values, &data);
         }
     }
 
@@ -340,7 +340,7 @@ pub trait Erc1155 {
         }
     }
 
-    fn peform_async_call_single_transfer(
+    fn perform_async_call_single_transfer(
         &self,
         from: ManagedAddress,
         to: ManagedAddress,
@@ -363,7 +363,7 @@ pub trait Erc1155 {
             .async_call_and_exit();
     }
 
-    fn peform_async_call_batch_transfer(
+    fn perform_async_call_batch_transfer(
         &self,
         from: ManagedAddress,
         to: ManagedAddress,

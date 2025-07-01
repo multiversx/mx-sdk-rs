@@ -1,3 +1,9 @@
+##############################################################################
+### LLDB support for displaying MultiversX SpaceCraft SDK types in debug mode
+##############################################################################
+### Version: 0.58.0
+##############################################################################
+
 from functools import partial
 import string
 from typing import Callable, Collection, Iterable, List, Tuple, Type
