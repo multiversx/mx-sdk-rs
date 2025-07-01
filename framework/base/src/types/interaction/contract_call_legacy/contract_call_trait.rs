@@ -1,7 +1,7 @@
 use crate::{
     api::CallTypeApi,
     codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti},
-    types::{AsyncCall, AsyncCallPromises, BackTransfers, ManagedArgBuffer, ManagedBuffer},
+    types::{AsyncCall, AsyncCallPromises, BackTransfersLegacy, ManagedArgBuffer, ManagedBuffer},
 };
 
 use super::{ContractCallNoPayment, ContractCallWithEgld};
@@ -109,13 +109,13 @@ where
     #[inline]
     fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
-    ) -> (RequestedResult, BackTransfers<SA>)
+    ) -> (RequestedResult, BackTransfersLegacy<SA>)
     where
         RequestedResult: TopDecodeMulti,
     {
         let result = self.execute_on_dest_context();
         let back_transfers =
-            crate::contract_base::BlockchainWrapper::<SA>::new().get_back_transfers();
+            crate::contract_base::BlockchainWrapper::<SA>::new().get_back_transfers_legacy();
 
         (result, back_transfers)
     }

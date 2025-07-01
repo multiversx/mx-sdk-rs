@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -25,14 +26,14 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_promise_retrieve_funds",
+                "function": "forward_sync_retrieve_funds_bt_multi",
                 "arguments": [
                     "sc:vault",
                     "str:EGLD",
                     "0",
                     "1000"
                 ],
-                "gasLimit": "60,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -47,8 +48,8 @@
                             "sc:vault"
                         ],
                         "data": [
-                            "str:AsyncCall",
-                            "str:retrieve_funds",
+                            "str:ExecuteOnDestContext",
+                            "str:retrieve_funds_multi",
                             "str:EGLD",
                             "0",
                             "1000"
@@ -56,9 +57,9 @@
                     },
                     {
                         "address": "sc:vault",
-                        "endpoint": "str:retrieve_funds",
+                        "endpoint": "str:retrieve_funds_multi",
                         "topics": [
-                            "str:retrieve_funds",
+                            "str:retrieve_funds_multi",
                             "str:EGLD",
                             "0",
                             "1000"
@@ -76,27 +77,25 @@
                         ],
                         "data": [
                             "str:BackTransfer",
-                            ""
-                        ]
-                    },
-                    {
-                        "address": "sc:vault",
-                        "endpoint": "str:transferValueOnly",
-                        "topics": [
-                            "",
-                            "sc:forwarder"
-                        ],
-                        "data": [
-                            "str:AsyncCallback",
-                            "str:retrieve_funds_callback",
-                            "0x00"
+                            "0"
                         ]
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:retrieve_funds_callback",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
                         "topics": [
-                            "str:retrieve_funds_callback",
+                            "str:back_transfers_egld_event",
+                            "1000"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
+                        "topics": [
+                            "str:back_transfers_multi_event",
                             "str:EGLD",
                             "0",
                             "1000"

@@ -19,7 +19,7 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },
@@ -29,7 +29,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_sync_retrieve_funds_bt",
+                "function": "forward_sync_retrieve_funds_bt_legacy",
                 "arguments": [
                     "sc:vault",
                     "str:TEST-TOKENA",
@@ -89,7 +89,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:forward_sync_retrieve_funds_bt",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_legacy",
                         "topics": [
                             "str:back_transfers",
                             "0",
@@ -128,7 +128,7 @@
                         "str:TEST-TOKENA": "1000"
                     },
                     "storage": "*",
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         }

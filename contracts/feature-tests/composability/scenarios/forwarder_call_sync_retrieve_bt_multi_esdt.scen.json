@@ -10,13 +10,16 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "1000",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000"
+                    },
                     "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },
@@ -26,10 +29,10 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_sync_retrieve_funds_bt",
+                "function": "forward_sync_retrieve_funds_bt_multi",
                 "arguments": [
                     "sc:vault",
-                    "str:EGLD",
+                    "str:TEST-TOKENA",
                     "0",
                     "1000"
                 ],
@@ -44,23 +47,23 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "0",
+                            "",
                             "sc:vault"
                         ],
                         "data": [
                             "str:ExecuteOnDestContext",
-                            "str:retrieve_funds",
-                            "str:EGLD",
+                            "str:retrieve_funds_multi",
+                            "str:TEST-TOKENA",
                             "0",
                             "1000"
                         ]
                     },
                     {
                         "address": "sc:vault",
-                        "endpoint": "str:retrieve_funds",
+                        "endpoint": "str:retrieve_funds_multi",
                         "topics": [
-                            "str:retrieve_funds",
-                            "str:EGLD",
+                            "str:retrieve_funds_multi",
+                            "str:TEST-TOKENA",
                             "0",
                             "1000"
                         ],
@@ -70,21 +73,27 @@
                     },
                     {
                         "address": "sc:vault",
-                        "endpoint": "str:transferValueOnly",
+                        "endpoint": "str:ESDTTransfer",
                         "topics": [
+                            "str:TEST-TOKENA",
+                            "0",
                             "1000",
                             "sc:forwarder"
                         ],
                         "data": [
                             "str:BackTransfer",
-                            "0"
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
                         ]
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:forward_sync_retrieve_funds_bt",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
                         "topics": [
-                            "str:back_transfers",
+                            "str:back_transfers_multi_event",
+                            "str:TEST-TOKENA",
+                            "0",
                             "1000"
                         ],
                         "data": [
@@ -113,9 +122,12 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "1000",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000"
+                    },
                     "storage": "*",
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         }

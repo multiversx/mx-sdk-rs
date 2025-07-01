@@ -10,9 +10,10 @@ use crate::{
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage,
     types::{
-        BackTransfers, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags,
-        EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray,
-        ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress, TokenIdentifier,
+        BackTransfers, BackTransfersLegacy, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier,
+        EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress,
+        TokenIdentifier,
     },
 };
 
@@ -459,7 +460,11 @@ where
     /// Works after:
     /// - synchronous calls
     /// - asynchronous calls too, in callbacks.
-    pub fn get_back_transfers(&self) -> BackTransfers<A> {
+    #[deprecated(
+        since = "0.59.0",
+        note = "Does not handle multi-transfers properly, use get_back_transfers instead"
+    )]
+    pub fn get_back_transfers_legacy(&self) -> BackTransfersLegacy<A> {
         let esdt_transfer_value_handle: A::BigIntHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         let call_value_handle: A::BigIntHandle =
@@ -471,13 +476,42 @@ where
         );
 
         unsafe {
-            BackTransfers {
+            BackTransfersLegacy {
                 total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
                 esdt_payments: ManagedVec::from_raw_handle(
                     esdt_transfer_value_handle.get_raw_handle(),
                 ),
             }
         }
+    }
+
+    /// Retrieves all back-transfers as a collection of payments.
+    ///
+    /// Covers all cases, including EGLD sent via multi-transfer.
+    pub fn get_back_transfers(&self) -> BackTransfers<A> {
+        unsafe {
+            let mut all_bt_vec = ManagedVec::new_uninit();
+            let bt_direct_egld = BigUint::<A>::new_uninit();
+
+            A::blockchain_api_impl().managed_get_back_transfers(
+                all_bt_vec.get_raw_handle_unchecked(),
+                bt_direct_egld.get_raw_handle_unchecked(),
+            );
+
+            if bt_direct_egld > 0u64 {
+                all_bt_vec.push(EgldOrEsdtTokenPayment::egld_payment(bt_direct_egld));
+            }
+
+            BackTransfers::new(all_bt_vec)
+        }
+    }
+
+    /// Clears back transfers by retrieving current back transfers and ignoring result.
+    pub fn reset_back_transfers(&self) {
+        A::blockchain_api_impl().managed_get_back_transfers(
+            const_handles::MBUF_TEMPORARY_1,
+            const_handles::BIG_INT_TEMPORARY_1,
+        );
     }
 
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.

@@ -1,12 +1,13 @@
+#![allow(deprecated)]
+
 use crate::vault_proxy;
 
 multiversx_sc::imports!();
 
-/// Not directly related to promises, but this contract already has the setup for VM 1.5.
 #[multiversx_sc::module]
-pub trait BackTransfersFeatureModule {
+pub trait BackTransfersLegacyModule {
     #[endpoint]
-    fn forward_sync_retrieve_funds_bt(
+    fn forward_sync_retrieve_funds_bt_legacy(
         &self,
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
@@ -18,7 +19,7 @@ pub trait BackTransfersFeatureModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .returns(ReturnsBackTransfers)
+            .returns(ReturnsBackTransfersLegacy)
             .sync_call();
 
         require!(
@@ -33,7 +34,7 @@ pub trait BackTransfersFeatureModule {
     }
 
     #[endpoint]
-    fn forward_sync_retrieve_funds_bt_reset_twice(
+    fn forward_sync_retrieve_funds_bt_legacy_reset_twice(
         &self,
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
@@ -45,7 +46,7 @@ pub trait BackTransfersFeatureModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
-            .returns(ReturnsBackTransfersReset)
+            .returns(ReturnsBackTransfersLegacyReset)
             .sync_call();
 
         require!(
@@ -63,7 +64,7 @@ pub trait BackTransfersFeatureModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .returns(ReturnsBackTransfersReset)
+            .returns(ReturnsBackTransfersLegacyReset)
             .sync_call();
 
         require!(
@@ -78,7 +79,7 @@ pub trait BackTransfersFeatureModule {
     }
 
     #[endpoint]
-    fn forward_sync_retrieve_funds_bt_twice(
+    fn forward_sync_retrieve_funds_bt_legacy_twice(
         &self,
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
@@ -90,7 +91,7 @@ pub trait BackTransfersFeatureModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
-            .returns(ReturnsBackTransfers)
+            .returns(ReturnsBackTransfersLegacy)
             .sync_call();
 
         require!(
@@ -108,7 +109,7 @@ pub trait BackTransfersFeatureModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .returns(ReturnsBackTransfers)
+            .returns(ReturnsBackTransfersLegacy)
             .sync_call();
 
         require!(

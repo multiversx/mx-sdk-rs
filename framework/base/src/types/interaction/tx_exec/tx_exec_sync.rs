@@ -5,8 +5,8 @@ use crate::{
     contract_base::{SendRawWrapper, SyncCallRawResult, SyncCallRawResultOrError},
     tuple_util::NestedTupleFlatten,
     types::{
-        decode_result, BackTransfers, ManagedBuffer, ManagedVec, OriginalResultMarker, RHListExec,
-        Tx, TxDataFunctionCall, TxGas, TxNoPayment, TxPayment, TxScEnv, TxToSpecified,
+        decode_result, BackTransfersLegacy, ManagedBuffer, ManagedVec, OriginalResultMarker,
+        RHListExec, Tx, TxDataFunctionCall, TxGas, TxNoPayment, TxPayment, TxScEnv, TxToSpecified,
     },
 };
 
@@ -201,13 +201,13 @@ where
     /// Backwards compatibility.
     pub fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
-    ) -> (RequestedResult, BackTransfers<Api>)
+    ) -> (RequestedResult, BackTransfersLegacy<Api>)
     where
         RequestedResult: TopDecodeMulti,
     {
         let result = self.execute_on_dest_context();
         let back_transfers =
-            crate::contract_base::BlockchainWrapper::<Api>::new().get_back_transfers();
+            crate::contract_base::BlockchainWrapper::<Api>::new().get_back_transfers_legacy();
 
         (result, back_transfers)
     }

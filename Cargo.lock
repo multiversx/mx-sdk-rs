@@ -728,7 +728,6 @@ dependencies = [
  "forwarder-raw",
  "multiversx-sc",
  "multiversx-sc-scenario",
- "promises-features",
  "proxy-test-first",
  "proxy-test-second",
  "recursive-caller",
@@ -3956,22 +3955,6 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "promises-features"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
-]
-
-[[package]]
-name = "promises-features-meta"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc-meta-lib",
- "promises-features",
 ]
 
 [[package]]

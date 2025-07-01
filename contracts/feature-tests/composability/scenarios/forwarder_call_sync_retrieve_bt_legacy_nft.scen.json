@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -9,7 +10,17 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "1000",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
                     "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
@@ -25,14 +36,14 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_promise_retrieve_funds",
+                "function": "forward_sync_retrieve_funds_bt_legacy",
                 "arguments": [
                     "sc:vault",
-                    "str:EGLD",
-                    "0",
-                    "1000"
+                    "str:NFT-000001",
+                    "5",
+                    "1"
                 ],
-                "gasLimit": "60,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -43,15 +54,15 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "0",
+                            "",
                             "sc:vault"
                         ],
                         "data": [
-                            "str:AsyncCall",
+                            "str:ExecuteOnDestContext",
                             "str:retrieve_funds",
-                            "str:EGLD",
-                            "0",
-                            "1000"
+                            "str:NFT-000001",
+                            "5",
+                            "01"
                         ]
                     },
                     {
@@ -59,9 +70,9 @@
                         "endpoint": "str:retrieve_funds",
                         "topics": [
                             "str:retrieve_funds",
-                            "str:EGLD",
-                            "0",
-                            "1000"
+                            "str:NFT-000001",
+                            "5",
+                            "1"
                         ],
                         "data": [
                             ""
@@ -69,37 +80,31 @@
                     },
                     {
                         "address": "sc:vault",
-                        "endpoint": "str:transferValueOnly",
+                        "endpoint": "str:ESDTNFTTransfer",
                         "topics": [
-                            "1000",
+                            "str:NFT-000001",
+                            "5",
+                            "01",
                             "sc:forwarder"
                         ],
                         "data": [
                             "str:BackTransfer",
-                            ""
-                        ]
-                    },
-                    {
-                        "address": "sc:vault",
-                        "endpoint": "str:transferValueOnly",
-                        "topics": [
-                            "",
+                            "str:ESDTNFTTransfer",
+                            "str:NFT-000001",
+                            "5",
+                            "01",
                             "sc:forwarder"
-                        ],
-                        "data": [
-                            "str:AsyncCallback",
-                            "str:retrieve_funds_callback",
-                            "0x00"
                         ]
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:retrieve_funds_callback",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_legacy",
                         "topics": [
-                            "str:retrieve_funds_callback",
-                            "str:EGLD",
+                            "str:back_transfers",
                             "0",
-                            "1000"
+                            "str:NFT-000001",
+                            "5",
+                            "1"
                         ],
                         "data": [
                             ""
@@ -127,7 +132,17 @@
                 },
                 "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "1000",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-000001": {
+                            "instances": [
+                                {
+                                    "nonce": "5",
+                                    "balance": "1"
+                                }
+                            ]
+                        }
+                    },
                     "storage": "*",
                     "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
