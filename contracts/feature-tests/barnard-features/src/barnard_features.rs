@@ -2,6 +2,18 @@
 
 use multiversx_sc::imports::*;
 
+pub type EsdtTokenDataMultiValue<M> = MultiValue9<
+    EsdtTokenType,
+    BigUint<M>,
+    bool,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedAddress<M>,
+    BigUint<M>,
+    ManagedVec<M, ManagedBuffer<M>>,
+>;
+
 #[multiversx_sc::contract]
 pub trait BarnardFeatures {
     #[init]
@@ -45,14 +57,31 @@ pub trait BarnardFeatures {
         self.blockchain().get_prev_block_timestamp_ms()
     }
 
+    /// Different implementation based on feature flag.
+    ///
+    /// TODO: deduplicate after Barnard release.
     #[view]
-    fn get_esdt_token_type(
+    fn get_esdt_token_data(
         &self,
         address: ManagedAddress,
-        token_id: EgldOrEsdtTokenIdentifier,
+        token_id: TokenIdentifier,
         nonce: u64,
-    ) -> EsdtTokenType {
-        self.blockchain()
-            .get_esdt_token_type(&address, &token_id, nonce)
+    ) -> EsdtTokenDataMultiValue<Self::Api> {
+        let token_data = self
+            .blockchain()
+            .get_esdt_token_data(&address, &token_id, nonce);
+
+        (
+            token_data.token_type,
+            token_data.amount,
+            token_data.frozen,
+            token_data.hash,
+            token_data.name,
+            token_data.attributes,
+            token_data.creator,
+            token_data.royalties,
+            token_data.uris,
+        )
+            .into()
     }
 }
