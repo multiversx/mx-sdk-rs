@@ -464,7 +464,6 @@ fn forwarder_get_esdt_local_roles_go() {
 }
 
 #[test]
-#[ignore = "TODO: Barnard fix"]
 fn forwarder_get_esdt_token_data_go() {
     world().run("scenarios/forwarder_get_esdt_token_data.scen.json");
 }

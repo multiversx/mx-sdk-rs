@@ -8,8 +8,8 @@ pub enum EsdtTokenType {
     Fungible = 0,
     NonFungible = 1,
     NonFungibleV2 = 2,
-    MetaFungible = 4,
     SemiFungible = 3,
+    MetaFungible = 4,
     DynamicNFT = 5,
     DynamicSFT = 6,
     DynamicMeta = 7,
@@ -30,8 +30,8 @@ impl EsdtTokenType {
             EsdtTokenType::Fungible => 0,
             EsdtTokenType::NonFungible => 1,
             EsdtTokenType::NonFungibleV2 => 2,
-            EsdtTokenType::MetaFungible => 4,
             EsdtTokenType::SemiFungible => 3,
+            EsdtTokenType::MetaFungible => 4,
             EsdtTokenType::DynamicNFT => 5,
             EsdtTokenType::DynamicSFT => 6,
             EsdtTokenType::DynamicMeta => 7,
@@ -47,23 +47,12 @@ impl From<u8> for EsdtTokenType {
             0 => EsdtTokenType::Fungible,
             1 => EsdtTokenType::NonFungible,
             2 => EsdtTokenType::NonFungibleV2,
-            4 => EsdtTokenType::MetaFungible,
             3 => EsdtTokenType::SemiFungible,
+            4 => EsdtTokenType::MetaFungible,
             5 => EsdtTokenType::DynamicNFT,
             6 => EsdtTokenType::DynamicSFT,
             7 => EsdtTokenType::DynamicMeta,
             _ => EsdtTokenType::Invalid,
-        }
-    }
-}
-
-impl From<Option<u64>> for EsdtTokenType {
-    #[inline]
-    fn from(opt: Option<u64>) -> Self {
-        if let Some(value) = opt {
-            EsdtTokenType::from(value as u8)
-        } else {
-            EsdtTokenType::Invalid
         }
     }
 }

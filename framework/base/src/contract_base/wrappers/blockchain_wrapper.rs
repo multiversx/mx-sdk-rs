@@ -368,12 +368,12 @@ where
     }
 
     #[cfg(feature = "barnard")]
-    pub fn get_esdt_token_type(
+    fn get_esdt_token_type_raw(
         &self,
         address: &ManagedAddress<A>,
         token_id: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-    ) -> EsdtTokenType {
+    ) -> u64 {
         unsafe {
             let big_int_temp_handle: A::BigIntHandle =
                 use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
@@ -387,8 +387,18 @@ where
 
             let bu = BigUint::<A>::from_handle(big_int_temp_handle);
             // TODO: forget bu
-            EsdtTokenType::from(bu.to_u64())
+            bu.to_u64().unwrap_or(255)
         }
+    }
+
+    #[cfg(feature = "barnard")]
+    pub fn get_esdt_token_type(
+        &self,
+        address: &ManagedAddress<A>,
+        token_id: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        EsdtTokenType::from(self.get_esdt_token_type_raw(address, token_id, nonce) as u8)
     }
 
     /// Legacy implementation, based on nonce.

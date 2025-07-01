@@ -112,6 +112,25 @@ where
             .original_result()
     }
 
+    pub fn get_esdt_token_data<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+    >(
+        self,
+        address: Arg0,
+        token_id: Arg1,
+        nonce: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue9<EsdtTokenType, BigUint<Env::Api>, bool, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedAddress<Env::Api>, BigUint<Env::Api>, ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_esdt_token_data")
+            .argument(&address)
+            .argument(&token_id)
+            .argument(&nonce)
+            .original_result()
+    }
+
     pub fn get_esdt_token_type<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
@@ -121,7 +140,7 @@ where
         address: Arg0,
         token_id: Arg1,
         nonce: Arg2,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EsdtTokenType> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, i64> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("get_esdt_token_type")

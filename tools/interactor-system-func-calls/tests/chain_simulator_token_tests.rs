@@ -260,10 +260,7 @@ async fn modify_creator() {
 
     // set roles
     interact
-        .set_roles(
-            dynamic_nft_token_id.as_bytes(),
-            vec![EsdtLocalRole::NftCreate],
-        )
+        .set_roles(&dynamic_nft_token_id, vec![EsdtLocalRole::NftCreate])
         .await;
 
     // mint NFT
@@ -319,10 +316,7 @@ async fn transfer_role() {
 
     // set roles
     interact
-        .set_roles(
-            dynamic_nft_token_id.as_bytes(),
-            vec![EsdtLocalRole::Transfer],
-        )
+        .set_roles(&dynamic_nft_token_id, vec![EsdtLocalRole::Transfer])
         .await;
 
     // get roles

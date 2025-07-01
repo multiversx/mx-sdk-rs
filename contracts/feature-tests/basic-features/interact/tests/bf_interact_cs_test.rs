@@ -275,10 +275,7 @@ async fn chain_simulator_bf_get_special_roles_test() {
 
     // set transfer role
     system_interact
-        .set_roles(
-            dynamic_nft_token_id.as_bytes(),
-            vec![EsdtLocalRole::Transfer],
-        )
+        .set_roles(&dynamic_nft_token_id, vec![EsdtLocalRole::Transfer])
         .await;
 
     // deploy bf
