@@ -2,7 +2,6 @@ mod builtin_func_proxy;
 mod delegation_manager_sc_proxy;
 mod delegation_sc_proxy;
 mod esdt_system_sc_proxy;
-mod governance_sc_proxy;
 mod legacy_system_sc_proxy;
 pub(crate) mod token_properties;
 mod token_properties_result;
