@@ -38,10 +38,6 @@ hex-literal = "1.0"
 bitflags = "2.9"
 num-traits = { version = "=0.2.19", default-features = false }
 unwrap-infallible = "0.1.5"
-serde = { version = "1.0.217", features = [
-    "derive",
-    "alloc",
-], default-features = false }
 generic-array = "1.2.0"
 
 [dependencies.multiversx-sc-derive]

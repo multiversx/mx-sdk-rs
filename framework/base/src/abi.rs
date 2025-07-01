@@ -19,7 +19,6 @@ pub use contract_abi::*;
 pub use endpoint_abi::*;
 pub use esdt_attribute_abi::EsdtAttributeAbi;
 pub use event_abi::*;
-use serde::Deserialize;
 pub use type_abi::*;
 pub use type_abi_from::*;
 pub use type_description::*;
@@ -27,7 +26,7 @@ pub use type_description_container::*;
 
 pub type TypeName = alloc::string::String;
 
-#[derive(Clone, Default, Debug, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub struct TypeNames {
     pub abi: alloc::string::String,
     pub rust: alloc::string::String,

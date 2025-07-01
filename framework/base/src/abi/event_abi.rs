@@ -4,14 +4,14 @@ use alloc::{
     vec::Vec,
 };
 
-#[derive(Clone, Debug, PartialEq, Deserialize)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct EventInputAbi {
     pub arg_name: String,
     pub type_name: TypeName,
     pub indexed: bool,
 }
 
-#[derive(Clone, Debug, PartialEq, Deserialize)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct EventAbi {
     pub docs: Vec<String>,
     pub identifier: String,
