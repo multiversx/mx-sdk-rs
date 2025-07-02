@@ -34,9 +34,9 @@ pub async fn adder_cli() {
                 .code_hash(Bech32Address::from_bech32_string(args.address))
                 .await;
         },
-        Some(barnard_interactor_cli::InteractCliCommand::GetESDTTokenType(args)) => {
+        Some(barnard_interactor_cli::InteractCliCommand::TokenData(args)) => {
             basic_interact
-                .get_esdt_token_type(
+                .get_esdt_token_data(
                     Bech32Address::from_bech32_string(args.address),
                     &args.token_id,
                     args.nonce,
@@ -60,7 +60,7 @@ impl PayableInteract {
             .await
             .use_chain_simulator(config.use_chain_simulator());
 
-        let wallet = Wallet::from_pem_file("internal.pem").unwrap();
+        let wallet = test_wallets::carol();
         let sc_owner_address = interactor.register_wallet(wallet).await;
         let wallet_address = interactor.register_wallet(wallet).await;
 
@@ -83,6 +83,7 @@ impl PayableInteract {
             .typed(barnard_features_proxy::BarnardFeaturesProxy)
             .init()
             .code(CODE_PATH)
+            .code_metadata(CodeMetadata::all())
             .returns(ReturnsNewBech32Address)
             .run()
             .await;
@@ -159,7 +160,7 @@ impl PayableInteract {
         );
     }
 
-    pub async fn get_esdt_token_type(
+    pub async fn get_esdt_token_data(
         &mut self,
         address: Bech32Address,
         token_id: &str,
@@ -171,8 +172,8 @@ impl PayableInteract {
             .from(&self.wallet_address)
             .to(self.state.current_barnard_features_address())
             .typed(barnard_features_proxy::BarnardFeaturesProxy)
-            .get_esdt_token_type(address, EgldOrEsdtTokenIdentifier::from(token_id), nonce)
-            .returns(ReturnsResult)
+            .get_esdt_token_data(address, TokenIdentifier::from(token_id), nonce)
+            .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 

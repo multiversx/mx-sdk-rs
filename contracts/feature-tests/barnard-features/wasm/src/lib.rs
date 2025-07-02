@@ -23,7 +23,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         get_block_timestamps => get_block_timestamps
         get_block_timestamp_ms => get_block_timestamp_ms
         get_prev_block_timestamp_ms => get_prev_block_timestamp_ms
-        get_esdt_token_type => get_esdt_token_type
+        get_esdt_token_data => get_esdt_token_data
     )
 }
 

@@ -4,9 +4,9 @@ use crate::{
 };
 
 /// Indicates that back-transfers will be returned.
-pub struct ReturnsBackTransfersMultiESDT;
+pub struct ReturnsBackTransfersLegacyMultiESDT;
 
-impl<Env, Original> RHListItem<Env, Original> for ReturnsBackTransfersMultiESDT
+impl<Env, Original> RHListItem<Env, Original> for ReturnsBackTransfersLegacyMultiESDT
 where
     Env: TxEnv,
 {
@@ -14,13 +14,13 @@ where
 }
 
 impl<RawResult, Env, Original> RHListItemExec<RawResult, Env, Original>
-    for ReturnsBackTransfersMultiESDT
+    for ReturnsBackTransfersLegacyMultiESDT
 where
     Env: TxEnv,
 {
     fn item_process_result(self, _raw_result: &RawResult) -> Self::Returns {
         BlockchainWrapper::<Env::Api>::new()
-            .get_back_transfers()
+            .get_back_transfers_legacy()
             .esdt_payments
     }
 }

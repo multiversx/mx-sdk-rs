@@ -2,130 +2,83 @@ use crate::vault_proxy;
 
 multiversx_sc::imports!();
 
-/// Not directly related to promises, but this contract already has the setup for VM 1.5.
 #[multiversx_sc::module]
-pub trait BackTransfersFeatureModule {
+pub trait BackTransfersModule {
     #[endpoint]
-    fn forward_sync_retrieve_funds_bt(
+    fn forward_sync_retrieve_funds_bt_multi(
         &self,
         to: ManagedAddress,
-        token: EgldOrEsdtTokenIdentifier,
-        token_nonce: u64,
-        amount: BigUint,
+        transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     ) {
-        let back_transfers = self
+        let bt_multi = self
             .tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_funds(token, token_nonce, amount)
+            .retrieve_funds_multi(&transfers)
             .returns(ReturnsBackTransfers)
             .sync_call();
 
-        require!(
-            back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
-            "Only one ESDT payment expected"
-        );
-
-        self.back_transfers_event(
-            &back_transfers.total_egld_amount,
-            &back_transfers.esdt_payments.into_multi_value(),
-        );
+        let egld_sum = bt_multi.egld_sum();
+        if egld_sum > 0u32 {
+            self.back_transfers_egld_event(egld_sum);
+        }
+        self.back_transfers_multi_event(bt_multi.into_multi_value());
     }
 
+    /// Highlights the behavior when calling back transfers **without** reset.
     #[endpoint]
-    fn forward_sync_retrieve_funds_bt_reset_twice(
+    fn forward_sync_retrieve_funds_bt_multi_twice(
         &self,
         to: ManagedAddress,
-        token: EgldOrEsdtTokenIdentifier,
-        token_nonce: u64,
-        amount: BigUint,
+        transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     ) {
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_multi(&transfers)
+            .sync_call();
+
         let back_transfers = self
             .tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_funds(token.clone(), token_nonce, amount.clone())
+            .retrieve_funds_multi(&transfers)
+            .returns(ReturnsBackTransfers)
+            .sync_call();
+
+        self.back_transfers_multi_event(back_transfers.into_multi_value());
+    }
+
+    /// Highlights the behavior when calling back transfers **with** reset.
+    #[endpoint]
+    fn forward_sync_retrieve_funds_bt_multi_twice_reset(
+        &self,
+        to: ManagedAddress,
+        transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+    ) {
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_multi(&transfers)
+            .sync_call();
+
+        let back_transfers = self
+            .tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_funds_multi(&transfers)
             .returns(ReturnsBackTransfersReset)
             .sync_call();
 
-        require!(
-            back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
-            "Only one ESDT payment expected"
-        );
-
-        self.back_transfers_event(
-            &back_transfers.total_egld_amount,
-            &back_transfers.esdt_payments.into_multi_value(),
-        );
-
-        let back_transfers = self
-            .tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
-            .retrieve_funds(token, token_nonce, amount)
-            .returns(ReturnsBackTransfersReset)
-            .sync_call();
-
-        require!(
-            back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
-            "Only one ESDT payment expected"
-        );
-
-        self.back_transfers_event(
-            &back_transfers.total_egld_amount,
-            &back_transfers.esdt_payments.into_multi_value(),
-        );
+        self.back_transfers_multi_event(back_transfers.into_multi_value());
     }
 
-    #[endpoint]
-    fn forward_sync_retrieve_funds_bt_twice(
+    #[event("back_transfers_multi_event")]
+    fn back_transfers_multi_event(
         &self,
-        to: ManagedAddress,
-        token: EgldOrEsdtTokenIdentifier,
-        token_nonce: u64,
-        amount: BigUint,
-    ) {
-        let back_transfers = self
-            .tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
-            .retrieve_funds(token.clone(), token_nonce, amount.clone())
-            .returns(ReturnsBackTransfers)
-            .sync_call();
-
-        require!(
-            back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
-            "Only one ESDT payment expected"
-        );
-
-        self.back_transfers_event(
-            &back_transfers.total_egld_amount,
-            &back_transfers.esdt_payments.into_multi_value(),
-        );
-
-        let back_transfers = self
-            .tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
-            .retrieve_funds(token, token_nonce, amount)
-            .returns(ReturnsBackTransfers)
-            .sync_call();
-
-        require!(
-            back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
-            "Only one ESDT payment expected"
-        );
-
-        self.back_transfers_event(
-            &back_transfers.total_egld_amount,
-            &back_transfers.esdt_payments.into_multi_value(),
-        );
-    }
-
-    #[event("back_transfers")]
-    fn back_transfers_event(
-        &self,
-        #[indexed] egld_value: &BigUint,
-        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        #[indexed] back_transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     );
+
+    #[event("back_transfers_egld_event")]
+    fn back_transfers_egld_event(&self, #[indexed] egld_value: BigUint);
 }

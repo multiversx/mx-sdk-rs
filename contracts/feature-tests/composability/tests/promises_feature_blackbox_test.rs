@@ -64,7 +64,7 @@ fn test_back_transfers() {
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
         .typed(forwarder_proxy::ForwarderProxy)
-        .forward_sync_retrieve_funds_bt(VAULT_ADDRESS, TOKEN_ID, 0u64, &token_amount)
+        .forward_sync_retrieve_funds_bt_legacy(VAULT_ADDRESS, TOKEN_ID, 0u64, &token_amount)
         .run();
 
     state
@@ -85,7 +85,7 @@ fn test_back_transfers_reset() {
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
         .typed(forwarder_proxy::ForwarderProxy)
-        .forward_sync_retrieve_funds_bt_reset_twice(
+        .forward_sync_retrieve_funds_bt_legacy_reset_twice(
             VAULT_ADDRESS,
             TOKEN_ID,
             0u64,
@@ -111,7 +111,12 @@ fn test_multi_call_back_transfers() {
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
         .typed(forwarder_proxy::ForwarderProxy)
-        .forward_sync_retrieve_funds_bt_twice(VAULT_ADDRESS, TOKEN_ID, 0u64, &half_token_amount)
+        .forward_sync_retrieve_funds_bt_legacy_twice(
+            VAULT_ADDRESS,
+            TOKEN_ID,
+            0u64,
+            &half_token_amount,
+        )
         .run();
 
     state
@@ -131,7 +136,7 @@ fn test_back_transfers_logs() {
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
         .typed(forwarder_proxy::ForwarderProxy)
-        .forward_sync_retrieve_funds_bt(VAULT_ADDRESS, TOKEN_ID, 0u64, &token_amount)
+        .forward_sync_retrieve_funds_bt_legacy(VAULT_ADDRESS, TOKEN_ID, 0u64, &token_amount)
         .returns(ReturnsLogs)
         .run();
 
@@ -152,7 +157,12 @@ fn test_multi_call_back_transfers_logs() {
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
         .typed(forwarder_proxy::ForwarderProxy)
-        .forward_sync_retrieve_funds_bt_twice(VAULT_ADDRESS, TOKEN_ID, 0u64, &half_token_amount)
+        .forward_sync_retrieve_funds_bt_legacy_twice(
+            VAULT_ADDRESS,
+            TOKEN_ID,
+            0u64,
+            &half_token_amount,
+        )
         .returns(ReturnsLogs)
         .run();
 

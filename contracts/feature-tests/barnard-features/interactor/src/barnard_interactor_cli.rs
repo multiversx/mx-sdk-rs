@@ -20,8 +20,8 @@ pub enum InteractCliCommand {
     BlockTimestamps,
     #[command(name = "codehash", about = "Code hash test")]
     CodeHash(CodeHashArgs),
-    #[command(name = "token-type", about = "Token type test")]
-    GetESDTTokenType(ESDTTokenTypeArgs),
+    #[command(name = "token", about = "Token data test")]
+    TokenData(TokenDataArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -31,7 +31,7 @@ pub struct CodeHashArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct ESDTTokenTypeArgs {
+pub struct TokenDataArgs {
     #[arg(short = 'a', long = "address")]
     pub address: String,
 
