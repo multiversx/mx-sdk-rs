@@ -1,3 +1,7 @@
+use alloc::vec::Vec;
+use multiversx_chain_core::types::BLSKey;
+use multiversx_sc_codec::multi_types::{MultiValue2, MultiValueVec};
+
 use crate::types::{
     BigUint, EgldPayment, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg, Tx,
     TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
@@ -98,24 +102,15 @@ where
             .original_result()
     }
 
-    pub fn add_nodes(
+    pub fn add_nodes<Arg0: ProxyArg<MultiValueVec<MultiValue2<BLSKey, Vec<u8>>>>>(
         self,
-        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-        signed_messages: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys_signatures: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        if bls_keys.len() != signed_messages.len() {
-            panic!("BLS keys and nodes must have the same length")
-        }
-
-        let mut tx = self.wrapped_tx.raw_call("addNodes").payment(NotPayable);
-
-        for i in 0..bls_keys.len() {
-            tx = tx
-                .argument(&bls_keys.get(i))
-                .argument(&signed_messages.get(i));
-        }
-
-        tx.original_result()
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("addNodes")
+            .argument(&bls_keys_signatures)
+            .original_result()
     }
 
     pub fn stake_nodes(

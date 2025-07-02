@@ -41,13 +41,10 @@ async fn cs_builtin_run_tests() {
     assert_eq!(&addresses[0], interactor.state.current_delegation_address());
 
     interactor
-        .add_nodes(
-            vec![
-                validator_1.public_key.clone(),
-                validator_2.public_key.clone(),
-            ],
-            vec!["signed1", "signed2"],
-        )
+        .add_nodes(vec![
+            (validator_1.public_key, "signed1".to_string()),
+            (validator_2.public_key, "signed2".to_string()),
+        ])
         .await;
 
     let state = interactor.get_all_node_states().await;
@@ -66,7 +63,7 @@ async fn cs_builtin_run_tests() {
     );
 
     interactor
-        .remove_nodes(vec![validator_2.public_key.clone()])
+        .remove_nodes(vec![validator_2.public_key.to_vec()])
         .await;
 
     let delegator1 = interactor.delegator1.clone();
@@ -112,25 +109,25 @@ async fn cs_builtin_run_tests() {
     // interactor.withdraw(&delegator2).await;
 
     interactor
-        .stake_nodes(vec![validator_1.public_key.clone()])
+        .stake_nodes(vec![validator_1.public_key.to_vec()])
         .await;
     let state = interactor.get_all_node_states().await;
     assert_eq!(&state, "staked");
 
     interactor
-        .unstake_nodes(vec![validator_1.public_key.clone()])
+        .unstake_nodes(vec![validator_1.public_key.to_vec()])
         .await;
     interactor
-        .restake_unstaked_nodes(vec![validator_1.public_key.clone()])
+        .restake_unstaked_nodes(vec![validator_1.public_key.to_vec()])
         .await;
     interactor
-        .unjail_nodes(vec![validator_1.public_key.clone()])
+        .unjail_nodes(vec![validator_1.public_key.to_vec()])
         .await;
 
     interactor
-        .unstake_nodes(vec![validator_1.public_key.clone()])
+        .unstake_nodes(vec![validator_1.public_key.to_vec()])
         .await;
     interactor
-        .unbond_nodes(vec![validator_1.public_key.clone()])
+        .unbond_nodes(vec![validator_1.public_key.to_vec()])
         .await;
 }

@@ -3,11 +3,12 @@ extern crate rand;
 use core::str;
 
 use anyhow::Result;
+use multiversx_chain_core::types::BLSKey;
 
 #[derive(Clone, Debug)]
 pub struct Validator {
     pub private_key: Vec<u8>,
-    pub public_key: Vec<u8>,
+    pub public_key: BLSKey,
 }
 
 impl Validator {
@@ -29,7 +30,7 @@ impl Validator {
 
         Ok(Validator {
             private_key: private_key.to_vec(),
-            public_key,
+            public_key: BLSKey::from_vec(public_key).expect("bad public key length"),
         })
     }
 }

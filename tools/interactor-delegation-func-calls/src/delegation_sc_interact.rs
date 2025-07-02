@@ -20,7 +20,7 @@ pub async fn delegation_sc_interact_cli() {
     let mut interact = DelegateCallsInteract::new(Config::load_config()).await;
 
     let cli = delegation_sc_interact_cli::InteractCli::parse();
-    match &cli.command {
+    match cli.command {
         Some(delegation_sc_interact_cli::InteractCliCommand::Create(args)) => {
             interact
                 .set_state(&interact.wallet_address.to_address())
@@ -51,11 +51,10 @@ pub async fn delegation_sc_interact_cli() {
                 .await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::AddNode(args)) => {
-            let bls_keys =
-                vec![hex::decode(args.public_key.clone())
-                    .expect("Failed to decode public key from hex")];
+            let bls_key =
+                BLSKey::parse_hex(&args.public_key).expect("Failed to decode public key from hex");
             interact
-                .add_nodes(bls_keys, vec![&args.verified_message])
+                .add_nodes(vec![(bls_key, args.verified_message)])
                 .await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::GetAllNodeStates) => {
@@ -288,21 +287,20 @@ impl DelegateCallsInteract {
         println!("Automatic activation set.");
     }
 
-    pub async fn add_nodes(&mut self, bls_keys: Vec<Vec<u8>>, verified_messages: Vec<&str>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
-            bls_keys.into_iter().map(ManagedBuffer::from).collect();
-        let managed_verified_messages: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
-            verified_messages
+    pub async fn add_nodes(&mut self, bls_keys_signatures: Vec<(BLSKey, String)>) {
+        let arg = MultiValueVec::from(
+            bls_keys_signatures
                 .into_iter()
-                .map(ManagedBuffer::from)
-                .collect();
+                .map(|(key, sig)| MultiValue2::from((key, sig.as_bytes().to_vec())))
+                .collect::<Vec<_>>(),
+        );
 
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .add_nodes(&managed_bls_keys, &managed_verified_messages)
+            .add_nodes(arg)
             .gas(60_000_000u64)
             .run()
             .await;
