@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           67
+// Endpoints:                           66
 // Async Callback:                       1
-// Total number of exported functions:  69
+// Total number of exported functions:  68
 
 #![no_std]
 
@@ -62,7 +62,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         local_mint => local_mint
         local_burn => local_burn
         get_esdt_local_roles => get_esdt_local_roles
-        get_esdt_token_data => get_esdt_token_data
         is_esdt_frozen => is_esdt_frozen
         is_esdt_paused => is_esdt_paused
         is_esdt_limited_transfer => is_esdt_limited_transfer
