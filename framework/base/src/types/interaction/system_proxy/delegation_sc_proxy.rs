@@ -133,7 +133,7 @@ where
 
     pub fn unstake_nodes(
         self,
-        bls_keys: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self.wrapped_tx.raw_call("unStakeNodes").payment(NotPayable);
 
@@ -146,7 +146,7 @@ where
 
     pub fn restake_unstaked_nodes(
         self,
-        bls_keys: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self
             .wrapped_tx
@@ -162,7 +162,7 @@ where
 
     pub fn unbond_nodes(
         self,
-        bls_keys: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self.wrapped_tx.raw_call("unBondNodes").payment(NotPayable);
 
@@ -175,7 +175,7 @@ where
 
     pub fn remove_nodes(
         self,
-        bls_keys: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self.wrapped_tx.raw_call("removeNodes").payment(NotPayable);
 
@@ -188,9 +188,12 @@ where
 
     pub fn unjail_nodes(
         self,
-        bls_keys: ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let mut tx = self.wrapped_tx.raw_call("unJailNodes").payment(NotPayable);
+        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+    ) -> TxTypedCall<Env, From, To, EgldPayment<<Env as TxEnv>::Api>, Gas, ()> {
+        let mut tx = self
+            .wrapped_tx
+            .raw_call("unJailNodes")
+            .egld(BigUint::from(2500000000000000000u128) * bls_keys.len() as u64);
 
         for bls_key in bls_keys {
             tx = tx.argument(&bls_key);
@@ -224,6 +227,19 @@ where
         self.wrapped_tx
             .raw_call("reDelegateRewards")
             .payment(NotPayable)
+            .original_result()
+    }
+
+    pub fn set_check_cap_on_redelegate_rewards(
+        self,
+        state: bool,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let state_str = if state { "true" } else { "false" };
+
+        self.wrapped_tx
+            .raw_call("setCheckCapOnReDelegateRewards")
+            .payment(NotPayable)
+            .argument(&state_str)
             .original_result()
     }
 

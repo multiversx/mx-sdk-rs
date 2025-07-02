@@ -67,7 +67,63 @@ pub async fn delegation_sc_interact_cli() {
                     .expect("Failed to decode public key from hex")];
             interact.stake_nodes(bls_keys).await;
         },
-        Some(delegation_sc_interact_cli::InteractCliCommand::Delegate) => {},
+        Some(delegation_sc_interact_cli::InteractCliCommand::UnstakeNode(args)) => {
+            let bls_keys =
+                vec![hex::decode(args.public_key.clone())
+                    .expect("Failed to decode public key from hex")];
+            interact.unstake_nodes(bls_keys).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::RestakeNode(args)) => {
+            let bls_keys =
+                vec![hex::decode(args.public_key.clone())
+                    .expect("Failed to decode public key from hex")];
+            interact.restake_unstaked_nodes(bls_keys).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::UnbondNode(args)) => {
+            let bls_keys =
+                vec![hex::decode(args.public_key.clone())
+                    .expect("Failed to decode public key from hex")];
+            interact.unbond_nodes(bls_keys).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::RemoveNode(args)) => {
+            let bls_keys =
+                vec![hex::decode(args.public_key.clone())
+                    .expect("Failed to decode public key from hex")];
+            interact.remove_nodes(bls_keys).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::UnjailNode(args)) => {
+            let bls_keys =
+                vec![hex::decode(args.public_key.clone())
+                    .expect("Failed to decode public key from hex")];
+            interact.unjail_nodes(bls_keys).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::Delegate(args)) => {
+            let sender = Bech32Address::from_bech32_string(args.from.clone());
+            interact.delegate(&sender, args.egld).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::ClaimRewards(args)) => {
+            let sender = Bech32Address::from_bech32_string(args.from.clone());
+            interact.claim_rewards(&sender).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::RedelegateRewards(args)) => {
+            let sender = Bech32Address::from_bech32_string(args.from.clone());
+            interact.redelegate_rewards(&sender).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::UndelegateFunds(args)) => {
+            let sender = Bech32Address::from_bech32_string(args.from.clone());
+            interact.undelegate(&sender, args.egld).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::Withdraw(args)) => {
+            let sender = Bech32Address::from_bech32_string(args.from.clone());
+            interact.withdraw(&sender).await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::SetCheckCapOnRedelegateRewards(
+            args,
+        )) => {
+            interact
+                .set_check_cap_on_redelegate_rewards(args.check_cap_redelegate_rewards)
+                .await;
+        },
         None => {},
     }
 }
@@ -110,6 +166,18 @@ impl DelegateCallsInteract {
         let vec_state = vec![set_state_account];
 
         let _set_state_response = self.interactor.set_state(vec_state).await;
+    }
+
+    pub async fn get_balance(&mut self, address: &Address) -> u128 {
+        let balance: u128 = self
+            .interactor
+            .get_account(address)
+            .await
+            .balance
+            .parse()
+            .unwrap();
+
+        balance
     }
 
     pub async fn create_new_delegation_contract(
@@ -287,22 +355,6 @@ impl DelegateCallsInteract {
 
         println!("Delegate successfully");
     }
-    pub async fn stake(&mut self, egld_value: u128, bls_keys: &Vec<u8>, message: &str) {
-        self.interactor
-            .tx()
-            .from(&self.delegator1)
-            .to(ValidatorSCAddress)
-            .typed(ValidatorSCProxy)
-            .stake(BigUint::from(egld_value), bls_keys, message) // Example delegation amount
-            .gas(12000000)
-            .run()
-            .await;
-
-        println!(
-            "Stake successfully {} EGLD",
-            egld_value / 1000000000000000000
-        );
-    }
 
     pub async fn get_total_active_stake(&mut self) -> RustBigUint {
         let total_stake = self
@@ -317,27 +369,6 @@ impl DelegateCallsInteract {
 
         println!("Total active stake: {}", total_stake);
         total_stake
-    }
-
-    pub async fn get_total_staked_top_up_staked_bls_keys(
-        &mut self,
-        address: &Bech32Address,
-    ) -> RustBigUint {
-        let top_up = self
-            .interactor
-            .query()
-            .to(ValidatorSCAddress)
-            .typed(ValidatorSCProxy)
-            .get_total_staked_top_up_staked_bls_keys(address)
-            .returns(ReturnsResultUnmanaged)
-            .run()
-            .await;
-
-        println!(
-            "Total staked top up staked bls keys: {}",
-            top_up.to_string()
-        );
-        top_up
     }
 
     pub async fn get_user_active_stake(&mut self) -> RustBigUint {
@@ -355,5 +386,159 @@ impl DelegateCallsInteract {
 
         println!("User active stake: {}", active_stake.to_string());
         active_stake
+    }
+
+    pub async fn unstake_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
+            bls_keys.into_iter().map(ManagedBuffer::from).collect();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .unstake_nodes(&managed_bls_keys)
+            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .run()
+            .await;
+
+        println!("Nodes unstaked successfully");
+    }
+
+    pub async fn restake_unstaked_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
+            bls_keys.into_iter().map(ManagedBuffer::from).collect();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .restake_unstaked_nodes(&managed_bls_keys)
+            .gas(30_000_000u64)
+            .run()
+            .await;
+
+        println!("Nodes restaked successfully");
+    }
+
+    pub async fn unbond_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
+            bls_keys.into_iter().map(ManagedBuffer::from).collect();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .unbond_nodes(&managed_bls_keys)
+            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .run()
+            .await;
+
+        println!("Nodes unbond successfully");
+    }
+
+    pub async fn remove_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
+            bls_keys.into_iter().map(ManagedBuffer::from).collect();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .remove_nodes(&managed_bls_keys)
+            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .run()
+            .await;
+
+        println!("Nodes removed successfully");
+    }
+
+    pub async fn unjail_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
+            bls_keys.into_iter().map(ManagedBuffer::from).collect();
+
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .unjail_nodes(&managed_bls_keys)
+            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .run()
+            .await;
+
+        println!("Nodes unjailed successfully");
+    }
+
+    pub async fn claim_rewards(&mut self, sender: &Bech32Address) {
+        self.interactor
+            .tx()
+            .from(sender)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .claim_rewards() // Example delegation amount
+            .gas(12000000)
+            .run()
+            .await;
+
+        println!("Claim rewards successfully");
+    }
+
+    pub async fn redelegate_rewards(&mut self, sender: &Bech32Address) {
+        self.interactor
+            .tx()
+            .from(sender)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .redelegate_rewards() // Example delegation amount
+            .gas(12000000)
+            .run()
+            .await;
+
+        println!("Redelegate rewards successfully");
+    }
+
+    pub async fn undelegate(&mut self, sender: &Bech32Address, egld_value: u128) {
+        self.interactor
+            .tx()
+            .from(sender)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .undelegate(BigUint::from(egld_value)) // Example delegation amount
+            .gas(12000000)
+            .run()
+            .await;
+
+        println!("Undelegate successfully");
+    }
+
+    pub async fn withdraw(&mut self, sender: &Bech32Address) {
+        self.interactor
+            .tx()
+            .from(sender)
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .withdraw() // Example delegation amount
+            .gas(12000000)
+            .run()
+            .await;
+        println!("Withdraw successfully");
+    }
+
+    pub async fn set_check_cap_on_redelegate_rewards(&mut self, state: bool) {
+        self.interactor
+            .tx()
+            .from(self.wallet_address.clone())
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .set_check_cap_on_redelegate_rewards(state) // Example delegation amount
+            .gas(12000000)
+            .run()
+            .await;
+
+        println!("Set check cap on redelegate rewards to: {}", state);
     }
 }
