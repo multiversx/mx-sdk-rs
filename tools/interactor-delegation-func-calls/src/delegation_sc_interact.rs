@@ -321,7 +321,7 @@ impl DelegateCallsInteract {
             .run()
             .await;
 
-        println!("Node states: {}", node_states.to_string());
+        println!("Node states: {}", node_states);
         node_states.to_string()
     }
 
@@ -384,7 +384,7 @@ impl DelegateCallsInteract {
             .run()
             .await;
 
-        println!("User active stake: {}", active_stake.to_string());
+        println!("User active stake: {}", active_stake);
         active_stake
     }
 

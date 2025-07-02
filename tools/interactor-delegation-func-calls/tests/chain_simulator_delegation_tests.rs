@@ -4,7 +4,7 @@ use delegation_sc_interact::{Config, DelegateCallsInteract};
 use multiversx_sc_snippets::{imports::RustBigUint, sdk::validator::Validator};
 
 #[tokio::test]
-#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+#[ignore = "configurable chain-simulator is not available in CI"]
 async fn cs_builtin_run_tests() {
     let mut interactor = DelegateCallsInteract::new(Config::chain_simulator_config()).await;
     let validator_1 =
@@ -33,7 +33,7 @@ async fn cs_builtin_run_tests() {
         .set_state(&interactor.delegator2.to_address())
         .await;
     interactor
-        .create_new_delegation_contract(51000_000_000_000_000_000_000u128, 3745u64)
+        .create_new_delegation_contract(51_000_000_000_000_000_000_000_u128, 3745u64)
         .await;
     interactor.set_check_cap_on_redelegate_rewards(false).await;
 
@@ -56,13 +56,13 @@ async fn cs_builtin_run_tests() {
     let total_stake = interactor.get_total_active_stake().await;
     assert_eq!(
         total_stake,
-        RustBigUint::from(1250_000_000_000_000_000_000u128)
+        RustBigUint::from(1_250_000_000_000_000_000_000u128)
     );
 
     let user_active_stake = interactor.get_user_active_stake().await;
     assert_eq!(
         user_active_stake,
-        RustBigUint::from(1250_000_000_000_000_000_000u128)
+        RustBigUint::from(1_250_000_000_000_000_000_000u128)
     );
 
     interactor
@@ -71,34 +71,34 @@ async fn cs_builtin_run_tests() {
 
     let delegator1 = interactor.delegator1.clone();
     interactor
-        .delegate(&delegator1, 1250_000_000_000_000_000_000u128)
+        .delegate(&delegator1, 1_250_000_000_000_000_000_000u128)
         .await;
 
     let total_stake = interactor.get_total_active_stake().await;
     assert_eq!(
         total_stake,
-        RustBigUint::from(2500_000_000_000_000_000_000u128)
+        RustBigUint::from(2_500_000_000_000_000_000_000u128)
     );
     let user_active_stake = interactor.get_user_active_stake().await;
     assert_eq!(
         user_active_stake,
-        RustBigUint::from(1250_000_000_000_000_000_000u128)
+        RustBigUint::from(1_250_000_000_000_000_000_000u128)
     );
 
     let delegator2 = interactor.delegator2.clone();
     interactor
-        .delegate(&delegator2, 2250_000_000_000_000_000_000u128)
+        .delegate(&delegator2, 2_250_000_000_000_000_000_000u128)
         .await;
 
     let total_stake = interactor.get_total_active_stake().await;
     assert_eq!(
         total_stake,
-        RustBigUint::from(4750_000_000_000_000_000_000u128)
+        RustBigUint::from(4_750_000_000_000_000_000_000u128)
     );
     let user_active_stake = interactor.get_user_active_stake().await;
     assert_eq!(
         user_active_stake,
-        RustBigUint::from(1250_000_000_000_000_000_000u128)
+        RustBigUint::from(1_250_000_000_000_000_000_000u128)
     );
 
     let _ = interactor.interactor.generate_blocks_until_epoch(10).await;

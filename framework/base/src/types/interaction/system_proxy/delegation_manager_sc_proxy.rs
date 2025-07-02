@@ -31,6 +31,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
+#[allow(clippy::type_complexity)]
 impl<Env, From, To, Gas> DelegationManagerSCProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
