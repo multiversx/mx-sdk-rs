@@ -2,6 +2,8 @@
 
 multiversx_sc::imports!();
 
+pub mod managed_map_features_proxy;
+
 #[multiversx_sc::contract]
 pub trait ManagedMapFeatures {
     #[init]
@@ -23,6 +25,16 @@ pub trait ManagedMapFeatures {
             map.put(&self.get_key(index), &self.get_value(index));
         }
         map
+    }
+
+    #[endpoint]
+    fn mm_put(&self, key: &ManagedBuffer, value: &ManagedBuffer) {
+        self.create_map().put(key, value);
+    }
+
+    #[endpoint]
+    fn mm_remove(&self, key: &ManagedBuffer) {
+        self.create_map().remove(key);
     }
 
     #[view]
