@@ -1,0 +1,126 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "100"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:managed-map-features": {
+                    "nonce": "1",
+                    "balance": "100",
+                    "storage": {
+                        "str:key|u32:0": "str:key0",
+                        "str:key|u32:1": "str:key1",
+                        "str:key|u32:2": "str:key2",
+                        "str:num_entries": "2",
+                        "str:value|u32:0": "str:value0",
+                        "str:value|u32:1": "str:value1",
+                        "str:value|u32:2": "str:value2"
+                    },
+                    "code": "mxsc:output/managed-map-features.mxsc.json",
+                    "owner": "address:owner"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:managed-map-features",
+                "function": "mm_get",
+                "arguments": [
+                    "0x6b657931"
+                ],
+                "gasLimit": "5,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x76616c756531"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:managed-map-features",
+                "function": "mm_get",
+                "arguments": [
+                    "0x6b65793179"
+                ],
+                "gasLimit": "5,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:managed-map-features",
+                "function": "mm_contains",
+                "arguments": [
+                    "0x6b65793179"
+                ],
+                "gasLimit": "5,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:managed-map-features",
+                "function": "mm_remove",
+                "arguments": [
+                    "0x6b65793179"
+                ],
+                "gasLimit": "5,000,000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:managed-map-features",
+                "function": "mm_get",
+                "arguments": [
+                    "0x6b657931"
+                ],
+                "gasLimit": "5,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x76616c756531"
+                ],
+                "status": "0"
+            }
+        }
+    ]
+}

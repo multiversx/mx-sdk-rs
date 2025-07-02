@@ -11,6 +11,8 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/managed-map-features");
     blockchain.register_contract(MANAGED_MAP_CODE_PATH, managed_map_features::ContractBuilder);
 
+    blockchain.start_trace();
+
     blockchain
         .account(OWNER_ADDRESS)
         .nonce(1)
@@ -23,13 +25,13 @@ fn world() -> ScenarioWorld {
         .balance(100)
         .owner(OWNER_ADDRESS)
         .code(MANAGED_MAP_CODE_PATH)
-        .storage("str:num_entries", "2")
-        .storage("str:key|u32:0", "str:key0")
-        .storage("str:key|u32:1", "str:key1")
-        .storage("str:key|u32:2", "str:key2")
-        .storage("str:value|u32:0", "str:value0")
-        .storage("str:value|u32:1", "str:value1")
-        .storage("str:value|u32:2", "str:value2")
+        .storage_mandos("str:num_entries", "2")
+        .storage_mandos("str:key|u32:0", "str:key0")
+        .storage_mandos("str:key|u32:1", "str:key1")
+        .storage_mandos("str:key|u32:2", "str:key2")
+        .storage_mandos("str:value|u32:0", "str:value0")
+        .storage_mandos("str:value|u32:1", "str:value1")
+        .storage_mandos("str:value|u32:2", "str:value2")
         .commit();
 
     blockchain
@@ -38,9 +40,6 @@ fn world() -> ScenarioWorld {
 #[test]
 fn key_mutability_test() {
     let mut world = world();
-    world.dump_state_step();
-
-    world.start_trace();
 
     let mut key = "key1".to_string();
 
@@ -100,4 +99,6 @@ fn key_mutability_test() {
         .run();
 
     assert_eq!(result, ManagedBuffer::from(b"value1"));
+
+    world.write_scenario_trace("scenarios/mmap_key_mutability.scen.json");
 }

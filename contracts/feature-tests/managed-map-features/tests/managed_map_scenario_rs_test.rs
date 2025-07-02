@@ -20,3 +20,8 @@ fn mmap_get_rs() {
 fn mmap_remove_rs() {
     world().run("scenarios/mmap_remove.scen.json");
 }
+
+#[test]
+fn mmap_key_mutability_rs() {
+    world().run("scenarios/mmap_key_mutability.scen.json");
+}

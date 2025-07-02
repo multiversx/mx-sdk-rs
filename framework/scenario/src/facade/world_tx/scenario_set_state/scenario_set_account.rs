@@ -218,7 +218,7 @@ impl SetStateBuilder<'_, AccountItem> {
         self
     }
 
-    pub fn storage(mut self, key: &'static str, value: &'static str) -> Self {
+    pub fn storage_mandos(mut self, key: &'static str, value: &'static str) -> Self {
         self.item.account.storage.insert(key.into(), value.into());
         self
     }
