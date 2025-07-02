@@ -24,7 +24,7 @@
                         "str:value|u32:1": "str:value1",
                         "str:value|u32:2": "str:value2"
                     },
-                    "code": "mxsc:output/managed-map-features.mxsc.json",
+                    "code": "mxsc:../output/managed-map-features.mxsc.json",
                     "owner": "address:owner"
                 }
             }
