@@ -103,14 +103,7 @@ async fn cs_builtin_run_tests() {
 
     let _ = interactor.interactor.generate_blocks_until_epoch(10).await;
 
-    let balance_before_claim = interactor.get_balance(&delegator1.to_address()).await;
     interactor.claim_rewards(&delegator1).await;
-    let balance_after_claim = interactor.get_balance(&delegator1.to_address()).await;
-    println!(
-        ">>>> balance_after_claim: {} | balance_before_claim {}",
-        balance_after_claim, balance_before_claim
-    );
-    // assert!(balance_after_claim > balance_before_claim);
 
     // interactor
     //     .undelegate(&delegator2, 1000000000000000000)
