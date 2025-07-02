@@ -1,6 +1,6 @@
 use crate::types::{
-    BigUint, EgldPayment, ManagedBuffer, ManagedVec, NotPayable, ProxyArg, Tx, TxEnv, TxFrom,
-    TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, EgldPayment, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg, Tx,
+    TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 /// Proxy for the Delegation smart contract.
@@ -246,6 +246,35 @@ where
         self.wrapped_tx
             .raw_call("withdraw")
             .payment(NotPayable)
+            .original_result()
+    }
+
+    pub fn get_all_node_states(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getAllNodeStates")
+            .original_result()
+    }
+
+    pub fn get_total_active_stake(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getTotalActiveStake")
+            .original_result()
+    }
+
+    pub fn get_user_active_stake(
+        self,
+        owner: &ManagedAddress<Env::Api>,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getUserActiveStake")
+            .argument(owner)
             .original_result()
     }
 }

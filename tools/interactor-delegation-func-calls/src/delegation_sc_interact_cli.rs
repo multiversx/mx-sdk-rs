@@ -14,6 +14,10 @@ pub struct InteractCli {
 pub enum InteractCliCommand {
     #[command(name = "create", about = "Create new delegation contract")]
     Create(CreateArgs),
+    #[command(name = "get-address", about = "Get all contract addresses")]
+    GetAllContractAddresses,
+    #[command(name = "get-node-states", about = "Get all node states")]
+    GetAllNodeStates,
     #[command(
         name = "set-metadata",
         about = "Store information that identifies the staking provider"

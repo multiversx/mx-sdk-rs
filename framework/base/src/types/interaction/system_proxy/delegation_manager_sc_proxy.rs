@@ -1,5 +1,6 @@
 use crate::types::{
-    BigUint, EgldPayment, ProxyArg, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, EgldPayment, ManagedAddress, ManagedVec, NotPayable, ProxyArg, Tx, TxEnv, TxFrom,
+    TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 /// Proxy for the Delegation Manager smart contract.
@@ -50,6 +51,16 @@ where
             .egld(BigUint::from(1250000000000000000000u128))
             .argument(&total_delegation_cap)
             .argument(&service_fee)
+            .original_result()
+    }
+
+    pub fn get_all_contract_addresses(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, ManagedAddress<Env::Api>>>
+    {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getAllContractAddresses")
             .original_result()
     }
 }

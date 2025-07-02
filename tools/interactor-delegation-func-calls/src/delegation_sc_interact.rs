@@ -22,10 +22,15 @@ pub async fn delegation_sc_interact_cli() {
     let cli = delegation_sc_interact_cli::InteractCli::parse();
     match &cli.command {
         Some(delegation_sc_interact_cli::InteractCliCommand::Create(args)) => {
-            interact.set_state().await;
+            interact
+                .set_state(&interact.wallet_address.to_address())
+                .await;
             interact
                 .create_new_delegation_contract(args.total_delegation_cap, args.service_fee)
                 .await;
+        },
+        Some(delegation_sc_interact_cli::InteractCliCommand::GetAllContractAddresses) => {
+            interact.get_all_contract_addresses().await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::SetMetadata(args)) => {
             interact
@@ -53,6 +58,9 @@ pub async fn delegation_sc_interact_cli() {
                 .add_nodes(bls_keys, vec![&args.verified_message])
                 .await;
         },
+        Some(delegation_sc_interact_cli::InteractCliCommand::GetAllNodeStates) => {
+            interact.get_all_node_states().await;
+        },
         Some(delegation_sc_interact_cli::InteractCliCommand::StakeNode(args)) => {
             let bls_keys =
                 vec![hex::decode(args.public_key.clone())
@@ -65,10 +73,11 @@ pub async fn delegation_sc_interact_cli() {
 }
 
 pub struct DelegateCallsInteract {
-    interactor: Interactor,
-    wallet_address: Bech32Address,
-    #[allow(unused)]
-    state: State,
+    pub interactor: Interactor,
+    pub wallet_address: Bech32Address,
+    pub delegator1: Bech32Address,
+    pub delegator2: Bech32Address,
+    pub state: State,
 }
 
 impl DelegateCallsInteract {
@@ -79,6 +88,8 @@ impl DelegateCallsInteract {
 
         interactor.set_current_dir_from_workspace("tools/interactor-delegation-func-calls");
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+        let delegator1 = interactor.register_wallet(test_wallets::bob()).await;
+        let delegator2 = interactor.register_wallet(test_wallets::dan()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
         interactor.generate_blocks_until_epoch(1).await.unwrap();
@@ -86,16 +97,15 @@ impl DelegateCallsInteract {
         Self {
             interactor,
             wallet_address: wallet_address.into(),
+            delegator1: delegator1.into(),
+            delegator2: delegator2.into(),
             state: State::load_state(),
         }
     }
 
-    pub async fn set_state(&mut self) {
-        let mut account = self
-            .interactor
-            .get_account(&self.wallet_address.to_address())
-            .await;
-        account.balance = "20000000000000000000000000".to_owned();
+    pub async fn set_state(&mut self, address: &Address) {
+        let mut account = self.interactor.get_account(address).await;
+        account.balance = "10000000000000000000000".to_owned();
         let set_state_account = SetStateAccount::from(account);
         let vec_state = vec![set_state_account];
 
@@ -133,6 +143,25 @@ impl DelegateCallsInteract {
             "New delegation contract deployed at: {}",
             self.state.current_delegation_address().to_bech32_expr()
         );
+    }
+
+    pub async fn get_all_contract_addresses(&mut self) -> Vec<Bech32Address> {
+        let addresses = self
+            .interactor
+            .query()
+            .to(DelegationManagerSCAddress)
+            .typed(DelegationManagerSCProxy)
+            .get_all_contract_addresses()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await;
+
+        println!("All delegation contract addresses:");
+        for address in addresses.iter() {
+            println!("{}", Bech32Address::from(address).to_bech32_expr());
+        }
+
+        addresses.iter().map(Bech32Address::from).collect()
     }
 
     pub async fn set_metadata(&mut self, name: &str, website: &str, identifier: &str) {
@@ -192,14 +221,12 @@ impl DelegateCallsInteract {
     }
 
     pub async fn add_nodes(&mut self, bls_keys: Vec<Vec<u8>>, verified_messages: Vec<&str>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> = bls_keys
-            .into_iter()
-            .map(|key| ManagedBuffer::from(key))
-            .collect();
+        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
+            bls_keys.into_iter().map(ManagedBuffer::from).collect();
         let managed_verified_messages: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
             verified_messages
                 .into_iter()
-                .map(|verified_message| ManagedBuffer::from(verified_message))
+                .map(ManagedBuffer::from)
                 .collect();
 
         self.interactor
@@ -215,11 +242,24 @@ impl DelegateCallsInteract {
         println!("Nodes added successfully");
     }
 
+    pub async fn get_all_node_states(&mut self) -> String {
+        let node_states = self
+            .interactor
+            .query()
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .get_all_node_states()
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        println!("Node states: {}", node_states.to_string());
+        node_states.to_string()
+    }
+
     pub async fn stake_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> = bls_keys
-            .into_iter()
-            .map(|key| ManagedBuffer::from(key))
-            .collect();
+        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
+            bls_keys.into_iter().map(ManagedBuffer::from).collect();
 
         self.interactor
             .tx()
@@ -234,10 +274,10 @@ impl DelegateCallsInteract {
         println!("Nodes staked successfully");
     }
 
-    pub async fn delegate(&mut self, egld_value: u128) {
+    pub async fn delegate(&mut self, sender: &Bech32Address, egld_value: u128) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(sender)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
             .delegate(BigUint::from(egld_value)) // Example delegation amount
@@ -246,5 +286,74 @@ impl DelegateCallsInteract {
             .await;
 
         println!("Delegate successfully");
+    }
+    pub async fn stake(&mut self, egld_value: u128, bls_keys: &Vec<u8>, message: &str) {
+        self.interactor
+            .tx()
+            .from(&self.delegator1)
+            .to(ValidatorSCAddress)
+            .typed(ValidatorSCProxy)
+            .stake(BigUint::from(egld_value), bls_keys, message) // Example delegation amount
+            .gas(12000000)
+            .run()
+            .await;
+
+        println!(
+            "Stake successfully {} EGLD",
+            egld_value / 1000000000000000000
+        );
+    }
+
+    pub async fn get_total_active_stake(&mut self) -> RustBigUint {
+        let total_stake = self
+            .interactor
+            .query()
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .get_total_active_stake()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await;
+
+        println!("Total active stake: {}", total_stake);
+        total_stake
+    }
+
+    pub async fn get_total_staked_top_up_staked_bls_keys(
+        &mut self,
+        address: &Bech32Address,
+    ) -> RustBigUint {
+        let top_up = self
+            .interactor
+            .query()
+            .to(ValidatorSCAddress)
+            .typed(ValidatorSCProxy)
+            .get_total_staked_top_up_staked_bls_keys(address)
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await;
+
+        println!(
+            "Total staked top up staked bls keys: {}",
+            top_up.to_string()
+        );
+        top_up
+    }
+
+    pub async fn get_user_active_stake(&mut self) -> RustBigUint {
+        let active_stake = self
+            .interactor
+            .query()
+            .to(self.state.current_delegation_address())
+            .typed(DelegationSCProxy)
+            .get_user_active_stake(&ManagedAddress::from_address(
+                &self.wallet_address.to_address(),
+            ))
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await;
+
+        println!("User active stake: {}", active_stake.to_string());
+        active_stake
     }
 }

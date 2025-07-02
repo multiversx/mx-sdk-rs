@@ -1,59 +1,102 @@
-use std::fs;
+use std::vec;
 
 use delegation_sc_interact::{Config, DelegateCallsInteract};
-use multiversx_sc_snippets::hex;
-
-pub fn extract_public_key_from_str(header: &str) -> Option<String> {
-    if header.contains("BEGIN") {
-        let mut parts = header.split_whitespace();
-
-        if let Some(last) = parts.next_back() {
-            let address = last.replace("-----", "").replace("\n", "");
-            return Some(address);
-        }
-    }
-
-    None
-}
-
-pub fn get_validator_public_key(file: &str) -> Option<Vec<u8>> {
-    let pem_content = fs::read_to_string(file).expect("Failed to read PEM file");
-    let lines: Vec<&str> = pem_content.split('\n').collect();
-    let header = lines[0];
-    if let Some(public_key) = extract_public_key_from_str(header) {
-        return Some(hex::decode(public_key).expect("Failed to decode public key from hex"));
-    }
-
-    None
-}
+use multiversx_sc_snippets::{imports::RustBigUint, sdk::validator::Validator};
 
 #[tokio::test]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn cs_builtin_run_tests() {
     let mut interactor = DelegateCallsInteract::new(Config::chain_simulator_config()).await;
 
-    interactor.set_state().await;
     interactor
-        .create_new_delegation_contract(7231941000000000000000u128, 3745u64)
+        .set_state(&interactor.wallet_address.to_address())
         .await;
     interactor
-        .set_metadata("Test Mx Provider", "testmx.provider", "testmxprovider")
+        .set_state(&interactor.delegator1.to_address())
         .await;
-    interactor.set_automatic_activation(false).await;
     interactor
-        .modify_total_delegation_cap(7231941000000000000000u128)
+        .set_state(&interactor.delegator2.to_address())
         .await;
-
-    let public_key_46 = get_validator_public_key("./validatorKey_46.pem")
-        .expect("Failed to get validator public key");
-    let public_key_11 = get_validator_public_key("./validatorKey_11.pem")
-        .expect("Failed to get validator public key");
     interactor
-        .add_nodes(
-            vec![public_key_46.clone(), public_key_11.clone()],
-            vec!["signed1", "signed2"],
-        )
+        .create_new_delegation_contract(51000_000_000_000_000_000_000u128, 3745u64)
         .await;
 
-    interactor.delegate(5000000000000000000u128).await;
+    let addresses = interactor.get_all_contract_addresses().await;
+    assert_eq!(&addresses[0], interactor.state.current_delegation_address());
+
+    let validator_1 =
+        Validator::from_pem_file("./validatorKey_46.pem").expect("unable to load validator key");
+
+    let _ = interactor
+        .interactor
+        .add_key(validator_1.private_key.clone())
+        .await
+        .unwrap();
+    interactor
+        .add_nodes(vec![validator_1.public_key.clone()], vec!["signed1"])
+        .await;
+
+    let state = interactor.get_all_node_states().await;
+    assert_eq!(&state, "notStaked");
+
+    let total_stake = interactor.get_total_active_stake().await;
+    assert_eq!(
+        total_stake,
+        RustBigUint::from(1250_000_000_000_000_000_000u128)
+    );
+
+    let delegator_contract_address = interactor.state.current_delegation_address().clone();
+    let top_up = interactor
+        .get_total_staked_top_up_staked_bls_keys(&delegator_contract_address)
+        .await;
+    assert_eq!(top_up, RustBigUint::from(1250_000_000_000_000_000_000u128));
+
+    let user_active_stake = interactor.get_user_active_stake().await;
+    assert_eq!(
+        user_active_stake,
+        RustBigUint::from(1250_000_000_000_000_000_000u128)
+    );
+
+    let delegator1 = interactor.delegator1.clone();
+    interactor
+        .delegate(&delegator1, 1250_000_000_000_000_000_000u128)
+        .await;
+
+    let top_up = interactor
+        .get_total_staked_top_up_staked_bls_keys(&delegator_contract_address)
+        .await;
+    assert_eq!(top_up, RustBigUint::from(2500_000_000_000_000_000_000u128));
+
+    let total_stake = interactor.get_total_active_stake().await;
+    assert_eq!(
+        total_stake,
+        RustBigUint::from(2500_000_000_000_000_000_000u128)
+    );
+    let user_active_stake = interactor.get_user_active_stake().await;
+    assert_eq!(
+        user_active_stake,
+        RustBigUint::from(1250_000_000_000_000_000_000u128)
+    );
+
+    let delegator2 = interactor.delegator2.clone();
+    interactor
+        .delegate(&delegator2, 1250_000_000_000_000_000_000u128)
+        .await;
+
+    let top_up = interactor
+        .get_total_staked_top_up_staked_bls_keys(&delegator_contract_address)
+        .await;
+    assert_eq!(top_up, RustBigUint::from(3750_000_000_000_000_000_000u128));
+
+    let total_stake = interactor.get_total_active_stake().await;
+    assert_eq!(
+        total_stake,
+        RustBigUint::from(3750_000_000_000_000_000_000u128)
+    );
+    let user_active_stake = interactor.get_user_active_stake().await;
+    assert_eq!(
+        user_active_stake,
+        RustBigUint::from(1250_000_000_000_000_000_000u128)
+    );
+    interactor.stake_nodes(vec![validator_1.public_key]).await;
 }
