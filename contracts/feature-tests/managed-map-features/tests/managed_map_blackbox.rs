@@ -11,8 +11,6 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/managed-map-features");
     blockchain.register_contract(MANAGED_MAP_CODE_PATH, managed_map_features::ContractBuilder);
 
-    blockchain.start_trace();
-
     blockchain
         .account(OWNER_ADDRESS)
         .nonce(1)
@@ -99,6 +97,4 @@ fn key_mutability_test() {
         .run();
 
     assert_eq!(result, ManagedBuffer::from(b"value1"));
-
-    world.write_scenario_trace("scenarios/mmap_key_mutability.scen.json");
 }
