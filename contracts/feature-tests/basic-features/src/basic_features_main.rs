@@ -20,6 +20,7 @@ pub mod managed_buffer_features;
 pub mod managed_decimal_features;
 pub mod managed_vec_features;
 pub mod non_zero_features;
+pub mod serde_features;
 pub mod small_num_overflow_test_ops;
 pub mod special_roles_from_system_account;
 pub mod storage_direct_load;
@@ -61,6 +62,7 @@ pub trait BasicFeatures:
     + managed_address_features::ManagedAddressFeatures
     + managed_buffer_features::ManagedBufferFeatures
     + managed_vec_features::ManagedVecFeatures
+    + serde_features::SerdeFeatures
     + storage_raw_api_features::StorageRawApiFeatures
     + storage_direct_load::StorageLoadFeatures
     + storage_direct_store::StorageStoreFeatures

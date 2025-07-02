@@ -12,6 +12,15 @@ path = "src/basic_features_main.rs"
 version = "0.58.0"
 path = "../../../framework/base"
 
+[dependencies.serde]
+version = "1.0"
+default-features = false
+features = ["derive"]
+
+[dependencies.serde_json]
+version = "1.0"
+default-features = false
+
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.58.0"
 features = ["wasmer-experimental"]

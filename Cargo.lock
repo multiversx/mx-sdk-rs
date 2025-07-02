@@ -248,6 +248,8 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
  "multiversx-sc-scenario",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
