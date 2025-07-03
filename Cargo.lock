@@ -3105,8 +3105,9 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm-executor"
-version = "0.4.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=5804799ee7b6446c9e7641b8308acb48ec00d751#5804799ee7b6446c9e7641b8308acb48ec00d751"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0cfb36050709604abee7d7896ad890358692245ddd406adcbce9d717b06c6cdf"
 dependencies = [
  "serde",
  "toml 0.7.8",
@@ -3114,8 +3115,9 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer-experimental"
-version = "0.4.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=5804799ee7b6446c9e7641b8308acb48ec00d751#5804799ee7b6446c9e7641b8308acb48ec00d751"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4fab0ca1253078cb8f52bdb59967c0c3b07c0dc4b34125bba58c60de8b70cb6c"
 dependencies = [
  "chrono",
  "log",
