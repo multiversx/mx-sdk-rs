@@ -15,7 +15,7 @@ pub trait MultiValueLength {
 /// - multi-value tuples
 pub trait MultiValueConstLength {
     /// The fixed (constant) number of single items contained a multi-value.
-    /// 
+    ///
     /// Its value is:
     /// - for single items: 1,
     /// - for multi-value tuples: the sum of the fixed lengths of their items, if applicable.

@@ -103,12 +103,6 @@ async fn cs_builtin_run_tests() {
 
     interactor.claim_rewards(&delegator1).await;
 
-    // interactor
-    //     .undelegate(&delegator2, 1000000000000000000)
-    //     .await;
-    // interactor.interactor.generate_blocks(144001).await.unwrap();
-    // interactor.withdraw(&delegator2).await;
-
     interactor.stake_nodes(vec![validator_1.public_key]).await;
     let state = interactor.get_all_node_states().await;
     assert_eq!(&state, "staked");
