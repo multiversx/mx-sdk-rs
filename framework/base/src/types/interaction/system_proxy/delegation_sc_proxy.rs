@@ -26,7 +26,6 @@ where
     }
 }
 
-#[allow(dead_code)]
 /// Method container of the Delegation smart contract proxy.
 pub struct DelegationSCProxyMethods<Env, From, To, Gas>
 where
@@ -38,7 +37,6 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
-#[allow(dead_code)]
 impl<Env, From, To, Gas> DelegationSCProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
