@@ -9,7 +9,6 @@ pub use delegation_sc_interact_config::Config;
 use delegation_sc_interact_state::State;
 
 use multiversx_sc_snippets::{
-    hex,
     imports::*,
     sdk::{gateway::SetStateAccount, utils::base64_decode},
 };
@@ -86,10 +85,9 @@ pub async fn delegation_sc_interact_cli() {
             interact.remove_nodes(vec![bls_key]).await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::UnjailNode(args)) => {
-            let bls_keys =
-                vec![hex::decode(args.public_key.clone())
-                    .expect("Failed to decode public key from hex")];
-            interact.unjail_nodes(bls_keys).await;
+            let bls_key = BLSKey::parse_hex(&args.public_key)
+                .expect("Failed to decode public BLS key from hex");
+            interact.unjail_nodes(vec![bls_key]).await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::Delegate(args)) => {
             let sender = Bech32Address::from_bech32_string(args.from.clone());
@@ -434,17 +432,14 @@ impl DelegateCallsInteract {
         println!("Nodes removed successfully");
     }
 
-    pub async fn unjail_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
-            bls_keys.into_iter().map(ManagedBuffer::from).collect();
-
+    pub async fn unjail_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
+            .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .typed(DelegationSCProxy)
-            .unjail_nodes(&managed_bls_keys)
-            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .unjail_nodes(MultiValueVec::from(bls_keys))
             .run()
             .await;
 

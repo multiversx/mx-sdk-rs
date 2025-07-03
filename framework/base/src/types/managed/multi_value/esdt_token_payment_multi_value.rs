@@ -1,8 +1,8 @@
 use crate::{
     abi::TypeAbiFrom,
     codec::{
-        multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
-        TopDecodeMultiInput, TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
+        multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
+        TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
     },
     types::ManagedVecRef,
 };
@@ -90,11 +90,11 @@ where
     }
 }
 
-impl<M> TopDecodeMultiLength for EsdtTokenPaymentMultiValue<M>
+impl<M> MultiValueConstLength for EsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
-    const LEN: usize = 3;
+    const CONST_LEN: usize = 3;
 }
 
 impl<M> TypeAbiFrom<Self> for EsdtTokenPaymentMultiValue<M> where M: ManagedTypeApi {}

@@ -1,9 +1,12 @@
 use multiversx_chain_core::types::{BLSKey, BLSSignature};
-use multiversx_sc_codec::multi_types::{MultiValue2, MultiValueVec};
+use multiversx_sc_codec::{
+    multi_types::{MultiValue2, MultiValueVec},
+    MultiValueLength,
+};
 
 use crate::types::{
-    BigUint, EgldPayment, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg, Tx,
-    TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, EgldPayment, ManagedAddress, ManagedBuffer, NotPayable, ProxyArg, Tx, TxEnv, TxFrom,
+    TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 /// Proxy for the Delegation smart contract.
@@ -167,20 +170,16 @@ where
             .original_result()
     }
 
-    pub fn unjail_nodes(
+    pub fn unjail_nodes<Arg0: ProxyArg<MultiValueVec<BLSKey>> + MultiValueLength>(
         self,
-        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, EgldPayment<<Env as TxEnv>::Api>, Gas, ()> {
-        let mut tx = self
-            .wrapped_tx
+        let num_keys = bls_keys.multi_value_len();
+        self.wrapped_tx
             .raw_call("unJailNodes")
-            .egld(BigUint::from(2500000000000000000u128) * bls_keys.len() as u64);
-
-        for bls_key in bls_keys {
-            tx = tx.argument(&bls_key);
-        }
-
-        tx.original_result()
+            .egld(BigUint::from(2500000000000000000u128) * num_keys as u64)
+            .argument(&bls_keys)
+            .original_result()
     }
 
     /// The minimum value for creating a new delegation contract is 1 EGLD

@@ -117,9 +117,7 @@ async fn cs_builtin_run_tests() {
     interactor
         .restake_unstaked_nodes(vec![validator_1.public_key])
         .await;
-    interactor
-        .unjail_nodes(vec![validator_1.public_key.to_vec()])
-        .await;
+    interactor.unjail_nodes(vec![validator_1.public_key]).await;
 
     interactor.unstake_nodes(vec![validator_1.public_key]).await;
     interactor.unbond_nodes(vec![validator_1.public_key]).await;
