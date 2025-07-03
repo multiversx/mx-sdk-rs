@@ -1,5 +1,4 @@
-use alloc::vec::Vec;
-use multiversx_chain_core::types::BLSKey;
+use multiversx_chain_core::types::{BLSKey, BLSSignature};
 use multiversx_sc_codec::multi_types::{MultiValue2, MultiValueVec};
 
 use crate::types::{
@@ -102,7 +101,7 @@ where
             .original_result()
     }
 
-    pub fn add_nodes<Arg0: ProxyArg<MultiValueVec<MultiValue2<BLSKey, Vec<u8>>>>>(
+    pub fn add_nodes<Arg0: ProxyArg<MultiValueVec<MultiValue2<BLSKey, BLSSignature>>>>(
         self,
         bls_keys_signatures: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {

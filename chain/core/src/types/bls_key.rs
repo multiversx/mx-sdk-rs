@@ -21,15 +21,15 @@ impl BLSKey {
         self.0
     }
 
+    pub fn to_vec(self) -> Vec<u8> {
+        self.0.to_vec()
+    }
+
     pub fn from_vec(v: Vec<u8>) -> Option<Self> {
         match v.try_into() {
             Ok(arr) => Some(Self(arr)),
             Err(_) => None,
         }
-    }
-
-    pub fn to_vec(self) -> Vec<u8> {
-        self.0.to_vec()
     }
 
     #[cfg(feature = "std")]

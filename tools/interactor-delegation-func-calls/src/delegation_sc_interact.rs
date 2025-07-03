@@ -51,11 +51,11 @@ pub async fn delegation_sc_interact_cli() {
                 .await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::AddNode(args)) => {
-            let bls_key =
-                BLSKey::parse_hex(&args.public_key).expect("Failed to decode public key from hex");
-            interact
-                .add_nodes(vec![(bls_key, args.verified_message)])
-                .await;
+            let bls_key = BLSKey::parse_hex(&args.public_key)
+                .expect("Failed to decode public BLS key from hex");
+            let bls_sig = BLSSignature::parse_hex(&args.verified_message)
+                .expect("Failed to decode BLS signature from hex");
+            interact.add_nodes(vec![(bls_key, bls_sig)]).await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::GetAllNodeStates) => {
             interact.get_all_node_states().await;
@@ -287,11 +287,11 @@ impl DelegateCallsInteract {
         println!("Automatic activation set.");
     }
 
-    pub async fn add_nodes(&mut self, bls_keys_signatures: Vec<(BLSKey, String)>) {
+    pub async fn add_nodes(&mut self, bls_keys_signatures: Vec<(BLSKey, BLSSignature)>) {
         let arg = MultiValueVec::from(
             bls_keys_signatures
                 .into_iter()
-                .map(|(key, sig)| MultiValue2::from((key, sig.as_bytes().to_vec())))
+                .map(MultiValue2::from)
                 .collect::<Vec<_>>(),
         );
 

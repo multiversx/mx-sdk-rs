@@ -20,6 +20,33 @@ impl BLSSignature {
     pub fn as_bytes(self) -> [u8; BLS_SIGNATURE_BYTE_LENGTH] {
         self.0
     }
+
+    pub fn to_vec(self) -> Vec<u8> {
+        self.0.to_vec()
+    }
+
+    pub fn from_vec(v: Vec<u8>) -> Option<Self> {
+        match v.try_into() {
+            Ok(arr) => Some(Self(arr)),
+            Err(_) => None,
+        }
+    }
+
+    #[cfg(feature = "std")]
+    pub fn parse_hex(hex_key: &str) -> Option<Self> {
+        let Ok(v) = hex::decode(hex_key) else {
+            return None;
+        };
+        Self::from_vec(v)
+    }
+
+    pub fn dummy(name: &str) -> Self {
+        let name_bytes = name.as_bytes();
+        assert!(name_bytes.len() < BLS_SIGNATURE_BYTE_LENGTH);
+        let mut arr = [0u8; BLS_SIGNATURE_BYTE_LENGTH];
+        arr[..name_bytes.len()].copy_from_slice(name_bytes);
+        Self(arr)
+    }
 }
 
 use crate::codec::*;

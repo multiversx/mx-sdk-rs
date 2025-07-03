@@ -1,7 +1,10 @@
 use std::vec;
 
 use delegation_sc_interact::{Config, DelegateCallsInteract};
-use multiversx_sc_snippets::{imports::RustBigUint, sdk::validator::Validator};
+use multiversx_sc_snippets::{
+    imports::{BLSSignature, RustBigUint},
+    sdk::validator::Validator,
+};
 
 #[tokio::test]
 #[ignore = "configurable chain-simulator is not available in CI"]
@@ -42,8 +45,8 @@ async fn cs_builtin_run_tests() {
 
     interactor
         .add_nodes(vec![
-            (validator_1.public_key, "signed1".to_string()),
-            (validator_2.public_key, "signed2".to_string()),
+            (validator_1.public_key, BLSSignature::dummy("signed1")),
+            (validator_2.public_key, BLSSignature::dummy("signed2")),
         ])
         .await;
 
