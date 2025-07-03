@@ -3210,6 +3210,7 @@ dependencies = [
  "multiversx-sc-meta-lib",
  "multiversx-sc-snippets",
  "pathdiff",
+ "regex",
  "reqwest",
  "ruplacer",
  "semver",

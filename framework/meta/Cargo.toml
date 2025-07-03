@@ -33,7 +33,8 @@ toml = { version = "0.8.6", features = ["preserve_order"] }
 colored = "3.0"
 convert_case = "0.8"
 semver = "1.0.20"
-ruplacer = { version = "0.10.0", default-features = false }
+ruplacer = { version = "0.10", default-features = false }
+regex = "1.11"
 reqwest = { version = "0.12", features = ["blocking", "json"] }
 zip = { version = "4.0", features = ["deflate"], default-features = false }
 copy_dir = "0.1.2"
