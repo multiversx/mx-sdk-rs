@@ -112,7 +112,7 @@ where
             .original_result()
     }
 
-    pub fn stake_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
+    pub fn stake_nodes<Arg0: ProxyArg<MultiValueVec<BLSKey>>>(
         self,
         bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -123,7 +123,7 @@ where
             .original_result()
     }
 
-    pub fn unstake_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
+    pub fn unstake_nodes<Arg0: ProxyArg<MultiValueVec<BLSKey>>>(
         self,
         bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -134,7 +134,7 @@ where
             .original_result()
     }
 
-    pub fn restake_unstaked_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
+    pub fn restake_unstaked_nodes<Arg0: ProxyArg<MultiValueVec<BLSKey>>>(
         self,
         bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -145,7 +145,7 @@ where
             .original_result()
     }
 
-    pub fn unbond_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
+    pub fn unbond_nodes<Arg0: ProxyArg<MultiValueVec<BLSKey>>>(
         self,
         bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -156,7 +156,7 @@ where
             .original_result()
     }
 
-    pub fn remove_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
+    pub fn remove_nodes<Arg0: ProxyArg<MultiValueVec<BLSKey>>>(
         self,
         bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {

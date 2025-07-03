@@ -65,9 +65,7 @@ async fn cs_builtin_run_tests() {
         RustBigUint::from(1_250_000_000_000_000_000_000u128)
     );
 
-    interactor
-        .remove_nodes(vec![validator_2.public_key.to_vec()])
-        .await;
+    interactor.remove_nodes(vec![validator_2.public_key]).await;
 
     let delegator1 = interactor.delegator1.clone();
     interactor
@@ -111,26 +109,18 @@ async fn cs_builtin_run_tests() {
     // interactor.interactor.generate_blocks(144001).await.unwrap();
     // interactor.withdraw(&delegator2).await;
 
-    interactor
-        .stake_nodes(vec![validator_1.public_key.to_vec()])
-        .await;
+    interactor.stake_nodes(vec![validator_1.public_key]).await;
     let state = interactor.get_all_node_states().await;
     assert_eq!(&state, "staked");
 
+    interactor.unstake_nodes(vec![validator_1.public_key]).await;
     interactor
-        .unstake_nodes(vec![validator_1.public_key.to_vec()])
-        .await;
-    interactor
-        .restake_unstaked_nodes(vec![validator_1.public_key.to_vec()])
+        .restake_unstaked_nodes(vec![validator_1.public_key])
         .await;
     interactor
         .unjail_nodes(vec![validator_1.public_key.to_vec()])
         .await;
 
-    interactor
-        .unstake_nodes(vec![validator_1.public_key.to_vec()])
-        .await;
-    interactor
-        .unbond_nodes(vec![validator_1.public_key.to_vec()])
-        .await;
+    interactor.unstake_nodes(vec![validator_1.public_key]).await;
+    interactor.unbond_nodes(vec![validator_1.public_key]).await;
 }

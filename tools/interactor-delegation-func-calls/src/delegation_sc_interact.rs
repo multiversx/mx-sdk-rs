@@ -61,34 +61,29 @@ pub async fn delegation_sc_interact_cli() {
             interact.get_all_node_states().await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::StakeNode(args)) => {
-            let bls_keys =
-                vec![hex::decode(args.public_key.clone())
-                    .expect("Failed to decode public key from hex")];
-            interact.stake_nodes(bls_keys).await;
+            let bls_key = BLSKey::parse_hex(&args.public_key)
+                .expect("Failed to decode public BLS key from hex");
+            interact.stake_nodes(vec![bls_key]).await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::UnstakeNode(args)) => {
-            let bls_keys =
-                vec![hex::decode(args.public_key.clone())
-                    .expect("Failed to decode public key from hex")];
-            interact.unstake_nodes(bls_keys).await;
+            let bls_key = BLSKey::parse_hex(&args.public_key)
+                .expect("Failed to decode public BLS key from hex");
+            interact.unstake_nodes(vec![bls_key]).await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::RestakeNode(args)) => {
-            let bls_keys =
-                vec![hex::decode(args.public_key.clone())
-                    .expect("Failed to decode public key from hex")];
-            interact.restake_unstaked_nodes(bls_keys).await;
+            let bls_key = BLSKey::parse_hex(&args.public_key)
+                .expect("Failed to decode public BLS key from hex");
+            interact.restake_unstaked_nodes(vec![bls_key]).await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::UnbondNode(args)) => {
-            let bls_keys =
-                vec![hex::decode(args.public_key.clone())
-                    .expect("Failed to decode public key from hex")];
-            interact.unbond_nodes(bls_keys).await;
+            let bls_key = BLSKey::parse_hex(&args.public_key)
+                .expect("Failed to decode public BLS key from hex");
+            interact.unbond_nodes(vec![bls_key]).await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::RemoveNode(args)) => {
-            let bls_keys =
-                vec![hex::decode(args.public_key.clone())
-                    .expect("Failed to decode public key from hex")];
-            interact.remove_nodes(bls_keys).await;
+            let bls_key = BLSKey::parse_hex(&args.public_key)
+                .expect("Failed to decode public BLS key from hex");
+            interact.remove_nodes(vec![bls_key]).await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::UnjailNode(args)) => {
             let bls_keys =
@@ -323,14 +318,14 @@ impl DelegateCallsInteract {
         node_states.to_string()
     }
 
-    pub async fn stake_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+    pub async fn stake_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
-            .typed(DelegationSCProxy)
-            .stake_nodes(bls_keys.clone())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
+            .typed(DelegationSCProxy)
+            .stake_nodes(MultiValueVec::from(bls_keys))
             .run()
             .await;
 
@@ -383,27 +378,27 @@ impl DelegateCallsInteract {
         active_stake
     }
 
-    pub async fn unstake_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+    pub async fn unstake_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
-            .typed(DelegationSCProxy)
-            .unstake_nodes(bls_keys.clone())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
+            .typed(DelegationSCProxy)
+            .unstake_nodes(MultiValueVec::from(bls_keys))
             .run()
             .await;
 
         println!("Nodes unstaked successfully");
     }
 
-    pub async fn restake_unstaked_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+    pub async fn restake_unstaked_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .restake_unstaked_nodes(bls_keys)
+            .restake_unstaked_nodes(MultiValueVec::from(bls_keys))
             .gas(30_000_000u64)
             .run()
             .await;
@@ -411,28 +406,28 @@ impl DelegateCallsInteract {
         println!("Nodes restaked successfully");
     }
 
-    pub async fn unbond_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+    pub async fn unbond_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
-            .typed(DelegationSCProxy)
-            .unbond_nodes(bls_keys.clone())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
+            .typed(DelegationSCProxy)
+            .unbond_nodes(MultiValueVec::from(bls_keys))
             .run()
             .await;
 
         println!("Nodes unbond successfully");
     }
 
-    pub async fn remove_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
+    pub async fn remove_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
-            .typed(DelegationSCProxy)
-            .remove_nodes(bls_keys.clone())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
+            .typed(DelegationSCProxy)
+            .remove_nodes(MultiValueVec::from(bls_keys))
             .run()
             .await;
 
