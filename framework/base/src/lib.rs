@@ -32,6 +32,9 @@ pub mod storage;
 pub mod tuple_util;
 pub mod types;
 
+#[cfg(feature = "std")]
+mod std_impl;
+
 pub use hex_call_data::*;
 pub use hex_literal;
 pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};

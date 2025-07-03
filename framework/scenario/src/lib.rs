@@ -1,7 +1,6 @@
 #![allow(clippy::type_complexity)]
 
 pub mod api;
-pub mod bech32;
 pub mod display_util;
 pub mod executor;
 mod facade;

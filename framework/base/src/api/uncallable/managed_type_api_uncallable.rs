@@ -43,6 +43,22 @@ impl ManagedTypeApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn mb_to_small_int_unsigned(&self, _buffer_handle: Self::ManagedBufferHandle) -> i64 {
+        unreachable!()
+    }
+
+    fn mb_to_small_int_signed(&self, _buffer_handle: Self::ManagedBufferHandle) -> i64 {
+        unreachable!()
+    }
+
+    fn mb_from_small_int_unsigned(&self, _buffer_handle: Self::ManagedBufferHandle, _value: i64) {
+        unreachable!()
+    }
+
+    fn mb_from_small_int_signed(&self, _buffer_handle: Self::ManagedBufferHandle, _value: i64) {
+        unreachable!()
+    }
+
     fn mb_to_big_float(
         &self,
         _buffer_handle: Self::ManagedBufferHandle,

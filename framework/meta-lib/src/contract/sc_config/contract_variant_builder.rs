@@ -81,6 +81,7 @@ impl ContractVariantBuilder {
                     default_features: cms.default_features,
                     kill_legacy_callback: cms.kill_legacy_callback,
                     profile: ContractVariantProfile::from_serde(&cms.profile),
+                    std: cms.std.unwrap_or(default.settings.std),
                     rustc_target: cms
                         .rustc_target
                         .clone()

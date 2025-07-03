@@ -89,6 +89,18 @@ where
             _phantom: PhantomData,
         }
     }
+
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
+        ManagedVec {
+            buffer: ManagedBuffer::new_uninit(),
+            _phantom: PhantomData,
+        }
+    }
 }
 
 impl<M, T, I> From<Vec<I>> for ManagedVec<M, T>

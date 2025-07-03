@@ -28,7 +28,7 @@
         },
         {
             "step": "scCall",
-            "id": "call-value-egld",
+            "id": "echo_call_value_legacy",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",

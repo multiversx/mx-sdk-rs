@@ -1,18 +1,16 @@
 use multiversx_sc::{
     api::ManagedTypeApi,
+    chain_core::std::Bech32Address,
     types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified},
 };
 use std::fmt;
 
 use crate::multiversx_sc::types::{Address, TestAddress, TestSCAddress};
 
-use crate::{
-    facade::expr::Bech32Address,
-    scenario_format::{
-        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-        serde_raw::ValueSubTree,
-        value_interpreter::{interpret_string, interpret_subtree},
-    },
+use crate::scenario_format::{
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+    serde_raw::ValueSubTree,
+    value_interpreter::{interpret_string, interpret_subtree},
 };
 
 use super::AddressKey;
