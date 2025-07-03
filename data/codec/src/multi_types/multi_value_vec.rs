@@ -77,7 +77,7 @@ where
 {
     #[inline]
     fn multi_value_len(&self) -> usize {
-        self.len() / T::CONST_LEN
+        self.len() * T::MULTI_VALUE_CONST_LEN
     }
 }
 

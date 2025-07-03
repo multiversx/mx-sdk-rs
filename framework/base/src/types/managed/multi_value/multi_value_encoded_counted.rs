@@ -124,7 +124,7 @@ where
     /// Number of items. Only available for multi-encode items.
     #[inline]
     pub fn len(&self) -> usize {
-        self.raw_len() / T::CONST_LEN
+        self.raw_len() / T::MULTI_VALUE_CONST_LEN
     }
 }
 
@@ -154,7 +154,7 @@ where
         H: EncodeErrorHandler,
     {
         let raw_count = self.raw_buffers.len();
-        let count = raw_count / T::CONST_LEN;
+        let count = raw_count / T::MULTI_VALUE_CONST_LEN;
         count.multi_encode_or_handle_err(output, h)?;
         for elem in &self.raw_buffers {
             elem.multi_encode_or_handle_err(output, h)?;
@@ -188,7 +188,7 @@ where
         H: DecodeErrorHandler,
     {
         let count: usize = input.next_value(h)?;
-        let raw_count = count * T::CONST_LEN;
+        let raw_count = count * T::MULTI_VALUE_CONST_LEN;
         let mut raw_buffers = ManagedVec::new();
         for _ in 0..raw_count {
             raw_buffers.push(input.next_value(h)?);

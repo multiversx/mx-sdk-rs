@@ -94,7 +94,7 @@ impl<M> MultiValueConstLength for EsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
-    const CONST_LEN: usize = 3;
+    const MULTI_VALUE_CONST_LEN: usize = 3;
 }
 
 impl<M> TypeAbiFrom<Self> for EsdtTokenPaymentMultiValue<M> where M: ManagedTypeApi {}

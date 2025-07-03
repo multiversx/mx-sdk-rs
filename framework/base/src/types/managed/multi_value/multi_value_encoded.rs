@@ -158,7 +158,7 @@ where
 {
     #[inline]
     fn multi_value_len(&self) -> usize {
-        self.raw_len() / T::multi_value_const_len()
+        self.raw_len()
     }
 }
 
@@ -170,7 +170,7 @@ where
     /// Number of items. Only available for multi-encode items.
     #[inline]
     pub fn len(&self) -> usize {
-        self.multi_value_len()
+        self.raw_len() / T::MULTI_VALUE_CONST_LEN
     }
 }
 

@@ -82,9 +82,9 @@ macro_rules! multi_value_impls {
             where
                 $($name: TopDecodeMulti + MultiValueConstLength,)+
             {
-                const CONST_LEN: usize = 0
+                const MULTI_VALUE_CONST_LEN: usize = 0
                 $(
-                    + <$name as MultiValueConstLength>::CONST_LEN
+                    + <$name as MultiValueConstLength>::MULTI_VALUE_CONST_LEN
                 )+
                 ;
             }
