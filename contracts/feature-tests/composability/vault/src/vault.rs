@@ -142,7 +142,7 @@ pub trait Vault {
 
     #[endpoint]
     #[payable("*")]
-    fn retrieve_received_funds_immmediately(&self) {
+    fn retrieve_received_funds_immediately(&self) {
         let tokens = self.call_value().all_transfers();
 
         self.tx().to(ToCaller).payment(tokens).transfer();

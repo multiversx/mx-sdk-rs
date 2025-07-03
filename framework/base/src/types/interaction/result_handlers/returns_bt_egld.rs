@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, RHListItem, RHListItemExec, TxEnv},
 };
 
-/// Returns the amount of EGLD transfered.
+/// Returns the amount of EGLD transferred.
 ///
 /// More precisely, it returns the sum of the EGLD transfer amounts,
 /// since multiple EGLD transfers are possible in a multi-transfer.

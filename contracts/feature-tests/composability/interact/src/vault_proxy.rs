@@ -178,11 +178,11 @@ where
             .original_result()
     }
 
-    pub fn retrieve_received_funds_immmediately(
+    pub fn retrieve_received_funds_immediately(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .raw_call("retrieve_received_funds_immmediately")
+            .raw_call("retrieve_received_funds_immediately")
             .original_result()
     }
 
