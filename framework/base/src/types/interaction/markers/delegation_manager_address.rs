@@ -8,7 +8,7 @@ use crate::{
     types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxTo, TxToSpecified},
 };
 
-/// Address of the delegation manager smart contract.
+/// Address of the delegation manager system smart contract.
 const DELEGATION_MANAGER_SC_ADDRESS_BYTES: [u8; 32] =
     hex!("000000000000000000010000000000000000000000000000000000000004ffff");
 const DELEGATION_MANAGER_SC_ADDRESS_BECH32: &str =
