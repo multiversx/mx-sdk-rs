@@ -113,72 +113,59 @@ where
             .original_result()
     }
 
-    pub fn stake_nodes(
+    pub fn stake_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
         self,
-        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let mut tx = self.wrapped_tx.raw_call("stakeNodes").payment(NotPayable);
-
-        for i in 0..bls_keys.len() {
-            tx = tx.argument(&bls_keys.get(i));
-        }
-
-        tx.original_result()
+        self.wrapped_tx
+            .raw_call("stakeNodes")
+            .payment(NotPayable)
+            .argument(&bls_keys)
+            .original_result()
     }
 
-    pub fn unstake_nodes(
+    pub fn unstake_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
         self,
-        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let mut tx = self.wrapped_tx.raw_call("unStakeNodes").payment(NotPayable);
-
-        for bls_key in bls_keys {
-            tx = tx.argument(&bls_key);
-        }
-
-        tx.original_result()
+        self.wrapped_tx
+            .raw_call("unStakeNodes")
+            .payment(NotPayable)
+            .argument(&bls_keys)
+            .original_result()
     }
 
-    pub fn restake_unstaked_nodes(
+    pub fn restake_unstaked_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
         self,
-        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let mut tx = self
-            .wrapped_tx
+        self.wrapped_tx
             .raw_call("reStakeUnStakedNodes")
-            .payment(NotPayable);
-
-        for bls_key in bls_keys {
-            tx = tx.argument(&bls_key);
-        }
-
-        tx.original_result()
+            .payment(NotPayable)
+            .argument(&bls_keys)
+            .original_result()
     }
 
-    pub fn unbond_nodes(
+    pub fn unbond_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
         self,
-        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let mut tx = self.wrapped_tx.raw_call("unBondNodes").payment(NotPayable);
-
-        for bls_key in bls_keys {
-            tx = tx.argument(&bls_key);
-        }
-
-        tx.original_result()
+        self.wrapped_tx
+            .raw_call("unBondNodes")
+            .payment(NotPayable)
+            .argument(&bls_keys)
+            .original_result()
     }
 
-    pub fn remove_nodes(
+    pub fn remove_nodes<Arg0: ProxyArg<ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>(
         self,
-        bls_keys: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        bls_keys: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        let mut tx = self.wrapped_tx.raw_call("removeNodes").payment(NotPayable);
-
-        for bls_key in bls_keys {
-            tx = tx.argument(&bls_key);
-        }
-
-        tx.original_result()
+        self.wrapped_tx
+            .raw_call("removeNodes")
+            .payment(NotPayable)
+            .argument(&bls_keys)
+            .original_result()
     }
 
     pub fn unjail_nodes(
@@ -197,14 +184,11 @@ where
         tx.original_result()
     }
 
+    /// The minimum value for creating a new delegation contract is 1 EGLD
     pub fn delegate(
         self,
         egld_value: BigUint<Env::Api>,
     ) -> TxTypedCall<Env, From, To, EgldPayment<<Env as TxEnv>::Api>, Gas, ()> {
-        if egld_value < BigUint::from(1000000000000000000u128) {
-            panic!("The minimum value for creating a new delegation contract is 1 EGLD");
-        }
-
         self.wrapped_tx
             .raw_call("delegate")
             .egld(egld_value)
@@ -238,14 +222,11 @@ where
             .original_result()
     }
 
+    /// The minimum value for undelegating is 1 EGLD
     pub fn undelegate(
         self,
         undelegate_egld_amount: BigUint<Env::Api>,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        if undelegate_egld_amount < BigUint::from(1000000000000000000u128) {
-            panic!("The minimum value for undelegating is 1 EGLD");
-        }
-
         self.wrapped_tx
             .raw_call("unDelegate")
             .payment(NotPayable)

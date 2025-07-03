@@ -7,7 +7,7 @@ pub use bf_interact_config::Config;
 use bf_interact_state::State;
 use clap::Parser;
 
-use multiversx_sc_snippets::{imports::*, sdk::validator::Validator};
+use multiversx_sc_snippets::imports::*;
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
@@ -76,7 +76,7 @@ impl BasicFeaturesInteract {
         }
     }
 
-    pub async fn add_key(&mut self) {
+    pub async fn add_validator_key(&mut self) {
         self.interactor
             .add_key(
                 Validator::from_pem_file("./validatorKey.pem")

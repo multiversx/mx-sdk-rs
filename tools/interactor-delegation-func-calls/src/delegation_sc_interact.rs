@@ -324,16 +324,13 @@ impl DelegateCallsInteract {
     }
 
     pub async fn stake_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
-            bls_keys.into_iter().map(ManagedBuffer::from).collect();
-
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .stake_nodes(&managed_bls_keys)
-            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .stake_nodes(bls_keys.clone())
+            .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .run()
             .await;
 
@@ -387,16 +384,13 @@ impl DelegateCallsInteract {
     }
 
     pub async fn unstake_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
-            bls_keys.into_iter().map(ManagedBuffer::from).collect();
-
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .unstake_nodes(&managed_bls_keys)
-            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .unstake_nodes(bls_keys.clone())
+            .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .run()
             .await;
 
@@ -404,15 +398,12 @@ impl DelegateCallsInteract {
     }
 
     pub async fn restake_unstaked_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
-            bls_keys.into_iter().map(ManagedBuffer::from).collect();
-
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .restake_unstaked_nodes(&managed_bls_keys)
+            .restake_unstaked_nodes(bls_keys)
             .gas(30_000_000u64)
             .run()
             .await;
@@ -421,16 +412,13 @@ impl DelegateCallsInteract {
     }
 
     pub async fn unbond_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
-            bls_keys.into_iter().map(ManagedBuffer::from).collect();
-
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .unbond_nodes(&managed_bls_keys)
-            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .unbond_nodes(bls_keys.clone())
+            .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .run()
             .await;
 
@@ -438,16 +426,13 @@ impl DelegateCallsInteract {
     }
 
     pub async fn remove_nodes(&mut self, bls_keys: Vec<Vec<u8>>) {
-        let managed_bls_keys: ManagedVec<StaticApi, ManagedBuffer<StaticApi>> =
-            bls_keys.into_iter().map(ManagedBuffer::from).collect();
-
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .remove_nodes(&managed_bls_keys)
-            .gas(1000000u64 + managed_bls_keys.len() as u64 * 6000000u64)
+            .remove_nodes(bls_keys.clone())
+            .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .run()
             .await;
 
