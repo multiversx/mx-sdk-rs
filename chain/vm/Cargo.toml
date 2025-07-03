@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-chain-vm"
-version = "0.15.0"
+version = "0.16.0"
 edition = "2021"
 
 authors = [
@@ -40,7 +40,7 @@ toml = "0.8"
 anyhow = "1.0"
 
 [dependencies.multiversx-chain-core]
-version = "=0.15.0"
+version = "=0.16.0"
 path = "../core"
 
 [dependencies.multiversx-chain-vm-executor]
