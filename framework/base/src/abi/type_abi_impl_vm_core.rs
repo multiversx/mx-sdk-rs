@@ -2,7 +2,7 @@ use super::*;
 
 use alloc::vec::Vec;
 use multiversx_chain_core::types::{
-    Address, BoxedBytes, CodeMetadata, EsdtLocalRole, EsdtTokenType, H256,
+    Address, BLSKey, BLSSignature, BoxedBytes, CodeMetadata, EsdtLocalRole, EsdtTokenType, H256,
 };
 
 impl TypeAbiFrom<Self> for H256 {}
@@ -57,6 +57,34 @@ impl TypeAbi for CodeMetadata {
 
     fn type_name_rust() -> TypeName {
         "CodeMetadata".into()
+    }
+}
+
+impl TypeAbiFrom<Self> for BLSKey {}
+impl TypeAbi for BLSKey {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        <[u8; BLSKey::len()]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "BLSKey".into()
+    }
+}
+
+impl TypeAbiFrom<Self> for BLSSignature {}
+impl TypeAbiFrom<[u8; BLSSignature::len()]> for BLSSignature {}
+impl TypeAbiFrom<BLSSignature> for [u8; BLSSignature::len()] {}
+impl TypeAbi for BLSSignature {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        <[u8; BLSSignature::len()]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "BLSSignature".into()
     }
 }
 

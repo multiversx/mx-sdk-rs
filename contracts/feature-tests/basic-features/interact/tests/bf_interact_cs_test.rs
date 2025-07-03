@@ -19,6 +19,7 @@ const ISSUE_COST: u64 = 50000000000000000u64;
 async fn simulator_basic_features_test() {
     let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
 
+    bf_interact.add_validator_key().await;
     bf_interact.deploy_storage_bytes().await;
     bf_interact.large_storage(15).await;
 

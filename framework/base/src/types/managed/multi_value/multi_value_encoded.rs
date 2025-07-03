@@ -1,4 +1,5 @@
 use multiversx_sc_codec::multi_types::MultiValue3;
+use multiversx_sc_codec::MultiValueLength;
 use unwrap_infallible::UnwrapInfallible;
 
 use crate::codec::multi_types::MultiValueVec;
@@ -10,8 +11,8 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
-        try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
-        TopDecodeMulti, TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti,
+        try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
+        TopDecode, TopDecodeMulti, TopDecodeMultiInput, TopEncode, TopEncodeMulti,
         TopEncodeMultiOutput,
     },
     contract_base::{ExitCodecErrorHandler, ManagedSerializer},
@@ -150,15 +151,26 @@ where
     }
 }
 
+impl<M, T> MultiValueLength for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: MultiValueConstLength,
+{
+    #[inline]
+    fn multi_value_len(&self) -> usize {
+        self.raw_len()
+    }
+}
+
 impl<M, T> MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopDecodeMultiLength,
+    T: MultiValueConstLength,
 {
     /// Number of items. Only available for multi-encode items.
     #[inline]
     pub fn len(&self) -> usize {
-        self.raw_len() / T::get_len()
+        self.raw_len() / T::MULTI_VALUE_CONST_LEN
     }
 }
 
