@@ -29,7 +29,7 @@ fn remove_old_lldb_extension() {
         .arg(extension_id)
         .status();
 
-    // Run to clean .vscode/extensions/ folder of the remains of previous extension instalations
+    // Run to clean .vscode/extensions/ folder of the remains of previous extension installations
     let _ = Command::new("rm")
         .arg("-rf")
         .arg("~/.vscode/extensions/vadim*")
