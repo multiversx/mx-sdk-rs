@@ -3057,7 +3057,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-core"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "bech32",
  "bitflags 2.9.1",
@@ -3081,7 +3081,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "anyhow",
  "bitflags 2.9.1",
@@ -3105,8 +3105,9 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm-executor"
-version = "0.4.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=5804799ee7b6446c9e7641b8308acb48ec00d751#5804799ee7b6446c9e7641b8308acb48ec00d751"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0cfb36050709604abee7d7896ad890358692245ddd406adcbce9d717b06c6cdf"
 dependencies = [
  "serde",
  "toml 0.7.8",
@@ -3114,8 +3115,9 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer-experimental"
-version = "0.4.0"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=5804799ee7b6446c9e7641b8308acb48ec00d751#5804799ee7b6446c9e7641b8308acb48ec00d751"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4fab0ca1253078cb8f52bdb59967c0c3b07c0dc4b34125bba58c60de8b70cb6c"
 dependencies = [
  "chrono",
  "log",
@@ -3129,7 +3131,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "getrandom 0.2.16",
  "multiversx-sc",
@@ -3149,7 +3151,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "bitflags 2.9.1",
  "generic-array 1.2.0",
@@ -3163,7 +3165,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.22.1"
+version = "0.23.0"
 dependencies = [
  "arrayvec",
  "bitflags 2.9.1",
@@ -3174,7 +3176,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.22.1"
+version = "0.23.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -3184,7 +3186,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -3195,7 +3197,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "bip39",
  "clap",
@@ -3208,6 +3210,7 @@ dependencies = [
  "multiversx-sc-meta-lib",
  "multiversx-sc-snippets",
  "pathdiff",
+ "regex",
  "reqwest",
  "ruplacer",
  "semver",
@@ -3220,7 +3223,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta-lib"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "clap",
  "colored 3.0.0",
@@ -3240,14 +3243,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "base64",
  "colored 3.0.0",
@@ -3271,7 +3274,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "anyhow",
  "base64",
@@ -3291,14 +3294,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sdk"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "aes",
  "anyhow",
@@ -3325,7 +3328,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk-dapp"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "anyhow",
  "getrandom 0.2.16",
@@ -3342,7 +3345,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sdk-http"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "anyhow",
  "hex",
@@ -3355,7 +3358,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.58.0"
+version = "0.59.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",

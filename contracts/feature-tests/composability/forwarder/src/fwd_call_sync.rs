@@ -119,6 +119,7 @@ pub trait ForwarderSyncCallModule {
         result
     }
 
+    #[allow(deprecated)]
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds_rh_multi_esdt(

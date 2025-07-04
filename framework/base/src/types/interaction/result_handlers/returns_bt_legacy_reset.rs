@@ -3,7 +3,7 @@ use crate::{
     types::{BackTransfersLegacy, RHListItem, RHListItemExec, TxEnv},
 };
 
-/// Indicates that back-transfers will be returned.
+/// Indicates that back-transfers will be returned, old implementation.
 ///
 /// Back-transfers are reset before a call, to avoid unwanted interferences.
 #[deprecated(

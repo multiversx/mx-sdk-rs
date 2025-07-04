@@ -33,6 +33,50 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.59.0, codec 0.23.0, chain 0.16.0, sdk 0.11.0] - 2025-07-03
+- Support for Barnard features
+	- `barnard` feature for smart contracts, can be enabled in the contract's `Cargo.toml` or `sc-config.toml`;
+	- Blockchain API new features:
+		- Code hash API;
+		- Block info:
+			- Timstamps in milliseconds: `get_block_timestamp_ms`,  `get_prev_block_timestamp_ms`, `epoch_start_block_timestamp_ms`;
+			- Block round time: `get_block_round_time_ms`;
+			- Epoch start info: `epoch_start_block_timestamp_ms`, `epoch_start_block_nonce`, `epoch_start_block_round`.
+		- ESDT info:
+			- Token type API supplied by the protocol (`get_esdt_token_type`);
+			- `get_esdt_token_data` provides the token type supplied by the protocol;
+			- `EsdtTokenType` updated with new ESDT types (meta & dynamic tokens).
+	- New transaction mechanisms:
+		- Fallible synchronous call;
+		- Fallible transfer-execute;
+		- Both are integrated in the unified syntax;
+		- Simplified several scenarios by routing all through the fallible tx VM hooks.
+	- Optimisations:
+		- Multi-transfer call value including the direct EGLD is now provided by the VM directly.
+		- Direct conversion between ManagedBuffer and i64 (small integer) now provided directly by the VM.
+- Back transfers now support multi-transfers with EGLD properly
+	- New `BackTransfer` structure contains back-transfers as a multi-transfer list;
+	- It contains methods to filter and extract EGLD or single ESDT values;
+	- New implementation of `ReturnsBackTransfers` and `ReturnsBackTransfersReset`, which work with this payment list;
+	- `ReturnsBackTransfersEGLD` now supports multi-transfer;
+	- Old implementations renamed to `*Legacy`.
+- New proxies for system smart contracts:
+	- Governance system SC;
+	- Delegation system SC.
+- Core crate updates:
+	- Bech32Address:
+		- Deduplicated and moved to the core crate, guarded by a `std` feature;
+		- Support for custom HRP;
+	- `BLSKey` and `BLSSignature` types, to help the interaction with the delegation contract.
+- `sc-meta`:
+	- Support for building contracts with `std` library;
+	-  `test-gen` support for `#[should_panic]` annotation.
+- Validator processing in the SDK, including parsing from pem.
+- Event log name can now be empty or missing in declaration, the method name will be used in this case.
+- Fixed a bug in mandos-rs, it was not handling a failing `scQuery` properly.
+- Codec: improved multi-value length handling.
+
+
 ## [sc 0.58.0, codec 0.22.1, chain 0.15.0, sdk 0.10.0] - 2025-05-26
 - Rust VM and debugger redesign:
 	- VM major refactoring: runtime, execution, debugger, VM hooks handler;
