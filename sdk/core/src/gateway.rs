@@ -3,6 +3,7 @@ mod gateway_account_esdt_roles;
 mod gateway_account_esdt_tokens;
 mod gateway_account_storage;
 mod gateway_block;
+mod gateway_chain_simulator_add_keys;
 mod gateway_chain_simulator_blocks;
 mod gateway_chain_simulator_send_funds;
 mod gateway_chain_simulator_set_state;
@@ -23,6 +24,7 @@ pub use gateway_account_esdt_roles::GetAccountEsdtRolesRequest;
 pub use gateway_account_esdt_tokens::GetAccountEsdtTokensRequest;
 pub use gateway_account_storage::GetAccountStorageRequest;
 pub use gateway_block::GetHyperBlockRequest;
+pub use gateway_chain_simulator_add_keys::ChainSimulatorAddKeysRequest;
 pub use gateway_chain_simulator_blocks::ChainSimulatorGenerateBlocksRequest;
 pub use gateway_chain_simulator_send_funds::ChainSimulatorSendFundsRequest;
 pub use gateway_chain_simulator_set_state::{ChainSimulatorSetStateRequest, SetStateAccount};
@@ -66,7 +68,8 @@ const GENERATE_BLOCKS_UNTIL_TX_PROCESSED_ENDPOINT: &str =
 const GENERATE_BLOCKS_UNTIL_EPOCH_REACHED_ENDPOINT: &str =
     "simulator/generate-blocks-until-epoch-reached";
 const SET_STATE_ENDPOINT: &str = "simulator/set-state";
-const SET_STATE_OVERWRITE_ENDPOINT: &str = "/simulator/set-state-overwrite";
+const SET_STATE_OVERWRITE_ENDPOINT: &str = "simulator/set-state-overwrite";
+const ADD_KEYS: &str = "simulator/add-keys";
 
 pub enum GatewayRequestType {
     Get,

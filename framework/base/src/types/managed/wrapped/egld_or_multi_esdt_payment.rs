@@ -30,7 +30,7 @@ impl<M: ManagedTypeApi> EgldOrMultiEsdtPayment<M> {
     }
 }
 
-/// The version of `EgldOrMultiEsdtPayment` that contains referrences instead of owned fields.
+/// The version of `EgldOrMultiEsdtPayment` that contains references instead of owned fields.
 pub enum EgldOrMultiEsdtPaymentRefs<'a, M: ManagedTypeApi> {
     Egld(&'a BigUint<M>),
     MultiEsdt(&'a ManagedVec<M, EsdtTokenPayment<M>>),

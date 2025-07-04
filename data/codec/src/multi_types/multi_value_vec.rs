@@ -1,6 +1,6 @@
 use crate::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
-    TopEncodeMultiOutput,
+    DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, MultiValueLength,
+    TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 use alloc::vec::Vec;
 use core::iter::FromIterator;
@@ -68,6 +68,16 @@ impl<T> FromIterator<T> for MultiValueVec<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let v = Vec::<T>::from_iter(iter);
         MultiValueVec(v)
+    }
+}
+
+impl<T> MultiValueLength for MultiValueVec<T>
+where
+    T: MultiValueConstLength,
+{
+    #[inline]
+    fn multi_value_len(&self) -> usize {
+        self.len() * T::MULTI_VALUE_CONST_LEN
     }
 }
 

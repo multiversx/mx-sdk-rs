@@ -5,7 +5,7 @@ use crate::{
     cmd::{print_util::print_tree_dir_metadata, upgrade::upgrade_settings::UpgradeSettings},
     folder_structure::{dir_pretty_print, RelevantDirectories, RelevantDirectory},
     version::FrameworkVersion,
-    version_history::{versions_iter, CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION, VERSIONS},
+    version_history::{versions_iter, CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION},
 };
 use multiversx_sc_meta_lib::framework_version;
 
@@ -15,6 +15,7 @@ use super::{
     upgrade_0_39::{postprocessing_after_39_0, upgrade_to_39_0},
     upgrade_0_45::upgrade_to_45_0,
     upgrade_0_51::upgrade_to_51_0,
+    upgrade_0_59::upgrade_to_59_0,
     upgrade_common::{cargo_check, version_bump_in_cargo_toml},
     upgrade_print::*,
 };
@@ -30,21 +31,9 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
 
     let last_version = args
         .override_target_version
-        .clone()
-        .map(|override_target_v| {
-            VERSIONS
-                .iter()
-                .find(|v| v.to_string() == override_target_v)
-                .cloned()
-                .unwrap_or(LAST_UPGRADE_VERSION)
-        })
-        .unwrap_or_else(|| LAST_UPGRADE_VERSION);
-
-    assert!(
-        VERSIONS.contains(&last_version),
-        "Invalid requested version: {}",
-        last_version.version,
-    );
+        .as_deref()
+        .map(FrameworkVersion::from_string_template)
+        .unwrap_or(LAST_UPGRADE_VERSION);
 
     let mut dirs = RelevantDirectories::find_all(path, args.ignore.as_slice());
     println!(
@@ -91,6 +80,8 @@ fn upgrade_function_selector(dir: &RelevantDirectory) {
             upgrade_to_45_0(dir)
         } else if framework_version!(0.51.0) == *to_version {
             upgrade_to_51_0(dir)
+        } else if framework_version!(0.59.0) == *to_version {
+            upgrade_to_59_0(dir)
         } else {
             version_bump_in_cargo_toml(&dir.path, from_version, to_version)
         }

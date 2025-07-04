@@ -44,7 +44,7 @@ pub async fn system_sc_interact_cli() {
         Some(system_sc_interact_cli::InteractCliCommand::SetRoles(args)) => {
             basic_interact
                 .set_roles(
-                    args.token_id.as_bytes(),
+                    &args.token_id,
                     args.roles
                         .clone()
                         .into_iter()
@@ -241,8 +241,8 @@ impl SysFuncCallsInteract {
             .use_chain_simulator(config.is_chain_simulator());
 
         interactor.set_current_dir_from_workspace("tools/interactor-system-func-calls");
-        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
-        let other_wallet_address = interactor.register_wallet(test_wallets::mike()).await;
+        let wallet_address = interactor.register_wallet(test_wallets::carol()).await;
+        let other_wallet_address = interactor.register_wallet(test_wallets::carol()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
         interactor.generate_blocks_until_epoch(1).await.unwrap();
@@ -253,6 +253,26 @@ impl SysFuncCallsInteract {
             other_wallet_address: other_wallet_address.into(),
             state: State::load_state(),
         }
+    }
+
+    pub async fn get_token_properties(&mut self, token_id: &[u8]) -> TokenPropertiesResult {
+        println!("Fetching token properties of token {token_id:?}...");
+
+        let res = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .get_token_properties(token_id)
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        println!("Token properties: {:?}", res);
+
+        res
     }
 
     pub async fn issue_fungible_token(
@@ -453,7 +473,7 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    pub async fn set_roles(&mut self, token_id: &[u8], roles: Vec<EsdtLocalRole>) {
+    pub async fn set_roles(&mut self, token_id: &str, roles: Vec<EsdtLocalRole>) {
         let wallet_address = &self.wallet_address.clone().into_address();
         println!("Setting the following roles: {roles:?} for {token_id:?}");
 

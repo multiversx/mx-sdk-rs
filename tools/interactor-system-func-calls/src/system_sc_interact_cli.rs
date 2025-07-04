@@ -267,15 +267,15 @@ pub struct WipeNFTArgs {
 
 #[derive(Clone, Debug, PartialEq, Eq, Args)]
 pub struct CreateNFTArgs {
-    #[arg(long = "token-id")]
+    #[arg(short = 't', long = "token-id")]
     pub token_id: String,
     #[arg(short = 'a', long = "amount")]
     pub amount: RustBigUint,
     #[arg(short = 'n', long = "name")]
     pub name: String,
-    #[arg(long = "hash")]
+    #[arg(short = 'h', long = "hash")]
     pub hash: String,
-    #[arg(short = 'r', long = "royalities")]
+    #[arg(short = 'r', long = "royalties")]
     pub royalties: u64,
 }
 

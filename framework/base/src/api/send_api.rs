@@ -22,7 +22,7 @@ pub trait SendApiImpl: ManagedTypeApiImpl {
         gas_limit: u64,
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
-    ) -> Result<(), &'static [u8]>;
+    );
 
     fn multi_transfer_esdt_nft_execute(
         &self,
@@ -31,7 +31,16 @@ pub trait SendApiImpl: ManagedTypeApiImpl {
         gas_limit: u64,
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
-    ) -> Result<(), &'static [u8]>;
+    );
+
+    fn multi_transfer_esdt_nft_execute_with_return(
+        &self,
+        to_handle: RawHandle,
+        payments_handle: RawHandle,
+        gas_limit: u64,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+    ) -> i32;
 
     /// Sends an asynchronous call to another contract.
     /// Calling this method immediately terminates tx execution.
@@ -141,6 +150,17 @@ pub trait SendApiImpl: ManagedTypeApiImpl {
         arg_buffer_handle: RawHandle,
         result_handle: RawHandle,
     );
+
+    /// Same shard, in-line execution of another contract, does not fail in case of error.
+    fn execute_on_dest_context_error_return_raw(
+        &self,
+        gas: u64,
+        address_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> i32;
 
     fn clean_return_data(&self);
 

@@ -34,11 +34,6 @@ impl State {
         self.bf_address_storage_bytes = Some(address);
     }
 
-    /// Sets the contract address for basic-features-crypto
-    pub fn set_bf_address_crypto(&mut self, address: Bech32Address) {
-        self.bf_address_crypto = Some(address);
-    }
-
     /// Sets the contract address for basic-features
     pub fn set_bf_address(&mut self, address: Bech32Address) {
         self.bf_address = Some(address);
@@ -49,13 +44,6 @@ impl State {
         self.bf_address_storage_bytes
             .as_ref()
             .expect("basic-features-storage-bytes contract not yet deployed")
-    }
-
-    /// Returns basic-features-storage-bytes contract
-    pub fn bf_crypto_contract(&self) -> &Bech32Address {
-        self.bf_address_crypto
-            .as_ref()
-            .expect("basic-features-crypto contract not yet deployed")
     }
 
     /// Returns basic-features contract

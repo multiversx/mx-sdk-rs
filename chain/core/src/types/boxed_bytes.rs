@@ -92,7 +92,7 @@ impl BoxedBytes {
     }
 
     /// Splits BoxedBytes into 2 others at designated position.
-    /// Returns the original and an empty BoxedBytes if position arugment out of range.
+    /// Returns the original and an empty BoxedBytes if position argument out of range.
     pub fn split(self, at: usize) -> (BoxedBytes, BoxedBytes) {
         if at >= self.len() {
             (self, BoxedBytes::empty())

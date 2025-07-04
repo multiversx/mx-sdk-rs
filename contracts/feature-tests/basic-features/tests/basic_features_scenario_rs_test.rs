@@ -1,7 +1,8 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
+
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
     blockchain.register_contract(
@@ -11,10 +12,6 @@ fn world() -> ScenarioWorld {
     blockchain.register_contract(
         "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
         esdt_system_sc_mock::ContractBuilder,
-    );
-    blockchain.register_contract(
-        "mxsc:output/basic-features-crypto.mxsc.json",
-        basic_features::ContractBuilder,
     );
 
     blockchain
