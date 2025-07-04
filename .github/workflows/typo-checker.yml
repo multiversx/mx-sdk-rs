@@ -3,7 +3,7 @@ on: [pull_request]
 
 jobs:
   run:
-    name: Spell Check with Typos
+    name: Typo Checker
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Actions Repository
