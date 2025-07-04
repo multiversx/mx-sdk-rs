@@ -79,8 +79,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         let signature = types.mb_get(signature_handle);
         let sig_valid = crypto_functions::verify_bls(key, message, signature);
         if !sig_valid {
-            // self.vm_error("invalid signature");
-
+            // TODO: correct error message
             return Err(early_exit_vm_error("invalid signature"));
         }
 
@@ -99,8 +98,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         let signature = types.mb_get(signature_handle);
         let sig_valid = crypto_functions::verify_bls_aggregated_signature(keys, message, signature);
         if !sig_valid {
-            // self.vm_error("invalid signature");
-
+            // TODO: correct error message
             return Err(early_exit_vm_error("invalid signature"));
         }
 
