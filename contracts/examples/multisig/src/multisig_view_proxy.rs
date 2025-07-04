@@ -212,7 +212,7 @@ where
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode)]
+#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum UserRole {
     None,
     Proposer,

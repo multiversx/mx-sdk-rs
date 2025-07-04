@@ -95,45 +95,13 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_accept_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .payment(all_token_payments)
-            .transfer_execute()
-    }
-
-    #[endpoint]
-    fn forward_transf_exec_reject_funds_multi_transfer(
-        &self,
-        to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
-    ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
-        self.tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
-            .accept_funds()
-            .payment(all_token_payments)
+            .payment(payment_args.convert_payment_multi_triples())
             .transfer_execute()
     }
 
@@ -141,22 +109,13 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_reject_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .reject_funds()
-            .payment(all_token_payments)
+            .payment(payment_args.convert_payment_multi_triples())
             .transfer_execute()
     }
 }

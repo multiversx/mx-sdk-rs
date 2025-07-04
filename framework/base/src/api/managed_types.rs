@@ -8,7 +8,7 @@ mod managed_map_api;
 mod managed_type_api;
 mod managed_type_api_impl;
 mod static_var_api;
-mod token_identifier_util;
+mod static_var_api_flags;
 
 pub use big_float_api::*;
 pub use big_int_api::*;
@@ -19,3 +19,4 @@ pub use managed_map_api::*;
 pub use managed_type_api::*;
 pub use managed_type_api_impl::*;
 pub use static_var_api::*;
+pub use static_var_api_flags::StaticVarApiFlags;

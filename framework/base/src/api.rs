@@ -30,4 +30,9 @@ pub use storage_api::*;
 pub use vm_api::VMApi;
 
 // Backwards compatibility.
-pub use crate::types::system_proxy::builtin_func_names::*;
+pub use crate::chain_core::builtin_func_names::*;
+
+/// Utility function.
+pub(crate) fn quick_signal_error<Api: ErrorApi>(message: &str) -> ! {
+    Api::error_api_impl().signal_error(message.as_bytes());
+}

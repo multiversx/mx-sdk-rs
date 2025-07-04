@@ -1,8 +1,9 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/crypto-kitties/kitty-ownership");
     blockchain.register_contract(
         "mxsc:../kitty-genetic-alg/output/kitty-genetic-alg.mxsc.json",
         kitty_genetic_alg::ContractBuilder,

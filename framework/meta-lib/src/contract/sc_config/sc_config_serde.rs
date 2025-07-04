@@ -56,15 +56,26 @@ pub struct ContractVariantSerde {
     pub features: Vec<String>,
 
     #[serde(default)]
+    #[serde(rename = "default-features")]
+    pub default_features: Option<bool>,
+
+    #[serde(default)]
     pub kill_legacy_callback: bool,
 
     #[serde(default)]
     pub profile: Option<ContractVariantProfileSerde>,
+
+    #[serde(default)]
+    pub std: Option<bool>,
+
+    #[serde(rename = "rustc-target")]
+    pub rustc_target: Option<String>,
 }
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct MultiContractGeneralSettingsSerde {
+    #[serde(default)]
     pub main: Option<String>,
 }
 

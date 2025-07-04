@@ -1,7 +1,7 @@
 use super::upgrade_common::{replace_in_files, version_bump_in_cargo_toml};
 use super::upgrade_print::*;
 use crate::folder_structure::{DirectoryType, RelevantDirectory};
-use multiversx_sc_meta_lib::cargo_toml_contents::CargoTomlContents;
+use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 use ruplacer::Query;
 use std::path::Path;
 use toml::Value;
@@ -21,7 +21,7 @@ fn v_0_51_replace_in_files(sc_crate_path: &Path) {
     replace_in_files(
         sc_crate_path,
         "*rs",
-        &[Query::substring(
+        &[Query::simple(
             "multiversx_sc_meta",
             "multiversx_sc_meta_lib",
         )][..],

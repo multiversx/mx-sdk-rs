@@ -36,10 +36,12 @@ where
             call_value_handle.get_raw_handle(),
         );
 
-        (
-            BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
-            ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
-        )
+        unsafe {
+            (
+                BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+                ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+            )
+        }
     }
 
     pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
@@ -97,7 +99,7 @@ where
 
         SendRawWrapper::<SA>::new().clean_return_data();
 
-        decode_result(raw_result)
+        decode_result(raw_result.0)
     }
 
     pub(super) fn execute_on_dest_context_readonly<RequestedResult>(self) -> RequestedResult
@@ -153,7 +155,7 @@ where
     pub(super) fn transfer_execute_egld(self, egld_payment: BigUint<SA>) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
-        let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
+        SendRawWrapper::<SA>::new().direct_egld_execute(
             &self.to,
             &egld_payment,
             gas_limit,
@@ -167,7 +169,7 @@ where
 
         if payment.token_nonce == 0 {
             // fungible ESDT
-            let _ = SendRawWrapper::<SA>::new().transfer_esdt_execute(
+            SendRawWrapper::<SA>::new().transfer_esdt_execute(
                 &self.to,
                 &payment.token_identifier,
                 &payment.amount,
@@ -177,7 +179,7 @@ where
             );
         } else {
             // non-fungible/semi-fungible ESDT
-            let _ = SendRawWrapper::<SA>::new().transfer_esdt_nft_execute(
+            SendRawWrapper::<SA>::new().transfer_esdt_nft_execute(
                 &self.to,
                 &payment.token_identifier,
                 payment.token_nonce,
@@ -194,7 +196,7 @@ where
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     ) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let _ = SendRawWrapper::<SA>::new().multi_esdt_transfer_execute(
+        SendRawWrapper::<SA>::new().multi_esdt_transfer_execute(
             &self.to,
             &payments,
             gas_limit,
@@ -206,7 +208,7 @@ where
     pub(super) fn transfer_execute_esdt(self, payments: ManagedVec<SA, EsdtTokenPayment<SA>>) {
         match payments.len() {
             0 => self.transfer_execute_egld(BigUint::zero()),
-            1 => self.transfer_execute_single_esdt(payments.get(0)),
+            1 => self.transfer_execute_single_esdt(payments.get(0).clone()),
             _ => self.transfer_execute_multi_esdt(payments),
         }
     }

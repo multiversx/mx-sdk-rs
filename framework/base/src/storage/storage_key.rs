@@ -22,7 +22,7 @@ where
     type OwnHandle = A::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: A::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: A::ManagedBufferHandle) -> Self {
         StorageKey {
             buffer: ManagedBuffer::from_handle(handle),
         }
@@ -32,7 +32,15 @@ where
         self.buffer.get_handle()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.buffer.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &A::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut A::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }

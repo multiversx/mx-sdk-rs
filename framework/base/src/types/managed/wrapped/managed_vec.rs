@@ -1,4 +1,4 @@
-use super::EncodedManagedVecItem;
+use super::{EncodedManagedVecItem, ManagedVecItemPayload};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
@@ -8,8 +8,8 @@ use crate::{
         TopEncodeMultiOutput, TopEncodeOutput,
     },
     types::{
-        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
-        ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
+        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem,
+        ManagedVecRefIterator, ManagedVecRefMut, MultiValueEncoded, MultiValueManagedVec,
     },
 };
 use alloc::{format, vec::Vec};
@@ -45,7 +45,7 @@ where
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
-    fn from_handle(handle: M::ManagedBufferHandle) -> Self {
+    unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         ManagedVec {
             buffer: ManagedBuffer::from_handle(handle),
             _phantom: PhantomData,
@@ -56,7 +56,15 @@ where
         self.buffer.get_handle()
     }
 
+    unsafe fn forget_into_handle(self) -> Self::OwnHandle {
+        self.buffer.forget_into_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
+        unsafe { core::mem::transmute(handle_ref) }
+    }
+
+    fn transmute_from_handle_ref_mut(handle_ref: &mut M::ManagedBufferHandle) -> &mut Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
 }
@@ -78,6 +86,18 @@ where
     pub(crate) fn new_from_raw_buffer(buffer: ManagedBuffer<M>) -> Self {
         ManagedVec {
             buffer,
+            _phantom: PhantomData,
+        }
+    }
+
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
+        ManagedVec {
+            buffer: ManagedBuffer::new_uninit(),
             _phantom: PhantomData,
         }
     }
@@ -131,17 +151,23 @@ where
         self.byte_len() == 0
     }
 
-    pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
+    /// Internal function that loads the payload for an item.
+    ///
+    /// Payload passed as mutable reference, to avoid copying of bytes around the stack.
+    fn load_item_payload(&self, index: usize, payload: &mut T::PAYLOAD) -> bool {
         let byte_index = index * T::payload_size();
-        let mut load_result = Ok(());
-        let result = unsafe {
-            T::from_byte_reader_as_borrow(|dest_slice| {
-                load_result = self.buffer.load_slice(byte_index, dest_slice);
-            })
-        };
-        match load_result {
-            Ok(_) => Some(result),
-            Err(_) => None,
+
+        self.buffer
+            .load_slice(byte_index, payload.payload_slice_mut())
+            .is_ok()
+    }
+
+    pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self.load_item_payload(index, &mut payload) {
+            unsafe { Some(T::borrow_from_payload(&payload)) }
+        } else {
+            None
         }
     }
 
@@ -157,7 +183,10 @@ where
             unsafe { MaybeUninit::<[MaybeUninit<T::Ref<'_>>; N]>::uninit().assume_init() };
 
         for (index, value) in self.iter().enumerate() {
-            result_uninit[index].write(value);
+            // length already checked
+            unsafe {
+                result_uninit.get_unchecked_mut(index).write(value);
+            }
         }
 
         let result = unsafe { transmute_copy(&ManuallyDrop::new(result_uninit)) };
@@ -173,26 +202,37 @@ where
         }
     }
 
-    pub fn get_mut(&mut self, index: usize) -> ManagedVecRef<M, T> {
-        ManagedVecRef::new(self.get_handle(), index)
-    }
-
-    pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
-        let byte_index = index * T::payload_size();
-        let mut load_result = Ok(());
-        let result = T::from_byte_reader(|dest_slice| {
-            load_result = self.buffer.load_slice(byte_index, dest_slice);
-        });
-
-        match load_result {
-            Ok(_) => result,
-            Err(_) => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
+    /// If it contains precisely one item, will return `Some` with a reference to that item.
+    ///
+    /// Will return `None` for zero or more than one item.
+    pub fn is_single_item(&self) -> Option<T::Ref<'_>> {
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self.len() == 1 {
+            let _ = self.load_item_payload(0, &mut payload);
+            unsafe { Some(T::borrow_from_payload(&payload)) }
+        } else {
+            None
         }
     }
 
-    pub fn set(&mut self, index: usize, item: &T) -> Result<(), InvalidSliceError> {
+    pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<M, T> {
+        ManagedVecRefMut::new(self.get_handle(), index)
+    }
+
+    pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
+        let mut payload = T::PAYLOAD::new_buffer();
+        if self.load_item_payload(index, &mut payload) {
+            T::read_from_payload(&payload)
+        } else {
+            M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
+        }
+    }
+
+    pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
-        item.to_byte_writer(|slice| self.buffer.set_slice(byte_index, slice))
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.set_slice(byte_index, payload.payload_slice())
     }
 
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
@@ -205,9 +245,9 @@ where
     }
 
     pub fn push(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
-            self.buffer.append_bytes(bytes);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.append_bytes(payload.payload_slice());
     }
 
     pub fn remove(&mut self, index: usize) {
@@ -233,7 +273,7 @@ where
             ManagedVec::new()
         };
 
-        self.buffer = part_before.buffer;
+        *self = part_before;
         self.buffer.append(&part_after.buffer);
     }
 
@@ -251,9 +291,9 @@ where
     }
 
     pub fn overwrite_with_single_item(&mut self, item: T) {
-        item.to_byte_writer(|bytes| {
-            self.buffer.overwrite(bytes);
-        });
+        let mut payload = T::PAYLOAD::new_buffer();
+        item.save_to_payload(&mut payload);
+        self.buffer.overwrite(payload.payload_slice());
     }
 
     /// Appends all the contents of another managed vec at the end of the current one.
@@ -356,6 +396,8 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + Ord + Debug,
 {
+    #[deprecated(since = "0.54.5", note = "Please use method `sort_unstable` instead.")]
+    #[cfg(feature = "alloc")]
     pub fn sort(&mut self) {
         self.with_self_as_slice_mut(|slice| {
             slice.sort();
@@ -363,6 +405,11 @@ where
         });
     }
 
+    #[deprecated(
+        since = "0.54.5",
+        note = "Please use method `sort_unstable_by` instead."
+    )]
+    #[cfg(feature = "alloc")]
     pub fn sort_by<F>(&mut self, mut compare: F)
     where
         F: FnMut(&T, &T) -> Ordering,
@@ -373,6 +420,11 @@ where
         });
     }
 
+    #[deprecated(
+        since = "0.54.5",
+        note = "Please use method `sort_unstable_by_key` instead."
+    )]
+    #[cfg(feature = "alloc")]
     pub fn sort_by_key<K, F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> K,
@@ -384,6 +436,8 @@ where
         });
     }
 
+    #[deprecated]
+    #[cfg(feature = "alloc")]
     pub fn sort_by_cached_key<K, F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> K,
@@ -496,7 +550,7 @@ where
     fn clone(&self) -> Self {
         let mut result = ManagedVec::new();
         for item in self.into_iter() {
-            result.push(item.clone())
+            result.push(item.borrow().clone())
         }
         result
     }
@@ -519,12 +573,16 @@ where
         }
         let mut byte_index = 0;
         while byte_index < self_len {
-            let self_item = T::from_byte_reader(|dest_slice| {
-                let _ = self.buffer.load_slice(byte_index, dest_slice);
-            });
-            let other_item = T::from_byte_reader(|dest_slice| {
-                let _ = other.buffer.load_slice(byte_index, dest_slice);
-            });
+            let mut self_payload = T::PAYLOAD::new_buffer();
+            let _ = self
+                .buffer
+                .load_slice(byte_index, self_payload.payload_slice_mut());
+            let mut other_payload = T::PAYLOAD::new_buffer();
+            let _ = other
+                .buffer
+                .load_slice(byte_index, other_payload.payload_slice_mut());
+            let self_item = T::read_from_payload(&self_payload);
+            let other_item = T::read_from_payload(&other_payload);
             if self_item != other_item {
                 return false;
             }
@@ -582,7 +640,8 @@ where
         } else {
             let mut nested_buffer = output.start_nested_encode();
             for item in self {
-                item.dep_encode_or_handle_err(&mut nested_buffer, h)?;
+                item.borrow()
+                    .dep_encode_or_handle_err(&mut nested_buffer, h)?;
             }
             output.finalize_nested_encode(nested_buffer);
             Ok(())
@@ -602,7 +661,7 @@ where
     {
         self.len().dep_encode_or_handle_err(dest, h)?;
         for item in self {
-            item.dep_encode_or_handle_err(dest, h)?;
+            item.borrow().dep_encode_or_handle_err(dest, h)?;
         }
         Ok(())
     }
@@ -719,7 +778,7 @@ where
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut dbg_list = f.debug_list();
         for item in self.into_iter() {
-            dbg_list.entry(&item);
+            dbg_list.entry(item.borrow());
         }
         dbg_list.finish()
     }

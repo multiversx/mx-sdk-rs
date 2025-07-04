@@ -1,8 +1,11 @@
-use crate::types::{BigUint, EgldOrMultiEsdtPaymentRefs, ManagedAddress, TxFrom, TxToSpecified};
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{BigUint, EgldOrMultiEsdtPaymentRefs, ManagedAddress, TxFrom, TxToSpecified},
+};
 
 use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<'a, Env> TxPayment<Env> for EgldOrMultiEsdtPaymentRefs<'a, Env::Api>
+impl<Env> TxPayment<Env> for EgldOrMultiEsdtPaymentRefs<'_, Env::Api>
 where
     Env: TxEnv,
 {
@@ -10,19 +13,19 @@ where
         self.is_empty()
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
+    ) -> Result<(), TransferExecuteFailed> {
         match self {
             EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
-                Egld(egld_amount).perform_transfer_execute(env, to, gas_limit, fc);
+                Egld(egld_amount).perform_transfer_execute_fallible(env, to, gas_limit, fc)
             },
             EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
-                multi_esdt_payment.perform_transfer_execute(env, to, gas_limit, fc);
+                multi_esdt_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
             },
         }
     }

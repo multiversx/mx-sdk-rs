@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write};
+use std::{fs::File, io::Write, path::Path};
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi};
 
@@ -6,17 +6,28 @@ use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to
 
 const DEFAULT_GAS: &str = "30_000_000u64";
 
-pub(crate) fn write_interact_struct_impl(
-    file: &mut File,
-    abi: &ContractAbi,
-    wasm_output_file_path_expr: &str,
-) {
+pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, crate_name: &str) {
+    let crate_path = crate_name.replace("_", "-");
+    let mxsc_file_name = format!("{crate_path}.mxsc.json");
+    let wasm_output_file_path = Path::new("..").join("output").join(mxsc_file_name);
+
+    let wasm_output_file_path_expr =
+        format!("\"mxsc:{}\"", &wasm_output_file_path.to_string_lossy());
+
     writeln!(
         file,
         r#"impl ContractInteract {{
-    async fn new() -> Self {{
-        let mut interactor = Interactor::new(GATEWAY).await;
-        let wallet_address = interactor.register_wallet(test_wallets::alice());
+    pub async fn new(config: Config) -> Self {{
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .use_chain_simulator(config.use_chain_simulator());
+
+        interactor.set_current_dir_from_workspace("{}");
+        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+
+        // Useful in the chain simulator setting
+        // generate blocks until ESDTSystemSCAddress is enabled
+        interactor.generate_blocks_until_epoch(1).await.unwrap();
         
         let contract_code = BytesValue::interpret_from(
             {},
@@ -31,10 +42,9 @@ pub(crate) fn write_interact_struct_impl(
         }}
     }}
 "#,
-        wasm_output_file_path_expr,
+        crate_path, wasm_output_file_path_expr,
     )
     .unwrap();
-
     write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
 
     for upgrade_abi in &abi.upgrade_constructors {
@@ -65,14 +75,11 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
             .init({})
             .code(&self.contract_code)
             .returns(ReturnsNewAddress)
-            .prepare_async()
             .run()
             .await;
-        let new_address_bech32 = bech32::encode(&new_address);
-        self.state
-            .set_address(Bech32Address::from_bech32_string(new_address_bech32.clone()));
-
-        println!("new address: {{new_address_bech32}}");"#,
+        let new_address_bech32 = new_address.to_bech32_default();
+        println!("new address: {{new_address_bech32}}");
+        self.state.set_address(new_address_bech32);"#,
         proxy_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
     )
@@ -100,8 +107,7 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
             .upgrade({})
             .code(&self.contract_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
-            .returns(ReturnsNewAddress)
-            .prepare_async()
+            .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 
@@ -132,7 +138,7 @@ fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
 }
 
 fn write_method_declaration(file: &mut File, endpoint_name: &str) {
-    writeln!(file, "    async fn {endpoint_name}(&mut self) {{").unwrap();
+    writeln!(file, "    pub async fn {endpoint_name}(&mut self) {{").unwrap();
 }
 
 fn write_payments_declaration(file: &mut File, accepted_tokens: &[String]) {
@@ -214,7 +220,6 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
             .typed(proxy::{}Proxy)
             .{}({}){}
             .returns(ReturnsResultUnmanaged)
-            .prepare_async()
             .run()
             .await;
 
@@ -237,7 +242,6 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi, name: &Stri
             .typed(proxy::{}Proxy)
             .{}({})
             .returns(ReturnsResultUnmanaged)
-            .prepare_async()
             .run()
             .await;
 

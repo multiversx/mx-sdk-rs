@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
@@ -45,8 +45,12 @@ fn whitelist_blacklist_fee_token_go() {
 }
 
 #[test]
-fn pay_fee_and_fund_esdt_go() {
-    world().run("scenarios/pay-fee-and-fund-esdt.scen.json");
+fn pay_fee_and_fund_esdt_single_go() {
+    world().run("scenarios/pay-fee-and-fund-esdt-single.scen.json");
+}
+#[test]
+fn pay_fee_and_fund_esdt_multiple_go() {
+    world().run("scenarios/pay-fee-and-fund-esdt-multiple.scen.json");
 }
 
 #[test]

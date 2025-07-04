@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.53.0"
+            "version": "0.59.0"
         }
     },
     "docs": [
@@ -110,6 +110,7 @@
         },
         {
             "name": "multi_result_3",
+            "title": "result-3",
             "mutability": "mutable",
             "inputs": [],
             "outputs": [
@@ -247,6 +248,21 @@
             ]
         },
         {
+            "name": "process_managed_decimal",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "input",
+                    "type": "ManagedDecimal<10>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<usize>"
+                }
+            ]
+        },
+        {
             "name": "esdt_local_role",
             "mutability": "mutable",
             "inputs": [],
@@ -313,6 +329,21 @@
             "outputs": [
                 {
                     "type": "List<AbiManagedVecItem>"
+                }
+            ]
+        },
+        {
+            "name": "echo_permission",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "p",
+                    "type": "Permission"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Permission"
                 }
             ]
         },
@@ -461,6 +492,10 @@
                     "indexed": true
                 }
             ]
+        },
+        {
+            "identifier": "empty_identifier_event",
+            "inputs": []
         }
     ],
     "esdtAttributes": [
@@ -1003,6 +1038,15 @@
                         "indicates that operation was interrupted prematurely, due to low gas"
                     ],
                     "name": "interrupted"
+                }
+            ]
+        },
+        "Permission": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "0",
+                    "type": "u32"
                 }
             ]
         }

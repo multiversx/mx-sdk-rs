@@ -1,7 +1,10 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace(
+        "contracts/feature-tests/erc-style-contracts/erc1155-marketplace",
+    );
     blockchain.register_contract(
         "mxsc:output/erc1155-marketplace.mxsc.json",
         erc1155_marketplace::ContractBuilder,

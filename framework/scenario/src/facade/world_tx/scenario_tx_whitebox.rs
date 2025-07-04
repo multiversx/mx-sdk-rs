@@ -1,10 +1,10 @@
-use crate::debug_executor::contract_instance_wrapped_execution;
+use crate::executor::debug::ContractDebugWhiteboxLambda;
 use crate::scenario::tx_to_step::TxToQueryStep;
 use crate::{
     imports::StaticApi, scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec,
 };
 use crate::{DebugApi, ScenarioEnvQuery};
-use multiversx_chain_vm::tx_mock::TxFunctionName;
+use multiversx_chain_vm::host::context::TxFunctionName;
 use multiversx_sc::contract_base::ContractBase;
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
@@ -60,12 +60,12 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_deploy_lambda(&step_wrapper.step, || {
-                contract_instance_wrapped_execution(true, || {
+            .perform_sc_deploy_lambda(
+                &step_wrapper.step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_INIT, || {
                     f(contract_obj);
-                    Ok(())
-                });
-            });
+                }),
+            );
 
         let mut response = TxResponse::from_tx_result(tx_result);
         response.new_deployed_address = Some(new_address);
@@ -133,12 +133,12 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_call_lambda(&step_wrapper.step, || {
-                contract_instance_wrapped_execution(true, || {
+            .perform_sc_call_lambda(
+                &step_wrapper.step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_CALL, || {
                     f(contract_obj);
-                    Ok(())
-                });
-            });
+                }),
+            );
 
         let response = TxResponse::from_tx_result(tx_result);
         step_wrapper.step.save_response(response);
@@ -203,12 +203,12 @@ where
             .world
             .get_mut_debugger_backend()
             .vm_runner
-            .perform_sc_query_lambda(&step_wrapper.step, || {
-                contract_instance_wrapped_execution(true, || {
+            .perform_sc_query_in_debugger(
+                &step_wrapper.step,
+                ContractDebugWhiteboxLambda::new(TxFunctionName::WHITEBOX_QUERY, || {
                     f(contract_obj);
-                    Ok(())
-                });
-            });
+                }),
+            );
 
         let response = TxResponse::from_tx_result(tx_result);
         step_wrapper.step.save_response(response);

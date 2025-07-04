@@ -1,7 +1,8 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{self, CurrentStorage, StorageAddress},
+    set_mapper::{self},
+    source::{CurrentStorage, StorageAddress},
     SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
@@ -234,7 +235,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> Iterator for Iter<'a, SA, A, K, V>
+impl<SA, A, K, V> Iterator for Iter<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -279,7 +280,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> Iterator for Values<'a, SA, A, K, V>
+impl<SA, A, K, V> Iterator for Values<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -344,7 +345,7 @@ where
     pub(super) _marker: PhantomData<&'a mut (K, V)>,
 }
 
-impl<'a, SA, A, K, V> Entry<'a, SA, A, K, V>
+impl<SA, A, K, V> Entry<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -438,7 +439,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> VacantEntry<'a, SA, A, K, V>
+impl<SA, A, K, V> VacantEntry<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -470,7 +471,7 @@ where
     }
 }
 
-impl<'a, SA, A, K, V> OccupiedEntry<'a, SA, A, K, V>
+impl<SA, A, K, V> OccupiedEntry<'_, SA, A, K, V>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -488,7 +489,7 @@ where
     }
 }
 
-impl<'a, SA, K, V> OccupiedEntry<'a, SA, CurrentStorage, K, V>
+impl<SA, K, V> OccupiedEntry<'_, SA, CurrentStorage, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,

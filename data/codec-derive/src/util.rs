@@ -1,5 +1,10 @@
-use quote::quote;
+use quote::{quote, ToTokens};
 use syn::{punctuated::Punctuated, token::Comma, Variant};
+
+pub const BITFLAGS_PRIMITIVE: &str = ":: __private :: PublicFlags > :: Primitive";
+const BITFLAGS_INTERNAL: &str = ":: __private :: PublicFlags > :: Internal";
+const BITFLAGS_INTERNAL_PATH: &str = ":: __private :: PublicFlags :: Internal";
+const PRIMITIVE: &str = "Primitive";
 
 pub struct ExplicitDiscriminant {
     pub variant_index: usize,
@@ -13,16 +18,33 @@ pub fn is_fieldless_enum(data_enum: &syn::DataEnum) -> bool {
         .all(|variant| variant.fields.is_empty())
 }
 
+pub fn is_bitflags_struct(data_struct: &syn::DataStruct) -> bool {
+    data_struct.fields.iter().any(|field| {
+        field
+            .ty
+            .to_token_stream()
+            .to_string()
+            .contains(BITFLAGS_INTERNAL)
+    })
+}
+
 pub fn self_field_expr(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
-    if let Some(ident) = &field.ident {
-        quote! {
-            self.#ident
-        }
-    } else {
-        let index_lit = proc_macro2::Literal::usize_unsuffixed(index);
-        quote! {
-            self.#index_lit
-        }
+    match &field.ident {
+        Some(ident) => quote!(self.#ident),
+        None => {
+            let index_lit = proc_macro2::Literal::usize_unsuffixed(index);
+
+            if field
+                .ty
+                .to_token_stream()
+                .to_string()
+                .contains(BITFLAGS_INTERNAL)
+            {
+                quote!(self.#index_lit.bits())
+            } else {
+                quote!(self.#index_lit)
+            }
+        },
     }
 }
 
@@ -140,4 +162,19 @@ pub fn get_discriminant(
     };
 
     quote! { #next_value}
+}
+
+pub fn sanitize_type_path(mut field: syn::Type) -> proc_macro2::TokenStream {
+    if let syn::Type::Path(ref mut p) = field {
+        if p.path
+            .to_token_stream()
+            .to_string()
+            .contains(BITFLAGS_INTERNAL_PATH)
+        {
+            let modified_path = p.path.segments.last_mut().unwrap();
+            modified_path.ident = syn::Ident::new(PRIMITIVE, modified_path.ident.span());
+        }
+    }
+
+    quote! (#field)
 }

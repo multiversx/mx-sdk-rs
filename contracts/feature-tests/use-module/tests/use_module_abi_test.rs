@@ -1,11 +1,12 @@
 use multiversx_sc_meta_lib::abi_json;
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 use std::{fs, fs::File, io::Write};
 
 #[test]
 fn use_module_abi_generated_ok() {
-    let blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/use-module");
 
     // generate ABI
     let multi_contract_config = multiversx_sc_meta_lib::multi_contract_config::<

@@ -1,7 +1,8 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/examples/bonding-curve-contract");
     blockchain.register_contract(
         "mxsc:output/bonding-curve-contract.mxsc.json",
         bonding_curve_contract::ContractBuilder,

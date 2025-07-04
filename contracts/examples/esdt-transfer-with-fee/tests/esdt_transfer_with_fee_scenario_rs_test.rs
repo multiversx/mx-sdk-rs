@@ -1,8 +1,9 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/esdt-transfer-with-fee");
     blockchain.register_contract(
         "mxsc:output/esdt-transfer-with-fee.mxsc.json",
         esdt_transfer_with_fee::ContractBuilder,

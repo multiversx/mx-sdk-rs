@@ -1,6 +1,4 @@
-use crate::{
-    DecodeError, DecodeErrorHandler, DefaultErrorHandler, TopDecode, TopDecodeMultiInput, TopEncode,
-};
+use crate::{DecodeError, DecodeErrorHandler, DefaultErrorHandler, TopDecode, TopDecodeMultiInput};
 
 pub trait TopDecodeMulti: Sized {
     /// Used to optimize single value loading of endpoint arguments.
@@ -24,12 +22,6 @@ pub trait TopDecodeMulti: Sized {
         }
     }
 }
-pub trait TopDecodeMultiLength {
-    const LEN: usize;
-    fn get_len() -> usize {
-        Self::LEN
-    }
-}
 
 /// All single top decode types also work as multi-value decode types.
 impl<T> TopDecodeMulti for T
@@ -45,11 +37,4 @@ where
     {
         input.next_value(h)
     }
-}
-
-impl<T> TopDecodeMultiLength for T
-where
-    T: TopEncode + TopDecode,
-{
-    const LEN: usize = 1;
 }

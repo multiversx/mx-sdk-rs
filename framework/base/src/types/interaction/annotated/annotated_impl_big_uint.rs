@@ -53,7 +53,7 @@ where
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, BigUint<Env::Api>> for ManagedRef<'a, Env::Api, BigUint<Env::Api>>
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for ManagedRef<'_, Env::Api, BigUint<Env::Api>>
 where
     Env: TxEnv,
 {

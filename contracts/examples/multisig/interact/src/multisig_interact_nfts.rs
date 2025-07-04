@@ -50,11 +50,10 @@ impl MultisigInteract {
                     .argument(&0u32),
             )
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 
-        println!("successfully proposed issue colllection with roles all action `{action_id}`");
+        println!("successfully proposed issue collection with roles all action `{action_id}`");
         action_id
     }
 
@@ -62,7 +61,7 @@ impl MultisigInteract {
         println!("proposing issue collection with all roles...");
         let action_id = self.propose_issue_collection_with_all_roles().await;
 
-        println!("perfoming issue collection with all roles action `{action_id}`...");
+        println!("performing issue collection with all roles action `{action_id}`...");
 
         self.sign_if_quorum_not_reached(action_id).await;
 
@@ -75,7 +74,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
             .returns(ReturnsNewTokenIdentifier)
-            .prepare_async()
             .run()
             .await;
         self.collection_token_identifier = new_token_id.to_string();
@@ -102,11 +100,10 @@ impl MultisigInteract {
                     .argument(&COLLECTION_TICKER),
             )
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 
-        println!("successfully proposed issue colllection action `{action_id}`");
+        println!("successfully proposed issue collection action `{action_id}`");
         action_id
     }
 
@@ -114,7 +111,7 @@ impl MultisigInteract {
         println!("proposing issue collection...");
         let action_id = self.propose_issue_collection().await;
 
-        println!("perfoming issue collection action `{action_id}`...");
+        println!("performing issue collection action `{action_id}`...");
 
         self.sign_if_quorum_not_reached(action_id).await;
 
@@ -127,7 +124,6 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
             .returns(ReturnsNewTokenIdentifier)
-            .prepare_async()
             .run()
             .await;
         self.collection_token_identifier = new_token_id;
@@ -156,7 +152,6 @@ impl MultisigInteract {
                     .argument(&"ESDTRoleNFTCreate"),
             )
             .returns(ReturnsResult)
-            .prepare_async()
             .run()
             .await;
 

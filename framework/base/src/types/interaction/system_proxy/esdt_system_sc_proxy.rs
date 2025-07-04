@@ -1,4 +1,4 @@
-use super::token_properties::*;
+use super::{token_properties::*, TokenPropertiesResult};
 
 use crate::{
     api::CallTypeApi,
@@ -14,6 +14,8 @@ const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &str = "issueNonFungible";
 const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &str = "issueSemiFungible";
 const REGISTER_META_ESDT_ENDPOINT_NAME: &str = "registerMetaESDT";
 const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
+const REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME: &str = "registerDynamic";
+const REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME: &str = "registerAndSetAllRolesDynamic";
 
 /// The specific `Tx` type produces by the issue operations of the ESDTSystemSCProxy.
 pub type IssueCall<Env, From, To, Gas> = Tx<
@@ -70,9 +72,9 @@ where
     >(
         self,
         issue_cost: BigUint<Env::Api>,
-        token_display_name: &Arg0,
-        token_ticker: &Arg1,
-        initial_supply: &Arg2,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
+        initial_supply: Arg2,
         properties: FungibleTokenProperties,
     ) -> IssueCall<Env, From, To, Gas> {
         self.issue(
@@ -104,8 +106,8 @@ where
     >(
         self,
         issue_cost: BigUint<Env::Api>,
-        token_display_name: &Arg0,
-        token_ticker: &Arg1,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
         properties: NonFungibleTokenProperties,
     ) -> IssueCall<Env, From, To, Gas> {
         let zero = &BigUint::zero();
@@ -138,8 +140,8 @@ where
     >(
         self,
         issue_cost: BigUint<Env::Api>,
-        token_display_name: &Arg0,
-        token_ticker: &Arg1,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
         properties: SemiFungibleTokenProperties,
     ) -> IssueCall<Env, From, To, Gas> {
         let zero = BigUint::zero();
@@ -172,14 +174,14 @@ where
     >(
         self,
         issue_cost: BigUint<Env::Api>,
-        token_display_name: &Arg0,
-        token_ticker: &Arg1,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
         properties: MetaTokenProperties,
     ) -> IssueCall<Env, From, To, Gas> {
         let zero = &BigUint::zero();
         self.issue(
             issue_cost,
-            EsdtTokenType::Meta,
+            EsdtTokenType::MetaFungible,
             token_display_name,
             token_ticker,
             zero,
@@ -211,20 +213,80 @@ where
     ) -> IssueCall<Env, From, To, Gas> {
         let token_type_name = match token_type {
             EsdtTokenType::Fungible => "FNG",
-            EsdtTokenType::NonFungible => "NFT",
-            EsdtTokenType::SemiFungible => "SFT",
-            EsdtTokenType::Meta => "META",
+            EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
+            | EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::SemiFungible | EsdtTokenType::DynamicSFT => "SFT",
+            EsdtTokenType::MetaFungible | EsdtTokenType::DynamicMeta => "META",
             EsdtTokenType::Invalid => "",
         };
 
-        self.wrapped_tx
-            .raw_call(ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME)
+        let endpoint = match token_type {
+            EsdtTokenType::Fungible
+            | EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
+            | EsdtTokenType::SemiFungible
+            | EsdtTokenType::MetaFungible => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
+            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
+                REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME
+            },
+            EsdtTokenType::Invalid => "",
+        };
+
+        let mut tx = self
+            .wrapped_tx
+            .raw_call(endpoint)
             .egld(issue_cost)
             .argument(&token_display_name)
             .argument(&token_ticker)
-            .argument(&token_type_name)
-            .argument(&num_decimals)
-            .original_result()
+            .argument(&token_type_name);
+
+        if token_type != EsdtTokenType::DynamicNFT && token_type != EsdtTokenType::DynamicSFT {
+            tx = tx.argument(&num_decimals);
+        }
+
+        tx.original_result()
+    }
+
+    /// Issues dynamic ESDT tokens
+    pub fn issue_dynamic<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        issue_cost: BigUint<Env::Api>,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> IssueCall<Env, From, To, Gas> {
+        let endpoint_name = match token_type {
+            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
+                REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
+            },
+            _ => "",
+        };
+
+        let token_type_name = match token_type {
+            EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::DynamicSFT => "SFT",
+            EsdtTokenType::DynamicMeta => "META",
+            _ => "",
+        };
+
+        let mut tx = self
+            .wrapped_tx
+            .raw_call(endpoint_name)
+            .egld(issue_cost)
+            .argument(&token_display_name)
+            .argument(&token_ticker)
+            .argument(&token_type_name);
+
+        if token_type != EsdtTokenType::DynamicNFT && token_type != EsdtTokenType::DynamicSFT {
+            tx = tx.argument(&num_decimals);
+        }
+
+        tx.original_result()
     }
 
     /// Deduplicates code from all the possible issue functions
@@ -236,30 +298,30 @@ where
         self,
         issue_cost: BigUint<Env::Api>,
         token_type: EsdtTokenType,
-        token_display_name: &Arg0,
-        token_ticker: &Arg1,
-        initial_supply: &Arg2,
+        token_display_name: Arg0,
+        token_ticker: Arg1,
+        initial_supply: Arg2,
         properties: TokenProperties,
     ) -> IssueCall<Env, From, To, Gas> {
         let endpoint_name = match token_type {
             EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
-            EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
-            EsdtTokenType::Invalid => "",
+            EsdtTokenType::MetaFungible => REGISTER_META_ESDT_ENDPOINT_NAME,
+            _ => "",
         };
 
         let mut tx = self
             .wrapped_tx
             .raw_call(endpoint_name)
             .egld(issue_cost)
-            .argument(token_display_name)
-            .argument(token_ticker);
+            .argument(&token_display_name)
+            .argument(&token_ticker);
 
         if token_type == EsdtTokenType::Fungible {
-            tx = tx.argument(initial_supply);
+            tx = tx.argument(&initial_supply);
             tx = tx.argument(&properties.num_decimals);
-        } else if token_type == EsdtTokenType::Meta {
+        } else if token_type == EsdtTokenType::MetaFungible {
             tx = tx.argument(&properties.num_decimals);
         }
 
@@ -290,14 +352,14 @@ where
     /// It will fail if the SC is not the owner of the token.
     pub fn mint<Arg0: ProxyArg<TokenIdentifier<Env::Api>>, Arg1: ProxyArg<BigUint<Env::Api>>>(
         self,
-        token_identifier: &Arg0,
-        amount: &Arg1,
+        token_identifier: Arg0,
+        amount: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("mint")
-            .argument(token_identifier)
-            .argument(amount)
+            .argument(&token_identifier)
+            .argument(&amount)
             .original_result()
     }
 
@@ -305,14 +367,14 @@ where
     /// which causes it to burn fungible ESDT tokens owned by the SC.
     pub fn burn<Arg0: ProxyArg<TokenIdentifier<Env::Api>>, Arg1: ProxyArg<BigUint<Env::Api>>>(
         self,
-        token_identifier: &Arg0,
-        amount: &Arg1,
+        token_identifier: Arg0,
+        amount: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("ESDTBurn")
-            .argument(token_identifier)
-            .argument(amount)
+            .argument(&token_identifier)
+            .argument(&amount)
             .original_result()
     }
 
@@ -320,24 +382,24 @@ where
     /// except minting, freezing/unfreezing and wiping.
     pub fn pause<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
-        token_identifier: &Arg0,
+        token_identifier: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("pause")
-            .argument(token_identifier)
+            .argument(&token_identifier)
             .original_result()
     }
 
     /// The reverse operation of `pause`.
     pub fn unpause<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
-        token_identifier: &Arg0,
+        token_identifier: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("unPause")
-            .argument(token_identifier)
+            .argument(&token_identifier)
             .original_result()
     }
 
@@ -349,14 +411,14 @@ where
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
-        token_identifier: &Arg0,
-        address: &Arg1,
+        token_identifier: Arg0,
+        address: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("freeze")
-            .argument(token_identifier)
-            .argument(address)
+            .argument(&token_identifier)
+            .argument(&address)
             .original_result()
     }
 
@@ -366,14 +428,14 @@ where
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
-        token_identifier: &Arg0,
-        address: &Arg1,
+        token_identifier: Arg0,
+        address: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("unFreeze")
-            .argument(token_identifier)
-            .argument(address)
+            .argument(&token_identifier)
+            .argument(&address)
             .original_result()
     }
 
@@ -386,14 +448,14 @@ where
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
-        token_identifier: &Arg0,
-        address: &Arg1,
+        token_identifier: Arg0,
+        address: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("wipe")
-            .argument(token_identifier)
-            .argument(address)
+            .argument(&token_identifier)
+            .argument(&address)
             .original_result()
     }
 
@@ -405,16 +467,16 @@ where
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
-        token_identifier: &Arg0,
+        token_identifier: Arg0,
         nft_nonce: u64,
-        address: &Arg1,
+        address: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("freezeSingleNFT")
-            .argument(token_identifier)
+            .argument(&token_identifier)
             .argument(&nft_nonce)
-            .argument(address)
+            .argument(&address)
             .original_result()
     }
 
@@ -424,16 +486,16 @@ where
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
-        token_identifier: &Arg0,
+        token_identifier: Arg0,
         nft_nonce: u64,
-        address: &Arg1,
+        address: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("unFreezeSingleNFT")
-            .argument(token_identifier)
+            .argument(&token_identifier)
             .argument(&nft_nonce)
-            .argument(address)
+            .argument(&address)
             .original_result()
     }
 
@@ -446,16 +508,16 @@ where
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
-        token_identifier: &Arg0,
+        token_identifier: Arg0,
         nft_nonce: u64,
-        address: &Arg1,
+        address: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("wipeSingleNFT")
-            .argument(token_identifier)
+            .argument(&token_identifier)
             .argument(&nft_nonce)
-            .argument(address)
+            .argument(&address)
             .original_result()
     }
 
@@ -463,13 +525,13 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn change_sft_to_meta_esdt<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
-        token_identifier: &Arg0,
+        token_identifier: Arg0,
         num_decimals: usize,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("changeSFTToMetaESDT")
-            .argument(token_identifier)
+            .argument(&token_identifier)
             .argument(&num_decimals)
             .original_result()
     }
@@ -484,21 +546,35 @@ where
         Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
-        address: &Arg0,
-        token_identifier: &Arg1,
+        address: Arg0,
+        token_identifier: Arg1,
         roles_iter: RoleIter,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self
             .wrapped_tx
             .payment(NotPayable)
             .raw_call("setSpecialRole")
-            .argument(token_identifier)
-            .argument(address);
+            .argument(&token_identifier)
+            .argument(&address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
                 tx = tx.argument(&role.as_role_name());
             }
         }
+
+        tx.original_result()
+    }
+
+    /// This function can be called to retrieve the special roles of a specific token.
+    pub fn get_special_roles<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_identifier: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        let tx = self
+            .wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getSpecialRoles")
+            .argument(&token_identifier);
 
         tx.original_result()
     }
@@ -513,16 +589,16 @@ where
         Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
-        address: &Arg0,
-        token_identifier: &Arg1,
+        address: Arg0,
+        token_identifier: Arg1,
         roles_iter: RoleIter,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self
             .wrapped_tx
             .payment(NotPayable)
             .raw_call("unSetSpecialRole")
-            .argument(token_identifier)
-            .argument(address);
+            .argument(&token_identifier)
+            .argument(&address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
                 tx = tx.argument(&role.as_role_name());
@@ -537,14 +613,14 @@ where
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
-        token_identifier: &Arg0,
-        new_owner: &Arg1,
+        token_identifier: Arg0,
+        new_owner: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("transferOwnership")
-            .argument(token_identifier)
-            .argument(new_owner)
+            .argument(&token_identifier)
+            .argument(&new_owner)
             .original_result()
     }
 
@@ -553,31 +629,68 @@ where
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
-        token_identifier: &Arg0,
-        old_creator: &Arg1,
-        new_creator: &Arg1,
+        token_identifier: Arg0,
+        old_creator: Arg1,
+        new_creator: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("transferNFTCreateRole")
-            .argument(token_identifier)
-            .argument(old_creator)
-            .argument(new_creator)
+            .argument(&token_identifier)
+            .argument(&old_creator)
+            .argument(&new_creator)
             .original_result()
     }
 
     pub fn control_changes<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
         self,
-        token_identifier: &Arg0,
+        token_identifier: Arg0,
         property_arguments: &TokenPropertyArguments,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self
             .wrapped_tx
             .payment(NotPayable)
             .raw_call("controlChanges")
-            .argument(token_identifier);
+            .argument(&token_identifier);
         append_token_property_arguments(&mut tx.data, property_arguments);
         tx.original_result()
+    }
+
+    /// Changes token to dynamic.
+    /// Does not work for: FungibleESDT, NonFungibleESDT, NonFungibleESDTv2.
+    pub fn change_to_dynamic<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("changeToDynamic")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Updates a specific token to the newest version.
+    pub fn update_token<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("updateTokenID")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Fetches token properties for a specific token.
+    pub fn get_token_properties<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenPropertiesResult> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getTokenProperties")
+            .argument(&token_id)
+            .original_result()
     }
 }
 

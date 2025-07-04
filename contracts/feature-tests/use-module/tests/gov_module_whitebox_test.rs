@@ -31,6 +31,7 @@ pub struct Payment {
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/use-module");
     blockchain.register_contract(USE_MODULE_PATH_EXPR, use_module::ContractBuilder);
     blockchain
 }
@@ -74,7 +75,7 @@ fn setup() -> ScenarioWorld {
             );
         });
 
-    assert_eq!(new_address.to_address(), USE_MODULE_ADDRESS.to_address());
+    assert_eq!(new_address, USE_MODULE_ADDRESS);
 
     world.current_block().block_nonce(10);
 

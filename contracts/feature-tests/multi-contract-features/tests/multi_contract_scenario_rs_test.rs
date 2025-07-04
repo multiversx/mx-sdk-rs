@@ -1,7 +1,8 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/multi-contract-features");
 
     blockchain.register_partial_contract::<multi_contract_features::AbiProvider, _>(
         "mxsc:output/multi-contract-features.mxsc.json",

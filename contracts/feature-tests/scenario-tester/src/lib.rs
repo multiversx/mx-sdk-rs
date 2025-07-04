@@ -12,9 +12,15 @@ pub trait ScenarioTester {
     #[storage_mapper("sum")]
     fn sum(&self) -> SingleValueMapper<BigUint>;
 
+    #[view(getOtherMapper)]
+    #[storage_mapper("otherMapper")]
+    fn other_mapper(&self) -> SingleValueMapper<ManagedBuffer>;
+
+    /// Return value for testing reasons.
     #[init]
-    fn init(&self, initial_value: BigUint) {
+    fn init(&self, initial_value: BigUint) -> &'static str {
         self.sum().set(initial_value);
+        "init-result"
     }
 
     #[upgrade]
@@ -28,6 +34,12 @@ pub trait ScenarioTester {
         self.sum().update(|sum| *sum += value);
     }
 
+    /// Sets a value at another key
+    #[endpoint]
+    fn set_other_mapper(&self, value: ManagedBuffer) {
+        self.other_mapper().set(value);
+    }
+
     /// Tests "from" conversion for MultiValueN parameters
     #[endpoint]
     fn multi_param(&self, _value: MultiValue2<BigUint, BigUint>) {}
@@ -37,5 +49,19 @@ pub trait ScenarioTester {
     fn multi_return(&self, value: BigUint) -> MultiValue2<BigUint, BigUint> {
         let value_plus_one = &value + 1u32;
         (value, value_plus_one).into()
+    }
+
+    #[view]
+    fn sc_panic(&self) {
+        sc_panic!("sc_panic! example");
+    }
+
+    // Trigger warning message in terminal: "Forbidden opcodes detected in endpoint"
+    // Report available in *.mxsc.json
+    #[endpoint]
+    #[inline(never)]
+    #[label("forbidden-opcodes")]
+    fn mul_floats(&self, arg: i32) -> i32 {
+        (arg as f32 * 1.5f32) as i32
     }
 }

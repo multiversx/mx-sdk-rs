@@ -16,7 +16,7 @@ pub struct Random {
 
 // usually, types should create their own `random` instance,
 // but because standalone types can't create a random seed
-// (due to no access to blockhain functions),
+// (due to no access to blockchain functions),
 // the method will use a provided `random` instance
 pub trait Randomizeable {
     fn get_random(random: &mut Random) -> Self;
@@ -24,6 +24,7 @@ pub trait Randomizeable {
 
 impl Random {
     /// block random seed + salt creates a stronger randomness source
+    #[allow(static_mut_refs)]
     pub fn new<M: ManagedTypeApi>(
         seed: ManagedByteArray<M, SEED_SIZE>,
         salt: ManagedByteArray<M, SALT_SIZE>,

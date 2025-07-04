@@ -198,7 +198,7 @@ where
 
     /// Sets a single token payment, with the token identifier and amount kept as references.
     ///
-    /// This is handy whem we only want one ESDT transfer and we want to avoid unnecessary object clones.
+    /// This is handy when we only want one ESDT transfer and we want to avoid unnecessary object clones.
     pub fn single_esdt<'a>(
         self,
         token_identifier: &'a TokenIdentifier<Env::Api>,
@@ -908,11 +908,11 @@ where
 impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
 where
     Env: TxEnvWithTxHash,
-    From: TxFromSpecified<Env>,
+    From: TxFrom<Env>,
     To: TxTo<Env>,
-    Payment: TxPaymentEgldOnly<Env>,
+    Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
-    Data: TxDataFunctionCall<Env>,
+    Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
     /// Sets the mock transaction hash to be used in a test.

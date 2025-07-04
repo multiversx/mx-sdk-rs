@@ -1,6 +1,5 @@
 {
     "name": "storage",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -13,7 +12,10 @@
                 "sc:extra-instance": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "mxsc:../output/basic-features.mxsc.json",
+                    "storage": {
+                        "str:contract_address": "sc:basic-features"
+                    }
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -51,6 +53,29 @@
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "function": "address_to_id_mapper_get_id",
+                "arguments": [
+                    "address:an_account"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "address_to_id_mapper_get_id_from_address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:extra-instance",
+                "function": "address_to_id_mapper_get_id_from_address",
                 "arguments": [
                     "address:an_account"
                 ],

@@ -74,9 +74,69 @@ pub trait ForwarderSyncCallModule {
             .returns(ReturnsResult)
             .sync_call();
 
-        let (egld_value, esdt_transfers_multi) = result.into_tuple();
+        self.accept_funds_sync_result_event(&result);
+    }
 
-        self.accept_funds_sync_result_event(&egld_value, &esdt_transfers_multi);
+    #[endpoint]
+    #[payable("EGLD")]
+    fn forward_sync_accept_funds_rh_egld(&self, to: ManagedAddress) -> BigUint {
+        let payment = self.call_value().egld();
+        let half_gas = self.blockchain().get_gas_left() / 2;
+
+        self.tx()
+            .to(&to)
+            .gas(half_gas)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_received_funds_immediately()
+            .egld(payment)
+            .returns(ReturnsBackTransfersEGLD)
+            .sync_call()
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn forward_sync_accept_funds_rh_single_esdt(
+        &self,
+        to: ManagedAddress,
+    ) -> EsdtTokenPayment<Self::Api> {
+        let payment = self.call_value().single_esdt();
+        let half_gas = self.blockchain().get_gas_left() / 2;
+
+        let result = self
+            .tx()
+            .to(&to)
+            .gas(half_gas)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_received_funds_immediately()
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            )
+            .returns(ReturnsBackTransfersSingleESDT)
+            .sync_call();
+
+        result
+    }
+
+    #[allow(deprecated)]
+    #[endpoint]
+    #[payable("*")]
+    fn forward_sync_accept_funds_rh_multi_esdt(
+        &self,
+        to: ManagedAddress,
+    ) -> ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>> {
+        let payment = self.call_value().all_transfers();
+        let half_gas = self.blockchain().get_gas_left() / 2;
+
+        self.tx()
+            .to(&to)
+            .gas(half_gas)
+            .typed(vault_proxy::VaultProxy)
+            .retrieve_received_funds_immediately()
+            .payment(payment)
+            .returns(ReturnsBackTransfersLegacyMultiESDT)
+            .sync_call()
     }
 
     #[payable("*")]
@@ -98,8 +158,7 @@ pub trait ForwarderSyncCallModule {
     #[event("accept_funds_sync_result")]
     fn accept_funds_sync_result_event(
         &self,
-        #[indexed] egld_value: &BigUint,
-        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
     );
 
     #[endpoint]
@@ -166,21 +225,13 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-            all_token_payments.push(payment);
-        }
-
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .payment(all_token_payments)
+            .payment(payment_args.convert_payment_multi_triples())
             .sync_call();
     }
 }

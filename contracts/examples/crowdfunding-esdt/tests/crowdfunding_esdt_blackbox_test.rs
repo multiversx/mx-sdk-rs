@@ -11,8 +11,9 @@ const CODE_PATH: MxscPath = MxscPath::new("output/crowdfunding-esdt.mxsc.json");
 const CROWDFUNDING_ADDRESS: TestSCAddress = TestSCAddress::new("crowdfunding-esdt");
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/crowdfunding-esdt");
     blockchain.register_contract(CODE_PATH, crowdfunding_esdt::ContractBuilder);
     blockchain
 }

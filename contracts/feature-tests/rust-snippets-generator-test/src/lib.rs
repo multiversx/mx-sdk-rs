@@ -13,12 +13,10 @@ multiversx_sc::derive_imports!();
 
 // Additionally, we also have to update the interactor snippets manually to add relative paths:
 // [dependencies.multiversx-sc-snippets]
-// version = "0.53.0"
 // path = "../../../../framework/snippets"
 
-#[derive(
-    TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Debug, Clone,
-)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Debug, Clone)]
 pub struct MyCoolStruct<M: ManagedTypeApi> {
     pub awesome: BigUint<M>,
 }

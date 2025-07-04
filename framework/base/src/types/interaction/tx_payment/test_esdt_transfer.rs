@@ -1,5 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
+    contract_base::TransferExecuteFailed,
     types::{
         BigUint, EsdtTokenPayment, FullPaymentData, FunctionCall, ManagedAddress,
         TestTokenIdentifier, TxEnv, TxFrom, TxPayment, TxToSpecified,
@@ -26,7 +27,7 @@ where
     }
 }
 
-impl<'a, Env> TxPayment<Env> for TestEsdtTransfer<'a>
+impl<Env> TxPayment<Env> for TestEsdtTransfer<'_>
 where
     Env: TxEnv,
 {
@@ -36,14 +37,14 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        EsdtTokenPayment::from(self).perform_transfer_execute(env, to, gas_limit, fc);
+    ) -> Result<(), TransferExecuteFailed> {
+        EsdtTokenPayment::from(self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]

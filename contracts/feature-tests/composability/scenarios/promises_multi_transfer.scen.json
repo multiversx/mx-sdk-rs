@@ -29,7 +29,7 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -64,7 +64,6 @@
             },
             "expect": {
                 "out": [
-                    "0",
                     "str:FWD-TOKEN",
                     "0",
                     "500",
@@ -115,7 +114,6 @@
                         "endpoint": "str:accept_funds_echo_payment",
                         "topics": [
                             "str:accept_funds",
-                            "0",
                             "str:FWD-TOKEN",
                             "0",
                             "500",
@@ -141,7 +139,6 @@
                             "str:AsyncCallback",
                             "str:the_one_callback",
                             "0x00",
-                            "0",
                             "str:FWD-TOKEN",
                             "0",
                             "500",
@@ -164,7 +161,6 @@
                         "data": [
                             [
                                 "nested:0x00",
-                                "nested:0",
                                 "nested:str:FWD-TOKEN",
                                 "nested:0",
                                 "nested:500",
@@ -239,7 +235,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         }

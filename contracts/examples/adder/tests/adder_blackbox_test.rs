@@ -7,8 +7,9 @@ const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
 const CODE_PATH: MxscPath = MxscPath::new("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/adder");
     blockchain.register_contract(CODE_PATH, adder::ContractBuilder);
     blockchain
 }
@@ -31,7 +32,7 @@ fn adder_blackbox() {
         .returns(ReturnsNewAddress)
         .run();
 
-    assert_eq!(new_address, ADDER_ADDRESS.to_address());
+    assert_eq!(new_address, ADDER_ADDRESS);
 
     world
         .query()

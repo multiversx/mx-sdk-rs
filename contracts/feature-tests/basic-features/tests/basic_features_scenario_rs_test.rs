@@ -1,7 +1,9 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
+
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
     blockchain.register_contract(
         "mxsc:output/basic-features.mxsc.json",
@@ -10,10 +12,6 @@ fn world() -> ScenarioWorld {
     blockchain.register_contract(
         "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
         esdt_system_sc_mock::ContractBuilder,
-    );
-    blockchain.register_contract(
-        "mxsc:output/basic-features-crypto.mxsc.json",
-        basic_features::ContractBuilder,
     );
 
     blockchain
@@ -104,14 +102,14 @@ fn crypto_verify_bls_rs() {
 
 #[test]
 #[ignore]
-fn crypto_verify_bls_share_rs() {
-    world().run("scenarios/crypto_verify_bls_share.scen.json");
+fn crypto_verify_bls_aggregated_signature_rs() {
+    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
 #[ignore]
-fn crypto_verify_bls_aggregated_rs() {
-    world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
+fn crypto_verify_bls_share_rs() {
+    world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
 
 #[test]
@@ -209,6 +207,16 @@ fn echo_u_64_rs() {
 #[test]
 fn echo_usize_rs() {
     world().run("scenarios/echo_usize.scen.json");
+}
+
+#[test]
+fn echo_varags_vec_with_counted_rs() {
+    world().run("scenarios/echo_varags_vec_with_counted.scen.json");
+}
+
+#[test]
+fn echo_varags_vec_with_counted_pairs_rs() {
+    world().run("scenarios/echo_varags_vec_with_counted_pairs.scen.json");
 }
 
 #[test]
@@ -350,6 +358,12 @@ fn small_num_overflow_rs() {
 }
 
 #[test]
+#[ignore = "unsupported"]
+fn send_esdt_to_nonexisting_account_rs() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}
+
+#[test]
 fn storage_big_int_rs() {
     world().run("scenarios/storage_big_int.scen.json");
 }
@@ -459,6 +473,16 @@ fn storage_mapper_set_rs() {
 #[test]
 fn storage_mapper_single_value_rs() {
     world().run("scenarios/storage_mapper_single_value.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_rs() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn storage_mapper_timelock_at_address_rs() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }
 
 #[test]

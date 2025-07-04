@@ -21,6 +21,7 @@ const NFT_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("NFT-123456")
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/rewards-distribution");
     blockchain.register_contract(
         REWARDS_DISTRIBUTION_PATH,
         rewards_distribution::ContractBuilder,
@@ -49,6 +50,7 @@ impl RewardsDistributionTestState {
             .typed(mock_seed_nft_minter_proxy::MockSeedNftMinterProxy)
             .init(NFT_TOKEN_ID)
             .code(SEED_NFT_MINTER_PATH)
+            .new_address(SEED_NFT_MINTER_ADDRESS)
             .run();
 
         self.world
@@ -84,6 +86,7 @@ impl RewardsDistributionTestState {
             .typed(rewards_distribution_proxy::RewardsDistributionProxy)
             .init(SEED_NFT_MINTER_ADDRESS.to_address(), brackets)
             .code(REWARDS_DISTRIBUTION_PATH)
+            .new_address(REWARDS_DISTRIBUTION_ADDRESS)
             .run();
 
         self
@@ -157,12 +160,6 @@ fn test_raffle_and_claim() {
             account_setter = account_setter.esdt_nft_balance(NFT_TOKEN_ID, nft_nonce, 1, ());
         }
     }
-
-    state.world.set_state_step(
-        SetStateStep::new()
-            .new_address(OWNER_ADDRESS, 1, SEED_NFT_MINTER_ADDRESS)
-            .new_address(OWNER_ADDRESS, 3, REWARDS_DISTRIBUTION_ADDRESS),
-    );
 
     state
         .deploy_seed_nft_minter_contract()

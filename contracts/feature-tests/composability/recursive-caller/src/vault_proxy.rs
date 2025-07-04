@@ -111,7 +111,7 @@ where
 
     pub fn accept_funds_echo_payment(
         self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>> {
         self.wrapped_tx
             .raw_call("accept_funds_echo_payment")
             .original_result()
@@ -170,16 +170,32 @@ where
             .original_result()
     }
 
-    pub fn retrieve_multi_funds_async<
-        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    pub fn retrieve_funds_egld_or_single_esdt(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("retrieve_funds_egld_or_single_esdt")
+            .original_result()
+    }
+
+    pub fn retrieve_received_funds_immediately(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("retrieve_received_funds_immediately")
+            .original_result()
+    }
+
+    pub fn retrieve_funds_multi<
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
     >(
         self,
-        token_payments: Arg0,
+        transfers: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("retrieve_multi_funds_async")
-            .argument(&token_payments)
+            .raw_call("retrieve_funds_multi")
+            .argument(&transfers)
             .original_result()
     }
 
@@ -188,6 +204,14 @@ where
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("burn_and_create_retrieve_async")
+            .original_result()
+    }
+
+    pub fn explicit_panic(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("explicit_panic")
             .original_result()
     }
 
@@ -212,24 +236,6 @@ where
             .payment(NotPayable)
             .raw_call("call_counts")
             .argument(&endpoint)
-            .original_result()
-    }
-
-    pub fn num_called_retrieve_funds_promises(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("num_called_retrieve_funds_promises")
-            .original_result()
-    }
-
-    pub fn num_async_calls_sent_from_child(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("num_async_calls_sent_from_child")
             .original_result()
     }
 }

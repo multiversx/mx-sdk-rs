@@ -1,0 +1,136 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000"
+                    },
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "forward_sync_retrieve_funds_bt_legacy",
+                "arguments": [
+                    "sc:vault",
+                    "str:TEST-TOKENA",
+                    "0",
+                    "1000"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:retrieve_funds",
+                            "str:TEST-TOKENA",
+                            "0",
+                            "1000"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:retrieve_funds",
+                        "topics": [
+                            "str:retrieve_funds",
+                            "str:TEST-TOKENA",
+                            "0",
+                            "1000"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:ESDTTransfer",
+                        "topics": [
+                            "str:TEST-TOKENA",
+                            "0",
+                            "1000",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:BackTransfer",
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_legacy",
+                        "topics": [
+                            "str:back_transfers",
+                            "0",
+                            "str:TEST-TOKENA",
+                            "0",
+                            "1000"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000"
+                    },
+                    "storage": "*",
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                }
+            }
+        }
+    ]
+}

@@ -42,8 +42,8 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     #[endpoint]
     fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
         let (token_id, payment) = self.call_value().single_fungible_esdt();
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
-        let amount_to_send = payment - fees;
+        let fees = percentage_fees * &*payment / PERCENTAGE_TOTAL;
+        let amount_to_send = payment.clone() - fees;
 
         self.tx()
             .to(&to)
@@ -73,18 +73,12 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
-        self.tx().to(&to).payment(all_token_payments).transfer();
+        self.tx()
+            .to(&to)
+            .payment(payment_args.convert_payment_multi_triples())
+            .transfer();
     }
 
     #[payable("EGLD")]
@@ -95,13 +89,13 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         let caller = self.blockchain().get_caller();
 
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 &initial_supply,

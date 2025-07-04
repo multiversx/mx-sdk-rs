@@ -1,10 +1,7 @@
-#![allow(unused)]
+mod adder_proxy;
 
 use multiversx_sc_scenario::imports::*;
-use std::borrow::Borrow;
 
-use adder::Adder;
-use factorial::Factorial;
 use multisig::{
     multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
     user_role::UserRole, Multisig,
@@ -16,6 +13,13 @@ const BOARD_MEMBER_ADDRESS: TestAddress = TestAddress::new("board-member");
 const MULTISIG_ADDRESS: TestSCAddress = TestSCAddress::new("multisig");
 const MULTISIG_PATH_EXPR: MxscPath = MxscPath::new("mxsc:output/multisig.mxsc.json");
 const QUORUM_SIZE: usize = 1;
+
+const ADDER_OWNER_ADDRESS: TestAddress = TestAddress::new("adder-owner");
+const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
+const NEW_ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("new-adder");
+const ADDER_CODE_PATH: MxscPath = MxscPath::new("test-contracts/adder.mxsc.json");
+const FACTORIAL_ADDRESS: TestSCAddress = TestSCAddress::new("factorial");
+const FACTORIAL_PATH_EXPR: MxscPath = MxscPath::new("test-contracts/factorial.mxsc.json");
 
 type RustBigUint = num_bigint::BigUint;
 
@@ -50,8 +54,10 @@ pub struct CallActionDataRaw {
 }
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new()
+        .executor_config(ExecutorConfig::Debugger.then(ExecutorConfig::Experimental));
 
+    blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
     blockchain.register_contract(MULTISIG_PATH_EXPR, multisig::ContractBuilder);
     blockchain
 }
@@ -102,18 +108,16 @@ fn call_propose(
         ActionRaw::SCUpgradeFromSource { amount, .. } => amount.clone(),
         _ => rust_biguint!(0),
     };
-    let amount_bytes = egld_amount.to_bytes_be();
-    let amount_rust_biguint = num_bigint::BigUint::from_bytes_be(amount_bytes.as_slice());
 
     let mut action_id = 0;
 
-    let mut transaction = world
+    let transaction = world
         .tx()
         .from(PROPOSER_ADDRESS)
         .to(MULTISIG_ADDRESS)
         .egld(BigUint::from(egld_amount));
 
-    let mut transaction_with_err = match expected_message {
+    let transaction_with_err = match expected_message {
         Some(message) => transaction.returns(ExpectError(4u64, message)),
         None => transaction.returns(ExpectError(0u64, "")),
     };
@@ -464,7 +468,7 @@ fn test_transfer_execute_to_user() {
     world.check_account(MULTISIG_ADDRESS).balance(EGLD_AMOUNT);
 
     // failed attempt
-    let action_id = call_propose(
+    let _ = call_propose(
         &mut world,
         ActionRaw::SendTransferExecute(CallActionDataRaw {
             to: NEW_USER_ADDRESS.to_address(),
@@ -504,26 +508,44 @@ fn test_transfer_execute_to_user() {
     world.check_account(NEW_USER_ADDRESS).balance(EGLD_AMOUNT);
 }
 
+fn deploy_adder_contract(world: &mut ScenarioWorld, initial_value: u64) {
+    world
+        .tx()
+        .from(ADDER_OWNER_ADDRESS)
+        .typed(adder_proxy::AdderProxy)
+        .init(initial_value)
+        .code(ADDER_CODE_PATH)
+        .new_address(ADDER_ADDRESS)
+        .run();
+}
+
+fn query_adder_contract(world: &mut ScenarioWorld, address: TestSCAddress, expected_value: u64) {
+    world
+        .query()
+        .to(address)
+        .typed(adder_proxy::AdderProxy)
+        .sum()
+        .returns(ExpectValue(expected_value))
+        .run();
+}
+
+fn deploy_factorial_contract(world: &mut ScenarioWorld) {
+    world
+        .tx()
+        .raw_deploy()
+        .from(OWNER_ADDRESS)
+        .code(FACTORIAL_PATH_EXPR)
+        .new_address(FACTORIAL_ADDRESS)
+        .run();
+}
+
 #[test]
 fn test_transfer_execute_sc_all() {
     let mut world = setup();
 
-    const ADDER_OWNER_ADDRESS: TestAddress = TestAddress::new("adder-owner");
-    const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
-    const ADDER_PATH_EXPR: MxscPath = MxscPath::new("mxsc:test-contracts/adder.mxsc.json");
-
-    world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     world.account(ADDER_OWNER_ADDRESS).nonce(1);
 
-    world
-        .tx()
-        .raw_deploy()
-        .from(ADDER_OWNER_ADDRESS)
-        .code(ADDER_PATH_EXPR)
-        .new_address(ADDER_ADDRESS)
-        .whitebox(adder::contract_obj, |sc| {
-            sc.init(BigUint::from(5u64));
-        });
+    deploy_adder_contract(&mut world, 5u64);
 
     let action_id = call_propose(
         &mut world,
@@ -550,36 +572,16 @@ fn test_transfer_execute_sc_all() {
             let _ = sc.perform_action_endpoint(action_id);
         });
 
-    world
-        .query()
-        .to(ADDER_ADDRESS)
-        .whitebox(adder::contract_obj, |sc| {
-            let actual_sum = sc.sum().get();
-            let expected_sum = managed_biguint!(10);
-            assert_eq!(actual_sum, expected_sum);
-        });
+    query_adder_contract(&mut world, ADDER_ADDRESS, 10);
 }
 
 #[test]
 fn test_async_call_to_sc() {
     let mut world = setup();
 
-    const ADDER_OWNER_ADDRESS: TestAddress = TestAddress::new("adder-owner");
-    const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
-    const ADDER_PATH_EXPR: MxscPath = MxscPath::new("mxsc:test-contracts/adder.mxsc.json");
-
-    world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     world.account(ADDER_OWNER_ADDRESS).nonce(1);
 
-    world
-        .tx()
-        .raw_deploy()
-        .from(ADDER_OWNER_ADDRESS)
-        .code(ADDER_PATH_EXPR)
-        .new_address(ADDER_ADDRESS)
-        .whitebox(adder::contract_obj, |sc| {
-            sc.init(BigUint::from(5u64));
-        });
+    deploy_adder_contract(&mut world, 5u64);
 
     let action_id = call_propose(
         &mut world,
@@ -606,43 +608,18 @@ fn test_async_call_to_sc() {
             let _ = sc.perform_action_endpoint(action_id);
         });
 
-    world
-        .query()
-        .to(ADDER_ADDRESS)
-        .whitebox(adder::contract_obj, |sc| {
-            let actual_sum = sc.sum().get();
-            let expected_sum = managed_biguint!(10);
-            assert_eq!(actual_sum, expected_sum);
-        });
+    query_adder_contract(&mut world, ADDER_ADDRESS, 10);
 }
 
 #[test]
 fn test_deploy_and_upgrade_from_source() {
     let mut world = setup();
-    const NEW_ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("new-adder");
 
-    const ADDER_OWNER_ADDRESS: TestAddress = TestAddress::new("adder-owner");
-    const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
-    const ADDER_PATH_EXPR: MxscPath = MxscPath::new("mxsc:test-contracts/adder.mxsc.json");
-
-    world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
-    world.set_state_step(SetStateStep::new().new_address(
-        MULTISIG_ADDRESS.eval_to_expr().as_str(),
-        0,
-        NEW_ADDER_ADDRESS.eval_to_expr().as_str(),
-    ));
+    world.new_address(MULTISIG_ADDRESS, 0, NEW_ADDER_ADDRESS);
 
     world.account(ADDER_OWNER_ADDRESS).nonce(1);
 
-    world
-        .tx()
-        .raw_deploy()
-        .from(ADDER_OWNER_ADDRESS)
-        .code(ADDER_PATH_EXPR)
-        .new_address(ADDER_ADDRESS)
-        .whitebox(adder::contract_obj, |sc| {
-            sc.init(BigUint::from(5u64));
-        });
+    deploy_adder_contract(&mut world, 5u64);
 
     let action_id = call_propose(
         &mut world,
@@ -697,28 +674,9 @@ fn test_deploy_and_upgrade_from_source() {
             let _ = sc.perform_action_endpoint(action_id);
         });
 
-    world
-        .query()
-        .to(NEW_ADDER_ADDRESS)
-        .whitebox(adder::contract_obj, |sc| {
-            let actual_sum = sc.sum().get();
-            let expected_sum = managed_biguint!(10);
-            assert_eq!(actual_sum, expected_sum);
-        });
+    query_adder_contract(&mut world, NEW_ADDER_ADDRESS, 10);
 
-    const FACTORIAL_ADDRESS: TestSCAddress = TestSCAddress::new("factorial");
-    const FACTORIAL_PATH_EXPR: MxscPath = MxscPath::new("mxsc:test-contracts/factorial.mxsc.json");
-
-    world.register_contract(FACTORIAL_PATH_EXPR, factorial::ContractBuilder);
-    world
-        .tx()
-        .raw_deploy()
-        .from(OWNER_ADDRESS)
-        .code(FACTORIAL_PATH_EXPR)
-        .new_address(FACTORIAL_ADDRESS)
-        .whitebox(factorial::contract_obj, |sc| {
-            sc.init();
-        });
+    deploy_factorial_contract(&mut world);
 
     let action_id = call_propose(
         &mut world,

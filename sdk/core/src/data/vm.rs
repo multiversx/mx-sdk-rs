@@ -1,4 +1,4 @@
-use super::address::Address;
+use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::collections::HashMap;
@@ -25,11 +25,9 @@ pub enum CallType {
 // VmValueRequest defines the request struct for values available in a VM
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct VmValueRequest {
-    pub sc_address: Address,
+pub struct VMQueryInput {
+    pub sc_address: Bech32Address,
     pub func_name: String,
-    pub caller: Address,
-    pub value: String,
     pub args: Vec<String>,
 }
 
@@ -38,7 +36,7 @@ pub struct VmValueRequest {
 #[serde(rename_all = "camelCase")]
 pub struct LogEntryApi {
     pub identifier: String,
-    pub address: Address,
+    pub address: Bech32Address,
     pub topics: Vec<String>,
     pub data: String,
 }
@@ -51,17 +49,17 @@ pub struct OutputTransferApi {
     pub gas_limit: u64,
     pub data: String,
     pub call_type: CallType,
-    pub sender_address: Address,
+    pub sender_address: Bech32Address,
 }
 
 // OutputAccountApi is a wrapper over vmcommon's OutputAccount
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OutputAccountApi {
-    address: Address,
+    address: Bech32Address,
     nonce: u64,
 
-    // TODO: unknow type of data
+    // TODO: unknown type of data
     // balance: Option<String>,
     balance_delta: u64,
     storage_updates: Option<HashMap<String, StorageUpdateApi>>,
@@ -85,6 +83,7 @@ pub struct StorageUpdateApi {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VMOutputApi {
+    #[serde(default)]
     pub return_data: Vec<String>,
     pub return_code: String,
     pub return_message: String,

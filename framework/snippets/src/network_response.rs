@@ -1,22 +1,23 @@
-use multiversx_sc_scenario::{
-    imports::{Address, ESDTSystemSCAddress},
-    multiversx_chain_vm::crypto_functions::keccak256,
-    scenario_model::{Log, TxResponse, TxResponseStatus},
-};
-use multiversx_sdk::{
+use crate::sdk::{
     data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
     utils::base64_decode,
+};
+use multiversx_sc_scenario::{
+    imports::{Address, ESDTSystemSCAddress, ReturnCode},
+    multiversx_chain_vm::{crypto_functions::keccak256, types::H256},
+    scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 
 const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
 /// Creates a [`TxResponse`] from a [`TransactionOnNetwork`].
-pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
-    let tx_error = process_signal_error(&tx);
+pub fn parse_tx_response(tx: TransactionOnNetwork, return_code: ReturnCode) -> TxResponse {
+    let tx_error = process_signal_error(&tx, return_code);
     if !tx_error.is_success() {
         return TxResponse {
             tx_error,
+            tx_hash: process_tx_hash(&tx),
             ..Default::default()
         };
     }
@@ -24,16 +25,12 @@ pub fn parse_tx_response(tx: TransactionOnNetwork) -> TxResponse {
     process_success(&tx)
 }
 
-fn process_signal_error(tx: &TransactionOnNetwork) -> TxResponseStatus {
+fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> TxResponseStatus {
     if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR) {
         let topics = event.topics.as_ref();
-        if let Some(error) = process_topics_error(topics) {
-            return TxResponseStatus::signal_error(&error);
-        }
 
-        let error_raw = base64_decode(topics.unwrap().get(1).unwrap());
-        let error = String::from_utf8(error_raw).unwrap();
-        return TxResponseStatus::signal_error(&error);
+        let error = topics.unwrap().first().unwrap();
+        return TxResponseStatus::new(return_code, error);
     }
 
     TxResponseStatus::default()
@@ -45,8 +42,18 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
         new_deployed_address: process_new_deployed_address(tx),
         new_issued_token_identifier: process_new_issued_token_identifier(tx),
         logs: process_logs(tx),
+        tx_hash: process_tx_hash(tx),
+        gas_used: tx.gas_used,
         ..Default::default()
     }
+}
+
+fn process_tx_hash(tx: &TransactionOnNetwork) -> Option<H256> {
+    tx.hash.as_ref().map(|encoded_hash| {
+        let decoded = hex::decode(encoded_hash).expect("error decoding tx hash from hex");
+        assert_eq!(decoded.len(), 32);
+        H256::from_slice(&decoded)
+    })
 }
 
 fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
@@ -65,7 +72,7 @@ fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
             .events
             .iter()
             .map(|event| Log {
-                address: Address::from_slice(&event.address.to_bytes()),
+                address: event.address.address.clone(),
                 endpoint: event.identifier.clone(),
                 topics: extract_topics(event),
                 data: extract_data(event),
@@ -122,10 +129,10 @@ fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
         return None;
     }
 
-    let sender_address_bytes = tx.sender.to_bytes();
+    let sender_address_bytes = tx.sender.address.as_bytes();
     let sender_nonce_bytes = tx.nonce.to_le_bytes();
     let mut bytes_to_hash: Vec<u8> = Vec::new();
-    bytes_to_hash.extend_from_slice(&sender_address_bytes);
+    bytes_to_hash.extend_from_slice(sender_address_bytes);
     bytes_to_hash.extend_from_slice(&sender_nonce_bytes);
 
     let address_keccak = keccak256(&bytes_to_hash);
@@ -144,7 +151,7 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
     let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
 
     for scr in tx.smart_contract_results.iter() {
-        if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
+        if scr.sender.address != ESDTSystemSCAddress.to_address() {
             continue;
         }
 
@@ -166,12 +173,17 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
         let is_register_meta_esdt = prev_tx_data.starts_with("registerMetaESDT@");
         let is_register_and_set_all_roles_esdt =
             prev_tx_data.starts_with("registerAndSetAllRoles@");
+        let is_register_dynamic_esdt = prev_tx_data.starts_with("registerDynamic");
+        let is_register_and_set_all_roles_dynamic_esdt =
+            prev_tx_data.starts_with("registerAndSetAllRolesDynamic@");
 
         if !is_issue_fungible
             && !is_issue_semi_fungible
             && !is_issue_non_fungible
             && !is_register_meta_esdt
             && !is_register_and_set_all_roles_esdt
+            && !is_register_dynamic_esdt
+            && !is_register_and_set_all_roles_dynamic_esdt
         {
             continue;
         }

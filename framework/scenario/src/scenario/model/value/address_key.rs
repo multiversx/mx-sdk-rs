@@ -1,12 +1,12 @@
-use multiversx_sc::types::{Address, TestAddress, TestSCAddress};
+use multiversx_sc::{
+    chain_core::std::Bech32Address,
+    types::{Address, TestAddress, TestSCAddress},
+};
 
 use super::{value_from_slice, AddressValue};
-use crate::{
-    facade::expr::Bech32Address,
-    scenario_format::{
-        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-        value_interpreter::interpret_string,
-    },
+use crate::scenario_format::{
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+    value_interpreter::interpret_string,
 };
 use std::{cmp::Ordering, fmt};
 
@@ -28,10 +28,6 @@ impl Default for AddressKey {
 impl AddressKey {
     pub fn to_address(&self) -> Address {
         self.value.clone()
-    }
-
-    pub fn to_vm_address(&self) -> multiversx_chain_vm::types::VMAddress {
-        self.value.as_array().into()
     }
 }
 

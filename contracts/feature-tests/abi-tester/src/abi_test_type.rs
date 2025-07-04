@@ -1,6 +1,8 @@
 use crate::only_nested::*;
+use bitflags::bitflags;
 use multiversx_sc::{
     api::ManagedTypeApi,
+    typenum::U2,
     types::{BigUint, Box, ConstDecimals, ManagedBuffer, ManagedBufferReadToEnd, ManagedDecimal},
 };
 multiversx_sc::derive_imports!();
@@ -38,15 +40,17 @@ pub struct AbiManagedVecItem {
 }
 
 #[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct OnlyShowsUpInEsdtAttr {
     #[allow(dead_code)]
     pub field: OnlyShowsUpAsNested10,
 }
 
 #[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct ManagedDecimalWrapper<M: ManagedTypeApi> {
     #[allow(dead_code)]
-    pub field: ManagedDecimal<M, ConstDecimals<2>>,
+    pub field: ManagedDecimal<M, ConstDecimals<U2>>,
 }
 
 /// Its only purpose is to test that the ABI generator works fine.
@@ -56,4 +60,15 @@ pub struct AbiWithManagedBufferReadToEnd<M: ManagedTypeApi> {
     pub endpoint: ManagedBuffer<M>,
     pub gas: u64,
     pub flush: ManagedBufferReadToEnd<M>,
+}
+
+bitflags! {
+    #[type_abi]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, NestedDecode, NestedEncode, TopEncode, TopDecode)]
+    pub struct Permission: u32 {
+        const NONE = 0;
+        const OWNER = 1;
+        const ADMIN = 2;
+        const PAUSE = 4;
+    }
 }

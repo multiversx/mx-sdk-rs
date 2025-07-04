@@ -1,14 +1,13 @@
+use crate::util::*;
 use proc_macro::TokenStream;
 use quote::quote;
-
-use crate::util::*;
 
 pub fn dep_decode_snippet(
     _index: usize,
     field: &syn::Field,
     input_value: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
-    let ty = &field.ty;
+    let ty = sanitize_type_path(field.ty.clone());
     if let Some(ident) = &field.ident {
         quote! {
             #ident: <#ty as codec::NestedDecode>::dep_decode_or_handle_err(#input_value, __h__)?
@@ -46,12 +45,15 @@ pub fn variant_dep_decode_snippets(
 pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-    let gen = match &ast.data {
+    let result = match &ast.data {
         syn::Data::Struct(data_struct) => {
             let field_dep_decode_snippets =
                 fields_decl_syntax(&data_struct.fields, |index, field| {
                     dep_decode_snippet(index, field, &quote! {input})
                 });
+
+            let decode_body = dep_decode_body(name, &field_dep_decode_snippets);
+
             quote! {
                 impl #impl_generics codec::NestedDecode for #name #ty_generics #where_clause {
                     fn dep_decode_or_handle_err<I, H>(input: &mut I, __h__: H) -> core::result::Result<Self, H::HandledErr>
@@ -59,9 +61,7 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
                         I: codec::NestedDecodeInput,
                         H: codec::DecodeErrorHandler,
                     {
-                        core::result::Result::Ok(
-                            #name #field_dep_decode_snippets
-                        )
+                        #decode_body
                     }
                 }
             }
@@ -90,5 +90,28 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
         syn::Data::Union(_) => panic!("Union not supported"),
     };
 
-    gen.into()
+    result.into()
+}
+
+fn dep_decode_body(
+    name: &proc_macro2::Ident,
+    field_dep_decode_snippets: &proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
+    if field_dep_decode_snippets
+        .to_string()
+        .contains(BITFLAGS_PRIMITIVE)
+    {
+        return quote!(
+            match #name::from_bits #field_dep_decode_snippets {
+                Some(r) => core::result::Result::Ok(r),
+                None => Err(__h__.handle_error(codec::DecodeError::INVALID_VALUE))
+            }
+        );
+    }
+
+    quote! (
+        core::result::Result::Ok(
+            #name #field_dep_decode_snippets
+        )
+    )
 }

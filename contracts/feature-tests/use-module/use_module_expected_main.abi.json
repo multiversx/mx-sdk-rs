@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.53.0"
+            "version": "0.59.0"
         }
     },
     "docs": [
@@ -345,7 +345,7 @@
             "docs": [
                 "Queue a proposal for execution.",
                 "This can be done only if the proposal has reached the quorum.",
-                "A proposal is considered successful and ready for queing if",
+                "A proposal is considered successful and ready for queuing if",
                 "total_votes - total_downvotes >= quorum"
             ],
             "name": "queue",

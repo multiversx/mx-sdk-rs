@@ -1,112 +1,38 @@
-use crate::data::{
-    account::{Account, AccountResponse},
-    account_storage::AccountStorageResponse,
-    address::Address,
-    esdt::{EsdtBalance, EsdtBalanceResponse, EsdtRolesResponse},
-};
-use anyhow::{anyhow, Result};
-use std::collections::HashMap;
+use crate::data::account::{Account, AccountResponse};
+use anyhow::anyhow;
+use multiversx_chain_core::std::Bech32Address;
 
-use super::GatewayProxy;
+use super::ACCOUNT_ENDPOINT;
+use super::{GatewayRequest, GatewayRequestType};
 
-const ACCOUNT_ENDPOINT: &str = "address/";
-const KEYS_ENDPOINT: &str = "/keys/";
+/// Retrieves an account info from the network (nonce, balance).
+pub struct GetAccountRequest<'a> {
+    pub address: &'a Bech32Address,
+}
 
-impl GatewayProxy {
-    // get_account retrieves an account info from the network (nonce, balance)
-    pub async fn get_account(&self, address: &Address) -> Result<Account> {
-        if !address.is_valid() {
-            return Err(anyhow!("invalid address"));
-        }
+impl<'a> GetAccountRequest<'a> {
+    pub fn new(address: &'a Bech32Address) -> Self {
+        Self { address }
+    }
+}
 
-        let endpoint = ACCOUNT_ENDPOINT.to_string() + address.to_string().as_str();
-        let endpoint = self.get_endpoint(endpoint.as_str());
-        let resp = self
-            .client
-            .get(endpoint)
-            .send()
-            .await?
-            .json::<AccountResponse>()
-            .await?;
+impl GatewayRequest for GetAccountRequest<'_> {
+    type Payload = ();
+    type DecodedJson = AccountResponse;
+    type Result = Account;
 
-        match resp.data {
-            None => Err(anyhow!("{}", resp.error)),
+    fn request_type(&self) -> GatewayRequestType {
+        GatewayRequestType::Get
+    }
+
+    fn get_endpoint(&self) -> String {
+        format!("{ACCOUNT_ENDPOINT}/{}", self.address.bech32)
+    }
+
+    fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result> {
+        match decoded.data {
+            None => Err(anyhow!("{}", decoded.error)),
             Some(b) => Ok(b.account),
-        }
-    }
-
-    // get_account_esdt_roles retrieves an all esdt roles of an account from the network
-    pub async fn get_account_esdt_roles(
-        &self,
-        address: &Address,
-    ) -> Result<HashMap<String, Vec<String>>> {
-        if !address.is_valid() {
-            return Err(anyhow!("invalid address"));
-        }
-
-        let endpoint = ACCOUNT_ENDPOINT.to_string() + address.to_string().as_str() + "/esdts/roles";
-        let endpoint = self.get_endpoint(endpoint.as_str());
-        let resp = self
-            .client
-            .get(endpoint)
-            .send()
-            .await?
-            .json::<EsdtRolesResponse>()
-            .await?;
-
-        match resp.data {
-            None => Err(anyhow!("{}", resp.error)),
-            Some(b) => Ok(b.roles),
-        }
-    }
-
-    // get_account_esdt_tokens retrieves an all esdt token of an account from the network
-    pub async fn get_account_esdt_tokens(
-        &self,
-        address: &Address,
-    ) -> Result<HashMap<String, EsdtBalance>> {
-        if !address.is_valid() {
-            return Err(anyhow!("invalid address"));
-        }
-
-        let endpoint = ACCOUNT_ENDPOINT.to_string() + address.to_string().as_str() + "/esdt";
-        let endpoint = self.get_endpoint(endpoint.as_str());
-        let resp = self
-            .client
-            .get(endpoint)
-            .send()
-            .await?
-            .json::<EsdtBalanceResponse>()
-            .await?;
-
-        match resp.data {
-            None => Err(anyhow!("{}", resp.error)),
-            Some(b) => Ok(b.esdts),
-        }
-    }
-
-    // get_account_esdt_tokens retrieves an all esdt token of an account from the network
-    pub async fn get_account_storage_keys(
-        &self,
-        address: &Address,
-    ) -> Result<HashMap<String, String>> {
-        if !address.is_valid() {
-            return Err(anyhow!("invalid address"));
-        }
-
-        let endpoint = ACCOUNT_ENDPOINT.to_string() + address.to_string().as_str() + KEYS_ENDPOINT;
-        let endpoint = self.get_endpoint(endpoint.as_str());
-        let resp = self
-            .client
-            .get(endpoint)
-            .send()
-            .await?
-            .json::<AccountStorageResponse>()
-            .await?;
-
-        match resp.data {
-            None => Err(anyhow!("{}", resp.error)),
-            Some(b) => Ok(b.pairs),
         }
     }
 }
