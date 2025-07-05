@@ -1,0 +1,25 @@
+[package]
+name = "multiversx-sc-codec-human-readable"
+version = "0.1.0"
+edition = "2018"
+publish = false
+
+authors = ["MultiversX <contact@multiversx.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/multiversx/mx-sdk-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.multiversx.com/"
+description = "Conversions from a human readable format to the multiversx-sc-codec"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["cryptography::cryptocurrencies", "development-tools"]
+
+[dependencies]
+
+[dependencies.multiversx-sc-scenario]
+version = "=0.59.0"
+path = "../../framework/scenario"
+
+[dependencies.multiversx-sc-meta-lib]
+version = "=0.59.0"
+path = "../../framework/meta-lib"

@@ -39,4 +39,11 @@ impl TypeNames {
             rust: alloc::string::String::new(),
         }
     }
+
+    pub fn abi_only(abi_name: alloc::string::String) -> Self {
+        TypeNames {
+            abi: abi_name,
+            rust: alloc::string::String::new(),
+        }
+    }
 }

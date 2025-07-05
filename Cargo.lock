@@ -3185,6 +3185,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "multiversx-sc-codec-human-readable"
+version = "0.1.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
 name = "multiversx-sc-derive"
 version = "0.59.0"
 dependencies = [
