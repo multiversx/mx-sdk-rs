@@ -13,3 +13,8 @@ fn mmap_get_go() {
 fn mmap_remove_go() {
     world().run("scenarios/mmap_remove.scen.json");
 }
+
+#[test]
+fn mmap_key_mutability_go() {
+    world().run("scenarios/mmap_key_mutability.scen.json");
+}
