@@ -1,22 +1,15 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-#[type_abi]
-#[derive(TopEncode, TopDecode, Debug)]
-pub struct CallbackData<M: ManagedTypeApi> {
-    callback_name: ManagedBuffer<M>,
-    token_identifier: EgldOrEsdtTokenIdentifier<M>,
-    token_nonce: u64,
-    token_amount: BigUint<M>,
-    args: ManagedVec<M, ManagedBuffer<M>>,
-}
+use crate::{
+    common::{self, CallbackData},
+    vault_proxy,
+};
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
 #[multiversx_sc::module]
-pub trait ForwarderAsyncCallModule {
+pub trait ForwarderAsyncCallModule: common::CommonModule {
     #[endpoint]
     fn echo_args_async(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
         self.tx()
@@ -144,14 +137,6 @@ pub trait ForwarderAsyncCallModule {
         });
     }
 
-    #[event("retrieve_funds_callback")]
-    fn retrieve_funds_callback_event(
-        &self,
-        #[indexed] token: &EgldOrEsdtTokenIdentifier,
-        #[indexed] nonce: u64,
-        #[indexed] payment: &BigUint,
-    );
-
     #[endpoint]
     fn send_funds_twice(
         &self,
@@ -212,36 +197,5 @@ pub trait ForwarderAsyncCallModule {
             .reject_funds()
             .payment(payment_args.convert_payment_multi_triples())
             .async_call_and_exit();
-    }
-
-    #[view]
-    #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<CallbackData<Self::Api>>;
-
-    #[view]
-    fn callback_data_at_index(
-        &self,
-        index: usize,
-    ) -> MultiValue5<
-        ManagedBuffer,
-        EgldOrEsdtTokenIdentifier,
-        u64,
-        BigUint,
-        MultiValueManagedVec<Self::Api, ManagedBuffer>,
-    > {
-        let cb_data = self.callback_data().get(index);
-        (
-            cb_data.callback_name,
-            cb_data.token_identifier,
-            cb_data.token_nonce,
-            cb_data.token_amount,
-            cb_data.args.into(),
-        )
-            .into()
-    }
-
-    #[endpoint]
-    fn clear_callback_data(&self) {
-        self.callback_data().clear();
     }
 }

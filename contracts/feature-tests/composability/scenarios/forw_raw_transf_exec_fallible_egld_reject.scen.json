@@ -42,7 +42,39 @@
                 ],
                 "status": "0",
                 "message": "",
-                "logs": []
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [
+                            "str:EGLD-000000",
+                            "",
+                            "100",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:TransferAndExecute",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:vault",
+                            "1",
+                            "str:EGLD-000000",
+                            "",
+                            "100",
+                            "str:reject_funds"
+                        ]
+                    },
+                    {
+                        "address": "address:a_user",
+                        "endpoint": "str:internalVMErrors",
+                        "topics": [
+                            "sc:forwarder",
+                            "str:transfer_execute_fallible"
+                        ],
+                        "data": [
+                            "*"
+                        ]
+                    }
+                ]
             }
         },
         {

@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.58.0"
+version = "0.59.0"
 edition = "2021"
 
 authors = [
@@ -21,7 +21,6 @@ base64 = "0.22"
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
-bech32 = "0.11"
 log = { version = "0.4.17", features = ["std"] }
 sha2 = "0.10.6"
 serde = "1.0"
@@ -40,12 +39,12 @@ run-go-tests = ["compiled-sc-tests"] # backwards compatibility
 wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
 
 [dependencies.multiversx-sc]
-version = "=0.58.0"
-features = ["alloc", "num-bigint"]
+version = "=0.59.0"
+features = ["alloc", "num-bigint", "std"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.58.0"
+version = "=0.59.0"
 path = "../meta-lib"
 
 [dependencies.multiversx-chain-scenario-format]
@@ -53,10 +52,8 @@ version = "0.23.1"
 path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-chain-vm-executor]
-version = "0.4.0"
-git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "5804799ee7b6446c9e7641b8308acb48ec00d751"
+version = "0.5.0"
 
 [dependencies.multiversx-chain-vm]
-version = "=0.15.0"
+version = "=0.16.0"
 path = "../../chain/vm"

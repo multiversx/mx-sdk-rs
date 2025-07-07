@@ -219,6 +219,9 @@ pub trait AbiTester {
     #[event("address-h256-event")]
     fn address_h256_event(&self, #[indexed] address: &Address, #[indexed] h256: &H256);
 
+    #[event]
+    fn empty_identifier_event(&self);
+
     #[endpoint]
     #[label("label1")]
     fn label_a(&self) {}

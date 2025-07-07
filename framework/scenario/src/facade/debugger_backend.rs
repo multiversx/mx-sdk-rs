@@ -19,6 +19,12 @@ impl DebuggerBackend {
     }
 }
 
+fn update_expect_from_response(expect: &mut Option<TxExpect>, response: &Option<TxResponse>) {
+    if expect.is_none() {
+        *expect = response.as_ref().map(TxResponse::to_expect);
+    }
+}
+
 impl ScenarioRunner for DebuggerBackend {
     fn run_external_steps(&mut self, step: &ExternalStepsStep) {
         self.for_each_runner_mut(|runner| runner.run_external_steps(step));
@@ -30,7 +36,7 @@ impl ScenarioRunner for DebuggerBackend {
 
     fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
         self.vm_runner.run_sc_call_step(step);
-        step.expect = step.response.as_ref().map(TxResponse::to_expect);
+        update_expect_from_response(&mut step.expect, &step.response);
         if let Some(trace) = &mut self.trace {
             trace.run_sc_call_step(step);
         }
@@ -39,7 +45,7 @@ impl ScenarioRunner for DebuggerBackend {
     fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
         self.vm_runner.run_multi_sc_call_step(steps);
         for step in steps.iter_mut() {
-            step.expect = step.response.as_ref().map(TxResponse::to_expect);
+            update_expect_from_response(&mut step.expect, &step.response);
         }
         if let Some(trace) = &mut self.trace {
             trace.run_multi_sc_call_step(steps);
@@ -48,7 +54,7 @@ impl ScenarioRunner for DebuggerBackend {
 
     fn run_sc_query_step(&mut self, step: &mut ScQueryStep) {
         self.vm_runner.run_sc_query_step(step);
-        step.expect = step.response.as_ref().map(TxResponse::to_expect);
+        update_expect_from_response(&mut step.expect, &step.response);
         if let Some(trace) = &mut self.trace {
             trace.run_sc_query_step(step);
         }
@@ -56,7 +62,7 @@ impl ScenarioRunner for DebuggerBackend {
 
     fn run_sc_deploy_step(&mut self, step: &mut ScDeployStep) {
         self.vm_runner.run_sc_deploy_step(step);
-        step.expect = step.response.as_ref().map(TxResponse::to_expect);
+        update_expect_from_response(&mut step.expect, &step.response);
         if let Some(trace) = &mut self.trace {
             trace.run_sc_deploy_step(step);
         }
@@ -65,7 +71,7 @@ impl ScenarioRunner for DebuggerBackend {
     fn run_multi_sc_deploy_step(&mut self, steps: &mut [ScDeployStep]) {
         self.vm_runner.run_multi_sc_deploy_step(steps);
         for step in steps.iter_mut() {
-            step.expect = step.response.as_ref().map(TxResponse::to_expect);
+            update_expect_from_response(&mut step.expect, &step.response);
         }
         if let Some(trace) = &mut self.trace {
             trace.run_multi_sc_deploy_step(steps);

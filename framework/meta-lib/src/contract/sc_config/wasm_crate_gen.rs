@@ -1,10 +1,8 @@
 use multiversx_sc::{abi::EndpointAbi, external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG};
-use rustc_version::Version;
 use std::{
     fs::{self, File},
     io::Write,
     path::{Path, PathBuf},
-    str::FromStr,
 };
 
 use super::ContractVariant;
@@ -17,30 +15,12 @@ const PREFIX_AUTO_GENERATED: &str =
 ////////////////////////////////////////////////////
 ";
 
+const NO_STD_ANNOTATION: &str = "#![no_std]
+";
+
 const NUM_INIT: usize = 1;
 const NUM_UPGRADE: usize = 1;
 const NUM_ASYNC_CB: usize = 1;
-
-const VER_1_71: &str = "1.71.0-nightly";
-const FEATURES_PRE_RUSTC_1_71: &str = "
-#![no_std]
-
-// Configuration that works with rustc < 1.71.0.
-// TODO: Recommended rustc version: 1.73.0 or newer.
-#![feature(alloc_error_handler)]
-";
-
-const VER_1_73: &str = "1.73.0-nightly";
-const FEATURES_PRE_RUSTC_1_73: &str = "
-#![no_std]
-
-// Configuration that works with rustc < 1.73.0.
-// TODO: Recommended rustc version: 1.73.0 or newer.
-";
-
-const FEATURES_DEFAULT: &str = "
-#![no_std]
-";
 
 impl ContractVariant {
     /// Makes sure that all the necessary wasm crate directories exist.
@@ -56,11 +36,14 @@ impl ContractVariant {
     }
 
     fn panic_handler_macro_invocation(&self) -> &'static str {
-        if self.settings.panic_message {
-            "multiversx_sc_wasm_adapter::panic_handler_with_message!();"
-        } else {
-            "multiversx_sc_wasm_adapter::panic_handler!();"
+        if !self.settings.std {
+            if self.settings.panic_message {
+                return "multiversx_sc_wasm_adapter::panic_handler_with_message!();";
+            } else {
+                return "multiversx_sc_wasm_adapter::panic_handler!();";
+            }
         }
+        ""
     }
 
     fn endpoint_macro_name(&self) -> &'static str {
@@ -83,7 +66,7 @@ impl ContractVariant {
     fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File) {
         writeln!(wasm_lib_file, "{PREFIX_AUTO_GENERATED}").unwrap();
         self.write_stat_comments(wasm_lib_file);
-        write_prefix(wasm_lib_file);
+        self.write_no_std_annotation(wasm_lib_file);
         writeln!(wasm_lib_file, "{}", self.allocator_macro_invocation()).unwrap();
         writeln!(wasm_lib_file, "{}", self.panic_handler_macro_invocation()).unwrap();
 
@@ -136,22 +119,19 @@ impl ContractVariant {
         }
 
         write_stat_comment(wasm_lib_file, "Total number of exported functions:", total);
+
+        writeln!(wasm_lib_file).unwrap();
+    }
+
+    fn write_no_std_annotation(&self, wasm_lib_file: &mut File) {
+        if !self.settings.std {
+            write_prefix(wasm_lib_file, NO_STD_ANNOTATION);
+        }
     }
 }
 
-fn select_features() -> &'static str {
-    let meta = rustc_version::version_meta().unwrap();
-    if meta.semver < Version::from_str(VER_1_71).unwrap() {
-        FEATURES_PRE_RUSTC_1_71
-    } else if meta.semver < Version::from_str(VER_1_73).unwrap() {
-        FEATURES_PRE_RUSTC_1_73
-    } else {
-        FEATURES_DEFAULT
-    }
-}
-
-fn write_prefix(wasm_lib_file: &mut File) {
-    writeln!(wasm_lib_file, "{}", select_features()).unwrap();
+fn write_prefix(wasm_lib_file: &mut File, features: &str) {
+    writeln!(wasm_lib_file, "{}", features).unwrap();
 }
 
 fn write_endpoints_macro<'a, I>(

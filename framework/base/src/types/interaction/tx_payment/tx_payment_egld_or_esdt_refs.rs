@@ -13,7 +13,7 @@ where
         self.is_empty()
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -22,8 +22,10 @@ where
     ) -> Result<(), TransferExecuteFailed> {
         self.map_egld_or_esdt(
             fc,
-            |fc, amount| Egld(amount).perform_transfer_execute(env, to, gas_limit, fc),
-            |fc, esdt_payment| esdt_payment.perform_transfer_execute(env, to, gas_limit, fc),
+            |fc, amount| Egld(amount).perform_transfer_execute_fallible(env, to, gas_limit, fc),
+            |fc, esdt_payment| {
+                esdt_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
+            },
         )
     }
 

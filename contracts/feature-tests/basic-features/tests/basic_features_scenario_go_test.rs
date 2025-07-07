@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
@@ -80,21 +80,25 @@ fn crypto_sha_256_go() {
 }
 
 #[test]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_go() {
     world().run("scenarios/crypto_verify_bls.scen.json");
 }
 
 #[test]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_aggregated_signature_go() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_share_go() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
 
 #[test]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_ed_25519_go() {
     world().run("scenarios/crypto_verify_ed25519.scen.json");
 }
@@ -105,6 +109,7 @@ fn crypto_verify_secp_256_k_1_go() {
 }
 
 #[test]
+#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_secp_256_r_1_go() {
     world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }
@@ -296,6 +301,21 @@ fn managed_vec_biguint_push_go() {
 }
 
 #[test]
+fn mmap_get_go() {
+    world().run("scenarios/mmap_get.scen.json");
+}
+
+#[test]
+fn mmap_mutable_input_go() {
+    world().run("scenarios/mmap_mutable_input.scen.json");
+}
+
+#[test]
+fn mmap_remove_go() {
+    world().run("scenarios/mmap_remove.scen.json");
+}
+
+#[test]
 fn new_address_go() {
     world().run("scenarios/new_address.scen.json");
 }
@@ -331,13 +351,13 @@ fn sc_properties_go() {
 }
 
 #[test]
-fn small_num_overflow_go() {
-    world().run("scenarios/small_num_overflow.scen.json");
+fn send_esdt_to_nonexisting_account_go() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
 }
 
 #[test]
-fn send_esdt_to_nonexisting_account_go() {
-    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+fn small_num_overflow_go() {
+    world().run("scenarios/small_num_overflow.scen.json");
 }
 
 #[test]
@@ -452,16 +472,6 @@ fn storage_mapper_single_value_go() {
 }
 
 #[test]
-fn storage_mapper_timelock_go() {
-    world().run("scenarios/timelock_mapper.scen.json");
-}
-
-#[test]
-fn storage_mapper_timelock_at_address_go() {
-    world().run("scenarios/timelock_mapper_at_address.scen.json");
-}
-
-#[test]
 fn storage_mapper_token_attributes_go() {
     world().run("scenarios/storage_mapper_token_attributes.scen.json");
 }
@@ -519,4 +529,14 @@ fn storage_usize_bad_go() {
 #[test]
 fn struct_eq_go() {
     world().run("scenarios/struct_eq.scen.json");
+}
+
+#[test]
+fn timelock_mapper_go() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn timelock_mapper_at_address_go() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }

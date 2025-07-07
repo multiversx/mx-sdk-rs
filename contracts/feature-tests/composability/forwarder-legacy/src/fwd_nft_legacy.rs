@@ -24,15 +24,6 @@ pub struct ComplexAttributes<M: ManagedTypeApi> {
 
 #[multiversx_sc::module]
 pub trait ForwarderNftModule: fwd_storage_legacy::ForwarderStorageModule {
-    #[view]
-    fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
-        self.blockchain().get_esdt_balance(
-            &self.blockchain().get_sc_address(),
-            token_identifier,
-            nonce,
-        )
-    }
-
     #[payable("*")]
     #[endpoint]
     fn buy_nft(&self, nft_id: TokenIdentifier, nft_nonce: u64, nft_amount: BigUint) -> BigUint {

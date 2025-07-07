@@ -4,7 +4,7 @@ pub const MEM_ALLOC_ERROR: &str = "memory allocation error";
 pub const NON_PAYABLE_FUNC_ESDT: &str = "function does not accept ESDT payment";
 pub const BAD_TOKEN_PROVIDED: &str = "bad call value token provided";
 pub const BAD_TOKEN_TICKER_FORMAT: &str = "bad token ticker format";
-pub const SINGLE_ESDT_EXPECTED: &str = "function expects single ESDT payment";
+pub const SINGLE_ESDT_EXPECTED: &str = "single ESDT payment expected";
 pub const TOO_MANY_ESDT_TRANSFERS: &str = "too many ESDT transfers";
 pub const ESDT_INVALID_TOKEN_INDEX: &str = "invalid token index";
 pub const ESDT_UNEXPECTED_EGLD: &str = "unexpected EGLD transfer";
@@ -13,6 +13,8 @@ pub const INCORRECT_NUM_TRANSFERS: &str = "incorrect number of transfers";
 pub const FUNGIBLE_TOKEN_EXPECTED_ERR_MSG: &str = "fungible ESDT token expected";
 pub const TOKEN_IDENTIFIER_ESDT_EXPECTED: &str = "ESDT expected";
 pub const TRANSFER_EXECUTE_FAILED: &str = "transfer execute failed";
+pub const TRANSFER_EXECUTE_REQUIRES_PAYMENT: &str = "transfer execute requires payment";
+pub const TRANSFER_EXECUTE_EMPTY: &str = "empty transfer";
 
 pub const ARG_WRONG_NUMBER: &str = "wrong number of arguments";
 pub const ARG_ASYNC_WRONG_NUMBER: &str = "wrong number of arguments provided to async call";

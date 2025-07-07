@@ -14,14 +14,14 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
-        EsdtTokenPayment::from(self).perform_transfer_execute(env, to, gas_limit, fc)
+        EsdtTokenPayment::from(self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
