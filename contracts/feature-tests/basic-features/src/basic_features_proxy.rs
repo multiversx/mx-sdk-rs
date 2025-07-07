@@ -279,6 +279,48 @@ where
             .raw_call("returns_egld_decimal")
             .original_result()
     }
+
+    pub fn mm_get<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        key: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("mm_get")
+            .argument(&key)
+            .original_result()
+    }
+
+    pub fn mm_contains<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        key: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("mm_contains")
+            .argument(&key)
+            .original_result()
+    }
+
+    pub fn mm_remove_get<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        remove_key: Arg0,
+        get_key: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue2<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("mm_remove_get")
+            .argument(&remove_key)
+            .argument(&get_key)
+            .original_result()
+    }
 }
 
 #[type_abi]

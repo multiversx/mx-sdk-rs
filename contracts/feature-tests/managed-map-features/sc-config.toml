@@ -1,2 +1,0 @@
-[[proxy]]
-path = "src/managed_map_features_proxy.rs"

@@ -1,28 +1,21 @@
-#![no_std]
-
 multiversx_sc::imports!();
 
-pub mod managed_map_features_proxy;
-
-#[multiversx_sc::contract]
+#[multiversx_sc::module]
 pub trait ManagedMapFeatures {
-    #[init]
-    fn init(&self) {}
+    #[storage_get("mm-num-entries")]
+    fn get_mm_num_entries(&self) -> usize;
 
-    #[storage_get("num_entries")]
-    fn get_num_entries(&self) -> usize;
+    #[storage_get("mm-key")]
+    fn get_mm_key(&self, index: usize) -> ManagedBuffer;
 
-    #[storage_get("key")]
-    fn get_key(&self, index: usize) -> ManagedBuffer;
-
-    #[storage_get("value")]
-    fn get_value(&self, index: usize) -> ManagedBuffer;
+    #[storage_get("mm-value")]
+    fn get_mm_value(&self, index: usize) -> ManagedBuffer;
 
     fn create_map(&self) -> ManagedMap {
         let mut map = ManagedMap::new();
-        let num_entries = self.get_num_entries();
+        let num_entries = self.get_mm_num_entries();
         for index in 0..num_entries {
-            map.put(&self.get_key(index), &self.get_value(index));
+            map.put(&self.get_mm_key(index), &self.get_mm_value(index));
         }
         map
     }

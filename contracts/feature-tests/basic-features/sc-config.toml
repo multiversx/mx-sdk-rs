@@ -36,4 +36,7 @@ add-endpoints = [
     "verify_secp256r1_signature",
     "verify_bls_signature_share",
     "verify_bls_aggregated_signature",
+    "mm_get",
+    "mm_contains",
+    "mm_remove_get"
 ]
