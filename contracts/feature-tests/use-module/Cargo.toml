@@ -9,17 +9,18 @@ publish = false
 path = "src/use_module.rs"
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.0"
+version = "0.59.0"
 path = "../../../contracts/modules"
 
 [dependencies.multiversx-sc]
-version = "0.54.0"
+version = "0.59.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.0"
+version = "0.59.0"
+features = ["wasmer-experimental"]
 path = "../../../framework/scenario"
 
 [dev-dependencies.multiversx-sc-meta-lib]
-version = "0.54.0"
+version = "0.59.0"
 path = "../../../framework/meta-lib"

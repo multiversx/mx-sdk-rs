@@ -85,10 +85,17 @@ pub const EI_1_4_ADDED_NAMES: &[&str] = &[
 ];
 
 pub const EI_1_5_ADDED_NAMES: &[&str] = &[
-    "getRoundTime",
-    "epochStartBlockTimeStamp",
+    "getBlockTimestampMs",
+    "getPrevBlockTimestampMs",
+    "getBlockRoundTimeMs",
+    "epochStartBlockTimestampMs",
     "epochStartBlockNonce",
     "epochStartBlockRound",
+    "managedGetAllTransfersCallValue",
+    "managedGetESDTTokenType",
+    "managedExecuteOnDestContextWithErrorReturn",
+    "managedMultiTransferESDTNFTExecuteWithReturn",
+    "managedGetCodeHash",
     "mBufferToSmallIntUnsigned",
     "mBufferToSmallIntSigned",
     "mBufferFromSmallIntUnsigned",

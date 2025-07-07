@@ -28,11 +28,10 @@ where
 /// Called initially in the generated code whenever `#[payable("EGLD")]` annotation is provided.
 pub fn payable_egld<A>()
 where
-    A: CallValueApi + ErrorApi,
+    A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
-    if A::call_value_api_impl().esdt_num_transfers() > 0 {
-        A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
-    }
+    // will crash if anything other than (single) EGLD was transferred
+    let _ = CallValueWrapper::<A>::new().egld();
 }
 
 /// Called initially in the generated code whenever `#[payable("<token identifier>")]` annotation is provided.

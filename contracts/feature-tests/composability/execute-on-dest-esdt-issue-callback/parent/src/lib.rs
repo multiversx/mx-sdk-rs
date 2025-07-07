@@ -38,11 +38,11 @@ pub trait Parent {
         token_ticker: ManagedBuffer,
         initial_supply: BigUint,
     ) {
-        let issue_cost = self.call_value().egld_value();
-        let child_contract_adress = self.child_contract_address().get();
+        let issue_cost = self.call_value().egld();
+        let child_contract_address = self.child_contract_address().get();
 
         self.tx()
-            .to(&child_contract_adress)
+            .to(&child_contract_address)
             .typed(child_proxy::ChildProxy)
             .issue_wrapped_egld(token_display_name, token_ticker, initial_supply)
             .egld(issue_cost)

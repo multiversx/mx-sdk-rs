@@ -5,6 +5,7 @@ mod tx_payment_egld_or_esdt_refs;
 mod tx_payment_egld_or_multi_esdt;
 mod tx_payment_egld_or_multi_esdt_ref;
 mod tx_payment_egld_value;
+mod tx_payment_multi_egld_or_esdt;
 mod tx_payment_multi_esdt;
 mod tx_payment_none;
 mod tx_payment_not_payable;
@@ -19,8 +20,10 @@ pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
 pub use tx_payment_not_payable::NotPayable;
 
 use crate::{
-    api::ManagedTypeApi,
-    types::{BigUint, ManagedAddress, ManagedBuffer, MultiEsdtPayment},
+    api::{quick_signal_error, CallTypeApi, ManagedTypeApi},
+    contract_base::TransferExecuteFailed,
+    err_msg,
+    types::{BigUint, ManagedAddress, ManagedBuffer, MultiEgldOrEsdtPayment},
 };
 
 use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};
@@ -31,7 +34,7 @@ use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};
     label = "not a valid payment type",
     note = "there are multiple ways to specify the transaction payment, but `{Self}` is not one of them"
 )]
-pub trait TxPayment<Env>
+pub trait TxPayment<Env>: Sized
 where
     Env: TxEnv,
 {
@@ -40,13 +43,37 @@ where
 
     /// Transfer-execute calls have different APIs for different payments types.
     /// This method selects between them.
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    );
+    ) -> Result<(), TransferExecuteFailed>;
+
+    /// Shortcut for doing direct transfers.
+    ///
+    /// It is relevant with EGLD: it is simpler to perform direct EGLD transfers,
+    /// instead of going via multi-transfer.
+    fn perform_transfer_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.perform_transfer_execute_fallible(env, to, 0, FunctionCall::empty())
+    }
+
+    /// Allows transfer-execute without payment.
+    fn perform_transfer_execute_legacy(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        let result = self.perform_transfer_execute_fallible(env, to, gas_limit, fc);
+        transfer_execute_failed_error::<Env::Api>(result);
+    }
 
     /// Converts an ESDT call to a built-in function call, if necessary.
     fn with_normalized<From, To, F, R>(
@@ -118,7 +145,7 @@ where
     Api: ManagedTypeApi,
 {
     pub egld: Option<AnnotatedEgldPayment<Api>>,
-    pub multi_esdt: MultiEsdtPayment<Api>,
+    pub multi_esdt: MultiEgldOrEsdtPayment<Api>,
 }
 
 impl<Api> Default for FullPaymentData<Api>
@@ -130,5 +157,13 @@ where
             egld: None,
             multi_esdt: Default::default(),
         }
+    }
+}
+
+pub(crate) fn transfer_execute_failed_error<Api: CallTypeApi>(
+    result: Result<(), TransferExecuteFailed>,
+) {
+    if result.is_err() {
+        quick_signal_error::<Api>(err_msg::TRANSFER_EXECUTE_FAILED);
     }
 }

@@ -1,21 +1,17 @@
-[settings]
-main = "basic-features"
-
 [contracts.basic-features]
 
 [contracts.basic-features.profile]
 overflow-checks = true # needed for overflow tests
 
+[contracts.barnard]
+name = "basic-features-barnard"
+features = ["barnard"]
+ei = "1.5"
+profile = { overflow-checks = true } # needed for overflow 
+
 [contracts.basic-features-storage-bytes]
 add-unlabelled = false
 add-endpoints = ["init", "load_bytes", "store_bytes"]
-kill_legacy_callback = true
-
-[contracts.basic-features-crypto]
-ei = "1.4"
-add-unlabelled = false
-add-endpoints = ["init"]
-add-labels = ["crypto-ei-1.4"]
 kill_legacy_callback = true
 
 [[proxy]]
@@ -27,5 +23,20 @@ add-endpoints = [
     "load_bytes",
     "returns_egld_decimal",
     "echo_managed_option",
+    "token_has_transfer_role",
+    "timelock_mapper",
+    "timelock_set_initial_value",
+    "timelock_set_unlock_timestamp",
+    "timelock_commit_action",
+    "timelock_get_unlock_timestamp",
+    "timelock_get_future_value",
+    "timelock_get_current_value_at_address",
+    "timelock_get_unlock_timestamp_at_address",
+    "timelock_get_future_value_at_address",
+    "verify_secp256r1_signature",
+    "verify_bls_signature_share",
+    "verify_bls_aggregated_signature",
+    "mm_get",
+    "mm_contains",
+    "mm_remove_get"
 ]
-add-labels = ["crypto-ei-1.4"]

@@ -244,7 +244,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
             .into_big_uint()
             .unwrap_or_sc_panic("log argument must be positive");
 
-        // start with aproximation, based on position of the most significant bit
+        // start with approximation, based on position of the most significant bit
         let Some(log2_floor) = trunc_val_unsigned.log2_floor() else {
             // means the input was zero, practically unreachable
             return BigFloat::from(0i64);

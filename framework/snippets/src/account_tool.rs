@@ -4,7 +4,7 @@ use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario_model::{Account, BytesKey, BytesValue, Scenario, SetStateStep, Step},
 };
-use multiversx_sdk::gateway::GatewayAsyncService;
+use multiversx_sdk::gateway::{GatewayAsyncService, SetStateAccount};
 use multiversx_sdk::gateway::{
     GetAccountEsdtRolesRequest, GetAccountEsdtTokensRequest, GetAccountRequest,
     GetAccountStorageRequest,
@@ -20,7 +20,7 @@ pub async fn print_account_as_scenario_set_state<GatewayProxy: GatewayAsyncServi
     address_bech32_string: String,
 ) {
     let address = Bech32Address::from_bech32_string(address_bech32_string);
-    let set_state = retrieve_account_as_scenario_set_state(&gateway_proxy, &address).await;
+    let (_, set_state) = retrieve_account_as_scenario_set_state(&gateway_proxy, &address).await;
     let scenario = build_scenario(set_state);
     println!("{}", scenario.into_raw().to_json_string());
 }
@@ -37,40 +37,46 @@ fn build_scenario(set_state: SetStateStep) -> Scenario {
 pub async fn retrieve_account_as_scenario_set_state<GatewayProxy: GatewayAsyncService>(
     api: &GatewayProxy,
     bech32_address: &Bech32Address,
-) -> SetStateStep {
-    let address = bech32_address.as_address();
-    let sdk_account = api.request(GetAccountRequest::new(address)).await.unwrap();
+) -> (SetStateAccount, SetStateStep) {
+    let sdk_account = api
+        .request(GetAccountRequest::new(bech32_address))
+        .await
+        .unwrap();
 
     let account_esdt = api
-        .request(GetAccountEsdtTokensRequest::new(address))
+        .request(GetAccountEsdtTokensRequest::new(bech32_address))
         .await
         .unwrap_or_else(|err| {
             eprintln!("failed to retrieve ESDT tokens for address {bech32_address}: {err}");
             HashMap::new()
         });
     let account_esdt_roles = api
-        .request(GetAccountEsdtRolesRequest::new(address))
+        .request(GetAccountEsdtRolesRequest::new(bech32_address))
         .await
         .unwrap_or_else(|err| {
             eprintln!("failed to retrieve ESDT roles for address {bech32_address}: {err}");
             HashMap::new()
         });
     let account_storage = api
-        .request(GetAccountStorageRequest::new(address))
+        .request(GetAccountStorageRequest::new(bech32_address))
         .await
         .unwrap_or_else(|err| {
             panic!("failed to retrieve storage for address {bech32_address}: {err}")
         });
 
     let account_state = set_account(
-        sdk_account,
-        account_storage,
+        sdk_account.clone(),
+        account_storage.clone(),
         account_esdt,
         account_esdt_roles,
     );
 
+    let set_state_account = SetStateAccount::from(sdk_account).with_storage(account_storage);
     let set_state_step = SetStateStep::new();
-    set_state_step.put_account(bech32_address, account_state)
+    (
+        set_state_account,
+        set_state_step.put_account(bech32_address, account_state),
+    )
 }
 
 fn set_account(

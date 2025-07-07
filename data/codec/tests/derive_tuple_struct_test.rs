@@ -7,7 +7,7 @@ use codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 struct TupleStruct(u8, u16, u32);
 
 // to test, run the following command in the crate folder:
-// cargo expand --test tuple_struct_derive_test > expanded.rs
+// cargo expand --test derive_tuple_struct_test > expanded.rs
 
 #[test]
 fn tuple_struct_derive_test() {

@@ -1,18 +1,17 @@
 use std::sync::Mutex;
 
 use multiversx_chain_vm::{
-    types::VMAddress,
-    vm_hooks::{SingleTxApiData, SingleTxApiVMHooksHandler, VMHooksDispatcher},
-    world_mock::AccountData,
+    blockchain::state::AccountData, host::vm_hooks::VMHooksDispatcher, types::VMAddress,
 };
+use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::api::RawHandle;
 
-use crate::debug_executor::{StaticVarData, VMHooksDebugger};
+use crate::executor::debug::{ContractDebugInstanceState, StaticVarData, VMHooksDebugger};
 
-use super::{VMHooksApi, VMHooksApiBackend};
+use super::{SingleTxApiData, SingleTxApiVMHooksContext, VMHooksApi, VMHooksApiBackend};
 
 thread_local! {
-    static SINGLE_TX_API_VH_CELL: Mutex<SingleTxApiVMHooksHandler> = Mutex::default();
+    static SINGLE_TX_API_VH_CELL: Mutex<SingleTxApiVMHooksContext> = Mutex::default();
 
     static SINGLE_TX_API_STATIC_CELL: StaticVarData = StaticVarData::default();
 }
@@ -25,12 +24,13 @@ impl VMHooksApiBackend for SingleTxApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooksDebugger) -> R,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
-            let handler = cell.lock().unwrap().clone();
-            let dispatcher = VMHooksDispatcher::new(Box::new(handler));
-            f(&dispatcher)
+            let vh_context = cell.lock().unwrap().clone();
+            let mut dispatcher = VMHooksDispatcher::new(vh_context);
+            f(&mut dispatcher)
+                .unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
         })
     }
 

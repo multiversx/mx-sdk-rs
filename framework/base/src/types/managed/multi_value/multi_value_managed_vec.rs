@@ -1,3 +1,5 @@
+use core::borrow::Borrow;
+
 use multiversx_sc_codec::multi_types::MultiValueVec;
 
 use crate::{
@@ -7,7 +9,7 @@ use crate::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput, Vec,
     },
-    types::ManagedType,
+    types::{ManagedType, ManagedVecOwnedIterator},
 };
 
 use crate::types::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
@@ -142,6 +144,20 @@ where
     }
 }
 
+impl<M, T> IntoIterator for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    type Item = T;
+
+    type IntoIter = ManagedVecOwnedIterator<M, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl<'a, M, T> IntoIterator for &'a MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -181,8 +197,8 @@ where
         O: TopEncodeMultiOutput,
         H: EncodeErrorHandler,
     {
-        for elem in self.0.into_iter() {
-            elem.multi_encode_or_handle_err(output, h)?;
+        for elem in &self.0 {
+            elem.borrow().multi_encode_or_handle_err(output, h)?;
         }
         Ok(())
     }

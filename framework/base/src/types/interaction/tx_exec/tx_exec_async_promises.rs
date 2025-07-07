@@ -3,8 +3,8 @@ use crate::{
     contract_base::{ErrorHelper, SendRawWrapper},
     types::{
         interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
-        FunctionCall, ManagedBuffer, OriginalResultMarker, Tx, TxGas, TxGasValue, TxPayment,
-        TxResultHandler, TxScEnv, TxToSpecified,
+        FunctionCall, ManagedBuffer, OriginalResultMarker, Tx, TxData, TxGas, TxGasValue,
+        TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
     },
 };
 
@@ -97,19 +97,18 @@ where
     }
 }
 
-impl<Api, To, Payment, Gas>
-    Tx<TxScEnv<Api>, (), To, Payment, Gas, FunctionCall<Api>, CallbackClosure<Api>>
+impl<Api, To, Payment, Gas, Data> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, CallbackClosure<Api>>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
+    Data: TxData<TxScEnv<Api>>,
 {
     pub fn gas_for_callback(
         self,
         gas: u64,
-    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, FunctionCall<Api>, CallbackClosureWithGas<Api>>
-    {
+    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, CallbackClosureWithGas<Api>> {
         Tx {
             env: self.env,
             from: self.from,
@@ -128,8 +127,7 @@ where
     pub fn with_extra_gas_for_callback(
         self,
         gas: u64,
-    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, FunctionCall<Api>, CallbackClosureWithGas<Api>>
-    {
+    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, CallbackClosureWithGas<Api>> {
         self.gas_for_callback(gas)
     }
 }
@@ -188,6 +186,25 @@ where
     }
 }
 
+impl<Api, To, Payment, GasValue, Callback>
+    Tx<TxScEnv<Api>, (), To, Payment, ExplicitGas<GasValue>, (), Callback>
+where
+    Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    GasValue: TxGasValue<TxScEnv<Api>>,
+    Callback: TxPromisesCallback<Api>,
+{
+    /// Launches a transaction as an asynchronous promise (async v2 mechanism),
+    /// but without calling any function on the destination.
+    ///
+    /// Such calls are useful for appending callbacks to simple transfers,
+    /// mitigating edge cases such as non-payable SCs and frozen assets.
+    pub fn register_promise(self) {
+        self.raw_call("").register_promise();
+    }
+}
+
 impl<Api, To, Payment, Callback> Tx<TxScEnv<Api>, (), To, Payment, (), FunctionCall<Api>, Callback>
 where
     Api: CallTypeApi,
@@ -216,36 +233,15 @@ where
 {
     /// ## Incorrect call
     ///
-    /// Must set **gas** and **function call** in order to call `register_promise`.
+    /// Must set **gas** in order to call `register_promise`, even when no SC endpoint is called.
     ///
     /// ## Safety
     ///
     /// This version of the method must never be called. It is only here to provide a more readable error.
     pub unsafe fn register_promise(self) {
         ErrorHelper::<Api>::signal_error_with_message(
-            "register_promise requires explicit gas and function call",
+            "register_promise requires explicit gas (even when no SC endpoint is called)",
         );
-    }
-}
-
-impl<Api, To, Payment, GasValue, Callback>
-    Tx<TxScEnv<Api>, (), To, Payment, ExplicitGas<GasValue>, (), Callback>
-where
-    Api: CallTypeApi,
-    To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
-    GasValue: TxGasValue<TxScEnv<Api>>,
-    Callback: TxPromisesCallback<Api>,
-{
-    /// ## Incorrect call
-    ///
-    /// Must set **function call** in order to call `register_promise`.
-    ///
-    /// ## Safety
-    ///
-    /// This version of the method must never be called. It is only here to provide a more readable error.
-    pub unsafe fn register_promise(self) {
-        ErrorHelper::<Api>::signal_error_with_message("register_promise requires function call");
     }
 }
 

@@ -38,7 +38,7 @@ impl SetStateBuilderItem for AccountItem {
     }
 }
 
-impl<'w> SetStateBuilder<'w, AccountItem> {
+impl SetStateBuilder<'_, AccountItem> {
     pub fn nonce<N>(mut self, nonce: N) -> Self
     where
         N: AnnotatedValue<ScenarioTxEnvData, u64>,
@@ -215,6 +215,11 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         let env = self.new_env_data();
         let owner_value = address_annotated(&env, &owner);
         self.item.account.owner = Some(owner_value);
+        self
+    }
+
+    pub fn storage_mandos(mut self, key: &'static str, value: &'static str) -> Self {
+        self.item.account.storage.insert(key.into(), value.into());
         self
     }
 }

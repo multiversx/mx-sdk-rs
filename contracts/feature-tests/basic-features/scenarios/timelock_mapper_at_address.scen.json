@@ -1,0 +1,246 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "100"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "1",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:other-basic-features": {
+                    "nonce": "1",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:basic-features",
+                "function": "timelock_set_initial_value",
+                "arguments": [
+                    "0x0a"
+                ],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:basic-features",
+                "function": "timelock_mapper",
+                "arguments": [],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x0a"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "3",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:basic-features",
+                "function": "timelock_set_unlock_timestamp",
+                "arguments": [
+                    "0x0a",
+                    "0x0f"
+                ],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "4",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:other-basic-features",
+                "function": "timelock_get_current_value_at_address",
+                "arguments": [
+                    "0x0000000000000000050062617369632d66656174757265735f5f5f5f5f5f5f5f"
+                ],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x0a"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "5",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:other-basic-features",
+                "function": "timelock_get_future_value_at_address",
+                "arguments": [
+                    "0x0000000000000000050062617369632d66656174757265735f5f5f5f5f5f5f5f"
+                ],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x0f"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "6",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:other-basic-features",
+                "function": "timelock_get_unlock_timestamp_at_address",
+                "arguments": [
+                    "0x0000000000000000050062617369632d66656174757265735f5f5f5f5f5f5f5f"
+                ],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x0a"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "12"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "7",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:basic-features",
+                "function": "timelock_commit_action",
+                "arguments": [],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x01"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "8",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:other-basic-features",
+                "function": "timelock_get_current_value_at_address",
+                "arguments": [
+                    "0x0000000000000000050062617369632d66656174757265735f5f5f5f5f5f5f5f"
+                ],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x0f"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "9",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:other-basic-features",
+                "function": "timelock_get_future_value_at_address",
+                "arguments": [
+                    "0x0000000000000000050062617369632d66656174757265735f5f5f5f5f5f5f5f"
+                ],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "10",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:other-basic-features",
+                "function": "timelock_get_unlock_timestamp_at_address",
+                "arguments": [
+                    "0x0000000000000000050062617369632d66656174757265735f5f5f5f5f5f5f5f"
+                ],
+                "gasLimit": "30,000,000"
+            },
+            "expect": {
+                "out": [
+                    "0x0a"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

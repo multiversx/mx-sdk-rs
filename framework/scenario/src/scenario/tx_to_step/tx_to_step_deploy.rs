@@ -23,7 +23,7 @@ where
         let mut step =
             tx_to_sc_deploy_step(&self.env, self.from, self.payment, self.gas, self.data);
         step.explicit_tx_hash = self.env.take_tx_hash();
-        step.expect = Some(self.result_handler.list_tx_expect());
+        step.expect = Some(self.result_handler.list_preprocessing());
 
         StepWrapper {
             env: self.env,
@@ -50,6 +50,7 @@ where
     let mut step = ScDeployStep::new()
         .from(address_annotated(env, &from))
         .code(code_annotated(env, data.code_source));
+    step.tx.code_metadata = data.code_metadata;
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());
     }

@@ -7,7 +7,7 @@ use super::{GatewayRequest, GatewayRequestType, SEND_MULTIPLE_TRANSACTIONS_ENDPO
 /// Sends multiple transactions at once.
 pub struct SendMultiTxRequest<'a>(pub &'a [Transaction]);
 
-impl<'a> GatewayRequest for SendMultiTxRequest<'a> {
+impl GatewayRequest for SendMultiTxRequest<'_> {
     type Payload = [Transaction];
     type DecodedJson = SendTransactionsResponse;
     type Result = Vec<String>;
@@ -28,12 +28,12 @@ impl<'a> GatewayRequest for SendMultiTxRequest<'a> {
         match decoded.data {
             None => Err(anyhow!("{}", decoded.error)),
             Some(b) => {
-                let mut tx_hashs: Vec<String> = vec![];
+                let mut tx_hashes: Vec<String> = vec![];
                 for key in b.txs_hashes.keys().sorted() {
-                    tx_hashs.push(b.txs_hashes[key].clone());
+                    tx_hashes.push(b.txs_hashes[key].clone());
                 }
 
-                Ok(tx_hashs)
+                Ok(tx_hashes)
             },
         }
     }

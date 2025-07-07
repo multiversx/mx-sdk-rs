@@ -1,0 +1,10 @@
+[contracts.main]
+name = "payable-features"
+
+[contracts.barnard]
+name = "payable-features-barnard"
+features = ["barnard"]
+ei = "1.5"
+
+[[proxy]]
+path = "src/payable_features_proxy.rs"

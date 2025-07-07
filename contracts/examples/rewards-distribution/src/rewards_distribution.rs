@@ -21,7 +21,7 @@ pub struct Bracket {
 }
 
 #[type_abi]
-#[derive(ManagedVecItem, NestedEncode, NestedDecode)]
+#[derive(ManagedVecItem, NestedEncode, NestedDecode, Clone)]
 pub struct ComputedBracket<M: ManagedTypeApi> {
     pub end_index: u64,
     pub nft_reward_percent: BigUint<M>,
@@ -57,7 +57,7 @@ pub trait RewardsDistribution:
         self.brackets().set(brackets);
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(depositRoyalties)]
     fn deposit_royalties(&self) {
         let payment = self.call_value().egld_or_single_esdt();
@@ -74,7 +74,7 @@ pub trait RewardsDistribution:
             .unwrap_or_else(|| self.new_raffle());
         let mut rng = RandomnessSource::default();
 
-        let mut bracket = raffle.computed_brackets.get(0);
+        let mut bracket = raffle.computed_brackets.get(0).clone();
 
         let run_result = self.run_while_it_has_gas(DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, || {
             let ticket = self.shuffle_and_pick_single_ticket(
@@ -138,7 +138,7 @@ pub trait RewardsDistribution:
     ) {
         while ticket > bracket.end_index {
             computed_brackets.remove(0);
-            *bracket = computed_brackets.get(0);
+            *bracket = computed_brackets.get(0).clone();
         }
     }
 
@@ -247,7 +247,7 @@ pub trait RewardsDistribution:
         );
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(claimRewards)]
     fn claim_rewards(
         &self,
@@ -279,9 +279,15 @@ pub trait RewardsDistribution:
             }
         }
 
-        self.tx().to(&caller).egld(total_egld_reward).transfer();
-        self.tx().to(&caller).payment(rewards).transfer();
-        self.tx().to(&caller).payment(nfts).transfer();
+        self.tx()
+            .to(&caller)
+            .egld(total_egld_reward)
+            .transfer_if_not_empty();
+        self.tx()
+            .to(&caller)
+            .payment(rewards)
+            .transfer_if_not_empty();
+        self.tx().to(&caller).payment(nfts).transfer_if_not_empty();
     }
 
     fn claim_reward_token(

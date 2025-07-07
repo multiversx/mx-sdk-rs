@@ -1,8 +1,8 @@
-use std::fs::File;
+use std::{fs::File, path::Path};
 
 #[must_use]
-pub(crate) fn create_file(proxy_file_name: &str) -> File {
-    let file = format!("../{proxy_file_name}");
+pub(crate) fn create_file(proxy_file_path: &Path) -> File {
+    let path = Path::new("..").join(proxy_file_path);
 
-    File::create(file).expect("could not write proxy file")
+    File::create(path).expect("could not write proxy file")
 }

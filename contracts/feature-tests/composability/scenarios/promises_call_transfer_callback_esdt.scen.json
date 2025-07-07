@@ -1,0 +1,232 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "2000"
+                    }
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "1000"
+                    }
+                ],
+                "function": "forward_payment_callback",
+                "arguments": [
+                    "sc:vault"
+                ],
+                "gasLimit": "60,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "",
+                            "1000",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:ESDTTransfer",
+                            "str:FWD-TOKEN",
+                            "1000"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:transfer_callback",
+                            "0x00"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transfer_callback",
+                        "topics": [
+                            "str:callback_result",
+                            "0x00"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transfer_callback",
+                        "topics": [
+                            "str:retrieve_funds_callback",
+                            "str:EGLD",
+                            "",
+                            ""
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "2",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:FWD-TOKEN",
+                        "value": "1000"
+                    }
+                ],
+                "function": "forward_payment_gas_for_callback",
+                "arguments": [
+                    "sc:vault"
+                ],
+                "gasLimit": "300,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:ESDTTransfer",
+                        "topics": [
+                            "str:FWD-TOKEN",
+                            "",
+                            "1000",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:ESDTTransfer",
+                            "str:FWD-TOKEN",
+                            "1000"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:transfer_callback",
+                            "0x00"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transfer_callback",
+                        "topics": [
+                            "str:callback_result",
+                            "0x00"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transfer_callback",
+                        "topics": [
+                            "str:retrieve_funds_callback",
+                            "str:EGLD",
+                            "",
+                            ""
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:FWD-TOKEN": "2000"
+                    },
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "0"
+                    },
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:callback_data.len": "2",
+                        "str:callback_data.item|u32:1": [
+                            "nested:str:transfer_callback",
+                            "nested:str:EGLD",
+                            "u64:0",
+                            "u32:0",
+                            "u32:0"
+                        ],
+                        "str:callback_data.item|u32:2": [
+                            "nested:str:transfer_callback",
+                            "nested:str:EGLD",
+                            "u64:0",
+                            "u32:0",
+                            "u32:0"
+                        ]
+                    },
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                }
+            }
+        }
+    ]
+}

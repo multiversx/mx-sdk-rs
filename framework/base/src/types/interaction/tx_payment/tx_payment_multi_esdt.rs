@@ -1,7 +1,7 @@
 use core::ops::Deref;
 
 use crate::{
-    contract_base::SendRawWrapper,
+    contract_base::{SendRawWrapper, TransferExecuteFailed},
     types::{BigUint, ManagedAddress, ManagedRef, MultiEsdtPayment, TxFrom, TxToSpecified},
 };
 
@@ -16,7 +16,7 @@ where
 
 impl<Env> TxPaymentMultiEsdt<Env> for MultiEsdtPayment<Env::Api> where Env: TxEnv {}
 impl<Env> TxPaymentMultiEsdt<Env> for &MultiEsdtPayment<Env::Api> where Env: TxEnv {}
-impl<'a, Env> TxPaymentMultiEsdt<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::Api>> where
+impl<Env> TxPaymentMultiEsdt<Env> for ManagedRef<'_, Env::Api, MultiEsdtPayment<Env::Api>> where
     Env: TxEnv
 {
 }
@@ -29,20 +29,20 @@ where
         self.is_empty()
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         _env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        let _ = SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
+    ) -> Result<(), TransferExecuteFailed> {
+        SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute_fallible(
             to,
-            self,
+            self.as_multi_egld_or_esdt_payment(),
             gas_limit,
             &fc.function_name,
             &fc.arg_buffer,
-        );
+        )
     }
 
     fn with_normalized<From, To, F, R>(
@@ -62,7 +62,10 @@ where
             0 => ().with_normalized(env, from, to, fc, f),
             1 => self.get(0).as_refs().with_normalized(env, from, to, fc, f),
             _ => to.with_address_ref(env, |to_addr| {
-                let fc_conv = fc.convert_to_multi_transfer_esdt_call(to_addr, self);
+                let fc_conv = fc.convert_to_multi_transfer_esdt_call(
+                    to_addr,
+                    self.as_multi_egld_or_esdt_payment(),
+                );
                 f(&from.resolve_address(env), &*BigUint::zero_ref(), fc_conv)
             }),
         }
@@ -71,12 +74,12 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: self.clone(),
+            multi_esdt: self.as_multi_egld_or_esdt_payment().clone(),
         }
     }
 }
 
-impl<'a, Env> TxPayment<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::Api>>
+impl<Env> TxPayment<Env> for ManagedRef<'_, Env::Api, MultiEsdtPayment<Env::Api>>
 where
     Env: TxEnv,
 {
@@ -86,15 +89,15 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
+    ) -> Result<(), TransferExecuteFailed> {
         self.deref()
-            .perform_transfer_execute(env, to, gas_limit, fc)
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -129,14 +132,14 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        (&self).perform_transfer_execute(env, to, gas_limit, fc);
+    ) -> Result<(), TransferExecuteFailed> {
+        (&self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -159,7 +162,7 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: self,
+            multi_esdt: self.into_multi_egld_or_esdt_payment(),
         }
     }
 }

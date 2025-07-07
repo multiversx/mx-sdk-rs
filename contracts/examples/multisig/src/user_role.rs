@@ -1,6 +1,7 @@
 use multiversx_sc::derive_imports::*;
 
-#[derive(TopEncode, TopDecode, TypeAbi, Clone, Copy, PartialEq, Eq, Debug)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum UserRole {
     None,
     Proposer,

@@ -1,5 +1,6 @@
-use crate::types::{
-    BigUint, EsdtTokenPayment, ManagedAddress, MultiEsdtPayment, TxFrom, TxToSpecified,
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{BigUint, EsdtTokenPayment, ManagedAddress, ManagedVec, TxFrom, TxToSpecified},
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
@@ -14,15 +15,15 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
+    ) -> Result<(), TransferExecuteFailed> {
         self.as_refs()
-            .perform_transfer_execute(env, to, gas_limit, fc);
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -45,7 +46,7 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: MultiEsdtPayment::from_single_item(self),
+            multi_esdt: ManagedVec::from_single_item(self.into_multi_egld_or_esdt_payment()),
         }
     }
 }
@@ -60,15 +61,15 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
+    ) -> Result<(), TransferExecuteFailed> {
         self.as_refs()
-            .perform_transfer_execute(env, to, gas_limit, fc);
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -91,7 +92,7 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: MultiEsdtPayment::from_single_item(self.clone()),
+            multi_esdt: ManagedVec::from_single_item(self.as_egld_or_esdt_payment().clone()),
         }
     }
 }

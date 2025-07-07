@@ -20,12 +20,12 @@ where
     pub(super) handle: T::OwnHandle,
 }
 
-impl<'a, M, T> ManagedRefMut<'a, M, T>
+impl<M, T> ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
-    pub fn new(value: &'a mut T) -> Self {
+    pub fn new(value: &mut T) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -44,7 +44,7 @@ where
     }
 }
 
-impl<'a, M, T> ManagedRefMut<'a, M, T>
+impl<M, T> ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + Clone,
@@ -55,7 +55,7 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedRefMut<'a, M, T>
+impl<M, T> Clone for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -70,7 +70,7 @@ where
     }
 }
 
-impl<'a, M, T> Deref for ManagedRefMut<'a, M, T>
+impl<M, T> Deref for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -83,7 +83,7 @@ where
     }
 }
 
-impl<'a, M, T> DerefMut for ManagedRefMut<'a, M, T>
+impl<M, T> DerefMut for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -93,7 +93,7 @@ where
     }
 }
 
-impl<'a, M, T> Borrow<T> for ManagedRefMut<'a, M, T>
+impl<M, T> Borrow<T> for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M>,
@@ -115,7 +115,7 @@ where
     }
 }
 
-impl<'a, M, T> PartialEq for ManagedRefMut<'a, M, T>
+impl<M, T> PartialEq for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
@@ -126,14 +126,14 @@ where
     }
 }
 
-impl<'a, M, T> Eq for ManagedRefMut<'a, M, T>
+impl<M, T> Eq for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + PartialEq,
 {
 }
 
-impl<'a, M, T> TopEncode for ManagedRefMut<'a, M, T>
+impl<M, T> TopEncode for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + TopEncode,
@@ -148,7 +148,7 @@ where
     }
 }
 
-impl<'a, M, T> NestedEncode for ManagedRefMut<'a, M, T>
+impl<M, T> NestedEncode for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + NestedEncode,
@@ -163,7 +163,7 @@ where
     }
 }
 
-impl<'a, M, T> core::fmt::Debug for ManagedRefMut<'a, M, T>
+impl<M, T> core::fmt::Debug for ManagedRefMut<'_, M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + core::fmt::Debug,

@@ -33,7 +33,7 @@ pub enum StandaloneCliAction {
     Install(InstallArgs),
 
     #[command(
-        about = "General info about the contract an libraries residing in the targetted directory.."
+        about = "General info about the contract an libraries residing in the targeted directory.."
     )]
     Info(InfoArgs),
 
@@ -75,7 +75,7 @@ pub enum StandaloneCliAction {
 
     #[command(
         name = "local-deps",
-        about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
+        about = "Generates a report on the local dependencies of contract crates. Will explore indirect dependencies too."
     )]
     LocalDeps(LocalDepsArgs),
 
@@ -84,6 +84,32 @@ pub enum StandaloneCliAction {
         about = "Generates a new wallet or performs actions on an existing wallet."
     )]
     Wallet(WalletArgs),
+
+    #[command(
+        name = "cs",
+        about = "Can install, start and stop a chain simulator configuration."
+    )]
+    ChainSimulator(ChainSimulatorArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct ChainSimulatorArgs {
+    #[command(subcommand)]
+    pub command: ChainSimulatorCommand,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum ChainSimulatorCommand {
+    #[command(
+        about = "Pulls the latest chain simulator docker image available. Needs Docker installed."
+    )]
+    Install,
+
+    #[command(about = "Starts the chain simulator.")]
+    Start,
+
+    #[command(about = "Stops the chain simulator.")]
+    Stop,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -101,18 +127,19 @@ pub struct InfoArgs {
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct TestArgs {
-    /// Target directory where to generate contract integration tests.
-    /// Will be current directory if not specified.
-    #[arg(short, long, verbatim_doc_comment)]
+    /// Target directory where to generate contract integration tests (default: current directory)
+    #[arg(short, long)]
     pub path: Option<String>,
 
-    /// This arg runs rust and go tests.
-    /// Default value will be "false" if not specified.
-    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    /// Run Debugger (Rust-only) and Go tests; deprecated in favor of -w or --wasm (default: "false")
+    #[arg(short, long, default_value = "false")]
     pub go: bool,
 
-    /// This arg runs interactor tests using chain simulator
-    /// Default value will be "false" if not specified
+    /// Run tests that are based on compiled contracts (default: "false")
+    #[arg(short, long, default_value = "false")]
+    pub wasm: bool,
+
+    /// Run interactor tests using chain simulator (default: "false")
     #[arg(
         short = 'c',
         long = "chain-simulator",
@@ -121,14 +148,12 @@ pub struct TestArgs {
     )]
     pub chain_simulator: bool,
 
-    /// This arg runs scenarios.
-    /// Default value will be "false" if not specified.
-    /// If scen and go are both specified, scen overrides the go argument.
+    /// Run mx-scenario-go (default: "false")
+    /// Overrides other arguments
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub scen: bool,
 
-    /// This arg prints the entire output of the vm.
-    /// Default value will be "false" if not specified
+    /// Print the entire output from the Rust tests (default: "false")
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub nocapture: bool,
 }
@@ -401,6 +426,9 @@ pub enum InstallCommand {
 
     #[command(name = "wasm-opt", about = "Installs the `wasm-opt` tool")]
     WasmOpt(InstallWasmOptArgs),
+
+    #[command(name = "debugger", about = "Installs the lldb debugger script tool")]
+    Debugger(InstallDebuggerArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -415,6 +443,9 @@ pub struct InstallWasm32Args {}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct InstallWasmOptArgs {}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallDebuggerArgs {}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct AccountArgs {
@@ -458,6 +489,9 @@ pub struct WalletNewArgs {
     /// The name of the wallet to create.
     #[arg(long = "outfile", verbatim_doc_comment)]
     pub outfile: Option<String>,
+
+    #[arg(long = "hrp", verbatim_doc_comment)]
+    pub hrp: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -473,6 +507,9 @@ pub struct WalletConvertArgs {
 
     #[arg(long = "outfile", verbatim_doc_comment)]
     pub outfile: Option<String>,
+
+    #[arg(long = "hrp", verbatim_doc_comment)]
+    pub hrp: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

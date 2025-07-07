@@ -1,13 +1,14 @@
-use std::sync::Arc;
-
 use multiversx_chain_vm::{
-    executor::BreakpointValue,
-    tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
-    vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
+    executor::VMHooksEarlyExit,
+    host::context::TxContextRef,
+    host::vm_hooks::{TxVMHooksContext, VMHooksDispatcher},
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
 
-use crate::debug_executor::{StaticVarData, StaticVarStack, VMHooksDebugger};
+use crate::executor::debug::{
+    ContractDebugInstance, ContractDebugInstanceState, ContractDebugStack, StaticVarData,
+    VMHooksDebugger,
+};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
@@ -19,26 +20,28 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooksDebugger) -> R,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
-        let top_context = TxContextStack::static_peek();
-        let wrapper = DebugApiVMHooksHandler::new(top_context);
-        let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
-        f(&dispatcher)
+        let instance = ContractDebugStack::static_peek();
+        let tx_context_ref = instance.tx_context_ref.clone();
+        let vh_context = TxVMHooksContext::new(tx_context_ref, ContractDebugInstanceState);
+        let mut dispatcher = VMHooksDispatcher::new(vh_context);
+        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
     }
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooksDebugger) -> R,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
-        let wrapper = DebugApiVMHooksHandler::new(handle.context);
-        let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
-        f(&dispatcher)
+        let tx_context_ref = TxContextRef(handle.context.clone());
+        let vh_context = TxVMHooksContext::new(tx_context_ref, ContractDebugInstanceState);
+        let mut dispatcher = VMHooksDispatcher::new(vh_context);
+        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
     }
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooksDebugger) -> R,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         Self::with_vm_hooks_ctx_1(handle1, f)
@@ -51,7 +54,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         f: F,
     ) -> R
     where
-        F: FnOnce(&dyn VMHooksDebugger) -> R,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         assert_handles_on_same_context(&handle1, &handle3);
@@ -60,9 +63,9 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn assert_live_handle(handle: &Self::HandleType) {
         if !handle.is_on_current_context() {
-            debugger_panic(
-                ReturnCode::DebugApiError,
-                err_msg::DEBUG_API_ERR_HANDLE_STALE,
+            ContractDebugInstanceState::early_exit_panic(
+                VMHooksEarlyExit::new(ReturnCode::DebugApiError.as_u64())
+                    .with_const_message(err_msg::DEBUG_API_ERR_HANDLE_STALE),
             );
         }
     }
@@ -70,20 +73,17 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&StaticVarData) -> R,
     {
-        let top_context = StaticVarStack::static_peek();
-        f(&top_context)
+        let top_static_vars = ContractDebugStack::static_peek().static_var_ref;
+        f(&top_static_vars)
     }
 }
 
 pub type DebugApi = VMHooksApi<DebugApiBackend>;
 
 impl DebugApi {
+    /// WARNING: this does not clean up after itself, must fix!!!
     pub fn dummy() {
-        let tx_context = TxContext::dummy();
-        let tx_context_arc = Arc::new(tx_context);
-        // TODO: WARNING: this does not clean up after itself, must fix!!!
-        TxContextStack::static_push(tx_context_arc);
-        StaticVarStack::static_push();
+        ContractDebugStack::static_push(ContractDebugInstance::dummy());
     }
 }
 
@@ -93,16 +93,11 @@ impl std::fmt::Debug for DebugApi {
     }
 }
 
-fn debugger_panic(status: ReturnCode, message: &str) {
-    TxContextRef::new_from_static().replace_tx_result_with_error(TxPanic::new(status, message));
-    std::panic::panic_any(BreakpointValue::SignalError);
-}
-
 fn assert_handles_on_same_context(handle1: &DebugHandle, handle2: &DebugHandle) {
     if !handle1.is_on_same_context(handle2) {
-        debugger_panic(
-            ReturnCode::DebugApiError,
-            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
+        ContractDebugInstanceState::early_exit_panic(
+            VMHooksEarlyExit::new(ReturnCode::DebugApiError.as_u64())
+                .with_const_message(err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH),
         );
     }
 }

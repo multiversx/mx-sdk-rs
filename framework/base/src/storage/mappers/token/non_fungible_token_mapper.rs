@@ -1,17 +1,26 @@
+use multiversx_chain_core::types::EsdtLocalRole;
+
 use crate::{
     abi::TypeAbiFrom,
     codec::{EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput},
-    storage_clear, storage_get, storage_set,
+    storage::mappers::{
+        source::{CurrentStorage, StorageAddress},
+        StorageMapperFromAddress,
+    },
+    storage_clear, storage_get, storage_get_len, storage_set,
     types::{
         system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
-        OriginalResultMarker, Tx, TxScEnv,
+        ManagedVec, OriginalResultMarker, Tx, TxScEnv,
     },
 };
 
 use super::{
     super::StorageMapper,
+    error::{
+        INVALID_PAYMENT_TOKEN_ERR_MSG, INVALID_TOKEN_ID_ERR_MSG, MUST_SET_TOKEN_ID_ERR_MSG,
+        PENDING_ERR_MSG, TOKEN_ID_ALREADY_SET_ERR_MSG,
+    },
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
-    token_mapper::{check_not_set, store_token_id, StorageTokenWrapper, INVALID_TOKEN_ID_ERR_MSG},
     TokenMapperState,
 };
 use crate::{
@@ -40,15 +49,17 @@ pub type IssueCallTo<Api> = Tx<
     OriginalResultMarker<TokenIdentifier<Api>>,
 >;
 
-pub struct NonFungibleTokenMapper<SA>
+pub struct NonFungibleTokenMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,
+    A: StorageAddress<SA>,
 {
     key: StorageKey<SA>,
     token_state: TokenMapperState<SA>,
+    address: A,
 }
 
-impl<SA> StorageMapper<SA> for NonFungibleTokenMapper<SA>
+impl<SA> StorageMapper<SA> for NonFungibleTokenMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
@@ -56,45 +67,25 @@ where
         Self {
             token_state: storage_get(base_key.as_ref()),
             key: base_key,
+            address: CurrentStorage,
         }
     }
 }
 
-impl<SA> StorageTokenWrapper<SA> for NonFungibleTokenMapper<SA>
+impl<SA> StorageMapperFromAddress<SA> for NonFungibleTokenMapper<SA, ManagedAddress<SA>>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
-        self.key.as_ref()
-    }
-
-    fn get_token_state(&self) -> TokenMapperState<SA> {
-        self.token_state.clone()
-    }
-
-    fn get_token_id(&self) -> TokenIdentifier<SA> {
-        if let TokenMapperState::Token(token) = &self.token_state {
-            token.clone()
-        } else {
-            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
+    fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        Self {
+            token_state: storage_get(base_key.as_ref()),
+            key: base_key,
+            address,
         }
-    }
-
-    fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
-        if let TokenMapperState::Token(token) = &self.token_state {
-            token
-        } else {
-            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
-        }
-    }
-
-    fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
-        store_token_id(self, &token_id);
-        self.token_state = TokenMapperState::Token(token_id);
     }
 }
 
-impl<SA> NonFungibleTokenMapper<SA>
+impl<SA> NonFungibleTokenMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
@@ -125,7 +116,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        check_not_set(self);
+        self.check_not_set();
 
         let callback = match opt_callback {
             Some(cb) => cb,
@@ -138,7 +129,7 @@ where
             EsdtTokenType::SemiFungible => {
                 Self::sft_issue(issue_cost, token_display_name, token_ticker)
             },
-            EsdtTokenType::Meta => {
+            EsdtTokenType::MetaFungible => {
                 Self::meta_issue(issue_cost, token_display_name, token_ticker, num_decimals)
             },
             _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG),
@@ -175,7 +166,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        check_not_set(self);
+        self.check_not_set();
 
         if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::Invalid {
             SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);
@@ -208,18 +199,7 @@ where
         }
     }
 
-    fn default_callback_closure_obj(&self) -> CallbackClosure<SA> {
-        let initial_caller = BlockchainWrapper::<SA>::new().get_caller();
-        let cb_name = DEFAULT_ISSUE_CALLBACK_NAME;
-
-        let mut cb_closure = CallbackClosure::new(cb_name);
-        cb_closure.push_endpoint_arg(&initial_caller);
-        cb_closure.push_endpoint_arg(&self.key.buffer);
-
-        cb_closure
-    }
-
-    fn nft_issue(
+    pub fn nft_issue(
         issue_cost: BigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
@@ -235,7 +215,7 @@ where
             )
     }
 
-    fn sft_issue(
+    pub fn sft_issue(
         issue_cost: BigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
@@ -251,7 +231,7 @@ where
             )
     }
 
-    fn meta_issue(
+    pub fn meta_issue(
         issue_cost: BigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
@@ -355,12 +335,65 @@ where
         send_wrapper.esdt_local_burn(token_id, token_nonce, amount);
     }
 
-    pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
-        let b_wrapper = BlockchainWrapper::new();
-        let own_sc_address = Self::get_sc_address();
-        let token_id = self.get_token_id_ref();
+    pub fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
+        Tx::new_tx_from_sc()
+            .to(to)
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            )
+            .transfer();
+    }
 
-        b_wrapper.get_esdt_token_data(&own_sc_address, token_id, token_nonce)
+    pub fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
+        self.store_token_id(&token_id);
+        self.token_state = TokenMapperState::Token(token_id);
+    }
+
+    pub fn set_if_empty(&mut self, token_id: TokenIdentifier<SA>) {
+        if self.is_empty() {
+            self.set_token_id(token_id);
+        }
+    }
+
+    pub fn set_local_roles(
+        &self,
+        roles: &[EsdtLocalRole],
+        opt_callback: Option<CallbackClosure<SA>>,
+    ) -> ! {
+        let own_sc_address = Self::get_sc_address();
+        self.set_local_roles_for_address(&own_sc_address, roles, opt_callback);
+    }
+
+    pub fn set_local_roles_for_address(
+        &self,
+        address: &ManagedAddress<SA>,
+        roles: &[EsdtLocalRole],
+        opt_callback: Option<CallbackClosure<SA>>,
+    ) -> ! {
+        self.require_issued_or_set();
+
+        let token_id = self.get_token_id_ref();
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
+            .set_special_roles(address, token_id, roles[..].iter().cloned())
+            .callback(opt_callback)
+            .async_call_and_exit()
+    }
+
+    pub(crate) fn store_token_id(&self, token_id: &TokenIdentifier<SA>) {
+        if self.get_token_state().is_set() {
+            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+        }
+        if !token_id.is_valid_esdt_identifier() {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
+        }
+        storage_set(
+            self.get_storage_key(),
+            &TokenMapperState::Token(token_id.clone()),
+        );
     }
 
     pub fn get_balance(&self, token_nonce: u64) -> BigUint<SA> {
@@ -371,20 +404,102 @@ where
         b_wrapper.get_esdt_balance(&own_sc_address, token_id, token_nonce)
     }
 
+    pub fn get_sc_address() -> ManagedAddress<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        b_wrapper.get_sc_address()
+    }
+
+    pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
+        let b_wrapper = BlockchainWrapper::new();
+        let own_sc_address = Self::get_sc_address();
+        let token_id = self.get_token_id_ref();
+
+        b_wrapper.get_esdt_token_data(&own_sc_address, token_id, token_nonce)
+    }
+
     pub fn get_token_attributes<T: TopDecode>(&self, token_nonce: u64) -> T {
         let token_data = self.get_all_token_data(token_nonce);
         token_data.decode_attributes()
     }
+}
 
-    fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
-        Tx::new_tx_from_sc()
-            .to(to)
-            .single_esdt(
-                &payment.token_identifier,
-                payment.token_nonce,
-                &payment.amount,
-            )
-            .transfer();
+impl<SA, A> NonFungibleTokenMapper<SA, A>
+where
+    SA: StorageMapperApi + CallTypeApi,
+    A: StorageAddress<SA>,
+{
+    pub(crate) fn check_not_set(&self) {
+        let storage_value: TokenMapperState<SA> = storage_get(self.get_storage_key());
+        match storage_value {
+            TokenMapperState::NotSet => {},
+            TokenMapperState::Pending => {
+                SA::error_api_impl().signal_error(PENDING_ERR_MSG);
+            },
+            TokenMapperState::Token(_) => {
+                SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+            },
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        storage_get_len(self.get_storage_key()) == 0
+    }
+
+    pub fn require_issued_or_set(&self) {
+        if self.is_empty() {
+            SA::error_api_impl().signal_error(MUST_SET_TOKEN_ID_ERR_MSG);
+        }
+    }
+
+    pub fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
+        let actual_token_id = self.get_token_id_ref();
+        if actual_token_id != expected_token_id {
+            SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
+        }
+    }
+
+    pub fn require_all_same_token(&self, payments: &ManagedVec<SA, EsdtTokenPayment<SA>>) {
+        let actual_token_id = self.get_token_id_ref();
+        for p in payments {
+            if actual_token_id != &p.token_identifier {
+                SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
+            }
+        }
+    }
+
+    pub fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
+        self.key.as_ref()
+    }
+
+    pub fn get_token_state(&self) -> TokenMapperState<SA> {
+        self.token_state.clone()
+    }
+
+    pub fn get_token_id(&self) -> TokenIdentifier<SA> {
+        if let TokenMapperState::Token(token) = &self.token_state {
+            token.clone()
+        } else {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
+        }
+    }
+
+    pub fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
+        if let TokenMapperState::Token(token) = &self.token_state {
+            token
+        } else {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
+        }
+    }
+
+    pub fn default_callback_closure_obj(&self) -> CallbackClosure<SA> {
+        let initial_caller = BlockchainWrapper::<SA>::new().get_caller();
+        let cb_name = DEFAULT_ISSUE_CALLBACK_NAME;
+
+        let mut cb_closure = CallbackClosure::new(cb_name);
+        cb_closure.push_endpoint_arg(&initial_caller);
+        cb_closure.push_endpoint_arg(&self.key.buffer);
+
+        cb_closure
     }
 }
 

@@ -3,7 +3,8 @@ use multiversx_sc::{derive_imports::*, imports::*};
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000;
 
-#[derive(TypeAbi, TopEncode, TopDecode)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct PriceTag<M: ManagedTypeApi> {
     pub token: EgldOrEsdtTokenIdentifier<M>,
     pub nonce: u64,
@@ -20,11 +21,11 @@ pub trait NftModule {
     fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
         require!(self.nft_token_id().is_empty(), "Token already issued");
 
-        let payment_amount = self.call_value().egld_value();
+        let payment_amount = self.call_value().egld();
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                payment_amount.clone_value(),
+                payment_amount.clone(),
                 &token_name,
                 &token_ticker,
                 NonFungibleTokenProperties {
@@ -58,7 +59,7 @@ pub trait NftModule {
 
     // endpoints
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(buyNft)]
     fn buy_nft(&self, nft_nonce: u64) {
         let payment = self.call_value().egld_or_single_esdt();

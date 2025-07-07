@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::version::FrameworkVersion;
 
 use super::{DependencyRawValue, VersionReq};
@@ -30,8 +32,8 @@ pub enum DependencyReference {
     GitCommit(GitCommitReference),
     GitBranch(GitBranchReference),
     GitTag(GitTagReference),
-    Path(String),
-    Unsupported(&'static str),
+    Path(PathBuf),
+    Unsupported(String),
 }
 
 impl DependencyReference {
@@ -66,10 +68,10 @@ impl DependencyRawValue {
                 },
 
                 (None, None, None) => DependencyReference::Unsupported(
-                    "need at least one of: git commit, git brach, or git tag",
+                    "need at least one of: git commit, git branch, or git tag".to_owned(),
                 ),
                 _ => DependencyReference::Unsupported(
-                    "can only have one of: git commit, git brach, or git tag",
+                    "can only have one of: git commit, git branch, or git tag".to_owned(),
                 ),
             };
         }
@@ -77,9 +79,15 @@ impl DependencyRawValue {
         // explicit version = "..."
         // handled last, because it has the lowest priority, both path and git fields override it
         if let Some(version) = self.version {
-            return DependencyReference::Version(VersionReq::from_version_str(&version));
+            if let Some(version_req) = VersionReq::from_version_str(&version) {
+                return DependencyReference::Version(version_req);
+            } else {
+                return DependencyReference::Unsupported(format!(
+                    "unknown framework version: {version}"
+                ));
+            }
         }
 
-        DependencyReference::Unsupported("expected at least one of: version, git, path")
+        DependencyReference::Unsupported("expected at least one of: version, git, path".to_owned())
     }
 }

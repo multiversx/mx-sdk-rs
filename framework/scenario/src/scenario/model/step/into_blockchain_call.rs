@@ -12,7 +12,7 @@ use crate::{
     },
 };
 
-/// Converts a [`ContractCall`] or [`ContractDeploy`] into a scenario object that additonally
+/// Converts a [`ContractCall`] or [`ContractDeploy`] into a scenario object that additionally
 /// contains gas costs and transaction-related data.
 #[deprecated(
     since = "0.42.0",

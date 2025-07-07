@@ -57,7 +57,7 @@ where
     }
 }
 
-impl<'k, A> TopDecodeInput for StorageGetInput<'k, A>
+impl<A> TopDecodeInput for StorageGetInput<'_, A>
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
@@ -96,12 +96,19 @@ where
             .into_max_size_buffer_align_right(buffer, h)
     }
 
-    #[inline]
     fn into_i64<H>(self, h: H) -> Result<i64, H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
         self.to_managed_buffer().into_i64(h)
+    }
+
+    #[cfg(feature = "barnard")]
+    fn into_u64<H>(self, h: H) -> Result<u64, H::HandledErr>
+    where
+        H: DecodeErrorHandler,
+    {
+        self.to_managed_buffer().into_u64(h)
     }
 
     #[inline]

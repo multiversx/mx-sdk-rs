@@ -5,9 +5,10 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           69
+// Endpoints:                           93
 // Async Callback:                       1
-// Total number of exported functions:  71
+// Promise callbacks:                    5
+// Total number of exported functions: 100
 
 #![no_std]
 
@@ -36,17 +37,15 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_async_accept_funds_half_payment => forward_async_accept_funds_half_payment
         forward_async_accept_funds_with_fees => forward_async_accept_funds_with_fees
         forward_async_retrieve_funds => forward_async_retrieve_funds
+        forward_async_reject_funds => forward_async_reject_funds
         send_funds_twice => send_funds_twice
         send_async_accept_multi_transfer => send_async_accept_multi_transfer
-        callback_data => callback_data
-        callback_data_at_index => callback_data_at_index
-        clear_callback_data => clear_callback_data
+        send_async_reject_multi_transfer => send_async_reject_multi_transfer
         forward_transf_exec_accept_funds => forward_transf_exec_accept_funds
         forward_transf_execu_accept_funds_with_fees => forward_transf_execu_accept_funds_with_fees
         forward_transf_exec_accept_funds_twice => forward_transf_exec_accept_funds_twice
         forward_transf_exec_accept_funds_return_values => forward_transf_exec_accept_funds_return_values
         transf_exec_multi_accept_funds => transf_exec_multi_accept_funds
-        forward_transf_exec_reject_funds_multi_transfer => forward_transf_exec_reject_funds_multi_transfer
         transf_exec_multi_reject_funds => transf_exec_multi_reject_funds
         changeOwnerAddress => change_owner
         deploy_contract => deploy_contract
@@ -85,8 +84,39 @@ multiversx_sc_wasm_adapter::endpoints! {
         create_and_send => create_and_send
         setLocalRoles => set_local_roles
         unsetLocalRoles => unset_local_roles
+        issue_dynamic_token => issue_dynamic_token
+        issue_token_all_roles => issue_token_all_roles
+        change_to_dynamic => change_to_dynamic
+        update_token => update_token
+        modify_royalties => modify_royalties
+        set_new_uris => set_new_uris
+        modify_creator => modify_creator
+        metadata_recreate => metadata_recreate
+        metadata_update => metadata_update
         lastIssuedToken => last_issued_token
         lastErrorMessage => last_error_message
+        callback_data => callback_data
+        callback_data_at_index => callback_data_at_index
+        clear_callback_data => clear_callback_data
+        forward_promise_accept_funds => forward_promise_accept_funds
+        forward_promise_retrieve_funds => forward_promise_retrieve_funds
+        forward_payment_callback => forward_payment_callback
+        forward_payment_gas_for_callback => forward_payment_gas_for_callback
+        promise_raw_single_token_to_user => promise_raw_single_token_to_user
+        promise_raw_single_token => promise_raw_single_token
+        promise_raw_multi_transfer => promise_raw_multi_transfer
+        forward_sync_retrieve_funds_bt_legacy => forward_sync_retrieve_funds_bt_legacy
+        forward_sync_retrieve_funds_bt_legacy_reset_twice => forward_sync_retrieve_funds_bt_legacy_reset_twice
+        forward_sync_retrieve_funds_bt_legacy_twice => forward_sync_retrieve_funds_bt_legacy_twice
+        forward_sync_retrieve_funds_bt_multi => forward_sync_retrieve_funds_bt_multi
+        forward_sync_retrieve_funds_bt_multi_twice => forward_sync_retrieve_funds_bt_multi_twice
+        forward_sync_retrieve_funds_bt_multi_twice_reset => forward_sync_retrieve_funds_bt_multi_twice_reset
+        forward_promise_retrieve_funds_back_transfers => forward_promise_retrieve_funds_back_transfers
+        retrieve_funds_callback => retrieve_funds_callback
+        transfer_callback => transfer_callback
+        the_one_callback => the_one_callback
+        retrieve_esdt_callback => retrieve_esdt_callback
+        retrieve_funds_back_transfers_callback => retrieve_funds_back_transfers_callback
     )
 }
 

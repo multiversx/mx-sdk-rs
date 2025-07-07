@@ -111,6 +111,14 @@ pub trait AbiTester {
     }
 
     #[endpoint]
+    fn process_managed_decimal(
+        &self,
+        input: ManagedDecimal<Self::Api, ConstDecimals<U10>>,
+    ) -> ManagedDecimal<Self::Api, usize> {
+        input.into()
+    }
+
+    #[endpoint]
     fn esdt_local_role(&self) -> EsdtLocalRole {
         EsdtLocalRole::None
     }
@@ -142,6 +150,11 @@ pub trait AbiTester {
     #[view]
     fn item_for_managed_vec(&self) -> ManagedVec<AbiManagedVecItem> {
         ManagedVec::new()
+    }
+
+    #[view]
+    fn echo_permission(&self, p: Permission) -> Permission {
+        p
     }
 
     #[view]
@@ -205,6 +218,9 @@ pub trait AbiTester {
 
     #[event("address-h256-event")]
     fn address_h256_event(&self, #[indexed] address: &Address, #[indexed] h256: &H256);
+
+    #[event]
+    fn empty_identifier_event(&self);
 
     #[endpoint]
     #[label("label1")]

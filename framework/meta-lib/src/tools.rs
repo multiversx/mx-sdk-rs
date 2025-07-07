@@ -1,16 +1,18 @@
+pub mod build_target;
 mod find_workspace;
 mod git_describe;
 pub(crate) mod panic_report;
-pub(crate) mod report_creator;
 pub mod twiggy;
 mod wasm_extractor;
-mod wasm_extractor_test;
 mod wasm_opt;
 mod wasm_to_wat;
 
 pub use find_workspace::{find_current_workspace, find_workspace};
 pub use git_describe::git_describe;
-pub use wasm_extractor::WasmInfo;
+pub use wasm_extractor::code_report::CodeReport;
+pub use wasm_extractor::extractor::WasmInfo;
+pub use wasm_extractor::report::WasmReport;
+pub use wasm_opt::install_wasm_opt;
 pub use wasm_opt::run_wasm_opt;
 pub use wasm_to_wat::wasm_to_wat;
 
