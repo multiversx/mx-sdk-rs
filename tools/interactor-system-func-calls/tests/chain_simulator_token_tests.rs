@@ -3,13 +3,18 @@ use system_sc_interact::{Config, NftDummyAttributes, SysFuncCallsInteract};
 
 const ISSUE_COST: u64 = 50000000000000000u64;
 
-// real blockchain tests for now, fixes needed for chain simulator
 #[tokio::test]
-#[ignore = "run on demand"]
-async fn cs_builtin_func_tokens_test() {
-    // let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+async fn cs_builtin_run_tests() {
+    cs_builtin_func_tokens_test().await;
+    change_to_dynamic_test().await;
+    update_token_test().await;
+    modify_creator().await;
+    transfer_role().await;
+}
 
-    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+async fn cs_builtin_func_tokens_test() {
+    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
 
     // issue dynamic NFT
     interact
@@ -91,7 +96,7 @@ async fn cs_builtin_func_tokens_test() {
                 creation_epoch: 2u64,
                 cool_factor: 3u8,
             },
-            Vec::new(),
+            &[],
         )
         .await;
 
@@ -107,11 +112,15 @@ async fn cs_builtin_func_tokens_test() {
     // set new uris
     let uris = vec!["thisianuri.com".to_string()];
     interact
-        .set_new_uris(dynamic_nft_token_id.as_bytes(), nonce, uris)
+        .set_new_uris(dynamic_nft_token_id.as_bytes(), nonce, &uris)
+        .await;
+    interact
+        .check_nft_uris(&dynamic_nft_token_id, nonce, &uris)
         .await;
 
     println!("New uris set for {dynamic_nft_token_id:?} with nonce {nonce:?}");
 
+    let uris = vec!["uri1_update1".to_string(), "uri2_update2".to_string()];
     // metadata update
     interact
         .metadata_update(
@@ -124,12 +133,15 @@ async fn cs_builtin_func_tokens_test() {
                 creation_epoch: 3u64,
                 cool_factor: 5u8,
             },
-            Vec::new(),
+            &uris,
         )
         .await;
-
+    interact
+        .check_nft_uris(&dynamic_nft_token_id, nonce, &uris)
+        .await;
     println!("Metadata updated for {dynamic_nft_token_id:?} with nonce {nonce:?}");
 
+    let uris = vec!["uri1_recreate1".to_string(), "uri2_recreate2".to_string()];
     // metadata recreate
     interact
         .metadata_recreate(
@@ -142,17 +154,37 @@ async fn cs_builtin_func_tokens_test() {
                 creation_epoch: 100u64,
                 cool_factor: 1u8,
             },
-            Vec::new(),
+            &uris,
         )
         .await;
+    interact
+        .check_nft_uris(&dynamic_nft_token_id, nonce, &uris)
+        .await;
+    println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
 
+    // metadata recreate with empty uris
+    interact
+        .metadata_recreate(
+            dynamic_nft_token_id.as_bytes(),
+            nonce,
+            b"TESTNFT",
+            30u64,
+            b"new_hash_recreated",
+            &NftDummyAttributes {
+                creation_epoch: 100u64,
+                cool_factor: 1u8,
+            },
+            &[],
+        )
+        .await;
+    interact
+        .check_nft_uris(&dynamic_nft_token_id, nonce, &[])
+        .await;
     println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
 }
 
-#[tokio::test]
-#[ignore = "run on demand"]
 async fn change_to_dynamic_test() {
-    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
 
     // issue NFT with all roles
     let _ = interact
@@ -172,7 +204,7 @@ async fn change_to_dynamic_test() {
             b"TESTNFT",
             b"TEST",
             18usize,
-            EsdtTokenType::Meta,
+            EsdtTokenType::MetaFungible,
         )
         .await;
 
@@ -194,10 +226,8 @@ async fn change_to_dynamic_test() {
     interact.change_to_dynamic(sft_token_id.as_bytes()).await;
 }
 
-#[tokio::test]
-#[ignore = "run on demand"]
 async fn update_token_test() {
-    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
 
     // issue NFT with all roles
     let nft_token_id = interact
@@ -214,10 +244,8 @@ async fn update_token_test() {
     interact.update_token(nft_token_id.as_bytes()).await;
 }
 
-#[tokio::test]
-#[ignore = "run on demand"]
 async fn modify_creator() {
-    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
 
     // issue dynamic NFT
     let dynamic_nft_token_id = interact
@@ -232,10 +260,7 @@ async fn modify_creator() {
 
     // set roles
     interact
-        .set_roles(
-            dynamic_nft_token_id.as_bytes(),
-            vec![EsdtLocalRole::NftCreate],
-        )
+        .set_roles(&dynamic_nft_token_id, vec![EsdtLocalRole::NftCreate])
         .await;
 
     // mint NFT
@@ -250,7 +275,7 @@ async fn modify_creator() {
                 creation_epoch: 2u64,
                 cool_factor: 3u8,
             },
-            Vec::new(),
+            &[],
         )
         .await;
 
@@ -275,10 +300,8 @@ async fn modify_creator() {
         .await;
 }
 
-#[tokio::test]
-#[ignore = "run on demand"]
 async fn transfer_role() {
-    let mut interact = SysFuncCallsInteract::init(Config::load_config()).await;
+    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
 
     // issue dynamic NFT
     let dynamic_nft_token_id = interact
@@ -293,12 +316,45 @@ async fn transfer_role() {
 
     // set roles
     interact
-        .set_roles(
-            dynamic_nft_token_id.as_bytes(),
-            vec![EsdtLocalRole::Transfer],
-        )
+        .set_roles(&dynamic_nft_token_id, vec![EsdtLocalRole::Transfer])
         .await;
 
     // get roles
     interact.get_roles(dynamic_nft_token_id.as_bytes()).await;
+}
+
+#[tokio::test]
+#[ignore = "run on demand"]
+async fn get_token_properties() {
+    let mut interact = SysFuncCallsInteract::init(Config::chain_simulator_config()).await;
+
+    // issue dynamic NFT
+    let dynamic_meta_esdt_token_id = interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTMETA",
+            b"TEST",
+            EsdtTokenType::DynamicMeta,
+            18usize,
+        )
+        .await;
+
+    // get properties
+    let token_properties = interact
+        .get_token_properties(dynamic_meta_esdt_token_id.as_bytes())
+        .await;
+
+    assert!(token_properties.num_decimals == 18usize);
+    assert!(!token_properties.is_paused);
+    assert!(token_properties.can_upgrade);
+    assert!(!token_properties.can_mint);
+    assert!(!token_properties.can_burn);
+    assert!(!token_properties.can_change_owner);
+    assert!(!token_properties.can_pause);
+    assert!(!token_properties.can_freeze);
+    assert!(!token_properties.can_wipe);
+    assert!(token_properties.can_add_special_roles);
+    assert!(!token_properties.can_transfer_nft_create_role);
+    assert!(!token_properties.nft_create_stopped);
+    assert!(token_properties.num_wiped == 0usize);
 }

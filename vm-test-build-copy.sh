@@ -49,6 +49,7 @@ build_and_copy_with_scenarios ./contracts/examples/factorial $VM_REPO_PATH/test/
 build_and_copy_with_scenarios ./contracts/examples/ping-pong-egld $VM_REPO_PATH/test/ping-pong-egld
 build_and_copy_with_scenarios ./contracts/examples/multisig $VM_REPO_PATH/test/multisig
 build_and_copy_with_scenarios ./contracts/feature-tests/alloc-features $VM_REPO_PATH/test/features/alloc-features
+build_and_copy_with_scenarios ./contracts/feature-tests/barnard-features $VM_REPO_PATH/test/features/barnard-features
 build_and_copy_with_scenarios ./contracts/feature-tests/basic-features $VM_REPO_PATH/test/features/basic-features
 build_and_copy_with_scenarios ./contracts/feature-tests/big-float-features $VM_REPO_PATH/test/features/big-float-features
 build_and_copy_with_scenarios ./contracts/feature-tests/erc-style-contracts/erc20 $VM_REPO_PATH/test/erc20-rust
@@ -70,10 +71,10 @@ build_and_copy ./contracts/feature-tests/composability/builtin-func-features $VM
 build_and_copy ./contracts/feature-tests/composability/forwarder             $VM_REPO_PATH/test/features/composability/forwarder
 build_and_copy ./contracts/feature-tests/composability/forwarder-queue       $VM_REPO_PATH/test/features/composability/forwarder-queue
 build_and_copy ./contracts/feature-tests/composability/forwarder-raw         $VM_REPO_PATH/test/features/composability/forwarder-raw
+build_and_copy ./contracts/feature-tests/composability/forwarder-barnard     $VM_REPO_PATH/test/features/composability/forwarder-barnard
 build_and_copy ./contracts/feature-tests/composability/proxy-test-first      $VM_REPO_PATH/test/features/composability/proxy-test-first
 build_and_copy ./contracts/feature-tests/composability/proxy-test-second     $VM_REPO_PATH/test/features/composability/proxy-test-second
 build_and_copy ./contracts/feature-tests/composability/recursive-caller      $VM_REPO_PATH/test/features/composability/recursive-caller
-build_and_copy ./contracts/feature-tests/composability/promises-features     $VM_REPO_PATH/test/features/composability/promises-features
 build_and_copy ./contracts/feature-tests/composability/vault                 $VM_REPO_PATH/test/features/composability/vault
 
 rm -f $VM_REPO_PATH/test/features/composability/scenarios/*

@@ -16,7 +16,7 @@ pub async fn adder_cli() {
 
     let config = Config::load_config();
 
-    let mut basic_interact = AdderInteract::new(config).await;
+    let mut basic_interact = BasicInteractor::new(config).await;
 
     let cli = basic_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -40,31 +40,38 @@ pub async fn adder_cli() {
     }
 }
 
-pub struct AdderInteract {
+pub struct BasicInteractor {
     pub interactor: Interactor,
     pub adder_owner_address: Bech32Address,
     pub wallet_address: Bech32Address,
     pub state: State,
 }
 
-impl AdderInteract {
+impl BasicInteractor {
     pub async fn new(config: Config) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
             .use_chain_simulator(config.use_chain_simulator());
         interactor.set_current_dir_from_workspace("contracts/examples/adder/interactor");
 
-        let adder_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
+        let adder_owner_address = interactor.register_wallet(test_wallets::mike()).await;
         let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
 
         interactor.generate_blocks(30u64).await.unwrap();
 
-        AdderInteract {
+        BasicInteractor {
             interactor,
             adder_owner_address: adder_owner_address.into(),
             wallet_address: wallet_address.into(),
             state: State::load_state(),
         }
+    }
+
+    pub async fn generate_blocks(&self, num_blocks: i32) {
+        self.interactor
+            .generate_blocks(num_blocks as u64)
+            .await
+            .unwrap();
     }
 
     pub async fn deploy(&mut self) {

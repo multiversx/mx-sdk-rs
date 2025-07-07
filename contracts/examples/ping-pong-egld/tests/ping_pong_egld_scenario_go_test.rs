@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
@@ -40,8 +40,8 @@ fn ping_pong_call_ping_twice_go() {
 }
 
 #[test]
-fn ping_pong_call_ping_wrong_ammount_go() {
-    world().run("scenarios/ping-pong-call-ping-wrong-ammount.scen.json");
+fn ping_pong_call_ping_wrong_amount_go() {
+    world().run("scenarios/ping-pong-call-ping-wrong-amount.scen.json");
 }
 
 #[test]

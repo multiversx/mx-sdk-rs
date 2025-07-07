@@ -47,6 +47,26 @@ where
         self.set_managed_buffer(&bytes.into())
     }
 
+    #[cfg(feature = "barnard")]
+    fn set_u64(self, value: u64) {
+        use crate::api::ManagedTypeApiImpl;
+
+        let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::managed_type_impl().mb_from_small_int_unsigned(handle.clone(), value as i64);
+        let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
+        self.set_managed_buffer(&managed_buffer);
+    }
+
+    #[cfg(feature = "barnard")]
+    fn set_i64(self, value: i64) {
+        use crate::api::ManagedTypeApiImpl;
+
+        let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::managed_type_impl().mb_from_small_int_signed(handle.clone(), value);
+        let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
+        self.set_managed_buffer(&managed_buffer);
+    }
+
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BigUint<A>>() || T::type_eq::<BigInt<A>>()

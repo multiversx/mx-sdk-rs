@@ -26,7 +26,7 @@ pub fn proxy_getter_return_type(m: &Method) -> ProxyGetterReturnType {
                         proxy_obj_name: last_segment,
                     }
                 } else {
-                    panic!("Proxy getter return type must be specfied with some module specifier (e.g. `path::to::module::Proxy`)");
+                    panic!("Proxy getter return type must be specified with some module specifier (e.g. `path::to::module::Proxy`)");
                 }
             } else {
                 panic!("Invalid proxy getter return type")

@@ -30,7 +30,7 @@ features = ["example_feature"]
 default-features = false
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.57.0"
+version = "0.59.0"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]

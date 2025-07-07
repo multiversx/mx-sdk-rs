@@ -101,7 +101,9 @@ impl MetaConfig {
         adjust_target_dir_wasm(&mut build_args);
 
         for contract_variant in &self.sc_config.contracts {
-            contract_variant.build_contract(&build_args, &self.output_dir);
+            contract_variant
+                .build_contract(&build_args, &self.output_dir)
+                .unwrap();
         }
     }
 

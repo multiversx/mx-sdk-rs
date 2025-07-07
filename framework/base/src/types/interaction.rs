@@ -21,7 +21,7 @@ mod tx_result_handler_list;
 mod tx_to;
 
 pub use annotated::*;
-pub use back_transfers::BackTransfers;
+pub use back_transfers::{BackTransfers, BackTransfersLegacy};
 pub use callback_closure::{
     new_callback_call, CallbackClosure, CallbackClosureForDeser, CallbackClosureMatcher,
 };

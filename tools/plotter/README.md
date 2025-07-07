@@ -39,7 +39,7 @@ This will start a dev server which will automatically reload your page
 whenever you change anything in `www` directory. To update `rust` code
 call `wasm-pack build` manually.
 
-## Developing without dependenices
+## Developing without dependencies
 If you don't want to use `npm` here's how you can run the example
 using any web server. We are using rust [basic-http-server](https://github.com/brson/basic-http-server), but
 any web server will do.
