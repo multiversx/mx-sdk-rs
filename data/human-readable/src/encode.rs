@@ -101,9 +101,9 @@ fn encode_single_value(
                 return Err(Box::new(EncodeError("expected bytes value")));
             };
 
-            let bech32_addres_string =
+            let bech32_address =
                 Bech32Address::encode_address_default_hrp(Address::from_slice(value));
-            Ok(JsonValue::String(bech32_addres_string.bech32).into())
+            Ok(JsonValue::String(bech32_address.bech32).into())
         },
         "bool" => {
             let AnyValue::SingleValue(value) = input else {
