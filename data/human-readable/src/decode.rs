@@ -6,7 +6,7 @@ use crate::{
     SingleValue, StructField, StructValue,
 };
 use multiversx_sc_scenario::{
-    bech32,
+    imports::Bech32Address,
     multiversx_sc::abi::{ContractAbi, EnumVariantDescription, StructFieldDescription},
     num_bigint::{BigInt, BigUint},
 };
@@ -95,11 +95,10 @@ fn decode_single_value(
                 .as_str()
                 .ok_or_else(|| Box::new(DecodeError("expected string value")))?;
 
-            let address = bech32::try_decode(str_value)
-                .map_err(|_| Box::new(DecodeError("failed to parse address")))?;
+            let address = Bech32Address::from_bech32_string(str_value.to_owned());
 
             Ok(AnyValue::SingleValue(SingleValue::Bytes(
-                address.as_bytes().into(),
+                address.address.as_bytes().into(),
             )))
         },
         "bool" => {

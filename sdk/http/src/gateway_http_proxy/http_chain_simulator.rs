@@ -1,14 +1,14 @@
 use super::GatewayHttpProxy;
 use anyhow::Error;
 use multiversx_sdk::{
-    chain_core::types::Address,
+    chain_core::std::Bech32Address,
     gateway::{
         ChainSimulatorGenerateBlocksRequest, ChainSimulatorSendFundsRequest, GatewayAsyncService,
     },
 };
 
 impl GatewayHttpProxy {
-    pub async fn send_user_funds(&self, receiver: &Address) -> Result<String, Error> {
+    pub async fn send_user_funds(&self, receiver: &Bech32Address) -> Result<String, Error> {
         self.request(ChainSimulatorSendFundsRequest::to_address(receiver))
             .await
     }

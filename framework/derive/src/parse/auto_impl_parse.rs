@@ -22,7 +22,11 @@ pub fn process_event_attribute(attr: &syn::Attribute, method: &mut Method) -> bo
     EventAttribute::parse(attr)
         .map(|event_attr| {
             assert_no_other_auto_impl(&*method);
-            let event_identifier = event_attr.identifier;
+            let event_identifier = if event_attr.identifier.is_empty() {
+                method.name.to_string()
+            } else {
+                event_attr.identifier.clone()
+            };
             method.implementation = MethodImpl::Generated(AutoImpl::Event {
                 identifier: event_identifier,
             });

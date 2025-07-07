@@ -18,6 +18,7 @@ pub mod macro_features;
 pub mod managed_address_features;
 pub mod managed_buffer_features;
 pub mod managed_decimal_features;
+pub mod managed_map_features;
 pub mod managed_vec_features;
 pub mod non_zero_features;
 pub mod small_num_overflow_test_ops;
@@ -88,6 +89,7 @@ pub trait BasicFeatures:
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
     + storage_mapper_get_at_address::StorageMapperGetAtAddress
     + managed_decimal_features::ManagedDecimalFeatures
+    + managed_map_features::ManagedMapFeatures
 {
     #[init]
     fn init(&self) {}

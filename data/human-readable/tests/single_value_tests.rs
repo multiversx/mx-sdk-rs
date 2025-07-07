@@ -3,7 +3,7 @@ use multiversx_sc_codec_human_readable::{
     format::HumanReadableValue, AnyValue, SingleValue,
 };
 use multiversx_sc_scenario::{
-    bech32,
+    imports::Bech32Address,
     meta::abi_json::deserialize_abi_from_json,
     multiversx_sc::{abi::ContractAbi, codec::top_encode_to_vec_u8},
 };
@@ -135,17 +135,17 @@ fn serialize_single_value_address() {
     let result = decode_human_readable_value(&value, "Address", &abi).unwrap();
     let serialized = top_encode_to_vec_u8(&result).unwrap();
 
-    let address = bech32::decode(TEST_ADDRESS);
+    let address = Bech32Address::from_bech32_string(TEST_ADDRESS.to_owned());
 
-    assert_eq!(serialized, address.to_vec());
+    assert_eq!(serialized, address.address.to_vec());
 }
 
 #[test]
 fn deserialize_single_value_address() {
     let abi: ContractAbi = deserialize_abi_from_json(EMPTY_ABI_JSON).unwrap().into();
-    let address = bech32::decode(TEST_ADDRESS);
+    let address = Bech32Address::from_bech32_string(TEST_ADDRESS.to_owned());
 
-    let value = AnyValue::SingleValue(SingleValue::Bytes(address.as_bytes().into()));
+    let value = AnyValue::SingleValue(SingleValue::Bytes(address.address.as_bytes().into()));
     let result = encode_human_readable_value(&value, "Address", &abi).unwrap();
 
     assert_eq!(result.to_string(), format!("\"{}\"", TEST_ADDRESS));

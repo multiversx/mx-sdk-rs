@@ -19,6 +19,9 @@ pub use crate::{
     types::{system_proxy::*, *},
 };
 
+#[cfg(feature = "std")]
+pub use multiversx_chain_core::std::Bech32Address;
+
 pub use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
     Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,

@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "id": "11",
+            "id": "forward_transf_exec_egld 1000 EGLD",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -70,7 +70,7 @@
         },
         {
             "step": "scCall",
-            "id": "11",
+            "id": "forward_transf_exec_egld 0 EGLD",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -84,7 +84,8 @@
             },
             "expect": {
                 "out": [],
-                "status": "0",
+                "status": "4",
+                "message": "str:transfer execute requires payment",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -103,7 +104,7 @@
                     "nonce": "0",
                     "balance": "1000",
                     "storage": {
-                        "str:call_counts|nested:str:accept_funds": "2"
+                        "str:call_counts|nested:str:accept_funds": "1"
                     },
                     "code": "mxsc:../vault/output/vault.mxsc.json"
                 },

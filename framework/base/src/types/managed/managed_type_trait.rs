@@ -35,6 +35,10 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
         self.get_handle().cast_or_signal_error::<M, _>()
     }
 
+    fn get_raw_handle_unchecked(&self) -> RawHandle {
+        self.get_handle().get_raw_handle_unchecked()
+    }
+
     /// Implement carefully, since the underlying transmutation is an unsafe operation.
     /// For types that wrap a handle to some VM-managed data,
     /// make sure the type only contains the handle (plus ZSTs if necessary).

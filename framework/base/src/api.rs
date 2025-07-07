@@ -31,3 +31,8 @@ pub use vm_api::VMApi;
 
 // Backwards compatibility.
 pub use crate::chain_core::builtin_func_names::*;
+
+/// Utility function.
+pub(crate) fn quick_signal_error<Api: ErrorApi>(message: &str) -> ! {
+    Api::error_api_impl().signal_error(message.as_bytes());
+}

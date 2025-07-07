@@ -263,13 +263,14 @@ fn print_ei_check(wasm_report: &WasmReport, check_ei: &Option<EIVersion>) {
 
         if wasm_report.ei_check {
             print_check_ei_ok();
-            return;
-        }
-
-        for import_name in &wasm_report.imports {
-            if !ei.contains_vm_hook(import_name.as_str()) {
-                print_invalid_vm_hook(import_name.as_str(), ei.name());
+        } else {
+            for import_name in &wasm_report.imports {
+                if !ei.contains_vm_hook(import_name.as_str()) {
+                    print_invalid_vm_hook(import_name.as_str(), ei.name());
+                }
             }
+
+            println!();
         }
     } else {
         print_ignore_ei_check();

@@ -138,7 +138,7 @@ where
         D: Into<ManagedBuffer<A>>,
     {
         if nonce == 0 {
-            let _ = self.send_raw_wrapper().transfer_esdt_execute(
+            self.send_raw_wrapper().transfer_esdt_execute(
                 to,
                 token_identifier,
                 amount,
@@ -147,7 +147,7 @@ where
                 &arguments.into(),
             );
         } else {
-            let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+            self.send_raw_wrapper().transfer_esdt_nft_execute(
                 to,
                 token_identifier,
                 nonce,
@@ -254,7 +254,7 @@ where
                 arguments,
             );
         } else {
-            let _ = self.send_raw_wrapper().direct_egld_execute(
+            self.send_raw_wrapper().direct_egld_execute(
                 to,
                 amount,
                 gas,
@@ -665,7 +665,7 @@ where
         );
         let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
 
-        let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+        self.send_raw_wrapper().transfer_esdt_nft_execute(
             buyer,
             nft_id,
             nft_nonce,
