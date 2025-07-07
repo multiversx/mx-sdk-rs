@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            6
+// Endpoints:                            4
 // Async Callback (empty):               1
-// Total number of exported functions:   8
+// Total number of exported functions:   6
 
 #![no_std]
 
@@ -18,8 +18,6 @@ multiversx_sc_wasm_adapter::endpoints! {
     managed_map_features
     (
         init => init
-        mm_put => mm_put
-        mm_remove => mm_remove
         mm_get => mm_get
         mm_contains => mm_contains
         mm_remove_get => mm_remove_get

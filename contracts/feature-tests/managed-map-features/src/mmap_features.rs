@@ -26,17 +26,7 @@ pub trait ManagedMapFeatures {
         }
         map
     }
-
-    #[endpoint]
-    fn mm_put(&self, key: &ManagedBuffer, value: &ManagedBuffer) {
-        self.create_map().put(key, value);
-    }
-
-    #[endpoint]
-    fn mm_remove(&self, key: &ManagedBuffer) {
-        self.create_map().remove(key);
-    }
-
+   
     #[view]
     fn mm_get(&self, key: &ManagedBuffer) -> ManagedBuffer {
         self.create_map().get(key)

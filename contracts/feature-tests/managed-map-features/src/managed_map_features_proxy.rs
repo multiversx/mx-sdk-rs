@@ -62,35 +62,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn mm_put<
-        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
-    >(
-        self,
-        key: Arg0,
-        value: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("mm_put")
-            .argument(&key)
-            .argument(&value)
-            .original_result()
-    }
-
-    pub fn mm_remove<
-        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-    >(
-        self,
-        key: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("mm_remove")
-            .argument(&key)
-            .original_result()
-    }
-
     pub fn mm_get<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
@@ -130,6 +101,22 @@ where
             .raw_call("mm_remove_get")
             .argument(&remove_key)
             .argument(&get_key)
+            .original_result()
+    }
+
+    pub fn mm_mutable_input_test<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        key: Arg0,
+        value: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue2<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("mm_mutable_input_test")
+            .argument(&key)
+            .argument(&value)
             .original_result()
     }
 }
