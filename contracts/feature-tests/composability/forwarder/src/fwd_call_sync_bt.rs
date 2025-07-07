@@ -23,6 +23,18 @@ pub trait BackTransfersModule {
             self.back_transfers_egld_event(egld_sum);
         }
         self.back_transfers_multi_event(bt_multi.into_multi_value());
+
+        let mut balances_after = MultiValueEncoded::new();
+        for transfer in transfers {
+            let payment = transfer.into_inner();
+            let balance = self
+                .blockchain()
+                .get_sc_balance(&payment.token_identifier, payment.token_nonce);
+            let balance_info =
+                EgldOrEsdtTokenPayment::new(payment.token_identifier, payment.token_nonce, balance);
+            balances_after.push(EgldOrEsdtTokenPaymentMultiValue::from(balance_info));
+        }
+        self.balances_after(balances_after);
     }
 
     /// Highlights the behavior when calling back transfers **without** reset.
@@ -81,4 +93,10 @@ pub trait BackTransfersModule {
 
     #[event("back_transfers_egld_event")]
     fn back_transfers_egld_event(&self, #[indexed] egld_value: BigUint);
+
+    #[event]
+    fn balances_after(
+        &self,
+        #[indexed] balances_after: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+    );
 }
