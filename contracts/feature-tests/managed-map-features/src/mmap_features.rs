@@ -26,7 +26,7 @@ pub trait ManagedMapFeatures {
         }
         map
     }
-   
+
     #[view]
     fn mm_get(&self, key: &ManagedBuffer) -> ManagedBuffer {
         self.create_map().get(key)
