@@ -58,4 +58,20 @@ pub trait ManagedMapFeatures {
         let get_value = map.get(get_key);
         (removed_value, get_value).into()
     }
+
+    #[view]
+    fn mm_mutable_input_test(
+        &self,
+        mut key: ManagedBuffer,
+        mut value: ManagedBuffer,
+    ) -> MultiValue2<ManagedBuffer, ManagedBuffer> {
+        let mut map = self.create_map();
+        map.put(&key, &value);
+        let original_key = key.clone();
+        key.append_bytes(b"...changed");
+        value.append_bytes(b"...changed");
+        let value1 = map.get(&original_key);
+        let value2 = map.get(&key);
+        (value1, value2).into()
+    }
 }

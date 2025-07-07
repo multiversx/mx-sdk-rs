@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            5
+// Endpoints:                            6
 // Async Callback (empty):               1
-// Total number of exported functions:   7
+// Total number of exported functions:   8
 
 #![no_std]
 
@@ -23,6 +23,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         mm_get => mm_get
         mm_contains => mm_contains
         mm_remove_get => mm_remove_get
+        mm_mutable_input_test => mm_mutable_input_test
     )
 }
 
