@@ -1,4 +1,5 @@
-use multiversx_sc_scenario::imports::*;
+use multiversx_sc::types::{ManagedBuffer, ManagedMap};
+use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn key_mutability_test() {
