@@ -103,6 +103,19 @@
                         "data": [
                             ""
                         ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
+                        "topics": [
+                            "str:balances_after",
+                            "str:EGLD",
+                            "",
+                            "1000"
+                        ],
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",
