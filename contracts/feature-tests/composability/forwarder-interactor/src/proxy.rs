@@ -324,6 +324,18 @@ where
             .original_result()
     }
 
+    pub fn forward_async_reject_funds<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("forward_async_reject_funds")
+            .argument(&to)
+            .original_result()
+    }
+
     pub fn send_funds_twice<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
