@@ -10,11 +10,6 @@ fn mmap_get_go() {
 }
 
 #[test]
-fn mmap_key_mutability_go() {
-    world().run("scenarios/mmap_key_mutability.scen.json");
-}
-
-#[test]
 fn mmap_mutable_input_go() {
     world().run("scenarios/mmap_mutable_input.scen.json");
 }

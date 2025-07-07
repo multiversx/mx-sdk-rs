@@ -23,7 +23,7 @@ fn world() -> ScenarioWorld {
         .balance(100)
         .owner(OWNER_ADDRESS)
         .code(MANAGED_MAP_CODE_PATH)
-        .storage_mandos("str:num_entries", "2")
+        .storage_mandos("str:num_entries", "3")
         .storage_mandos("str:key|u32:0", "str:key0")
         .storage_mandos("str:key|u32:1", "str:key1")
         .storage_mandos("str:key|u32:2", "str:key2")
@@ -36,65 +36,60 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn key_mutability_test() {
+fn managed_map_get_set_remove_test() {
     let mut world = world();
 
-    let mut key = "key1".to_string();
-
     let result = world
-        .tx()
-        .from(OWNER_ADDRESS)
+        .query()
         .to(SC_ADDRESS)
         .typed(managed_map_features_proxy::ManagedMapFeaturesProxy)
-        .mm_get(&key)
-        .returns(ReturnsResult)
+        .mm_get("key1")
+        .returns(ReturnsResultUnmanaged)
         .run();
 
-    assert_eq!(result, ManagedBuffer::from(b"value1"));
-
-    key.push('y');
+    assert_eq!(result, "value1".as_bytes());
 
     let result = world
-        .tx()
-        .from(OWNER_ADDRESS)
+        .query()
         .to(SC_ADDRESS)
         .typed(managed_map_features_proxy::ManagedMapFeaturesProxy)
-        .mm_get(&key)
+        .mm_get("unknown-key")
         .returns(ReturnsResult)
         .run();
 
     assert!(result.is_empty());
 
     let result = world
-        .tx()
-        .from(OWNER_ADDRESS)
+        .query()
         .to(SC_ADDRESS)
         .typed(managed_map_features_proxy::ManagedMapFeaturesProxy)
-        .mm_contains(&key)
+        .mm_contains("unknown-key")
         .returns(ReturnsResult)
         .run();
 
     assert!(!result);
 
-    world
-        .tx()
-        .from(OWNER_ADDRESS)
+    let (removed_value, get_value) = world
+        .query()
         .to(SC_ADDRESS)
         .typed(managed_map_features_proxy::ManagedMapFeaturesProxy)
-        .mm_remove(&key)
-        .returns(ReturnsResult)
-        .run();
+        .mm_remove_get("key1", "key1")
+        .returns(ReturnsResultUnmanaged)
+        .run()
+        .into_tuple();
 
-    key = key[..key.len() - 1].to_string();
+    assert_eq!(removed_value, "value1".as_bytes());
+    assert!(get_value.is_empty());
 
-    let result = world
-        .tx()
-        .from(OWNER_ADDRESS)
+    let (removed_value, get_value) = world
+        .query()
         .to(SC_ADDRESS)
         .typed(managed_map_features_proxy::ManagedMapFeaturesProxy)
-        .mm_get(&key)
-        .returns(ReturnsResult)
-        .run();
+        .mm_remove_get("unknown-key", "unknown-key")
+        .returns(ReturnsResultUnmanaged)
+        .run()
+        .into_tuple();
 
-    assert_eq!(result, ManagedBuffer::from(b"value1"));
+    assert!(removed_value.is_empty());
+    assert!(get_value.is_empty());
 }

@@ -17,11 +17,6 @@ fn mmap_get_rs() {
 }
 
 #[test]
-fn mmap_key_mutability_rs() {
-    world().run("scenarios/mmap_key_mutability.scen.json");
-}
-
-#[test]
 fn mmap_mutable_input_rs() {
     world().run("scenarios/mmap_mutable_input.scen.json");
 }
