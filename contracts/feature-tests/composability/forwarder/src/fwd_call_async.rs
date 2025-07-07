@@ -110,6 +110,19 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
             .async_call_and_exit()
     }
 
+    #[endpoint]
+    #[payable]
+    fn forward_async_reject_funds(&self, to: ManagedAddress) {
+        let payment = self.call_value().all_transfers();
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .reject_funds()
+            .payment(payment)
+            .callback(self.callbacks().retrieve_funds_callback())
+            .async_call_and_exit()
+    }
+
     #[callback]
     fn retrieve_funds_callback(&self) {
         let (token, nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
