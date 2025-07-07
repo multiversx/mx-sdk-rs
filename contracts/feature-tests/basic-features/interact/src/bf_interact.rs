@@ -76,6 +76,17 @@ impl BasicFeaturesInteract {
         }
     }
 
+    pub async fn add_validator_key(&mut self) {
+        self.interactor
+            .add_key(
+                Validator::from_pem_file("./validatorKey.pem")
+                    .expect("Unable to load validator key")
+                    .private_key,
+            )
+            .await
+            .expect("Failed to add validator key");
+    }
+
     pub async fn large_storage(&mut self, size_kb: usize) {
         let large_data = std::fs::read_to_string("pi.txt").unwrap().into_bytes();
         let payload = &large_data[0..size_kb * 1024];

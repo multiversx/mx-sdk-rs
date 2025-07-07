@@ -18,18 +18,6 @@ pub type EsdtTokenDataMultiValue<M> = MultiValue9<
 
 #[multiversx_sc::module]
 pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
-    #[view(getFungibleEsdtBalance)]
-    fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
-        self.blockchain()
-            .get_esdt_balance(&self.blockchain().get_sc_address(), token_identifier, 0)
-    }
-
-    #[view(getCurrentNftNonce)]
-    fn get_current_nft_nonce(&self, token_identifier: &TokenIdentifier) -> u64 {
-        self.blockchain()
-            .get_current_esdt_nft_nonce(&self.blockchain().get_sc_address(), token_identifier)
-    }
-
     #[endpoint]
     fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BigUint) {
         self.send().direct_esdt(to, &token_id, 0, amount);
@@ -141,65 +129,5 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
     #[endpoint]
     fn local_burn(&self, token_identifier: TokenIdentifier, amount: BigUint) {
         self.send().esdt_local_burn(&token_identifier, 0, &amount);
-    }
-
-    #[view]
-    fn get_esdt_local_roles(&self, token_id: TokenIdentifier) -> MultiValueEncoded<ManagedBuffer> {
-        let roles = self.blockchain().get_esdt_local_roles(&token_id);
-        let mut result = MultiValueEncoded::new();
-        for role in roles.iter_roles() {
-            result.push(role.as_role_name().into());
-        }
-        result
-    }
-
-    #[view]
-    fn get_esdt_token_data(
-        &self,
-        address: ManagedAddress,
-        token_id: TokenIdentifier,
-        nonce: u64,
-    ) -> EsdtTokenDataMultiValue<Self::Api> {
-        let token_data = self
-            .blockchain()
-            .get_esdt_token_data(&address, &token_id, nonce);
-
-        (
-            token_data.token_type,
-            token_data.amount,
-            token_data.frozen,
-            token_data.hash,
-            token_data.name,
-            token_data.attributes,
-            token_data.creator,
-            token_data.royalties,
-            token_data.uris,
-        )
-            .into()
-    }
-
-    #[view]
-    fn is_esdt_frozen(
-        &self,
-        address: &ManagedAddress,
-        token_id: &TokenIdentifier,
-        nonce: u64,
-    ) -> bool {
-        self.blockchain().is_esdt_frozen(address, token_id, nonce)
-    }
-
-    #[view]
-    fn is_esdt_paused(&self, token_id: &TokenIdentifier) -> bool {
-        self.blockchain().is_esdt_paused(token_id)
-    }
-
-    #[view]
-    fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier) -> bool {
-        self.blockchain().is_esdt_limited_transfer(token_id)
-    }
-
-    #[view]
-    fn validate_token_identifier(&self, token_id: TokenIdentifier) -> bool {
-        token_id.is_valid_esdt_identifier()
     }
 }

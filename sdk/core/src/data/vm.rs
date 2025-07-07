@@ -59,7 +59,7 @@ pub struct OutputAccountApi {
     address: Bech32Address,
     nonce: u64,
 
-    // TODO: unknow type of data
+    // TODO: unknown type of data
     // balance: Option<String>,
     balance_delta: u64,
     storage_updates: Option<HashMap<String, StorageUpdateApi>>,

@@ -3,7 +3,11 @@ use crate::{
     types::{EsdtTokenPayment, ManagedVec, RHListItem, RHListItemExec, TxEnv},
 };
 
-/// Indicates that back-transfers will be returned.
+/// Indicates that back-transfers will be returned, old implementation.
+#[deprecated(
+    since = "0.59.0",
+    note = "Does not handle multi-transfers properly, use ReturnsBackTransfers instead"
+)]
 pub struct ReturnsBackTransfersLegacyMultiESDT;
 
 impl<Env, Original> RHListItem<Env, Original> for ReturnsBackTransfersLegacyMultiESDT

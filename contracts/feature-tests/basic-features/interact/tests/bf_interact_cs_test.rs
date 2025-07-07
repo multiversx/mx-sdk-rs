@@ -19,6 +19,7 @@ const ISSUE_COST: u64 = 50000000000000000u64;
 async fn simulator_basic_features_test() {
     let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
 
+    bf_interact.add_validator_key().await;
     bf_interact.deploy_storage_bytes().await;
     bf_interact.large_storage(15).await;
 
@@ -275,10 +276,7 @@ async fn chain_simulator_bf_get_special_roles_test() {
 
     // set transfer role
     system_interact
-        .set_roles(
-            dynamic_nft_token_id.as_bytes(),
-            vec![EsdtLocalRole::Transfer],
-        )
+        .set_roles(&dynamic_nft_token_id, vec![EsdtLocalRole::Transfer])
         .await;
 
     // deploy bf

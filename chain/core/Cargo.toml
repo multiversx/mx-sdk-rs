@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-chain-core"
-version = "0.15.0"
+version = "0.16.0"
 edition = "2021"
 
 authors = [
@@ -17,14 +17,15 @@ keywords = ["multiversx", "blockchain", "vm", "tools"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [features]
-std = ["bech32", "serde"]
+std = ["bech32", "serde", "hex"]
 
 [dependencies]
 bitflags = "2.9"
 bech32 = { version = "0.11", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
+hex = { version = "0.4", optional = true }
 
 [dependencies.multiversx-sc-codec]
-version = "=0.22.1"
+version = "=0.23.0"
 path = "../../data/codec"
 features = ["derive"]

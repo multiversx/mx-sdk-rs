@@ -87,7 +87,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_received_funds_immmediately()
+            .retrieve_received_funds_immediately()
             .egld(payment)
             .returns(ReturnsBackTransfersEGLD)
             .sync_call()
@@ -107,7 +107,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_received_funds_immmediately()
+            .retrieve_received_funds_immediately()
             .single_esdt(
                 &payment.token_identifier,
                 payment.token_nonce,
@@ -119,6 +119,7 @@ pub trait ForwarderSyncCallModule {
         result
     }
 
+    #[allow(deprecated)]
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds_rh_multi_esdt(
@@ -132,7 +133,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_received_funds_immmediately()
+            .retrieve_received_funds_immediately()
             .payment(payment)
             .returns(ReturnsBackTransfersLegacyMultiESDT)
             .sync_call()

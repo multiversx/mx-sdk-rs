@@ -159,30 +159,6 @@ where
     }
 
     #[cfg(feature = "barnard")]
-    pub fn get_esdt_token_type(
-        &self,
-        address: &ManagedAddress<A>,
-        token_id: &EgldOrEsdtTokenIdentifier<A>,
-        nonce: u64,
-    ) -> EsdtTokenType {
-        unsafe {
-            let big_int_temp_handle: A::BigIntHandle =
-                use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-
-            A::blockchain_api_impl().managed_get_esdt_token_type(
-                address.get_handle(),
-                token_id.get_handle(),
-                nonce,
-                big_int_temp_handle.clone(),
-            );
-
-            let bu = BigUint::<A>::from_handle(big_int_temp_handle);
-            // TODO: forget bu
-            EsdtTokenType::from(bu.to_u64())
-        }
-    }
-
-    #[cfg(feature = "barnard")]
     pub fn get_code_hash(&self, address: &ManagedAddress<A>) -> ManagedBuffer<A> {
         unsafe {
             let result = ManagedBuffer::new_uninit();
@@ -392,6 +368,51 @@ where
         }
     }
 
+    #[cfg(feature = "barnard")]
+    fn get_esdt_token_type_raw(
+        &self,
+        address: &ManagedAddress<A>,
+        token_id: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+    ) -> u64 {
+        unsafe {
+            let big_int_temp_handle: A::BigIntHandle =
+                use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+
+            A::blockchain_api_impl().managed_get_esdt_token_type(
+                address.get_handle(),
+                token_id.get_handle(),
+                nonce,
+                big_int_temp_handle.clone(),
+            );
+
+            let bu = BigUint::<A>::from_handle(big_int_temp_handle);
+            // TODO: forget bu
+            bu.to_u64().unwrap_or(255)
+        }
+    }
+
+    #[cfg(feature = "barnard")]
+    pub fn get_esdt_token_type(
+        &self,
+        address: &ManagedAddress<A>,
+        token_id: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        EsdtTokenType::from(self.get_esdt_token_type_raw(address, token_id, nonce) as u8)
+    }
+
+    /// Legacy implementation, based on nonce.
+    #[cfg(not(feature = "barnard"))]
+    pub fn get_esdt_token_type(
+        &self,
+        _address: &ManagedAddress<A>,
+        _token_id: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        EsdtTokenType::based_on_token_nonce(nonce)
+    }
+
     pub fn get_esdt_token_data(
         &self,
         address: &ManagedAddress<A>,
@@ -425,11 +446,7 @@ where
             uris_handle.get_raw_handle(),
         );
 
-        let token_type = if nonce == 0 {
-            EsdtTokenType::Fungible
-        } else {
-            EsdtTokenType::NonFungible
-        };
+        let token_type = self.get_esdt_token_type(address, &token_id.data, nonce);
 
         if managed_api_impl.mb_len(creator_handle.clone()) == 0 {
             managed_api_impl.mb_overwrite(creator_handle.clone(), &[0u8; 32][..]);

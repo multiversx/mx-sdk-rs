@@ -16,11 +16,11 @@ path = "src/barnard_interactor.rs"
 path = ".."
 
 [dependencies.multiversx-sc]
-version = "0.58.0"
+version = "0.59.0"
 path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.58.0"
+version = "0.59.0"
 path = "../../../../framework/snippets"
 
 [dependencies]
