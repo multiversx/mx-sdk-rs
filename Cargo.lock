@@ -2901,22 +2901,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "managed-map-features"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
-]
-
-[[package]]
-name = "managed-map-features-meta"
-version = "0.0.0"
-dependencies = [
- "managed-map-features",
- "multiversx-sc-meta-lib",
-]
-
-[[package]]
 name = "map-repeat"
 version = "0.0.0"
 dependencies = [
