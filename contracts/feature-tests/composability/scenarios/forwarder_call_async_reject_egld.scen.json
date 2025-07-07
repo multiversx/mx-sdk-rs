@@ -21,7 +21,7 @@
         {
             "step": "scCall",
             "id": "2",
-            "comment": "send all types",
+            "comment": "tokens returned after a failed call do not currently show up as callback call value",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -60,7 +60,7 @@
                             "str:retrieve_funds_callback",
                             "str:EGLD",
                             "",
-                            "1000"
+                            "0"
                         ],
                         "data": [
                             ""

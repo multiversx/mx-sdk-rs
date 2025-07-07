@@ -337,6 +337,18 @@ fn forwarder_call_async_multi_transfer_egld_reject_rs() {
 }
 
 #[test]
+#[ignore = "not yet supported, Go VM also doesn't return rejected tokens as callback call value"]
+fn forwarder_call_async_reject_egld_rs() {
+    world().run("scenarios/forwarder_call_async_reject_egld.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported, Go VM also doesn't return rejected tokens as callback call value"]
+fn forwarder_call_async_reject_esdt_rs() {
+    world().run("scenarios/forwarder_call_async_reject_esdt.scen.json");
+}
+
+#[test]
 fn forwarder_call_async_retrieve_egld_rs() {
     world().run("scenarios/forwarder_call_async_retrieve_egld.scen.json");
 }
