@@ -183,6 +183,28 @@
                         "data": [
                             ""
                         ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
+                        "topics": [
+                            "str:balances_after",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:NFT-123456",
+                            "1",
+                            "1",
+                            "str:EGLD",
+                            "0",
+                            "100",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ],
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",
