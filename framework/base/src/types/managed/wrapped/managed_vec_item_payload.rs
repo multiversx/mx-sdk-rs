@@ -5,7 +5,7 @@ use generic_array::{
     ArrayLength, GenericArray, IntoArrayLength,
 };
 
-/// Describes the binary represetnation of a ManagedVecItem.
+/// Describes the binary representation of a ManagedVecItem.
 ///
 /// It is always an array that can be allocated directly on stack.
 pub trait ManagedVecItemPayload {

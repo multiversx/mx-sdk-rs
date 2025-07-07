@@ -7,7 +7,7 @@ pub const fn top_encode_number_buffer() -> TopEncodeNumberBuffer {
     [0u8; 8]
 }
 
-/// Encodes number to minimimum number of bytes (top-encoding).
+/// Encodes number to minimum number of bytes (top-encoding).
 ///
 /// Smaller types need to be converted to u64 before using this function.
 ///

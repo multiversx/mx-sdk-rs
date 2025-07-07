@@ -1,4 +1,4 @@
-/// Contains metdata from the `#[payable(...)]` attribute.
+/// Contains metadata from the `#[payable(...)]` attribute.
 /// Only endpoints and the constructor can be marked payable.
 #[derive(Clone, Debug)]
 pub enum MethodPayableMetadata {

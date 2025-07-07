@@ -10,9 +10,10 @@ use crate::{
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage,
     types::{
-        BackTransfers, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags,
-        EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray,
-        ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress, TokenIdentifier,
+        BackTransfers, BackTransfersLegacy, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier,
+        EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress,
+        TokenIdentifier,
     },
 };
 
@@ -145,7 +146,6 @@ where
         }
     }
 
-    #[inline]
     pub fn get_code_metadata(&self, address: &ManagedAddress<A>) -> CodeMetadata {
         let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::blockchain_api_impl()
@@ -156,6 +156,16 @@ where
                 .load_to_byte_array(&mut buffer);
         }
         CodeMetadata::from(buffer)
+    }
+
+    #[cfg(feature = "barnard")]
+    pub fn get_code_hash(&self, address: &ManagedAddress<A>) -> ManagedBuffer<A> {
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            A::blockchain_api_impl()
+                .managed_get_code_hash(address.get_handle(), result.get_handle());
+            result
+        }
     }
 
     #[inline]
@@ -219,6 +229,13 @@ where
         A::blockchain_api_impl().get_block_timestamp()
     }
 
+    /// Block timestamp, in milliseconds.
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_block_timestamp_ms()
+    }
+
     #[inline]
     pub fn get_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().get_block_nonce()
@@ -232,6 +249,30 @@ where
     #[inline]
     pub fn get_block_epoch(&self) -> u64 {
         A::blockchain_api_impl().get_block_epoch()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_block_round_time_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_block_round_time_ms()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_timestamp_ms()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_nonce(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_nonce()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn epoch_start_block_round(&self) -> u64 {
+        A::blockchain_api_impl().epoch_start_block_round()
     }
 
     #[deprecated(
@@ -256,6 +297,12 @@ where
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp()
+    }
+
+    #[cfg(feature = "barnard")]
+    #[inline]
+    pub fn get_prev_block_timestamp_ms(&self) -> u64 {
+        A::blockchain_api_impl().get_prev_block_timestamp_ms()
     }
 
     #[inline]
@@ -321,6 +368,51 @@ where
         }
     }
 
+    #[cfg(feature = "barnard")]
+    fn get_esdt_token_type_raw(
+        &self,
+        address: &ManagedAddress<A>,
+        token_id: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+    ) -> u64 {
+        unsafe {
+            let big_int_temp_handle: A::BigIntHandle =
+                use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+
+            A::blockchain_api_impl().managed_get_esdt_token_type(
+                address.get_handle(),
+                token_id.get_handle(),
+                nonce,
+                big_int_temp_handle.clone(),
+            );
+
+            let bu = BigUint::<A>::from_handle(big_int_temp_handle);
+            // TODO: forget bu
+            bu.to_u64().unwrap_or(255)
+        }
+    }
+
+    #[cfg(feature = "barnard")]
+    pub fn get_esdt_token_type(
+        &self,
+        address: &ManagedAddress<A>,
+        token_id: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        EsdtTokenType::from(self.get_esdt_token_type_raw(address, token_id, nonce) as u8)
+    }
+
+    /// Legacy implementation, based on nonce.
+    #[cfg(not(feature = "barnard"))]
+    pub fn get_esdt_token_type(
+        &self,
+        _address: &ManagedAddress<A>,
+        _token_id: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+    ) -> EsdtTokenType {
+        EsdtTokenType::based_on_token_nonce(nonce)
+    }
+
     pub fn get_esdt_token_data(
         &self,
         address: &ManagedAddress<A>,
@@ -354,11 +446,7 @@ where
             uris_handle.get_raw_handle(),
         );
 
-        let token_type = if nonce == 0 {
-            EsdtTokenType::Fungible
-        } else {
-            EsdtTokenType::NonFungible
-        };
+        let token_type = self.get_esdt_token_type(address, &token_id.data, nonce);
 
         if managed_api_impl.mb_len(creator_handle.clone()) == 0 {
             managed_api_impl.mb_overwrite(creator_handle.clone(), &[0u8; 32][..]);
@@ -389,7 +477,11 @@ where
     /// Works after:
     /// - synchronous calls
     /// - asynchronous calls too, in callbacks.
-    pub fn get_back_transfers(&self) -> BackTransfers<A> {
+    #[deprecated(
+        since = "0.59.0",
+        note = "Does not handle multi-transfers properly, use get_back_transfers instead"
+    )]
+    pub fn get_back_transfers_legacy(&self) -> BackTransfersLegacy<A> {
         let esdt_transfer_value_handle: A::BigIntHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         let call_value_handle: A::BigIntHandle =
@@ -401,13 +493,42 @@ where
         );
 
         unsafe {
-            BackTransfers {
+            BackTransfersLegacy {
                 total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
                 esdt_payments: ManagedVec::from_raw_handle(
                     esdt_transfer_value_handle.get_raw_handle(),
                 ),
             }
         }
+    }
+
+    /// Retrieves all back-transfers as a collection of payments.
+    ///
+    /// Covers all cases, including EGLD sent via multi-transfer.
+    pub fn get_back_transfers(&self) -> BackTransfers<A> {
+        unsafe {
+            let mut all_bt_vec = ManagedVec::new_uninit();
+            let bt_direct_egld = BigUint::<A>::new_uninit();
+
+            A::blockchain_api_impl().managed_get_back_transfers(
+                all_bt_vec.get_raw_handle_unchecked(),
+                bt_direct_egld.get_raw_handle_unchecked(),
+            );
+
+            if bt_direct_egld > 0u64 {
+                all_bt_vec.push(EgldOrEsdtTokenPayment::egld_payment(bt_direct_egld));
+            }
+
+            BackTransfers::new(all_bt_vec)
+        }
+    }
+
+    /// Clears back transfers by retrieving current back transfers and ignoring result.
+    pub fn reset_back_transfers(&self) {
+        A::blockchain_api_impl().managed_get_back_transfers(
+            const_handles::MBUF_TEMPORARY_1,
+            const_handles::BIG_INT_TEMPORARY_1,
+        );
     }
 
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.

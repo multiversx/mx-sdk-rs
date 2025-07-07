@@ -1,7 +1,7 @@
 use multiversx_sc_scenario::imports::*;
 use scenario_tester::*;
 
-const ST_PATH_EXPR: MxscPath = MxscPath::new("mxsc:output/scenario-tester.mxsc.json");
+const ST_PATH_EXPR: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
 const OWNER: TestAddress = TestAddress::new("owner");
 const SCENARIO_TESTER: TestSCAddress = TestSCAddress::new("scenario-tester");
 
@@ -33,7 +33,7 @@ fn st_whitebox() {
             sc.init(BigUint::from(5u64));
         });
 
-    assert_eq!(new_address.to_address(), SCENARIO_TESTER.to_address());
+    assert_eq!(new_address, SCENARIO_TESTER);
 
     world
         .query()
@@ -73,7 +73,7 @@ fn st_whitebox_tx_hash() {
             sc.init(BigUint::from(5u64));
         });
 
-    assert_eq!(new_address.to_address(), SCENARIO_TESTER.to_address());
+    assert_eq!(new_address, SCENARIO_TESTER);
     assert_eq!(tx_hash.as_array(), &[11u8; 32]);
 
     let tx_hash = world

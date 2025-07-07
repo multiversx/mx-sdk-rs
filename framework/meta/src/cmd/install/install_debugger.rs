@@ -11,6 +11,7 @@ pub const TARGET_PATH: &str = ".vscode/extensions/";
 
 pub async fn install_debugger(custom_path: Option<PathBuf>) {
     let testing = custom_path.is_some();
+    remove_old_lldb_extension();
     let _ = install_lldb_extension();
     install_script(custom_path).await;
     if !testing {
@@ -19,23 +20,38 @@ pub async fn install_debugger(custom_path: Option<PathBuf>) {
     }
 }
 
+fn remove_old_lldb_extension() {
+    let extension_id = "vadimcn.vscode-lldb";
+
+    // Run the VSCode command to remove the previous installed extension
+    let _ = Command::new("code")
+        .arg("--uninstall-extension")
+        .arg(extension_id)
+        .status();
+
+    // Run to clean .vscode/extensions/ folder of the remains of previous extension installations
+    let _ = Command::new("rm")
+        .arg("-rf")
+        .arg("~/.vscode/extensions/vadim*")
+        .status();
+}
 fn install_lldb_extension() -> io::Result<()> {
     let extension_id = "vadimcn.vscode-lldb";
 
     // Run the VSCode command to install the extension
-    let status = Command::new("code")
+    let install_lldb_command = Command::new("code")
         .arg("--install-extension")
         .arg(extension_id)
         .status()?;
 
-    // Check if the command was successful
-    if status.success() {
-        println!("Extension {} installed successfully.", extension_id);
+    if install_lldb_command.success() {
+        println!("Extension {} installed successfully.", install_lldb_command);
     } else {
-        eprintln!("Failed to install extension {}.", extension_id);
+        eprintln!("Failed to install extension {}.", install_lldb_command);
     }
 
     Ok(())
+    // Check if the command was successful
 }
 
 async fn install_script(custom_path: Option<PathBuf>) {
@@ -103,13 +119,13 @@ fn configure_vscode() {
     let script_full_path = get_script_path(home::home_dir().unwrap().join(TARGET_PATH));
     let json = fs::read_to_string(&path_to_settings).expect("Unable to read settings.json");
     let mut sub_values: serde_json::Value = serde_json::from_str(&json).unwrap_or_else(
-        |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is locatted at line {}, column {}. This error might be caused either by a trailling comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
+        |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is located at line {}, column {}. This error might be caused either by a trailing comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
     );
 
     let init_commands = sub_values
         .as_object_mut()
         .unwrap()
-        .entry("lldb.launch.initCommands")
+        .entry("lldb.launch.preRunCommands")
         .or_insert_with(|| serde_json::Value::Array(Vec::new()));
     let command_script_line =
         "command script import ".to_owned() + script_full_path.to_str().unwrap();

@@ -27,4 +27,7 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl + Sized {
     /// It is redundant, since the number can also be retrieved from `load_all_esdt_transfers`,
     /// but it is easier and cheaper to call when the content of those transfers is of no interest.
     fn esdt_num_transfers(&self) -> usize;
+
+    /// Loads all EGLD+ESDT call values into a managed vec. Overwrites destination.
+    fn load_all_transfers(&self, dest_handle: Self::ManagedBufferHandle);
 }

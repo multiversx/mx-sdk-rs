@@ -61,7 +61,7 @@ pub trait ManagedVecItem: 'static {
 
     /// Converts the object into bytes.
     ///
-    /// The method is used when instering (push, overwrite) into a ManagedVec.
+    /// The method is used when inserting (push, overwrite) into a ManagedVec.
     ///
     /// Note that a destructor should not be called at this moment, since the ManagedVec will take ownership of the item.
     fn save_to_payload(self, payload: &mut Self::PAYLOAD);

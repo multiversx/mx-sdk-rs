@@ -129,7 +129,7 @@ where
             EsdtTokenType::SemiFungible => {
                 Self::sft_issue(issue_cost, token_display_name, token_ticker)
             },
-            EsdtTokenType::Meta => {
+            EsdtTokenType::MetaFungible => {
                 Self::meta_issue(issue_cost, token_display_name, token_ticker, num_decimals)
             },
             _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG),

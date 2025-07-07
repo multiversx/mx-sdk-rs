@@ -1,5 +1,5 @@
 use multiversx_sc_meta_lib::abi_json;
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 use std::{fs, fs::File, io::Write};
 

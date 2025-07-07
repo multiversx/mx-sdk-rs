@@ -5,7 +5,7 @@ pub const DEFAULT_STACK_SIZE: usize = 2 * WASM_PAGE_SIZE;
 
 pub const STACK_SIZE_SUFFIX_KILO: &str = "k";
 pub const STACK_SIZE_SUFFIX_PAGES: &str = "pages";
-pub const STACK_SIZE_MULIPLIER_KILO: usize = 1024;
+pub const STACK_SIZE_MULTIPLIER_KILO: usize = 1024;
 
 pub fn parse_stack_size(stack_size: &Option<String>) -> usize {
     if let Some(stack_size_str) = stack_size {
@@ -17,7 +17,7 @@ pub fn parse_stack_size(stack_size: &Option<String>) -> usize {
 
 fn parse_stack_size_expr(stack_size_str: &str) -> usize {
     if let Some(s) = stack_size_str.strip_suffix(STACK_SIZE_SUFFIX_KILO) {
-        parse_stack_size_str(s) * STACK_SIZE_MULIPLIER_KILO
+        parse_stack_size_str(s) * STACK_SIZE_MULTIPLIER_KILO
     } else if let Some(s) = stack_size_str.strip_suffix(STACK_SIZE_SUFFIX_PAGES) {
         parse_stack_size_str(s) * WASM_PAGE_SIZE
     } else {
