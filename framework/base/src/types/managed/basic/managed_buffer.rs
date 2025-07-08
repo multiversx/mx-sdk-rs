@@ -1,8 +1,7 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
-        ManagedTypeApi, RawHandle, StaticVarApiImpl,
+        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl
     },
     codec::{
         DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -427,8 +426,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
     fn drop(&mut self) {
-        // TODO: enable, after fixing all ownership issues
-        // M::managed_type_impl().drop_managed_buffer(self.handle.clone());
+        M::managed_type_impl().drop_managed_buffer(self.handle.clone());
     }
 }
 

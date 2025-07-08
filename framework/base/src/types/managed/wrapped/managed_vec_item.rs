@@ -8,7 +8,7 @@ use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
 use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 
 use crate::{
-    api::{use_raw_handle, HandleConstraints, ManagedTypeApi},
+    api::{use_raw_handle, HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
     types::{
         BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
         ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
@@ -50,6 +50,8 @@ pub trait ManagedVecItem: 'static {
     }
 
     /// Parses given bytes as a an owned object.
+    ///
+    /// TODO: unsafe
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self;
 
     /// Parses given bytes as a representation of the object, either owned, or a reference.
@@ -65,6 +67,20 @@ pub trait ManagedVecItem: 'static {
     ///
     /// Note that a destructor should not be called at this moment, since the ManagedVec will take ownership of the item.
     fn save_to_payload(self, payload: &mut Self::PAYLOAD);
+
+    /// Signals that vec should drop all items one by one when being itself dropped.
+    ///
+    /// If false, iterating over all items on drop makes no sense.
+    fn requires_drop() -> bool {
+        false
+    }
+
+    /// Called when deallocating the item, based on payload. Will be called if `requires_drop` returns true.
+    ///
+    /// Especially important for managed types.
+    ///
+    /// Avoid calling directly, it should be called automatically.
+    unsafe fn item_drop(_payload: &mut Self::PAYLOAD) {}
 }
 
 /// Used by the ManagedVecItem derive.
@@ -202,6 +218,10 @@ where
             t.save_to_payload(p2);
         }
     }
+
+    fn requires_drop() -> bool {
+        T::requires_drop()
+    }
 }
 
 macro_rules! impl_managed_type {
@@ -259,6 +279,19 @@ where
         let handle = unsafe { self.forget_into_handle() };
         handle.get_raw_handle().save_to_payload(payload);
     }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
+    }
+
+    // unsafe fn item_drop(payload: &mut Self::PAYLOAD) {
+    //     let handle = use_raw_handle(i32::read_from_payload(payload));
+    //     Self::dealloc_vec(handle)
+    // }
+
+    // unsafe fn item_drop(&mut self) {
+    //     M::managed_type_impl().drop_managed_buffer(self.get_handle());
+    // }
 }
 
 impl<M, T> ManagedVecItem for ManagedVec<M, T>
@@ -283,6 +316,15 @@ where
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         let handle = unsafe { self.forget_into_handle() };
         handle.get_raw_handle().save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
+    }
+
+    unsafe fn item_drop(payload: &mut Self::PAYLOAD) {
+        // let handle = use_raw_handle(i32::read_from_payload(payload));
+        // Self::dealloc_vec(handle)
     }
 }
 

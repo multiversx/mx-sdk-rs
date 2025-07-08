@@ -1,7 +1,7 @@
 use super::{EncodedManagedVecItem, ManagedVecItemPayload};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
-    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
+    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi, ManagedTypeApiImpl},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
@@ -9,7 +9,8 @@ use crate::{
     },
     types::{
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem,
-        ManagedVecRefIterator, ManagedVecRefMut, MultiValueEncoded, MultiValueManagedVec,
+        ManagedVecPayloadIterator, ManagedVecRefIterator, ManagedVecRefMut, MultiValueEncoded,
+        MultiValueManagedVec,
     },
 };
 use alloc::{format, vec::Vec};
@@ -57,7 +58,11 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.buffer.forget_into_handle()
+        unsafe {
+            let handle = core::ptr::read(&self.buffer.handle);
+            core::mem::forget(self);
+            handle
+        }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -621,6 +626,25 @@ where
     #[inline]
     pub fn contains(&self, item: &T) -> bool {
         self.find(item).is_some()
+    }
+}
+
+impl<M, T> Drop for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    fn drop(&mut self) {
+        unsafe {
+            if T::requires_drop() {
+                let iter = ManagedVecPayloadIterator::<M, T::PAYLOAD>::new(self.get_handle());
+                for payload in iter {
+                    let item = T::read_from_payload(&payload);
+                    core::mem::drop(item);
+                }
+            }
+            M::managed_type_impl().drop_managed_buffer(self.get_handle());
+        }
     }
 }
 
