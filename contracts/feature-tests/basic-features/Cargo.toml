@@ -15,6 +15,15 @@ barnard = ["multiversx-sc/barnard"]
 version = "0.59.0"
 path = "../../../framework/base"
 
+[dependencies.serde]
+version = "1.0"
+default-features = false
+features = ["derive"]
+
+[dependencies.serde_json]
+version = "1.0"
+default-features = false
+
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.59.0"
 features = ["wasmer-experimental"]
