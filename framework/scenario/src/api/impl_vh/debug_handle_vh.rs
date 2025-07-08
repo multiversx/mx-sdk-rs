@@ -44,6 +44,7 @@ impl core::fmt::Debug for DebugHandle {
 
 impl HandleConstraints for DebugHandle {
     fn new(handle: multiversx_sc::api::RawHandle) -> Self {
+        println!("new handle {handle}");
         Self {
             context: ContractDebugStack::static_peek().tx_context_ref.into_ref(),
             raw_handle: handle,
