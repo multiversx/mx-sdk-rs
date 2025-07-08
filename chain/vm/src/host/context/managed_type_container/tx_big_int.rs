@@ -11,6 +11,10 @@ impl ManagedTypeContainer {
         self.big_int_map.insert_new_handle_raw(value)
     }
 
+    pub fn bi_remove(&mut self, handle: RawHandle) {
+        self.big_int_map.remove_handle(handle);
+    }
+
     pub fn bi_overwrite(&mut self, destination: RawHandle, value: num_bigint::BigInt) {
         self.big_int_map.insert(destination, value);
     }

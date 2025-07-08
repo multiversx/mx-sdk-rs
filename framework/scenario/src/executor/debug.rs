@@ -9,6 +9,7 @@ mod contract_debug_whitebox_lambda;
 mod contract_map;
 mod static_var_data;
 mod tx_static_vars;
+mod vm_hooks_debugger;
 
 pub use catch_tx_panic::catch_tx_panic;
 pub use contract_container::{ContractContainer, ContractContainerRef};
@@ -21,3 +22,4 @@ pub use contract_debug_whitebox_lambda::ContractDebugWhiteboxLambda;
 pub use contract_map::{ContractMap, ContractMapRef};
 pub use static_var_data::StaticVarData;
 pub use tx_static_vars::TxStaticVars;
+pub use vm_hooks_debugger::VMHooksDebugger;
