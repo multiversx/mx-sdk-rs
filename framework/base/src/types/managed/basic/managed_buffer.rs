@@ -1,7 +1,8 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl
+        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
+        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     codec::{
         DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,

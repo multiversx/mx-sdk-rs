@@ -74,13 +74,6 @@ pub trait ManagedVecItem: 'static {
     fn requires_drop() -> bool {
         false
     }
-
-    /// Called when deallocating the item, based on payload. Will be called if `requires_drop` returns true.
-    ///
-    /// Especially important for managed types.
-    ///
-    /// Avoid calling directly, it should be called automatically.
-    unsafe fn item_drop(_payload: &mut Self::PAYLOAD) {}
 }
 
 /// Used by the ManagedVecItem derive.
@@ -283,15 +276,6 @@ where
     fn requires_drop() -> bool {
         M::managed_type_impl().requires_managed_type_drop()
     }
-
-    // unsafe fn item_drop(payload: &mut Self::PAYLOAD) {
-    //     let handle = use_raw_handle(i32::read_from_payload(payload));
-    //     Self::dealloc_vec(handle)
-    // }
-
-    // unsafe fn item_drop(&mut self) {
-    //     M::managed_type_impl().drop_managed_buffer(self.get_handle());
-    // }
 }
 
 impl<M, T> ManagedVecItem for ManagedVec<M, T>
@@ -320,11 +304,6 @@ where
 
     fn requires_drop() -> bool {
         M::managed_type_impl().requires_managed_type_drop()
-    }
-
-    unsafe fn item_drop(payload: &mut Self::PAYLOAD) {
-        // let handle = use_raw_handle(i32::read_from_payload(payload));
-        // Self::dealloc_vec(handle)
     }
 }
 
