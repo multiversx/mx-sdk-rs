@@ -192,7 +192,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedVecRef<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
         unsafe {
             EsdtTokenPayment {

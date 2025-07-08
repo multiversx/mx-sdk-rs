@@ -206,7 +206,7 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let handle = use_raw_handle(i32::read_from_payload(payload));
         Self::new_with_handle(handle)
     }
