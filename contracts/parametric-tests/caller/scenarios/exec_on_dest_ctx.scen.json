@@ -1,0 +1,185 @@
+{
+    "name": "caller",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "positive",
+            "comment": "send a positive number with 1k EGLD to caller",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:caller",
+                "function": "call_other_exec_on_dest_ctx",
+                "value": "1000",
+                "arguments": [
+                    "sc:callee",
+                    "str:fail_if_neg",
+                    "3",
+                    "500"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["str:positive", "str:done"],
+                "status": ""
+            }
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/check_1.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "negative: error message",
+            "comment": "owner -> caller -> callee wrong func name",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:caller",
+                "function": "call_other",
+                "value": "500",
+                "arguments": [
+                    "sc:callee",
+                    "str:fail_if_negative",
+                    "-1",
+                    "250"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:invalid function (not found)",
+                "out": []
+            }
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/check_1.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "negative: error message",
+            "comment": "owner -> caller -> callee. callee fails and everything is reverted",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:caller",
+                "function": "call_other",
+                "value": "500",
+                "arguments": [
+                    "sc:callee",
+                    "str:fail_if_neg",
+                    "-1",
+                    "250"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:error signalled by smartcontract",
+                "out": []
+            }
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/check_1.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "positive with 0 EGLD",
+            "comment": "send a positive number with 0 EGLD to caller",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:caller",
+                "function": "call_other",
+                "value": "0",
+                "arguments": [
+                    "sc:callee",
+                    "str:fail_if_neg",
+                    "3",
+                    "0"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["str:positive", "str:done"],
+                "status": ""
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "99000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:caller": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "storage": {},
+                    "code": "file:../output/caller.wasm"
+                },
+                "sc:callee": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "storage": {},
+                    "code": "file:../../callee/output/callee.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "positive with 1 EGLD",
+            "comment": "send a positive number with an odd number of EGLD to caller",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:caller",
+                "function": "call_other",
+                "value": "1",
+                "arguments": [
+                    "sc:callee",
+                    "str:fail_if_neg",
+                    "3",
+                    "0"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["str:positive", "str:done"],
+                "status": ""
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "98999",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:caller": {
+                    "nonce": "0",
+                    "balance": "501",
+                    "storage": {},
+                    "code": "file:../output/caller.wasm"
+                },
+                "sc:callee": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "storage": {},
+                    "code": "file:../../callee/output/callee.wasm"
+                }
+            }
+        }
+        
+    ]
+}
