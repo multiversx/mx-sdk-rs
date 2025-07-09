@@ -27,7 +27,7 @@ async fn cs_builtin_run_tests() {
         .unwrap();
 
     interactor
-        .set_state(&interactor.wallet_address.to_address())
+        .set_state(&interactor.owner.to_address())
         .await;
     interactor
         .set_state(&interactor.delegator1.to_address())

@@ -2064,6 +2064,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "governance-sc-interact"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "delegation-sc-interact",
+ "multiversx-sc-snippets",
+ "serde",
+ "tokio",
+ "toml 0.8.23",
+]
+
+[[package]]
 name = "h2"
 version = "0.4.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
