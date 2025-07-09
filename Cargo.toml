@@ -25,6 +25,7 @@ members = [
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
   "tools/interactor-delegation-func-calls/",
+  "tools/interactor-governance-func-calls/",
   "tools/gas-schedule-generator",
 
   "contracts/modules",
