@@ -2,7 +2,7 @@ mod governance_sc_interact_cli;
 mod governance_sc_interact_config;
 mod governance_sc_interact_state;
 
-// use clap::Parser;
+use clap::Parser;
 pub use governance_sc_interact_config::Config;
 use governance_sc_interact_state::State;
 
@@ -11,13 +11,20 @@ use multiversx_sc_snippets::{imports::*, sdk::gateway::SetStateAccount};
 pub async fn governance_sc_interact_cli() {
     env_logger::init();
 
-    // let mut interact = GovernanceCallsInteract::new(Config::load_config()).await;
+    let mut interactor = GovernanceCallsInteract::new(Config::load_config()).await;
 
-    // let cli = governance_sc_interact_cli::InteractCli::parse();
-    // match cli.command {
-    //     Some(_) => {},
-    //     None => {},
-    // }
+    let cli = governance_sc_interact_cli::InteractCli::parse();
+    match cli.command {
+        Some(governance_sc_interact_cli::InteractCliCommand::Propose) => {
+            interactor
+                .proposal("6db132d759482f9f3515fe3ca8f72a8d6dc61244", 981, 983)
+                .await;
+        },
+        Some(governance_sc_interact_cli::InteractCliCommand::View) => {
+            interactor.view_config().await;
+        },
+        None => {},
+    }
 }
 
 pub struct GovernanceCallsInteract {
@@ -60,15 +67,35 @@ impl GovernanceCallsInteract {
         let _set_state_response = self.interactor.set_state(vec_state).await;
     }
 
+    pub async fn view_config(&mut self) {
+        let raw = self
+            .interactor
+            .query()
+            .to(GovernanceSystemSCAddress)
+            .typed(GovernanceSCProxy)
+            .view_config()
+            .returns(ReturnsRawResult)
+            // .returns(ReturnsResultUnmanaged)
+            .run()
+            .await;
+
+        println!("config raw: {:?}", raw);
+    }
+
     pub async fn proposal(
         &mut self,
         commit_hash: &str,
         start_vote_epoch: usize,
         end_vote_epoch: usize,
     ) {
+        let user_address = self
+            .interactor
+            .register_wallet(Wallet::from_pem_file("delegator2.pem").unwrap())
+            .await;
+
         self.interactor
             .tx()
-            .from(&self.owner)
+            .from(user_address)
             .to(GovernanceSystemSCAddress)
             .typed(GovernanceSCProxy)
             .proposal(commit_hash, start_vote_epoch, end_vote_epoch)

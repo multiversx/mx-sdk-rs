@@ -11,4 +11,10 @@ pub struct InteractCli {
 
 /// GovernanceFuncCalls Interact CLI Commands
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
-pub enum InteractCliCommand {}
+pub enum InteractCliCommand {
+    #[command(about = "Propose")]
+    Propose,
+
+    #[command(about = "View config")]
+    View,
+}

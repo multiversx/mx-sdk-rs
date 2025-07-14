@@ -1,3 +1,5 @@
+use multiversx_sc_codec::multi_types::MultiValue5;
+
 use crate::types::{
     BigUint, EgldPayment, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, ProxyArg,
     Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
@@ -64,10 +66,7 @@ where
             .original_result()
     }
 
-    pub fn vote<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
-    >(
+    pub fn vote<Arg0: ProxyArg<BigUint<Env::Api>>, Arg1: ProxyArg<ManagedBuffer<Env::Api>>>(
         self,
         proposal_to_vote: Arg0,
         vote: Arg1,
@@ -162,7 +161,23 @@ where
             .original_result()
     }
 
-    pub fn view_config(self) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    /// Note: values are returned as strings (base 10 representation).
+    pub fn view_config(
+        self,
+    ) -> TxTypedCall<
+        Env,
+        From,
+        To,
+        NotPayable,
+        Gas,
+        MultiValue5<
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+        >,
+    > {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("viewConfig")
