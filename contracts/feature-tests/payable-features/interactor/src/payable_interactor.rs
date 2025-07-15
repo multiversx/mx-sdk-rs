@@ -21,7 +21,7 @@ pub async fn adder_cli() {
     let cli = payable_interactor_cli::InteractCli::parse();
     match &cli.command {
         Some(payable_interactor_cli::InteractCliCommand::Deploy) => {
-            basic_interact.deploy().await;
+            basic_interact.deploy(CodeMetadata::default()).await;
         },
         Some(payable_interactor_cli::InteractCliCommand::AllTransfers) => {
             basic_interact.check_all_transfers().await;
@@ -48,6 +48,8 @@ impl PayableInteract {
             .await
             .use_chain_simulator(config.use_chain_simulator());
 
+        interactor.set_current_dir_from_workspace("contracts/feature-tests/payable-features/interactor");
+
         let sc_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
         let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
 
@@ -61,7 +63,7 @@ impl PayableInteract {
         }
     }
 
-    pub async fn deploy(&mut self) {
+    pub async fn deploy(&mut self, code_metadata: CodeMetadata) {
         let new_address = self
             .interactor
             .tx()
@@ -70,6 +72,7 @@ impl PayableInteract {
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .init()
             .code(CODE_PATH)
+            .code_metadata(code_metadata)
             .returns(ReturnsNewBech32Address)
             .run()
             .await;

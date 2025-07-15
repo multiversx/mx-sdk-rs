@@ -1,4 +1,4 @@
-use multiversx_sc_codec::multi_types::MultiValue5;
+use multiversx_sc_codec::multi_types::MultiValue6;
 
 use crate::types::{
     BigUint, EgldPayment, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, ProxyArg,
@@ -80,7 +80,7 @@ where
     }
 
     pub fn delegate_vote<
-        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<ManagedAddress<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
@@ -162,7 +162,7 @@ where
     }
 
     /// Note: values are returned as strings (base 10 representation).
-    /// 
+    ///
     /// TODO: specialized return type.
     pub fn view_config(
         self,
@@ -172,7 +172,8 @@ where
         To,
         NotPayable,
         Gas,
-        MultiValue5<
+        MultiValue6<
+            ManagedBuffer<Env::Api>,
             ManagedBuffer<Env::Api>,
             ManagedBuffer<Env::Api>,
             ManagedBuffer<Env::Api>,

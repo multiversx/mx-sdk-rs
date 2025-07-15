@@ -2070,6 +2070,7 @@ dependencies = [
  "clap",
  "delegation-sc-interact",
  "multiversx-sc-snippets",
+ "payable-interactor",
  "serde",
  "tokio",
  "toml 0.8.23",

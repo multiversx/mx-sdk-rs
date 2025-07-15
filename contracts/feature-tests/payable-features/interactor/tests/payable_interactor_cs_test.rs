@@ -1,3 +1,4 @@
+use multiversx_sc_snippets::imports::CodeMetadata;
 use payable_interactor::{Config, PayableInteract};
 use serial_test::serial;
 
@@ -7,7 +8,7 @@ use serial_test::serial;
 async fn payable_interactor_test() {
     let mut payable_interact = PayableInteract::new(Config::chain_simulator_config()).await;
 
-    payable_interact.deploy().await;
+    payable_interact.deploy(CodeMetadata::default()).await;
 
     payable_interact
         .check_multi_transfer_only_egld_transfer()

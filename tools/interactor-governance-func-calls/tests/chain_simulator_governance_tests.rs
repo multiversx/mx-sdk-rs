@@ -14,6 +14,14 @@ async fn cs_builtin_run_tests() {
         .set_state(&governance_interactor.user1.to_address())
         .await;
 
+    let payable_sc = governance_interactor
+        .deploy_sc(payable_interactor::Config::chain_simulator_config())
+        .await;
+
+    governance_interactor
+        .set_state(&payable_sc.to_address())
+        .await;
+
     let _ = governance_interactor
         .interactor
         .generate_blocks_until_epoch(8)
@@ -73,7 +81,7 @@ async fn cs_builtin_run_tests() {
 
     governance_interactor
         .stake(
-            governance_interactor.user1.clone(),
+            payable_sc.clone(),
             1,
             vec![(validator_2.public_key, BLSSignature::dummy("signed2"))],
             40000_000_000_000_000_000_000u128,
@@ -97,6 +105,16 @@ async fn cs_builtin_run_tests() {
 
     delegation_interactor
         .stake_nodes(vec![validator_3.public_key])
+        .await;
+
+    governance_interactor
+        .delegate_vote(
+            &payable_sc,
+            1,
+            "yes",
+            &governance_interactor.user2.clone(),
+            40000,
+        )
         .await;
 
     delegation_interactor

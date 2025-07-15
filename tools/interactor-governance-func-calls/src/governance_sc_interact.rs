@@ -6,7 +6,8 @@ use clap::Parser;
 pub use governance_sc_interact_config::Config;
 use governance_sc_interact_state::State;
 
-use multiversx_sc_snippets::{imports::*, sdk::gateway::SetStateAccount};
+use multiversx_sc_snippets::{imports::*, sdk::gateway::SetStateAccount, Sender};
+use payable_interactor::PayableInteract;
 
 pub async fn governance_sc_interact_cli() {
     env_logger::init();
@@ -35,6 +36,7 @@ pub struct GovernanceCallsInteract {
     pub interactor: Interactor,
     pub owner: Bech32Address,
     pub user1: Bech32Address,
+    pub user2: Bech32Address,
     pub state: State,
 }
 
@@ -46,7 +48,8 @@ impl GovernanceCallsInteract {
 
         interactor.set_current_dir_from_workspace("tools/interactor-governance-func-calls");
         let owner = interactor.register_wallet(test_wallets::eve()).await;
-        let user1 = interactor.register_wallet(test_wallets::grace()).await;
+        let user1 = interactor.register_wallet(test_wallets::mike()).await;
+        let user2 = interactor.register_wallet(test_wallets::judy()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
         interactor.generate_blocks_until_epoch(1).await.unwrap();
@@ -55,6 +58,7 @@ impl GovernanceCallsInteract {
             interactor,
             owner: owner.into(),
             user1: user1.into(),
+            user2: user2.into(),
             state: State::load_state(),
         }
     }
@@ -87,18 +91,12 @@ impl GovernanceCallsInteract {
             .await;
     }
 
-    /// Temporary, some hardcoded values for quicker testing.
     pub async fn proposal(
         &mut self,
         commit_hash: &str,
         start_vote_epoch: usize,
         end_vote_epoch: usize,
     ) {
-        let user_address = self
-            .interactor
-            .register_wallet(Wallet::from_pem_file("delegator1.pem").unwrap())
-            .await;
-
         let raw = self
             .interactor
             .tx()
@@ -159,6 +157,27 @@ impl GovernanceCallsInteract {
         .await;
     }
 
+    pub async fn delegate_vote(
+        &mut self,
+        sender: &Bech32Address,
+        nonce: u64,
+        vote: &str,
+        voter: &Bech32Address,
+        stake: u64,
+    ) {
+        self.interactor
+            .tx()
+            .from(sender)
+            .to(GovernanceSystemSCAddress)
+            .typed(GovernanceSCProxy)
+            .delegate_vote(nonce, vote, voter, stake)
+            .gas(60_000_000u64)
+            .run()
+            .await;
+
+        println!("Delegate vote successfully done!");
+    }
+
     pub async fn stake(
         &mut self,
         sender: Bech32Address,
@@ -191,5 +210,33 @@ impl GovernanceCallsInteract {
             .await;
 
         println!("Stake successfully done!");
+    }
+
+    pub async fn deploy_sc(&mut self, config: payable_interactor::Config) -> Bech32Address {
+        let mut payable_contract = PayableInteract::new(config).await;
+        payable_contract
+            .deploy(CodeMetadata::PAYABLE | CodeMetadata::PAYABLE_BY_SC)
+            .await;
+
+        self.interactor.sender_map.insert(
+            payable_contract
+                .state
+                .current_payable_features_address()
+                .to_address(),
+            Sender {
+                address: payable_contract
+                    .state
+                    .current_payable_features_address()
+                    .to_address(),
+                hrp: payable_contract.interactor.get_hrp().to_string(),
+                wallet: test_wallets::heidi(), // the owner of the payable contract
+                current_nonce: None,
+            },
+        );
+
+        payable_contract
+            .state
+            .current_payable_features_address()
+            .clone()
     }
 }
