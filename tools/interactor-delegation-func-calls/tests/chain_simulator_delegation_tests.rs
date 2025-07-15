@@ -26,9 +26,7 @@ async fn cs_builtin_run_tests() {
         .await
         .unwrap();
 
-    interactor
-        .set_state(&interactor.owner.to_address())
-        .await;
+    interactor.set_state(&interactor.owner.to_address()).await;
     interactor
         .set_state(&interactor.delegator1.to_address())
         .await;

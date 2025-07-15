@@ -162,6 +162,8 @@ where
     }
 
     /// Note: values are returned as strings (base 10 representation).
+    /// 
+    /// TODO: specialized return type.
     pub fn view_config(
         self,
     ) -> TxTypedCall<

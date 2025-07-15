@@ -16,12 +16,16 @@ pub async fn governance_sc_interact_cli() {
     let cli = governance_sc_interact_cli::InteractCli::parse();
     match cli.command {
         Some(governance_sc_interact_cli::InteractCliCommand::Propose) => {
-            interactor
-                .proposal("6db132d759482f9f3515fe3ca8f72a8d6dc61244", 981, 983)
-                .await;
+            interactor.proposal_hardcoded().await;
         },
-        Some(governance_sc_interact_cli::InteractCliCommand::View) => {
+        Some(governance_sc_interact_cli::InteractCliCommand::ViewConfig) => {
             interactor.view_config().await;
+        },
+        Some(governance_sc_interact_cli::InteractCliCommand::ViewProposal) => {
+            interactor.view_proposal(2).await;
+        },
+        Some(governance_sc_interact_cli::InteractCliCommand::Vote) => {
+            interactor.vote_hardcoded().await;
         },
         None => {},
     }
@@ -75,13 +79,18 @@ impl GovernanceCallsInteract {
             .typed(GovernanceSCProxy)
             .view_config()
             .returns(ReturnsRawResult)
-            // .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 
         println!("config raw: {:?}", raw);
     }
 
+    pub async fn proposal_hardcoded(&mut self) {
+        self.proposal("a1075ebe040351a8a6b457176a253d410edd391c", 4041, 4041)
+            .await;
+    }
+
+    /// Temporary, some hardcoded values for quicker testing.
     pub async fn proposal(
         &mut self,
         commit_hash: &str,
@@ -90,18 +99,41 @@ impl GovernanceCallsInteract {
     ) {
         let user_address = self
             .interactor
-            .register_wallet(Wallet::from_pem_file("delegator2.pem").unwrap())
+            .register_wallet(Wallet::from_pem_file("delegator1.pem").unwrap())
             .await;
 
-        self.interactor
+        let raw = self
+            .interactor
             .tx()
             .from(user_address)
             .to(GovernanceSystemSCAddress)
             .typed(GovernanceSCProxy)
             .proposal(commit_hash, start_vote_epoch, end_vote_epoch)
             .gas(60_000_000u64)
+            .returns(ReturnsRawResult)
             .run()
             .await;
+
+        println!("proposal result raw: {:?}", raw);
+    }
+
+    pub async fn view_proposal(&mut self, nonce: u64) {
+        let raw = self
+            .interactor
+            .query()
+            .to(GovernanceSystemSCAddress)
+            .typed(GovernanceSCProxy)
+            .view_proposal(nonce)
+            .returns(ReturnsRawResult)
+            .run()
+            .await;
+
+        let result_strings = raw
+            .into_iter()
+            .map(|mb| String::from_utf8_lossy(&mb.to_vec()).into_owned())
+            .collect::<Vec<_>>();
+
+        println!("proposal raw: {:?}", result_strings);
     }
 
     pub async fn vote(&mut self, sender: &Bech32Address, nonce: usize, vote_type: &str) {
@@ -114,5 +146,19 @@ impl GovernanceCallsInteract {
             .gas(60_000_000u64)
             .run()
             .await;
+    }
+
+    /// Temporary, some hardcoded values for quicker testing.
+    pub async fn vote_hardcoded(&mut self) {
+        let user_address = self
+            .interactor
+            .register_wallet(Wallet::from_pem_file("delegator2.pem").unwrap())
+            .await;
+        self.vote(
+            &Bech32Address::encode_address_default_hrp(user_address),
+            2,
+            "yes",
+        )
+        .await;
     }
 }

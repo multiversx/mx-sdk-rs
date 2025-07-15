@@ -21,9 +21,7 @@ pub async fn delegation_sc_interact_cli() {
     let cli = delegation_sc_interact_cli::InteractCli::parse();
     match cli.command {
         Some(delegation_sc_interact_cli::InteractCliCommand::Create(args)) => {
-            interact
-                .set_state(&interact.owner.to_address())
-                .await;
+            interact.set_state(&interact.owner.to_address()).await;
             interact
                 .create_new_delegation_contract(args.total_delegation_cap, args.service_fee)
                 .await;
@@ -365,9 +363,7 @@ impl DelegateCallsInteract {
             .query()
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .get_user_active_stake(&ManagedAddress::from_address(
-                &self.owner.to_address(),
-            ))
+            .get_user_active_stake(&ManagedAddress::from_address(&self.owner.to_address()))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;

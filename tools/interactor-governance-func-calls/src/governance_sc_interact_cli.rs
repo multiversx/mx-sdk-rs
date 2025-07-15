@@ -16,5 +16,11 @@ pub enum InteractCliCommand {
     Propose,
 
     #[command(about = "View config")]
-    View,
+    ViewConfig,
+
+    #[command(about = "View proposal")]
+    ViewProposal,
+
+    #[command(about = "Vote")]
+    Vote,
 }
