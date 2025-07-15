@@ -23,7 +23,11 @@ pub async fn delegation_sc_interact_cli() {
         Some(delegation_sc_interact_cli::InteractCliCommand::Create(args)) => {
             interact.set_state(&interact.owner.to_address()).await;
             interact
-                .create_new_delegation_contract(args.total_delegation_cap, args.service_fee)
+                .create_new_delegation_contract(
+                    args.total_delegation_cap,
+                    args.service_fee,
+                    1250000000000000000000u128,
+                )
                 .await;
         },
         Some(delegation_sc_interact_cli::InteractCliCommand::GetAllContractAddresses) => {
@@ -151,7 +155,7 @@ impl DelegateCallsInteract {
 
     pub async fn set_state(&mut self, address: &Address) {
         let mut account = self.interactor.get_account(address).await;
-        account.balance = "10000000000000000000000".to_owned();
+        account.balance = "100000000000000000000000".to_owned();
         let set_state_account = SetStateAccount::from(account);
         let vec_state = vec![set_state_account];
 
@@ -174,6 +178,7 @@ impl DelegateCallsInteract {
         &mut self,
         total_delegation_cap: u128,
         service_fee: u64,
+        amount: u128,
     ) {
         let logs = self
             .interactor
@@ -181,7 +186,11 @@ impl DelegateCallsInteract {
             .from(&self.owner)
             .to(DelegationManagerSCAddress)
             .typed(DelegationManagerSCProxy)
-            .create_new_delegation_contract(BigUint::from(total_delegation_cap), service_fee)
+            .create_new_delegation_contract(
+                BigUint::from(total_delegation_cap),
+                service_fee,
+                BigUint::from(amount),
+            )
             .gas(60_000_000u64)
             .returns(ReturnsLogs)
             .run()

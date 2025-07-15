@@ -34,7 +34,11 @@ async fn cs_builtin_run_tests() {
         .set_state(&interactor.delegator2.to_address())
         .await;
     interactor
-        .create_new_delegation_contract(51_000_000_000_000_000_000_000_u128, 3745u64)
+        .create_new_delegation_contract(
+            51_000_000_000_000_000_000_000_u128,
+            3745u64,
+            1250000000000000000000u128,
+        )
         .await;
     interactor.set_check_cap_on_redelegate_rewards(false).await;
 
