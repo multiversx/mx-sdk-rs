@@ -6,7 +6,11 @@ use clap::Parser;
 pub use governance_sc_interact_config::Config;
 use governance_sc_interact_state::State;
 
-use multiversx_sc_snippets::{imports::*, sdk::gateway::SetStateAccount, Sender};
+use multiversx_sc_snippets::{
+    imports::*,
+    sdk::{gateway::SetStateAccount, utils::base64_decode},
+    Sender,
+};
 use payable_interactor::PayableInteract;
 
 pub async fn governance_sc_interact_cli() {
@@ -23,7 +27,7 @@ pub async fn governance_sc_interact_cli() {
             interactor.view_config().await;
         },
         Some(governance_sc_interact_cli::InteractCliCommand::ViewProposal) => {
-            interactor.view_proposal(2).await;
+            interactor.view_proposal(4).await;
         },
         Some(governance_sc_interact_cli::InteractCliCommand::Vote) => {
             interactor.vote_hardcoded().await;
@@ -87,8 +91,13 @@ impl GovernanceCallsInteract {
     }
 
     pub async fn proposal_hardcoded(&mut self) {
-        self.proposal("a1075ebe040351a8a6b457176a253d410edd391c", 4041, 4041)
-            .await;
+        let epoch = 1004;
+        self.proposal(
+            &format!("aaaaaaaaaaaaaaaaaaaa0000000000000000{epoch}"),
+            epoch,
+            epoch,
+        )
+        .await;
     }
 
     pub async fn proposal(
@@ -97,19 +106,31 @@ impl GovernanceCallsInteract {
         start_vote_epoch: usize,
         end_vote_epoch: usize,
     ) {
-        let raw = self
+        println!("proposing hash: {commit_hash}, start epoch: {start_vote_epoch}, end epoch: {end_vote_epoch}");
+
+        let user_address = self
+            .interactor
+            .register_wallet(Wallet::from_pem_file("testnet-delegator1.pem").unwrap())
+            .await;
+
+        let logs = self
             .interactor
             .tx()
-            .from(&self.owner)
+            .from(user_address)
             .to(GovernanceSystemSCAddress)
             .typed(GovernanceSCProxy)
             .proposal(commit_hash, start_vote_epoch, end_vote_epoch)
             .gas(60_000_000u64)
-            .returns(ReturnsRawResult)
+            .returns(ReturnsLogs)
             .run()
             .await;
 
-        println!("proposal result raw: {:?}", raw);
+        for log in logs {
+            if log.endpoint == "proposal" && log.topics.len() >= 4 {
+                let nonce = base64_decode(&log.topics[0]);
+                println!("proposal nonce: {:?}", nonce);
+            }
+        }
     }
 
     pub async fn view_proposal(&mut self, nonce: u64) {
@@ -151,7 +172,7 @@ impl GovernanceCallsInteract {
             .await;
         self.vote(
             &Bech32Address::encode_address_default_hrp(user_address),
-            2,
+            4,
             "yes",
         )
         .await;

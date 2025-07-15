@@ -48,7 +48,8 @@ impl PayableInteract {
             .await
             .use_chain_simulator(config.use_chain_simulator());
 
-        interactor.set_current_dir_from_workspace("contracts/feature-tests/payable-features/interactor");
+        interactor
+            .set_current_dir_from_workspace("contracts/feature-tests/payable-features/interactor");
 
         let sc_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
         let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
