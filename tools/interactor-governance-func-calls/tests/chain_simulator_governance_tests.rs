@@ -5,6 +5,26 @@ use multiversx_sc_snippets::imports::{BLSSignature, Validator};
 #[tokio::test]
 #[ignore = "configurable chain-simulator is not available in CI"]
 async fn cs_builtin_run_tests() {
+    let mut governance_interactor =
+        GovernanceCallsInteract::new(Config::chain_simulator_config()).await;
+    governance_interactor
+        .set_state(&governance_interactor.owner.to_address())
+        .await;
+    governance_interactor
+        .set_state(&governance_interactor.user1.to_address())
+        .await;
+
+    let _ = governance_interactor
+        .interactor
+        .generate_blocks_until_epoch(8)
+        .await;
+
+    governance_interactor
+        .proposal("6db132d759482f9f3515fe3ca8f72a8d6dc61244", 9, 11)
+        .await;
+
+    //do post view config
+
     let mut delegation_interactor =
         DelegateCallsInteract::new(delegation_sc_interact::Config::chain_simulator_config()).await;
     let validator_1 =
@@ -13,6 +33,8 @@ async fn cs_builtin_run_tests() {
     let validator_2 =
         Validator::from_pem_file("../interactor-delegation-func-calls/validatorKey2.pem")
             .expect("unable to load validator key");
+    let validator_3 =
+        Validator::from_pem_file("./validatorKey3.pem").expect("unable to load validator key");
 
     let _ = delegation_interactor
         .interactor
@@ -22,6 +44,11 @@ async fn cs_builtin_run_tests() {
     let _ = delegation_interactor
         .interactor
         .add_key(validator_2.private_key.clone())
+        .await
+        .unwrap();
+    let _ = delegation_interactor
+        .interactor
+        .add_key(validator_3.private_key.clone())
         .await
         .unwrap();
 
@@ -34,38 +61,57 @@ async fn cs_builtin_run_tests() {
     delegation_interactor
         .set_state(&delegation_interactor.delegator2.to_address())
         .await;
+
+    governance_interactor
+        .stake(
+            governance_interactor.owner.clone(),
+            1,
+            vec![(validator_1.public_key, BLSSignature::dummy("signed1"))],
+            30000_000_000_000_000_000_000u128,
+        )
+        .await;
+
+    governance_interactor
+        .stake(
+            governance_interactor.user1.clone(),
+            1,
+            vec![(validator_2.public_key, BLSSignature::dummy("signed2"))],
+            40000_000_000_000_000_000_000u128,
+        )
+        .await;
+
     delegation_interactor
-        .create_new_delegation_contract(51_000_000_000_000_000_000_000_u128, 3745u64)
+        .set_state(&delegation_interactor.owner.to_address())
+        .await;
+
+    delegation_interactor
+        .create_new_delegation_contract(0u128, 0u64, 40_000_000_000_000_000_000_000_u128)
         .await;
 
     delegation_interactor
         .add_nodes(vec![(
-            validator_1.public_key,
-            BLSSignature::dummy("signed1"),
+            validator_3.public_key,
+            BLSSignature::dummy("signed3"),
         )])
         .await;
 
-    let delegator1 = delegation_interactor.delegator1.clone();
     delegation_interactor
-        .delegate(&delegator1, 1_250_000_000_000_000_000_000u128)
+        .stake_nodes(vec![validator_3.public_key])
         .await;
 
-    let mut governance_interactor =
-        GovernanceCallsInteract::new(Config::chain_simulator_config()).await;
-    governance_interactor
-        .set_state(&governance_interactor.owner.to_address())
+    delegation_interactor
+        .delegate(
+            &delegation_interactor.delegator1.clone(),
+            50000_000_000_000_000_000_000u128,
+        )
         .await;
 
     let _ = governance_interactor
         .interactor
-        .generate_blocks_until_epoch(8)
+        .generate_blocks_until_epoch(10)
         .await;
 
     governance_interactor
-        .proposal("6db132d759482f9f3515fe3ca8f72a8d6dc61244", 9, 11)
+        .vote(&governance_interactor.owner.clone(), 1, "yes")
         .await;
-
-    // governance_interactor
-    //     .vote(&delegation_interactor.delegator1, 2, "yes")
-    //     .await;
 }

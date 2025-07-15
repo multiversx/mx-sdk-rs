@@ -34,8 +34,7 @@ pub async fn governance_sc_interact_cli() {
 pub struct GovernanceCallsInteract {
     pub interactor: Interactor,
     pub owner: Bech32Address,
-    pub voter: Bech32Address,
-    pub delegator2: Bech32Address,
+    pub user1: Bech32Address,
     pub state: State,
 }
 
@@ -47,8 +46,7 @@ impl GovernanceCallsInteract {
 
         interactor.set_current_dir_from_workspace("tools/interactor-governance-func-calls");
         let owner = interactor.register_wallet(test_wallets::eve()).await;
-        let voter = interactor.register_wallet(test_wallets::bob()).await;
-        let delegator2 = interactor.register_wallet(test_wallets::dan()).await;
+        let user1 = interactor.register_wallet(test_wallets::grace()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
         interactor.generate_blocks_until_epoch(1).await.unwrap();
@@ -56,15 +54,14 @@ impl GovernanceCallsInteract {
         Self {
             interactor,
             owner: owner.into(),
-            voter: voter.into(),
-            delegator2: delegator2.into(),
+            user1: user1.into(),
             state: State::load_state(),
         }
     }
 
     pub async fn set_state(&mut self, address: &Address) {
         let mut account = self.interactor.get_account(address).await;
-        account.balance = "10000000000000000000000".to_owned();
+        account.balance = "100000000000000000000000".to_owned();
         let set_state_account = SetStateAccount::from(account);
         let vec_state = vec![set_state_account];
 
@@ -105,7 +102,7 @@ impl GovernanceCallsInteract {
         let raw = self
             .interactor
             .tx()
-            .from(user_address)
+            .from(&self.owner)
             .to(GovernanceSystemSCAddress)
             .typed(GovernanceSCProxy)
             .proposal(commit_hash, start_vote_epoch, end_vote_epoch)
@@ -160,5 +157,39 @@ impl GovernanceCallsInteract {
             "yes",
         )
         .await;
+    }
+
+    pub async fn stake(
+        &mut self,
+        sender: Bech32Address,
+        maximum_staked_nodes: usize,
+        bls_keys_signatures: Vec<(BLSKey, BLSSignature)>,
+        amount: u128,
+    ) {
+        let managed_bls_keys_signatures = MultiValueVec::from(
+            bls_keys_signatures
+                .into_iter()
+                .map(MultiValue2::from)
+                .collect::<Vec<_>>(),
+        );
+
+        let total_amount: BigUint<StaticApi> =
+            BigUint::from(amount) * BigUint::from(managed_bls_keys_signatures.len());
+
+        self.interactor
+            .tx()
+            .from(sender)
+            .to(ValidatorSystemSCAddress)
+            .typed(ValidatorSCProxy)
+            .stake(
+                maximum_staked_nodes,
+                managed_bls_keys_signatures,
+                total_amount,
+            )
+            .gas(60_000_000u64)
+            .run()
+            .await;
+
+        println!("Stake successfully done!");
     }
 }
