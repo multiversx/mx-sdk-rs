@@ -1,8 +1,8 @@
 #![allow(deprecated)]
 
 use crate::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
-    TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
+    DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, MultiValueLength,
+    TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 macro_rules! multi_value_impls_debug {
@@ -66,13 +66,25 @@ macro_rules! multi_value_impls {
                 }
             }
 
-            impl<$($name),+ > TopDecodeMultiLength for $mv_struct<$($name,)+>
+            impl<$($name),+ > MultiValueLength for $mv_struct<$($name,)+>
             where
-                $($name: TopDecodeMulti + TopDecodeMultiLength,)+
+                $($name: TopDecodeMulti + MultiValueLength,)+
             {
-                const LEN: usize = 0
+                fn multi_value_len(&self) -> usize {
+                    0
+                    $(
+                        + <$name as MultiValueLength>::multi_value_len(&self.0.$n)
+                    )+
+                }
+            }
+
+            impl<$($name),+ > MultiValueConstLength for $mv_struct<$($name,)+>
+            where
+                $($name: TopDecodeMulti + MultiValueConstLength,)+
+            {
+                const MULTI_VALUE_CONST_LEN: usize = 0
                 $(
-                    + <$name as TopDecodeMultiLength>::LEN
+                    + <$name as MultiValueConstLength>::MULTI_VALUE_CONST_LEN
                 )+
                 ;
             }

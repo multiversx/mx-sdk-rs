@@ -94,6 +94,10 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         self.with_vm_hooks(|vh| vh.get_block_timestamp()) as u64
     }
 
+    fn get_block_timestamp_ms(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.get_block_timestamp_ms()) as u64
+    }
+
     fn get_block_nonce(&self) -> u64 {
         self.with_vm_hooks(|vh| vh.get_block_nonce()) as u64
     }
@@ -113,6 +117,10 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
 
     fn get_prev_block_timestamp(&self) -> u64 {
         self.with_vm_hooks(|vh| vh.get_prev_block_timestamp()) as u64
+    }
+
+    fn get_prev_block_timestamp_ms(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.get_prev_block_timestamp_ms()) as u64
     }
 
     fn get_prev_block_nonce(&self) -> u64 {
@@ -136,6 +144,22 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         self.with_vm_hooks(|vh| {
             vh.managed_get_prev_block_random_seed(dest.get_raw_handle_unchecked())
         });
+    }
+
+    fn get_block_round_time_ms(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.get_block_round_time_ms()) as u64
+    }
+
+    fn epoch_start_block_timestamp_ms(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.epoch_start_block_timestamp_ms()) as u64
+    }
+
+    fn epoch_start_block_nonce(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.epoch_start_block_nonce()) as u64
+    }
+
+    fn epoch_start_block_round(&self) -> u64 {
+        self.with_vm_hooks(|vh| vh.epoch_start_block_round()) as u64
     }
 
     fn get_current_esdt_nft_nonce(
@@ -283,6 +307,36 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
             vh.managed_get_code_metadata(
                 address_handle.get_raw_handle_unchecked(),
                 response_handle.get_raw_handle_unchecked(),
+            )
+        });
+    }
+
+    fn managed_get_code_hash(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        code_hash_handle: Self::ManagedBufferHandle,
+    ) {
+        self.with_vm_hooks(|vh| {
+            vh.managed_get_code_hash(
+                address_handle.get_raw_handle_unchecked(),
+                code_hash_handle.get_raw_handle_unchecked(),
+            )
+        });
+    }
+
+    fn managed_get_esdt_token_type(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        token_id_handle: Self::ManagedBufferHandle,
+        nonce: u64,
+        dest_handle: Self::BigIntHandle,
+    ) {
+        self.with_vm_hooks(|vh| {
+            vh.managed_get_esdt_token_type(
+                address_handle.get_raw_handle_unchecked(),
+                token_id_handle.get_raw_handle_unchecked(),
+                nonce as i64,
+                dest_handle.get_raw_handle_unchecked(),
             )
         });
     }

@@ -14,6 +14,7 @@ pub struct ScenarioTestFn {
     pub docs: String,
     pub test_line: String,
     pub ignore_line: Option<String>,
+    pub should_panic_line: Option<String>,
     pub scenario_file_name: String,
 }
 
@@ -25,6 +26,7 @@ impl Section {
             test_fn: Some(ScenarioTestFn {
                 docs: String::new(),
                 ignore_line: None,
+                should_panic_line: None,
                 test_line: TEST_ANNOTATION.to_string(),
                 scenario_file_name: scenario_name.to_string(),
             }),

@@ -81,7 +81,7 @@ fn test_staking_module() {
             );
         });
 
-    assert_eq!(new_address.to_address(), USE_MODULE_ADDRESS.to_address());
+    assert_eq!(new_address, USE_MODULE_ADDRESS);
 
     // try stake - not a board member
     world

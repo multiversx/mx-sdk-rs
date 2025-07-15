@@ -193,6 +193,25 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         }
     }
 
+    pub fn managed_multi_transfer_esdt_nft_execute_with_return(
+        &mut self,
+        to_handle: i32,
+        payments_handle: i32,
+        gas_limit: u64,
+        function_handle: i32,
+        arguments_handle: i32,
+    ) -> Result<i32, VMHooksEarlyExit> {
+        self.multi_transfer_esdt_nft_execute(
+            to_handle,
+            payments_handle,
+            gas_limit,
+            function_handle,
+            arguments_handle,
+        )?;
+        // TODO: fallibility
+        Ok(0)
+    }
+
     pub fn async_call_raw(
         &mut self,
         to_handle: RawHandle,

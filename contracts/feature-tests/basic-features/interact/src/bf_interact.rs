@@ -15,7 +15,6 @@ const CODE_EXPR_STORAGE_BYTES: MxscPath =
     MxscPath::new("../output/basic-features-storage-bytes.mxsc.json");
 
 const CODE_EXPR: MxscPath = MxscPath::new("../output/basic-features.mxsc.json");
-const CODE_CRYPTO_EXPR: MxscPath = MxscPath::new("../output/basic-features-crypto.mxsc.json");
 
 pub async fn basic_features_cli() {
     env_logger::init();
@@ -31,9 +30,6 @@ pub async fn basic_features_cli() {
         },
         Some(bf_interact_cli::InteractCliCommand::DeployStorageBytes) => {
             bf_interact.deploy_storage_bytes().await;
-        },
-        Some(bf_interact_cli::InteractCliCommand::DeployCrypto) => {
-            bf_interact.deploy_crypto().await;
         },
         Some(bf_interact_cli::InteractCliCommand::LargeStorage(args)) => {
             bf_interact.large_storage(args.size_kb).await;
@@ -78,6 +74,17 @@ impl BasicFeaturesInteract {
             state: State::load_state(),
             large_storage_payload: Vec::new(),
         }
+    }
+
+    pub async fn add_validator_key(&mut self) {
+        self.interactor
+            .add_key(
+                Validator::from_pem_file("./validatorKey.pem")
+                    .expect("Unable to load validator key")
+                    .private_key,
+            )
+            .await
+            .expect("Failed to add validator key");
     }
 
     pub async fn large_storage(&mut self, size_kb: usize) {
@@ -132,26 +139,6 @@ impl BasicFeaturesInteract {
         println!("new address for basic-features-storage-bytes: {new_address}");
 
         self.state.set_bf_address_storage_bytes(new_address);
-    }
-
-    pub async fn deploy_crypto(&mut self) {
-        self.set_state().await;
-
-        let new_address = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .gas(40_000_000)
-            .typed(basic_features_proxy::BasicFeaturesProxy)
-            .init()
-            .code(CODE_CRYPTO_EXPR)
-            .returns(ReturnsNewBech32Address)
-            .run()
-            .await;
-
-        println!("new address for basic-features-crypto: {new_address}");
-
-        self.state.set_bf_address_crypto(new_address);
     }
 
     pub async fn set_large_storage(&mut self, value: &[u8]) {
@@ -230,7 +217,7 @@ impl BasicFeaturesInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.bf_crypto_contract())
+            .to(self.state.bf_contract())
             .gas(10_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
             .verify_secp256r1_signature(key, message, signature)
@@ -261,7 +248,7 @@ impl BasicFeaturesInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.bf_crypto_contract())
+            .to(self.state.bf_contract())
             .gas(10_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
             .verify_bls_signature_share(key, message, signature)
@@ -292,7 +279,7 @@ impl BasicFeaturesInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.bf_crypto_contract())
+            .to(self.state.bf_contract())
             .gas(10_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
             .verify_bls_aggregated_signature(key, message, signature)

@@ -90,3 +90,16 @@ fn query_expect_error_test() {
         .with_result(ExpectError(4, "sc_panic! test"))
         .run();
 }
+
+#[test]
+#[should_panic]
+fn fail_query_test() {
+    let mut world = setup();
+
+    world
+        .query()
+        .to(SC_PMF)
+        .typed(pmf_proxy::PanicMessageFeaturesProxy)
+        .sc_panic()
+        .run();
+}

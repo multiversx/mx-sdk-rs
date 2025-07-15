@@ -366,6 +366,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     /// Convenience method for quickly getting a top-decoded u64 from the managed buffer.
     ///
     /// TODO: remove this method once TopDecodeInput is implemented for ManagedBuffer reference.
+    #[cfg(not(feature = "barnard"))]
     pub fn parse_as_u64(&self) -> Option<u64> {
         const U64_NUM_BYTES: usize = 8;
         let l = self.len();
@@ -381,6 +382,34 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         } else {
             Some(u64::from_be_bytes(bytes))
         }
+    }
+
+    /// Convenience method for quickly getting a top-decoded u64 from the managed buffer.
+    #[cfg(feature = "barnard")]
+    pub fn parse_as_u64(&self) -> Option<u64> {
+        use crate::api::ManagedTypeApiImpl;
+
+        const U64_NUM_BYTES: usize = 8;
+        let l = self.len();
+        if l > U64_NUM_BYTES {
+            return None;
+        }
+        let value = M::managed_type_impl().mb_to_small_int_unsigned(self.handle.clone());
+        Some(value as u64)
+    }
+
+    /// Convenience method for quickly getting a top-decoded i64 from the managed buffer.
+    #[cfg(feature = "barnard")]
+    pub fn parse_as_i64(&self) -> Option<i64> {
+        use crate::api::ManagedTypeApiImpl;
+
+        const I64_NUM_BYTES: usize = 8;
+        let l = self.len();
+        if l > I64_NUM_BYTES {
+            return None;
+        }
+        let value = M::managed_type_impl().mb_to_small_int_signed(self.handle.clone());
+        Some(value)
     }
 
     /// Produces a hex expression in another managed buffer,
