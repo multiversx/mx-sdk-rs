@@ -13,13 +13,8 @@ async fn cs_builtin_run_tests() {
     governance_interactor
         .set_state(&governance_interactor.user1.to_address())
         .await;
-
-    let payable_sc = governance_interactor
-        .deploy_sc(payable_interactor::Config::chain_simulator_config())
-        .await;
-
     governance_interactor
-        .set_state(&payable_sc.to_address())
+        .set_state(&governance_interactor.delegator.to_address())
         .await;
 
     let _ = governance_interactor
@@ -28,7 +23,12 @@ async fn cs_builtin_run_tests() {
         .await;
 
     governance_interactor
-        .proposal("6db132d759482f9f3515fe3ca8f72a8d6dc61244", 9, 11)
+        .proposal(
+            &governance_interactor.owner.to_address(),
+            "6db132d759482f9f3515fe3ca8f72a8d6dc61244",
+            9,
+            11,
+        )
         .await;
 
     //do post view config
@@ -75,16 +75,16 @@ async fn cs_builtin_run_tests() {
             governance_interactor.owner.clone(),
             1,
             vec![(validator_1.public_key, BLSSignature::dummy("signed1"))],
-            30000_000_000_000_000_000_000u128,
+            30_000_000_000_000_000_000_000u128,
         )
         .await;
 
     governance_interactor
         .stake(
-            payable_sc.clone(),
+            governance_interactor.user1.clone(),
             1,
             vec![(validator_2.public_key, BLSSignature::dummy("signed2"))],
-            40000_000_000_000_000_000_000u128,
+            40_000_000_000_000_000_000_000u128,
         )
         .await;
 
@@ -109,18 +109,19 @@ async fn cs_builtin_run_tests() {
 
     governance_interactor
         .delegate_vote(
-            &payable_sc,
+            &governance_interactor.delegator.clone(),
             1,
             "yes",
             &governance_interactor.user2.clone(),
             40000,
+            Some("user error"),
         )
         .await;
 
     delegation_interactor
         .delegate(
             &delegation_interactor.delegator1.clone(),
-            50000_000_000_000_000_000_000u128,
+            50_000_000_000_000_000_000_000u128,
         )
         .await;
 
