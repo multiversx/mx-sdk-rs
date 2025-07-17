@@ -192,7 +192,35 @@ impl GovernanceCallsInteract {
             .run()
             .await;
 
-        println!("view proposal with nonce {nonce}: {:#?}", result);
+        println!(
+            r#"view proposal with nonce {nonce}:
+    proposal_cost: {},
+    commit_hash: {},
+    proposal_nonce: {},
+    issuer_address: {},
+    start_vote_epoch: {},
+    end_vote_epoch: {},
+    quorum_stake: {},
+    yes: {},
+    no: {},
+    veto: {},
+    abstain: {},
+    closed: {},
+    passed: {},"#,
+            result.proposal_cost.to_display(),
+            result.commit_hash,
+            result.proposal_nonce,
+            Bech32Address::from(result.issuer_address).to_bech32_expr(),
+            result.start_vote_epoch,
+            result.end_vote_epoch,
+            result.quorum_stake,
+            result.yes,
+            result.no,
+            result.veto,
+            result.abstain,
+            result.closed,
+            result.passed
+        );
     }
 
     pub async fn vote(&mut self, sender: &Bech32Address, nonce: usize, vote_type: &str) {

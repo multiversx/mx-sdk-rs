@@ -193,7 +193,7 @@ where
     pub fn view_proposal<Arg0: ProxyArg<BigUint<Env::Api>>>(
         self,
         nonce: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ProposalViewResult> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ProposalViewResult<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("viewProposal")
