@@ -37,17 +37,21 @@ impl GatewayHttpProxy {
         G: GatewayRequest,
     {
         let url = format!("{}/{}", self.proxy_uri, request.get_endpoint());
-        let method = reqwest_method(request.request_type());
-        let mut request_builder = self.client.request(method, url);
+        let method = request.request_type();
+        log::info!("{method} request: {url}");
+
+        let mut request_builder = self.client.request(reqwest_method(method), url);
         if let Some(payload) = request.get_payload() {
+            log::trace!("{method} payload: {}", serde_json::to_string(payload)?);
             request_builder = request_builder.json(&payload);
         }
 
-        let decoded = request_builder
-            .send()
-            .await?
-            .json::<G::DecodedJson>()
-            .await?;
+        let http_request = request_builder.build()?;
+        let http_response = self.client.execute(http_request).await?;
+        let http_response_text = http_response.text().await?;
+        log::trace!("{method} response: {http_response_text}");
+
+        let decoded = serde_json::from_str::<G::DecodedJson>(&http_response_text)?;
 
         request.process_json(decoded)
     }

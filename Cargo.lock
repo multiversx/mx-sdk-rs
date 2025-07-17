@@ -308,6 +308,7 @@ version = "0.0.0"
 dependencies = [
  "adder",
  "clap",
+ "env_logger",
  "multiversx-sc-snippets",
  "serde",
  "serial_test",
@@ -3337,6 +3338,7 @@ dependencies = [
  "log",
  "multiversx-sdk",
  "reqwest",
+ "serde_json",
  "tokio",
 ]
 
