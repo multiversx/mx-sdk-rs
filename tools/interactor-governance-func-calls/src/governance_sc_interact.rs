@@ -123,17 +123,17 @@ impl GovernanceCallsInteract {
     }
 
     pub async fn view_config(&mut self) {
-        let raw = self
+        let result = self
             .interactor
             .query()
             .to(GovernanceSystemSCAddress)
             .typed(GovernanceSCProxy)
             .view_config()
-            .returns(ReturnsRawResult)
+            .returns(ReturnsResult)
             .run()
             .await;
 
-        println!("config raw: {:?}", raw);
+        println!("view config: {:#?}", result);
     }
 
     pub async fn proposal_hardcoded(&mut self) {
@@ -182,22 +182,17 @@ impl GovernanceCallsInteract {
     }
 
     pub async fn view_proposal(&mut self, nonce: u64) {
-        let raw = self
+        let result = self
             .interactor
             .query()
             .to(GovernanceSystemSCAddress)
             .typed(GovernanceSCProxy)
             .view_proposal(nonce)
-            .returns(ReturnsRawResult)
+            .returns(ReturnsResult)
             .run()
             .await;
 
-        let result_strings = raw
-            .into_iter()
-            .map(|mb| String::from_utf8_lossy(&mb.to_vec()).into_owned())
-            .collect::<Vec<_>>();
-
-        println!("proposal raw: {:?}", result_strings);
+        println!("view proposal with nonce {nonce}: {:#?}", result);
     }
 
     pub async fn vote(&mut self, sender: &Bech32Address, nonce: usize, vote_type: &str) {

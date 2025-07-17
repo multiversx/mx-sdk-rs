@@ -1,8 +1,11 @@
-use multiversx_sc_codec::multi_types::MultiValue6;
-
-use crate::types::{
-    BigUint, EgldPayment, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, ProxyArg,
-    Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+use crate::{
+    imports::{
+        governance_config_result::GovernanceConfigResult, proposal_view_result::ProposalViewResult,
+    },
+    types::{
+        BigUint, EgldPayment, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable,
+        ProxyArg, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    },
 };
 
 /// Proxy for the Governance system smart contract.
@@ -162,25 +165,9 @@ where
     }
 
     /// Note: values are returned as strings (base 10 representation).
-    ///
-    /// TODO: specialized return type.
     pub fn view_config(
         self,
-    ) -> TxTypedCall<
-        Env,
-        From,
-        To,
-        NotPayable,
-        Gas,
-        MultiValue6<
-            ManagedBuffer<Env::Api>,
-            ManagedBuffer<Env::Api>,
-            ManagedBuffer<Env::Api>,
-            ManagedBuffer<Env::Api>,
-            ManagedBuffer<Env::Api>,
-            ManagedBuffer<Env::Api>,
-        >,
-    > {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, GovernanceConfigResult> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("viewConfig")
@@ -206,7 +193,7 @@ where
     pub fn view_proposal<Arg0: ProxyArg<BigUint<Env::Api>>>(
         self,
         nonce: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ProposalViewResult> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("viewProposal")
