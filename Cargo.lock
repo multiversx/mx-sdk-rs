@@ -6005,6 +6005,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "wat-gen"
+version = "0.1.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+ "wat",
+]
+
+[[package]]
 name = "web-sys"
 version = "0.3.77"
 source = "registry+https://github.com/rust-lang/crates.io-index"

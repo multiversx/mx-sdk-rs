@@ -84,6 +84,7 @@ pub const EI_1_4_ADDED_NAMES: &[&str] = &[
     "managedVerifyBLSAggregatedSignature",
 ];
 
+/// Added in the Barnard release.
 pub const EI_1_5_ADDED_NAMES: &[&str] = &[
     "getBlockTimestampMs",
     "getPrevBlockTimestampMs",
