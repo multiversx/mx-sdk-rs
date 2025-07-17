@@ -153,7 +153,7 @@ fn upgrade_dependency_version(
                 deps_name,
                 framework_crate_name,
             );
-        },
+        }
         Some(Value::Table(t)) => {
             if let Some(Value::String(version_string)) = t.get_mut("version") {
                 change_version_string(
@@ -165,8 +165,8 @@ fn upgrade_dependency_version(
                     framework_crate_name,
                 );
             }
-        },
-        _ => {},
+        }
+        _ => {}
     }
 }
 

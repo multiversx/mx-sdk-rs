@@ -360,13 +360,13 @@ where
     pub(crate) fn check_not_set(&self) {
         let storage_value: TokenMapperState<SA> = storage_get(self.get_storage_key());
         match storage_value {
-            TokenMapperState::NotSet => {},
+            TokenMapperState::NotSet => {}
             TokenMapperState::Pending => {
                 SA::error_api_impl().signal_error(PENDING_ERR_MSG);
-            },
+            }
             TokenMapperState::Token(_) => {
                 SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-            },
+            }
         }
     }
 }

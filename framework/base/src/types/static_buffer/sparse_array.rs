@@ -271,7 +271,7 @@ where
                     len: array_vec.len(),
                     _phantom: PhantomData,
                 })
-            },
+            }
             Err(e) => Err(h.handle_error(e)),
         }
     }
@@ -298,7 +298,7 @@ where
                     len: array_vec.len(),
                     _phantom: PhantomData,
                 })
-            },
+            }
             Err(e) => Err(h.handle_error(e)),
         }
     }

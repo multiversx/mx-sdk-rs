@@ -22,16 +22,16 @@ pub async fn adder_cli() {
     match &cli.command {
         Some(payable_interactor_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
-        },
+        }
         Some(payable_interactor_cli::InteractCliCommand::AllTransfers) => {
             basic_interact.check_all_transfers().await;
-        },
+        }
         Some(payable_interactor_cli::InteractCliCommand::MultiTransferWithOneEGLD) => {
             basic_interact
                 .check_multi_transfer_only_egld_transfer()
                 .await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 

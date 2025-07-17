@@ -27,96 +27,96 @@ pub async fn delegation_sc_interact_cli() {
             interact
                 .create_new_delegation_contract(args.total_delegation_cap, args.service_fee)
                 .await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::GetAllContractAddresses) => {
             interact.get_all_contract_addresses().await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::SetMetadata(args)) => {
             interact
                 .set_metadata(&args.name, &args.website, &args.identifier)
                 .await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::ChangeServiceFee(args)) => {
             interact.change_service_fee(args.fee).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::SetAutomaticActivation(args)) => {
             interact
                 .set_automatic_activation(args.automatic_activation)
                 .await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::ModifyTotalDelegationCap(args)) => {
             interact
                 .modify_total_delegation_cap(args.total_delegation_cap)
                 .await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::AddNode(args)) => {
             let bls_key = BLSKey::parse_hex(&args.public_key)
                 .expect("Failed to decode public BLS key from hex");
             let bls_sig = BLSSignature::parse_hex(&args.verified_message)
                 .expect("Failed to decode BLS signature from hex");
             interact.add_nodes(vec![(bls_key, bls_sig)]).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::GetAllNodeStates) => {
             interact.get_all_node_states().await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::StakeNode(args)) => {
             let bls_key = BLSKey::parse_hex(&args.public_key)
                 .expect("Failed to decode public BLS key from hex");
             interact.stake_nodes(vec![bls_key]).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::UnstakeNode(args)) => {
             let bls_key = BLSKey::parse_hex(&args.public_key)
                 .expect("Failed to decode public BLS key from hex");
             interact.unstake_nodes(vec![bls_key]).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::RestakeNode(args)) => {
             let bls_key = BLSKey::parse_hex(&args.public_key)
                 .expect("Failed to decode public BLS key from hex");
             interact.restake_unstaked_nodes(vec![bls_key]).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::UnbondNode(args)) => {
             let bls_key = BLSKey::parse_hex(&args.public_key)
                 .expect("Failed to decode public BLS key from hex");
             interact.unbond_nodes(vec![bls_key]).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::RemoveNode(args)) => {
             let bls_key = BLSKey::parse_hex(&args.public_key)
                 .expect("Failed to decode public BLS key from hex");
             interact.remove_nodes(vec![bls_key]).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::UnjailNode(args)) => {
             let bls_key = BLSKey::parse_hex(&args.public_key)
                 .expect("Failed to decode public BLS key from hex");
             interact.unjail_nodes(vec![bls_key]).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::Delegate(args)) => {
             let sender = Bech32Address::from_bech32_string(args.from.clone());
             interact.delegate(&sender, args.egld).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::ClaimRewards(args)) => {
             let sender = Bech32Address::from_bech32_string(args.from.clone());
             interact.claim_rewards(&sender).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::RedelegateRewards(args)) => {
             let sender = Bech32Address::from_bech32_string(args.from.clone());
             interact.redelegate_rewards(&sender).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::UndelegateFunds(args)) => {
             let sender = Bech32Address::from_bech32_string(args.from.clone());
             interact.undelegate(&sender, args.egld).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::Withdraw(args)) => {
             let sender = Bech32Address::from_bech32_string(args.from.clone());
             interact.withdraw(&sender).await;
-        },
+        }
         Some(delegation_sc_interact_cli::InteractCliCommand::SetCheckCapOnRedelegateRewards(
             args,
         )) => {
             interact
                 .set_check_cap_on_redelegate_rewards(args.check_cap_redelegate_rewards)
                 .await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 

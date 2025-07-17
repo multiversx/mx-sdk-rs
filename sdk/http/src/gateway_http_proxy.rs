@@ -34,10 +34,10 @@ impl GatewayHttpProxy {
         match request.request_type() {
             multiversx_sdk::gateway::GatewayRequestType::Get => {
                 request_builder = self.client.get(url);
-            },
+            }
             multiversx_sdk::gateway::GatewayRequestType::Post => {
                 request_builder = self.client.post(url);
-            },
+            }
         }
 
         if let Some(payload) = request.get_payload() {

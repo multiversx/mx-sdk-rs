@@ -287,14 +287,14 @@ impl AllArgs {
             match &mut result.command {
                 ContractCliAction::Build(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
-                },
+                }
                 ContractCliAction::BuildDbg(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
-                },
+                }
                 ContractCliAction::Twiggy(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
         result

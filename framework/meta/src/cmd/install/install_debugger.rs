@@ -100,7 +100,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("Code")
                 .join("User")
                 .join("settings.json")
-        },
+        }
         "linux" => {
             // For Linux
             Path::new(&user_home)
@@ -108,7 +108,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("Code")
                 .join("User")
                 .join("settings.json")
-        },
+        }
         _ => panic!("OS not supported"),
     }
 }

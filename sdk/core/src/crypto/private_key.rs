@@ -46,13 +46,13 @@ impl PrivateKey {
                 bits.copy_from_slice(&merge[..64]);
 
                 Ok(PrivateKey(bits))
-            },
+            }
             PRIVATE_KEY_LENGTH => {
                 let mut bits: [u8; 64] = [0u8; 64];
                 bits.copy_from_slice(&bytes[..64]);
 
                 Ok(PrivateKey(bits))
-            },
+            }
             _ => Err(anyhow!("Invalid secret key length")),
         }
     }

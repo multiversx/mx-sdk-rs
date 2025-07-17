@@ -65,13 +65,13 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
                 &self.data * &scaling_factor.value
-            },
+            }
             Ordering::Equal => self.data.clone(),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
                 &self.data / &scaling_factor.value
-            },
+            }
         }
     }
 
