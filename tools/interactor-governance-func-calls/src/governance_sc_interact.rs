@@ -18,33 +18,33 @@ pub async fn governance_sc_interact_cli() {
 
     let cli = governance_sc_interact_cli::InteractCli::parse();
     match cli.command {
-        Some(governance_sc_interact_cli::InteractCliCommand::Propose(args)) => {
-            // interactor.proposal_hardcoded().await;
-            interactor
-                .proposal(
-                    &Bech32Address::from_bech32_string(args.from).to_address(),
-                    &args.commit_hash,
-                    args.start_vote_epoch,
-                    args.end_vote_epoch,
-                )
-                .await;
+        Some(governance_sc_interact_cli::InteractCliCommand::Propose(_args)) => {
+            interactor.proposal_hardcoded().await;
+            // interactor
+            //     .proposal(
+            //         &Bech32Address::from_bech32_string(args.from).to_address(),
+            //         &args.commit_hash,
+            //         args.start_vote_epoch,
+            //         args.end_vote_epoch,
+            //     )
+            //     .await;
         },
         Some(governance_sc_interact_cli::InteractCliCommand::ViewConfig) => {
             interactor.view_config().await;
         },
-        Some(governance_sc_interact_cli::InteractCliCommand::ViewProposal(args)) => {
-            interactor.view_proposal(args.nonce).await;
-            // interactor.view_proposal(4).await;
+        Some(governance_sc_interact_cli::InteractCliCommand::ViewProposal(_args)) => {
+            // interactor.view_proposal(args.nonce).await;
+            interactor.view_proposal(4).await;
         },
-        Some(governance_sc_interact_cli::InteractCliCommand::Vote(args)) => {
-            interactor
-                .vote(
-                    &Bech32Address::from_bech32_string(args.from),
-                    args.nonce,
-                    &args.vote,
-                )
-                .await;
-            // interactor.vote_hardcoded().await;
+        Some(governance_sc_interact_cli::InteractCliCommand::Vote(_args)) => {
+            // interactor
+            //     .vote(
+            //         &Bech32Address::from_bech32_string(args.from),
+            //         args.nonce,
+            //         &args.vote,
+            //     )
+            //     .await;
+            interactor.vote_hardcoded().await;
         },
         Some(governance_sc_interact_cli::InteractCliCommand::DelegateVote(args)) => {
             interactor
