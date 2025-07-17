@@ -1,16 +1,16 @@
 use alloc::string::String;
 
-use multiversx_chain_core::std::Bech32Address;
+use multiversx_chain_core::types::Address;
 use multiversx_sc_codec::{
     num_bigint::BigUint, DecodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
 };
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct ProposalViewResult {
     pub proposal_cost: BigUint,
     pub commit_hash: String,
     pub proposal_nonce: u64,
-    pub issuer_address: Bech32Address,
+    pub issuer_address: Address,
     pub start_vote_epoch: u64,
     pub end_vote_epoch: u64,
     pub quorum_stake: u64,
@@ -33,7 +33,7 @@ impl TopDecodeMulti for ProposalViewResult {
         let proposal_cost = BigUint::multi_decode_or_handle_err(input, h)?;
         let commit_hash = String::multi_decode_or_handle_err(input, h)?;
         let proposal_nonce = u64::multi_decode_or_handle_err(input, h)?;
-        let issuer_address = Bech32Address::multi_decode_or_handle_err(input, h)?;
+        let issuer_address = Address::multi_decode_or_handle_err(input, h)?;
         let start_vote_epoch = u64::multi_decode_or_handle_err(input, h)?;
         let end_vote_epoch = u64::multi_decode_or_handle_err(input, h)?;
         let quorum_stake = u64::multi_decode_or_handle_err(input, h)?;
