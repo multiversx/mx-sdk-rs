@@ -85,7 +85,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
             ManagedAsyncCallResult::Ok(token_identifier) => {
                 self.last_issued_token().set(&token_identifier);
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 let (token_identifier, returned_tokens) =
@@ -95,7 +95,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 

@@ -10,10 +10,10 @@ impl RepoVersion {
         match self {
             RepoVersion::Master => {
                 "https://github.com/multiversx/mx-sdk-rs/archive/refs/heads/master.zip".to_string()
-            },
+            }
             RepoVersion::Tag(tag) => {
                 format!("https://github.com/multiversx/mx-sdk-rs/archive/refs/tags/v{tag}.zip")
-            },
+            }
         }
     }
 
@@ -22,7 +22,7 @@ impl RepoVersion {
             RepoVersion::Master => "mx-sdk-rs-master".to_string(),
             RepoVersion::Tag(tag) => {
                 format!("mx-sdk-rs-{tag}")
-            },
+            }
         }
     }
 

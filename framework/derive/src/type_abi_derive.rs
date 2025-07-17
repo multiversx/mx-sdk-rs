@@ -96,7 +96,7 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
                     }
                 }
             }
-        },
+        }
         syn::Data::Enum(data_enum) => {
             let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
             let enum_variant_snippets: Vec<proc_macro2::TokenStream> = data_enum
@@ -140,7 +140,7 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
                     }
                 }
             }
-        },
+        }
         syn::Data::Union(_) => panic!("Union not supported!"),
     };
 
@@ -186,7 +186,7 @@ pub fn get_discriminant(
                     value,
                 });
                 value
-            },
+            }
             _ => panic!("Only integer values as discriminants"), // theoretically covered by the compiler
         };
         return quote! { #lit};

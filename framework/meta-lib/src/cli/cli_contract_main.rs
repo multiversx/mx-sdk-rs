@@ -12,28 +12,28 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
     let cli_args = ContractCliArgs::parse();
     let mut meta_config_opt = process_original_abi::<AbiObj>(&cli_args);
     match cli_args.command {
-        ContractCliAction::Abi => {},
+        ContractCliAction::Abi => {}
         ContractCliAction::Build(build_args) => meta_config_opt.build(build_args),
         ContractCliAction::BuildDbg(build_args) => {
             meta_config_opt.build(build_args.into_build_args())
-        },
+        }
         ContractCliAction::Twiggy(build_args) => {
             meta_config_opt.build(build_args.into_build_args())
-        },
+        }
         ContractCliAction::Clean => meta_config_opt.clean(),
         ContractCliAction::Update => meta_config_opt.update(),
         ContractCliAction::GenerateSnippets(gs_arg) => {
             meta_config_opt.generate_rust_snippets(&gs_arg);
             meta_config_opt.reload_sc_config();
             meta_config_opt.generate_proxy()
-        },
+        }
         ContractCliAction::GenerateProxies(proxy_args) => {
             if proxy_args.compare {
                 meta_config_opt.compare_proxy()
             } else {
                 meta_config_opt.generate_proxy()
             }
-        },
+        }
     }
 }
 

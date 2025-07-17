@@ -78,7 +78,7 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                     core::result::Result::Ok(result)
                 }
             }
-        },
+        }
         syn::Data::Enum(data_enum) => {
             validate_enum_variants(&data_enum.variants);
 
@@ -111,7 +111,7 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                     result
                 }
             }
-        },
+        }
         syn::Data::Union(_) => panic!("Union not supported"),
     }
 }

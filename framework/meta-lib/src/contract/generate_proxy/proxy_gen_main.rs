@@ -55,9 +55,9 @@ fn write_proxy_with_explicit_path(proxy_config: &ProxyConfig, meta_config: &Meta
         Ok(mut file) => {
             let mut proxy_generator = ProxyGenerator::new(meta_config, &mut file, proxy_config);
             proxy_generator.write_proxy_to_file();
-        },
+        }
         Err(err) => {
             print_proxy_error(&path, err.to_string());
-        },
+        }
     }
 }

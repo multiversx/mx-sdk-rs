@@ -102,7 +102,7 @@ fn convert_mandos_esdt_to_world_mock(mandos_esdt: &crate::scenario::model::Esdt)
             let mut esdt_data = EsdtData::default();
             esdt_data.instances.add(0, balance);
             esdt_data
-        },
+        }
         crate::scenario::model::Esdt::Full(full_esdt) => EsdtData {
             instances: EsdtInstances::new_from_hash(
                 full_esdt

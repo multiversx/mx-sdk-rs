@@ -40,34 +40,34 @@ pub async fn forwarder_cli() {
         "forward_sync_accept_funds_rh_egld" => interact.forward_sync_accept_funds_rh_egld().await,
         "forward_sync_accept_funds_rh_single_esdt" => {
             interact.forward_sync_accept_funds_rh_single_esdt().await
-        },
+        }
         "forward_sync_accept_funds_rh_multi_esdt" => {
             interact.forward_sync_accept_funds_rh_multi_esdt().await
-        },
+        }
         "forward_sync_accept_funds_with_fees" => {
             interact.forward_sync_accept_funds_with_fees().await
-        },
+        }
         "forward_sync_accept_funds_then_read" => {
             interact.forward_sync_accept_funds_then_read().await
-        },
+        }
         "forward_sync_retrieve_funds" => interact.forward_sync_retrieve_funds().await,
         "forward_sync_retrieve_funds_with_accept_func" => {
             interact
                 .forward_sync_retrieve_funds_with_accept_func()
                 .await
-        },
+        }
         "accept_funds_func" => interact.accept_funds_func().await,
         "forward_sync_accept_funds_multi_transfer" => {
             interact.forward_sync_accept_funds_multi_transfer().await
-        },
+        }
         "echo_args_async" => interact.echo_args_async().await,
         "forward_async_accept_funds" => interact.forward_async_accept_funds().await,
         "forward_async_accept_funds_half_payment" => {
             interact.forward_async_accept_funds_half_payment().await
-        },
+        }
         "forward_async_accept_funds_with_fees" => {
             interact.forward_async_accept_funds_with_fees().await
-        },
+        }
         "forward_async_retrieve_funds" => interact.forward_async_retrieve_funds().await,
         "send_funds_twice" => interact.send_funds_twice().await,
         "send_async_accept_multi_transfer" => interact.send_async_accept_multi_transfer().await,
@@ -77,15 +77,15 @@ pub async fn forwarder_cli() {
         "forward_transf_exec_accept_funds" => interact.forward_transf_exec_accept_funds().await,
         "forward_transf_execu_accept_funds_with_fees" => {
             interact.forward_transf_execu_accept_funds_with_fees().await
-        },
+        }
         "forward_transf_exec_accept_funds_twice" => {
             interact.forward_transf_exec_accept_funds_twice().await
-        },
+        }
         "forward_transf_exec_accept_funds_return_values" => {
             interact
                 .forward_transf_exec_accept_funds_return_values()
                 .await
-        },
+        }
         "transf_exec_multi_accept_funds" => interact.transf_exec_multi_accept_funds().await,
         "transf_exec_multi_reject_funds" => interact.transf_exec_multi_reject_funds().await,
         "changeOwnerAddress" => interact.change_owner().await,

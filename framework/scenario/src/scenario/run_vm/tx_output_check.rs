@@ -45,7 +45,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
     );
 
     match &tx_expect.logs {
-        CheckLogs::Star => {},
+        CheckLogs::Star => {}
         CheckLogs::List(expected_logs) => {
             assert!(
                 tx_result.result_logs.len() >= expected_logs.list.len(),
@@ -78,7 +78,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                     )
                 }
             }
-        },
+        }
     }
 }
 

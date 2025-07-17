@@ -22,7 +22,7 @@ impl InteractorStepRef<'_> {
             InteractorStepRef::ScCall(sc_call) => interactor.tx_call_to_blockchain_tx(&sc_call.tx),
             InteractorStepRef::ScDeploy(sc_deploy) => {
                 interactor.sc_deploy_to_blockchain_tx(sc_deploy)
-            },
+            }
         }
     }
 
