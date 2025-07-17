@@ -4,7 +4,6 @@ use std::process;
 
 use super::error_message::query_err_message;
 use crate::InteractorBase;
-use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
     mandos_system::ScenarioRunner,
@@ -47,8 +46,6 @@ where
                 process::exit(1);
             },
         };
-
-        info!("{:#?}", result);
 
         let raw_results: Vec<Vec<u8>> = result.data.return_data.iter().map(base64_decode).collect();
 

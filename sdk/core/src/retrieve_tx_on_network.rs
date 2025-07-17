@@ -33,10 +33,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                             .await
                             .unwrap();
 
-                        info!(
-                            "Transaction retrieved successfully, with status {}: {:#?}",
-                            status, transaction_info_with_results
-                        );
+                        log::info!("Transaction retrieved successfully, with status {status}",);
                         return (transaction_info_with_results, ReturnCode::Success);
                     },
                     "fail" => {
@@ -44,7 +41,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         let failed_transaction_info: TransactionOnNetwork =
                             create_tx_failed(&error_message);
 
-                        info!(
+                        log::error!(
                             "Transaction failed with error code: {} and message: {error_message}",
                             error_code.as_u64()
                         );

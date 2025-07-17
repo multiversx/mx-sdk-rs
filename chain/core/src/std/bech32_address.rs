@@ -15,7 +15,7 @@ const DEFAULT_HRP: &str = "erd";
 /// Provides:
 ///- serde serialization/deserialization as bech32
 /// - conversions to/from bech32
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct Bech32Address {
     pub address: Address,
     pub hrp: String,
@@ -178,6 +178,12 @@ impl<'de> Deserialize<'de> for Bech32Address {
             bech32 = stripped.to_string();
         }
         Ok(Bech32Address::from_bech32_string(bech32))
+    }
+}
+
+impl core::fmt::Debug for Bech32Address {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("Bech32Address").field(&self.bech32).finish()
     }
 }
 
