@@ -39,6 +39,7 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    /// Field "amount" requires at least 1250 EGLD.
     pub fn create_new_delegation_contract<
         Arg0: ProxyArg<BigUint<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
@@ -46,10 +47,11 @@ where
         self,
         total_delegation_cap: Arg0,
         service_fee: Arg1,
+        amount: BigUint<Env::Api>,
     ) -> TxTypedCall<Env, From, To, EgldPayment<<Env as TxEnv>::Api>, Gas, ()> {
         self.wrapped_tx
             .raw_call("createNewDelegationContract")
-            .egld(BigUint::from(1250000000000000000000u128))
+            .egld(amount)
             .argument(&total_delegation_cap)
             .argument(&service_fee)
             .original_result()

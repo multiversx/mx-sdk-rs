@@ -1,6 +1,8 @@
+use multiversx_sc_codec::multi_types::MultiValue6;
+
 use crate::types::{
-    BigUint, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, ProxyArg, Tx, TxEnv,
-    TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, EgldPayment, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, ProxyArg,
+    Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 /// Proxy for the Governance system smart contract.
@@ -54,20 +56,17 @@ where
         commit_hash: Arg0,
         start_vote_epoch: Arg1,
         end_vote_epoch: Arg2,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, EgldPayment<<Env as TxEnv>::Api>, Gas, ()> {
         self.wrapped_tx
-            .payment(NotPayable)
             .raw_call("proposal")
             .argument(&commit_hash)
             .argument(&start_vote_epoch)
             .argument(&end_vote_epoch)
+            .egld(BigUint::from(1_000_000_000_000_000_000_000u128))
             .original_result()
     }
 
-    pub fn vote<
-        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
-    >(
+    pub fn vote<Arg0: ProxyArg<BigUint<Env::Api>>, Arg1: ProxyArg<ManagedBuffer<Env::Api>>>(
         self,
         proposal_to_vote: Arg0,
         vote: Arg1,
@@ -81,7 +80,7 @@ where
     }
 
     pub fn delegate_vote<
-        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<ManagedAddress<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
@@ -162,7 +161,26 @@ where
             .original_result()
     }
 
-    pub fn view_config(self) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    /// Note: values are returned as strings (base 10 representation).
+    ///
+    /// TODO: specialized return type.
+    pub fn view_config(
+        self,
+    ) -> TxTypedCall<
+        Env,
+        From,
+        To,
+        NotPayable,
+        Gas,
+        MultiValue6<
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+            ManagedBuffer<Env::Api>,
+        >,
+    > {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("viewConfig")

@@ -1,0 +1,38 @@
+[[bin]]
+name = "governance-sc-interact"
+path = "src/governance_sc_main.rs"
+
+[lib]
+path = "src/governance_sc_interact.rs"
+
+[package]
+name = "governance-sc-interact"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[dependencies]
+toml = "0.8"
+tokio = { version = "1.24" }
+
+[dependencies.clap]
+version = "4.4.7"
+features = ["derive"]
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.multiversx-sc-snippets]
+version = "=0.59.0"
+path = "../../framework/snippets"
+
+[dependencies.delegation-sc-interact]
+path = "../interactor-delegation-func-calls"
+
+
+[dependencies.payable-interactor]
+path = "../../contracts/feature-tests/payable-features/interactor"
+
+[features]
+chain-simulator-tests = []
