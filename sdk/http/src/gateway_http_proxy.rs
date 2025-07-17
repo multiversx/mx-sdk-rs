@@ -4,15 +4,22 @@ mod http_chain_simulator;
 mod http_network;
 mod http_tx;
 
+use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest, GatewayRequestType};
+use reqwest::Method;
 use std::time::Duration;
-
-use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest};
 
 /// Allows communication with the MultiversX gateway API.
 #[derive(Clone, Debug)]
 pub struct GatewayHttpProxy {
     pub(crate) proxy_uri: String,
     pub(crate) client: reqwest::Client,
+}
+
+fn reqwest_method(request_type: GatewayRequestType) -> Method {
+    match request_type {
+        GatewayRequestType::Get => Method::GET,
+        GatewayRequestType::Post => Method::POST,
+    }
 }
 
 impl GatewayHttpProxy {
@@ -30,16 +37,8 @@ impl GatewayHttpProxy {
         G: GatewayRequest,
     {
         let url = format!("{}/{}", self.proxy_uri, request.get_endpoint());
-        let mut request_builder;
-        match request.request_type() {
-            multiversx_sdk::gateway::GatewayRequestType::Get => {
-                request_builder = self.client.get(url);
-            },
-            multiversx_sdk::gateway::GatewayRequestType::Post => {
-                request_builder = self.client.post(url);
-            },
-        }
-
+        let method = reqwest_method(request.request_type());
+        let mut request_builder = self.client.request(method, url);
         if let Some(payload) = request.get_payload() {
             request_builder = request_builder.json(&payload);
         }
