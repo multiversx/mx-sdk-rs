@@ -58,7 +58,7 @@ pub trait EsdtModule {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
                 self.token_id().set(&token_id);
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 // return payment to initial caller
                 let initial_caller = self.blockchain().get_owner_address();
@@ -67,7 +67,7 @@ pub trait EsdtModule {
                     .to(&initial_caller)
                     .egld(egld_returned)
                     .transfer_if_not_empty();
-            },
+            }
         }
     }
 

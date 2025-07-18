@@ -27,24 +27,24 @@ pub async fn basic_features_cli() {
     match &cli.command {
         Some(bf_interact_cli::InteractCliCommand::Deploy) => {
             bf_interact.deploy().await;
-        },
+        }
         Some(bf_interact_cli::InteractCliCommand::DeployStorageBytes) => {
             bf_interact.deploy_storage_bytes().await;
-        },
+        }
         Some(bf_interact_cli::InteractCliCommand::LargeStorage(args)) => {
             bf_interact.large_storage(args.size_kb).await;
-        },
+        }
         Some(bf_interact_cli::InteractCliCommand::ReturnsEGLDDecimals(args)) => {
             bf_interact.returns_egld_decimal(args.egld).await;
-        },
+        }
         Some(bf_interact_cli::InteractCliCommand::EchoManagedOption(args)) => {
             let mo = match args.managed_option {
                 Some(value) => ManagedOption::some(BigUint::from(value)),
                 None => ManagedOption::none(),
             };
             bf_interact.echo_managed_option(mo).await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
@@ -233,7 +233,7 @@ impl BasicFeaturesInteract {
                     err.message
                 );
                 assert_eq!(err_msg.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -264,7 +264,7 @@ impl BasicFeaturesInteract {
                     err.message
                 );
                 assert_eq!(err_msg.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -295,7 +295,7 @@ impl BasicFeaturesInteract {
                     err.message
                 );
                 assert_eq!(err_msg.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 

@@ -18,10 +18,10 @@ fn generate_struct_payload_nested_tuple(fields: &syn::Fields) -> proc_macro2::To
                 result = quote! { (#ty, #result) };
             }
             result
-        },
+        }
         _ => {
             panic!("ManagedVecItem only supports named fields")
-        },
+        }
     }
 }
 
@@ -52,7 +52,7 @@ fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_mac
             .collect(),
         _ => {
             panic!("ManagedVecItem only supports named fields")
-        },
+        }
     }
 }
 
@@ -195,7 +195,7 @@ fn single_fields_type(fields: &syn::Fields) -> Option<syn::Type> {
     match fields {
         syn::Fields::Named(_) => {
             panic!("named fields currently not supported, only single unnamed fields supported, of type Variant(T)")
-        },
+        }
         syn::Fields::Unnamed(fields_unnamed) => {
             assert_eq!(
                 fields_unnamed.unnamed.len(),
@@ -203,7 +203,7 @@ fn single_fields_type(fields: &syn::Fields) -> Option<syn::Type> {
                 "only single unnamed fields supported, of type Variant(T)"
             );
             Some(fields_unnamed.unnamed.first().unwrap().ty.clone())
-        },
+        }
         syn::Fields::Unit => None,
     }
 }

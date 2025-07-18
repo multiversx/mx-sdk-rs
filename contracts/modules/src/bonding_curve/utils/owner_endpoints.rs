@@ -102,7 +102,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 OptionalValue::Some(token) => set_payment = EgldOrEsdtTokenIdentifier::esdt(token),
                 OptionalValue::None => {
                     sc_panic!("Expected provided accepted_payment for the token");
-                },
+                }
             };
         }
         if self.token_details(identifier).is_empty() {

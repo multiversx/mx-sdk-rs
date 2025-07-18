@@ -78,7 +78,7 @@ where
                     A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
                 }
                 unsafe { ManagedRef::wrap_handle(first.amount.get_handle()) }
-            },
+            }
             _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
         }
     }
@@ -94,14 +94,14 @@ where
                     use_raw_handle(const_handles::CALL_VALUE_EGLD);
                 A::managed_type_impl().bi_set_int64(call_value_handle.clone(), 0);
                 unsafe { ManagedRef::wrap_handle(call_value_handle) }
-            },
+            }
             1 => {
                 let first = all_transfers.get(0);
                 if !first.token_identifier.is_egld() {
                     A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
                 }
                 unsafe { ManagedRef::wrap_handle(first.amount.get_handle()) }
-            },
+            }
             _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
         }
     }

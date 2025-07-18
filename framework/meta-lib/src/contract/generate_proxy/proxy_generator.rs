@@ -167,12 +167,12 @@ where
             match &type_description.contents {
                 TypeContents::Enum(enum_variants) => {
                     self.write_enum(enum_variants, type_description, &type_name)
-                },
+                }
                 TypeContents::Struct(struct_fields) => {
                     self.write_struct(struct_fields, type_description, &type_name)
-                },
-                TypeContents::NotSpecified => {},
-                TypeContents::ExplicitEnum(_) => {},
+                }
+                TypeContents::NotSpecified => {}
+                TypeContents::ExplicitEnum(_) => {}
             }
         }
     }
@@ -414,11 +414,11 @@ where
         match outputs.len() {
             0 => {
                 self.write("()");
-            },
+            }
             1 => {
                 let adjusted = self.adjust_type_name_with_env_api(&outputs[0].type_names.rust);
                 self.write(adjusted);
-            },
+            }
             _ => {
                 self.write(format!("MultiValue{}<", outputs.len()));
                 for (i, output) in outputs.iter().enumerate() {
@@ -429,7 +429,7 @@ where
                     self.write(adjusted);
                 }
                 self.write(">");
-            },
+            }
         }
     }
 

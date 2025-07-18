@@ -61,19 +61,19 @@ impl WasmInfo {
                 Payload::ImportSection(import_section) => {
                     wasm_info.process_imports(import_section, import_extraction_enabled);
                     wasm_info.report.ei_check |= is_ei_valid(&wasm_info.report.imports, check_ei);
-                },
+                }
                 Payload::DataSection(data_section) => {
                     wasm_info.report.code.has_allocator |=
                         is_fail_allocator_triggered(data_section.clone());
                     wasm_info.report.code.has_panic.max_severity(data_section);
-                },
+                }
                 Payload::CodeSectionEntry(code_section) => {
                     wasm_info.report.memory_grow_flag |= is_mem_grow(&code_section);
                     wasm_info.create_call_graph(code_section);
-                },
+                }
                 Payload::ExportSection(export_section) => {
                     wasm_info.parse_export_section(export_section);
-                },
+                }
                 _ => (),
             }
         }

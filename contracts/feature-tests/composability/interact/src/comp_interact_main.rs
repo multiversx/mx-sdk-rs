@@ -27,7 +27,7 @@ async fn main() {
             composability_interact
                 .full_scenario(&args.endpoint_name, &args.endpoint_args)
                 .await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }

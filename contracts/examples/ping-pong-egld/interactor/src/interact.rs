@@ -31,7 +31,7 @@ pub async fn ping_pong_egld_cli() {
                     OptionalValue::from(args.max_funds.clone()),
                 )
                 .await;
-        },
+        }
         Some(interact_cli::InteractCliCommand::Upgrade(args)) => {
             interact
                 .upgrade(
@@ -41,28 +41,28 @@ pub async fn ping_pong_egld_cli() {
                     OptionalValue::from(args.max_funds.clone()),
                 )
                 .await
-        },
+        }
         Some(interact_cli::InteractCliCommand::Ping(args)) => {
             let sender = interact.ping_pong_owner_address.clone();
             interact
                 .ping(args.cost.unwrap_or_default(), None, &sender)
                 .await
-        },
+        }
         Some(interact_cli::InteractCliCommand::Pong) => {
             let sender = interact.ping_pong_owner_address.clone();
             interact.pong(None, &sender).await;
-        },
+        }
         Some(interact_cli::InteractCliCommand::PongAll) => {
             let sender = interact.ping_pong_owner_address.clone();
             interact.pong_all(None, &sender).await;
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetUserAddresses) => {
             let user_addresses = interact.get_user_addresses().await;
             println!("User addresses: ");
             for address in user_addresses {
                 print!("{address} ");
             }
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetContractState) => {
             let contract_state = interact.get_contract_state().await;
             println!("Contract state: ping_amount -> {:#?} | deadline -> {:#?} | activation_timestamp -> {:#?} | max_funds -> {:#?} | pong_all_last_user -> {:#?}", 
@@ -71,26 +71,26 @@ pub async fn ping_pong_egld_cli() {
             contract_state.activation_timestamp,
             contract_state.max_funds,
             contract_state.pong_all_last_user);
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetPingAmount) => {
             let ping_amount = interact.get_ping_amount().await;
             println!("Ping amount: {}", ping_amount);
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetDeadline) => {
             let deadline = interact.get_deadline().await;
             println!("Deadline: {}", deadline);
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetActivationTimestamp) => {
             let activation_timestamp = interact.get_activation_timestamp().await;
             println!("Activation timestamp: {}", activation_timestamp);
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetMaxFunds) => {
             let max_funds = interact.get_max_funds().await;
             match max_funds {
                 Some(funds) => println!("Max funds: {}", funds),
                 None => println!("Max funds: none"),
             }
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetUserStatus(args)) => {
             let user_status = interact.get_user_status(args.id).await;
             match user_status {
@@ -98,12 +98,12 @@ pub async fn ping_pong_egld_cli() {
                 UserStatus::Registered => println!("User status: `ping`-ed"),
                 UserStatus::Withdrawn => println!("User status: `pong`-ed"),
             }
-        },
+        }
         Some(interact_cli::InteractCliCommand::PongAllLastUser) => {
             let pong_all_last_user = interact.pong_all_last_user().await;
             println!("Pong all last user: {pong_all_last_user}");
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
@@ -228,7 +228,7 @@ impl PingPongEgldInteract {
             Err(err) => {
                 println!("Ping failed with message: {}", err.message);
                 assert_eq!(message.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -250,7 +250,7 @@ impl PingPongEgldInteract {
             Err(err) => {
                 println!("Pong failed with message: {}", err.message);
                 assert_eq!(message.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -272,7 +272,7 @@ impl PingPongEgldInteract {
             Err(err) => {
                 println!("Pong All failed with message: {}", err.message);
                 assert_eq!(message.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 

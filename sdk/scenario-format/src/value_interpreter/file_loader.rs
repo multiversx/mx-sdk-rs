@@ -54,10 +54,10 @@ fn normalize_path<P: AsRef<Path>>(path: P) -> PathBuf {
                 if !normalized.pop() {
                     normalized.push(component);
                 }
-            },
+            }
             _ => {
                 normalized.push(component);
-            },
+            }
         }
     }
     if ends_with_slash {

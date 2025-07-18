@@ -41,10 +41,10 @@ impl<M: ManagedTypeApi> EgldOrMultiEsdtPayment<M> {
         match self {
             EgldOrMultiEsdtPayment::Egld(egld_value) => {
                 EgldOrMultiEsdtPaymentRefs::Egld(egld_value)
-            },
+            }
             EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => {
                 EgldOrMultiEsdtPaymentRefs::MultiEsdt(esdt_payments)
-            },
+            }
         }
     }
 }
@@ -54,10 +54,10 @@ impl<M: ManagedTypeApi> EgldOrMultiEsdtPaymentRefs<'_, M> {
         match self {
             EgldOrMultiEsdtPaymentRefs::Egld(egld_value) => {
                 EgldOrMultiEsdtPayment::Egld((*egld_value).clone())
-            },
+            }
             EgldOrMultiEsdtPaymentRefs::MultiEsdt(esdt_payments) => {
                 EgldOrMultiEsdtPayment::MultiEsdt((*esdt_payments).clone())
-            },
+            }
         }
     }
 

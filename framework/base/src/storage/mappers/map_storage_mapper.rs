@@ -367,7 +367,7 @@ where
             Entry::Occupied(mut entry) => {
                 entry.update(f);
                 Entry::Occupied(entry)
-            },
+            }
             Entry::Vacant(entry) => Entry::Vacant(entry),
         }
     }

@@ -29,7 +29,7 @@ fn extract_token_identifier(attr: &syn::Attribute) -> String {
         syn::Meta::Path(_) => {
             // #[payable]
             "*".to_owned()
-        },
+        }
         syn::Meta::List(list) => {
             let mut iter = list.tokens.into_iter();
             let ticker = match iter.next() {
@@ -62,7 +62,7 @@ fn extract_token_identifier(attr: &syn::Attribute) -> String {
                 "too many tokens in attribute argument"
             );
             ticker
-        },
+        }
         syn::Meta::NameValue(_) => panic!(
             "attribute can not be name value. attribute needs 1 string argument: \"*\" or \"EGLD\""
         ),

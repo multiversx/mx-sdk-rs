@@ -67,7 +67,7 @@ where
             Err(err) => {
                 deploy_err_message(&err);
                 process::exit(1);
-            },
+            }
         };
 
         self.generate_blocks_until_tx_processed(&tx_hash)

@@ -111,10 +111,10 @@ fn test_opt_multi_arg_2() {
             let tuple = tuple_arg.into_tuple();
             assert_eq!(tuple.0, 0x1111i32);
             assert_eq!(tuple.1, 0x2222i32);
-        },
+        }
         OptionalValue::None => {
             panic!("OptionalValue::Some expected");
-        },
+        }
     }
 }
 
@@ -134,10 +134,10 @@ fn test_async_call_result_ok() {
             let tuple = tuple_arg.into_tuple();
             assert_eq!(tuple.0, 0x1111i32);
             assert_eq!(tuple.1, 0x2222i32);
-        },
+        }
         AsyncCallResult::Err(_) => {
             panic!("AsyncCallResult::Ok expected");
-        },
+        }
     }
 }
 
@@ -155,10 +155,10 @@ fn test_async_call_result_ok2() {
     match acr {
         AsyncCallResult::Ok(var_args) => {
             assert_eq!(var_args.len(), 0);
-        },
+        }
         AsyncCallResult::Err(_) => {
             panic!("AsyncCallResult::Ok expected");
-        },
+        }
     }
 }
 
@@ -176,10 +176,10 @@ fn test_async_call_result_err() {
     match acr {
         AsyncCallResult::Ok(_) => {
             panic!("AsyncCallResult::Err expected");
-        },
+        }
         AsyncCallResult::Err(async_call_error) => {
             assert_eq!(async_call_error.err_code, 0x0123);
             assert_eq!(async_call_error.err_msg.as_slice(), &[0x11u8, 0x11u8][..]);
-        },
+        }
     }
 }
