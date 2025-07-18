@@ -1,10 +1,10 @@
-use crate::executor::debug::StaticVarData;
+use crate::executor::debug::{StaticVarData, VMHooksDebugger};
 
 use super::VMHooksApiBackend;
 
 use std::marker::PhantomData;
 
-use multiversx_chain_vm::executor::{MemPtr, VMHooks};
+use multiversx_chain_vm::executor::MemPtr;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl};
 
@@ -23,7 +23,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// All communication with the VM happens via this method.
     pub fn with_vm_hooks<R, F>(&self, f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         VHB::with_vm_hooks(f)
     }
@@ -31,7 +31,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// Works with the VM hooks given by the context of 1 handle.
     pub fn with_vm_hooks_ctx_1<R, F>(&self, handle: &VHB::HandleType, f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         VHB::with_vm_hooks_ctx_1(handle.clone(), f)
     }
@@ -44,7 +44,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
         f: F,
     ) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         VHB::with_vm_hooks_ctx_2(handle1.clone(), handle2.clone(), f)
     }
@@ -58,7 +58,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
         f: F,
     ) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         VHB::with_vm_hooks_ctx_3(handle1.clone(), handle2.clone(), handle3.clone(), f)
     }

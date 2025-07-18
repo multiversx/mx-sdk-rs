@@ -15,3 +15,10 @@ fn test_managed_address_zero() {
     let result = bf.managed_address_zero();
     assert_eq!(ManagedAddress::zero(), result);
 }
+
+#[test]
+fn test_managed_buffer_destructor() {
+    let my_buffer = ManagedBuffer::<StaticApi>::from(b"my buffer");
+    assert_eq!(my_buffer, managed_buffer!(b"my buffer"));
+    drop(my_buffer);
+}
