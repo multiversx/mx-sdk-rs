@@ -43,13 +43,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn init_v2(self) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("initV2")
-            .original_result()
-    }
-
     pub fn proposal<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
