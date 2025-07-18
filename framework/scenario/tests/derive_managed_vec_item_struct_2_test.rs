@@ -79,7 +79,11 @@ fn struct_2_from_bytes_reader() {
         /* arr  */ 0x61, 0x11, 0x62, 0x22,
     ];
 
-    let struct_from_bytes =
-        <Struct2 as multiversx_sc::types::ManagedVecItem>::read_from_payload(&payload.into());
-    assert_eq!(expected_struct, struct_from_bytes);
+
+    <Struct2 as multiversx_sc::types::ManagedVecItem>::temp_decode(
+        &payload.into(),
+        |struct_from_bytes| {
+            assert_eq!(&expected_struct, struct_from_bytes);
+        },
+    );
 }

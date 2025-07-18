@@ -100,7 +100,7 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         Self::from(ManagedVec::<M, T>::read_from_payload(payload))
     }
 
