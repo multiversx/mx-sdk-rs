@@ -1,7 +1,7 @@
 use super::{EncodedManagedVecItem, ManagedVecItemPayload};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
-    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi, ManagedTypeApiImpl},
+    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
@@ -650,7 +650,6 @@ where
                     core::mem::drop(item);
                 }
             }
-            M::managed_type_impl().drop_managed_buffer(self.get_handle());
         }
     }
 }

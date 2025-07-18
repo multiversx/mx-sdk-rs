@@ -29,7 +29,9 @@ impl VMHooksApiBackend for StaticApiBackend {
     {
         STATIC_API_VH_CELL.with(|vh_mutex| {
             let mut vh = vh_mutex.lock().unwrap();
-            f(&mut *vh).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
+            let result = f(&mut *vh);
+            std::mem::drop(vh);
+            result.unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
         })
     }
 
