@@ -183,7 +183,7 @@ impl DelegateCallsInteract {
             .from(&self.wallet_address)
             .to(DelegationManagerSCAddress)
             .typed(DelegationManagerSCProxy)
-            .create_new_delegation_contract(BigUint::from(total_delegation_cap), service_fee)
+            .create_new_delegation_contract(total_delegation_cap, service_fee)
             .gas(60_000_000u64)
             .returns(ReturnsLogs)
             .run()
@@ -272,7 +272,7 @@ impl DelegateCallsInteract {
             .from(&self.wallet_address)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .modify_total_delegation_cap(BigUint::from(total_delegation_cap))
+            .modify_total_delegation_cap(total_delegation_cap)
             .gas(60_000_000u64)
             .run()
             .await;
@@ -480,7 +480,7 @@ impl DelegateCallsInteract {
             .from(sender)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .undelegate(BigUint::from(egld_value)) // Example delegation amount
+            .undelegate(egld_value) // Example delegation amount
             .gas(12000000)
             .run()
             .await;
