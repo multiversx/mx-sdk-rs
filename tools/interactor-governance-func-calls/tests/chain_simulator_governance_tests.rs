@@ -31,7 +31,8 @@ async fn cs_builtin_run_tests() {
         )
         .await;
 
-    //do post view config
+    governance_interactor.view_config().await;
+    governance_interactor.view_proposal(1).await;
 
     let mut delegation_interactor =
         DelegateCallsInteract::new(delegation_sc_interact::Config::chain_simulator_config()).await;
