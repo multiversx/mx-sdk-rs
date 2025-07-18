@@ -1,12 +1,12 @@
-use crate::{
-    imports::{
-        governance_config_result::GovernanceConfigResult, proposal_view_result::ProposalViewResult,
-    },
-    types::{
-        BigUint, EgldPayment, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable,
-        ProxyArg, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
-    },
+pub(super) mod governance_config_result;
+pub(super) mod proposal_view_result;
+
+use crate::types::{
+    BigUint, EgldPayment, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, ProxyArg,
+    Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
+use governance_config_result::GovernanceConfigResult;
+use proposal_view_result::ProposalViewResult;
 
 /// Proxy for the Governance system smart contract.
 pub struct GovernanceSCProxy;
