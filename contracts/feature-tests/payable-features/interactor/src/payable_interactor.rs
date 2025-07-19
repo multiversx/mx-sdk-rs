@@ -91,7 +91,7 @@ impl PayableInteract {
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .payable_all_transfers()
             .payment(payment)
-            .returns(ReturnsResult)
+            .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 
