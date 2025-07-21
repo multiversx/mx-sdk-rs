@@ -418,10 +418,9 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     fn clone(&self) -> Self {
-        let api = M::managed_type_impl();
-        let clone_handle = api.mb_new_empty();
-        api.mb_append(clone_handle.clone(), self.handle.clone());
-        unsafe { ManagedBuffer::from_handle(clone_handle) }
+        let cloned = ManagedBuffer::new();
+        M::managed_type_impl().mb_append(cloned.get_handle(), self.handle.clone());
+        cloned
     }
 }
 
