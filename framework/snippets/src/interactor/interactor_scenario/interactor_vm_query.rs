@@ -6,12 +6,13 @@ use super::error_message::query_err_message;
 use crate::InteractorBase;
 use multiversx_sc_scenario::{
     api::StaticApi,
+    imports::ReturnCode,
     mandos_system::ScenarioRunner,
     multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti, types::ContractCall},
-    scenario_model::{ScQueryStep, TxResponse},
+    scenario_model::{ScQueryStep, TxResponse, TxResponseStatus},
 };
+use multiversx_sdk::data::vm::VMQueryInput;
 use multiversx_sdk::gateway::{GatewayAsyncService, VMQueryRequest};
-use multiversx_sdk::{data::vm::VMQueryInput, utils::base64_decode};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -47,9 +48,18 @@ where
             },
         };
 
-        let raw_results: Vec<Vec<u8>> = result.data.return_data.iter().map(base64_decode).collect();
-
-        step.save_response(TxResponse::from_raw_results(raw_results));
+        if result.data.is_ok() {
+            let raw_results = result.data.return_data_base64_decode();
+            step.save_response(TxResponse::from_raw_results(raw_results));
+        } else {
+            step.save_response(TxResponse {
+                tx_error: TxResponseStatus {
+                    status: ReturnCode::VMQueryError,
+                    message: result.data.return_message.clone(),
+                },
+                ..Default::default()
+            })
+        }
 
         self.pre_runners.run_sc_query_step(step);
         self.post_runners.run_sc_query_step(step);
