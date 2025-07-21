@@ -15,6 +15,7 @@ pub struct GatewayHttpProxy {
     pub(crate) client: reqwest::Client,
 }
 
+/// Converts from common sdk type to reqwest type.
 fn reqwest_method(request_type: GatewayRequestType) -> Method {
     match request_type {
         GatewayRequestType::Get => Method::GET,

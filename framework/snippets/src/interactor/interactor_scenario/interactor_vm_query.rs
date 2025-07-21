@@ -52,6 +52,11 @@ where
             let raw_results = result.data.return_data_base64_decode();
             step.save_response(TxResponse::from_raw_results(raw_results));
         } else {
+            log::error!(
+                "VM query error, code: {}, message: {}",
+                result.data.return_code,
+                result.data.return_message
+            );
             step.save_response(TxResponse {
                 tx_error: TxResponseStatus {
                     status: ReturnCode::VMQueryError,
