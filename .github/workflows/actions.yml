@@ -14,12 +14,13 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v4.2.2
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@d10dc8345b6f54871fb884bc999fbf55acdd3ecc
     with:
       rust-toolchain: 1.87
       path-to-sc-meta: framework/meta
       mx-scenario-go-version: v4.0.0
       enable-interactor-tests: true
+      logger: trace
       coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
