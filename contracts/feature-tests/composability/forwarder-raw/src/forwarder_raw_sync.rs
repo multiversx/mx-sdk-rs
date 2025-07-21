@@ -36,7 +36,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
         let payment = self.call_value().egld();
         let one_third_gas = self.blockchain().get_gas_left() / 3;
         let half_payment = &*payment / 2u32;
-        let arg_buffer = args.to_arg_buffer();
+        let arg_buffer = args.into_arg_buffer();
 
         let result = self
             .tx()
