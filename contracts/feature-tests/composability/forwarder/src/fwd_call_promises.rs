@@ -100,7 +100,7 @@ pub trait CallPromisesModule: common::CommonModule {
                     token_amount: egld,
                     args: ManagedVec::new(),
                 });
-            },
+            }
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt) => {
                 for esdt in multi_esdt.into_iter() {
                     let token_identifier = EgldOrEsdtTokenIdentifier::esdt(esdt.token_identifier);
@@ -113,7 +113,7 @@ pub trait CallPromisesModule: common::CommonModule {
                         args: ManagedVec::new(),
                     });
                 }
-            },
+            }
         }
     }
 }

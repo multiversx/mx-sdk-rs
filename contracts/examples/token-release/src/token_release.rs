@@ -281,7 +281,7 @@ pub trait TokenRelease {
                     }
                     claimable_amount += BigUint::from(periods_passed) * period_unlock_amount
                         / BigUint::from(users_in_group_no);
-                },
+                }
                 UnlockType::Percentage {
                     period_unlock_percentage,
                     release_period,
@@ -299,7 +299,7 @@ pub trait TokenRelease {
                         * (period_unlock_percentage as u64)
                         / PERCENTAGE_TOTAL
                         / BigUint::from(users_in_group_no);
-                },
+                }
             }
         }
 

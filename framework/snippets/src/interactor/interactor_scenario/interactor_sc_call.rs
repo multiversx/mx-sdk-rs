@@ -29,7 +29,7 @@ where
             Err(err) => {
                 sc_call_err_message(&err);
                 process::exit(1);
-            },
+            }
         };
 
         self.generate_blocks_until_tx_processed(&tx_hash)

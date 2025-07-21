@@ -37,7 +37,7 @@ where
             CheckBytesValueRaw::Star => CheckValue::Star,
             CheckBytesValueRaw::Equal(bytes_value) => {
                 CheckValue::Equal(T::interpret_from(bytes_value, context))
-            },
+            }
         }
     }
 }
@@ -129,7 +129,7 @@ impl CheckValueList {
                 }
                 s.push(']');
                 s
-            },
+            }
         }
     }
 }

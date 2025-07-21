@@ -32,7 +32,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
                 cb_result.append_vec(results.into_vec_of_buffers());
 
                 cb_result.into()
-            },
+            }
             ManagedAsyncCallResult::Err(err) => {
                 let mut cb_result =
                     ManagedVec::from_single_item(ManagedBuffer::new_from_bytes(b"error"));
@@ -42,7 +42,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
                 cb_result.push(err.err_msg);
 
                 cb_result.into()
-            },
+            }
         }
     }
 

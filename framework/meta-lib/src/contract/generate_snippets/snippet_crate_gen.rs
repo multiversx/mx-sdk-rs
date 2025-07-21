@@ -125,7 +125,7 @@ pub(crate) fn create_and_get_lib_file(snippets_folder_path: &Path, overwrite: bo
                     .yellow()
                 );
                 File::options().write(true).open(&lib_path).unwrap()
-            },
+            }
         }
     }
 }

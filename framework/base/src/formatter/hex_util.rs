@@ -38,16 +38,16 @@ pub fn hex_digits_to_byte(digit1: u8, digit2: u8) -> Option<u8> {
     let mut result = match hex_digit_to_half_byte(digit1) {
         None => {
             return None;
-        },
+        }
         Some(num) => num << 4,
     };
     match hex_digit_to_half_byte(digit2) {
         None => {
             return None;
-        },
+        }
         Some(num) => {
             result |= num;
-        },
+        }
     };
     Some(result)
 }

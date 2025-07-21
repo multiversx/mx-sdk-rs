@@ -141,10 +141,10 @@ pub trait Lottery {
             Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
             Status::Ended => {
                 sc_panic!("Lottery entry period has ended! Awaiting winner announcement.")
-            },
+            }
             Status::DistributingPrizes => {
                 sc_panic!("Prizes are currently being distributed. Can't buy tickets!")
-            },
+            }
         }
     }
 
@@ -161,7 +161,7 @@ pub trait Lottery {
                 }
 
                 self.distribute_prizes(&lottery_name);
-            },
+            }
             Status::DistributingPrizes => sc_panic!("Prizes are currently being distributed!"),
         }
     }
@@ -349,11 +349,11 @@ pub trait Lottery {
                 info.prize_pool += ticket_price;
 
                 self.set_number_of_entries_for_user(cb_lottery_name, cb_sender, entries);
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 // payment error, return ticket to pool
                 info.tickets_left += 1;
-            },
+            }
         }
 
         info.queued_tickets -= 1;
@@ -371,7 +371,7 @@ pub trait Lottery {
             ManagedAsyncCallResult::Ok(()) => self.distribute_prizes(cb_lottery_name),
             ManagedAsyncCallResult::Err(_) => {
                 // nothing we can do if an error occurs in the erc20 contract
-            },
+            }
         }
     }
 

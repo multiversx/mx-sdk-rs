@@ -45,7 +45,7 @@ where
             Err(err) => {
                 query_err_message(&err);
                 process::exit(1);
-            },
+            }
         };
 
         if result.data.is_ok() {
