@@ -41,7 +41,6 @@ fn enum_to_bytes_writer() {
 
 #[test]
 fn enum_from_bytes_reader() {
-
     <SimpleEnum as multiversx_sc::types::ManagedVecItem>::temp_decode(
         &[1u8].into(),
         |enum_from_bytes| {
