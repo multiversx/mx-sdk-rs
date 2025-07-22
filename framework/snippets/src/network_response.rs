@@ -60,8 +60,10 @@ fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
     let out_scr = tx.smart_contract_results.iter().find(is_out_scr);
 
     if let Some(out_scr) = out_scr {
+        log::trace!("Parsing result from scr: {out_scr:?}");
         decode_scr_data_or_panic(&out_scr.data)
     } else {
+        log::trace!("Parsing result from logs");
         process_out_from_log(tx).unwrap_or_default()
     }
 }
@@ -103,7 +105,9 @@ fn extract_topics(event: &Events) -> Vec<Vec<u8>> {
 
 fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
+        println!("{:?}", logs.events);
         logs.events.iter().rev().find_map(|event| {
+            println!("{event:?}");
             if event.identifier == "writeLog" {
                 let mut out = Vec::new();
                 event.data.for_each(|data_member| {
