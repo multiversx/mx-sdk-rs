@@ -286,6 +286,16 @@ fn forwarder_call_async_multi_transfer_egld_reject_go() {
 }
 
 #[test]
+fn forwarder_call_async_reject_egld_go() {
+    world().run("scenarios/forwarder_call_async_reject_egld.scen.json");
+}
+
+#[test]
+fn forwarder_call_async_reject_esdt_go() {
+    world().run("scenarios/forwarder_call_async_reject_esdt.scen.json");
+}
+
+#[test]
 fn forwarder_call_async_retrieve_egld_go() {
     world().run("scenarios/forwarder_call_async_retrieve_egld.scen.json");
 }
@@ -368,6 +378,7 @@ fn forwarder_call_sync_retrieve_bt_legacy_nft_go() {
 }
 
 #[test]
+#[ignore = "TODO: Barnard fixes a bug with this"]
 fn forwarder_call_sync_retrieve_bt_multi_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_bt_multi.scen.json");
 }

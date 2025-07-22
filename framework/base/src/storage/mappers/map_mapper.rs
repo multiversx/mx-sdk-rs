@@ -403,7 +403,7 @@ where
             Entry::Vacant(entry) => {
                 let value = default(entry.key());
                 entry.insert(value)
-            },
+            }
         }
     }
 
@@ -417,7 +417,7 @@ where
             Entry::Occupied(mut entry) => {
                 entry.update(f);
                 Entry::Occupied(entry)
-            },
+            }
             Entry::Vacant(entry) => Entry::Vacant(entry),
         }
     }

@@ -56,7 +56,7 @@ impl ScenarioVMRunner {
                 } else {
                     self.create_executor(fallback, weak)
                 }
-            },
+            }
             ExecutorConfig::Composite(list) => Box::new(CompositeExecutor::new(
                 list.iter()
                     .map(|sub_config| self.create_executor(sub_config, weak.clone()))

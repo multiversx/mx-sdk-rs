@@ -58,7 +58,7 @@ impl InterpretableFrom<EsdtRaw> for Esdt {
         match from {
             EsdtRaw::Short(short_esdt) => {
                 Esdt::Short(BigUintValue::interpret_from(short_esdt, context))
-            },
+            }
             EsdtRaw::Full(full_esdt) => Esdt::Full(EsdtObject {
                 token_identifier: full_esdt
                     .token_identifier

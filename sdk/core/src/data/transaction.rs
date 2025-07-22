@@ -112,7 +112,7 @@ pub enum LogData {
 impl LogData {
     pub fn for_each<F: FnMut(&String)>(&self, mut f: F) {
         match self {
-            LogData::Empty => {},
+            LogData::Empty => {}
             LogData::String(s) => f(s),
             LogData::Vec(v) => v.iter().for_each(f),
         }

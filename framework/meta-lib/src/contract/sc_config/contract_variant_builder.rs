@@ -187,7 +187,7 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
             multiversx_sc::abi::EndpointTypeAbi::Endpoint => endpoints.push(endpoint_abi),
             multiversx_sc::abi::EndpointTypeAbi::PromisesCallback => {
                 promise_callbacks.push(endpoint_abi)
-            },
+            }
         }
     }
     let has_callback = original_abi.has_callback
@@ -280,7 +280,7 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                 alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
 
                 contract_builders = HashMap::from([(contract_id, contract_builder)]);
-            },
+            }
             None => {
                 let mut contract_builder = ContractVariantBuilder::default();
                 alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
@@ -289,7 +289,7 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                     proxy_config.path.to_string_lossy().to_string(),
                     contract_builder,
                 );
-            },
+            }
         }
 
         collect_and_process_endpoints(
@@ -387,7 +387,7 @@ impl ScConfig {
                     &config_serde,
                     original_abi,
                 ))
-            },
+            }
             Err(_) => None,
         }
     }

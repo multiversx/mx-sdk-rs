@@ -128,7 +128,7 @@ pub trait ForwarderQueue {
         match &payments {
             EgldOrMultiEsdtPayment::Egld(egld_value) => {
                 self.add_queued_call_egld_event(&call_type, &to, &endpoint_name, egld_value);
-            },
+            }
             EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => {
                 self.add_queued_call_esdt_event(
                     &call_type,
@@ -136,7 +136,7 @@ pub trait ForwarderQueue {
                     &endpoint_name,
                     &esdt_payments.clone().into_multi_value(),
                 );
-            },
+            }
         }
 
         self.queued_calls().push_back(QueuedCall {
@@ -163,7 +163,7 @@ pub trait ForwarderQueue {
                         &call.endpoint_name,
                         egld_value,
                     );
-                },
+                }
                 EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => {
                     self.forward_queued_call_esdt_event(
                         &call.call_type,
@@ -171,7 +171,7 @@ pub trait ForwarderQueue {
                         &call.endpoint_name,
                         &esdt_payments.clone().into_multi_value(),
                     );
-                },
+                }
             };
 
             let contract_call = self
@@ -183,20 +183,20 @@ pub trait ForwarderQueue {
             match call.call_type {
                 QueuedCallType::Sync => {
                     contract_call.sync_call();
-                },
+                }
                 QueuedCallType::LegacyAsync => {
                     contract_call.async_call_and_exit();
-                },
+                }
                 QueuedCallType::TransferExecute => {
                     contract_call.gas(call.gas_limit).transfer_execute();
-                },
+                }
                 QueuedCallType::Promise => {
                     contract_call
                         .gas(call.gas_limit)
                         .arguments_raw(call.args)
                         .callback(self.callbacks().promises_callback_method())
                         .register_promise();
-                },
+                }
             }
         }
     }

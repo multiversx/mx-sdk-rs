@@ -1,4 +1,4 @@
-ALICE="./interaction/alice.pem"
+ALICE="${USERS}/alice.pem"
 PROJECT="${PWD}"
 PROXY=https://devnet-gateway.multiversx.com
 CHAINID=D

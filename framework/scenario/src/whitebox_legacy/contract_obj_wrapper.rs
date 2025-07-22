@@ -146,7 +146,7 @@ impl BlockchainStateWrapper {
                         ),
                         None => (num_bigint::BigUint::zero(), Vec::new()),
                     }
-                },
+                }
                 None => (num_bigint::BigUint::zero(), Vec::new()),
             };
 
@@ -750,7 +750,7 @@ impl BlockchainStateWrapper {
                     match AttributesType::top_decode(&instance.metadata.attributes[..]) {
                         core::result::Result::Ok(attr) => {
                             print_token_balance_specialized(*token_nonce, &instance.balance, &attr)
-                        },
+                        }
                         core::result::Result::Err(_) => print_token_balance_raw(
                             *token_nonce,
                             &instance.balance,
