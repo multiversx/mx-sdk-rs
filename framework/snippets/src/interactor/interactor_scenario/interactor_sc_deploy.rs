@@ -3,7 +3,6 @@ use std::process;
 use super::error_message::deploy_err_message;
 use crate::{network_response, InteractorBase};
 use anyhow::Error;
-use log::info;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     mandos_system::ScenarioRunner,
@@ -49,9 +48,15 @@ where
             .await;
         let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
 
-        if let Ok(tx_hash) = tx_hash.as_ref() {
-            println!("sc deploy tx hash: {tx_hash}");
-            info!("sc deploy tx hash: {tx_hash}");
+        match tx_hash.as_ref() {
+            Ok(tx_hash) => {
+                println!("sc deploy tx hash: {tx_hash}");
+                log::info!("sc deploy tx hash: {tx_hash}");
+            }
+            Err(err) => {
+                println!("sc deploy error: {err}");
+                log::error!("sc deploy error: {err}");
+            }
         }
 
         tx_hash
