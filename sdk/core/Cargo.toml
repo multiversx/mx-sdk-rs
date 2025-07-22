@@ -17,7 +17,7 @@ keywords = ["multiversx", "blockchain", "sdk", "api"]
 
 [dependencies]
 serde = { version = "1.0.130", features = ["derive"] }
-serde_json = { version = "1.0.68", features = ["preserve_order"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
 serde_repr = "0.1.8"
 anyhow = "1.0"
 rand = "0.8.5"

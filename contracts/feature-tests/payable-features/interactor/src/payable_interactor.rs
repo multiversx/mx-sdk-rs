@@ -11,7 +11,7 @@ use multiversx_sc_snippets::imports::*;
 
 const CODE_PATH: MxscPath = MxscPath::new("../output/payable-features.mxsc.json");
 
-pub async fn adder_cli() {
+pub async fn payable_features_cli() {
     env_logger::init();
 
     let config = Config::load_config();
