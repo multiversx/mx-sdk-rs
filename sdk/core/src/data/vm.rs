@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::collections::HashMap;
 
+use crate::utils::base64_decode;
+
 #[derive(Serialize_repr, Deserialize_repr, Debug, Clone)]
 #[repr(u8)]
 pub enum CallType {
@@ -84,7 +86,7 @@ pub struct StorageUpdateApi {
 #[serde(rename_all = "camelCase")]
 pub struct VMOutputApi {
     #[serde(default)]
-    pub return_data: Vec<String>,
+    pub return_data: Option<Vec<String>>,
     pub return_code: String,
     pub return_message: String,
     pub gas_remaining: u64,
@@ -93,6 +95,24 @@ pub struct VMOutputApi {
     pub deleted_accounts: Option<Vec<String>>,
     pub touched_accounts: Option<Vec<String>>,
     pub logs: Option<Vec<LogEntryApi>>,
+}
+
+impl VMOutputApi {
+    pub fn return_data(&self) -> &[String] {
+        if let Some(return_data) = &self.return_data {
+            return_data
+        } else {
+            &[]
+        }
+    }
+
+    pub fn return_data_base64_decode(&self) -> Vec<Vec<u8>> {
+        self.return_data().iter().map(base64_decode).collect()
+    }
+
+    pub fn is_ok(&self) -> bool {
+        self.return_code == "ok"
+    }
 }
 
 // VmValuesResponseData follows the format of the data field in an API response for a VM values query

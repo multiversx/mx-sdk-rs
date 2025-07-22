@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
-use log::debug;
 use multiversx_sc_scenario::multiversx_sc::types::Address;
 use multiversx_sdk::data::account::Account;
 use multiversx_sdk::data::esdt::EsdtBalance;
@@ -87,6 +86,5 @@ where
         // sign
         let signature = sender.wallet.sign_tx(transaction);
         transaction.signature = Some(hex::encode(signature));
-        debug!("transaction {:#?}", transaction);
     }
 }

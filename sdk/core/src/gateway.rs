@@ -19,6 +19,8 @@ mod gateway_tx_send_multi;
 mod gateway_tx_status;
 mod gateway_tx_vmquery;
 
+use std::fmt::Display;
+
 pub use gateway_account::GetAccountRequest;
 pub use gateway_account_esdt_roles::GetAccountEsdtRolesRequest;
 pub use gateway_account_esdt_tokens::GetAccountEsdtTokensRequest;
@@ -71,9 +73,21 @@ const SET_STATE_ENDPOINT: &str = "simulator/set-state";
 const SET_STATE_OVERWRITE_ENDPOINT: &str = "simulator/set-state-overwrite";
 const ADD_KEYS: &str = "simulator/add-keys";
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum GatewayRequestType {
     Get,
     Post,
+}
+
+impl Display for GatewayRequestType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // padding makes the logs prettier
+        let padded_str = match self {
+            GatewayRequestType::Get => "GET ",
+            GatewayRequestType::Post => "POST",
+        };
+        padded_str.fmt(f)
+    }
 }
 
 /// Models requests to the gateway.

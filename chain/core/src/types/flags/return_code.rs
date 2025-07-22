@@ -59,6 +59,9 @@ pub enum ReturnCode {
 
     // Returned when a connection timeout occurs
     NetworkTimeout = 101,
+
+    // Constructed from failed VM Queries in interactors
+    VMQueryError = 200,
 }
 
 impl ReturnCode {
