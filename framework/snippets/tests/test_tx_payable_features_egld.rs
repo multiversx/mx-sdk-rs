@@ -207,11 +207,6 @@ fn test_tx_payable_features_egld() {
         .unwrap()
         .transaction;
     let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
-    
 
     assert!(!tx_response.out.is_empty());
-    // assert!(tx_response.logs.len() == 3);
-    // assert_eq!(tx_response.logs[0].endpoint, "transferValueOnly");
-    // assert_eq!(tx_response.logs[1].endpoint, "writeLog");
-    // assert_eq!(tx_response.logs[2].endpoint, "completedTxEvent");
 }

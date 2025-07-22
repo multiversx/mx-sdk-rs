@@ -81,8 +81,6 @@ impl PayableInteract {
     pub async fn check_multi_transfer_only_egld_transfer(&mut self) {
         let mut payment = MultiEgldOrEsdtPayment::new();
         payment.push(EgldOrEsdtTokenPayment::egld_payment(1_0000u64.into()));
-        // payment.push(EgldOrEsdtTokenPayment::new(EgldOrEsdtTokenIdentifier::esdt("ROSETTA-1597b8"), 0, 1u32.into()));
-        // payment.push(EgldOrEsdtTokenPayment::new(EgldOrEsdtTokenIdentifier::esdt("ROSETTA-1597b8"), 0, 2u32.into()));
 
         let result = self
             .interactor
