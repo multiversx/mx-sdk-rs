@@ -186,11 +186,7 @@ impl DelegateCallsInteract {
             .from(&self.owner)
             .to(DelegationManagerSCAddress)
             .typed(DelegationManagerSCProxy)
-            .create_new_delegation_contract(
-                total_delegation_cap,
-                service_fee,
-                BigUint::from(amount), // TODO
-            )
+            .create_new_delegation_contract(total_delegation_cap, service_fee, amount)
             .gas(60_000_000u64)
             .returns(ReturnsLogs)
             .run()

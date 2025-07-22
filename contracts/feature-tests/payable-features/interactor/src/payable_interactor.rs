@@ -22,7 +22,7 @@ pub async fn payable_features_cli() {
     match &cli.command {
         Some(payable_interactor_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy(CodeMetadata::default()).await;
-        },
+        }
         Some(payable_interactor_cli::InteractCliCommand::AllTransfers) => {
             basic_interact.check_all_transfers().await;
         }

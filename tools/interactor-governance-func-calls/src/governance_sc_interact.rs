@@ -28,14 +28,14 @@ pub async fn governance_sc_interact_cli() {
             //         args.end_vote_epoch,
             //     )
             //     .await;
-        },
+        }
         Some(governance_sc_interact_cli::InteractCliCommand::ViewConfig) => {
             interactor.view_config().await;
-        },
+        }
         Some(governance_sc_interact_cli::InteractCliCommand::ViewProposal(_args)) => {
             // interactor.view_proposal(args.nonce).await;
             interactor.view_proposal(4).await;
-        },
+        }
         Some(governance_sc_interact_cli::InteractCliCommand::Vote(_args)) => {
             // interactor
             //     .vote(
@@ -45,7 +45,7 @@ pub async fn governance_sc_interact_cli() {
             //     )
             //     .await;
             interactor.vote_hardcoded().await;
-        },
+        }
         Some(governance_sc_interact_cli::InteractCliCommand::DelegateVote(args)) => {
             interactor
                 .delegate_vote(
@@ -57,7 +57,7 @@ pub async fn governance_sc_interact_cli() {
                     args.error.as_deref(),
                 )
                 .await;
-        },
+        }
         Some(governance_sc_interact_cli::InteractCliCommand::Stake(args)) => {
             let bls_key = BLSKey::from_vec(args.bls_key.into_bytes());
             let bls_signature = BLSSignature::from_vec(args.bls_signature.into_bytes());
@@ -74,8 +74,8 @@ pub async fn governance_sc_interact_cli() {
                     args.amount,
                 )
                 .await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
@@ -278,7 +278,7 @@ impl GovernanceCallsInteract {
                 } else {
                     panic!("Unexpected error: {}", err);
                 }
-            },
+            }
         };
     }
 
