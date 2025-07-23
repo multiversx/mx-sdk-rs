@@ -15,7 +15,6 @@ fn panic_message_go() {
 }
 
 #[test]
-#[ignore = "bulk memory operations"]
 fn panic_message_std_go() {
     world().run("scenarios/panic-message-std.scen.json");
 }
