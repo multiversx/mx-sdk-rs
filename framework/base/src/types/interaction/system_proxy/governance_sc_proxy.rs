@@ -76,7 +76,7 @@ where
     }
 
     pub fn delegate_vote<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg0: ProxyArg<u64>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<ManagedAddress<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
