@@ -148,6 +148,7 @@ pub struct ApiSmartContractResult {
     pub code_metadata: Option<String>,
     pub return_message: Option<String>,
     pub original_sender: Option<String>,
+    pub logs: Option<ApiLogs>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
