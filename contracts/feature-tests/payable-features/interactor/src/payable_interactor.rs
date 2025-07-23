@@ -16,18 +16,18 @@ pub async fn payable_features_cli() {
 
     let config = Config::load_config();
 
-    let mut basic_interact = PayableInteract::new(config).await;
+    let mut payable_interact = PayableInteract::new(config).await;
 
     let cli = payable_interactor_cli::InteractCli::parse();
     match &cli.command {
         Some(payable_interactor_cli::InteractCliCommand::Deploy) => {
-            basic_interact.deploy(CodeMetadata::default()).await;
+            payable_interact.deploy().await;
         }
         Some(payable_interactor_cli::InteractCliCommand::AllTransfers) => {
-            basic_interact.check_all_transfers().await;
+            payable_interact.check_all_transfers().await;
         }
         Some(payable_interactor_cli::InteractCliCommand::MultiTransferWithOneEGLD) => {
-            basic_interact
+            payable_interact
                 .check_multi_transfer_only_egld_transfer()
                 .await;
         }
@@ -64,7 +64,7 @@ impl PayableInteract {
         }
     }
 
-    pub async fn deploy(&mut self, code_metadata: CodeMetadata) {
+    pub async fn deploy(&mut self) {
         let new_address = self
             .interactor
             .tx()
@@ -73,7 +73,7 @@ impl PayableInteract {
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .init()
             .code(CODE_PATH)
-            .code_metadata(code_metadata)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewBech32Address)
             .run()
             .await;
