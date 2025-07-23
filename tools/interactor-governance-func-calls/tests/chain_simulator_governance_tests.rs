@@ -4,7 +4,7 @@ use multiversx_sc_snippets::imports::{BLSSignature, Validator};
 
 #[tokio::test]
 #[ignore = "configurable chain-simulator is not available in CI"]
-async fn cs_builtin_run_tests() {
+async fn cs_governance_run_tests() {
     let mut governance_interactor =
         GovernanceCallsInteract::new(Config::chain_simulator_config()).await;
     governance_interactor

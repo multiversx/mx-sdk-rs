@@ -8,7 +8,7 @@ use multiversx_sc_snippets::{
 
 #[tokio::test]
 #[ignore = "configurable chain-simulator is not available in CI"]
-async fn cs_builtin_run_tests() {
+async fn cs_delegation_run_tests() {
     let mut interactor = DelegateCallsInteract::new(Config::chain_simulator_config()).await;
     let validator_1 =
         Validator::from_pem_file("./validatorKey1.pem").expect("unable to load validator key");
