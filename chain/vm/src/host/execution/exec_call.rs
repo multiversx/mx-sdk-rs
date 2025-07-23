@@ -124,7 +124,7 @@ fn commit_async_call_and_callback(
             Ok(blockchain_updates) => {
                 state.commit_updates(blockchain_updates);
                 (TxResult::empty(), TxResult::empty())
-            },
+            }
             Err(err) => (TxResult::from_panic_obj(&err), TxResult::empty()),
         }
     }
@@ -152,7 +152,7 @@ fn commit_promise_call_and_callback(
             Ok(blockchain_updates) => {
                 state.commit_updates(blockchain_updates);
                 (TxResult::empty(), TxResult::empty())
-            },
+            }
             Err(err) => (TxResult::from_panic_obj(&err), TxResult::empty()),
         }
     }

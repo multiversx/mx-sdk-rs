@@ -21,7 +21,7 @@ pub async fn install(args: &InstallArgs) {
             install_wasm32(&InstallWasm32Args::default());
             install_wasm_opt(&InstallWasmOptArgs::default());
             install_debugger(&InstallDebuggerArgs::default()).await;
-        },
+        }
         InstallCommand::MxScenarioGo(sg_args) => install_scenario_go(sg_args).await,
         InstallCommand::Wasm32(wam32_args) => install_wasm32(wam32_args),
         InstallCommand::WasmOpt(wasm_opt_args) => install_wasm_opt(wasm_opt_args),

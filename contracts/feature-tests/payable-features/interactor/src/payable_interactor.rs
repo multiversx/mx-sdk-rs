@@ -11,7 +11,7 @@ use multiversx_sc_snippets::imports::*;
 
 const CODE_PATH: MxscPath = MxscPath::new("../output/payable-features.mxsc.json");
 
-pub async fn adder_cli() {
+pub async fn payable_features_cli() {
     env_logger::init();
 
     let config = Config::load_config();
@@ -22,16 +22,16 @@ pub async fn adder_cli() {
     match &cli.command {
         Some(payable_interactor_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
-        },
+        }
         Some(payable_interactor_cli::InteractCliCommand::AllTransfers) => {
             basic_interact.check_all_transfers().await;
-        },
+        }
         Some(payable_interactor_cli::InteractCliCommand::MultiTransferWithOneEGLD) => {
             basic_interact
                 .check_multi_transfer_only_egld_transfer()
                 .await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
@@ -91,7 +91,7 @@ impl PayableInteract {
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .payable_all_transfers()
             .payment(payment)
-            .returns(ReturnsResult)
+            .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 

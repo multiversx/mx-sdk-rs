@@ -48,7 +48,7 @@ impl Serialize for CheckLogsRaw {
                     seq.serialize_element("+")?;
                 }
                 seq.end()
-            },
+            }
         }
     }
 }
@@ -136,10 +136,10 @@ impl<'de> Visitor<'de> for CheckLogsVisitor {
                         ));
                     }
                     check_list.list.push(log);
-                },
+                }
                 CheckLogElement::Plus => {
                     check_list.more_allowed_at_end = true;
-                },
+                }
             }
         }
 

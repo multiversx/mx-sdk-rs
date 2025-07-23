@@ -153,7 +153,7 @@ impl<'w> CheckStateBuilder<'w> {
                 };
 
                 self.current_account.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
-            },
+            }
             CheckEsdtMap::Equal(check_esdt_map) => {
                 if check_esdt_map.contents.contains_key(&token_id_key) {
                     let prev_entry = check_esdt_map.contents.get_mut(&token_id_key).unwrap();
@@ -165,7 +165,7 @@ impl<'w> CheckStateBuilder<'w> {
                         },
                     }
                 }
-            },
+            }
         }
 
         self

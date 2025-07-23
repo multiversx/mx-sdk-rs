@@ -18,13 +18,13 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, 
                 let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
                 &self.data * scaling_factor == other.data
-            },
+            }
             Ordering::Equal => self.data == other.data,
             Ordering::Greater => {
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
                 &other.data * scaling_factor == self.data
-            },
+            }
         }
     }
 }
@@ -43,13 +43,13 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialOrd<ManagedDecimal<M,
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
 
                 Some((&self.data * scaling_factor).cmp(&other.data))
-            },
+            }
             Ordering::Equal => Some((self.data).cmp(&other.data)),
             Ordering::Greater => {
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
                 Some((&other.data * scaling_factor).cmp(&self.data))
-            },
+            }
         }
     }
 }

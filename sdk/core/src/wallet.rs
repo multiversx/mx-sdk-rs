@@ -171,13 +171,13 @@ impl Wallet {
                         panic!("Error: {:?}", e);
                     },
                 )
-            },
+            }
             InsertPassword::StandardInput => {
                 Self::validate_keystore_password(file_path, Self::get_keystore_password())
                     .unwrap_or_else(|e| {
                         panic!("Error: {:?}", e);
                     })
-            },
+            }
         };
         let priv_key = PrivateKey::from_hex_str(
             hex::encode(Self::decrypt_secret_key(decryption_params)).as_str(),

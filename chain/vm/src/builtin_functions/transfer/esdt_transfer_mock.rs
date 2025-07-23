@@ -43,11 +43,11 @@ impl BuiltinFunction for ESDTTransfer {
             Ok(parsed_tx) => {
                 let log = build_log(&tx_input, &parsed_tx);
                 execute_transfer_builtin_func(runtime, parsed_tx, tx_input, tx_cache, log, f)
-            },
+            }
             Err(message) => {
                 let err_result = TxResult::from_vm_error(message);
                 (err_result, BlockchainUpdate::empty())
-            },
+            }
         }
     }
 }

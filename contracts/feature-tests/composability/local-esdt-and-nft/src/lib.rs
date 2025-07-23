@@ -279,7 +279,7 @@ pub trait LocalEsdtAndEsdtNft {
             ManagedAsyncCallResult::Ok(()) => {
                 self.last_issued_token().set(token_identifier.unwrap_esdt());
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
@@ -287,7 +287,7 @@ pub trait LocalEsdtAndEsdtNft {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 
@@ -301,7 +301,7 @@ pub trait LocalEsdtAndEsdtNft {
             ManagedAsyncCallResult::Ok(token_identifier) => {
                 self.last_issued_token().set(&token_identifier);
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 let (token_identifier, returned_tokens) =
@@ -311,7 +311,7 @@ pub trait LocalEsdtAndEsdtNft {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 
@@ -320,10 +320,10 @@ pub trait LocalEsdtAndEsdtNft {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 

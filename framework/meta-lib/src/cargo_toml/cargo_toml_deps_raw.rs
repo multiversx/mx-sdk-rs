@@ -42,7 +42,7 @@ impl DependencyRawValue {
                     result.tag = Some(tag.to_owned());
                 }
                 result
-            },
+            }
             _ => panic!("Unsupported dependency value"),
         }
     }

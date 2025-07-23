@@ -29,7 +29,7 @@ impl ValueSubTree {
                     }
                     item.append_to_concatenated_string(accumulator);
                 }
-            },
+            }
             ValueSubTree::Map(m) => {
                 for value in m.values() {
                     if !(accumulator.is_empty()) {
@@ -37,7 +37,7 @@ impl ValueSubTree {
                     }
                     value.append_to_concatenated_string(accumulator);
                 }
-            },
+            }
         }
     }
 
@@ -68,14 +68,14 @@ impl Serialize for ValueSubTree {
                     seq.serialize_element(item)?;
                 }
                 seq.end()
-            },
+            }
             ValueSubTree::Map(m) => {
                 let mut map = serializer.serialize_map(Some(m.len()))?;
                 for (k, v) in m {
                     map.serialize_entry(k, v)?;
                 }
                 map.end()
-            },
+            }
         }
     }
 }

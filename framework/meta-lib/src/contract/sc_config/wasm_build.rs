@@ -47,7 +47,7 @@ impl ContractVariant {
                 Err(err) => {
                     println!("\n{}", err.to_string().red().bold());
                     exit(1);
-                },
+                }
             };
 
             let rustc_target_str = self.settings.rustc_target.as_str();

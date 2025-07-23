@@ -31,7 +31,7 @@ pub fn proxy_getter_return_type(m: &Method) -> ProxyGetterReturnType {
             } else {
                 panic!("Invalid proxy getter return type")
             }
-        },
+        }
     }
 }
 

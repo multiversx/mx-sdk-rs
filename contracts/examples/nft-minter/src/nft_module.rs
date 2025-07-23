@@ -125,13 +125,13 @@ pub trait NftModule {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
                 self.nft_token_id().set(token_id.unwrap_esdt());
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 let returned = self.call_value().egld_or_single_esdt();
                 if returned.token_identifier.is_egld() && returned.amount > 0 {
                     self.tx().to(ToCaller).egld(returned.amount).transfer();
                 }
-            },
+            }
         }
     }
 

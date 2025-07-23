@@ -37,7 +37,7 @@ impl InterpretableFrom<StepRaw> for Step {
         match from {
             StepRaw::ExternalSteps { comment, path } => {
                 Step::ExternalSteps(ExternalStepsStep { comment, path })
-            },
+            }
             StepRaw::SetState {
                 comment,
                 accounts,

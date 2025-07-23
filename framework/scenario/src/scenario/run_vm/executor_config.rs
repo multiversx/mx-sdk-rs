@@ -38,13 +38,13 @@ impl ExecutorConfig {
             Self::Composite(mut list) => {
                 next.append_flattened_to_vec(&mut list);
                 Self::from_list(list)
-            },
+            }
             _ => {
                 let mut list = Vec::new();
                 self.append_flattened_to_vec(&mut list);
                 next.append_flattened_to_vec(&mut list);
                 Self::from_list(list)
-            },
+            }
         }
     }
 
@@ -86,10 +86,10 @@ impl ExecutorConfig {
                 for item in list {
                     item.append_flattened_to_vec(destination);
                 }
-            },
+            }
             _ => {
                 destination.push(self);
-            },
+            }
         }
     }
 }

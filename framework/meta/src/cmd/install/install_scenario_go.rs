@@ -99,7 +99,7 @@ impl ScenarioGoInstaller {
 
         let tag_name = parsed
             .get("tag_name")
-            .expect("tag name not found")
+            .unwrap_or_else(|| panic!("tag name not found in response: {raw_json}"))
             .as_str()
             .expect("malformed json");
 

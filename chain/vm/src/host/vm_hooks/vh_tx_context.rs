@@ -249,7 +249,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
                 // TODO: not sure it's the right condition, it catches insufficient funds
                 Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                     .with_message(tx_result.result_message.clone()))
-            },
+            }
             _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                 .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }
@@ -285,12 +285,12 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
                 Ok(())
-            },
+            }
             ReturnCode::ExecutionFailed => {
                 // TODO: not sure it's the right condition, it catches insufficient funds
                 Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                     .with_message(tx_result.result_message.clone()))
-            },
+            }
             _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                 .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }
