@@ -18,33 +18,30 @@ pub async fn governance_sc_interact_cli() {
 
     let cli = governance_sc_interact_cli::InteractCli::parse();
     match cli.command {
-        Some(governance_sc_interact_cli::InteractCliCommand::Propose(_args)) => {
-            interactor.proposal_hardcoded().await;
-            // interactor
-            //     .proposal(
-            //         &Bech32Address::from_bech32_string(args.from).to_address(),
-            //         &args.commit_hash,
-            //         args.start_vote_epoch,
-            //         args.end_vote_epoch,
-            //     )
-            //     .await;
+        Some(governance_sc_interact_cli::InteractCliCommand::Propose(args)) => {
+            interactor
+                .proposal(
+                    &Bech32Address::from_bech32_string(args.from).to_address(),
+                    &args.commit_hash,
+                    args.start_vote_epoch,
+                    args.end_vote_epoch,
+                )
+                .await;
         }
         Some(governance_sc_interact_cli::InteractCliCommand::ViewConfig) => {
             interactor.view_config().await;
         }
-        Some(governance_sc_interact_cli::InteractCliCommand::ViewProposal(_args)) => {
-            // interactor.view_proposal(args.nonce).await;
-            interactor.view_proposal(4).await;
+        Some(governance_sc_interact_cli::InteractCliCommand::ViewProposal(args)) => {
+            interactor.view_proposal(args.nonce).await;
         }
-        Some(governance_sc_interact_cli::InteractCliCommand::Vote(_args)) => {
-            // interactor
-            //     .vote(
-            //         &Bech32Address::from_bech32_string(args.from),
-            //         args.nonce,
-            //         &args.vote,
-            //     )
-            //     .await;
-            interactor.vote_hardcoded().await;
+        Some(governance_sc_interact_cli::InteractCliCommand::Vote(args)) => {
+            interactor
+                .vote(
+                    &Bech32Address::from_bech32_string(args.from),
+                    args.nonce,
+                    &args.vote,
+                )
+                .await;
         }
         Some(governance_sc_interact_cli::InteractCliCommand::DelegateVote(args)) => {
             interactor
@@ -136,22 +133,6 @@ impl GovernanceCallsInteract {
         println!("view config: {:#?}", result);
     }
 
-    pub async fn proposal_hardcoded(&mut self) {
-        let user_address = self
-            .interactor
-            .register_wallet(Wallet::from_pem_file("testnet-delegator1.pem").unwrap())
-            .await;
-
-        let epoch = 1004;
-        self.proposal(
-            &user_address,
-            &format!("aaaaaaaaaaaaaaaaaaaa0000000000000000{epoch}"),
-            epoch,
-            epoch,
-        )
-        .await;
-    }
-
     pub async fn proposal(
         &mut self,
         sender: &Address,
@@ -233,20 +214,6 @@ impl GovernanceCallsInteract {
             .gas(60_000_000u64)
             .run()
             .await;
-    }
-
-    /// Temporary, some hardcoded values for quicker testing.
-    pub async fn vote_hardcoded(&mut self) {
-        let user_address = self
-            .interactor
-            .register_wallet(Wallet::from_pem_file("delegator2.pem").unwrap())
-            .await;
-        self.vote(
-            &Bech32Address::encode_address_default_hrp(user_address),
-            4,
-            "yes",
-        )
-        .await;
     }
 
     pub async fn delegate_vote(
