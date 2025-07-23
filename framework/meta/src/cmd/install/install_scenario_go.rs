@@ -9,6 +9,7 @@ use multiversx_sc_meta_lib::print_util::println_green;
 
 use super::system_info::{get_system_info, SystemInfo};
 
+const MAX_RETRIES: u64 = 5;
 const USER_AGENT: &str = "multiversx-sc-meta";
 const SCENARIO_CLI_RELEASES_BASE_URL: &str =
     "https://api.github.com/repos/multiversx/mx-chain-scenario-cli-go/releases";
@@ -82,16 +83,27 @@ impl ScenarioGoInstaller {
         let release_url = self.release_url();
         println_green(format!("Retrieving release info: {release_url}"));
 
-        let response = reqwest::Client::builder()
+        let client = reqwest::Client::builder()
             .user_agent(&self.user_agent)
-            .build()?
-            .get(release_url)
-            .send()
-            .await?
-            .text()
-            .await?;
+            .build()?;
 
-        Ok(response)
+        let mut last_error: Option<reqwest::Error> = None;
+
+        for _ in 0..=MAX_RETRIES {
+            match client.get(&release_url).send().await {
+                Ok(response) => match response.text().await {
+                    Ok(response_str) => return Ok(response_str),
+                    Err(e) => {
+                        last_error = Some(e);
+                    }
+                },
+                Err(e) => {
+                    last_error = Some(e);
+                }
+            }
+        }
+
+        Err(last_error.unwrap())
     }
 
     fn parse_scenario_go_release(&self, raw_json: &str) -> ScenarioGoRelease {
