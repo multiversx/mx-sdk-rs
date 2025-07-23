@@ -27,7 +27,7 @@ pub fn encode_any_value(
     match &type_description.contents {
         TypeContents::NotSpecified => {
             encode_single_value(input, type_description.names.abi.as_str())
-        },
+        }
         TypeContents::Enum(variants) => encode_enum(input, variants, contract_abi),
         TypeContents::Struct(fields) => encode_struct(input, fields, contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
@@ -52,7 +52,7 @@ fn encode_single_value(
                 .map_err(|_| Box::new(EncodeError("expected number value")))?;
 
             Ok(json_value.into())
-        },
+        }
         "BigInt" | "i64" | "i32" | "i16" | "isize" | "i8" => {
             let AnyValue::SingleValue(value) = input else {
                 return Err(Box::new(EncodeError("expected single value")));
@@ -66,7 +66,7 @@ fn encode_single_value(
                 .map_err(|_| Box::new(EncodeError("expected number value")))?;
 
             Ok(json_value.into())
-        },
+        }
         "ManagedBuffer" => {
             let AnyValue::SingleValue(value) = input else {
                 return Err(Box::new(EncodeError("expected single value")));
@@ -82,7 +82,7 @@ fn encode_single_value(
                     .collect(),
             )
             .into())
-        },
+        }
         "string" | "utf-8 string" => {
             let AnyValue::SingleValue(value) = input else {
                 return Err(Box::new(EncodeError("expected single value")));
@@ -92,7 +92,7 @@ fn encode_single_value(
             };
 
             Ok(JsonValue::String(value.to_owned()).into())
-        },
+        }
         "Address" => {
             let AnyValue::SingleValue(value) = input else {
                 return Err(Box::new(EncodeError("expected single value")));
@@ -104,7 +104,7 @@ fn encode_single_value(
             let bech32_address =
                 Bech32Address::encode_address_default_hrp(Address::from_slice(value));
             Ok(JsonValue::String(bech32_address.bech32).into())
-        },
+        }
         "bool" => {
             let AnyValue::SingleValue(value) = input else {
                 return Err(Box::new(EncodeError("expected single value")));
@@ -114,11 +114,11 @@ fn encode_single_value(
             };
 
             Ok(JsonValue::Bool(value.to_owned()).into())
-        },
+        }
         _ => {
             println!("unknown type: {}", type_name);
             Err(Box::new(EncodeError("unknown type")))
-        },
+        }
     }
 }
 

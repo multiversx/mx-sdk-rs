@@ -411,7 +411,7 @@ fn default_enum_discriminant_only() {
     };
     assert_eq!(variant.discriminant, 0);
     match variant.value {
-        AnyValue::None => {},
+        AnyValue::None => {}
         _ => panic!("Expected value none"),
     };
 }

@@ -30,7 +30,7 @@ pub fn decode_any_value(
     match &type_description.contents {
         TypeContents::NotSpecified => {
             decode_single_value(input, type_description.names.abi.as_str())
-        },
+        }
         TypeContents::Enum(variants) => decode_enum(input, variants, contract_abi),
         TypeContents::Struct(fields) => decode_struct(input, fields, contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
@@ -50,7 +50,7 @@ fn decode_single_value(
 
             let value = number_value.to_string().parse::<BigUint>()?;
             Ok(AnyValue::SingleValue(SingleValue::UnsignedNumber(value)))
-        },
+        }
         "BigInt" | "i64" | "i32" | "i16" | "isize" | "i8" => {
             let number_value = input
                 .get_value()
@@ -59,7 +59,7 @@ fn decode_single_value(
 
             let value = number_value.to_string().parse::<BigInt>()?;
             Ok(AnyValue::SingleValue(SingleValue::SignedNumber(value)))
-        },
+        }
         "ManagedBuffer" => {
             let array_value = input
                 .get_value()
@@ -78,7 +78,7 @@ fn decode_single_value(
             }
 
             Ok(AnyValue::SingleValue(SingleValue::Bytes(bytes.into())))
-        },
+        }
         "string" | "utf-8 string" => {
             let str_value = input
                 .get_value()
@@ -88,7 +88,7 @@ fn decode_single_value(
             Ok(AnyValue::SingleValue(SingleValue::String(
                 str_value.to_string(),
             )))
-        },
+        }
         "Address" => {
             let str_value = input
                 .get_value()
@@ -100,7 +100,7 @@ fn decode_single_value(
             Ok(AnyValue::SingleValue(SingleValue::Bytes(
                 address.address.as_bytes().into(),
             )))
-        },
+        }
         "bool" => {
             let bool_value = input
                 .get_value()
@@ -108,7 +108,7 @@ fn decode_single_value(
                 .ok_or_else(|| Box::new(DecodeError("expected bool value")))?;
 
             Ok(AnyValue::SingleValue(SingleValue::Bool(bool_value)))
-        },
+        }
         _ => Err(Box::new(DecodeError("unknown type"))),
     }
 }

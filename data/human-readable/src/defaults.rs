@@ -24,7 +24,7 @@ pub fn default_value_for_any_value(
     match &type_description.contents {
         TypeContents::NotSpecified => {
             default_value_for_single_value(type_description.names.abi.as_str())
-        },
+        }
         TypeContents::Enum(variants) => default_value_for_enum(variants, contract_abi),
         TypeContents::Struct(fields) => default_value_for_struct(fields, contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
