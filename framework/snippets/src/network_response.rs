@@ -110,9 +110,7 @@ fn extract_topics(event: &Events) -> Vec<Vec<u8>> {
 
 fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
-        println!("{:?}", logs.events);
         logs.events.iter().rev().find_map(|event| {
-            println!("{event:?}");
             if event.identifier == "writeLog" {
                 let out = extract_write_log_data(event);
                 return Some(out);
