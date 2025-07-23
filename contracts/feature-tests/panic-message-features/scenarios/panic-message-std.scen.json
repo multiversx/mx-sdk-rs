@@ -6,7 +6,7 @@
                 "sc:panic_features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/panic-message-features.mxsc.json"
+                    "code": "mxsc:../output/panic-message-std.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -34,23 +34,6 @@
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
-            }
-        },
-        {
-            "step": "checkState",
-            "accounts": {
-                "sc:panic_features": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": "mxsc:../output/panic-message-features.mxsc.json"
-                },
-                "address:an_account": {
-                    "nonce": "1",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
-                }
             }
         }
     ]

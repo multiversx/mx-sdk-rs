@@ -28,6 +28,8 @@ macro_rules! panic_handler {
         fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::panic::PanicInfo) -> ! {
             multiversx_sc_wasm_adapter::panic::panic_fmt(panic_info)
         }
+
+        fn __set_panic_hook() {}
     };
 }
 
@@ -37,6 +39,26 @@ macro_rules! panic_handler_with_message {
         #[panic_handler]
         fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::panic::PanicInfo) -> ! {
             multiversx_sc_wasm_adapter::panic::panic_fmt_with_message(panic_info)
+        }
+
+        fn __set_panic_hook() {}
+    };
+}
+
+#[macro_export]
+macro_rules! panic_handler_std {
+    () => {
+        fn __set_panic_hook() {
+            multiversx_sc_wasm_adapter::panic_std::set_panic_hook();
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! panic_handler_std_with_message {
+    () => {
+        fn __set_panic_hook() {
+            multiversx_sc_wasm_adapter::panic_std::set_panic_hook_with_message();
         }
     };
 }
@@ -66,6 +88,7 @@ macro_rules! endpoints {
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
+                __set_panic_hook();
                 $mod_name::__wasm__endpoints__::$method_name::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
             }
         )*
@@ -79,6 +102,7 @@ macro_rules! external_view_endpoints {
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
+                __set_panic_hook();
                 $mod_name::__wasm__endpoints__::$method_name::<multiversx_sc_wasm_adapter::multiversx_sc::api::ExternalViewApi<multiversx_sc_wasm_adapter::api::VmApiImpl>>();
             }
         )*
@@ -108,6 +132,7 @@ macro_rules! external_view_init {
     () => {
         #[no_mangle]
         fn init() {
+            __set_panic_hook();
             multiversx_sc_wasm_adapter::multiversx_sc::external_view_contract::external_view_contract_constructor::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
         }
     };
@@ -119,6 +144,7 @@ macro_rules! async_callback {
         #[allow(non_snake_case)]
         #[no_mangle]
         fn callBack() {
+            __set_panic_hook();
             $mod_name::__wasm__endpoints__::callBack::<multiversx_sc_wasm_adapter::api::VmApiImpl>(
             );
         }

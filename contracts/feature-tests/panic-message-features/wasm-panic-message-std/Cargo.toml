@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "std-contract-wasm"
+name = "panic-message-std-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -24,7 +24,7 @@ overflow-checks = false
 [profile.dev]
 panic = "abort"
 
-[dependencies.std-contract]
+[dependencies.panic-message-features]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
