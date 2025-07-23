@@ -208,5 +208,10 @@ fn test_tx_payable_features_egld() {
         .transaction;
     let tx_response = network_response::parse_tx_response(tx_on_network, ReturnCode::Success);
 
-    assert!(!tx_response.out.is_empty());
+    let expected: Vec<u8> = [
+        0, 0, 0, 4, 69, 71, 76, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 39, 16, 0, 0, 0, 14, 82,
+        79, 83, 69, 84, 84, 65, 45, 49, 53, 57, 55, 98, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+    ]
+    .to_vec();
+    assert_eq!(tx_response.out, vec![expected]);
 }
