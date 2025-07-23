@@ -296,8 +296,7 @@ impl GovernanceCallsInteract {
                 .collect::<Vec<_>>(),
         );
 
-        let total_amount: BigUint<StaticApi> =
-            BigUint::from(amount) * BigUint::from(managed_bls_keys_signatures.len());
+        let total_amount = amount * managed_bls_keys_signatures.len() as u128;
 
         self.interactor
             .tx()

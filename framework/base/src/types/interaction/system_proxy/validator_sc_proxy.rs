@@ -2,7 +2,7 @@ use multiversx_chain_core::types::{BLSKey, BLSSignature};
 use multiversx_sc_codec::multi_types::{MultiValue2, MultiValueVec};
 
 use crate::types::{
-    BigUint, EgldPayment, ProxyArg, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, Egld, ProxyArg, Tx, TxEgldValue, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 /// Proxy for the Validator system smart contract.
@@ -44,12 +44,13 @@ where
     pub fn stake<
         Arg0: ProxyArg<BigUint<Env::Api>>,
         Arg1: ProxyArg<MultiValueVec<MultiValue2<BLSKey, BLSSignature>>>,
+        EgldValue: TxEgldValue<Env>,
     >(
         self,
         max_nodes_to_run: Arg0,
         bls_keys_signatures: Arg1,
-        amount: BigUint<Env::Api>,
-    ) -> TxTypedCall<Env, From, To, EgldPayment<<Env as TxEnv>::Api>, Gas, ()> {
+        amount: EgldValue,
+    ) -> TxTypedCall<Env, From, To, Egld<EgldValue>, Gas, ()> {
         self.wrapped_tx
             .raw_call("stake")
             .argument(&max_nodes_to_run)
