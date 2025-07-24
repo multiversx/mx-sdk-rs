@@ -12,8 +12,8 @@ use crate::{
     types::{
         BackTransfers, BackTransfersLegacy, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier,
         EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress,
-        TokenIdentifier,
+        ManagedBuffer, ManagedByteArray, ManagedRef, ManagedRefMut, ManagedType, ManagedVec,
+        SystemSCAddress, TokenIdentifier,
     },
 };
 
@@ -386,8 +386,7 @@ where
                 big_int_temp_handle.clone(),
             );
 
-            let bu = BigUint::<A>::from_handle(big_int_temp_handle);
-            // TODO: forget bu
+            let bu = ManagedRef::<A, BigUint<A>>::wrap_handle(big_int_temp_handle); //  BigUint::<A>::from_handle(big_int_temp_handle);
             bu.to_u64().unwrap_or(255)
         }
     }
@@ -619,7 +618,7 @@ where
             result_handle.clone(),
         );
 
-        let result = unsafe { ManagedBuffer::<A>::from_handle(result_handle) };
+        let result = unsafe { ManagedRef::<A, ManagedBuffer<A>>::wrap_handle(result_handle) };
 
         // Decoding the response needs more research
         // Empty response means no address has transferRole for the token

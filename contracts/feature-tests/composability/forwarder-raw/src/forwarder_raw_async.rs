@@ -48,7 +48,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         self.tx()
             .to(to)
             .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
+            .arguments_raw(args.into_arg_buffer())
             .payment(EgldOrEsdtTokenPayment::new(
                 payment_token,
                 0,

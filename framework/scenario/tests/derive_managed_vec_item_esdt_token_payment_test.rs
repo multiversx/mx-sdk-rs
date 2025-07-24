@@ -89,10 +89,10 @@ fn struct_from_bytes_reader() {
         handle3[1], handle3[2], handle3[3], handle4[0], handle4[1], handle4[2], handle4[3],
     ];
 
-    let struct_from_bytes =
-        <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::read_from_payload(
-            &arr.into()
-        );
-
-    assert_eq!(s, struct_from_bytes);
+    <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::temp_decode(
+        &arr.into(),
+        |struct_from_bytes| {
+            assert_eq!(&s, struct_from_bytes);
+        },
+    );
 }

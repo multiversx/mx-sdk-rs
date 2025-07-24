@@ -6,10 +6,7 @@ use crate::api::HandleConstraints;
 use crate::codec::{TopDecode, TopEncode};
 
 use crate::{
-    api::{
-        const_handles::MBUF_TEMPORARY_1, use_raw_handle, ErrorApi, ManagedTypeApi, StorageReadApi,
-        StorageReadApiImpl, StorageWriteApi,
-    },
+    api::{ErrorApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi},
     storage::StorageKey,
     storage_get,
     storage_get::StorageGetErrorHandler,
@@ -59,8 +56,7 @@ where
         V: TopDecode,
     {
         let key: StorageKey<A> = storage_key.into();
-        let result_buffer =
-            unsafe { ManagedBuffer::<A>::from_handle(use_raw_handle(MBUF_TEMPORARY_1)) };
+        let result_buffer = unsafe { ManagedBuffer::<A>::new_uninit() };
         A::storage_read_api_impl().storage_load_from_address(
             address.get_handle(),
             key.get_handle(),

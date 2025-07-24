@@ -131,7 +131,7 @@ where
             MultiValueEncoded::<Api, ManagedBuffer<Api>>::multi_decode_or_handle_err(input, h)?;
         Ok(FunctionCall {
             function_name,
-            arg_buffer: args.to_arg_buffer(),
+            arg_buffer: args.into_arg_buffer(),
         })
     }
 }

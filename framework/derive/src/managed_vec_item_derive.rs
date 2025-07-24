@@ -158,7 +158,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
             const SKIPS_RESERIALIZATION: bool = #skips_reserialization;
             type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
 
-            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+            unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let mut index = 0;
 
                 unsafe {
@@ -223,7 +223,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
 
-            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+            unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let mut index = 0;
 
                 unsafe {

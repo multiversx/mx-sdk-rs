@@ -65,29 +65,34 @@ fn enum_to_bytes_writer_variant_3() {
 #[test]
 fn enum_from_bytes_reader_variant_1() {
     let payload = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    let enum_from_bytes =
-        <EnumWithFields as multiversx_sc::types::ManagedVecItem>::read_from_payload(
-            &payload.into(),
-        );
-    assert_eq!(enum_from_bytes, EnumWithFields::Variant1(0));
+
+    <EnumWithFields as multiversx_sc::types::ManagedVecItem>::temp_decode(
+        &payload.into(),
+        |enum_from_bytes| {
+            assert_eq!(enum_from_bytes, &EnumWithFields::Variant1(0));
+        },
+    );
 }
 
 #[test]
 fn enum_from_bytes_reader_variant_2() {
     let payload = [1, 0, 0, 0, 0, 0, 0, 0, 0];
-    let enum_from_bytes =
-        <EnumWithFields as multiversx_sc::types::ManagedVecItem>::read_from_payload(
-            &payload.into(),
-        );
-    assert_eq!(enum_from_bytes, EnumWithFields::Variant2);
+
+    <EnumWithFields as multiversx_sc::types::ManagedVecItem>::temp_decode(
+        &payload.into(),
+        |enum_from_bytes| {
+            assert_eq!(enum_from_bytes, &EnumWithFields::Variant2);
+        },
+    );
 }
 
 #[test]
 fn enum_from_bytes_reader_variant_3() {
     let payload = [2, 0, 0, 0, 0, 0, 0, 0, 4];
-    let enum_from_bytes =
-        <EnumWithFields as multiversx_sc::types::ManagedVecItem>::read_from_payload(
-            &payload.into(),
-        );
-    assert_eq!(enum_from_bytes, EnumWithFields::Variant3(4));
+    <EnumWithFields as multiversx_sc::types::ManagedVecItem>::temp_decode(
+        &payload.into(),
+        |enum_from_bytes| {
+            assert_eq!(enum_from_bytes, &EnumWithFields::Variant3(4));
+        },
+    );
 }
