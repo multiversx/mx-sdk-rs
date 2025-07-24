@@ -53,13 +53,16 @@ where
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
+        // This drop saves the item back into the p-arent ManagedVec.
+        //
+        // The `set` method also handles soft deallocation
+        // (freeing of the handle, without deallocating the underlying resource).
         let item = unsafe { ManuallyDrop::take(&mut self.item) };
         unsafe {
-            let _ =
-                ManagedRefMut::<M, ManagedVec<M, T>>::wrap_handle(self.managed_vec_handle.clone())
-                    .set(self.item_index, item);
+            let mut parent_ref =
+                ManagedRefMut::<M, ManagedVec<M, T>>::wrap_handle(self.managed_vec_handle.clone());
+            let _ = parent_ref.set(self.item_index, item);
         }
-        // core::mem::forget(item);
     }
 }
 
