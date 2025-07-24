@@ -92,12 +92,19 @@ impl ScenarioGoInstaller {
         for _ in 0..=MAX_RETRIES {
             match client.get(&release_url).send().await {
                 Ok(response) => match response.text().await {
-                    Ok(response_str) => return Ok(response_str),
+                    Ok(response_str) => {
+                        println_green(format!(
+                            "Successfully retrieved release info: {response_str}"
+                        ));
+                        return Ok(response_str);
+                    }
                     Err(e) => {
+                        println!("Error retrieving response: {:?}", e);
                         last_error = Some(e);
                     }
                 },
                 Err(e) => {
+                    println!("Error sending request: {:?}", e);
                     last_error = Some(e);
                 }
             }
