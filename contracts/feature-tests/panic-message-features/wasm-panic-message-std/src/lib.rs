@@ -5,19 +5,20 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Upgrade:                              1
-// Endpoints:                            0
+// Endpoints:                            3
 // Async Callback (empty):               1
-// Total number of exported functions:   3
+// Total number of exported functions:   5
 
-multiversx_sc_wasm_adapter::allocator!();
-multiversx_sc_wasm_adapter::panic_handler_std!();
+multiversx_sc_wasm_adapter::allocator!(leaking);
+multiversx_sc_wasm_adapter::panic_handler_std_with_message!();
 
 multiversx_sc_wasm_adapter::endpoints! {
-    std_contract
+    panic_message_features
     (
         init => init
-        upgrade => upgrade
+        panicWithMessage => panic_with_message
+        panicAfterLog => panic_after_log
+        sc_panic => sc_panic
     )
 }
 

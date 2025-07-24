@@ -26,6 +26,12 @@ fn panic_message_rs() {
 }
 
 #[test]
+#[ignore = "PanicInfo currently not available, TODO: use std::panic::set_hook"]
+fn panic_message_std_rs() {
+    world().run("scenarios/panic-message-std.scen.json");
+}
+
+#[test]
 #[should_panic]
 fn should_panic_call_rs() {
     world().run("scenarios/should-panic-call.scen.json");
