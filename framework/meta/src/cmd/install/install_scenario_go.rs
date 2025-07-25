@@ -1,15 +1,16 @@
+use core::time;
 use serde_json::Value;
 use std::{
     fs::File,
     io::Write,
     path::{Path, PathBuf},
+    thread::sleep,
 };
 
 use multiversx_sc_meta_lib::print_util::println_green;
 
 use super::system_info::{get_system_info, SystemInfo};
 
-const MAX_RETRIES: u64 = 5;
 const USER_AGENT: &str = "multiversx-sc-meta";
 const SCENARIO_CLI_RELEASES_BASE_URL: &str =
     "https://api.github.com/repos/multiversx/mx-chain-scenario-cli-go/releases";
@@ -83,34 +84,23 @@ impl ScenarioGoInstaller {
         let release_url = self.release_url();
         println_green(format!("Retrieving release info: {release_url}"));
 
-        let client = reqwest::Client::builder()
-            .user_agent(&self.user_agent)
-            .build()?;
+        loop {
+            let response = reqwest::Client::builder()
+                .user_agent(&self.user_agent)
+                .build()?
+                .get(&release_url)
+                .send()
+                .await?
+                .text()
+                .await?;
 
-        let mut last_error: Option<reqwest::Error> = None;
-
-        for _ in 0..=MAX_RETRIES {
-            match client.get(&release_url).send().await {
-                Ok(response) => match response.text().await {
-                    Ok(response_str) => {
-                        println_green(format!(
-                            "Successfully retrieved release info: {response_str}"
-                        ));
-                        return Ok(response_str);
-                    }
-                    Err(e) => {
-                        println!("Error retrieving response: {:?}", e);
-                        last_error = Some(e);
-                    }
-                },
-                Err(e) => {
-                    println!("Error sending request: {:?}", e);
-                    last_error = Some(e);
-                }
+            if !response.contains("API rate limit exceeded for") {
+                return Ok(response);
             }
-        }
 
-        Err(last_error.unwrap())
+            println!("API rate limit exceeded, retrying...");
+            sleep(time::Duration::from_secs(5));
+        }
     }
 
     fn parse_scenario_go_release(&self, raw_json: &str) -> ScenarioGoRelease {
