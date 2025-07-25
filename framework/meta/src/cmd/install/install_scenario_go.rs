@@ -1,8 +1,10 @@
+use core::time;
 use serde_json::Value;
 use std::{
     fs::File,
     io::Write,
     path::{Path, PathBuf},
+    thread::sleep,
 };
 
 use multiversx_sc_meta_lib::print_util::println_green;
@@ -82,16 +84,23 @@ impl ScenarioGoInstaller {
         let release_url = self.release_url();
         println_green(format!("Retrieving release info: {release_url}"));
 
-        let response = reqwest::Client::builder()
-            .user_agent(&self.user_agent)
-            .build()?
-            .get(release_url)
-            .send()
-            .await?
-            .text()
-            .await?;
+        loop {
+            let response = reqwest::Client::builder()
+                .user_agent(&self.user_agent)
+                .build()?
+                .get(&release_url)
+                .send()
+                .await?
+                .text()
+                .await?;
 
-        Ok(response)
+            if !response.contains("API rate limit exceeded for") {
+                return Ok(response);
+            }
+
+            println!("API rate limit exceeded, retrying...");
+            sleep(time::Duration::from_secs(5));
+        }
     }
 
     fn parse_scenario_go_release(&self, raw_json: &str) -> ScenarioGoRelease {
