@@ -183,6 +183,10 @@ impl ManagedTypeContainer {
 
         num_bytes_copied
     }
+
+    pub fn mb_remove(&mut self, handle: RawHandle) {
+        self.managed_buffer_map.remove_handle(handle);
+    }
 }
 
 pub fn handle_to_be_bytes(handle: RawHandle) -> [u8; 4] {
