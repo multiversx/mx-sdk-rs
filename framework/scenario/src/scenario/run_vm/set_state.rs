@@ -93,6 +93,9 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
     if let Some(block_info_obj) = &*set_state_step.current_block_info {
         update_block_info(&mut state.current_block_info, block_info_obj);
     }
+    if let Some(block_info_obj) = &*set_state_step.epoch_start_block_info {
+        update_block_info(&mut state.epoch_start_block_info, block_info_obj);
+    }
 }
 
 fn convert_mandos_esdt_to_world_mock(mandos_esdt: &crate::scenario::model::Esdt) -> EsdtData {
@@ -181,7 +184,10 @@ fn update_block_info(
     scenario_block_info: &crate::scenario::model::BlockInfo,
 ) {
     if let Some(u64_value) = &scenario_block_info.block_timestamp {
-        block_info.block_timestamp = u64_value.value;
+        block_info.block_timestamp_ms = u64_value.value * 1000;
+    }
+    if let Some(u64_value) = &scenario_block_info.block_timestamp_ms {
+        block_info.block_timestamp_ms = u64_value.value;
     }
     if let Some(u64_value) = &scenario_block_info.block_nonce {
         block_info.block_nonce = u64_value.value;

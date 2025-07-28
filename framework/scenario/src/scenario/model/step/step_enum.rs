@@ -72,6 +72,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 current_block_info: Box::new(
                     current_block_info.map(|v| BlockInfo::interpret_from(v, context)),
                 ),
+                epoch_start_block_info: Box::new(None), // not implemented in Mandos
             }),
             StepRaw::ScCall {
                 id,

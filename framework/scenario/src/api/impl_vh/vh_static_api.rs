@@ -87,6 +87,10 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot access the block info in the StaticApi")
     }
 
+    fn get_epoch_start_block_info(&self) -> &BlockInfo {
+        panic!("cannot access the block info in the StaticApi")
+    }
+
     fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
         panic!("cannot access the back transfers in the StaticApi")
     }

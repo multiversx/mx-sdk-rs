@@ -64,6 +64,8 @@ pub trait VMHooksContext: Debug {
 
     fn get_current_block_info(&self) -> &BlockInfo;
 
+    fn get_epoch_start_block_info(&self) -> &BlockInfo;
+
     fn back_transfers_lock(&self) -> MutexGuard<BackTransfers>;
 
     /// For ownership reasons, needs to return a clone.

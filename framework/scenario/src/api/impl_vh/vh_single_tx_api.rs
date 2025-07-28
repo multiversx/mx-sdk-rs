@@ -27,6 +27,7 @@ pub struct SingleTxApiData {
     pub tx_result_cell: Mutex<TxResult>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
+    pub epoch_start_block_info: BlockInfo,
 }
 
 impl SingleTxApiData {
@@ -111,6 +112,10 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
 
     fn get_current_block_info(&self) -> &BlockInfo {
         &self.0.current_block_info
+    }
+
+    fn get_epoch_start_block_info(&self) -> &BlockInfo {
+        &self.0.epoch_start_block_info
     }
 
     fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {

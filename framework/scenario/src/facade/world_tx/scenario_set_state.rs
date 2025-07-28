@@ -192,6 +192,10 @@ impl ScenarioWorld {
     pub fn previous_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
         self.empty_builder().previous_block()
     }
+
+    pub fn epoch_start_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
+        self.empty_builder().epoch_start_block()
+    }
 }
 
 pub trait SetStateBuilderItem {
@@ -306,6 +310,15 @@ where
         SetStateBuilder {
             base: Some(base),
             item: BlockItem::new_prev(),
+        }
+    }
+
+    pub fn epoch_start_block(&mut self) -> SetStateBuilder<'w, BlockItem> {
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        SetStateBuilder {
+            base: Some(base),
+            item: BlockItem::new_epoch_start(),
         }
     }
 

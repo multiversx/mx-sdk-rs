@@ -17,8 +17,10 @@ use super::{AccountData, BlockInfo};
 pub struct BlockchainState {
     pub accounts: HashMap<VMAddress, AccountData>,
     pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
+    // TODO: group block info into a single structure
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
+    pub epoch_start_block_info: BlockInfo,
     pub new_token_identifiers: Vec<String>,
 }
 

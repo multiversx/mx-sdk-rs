@@ -123,6 +123,10 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         &self.tx_context_ref.blockchain_ref().current_block_info
     }
 
+    fn get_epoch_start_block_info(&self) -> &BlockInfo {
+        &self.tx_context_ref.blockchain_ref().epoch_start_block_info
+    }
+
     fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
         self.tx_context_ref.back_transfers_lock()
     }

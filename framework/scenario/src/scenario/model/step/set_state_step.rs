@@ -13,6 +13,7 @@ pub struct SetStateStep {
     pub block_hashes: Vec<BytesValue>,
     pub previous_block_info: Box<Option<BlockInfo>>,
     pub current_block_info: Box<Option<BlockInfo>>,
+    pub epoch_start_block_info: Box<Option<BlockInfo>>,
 }
 
 impl SetStateStep {
