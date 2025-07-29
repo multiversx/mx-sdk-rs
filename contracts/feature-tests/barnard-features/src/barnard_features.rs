@@ -1,5 +1,7 @@
 #![no_std]
 
+pub mod barnard_features_proxy;
+
 use multiversx_sc::imports::*;
 
 pub type EsdtTokenDataMultiValue<M> = MultiValue9<

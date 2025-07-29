@@ -3,7 +3,7 @@ use std::sync::{Mutex, MutexGuard};
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
-    blockchain::state::{AccountData, BlockInfo},
+    blockchain::state::{AccountData, BlockConfig},
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult},
         vm_hooks::VMHooksContext,
@@ -79,11 +79,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot access the storage in the StaticApi")
     }
 
-    fn get_previous_block_info(&self) -> &BlockInfo {
-        panic!("cannot access the block info in the StaticApi")
-    }
-
-    fn get_current_block_info(&self) -> &BlockInfo {
+    fn get_block_config(&self) -> &BlockConfig {
         panic!("cannot access the block info in the StaticApi")
     }
 

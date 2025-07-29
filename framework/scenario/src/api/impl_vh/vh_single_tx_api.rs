@@ -6,7 +6,7 @@ use std::{
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
-    blockchain::state::{AccountData, BlockInfo},
+    blockchain::state::{AccountData, BlockConfig},
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
         vm_hooks::VMHooksContext,
@@ -25,8 +25,7 @@ pub struct SingleTxApiData {
     pub accounts: Mutex<HashMap<VMAddress, AccountData>>,
     pub managed_types: Mutex<ManagedTypeContainer>,
     pub tx_result_cell: Mutex<TxResult>,
-    pub previous_block_info: BlockInfo,
-    pub current_block_info: BlockInfo,
+    pub block_config: BlockConfig,
 }
 
 impl SingleTxApiData {
@@ -105,12 +104,8 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         Ok(())
     }
 
-    fn get_previous_block_info(&self) -> &BlockInfo {
-        &self.0.previous_block_info
-    }
-
-    fn get_current_block_info(&self) -> &BlockInfo {
-        &self.0.current_block_info
+    fn get_block_config(&self) -> &BlockConfig {
+        &self.0.block_config
     }
 
     fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
