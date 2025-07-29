@@ -29,6 +29,30 @@ fn block_info_blackbox() {
         .new_address(SC_ADDRESS)
         .run();
 
+    // defaults
+
+    let result = world
+        .query()
+        .to(SC_ADDRESS)
+        .typed(barnard_features_proxy::BarnardFeaturesProxy)
+        .epoch_info()
+        .returns(ReturnsResult)
+        .run();
+
+    let (
+        block_round_time_ms,
+        epoch_start_block_timestamp_ms,
+        epoch_start_block_nonce,
+        epoch_start_block_round,
+    ) = result.into_tuple();
+
+    assert_eq!(block_round_time_ms, 6000);
+    assert_eq!(epoch_start_block_timestamp_ms, 0);
+    assert_eq!(epoch_start_block_nonce, 0);
+    assert_eq!(epoch_start_block_round, 0);
+
+    // actual values
+
     world
         .epoch_start_block()
         .block_timestamp_ms(123_000_000)
