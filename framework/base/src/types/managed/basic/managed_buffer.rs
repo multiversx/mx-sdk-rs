@@ -425,6 +425,13 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     }
 }
 
+impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
+    fn drop(&mut self) {
+        // TODO: enable, after fixing all ownership issues
+        // M::managed_type_impl().drop_managed_buffer(self.handle.clone());
+    }
+}
+
 impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
