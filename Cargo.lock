@@ -3196,6 +3196,7 @@ dependencies = [
 name = "multiversx-sc-meta"
 version = "0.59.1"
 dependencies = [
+ "anyhow",
  "bip39",
  "clap",
  "colored 3.0.0",
