@@ -18,7 +18,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             Ok(message_string) => {
                 Err(VMHooksEarlyExit::new(ReturnCode::UserError.as_u64())
                     .with_message(message_string))
-            },
+            }
             Err(_) => Err(early_exit_vm_error("error message utf-8 error")),
         }
     }

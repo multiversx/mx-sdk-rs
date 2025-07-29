@@ -9,15 +9,15 @@ publish = false
 path = "src/forwarder_barnard.rs"
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.59.1"
 path = "../../../../framework/base"
 features = ["barnard"]
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.59.0"
+version = "0.59.1"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.0"
+version = "0.59.1"
 path = "../../../../framework/scenario"

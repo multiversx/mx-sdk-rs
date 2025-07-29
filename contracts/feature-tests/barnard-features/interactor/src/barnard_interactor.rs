@@ -22,18 +22,18 @@ pub async fn adder_cli() {
     match cli.command {
         Some(barnard_interactor_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
-        },
+        }
         Some(barnard_interactor_cli::InteractCliCommand::EpochInfo) => {
             basic_interact.epoch_info().await;
-        },
+        }
         Some(barnard_interactor_cli::InteractCliCommand::BlockTimestamps) => {
             basic_interact.block_timestamps().await;
-        },
+        }
         Some(barnard_interactor_cli::InteractCliCommand::CodeHash(args)) => {
             basic_interact
                 .code_hash(Bech32Address::from_bech32_string(args.address))
                 .await;
-        },
+        }
         Some(barnard_interactor_cli::InteractCliCommand::TokenData(args)) => {
             basic_interact
                 .get_esdt_token_data(
@@ -42,8 +42,8 @@ pub async fn adder_cli() {
                     args.nonce,
                 )
                 .await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 

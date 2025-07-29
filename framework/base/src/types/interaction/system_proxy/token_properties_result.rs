@@ -59,7 +59,7 @@ impl TokenPropertiesResult {
                 b"CanTransferNFTCreateRole-" => self.can_transfer_nft_create_role = is_true(value),
                 b"NFTCreateStopped-" => self.nft_create_stopped = is_true(value),
                 b"NumWiped-" => self.num_wiped = parse_usize(value),
-                _ => {},
+                _ => {}
             }
         }
     }

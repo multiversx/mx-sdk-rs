@@ -58,7 +58,7 @@ fn top_encode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                 output.finalize_nested_encode(__buffer__);
                 core::result::Result::Ok(())
             }
-        },
+        }
         syn::Data::Enum(data_enum) => {
             validate_enum_variants(&data_enum.variants);
 
@@ -69,7 +69,7 @@ fn top_encode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                     #(#variant_top_encode_snippets)*
                 }
             }
-        },
+        }
         syn::Data::Union(_) => panic!("Union not supported"),
     }
 }

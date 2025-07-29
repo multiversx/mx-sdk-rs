@@ -30,10 +30,10 @@ pub trait ForwarderBarnard {
         match result {
             Ok(success) => {
                 self.sync_call_fallible_success(success);
-            },
+            }
             Err(error_code) => {
                 self.sync_call_fallible_error(error_code);
-            },
+            }
         }
     }
 
@@ -84,10 +84,10 @@ pub trait ForwarderBarnard {
         match result {
             Ok(()) => {
                 self.sync_call_fallible_success(ManagedVec::new());
-            },
+            }
             Err(error_code) => {
                 self.sync_call_fallible_error(error_code);
-            },
+            }
         }
     }
 

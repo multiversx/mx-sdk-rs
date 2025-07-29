@@ -106,10 +106,10 @@ impl Instance for ContractDebugInstance {
         match func_name {
             FUNC_CONTEXT_PUSH => {
                 ContractDebugStack::static_push(self.clone());
-            },
+            }
             FUNC_CONTEXT_POP => {
                 ContractDebugStack::static_pop();
-            },
+            }
             _ => self.call_endpoint(func_name),
         }
         InstanceCallResult::Ok

@@ -10,12 +10,12 @@ description = "MultiversX VM adapter for the Wasmer Production executor"
 path = "src/wasmer_prod.rs"
 
 [dependencies.multiversx-chain-core]
-version = "=0.16.0"
+version = "=0.16.1"
 path = "../core"
 
 
 [dependencies.multiversx-chain-vm]
-version = "=0.16.0"
+version = "=0.16.1"
 path = "../vm"
 
 [dependencies.multiversx-chain-vm-executor]

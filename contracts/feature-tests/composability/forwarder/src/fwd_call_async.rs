@@ -32,7 +32,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
                 cb_result.append_vec(results.into_vec_of_buffers());
 
                 cb_result.into()
-            },
+            }
             ManagedAsyncCallResult::Err(err) => {
                 let mut cb_result =
                     ManagedVec::from_single_item(ManagedBuffer::new_from_bytes(b"error"));
@@ -42,7 +42,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
                 cb_result.push(err.err_msg);
 
                 cb_result.into()
-            },
+            }
         }
     }
 
@@ -106,6 +106,19 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
+            .callback(self.callbacks().retrieve_funds_callback())
+            .async_call_and_exit()
+    }
+
+    #[endpoint]
+    #[payable]
+    fn forward_async_reject_funds(&self, to: ManagedAddress) {
+        let payment = self.call_value().all_transfers();
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .reject_funds()
+            .payment(payment)
             .callback(self.callbacks().retrieve_funds_callback())
             .async_call_and_exit()
     }

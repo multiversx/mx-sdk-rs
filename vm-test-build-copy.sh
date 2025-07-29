@@ -75,7 +75,6 @@ build_and_copy ./contracts/feature-tests/composability/forwarder-barnard     $VM
 build_and_copy ./contracts/feature-tests/composability/proxy-test-first      $VM_REPO_PATH/test/features/composability/proxy-test-first
 build_and_copy ./contracts/feature-tests/composability/proxy-test-second     $VM_REPO_PATH/test/features/composability/proxy-test-second
 build_and_copy ./contracts/feature-tests/composability/recursive-caller      $VM_REPO_PATH/test/features/composability/recursive-caller
-build_and_copy ./contracts/feature-tests/composability/promises-features     $VM_REPO_PATH/test/features/composability/promises-features
 build_and_copy ./contracts/feature-tests/composability/vault                 $VM_REPO_PATH/test/features/composability/vault
 
 rm -f $VM_REPO_PATH/test/features/composability/scenarios/*

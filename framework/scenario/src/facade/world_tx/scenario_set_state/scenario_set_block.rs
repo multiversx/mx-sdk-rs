@@ -41,10 +41,10 @@ impl SetStateBuilderItem for BlockItem {
         match self.target {
             BlockItemTarget::Current => {
                 step.current_block_info = Box::new(Some(block_info));
-            },
+            }
             BlockItemTarget::Previous => {
                 step.previous_block_info = Box::new(Some(block_info));
-            },
+            }
         }
     }
 }

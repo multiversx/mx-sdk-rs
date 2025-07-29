@@ -71,7 +71,7 @@ pub fn big_int_to_i64(bi: &num_bigint::BigInt) -> Option<i64> {
             } else {
                 None
             }
-        },
+        }
         Sign::Minus => {
             if digits.len() == 1 {
                 let as_u64 = digits[0];
@@ -83,7 +83,7 @@ pub fn big_int_to_i64(bi: &num_bigint::BigInt) -> Option<i64> {
             } else {
                 None
             }
-        },
+        }
     }
 }
 

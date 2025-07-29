@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.59.0"
+version = "0.59.1"
 edition = "2021"
 
 authors = [
@@ -39,12 +39,12 @@ run-go-tests = ["compiled-sc-tests"] # backwards compatibility
 wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
 
 [dependencies.multiversx-sc]
-version = "=0.59.0"
+version = "=0.59.1"
 features = ["alloc", "num-bigint", "std"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.59.0"
+version = "=0.59.1"
 path = "../meta-lib"
 
 [dependencies.multiversx-chain-scenario-format]
@@ -55,5 +55,5 @@ path = "../../sdk/scenario-format"
 version = "0.5.0"
 
 [dependencies.multiversx-chain-vm]
-version = "=0.16.0"
+version = "=0.16.1"
 path = "../../chain/vm"

@@ -314,6 +314,21 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
+fn mmap_get_rs() {
+    world().run("scenarios/mmap_get.scen.json");
+}
+
+#[test]
+fn mmap_mutable_input_rs() {
+    world().run("scenarios/mmap_mutable_input.scen.json");
+}
+
+#[test]
+fn mmap_remove_rs() {
+    world().run("scenarios/mmap_remove.scen.json");
+}
+
+#[test]
 fn new_address_rs() {
     world().run("scenarios/new_address.scen.json");
 }
@@ -351,14 +366,14 @@ fn sc_properties_rs() {
 }
 
 #[test]
-fn small_num_overflow_rs() {
-    world().run("scenarios/small_num_overflow.scen.json");
-}
-
-#[test]
 #[ignore = "unsupported"]
 fn send_esdt_to_nonexisting_account_rs() {
     world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}
+
+#[test]
+fn small_num_overflow_rs() {
+    world().run("scenarios/small_num_overflow.scen.json");
 }
 
 #[test]
@@ -474,16 +489,6 @@ fn storage_mapper_single_value_rs() {
 }
 
 #[test]
-fn storage_mapper_timelock_rs() {
-    world().run("scenarios/timelock_mapper.scen.json");
-}
-
-#[test]
-fn storage_mapper_timelock_at_address_rs() {
-    world().run("scenarios/timelock_mapper_at_address.scen.json");
-}
-
-#[test]
 fn storage_mapper_token_attributes_rs() {
     world().run("scenarios/storage_mapper_token_attributes.scen.json");
 }
@@ -541,4 +546,14 @@ fn storage_usize_bad_rs() {
 #[test]
 fn struct_eq_rs() {
     world().run("scenarios/struct_eq.scen.json");
+}
+
+#[test]
+fn timelock_mapper_rs() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn timelock_mapper_at_address_rs() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }

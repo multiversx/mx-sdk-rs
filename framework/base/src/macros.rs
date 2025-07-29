@@ -144,7 +144,7 @@ macro_rules! sc_try {
             multiversx_sc::types::SCResult::Ok(t) => t,
             multiversx_sc::types::SCResult::Err(e) => {
                 return multiversx_sc::types::SCResult::Err(e);
-            },
+            }
         }
     };
 }

@@ -33,6 +33,15 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.59.1, codec 0.23.1, chain 0.16.1, sdk 0.11.1] - 2025-07-24
+- Governance proxy improvements.
+- Codec: added support for using u128.
+- SDK/interactors:
+	- Added logging for http requests and responses;
+	- Fixed an issue with retrieving results from transactions with multi-transfer ESDT.
+	- Fixed a VM query error handling issue.
+
+
 ## [sc 0.59.0, codec 0.23.0, chain 0.16.0, sdk 0.11.0] - 2025-07-03
 - Support for Barnard features
 	- `barnard` feature for smart contracts, can be enabled in the contract's `Cargo.toml` or `sc-config.toml`;

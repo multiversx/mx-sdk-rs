@@ -22,11 +22,11 @@ impl Display for ExecuteCommandError {
             ),
             ExecuteCommandError::JobFailed(job) => {
                 format!("Job {} failed.", job)
-            },
+            }
             ExecuteCommandError::ErrorParsing(job) => format!("Error parsing {} output", job),
             ExecuteCommandError::ErrorRunningBuildProcess => {
                 "contract build process was not running".to_string()
-            },
+            }
         };
         write!(f, "{}", message)
     }
