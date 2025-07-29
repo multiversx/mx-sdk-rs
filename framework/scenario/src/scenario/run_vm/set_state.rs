@@ -88,13 +88,16 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
         state.put_new_token_identifier(new_token_identifier)
     }
     if let Some(block_info_obj) = &*set_state_step.previous_block_info {
-        update_block_info(&mut state.previous_block_info, block_info_obj);
+        update_block_info(&mut state.block_config.previous_block_info, block_info_obj);
     }
     if let Some(block_info_obj) = &*set_state_step.current_block_info {
-        update_block_info(&mut state.current_block_info, block_info_obj);
+        update_block_info(&mut state.block_config.current_block_info, block_info_obj);
     }
     if let Some(block_info_obj) = &*set_state_step.epoch_start_block_info {
-        update_block_info(&mut state.epoch_start_block_info, block_info_obj);
+        update_block_info(
+            &mut state.block_config.epoch_start_block_info,
+            block_info_obj,
+        );
     }
 }
 

@@ -35,6 +35,8 @@ fn block_info_blackbox() {
         .block_nonce(15_000)
         .block_round(17_000);
 
+    world.block_round_time_ms(600);
+
     let result = world
         .query()
         .to(SC_ADDRESS)
@@ -50,7 +52,7 @@ fn block_info_blackbox() {
         epoch_start_block_round,
     ) = result.into_tuple();
 
-    assert_eq!(block_round_time_ms, 6000);
+    assert_eq!(block_round_time_ms, 600);
     assert_eq!(epoch_start_block_timestamp_ms, 123_000_000);
     assert_eq!(epoch_start_block_nonce, 15_000);
     assert_eq!(epoch_start_block_round, 17_000);

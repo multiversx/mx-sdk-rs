@@ -14,6 +14,7 @@ pub struct SetStateStep {
     pub previous_block_info: Box<Option<BlockInfo>>,
     pub current_block_info: Box<Option<BlockInfo>>,
     pub epoch_start_block_info: Box<Option<BlockInfo>>,
+    pub block_round_time_ms: Option<U64Value>,
 }
 
 impl SetStateStep {
