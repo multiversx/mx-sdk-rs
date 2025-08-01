@@ -140,6 +140,7 @@ where
             },
         )
     }
+
     /// Backwards compatibility only.
     #[deprecated(
         since = "0.59.2",
