@@ -144,7 +144,7 @@ where
     /// Backwards compatibility only.
     #[deprecated(
         since = "0.59.2",
-        note = "Backwards compatibility only, does nothing. Just delete. Use `async_call_and_exit` to launch asynchronous calls or `sync_call` to launch synchronous calls."
+        note = "Please use method async_call_and_exit instead."
     )]
     pub fn call_and_exit(self) -> ! {
         self.async_call_and_exit()
