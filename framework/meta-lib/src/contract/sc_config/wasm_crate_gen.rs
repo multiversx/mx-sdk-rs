@@ -35,15 +35,21 @@ impl ContractVariant {
         )
     }
 
+    #[allow(clippy::collapsible_else_if)]
     fn panic_handler_macro_invocation(&self) -> &'static str {
-        if !self.settings.std {
+        if self.settings.std {
             if self.settings.panic_message {
-                return "multiversx_sc_wasm_adapter::panic_handler_with_message!();";
+                "multiversx_sc_wasm_adapter::panic_handler_std_with_message!();"
             } else {
-                return "multiversx_sc_wasm_adapter::panic_handler!();";
+                "multiversx_sc_wasm_adapter::panic_handler_std!();"
+            }
+        } else {
+            if self.settings.panic_message {
+                "multiversx_sc_wasm_adapter::panic_handler_with_message!();"
+            } else {
+                "multiversx_sc_wasm_adapter::panic_handler!();"
             }
         }
-        ""
     }
 
     fn endpoint_macro_name(&self) -> &'static str {

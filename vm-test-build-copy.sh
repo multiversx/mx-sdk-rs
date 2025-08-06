@@ -54,6 +54,7 @@ build_and_copy_with_scenarios ./contracts/feature-tests/basic-features $VM_REPO_
 build_and_copy_with_scenarios ./contracts/feature-tests/big-float-features $VM_REPO_PATH/test/features/big-float-features
 build_and_copy_with_scenarios ./contracts/feature-tests/erc-style-contracts/erc20 $VM_REPO_PATH/test/erc20-rust
 build_and_copy_with_scenarios ./contracts/feature-tests/formatted-message-features $VM_REPO_PATH/test/features/formatted-message-features
+build_and_copy_with_scenarios ./contracts/feature-tests/panic-message-features $VM_REPO_PATH/test/features/panic-message-features
 build_and_copy_with_scenarios ./contracts/feature-tests/payable-features $VM_REPO_PATH/test/features/payable-features
 build_and_copy_with_scenarios ./contracts/feature-tests/esdt-system-sc-mock $VM_REPO_PATH/test/features/esdt-system-sc-mock
 
