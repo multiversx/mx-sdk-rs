@@ -1,6 +1,6 @@
 use crate::types::{
-    BigUint, EgldPayment, ManagedAddress, ManagedVec, NotPayable, ProxyArg, Tx, TxEnv, TxFrom,
-    TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, Egld, ManagedAddress, ManagedVec, NotPayable, ProxyArg, Tx, TxEgldValue, TxEnv,
+    TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 /// Proxy for the Delegation Manager smart contract.
@@ -39,17 +39,20 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    /// Field "amount" requires at least 1250 EGLD.
     pub fn create_new_delegation_contract<
         Arg0: ProxyArg<BigUint<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
+        EgldValue: TxEgldValue<Env>,
     >(
         self,
         total_delegation_cap: Arg0,
         service_fee: Arg1,
-    ) -> TxTypedCall<Env, From, To, EgldPayment<<Env as TxEnv>::Api>, Gas, ()> {
+        amount: EgldValue,
+    ) -> TxTypedCall<Env, From, To, Egld<EgldValue>, Gas, ()> {
         self.wrapped_tx
             .raw_call("createNewDelegationContract")
-            .egld(BigUint::from(1250000000000000000000u128))
+            .egld(amount)
             .argument(&total_delegation_cap)
             .argument(&service_fee)
             .original_result()
