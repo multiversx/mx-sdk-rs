@@ -3,7 +3,7 @@ use std::{fmt::Debug, sync::MutexGuard};
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use crate::{
-    blockchain::state::{AccountData, BlockInfo},
+    blockchain::state::{AccountData, BlockConfig},
     host::context::{
         BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
     },
@@ -60,9 +60,7 @@ pub trait VMHooksContext: Debug {
 
     fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit>;
 
-    fn get_previous_block_info(&self) -> &BlockInfo;
-
-    fn get_current_block_info(&self) -> &BlockInfo;
+    fn get_block_config(&self) -> &BlockConfig;
 
     fn back_transfers_lock(&self) -> MutexGuard<BackTransfers>;
 

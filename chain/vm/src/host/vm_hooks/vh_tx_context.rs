@@ -6,13 +6,11 @@ use multiversx_chain_vm_executor::{InstanceState, MemLength, MemPtr, VMHooksEarl
 use num_bigint::BigUint;
 use num_traits::Zero;
 
+use crate::blockchain::state::BlockConfig;
 use crate::host::runtime::RuntimeInstanceCallLambdaDefault;
 use crate::schedule::GasSchedule;
 use crate::{
-    blockchain::{
-        reserved::STORAGE_RESERVED_PREFIX,
-        state::{AccountData, BlockInfo},
-    },
+    blockchain::{reserved::STORAGE_RESERVED_PREFIX, state::AccountData},
     host::context::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType,
         ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxResult,
@@ -115,12 +113,8 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         Ok(())
     }
 
-    fn get_previous_block_info(&self) -> &BlockInfo {
-        &self.tx_context_ref.blockchain_ref().previous_block_info
-    }
-
-    fn get_current_block_info(&self) -> &BlockInfo {
-        &self.tx_context_ref.blockchain_ref().current_block_info
+    fn get_block_config(&self) -> &BlockConfig {
+        &self.tx_context_ref.blockchain_ref().block_config
     }
 
     fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
