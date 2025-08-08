@@ -21,7 +21,7 @@
                             "frozen": "true"
                         }
                     },
-                    "code": "mxsc:../forwarder-barnard/output/forwarder-barnard.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:vault": {
                     "nonce": "0",

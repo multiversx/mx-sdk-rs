@@ -29,10 +29,10 @@ pub enum EIVersion {
     V1_3,
 
     /// Hooks made available in the Spica release, November 12, 2024: https://multiversx.com/release/release-spica-v1-8-4-0
-    #[default]
     V1_4,
 
-    /// Hooks made available in the Barnard release, Q2 2025.
+    /// Hooks made available in the Barnard release, activated July 26 2025: https://multiversx.com/release/release-barnard-v1-10-4
+    #[default]
     V1_5,
 }
 

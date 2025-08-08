@@ -3,7 +3,7 @@ use std::sync::{Mutex, MutexGuard};
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
-    blockchain::state::{AccountData, BlockInfo},
+    blockchain::state::{AccountData, BlockConfig},
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult},
         vm_hooks::VMHooksContext,
@@ -39,7 +39,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         }
     }
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer> {
         self.0.lock().unwrap()
     }
 
@@ -63,7 +63,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot access the random bytes generator in the StaticApi")
     }
 
-    fn result_lock(&self) -> MutexGuard<TxResult> {
+    fn result_lock(&self) -> MutexGuard<'_, TxResult> {
         panic!("cannot access tx results in the StaticApi")
     }
 
@@ -79,15 +79,11 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot access the storage in the StaticApi")
     }
 
-    fn get_previous_block_info(&self) -> &BlockInfo {
+    fn get_block_config(&self) -> &BlockConfig {
         panic!("cannot access the block info in the StaticApi")
     }
 
-    fn get_current_block_info(&self) -> &BlockInfo {
-        panic!("cannot access the block info in the StaticApi")
-    }
-
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers> {
         panic!("cannot access the back transfers in the StaticApi")
     }
 

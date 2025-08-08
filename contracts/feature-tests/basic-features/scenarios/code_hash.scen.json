@@ -17,7 +17,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "1",
-                    "newAddress": "sc:barnard"
+                    "newAddress": "sc:basic-features"
                 }
             ]
         },
@@ -26,9 +26,9 @@
             "id": "1",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "mxsc:../output/barnard-features.mxsc.json",
+                "contractCode": "mxsc:../output/basic-features.mxsc.json",
                 "arguments": [],
-                "gasLimit": "5,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -43,8 +43,8 @@
             "step": "scQuery",
             "id": "2",
             "tx": {
-                "to": "sc:barnard",
-                "function": "codeHash",
+                "to": "sc:basic-features",
+                "function": "code_hash",
                 "arguments": [
                     "sc:code-hash-sc"
                 ]

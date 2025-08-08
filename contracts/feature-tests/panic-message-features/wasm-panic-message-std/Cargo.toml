@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "payable-features-barnard-wasm"
+name = "panic-message-std-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -24,13 +24,13 @@ overflow-checks = false
 [profile.dev]
 panic = "abort"
 
-[dependencies.payable-features]
+[dependencies.panic-message-features]
 path = ".."
-features = ["barnard"]
 
 [dependencies.multiversx-sc-wasm-adapter]
 version = "0.59.1"
 path = "../../../../framework/wasm-adapter"
+features = ["std"]
 
 [workspace]
 members = ["."]

@@ -94,6 +94,7 @@ impl RewardsDistributionTestState {
 }
 
 #[test]
+#[ignore = "long running test, run on demand"]
 fn test_compute_brackets() {
     let mut state = RewardsDistributionTestState::new();
 

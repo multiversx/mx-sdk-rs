@@ -127,7 +127,7 @@ impl PingPongEgldInteract {
         let wallet_address = interactor.register_wallet(test_wallets::mallory()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,
