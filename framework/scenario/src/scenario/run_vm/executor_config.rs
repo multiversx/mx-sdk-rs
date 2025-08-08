@@ -6,7 +6,7 @@ use multiversx_chain_vm_executor::Executor;
 /// Created specifically to avoid referencing the Wasmer 2.2 crate from the VM.
 pub type CustomExecutorFn = fn(RuntimeWeakRef) -> Box<dyn Executor + Send + Sync>;
 
-#[derive(Default, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Clone, Debug)]
 pub enum ExecutorConfig {
     /// Uses the debugger infrastructure: testing the smart contract code directly.
     #[default]
@@ -93,6 +93,32 @@ impl ExecutorConfig {
         }
     }
 }
+
+impl PartialEq for ExecutorConfig {
+    fn eq(&self, other: &Self) -> bool {
+        use ExecutorConfig::*;
+        match (self, other) {
+            (Debugger, Debugger) => true,
+            (Experimental, Experimental) => true,
+            (
+                CompiledFeatureIfElse {
+                    if_compiled: a1,
+                    fallback: b1,
+                },
+                CompiledFeatureIfElse {
+                    if_compiled: a2,
+                    fallback: b2,
+                },
+            ) => a1 == a2 && b1 == b2,
+            (Composite(v1), Composite(v2)) => v1 == v2,
+            // Custom executor functions cannot be compared, so not considered equal
+            (Custom(_), Custom(_)) => false,
+            _ => false,
+        }
+    }
+}
+
+impl Eq for ExecutorConfig {}
 
 #[cfg(test)]
 mod tests {
