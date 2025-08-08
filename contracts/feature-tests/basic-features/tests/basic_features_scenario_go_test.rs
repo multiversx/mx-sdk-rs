@@ -50,6 +50,16 @@ fn block_info_go() {
 }
 
 #[test]
+fn block_info_ms_go() {
+    world().run("scenarios/block_info_ms.scen.json");
+}
+
+#[test]
+fn code_hash_go() {
+    world().run("scenarios/code_hash.scen.json");
+}
+
+#[test]
 fn codec_err_go() {
     world().run("scenarios/codec_err.scen.json");
 }

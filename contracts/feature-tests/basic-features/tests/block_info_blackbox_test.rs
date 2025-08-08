@@ -1,16 +1,16 @@
 use multiversx_sc_scenario::imports::*;
 
-use barnard_features::barnard_features_proxy;
+use basic_features::basic_features_proxy;
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
-const SC_ADDRESS: TestSCAddress = TestSCAddress::new("barnard-features");
-const CODE_PATH: MxscPath = MxscPath::new("output/barnard-features.mxsc.json");
+const SC_ADDRESS: TestSCAddress = TestSCAddress::new("basic-features");
+const CODE_PATH: MxscPath = MxscPath::new("output/basic-features.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
-    blockchain.set_current_dir_from_workspace("contracts/feature-tests/barnard-features");
-    blockchain.register_contract(CODE_PATH, barnard_features::ContractBuilder);
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
+    blockchain.register_contract(CODE_PATH, basic_features::ContractBuilder);
     blockchain
 }
 
@@ -23,7 +23,7 @@ fn block_info_blackbox() {
     world
         .tx()
         .from(OWNER_ADDRESS)
-        .typed(barnard_features_proxy::BarnardFeaturesProxy)
+        .typed(basic_features_proxy::BasicFeaturesProxy)
         .init()
         .code(CODE_PATH)
         .new_address(SC_ADDRESS)
@@ -34,7 +34,7 @@ fn block_info_blackbox() {
     let result = world
         .query()
         .to(SC_ADDRESS)
-        .typed(barnard_features_proxy::BarnardFeaturesProxy)
+        .typed(basic_features_proxy::BasicFeaturesProxy)
         .epoch_info()
         .returns(ReturnsResult)
         .run();
@@ -64,7 +64,7 @@ fn block_info_blackbox() {
     let result = world
         .query()
         .to(SC_ADDRESS)
-        .typed(barnard_features_proxy::BarnardFeaturesProxy)
+        .typed(basic_features_proxy::BasicFeaturesProxy)
         .epoch_info()
         .returns(ReturnsResult)
         .run();
