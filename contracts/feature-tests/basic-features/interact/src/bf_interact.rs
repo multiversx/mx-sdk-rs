@@ -66,7 +66,7 @@ impl BasicFeaturesInteract {
             .set_current_dir_from_workspace("contracts/feature-tests/basic-features/interact");
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
 
-        interactor.generate_blocks_until_epoch(2).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,
