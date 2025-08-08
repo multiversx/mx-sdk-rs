@@ -41,6 +41,7 @@ pub const FORMATTER_ENCODE_ERROR: &str = "formatter encode error: ";
 pub const LOG_TOPIC_ENCODE_ERROR: &str = "log topic encode error: ";
 pub const LOG_DATA_ENCODE_ERROR: &str = "log data encode error: ";
 pub const CONTRACT_CALL_ENCODE_ERROR: &str = "contract call encode error: ";
+pub const BAD_MB_SLICE: &str = "ManagedBuffer slice out of bounds";
 
 pub const VALUE_EXCEEDS_SLICE: &str = "value exceeds target slice";
 pub const CAST_TO_I64_ERROR: &str = "cast to i64 error";

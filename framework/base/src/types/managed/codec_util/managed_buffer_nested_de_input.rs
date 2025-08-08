@@ -101,9 +101,13 @@ where
     where
         H: DecodeErrorHandler,
     {
-        self.buffer
-            .load_slice(self.decode_index, into)
-            .map_err(|_| h.handle_error(DecodeError::INPUT_TOO_SHORT))
+        if into.len() > self.remaining_len() {
+            return Err(h.handle_error(DecodeError::INPUT_TOO_SHORT));
+        }
+
+        self.buffer.load_slice(self.decode_index, into);
+
+        Ok(())
     }
 
     fn read_into<H>(&mut self, into: &mut [u8], h: H) -> Result<(), H::HandledErr>
