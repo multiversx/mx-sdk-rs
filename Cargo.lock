@@ -692,7 +692,6 @@ version = "0.0.0"
 dependencies = [
  "builtin-func-features",
  "forwarder",
- "forwarder-barnard",
  "forwarder-legacy",
  "forwarder-queue",
  "forwarder-raw",
@@ -1542,23 +1541,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
-]
-
-[[package]]
-name = "forwarder-barnard"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
- "multiversx-sc-wasm-adapter",
-]
-
-[[package]]
-name = "forwarder-barnard-meta"
-version = "0.0.0"
-dependencies = [
- "forwarder-barnard",
- "multiversx-sc-meta-lib",
 ]
 
 [[package]]

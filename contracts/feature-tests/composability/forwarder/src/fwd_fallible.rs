@@ -1,15 +1,9 @@
-#![no_std]
-
-pub mod vault_proxy;
+use crate::vault_proxy;
 
 multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
 
-#[multiversx_sc::contract]
-pub trait ForwarderBarnard {
-    #[init]
-    fn init(&self) {}
-
+#[multiversx_sc::module]
+pub trait ForwarderFallibleModule {
     #[endpoint]
     fn sync_call_fallible(
         &self,
