@@ -9,10 +9,10 @@ publish = false
 path = "src/adder.rs"
 
 [dependencies.multiversx-sc]
-version = "0.59.1"
+version = "0.60.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.1"
+version = "0.60.0"
 features = ["wasmer-experimental"]
 path = "../../../framework/scenario"
