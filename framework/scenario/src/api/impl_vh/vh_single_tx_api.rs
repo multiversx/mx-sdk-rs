@@ -67,7 +67,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         }
     }
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer> {
         self.0.managed_types.lock().unwrap()
     }
 
@@ -87,7 +87,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         panic!("cannot access the random bytes generator in the SingleTxApi")
     }
 
-    fn result_lock(&self) -> MutexGuard<TxResult> {
+    fn result_lock(&self) -> MutexGuard<'_, TxResult> {
         self.0.tx_result_cell.lock().unwrap()
     }
 
@@ -108,7 +108,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         &self.0.block_config
     }
 
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers> {
         panic!("cannot access back transfers in the SingleTxApi")
     }
 

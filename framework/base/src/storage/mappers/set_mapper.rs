@@ -146,11 +146,11 @@ where
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, A, T> {
+    pub fn iter(&self) -> Iter<'_, SA, A, T> {
         self.queue_mapper.iter()
     }
 
-    pub fn iter_from(&self, value: &T) -> Iter<SA, A, T> {
+    pub fn iter_from(&self, value: &T) -> Iter<'_, SA, A, T> {
         let node_id = self.get_node_id(value);
         self.queue_mapper.iter_from_node_id(node_id)
     }
