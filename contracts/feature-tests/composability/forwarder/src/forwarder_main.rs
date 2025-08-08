@@ -15,6 +15,7 @@ pub mod fwd_change_owner;
 pub mod fwd_deploy;
 pub mod fwd_dynamic;
 pub mod fwd_esdt;
+pub mod fwd_fallible;
 pub mod fwd_nft;
 pub mod fwd_roles;
 pub mod fwd_sft;
@@ -35,6 +36,7 @@ pub trait Forwarder:
     + fwd_deploy::DeployContractModule
     + fwd_upgrade::UpgradeContractModule
     + fwd_esdt::ForwarderEsdtModule
+    + fwd_fallible::ForwarderFallibleModule
     + fwd_sft::ForwarderSftModule
     + fwd_nft::ForwarderNftModule
     + fwd_roles::ForwarderRolesModule

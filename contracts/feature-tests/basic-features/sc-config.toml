@@ -3,12 +3,6 @@
 [contracts.basic-features.profile]
 overflow-checks = true # needed for overflow tests
 
-[contracts.barnard]
-name = "basic-features-barnard"
-features = ["barnard"]
-ei = "1.5"
-profile = { overflow-checks = true } # needed for overflow 
-
 [contracts.basic-features-storage-bytes]
 add-unlabelled = false
 add-endpoints = ["init", "load_bytes", "store_bytes"]
@@ -38,5 +32,9 @@ add-endpoints = [
     "verify_bls_aggregated_signature",
     "mm_get",
     "mm_contains",
-    "mm_remove_get"
+    "mm_remove_get",
+    "epoch_info",
+    "code_hash",
+    "get_block_timestamps",
+    "get_esdt_token_data",
 ]

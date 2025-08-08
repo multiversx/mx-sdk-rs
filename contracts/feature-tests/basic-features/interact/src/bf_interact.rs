@@ -1,3 +1,4 @@
+mod bf_interact_barnard;
 mod bf_interact_cli;
 mod bf_interact_config;
 mod bf_interact_state;
@@ -24,7 +25,7 @@ pub async fn basic_features_cli() {
     let mut bf_interact = BasicFeaturesInteract::init(config).await;
 
     let cli = bf_interact_cli::InteractCli::parse();
-    match &cli.command {
+    match cli.command {
         Some(bf_interact_cli::InteractCliCommand::Deploy) => {
             bf_interact.deploy().await;
         }
@@ -43,6 +44,26 @@ pub async fn basic_features_cli() {
                 None => ManagedOption::none(),
             };
             bf_interact.echo_managed_option(mo).await;
+        }
+        Some(bf_interact_cli::InteractCliCommand::EpochInfo) => {
+            bf_interact.epoch_info().await;
+        }
+        Some(bf_interact_cli::InteractCliCommand::BlockTimestamps) => {
+            bf_interact.block_timestamps().await;
+        }
+        Some(bf_interact_cli::InteractCliCommand::CodeHash(args)) => {
+            bf_interact
+                .code_hash(Bech32Address::from_bech32_string(args.address))
+                .await;
+        }
+        Some(bf_interact_cli::InteractCliCommand::TokenData(args)) => {
+            bf_interact
+                .get_esdt_token_data(
+                    Bech32Address::from_bech32_string(args.address),
+                    &args.token_id,
+                    args.nonce,
+                )
+                .await;
         }
         None => {}
     }
