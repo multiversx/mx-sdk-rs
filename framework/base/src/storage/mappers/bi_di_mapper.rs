@@ -127,15 +127,15 @@ where
         self.value_set_mapper.contains(value)
     }
 
-    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<SA, V, A> {
+    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<'_, SA, V, A> {
         self.value_set_mapper.iter()
     }
 
-    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<SA, K, A> {
+    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<'_, SA, K, A> {
         self.id_set_mapper.iter()
     }
 
-    pub fn iter(&self) -> Iter<SA, K, V, A> {
+    pub fn iter(&self) -> Iter<'_, SA, K, V, A> {
         Iter::new(self)
     }
 

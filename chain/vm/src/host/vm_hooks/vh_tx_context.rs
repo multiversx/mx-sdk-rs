@@ -56,7 +56,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
             .expect("error writing to wasmer instance memory");
     }
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer> {
         self.tx_context_ref.m_types_lock()
     }
 
@@ -93,7 +93,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         self.tx_context_ref.rng_lock().next_bytes(length)
     }
 
-    fn result_lock(&self) -> MutexGuard<TxResult> {
+    fn result_lock(&self) -> MutexGuard<'_, TxResult> {
         self.tx_context_ref.result_lock()
     }
 
@@ -117,7 +117,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         &self.tx_context_ref.blockchain_ref().block_config
     }
 
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers> {
         self.tx_context_ref.back_transfers_lock()
     }
 
