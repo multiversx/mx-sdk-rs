@@ -1,8 +1,6 @@
 use std::{fs::File, io::Write};
 
-use multiversx_sc::abi::ContractAbi;
-
-use super::snippet_gen_common::write_newline;
+use super::{snippet_abi_check::ShortContractAbi, snippet_gen_common::write_newline};
 
 pub(crate) fn write_snippet_imports(file: &mut File) {
     writeln!(
@@ -29,7 +27,11 @@ pub(crate) fn write_snippet_constants(file: &mut File) {
     writeln!(file, "const STATE_FILE: &str = \"state.toml\";").unwrap();
 }
 
-pub(crate) fn write_snippet_main_function(file: &mut File, abi: &ContractAbi, crate_name: &str) {
+pub(crate) fn write_snippet_main_function(
+    file: &mut File,
+    abi: &ShortContractAbi,
+    crate_name: &str,
+) {
     writeln!(
         file,
         "
@@ -48,7 +50,7 @@ pub async fn {crate_name}_cli() {{
     // all contracts have a deploy snippet
     writeln!(file, r#"        "deploy" => interact.deploy().await,"#).unwrap();
 
-    for upgrade_endpoint in &abi.upgrade_constructors {
+    for upgrade_endpoint in &abi.upgrade_constructor {
         writeln!(
             file,
             r#"        "{}" => interact.{}().await,"#,
