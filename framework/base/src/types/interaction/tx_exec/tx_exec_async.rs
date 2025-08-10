@@ -143,7 +143,7 @@ where
 
     /// Backwards compatibility only.
     #[deprecated(
-        since = "0.59.2",
+        since = "0.60.0",
         note = "Please use method async_call_and_exit instead."
     )]
     pub fn call_and_exit(self) -> ! {
