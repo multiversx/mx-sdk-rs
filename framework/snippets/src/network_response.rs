@@ -62,9 +62,12 @@ fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
 
     if let Some(out_multi_transfer) = out_multi_transfer {
         log::trace!("Parsing result from multi transfer: {out_multi_transfer:?}");
-        return decode_multi_transfer_data_or_panic(out_multi_transfer.logs.clone())
-            .unwrap_or_default();
-    } else if let Some(out_scr) = out_scr {
+        if let Some(data) = decode_multi_transfer_data_or_panic(out_multi_transfer.logs.clone()) {
+            return data;
+        }
+    }
+
+    if let Some(out_scr) = out_scr {
         log::trace!("Parsing result from scr: {out_scr:?}");
         return decode_scr_data_or_panic(&out_scr.data);
     }
@@ -239,7 +242,7 @@ pub fn decode_scr_data_or_panic(data: &str) -> Vec<Vec<u8>> {
 
 /// Decodes the data of a multi transfer result.
 pub fn decode_multi_transfer_data_or_panic(logs: Option<ApiLogs>) -> Option<Vec<Vec<u8>>> {
-    let logs = logs.expect("missing logs");
+    let logs = logs?;
 
     if let Some(event) = logs
         .events
