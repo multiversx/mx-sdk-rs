@@ -83,7 +83,7 @@ pub fn print_invalid_vm_hook(import_name: &str, ei_version: &str) {
 }
 
 pub fn print_check_ei_ok() {
-    println!("{}", " OK".green(),);
+    print!("{}", " OK".green(),);
 }
 
 pub fn print_ignore_ei_check() {
