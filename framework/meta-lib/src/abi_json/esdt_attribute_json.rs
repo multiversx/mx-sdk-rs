@@ -16,3 +16,19 @@ impl From<&EsdtAttributeAbi> for EsdtAttributeJson {
         }
     }
 }
+
+impl From<&EsdtAttributeJson> for EsdtAttributeAbi {
+    fn from(attr: &EsdtAttributeJson) -> Self {
+        EsdtAttributeAbi {
+            ticker: attr.ticker.to_owned(),
+            ty: attr.ty.clone(),
+            type_descriptions: Default::default(),
+        }
+    }
+}
+
+impl From<EsdtAttributeJson> for EsdtAttributeAbi {
+    fn from(attr: EsdtAttributeJson) -> Self {
+        EsdtAttributeAbi::from(&attr)
+    }
+}
