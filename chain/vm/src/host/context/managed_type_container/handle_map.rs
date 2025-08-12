@@ -47,4 +47,8 @@ impl<V> HandleMap<V> {
     pub fn insert(&mut self, handle: RawHandle, value: V) {
         let _ = self.map.insert(handle, value);
     }
+
+    pub fn remove_handle(&mut self, handle: RawHandle) {
+        let _ = self.map.remove(&handle);
+    }
 }
