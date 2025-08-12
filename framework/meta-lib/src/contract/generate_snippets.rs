@@ -1,3 +1,4 @@
+pub mod snippet_abi_check;
 pub mod snippet_crate_gen;
 pub mod snippet_gen_common;
 pub mod snippet_gen_main;
