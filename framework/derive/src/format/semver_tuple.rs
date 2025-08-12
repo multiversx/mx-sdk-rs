@@ -26,7 +26,7 @@ fn convert_token_tree(token: &proc_macro2::TokenTree) -> proc_macro2::TokenStrea
             quote! {
                 (#major, #minor, #patch)
             }
-        },
+        }
         _ => panic!("Tokentree does not match with the requirements"),
     }
 }

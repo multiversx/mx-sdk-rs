@@ -38,14 +38,14 @@ where
                 // though readonly, the object might have changed via cells,
                 // so it needs to be copied back
                 std::ptr::write(t, obj);
-            },
+            }
             Err(obj_rc) => {
                 // could not unwrap, this means there are still references to obj elsewhere
                 // to avoid memory corruption, we perform a clone of the contents
                 let obj = (*obj_rc).clone();
                 std::ptr::write(t, obj);
                 panic!("failed to recover owned object from Rc")
-            },
+            }
         }
 
         result

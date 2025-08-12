@@ -105,31 +105,31 @@ impl DebuggerBackend {
                     let parent_path = steps_path.parent().unwrap();
                     let new_path = parent_path.join(external_steps_step.path.as_str());
                     self.run_scenario_file(new_path.as_path());
-                },
+                }
                 Step::SetState(set_state_step) => {
                     self.run_set_state_step(set_state_step);
-                },
+                }
                 Step::ScCall(sc_call_step) => {
                     self.run_sc_call_step(sc_call_step);
-                },
+                }
                 Step::ScQuery(sc_query_step) => {
                     self.run_sc_query_step(sc_query_step);
-                },
+                }
                 Step::ScDeploy(sc_deploy_step) => {
                     self.run_sc_deploy_step(sc_deploy_step);
-                },
+                }
                 Step::Transfer(transfer_step) => {
                     self.run_transfer_step(transfer_step);
-                },
+                }
                 Step::ValidatorReward(validator_reward_step) => {
                     self.run_validator_reward_step(validator_reward_step);
-                },
+                }
                 Step::CheckState(check_state_step) => {
                     self.run_check_state_step(check_state_step);
-                },
+                }
                 Step::DumpState(_) => {
                     self.run_dump_state_step();
-                },
+                }
             }
         }
     }

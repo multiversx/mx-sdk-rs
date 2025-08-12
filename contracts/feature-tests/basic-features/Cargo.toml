@@ -12,7 +12,7 @@ path = "src/basic_features_main.rs"
 barnard = ["multiversx-sc/barnard"]
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.60.0"
 path = "../../../framework/base"
 
 [dependencies.serde]
@@ -25,12 +25,12 @@ version = "1.0"
 default-features = false
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.0"
+version = "0.60.0"
 features = ["wasmer-experimental"]
 path = "../../../framework/scenario"
 
 [dependencies.multiversx-sc-modules]
-version = "0.59.0"
+version = "0.60.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.esdt-system-sc-mock]

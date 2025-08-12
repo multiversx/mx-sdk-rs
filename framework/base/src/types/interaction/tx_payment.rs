@@ -70,10 +70,7 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        let result = self.perform_transfer_execute_fallible(env, to, gas_limit, fc);
-        transfer_execute_failed_error::<Env::Api>(result);
-    }
+    );
 
     /// Converts an ESDT call to a built-in function call, if necessary.
     fn with_normalized<From, To, F, R>(
@@ -160,6 +157,7 @@ where
     }
 }
 
+#[allow(unused)]
 pub(crate) fn transfer_execute_failed_error<Api: CallTypeApi>(
     result: Result<(), TransferExecuteFailed>,
 ) {

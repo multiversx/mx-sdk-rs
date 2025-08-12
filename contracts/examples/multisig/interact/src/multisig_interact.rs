@@ -25,52 +25,52 @@ async fn main() {
     match &cli.command {
         Some(multisig_interact_cli::InteractCliCommand::Board) => {
             multisig_interact.print_board().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
             multisig_interact.deploy().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::DnsRegister(args)) => {
             multisig_interact.dns_register(&args.name).await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::Feed) => {
             multisig_interact.feed_contract_egld().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
             multisig_interact.multi_deploy(&args.count).await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::NftFullAllRoles) => {
             multisig_interact
                 .issue_multisig_and_collection_with_all_roles_full()
                 .await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::NftFull) => {
             multisig_interact.issue_multisig_and_collection_full().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::NftIssueAllRoles) => {
             multisig_interact.issue_collection_with_all_roles().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::NftIssue) => {
             multisig_interact.issue_collection().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::NftItems) => {
             multisig_interact.create_items().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::NftSpecial) => {
             multisig_interact.set_special_role().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
             multisig_interact.print_quorum().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::UnwrapEgld) => {
             multisig_interact.unwrap_egld().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::WEgldSwapFull) => {
             multisig_interact.wegld_swap_full().await;
-        },
+        }
         Some(multisig_interact_cli::InteractCliCommand::WrapEgld) => {
             multisig_interact.wrap_egld().await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 

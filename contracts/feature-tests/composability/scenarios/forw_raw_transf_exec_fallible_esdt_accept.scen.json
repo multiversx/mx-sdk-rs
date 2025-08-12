@@ -13,7 +13,7 @@
                     "esdt": {
                         "str:FWD-TOKEN": "1000"
                     },
-                    "code": "mxsc:../forwarder-barnard/output/forwarder-barnard.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:vault": {
                     "nonce": "0",

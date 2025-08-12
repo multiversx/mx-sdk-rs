@@ -109,7 +109,7 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
             ManagedAsyncCallResult::Ok(()) => {
                 self.last_issued_token().set(token_identifier.unwrap_esdt());
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
@@ -117,7 +117,7 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 

@@ -23,10 +23,27 @@ where
         match self {
             EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
                 Egld(egld_amount).perform_transfer_execute_fallible(env, to, gas_limit, fc)
-            },
+            }
             EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
                 multi_esdt_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
-            },
+            }
+        }
+    }
+
+    fn perform_transfer_execute_legacy(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        match self {
+            EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
+                Egld(egld_amount).perform_transfer_execute_legacy(env, to, gas_limit, fc)
+            }
+            EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
+                multi_esdt_payment.perform_transfer_execute_legacy(env, to, gas_limit, fc)
+            }
         }
     }
 
@@ -46,10 +63,10 @@ where
         match self {
             EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
                 Egld(egld_amount).with_normalized(env, from, to, fc, f)
-            },
+            }
             EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
                 multi_esdt_payment.with_normalized(env, from, to, fc, f)
-            },
+            }
         }
     }
 
@@ -57,10 +74,10 @@ where
         match self {
             EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
                 Egld(egld_amount).into_full_payment_data(env)
-            },
+            }
             EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
                 multi_esdt_payment.into_full_payment_data(env)
-            },
+            }
         }
     }
 }

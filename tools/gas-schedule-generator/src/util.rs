@@ -11,6 +11,6 @@ pub(crate) fn get_file_path() -> PathBuf {
             std::fs::create_dir_all(output_dir).unwrap();
 
             output_dir.join(SECTIONS_FILE_NAME)
-        },
+        }
     }
 }

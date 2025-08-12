@@ -24,8 +24,8 @@ impl CheckEsdtInstances {
                         return true;
                     }
                 }
-            },
-            CheckEsdtInstances::Star => {},
+            }
+            CheckEsdtInstances::Star => {}
         }
         false
     }
@@ -56,7 +56,7 @@ impl IntoRaw<CheckEsdtInstancesRaw> for CheckEsdtInstances {
         match self {
             CheckEsdtInstances::Equal(eq) => {
                 CheckEsdtInstancesRaw::Equal(eq.into_iter().map(|cei| cei.into_raw()).collect())
-            },
+            }
             CheckEsdtInstances::Star => CheckEsdtInstancesRaw::Star,
         }
     }

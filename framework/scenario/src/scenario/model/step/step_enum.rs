@@ -37,7 +37,7 @@ impl InterpretableFrom<StepRaw> for Step {
         match from {
             StepRaw::ExternalSteps { comment, path } => {
                 Step::ExternalSteps(ExternalStepsStep { comment, path })
-            },
+            }
             StepRaw::SetState {
                 comment,
                 accounts,
@@ -72,6 +72,8 @@ impl InterpretableFrom<StepRaw> for Step {
                 current_block_info: Box::new(
                     current_block_info.map(|v| BlockInfo::interpret_from(v, context)),
                 ),
+                epoch_start_block_info: Box::new(None), // not implemented in Mandos
+                block_round_time_ms: None,              // not implemented in Mandos
             }),
             StepRaw::ScCall {
                 id,

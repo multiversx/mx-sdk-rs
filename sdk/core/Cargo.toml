@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk"
-version = "0.11.0"
+version = "0.11.2"
 edition = "2021"
 
 authors = [
@@ -17,7 +17,7 @@ keywords = ["multiversx", "blockchain", "sdk", "api"]
 
 [dependencies]
 serde = { version = "1.0.130", features = ["derive"] }
-serde_json = { version = "1.0.68", features = ["preserve_order"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
 serde_repr = "0.1.8"
 anyhow = "1.0"
 rand = "0.8.5"
@@ -38,6 +38,6 @@ ctr = "0.9.2"
 uuid = {version = "1.10.0", features = ["v4"]}
 
 [dependencies.multiversx-chain-core]
-version = "=0.16.0"
+version = "=0.17.0"
 features = ["std"]
 path = "../../chain/core"

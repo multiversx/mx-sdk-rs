@@ -8,6 +8,8 @@ use multiversx_sdk::gateway::{
 
 use crate::InteractorBase;
 
+pub const ALL_ACTIVATIONS_EPOCH: u64 = 2;
+
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
@@ -52,6 +54,14 @@ where
                 epoch_number,
             ))
             .await
+    }
+
+    /// Convenience method to wait enough blocks until all relevant activations are processed.
+    pub async fn generate_blocks_until_all_activations(&self) {
+        let _ = self
+            .generate_blocks_until_epoch(ALL_ACTIVATIONS_EPOCH)
+            .await
+            .expect("Failed to generate blocks until all activations");
     }
 
     pub async fn generate_blocks_until_tx_processed(&self, tx_hash: &str) -> Result<String, Error> {

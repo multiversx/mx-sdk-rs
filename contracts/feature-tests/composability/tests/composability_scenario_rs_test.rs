@@ -17,10 +17,6 @@ fn world() -> ScenarioWorld {
         forwarder::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:forwarder-barnard/output/forwarder-barnard.mxsc.json",
-        forwarder_barnard::ContractBuilder,
-    );
-    blockchain.register_contract(
         "mxsc:forwarder-raw/output/forwarder-raw.mxsc.json",
         forwarder_raw::ContractBuilder,
     );

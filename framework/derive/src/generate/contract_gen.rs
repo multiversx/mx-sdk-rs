@@ -32,7 +32,7 @@ pub fn generate_call_methods(contract_trait: &ContractTrait) -> Vec<proc_macro2:
             PublicRole::Endpoint(_endpoint_metadata) => Some(generate_call_method(m)),
             PublicRole::CallbackPromise(_callback_metadata) => {
                 Some(generate_promises_callback_call_method(m))
-            },
+            }
             _ => None,
         })
         .collect()

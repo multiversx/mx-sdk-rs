@@ -92,7 +92,7 @@ fn setup() -> ScenarioWorld {
 }
 
 #[test]
-fn test_init() {
+fn whitebox_init() {
     setup();
 }
 
@@ -176,7 +176,7 @@ fn call_propose(
 }
 
 #[test]
-fn test_add_board_member() {
+fn whitebox_add_board_member() {
     let mut world = setup();
 
     const NEW_BOARD_MEMBER_ADDRESS: TestAddress = TestAddress::new("new-board-member");
@@ -226,7 +226,7 @@ fn test_add_board_member() {
 }
 
 #[test]
-fn test_add_proposer() {
+fn whitebox_add_proposer() {
     let mut world = setup();
 
     const NEW_PROPOSER_ADDRESS: TestAddress = TestAddress::new("new-proposer");
@@ -276,7 +276,7 @@ fn test_add_proposer() {
 }
 
 #[test]
-fn test_remove_proposer() {
+fn whitebox_remove_proposer() {
     let mut world = setup();
 
     world
@@ -322,7 +322,7 @@ fn test_remove_proposer() {
 }
 
 #[test]
-fn test_try_remove_all_board_members() {
+fn whitebox_try_remove_all_board_members() {
     let mut world = setup();
 
     let action_id = call_propose(
@@ -348,7 +348,7 @@ fn test_try_remove_all_board_members() {
 }
 
 #[test]
-fn test_change_quorum() {
+fn whitebox_change_quorum() {
     let mut world = setup();
 
     let new_quorum_size = 2;
@@ -448,7 +448,7 @@ fn test_change_quorum() {
 }
 
 #[test]
-fn test_transfer_execute_to_user() {
+fn whitebox_transfer_execute_to_user() {
     let mut world = setup();
 
     const NEW_USER_ADDRESS: TestAddress = TestAddress::new("new-user");
@@ -540,7 +540,7 @@ fn deploy_factorial_contract(world: &mut ScenarioWorld) {
 }
 
 #[test]
-fn test_transfer_execute_sc_all() {
+fn whitebox_transfer_execute_sc_all() {
     let mut world = setup();
 
     world.account(ADDER_OWNER_ADDRESS).nonce(1);
@@ -576,7 +576,7 @@ fn test_transfer_execute_sc_all() {
 }
 
 #[test]
-fn test_async_call_to_sc() {
+fn whitebox_async_call_to_sc() {
     let mut world = setup();
 
     world.account(ADDER_OWNER_ADDRESS).nonce(1);
@@ -612,7 +612,7 @@ fn test_async_call_to_sc() {
 }
 
 #[test]
-fn test_deploy_and_upgrade_from_source() {
+fn whitebox_deploy_and_upgrade_from_source() {
     let mut world = setup();
 
     world.new_address(MULTISIG_ADDRESS, 0, NEW_ADDER_ADDRESS);

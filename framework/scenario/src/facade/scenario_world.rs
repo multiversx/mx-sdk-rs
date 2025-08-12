@@ -77,10 +77,10 @@ impl ScenarioWorld {
         match self.backend {
             Backend::Debugger(mut debugger) => {
                 debugger.run_scenario_file(&absolute_path);
-            },
+            }
             Backend::VmGoBackend => {
                 run_mx_scenario_go(&absolute_path);
-            },
+            }
         }
     }
 
