@@ -18,11 +18,6 @@ use crate::{
         StaticBufferRef,
     },
 };
-use core::fmt;
-use serde::{
-    de::{self, Deserializer, Visitor},
-    ser::Serializer,
-};
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
@@ -578,33 +573,5 @@ impl<M: ManagedTypeApi> core::fmt::Display for ManagedBuffer<M> {
             .unwrap_or_else(|err| ErrorHelper::<M>::signal_error_with_message(err.as_bytes()));
 
         s.fmt(f)
-    }
-}
-
-impl<M: ManagedTypeApi> serde::Serialize for ManagedBuffer<M> {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        let bytes = self.to_boxed_bytes();
-        serializer.serialize_bytes(bytes.as_slice())
-    }
-}
-
-struct ManagedBufferVisitor<M: ManagedTypeApi>(core::marker::PhantomData<M>);
-
-impl<'de, M: ManagedTypeApi> Visitor<'de> for ManagedBufferVisitor<M> {
-    type Value = ManagedBuffer<M>;
-
-    fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str("a UTF-8 string")
-    }
-
-    fn visit_bytes<E: de::Error>(self, v: &[u8]) -> Result<Self::Value, E> {
-        let buf = ManagedBuffer::new_from_bytes(v);
-        Ok(buf)
-    }
-}
-
-impl<'de, M: ManagedTypeApi> serde::Deserialize<'de> for ManagedBuffer<M> {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        deserializer.deserialize_bytes(ManagedBufferVisitor(core::marker::PhantomData))
     }
 }

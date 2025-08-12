@@ -16,15 +16,10 @@ use alloc::{format, vec::Vec};
 use core::{
     borrow::Borrow,
     cmp::Ordering,
-    fmt::{self, Debug},
+    fmt::Debug,
     iter::FromIterator,
     marker::PhantomData,
     mem::{transmute_copy, ManuallyDrop, MaybeUninit},
-};
-use serde::{
-    de::{SeqAccess, Visitor},
-    ser::SerializeSeq,
-    Deserialize, Deserializer, Serialize, Serializer,
 };
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
@@ -826,69 +821,5 @@ where
         for elem in iter {
             self.push(elem);
         }
-    }
-}
-struct ManagedVecVisitor<M, T> {
-    _phantom: PhantomData<(M, T)>,
-}
-
-impl<'de, M, T> Visitor<'de> for ManagedVecVisitor<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + Deserialize<'de>,
-{
-    type Value = ManagedVec<M, T>;
-
-    fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "a sequence that can be deserialized into ManagedVec")
-    }
-
-    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-    where
-        A: SeqAccess<'de>,
-    {
-        let mut vec = ManagedVec::<M, T>::new();
-
-        while let Some(item) = seq.next_element::<T>()? {
-            vec.push(item);
-        }
-
-        Ok(vec)
-    }
-}
-
-impl<M, T> Serialize for ManagedVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + Serialize,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let len = self.len();
-        let mut seq = serializer.serialize_seq(Some(len))?;
-
-        for i in 0..len {
-            let item_ref = self.get(i);
-            seq.serialize_element(item_ref.borrow())?;
-        }
-
-        seq.end()
-    }
-}
-
-impl<'de, M, T> Deserialize<'de> for ManagedVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + Deserialize<'de>,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        deserializer.deserialize_seq(ManagedVecVisitor {
-            _phantom: PhantomData,
-        })
     }
 }
