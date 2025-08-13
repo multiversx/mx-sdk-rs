@@ -9,6 +9,7 @@ use crate::{
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
         TryStaticCast,
     },
+    err_msg,
     formatter::{
         hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay,
         SCLowerHex,
@@ -116,7 +117,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         M: ManagedTypeApi,
     {
         StaticBufferRef::try_new_from_copy_bytes(self.len(), |dest_slice| {
-            let _ = self.load_slice(0, dest_slice);
+            self.load_slice(0, dest_slice);
         })
         .unwrap_or_else(|| {
             M::error_api_impl().signal_error(b"static cache too small or already in use")
@@ -257,12 +258,15 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
     #[inline]
-    pub fn load_slice(
-        &self,
-        starting_position: usize,
-        dest_slice: &mut [u8],
-    ) -> Result<(), InvalidSliceError> {
-        M::managed_type_impl().mb_load_slice(self.handle.clone(), starting_position, dest_slice)
+    pub fn load_slice(&self, starting_position: usize, dest_slice: &mut [u8]) {
+        let result = M::managed_type_impl().mb_load_slice(
+            self.handle.clone(),
+            starting_position,
+            dest_slice,
+        );
+        if result.is_err() {
+            M::error_api_impl().signal_error(err_msg::BAD_MB_SLICE.as_bytes());
+        }
     }
 
     pub fn copy_slice(
@@ -291,7 +295,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             M::error_api_impl().signal_error(&b"failed to load to byte array"[..]);
         }
         let byte_slice = &mut array[..len];
-        let _ = self.load_slice(0, byte_slice);
+        self.load_slice(0, byte_slice);
         byte_slice
     }
 
@@ -304,7 +308,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             let bytes_remaining = arg_len - current_arg_index;
             let bytes_to_load = core::cmp::min(bytes_remaining, BATCH_SIZE);
             let loaded_slice = &mut buffer[0..bytes_to_load];
-            let _ = self.load_slice(current_arg_index, loaded_slice);
+            self.load_slice(current_arg_index, loaded_slice);
             f(loaded_slice);
             current_arg_index += BATCH_SIZE;
         }
