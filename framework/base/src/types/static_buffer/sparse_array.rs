@@ -116,7 +116,7 @@ where
         }
     }
 
-    pub fn iter(&self) -> SparseArrayIterator<E, CAPACITY> {
+    pub fn iter(&self) -> SparseArrayIterator<'_, E, CAPACITY> {
         SparseArrayIterator::new(self)
     }
 }

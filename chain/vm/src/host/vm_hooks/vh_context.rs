@@ -27,7 +27,7 @@ pub trait VMHooksContext: Debug {
     /// The offset and the length must point to valid instance memory.
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]);
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer>;
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer>;
 
     fn gas_schedule(&self) -> &GasSchedule;
 
@@ -46,7 +46,7 @@ pub trait VMHooksContext: Debug {
     /// Random number generator, based on the blockchain randomness source.
     fn random_next_bytes(&self, length: usize) -> Vec<u8>;
 
-    fn result_lock(&self) -> MutexGuard<TxResult>;
+    fn result_lock(&self) -> MutexGuard<'_, TxResult>;
 
     fn push_tx_log(&self, tx_log: TxLog) {
         self.result_lock().result_logs.push(tx_log);
@@ -62,7 +62,7 @@ pub trait VMHooksContext: Debug {
 
     fn get_block_config(&self) -> &BlockConfig;
 
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers>;
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers>;
 
     /// For ownership reasons, needs to return a clone.
     ///

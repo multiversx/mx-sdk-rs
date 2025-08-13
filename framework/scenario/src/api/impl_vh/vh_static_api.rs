@@ -39,7 +39,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         }
     }
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer> {
         self.0.lock().unwrap()
     }
 
@@ -63,7 +63,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot access the random bytes generator in the StaticApi")
     }
 
-    fn result_lock(&self) -> MutexGuard<TxResult> {
+    fn result_lock(&self) -> MutexGuard<'_, TxResult> {
         panic!("cannot access tx results in the StaticApi")
     }
 
@@ -83,7 +83,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot access the block info in the StaticApi")
     }
 
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers> {
         panic!("cannot access the back transfers in the StaticApi")
     }
 

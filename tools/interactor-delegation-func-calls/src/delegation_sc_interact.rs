@@ -142,7 +142,7 @@ impl DelegateCallsInteract {
         let delegator2 = interactor.register_wallet(test_wallets::dan()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,

@@ -1,9 +1,0 @@
-[contracts.main]
-name = "barnard-features"
-ei = "1.5"
-
-[[proxy]]
-path = "interactor/src/barnard_features_proxy.rs"
-
-[[proxy]]
-path = "src/barnard_features_proxy.rs"

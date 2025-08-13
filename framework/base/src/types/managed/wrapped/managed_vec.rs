@@ -220,7 +220,7 @@ where
         }
     }
 
-    pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<M, T> {
+    pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<'_, M, T> {
         ManagedVecRefMut::new(self.get_handle(), index)
     }
 
@@ -341,7 +341,7 @@ where
         result
     }
 
-    pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
+    pub fn iter(&self) -> ManagedVecRefIterator<'_, M, T> {
         ManagedVecRefIterator::new(self)
     }
 

@@ -35,6 +35,37 @@ where
         )
     }
 
+    fn perform_transfer_execute_legacy(
+        self,
+        _env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        if self.token_nonce == 0 {
+            // fungible ESDT
+            SendRawWrapper::<Env::Api>::new().transfer_esdt_execute(
+                to,
+                self.token_identifier,
+                self.amount,
+                gas_limit,
+                &fc.function_name,
+                &fc.arg_buffer,
+            );
+        } else {
+            // non-fungible/semi-fungible ESDT
+            SendRawWrapper::<Env::Api>::new().transfer_esdt_nft_execute(
+                to,
+                self.token_identifier,
+                self.token_nonce,
+                self.amount,
+                gas_limit,
+                &fc.function_name,
+                &fc.arg_buffer,
+            );
+        }
+    }
+
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,

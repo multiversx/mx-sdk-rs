@@ -63,6 +63,17 @@ fn block_info_rs() {
 }
 
 #[test]
+fn block_info_ms_rs() {
+    world().run("scenarios/block_info_ms.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn code_hash_rs() {
+    world().run("scenarios/code_hash.scen.json");
+}
+
+#[test]
 fn codec_err_rs() {
     world().run("scenarios/codec_err.scen.json");
 }

@@ -4,10 +4,10 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:barnard-features": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/barnard-features.mxsc.json"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -34,7 +34,7 @@
             "id": "get_prev_block_timestamp_ms",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:barnard-features",
+                "to": "sc:basic-features",
                 "function": "get_prev_block_timestamp_ms",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -55,7 +55,7 @@
             "id": "get_block_timestamp_ms",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:barnard-features",
+                "to": "sc:basic-features",
                 "function": "get_block_timestamp_ms",
                 "arguments": [],
                 "gasLimit": "50,000,000",

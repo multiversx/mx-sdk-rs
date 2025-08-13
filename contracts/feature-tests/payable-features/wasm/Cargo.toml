@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "payable-features-barnard-wasm"
+name = "payable-features-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -26,10 +26,9 @@ panic = "abort"
 
 [dependencies.payable-features]
 path = ".."
-features = ["barnard"]
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.59.1"
+version = "0.60.0"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]
