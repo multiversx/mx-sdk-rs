@@ -274,6 +274,18 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         slice_len: usize,
     ) -> Option<ManagedBuffer<M>> {
+        let mb_len = self.len();
+        if starting_position > mb_len || starting_position + slice_len > mb_len {
+            return None;
+        }
+        self.copy_slice_unchecked(starting_position, slice_len)
+    }
+
+    fn copy_slice_unchecked(
+        &self,
+        starting_position: usize,
+        slice_len: usize,
+    ) -> Option<ManagedBuffer<M>> {
         let api = M::managed_type_impl();
         let result_handle = api.mb_new_empty();
         let err_result = api.mb_copy_slice(
