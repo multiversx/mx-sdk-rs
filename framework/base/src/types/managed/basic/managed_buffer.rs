@@ -256,8 +256,6 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         self.to_boxed_bytes().into_vec()
     }
 
-    /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
-    #[inline]
     pub fn load_slice(&self, starting_position: usize, dest_slice: &mut [u8]) {
         let result = M::managed_type_impl().mb_load_slice(
             self.handle.clone(),
