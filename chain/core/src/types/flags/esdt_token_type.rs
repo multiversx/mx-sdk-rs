@@ -38,6 +38,18 @@ impl EsdtTokenType {
             EsdtTokenType::Invalid => 255,
         }
     }
+
+    pub fn collection_from_string(token_type: String) -> Self {
+        match token_type.as_str() {
+            "NonFungibleESDT" => EsdtTokenType::NonFungibleV2,
+            "SemiFungibleESDT" => EsdtTokenType::SemiFungible,
+            "MetaESDT" => EsdtTokenType::MetaFungible,
+            "DynamicNonFungibleESDT" => EsdtTokenType::DynamicNFT,
+            "DynamicSemiFungibleESDT" => EsdtTokenType::DynamicSFT,
+            "DynamicMetaESDT" => EsdtTokenType::DynamicMeta,
+            _ => EsdtTokenType::Invalid,
+        }
+    }
 }
 
 impl From<u8> for EsdtTokenType {
