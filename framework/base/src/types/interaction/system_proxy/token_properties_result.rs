@@ -101,7 +101,7 @@ impl TopDecodeMulti for TokenPropertiesResult {
 
         token_properties.token_name = String::multi_decode_or_handle_err(input, h)?;
         let token_type = String::multi_decode_or_handle_err(input, h)?;
-        token_properties.token_type = EsdtTokenType::collection_from_string(token_type);
+        token_properties.token_type = EsdtTokenType::collection_from_string(token_type.as_str());
         token_properties.owner_address = Address::multi_decode_or_handle_err(input, h)?;
         while input.has_next() {
             let value = input.next_value_input(h)?;

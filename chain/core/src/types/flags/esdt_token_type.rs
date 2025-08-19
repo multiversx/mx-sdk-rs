@@ -39,8 +39,8 @@ impl EsdtTokenType {
         }
     }
 
-    pub fn collection_from_string(token_type: String) -> Self {
-        match token_type.as_str() {
+    pub fn collection_from_string(token_type: &str) -> Self {
+        match token_type {
             "NonFungibleESDT" => EsdtTokenType::NonFungibleV2,
             "SemiFungibleESDT" => EsdtTokenType::SemiFungible,
             "MetaESDT" => EsdtTokenType::MetaFungible,
