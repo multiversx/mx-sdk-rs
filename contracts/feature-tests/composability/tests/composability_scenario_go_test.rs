@@ -95,6 +95,7 @@ fn forw_raw_init_sync_accept_egld_go() {
 }
 
 #[test]
+#[ignore = "log being changed (after supernova)"]
 fn forw_raw_init_sync_echo_go() {
     world().run("scenarios/forw_raw_init_sync_echo.scen.json");
 }

@@ -16,11 +16,11 @@ path = "src/interact.rs"
 path = "../forwarder"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.59.0"
+version = "0.60.0"
 path = "../../../../framework/snippets"
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.60.0"
 path = "../../../../framework/base"
 
 [dependencies]

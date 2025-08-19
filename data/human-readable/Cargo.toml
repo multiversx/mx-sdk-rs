@@ -18,5 +18,5 @@ categories = ["cryptography::cryptocurrencies", "development-tools"]
 serde_json = { version = "1.0.68" }
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.59.0"
+version = "=0.60.0"
 path = "../../framework/scenario"

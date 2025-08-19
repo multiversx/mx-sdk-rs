@@ -13,10 +13,10 @@ path = "src/lib.rs"
 path = "../erc1155"
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.60.0"
 path = "../../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.0"
+version = "0.60.0"
 path = "../../../../framework/scenario"

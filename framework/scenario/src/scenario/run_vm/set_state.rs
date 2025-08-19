@@ -88,10 +88,16 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
         state.put_new_token_identifier(new_token_identifier)
     }
     if let Some(block_info_obj) = &*set_state_step.previous_block_info {
-        update_block_info(&mut state.previous_block_info, block_info_obj);
+        update_block_info(&mut state.block_config.previous_block_info, block_info_obj);
     }
     if let Some(block_info_obj) = &*set_state_step.current_block_info {
-        update_block_info(&mut state.current_block_info, block_info_obj);
+        update_block_info(&mut state.block_config.current_block_info, block_info_obj);
+    }
+    if let Some(block_info_obj) = &*set_state_step.epoch_start_block_info {
+        update_block_info(
+            &mut state.block_config.epoch_start_block_info,
+            block_info_obj,
+        );
     }
 }
 
@@ -181,7 +187,10 @@ fn update_block_info(
     scenario_block_info: &crate::scenario::model::BlockInfo,
 ) {
     if let Some(u64_value) = &scenario_block_info.block_timestamp {
-        block_info.block_timestamp = u64_value.value;
+        block_info.block_timestamp_ms = u64_value.value * 1000;
+    }
+    if let Some(u64_value) = &scenario_block_info.block_timestamp_ms {
+        block_info.block_timestamp_ms = u64_value.value;
     }
     if let Some(u64_value) = &scenario_block_info.block_nonce {
         block_info.block_nonce = u64_value.value;

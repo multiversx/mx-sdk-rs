@@ -15,6 +15,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
+name = "bech32"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d965446196e3b7decd44aa7ee49e31d630118f90ef12f97900f262eb915c951d"
+
+[[package]]
 name = "bitflags"
 version = "2.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -49,15 +55,18 @@ checksum = "bcaaec4551594c969335c98c903c1397853d4198408ea609190f420500f6be71"
 
 [[package]]
 name = "multiversx-chain-core"
-version = "0.16.0"
+version = "0.17.0"
 dependencies = [
+ "bech32",
  "bitflags",
+ "hex",
  "multiversx-sc-codec",
+ "serde",
 ]
 
 [[package]]
 name = "multiversx-sc"
-version = "0.59.0"
+version = "0.60.0"
 dependencies = [
  "bitflags",
  "generic-array",
@@ -71,7 +80,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.23.0"
+version = "0.23.1"
 dependencies = [
  "arrayvec",
  "bitflags",
@@ -81,7 +90,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.23.0"
+version = "0.23.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -91,7 +100,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.59.0"
+version = "0.60.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -102,7 +111,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.59.0"
+version = "0.60.0"
 dependencies = [
  "multiversx-sc",
 ]
@@ -151,6 +160,26 @@ checksum = "c069c179fcdc6a2fe24d8d18305cf085fdbd4f922c041943e203685d6a1c58fd"
 dependencies = [
  "endian-type",
  "nibble_vec",
+]
+
+[[package]]
+name = "serde"
+version = "1.0.219"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.219"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b0276cf7f2c73365f7157c8123c21cd9a50fbbd844757af28ca1f5925fc2a00"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

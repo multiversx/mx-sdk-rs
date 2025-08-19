@@ -25,6 +25,17 @@ where
     }
 
     #[inline]
+    fn perform_transfer_execute_legacy(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        EsdtTokenPayment::from(self).perform_transfer_execute_legacy(env, to, gas_limit, fc)
+    }
+
+    #[inline]
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,

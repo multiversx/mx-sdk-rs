@@ -246,7 +246,7 @@ impl MultisigTestState {
 }
 
 #[test]
-fn test_add_board_member() {
+fn blackbox_add_board_member() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -277,7 +277,7 @@ fn test_add_board_member() {
 }
 
 #[test]
-fn test_add_proposer() {
+fn blackbox_add_proposer() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -311,7 +311,7 @@ fn test_add_proposer() {
 }
 
 #[test]
-fn test_remove_proposer() {
+fn blackbox_remove_proposer() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -333,7 +333,7 @@ fn test_remove_proposer() {
 }
 
 #[test]
-fn test_try_remove_all_board_members() {
+fn blackbox_try_remove_all_board_members() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -343,7 +343,7 @@ fn test_try_remove_all_board_members() {
 }
 
 #[test]
-fn test_change_quorum() {
+fn blackbox_change_quorum() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -413,7 +413,7 @@ fn test_change_quorum() {
 }
 
 #[test]
-fn test_transfer_execute_to_user() {
+fn blackbox_transfer_execute_to_user() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -465,7 +465,7 @@ fn test_transfer_execute_to_user() {
 }
 
 #[test]
-fn test_transfer_execute_sc_all() {
+fn blackbox_transfer_execute_sc_all() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
@@ -491,7 +491,7 @@ fn test_transfer_execute_sc_all() {
 }
 
 #[test]
-fn test_async_call_to_sc() {
+fn blackbox_async_call_to_sc() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
@@ -517,7 +517,7 @@ fn test_async_call_to_sc() {
 }
 
 #[test]
-fn test_deploy_and_upgrade_from_source() {
+fn blackbox_deploy_and_upgrade_from_source() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 

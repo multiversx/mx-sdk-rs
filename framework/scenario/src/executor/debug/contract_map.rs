@@ -58,7 +58,7 @@ impl ContractMapRef {
         ContractMapRef(Arc::new(Mutex::new(ContractMap::new())))
     }
 
-    pub fn lock(&self) -> MutexGuard<ContractMap> {
+    pub fn lock(&self) -> MutexGuard<'_, ContractMap> {
         self.0.lock().unwrap()
     }
 }

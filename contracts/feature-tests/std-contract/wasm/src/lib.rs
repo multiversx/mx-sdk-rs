@@ -11,7 +11,7 @@
 // Total number of exported functions:   3
 
 multiversx_sc_wasm_adapter::allocator!();
-
+multiversx_sc_wasm_adapter::panic_handler_std!();
 
 multiversx_sc_wasm_adapter::endpoints! {
     std_contract
