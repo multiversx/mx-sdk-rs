@@ -70,6 +70,7 @@ fn count_ones_go() {
 }
 
 #[test]
+#[ignore = "some hooks are being disabled (after-supernova)"]
 fn crypto_elliptic_curves_go() {
     world().run("scenarios/crypto_elliptic_curves.scen.json");
 }

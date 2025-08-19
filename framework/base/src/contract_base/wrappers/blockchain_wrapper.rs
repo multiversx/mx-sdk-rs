@@ -432,9 +432,7 @@ where
             managed_api_impl.mb_overwrite(creator_handle.clone(), &[0u8; 32][..]);
         }
 
-        // here we trust Arwen that it always gives us a properties buffer of length 2
-        let mut properties_bytes = [0u8; 2];
-        let _ = managed_api_impl.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
+        let properties_bytes = load_properties::<A>(properties_handle);
         let frozen = esdt_is_frozen(&properties_bytes);
 
         unsafe {
@@ -605,6 +603,15 @@ where
         // Empty response means no address has transferRole for the token
         !result.is_empty()
     }
+}
+
+fn load_properties<A: ManagedTypeApi>(properties_handle: A::ManagedBufferHandle) -> [u8; 2] {
+    let mut properties_bytes = [0u8; 2];
+    if A::managed_type_impl().mb_len(properties_handle.clone()) == 2 {
+        let _ =
+            A::managed_type_impl().mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
+    }
+    properties_bytes
 }
 
 fn esdt_is_frozen(properties_bytes: &[u8; 2]) -> bool {

@@ -17,6 +17,7 @@ build_and_copy() {
    cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
    rm $vm_contract_path/output/*.wasm
+   rm $vm_contract_path/output/*-dbg.mxsc.json
 }
 
 build_and_copy_with_scenarios() {
@@ -30,6 +31,7 @@ build_and_copy_with_scenarios() {
    cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
    rm $vm_contract_path/output/*.wasm
+   rm $vm_contract_path/output/*-dbg.mxsc.json
 
    # copying scenarios ...
    rsync -av \
