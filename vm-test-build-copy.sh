@@ -37,6 +37,7 @@ build_and_copy_with_scenarios() {
    rsync -av \
       $contract_path/scenarios/ \
       $vm_contract_path/scenarios/
+   rm $vm_contract_path/scenarios/should-panic*.scen.json # these are Rust testing framework tests
 }
 
 # building all contracts takes a lot of time, only the ones for the wasm-vm tests are built below
