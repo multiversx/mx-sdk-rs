@@ -709,19 +709,19 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     }
 
     fn get_block_round_time_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        panic!("Unavailable: get_block_round_time_ms")
+        self.handler.get_block_round_time_ms()
     }
 
     fn epoch_start_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        panic!("Unavailable: epoch_start_block_timestamp")
+        self.handler.get_epoch_start_block_timestamp_ms()
     }
 
     fn epoch_start_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        panic!("Unavailable: epoch_start_block_nonce")
+        self.handler.get_epoch_start_block_nonce()
     }
 
     fn epoch_start_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        panic!("Unavailable: epoch_start_block_round")
+        self.handler.get_epoch_start_block_round()
     }
 
     fn managed_get_return_data(

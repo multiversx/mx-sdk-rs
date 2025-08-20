@@ -146,7 +146,7 @@ impl AccountEsdt {
             .attributes = new_attribute_bytes;
     }
 
-    pub fn iter(&self) -> Iter<Vec<u8>, EsdtData> {
+    pub fn iter(&self) -> Iter<'_, Vec<u8>, EsdtData> {
         self.0.iter()
     }
 

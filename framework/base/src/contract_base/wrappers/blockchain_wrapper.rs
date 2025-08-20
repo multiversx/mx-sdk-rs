@@ -158,7 +158,6 @@ where
         CodeMetadata::from(buffer)
     }
 
-    #[cfg(feature = "barnard")]
     pub fn get_code_hash(&self, address: &ManagedAddress<A>) -> ManagedBuffer<A> {
         unsafe {
             let result = ManagedBuffer::new_uninit();
@@ -230,7 +229,6 @@ where
     }
 
     /// Block timestamp, in milliseconds.
-    #[cfg(feature = "barnard")]
     #[inline]
     pub fn get_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp_ms()
@@ -251,25 +249,21 @@ where
         A::blockchain_api_impl().get_block_epoch()
     }
 
-    #[cfg(feature = "barnard")]
     #[inline]
     pub fn get_block_round_time_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_round_time_ms()
     }
 
-    #[cfg(feature = "barnard")]
     #[inline]
     pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_timestamp_ms()
     }
 
-    #[cfg(feature = "barnard")]
     #[inline]
     pub fn epoch_start_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_nonce()
     }
 
-    #[cfg(feature = "barnard")]
     #[inline]
     pub fn epoch_start_block_round(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_round()
@@ -299,7 +293,6 @@ where
         A::blockchain_api_impl().get_prev_block_timestamp()
     }
 
-    #[cfg(feature = "barnard")]
     #[inline]
     pub fn get_prev_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp_ms()
@@ -368,7 +361,6 @@ where
         }
     }
 
-    #[cfg(feature = "barnard")]
     fn get_esdt_token_type_raw(
         &self,
         address: &ManagedAddress<A>,
@@ -392,7 +384,6 @@ where
         }
     }
 
-    #[cfg(feature = "barnard")]
     pub fn get_esdt_token_type(
         &self,
         address: &ManagedAddress<A>,
@@ -400,17 +391,6 @@ where
         nonce: u64,
     ) -> EsdtTokenType {
         EsdtTokenType::from(self.get_esdt_token_type_raw(address, token_id, nonce) as u8)
-    }
-
-    /// Legacy implementation, based on nonce.
-    #[cfg(not(feature = "barnard"))]
-    pub fn get_esdt_token_type(
-        &self,
-        _address: &ManagedAddress<A>,
-        _token_id: &EgldOrEsdtTokenIdentifier<A>,
-        nonce: u64,
-    ) -> EsdtTokenType {
-        EsdtTokenType::based_on_token_nonce(nonce)
     }
 
     pub fn get_esdt_token_data(

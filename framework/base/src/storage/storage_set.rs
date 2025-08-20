@@ -47,7 +47,6 @@ where
         self.set_managed_buffer(&bytes.into())
     }
 
-    #[cfg(feature = "barnard")]
     fn set_u64(self, value: u64) {
         use crate::api::ManagedTypeApiImpl;
 
@@ -57,7 +56,6 @@ where
         self.set_managed_buffer(&managed_buffer);
     }
 
-    #[cfg(feature = "barnard")]
     fn set_i64(self, value: i64) {
         use crate::api::ManagedTypeApiImpl;
 

@@ -1,14 +1,20 @@
+use anyhow::{anyhow, Result};
+use core::time;
 use serde_json::Value;
 use std::{
     fs::File,
     io::Write,
     path::{Path, PathBuf},
+    thread::sleep,
 };
 
 use multiversx_sc_meta_lib::print_util::println_green;
 
 use super::system_info::{get_system_info, SystemInfo};
 
+const API_LIMIT_EXCEEDED: &str = "api rate limit exceeded for";
+const MAX_RETRIES: u64 = 5;
+const RETRY_DELAY: time::Duration = time::Duration::from_secs(2);
 const USER_AGENT: &str = "multiversx-sc-meta";
 const SCENARIO_CLI_RELEASES_BASE_URL: &str =
     "https://api.github.com/repos/multiversx/mx-chain-scenario-cli-go/releases";
@@ -78,20 +84,35 @@ impl ScenarioGoInstaller {
         }
     }
 
-    async fn get_scenario_go_release_json(&self) -> Result<String, reqwest::Error> {
+    async fn get_scenario_go_release_json(&self) -> Result<String> {
         let release_url = self.release_url();
         println_green(format!("Retrieving release info: {release_url}"));
 
-        let response = reqwest::Client::builder()
-            .user_agent(&self.user_agent)
-            .build()?
-            .get(release_url)
-            .send()
-            .await?
-            .text()
-            .await?;
+        let mut wait_time = RETRY_DELAY;
 
-        Ok(response)
+        for i in 0..MAX_RETRIES {
+            let response = reqwest::Client::builder()
+                .user_agent(&self.user_agent)
+                .build()?
+                .get(&release_url)
+                .send()
+                .await?
+                .text()
+                .await?;
+
+            if !response.to_lowercase().contains(API_LIMIT_EXCEEDED) {
+                return Ok(response);
+            }
+
+            println!("API rate limit exceeded, attempt {i} retrying...");
+            sleep(wait_time);
+            wait_time += RETRY_DELAY;
+        }
+
+        Err(anyhow!(
+            "Failed to retrieve release info after {} retries",
+            MAX_RETRIES
+        ))
     }
 
     fn parse_scenario_go_release(&self, raw_json: &str) -> ScenarioGoRelease {

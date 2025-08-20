@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc"
-version = "0.59.1"
+version = "0.60.0"
 edition = "2021"
 rust-version = "1.83"
 
@@ -33,7 +33,7 @@ unwrap-infallible = "0.1.5"
 generic-array = "1.2.0"
 
 [dependencies.multiversx-sc-derive]
-version = "=0.59.1"
+version = "=0.60.0"
 path = "../derive"
 
 [dependencies.multiversx-sc-codec]
@@ -42,5 +42,5 @@ path = "../../data/codec"
 features = ["derive"]
 
 [dependencies.multiversx-chain-core]
-version = "=0.16.1"
+version = "=0.17.0"
 path = "../../chain/core"

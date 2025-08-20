@@ -8,11 +8,11 @@ publish = false
 path = "src/gas_tests.rs"
 
 [dependencies.multiversx-sc]
-version = "0.59.1"
+version = "0.60.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.1"
+version = "0.60.0"
 path = "../../../framework/scenario"
 
 [dependencies.multiversx-chain-vm-wasmer-prod]
