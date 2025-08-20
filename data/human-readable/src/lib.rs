@@ -3,6 +3,7 @@ mod defaults;
 mod encode;
 pub mod format;
 mod value;
+pub mod schema;
 
 pub use decode::*;
 pub use defaults::*;
