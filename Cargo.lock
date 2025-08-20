@@ -2895,6 +2895,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "mcl_rust"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4052e3d772f6a08ac3c7de7707641b2c732a5d2e6d191851b28a8ebddd90516"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "memchr"
 version = "2.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3052,6 +3061,7 @@ dependencies = [
  "hex",
  "hex-literal",
  "itertools 0.14.0",
+ "mcl_rust",
  "multiversx-chain-core",
  "multiversx-chain-vm-executor",
  "multiversx-chain-vm-executor-wasmer-experimental",
