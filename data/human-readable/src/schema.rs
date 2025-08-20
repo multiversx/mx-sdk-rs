@@ -19,7 +19,7 @@ pub fn build_schema_for_type_description(
 ) -> Result<JsonValue, SchemaError> {
     match &type_description.contents {
         TypeContents::NotSpecified => build_schema_for_single_value(&type_description.names.abi),
-        TypeContents::Enum(variants) => build_schema_for_enum(&variants, contract_abi),
+        TypeContents::Enum(variants) => build_schema_for_enum(variants, contract_abi),
         TypeContents::Struct(fields) => build_schema_for_struct(fields, contract_abi),
         TypeContents::ExplicitEnum(_) => panic!("not supported"),
     }
@@ -108,7 +108,7 @@ fn wrap_in_single_key_object(key: &str, value: JsonValue) -> JsonValue {
 }
 
 fn build_schema_for_enum(
-    variants: &Vec<EnumVariantDescription>,
+    variants: &[EnumVariantDescription],
     abi: &ContractAbi,
 ) -> Result<JsonValue, SchemaError> {
     let variants_simple = variants
@@ -141,7 +141,7 @@ fn build_schema_for_enum(
 
             variant_complex_values.push(wrap_in_single_key_object(
                 &variant.name,
-                build_schema_for_type(type_name, &abi)?,
+                build_schema_for_type(type_name, abi)?,
             ));
 
             continue;
@@ -153,7 +153,7 @@ fn build_schema_for_enum(
 
             let mut values = Vec::new();
             for field in ordered_fields {
-                values.push(build_schema_for_type(&field.field_type.abi, &abi)?);
+                values.push(build_schema_for_type(&field.field_type.abi, abi)?);
             }
 
             variant_complex_values.push(wrap_in_single_key_object(
@@ -175,7 +175,7 @@ fn build_schema_for_enum(
         let mut properties = Vec::new();
 
         for field in variant.fields.iter() {
-            let field_type = build_schema_for_type(&field.field_type.abi, &abi)?;
+            let field_type = build_schema_for_type(&field.field_type.abi, abi)?;
             properties.push((field.name.clone(), field_type));
         }
 
@@ -208,7 +208,7 @@ fn build_schema_for_enum(
         continue;
     }
 
-    if variants_simple.len() > 0 {
+    if !variants_simple.is_empty() {
         variant_complex_values.push(variant_simple_values);
     }
 
@@ -233,3 +233,110 @@ impl Display for SchemaError {
 }
 
 impl Error for SchemaError {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use multiversx_sc_scenario::multiversx_sc::abi::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_build_schema_for_single_value_integer() {
+        let schema = build_schema_for_single_value("u64").unwrap();
+        assert_eq!(schema, json!({"type": "integer"}));
+    }
+
+    #[test]
+    fn test_build_schema_for_single_value_string() {
+        let schema = build_schema_for_single_value("string").unwrap();
+        assert_eq!(schema, json!({"type": "string"}));
+    }
+
+    #[test]
+    fn test_build_schema_for_single_value_bool() {
+        let schema = build_schema_for_single_value("bool").unwrap();
+        assert_eq!(schema, json!({"type": "boolean"}));
+    }
+
+    #[test]
+    fn test_build_schema_for_single_value_managed_buffer() {
+        let schema = build_schema_for_single_value("ManagedBuffer").unwrap();
+        assert_eq!(
+            schema,
+            json!({
+                "type": "array",
+                "items": {"type": "integer"}
+            })
+        );
+    }
+
+    #[test]
+    fn test_build_schema_for_single_value_unknown() {
+        let err = build_schema_for_single_value("UnknownType");
+        assert!(err.is_err());
+    }
+
+    #[test]
+    fn test_build_schema_for_struct() {
+        let fields = vec![
+            StructFieldDescription {
+                name: "field1".to_string(),
+                field_type: TypeNames::from_abi("u64".to_string()),
+                docs: vec![],
+            },
+            StructFieldDescription {
+                name: "field2".to_string(),
+                field_type: TypeNames::from_abi("string".to_string()),
+                docs: vec![],
+            },
+        ];
+        let abi = ContractAbi::default();
+        let schema = build_schema_for_struct(&fields, &abi).unwrap();
+        assert_eq!(schema["type"], "object");
+        assert_eq!(schema["required"], json!(["field1", "field2"]));
+        assert_eq!(schema["additionalProperties"], false);
+        assert_eq!(schema["properties"]["field1"], json!({"type": "integer"}));
+        assert_eq!(schema["properties"]["field2"], json!({"type": "string"}));
+    }
+
+    #[test]
+    fn test_build_schema_for_enum_simple() {
+        let variants = vec![
+            EnumVariantDescription {
+                name: "A".to_string(),
+                fields: vec![],
+                docs: vec![],
+                discriminant: 0,
+            },
+            EnumVariantDescription {
+                name: "B".to_string(),
+                fields: vec![],
+                docs: vec![],
+                discriminant: 1,
+            },
+        ];
+        let abi = ContractAbi::default();
+        let schema = build_schema_for_enum(&variants, &abi).unwrap();
+        // Should contain an enum with values A and B
+        let one_of = &schema["oneOf"][0]["enum"];
+        assert_eq!(one_of, &json!(["A", "B"]));
+    }
+
+    #[test]
+    fn test_build_schema_for_enum_tuple_variant() {
+        let variants = vec![EnumVariantDescription {
+            name: "Tuple".to_string(),
+            fields: vec![StructFieldDescription {
+                name: "0".to_string(),
+                field_type: TypeNames::from_abi("u64".to_string()),
+                docs: vec![],
+            }],
+            docs: vec![],
+            discriminant: 0,
+        }];
+        let abi = ContractAbi::default();
+        let schema = build_schema_for_enum(&variants, &abi).unwrap();
+        // Should be a single-key object with an integer
+        assert_eq!(schema["properties"]["Tuple"]["type"], "integer");
+    }
+}
