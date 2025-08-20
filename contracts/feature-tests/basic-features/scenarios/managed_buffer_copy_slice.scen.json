@@ -68,7 +68,7 @@
         },
         {
             "step": "scQuery",
-            "id": "3",
+            "id": "4",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mbuffer_copy_slice",
@@ -86,7 +86,7 @@
         },
         {
             "step": "scQuery",
-            "id": "3",
+            "id": "5",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mbuffer_copy_slice",

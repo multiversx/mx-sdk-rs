@@ -45,6 +45,48 @@ pub struct ContractAbiJson {
     pub types: BTreeMap<String, TypeDescriptionJson>,
 }
 
+impl From<ContractAbiJson> for ContractAbi {
+    fn from(abi_json: ContractAbiJson) -> Self {
+        ContractAbi {
+            build_info: abi_json
+                .build_info
+                .map(BuildInfoAbi::from)
+                .unwrap_or_default(),
+            docs: abi_json.docs,
+            name: abi_json.name,
+            constructors: abi_json
+                .constructor
+                .map(|c| vec![EndpointAbi::from(&c)])
+                .unwrap_or_default(),
+            upgrade_constructors: abi_json
+                .upgrade_constructor
+                .map(|c| vec![EndpointAbi::from(&c)])
+                .unwrap_or_default(),
+            endpoints: abi_json
+                .endpoints
+                .into_iter()
+                .map(EndpointAbi::from)
+                .collect(),
+            promise_callbacks: abi_json
+                .promises_callback_names
+                .into_iter()
+                .map(|name| EndpointAbi {
+                    name,
+                    ..Default::default()
+                })
+                .collect(),
+            events: abi_json.events.into_iter().map(EventAbi::from).collect(),
+            esdt_attributes: abi_json
+                .esdt_attributes
+                .into_iter()
+                .map(EsdtAttributeAbi::from)
+                .collect(),
+            has_callback: abi_json.has_callback,
+            type_descriptions: convert_json_to_type_descriptions(abi_json.types),
+        }
+    }
+}
+
 impl From<&ContractAbi> for ContractAbiJson {
     fn from(abi: &ContractAbi) -> Self {
         ContractAbiJson {
@@ -87,6 +129,23 @@ pub fn convert_type_descriptions_to_json(
         }
     }
     types
+}
+
+pub fn convert_json_to_type_descriptions(
+    types: BTreeMap<String, TypeDescriptionJson>,
+) -> TypeDescriptionContainerImpl {
+    let mut type_descriptions = TypeDescriptionContainerImpl::new();
+    for (type_name, type_description) in types.into_iter() {
+        type_descriptions.insert(
+            TypeNames::from_abi(type_name),
+            TypeDescription::from(&type_description),
+        );
+    }
+    type_descriptions
+}
+
+pub fn empty_type_description_container() -> TypeDescriptionContainerImpl {
+    TypeDescriptionContainerImpl::new()
 }
 
 pub fn serialize_abi_to_json(abi_json: &ContractAbiJson) -> String {

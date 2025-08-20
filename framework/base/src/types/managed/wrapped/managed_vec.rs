@@ -157,9 +157,14 @@ where
     fn load_item_payload(&self, index: usize, payload: &mut T::PAYLOAD) -> bool {
         let byte_index = index * T::payload_size();
 
+        if byte_index + T::payload_size() > self.byte_len() {
+            return false;
+        }
+
         self.buffer
-            .load_slice(byte_index, payload.payload_slice_mut())
-            .is_ok()
+            .load_slice(byte_index, payload.payload_slice_mut());
+
+        true
     }
 
     pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
@@ -574,11 +579,10 @@ where
         let mut byte_index = 0;
         while byte_index < self_len {
             let mut self_payload = T::PAYLOAD::new_buffer();
-            let _ = self
-                .buffer
+            self.buffer
                 .load_slice(byte_index, self_payload.payload_slice_mut());
             let mut other_payload = T::PAYLOAD::new_buffer();
-            let _ = other
+            other
                 .buffer
                 .load_slice(byte_index, other_payload.payload_slice_mut());
             let self_item = T::read_from_payload(&self_payload);
