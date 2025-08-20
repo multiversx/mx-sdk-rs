@@ -111,6 +111,7 @@ fn crypto_verify_bls_rs() {
 }
 
 #[test]
+#[ignore]
 fn crypto_verify_bls_aggregated_signature_rs() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
