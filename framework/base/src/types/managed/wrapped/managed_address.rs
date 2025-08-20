@@ -35,7 +35,7 @@ where
 
     pub fn to_address(&self) -> Address {
         let mut result = Address::zero();
-        let _ = self.bytes.buffer.load_slice(0, result.as_mut());
+        self.bytes.buffer.load_slice(0, result.as_mut());
         result
     }
 
