@@ -10,7 +10,7 @@ use sha3::{Digest, Keccak256};
 
 pub const SHA256_RESULT_LEN: usize = 32;
 pub const KECCAK256_RESULT_LEN: usize = 32;
-pub const BLS_DST_VALUE: &[u8] = b"BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
+pub const BLS_DST_VALUE: &[u8] = b"BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_";
 
 pub fn sha256(data: &[u8]) -> [u8; SHA256_RESULT_LEN] {
     let mut hasher = Sha256::new();
@@ -52,14 +52,17 @@ pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
 }
 
 pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+    if key.is_empty() || signature.is_empty() || message.is_empty() {
+        return false;
+    }
+
     init(CurveType::BLS12_381);
 
     let public_key = create_bls_public_key(key);
     let signature = create_bls_signature(signature);
-    let aug_msg = [BLS_DST_VALUE, message].concat();
 
     let mut pairing = Pairing::new(true, BLS_DST_VALUE);
-    let err = pairing.aggregate(&public_key, true, &signature, true, &aug_msg, &[]);
+    let err = pairing.aggregate(&public_key, true, &signature, true, &message, &[]);
 
     if err == blst::BLST_ERROR::BLST_SUCCESS {
         return true;

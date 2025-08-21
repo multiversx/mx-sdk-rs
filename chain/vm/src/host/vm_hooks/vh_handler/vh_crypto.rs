@@ -80,7 +80,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         let sig_valid = crypto_functions::verify_bls(key, message, signature);
         if !sig_valid {
             // TODO: correct error message
-            return Err(early_exit_vm_error("invalid signature"));
+            return Err(early_exit_vm_error("bls verify error"));
         }
 
         Ok(())
