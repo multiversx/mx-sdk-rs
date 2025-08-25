@@ -1,0 +1,16 @@
+[package]
+name = "serde-features-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+authors = ["you"]
+
+[dev-dependencies]
+
+[dependencies.serde-features]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.60.0"
+path = "../../../../framework/meta-lib"
+default-features = false
