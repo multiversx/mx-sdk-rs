@@ -16,17 +16,32 @@ SpaceCraft SDK v0.58.0 is live, and testing just got a lot more real.
 
 This release was 3+ months in the making, with over 27,000 lines of code rewritten to open up testing workflows for real-world complexity.
 
-For the first time ever, you can run actual smart contracts in blackbox tests, no source code needed. That means better testing for contracts you don’t own, don’t control, or just don’t want to peek into.
+### Rust VM Wasmer integration
+
+For the first time ever, developers can run actual smart contracts in blackbox tests, no source code needed. That means better testing for contracts you don’t own, don’t control, or just don’t want to peek into.
 
 Why this matters:
 - Run tests against any Wasm contract, no matter how it was built
 - Simulate multi-contract interactions more realistically
 - Prepare for production-level usage with real code
+- Metering is now possible in Rust integration tests
 
-We’ve also:
-- Enabled gas usage tracking (experimental for now)
-- Added support for Rust 1.87
-- Rolled in Wasmer 6 for local devs, while keeping compatibility with Wasmer 2.2 on mainnet
-- Improved the build system with auto-target install + opcode validation
+This release also does some preparation work for the future integration of Wasmer 6 (or subsequent version) into the main Go VM. Even though Wasmer 6 is currently only available for developers in the Rust VM, much of the groundwork has been laid for a deeper integration.
 
-Coming soon: v0.59 with Barnard support on devnet. Stay tuned. 
+
+### Support for Rust 1.87
+
+Rust 1.87 has migrated to LLVM 20, which by default adds memory copy and fill opcodes to smart contracts. These opcodes are not yet supported by the MultiversX Space VM.
+
+To avoid issues, the build system uses a custom build mode to avoid these opcodes (`wasmv1-none` instead of `wasm32-unknown-unknown`).
+
+To make builds easier, both these targets will be auto-installed on build, as required.
+
+All these build configurations are made custimzable in `sc-config.toml`.
+
+Note: Rust 1.87 (or newer) cannot be used with smart contracts built with older versions of the framework (< 0.58.0).
+
+
+### Opcode validator
+
+An opcode validator is now run by default after every build. It detects forbidden opcocdes, including the problematic memory.copy and memory.fill mentioned above.
