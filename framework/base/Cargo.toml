@@ -24,8 +24,8 @@ std = ["multiversx-chain-core/std"]
 managed-buffer-builder-cached = []
 esdt-token-payment-legacy-decode = []
 barnard = []
-default = ["serde-json-io"]
-serde-json-io = ["serde", "serde-json-core"]
+# default = ["serde-json-io"]
+serde-util = ["serde", "serde-json-core"]
 
 [dependencies]
 hex-literal = "1.0"

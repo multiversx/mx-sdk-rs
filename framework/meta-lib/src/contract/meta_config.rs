@@ -22,6 +22,8 @@ const SNIPPETS_RELATIVE_PATH: &str = "interactor";
 const WASM_NO_MANAGED_EI: &str = "wasm-no-managed-ei";
 const FRAMEWORK_NAME_BASE: &str = "multiversx-sc";
 
+const WASM_ADAPTER_FEATURE_WHITELIST: &[&str] = &["serde"];
+
 #[derive(Debug)]
 pub struct MetaConfig {
     pub load_abi_git_version: bool,
@@ -79,6 +81,11 @@ impl MetaConfig {
             if contract.settings.std {
                 framework_dependency.features.insert("std".to_owned());
             }
+            framework_dependency.features = framework_dependency
+                .features
+                .into_iter()
+                .filter(|f| WASM_ADAPTER_FEATURE_WHITELIST.contains(&f.as_str()))
+                .collect();
 
             let cargo_toml_data = WasmCargoTomlData {
                 name: contract.wasm_crate_name.clone(),

@@ -42,6 +42,13 @@ impl DependencyRawValue {
                 if let Some(toml::Value::String(tag)) = table.get("tag") {
                     result.tag = Some(tag.to_owned());
                 }
+                if let Some(toml::Value::Array(feature_values)) = table.get("features") {
+                    for feature_value in feature_values {
+                        if let toml::Value::String(feature) = feature_value {
+                            result.features.insert(feature.to_owned());
+                        }
+                    }
+                }
                 result
             }
             _ => panic!("Unsupported dependency value"),

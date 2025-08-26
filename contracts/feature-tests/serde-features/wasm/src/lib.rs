@@ -5,13 +5,13 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            2
+// Endpoints:                            4
 // Async Callback (empty):               1
-// Total number of exported functions:   4
+// Total number of exported functions:   6
 
 #![no_std]
 
-multiversx_sc_wasm_adapter::allocator!();
+multiversx_sc_wasm_adapter::allocator!(static64k);
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
@@ -19,7 +19,9 @@ multiversx_sc_wasm_adapter::endpoints! {
     (
         init => init
         out_value_1 => out_value_1
+        out_value_2 => out_value_2
         inc_serde_1 => inc_serde_1
+        inc_serde_2 => inc_serde_2
     )
 }
 
