@@ -32,6 +32,9 @@ pub mod storage;
 pub mod tuple_util;
 pub mod types;
 
+#[cfg(feature = "serde")]
+pub mod serde;
+
 #[cfg(feature = "std")]
 mod std_impl;
 

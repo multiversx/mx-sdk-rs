@@ -3132,6 +3132,7 @@ dependencies = [
  "multiversx-sc-derive",
  "num-traits",
  "serde",
+ "serde-json-core",
  "unwrap-infallible",
 ]
 
@@ -4781,7 +4782,6 @@ dependencies = [
  "multiversx-sc-scenario",
  "serde",
  "serde-json-core",
- "serde_json",
 ]
 
 [[package]]

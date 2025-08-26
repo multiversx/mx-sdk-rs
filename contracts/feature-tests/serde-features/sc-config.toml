@@ -1,2 +1,2 @@
 [contracts.serde-features]
-allocator = "static64k"
+# allocator = "static64k"

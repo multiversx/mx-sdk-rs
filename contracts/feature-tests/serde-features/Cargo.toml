@@ -11,7 +11,7 @@ path = "src/serde_features.rs"
 [dependencies]
 serde = { version = "1.0", optional = false, default-features = false, features = ["derive"] }
 serde-json-core = { version = "0.6.0", optional = false, default-features = true}
-serde_json = { version = "1.0", optional = false, default-features = false, features = ["alloc", "raw_value"] }
+# serde_json = { version = "1.0", optional = false, default-features = false, features = ["alloc", "raw_value"] }
 
 [dependencies.multiversx-sc]
 version = "0.60.0"
