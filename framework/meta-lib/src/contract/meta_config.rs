@@ -78,14 +78,18 @@ impl MetaConfig {
             let mut framework_dependency = main_cargo_toml_contents
                 .dependency_raw_value(FRAMEWORK_NAME_BASE)
                 .expect("missing framework dependency in Cargo.toml");
-            if contract.settings.std {
-                framework_dependency.features.insert("std".to_owned());
-            }
+
+            // filter original multiversx_sc feature flags (none at the moment)
             framework_dependency.features = framework_dependency
                 .features
                 .into_iter()
                 .filter(|f| WASM_ADAPTER_FEATURE_WHITELIST.contains(&f.as_str()))
                 .collect();
+
+            // add std feature flag
+            if contract.settings.std {
+                framework_dependency.features.insert("std".to_owned());
+            }
 
             let cargo_toml_data = WasmCargoTomlData {
                 name: contract.wasm_crate_name.clone(),
