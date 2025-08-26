@@ -37,7 +37,7 @@ where
             return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
         let byte_slice = &mut buffer[..len];
-        let _ = self.load_slice(0, byte_slice);
+        self.load_slice(0, byte_slice);
         Ok(byte_slice)
     }
 
@@ -55,7 +55,7 @@ where
         }
         unsafe {
             let byte_slice = buffer.get_unchecked_mut(MAX_LEN - len..);
-            let _ = self.load_slice(0, byte_slice);
+            self.load_slice(0, byte_slice);
         }
         Ok(len)
     }

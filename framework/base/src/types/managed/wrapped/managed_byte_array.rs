@@ -119,7 +119,7 @@ where
     #[inline]
     pub fn to_byte_array(&self) -> [u8; N] {
         let mut result = [0u8; N];
-        let _ = self.buffer.load_slice(0, &mut result[..]);
+        self.buffer.load_slice(0, &mut result[..]);
         result
     }
 }
