@@ -27,4 +27,3 @@ impl HandleTypeInfo for UncallableApi {
 
     type ManagedMapHandle = i32;
 }
-

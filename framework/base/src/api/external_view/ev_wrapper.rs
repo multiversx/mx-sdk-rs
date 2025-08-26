@@ -189,4 +189,3 @@ where
 }
 
 impl<A> Eq for ExternalViewApi<A> where A: VMApi {}
-
