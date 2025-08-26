@@ -12,24 +12,24 @@ path = "src/multisig_interact.rs"
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.8.6"
+toml = "0.8"
 tokio = { version = "1.24" }
 
 [dependencies.multisig]
 path = ".."
 
 [dependencies.multiversx-sc-modules]
-version = "0.54.6"
+version = "0.60.0"
 path = "../../../../contracts/modules"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.54.6"
+version = "0.60.0"
 path = "../../../../framework/snippets"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.54.6"
+version = "=0.60.0"
 path = "../../../../framework/scenario"
 
 [dependencies.multiversx-sc]
-version = "=0.54.6"
+version = "=0.60.0"
 path = "../../../../framework/base"

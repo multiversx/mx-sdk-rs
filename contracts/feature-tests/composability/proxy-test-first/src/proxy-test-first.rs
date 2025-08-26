@@ -29,7 +29,7 @@ pub trait ProxyTestFirst {
     #[payable("EGLD")]
     #[endpoint(deploySecondContract)]
     fn deploy_second_contract(&self, code: ManagedBuffer) -> i32 {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
 
         let (address, init_result) = self
             .tx()
@@ -49,7 +49,7 @@ pub trait ProxyTestFirst {
     #[payable("EGLD")]
     #[endpoint(upgradeSecondContract)]
     fn upgrade_second_contract(&self, code: ManagedBuffer) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let other_contract = self.get_other_contract();
 
         self.tx()
@@ -66,7 +66,7 @@ pub trait ProxyTestFirst {
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContract)]
     fn forward_to_other_contract(&self) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let other_contract = self.get_other_contract();
         self.tx()
             .to(&other_contract)
@@ -79,7 +79,7 @@ pub trait ProxyTestFirst {
     #[payable("EGLD")]
     #[endpoint(forwardToOtherContractWithCallback)]
     fn forward_to_other_contract_with_callback(&self) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let other_contract = self.get_other_contract();
         self.tx()
             .to(&other_contract)
@@ -126,8 +126,8 @@ pub trait ProxyTestFirst {
         match call_result {
             ManagedAsyncCallResult::Ok(cb_arg) => {
                 self.set_callback_info(cb_arg);
-            },
-            ManagedAsyncCallResult::Err(_) => {},
+            }
+            ManagedAsyncCallResult::Err(_) => {}
         }
     }
 

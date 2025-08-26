@@ -13,7 +13,7 @@ pub enum InteractorStepRef<'a> {
     ScDeploy(&'a mut ScDeployStep),
 }
 
-impl<'a> InteractorStepRef<'a> {
+impl InteractorStepRef<'_> {
     pub fn to_transaction<GatewayProxy: GatewayAsyncService>(
         &self,
         interactor: &InteractorBase<GatewayProxy>,
@@ -22,7 +22,7 @@ impl<'a> InteractorStepRef<'a> {
             InteractorStepRef::ScCall(sc_call) => interactor.tx_call_to_blockchain_tx(&sc_call.tx),
             InteractorStepRef::ScDeploy(sc_deploy) => {
                 interactor.sc_deploy_to_blockchain_tx(sc_deploy)
-            },
+            }
         }
     }
 

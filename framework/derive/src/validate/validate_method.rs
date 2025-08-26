@@ -90,10 +90,10 @@ fn validate_payment_args(m: &Method) {
 pub fn validate_payment_args_not_reference(m: &Method) {
     if let Some(payment_arg) = m.payment_amount_arg() {
         match &payment_arg.ty {
-            syn::Type::Path(_) => {},
+            syn::Type::Path(_) => {}
             syn::Type::Reference(_) => {
                 panic!("The payment argument is expected to be an owned BigUint, references are not allowed.");
-            },
+            }
             _ => panic!("Unsupported payment argument type"),
         }
     }

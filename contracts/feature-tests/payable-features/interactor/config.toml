@@ -1,0 +1,6 @@
+
+# chain_type = 'simulator'
+# gateway_uri = 'http://localhost:8085'
+
+chain_type = 'real'
+gateway_uri = 'https://testnet-gateway.multiversx.com'

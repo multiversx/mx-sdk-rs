@@ -1,8 +1,11 @@
-use crate::types::{BigUint, EgldOrEsdtTokenPaymentRefs, ManagedAddress, TxFrom, TxToSpecified};
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{BigUint, EgldOrEsdtTokenPaymentRefs, ManagedAddress, TxFrom, TxToSpecified},
+};
 
 use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<'a, Env> TxPayment<Env> for EgldOrEsdtTokenPaymentRefs<'a, Env::Api>
+impl<Env> TxPayment<Env> for EgldOrEsdtTokenPaymentRefs<'_, Env::Api>
 where
     Env: TxEnv,
 {
@@ -10,7 +13,23 @@ where
         self.is_empty()
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.map_egld_or_esdt(
+            fc,
+            |fc, amount| Egld(amount).perform_transfer_execute_fallible(env, to, gas_limit, fc),
+            |fc, esdt_payment| {
+                esdt_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
+            },
+        )
+    }
+
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -19,8 +38,8 @@ where
     ) {
         self.map_egld_or_esdt(
             fc,
-            |fc, amount| Egld(amount).perform_transfer_execute(env, to, gas_limit, fc),
-            |fc, esdt_payment| esdt_payment.perform_transfer_execute(env, to, gas_limit, fc),
+            |fc, amount| Egld(amount).perform_transfer_execute_legacy(env, to, gas_limit, fc),
+            |fc, esdt_payment| esdt_payment.perform_transfer_execute_legacy(env, to, gas_limit, fc),
         )
     }
 

@@ -1,7 +1,5 @@
 use core::marker::PhantomData;
 
-use storage_get_from_address::storage_get_len_from_address;
-
 pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper, StorageMapperFromAddress};
 use crate::{
@@ -11,49 +9,15 @@ use crate::{
         self, multi_encode_iter_or_handle_err, EncodeErrorHandler, NestedDecode, NestedEncode,
         TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_get_from_address, storage_set, StorageKey},
-    storage_get, storage_get_len,
-    types::{ManagedAddress, ManagedRef, ManagedType, MultiValueEncoded},
+    storage::{
+        mappers::source::{CurrentStorage, StorageAddress},
+        storage_set, StorageKey,
+    },
+    types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
 const NULL_ENTRY: u32 = 0;
 const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
-
-pub trait StorageAddress<SA>
-where
-    SA: StorageMapperApi,
-{
-    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T;
-    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize;
-}
-
-pub struct CurrentStorage;
-
-impl<SA> StorageAddress<SA> for CurrentStorage
-where
-    SA: StorageMapperApi,
-{
-    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
-        storage_get(key)
-    }
-
-    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize {
-        storage_get_len(key)
-    }
-}
-
-impl<SA> StorageAddress<SA> for ManagedAddress<SA>
-where
-    SA: StorageMapperApi,
-{
-    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
-        storage_get_from_address(self.as_ref(), key)
-    }
-
-    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize {
-        storage_get_len_from_address(self.as_ref(), key)
-    }
-}
 
 pub struct SetMapper<SA, T, A = CurrentStorage>
 where
@@ -182,11 +146,11 @@ where
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, A, T> {
+    pub fn iter(&self) -> Iter<'_, SA, A, T> {
         self.queue_mapper.iter()
     }
 
-    pub fn iter_from(&self, value: &T) -> Iter<SA, A, T> {
+    pub fn iter_from(&self, value: &T) -> Iter<'_, SA, A, T> {
         let node_id = self.get_node_id(value);
         self.queue_mapper.iter_from_node_id(node_id)
     }

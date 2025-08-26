@@ -1,8 +1,5 @@
 # Keeping one file called `multicontract.toml` to test the backwards compatibility.
 
-[settings]
-main = "multi-contract-main"
-
 [contracts.multi-contract-main]
 # main contract can have any id and any name
 name = "multi-contract-features"
@@ -10,7 +7,7 @@ name = "multi-contract-features"
 # all default values below:
 external-view = false
 panic-message = false
-ei = "1.3"
+ei = "1.5"
 allocator = "fail"
 stack-size = "64k"
 features = []

@@ -9,7 +9,7 @@ pub(crate) fn write_snippet_imports(file: &mut File) {
         file,
         "#![allow(non_snake_case)]
 
-mod config;
+pub mod config;
 mod proxy;
 
 use config::Config;
@@ -39,7 +39,8 @@ pub async fn {crate_name}_cli() {{
     let mut args = std::env::args();
     let _ = args.next();
     let cmd = args.next().expect(\"at least one argument required\");
-    let mut interact = ContractInteract::new().await;
+    let config = Config::new();
+    let mut interact = ContractInteract::new(config).await;
     match cmd.as_str() {{"
     )
     .unwrap();
@@ -230,7 +231,7 @@ pub(crate) fn write_chain_sim_test_to_file(file: &mut File, crate_name: &str) {
     writeln!(
         file,
         r#"use multiversx_sc_snippets::imports::*;
-use rust_interact::ContractInteract;
+use rust_interact::{{config::Config, ContractInteract}};
 
 // Simple deploy test that runs using the chain simulator configuration.
 // In order for this test to work, make sure that the `config.toml` file contains the chain simulator config (or choose it manually)
@@ -240,7 +241,7 @@ use rust_interact::ContractInteract;
 #[tokio::test]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn deploy_test_{crate_name}_cs() {{
-    let mut interactor = ContractInteract::new().await;
+    let mut interactor = ContractInteract::new(Config::chain_simulator_config()).await;
 
     interactor.deploy().await;
 }}"#
@@ -251,7 +252,7 @@ pub(crate) fn write_interactor_test_to_file(file: &mut File, crate_name: &str) {
     writeln!(
         file,
         r#"use multiversx_sc_snippets::imports::*;
-use rust_interact::ContractInteract;
+use rust_interact::{{config::Config, ContractInteract}};
 
 // Simple deploy test that runs on the real blockchain configuration.
 // In order for this test to work, make sure that the `config.toml` file contains the real blockchain config (or choose it manually)
@@ -259,7 +260,7 @@ use rust_interact::ContractInteract;
 #[tokio::test]
 #[ignore = "run on demand, relies on real blockchain state"]
 async fn deploy_test_{crate_name}() {{
-    let mut interactor = ContractInteract::new().await;
+    let mut interactor = ContractInteract::new(Config::new()).await;
 
     interactor.deploy().await;
 }}"#

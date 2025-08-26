@@ -1,12 +1,9 @@
 use crate::{
-    data::{
-        sdk_address::SdkAddress,
-        transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
-    },
+    data::transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
     gateway::{GetTxInfo, GetTxProcessStatus},
 };
 use log::info;
-use multiversx_chain_core::types::{Address, ReturnCode};
+use multiversx_chain_core::{std::Bech32Address, types::ReturnCode};
 
 use crate::gateway::GatewayAsyncService;
 
@@ -36,28 +33,25 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                             .await
                             .unwrap();
 
-                        info!(
-                            "Transaction retrieved successfully, with status {}: {:#?}",
-                            status, transaction_info_with_results
-                        );
+                        log::info!("Transaction retrieved successfully, with status {status}",);
                         return (transaction_info_with_results, ReturnCode::Success);
-                    },
+                    }
                     "fail" => {
                         let (error_code, error_message) = parse_reason(&reason);
                         let failed_transaction_info: TransactionOnNetwork =
                             create_tx_failed(&error_message);
 
-                        info!(
+                        log::error!(
                             "Transaction failed with error code: {} and message: {error_message}",
                             error_code.as_u64()
                         );
                         return (failed_transaction_info, error_code);
-                    },
+                    }
                     _ => {
                         continue;
-                    },
+                    }
                 }
-            },
+            }
             Err(err) => {
                 retries += 1;
                 if retries >= MAX_RETRIES {
@@ -69,7 +63,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                 let backoff_time = backoff_delay.min(MAX_BACKOFF_DELAY);
                 proxy.sleep(backoff_time).await;
                 backoff_delay *= 2; // exponential backoff
-            },
+            }
         }
     }
 
@@ -99,7 +93,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
             }
 
             (return_code, message)
-        },
+        }
         None => {
             if message.is_empty() {
                 message = extract_message_from_string_reason(reason);
@@ -107,7 +101,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
             let return_code = ReturnCode::from_message(&message).unwrap_or(ReturnCode::UserError);
 
             (return_code, message)
-        },
+        }
     }
 }
 
@@ -138,16 +132,16 @@ pub fn extract_message_from_string_reason(reason: &str) -> String {
         return message[0].to_string();
     }
 
-    return contract_error.last().unwrap_or(&"").split(']').collect();
+    contract_error.last().unwrap_or(&"").split(']').collect()
 }
 
 fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
     let mut failed_transaction_info = TransactionOnNetwork::default();
 
     let log: ApiLogs = ApiLogs {
-        address: SdkAddress(Address::zero()),
+        address: Bech32Address::zero_default_hrp(),
         events: vec![Events {
-            address: SdkAddress(Address::zero()),
+            address: Bech32Address::zero_default_hrp(),
             identifier: LOG_IDENTIFIER_SIGNAL_ERROR.to_string(),
             topics: Some(vec![error_message.to_string()]),
             data: LogData::default(),

@@ -58,7 +58,7 @@ fn top_encode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                 output.finalize_nested_encode(__buffer__);
                 core::result::Result::Ok(())
             }
-        },
+        }
         syn::Data::Enum(data_enum) => {
             validate_enum_variants(&data_enum.variants);
 
@@ -69,7 +69,7 @@ fn top_encode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                     #(#variant_top_encode_snippets)*
                 }
             }
-        },
+        }
         syn::Data::Union(_) => panic!("Union not supported"),
     }
 }
@@ -79,7 +79,7 @@ pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     let top_encode_body = top_encode_method_body(ast);
 
-    let gen = quote! {
+    let result = quote! {
         impl #impl_generics codec::TopEncode for #name #ty_generics #where_clause {
             fn top_encode_or_handle_err<O, H>(&self, output: O, __h__: H) -> core::result::Result<(), H::HandledErr>
             where
@@ -90,7 +90,7 @@ pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
     };
-    gen.into()
+    result.into()
 }
 
 pub fn top_encode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
@@ -98,7 +98,7 @@ pub fn top_encode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     let top_encode_body = top_encode_method_body(ast);
 
-    let gen = quote! {
+    let result = quote! {
         impl #impl_generics codec::TopEncode for #name #ty_generics #where_clause {
             fn top_encode_or_handle_err<O, H>(&self, output: O, __h__: H) -> core::result::Result<(), H::HandledErr>
             where
@@ -114,5 +114,5 @@ pub fn top_encode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
     };
-    gen.into()
+    result.into()
 }

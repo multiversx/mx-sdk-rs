@@ -43,11 +43,11 @@ pub trait EsdtTransferWithFee {
         self.tx().to(ToCaller).payment(fees).transfer();
     }
 
-    #[payable("*")]
+    #[payable]
     #[endpoint]
     fn transfer(&self, address: ManagedAddress) {
         require!(
-            *self.call_value().egld_value() == 0,
+            *self.call_value().egld_direct_non_strict() == 0,
             "EGLD transfers not allowed"
         );
         let payments = self.call_value().all_esdt_transfers();
@@ -71,14 +71,14 @@ pub trait EsdtTransferWithFee {
                         "Mismatching payment for covering fees"
                     );
                     let _ = self.get_payment_after_fees(fee_type, &next_payment);
-                    new_payments.push(payment);
-                },
+                    new_payments.push(payment.clone());
+                }
                 Fee::Percentage(_) => {
                     new_payments.push(self.get_payment_after_fees(fee_type, &payment));
-                },
+                }
                 Fee::Unset => {
-                    new_payments.push(payment);
-                },
+                    new_payments.push(payment.clone());
+                }
             }
         }
         self.tx().to(&address).payment(new_payments).transfer();
@@ -115,11 +115,11 @@ pub trait EsdtTransferWithFee {
                 let calculated_fee_amount = &provided.amount * *percentage / PERCENTAGE_DIVISOR;
                 provided.amount = calculated_fee_amount;
                 provided
-            },
+            }
             Fee::Unset => {
                 provided.amount = BigUint::zero();
                 provided
-            },
+            }
         }
     }
 

@@ -1,0 +1,27 @@
+[package]
+name = "gas_tests"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/gas_tests.rs"
+
+[dependencies.multiversx-sc]
+version = "0.60.0"
+path = "../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.60.0"
+path = "../../../framework/scenario"
+
+[dependencies.multiversx-chain-vm-wasmer-prod]
+path = "../../../chain/wasmer-prod"
+optional = true
+
+[features]
+wasmer-prod = ["multiversx-chain-vm-wasmer-prod"]
+wasmer-experimental = ["multiversx-sc-scenario/wasmer-experimental"]
+
+[workspace]
+members = ["."]

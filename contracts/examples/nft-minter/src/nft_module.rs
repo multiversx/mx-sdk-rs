@@ -21,11 +21,11 @@ pub trait NftModule {
     fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
         require!(self.nft_token_id().is_empty(), "Token already issued");
 
-        let payment_amount = self.call_value().egld_value();
+        let payment_amount = self.call_value().egld();
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                payment_amount.clone_value(),
+                payment_amount.clone(),
                 &token_name,
                 &token_ticker,
                 NonFungibleTokenProperties {
@@ -59,7 +59,7 @@ pub trait NftModule {
 
     // endpoints
 
-    #[payable("*")]
+    #[payable]
     #[endpoint(buyNft)]
     fn buy_nft(&self, nft_nonce: u64) {
         let payment = self.call_value().egld_or_single_esdt();
@@ -125,13 +125,13 @@ pub trait NftModule {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
                 self.nft_token_id().set(token_id.unwrap_esdt());
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 let returned = self.call_value().egld_or_single_esdt();
                 if returned.token_identifier.is_egld() && returned.amount > 0 {
                     self.tx().to(ToCaller).egld(returned.amount).transfer();
                 }
-            },
+            }
         }
     }
 

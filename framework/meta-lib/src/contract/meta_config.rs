@@ -1,10 +1,15 @@
-use std::fs;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use multiversx_sc::abi::ContractAbi;
 
 use crate::{
-    cargo_toml::CargoTomlContents, cli::BuildArgs, print_util::print_workspace_target_dir,
-    tools::check_tools_installed, tools::find_current_workspace,
+    cargo_toml::CargoTomlContents,
+    cli::BuildArgs,
+    print_util::{print_removing_wasm_crate, print_workspace_target_dir},
+    tools::{check_tools_installed, find_current_workspace},
 };
 
 use super::{
@@ -12,17 +17,16 @@ use super::{
     wasm_cargo_toml_generate::generate_wasm_cargo_toml,
 };
 
-const OUTPUT_RELATIVE_PATH: &str = "../output";
-const SNIPPETS_RELATIVE_PATH: &str = "../interactor";
-const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
+const OUTPUT_RELATIVE_PATH: &str = "output";
+const SNIPPETS_RELATIVE_PATH: &str = "interactor";
 const WASM_NO_MANAGED_EI: &str = "wasm-no-managed-ei";
-const WASM_NO_MANAGED_EI_LIB_PATH: &str = "../wasm-no-managed-ei/src/lib.rs";
 const FRAMEWORK_NAME_BASE: &str = "multiversx-sc";
 
+#[derive(Debug)]
 pub struct MetaConfig {
     pub load_abi_git_version: bool,
-    pub output_dir: String,
-    pub snippets_dir: String,
+    pub output_dir: PathBuf,
+    pub snippets_dir: PathBuf,
     pub original_contract_abi: ContractAbi,
     pub sc_config: ScConfig,
 }
@@ -30,11 +34,13 @@ pub struct MetaConfig {
 impl MetaConfig {
     pub fn create(original_contract_abi: ContractAbi, load_abi_git_version: bool) -> MetaConfig {
         let sc_config = ScConfig::load_from_crate_or_default("..", &original_contract_abi);
+        let output_relative_path = Path::new("..").join(OUTPUT_RELATIVE_PATH);
+        let snippets_dir = Path::new("..").join(SNIPPETS_RELATIVE_PATH);
 
         MetaConfig {
             load_abi_git_version,
-            output_dir: OUTPUT_RELATIVE_PATH.to_string(),
-            snippets_dir: SNIPPETS_RELATIVE_PATH.to_string(),
+            output_dir: output_relative_path,
+            snippets_dir,
             original_contract_abi,
             sc_config,
         }
@@ -62,17 +68,23 @@ impl MetaConfig {
     /// Cargo.toml files for all wasm crates are generated from the main contract Cargo.toml,
     /// by changing the package name.
     pub fn generate_cargo_toml_for_all_wasm_crates(&mut self) {
-        let main_cargo_toml_contents = CargoTomlContents::load_from_file("../Cargo.toml");
+        let main_cargo_toml_contents =
+            CargoTomlContents::load_from_file(Path::new("..").join("Cargo.toml"));
         let crate_name = main_cargo_toml_contents.package_name();
 
         for contract in self.sc_config.contracts.iter() {
+            let mut framework_dependency = main_cargo_toml_contents
+                .dependency_raw_value(FRAMEWORK_NAME_BASE)
+                .expect("missing framework dependency in Cargo.toml");
+            if contract.settings.std {
+                framework_dependency.features.insert("std".to_owned());
+            }
+
             let cargo_toml_data = WasmCargoTomlData {
                 name: contract.wasm_crate_name.clone(),
                 edition: main_cargo_toml_contents.package_edition(),
                 profile: contract.settings.profile.clone(),
-                framework_dependency: main_cargo_toml_contents
-                    .dependency_raw_value(FRAMEWORK_NAME_BASE)
-                    .expect("missing framework dependency in Cargo.toml"),
+                framework_dependency,
                 contract_features: contract.settings.features.clone(),
                 contract_default_features: contract.settings.default_features,
             };
@@ -94,7 +106,9 @@ impl MetaConfig {
         adjust_target_dir_wasm(&mut build_args);
 
         for contract_variant in &self.sc_config.contracts {
-            contract_variant.build_contract(&build_args, self.output_dir.as_str());
+            contract_variant
+                .build_contract(&build_args, &self.output_dir)
+                .unwrap();
         }
     }
 
@@ -122,7 +136,7 @@ impl MetaConfig {
     }
 
     fn is_expected_crate(&self, dir_name: &str) -> bool {
-        if !dir_name.starts_with("wasm-") {
+        if !dir_name.starts_with("wasm") {
             return true;
         }
 
@@ -131,7 +145,8 @@ impl MetaConfig {
         }
 
         self.sc_config
-            .secondary_contracts()
+            .contracts
+            .iter()
             .any(|contract| contract.wasm_crate_dir_name().as_str() == dir_name)
     }
 
@@ -147,7 +162,7 @@ impl MetaConfig {
                 let file_name = path.file_name();
                 let dir_name = file_name.to_str().expect("error processing dir name");
                 if !self.is_expected_crate(dir_name) {
-                    println!("Removing crate {dir_name}");
+                    print_removing_wasm_crate(dir_name);
                     fs::remove_dir_all(path.path()).unwrap_or_else(|_| {
                         panic!("failed to remove unexpected directory {dir_name}")
                     });
@@ -174,13 +189,21 @@ fn adjust_target_dir_wasm(build_args: &mut BuildArgs) {
 /// This one is useful for some of the special unmanaged EI tests in the framework.
 /// Will do nothing for regular contracts.
 fn copy_to_wasm_unmanaged_ei() {
-    if std::path::Path::new(WASM_NO_MANAGED_EI_LIB_PATH).exists() {
-        fs::copy(WASM_LIB_PATH, WASM_NO_MANAGED_EI_LIB_PATH).unwrap();
+    let wasm_no_managed_ei_path = Path::new("..")
+        .join("wasm-no-managed-ei")
+        .join("src")
+        .join("lib.rs");
+
+    if wasm_no_managed_ei_path.exists() {
+        let wasm_lib_path = Path::new("..").join("wasm").join("src").join("lib.rs");
+        fs::copy(wasm_lib_path, wasm_no_managed_ei_path).unwrap();
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
+
     use crate::{cargo_toml::DependencyRawValue, contract::sc_config::ContractVariantProfile};
 
     const EXPECTED_CARGO_TOML_CONTENTS: &str =
@@ -223,13 +246,18 @@ members = [\".\"]
 
     #[test]
     fn test_generate_cargo() {
+        let path = Path::new("..")
+            .join("..")
+            .join("..")
+            .join("framework")
+            .join("base");
         let wasm_cargo_toml_data = super::WasmCargoTomlData {
             name: "test".to_string(),
             edition: "2021".to_string(),
             profile: ContractVariantProfile::default(),
             framework_dependency: DependencyRawValue {
                 version: Some("x.y.z".to_owned()),
-                path: Option::Some("../../../framework/base".to_owned()),
+                path: Option::Some(path),
                 ..Default::default()
             },
             contract_features: Vec::<String>::new(),

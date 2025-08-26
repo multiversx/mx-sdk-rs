@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use std::{
     ops::{Deref, DerefMut},
     sync::Arc,
@@ -9,6 +11,7 @@ use std::{
 ///
 /// This happens in a controlled environment, in the `with_shared` method closure argument.
 /// All reference-counted pointers are expected to be dropped until that closure finishes.
+#[deprecated(since = "0.57.0", note = "replaced by BlockchainVMRef and Arc")]
 pub enum Shareable<T> {
     Owned(T),
     Shared(Arc<T>),
@@ -55,7 +58,7 @@ impl<T> DerefMut for Shareable<T> {
             Shareable::Owned(t) => t,
             Shareable::Shared(_) => {
                 panic!("cannot mutably dereference ShareableMut when in Shared state")
-            },
+            }
         }
     }
 }
@@ -88,11 +91,11 @@ impl<T> Shareable<T> {
                 match Arc::try_unwrap(arc) {
                     Ok(t) => {
                         std::ptr::write(self, Shareable::Owned(t));
-                    },
+                    }
                     Err(rc) => {
                         std::mem::forget(rc);
                         panic!("failed to recover Owned ShareableMut from Shared, not all Rc pointers dropped")
-                    },
+                    }
                 }
             } else {
                 std::mem::forget(temp);
@@ -123,6 +126,8 @@ impl<T> Shareable<T> {
 
 #[cfg(test)]
 mod test {
+    #![allow(deprecated)]
+
     use std::cell::RefCell;
 
     use super::Shareable;

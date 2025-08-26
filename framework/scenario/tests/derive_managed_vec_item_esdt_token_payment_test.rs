@@ -1,7 +1,9 @@
 use multiversx_sc::{
     api::ManagedTypeApi,
-    codec,
-    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    codec::{
+        self,
+        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    },
     derive::ManagedVecItem,
     types::{
         BigUint, EsdtTokenPayment, ManagedByteArray, ManagedType, ManagedVecItemPayload,
@@ -50,9 +52,6 @@ fn struct_to_bytes_writer() {
         eth_address_2: ManagedByteArray::new_from_bytes(&[2u8; 20]),
     };
 
-    let mut payload = <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
-    let payload_slice = payload.payload_slice_mut();
-
     let handle1 = s.token.token_identifier.get_handle().to_be_bytes();
     let handle2 = s.token.amount.get_handle().to_be_bytes();
     let handle3 = s.eth_address_1.get_handle().to_be_bytes();
@@ -63,14 +62,12 @@ fn struct_to_bytes_writer() {
         handle3[1], handle3[2], handle3[3], handle4[0], handle4[1], handle4[2], handle4[3],
     ];
 
-    <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::into_byte_writer(
+    let mut payload = <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
+    <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::save_to_payload(
         s,
-        |bytes| {
-            payload_slice.copy_from_slice(bytes);
-
-            assert_eq!(payload_slice, expected);
-        },
+        &mut payload,
     );
+    assert_eq!(payload.into_array(), expected);
 }
 
 #[test]
@@ -93,14 +90,8 @@ fn struct_from_bytes_reader() {
     ];
 
     let struct_from_bytes =
-        <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::from_byte_reader(
-            |bytes| {
-                bytes.copy_from_slice(
-                    &arr
-                        [0
-                            ..<ManagedStructWithToken::<StaticApi> as multiversx_sc::types::ManagedVecItem>::payload_size()],
-                );
-            },
+        <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::read_from_payload(
+            &arr.into()
         );
 
     assert_eq!(s, struct_from_bytes);

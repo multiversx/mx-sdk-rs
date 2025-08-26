@@ -29,7 +29,7 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -59,7 +59,7 @@
                     "3",
                     "6"
                 ],
-                "gasLimit": "100,000,000",
+                "gasLimit": "150,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -171,7 +171,7 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:vault": {
                     "nonce": "0",

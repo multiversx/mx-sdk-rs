@@ -22,7 +22,7 @@
         },
         {
             "step": "scCall",
-            "id": "11",
+            "id": "forward_transf_exec_egld 1000 EGLD",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -70,7 +70,7 @@
         },
         {
             "step": "scCall",
-            "id": "11",
+            "id": "forward_transf_exec_egld 0 EGLD",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",

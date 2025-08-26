@@ -57,13 +57,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("EGLD")]
     #[endpoint]
     fn receive_egld(&self) -> BigUint {
-        self.call_value().egld_value().clone_value()
+        self.call_value().egld().clone()
     }
 
     #[payable("EGLD")]
     #[endpoint]
-    fn recieve_egld_half(&self) {
-        let payment_amount = &*self.call_value().egld_value() / 2u32;
+    fn receive_egld_half(&self) {
+        let payment_amount = &*self.call_value().egld() / 2u32;
         self.tx().to(ToCaller).egld(payment_amount).transfer();
     }
 
@@ -71,7 +71,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn receive_esdt(&self) -> (TokenIdentifier, BigUint) {
         let payment = self.call_value().single_esdt();
-        (payment.token_identifier, payment.amount)
+        (payment.token_identifier.clone(), payment.amount.clone())
     }
 
     #[payable("*")]
@@ -84,7 +84,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn receive_esdt_half(&self) {
         let payment = self.call_value().single_esdt();
-        let amount = payment.amount / 2u32;
+        let amount = &payment.amount / 2u32;
 
         self.tx()
             .to(ToCaller)
@@ -95,7 +95,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("*")]
     #[endpoint]
     fn receive_multi_esdt(&self) -> ManagedVec<EsdtTokenPayment<Self::Api>> {
-        self.call_value().all_esdt_transfers().clone_value()
+        self.call_value().all_esdt_transfers().clone()
     }
 
     #[payable("*")]

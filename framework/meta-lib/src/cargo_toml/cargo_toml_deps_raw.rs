@@ -1,3 +1,5 @@
+use std::{collections::BTreeSet, path::PathBuf};
+
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct DependencyRawValue {
     pub version: Option<String>,
@@ -5,7 +7,8 @@ pub struct DependencyRawValue {
     pub rev: Option<String>,
     pub branch: Option<String>,
     pub tag: Option<String>,
-    pub path: Option<String>,
+    pub path: Option<PathBuf>,
+    pub features: BTreeSet<String>,
 }
 
 impl DependencyRawValue {
@@ -25,7 +28,7 @@ impl DependencyRawValue {
                     result.version = Some(version.to_owned());
                 }
                 if let Some(toml::Value::String(path)) = table.get("path") {
-                    result.path = Some(path.to_owned());
+                    result.path = Some(PathBuf::from(path));
                 }
                 if let Some(toml::Value::String(git)) = table.get("git") {
                     result.git = Some(git.to_owned());
@@ -40,7 +43,7 @@ impl DependencyRawValue {
                     result.tag = Some(tag.to_owned());
                 }
                 result
-            },
+            }
             _ => panic!("Unsupported dependency value"),
         }
     }
@@ -69,7 +72,22 @@ impl DependencyRawValue {
         }
 
         if let Some(path) = self.path {
-            table.insert("path".to_string(), toml::Value::String(path));
+            table.insert(
+                "path".to_string(),
+                toml::Value::String(path.to_string_lossy().into_owned()),
+            );
+        }
+
+        if !self.features.is_empty() {
+            table.insert(
+                "features".to_string(),
+                toml::Value::Array(
+                    self.features
+                        .iter()
+                        .map(|feature| toml::Value::String(feature.clone()))
+                        .collect(),
+                ),
+            );
         }
 
         toml::Value::Table(table)

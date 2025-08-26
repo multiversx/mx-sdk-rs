@@ -59,10 +59,13 @@ pub enum ReturnCode {
 
     // Returned when a connection timeout occurs
     NetworkTimeout = 101,
+
+    // Constructed from failed VM Queries in interactors
+    VMQueryError = 200,
 }
 
 impl ReturnCode {
-    pub fn as_u64(self) -> u64 {
+    pub const fn as_u64(self) -> u64 {
         self as u64
     }
 

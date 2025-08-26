@@ -1,0 +1,32 @@
+[package]
+name = "multiversx-chain-vm-wasmer-prod"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+description = "MultiversX VM adapter for the Wasmer Production executor"
+
+[lib]
+path = "src/wasmer_prod.rs"
+
+[dependencies.multiversx-chain-core]
+version = "=0.17.0"
+path = "../core"
+
+
+[dependencies.multiversx-chain-vm]
+version = "=0.17.0"
+path = "../vm"
+
+[dependencies.multiversx-chain-vm-executor]
+version = "0.5.0"
+
+[dependencies.multiversx-chain-vm-executor-wasmer]
+version = "0.5.0"
+default-features = false
+features = ["multiversx-chain-vm-executor-published"]
+git = "https://github.com/multiversx/mx-vm-executor-rs"
+rev = "2eebf910d7c35779fe2cf932c1c2159ba41df030"
+
+[workspace]
+members = ["."]

@@ -1,6 +1,8 @@
 use core::ptr;
 
-use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{
+    EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
+};
 
 use crate::{
     abi::TypeAbiFrom,
@@ -32,7 +34,7 @@ impl<'a> TestSCAddress<'a> {
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for TestSCAddress<'a>
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for TestSCAddress<'_>
 where
     Env: TxEnv,
 {
@@ -48,7 +50,7 @@ where
     }
 }
 
-impl<'a> TestSCAddress<'a> {
+impl TestSCAddress<'_> {
     pub fn to_address(&self) -> Address {
         self.eval_to_array().into()
     }
@@ -58,13 +60,13 @@ impl<'a> TestSCAddress<'a> {
     }
 }
 
-impl<'a, 'b> PartialEq<TestAddress<'b>> for TestSCAddress<'a> {
+impl PartialEq<TestAddress<'_>> for TestSCAddress<'_> {
     fn eq(&self, other: &TestAddress) -> bool {
         self.to_address() == other.to_address()
     }
 }
 
-impl<'a> PartialEq<Address> for TestSCAddress<'a> {
+impl PartialEq<Address> for TestSCAddress<'_> {
     fn eq(&self, other: &Address) -> bool {
         &self.to_address() == other
     }
@@ -76,7 +78,21 @@ impl<'a> PartialEq<TestSCAddress<'a>> for Address {
     }
 }
 
-impl<'a, Api: ManagedTypeApi> PartialEq<ManagedAddress<Api>> for TestSCAddress<'a> {
+#[cfg(feature = "std")]
+impl PartialEq<multiversx_chain_core::std::Bech32Address> for TestSCAddress<'_> {
+    fn eq(&self, other: &multiversx_chain_core::std::Bech32Address) -> bool {
+        self.to_address() == other.address
+    }
+}
+
+#[cfg(feature = "std")]
+impl<'a> PartialEq<TestSCAddress<'a>> for multiversx_chain_core::std::Bech32Address {
+    fn eq(&self, other: &TestSCAddress<'a>) -> bool {
+        self.address == other.to_address()
+    }
+}
+
+impl<Api: ManagedTypeApi> PartialEq<ManagedAddress<Api>> for TestSCAddress<'_> {
     fn eq(&self, other: &ManagedAddress<Api>) -> bool {
         self.to_address() == other.to_address()
     }
@@ -88,7 +104,7 @@ impl<'a, Api: ManagedTypeApi> PartialEq<TestSCAddress<'a>> for ManagedAddress<Ap
     }
 }
 
-impl<'a, Env> TxFrom<Env> for TestSCAddress<'a>
+impl<Env> TxFrom<Env> for TestSCAddress<'_>
 where
     Env: TxEnv,
 {
@@ -97,11 +113,11 @@ where
         expr.into()
     }
 }
-impl<'a, Env> TxFromSpecified<Env> for TestSCAddress<'a> where Env: TxEnv {}
-impl<'a, Env> TxTo<Env> for TestSCAddress<'a> where Env: TxEnv {}
-impl<'a, Env> TxToSpecified<Env> for TestSCAddress<'a> where Env: TxEnv {}
+impl<Env> TxFromSpecified<Env> for TestSCAddress<'_> where Env: TxEnv {}
+impl<Env> TxTo<Env> for TestSCAddress<'_> where Env: TxEnv {}
+impl<Env> TxToSpecified<Env> for TestSCAddress<'_> where Env: TxEnv {}
 
-impl<'a> TestSCAddress<'a> {
+impl TestSCAddress<'_> {
     pub fn eval_to_array(&self) -> [u8; 32] {
         let result = *b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00______________________";
         let expr_bytes = self.name.as_bytes();
@@ -130,7 +146,7 @@ impl<'a> TestSCAddress<'a> {
     }
 }
 
-impl<'a> TopEncode for TestSCAddress<'a> {
+impl TopEncode for TestSCAddress<'_> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -140,7 +156,18 @@ impl<'a> TopEncode for TestSCAddress<'a> {
     }
 }
 
-impl<'a, Api> TypeAbiFrom<TestSCAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
+impl NestedEncode for TestSCAddress<'_> {
+    #[inline]
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.eval_to_array().dep_encode_or_handle_err(dest, h)
+    }
+}
+
+impl<Api> TypeAbiFrom<TestSCAddress<'_>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
 
 #[cfg(test)]
 pub mod tests {

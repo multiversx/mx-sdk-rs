@@ -2,6 +2,7 @@ use core::marker::PhantomData;
 
 use crate::codec::Empty;
 
+use crate::types::ManagedRef;
 use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
@@ -52,7 +53,7 @@ where
         self.esdt_system_sc_tx()
     }
 
-    /// Prepares a proxy object to call the system SC.
+    /// Prepares a proxy object to call the ESDT system SC.
     /// It has the destination address set, as well as the contract type (as specified in the proxy).
     pub fn esdt_system_sc_tx(
         &self,
@@ -137,7 +138,7 @@ where
         D: Into<ManagedBuffer<A>>,
     {
         if nonce == 0 {
-            let _ = self.send_raw_wrapper().transfer_esdt_execute(
+            self.send_raw_wrapper().transfer_esdt_execute(
                 to,
                 token_identifier,
                 amount,
@@ -146,7 +147,7 @@ where
                 &arguments.into(),
             );
         } else {
-            let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+            self.send_raw_wrapper().transfer_esdt_nft_execute(
                 to,
                 token_identifier,
                 nonce,
@@ -253,7 +254,7 @@ where
                 arguments,
             );
         } else {
-            let _ = self.send_raw_wrapper().direct_egld_execute(
+            self.send_raw_wrapper().direct_egld_execute(
                 to,
                 amount,
                 gas,
@@ -304,7 +305,7 @@ where
     ///
     /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.
     ///
-    /// Note that EGLD can NOT be transfered with this function.  
+    /// Note that EGLD can NOT be transferred with this function.  
     pub fn transfer_esdt_via_async_call(
         &self,
         to: ManagedAddress<A>,
@@ -324,7 +325,7 @@ where
     /// so only use as the last call in your endpoint.
     ///
     /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
-    /// Note that EGLD can NOT be transfered with this function.
+    /// Note that EGLD can NOT be transferred with this function.
     ///
     /// If the amount is 0, it returns without error.
     pub fn transfer_esdt_non_zero_via_async_call(
@@ -589,7 +590,9 @@ where
     ) -> u64 {
         let big_zero = BigUint::zero();
         let empty_buffer = ManagedBuffer::new();
-        let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
+
+        // sneakily reuses the same handle
+        let empty_vec = unsafe { ManagedRef::wrap_handle(empty_buffer.get_handle()) };
 
         self.esdt_nft_create(
             token,
@@ -662,7 +665,7 @@ where
         );
         let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
 
-        let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+        self.send_raw_wrapper().transfer_esdt_nft_execute(
             buyer,
             nft_id,
             nft_nonce,
@@ -758,6 +761,86 @@ where
             .gas(GasLeft)
             .typed(system_proxy::UserBuiltinProxy)
             .nft_update_attributes(token_id, nft_nonce, new_attributes)
+            .sync_call()
+    }
+
+    /// Modifies royalties for a specific token.
+    pub fn esdt_modify_royalties(
+        &self,
+        token_id: &TokenIdentifier<A>,
+        nonce: u64,
+        new_royalty: u64,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_modify_royalties(token_id, nonce, new_royalty)
+            .sync_call()
+    }
+
+    /// Sets new uris for a specific token.
+    pub fn esdt_nft_set_new_uris(
+        &self,
+        token_id: &TokenIdentifier<A>,
+        nonce: u64,
+        uris: &ManagedVec<A, ManagedBuffer<A>>,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_nft_set_new_uris(token_id, nonce, uris)
+            .sync_call()
+    }
+
+    /// Changes the creator of a specific token into the caller.
+    pub fn esdt_nft_modify_creator(&self, token_id: &TokenIdentifier<A>, nonce: u64) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_nft_modify_creator(token_id, nonce)
+            .sync_call()
+    }
+
+    /// Recreates an ESDT token with the newly specified attributes.
+    #[allow(clippy::too_many_arguments)]
+    pub fn esdt_metadata_recreate<T: codec::TopEncode>(
+        &self,
+        token_id: TokenIdentifier<A>,
+        nonce: u64,
+        name: ManagedBuffer<A>,
+        royalties: u64,
+        hash: ManagedBuffer<A>,
+        new_attributes: &T,
+        uris: ManagedVec<A, ManagedBuffer<A>>,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_metadata_recreate(token_id, nonce, name, royalties, hash, new_attributes, uris)
+            .sync_call()
+    }
+
+    /// Updates an ESDT token with the newly specified attributes.
+    #[allow(clippy::too_many_arguments)]
+    pub fn esdt_metadata_update<T: codec::TopEncode>(
+        &self,
+        token_id: TokenIdentifier<A>,
+        nonce: u64,
+        name: ManagedBuffer<A>,
+        royalties: u64,
+        hash: ManagedBuffer<A>,
+        new_attributes: &T,
+        uris: ManagedVec<A, ManagedBuffer<A>>,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_metadata_update(token_id, nonce, name, royalties, hash, new_attributes, uris)
             .sync_call()
     }
 }

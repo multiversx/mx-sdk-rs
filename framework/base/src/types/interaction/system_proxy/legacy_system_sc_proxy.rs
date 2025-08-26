@@ -17,6 +17,8 @@ const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &str = "issueNonFungible";
 const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &str = "issueSemiFungible";
 const REGISTER_META_ESDT_ENDPOINT_NAME: &str = "registerMetaESDT";
 const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
+const REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME: &str = "registerDynamic";
+const REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME: &str = "registerAndSetAllRolesDynamic";
 
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
@@ -37,7 +39,7 @@ where
     SA: SendApi + 'static,
 {
     /// Constructor.
-    /// TODO: consider moving this to a new Proxy contructor trait (bonus: better proxy constructor syntax).
+    /// TODO: consider moving this to a new Proxy constructor trait (bonus: better proxy constructor syntax).
     pub fn new_proxy_obj() -> Self {
         ESDTSystemSmartContractProxy {
             _phantom: PhantomData,
@@ -154,7 +156,7 @@ where
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
-            EsdtTokenType::Meta,
+            EsdtTokenType::MetaFungible,
             token_display_name,
             token_ticker,
             &zero,
@@ -185,21 +187,78 @@ where
 
         let token_type_name = match token_type {
             EsdtTokenType::Fungible => "FNG",
-            EsdtTokenType::NonFungible => "NFT",
-            EsdtTokenType::SemiFungible => "SFT",
-            EsdtTokenType::Meta => "META",
+            EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
+            | EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::SemiFungible | EsdtTokenType::DynamicSFT => "SFT",
+            EsdtTokenType::MetaFungible | EsdtTokenType::DynamicMeta => "META",
             EsdtTokenType::Invalid => "",
         };
 
-        ContractCallWithEgld::new(
-            esdt_system_sc_address,
-            ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
-            issue_cost,
-        )
-        .argument(&token_display_name)
-        .argument(&token_ticker)
-        .argument(&token_type_name)
-        .argument(&num_decimals)
+        let endpoint = match token_type {
+            EsdtTokenType::Fungible
+            | EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
+            | EsdtTokenType::SemiFungible
+            | EsdtTokenType::MetaFungible => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
+
+            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
+                REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME
+            }
+
+            EsdtTokenType::Invalid => "",
+        };
+
+        let mut contract_call =
+            ContractCallWithEgld::new(esdt_system_sc_address, endpoint, issue_cost)
+                .argument(&token_display_name)
+                .argument(&token_ticker)
+                .argument(&token_type_name);
+
+        if token_type != EsdtTokenType::DynamicNFT {
+            contract_call = contract_call.argument(&num_decimals);
+        }
+
+        contract_call
+    }
+
+    /// Issues dynamic ESDT tokens
+    pub fn issue_dynamic(
+        self,
+        issue_cost: BigUint<SA>,
+        token_display_name: &ManagedBuffer<SA>,
+        token_ticker: &ManagedBuffer<SA>,
+        token_type: EsdtTokenType,
+        num_decimals: usize,
+    ) -> ContractCallWithEgld<SA, ()> {
+        let esdt_system_sc_address = self.esdt_system_sc_address();
+
+        let endpoint_name = match token_type {
+            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
+                REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
+            }
+            _ => "",
+        };
+
+        let token_type_name = match token_type {
+            EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::DynamicSFT => "SFT",
+            EsdtTokenType::DynamicMeta => "META",
+            _ => "",
+        };
+
+        let mut contract_call =
+            ContractCallWithEgld::new(esdt_system_sc_address, endpoint_name, issue_cost);
+
+        contract_call.proxy_arg(token_display_name);
+        contract_call.proxy_arg(token_ticker);
+        contract_call.proxy_arg(&token_type_name);
+
+        if token_type != EsdtTokenType::DynamicNFT {
+            contract_call.proxy_arg(&num_decimals);
+        }
+
+        contract_call
     }
 
     /// Deduplicates code from all the possible issue functions
@@ -218,8 +277,8 @@ where
             EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
-            EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
-            EsdtTokenType::Invalid => "",
+            EsdtTokenType::MetaFungible => REGISTER_META_ESDT_ENDPOINT_NAME,
+            _ => "",
         };
 
         let mut contract_call =
@@ -231,7 +290,7 @@ where
         if token_type == EsdtTokenType::Fungible {
             contract_call.proxy_arg(initial_supply);
             contract_call.proxy_arg(&properties.num_decimals);
-        } else if token_type == EsdtTokenType::Meta {
+        } else if token_type == EsdtTokenType::MetaFungible {
             contract_call.proxy_arg(&properties.num_decimals);
         }
 

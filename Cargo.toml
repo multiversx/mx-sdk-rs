@@ -22,12 +22,13 @@ members = [
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",
-  "tools/payload-macro-generator",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
+
+  "tools/interactor-delegation-func-calls/",
+  "tools/interactor-governance-func-calls/",
+  "tools/gas-schedule-generator",
   "tools/git-scraper/",
-
-
 
   "contracts/modules",
 
@@ -137,6 +138,7 @@ members = [
   "contracts/feature-tests/composability/execute-on-dest-esdt-issue-callback/child/meta",
   "contracts/feature-tests/composability/forwarder",
   "contracts/feature-tests/composability/forwarder/meta",
+  "contracts/feature-tests/composability/forwarder-interactor",
   "contracts/feature-tests/composability/forwarder-legacy",
   "contracts/feature-tests/composability/forwarder-legacy/meta",
   "contracts/feature-tests/composability/forwarder-queue",
@@ -145,8 +147,6 @@ members = [
   "contracts/feature-tests/composability/forwarder-raw/meta",
   "contracts/feature-tests/composability/local-esdt-and-nft",
   "contracts/feature-tests/composability/local-esdt-and-nft/meta",
-  "contracts/feature-tests/composability/promises-features",
-  "contracts/feature-tests/composability/promises-features/meta",
   "contracts/feature-tests/composability/proxy-test-first",
   "contracts/feature-tests/composability/proxy-test-first/meta",
   "contracts/feature-tests/composability/proxy-test-second",
@@ -177,13 +177,12 @@ members = [
   "contracts/feature-tests/exchange-features/meta",
   "contracts/feature-tests/formatted-message-features",
   "contracts/feature-tests/formatted-message-features/meta",
-  "contracts/feature-tests/managed-map-features",
-  "contracts/feature-tests/managed-map-features/meta",
   "contracts/feature-tests/multi-contract-features",
   "contracts/feature-tests/multi-contract-features/meta",
   "contracts/feature-tests/panic-message-features",
   "contracts/feature-tests/panic-message-features/meta",
   "contracts/feature-tests/payable-features",
+  "contracts/feature-tests/payable-features/interactor",
   "contracts/feature-tests/payable-features/meta",
   "contracts/feature-tests/rust-snippets-generator-test",
   "contracts/feature-tests/rust-snippets-generator-test/meta",
@@ -191,6 +190,12 @@ members = [
   "contracts/feature-tests/rust-testing-framework-tester/meta",
   "contracts/feature-tests/scenario-tester",
   "contracts/feature-tests/scenario-tester/meta",
+  "contracts/feature-tests/std-contract",
+  "contracts/feature-tests/std-contract/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
+
+
+  # "chain/wasmer-prod", ## not included, references wasmer 2.2
+  # "contracts/feature-tests/gas-tests", ## uncomment for easier development
 ]

@@ -60,7 +60,7 @@ pub trait GovernanceModule:
         self.require_valid_proposal_id(proposal_id);
         require!(
             self.get_proposal_status(proposal_id) == GovernanceProposalStatus::WaitingForFees,
-            "Cannot claim deposited tokens anymore; Proposal is not in WatingForFees state"
+            "Cannot claim deposited tokens anymore; Proposal is not in WaitingForFees state"
         );
 
         require!(
@@ -74,7 +74,7 @@ pub trait GovernanceModule:
         let mut i = 0;
         while i < proposal.fees.entries.len() {
             if proposal.fees.entries.get(i).depositor_addr == caller {
-                fees_to_send.push(proposal.fees.entries.get(i));
+                fees_to_send.push(proposal.fees.entries.get(i).clone());
                 proposal.fees.entries.remove(i);
             } else {
                 i += 1;
@@ -202,31 +202,31 @@ pub trait GovernanceModule:
                     total_votes.up_votes += &payment.amount.clone();
                 });
                 self.up_vote_cast_event(&voter, proposal_id, &payment.amount);
-            },
+            }
             VoteType::DownVote => {
                 self.proposal_votes(proposal_id).update(|total_votes| {
                     total_votes.down_votes += &payment.amount.clone();
                 });
                 self.down_vote_cast_event(&voter, proposal_id, &payment.amount);
-            },
+            }
             VoteType::DownVetoVote => {
                 self.proposal_votes(proposal_id).update(|total_votes| {
                     total_votes.down_veto_votes += &payment.amount.clone();
                 });
                 self.down_veto_vote_cast_event(&voter, proposal_id, &payment.amount);
-            },
+            }
             VoteType::AbstainVote => {
                 self.proposal_votes(proposal_id).update(|total_votes| {
                     total_votes.abstain_votes += &payment.amount.clone();
                 });
                 self.abstain_vote_cast_event(&voter, proposal_id, &payment.amount);
-            },
+            }
         }
     }
 
     /// Queue a proposal for execution.
     /// This can be done only if the proposal has reached the quorum.
-    /// A proposal is considered successful and ready for queing if
+    /// A proposal is considered successful and ready for queuing if
     /// total_votes - total_downvotes >= quorum
     #[endpoint]
     fn queue(&self, proposal_id: usize) {
@@ -299,7 +299,7 @@ pub trait GovernanceModule:
         match self.get_proposal_status(proposal_id) {
             GovernanceProposalStatus::None => {
                 sc_panic!("Proposal does not exist");
-            },
+            }
             GovernanceProposalStatus::Pending => {
                 let proposal = self.proposals().get(proposal_id);
                 let caller = self.blockchain().get_caller();
@@ -308,14 +308,14 @@ pub trait GovernanceModule:
                     caller == proposal.proposer,
                     "Only original proposer may cancel a pending proposal"
                 );
-            },
-            GovernanceProposalStatus::Defeated => {},
+            }
+            GovernanceProposalStatus::Defeated => {}
             GovernanceProposalStatus::WaitingForFees => {
                 self.refund_payments(proposal_id);
-            },
+            }
             _ => {
                 sc_panic!("Action may not be cancelled");
-            },
+            }
         }
 
         self.clear_proposal(proposal_id);
@@ -417,7 +417,7 @@ pub trait GovernanceModule:
         let payments = self.proposals().get(proposal_id).fees;
 
         for fee_entry in payments.entries.iter() {
-            let payment = fee_entry.tokens;
+            let payment = &fee_entry.tokens;
             self.tx()
                 .to(&fee_entry.depositor_addr)
                 .single_esdt(
@@ -435,7 +435,7 @@ pub trait GovernanceModule:
             payment.token_identifier == self.governance_token_id().get(),
             "Only Governance token accepted as payment"
         );
-        payment
+        payment.clone()
     }
 
     fn require_valid_proposal_id(&self, proposal_id: usize) {

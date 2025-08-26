@@ -8,7 +8,7 @@ use alloc::{boxed::Box, vec::Vec};
 
 /// Deserializes from the MultiversX smart contract call format.
 ///
-/// This format consists of the function name, followed by '@', follwed by hex-encoded argument bytes separated by '@' characters.
+/// This format consists of the function name, followed by '@', followed by hex-encoded argument bytes separated by '@' characters.
 /// Example: "funcName@00000@aaaa@1234@@".
 /// Arguments can be empty.
 /// Argument hex encodings must always have an even number of digits.
@@ -91,19 +91,19 @@ impl<'a> HexCallDataDeserializer<'a> {
                     match hex_digits_to_byte(arg_hex[2 * i], arg_hex[2 * i + 1]) {
                         None => {
                             return Err(err_msg::DESERIALIZATION_INVALID_BYTE);
-                        },
+                        }
                         Some(byte) => {
                             res_vec.push(byte);
-                        },
+                        }
                     }
                 }
                 Ok(Some(res_vec))
-            },
+            }
         }
     }
 }
 
-impl<'a> TopDecodeMultiInput for HexCallDataDeserializer<'a> {
+impl TopDecodeMultiInput for HexCallDataDeserializer<'_> {
     type ValueInput = Box<[u8]>;
 
     fn has_next(&self) -> bool {

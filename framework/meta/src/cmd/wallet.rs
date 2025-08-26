@@ -2,7 +2,6 @@ use core::str;
 
 use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
 use multiversx_sc::types::{self, Address};
-use multiversx_sc_snippets::sdk::bech32;
 use multiversx_sc_snippets::sdk::{crypto::public_key::PublicKey, wallet::Wallet};
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
 use std::{
@@ -24,6 +23,10 @@ fn convert(convert_args: &WalletConvertArgs) {
     let outfile = convert_args.outfile.as_ref();
     let in_format = &convert_args.from;
     let out_format = &convert_args.to;
+    let hrp = convert_args
+        .hrp
+        .clone()
+        .unwrap_or_else(|| "erd".to_string());
 
     let mut mnemonic_str = String::new();
     let private_key_str: String;
@@ -34,14 +37,14 @@ fn convert(convert_args: &WalletConvertArgs) {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
                 (private_key_str, public_key_str) = Wallet::get_wallet_keys_mnemonic(mnemonic_str);
-                write_resulted_pem(&public_key_str, &private_key_str, outfile);
-            },
+                write_resulted_pem(&hrp, &public_key_str, &private_key_str, outfile);
+            }
             None => {
                 println!("Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.");
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
                 (private_key_str, public_key_str) = Wallet::get_wallet_keys_mnemonic(mnemonic_str);
-                write_resulted_pem(&public_key_str, &private_key_str, outfile);
-            },
+                write_resulted_pem(&hrp, &public_key_str, &private_key_str, outfile);
+            }
         },
         ("keystore-secret", "pem") => match infile {
             Some(file) => {
@@ -53,11 +56,11 @@ fn convert(convert_args: &WalletConvertArgs) {
                 private_key_str = private_key.to_string();
                 let public_key = PublicKey::from(&private_key);
                 public_key_str = public_key.to_string();
-                write_resulted_pem(&public_key_str, &private_key_str, outfile);
-            },
+                write_resulted_pem(&hrp, &public_key_str, &private_key_str, outfile);
+            }
             None => {
                 panic!("Input file is required for keystore-secret format");
-            },
+            }
         },
         ("pem", "keystore-secret") => match infile {
             Some(file) => {
@@ -69,34 +72,35 @@ fn convert(convert_args: &WalletConvertArgs) {
 
                 let json_result = Wallet::encrypt_keystore(
                     hex_decoded_keys.as_slice(),
+                    &hrp,
                     &address,
                     &public_key_str,
                     &Wallet::get_keystore_password(),
                 );
                 write_resulted_keystore(json_result, outfile);
-            },
+            }
             None => {
                 panic!("Input file is required for pem format");
-            },
+            }
         },
         _ => {
             println!("Unsupported conversion");
-        },
+        }
     }
 }
 
-fn write_resulted_pem(public_key: &str, private_key: &str, outfile: Option<&String>) {
+fn write_resulted_pem(hrp: &str, public_key: &str, private_key: &str, outfile: Option<&String>) {
     let address = get_wallet_address(private_key);
     match outfile {
         Some(outfile) => {
-            let pem_content = Wallet::generate_pem_content(&address, private_key, public_key);
+            let pem_content = Wallet::generate_pem_content(hrp, &address, private_key, public_key);
             let mut file = File::create(outfile).unwrap();
             file.write_all(pem_content.as_bytes()).unwrap();
-        },
+        }
         None => {
-            let pem_content = Wallet::generate_pem_content(&address, private_key, public_key);
+            let pem_content = Wallet::generate_pem_content(hrp, &address, private_key, public_key);
             print!("{}", pem_content);
-        },
+        }
     }
 }
 
@@ -105,10 +109,10 @@ fn write_resulted_keystore(json_result: String, outfile: Option<&String>) {
         Some(outfile) => {
             let mut file = File::create(outfile).unwrap();
             file.write_all(json_result.as_bytes()).unwrap();
-        },
+        }
         None => {
             println!("{}", json_result);
-        },
+        }
     }
 }
 
@@ -124,15 +128,16 @@ fn bech32_conversion(bech32_args: &WalletBech32Args) {
             let addr = types::Address::from(&bytes_arr);
             let bech32_addr = Bech32Address::from(addr).to_bech32_str().to_string();
             println!("{}", bech32_addr);
-        },
+        }
         (None, Some(bech32)) => {
-            let hex_addr = Bech32Address::from_bech32_string(bech32.to_string()).to_hex();
+            let bech32_address = Bech32Address::from_bech32_string(bech32.to_string());
+            let hex_addr = hex::encode(&bech32_address.address);
             println!("{}", hex_addr);
-        },
+        }
         (Some(_), Some(_)) => {
             println!("error: only one of --encode or --decode can be used in the same command");
-        },
-        _ => {},
+        }
+        _ => {}
     }
 }
 
@@ -144,32 +149,39 @@ fn get_wallet_address(private_key: &str) -> Address {
 fn new(new_args: &WalletNewArgs) {
     let format = new_args.wallet_format.as_deref();
     let outfile = new_args.outfile.as_ref(); // Handle outfile as Option<&str> if it's an Option<String>
+    let hrp = new_args.hrp.clone().unwrap_or_else(|| "erd".to_string());
     let mnemonic = Wallet::generate_mnemonic();
     println!("Mnemonic: {}", mnemonic);
 
     let (private_key_str, public_key_str) = Wallet::get_wallet_keys_mnemonic(mnemonic.to_string());
     let address = get_wallet_address(private_key_str.as_str());
 
-    println!("Wallet address: {}", bech32::encode(&address));
+    println!("Wallet address: {}", address.to_bech32(&hrp));
 
     match format {
         Some("pem") => {
-            write_resulted_pem(public_key_str.as_str(), private_key_str.as_str(), outfile);
-        },
+            write_resulted_pem(
+                &hrp,
+                public_key_str.as_str(),
+                private_key_str.as_str(),
+                outfile,
+            );
+        }
         Some("keystore-secret") => {
             let concatenated_keys = format!("{}{}", private_key_str, public_key_str);
             let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
             let json_result = Wallet::encrypt_keystore(
                 hex_decoded_keys.as_slice(),
+                &hrp,
                 &address,
                 &public_key_str,
                 &Wallet::get_keystore_password(),
             );
             write_resulted_keystore(json_result, outfile);
-        },
+        }
         Some(_) => {
             println!("Unsupported format");
-        },
-        None => {},
+        }
+        None => {}
     }
 }

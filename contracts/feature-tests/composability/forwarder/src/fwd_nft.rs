@@ -5,7 +5,7 @@ use super::fwd_storage;
 
 // used as mock attributes for NFTs
 #[type_abi]
-#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug)]
+#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug, Default)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
@@ -13,7 +13,7 @@ pub struct Color {
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone)]
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub biguint: BigUint<M>,
     pub vec_u8: ManagedBuffer<M>,
@@ -52,13 +52,13 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     #[payable("EGLD")]
     #[endpoint]
     fn nft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         let caller = self.blockchain().get_caller();
 
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 NonFungibleTokenProperties {
@@ -85,7 +85,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
             ManagedAsyncCallResult::Ok(token_identifier) => {
                 self.last_issued_token().set(&token_identifier);
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 let (token_identifier, returned_tokens) =
@@ -95,7 +95,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 

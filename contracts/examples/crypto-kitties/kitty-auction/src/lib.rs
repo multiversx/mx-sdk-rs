@@ -152,7 +152,7 @@ pub trait KittyAuction {
     #[payable("EGLD")]
     #[endpoint]
     fn bid(&self, kitty_id: u32) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
 
         require!(
             self.is_up_for_auction(kitty_id),
@@ -192,7 +192,7 @@ pub trait KittyAuction {
         }
 
         // update auction bid and winner
-        auction.current_bid = payment.clone_value();
+        auction.current_bid = payment.clone();
         auction.current_winner = caller;
         self.auction(kitty_id).set(auction);
     }
@@ -339,10 +339,10 @@ pub trait KittyAuction {
                 );
 
                 self.auction(cb_kitty_id).set(auction);
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 // nothing to revert in case of error
-            },
+            }
         }
     }
 
@@ -368,11 +368,11 @@ pub trait KittyAuction {
                         .egld(&auction.current_bid)
                         .transfer();
                 }
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_ownership contract address is invalid
                 // nothing to revert in case of error
-            },
+            }
         }
     }
 
@@ -391,11 +391,11 @@ pub trait KittyAuction {
 
                 // auction data will be cleared in the transfer callback
                 // winning bid money will be sent as well
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_ownership contract address is invalid
                 // nothing to revert in case of error
-            },
+            }
         }
     }
 
@@ -404,11 +404,11 @@ pub trait KittyAuction {
         match result {
             ManagedAsyncCallResult::Ok(kitty_id) => {
                 self.start_gen_zero_kitty_auction(kitty_id);
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_ownership contract address is invalid
                 // nothing to revert in case of error
-            },
+            }
         }
     }
 

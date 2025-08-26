@@ -1,5 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
+    typenum::Unsigned,
     types::{ConstDecimals, Decimals, ManagedDecimal, NumDecimals},
 };
 
@@ -24,7 +25,7 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> AddAssign<ManagedDecimal<M, 
 }
 
 // const + const
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Add<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+impl<M: ManagedTypeApi, DECIMALS: Unsigned> Add<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     type Output = Self;
@@ -44,19 +45,19 @@ impl<M: ManagedTypeApi> Add<ManagedDecimal<M, NumDecimals>> for ManagedDecimal<M
             core::cmp::Ordering::Less => {
                 self = self.rescale(rhs.decimals);
                 self.data += rhs.data;
-            },
+            }
             core::cmp::Ordering::Equal => self.data += rhs.data,
             core::cmp::Ordering::Greater => {
                 let rhs_data = rhs.rescale_data(self.decimals);
                 self.data += rhs_data;
-            },
+            }
         }
         self
     }
 }
 
 // var + const
-impl<const DECIMALS: usize, M: ManagedTypeApi> Add<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Add<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
     for ManagedDecimal<M, NumDecimals>
 {
     type Output = ManagedDecimal<M, NumDecimals>;
@@ -67,7 +68,7 @@ impl<const DECIMALS: usize, M: ManagedTypeApi> Add<ManagedDecimal<M, ConstDecima
 }
 
 // const + var
-impl<const DECIMALS: usize, M: ManagedTypeApi> Add<ManagedDecimal<M, NumDecimals>>
+impl<DECIMALS: Unsigned, M: ManagedTypeApi> Add<ManagedDecimal<M, NumDecimals>>
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     type Output = ManagedDecimal<M, NumDecimals>;

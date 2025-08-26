@@ -1,6 +1,4 @@
-use imports::{MxscPath, ReturnsResult, TestAddress, TestSCAddress};
-use multiversx_sc::types::{BigUint, ConstDecimals, ManagedDecimal};
-use multiversx_sc_scenario::{api::StaticApi, imports, ScenarioTxRun, ScenarioWorld};
+use multiversx_sc_scenario::imports::*;
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const BASIC_FEATURES_ADDRESS: TestSCAddress = TestSCAddress::new("basic-features");
@@ -26,7 +24,7 @@ impl BasicFeaturesState {
     }
 }
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
     blockchain.register_contract(BASIC_FEATURES_PATH, basic_features::ContractBuilder);
@@ -50,8 +48,6 @@ fn egld_decimal_blackbox_test() {
 
     assert_eq!(
         egld_decimal_result,
-        ManagedDecimal::<StaticApi, ConstDecimals<18>>::const_decimals_from_raw(BigUint::from(
-            5u64
-        ))
+        ManagedDecimal::<StaticApi, EgldDecimals>::const_decimals_from_raw(BigUint::from(5u64))
     );
 }

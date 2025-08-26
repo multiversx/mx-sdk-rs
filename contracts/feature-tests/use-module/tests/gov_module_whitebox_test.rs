@@ -75,7 +75,7 @@ fn setup() -> ScenarioWorld {
             );
         });
 
-    assert_eq!(new_address.to_address(), USE_MODULE_ADDRESS.to_address());
+    assert_eq!(new_address, USE_MODULE_ADDRESS);
 
     world.current_block().block_nonce(10);
 

@@ -37,7 +37,7 @@ pub fn generate_endpoints_mod(
                 A: multiversx_sc::api::VMApi ,
             {
                 super::EndpointWrappers::callback(
-                    &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                    &mut multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
                 );
             }
         }
@@ -71,11 +71,11 @@ fn generate_wasm_endpoints(contract_trait: &ContractTrait) -> Vec<proc_macro2::T
             PublicRole::Endpoint(endpoint_metadata) => {
                 let endpoint_ident = &endpoint_metadata.public_name;
                 Some(generate_wasm_endpoint(m, &quote! { #endpoint_ident }))
-            },
+            }
             PublicRole::CallbackPromise(callback_metadata) => {
                 let callback_name = &callback_metadata.callback_name;
                 Some(generate_wasm_endpoint(m, &quote! { #callback_name }))
-            },
+            }
             _ => None,
         })
         .collect()
@@ -93,7 +93,7 @@ fn generate_wasm_endpoint(
             A: multiversx_sc::api::VMApi,
         {
             super::EndpointWrappers::#call_method_ident(
-                &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                &mut multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
             );
         }
     }

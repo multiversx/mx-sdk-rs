@@ -1,22 +1,15 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-#[type_abi]
-#[derive(TopEncode, TopDecode)]
-pub struct CallbackData<M: ManagedTypeApi> {
-    callback_name: ManagedBuffer<M>,
-    token_identifier: EgldOrEsdtTokenIdentifier<M>,
-    token_nonce: u64,
-    token_amount: BigUint<M>,
-    args: ManagedVec<M, ManagedBuffer<M>>,
-}
+use crate::{
+    common::{self, CallbackData},
+    vault_proxy,
+};
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
 #[multiversx_sc::module]
-pub trait ForwarderAsyncCallModule {
+pub trait ForwarderAsyncCallModule: common::CommonModule {
     #[endpoint]
     fn echo_args_async(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
         self.tx()
@@ -39,7 +32,7 @@ pub trait ForwarderAsyncCallModule {
                 cb_result.append_vec(results.into_vec_of_buffers());
 
                 cb_result.into()
-            },
+            }
             ManagedAsyncCallResult::Err(err) => {
                 let mut cb_result =
                     ManagedVec::from_single_item(ManagedBuffer::new_from_bytes(b"error"));
@@ -49,7 +42,7 @@ pub trait ForwarderAsyncCallModule {
                 cb_result.push(err.err_msg);
 
                 cb_result.into()
-            },
+            }
         }
     }
 
@@ -117,6 +110,19 @@ pub trait ForwarderAsyncCallModule {
             .async_call_and_exit()
     }
 
+    #[endpoint]
+    #[payable]
+    fn forward_async_reject_funds(&self, to: ManagedAddress) {
+        let payment = self.call_value().all_transfers();
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .reject_funds()
+            .payment(payment)
+            .callback(self.callbacks().retrieve_funds_callback())
+            .async_call_and_exit()
+    }
+
     #[callback]
     fn retrieve_funds_callback(&self) {
         let (token, nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
@@ -130,14 +136,6 @@ pub trait ForwarderAsyncCallModule {
             args: ManagedVec::new(),
         });
     }
-
-    #[event("retrieve_funds_callback")]
-    fn retrieve_funds_callback_event(
-        &self,
-        #[indexed] token: &EgldOrEsdtTokenIdentifier,
-        #[indexed] nonce: u64,
-        #[indexed] payment: &BigUint,
-    );
 
     #[endpoint]
     fn send_funds_twice(
@@ -177,53 +175,27 @@ pub trait ForwarderAsyncCallModule {
     fn send_async_accept_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .payment(all_token_payments)
+            .payment(payment_args.convert_payment_multi_triples())
             .async_call_and_exit();
     }
 
-    #[view]
-    #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<CallbackData<Self::Api>>;
-
-    #[view]
-    fn callback_data_at_index(
-        &self,
-        index: usize,
-    ) -> MultiValue5<
-        ManagedBuffer,
-        EgldOrEsdtTokenIdentifier,
-        u64,
-        BigUint,
-        MultiValueManagedVec<Self::Api, ManagedBuffer>,
-    > {
-        let cb_data = self.callback_data().get(index);
-        (
-            cb_data.callback_name,
-            cb_data.token_identifier,
-            cb_data.token_nonce,
-            cb_data.token_amount,
-            cb_data.args.into(),
-        )
-            .into()
-    }
-
     #[endpoint]
-    fn clear_callback_data(&self) {
-        self.callback_data().clear();
+    fn send_async_reject_multi_transfer(
+        &self,
+        to: ManagedAddress,
+        payment_args: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
+    ) {
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
+            .reject_funds()
+            .payment(payment_args.convert_payment_multi_triples())
+            .async_call_and_exit();
     }
 }

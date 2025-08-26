@@ -1,7 +1,10 @@
-use multiversx_chain_vm::world_mock::BlockchainState;
+use multiversx_chain_vm::{blockchain::state::BlockchainState, schedule::GasScheduleVersion};
 
 use crate::{
-    scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
+    scenario::{
+        run_trace::ScenarioTrace,
+        run_vm::{ExecutorConfig, ScenarioVMRunner},
+    },
     vm_go_tool::run_mx_scenario_go,
 };
 use multiversx_sc_meta_lib::tools::find_current_workspace;
@@ -47,6 +50,17 @@ impl ScenarioWorld {
         Self::debugger()
     }
 
+    pub fn executor_config(mut self, config: ExecutorConfig) -> Self {
+        self.get_mut_debugger_backend().vm_runner.executor_config = config;
+        self
+    }
+
+    pub fn gas_schedule(mut self, gas_schedule: GasScheduleVersion) -> Self {
+        let vm = &mut self.get_mut_debugger_backend().vm_runner.blockchain_mock.vm;
+        vm.change_gas_schedule(gas_schedule.load_gas_schedule());
+        self
+    }
+
     pub fn vm_go() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),
@@ -63,10 +77,10 @@ impl ScenarioWorld {
         match self.backend {
             Backend::Debugger(mut debugger) => {
                 debugger.run_scenario_file(&absolute_path);
-            },
+            }
             Backend::VmGoBackend => {
                 run_mx_scenario_go(&absolute_path);
-            },
+            }
         }
     }
 

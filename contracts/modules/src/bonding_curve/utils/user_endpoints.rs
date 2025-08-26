@@ -21,11 +21,14 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             + PartialEq
             + Default,
     {
-        let (offered_token, nonce, sell_amount) = self.call_value().single_esdt().into_tuple();
-        let _ = self.check_owned_return_payment_token::<T>(&offered_token, &sell_amount);
+        let esdt_payment = self.call_value().single_esdt();
+        let offered_token = &esdt_payment.token_identifier;
+        let nonce = esdt_payment.token_nonce;
+        let sell_amount = &esdt_payment.amount;
+        let _ = self.check_owned_return_payment_token::<T>(offered_token, sell_amount);
 
         let (calculated_price, payment_token) =
-            self.bonding_curve(&offered_token).update(|buffer| {
+            self.bonding_curve(offered_token).update(|buffer| {
                 let serializer = ManagedSerializer::new();
 
                 let mut bonding_curve: BondingCurve<Self::Api, T> =
@@ -35,9 +38,9 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     bonding_curve.sell_availability,
                     "Selling is not available on this token"
                 );
-                let price = self.compute_sell_price::<T>(&offered_token, &sell_amount);
+                let price = self.compute_sell_price::<T>(offered_token, sell_amount);
                 bonding_curve.payment.amount -= &price;
-                bonding_curve.arguments.balance += &sell_amount;
+                bonding_curve.arguments.balance += sell_amount;
                 let payment_token = bonding_curve.payment_token();
                 *buffer = serializer.top_encode_to_managed_buffer(&bonding_curve);
                 (price, payment_token)
@@ -45,7 +48,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
         let caller = self.blockchain().get_caller();
 
-        self.nonce_amount(&offered_token, nonce)
+        self.nonce_amount(offered_token, nonce)
             .update(|val| *val += sell_amount);
 
         self.tx()
@@ -53,7 +56,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             .egld_or_single_esdt(&payment_token, 0u64, &calculated_price)
             .transfer();
 
-        self.token_details(&offered_token)
+        self.token_details(offered_token)
             .update(|details| details.add_nonce(nonce));
 
         self.sell_token_event(&caller, &calculated_price);
@@ -113,10 +116,10 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     self.token_details(&requested_token)
                         .update(|details| details.remove_nonce(nonce));
                 }
-            },
+            }
             OptionalValue::None => {
                 self.send_next_available_tokens(&caller, requested_token, requested_amount);
-            },
+            }
         };
 
         self.tx()

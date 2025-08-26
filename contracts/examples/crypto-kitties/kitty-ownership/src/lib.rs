@@ -287,7 +287,7 @@ pub trait KittyOwnership {
         require!(self.is_valid_id(matron_id), "Invalid matron id!");
         require!(self.is_valid_id(sire_id), "Invalid sire id!");
 
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld();
         let auto_birth_fee = self.birth_fee().get();
         let caller = self.blockchain().get_caller();
 
@@ -573,11 +573,11 @@ pub trait KittyOwnership {
                 // send birth fee to caller
                 let fee = self.birth_fee().get();
                 self.tx().to(&original_caller).egld(&fee).transfer();
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 // this can only fail if the kitty_genes contract address is invalid
                 // in which case, the only thing we can do is call this again later
-            },
+            }
         }
     }
 

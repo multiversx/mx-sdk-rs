@@ -9,11 +9,11 @@ use crate::{
 };
 
 /// Address of the system smart contract that manages ESDT.
-const SYSTEM_SC_ADDRESS_BYTES: [u8; 32] =
+const ESDT_SYSTEM_SC_ADDRESS_BYTES: [u8; 32] =
     hex!("000000000000000000010000000000000000000000000000000000000002ffff");
-const SYSTEM_SC_ADDRESS_BECH32: &str =
+const ESDT_SYSTEM_SC_ADDRESS_BECH32: &str =
     "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
-const SYSTEM_SC_ADDRESS_ANNOTATION: &str =
+const ESDT_SYSTEM_SC_ADDRESS_ANNOTATION: &str =
     "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 
 /// Indicates the system SC address, which is the same on any MultiversX blockchain.
@@ -24,19 +24,19 @@ impl ESDTSystemSCAddress {
     where
         Api: ManagedTypeApi,
     {
-        ManagedAddress::from(SYSTEM_SC_ADDRESS_BYTES)
+        ManagedAddress::from(ESDT_SYSTEM_SC_ADDRESS_BYTES)
     }
 
     pub fn to_address(&self) -> Address {
-        SYSTEM_SC_ADDRESS_BYTES.into()
+        ESDT_SYSTEM_SC_ADDRESS_BYTES.into()
     }
 
     pub fn to_bech32_str(&self) -> &str {
-        SYSTEM_SC_ADDRESS_BECH32
+        ESDT_SYSTEM_SC_ADDRESS_BECH32
     }
 
     pub fn to_bech32_string(&self) -> alloc::string::String {
-        SYSTEM_SC_ADDRESS_BECH32.into()
+        ESDT_SYSTEM_SC_ADDRESS_BECH32.into()
     }
 }
 
@@ -45,7 +45,7 @@ where
     Env: TxEnv,
 {
     fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
-        ManagedBuffer::from(SYSTEM_SC_ADDRESS_ANNOTATION)
+        ManagedBuffer::from(ESDT_SYSTEM_SC_ADDRESS_ANNOTATION)
     }
 
     fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
@@ -62,7 +62,7 @@ impl TopEncode for ESDTSystemSCAddress {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        SYSTEM_SC_ADDRESS_BYTES.top_encode_or_handle_err(output, h)
+        ESDT_SYSTEM_SC_ADDRESS_BYTES.top_encode_or_handle_err(output, h)
     }
 }
 
@@ -70,6 +70,6 @@ impl<M> TypeAbiFrom<ESDTSystemSCAddress> for ManagedAddress<M> where M: ManagedT
 
 impl core::fmt::Display for ESDTSystemSCAddress {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.write_str(SYSTEM_SC_ADDRESS_BECH32)
+        f.write_str(ESDT_SYSTEM_SC_ADDRESS_BECH32)
     }
 }

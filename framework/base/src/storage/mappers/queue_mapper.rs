@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
@@ -305,11 +305,11 @@ where
         name_key
     }
 
-    pub fn iter(&self) -> Iter<SA, A, T> {
+    pub fn iter(&self) -> Iter<'_, SA, A, T> {
         Iter::new(self)
     }
 
-    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, A, T> {
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<'_, SA, A, T> {
         Iter::new_from_node_id(self, node_id)
     }
 
@@ -484,7 +484,7 @@ where
     }
 }
 
-impl<'a, SA, A, T> Iterator for Iter<'a, SA, A, T>
+impl<SA, A, T> Iterator for Iter<'_, SA, A, T>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,

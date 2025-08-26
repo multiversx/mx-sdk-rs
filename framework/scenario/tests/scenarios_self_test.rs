@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 // These tests don't really test any contract, but the testing framework itself.
 
@@ -158,6 +158,12 @@ fn esdt_non_zero_balance_check_err_rs() {
 #[should_panic]
 fn esdt_zero_balance_check_err_rs() {
     world().run("tests/scenarios-self/esdt-zero-balance-check-err.scen.json");
+}
+
+#[test]
+#[ignore = "TODO: not yet implemented in Rust VM"]
+fn multi_transfer_egld_rs() {
+    world().run("tests/scenarios-self/multi-transfer-esdt.scen.json");
 }
 
 #[test]

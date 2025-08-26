@@ -50,7 +50,7 @@ fn create_address_optional_shard_id(input: &str, num_leading_zeros: usize) -> Ve
                 create_address_from_prefix(tokens[0].as_bytes(), num_leading_zeros, 31);
             address.push(shard_id);
             address
-        },
+        }
         _ => panic!("only one shard id separator allowed in address expression. Got: `{input}`"),
     }
 }

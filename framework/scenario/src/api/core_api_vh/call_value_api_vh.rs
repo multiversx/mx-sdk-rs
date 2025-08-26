@@ -30,4 +30,11 @@ impl<VHB: VMHooksApiBackend> CallValueApiImpl for VMHooksApi<VHB> {
     fn esdt_num_transfers(&self) -> usize {
         self.with_vm_hooks(|vh| vh.get_num_esdt_transfers()) as usize
     }
+
+    fn load_all_transfers(&self, dest_handle: Self::ManagedBufferHandle) {
+        self.assert_live_handle(&dest_handle);
+        self.with_vm_hooks(|vh| {
+            vh.managed_get_all_transfers_call_value(dest_handle.get_raw_handle_unchecked())
+        });
+    }
 }

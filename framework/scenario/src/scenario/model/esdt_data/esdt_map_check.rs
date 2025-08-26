@@ -26,7 +26,7 @@ impl InterpretableFrom<CheckEsdtMapRaw> for CheckEsdtMap {
             CheckEsdtMapRaw::Star => CheckEsdtMap::Star,
             CheckEsdtMapRaw::Equal(m) => {
                 CheckEsdtMap::Equal(CheckEsdtMapContents::interpret_from(m, context))
-            },
+            }
         }
     }
 }

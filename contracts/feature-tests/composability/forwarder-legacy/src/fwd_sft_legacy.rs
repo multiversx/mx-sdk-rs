@@ -7,13 +7,13 @@ pub trait ForwarderSftModule: fwd_storage_legacy::ForwarderStorageModule {
     #[payable("EGLD")]
     #[endpoint]
     fn sft_issue(&self, token_display_name: ManagedBuffer, token_ticker: ManagedBuffer) {
-        let issue_cost = self.call_value().egld_value();
+        let issue_cost = self.call_value().egld();
         let caller = self.blockchain().get_caller();
 
         self.send()
             .esdt_system_sc_proxy()
             .issue_semi_fungible(
-                issue_cost.clone_value(),
+                issue_cost.clone(),
                 &token_display_name,
                 &token_ticker,
                 SemiFungibleTokenProperties {
@@ -41,7 +41,7 @@ pub trait ForwarderSftModule: fwd_storage_legacy::ForwarderStorageModule {
             ManagedAsyncCallResult::Ok(token_identifier) => {
                 self.last_issued_token().set(&token_identifier);
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 let (token_identifier, returned_tokens) =
@@ -51,7 +51,7 @@ pub trait ForwarderSftModule: fwd_storage_legacy::ForwarderStorageModule {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 }

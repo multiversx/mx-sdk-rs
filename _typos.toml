@@ -1,0 +1,9 @@
+[default]
+extend-ignore-identifiers-re = [
+    "erd1*", # addresses
+    "65ba30" # some hex
+]
+
+[default.extend-words]
+ser = "ser" # short for "serialize"
+abd = "abd" # it's a hex

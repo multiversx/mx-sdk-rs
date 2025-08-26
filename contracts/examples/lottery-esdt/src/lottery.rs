@@ -141,14 +141,14 @@ pub trait Lottery {
                 );
                 self.burn_percentage_for_lottery(&lottery_name)
                     .set(burn_percentage);
-            },
-            OptionalValue::None => {},
+            }
+            OptionalValue::None => {}
         }
 
         if let Some(whitelist) = opt_whitelist.as_option() {
             let mut mapper = self.lottery_whitelist(&lottery_name);
             for addr in &*whitelist {
-                mapper.insert(addr);
+                mapper.insert(addr.clone());
             }
         }
 
@@ -166,7 +166,7 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn buy_ticket(&self, lottery_name: ManagedBuffer) {
         let (token_identifier, payment) = self.call_value().egld_or_single_fungible_esdt();
 
@@ -174,10 +174,10 @@ pub trait Lottery {
             Status::Inactive => sc_panic!("Lottery is currently inactive."),
             Status::Running => {
                 self.update_after_buy_ticket(&lottery_name, &token_identifier, &payment)
-            },
+            }
             Status::Ended => {
                 sc_panic!("Lottery entry period has ended! Awaiting winner announcement.")
-            },
+            }
         };
     }
 
@@ -189,7 +189,7 @@ pub trait Lottery {
             Status::Ended => {
                 self.distribute_prizes(&lottery_name);
                 self.clear_storage(&lottery_name);
-            },
+            }
         };
     }
 

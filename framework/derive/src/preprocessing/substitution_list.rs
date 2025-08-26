@@ -56,6 +56,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedAsyncCallResult));
     add_managed_type(substitutions, &quote!(EsdtTokenPaymentMultiArg));
     add_managed_type(substitutions, &quote!(EsdtTokenPaymentMultiValue));
+    add_managed_type(substitutions, &quote!(EgldOrEsdtTokenPaymentMultiValue));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueEncodedIterator));
     add_managed_type_with_generics(substitutions, &quote!(MultiValueEncoded));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVarArgs));
@@ -120,6 +121,7 @@ fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
     add_storage_mapper(substitutions, &quote!(SetMapper));
     add_storage_mapper(substitutions, &quote!(UnorderedSetMapper));
     add_storage_mapper(substitutions, &quote!(SingleValueMapper));
+    add_storage_mapper(substitutions, &quote!(TimelockMapper));
     add_storage_mapper(substitutions, &quote!(VecMapper));
     add_storage_mapper(substitutions, &quote!(QueueMapper));
     add_storage_mapper(substitutions, &quote!(WhitelistMapper));

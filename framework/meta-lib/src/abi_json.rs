@@ -30,7 +30,7 @@ pub fn print_abi<AbiTrait: ContractAbiProvider>() {
 }
 
 /// Same as `contract_abi`, but allows caller to replace the compiler metadata,
-/// so that ABI tests are deterministc and independent on compiler version.
+/// so that ABI tests are deterministic and independent on compiler version.
 /// Will return the main contract ABI + view contract ABI.
 pub fn abi_to_json_dummy_environment(contract_abi: &ContractAbi) -> String {
     let mut abi_json = ContractAbiJson::from(contract_abi);

@@ -45,22 +45,22 @@ impl From<&TypeDescription> for TypeDescriptionJson {
                         .fields
                         .push(StructFieldDescriptionJson::from(field));
                 }
-            },
+            }
             TypeContents::Enum(variants) => {
                 for variant in variants {
                     type_desc_json
                         .variants
                         .push(EnumVariantDescriptionJson::from(variant));
                 }
-            },
+            }
             TypeContents::ExplicitEnum(variants) => {
                 for variant in variants {
                     type_desc_json
                         .variants
                         .push(EnumVariantDescriptionJson::from(variant));
                 }
-            },
-            _ => {},
+            }
+            _ => {}
         }
 
         type_desc_json

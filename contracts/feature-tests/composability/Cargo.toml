@@ -20,9 +20,6 @@ path = "forwarder-queue"
 [dev-dependencies.forwarder-raw]
 path = "forwarder-raw"
 
-[dev-dependencies.promises-features]
-path = "promises-features"
-
 [dev-dependencies.proxy-test-first]
 path = "proxy-test-first"
 
@@ -36,9 +33,10 @@ path = "recursive-caller"
 path = "vault"
 
 [dependencies.multiversx-sc]
-version = "0.54.6"
+version = "0.60.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.54.6"
+version = "0.60.0"
 path = "../../../framework/scenario"
+features = ["wasmer-experimental"]

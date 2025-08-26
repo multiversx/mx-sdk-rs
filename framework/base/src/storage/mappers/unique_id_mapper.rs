@@ -7,7 +7,7 @@ use crate::{
 };
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     StorageMapper, StorageMapperFromAddress, VecMapper,
 };
 use crate::{
@@ -86,7 +86,7 @@ where
     }
 
     /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, A> {
+    pub fn iter(&self) -> Iter<'_, SA, A> {
         Iter::new(self)
     }
 }
@@ -180,7 +180,7 @@ where
     }
 }
 
-impl<'a, SA, A> Iterator for Iter<'a, SA, A>
+impl<SA, A> Iterator for Iter<'_, SA, A>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,

@@ -1,2 +1,2 @@
 [toolchain]
-channel = "1.82" # TODO: clippy fixes performed in rc/v0.55, revert to latest stable after merging
+channel = "1.89"

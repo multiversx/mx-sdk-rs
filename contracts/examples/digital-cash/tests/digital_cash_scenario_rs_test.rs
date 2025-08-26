@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -52,8 +52,13 @@ fn whitelist_blacklist_fee_token_rs() {
 }
 
 #[test]
-fn pay_fee_and_fund_esdt_rs() {
-    world().run("scenarios/pay-fee-and-fund-esdt.scen.json");
+fn pay_fee_and_fund_esdt_single_rs() {
+    world().run("scenarios/pay-fee-and-fund-esdt-single.scen.json");
+}
+
+#[test]
+fn pay_fee_and_fund_esdt_multiple_rs() {
+    world().run("scenarios/pay-fee-and-fund-esdt-multiple.scen.json");
 }
 
 #[test]

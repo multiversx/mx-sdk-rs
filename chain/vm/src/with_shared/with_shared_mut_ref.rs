@@ -9,6 +9,10 @@ use std::rc::Rc;
 /// The `Clone` of the argument is not used, except to preserve memory consistency in case of failure.
 ///
 /// See the `Shared` type for a safer implementation, which does not require `Clone`.
+#[deprecated(
+    since = "0.57.0",
+    note = "not currently used, has not been used in some time, only kept for reference"
+)]
 pub fn with_shared_mut_ref<T, F, R>(t: &mut T, f: F) -> R
 where
     T: Clone,
@@ -34,14 +38,14 @@ where
                 // though readonly, the object might have changed via cells,
                 // so it needs to be copied back
                 std::ptr::write(t, obj);
-            },
+            }
             Err(obj_rc) => {
                 // could not unwrap, this means there are still references to obj elsewhere
                 // to avoid memory corruption, we perform a clone of the contents
                 let obj = (*obj_rc).clone();
                 std::ptr::write(t, obj);
                 panic!("failed to recover owned object from Rc")
-            },
+            }
         }
 
         result

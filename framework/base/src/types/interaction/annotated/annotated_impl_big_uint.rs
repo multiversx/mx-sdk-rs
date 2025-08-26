@@ -53,7 +53,7 @@ where
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, BigUint<Env::Api>> for ManagedRef<'a, Env::Api, BigUint<Env::Api>>
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for ManagedRef<'_, Env::Api, BigUint<Env::Api>>
 where
     Env: TxEnv,
 {
@@ -80,6 +80,19 @@ where
 }
 
 impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for u64
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        BigUint::from(*self).to_display()
+    }
+
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        BigUint::from(*self)
+    }
+}
+
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for u128
 where
     Env: TxEnv,
 {

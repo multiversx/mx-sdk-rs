@@ -1,7 +1,7 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
-use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+pub use super::{
+    source::{CurrentStorage, StorageAddress},
     StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
