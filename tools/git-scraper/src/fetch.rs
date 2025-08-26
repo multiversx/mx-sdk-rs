@@ -100,7 +100,7 @@ pub(crate) fn fetch_interactor_contents(
                                             src_contents =
                                                 fetch_files_from_directory(client, src_url);
                                         }
-                                    },
+                                    }
                                     Some("Cargo.toml") => {
                                         if let Some(download_url) =
                                             interactor_entry["download_url"].as_str()
@@ -111,8 +111,8 @@ pub(crate) fn fetch_interactor_contents(
                                                 cargo_contents = Some(content);
                                             }
                                         }
-                                    },
-                                    _ => {},
+                                    }
+                                    _ => {}
                                 }
                             }
                         }
@@ -174,7 +174,7 @@ pub(crate) fn fetch_meta_contents(client: &Client, folder_url: &str) -> Option<I
                                             src_contents =
                                                 fetch_files_from_directory(client, src_url);
                                         }
-                                    },
+                                    }
                                     Some("Cargo.toml") => {
                                         if let Some(download_url) =
                                             interactor_entry["download_url"].as_str()
@@ -185,8 +185,8 @@ pub(crate) fn fetch_meta_contents(client: &Client, folder_url: &str) -> Option<I
                                                 cargo_contents = Some(content);
                                             }
                                         }
-                                    },
-                                    _ => {},
+                                    }
+                                    _ => {}
                                 }
                             }
                         }

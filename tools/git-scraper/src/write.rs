@@ -272,5 +272,5 @@ fn has_local_path_next(lines: &[&str], current: &str) -> bool {
         .iter()
         .skip_while(|&&x| x != current)
         .nth(1)
-        .map_or(false, |next| next.trim().starts_with("path = \"../../../"))
+        .is_some_and(|next| next.trim().starts_with("path = \"../../../"))
 }
