@@ -80,11 +80,9 @@ impl MetaConfig {
                 .expect("missing framework dependency in Cargo.toml");
 
             // filter original multiversx_sc feature flags (none at the moment)
-            framework_dependency.features = framework_dependency
+            framework_dependency
                 .features
-                .into_iter()
-                .filter(|f| WASM_ADAPTER_FEATURE_WHITELIST.contains(&f.as_str()))
-                .collect();
+                .retain(|f| WASM_ADAPTER_FEATURE_WHITELIST.contains(&f.as_str()));
 
             // add std feature flag
             if contract.settings.std {

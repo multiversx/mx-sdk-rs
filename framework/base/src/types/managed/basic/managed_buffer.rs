@@ -597,8 +597,9 @@ impl<M: ManagedTypeApi> serde::Serialize for ManagedBuffer<M> {
         S: serde::Serializer,
     {
         let bytes = self.to_boxed_bytes();
-        let s = str::from_utf8(bytes.as_slice()).map_err(|err| serde::ser::Error::custom(err))?;
-        serializer.serialize_str(s)
+        let s = alloc::string::String::from_utf8(bytes.into_vec())
+            .map_err(serde::ser::Error::custom)?;
+        serializer.serialize_str(&s)
     }
 }
 
