@@ -189,6 +189,8 @@ members = [
   "contracts/feature-tests/rust-testing-framework-tester/meta",
   "contracts/feature-tests/scenario-tester",
   "contracts/feature-tests/scenario-tester/meta",
+  "contracts/feature-tests/serde-features",
+  "contracts/feature-tests/serde-features/meta",
   "contracts/feature-tests/std-contract",
   "contracts/feature-tests/std-contract/meta",
   "contracts/feature-tests/use-module",
