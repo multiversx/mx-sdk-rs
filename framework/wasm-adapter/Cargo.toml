@@ -23,7 +23,6 @@ categories = [
 
 [features]
 std = ["multiversx-sc/std"]
-serde = ["multiversx-sc/serde"]
 
 [dependencies.multiversx-sc]
 version = "=0.60.0"

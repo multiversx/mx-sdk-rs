@@ -602,18 +602,6 @@ impl<M: ManagedTypeApi> serde::Serialize for ManagedBuffer<M> {
     }
 }
 
-// #[cfg(feature = "serde")]
-// impl<'de, M: ManagedTypeApi> serde::Deserialize<'de> for ManagedBuffer<M> {
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//         D: serde::Deserializer<'de>,
-//     {
-//         deserializer.deserialize_str(visitor)
-//         let s = alloc::string::String::deserialize(deserializer)?;
-//         Ok(ManagedBuffer::new_from_bytes(s.as_bytes()))
-//     }
-// }
-
 #[cfg(feature = "serde")]
 impl<'de, M: ManagedTypeApi> serde::Deserialize<'de> for ManagedBuffer<M> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>

@@ -4,7 +4,6 @@ use super::{
     StorageReadApiImpl, StorageWriteApi,
 };
 
-#[cfg(not(feature = "serde"))]
 pub trait VMApi:
     ManagedTypeApi
     + BlockchainApi
@@ -25,43 +24,6 @@ pub trait VMApi:
     + Eq
     + Send
     + Sync
-{
-    /// Slightly hacky way of overriding the constructor for external view contracts.
-    /// 
-    /// Only required for the tests, in production the meta crate makes sure to replace it.
-    /// 
-    /// TODO: find a more robust and maybe extendable solution.
-    fn external_view_init_override() -> bool {
-        false
-    }
-    fn init_static() {
-        Self::storage_read_api_impl().storage_read_api_init();
-    }
-}
-
-#[cfg(feature = "serde")]
-pub trait VMApi:
-    ManagedTypeApi
-    + BlockchainApi
-    + CallValueApi
-    + CryptoApi
-    + EndpointArgumentApi
-    + EndpointFinishApi
-    + ErrorApi
-    + LogApi
-    + SendApi
-    + StorageReadApi
-    + StorageWriteApi
-    + PrintApi
-    + CallTypeApi
-    + StorageMapperApi
-    + Clone // TODO: remove
-    + PartialEq // for helping derive PartialEq for managed types
-    + Eq
-    + Send
-    + Sync
-    + serde::ser::Serialize 
-    + serde::de::DeserializeOwned
 {
     /// Slightly hacky way of overriding the constructor for external view contracts.
     /// 

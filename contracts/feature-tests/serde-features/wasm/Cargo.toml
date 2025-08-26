@@ -30,7 +30,6 @@ path = ".."
 [dependencies.multiversx-sc-wasm-adapter]
 version = "0.60.0"
 path = "../../../../framework/wasm-adapter"
-features = ["serde"]
 
 [workspace]
 members = ["."]

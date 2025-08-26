@@ -190,28 +190,3 @@ where
 
 impl<A> Eq for ExternalViewApi<A> where A: VMApi {}
 
-#[cfg(feature = "serde")]
-impl<A> serde::Serialize for ExternalViewApi<A>
-where
-    A: VMApi,
-{
-    fn serialize<S>(&self, _serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        unreachable!()
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<'de, A> serde::de::Deserialize<'de> for ExternalViewApi<A>
-where
-    A: VMApi,
-{
-    fn deserialize<D>(_deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        unreachable!()
-    }
-}

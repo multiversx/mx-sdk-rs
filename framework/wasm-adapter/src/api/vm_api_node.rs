@@ -38,23 +38,3 @@ impl HandleTypeInfo for VmApiImpl {
 
     type ManagedMapHandle = i32;
 }
-
-#[cfg(feature = "serde")]
-impl multiversx_sc::serde::Serialize for VmApiImpl {
-    fn serialize<S>(&self, _serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: multiversx_sc::serde::Serializer,
-    {
-        unreachable!()
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<'de> multiversx_sc::serde::de::Deserialize<'de> for VmApiImpl {
-    fn deserialize<D>(_deserializer: D) -> Result<Self, D::Error>
-    where
-        D: multiversx_sc::serde::Deserializer<'de>,
-    {
-        unreachable!()
-    }
-}

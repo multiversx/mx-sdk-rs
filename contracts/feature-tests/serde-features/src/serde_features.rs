@@ -20,6 +20,7 @@ pub struct SerdeStruct2 {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(bound = "M: ManagedTypeApi")] 
 pub struct ManagedSerdeStruct<M: ManagedTypeApi> {
     mb: ManagedBuffer<M>,
 }
