@@ -344,6 +344,9 @@ async fn get_token_properties() {
         .get_token_properties(dynamic_meta_esdt_token_id.as_bytes())
         .await;
 
+    assert!(token_properties.owner_address == interact.wallet_address.to_address());
+    assert!(token_properties.token_name == "TESTMETA");
+    assert!(token_properties.token_type == EsdtTokenType::DynamicMeta);
     assert!(token_properties.num_decimals == 18usize);
     assert!(!token_properties.is_paused);
     assert!(token_properties.can_upgrade);
