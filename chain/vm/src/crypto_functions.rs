@@ -1,4 +1,4 @@
-use bls_binary_rust::{G1, G2};
+use bls_binary_rust::{BlsError, G1, G2};
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
 
@@ -46,16 +46,23 @@ pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
 }
 
 pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-    if key.len() != 96 || signature.len() != 48 || message.is_empty() {
+    if message.is_empty() {
         return false;
     }
 
-    let mut public_key = G2::default();
-    public_key.set_str(G2_STR);
-    public_key.deserialize_g2(key);
+    let public_key = create_public_key_from_bytes(key)
+        .unwrap_or_else(|e| panic!("Failed to deserialize public key: {key:?}. Error: {e:?}"));
 
-    let mut sign = G1::default();
-    sign.deserialize(signature);
+    if !is_public_key_point_valid(&public_key) {
+        return false;
+    }
+
+    let sign = create_signature_from_bytes(signature)
+        .unwrap_or_else(|e| panic!("Failed to deserialize signature: {signature:?}. Error: {e:?}"));
+
+    if !is_sig_valid_point(&sign) {
+        return false;
+    }
 
     sign.verify(public_key, message)
 }
@@ -66,4 +73,42 @@ pub fn verify_bls_aggregated_signature(
     _signature: &[u8],
 ) -> bool {
     true
+}
+
+fn create_public_key_from_bytes(key: &[u8]) -> Result<G2, BlsError> {
+    if key.len() != 96 {
+        return Err(BlsError::InvalidData);
+    }
+
+    let mut public_key = G2::default();
+
+    public_key.set_str(G2_STR);
+
+    if !public_key.deserialize_g2(key) {
+        return Err(BlsError::InvalidData);
+    }
+
+    Ok(public_key)
+}
+
+fn create_signature_from_bytes(signature: &[u8]) -> Result<G1, BlsError> {
+    if signature.len() != 48 {
+        return Err(BlsError::InvalidData);
+    }
+
+    let mut sign = G1::default();
+
+    if !sign.deserialize(signature) {
+        return Err(BlsError::InvalidData);
+    }
+
+    Ok(sign)
+}
+
+fn is_public_key_point_valid(pk: &G2) -> bool {
+    !pk.is_zero() && pk.is_valid_order() && pk.is_valid()
+}
+
+fn is_sig_valid_point(sig: &G1) -> bool {
+    !sig.is_zero() && sig.is_valid_order() && sig.is_valid()
 }

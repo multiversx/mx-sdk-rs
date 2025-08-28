@@ -113,6 +113,7 @@ fn test_verify_bls_signature_ok_2() {
 }
 
 #[test]
+#[should_panic(expected = "Failed to deserialize public key: []. Error: InvalidData")]
 fn test_bls_signer_verify_empty_pk_err() {
     let message = b"6d65737361676520746f206265207369676e6564";
     let signature = b"6564590f65d4156a970b7758c415a99d039afaf0d80e6e04639fc315ebfa80486599226cb9515b726fd3045248687002";
@@ -139,6 +140,7 @@ fn test_bls_signer_verify_empty_message_err() {
 }
 
 #[test]
+#[should_panic(expected = "Failed to deserialize signature: []. Error: InvalidData")]
 fn test_bls_signer_verify_empty_signature_err() {
     let public_key = b"494a592c78795857a8cb71537fc3508839ab22f18cc61b2c83ae33e5adde2d34b304b6183116281a7f558dc6d758c00979da47633ad62414ff967f94158558e2e346bf6c60c3e6d2525450bf82a86c578b8050e21073d94ad7f41ade8855da0b";
     let message = b"6d65737361676520746f206265207369676e6564";
