@@ -271,3 +271,61 @@ fn test_verify_bls_aggregated_signature_wrong_message() {
 
     assert!(!success)
 }
+
+#[test]
+fn test_bls_multi_signer_create_signature_share_ok() {
+    let public_key = b"fcb01af173ebffaace062f24d64530d52b564f1c89ffc2c0d249e5b033124a9992dfad1f5768904162ad3295a7a5290ff3d6b017127df43be2966a851b2fa6718f8547366575f44f792884f71d31c07188cbf315d237d8c8153123b25bac4704";
+    let message = b"6d657373616765";
+    let signature = b"e9cfb277b7b4c5718e3de50cee5786583951092b63c38a2de2bf3e719f0ac36f23a3aac5d472d6651071d2c0da512382";
+
+    let pk_bytes: Vec<u8> = FromHex::from_hex(public_key).unwrap();
+    let msg_bytes: Vec<u8> = FromHex::from_hex(message).unwrap();
+    let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
+
+    let success = crypto_functions::verify_bls_signature_share(&pk_bytes, &msg_bytes, &sig_bytes);
+
+    assert!(success);
+}
+
+#[test]
+fn test_bls_multi_signer_verify_signature_share_nil_sig_should_err() {
+    let public_key = b"fcb01af173ebffaace062f24d64530d52b564f1c89ffc2c0d249e5b033124a9992dfad1f5768904162ad3295a7a5290ff3d6b017127df43be2966a851b2fa6718f8547366575f44f792884f71d31c07188cbf315d237d8c8153123b25bac4704";
+    let message = b"6d657373616765";
+
+    let pk_bytes: Vec<u8> = FromHex::from_hex(public_key).unwrap();
+    let msg_bytes: Vec<u8> = FromHex::from_hex(message).unwrap();
+
+    let success = crypto_functions::verify_bls_signature_share(&pk_bytes, &msg_bytes, &[]);
+
+    assert!(!success);
+}
+
+#[test]
+fn test_bls_multi_signer_verify_signature_share_invalid_signature_should_err() {
+    let public_key = b"c9da9f301f3c583f948b016fd4405f365975d5ea6c1ff62500f4867708222132260079729d425826b6cad371c55c7002adce1ccf6fc1912ed9c623d35dfe23f3f1f9d4ccb316863753bc60f6778d180896f3389b56ecb598a665d50ece9c4b0d";
+    let message = b"6d657373616765";
+    let signature = b"0f81ee78bf561a9e9f8c8e3c167f97a2dc7e785464484a9c02c4ee1435e28f14c5c4f1e8e958907262b0b8d1f0c2cd82";
+
+    let pk_bytes: Vec<u8> = FromHex::from_hex(public_key).unwrap();
+    let msg_bytes: Vec<u8> = FromHex::from_hex(message).unwrap();
+    let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
+
+    let success = crypto_functions::verify_bls_signature_share(&pk_bytes, &msg_bytes, &sig_bytes);
+
+    assert!(!success);
+}
+
+#[test]
+fn test_bls_multi_signer_verify_signature_share_ok() {
+    let public_key = b"bfe14a074f7892f032753d25be1fb8738fac92ff125c14ce1ae74e33795c2dc39c11d0e448d7812003503ba59a76ad0aaaae7afbd2f8c8165e2531cfda8d634bc8d478d82fb32fbaeb520541575fb19e44c42b02b8cc84de2f948821f0fb4497";
+    let message = b"6d657373616765";
+    let signature = b"ed4f527fc501cd82e6ee1de493d8957bca5f339ec588efa8d4188ddb44ff9fce136ac28158c34bc1dde41da5605fa301";
+
+    let pk_bytes: Vec<u8> = FromHex::from_hex(public_key).unwrap();
+    let msg_bytes: Vec<u8> = FromHex::from_hex(message).unwrap();
+    let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
+
+    let success = crypto_functions::verify_bls_signature_share(&pk_bytes, &msg_bytes, &sig_bytes);
+
+    assert!(success);
+}

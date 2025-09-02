@@ -113,8 +113,12 @@ pub fn verify_bls_aggregated_signature(
     sign.fast_aggregate_verify(&public_keys, message)
 }
 
-pub fn verify_bls_signature_share(_key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
-    false
+pub fn verify_bls_signature_share(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
+    if signature.is_empty() || key.is_empty() || message.is_empty() {
+        return false;
+    }
+
+    verify_bls(key, message, signature)
 }
 
 fn create_public_key_from_bytes(key: &[u8]) -> Result<G2, BlsError> {

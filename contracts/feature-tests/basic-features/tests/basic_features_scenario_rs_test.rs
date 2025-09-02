@@ -116,7 +116,6 @@ fn crypto_verify_bls_aggregated_signature_rs() {
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_share_rs() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
