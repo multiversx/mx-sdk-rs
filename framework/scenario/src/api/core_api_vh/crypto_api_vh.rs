@@ -117,11 +117,17 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
 
     fn verify_bls_signature_share_managed(
         &self,
-        _key: Self::ManagedBufferHandle,
-        _message: Self::ManagedBufferHandle,
-        _signature: Self::ManagedBufferHandle,
+        key: Self::ManagedBufferHandle,
+        message: Self::ManagedBufferHandle,
+        signature: Self::ManagedBufferHandle,
     ) {
-        panic!("verify_bls_signature_share not implemented yet!")
+        self.with_vm_hooks_ctx_3(&key, &message, &signature, |vh| {
+            vh.managed_verify_blssignature_share(
+                key.get_raw_handle_unchecked(),
+                message.get_raw_handle_unchecked(),
+                signature.get_raw_handle_unchecked(),
+            )
+        });
     }
 
     fn verify_bls_aggregated_signature_managed(

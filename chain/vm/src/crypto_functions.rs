@@ -113,6 +113,10 @@ pub fn verify_bls_aggregated_signature(
     sign.fast_aggregate_verify(&public_keys, message)
 }
 
+pub fn verify_bls_signature_share(_key: &[u8], _message: &[u8], _signature: &[u8]) -> bool {
+    false
+}
+
 fn create_public_key_from_bytes(key: &[u8]) -> Result<G2, BlsError> {
     if key.len() != 96 {
         return Err(BlsError::InvalidData);

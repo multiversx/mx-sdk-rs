@@ -104,4 +104,24 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
         Ok(())
     }
+
+    pub fn verify_bls_signature_share(
+        &self,
+        key_handle: RawHandle,
+        message_handle: RawHandle,
+        signature_handle: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
+        let types = self.context.m_types_lock();
+        let key = types.mb_get(key_handle);
+        let message = types.mb_get(message_handle);
+        let signature = types.mb_get(signature_handle);
+
+        let sig_valid = crypto_functions::verify_bls_signature_share(key, message, signature);
+        if !sig_valid {
+            // TODO: correct error message
+            return Err(early_exit_vm_error("bls verify error"));
+        }
+
+        Ok(())
+    }
 }
