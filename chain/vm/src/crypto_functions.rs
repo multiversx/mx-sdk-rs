@@ -50,15 +50,25 @@ pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         return false;
     }
 
-    let public_key = create_public_key_from_bytes(key)
-        .unwrap_or_else(|e| panic!("Failed to deserialize public key: {key:?}. Error: {e:?}"));
+    let public_key = match create_public_key_from_bytes(key) {
+        Ok(pk) => pk,
+        Err(e) => {
+            eprintln!("Failed to deserialize public key: {key:?}. Error: {e}");
+            return false;
+        }
+    };
 
     if !is_public_key_point_valid(&public_key) {
         return false;
     }
 
-    let sign = create_signature_from_bytes(signature)
-        .unwrap_or_else(|e| panic!("Failed to deserialize signature: {signature:?}. Error: {e:?}"));
+    let sign = match create_signature_from_bytes(signature) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("Failed to deserialize signature: {signature:?}. Error: {e}");
+            return false;
+        }
+    };
 
     if !is_sig_valid_point(&sign) {
         return false;
@@ -68,11 +78,39 @@ pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
 }
 
 pub fn verify_bls_aggregated_signature(
-    _keys: Vec<Vec<u8>>,
-    _message: &[u8],
-    _signature: &[u8],
+    keys: Vec<Vec<u8>>,
+    message: &[u8],
+    signature: &[u8],
 ) -> bool {
-    true
+    if message.is_empty() {
+        return false;
+    }
+
+    let public_keys = match keys
+        .iter()
+        .map(|key| create_public_key_from_bytes(key))
+        .collect::<Result<Vec<G2>, BlsError>>()
+    {
+        Ok(pks) => pks,
+        Err(e) => {
+            eprintln!("Failed to deserialize public keys. Error: {e}");
+            return false;
+        }
+    };
+
+    if public_keys.is_empty() {
+        return false;
+    }
+
+    let sign = match create_signature_from_bytes(signature) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("Failed to deserialize signature: {signature:?}. Error: {e}");
+            return false;
+        }
+    };
+
+    sign.fast_aggregate_verify(&public_keys, message)
 }
 
 fn create_public_key_from_bytes(key: &[u8]) -> Result<G2, BlsError> {
