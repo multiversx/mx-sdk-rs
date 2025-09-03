@@ -1,0 +1,57 @@
+{
+    "name": "init and deploy",
+    "comment": "initialize the owner account and deploy caller and callee",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "100000"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:callee"
+                },
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "2",
+                    "newAddress": "sc:caller"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy callee",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../../../callee/output/callee.wasm",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": ""
+            }
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy caller",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../../output/caller.wasm",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": ""
+            }
+        }
+    ]
+}

@@ -193,6 +193,18 @@ members = [
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
 
+  "contracts/parametric-tests/adder-pt",
+  "contracts/parametric-tests/adder-pt/meta",
+  "contracts/parametric-tests/addercaller",
+  "contracts/parametric-tests/addercaller/meta",
+  "contracts/parametric-tests/callee",
+  "contracts/parametric-tests/callee/meta",
+  "contracts/parametric-tests/caller",
+  "contracts/parametric-tests/caller/meta",
+  "contracts/parametric-tests/multisig-pt",
+  "contracts/parametric-tests/multisig-pt/meta",
+  "contracts/parametric-tests/testapi-pt",
+  "contracts/parametric-tests/testapi-pt/meta",
 
   # "chain/wasmer-prod", ## not included, references wasmer 2.2
   # "contracts/feature-tests/gas-tests", ## uncomment for easier development

@@ -9,6 +9,7 @@ mod managed_types;
 mod print_api_node;
 mod send_api_node;
 mod storage_api_node;
+mod test_api_node;
 mod unsafe_buffer;
 mod vm_api_node;
 
