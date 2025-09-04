@@ -7,10 +7,10 @@ use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
     types::{
-        system_proxy, BigUint, ContractCallNoPayment, ESDTSystemSCAddress,
-        EgldOrEsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, NotPayable, OriginalResultMarker,
-        ReturnsRawResult, ReturnsResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
+        system_proxy, BigUint, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
+        FunctionCall, GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType,
+        ManagedVec, NotPayable, OriginalResultMarker, ReturnsRawResult, ReturnsResult, ToSelf,
+        TokenIdentifier, Tx, TxScEnv,
     },
 };
 
@@ -61,18 +61,6 @@ where
         Tx::new_tx_from_sc()
             .to(ESDTSystemSCAddress)
             .typed(system_proxy::ESDTSystemSCProxy)
-    }
-
-    /// Convenient way to quickly instance a minimal contract call (with no EGLD, no arguments, etc.)
-    ///
-    /// You can further configure this contract call by chaining methods to it.
-    #[inline]
-    pub fn contract_call<R>(
-        &self,
-        to: ManagedAddress<A>,
-        endpoint_name: impl Into<ManagedBuffer<A>>,
-    ) -> ContractCallNoPayment<A, R> {
-        ContractCallNoPayment::new(to, endpoint_name)
     }
 
     /// Sends EGLD to a given address, directly.

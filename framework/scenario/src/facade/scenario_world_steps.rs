@@ -1,13 +1,8 @@
 #![allow(deprecated)]
 
-use multiversx_sc::{
-    abi::TypeAbiFrom,
-    codec::TopDecodeMulti,
-    types::{heap::Address, ContractCall},
-};
+use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti, types::heap::Address};
 
 use crate::{
-    api::StaticApi,
     facade::ScenarioWorld,
     multiversx_sc::codec::TopEncodeMulti,
     scenario::{model::*, ScenarioRunner},
@@ -133,37 +128,6 @@ impl ScenarioWorld {
         })
     }
 
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    pub fn sc_query_get_result<OriginalResult, RequestedResult>(
-        &mut self,
-        mut step: TypedScQuery<OriginalResult>,
-    ) -> RequestedResult
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
-    {
-        self.run_sc_query_step(&mut step.sc_query_step);
-        let response = unwrap_response(&step.sc_query_step.response);
-        let typed_response = TypedResponse::from_raw(response);
-        typed_response.result.expect("SC query failed")
-    }
-
-    /// Performs a SC query to a contract, leaves no scenario trace behind.
-    ///
-    /// Meant to be used for the test to investigate the state of the contract.
-    ///
-    /// Use `mandos_sc_query` to embed the SC query in the resulting scenario.
-    pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
-    where
-        CC: ContractCall<StaticApi>,
-        RequestedResult: TopDecodeMulti + TypeAbiFrom<CC::OriginalResult>,
-    {
-        self.sc_query_get_result(ScQueryStep::new().call(contract_call))
-    }
-
     /// Adds a SC deploy step, then executes it.
     pub fn sc_deploy<S>(&mut self, mut step: S) -> &mut Self
     where
@@ -281,24 +245,6 @@ impl TypedScDeployExecutor for ScenarioWorld {
         RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_deploy_get_result(typed_sc_call)
-    }
-}
-
-impl TypedScQueryExecutor for ScenarioWorld {
-    /// Adds a SC query step, but sets the contract call data and returns the result.
-    ///
-    /// It also sets in the trace the expected result to be the actual returned result.
-    ///
-    /// It is the duty of the test developer to check that the result is actually correct after the call.
-    fn execute_typed_sc_query<OriginalResult, RequestedResult>(
-        &mut self,
-        typed_sc_query: TypedScQuery<OriginalResult>,
-    ) -> RequestedResult
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
-    {
-        self.sc_query_get_result(typed_sc_query)
     }
 }
 
