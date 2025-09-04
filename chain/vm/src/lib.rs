@@ -1,7 +1,6 @@
 pub mod blockchain;
 pub mod builtin_functions;
 pub mod crypto_functions;
-pub mod crypto_functions_bls;
 pub mod display_util;
 pub mod executor_impl;
 pub mod host;
@@ -21,3 +20,6 @@ pub use multiversx_chain_core as chain_core;
 
 #[macro_use]
 extern crate alloc;
+
+#[cfg(feature = "bls")]
+pub mod crypto_functions_bls;

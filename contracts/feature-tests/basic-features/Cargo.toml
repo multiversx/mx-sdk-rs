@@ -17,7 +17,7 @@ path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.60.0"
-features = ["wasmer-experimental"]
+features = ["wasmer-experimental", "bls"]
 path = "../../../framework/scenario"
 
 [dependencies.multiversx-sc-modules]

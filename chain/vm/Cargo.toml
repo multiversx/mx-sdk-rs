@@ -18,6 +18,7 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [features]
 # not supported when compiling to wasm
+bls = ["multiversx-bls"]
 wasm-incompatible = ["rand"]
 wasmer-experimental = ["multiversx-chain-vm-executor-wasmer-experimental"]
 # default = ["wasmer-experimental"] ## uncomment for easier development
@@ -38,7 +39,7 @@ ed25519-dalek = "2.1.0"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
 anyhow = "1.0"
-multiversx-bls = "0.1.0"
+multiversx-bls = { version = "0.1.0", optional = true }
 
 [dependencies.multiversx-chain-core]
 version = "=0.17.0"

@@ -37,6 +37,7 @@ wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
 compiled-sc-tests = []
 run-go-tests = ["compiled-sc-tests"] # backwards compatibility
 wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
+bls = ["multiversx-chain-vm/bls"]
 
 [dependencies.multiversx-sc]
 version = "=0.60.0"

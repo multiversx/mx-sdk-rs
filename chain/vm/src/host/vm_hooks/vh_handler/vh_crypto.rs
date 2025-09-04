@@ -67,6 +67,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         Ok(())
     }
 
+    #[cfg(feature = "bls")]
     pub fn verify_bls_managed(
         &self,
         key_handle: RawHandle,
@@ -77,15 +78,25 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         let key = types.mb_get(key_handle);
         let message = types.mb_get(message_handle);
         let signature = types.mb_get(signature_handle);
-        let sig_valid = crypto_functions::verify_bls(key, message, signature);
+        let sig_valid = crate::crypto_functions_bls::verify_bls(key, message, signature);
         if !sig_valid {
-            // TODO: correct error message
             return Err(early_exit_vm_error("bls verify error"));
         }
 
         Ok(())
     }
 
+    #[cfg(not(feature = "bls"))]
+    pub fn verify_bls_managed(
+        &self,
+        _key_handle: RawHandle,
+        _message_handle: RawHandle,
+        _signature_handle: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
+        panic!("BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it");
+    }
+
+    #[cfg(feature = "bls")]
     pub fn verify_bls_aggregated_signature(
         &self,
         key_handle: RawHandle,
@@ -96,15 +107,26 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         let (keys, _) = types.mb_get_vec_of_bytes(key_handle);
         let message = types.mb_get(message_handle);
         let signature = types.mb_get(signature_handle);
-        let sig_valid = crypto_functions::verify_bls_aggregated_signature(keys, message, signature);
+        let sig_valid =
+            crate::crypto_functions_bls::verify_bls_aggregated_signature(keys, message, signature);
         if !sig_valid {
-            // TODO: correct error message
             return Err(early_exit_vm_error("bls verify error"));
         }
 
         Ok(())
     }
 
+    #[cfg(not(feature = "bls"))]
+    pub fn verify_bls_aggregated_signature(
+        &self,
+        _key_handle: RawHandle,
+        _message_handle: RawHandle,
+        _signature_handle: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
+        panic!("BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it");
+    }
+
+    #[cfg(feature = "bls")]
     pub fn verify_bls_signature_share(
         &self,
         key_handle: RawHandle,
@@ -116,12 +138,22 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         let message = types.mb_get(message_handle);
         let signature = types.mb_get(signature_handle);
 
-        let sig_valid = crypto_functions::verify_bls_signature_share(key, message, signature);
+        let sig_valid =
+            crate::crypto_functions_bls::verify_bls_signature_share(key, message, signature);
         if !sig_valid {
-            // TODO: correct error message
             return Err(early_exit_vm_error("bls verify error"));
         }
 
         Ok(())
+    }
+
+    #[cfg(not(feature = "bls"))]
+    pub fn verify_bls_signature_share(
+        &self,
+        _key_handle: RawHandle,
+        _message_handle: RawHandle,
+        _signature_handle: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
+        panic!("BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it");
     }
 }
