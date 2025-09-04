@@ -38,7 +38,7 @@ ed25519-dalek = "2.1.0"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
 anyhow = "1.0"
-bls_binary_rust = { git = "https://github.com/BiancaIalangi/bls-rust.git" }
+mx-bls-rs = { git = "https://github.com/multiversx/mx-bls-rs.git", branch = "remove-eth"}
 
 [dependencies.multiversx-chain-core]
 version = "=0.17.0"

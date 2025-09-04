@@ -1,4 +1,4 @@
-use bls_binary_rust::{BlsError, G1, G2};
+use mx_bls_rs::{BlsError, G1, G2};
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
 
