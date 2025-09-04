@@ -227,11 +227,11 @@ pub async fn system_sc_interact_cli() {
 }
 
 pub struct SysFuncCallsInteract {
-    interactor: Interactor,
-    wallet_address: Bech32Address,
-    other_wallet_address: Bech32Address,
+    pub interactor: Interactor,
+    pub wallet_address: Bech32Address,
+    pub other_wallet_address: Bech32Address,
     #[allow(unused)]
-    state: State,
+    pub state: State,
 }
 
 impl SysFuncCallsInteract {
@@ -260,10 +260,8 @@ impl SysFuncCallsInteract {
 
         let res = self
             .interactor
-            .tx()
-            .from(&self.wallet_address)
+            .query()
             .to(ESDTSystemSCAddress)
-            .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .get_token_properties(token_id)
             .returns(ReturnsResult)
