@@ -1,6 +1,7 @@
 pub mod blockchain;
 pub mod builtin_functions;
 pub mod crypto_functions;
+pub mod crypto_functions_bls;
 pub mod display_util;
 pub mod executor_impl;
 pub mod host;
