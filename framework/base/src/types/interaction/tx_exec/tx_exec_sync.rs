@@ -257,7 +257,7 @@ where
 
         match raw_result {
             SyncCallRawResultOrError::Success(result) => Ok(decode_result(result.0)),
-            SyncCallRawResultOrError::Error(err_code) => return Err(err_code),
+            SyncCallRawResultOrError::Error(err_code) => Err(err_code),
         }
     }
 }
