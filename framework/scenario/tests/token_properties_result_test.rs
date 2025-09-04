@@ -1,4 +1,8 @@
-use multiversx_sc::{codec::TopDecodeMulti, imports::TokenPropertiesResult};
+use multiversx_sc::{
+    codec::TopDecodeMulti,
+    imports::{Bech32Address, TokenPropertiesResult},
+    types::EsdtTokenType,
+};
 
 fn hex_decode(hex: &[u8]) -> Option<Vec<u8>> {
     if hex.len() % 2 != 0 {
@@ -23,7 +27,7 @@ fn hex_decode(hex: &[u8]) -> Option<Vec<u8>> {
 
 #[test]
 fn multi_decode_from_api_response() {
-    let raw_input = b"@6f6b@544553544e4654@44796e616d69634e6f6e46756e6769626c6545534454@0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1@30@30@4e756d446563696d616c732d3138@49735061757365642d66616c7365@43616e557067726164652d74727565@43616e4d696e742d66616c7365@43616e4275726e2d74727565@43616e4368616e67654f776e65722d66616c7365@43616e50617573652d66616c7365@43616e467265657a652d66616c7365@43616e576970652d66616c7365@43616e4164645370656369616c526f6c65732d74727565@43616e5472616e736665724e4654437265617465526f6c652d66616c7365@4e465443726561746553746f707065642d66616c7365@4e756d57697065642d30";
+    let raw_input = b"@544553544e4654@44796e616d69634e6f6e46756e6769626c6545534454@0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1@30@30@4e756d446563696d616c732d3138@49735061757365642d66616c7365@43616e557067726164652d74727565@43616e4d696e742d66616c7365@43616e4275726e2d74727565@43616e4368616e67654f776e65722d66616c7365@43616e50617573652d66616c7365@43616e467265657a652d66616c7365@43616e576970652d66616c7365@43616e4164645370656369616c526f6c65732d74727565@43616e5472616e736665724e4654437265617465526f6c652d66616c7365@4e465443726561746553746f707065642d66616c7365@4e756d57697065642d30";
     let mut input: Vec<Vec<u8>> = raw_input
         .split(|&b| b == b'@')
         .filter(|slice| !slice.is_empty())
@@ -31,7 +35,12 @@ fn multi_decode_from_api_response() {
         .collect();
 
     let token_properties = TokenPropertiesResult::multi_decode(&mut input).unwrap();
-
+    assert!(token_properties.token_name == "TESTNFT");
+    assert!(token_properties.token_type == EsdtTokenType::DynamicNFT);
+    assert!(
+        Bech32Address::from(token_properties.owner_address).to_bech32_str()
+            == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    );
     assert!(token_properties.num_decimals == 18usize);
     assert!(!token_properties.is_paused);
     assert!(token_properties.can_upgrade);

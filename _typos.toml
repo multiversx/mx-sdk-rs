@@ -7,3 +7,6 @@ extend-ignore-identifiers-re = [
 [default.extend-words]
 ser = "ser" # short for "serialize"
 abd = "abd" # it's a hex
+
+[files]
+extend-exclude = ["tools/git-scraper/contracts_dump.txt"]
