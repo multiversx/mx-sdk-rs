@@ -121,6 +121,11 @@ fn forw_raw_sync_fallible_go() {
 }
 
 #[test]
+fn forw_raw_sync_fallible_legacy_go() {
+    world().run("scenarios/forw_raw_sync_fallible_legacy.scen.json");
+}
+
+#[test]
 fn forw_raw_sync_readonly_go() {
     world().run("scenarios/forw_raw_sync_readonly.scen.json");
 }
