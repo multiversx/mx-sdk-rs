@@ -33,6 +33,12 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.61.0, chain 0.18.0, sdk 0.11.3] - 2025-09-04
+- BLS crypto function support in the Rust VM. Functionality is guarded by the `bls` feature flag.
+- Managed buffer slices out of bounds handled in the framework.
+- Interactor - fixed log management.
+
+
 ## [sc 0.60.0, chain 0.17.0, sdk 0.11.2] - 2025-08-08
 - Block info hooks:
 	- Rust VM support for the new block/round info hooks: `getBlockTimestampMs`, `getPrevBlockTimestampMs`, `getBlockRoundTimeMs`, `epochStartBlockTimestampMs`, `epochStartBlockNonce`, `epochStartBlockRound`;
@@ -41,6 +47,7 @@ They are:
 	- Removed the `barnard` feature. All functionality is routed to the new Barnard hooks, where appropriate.
 	- Reverted routing non-fallible transfer execute through the fallible vm hook. This preserves pre-Barnard behavior for most cases.
 - `sc-meta install mx-scenario-go` retries several times in case of connection issues.
+
 
 ## [sc 0.59.1, codec 0.23.1, chain 0.16.1, sdk 0.11.1] - 2025-07-24
 - Governance proxy improvements.
