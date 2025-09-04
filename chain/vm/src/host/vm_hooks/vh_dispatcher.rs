@@ -2142,7 +2142,9 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         message_handle: i32,
         sig_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_verify_bls")
+        self.handler
+            .verify_bls_managed(key_handle, message_handle, sig_handle)?;
+        Ok(0)
     }
 
     fn verify_ed25519(
@@ -2483,20 +2485,26 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     ) -> Result<i32, VMHooksEarlyExit> {
         panic!("Unavailable: managed_verify_secp256r1")
     }
+
     fn managed_verify_blssignature_share(
         &mut self,
         key_handle: i32,
         message_handle: i32,
         sig_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_verify_blssignature_share")
+        self.handler
+            .verify_bls_signature_share(key_handle, message_handle, sig_handle)?;
+        Ok(0)
     }
+
     fn managed_verify_blsaggregated_signature(
         &mut self,
         key_handle: i32,
         message_handle: i32,
         sig_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_verify_blsaggregated_signature")
+        self.handler
+            .verify_bls_aggregated_signature(key_handle, message_handle, sig_handle)?;
+        Ok(0)
     }
 }

@@ -25,6 +25,22 @@ impl From<&EventInputAbi> for EventInputAbiJson {
     }
 }
 
+impl From<&EventInputAbiJson> for EventInputAbi {
+    fn from(abi: &EventInputAbiJson) -> Self {
+        EventInputAbi {
+            arg_name: abi.arg_name.to_string(),
+            type_name: abi.type_name.clone(),
+            indexed: abi.indexed.unwrap_or(false),
+        }
+    }
+}
+
+impl From<EventInputAbiJson> for EventInputAbi {
+    fn from(abi: EventInputAbiJson) -> Self {
+        EventInputAbi::from(&abi)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct EventAbiJson {
     #[serde(default)]
@@ -41,5 +57,21 @@ impl From<&EventAbi> for EventAbiJson {
             identifier: abi.identifier.to_string(),
             inputs: abi.inputs.iter().map(EventInputAbiJson::from).collect(),
         }
+    }
+}
+
+impl From<&EventAbiJson> for EventAbi {
+    fn from(abi: &EventAbiJson) -> Self {
+        EventAbi {
+            docs: abi.docs.iter().map(|d| d.to_string()).collect(),
+            identifier: abi.identifier.to_string(),
+            inputs: abi.inputs.iter().map(EventInputAbi::from).collect(),
+        }
+    }
+}
+
+impl From<EventAbiJson> for EventAbi {
+    fn from(abi: EventAbiJson) -> Self {
+        EventAbi::from(&abi)
     }
 }

@@ -933,13 +933,8 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "*",
-                    "*",
-                    "*"
-                ],
-                "status": "0",
-                "message": "*"
+                "status": "10",
+                "message": "str:VM hook is deactivated"
             }
         },
         {
@@ -956,13 +951,8 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "*",
-                    "*",
-                    "*"
-                ],
-                "status": "0",
-                "message": "*"
+                "status": "10",
+                "message": "str:VM hook is deactivated"
             }
         },
         {
@@ -979,13 +969,8 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "*",
-                    "*",
-                    "*"
-                ],
-                "status": "0",
-                "message": "*"
+                "status": "10",
+                "message": "str:VM hook is deactivated"
             }
         },
         {
@@ -1002,13 +987,8 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "*",
-                    "*",
-                    "*"
-                ],
-                "status": "0",
-                "message": "*"
+                "status": "10",
+                "message": "str:VM hook is deactivated"
             }
         },
         {

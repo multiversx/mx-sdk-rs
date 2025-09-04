@@ -168,6 +168,12 @@ fn forw_raw_sync_fallible_rs() {
 }
 
 #[test]
+#[ignore = "requires Barnard, unavailable: managed_execute_on_dest_context_with_error_return"]
+fn forw_raw_sync_fallible_legacy_rs() {
+    world().run("scenarios/forw_raw_sync_fallible_legacy.scen.json");
+}
+
+#[test]
 fn forw_raw_sync_readonly_rs() {
     world().run("scenarios/forw_raw_sync_readonly.scen.json");
 }
