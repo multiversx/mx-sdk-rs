@@ -106,19 +106,16 @@ fn crypto_sha_256_rs() {
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_rs() {
     world().run("scenarios/crypto_verify_bls.scen.json");
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_aggregated_signature_rs() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_share_rs() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
