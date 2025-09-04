@@ -1,4 +1,4 @@
-use mx_bls_rs::{BlsError, G1, G2};
+use multiversx_bls::{BlsError, G1, G2};
 use sha2::Sha256;
 use sha3::{Digest, Keccak256};
 
