@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk-http"
-version = "0.11.2"
+version = "0.11.3"
 edition = "2021"
 
 authors = [
@@ -31,5 +31,5 @@ log = "0.4.17"
 serde_json = "1.0"
 
 [dependencies.multiversx-sdk]
-version = "=0.11.2"
+version = "=0.11.3"
 path = "../core"
