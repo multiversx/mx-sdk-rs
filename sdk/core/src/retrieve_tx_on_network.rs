@@ -38,8 +38,12 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                     }
                     "fail" => {
                         let (error_code, error_message) = parse_reason(&reason);
-                        let failed_transaction_info: TransactionOnNetwork =
-                            create_tx_failed(&error_message);
+                        let mut failed_transaction_info: TransactionOnNetwork = proxy
+                            .request(GetTxInfo::new(&tx_hash).with_results())
+                            .await
+                            .unwrap();
+
+                        replace_with_error_message(&mut failed_transaction_info, &error_message);
 
                         log::error!(
                             "Transaction failed with error code: {} and message: {error_message}",
@@ -151,4 +155,28 @@ fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
     failed_transaction_info.logs = Some(log);
 
     failed_transaction_info
+}
+
+pub fn replace_with_error_message(tx: &mut TransactionOnNetwork, error_message: &str) {
+    if error_message.is_empty() {
+        return;
+    }
+
+    if let Some(event) = find_log(tx) {
+        if let Some(event_topics) = event.topics.as_mut() {
+            if event_topics.len() == 2 {
+                event_topics[1] = error_message.to_string();
+            }
+        }
+    }
+}
+
+fn find_log(tx: &mut TransactionOnNetwork) -> Option<&mut Events> {
+    if let Some(logs) = tx.logs.as_mut() {
+        logs.events
+            .iter_mut()
+            .find(|event| event.identifier == LOG_IDENTIFIER_SIGNAL_ERROR)
+    } else {
+        None
+    }
 }
