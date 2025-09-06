@@ -18,7 +18,7 @@ pub trait TypeDescriptionContainer {
     fn insert_all(&mut self, other: &Self);
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct TypeDescriptionContainerImpl(pub Vec<(TypeNames, TypeDescription)>);
 
 impl TypeDescriptionContainerImpl {
