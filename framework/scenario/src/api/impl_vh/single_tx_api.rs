@@ -1,13 +1,12 @@
 use std::sync::Mutex;
 
 use multiversx_chain_vm::{
-    blockchain::state::AccountData, executor::VMHooks, host::vm_hooks::VMHooksDispatcher,
-    types::VMAddress,
+    blockchain::state::AccountData, host::vm_hooks::VMHooksDispatcher, types::VMAddress,
 };
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::api::RawHandle;
 
-use crate::executor::debug::{ContractDebugInstanceState, StaticVarData};
+use crate::executor::debug::{ContractDebugInstanceState, StaticVarData, VMHooksDebugger};
 
 use super::{SingleTxApiData, SingleTxApiVMHooksContext, VMHooksApi, VMHooksApiBackend};
 
@@ -25,7 +24,7 @@ impl VMHooksApiBackend for SingleTxApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
             let vh_context = cell.lock().unwrap().clone();

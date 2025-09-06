@@ -311,4 +311,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
         Ok(())
     }
+
+    pub fn bi_drop(&self, map_handle: RawHandle) {
+        self.context.m_types_lock().bi_remove(map_handle);
+    }
 }
