@@ -2,7 +2,6 @@ mod annotated;
 mod back_transfers;
 mod callback_closure;
 mod callback_selector_result;
-mod contract_call_legacy;
 mod expr;
 mod managed_arg_buffer;
 mod markers;
@@ -26,7 +25,6 @@ pub use callback_closure::{
     new_callback_call, CallbackClosure, CallbackClosureForDeser, CallbackClosureMatcher,
 };
 pub use callback_selector_result::CallbackSelectorResult;
-pub use contract_call_legacy::*;
 pub use expr::*;
 pub use managed_arg_buffer::ManagedArgBuffer;
 pub use markers::*;

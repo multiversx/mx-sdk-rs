@@ -1,6 +1,5 @@
 mod check_state_step;
 mod dump_state_step;
-mod into_blockchain_call;
 mod sc_call_step;
 mod sc_deploy_step;
 mod sc_query_step;
@@ -13,7 +12,6 @@ mod typed_sc_query;
 
 pub use check_state_step::*;
 pub use dump_state_step::*;
-pub use into_blockchain_call::*;
 pub use sc_call_step::*;
 pub use sc_deploy_step::*;
 pub use sc_query_step::*;

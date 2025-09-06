@@ -2,11 +2,10 @@
 
 use crate::InteractorBase;
 use multiversx_sc_scenario::{
-    api::StaticApi,
     multiversx_sc::{
         abi::TypeAbiFrom,
         codec::{TopDecodeMulti, TopEncodeMulti},
-        types::{Address, ContractCallBase},
+        types::Address,
     },
     scenario_model::{
         ScCallStep, ScDeployStep, ScQueryStep, TxResponse, TypedResponse, TypedScCall,
@@ -125,22 +124,6 @@ where
         self.sc_query(step.as_mut()).await;
         let response = unwrap_response(&step.sc_query_step.response);
         TypedResponse::from_raw(response)
-    }
-
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    pub async fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
-    where
-        CC: ContractCallBase<StaticApi>,
-        RequestedResult: TopDecodeMulti + TypeAbiFrom<CC::OriginalResult>,
-    {
-        let mut typed_sc_query = ScQueryStep::new().call(contract_call);
-        self.sc_query(&mut typed_sc_query).await;
-        let response = unwrap_response(&typed_sc_query.sc_query_step.response);
-        let typed_response = TypedResponse::from_raw(response);
-        typed_response.result.unwrap()
     }
 
     #[deprecated(

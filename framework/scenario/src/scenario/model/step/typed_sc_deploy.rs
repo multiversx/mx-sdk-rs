@@ -6,7 +6,6 @@ use multiversx_sc::{
 };
 
 use crate::{
-    api::StaticApi,
     multiversx_sc::{
         codec::TopEncodeMulti,
         types::{Address, CodeMetadata},
@@ -97,25 +96,6 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
     /// Note: by default a basic `TxExpect::ok()` is added, which checks that status is 0 and nothing else.
     pub fn no_expect(mut self) -> Self {
         self.sc_deploy_step.expect = None;
-        self
-    }
-
-    /// Sets following fields based on the smart contract proxy:
-    /// - "function"
-    /// - "arguments"
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    #[allow(deprecated)]
-    pub fn call(
-        mut self,
-        contract_deploy: multiversx_sc::types::ContractDeploy<StaticApi, OriginalResult>,
-    ) -> Self {
-        let (_, mandos_args) = super::process_contract_deploy(contract_deploy);
-        for arg in mandos_args {
-            self.sc_deploy_step.tx.arguments.push(BytesValue::from(arg));
-        }
         self
     }
 

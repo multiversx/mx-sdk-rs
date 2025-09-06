@@ -6,12 +6,12 @@ use multiversx_sc_codec::{
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
     },
     types::{
-        ContractCallNoPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, MultiEgldOrEsdtPayment, MultiValueEncoded, TypedFunctionCall,
+        EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        MultiEgldOrEsdtPayment, MultiValueEncoded,
     },
 };
 
@@ -65,13 +65,6 @@ where
         self.arg_buffer = raw;
         self
     }
-
-    pub fn typed_result<R>(self) -> TypedFunctionCall<Api, R>
-    where
-        R: TopEncodeMulti + TopDecodeMulti,
-    {
-        self.into()
-    }
 }
 
 impl<Api> From<()> for FunctionCall<Api>
@@ -80,15 +73,6 @@ where
 {
     fn from(_: ()) -> Self {
         FunctionCall::empty()
-    }
-}
-
-impl<Api, R> From<ContractCallNoPayment<Api, R>> for FunctionCall<Api>
-where
-    Api: CallTypeApi,
-{
-    fn from(ccnp: ContractCallNoPayment<Api, R>) -> Self {
-        ccnp.function_call
     }
 }
 

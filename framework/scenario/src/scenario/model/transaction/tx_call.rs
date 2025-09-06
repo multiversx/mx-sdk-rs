@@ -4,8 +4,6 @@ use multiversx_sc::api::{
 };
 
 use crate::{
-    api::StaticApi,
-    multiversx_sc::types::{ContractCall, EsdtTokenPayment},
     scenario::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
@@ -92,47 +90,6 @@ impl IntoRaw<TxCallRaw> for TxCall {
 }
 
 impl TxCall {
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    #[allow(deprecated)]
-    pub fn to_contract_call(&self) -> multiversx_sc::types::ContractCallWithEgld<StaticApi, ()> {
-        let mut contract_call = multiversx_sc::types::ContractCallWithEgld::new(
-            (&self.to.value).into(),
-            self.function.as_bytes(),
-            (&self.egld_value.value).into(),
-        );
-
-        contract_call.basic.explicit_gas_limit = self.gas_limit.value;
-
-        contract_call = contract_call.convert_to_esdt_transfer_call(
-            self.esdt_value
-                .iter()
-                .map(|esdt| {
-                    EsdtTokenPayment::new(
-                        esdt.esdt_token_identifier.value.as_slice().into(),
-                        esdt.nonce.value,
-                        (&esdt.esdt_value.value).into(),
-                    )
-                })
-                .collect(),
-        );
-
-        // For some contract calls from == to.
-        // The contract call objects have no "from" field, since that is always part of the execution context.
-        // On the static API there is no execution context, but a placeholder value is provided.
-        // Here we already know the sender, so we can replace the placeholder with the actual value.
-        if StaticApi::is_current_address_placeholder(&contract_call.basic.to.to_address()) {
-            contract_call.basic.to = self.from.value.clone().into();
-        }
-
-        for argument in &self.arguments {
-            contract_call.push_raw_argument(argument.value.as_slice());
-        }
-        contract_call
-    }
-
     /// Converts call to builtin function ESDT transfer call, if necessary.
     pub fn normalize(&self) -> TxCall {
         let (function, arguments, to_self) = self.process_payments();
