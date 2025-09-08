@@ -5,6 +5,7 @@ use multiversx_sdk::{
         extract_message_from_string_reason, find_code_and_message, parse_reason,
         replace_with_error_message,
     },
+    utils::base64_decode,
 };
 
 #[test]
@@ -226,7 +227,7 @@ fn replace_logs_reason_with_message_test() {
     let expected_tx: TransactionOnNetwork =
         serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
 
-    replace_with_error_message(&mut tx, "b3V0IG9mIGZ1bmRz");
+    replace_with_error_message(&mut tx, "out of funds");
     assert_eq!(
         expected_tx.logs.unwrap().events[0].topics,
         tx.logs.unwrap().events[0].topics
@@ -715,7 +716,7 @@ fn replace_logs_parse_reason_test() {
     let expected_tx: TransactionOnNetwork =
         serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
 
-    replace_with_error_message(&mut tx, "Y2FsbGVyIGlzIG5vdCBhIGRlbGVnYXRvcg==");
+    replace_with_error_message(&mut tx, "caller is not a delegator");
     assert_eq!(
         expected_tx.logs.unwrap().events[0].topics,
         tx.logs.unwrap().events[0].topics
@@ -868,7 +869,7 @@ fn replace_logs_reason_sc_panic_test() {
         serde_json::from_str::<TransactionOnNetwork>(tx_str).unwrap();
     let expected_tx: TransactionOnNetwork =
         serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
-    replace_with_error_message(&mut tx, "c3RvcmFnZSBkZWNvZGUgZXJyb3IgKGtleTogcG9vbENvbnRyYWN0AAAAAAAAAe+/vSk6IGlucHV0IHRvbyBzaG9ydA==");
+    replace_with_error_message(&mut tx, &String::from_utf8(base64_decode("c3RvcmFnZSBkZWNvZGUgZXJyb3IgKGtleTogcG9vbENvbnRyYWN0AAAAAAAAAe+/vSk6IGlucHV0IHRvbyBzaG9ydA==")).unwrap());
     assert_eq!(
         expected_tx.logs.unwrap().events[0].topics,
         tx.logs.unwrap().events[0].topics
@@ -1021,7 +1022,7 @@ fn replace_logs_reason_invalid_test() {
         serde_json::from_str::<TransactionOnNetwork>(tx_str).unwrap();
     let expected_tx: TransactionOnNetwork =
         serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
-    replace_with_error_message(&mut tx, "aW52YWxpZCBmdW5jdGlvbiAobm90IGZvdW5kKQ==");
+    replace_with_error_message(&mut tx, "invalid function (not found)");
     assert_eq!(
         expected_tx.logs.unwrap().events[0].topics,
         tx.logs.unwrap().events[0].topics

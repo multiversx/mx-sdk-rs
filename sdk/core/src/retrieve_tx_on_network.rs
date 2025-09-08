@@ -1,6 +1,7 @@
 use crate::{
     data::transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
     gateway::{GetTxInfo, GetTxProcessStatus},
+    utils::base64_encode,
 };
 use log::info;
 use multiversx_chain_core::{std::Bech32Address, types::ReturnCode};
@@ -37,19 +38,21 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         return (transaction_info_with_results, ReturnCode::Success);
                     }
                     "fail" => {
-                        let (error_code, error_message) = parse_reason(&reason);
-                        let mut failed_transaction_info: TransactionOnNetwork = proxy
+                        let (error_code, reason) = parse_reason(&reason);
+
+                        let mut failed_transaction: TransactionOnNetwork = proxy
                             .request(GetTxInfo::new(&tx_hash).with_results())
                             .await
                             .unwrap();
 
-                        replace_with_error_message(&mut failed_transaction_info, &error_message);
+                        replace_with_error_message(&mut failed_transaction, &reason);
 
                         log::error!(
-                            "Transaction failed with error code: {} and message: {error_message}",
+                            "Transaction failed with error code: {} and message: {reason}",
                             error_code.as_u64()
                         );
-                        return (failed_transaction_info, error_code);
+
+                        return (failed_transaction, error_code);
                     }
                     _ => {
                         continue;
@@ -147,7 +150,7 @@ fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
         events: vec![Events {
             address: Bech32Address::zero_default_hrp(),
             identifier: LOG_IDENTIFIER_SIGNAL_ERROR.to_string(),
-            topics: Some(vec![error_message.to_string()]),
+            topics: vec![String::new(), base64_encode(error_message.as_bytes())],
             data: LogData::default(),
         }],
     };
@@ -163,10 +166,8 @@ pub fn replace_with_error_message(tx: &mut TransactionOnNetwork, error_message: 
     }
 
     if let Some(event) = find_log(tx) {
-        if let Some(event_topics) = event.topics.as_mut() {
-            if event_topics.len() == 2 {
-                event_topics[1] = error_message.to_string();
-            }
+        if event.topics.len() >= 2 && event.topics[1] != base64_encode(error_message) {
+            event.topics[1] = base64_encode(error_message);
         }
     }
 }
