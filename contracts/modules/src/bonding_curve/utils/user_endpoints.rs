@@ -116,10 +116,10 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     self.token_details(&requested_token)
                         .update(|details| details.remove_nonce(nonce));
                 }
-            },
+            }
             OptionalValue::None => {
                 self.send_next_available_tokens(&caller, requested_token, requested_amount);
-            },
+            }
         };
 
         self.tx()

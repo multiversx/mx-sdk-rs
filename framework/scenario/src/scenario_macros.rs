@@ -54,11 +54,11 @@ macro_rules! assert_sc_error {
         match $sc_result {
             multiversx_sc::types::SCResult::Ok(t) => {
                 panic!("Expected SCError, but got SCResult::Ok: {:?}", t)
-            },
+            }
             multiversx_sc::types::SCResult::Err(err) => {
                 let as_str = String::from_utf8(err.as_bytes().to_vec()).unwrap();
                 assert_eq!(as_str, $expected_string);
-            },
+            }
         }
     }};
 }
@@ -83,7 +83,7 @@ macro_rules! unwrap_or_panic {
             multiversx_sc::types::SCResult::Err(err) => {
                 let as_str = String::from_utf8(err.as_bytes().to_vec()).unwrap();
                 panic!("{}", as_str);
-            },
+            }
         }
     }};
 }

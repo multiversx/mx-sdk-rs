@@ -120,6 +120,7 @@ fn generate_token_identifier_from_ticker(
         tx_input.from.as_bytes(),
         tx_cache
             .blockchain_ref()
+            .block_config
             .current_block_info
             .block_random_seed
             .as_slice(),

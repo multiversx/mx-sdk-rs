@@ -23,16 +23,20 @@ pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {
     core::fmt::write(&mut panic_msg, format_args!("{panic_info}"))
         .unwrap_or_else(|_| panic_msg.append_str("unable to write panic"));
 
+    signal_error_with_managed_panic_message(panic_msg)
+}
+
+pub fn signal_error_with_managed_panic_message(panic_msg: ManagedPanicMessage) -> ! {
     VmApiImpl::error_api_impl().signal_error_from_buffer(panic_msg.buffer.get_handle())
 }
 
 #[derive(Default)]
-struct ManagedPanicMessage {
+pub struct ManagedPanicMessage {
     buffer: ManagedBuffer<VmApiImpl>,
 }
 
 impl ManagedPanicMessage {
-    fn append_str(&mut self, s: &str) {
+    pub fn append_str(&mut self, s: &str) {
         self.buffer.append_bytes(s.as_bytes());
     }
 }

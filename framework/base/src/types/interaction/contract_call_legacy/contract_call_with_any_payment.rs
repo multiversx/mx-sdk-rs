@@ -58,10 +58,10 @@ where
         match self.payment {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => {
                 self.basic.transfer_execute_egld(egld_amount);
-            },
+            }
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
                 self.basic.transfer_execute_esdt(multi_esdt_payment);
-            },
+            }
         }
     }
 }

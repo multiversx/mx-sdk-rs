@@ -57,7 +57,7 @@ pub fn generate_body_with_result(
                 let result = #mbody;
                 multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
             }
-        },
+        }
     }
 }
 

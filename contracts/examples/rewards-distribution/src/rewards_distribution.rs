@@ -105,7 +105,7 @@ pub trait RewardsDistribution:
             OperationCompletionStatus::Completed => {
                 self.completed_raffle_id_count().set(raffle.raffle_id + 1);
                 None
-            },
+            }
         };
 
         self.raffle_progress().set(raffle_progress);

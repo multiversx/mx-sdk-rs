@@ -34,6 +34,14 @@ pub enum InteractCliCommand {
         about = "Experiment with echo_managed_option on basic-features contract"
     )]
     EchoManagedOption(EchoManagedOptionArgs),
+    #[command(name = "epoch", about = "Epoch info")]
+    EpochInfo,
+    #[command(name = "blockt", about = "Epoch info")]
+    BlockTimestamps,
+    #[command(name = "codehash", about = "Code hash test")]
+    CodeHash(CodeHashArgs),
+    #[command(name = "token", about = "Token data test")]
+    TokenData(TokenDataArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -55,4 +63,22 @@ pub struct EchoManagedOptionArgs {
     /// The value of ManagedOption
     #[arg(short = 'm')]
     pub managed_option: Option<u64>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct CodeHashArgs {
+    #[arg(short = 'a', long = "address")]
+    pub address: String,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TokenDataArgs {
+    #[arg(short = 'a', long = "address")]
+    pub address: String,
+
+    #[arg(short = 't', long = "token-id")]
+    pub token_id: String,
+
+    #[arg(short = 'n', long = "nonce", default_value = "0")]
+    pub nonce: u64,
 }

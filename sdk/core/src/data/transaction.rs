@@ -112,7 +112,7 @@ pub enum LogData {
 impl LogData {
     pub fn for_each<F: FnMut(&String)>(&self, mut f: F) {
         match self {
-            LogData::Empty => {},
+            LogData::Empty => {}
             LogData::String(s) => f(s),
             LogData::Vec(v) => v.iter().for_each(f),
         }
@@ -148,6 +148,7 @@ pub struct ApiSmartContractResult {
     pub code_metadata: Option<String>,
     pub return_message: Option<String>,
     pub original_sender: Option<String>,
+    pub logs: Option<ApiLogs>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

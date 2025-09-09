@@ -6,13 +6,11 @@ use multiversx_chain_vm_executor::{InstanceState, MemLength, MemPtr, VMHooksEarl
 use num_bigint::BigUint;
 use num_traits::Zero;
 
+use crate::blockchain::state::BlockConfig;
 use crate::host::runtime::RuntimeInstanceCallLambdaDefault;
 use crate::schedule::GasSchedule;
 use crate::{
-    blockchain::{
-        reserved::STORAGE_RESERVED_PREFIX,
-        state::{AccountData, BlockInfo},
-    },
+    blockchain::{reserved::STORAGE_RESERVED_PREFIX, state::AccountData},
     host::context::{
         async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType,
         ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxResult,
@@ -58,7 +56,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
             .expect("error writing to wasmer instance memory");
     }
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer> {
         self.tx_context_ref.m_types_lock()
     }
 
@@ -95,7 +93,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         self.tx_context_ref.rng_lock().next_bytes(length)
     }
 
-    fn result_lock(&self) -> MutexGuard<TxResult> {
+    fn result_lock(&self) -> MutexGuard<'_, TxResult> {
         self.tx_context_ref.result_lock()
     }
 
@@ -115,15 +113,11 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         Ok(())
     }
 
-    fn get_previous_block_info(&self) -> &BlockInfo {
-        &self.tx_context_ref.blockchain_ref().previous_block_info
+    fn get_block_config(&self) -> &BlockConfig {
+        &self.tx_context_ref.blockchain_ref().block_config
     }
 
-    fn get_current_block_info(&self) -> &BlockInfo {
-        &self.tx_context_ref.blockchain_ref().current_block_info
-    }
-
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers> {
         self.tx_context_ref.back_transfers_lock()
     }
 
@@ -249,7 +243,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
                 // TODO: not sure it's the right condition, it catches insufficient funds
                 Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                     .with_message(tx_result.result_message.clone()))
-            },
+            }
             _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                 .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }
@@ -285,12 +279,12 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
                 Ok(())
-            },
+            }
             ReturnCode::ExecutionFailed => {
                 // TODO: not sure it's the right condition, it catches insufficient funds
                 Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                     .with_message(tx_result.result_message.clone()))
-            },
+            }
             _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                 .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }

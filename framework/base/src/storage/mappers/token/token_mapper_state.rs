@@ -46,10 +46,10 @@ impl<M: ManagedTypeApi> codec::TopEncode for TokenMapperState<M> {
             TokenMapperState::NotSet => codec::TopEncode::top_encode_or_handle_err(&"", output, h),
             TokenMapperState::Pending => {
                 codec::TopEncode::top_encode_or_handle_err(&"pending", output, h)
-            },
+            }
             TokenMapperState::Token(token) => {
                 codec::TopEncode::top_encode_or_handle_err(&token, output, h)
-            },
+            }
         }
     }
 }

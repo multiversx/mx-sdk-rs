@@ -64,7 +64,7 @@ impl ComposabilityInteract {
                                 .returns(ReturnsStatus)
                                 .returns(ReturnsResult)
                         });
-                    },
+                    }
                     CallNode::Vault(vault_rc) => {
                         // Call Vault
                         let vault_addr = {
@@ -93,7 +93,7 @@ impl ComposabilityInteract {
                                 .returns(ReturnsStatus)
                                 .returns(ReturnsResult)
                         });
-                    },
+                    }
                 }
             }
         }

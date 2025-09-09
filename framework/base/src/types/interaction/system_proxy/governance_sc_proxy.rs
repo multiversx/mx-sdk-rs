@@ -1,7 +1,12 @@
+pub(super) mod governance_config_result;
+pub(super) mod proposal_view_result;
+
 use crate::types::{
-    BigUint, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, ProxyArg, Tx, TxEnv,
-    TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, EgldPayment, ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, ProxyArg,
+    Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
+use governance_config_result::GovernanceConfigResult;
+use proposal_view_result::ProposalViewResult;
 
 /// Proxy for the Governance system smart contract.
 pub struct GovernanceSCProxy;
@@ -38,13 +43,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn init_v2(self) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("initV2")
-            .original_result()
-    }
-
     pub fn proposal<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
@@ -54,20 +52,17 @@ where
         commit_hash: Arg0,
         start_vote_epoch: Arg1,
         end_vote_epoch: Arg2,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, EgldPayment<<Env as TxEnv>::Api>, Gas, ()> {
         self.wrapped_tx
-            .payment(NotPayable)
             .raw_call("proposal")
             .argument(&commit_hash)
             .argument(&start_vote_epoch)
             .argument(&end_vote_epoch)
+            .egld(BigUint::from(1_000_000_000_000_000_000_000u128))
             .original_result()
     }
 
-    pub fn vote<
-        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
-    >(
+    pub fn vote<Arg0: ProxyArg<BigUint<Env::Api>>, Arg1: ProxyArg<ManagedBuffer<Env::Api>>>(
         self,
         proposal_to_vote: Arg0,
         vote: Arg1,
@@ -81,7 +76,7 @@ where
     }
 
     pub fn delegate_vote<
-        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<u64>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<ManagedAddress<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
@@ -162,7 +157,10 @@ where
             .original_result()
     }
 
-    pub fn view_config(self) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    /// Note: values are returned as strings (base 10 representation).
+    pub fn view_config(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, GovernanceConfigResult> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("viewConfig")
@@ -188,7 +186,7 @@ where
     pub fn view_proposal<Arg0: ProxyArg<BigUint<Env::Api>>>(
         self,
         nonce: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ProposalViewResult<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("viewProposal")

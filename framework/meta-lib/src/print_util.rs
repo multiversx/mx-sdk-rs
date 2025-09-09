@@ -110,3 +110,10 @@ pub fn print_sc_config_main_deprecated(path: &Path) {
         .yellow(),
     );
 }
+
+pub fn print_proxy_error(path: &Path, error: String) {
+    println!(
+        "{}",
+        format!("Could not write proxy file {}: {error}", path.display()).red(),
+    );
+}

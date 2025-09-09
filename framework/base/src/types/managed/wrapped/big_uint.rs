@@ -55,6 +55,8 @@ impl<M: ManagedTypeApi> From<u128> for BigUint<M> {
     }
 }
 
+impl<M: ManagedTypeApi> TypeAbiFrom<u128> for BigUint<M> {}
+
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
     #[inline]
     fn from(item: ManagedBuffer<M>) -> Self {

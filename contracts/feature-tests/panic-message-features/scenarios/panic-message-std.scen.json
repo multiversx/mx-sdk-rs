@@ -1,0 +1,40 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:panic_features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/panic-message-std.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:panic_features",
+                "function": "panicWithMessage",
+                "arguments": [
+                    "123"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0x04",
+                "message": "file:error-message.txt",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

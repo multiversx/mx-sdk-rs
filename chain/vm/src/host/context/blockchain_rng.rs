@@ -14,12 +14,14 @@ impl BlockchainRng {
         seed.extend_from_slice(
             &tx_cache
                 .blockchain_ref()
+                .block_config
                 .previous_block_info
                 .block_random_seed[..],
         );
         seed.extend_from_slice(
             &tx_cache
                 .blockchain_ref()
+                .block_config
                 .current_block_info
                 .block_random_seed[..],
         );

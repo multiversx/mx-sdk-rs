@@ -215,7 +215,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
                 let inv = &one / self;
                 debug_assert!(inv > one);
                 Some(inv.ln_gt_one().neg())
-            },
+            }
             core::cmp::Ordering::Equal => Some(BigFloat::from(0i64)),
             core::cmp::Ordering::Greater => Some(self.ln_gt_one()),
         }
