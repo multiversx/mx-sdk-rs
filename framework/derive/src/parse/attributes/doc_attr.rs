@@ -40,7 +40,7 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
                 } else {
                     panic!("Value is not a string literal");
                 }
-            },
+            }
         })
         .collect()
 }

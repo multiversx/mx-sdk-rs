@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           58
+// Endpoints:                           61
 // Async Callback:                       1
-// Total number of exported functions:  60
+// Total number of exported functions:  63
 
 #![no_std]
 
@@ -59,6 +59,9 @@ multiversx_sc_wasm_adapter::endpoints! {
         issue_fungible_token => issue_fungible_token
         local_mint => local_mint
         local_burn => local_burn
+        sync_call_fallible => sync_call_fallible
+        forward_sync_fallible_accept_funds_multi_transfer => forward_sync_fallible_accept_funds_multi_transfer
+        forward_sync_reject_funds_multi_transfer => forward_sync_reject_funds_multi_transfer
         sft_issue => sft_issue
         buy_nft => buy_nft
         nft_issue => nft_issue

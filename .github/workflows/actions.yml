@@ -18,7 +18,7 @@ jobs:
     with:
       rust-toolchain: 1.87
       path-to-sc-meta: framework/meta
-      mx-scenario-go-version: v4.0.0
+      mx-scenario-go-version: v5.0.0
       enable-interactor-tests: true
       coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
     secrets:

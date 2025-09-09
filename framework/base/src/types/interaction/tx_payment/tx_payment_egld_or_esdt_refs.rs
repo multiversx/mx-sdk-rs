@@ -29,6 +29,20 @@ where
         )
     }
 
+    fn perform_transfer_execute_legacy(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        self.map_egld_or_esdt(
+            fc,
+            |fc, amount| Egld(amount).perform_transfer_execute_legacy(env, to, gas_limit, fc),
+            |fc, esdt_payment| esdt_payment.perform_transfer_execute_legacy(env, to, gas_limit, fc),
+        )
+    }
+
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,

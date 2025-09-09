@@ -91,7 +91,7 @@ impl Method {
             PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.payable.is_payable(),
             PublicRole::Callback(_) | PublicRole::CallbackRaw | PublicRole::CallbackPromise(_) => {
                 true
-            },
+            }
             PublicRole::Private => false,
         }
     }
@@ -103,7 +103,7 @@ impl Method {
             PublicRole::Endpoint(endpoint_metadata) => endpoint_metadata.payable.clone(),
             PublicRole::Callback(_) | PublicRole::CallbackRaw | PublicRole::CallbackPromise(_) => {
                 MethodPayableMetadata::AnyToken
-            },
+            }
             PublicRole::Private => MethodPayableMetadata::NotPayable,
         }
     }
@@ -116,7 +116,7 @@ impl Method {
             PublicRole::Callback(callback_metadata)
             | PublicRole::CallbackPromise(callback_metadata) => {
                 callback_metadata.allow_multiple_var_args
-            },
+            }
             PublicRole::CallbackRaw => true,
             PublicRole::Private => false,
         }

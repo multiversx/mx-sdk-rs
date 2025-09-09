@@ -50,6 +50,16 @@ fn block_info_go() {
 }
 
 #[test]
+fn block_info_ms_go() {
+    world().run("scenarios/block_info_ms.scen.json");
+}
+
+#[test]
+fn code_hash_go() {
+    world().run("scenarios/code_hash.scen.json");
+}
+
+#[test]
 fn codec_err_go() {
     world().run("scenarios/codec_err.scen.json");
 }
@@ -60,6 +70,7 @@ fn count_ones_go() {
 }
 
 #[test]
+#[ignore = "some hooks are being disabled (after-supernova)"]
 fn crypto_elliptic_curves_go() {
     world().run("scenarios/crypto_elliptic_curves.scen.json");
 }
@@ -80,25 +91,21 @@ fn crypto_sha_256_go() {
 }
 
 #[test]
-#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_go() {
     world().run("scenarios/crypto_verify_bls.scen.json");
 }
 
 #[test]
-#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_aggregated_signature_go() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_bls_share_go() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
 
 #[test]
-#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_ed_25519_go() {
     world().run("scenarios/crypto_verify_ed25519.scen.json");
 }
@@ -109,7 +116,6 @@ fn crypto_verify_secp_256_k_1_go() {
 }
 
 #[test]
-#[ignore = "TODO: error message changed, unignore after Barnard"]
 fn crypto_verify_secp_256_r_1_go() {
     world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }

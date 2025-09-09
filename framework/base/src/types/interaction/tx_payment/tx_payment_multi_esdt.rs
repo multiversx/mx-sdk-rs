@@ -45,6 +45,22 @@ where
         )
     }
 
+    fn perform_transfer_execute_legacy(
+        self,
+        _env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
+            to,
+            self,
+            gas_limit,
+            &fc.function_name,
+            &fc.arg_buffer,
+        );
+    }
+
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
@@ -101,6 +117,18 @@ where
     }
 
     #[inline]
+    fn perform_transfer_execute_legacy(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        self.deref()
+            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
+    }
+
+    #[inline]
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
@@ -140,6 +168,17 @@ where
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
         (&self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        (&self).perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]

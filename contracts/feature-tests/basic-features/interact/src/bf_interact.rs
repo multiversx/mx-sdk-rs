@@ -1,3 +1,4 @@
+mod bf_interact_barnard;
 mod bf_interact_cli;
 mod bf_interact_config;
 mod bf_interact_state;
@@ -24,27 +25,47 @@ pub async fn basic_features_cli() {
     let mut bf_interact = BasicFeaturesInteract::init(config).await;
 
     let cli = bf_interact_cli::InteractCli::parse();
-    match &cli.command {
+    match cli.command {
         Some(bf_interact_cli::InteractCliCommand::Deploy) => {
             bf_interact.deploy().await;
-        },
+        }
         Some(bf_interact_cli::InteractCliCommand::DeployStorageBytes) => {
             bf_interact.deploy_storage_bytes().await;
-        },
+        }
         Some(bf_interact_cli::InteractCliCommand::LargeStorage(args)) => {
             bf_interact.large_storage(args.size_kb).await;
-        },
+        }
         Some(bf_interact_cli::InteractCliCommand::ReturnsEGLDDecimals(args)) => {
             bf_interact.returns_egld_decimal(args.egld).await;
-        },
+        }
         Some(bf_interact_cli::InteractCliCommand::EchoManagedOption(args)) => {
             let mo = match args.managed_option {
                 Some(value) => ManagedOption::some(BigUint::from(value)),
                 None => ManagedOption::none(),
             };
             bf_interact.echo_managed_option(mo).await;
-        },
-        None => {},
+        }
+        Some(bf_interact_cli::InteractCliCommand::EpochInfo) => {
+            bf_interact.epoch_info().await;
+        }
+        Some(bf_interact_cli::InteractCliCommand::BlockTimestamps) => {
+            bf_interact.block_timestamps().await;
+        }
+        Some(bf_interact_cli::InteractCliCommand::CodeHash(args)) => {
+            bf_interact
+                .code_hash(Bech32Address::from_bech32_string(args.address))
+                .await;
+        }
+        Some(bf_interact_cli::InteractCliCommand::TokenData(args)) => {
+            bf_interact
+                .get_esdt_token_data(
+                    Bech32Address::from_bech32_string(args.address),
+                    &args.token_id,
+                    args.nonce,
+                )
+                .await;
+        }
+        None => {}
     }
 }
 
@@ -66,7 +87,7 @@ impl BasicFeaturesInteract {
             .set_current_dir_from_workspace("contracts/feature-tests/basic-features/interact");
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
 
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,
@@ -233,7 +254,7 @@ impl BasicFeaturesInteract {
                     err.message
                 );
                 assert_eq!(err_msg.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -264,7 +285,7 @@ impl BasicFeaturesInteract {
                     err.message
                 );
                 assert_eq!(err_msg.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -295,7 +316,7 @@ impl BasicFeaturesInteract {
                     err.message
                 );
                 assert_eq!(err_msg.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 

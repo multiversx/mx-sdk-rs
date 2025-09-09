@@ -5,10 +5,10 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           93
+// Endpoints:                           98
 // Async Callback:                       1
 // Promise callbacks:                    5
-// Total number of exported functions: 100
+// Total number of exported functions: 105
 
 #![no_std]
 
@@ -68,6 +68,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         is_esdt_paused => is_esdt_paused
         is_esdt_limited_transfer => is_esdt_limited_transfer
         validate_token_identifier => validate_token_identifier
+        sync_call_fallible => sync_call_fallible
+        forward_sync_fallible_accept_funds_multi_transfer => forward_sync_fallible_accept_funds_multi_transfer
+        forward_sync_reject_funds_multi_transfer => forward_sync_reject_funds_multi_transfer
+        transfer_fallible => transfer_fallible
+        transfer_execute_fallible => transfer_execute_fallible
         sft_issue => sft_issue
         get_nft_balance => get_nft_balance
         buy_nft => buy_nft

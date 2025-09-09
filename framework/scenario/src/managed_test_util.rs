@@ -38,13 +38,13 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(bytes: &[u8]) 
     match T::top_decode(bytes) {
         Ok(from_unmanaged) => {
             assert_eq!(from_unmanaged, from_mb);
-        },
+        }
         Err(err) => {
             panic!(
                 "Unexpected encoding error:: {}",
                 core::str::from_utf8(err.message_bytes()).unwrap()
             )
-        },
+        }
     }
 
     from_mb

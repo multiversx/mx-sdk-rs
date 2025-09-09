@@ -204,7 +204,7 @@ where
 
             EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
                 REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME
-            },
+            }
 
             EsdtTokenType::Invalid => "",
         };
@@ -236,7 +236,7 @@ where
         let endpoint_name = match token_type {
             EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
                 REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
-            },
+            }
             _ => "",
         };
 

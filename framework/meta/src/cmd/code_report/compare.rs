@@ -7,7 +7,7 @@ pub(crate) fn size_status_after_comparing(size: usize, compared_size: usize) -> 
                 size,
                 size - compared_size
             )
-        },
+        }
         std::cmp::Ordering::Less => {
             format!(
                 "{} :arrow_right: {} :green_circle: (-{})",
@@ -15,10 +15,10 @@ pub(crate) fn size_status_after_comparing(size: usize, compared_size: usize) -> 
                 size,
                 compared_size - size
             )
-        },
+        }
         std::cmp::Ordering::Equal => {
             format!("{}", size)
-        },
+        }
     }
 }
 

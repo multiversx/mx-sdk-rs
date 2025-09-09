@@ -20,3 +20,6 @@ pub use multiversx_chain_core as chain_core;
 
 #[macro_use]
 extern crate alloc;
+
+#[cfg(feature = "bls")]
+pub mod crypto_functions_bls;

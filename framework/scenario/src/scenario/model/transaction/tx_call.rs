@@ -168,7 +168,7 @@ impl TxCall {
                 } else {
                     self.construct_single_transfer_nft_call(payment)
                 }
-            },
+            }
             _ => self.construct_multi_transfer_esdt_call(),
         }
     }

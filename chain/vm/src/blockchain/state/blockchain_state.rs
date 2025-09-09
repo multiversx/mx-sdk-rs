@@ -11,14 +11,13 @@ use crate::{
     blockchain::reserved::STORAGE_REWARD_KEY, host::context::BlockchainUpdate, types::VMAddress,
 };
 
-use super::{AccountData, BlockInfo};
+use super::{AccountData, BlockConfig};
 
 #[derive(Default, Clone)]
 pub struct BlockchainState {
     pub accounts: HashMap<VMAddress, AccountData>,
     pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
-    pub previous_block_info: BlockInfo,
-    pub current_block_info: BlockInfo,
+    pub block_config: BlockConfig,
     pub new_token_identifiers: Vec<String>,
 }
 
@@ -94,7 +93,7 @@ impl Debug for BlockchainState {
         f.debug_struct("BlockchainState")
             .field("accounts", &self.accounts)
             .field("new_addresses", &self.new_addresses)
-            .field("current_block_info", &self.current_block_info)
+            .field("block_config", &self.block_config)
             .finish()
     }
 }

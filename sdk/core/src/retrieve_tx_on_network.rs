@@ -33,28 +33,25 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                             .await
                             .unwrap();
 
-                        info!(
-                            "Transaction retrieved successfully, with status {}: {:#?}",
-                            status, transaction_info_with_results
-                        );
+                        log::info!("Transaction retrieved successfully, with status {status}",);
                         return (transaction_info_with_results, ReturnCode::Success);
-                    },
+                    }
                     "fail" => {
                         let (error_code, error_message) = parse_reason(&reason);
                         let failed_transaction_info: TransactionOnNetwork =
                             create_tx_failed(&error_message);
 
-                        info!(
+                        log::error!(
                             "Transaction failed with error code: {} and message: {error_message}",
                             error_code.as_u64()
                         );
                         return (failed_transaction_info, error_code);
-                    },
+                    }
                     _ => {
                         continue;
-                    },
+                    }
                 }
-            },
+            }
             Err(err) => {
                 retries += 1;
                 if retries >= MAX_RETRIES {
@@ -66,7 +63,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                 let backoff_time = backoff_delay.min(MAX_BACKOFF_DELAY);
                 proxy.sleep(backoff_time).await;
                 backoff_delay *= 2; // exponential backoff
-            },
+            }
         }
     }
 
@@ -96,7 +93,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
             }
 
             (return_code, message)
-        },
+        }
         None => {
             if message.is_empty() {
                 message = extract_message_from_string_reason(reason);
@@ -104,7 +101,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
             let return_code = ReturnCode::from_message(&message).unwrap_or(ReturnCode::UserError);
 
             (return_code, message)
-        },
+        }
     }
 }
 

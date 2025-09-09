@@ -23,7 +23,7 @@ pub fn parse_supertrait(supertrait: &syn::TypeParamBound) -> Supertrait {
             } else {
                 panic!("All contract module supertraits must be specified with some module specifier (e.g. `path::to::module::ContractName`)");
             }
-        },
+        }
         _ => panic!("Contract trait can only extend other traits."),
     }
 }

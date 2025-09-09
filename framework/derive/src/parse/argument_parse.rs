@@ -19,14 +19,14 @@ pub fn extract_method_args(m: &syn::TraitItemFn) -> (MethodMutability, Vec<Metho
                     receiver_mutability = Some(MethodMutability::Readonly);
                 }
                 None
-            },
+            }
             syn::FnArg::Typed(pat_typed) => {
                 if receiver_mutability.is_none() {
                     missing_self_panic(m);
                 }
 
                 Some(extract_method_arg(pat_typed))
-            },
+            }
         })
         .collect();
 
