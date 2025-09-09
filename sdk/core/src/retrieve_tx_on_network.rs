@@ -165,9 +165,11 @@ pub fn replace_with_error_message(tx: &mut TransactionOnNetwork, error_message: 
         return;
     }
 
+    let error_message_encoded = base64_encode(error_message);
+
     if let Some(event) = find_log(tx) {
-        if event.topics.len() >= 2 && event.topics[1] != base64_encode(error_message) {
-            event.topics[1] = base64_encode(error_message);
+        if event.topics.len() >= 2 && event.topics[1] != error_message_encoded {
+            event.topics[1] = error_message_encoded;
         }
     }
 }
