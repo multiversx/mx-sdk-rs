@@ -60,7 +60,8 @@ async fn run_estimate_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH
         DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >,
-) where
+) -> u128
+where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
     Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
@@ -73,7 +74,7 @@ async fn run_estimate_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH
         .env
         .world
         .sc_estimate_deploy(&mut step_wrapper.step)
-        .await;
+        .await
 }
 
 impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorRunAsync
@@ -120,7 +121,7 @@ where
     CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Result = ();
+    type Result = u128;
 
     fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
         run_estimate_deploy(self)

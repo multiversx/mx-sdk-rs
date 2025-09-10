@@ -55,12 +55,12 @@ where
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    pub async fn sc_estimate<S>(&mut self, mut sc_call_step: S)
+    pub async fn sc_estimate<S>(&mut self, mut sc_call_step: S) -> u128
     where
         S: AsMut<ScCallStep>,
     {
         let sc_call_step = sc_call_step.as_mut();
-        match self.launch_sc_tx_cost(sc_call_step).await {
+        let tx_gas_units = match self.launch_sc_tx_cost(sc_call_step).await {
             Ok(gas) => gas,
             Err(err) => {
                 estimate_sc_call_err_message(&err);
@@ -69,6 +69,8 @@ where
         };
 
         self.post_runners.run_sc_call_step(sc_call_step);
+
+        tx_gas_units
     }
 
     async fn launch_sc(&mut self, sc_call_step: &mut ScCallStep) -> Transaction {

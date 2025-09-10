@@ -134,12 +134,12 @@ where
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
     }
 
-    pub async fn sc_estimate_deploy<S>(&mut self, mut sc_deploy_step: S)
+    pub async fn sc_estimate_deploy<S>(&mut self, mut sc_deploy_step: S) -> u128
     where
         S: AsMut<ScDeployStep>,
     {
         let sc_deploy_step = sc_deploy_step.as_mut();
-        match self.launch_deploy_tx_cost(sc_deploy_step).await {
+        let tx_gas_units = match self.launch_deploy_tx_cost(sc_deploy_step).await {
             Ok(gas) => gas,
             Err(err) => {
                 estimate_deploy_err_message(&err);
@@ -148,5 +148,7 @@ where
         };
 
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
+
+        tx_gas_units
     }
 }
