@@ -5,7 +5,26 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
+use crate::InteractorEstimateAsync;
+
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
+
+async fn estimate_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
+    tx: Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>,
+) where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+{
+    let step_wrapper = tx.tx_to_step();
+    step_wrapper
+        .env
+        .world
+        .estimate_transfer(step_wrapper.step)
+        .await;
+}
 
 async fn run_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
     tx: Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>,
@@ -33,6 +52,22 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_transfer(self)
+    }
+}
+
+impl<'w, GatewayProxy, From, To, Payment, Gas> InteractorEstimateAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+{
+    type Result = ();
+
+    fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
+        estimate_async_transfer(self)
     }
 }
 

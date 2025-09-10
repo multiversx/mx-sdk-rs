@@ -1,14 +1,19 @@
 use std::process;
 
 use super::error_message::sc_call_err_message;
-use crate::{network_response, InteractorBase};
+use crate::{
+    interactor::interactor_scenario::error_message::estimate_sc_call_err_message, network_response,
+    InteractorBase,
+};
 use anyhow::Error;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
-use multiversx_sdk::{data::transaction::Transaction, utils::base64_encode};
+use multiversx_sdk::{
+    data::transaction::Transaction, gateway::SimulateTxRequest, utils::base64_encode,
+};
 use multiversx_sdk::{
     gateway::{GatewayAsyncService, SendTxRequest},
     retrieve_tx_on_network,
@@ -50,13 +55,36 @@ where
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    async fn launch_sc_call(&mut self, sc_call_step: &mut ScCallStep) -> Result<String, Error> {
+    pub async fn sc_estimate<S>(&mut self, mut sc_call_step: S)
+    where
+        S: AsMut<ScCallStep>,
+    {
+        let sc_call_step = sc_call_step.as_mut();
+        match self.launch_sc_tx_cost(sc_call_step).await {
+            Ok(gas) => gas,
+            Err(err) => {
+                estimate_sc_call_err_message(&err);
+                process::exit(1);
+            }
+        };
+
+        self.post_runners.run_sc_call_step(sc_call_step);
+    }
+
+    async fn launch_sc(&mut self, sc_call_step: &mut ScCallStep) -> Transaction {
         self.pre_runners.run_sc_call_step(sc_call_step);
 
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
+
+        transaction
+    }
+
+    async fn launch_sc_call(&mut self, sc_call_step: &mut ScCallStep) -> Result<String, Error> {
+        let transaction = self.launch_sc(sc_call_step).await;
+
         let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
 
         match tx_hash.as_ref() {
@@ -71,6 +99,25 @@ where
         }
 
         tx_hash
+    }
+
+    async fn launch_sc_tx_cost(&mut self, sc_call_step: &mut ScCallStep) -> Result<u128, Error> {
+        let transaction = self.launch_sc(sc_call_step).await;
+
+        let tx_gas_units = self.proxy.request(SimulateTxRequest(&transaction)).await;
+
+        match tx_gas_units.as_ref() {
+            Ok(gas) => {
+                println!("The SC call is estimated to cost {gas} gas units.");
+                log::info!("The SC call is estimated to cost {gas} gas units.");
+            }
+            Err(err) => {
+                println!("Estimation cost error: {err}");
+                log::error!("Estimation cost error: {err}");
+            }
+        }
+
+        tx_gas_units
     }
 
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {

@@ -909,7 +909,7 @@ impl SysFuncCallsInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.other_wallet_address)
-            .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
+            .single_esdt(&token_id.into(), nonce, &amount.into())
             .run()
             .await;
     }

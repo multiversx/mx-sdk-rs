@@ -145,6 +145,16 @@ impl BasicFeaturesInteract {
     pub async fn deploy_storage_bytes(&mut self) {
         self.set_state().await;
 
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .gas(4_000_000)
+            .typed(basic_features_proxy::BasicFeaturesProxy)
+            .init()
+            .code(CODE_EXPR_STORAGE_BYTES)
+            .estimate()
+            .await;
+
         let new_address = self
             .interactor
             .tx()
@@ -163,6 +173,16 @@ impl BasicFeaturesInteract {
     }
 
     pub async fn set_large_storage(&mut self, value: &[u8]) {
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.bf_storage_bytes_contract())
+            .gas(600_000_000)
+            .typed(basic_features_proxy::BasicFeaturesProxy)
+            .store_bytes(value)
+            .estimate()
+            .await;
+
         self.interactor
             .tx()
             .from(&self.wallet_address)

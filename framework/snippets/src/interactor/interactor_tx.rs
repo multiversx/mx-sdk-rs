@@ -13,6 +13,8 @@ mod interactor_query_step;
 
 pub use interactor_exec_env::InteractorEnvExec;
 pub use interactor_exec_step::InteractorExecStep;
-pub use interactor_prepare_async::{InteractorPrepareAsync, InteractorRunAsync};
+pub use interactor_prepare_async::{
+    InteractorEstimateAsync, InteractorPrepareAsync, InteractorRunAsync,
+};
 pub use interactor_query_env::InteractorEnvQuery;
 pub use interactor_query_step::InteractorQueryStep;

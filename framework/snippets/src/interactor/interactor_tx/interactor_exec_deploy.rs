@@ -12,7 +12,7 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::InteractorBase;
+use crate::{InteractorBase, InteractorEstimateAsync};
 
 use super::{
     interactor_prepare_async::InteractorRunAsync, InteractorEnvExec, InteractorExecStep,
@@ -49,6 +49,33 @@ where
     step_wrapper.process_result()
 }
 
+#[allow(clippy::type_complexity)]
+async fn run_estimate_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH>(
+    tx: Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        (),
+        Payment,
+        Gas,
+        DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >,
+) where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+{
+    let mut step_wrapper = tx.tx_to_step();
+    step_wrapper
+        .env
+        .world
+        .sc_estimate_deploy(&mut step_wrapper.step)
+        .await;
+}
+
 impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorRunAsync
     for Tx<
         InteractorEnvExec<'w, GatewayProxy>,
@@ -72,6 +99,31 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_deploy(self)
+    }
+}
+
+impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorEstimateAsync
+    for Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        (),
+        Payment,
+        Gas,
+        DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+{
+    type Result = ();
+
+    fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
+        run_estimate_deploy(self)
     }
 }
 

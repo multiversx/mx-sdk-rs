@@ -13,7 +13,9 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::InteractorBase;
+use crate::{
+    interactor::interactor_tx::interactor_prepare_async::InteractorEstimateAsync, InteractorBase,
+};
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
 
@@ -42,6 +44,32 @@ where
     step_wrapper.process_result()
 }
 
+async fn estimate_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
+    tx: Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        To,
+        Payment,
+        Gas,
+        FunctionCall<StaticApi>,
+        RH,
+    >,
+) where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+{
+    let mut step_wrapper = tx.tx_to_step();
+    step_wrapper
+        .env
+        .world
+        .sc_estimate(&mut step_wrapper.step)
+        .await;
+}
+
 impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorRunAsync
     for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
 where
@@ -57,6 +85,23 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_call(self)
+    }
+}
+
+impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorEstimateAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+{
+    type Result = ();
+
+    fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
+        estimate_async_call(self)
     }
 }
 

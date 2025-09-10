@@ -6,7 +6,7 @@ use multiversx_sc_snippets::{
         ManagedOption, ManagedVec, ReturnsNewTokenIdentifier, RustBigUint, StaticApi,
         TokenIdentifier,
     },
-    test_wallets, InteractorRunAsync,
+    test_wallets, InteractorEstimateAsync, InteractorRunAsync,
 };
 use serial_test::serial;
 use system_sc_interact::SysFuncCallsInteract;
@@ -22,6 +22,15 @@ async fn simulator_basic_features_test() {
     bf_interact.add_validator_key().await;
     bf_interact.deploy_storage_bytes().await;
     bf_interact.large_storage(15).await;
+
+    bf_interact
+        .interactor
+        .tx()
+        .from(&bf_interact.wallet_address)
+        .to(bf_interact.state.bf_storage_bytes_contract())
+        .egld(1000)
+        .estimate()
+        .await;
 
     let data = bf_interact.get_large_storage().await.to_vec();
     assert_eq!(bf_interact.large_storage_payload, data);
