@@ -508,10 +508,10 @@ pub mod tests {
                 expected_write_index_functions,
                 wasm_info.write_index_functions
             );
-            assert_eq!(expected_call_graph, wasm_info.call_graph);
+            assert_eq!(expected_call_graph, wasm_info.call_graph.function_map);
             assert_eq!(
                 expected_view_index,
-                get_view_endpoints(&wasm_info.endpoints)
+                get_view_endpoints(&wasm_info.call_graph.endpoints)
             );
         }
     }

@@ -1,22 +1,40 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+
+pub type FunctionIndex = usize;
+
+#[derive(Default, Debug, Clone)]
+pub struct CallGraph {
+    pub function_map: HashMap<FunctionIndex, FunctionInfo>,
+    pub endpoints: HashMap<String, EndpointInfo>,
+}
+
+impl CallGraph {
+    pub fn next_function_index(&self) -> FunctionIndex {
+        self.function_map.len()
+    }
+
+    pub fn insert_function(&mut self, function_index: FunctionIndex, function_info: FunctionInfo) {
+        self.function_map.insert(function_index, function_info);
+    }
+}
 
 #[derive(Debug, PartialEq, Eq, Default, Clone)]
 pub struct FunctionInfo {
-    pub indexes: HashSet<usize>,
+    pub called_function_indexes: HashSet<FunctionIndex>,
     pub forbidden_opcodes: HashSet<String>,
 }
 
 impl FunctionInfo {
     pub fn new() -> Self {
         Self {
-            indexes: HashSet::new(),
+            called_function_indexes: HashSet::new(),
             forbidden_opcodes: HashSet::new(),
         }
     }
 
-    pub fn new_with_indexes(indexes: Vec<usize>) -> Self {
+    pub fn new_with_indexes(indexes: Vec<FunctionIndex>) -> Self {
         Self {
-            indexes: indexes.into_iter().collect(),
+            called_function_indexes: indexes.into_iter().collect(),
             forbidden_opcodes: HashSet::new(),
         }
     }
@@ -31,14 +49,14 @@ impl FunctionInfo {
         }
     }
 
-    pub fn add_function_index(&mut self, index: usize) {
-        self.indexes.insert(index);
+    pub fn add_called_function(&mut self, called_function_index: FunctionIndex) {
+        self.called_function_indexes.insert(called_function_index);
     }
 }
 
 #[derive(Default, Debug, Clone)]
 pub struct EndpointInfo {
-    pub index: usize,
+    pub index: FunctionIndex,
     pub readonly: bool,
     pub forbidden_opcodes: HashSet<String>,
 }

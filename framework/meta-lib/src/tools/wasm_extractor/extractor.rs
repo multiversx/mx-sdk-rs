@@ -9,7 +9,13 @@ use wasmparser::{
     Operator, Parser, Payload,
 };
 
-use crate::{ei::EIVersion, tools::CodeReport};
+use crate::{
+    ei::EIVersion,
+    tools::{
+        wasm_extractor::endpoint_info::{CallGraph, FunctionIndex},
+        CodeReport,
+    },
+};
 
 use super::{
     endpoint_info::{EndpointInfo, FunctionInfo},
@@ -17,13 +23,10 @@ use super::{
     whitelisted_opcodes::{is_whitelisted, ERROR_FAIL_ALLOCATOR, WRITE_OP},
 };
 
-type CallGraph = HashMap<usize, FunctionInfo>;
-
 #[derive(Default, Debug, Clone)]
 pub struct WasmInfo {
     pub call_graph: CallGraph,
     pub write_index_functions: HashSet<usize>,
-    pub endpoints: HashMap<String, EndpointInfo>,
     pub report: WasmReport,
     pub data: Vec<u8>,
 }
@@ -84,17 +87,14 @@ impl WasmInfo {
         Ok(wasm_info)
     }
 
-    pub(crate) fn add_endpoints(self, endpoints: &HashMap<&str, bool>) -> Self {
-        let mut endpoints_map = HashMap::new();
-
+    pub(crate) fn add_endpoints(mut self, endpoints: &HashMap<&str, bool>) -> Self {
         for (name, readonly) in endpoints {
-            endpoints_map.insert(name.to_string(), EndpointInfo::default(*readonly));
+            self.call_graph
+                .endpoints
+                .insert(name.to_string(), EndpointInfo::default(*readonly));
         }
 
-        WasmInfo {
-            endpoints: endpoints_map,
-            ..self
-        }
+        self
     }
 
     pub(crate) fn add_wasm_data(self, data: &[u8]) -> Self {
@@ -123,10 +123,13 @@ impl WasmInfo {
             .expect("Failed to get operators reader");
 
         let mut function_info = FunctionInfo::new();
+        let function_index = self.call_graph.next_function_index();
         while let Ok(op) = instructions_reader.read() {
-            if let Operator::Call { function_index } = op {
-                let function_usize: usize = function_index.try_into().unwrap();
-                function_info.add_function_index(function_usize);
+            if let Operator::Call {
+                function_index: called_function_index,
+            } = op
+            {
+                function_info.add_called_function(called_function_index as usize);
             }
 
             if !is_whitelisted(&op) {
@@ -135,7 +138,8 @@ impl WasmInfo {
             }
         }
 
-        self.call_graph.insert(self.call_graph.len(), function_info);
+        self.call_graph
+            .insert_function(function_index, function_info);
     }
 
     fn process_imports(
@@ -147,7 +151,7 @@ impl WasmInfo {
             if import_extraction_enabled {
                 self.report.imports.push(import.name.to_string());
             }
-            self.call_graph.insert(index, FunctionInfo::new());
+            self.call_graph.insert_function(index, FunctionInfo::new());
             if WRITE_OP.contains(&import.name) {
                 self.write_index_functions.insert(index);
             }
@@ -159,11 +163,11 @@ impl WasmInfo {
     fn detect_write_operations_in_views(&mut self) {
         let mut visited: HashSet<usize> = HashSet::new();
 
-        for index in get_view_endpoints_indexes(&self.endpoints) {
+        for index in get_view_endpoints_indexes(&self.call_graph.endpoints) {
             mark_write(self, index, &mut visited);
         }
 
-        for (name, index) in get_view_endpoints(&self.endpoints) {
+        for (name, index) in get_view_endpoints(&self.call_graph.endpoints) {
             if self.write_index_functions.contains(&index) {
                 println!(
                     "{} {}",
@@ -179,17 +183,22 @@ impl WasmInfo {
 
     fn detect_forbidden_opcodes(&mut self) {
         let mut visited: HashSet<usize> = HashSet::new();
-        for endpoint_info in self.endpoints.values_mut() {
-            mark_forbidden_functions(endpoint_info.index, &mut self.call_graph, &mut visited);
+        for endpoint_info in self.call_graph.endpoints.values_mut() {
+            mark_forbidden_functions(
+                endpoint_info.index,
+                &mut self.call_graph.function_map,
+                &mut visited,
+            );
             endpoint_info.forbidden_opcodes = self
                 .call_graph
+                .function_map
                 .get(&endpoint_info.index)
                 .unwrap()
                 .forbidden_opcodes
                 .clone();
         }
 
-        for (name, endpoint_info) in &self.endpoints {
+        for (name, endpoint_info) in &self.call_graph.endpoints {
             if !endpoint_info.forbidden_opcodes.is_empty() {
                 self.report.forbidden_opcodes.insert(
                     name.to_string(),
@@ -217,14 +226,14 @@ impl WasmInfo {
     }
 
     fn parse_export_section(&mut self, export_section: ExportSectionReader) {
-        if self.endpoints.is_empty() {
+        if self.call_graph.endpoints.is_empty() {
             return;
         }
 
         for export in export_section {
             let export = export.expect("Failed to read export section");
             if wasmparser::ExternalKind::Func == export.kind {
-                if let Some(endpoint) = self.endpoints.get_mut(export.name) {
+                if let Some(endpoint) = self.call_graph.endpoints.get_mut(export.name) {
                     endpoint.set_index(export.index.try_into().unwrap());
                 }
             }
@@ -283,8 +292,8 @@ fn mark_write(wasm_info: &mut WasmInfo, func: usize, visited: &mut HashSet<usize
 
     visited.insert(func);
 
-    let callees: Vec<usize> = if let Some(callees) = wasm_info.call_graph.get(&func) {
-        callees.indexes.iter().cloned().collect()
+    let callees: Vec<usize> = if let Some(callees) = wasm_info.call_graph.function_map.get(&func) {
+        callees.called_function_indexes.iter().cloned().collect()
     } else {
         return;
     };
@@ -301,7 +310,11 @@ fn mark_write(wasm_info: &mut WasmInfo, func: usize, visited: &mut HashSet<usize
     }
 }
 
-fn mark_forbidden_functions(func: usize, call_graph: &mut CallGraph, visited: &mut HashSet<usize>) {
+fn mark_forbidden_functions(
+    func: usize,
+    function_map: &mut HashMap<FunctionIndex, FunctionInfo>,
+    visited: &mut HashSet<usize>,
+) {
     // Return early to prevent cycles.
     if visited.contains(&func) {
         return;
@@ -309,23 +322,33 @@ fn mark_forbidden_functions(func: usize, call_graph: &mut CallGraph, visited: &m
 
     visited.insert(func);
 
-    if let Some(function_info) = call_graph.get(&func) {
-        for index in function_info.indexes.clone() {
-            if !call_graph.get(&index).unwrap().forbidden_opcodes.is_empty() {
+    if let Some(function_info) = function_map.get(&func) {
+        for index in function_info.called_function_indexes.clone() {
+            if !function_map
+                .get(&index)
+                .unwrap()
+                .forbidden_opcodes
+                .is_empty()
+            {
                 let index_forbidden_opcodes =
-                    call_graph.get(&index).unwrap().forbidden_opcodes.clone();
+                    function_map.get(&index).unwrap().forbidden_opcodes.clone();
 
-                call_graph
+                function_map
                     .get_mut(&func)
                     .unwrap()
                     .add_forbidden_opcodes(index_forbidden_opcodes);
             } else {
-                mark_forbidden_functions(index, call_graph, visited);
-                if !call_graph.get(&index).unwrap().forbidden_opcodes.is_empty() {
+                mark_forbidden_functions(index, function_map, visited);
+                if !function_map
+                    .get(&index)
+                    .unwrap()
+                    .forbidden_opcodes
+                    .is_empty()
+                {
                     let index_forbidden_opcodes =
-                        call_graph.get(&index).unwrap().forbidden_opcodes.clone();
+                        function_map.get(&index).unwrap().forbidden_opcodes.clone();
 
-                    call_graph
+                    function_map
                         .get_mut(&func)
                         .unwrap()
                         .add_forbidden_opcodes(index_forbidden_opcodes);
