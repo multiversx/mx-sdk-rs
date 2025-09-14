@@ -412,6 +412,51 @@ pub mod tests {
 )
 "#;
 
+    const CALL_FUNC_WITH_MEMORY_FILL: &str = r#"
+(module
+    (memory 1)
+    (type $fill_type (func (param i32 i32 i32)))
+    (type $copy_type (func (param i32 i32 i32)))
+    (table 2 funcref)
+    (func $fill_memory (type $fill_type)
+        (param $offset i32) (param $value i32) (param $len i32)
+        local.get $offset
+        local.get $value
+        local.get $len
+        memory.fill
+    )
+    (func $copy_memory (type $copy_type)
+        (param $dst i32) (param $src i32) (param $len i32)
+        local.get $dst
+        local.get $src
+        local.get $len
+        memory.copy
+    )
+    (elem (i32.const 0) $fill_memory $copy_memory)
+    (func (export "call_fill")
+        i32.const 0    ;; offset
+        i32.const 42   ;; value
+        i32.const 10   ;; length
+        call $fill_memory
+    )
+    (func (export "call_fill_indirect")
+        i32.const 0    ;; offset
+        i32.const 99   ;; value
+        i32.const 5    ;; length
+        i32.const 0    ;; table index
+        call_indirect (type $fill_type)
+    )
+    (func (export "call_copy_indirect")
+        i32.const 0    ;; dst
+        i32.const 20   ;; src
+        i32.const 5    ;; length
+        i32.const 1    ;; table index (copy_memory)
+        call_indirect (type $copy_type)
+    )
+    
+)
+"#;
+
     #[test]
     fn test_empty() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
@@ -566,5 +611,40 @@ pub mod tests {
         );
 
         assert_eq!(expected_forbidden_opcodes, wasm_report.forbidden_opcodes);
+    }
+
+    #[test]
+    fn test_call_func_with_bulk_memory_opcodes() {
+        if let Ok(content) = Parser::new().parse_bytes(None, CALL_FUNC_WITH_MEMORY_FILL.as_bytes())
+        {
+            let wasm_info = WasmInfo::default()
+                .add_wasm_data(&content)
+                .add_endpoints(&HashMap::from([
+                    ("call_fill", true),
+                    ("call_fill_indirect", true),
+                    ("call_copy_indirect", true),
+                ]))
+                .populate_wasm_info(false, None)
+                .expect("Unable to parse WASM content.");
+            let forbidden: &BTreeMap<String, BTreeSet<String>> =
+                &wasm_info.report.forbidden_opcodes;
+            println!("forbidden: {forbidden:#?}");
+
+            // Check expected forbidden opcodes
+            let expected: BTreeMap<String, BTreeSet<String>> = vec![
+                ("call_fill", vec!["MemoryFill"]),
+                ("call_fill_indirect", vec!["MemoryCopy", "MemoryFill"]),
+                ("call_copy_indirect", vec!["MemoryCopy", "MemoryFill"]),
+            ]
+            .into_iter()
+            .map(|(k, v)| {
+                (
+                    k.to_string(),
+                    v.into_iter().map(|s| s.to_string()).collect(),
+                )
+            })
+            .collect();
+            assert_eq!(expected, wasm_info.report.forbidden_opcodes);
+        }
     }
 }
