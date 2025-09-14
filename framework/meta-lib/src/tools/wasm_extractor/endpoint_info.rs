@@ -9,7 +9,7 @@ pub struct FunctionInfo {
     pub called_function_indexes: BTreeSet<FunctionIndex>,
     pub contains_call_indirect: bool,
     pub forbidden_opcodes: HashSet<String>,
-    pub accesible_from_function_indexes: HashSet<FunctionIndex>,
+    pub accessible_from_function_indexes: HashSet<FunctionIndex>,
     pub accessible_from_call_indirect: bool,
 }
 
@@ -19,7 +19,7 @@ impl FunctionInfo {
             called_function_indexes: BTreeSet::new(),
             contains_call_indirect: false,
             forbidden_opcodes: HashSet::new(),
-            accesible_from_function_indexes: HashSet::new(),
+            accessible_from_function_indexes: HashSet::new(),
             accessible_from_call_indirect: false,
         }
     }
@@ -29,7 +29,7 @@ impl FunctionInfo {
             called_function_indexes: indexes.into_iter().collect(),
             contains_call_indirect: false,
             forbidden_opcodes: HashSet::new(),
-            accesible_from_function_indexes: HashSet::new(),
+            accessible_from_function_indexes: HashSet::new(),
             accessible_from_call_indirect: false,
         }
     }

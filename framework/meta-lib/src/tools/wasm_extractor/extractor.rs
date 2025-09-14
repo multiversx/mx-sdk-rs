@@ -80,8 +80,10 @@ impl WasmInfo {
 
         wasm_info
             .call_graph
-            .populate_accesible_from_function_indexes();
-        wasm_info.call_graph.populate_accesible_from_call_indirect();
+            .populate_accessible_from_function_indexes();
+        wasm_info
+            .call_graph
+            .populate_accessible_from_call_indirect();
         wasm_info.call_graph.populate_function_endpoints();
         wasm_info
             .call_graph

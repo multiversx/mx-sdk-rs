@@ -29,7 +29,7 @@ impl CallGraph {
         result
     }
 
-    fn mark_accesible_from_function_index(
+    fn mark_accessible_from_function_index(
         &mut self,
         from_index: FunctionIndex,
         to_index: FunctionIndex,
@@ -39,23 +39,23 @@ impl CallGraph {
         };
 
         if to_func_info
-            .accesible_from_function_indexes
+            .accessible_from_function_indexes
             .contains(&from_index)
         {
             return;
         }
 
         to_func_info
-            .accesible_from_function_indexes
+            .accessible_from_function_indexes
             .insert(from_index);
 
         let called_function_indexes = to_func_info.get_called_function_indexes();
         for called_index in called_function_indexes {
-            self.mark_accesible_from_function_index(from_index, called_index);
+            self.mark_accessible_from_function_index(from_index, called_index);
         }
     }
 
-    pub fn populate_accesible_from_function_indexes(&mut self) {
+    pub fn populate_accessible_from_function_indexes(&mut self) {
         let mut from_to_pairs = Vec::new();
         for (&func_index, func_info) in &self.function_map {
             for called_function_index in &func_info.called_function_indexes {
@@ -64,7 +64,7 @@ impl CallGraph {
         }
 
         for (from_index, to_index) in from_to_pairs {
-            self.mark_accesible_from_function_index(from_index, to_index);
+            self.mark_accessible_from_function_index(from_index, to_index);
         }
     }
 
@@ -85,7 +85,7 @@ impl CallGraph {
         }
     }
 
-    pub fn populate_accesible_from_call_indirect(&mut self) {
+    pub fn populate_accessible_from_call_indirect(&mut self) {
         for table_func_index in self.table_functions.clone() {
             self.mark_accessible_from_call_indirect(table_func_index);
         }
@@ -110,7 +110,7 @@ impl CallGraph {
             .cloned()
             .unwrap_or_default();
         if let Some(func_info) = self.function_map.get(&function_index) {
-            for from_index in &func_info.accesible_from_function_indexes {
+            for from_index in &func_info.accessible_from_function_indexes {
                 if let Some(endpoints) = self.function_endpoints.get(from_index) {
                     for endpoint in endpoints {
                         result.insert(endpoint.clone());
