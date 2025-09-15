@@ -70,6 +70,9 @@ pub struct ContractVariantSerde {
 
     #[serde(rename = "rustc-target")]
     pub rustc_target: Option<String>,
+
+    #[serde(rename = "opcode-version")]
+    pub opcode_version: Option<String>,
 }
 
 #[derive(Deserialize, Default, Debug)]

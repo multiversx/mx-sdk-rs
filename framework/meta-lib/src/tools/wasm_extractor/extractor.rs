@@ -12,10 +12,19 @@ use wasmparser::{
 use crate::{ei::EIVersion, tools::CodeReport};
 
 use super::{
-    report::WasmReport,
-    whitelisted_opcodes::{is_whitelisted, ERROR_FAIL_ALLOCATOR, WRITE_OP},
-    CallGraph, EndpointInfo, FunctionInfo,
+    opcode_whitelist::is_opcode_whitelisted, report::WasmReport, CallGraph, EndpointInfo,
+    FunctionInfo, OpcodeVersion,
 };
+
+const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
+const WRITE_OP: &[&str] = &[
+    "mBufferStorageStore",
+    "storageStore",
+    "int64storageStore",
+    "bigIntStorageStoreUnsigned",
+    "smallIntStorageStoreUnsigned",
+    "smallIntStorageStoreSigned",
+];
 
 #[derive(Default, Debug, Clone)]
 pub struct WasmInfo {
@@ -31,6 +40,7 @@ impl WasmInfo {
         extract_imports_enabled: bool,
         check_ei: Option<&EIVersion>,
         endpoints: &HashMap<&str, bool>,
+        opcode_version: OpcodeVersion,
     ) -> WasmReport {
         let wasm_data = fs::read(output_wasm_path)
             .expect("error occurred while extracting information from .wasm: file not found");
@@ -39,7 +49,7 @@ impl WasmInfo {
             .add_endpoints(endpoints)
             .add_path(output_wasm_path)
             .add_wasm_data(&wasm_data)
-            .populate_wasm_info(extract_imports_enabled, check_ei)
+            .populate_wasm_info(extract_imports_enabled, check_ei, opcode_version)
             .expect("error occurred while extracting information from .wasm file");
 
         wasm_info.report
@@ -49,6 +59,7 @@ impl WasmInfo {
         self,
         import_extraction_enabled: bool,
         check_ei: Option<&EIVersion>,
+        opcode_version: OpcodeVersion,
     ) -> Result<WasmInfo, BinaryReaderError> {
         let parser = Parser::new(0);
         let mut wasm_info = self.clone();
@@ -66,7 +77,7 @@ impl WasmInfo {
                 }
                 Payload::CodeSectionEntry(code_section) => {
                     wasm_info.report.memory_grow_flag |= is_mem_grow(&code_section);
-                    wasm_info.create_call_graph(code_section);
+                    wasm_info.create_call_graph(code_section, opcode_version);
                 }
                 Payload::ExportSection(export_section) => {
                     wasm_info.parse_export_section(export_section);
@@ -125,7 +136,7 @@ impl WasmInfo {
         }
     }
 
-    fn create_call_graph(&mut self, body: FunctionBody) {
+    fn create_call_graph(&mut self, body: FunctionBody, opcode_version: OpcodeVersion) {
         let mut instructions_reader = body
             .get_operators_reader()
             .expect("Failed to get operators reader");
@@ -143,7 +154,7 @@ impl WasmInfo {
                 _ => {}
             }
 
-            if !is_whitelisted(&op) {
+            if !is_opcode_whitelisted(&op, opcode_version) {
                 let opcode = extract_opcode(op);
                 function_info.add_forbidden_opcode(opcode);
             }
