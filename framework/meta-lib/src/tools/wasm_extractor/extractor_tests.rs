@@ -1,7 +1,7 @@
 #[cfg(test)]
 pub mod tests {
     use std::{
-        collections::{HashMap, HashSet},
+        collections::{BTreeMap, BTreeSet, HashMap, HashSet},
         path::PathBuf,
         vec,
     };
@@ -10,10 +10,7 @@ pub mod tests {
 
     use crate::tools::{
         panic_report::PanicReport,
-        wasm_extractor::{
-            endpoint_info::FunctionInfo,
-            extractor::{get_view_endpoints, WasmInfo},
-        },
+        wasm_extractor::extractor::{get_view_endpoints, WasmInfo},
     };
 
     const ADDER_WITH_ERR_IN_VIEW: &str = r#"
@@ -415,6 +412,51 @@ pub mod tests {
 )
 "#;
 
+    const CALL_FUNC_WITH_MEMORY_FILL: &str = r#"
+(module
+    (memory 1)
+    (type $fill_type (func (param i32 i32 i32)))
+    (type $copy_type (func (param i32 i32 i32)))
+    (table 2 funcref)
+    (func $fill_memory (type $fill_type)
+        (param $offset i32) (param $value i32) (param $len i32)
+        local.get $offset
+        local.get $value
+        local.get $len
+        memory.fill
+    )
+    (func $copy_memory (type $copy_type)
+        (param $dst i32) (param $src i32) (param $len i32)
+        local.get $dst
+        local.get $src
+        local.get $len
+        memory.copy
+    )
+    (elem (i32.const 0) $fill_memory $copy_memory)
+    (func (export "call_fill")
+        i32.const 0    ;; offset
+        i32.const 42   ;; value
+        i32.const 10   ;; length
+        call $fill_memory
+    )
+    (func (export "call_fill_indirect")
+        i32.const 0    ;; offset
+        i32.const 99   ;; value
+        i32.const 5    ;; length
+        i32.const 0    ;; table index
+        call_indirect (type $fill_type)
+    )
+    (func (export "call_copy_indirect")
+        i32.const 0    ;; dst
+        i32.const 20   ;; src
+        i32.const 5    ;; length
+        i32.const 1    ;; table index (copy_memory)
+        call_indirect (type $copy_type)
+    )
+    
+)
+"#;
+
     #[test]
     fn test_empty() {
         if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
@@ -470,32 +512,30 @@ pub mod tests {
         let expected_view_index: HashMap<&str, usize> =
             HashMap::from([("getSum", 18), ("add", 19)]);
         let expected_write_index_functions: HashSet<usize> = HashSet::from([4, 19, 14]);
-        let expected_call_graph: HashMap<usize, FunctionInfo> = HashMap::from([
-            (0, FunctionInfo::new()),
-            (1, FunctionInfo::new()),
-            (2, FunctionInfo::new()),
-            (3, FunctionInfo::new()),
-            (4, FunctionInfo::new()),
-            (5, FunctionInfo::new()),
-            (6, FunctionInfo::new()),
-            (7, FunctionInfo::new()),
-            (8, FunctionInfo::new()),
-            (9, FunctionInfo::new()),
-            (10, FunctionInfo::new()),
-            (11, FunctionInfo::new_with_indexes(vec![12, 0])),
-            (12, FunctionInfo::new()),
-            (13, FunctionInfo::new_with_indexes(vec![1, 2])),
-            (14, FunctionInfo::new_with_indexes(vec![12, 3, 4])),
-            (15, FunctionInfo::new_with_indexes(vec![12, 5, 6])),
-            (16, FunctionInfo::new_with_indexes(vec![12, 7])),
-            (17, FunctionInfo::new_with_indexes(vec![8, 13, 11, 16, 14])),
-            (18, FunctionInfo::new_with_indexes(vec![8, 13, 16, 15, 9])),
-            (
-                19,
-                FunctionInfo::new_with_indexes(vec![8, 13, 11, 16, 15, 10, 14]),
-            ),
-            (20, FunctionInfo::new()),
-        ]);
+
+        let expected_call_graph = vec![
+            (0, vec![]),
+            (1, vec![]),
+            (2, vec![]),
+            (3, vec![]),
+            (4, vec![]),
+            (5, vec![]),
+            (6, vec![]),
+            (7, vec![]),
+            (8, vec![]),
+            (9, vec![]),
+            (10, vec![]),
+            (11, vec![0, 12]),
+            (12, vec![]),
+            (13, vec![1, 2]),
+            (14, vec![3, 4, 12]),
+            (15, vec![5, 6, 12]),
+            (16, vec![7, 12]),
+            (17, vec![8, 11, 13, 14, 16]),
+            (18, vec![8, 9, 13, 15, 16]),
+            (19, vec![8, 10, 11, 13, 14, 15, 16]),
+            (20, vec![]),
+        ];
 
         if let Ok(content) = Parser::new().parse_bytes(None, ADDER_WITH_ERR_IN_VIEW.as_bytes()) {
             let wasm_info = WasmInfo::default()
@@ -508,10 +548,13 @@ pub mod tests {
                 expected_write_index_functions,
                 wasm_info.write_index_functions
             );
-            assert_eq!(expected_call_graph, wasm_info.call_graph);
+            assert_eq!(
+                expected_call_graph,
+                wasm_info.call_graph.get_function_calls()
+            );
             assert_eq!(
                 expected_view_index,
-                get_view_endpoints(&wasm_info.endpoints)
+                get_view_endpoints(&wasm_info.call_graph.endpoints)
             );
         }
     }
@@ -521,7 +564,7 @@ pub mod tests {
     #[test]
     fn test_data_drop() {
         let expected_forbidden_opcodes =
-            HashMap::from([("main".to_string(), vec!["DataDrop".to_string()])]);
+            BTreeMap::from([("main".to_string(), BTreeSet::from(["DataDrop".to_string()]))]);
 
         let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/data-drop.wasm"),
@@ -537,8 +580,10 @@ pub mod tests {
     // "Forbidden opcodes detected in endpoint "main". This are the opcodes: MemoryCopy"
     #[test]
     fn test_memory_copy() {
-        let expected_forbidden_opcodes =
-            HashMap::from([("main".to_string(), vec!["MemoryCopy".to_string()])]);
+        let expected_forbidden_opcodes = BTreeMap::from([(
+            "main".to_string(),
+            BTreeSet::from(["MemoryCopy".to_string()]),
+        )]);
         let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-copy.wasm"),
             false,
@@ -550,11 +595,13 @@ pub mod tests {
     }
 
     // should trigger in terminal warning:
-    // "Forbidden opcodes detected in endpoint "main". This are the opcodes: MemoryFill"
+    // "Forbidden opcodes detected in endpoint "main". These are the opcodes: MemoryFill"
     #[test]
     fn test_memory_fill() {
-        let expected_forbidden_opcodes =
-            HashMap::from([("main".to_string(), vec!["MemoryFill".to_string()])]);
+        let expected_forbidden_opcodes = BTreeMap::from([(
+            "main".to_string(),
+            BTreeSet::from(["MemoryFill".to_string()]),
+        )]);
 
         let wasm_report = WasmInfo::extract_wasm_report(
             &PathBuf::from("src/tools/wasm_extractor/forbidden-opcodes/memory-fill.wasm"),
@@ -564,5 +611,40 @@ pub mod tests {
         );
 
         assert_eq!(expected_forbidden_opcodes, wasm_report.forbidden_opcodes);
+    }
+
+    #[test]
+    fn test_call_func_with_bulk_memory_opcodes() {
+        if let Ok(content) = Parser::new().parse_bytes(None, CALL_FUNC_WITH_MEMORY_FILL.as_bytes())
+        {
+            let wasm_info = WasmInfo::default()
+                .add_wasm_data(&content)
+                .add_endpoints(&HashMap::from([
+                    ("call_fill", true),
+                    ("call_fill_indirect", true),
+                    ("call_copy_indirect", true),
+                ]))
+                .populate_wasm_info(false, None)
+                .expect("Unable to parse WASM content.");
+            let forbidden: &BTreeMap<String, BTreeSet<String>> =
+                &wasm_info.report.forbidden_opcodes;
+            println!("forbidden: {forbidden:#?}");
+
+            // Check expected forbidden opcodes
+            let expected: BTreeMap<String, BTreeSet<String>> = vec![
+                ("call_fill", vec!["MemoryFill"]),
+                ("call_fill_indirect", vec!["MemoryCopy", "MemoryFill"]),
+                ("call_copy_indirect", vec!["MemoryCopy", "MemoryFill"]),
+            ]
+            .into_iter()
+            .map(|(k, v)| {
+                (
+                    k.to_string(),
+                    v.into_iter().map(|s| s.to_string()).collect(),
+                )
+            })
+            .collect();
+            assert_eq!(expected, wasm_info.report.forbidden_opcodes);
+        }
     }
 }

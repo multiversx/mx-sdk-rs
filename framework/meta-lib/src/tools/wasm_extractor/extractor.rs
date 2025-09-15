@@ -5,25 +5,22 @@ use std::{
     path::{Path, PathBuf},
 };
 use wasmparser::{
-    BinaryReaderError, DataSectionReader, ExportSectionReader, FunctionBody, ImportSectionReader,
-    Operator, Parser, Payload,
+    BinaryReaderError, DataSectionReader, ElementItems, ElementSectionReader, ExportSectionReader,
+    FunctionBody, ImportSectionReader, Operator, Parser, Payload,
 };
 
 use crate::{ei::EIVersion, tools::CodeReport};
 
 use super::{
-    endpoint_info::{EndpointInfo, FunctionInfo},
     report::WasmReport,
     whitelisted_opcodes::{is_whitelisted, ERROR_FAIL_ALLOCATOR, WRITE_OP},
+    CallGraph, EndpointInfo, FunctionInfo,
 };
-
-type CallGraph = HashMap<usize, FunctionInfo>;
 
 #[derive(Default, Debug, Clone)]
 pub struct WasmInfo {
     pub call_graph: CallGraph,
     pub write_index_functions: HashSet<usize>,
-    pub endpoints: HashMap<String, EndpointInfo>,
     pub report: WasmReport,
     pub data: Vec<u8>,
 }
@@ -74,9 +71,23 @@ impl WasmInfo {
                 Payload::ExportSection(export_section) => {
                     wasm_info.parse_export_section(export_section);
                 }
-                _ => (),
+                Payload::ElementSection(elem_section) => {
+                    wasm_info.parse_element_section(elem_section);
+                }
+                _ => {}
             }
         }
+
+        wasm_info
+            .call_graph
+            .populate_accessible_from_function_indexes();
+        wasm_info
+            .call_graph
+            .populate_accessible_from_call_indirect();
+        wasm_info.call_graph.populate_function_endpoints();
+        wasm_info
+            .call_graph
+            .populate_call_indirect_accessible_from_endpoints();
 
         wasm_info.detect_write_operations_in_views();
         wasm_info.detect_forbidden_opcodes();
@@ -84,17 +95,14 @@ impl WasmInfo {
         Ok(wasm_info)
     }
 
-    pub(crate) fn add_endpoints(self, endpoints: &HashMap<&str, bool>) -> Self {
-        let mut endpoints_map = HashMap::new();
-
+    pub(crate) fn add_endpoints(mut self, endpoints: &HashMap<&str, bool>) -> Self {
         for (name, readonly) in endpoints {
-            endpoints_map.insert(name.to_string(), EndpointInfo::default(*readonly));
+            self.call_graph
+                .endpoints
+                .insert(name.to_string(), EndpointInfo::default(*readonly));
         }
 
-        WasmInfo {
-            endpoints: endpoints_map,
-            ..self
-        }
+        self
     }
 
     pub(crate) fn add_wasm_data(self, data: &[u8]) -> Self {
@@ -123,10 +131,16 @@ impl WasmInfo {
             .expect("Failed to get operators reader");
 
         let mut function_info = FunctionInfo::new();
+        let function_index = self.call_graph.next_function_index();
         while let Ok(op) = instructions_reader.read() {
-            if let Operator::Call { function_index } = op {
-                let function_usize: usize = function_index.try_into().unwrap();
-                function_info.add_function_index(function_usize);
+            match op {
+                Operator::Call { function_index } => {
+                    function_info.add_called_function(function_index as usize);
+                }
+                Operator::CallIndirect { .. } => {
+                    function_info.contains_call_indirect = true;
+                }
+                _ => {}
             }
 
             if !is_whitelisted(&op) {
@@ -135,7 +149,8 @@ impl WasmInfo {
             }
         }
 
-        self.call_graph.insert(self.call_graph.len(), function_info);
+        self.call_graph
+            .insert_function(function_index, function_info);
     }
 
     fn process_imports(
@@ -147,7 +162,7 @@ impl WasmInfo {
             if import_extraction_enabled {
                 self.report.imports.push(import.name.to_string());
             }
-            self.call_graph.insert(index, FunctionInfo::new());
+            self.call_graph.insert_function(index, FunctionInfo::new());
             if WRITE_OP.contains(&import.name) {
                 self.write_index_functions.insert(index);
             }
@@ -159,11 +174,11 @@ impl WasmInfo {
     fn detect_write_operations_in_views(&mut self) {
         let mut visited: HashSet<usize> = HashSet::new();
 
-        for index in get_view_endpoints_indexes(&self.endpoints) {
+        for index in get_view_endpoints_indexes(&self.call_graph.endpoints) {
             mark_write(self, index, &mut visited);
         }
 
-        for (name, index) in get_view_endpoints(&self.endpoints) {
+        for (name, index) in get_view_endpoints(&self.call_graph.endpoints) {
             if self.write_index_functions.contains(&index) {
                 println!(
                     "{} {}",
@@ -178,54 +193,92 @@ impl WasmInfo {
     }
 
     fn detect_forbidden_opcodes(&mut self) {
-        let mut visited: HashSet<usize> = HashSet::new();
-        for endpoint_info in self.endpoints.values_mut() {
-            mark_forbidden_functions(endpoint_info.index, &mut self.call_graph, &mut visited);
-            endpoint_info.forbidden_opcodes = self
-                .call_graph
-                .get(&endpoint_info.index)
-                .unwrap()
-                .forbidden_opcodes
-                .clone();
-        }
-
-        for (name, endpoint_info) in &self.endpoints {
-            if !endpoint_info.forbidden_opcodes.is_empty() {
-                self.report.forbidden_opcodes.insert(
-                    name.to_string(),
-                    endpoint_info.forbidden_opcodes.iter().cloned().collect(),
-                );
-
-                println!(
-                    "{}{}{} {}",
-                    "Forbidden opcodes detected in endpoint \""
-                        .to_string()
-                        .red()
-                        .bold(),
-                    name.red().bold(),
-                    "\". This are the opcodes:".to_string().red().bold(),
-                    self.report
-                        .forbidden_opcodes
-                        .get(name)
-                        .unwrap()
-                        .join(", ")
-                        .red()
-                        .bold()
-                );
+        for (&func_index, func_info) in &self.call_graph.function_map {
+            if func_info.forbidden_opcodes.is_empty() {
+                continue;
             }
+
+            let opcodes = func_info
+                .forbidden_opcodes
+                .iter()
+                .cloned()
+                .collect::<Vec<String>>()
+                .join(", ");
+            let mut message =
+                format!("Forbidden opcodes detected in function {func_index}: {opcodes}.");
+
+            let endpoints = self
+                .call_graph
+                .function_accessible_from_endpoints(func_index);
+            if !endpoints.is_empty() {
+                message.push_str(&format!(
+                    " This function is accessible endpoints: {}.",
+                    endpoints
+                        .iter()
+                        .cloned()
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                ));
+            }
+            for endpoint in endpoints {
+                for forbidden_opcode in &func_info.forbidden_opcodes {
+                    self.report.add_forbidden_opcode_accessible_from_endpoint(
+                        endpoint.clone(),
+                        forbidden_opcode.clone(),
+                    );
+                }
+            }
+
+            if func_info.accessible_from_call_indirect {
+                for endpoint in &self.call_graph.call_indirect_accessible_from_endpoints {
+                    for forbidden_opcode in &func_info.forbidden_opcodes {
+                        self.report.add_forbidden_opcode_accessible_from_endpoint(
+                            endpoint.clone(),
+                            forbidden_opcode.clone(),
+                        );
+                    }
+                }
+                message.push_str(&format!(
+                    " This function is accessible via call_indirect, from endpoints: {}.",
+                    self.call_graph
+                        .call_indirect_accessible_from_endpoints
+                        .iter()
+                        .cloned()
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                ));
+            }
+
+            println!("{}", message.red().bold());
         }
     }
 
     fn parse_export_section(&mut self, export_section: ExportSectionReader) {
-        if self.endpoints.is_empty() {
+        if self.call_graph.endpoints.is_empty() {
             return;
         }
 
         for export in export_section {
             let export = export.expect("Failed to read export section");
             if wasmparser::ExternalKind::Func == export.kind {
-                if let Some(endpoint) = self.endpoints.get_mut(export.name) {
+                if let Some(endpoint) = self.call_graph.endpoints.get_mut(export.name) {
                     endpoint.set_index(export.index.try_into().unwrap());
+                }
+            }
+        }
+    }
+
+    fn parse_element_section(&mut self, element_section: ElementSectionReader) {
+        for t in element_section.into_iter() {
+            let element = t.expect("Failed to read table section");
+
+            if let ElementItems::Functions(functions) = element.items {
+                for func_result in functions {
+                    let function_index =
+                        func_result.expect("Failed to read function index in element section");
+                    self.call_graph
+                        .table_functions
+                        .push(function_index as usize);
                 }
             }
         }
@@ -283,8 +336,8 @@ fn mark_write(wasm_info: &mut WasmInfo, func: usize, visited: &mut HashSet<usize
 
     visited.insert(func);
 
-    let callees: Vec<usize> = if let Some(callees) = wasm_info.call_graph.get(&func) {
-        callees.indexes.iter().cloned().collect()
+    let callees: Vec<usize> = if let Some(callees) = wasm_info.call_graph.function_map.get(&func) {
+        callees.called_function_indexes.iter().cloned().collect()
     } else {
         return;
     };
@@ -296,40 +349,6 @@ fn mark_write(wasm_info: &mut WasmInfo, func: usize, visited: &mut HashSet<usize
             mark_write(wasm_info, callee, visited);
             if wasm_info.write_index_functions.contains(&callee) {
                 wasm_info.write_index_functions.insert(func);
-            }
-        }
-    }
-}
-
-fn mark_forbidden_functions(func: usize, call_graph: &mut CallGraph, visited: &mut HashSet<usize>) {
-    // Return early to prevent cycles.
-    if visited.contains(&func) {
-        return;
-    }
-
-    visited.insert(func);
-
-    if let Some(function_info) = call_graph.get(&func) {
-        for index in function_info.indexes.clone() {
-            if !call_graph.get(&index).unwrap().forbidden_opcodes.is_empty() {
-                let index_forbidden_opcodes =
-                    call_graph.get(&index).unwrap().forbidden_opcodes.clone();
-
-                call_graph
-                    .get_mut(&func)
-                    .unwrap()
-                    .add_forbidden_opcodes(index_forbidden_opcodes);
-            } else {
-                mark_forbidden_functions(index, call_graph, visited);
-                if !call_graph.get(&index).unwrap().forbidden_opcodes.is_empty() {
-                    let index_forbidden_opcodes =
-                        call_graph.get(&index).unwrap().forbidden_opcodes.clone();
-
-                    call_graph
-                        .get_mut(&func)
-                        .unwrap()
-                        .add_forbidden_opcodes(index_forbidden_opcodes);
-                }
             }
         }
     }
