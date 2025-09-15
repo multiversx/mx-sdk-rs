@@ -460,51 +460,54 @@ pub mod tests {
 
     #[test]
     fn test_empty() {
-        if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_DBG_WAT.as_bytes()) {
-            let wasm_info = WasmInfo::default()
-                .add_wasm_data(&content)
-                .populate_wasm_info(false, None, OpcodeVersion::V1)
-                .expect("Unable to parse WASM content.");
-            assert!(!wasm_info.report.memory_grow_flag);
-            assert!(!wasm_info.report.code.has_allocator);
-            assert_eq!(
-                PanicReport::None.to_string(),
-                wasm_info.report.code.has_panic.to_string()
-            );
-        }
+        let content = Parser::new()
+            .parse_bytes(None, EMPTY_DBG_WAT.as_bytes())
+            .unwrap();
+        let wasm_info = WasmInfo::default()
+            .add_wasm_data(&content)
+            .populate_wasm_info(false, None, OpcodeVersion::V1)
+            .expect("Unable to parse WASM content.");
+        assert!(!wasm_info.report.memory_grow_flag);
+        assert!(!wasm_info.report.code.has_allocator);
+        assert_eq!(
+            PanicReport::None.to_string(),
+            wasm_info.report.code.has_panic.to_string()
+        );
     }
 
     #[test]
     fn test_empty_with_mem_grow() {
-        if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_MEM_GROW.as_bytes()) {
-            let wasm_info = WasmInfo::default()
-                .add_wasm_data(&content)
-                .populate_wasm_info(false, None, OpcodeVersion::V1)
-                .expect("Unable to parse WASM content.");
-            assert!(wasm_info.report.memory_grow_flag);
-            assert!(!wasm_info.report.code.has_allocator);
-            assert_eq!(
-                PanicReport::WithoutMessage.to_string(),
-                wasm_info.report.code.has_panic.to_string()
-            );
-        }
+        let content = Parser::new()
+            .parse_bytes(None, EMPTY_WITH_MEM_GROW.as_bytes())
+            .unwrap();
+        let wasm_info = WasmInfo::default()
+            .add_wasm_data(&content)
+            .populate_wasm_info(false, None, OpcodeVersion::V1)
+            .expect("Unable to parse WASM content.");
+        assert!(wasm_info.report.memory_grow_flag);
+        assert!(!wasm_info.report.code.has_allocator);
+        assert_eq!(
+            PanicReport::WithoutMessage.to_string(),
+            wasm_info.report.code.has_panic.to_string()
+        );
     }
 
     #[test]
     fn test_empty_with_fail_allocator() {
-        if let Ok(content) = Parser::new().parse_bytes(None, EMPTY_WITH_FAIL_ALLOCATOR.as_bytes()) {
-            let wasm_info = WasmInfo::default()
-                .add_endpoints(&HashMap::from([("init", false)]))
-                .add_wasm_data(&content)
-                .populate_wasm_info(false, None, OpcodeVersion::V1)
-                .expect("Unable to parse WASM content.");
-            assert!(!wasm_info.report.memory_grow_flag);
-            assert!(wasm_info.report.code.has_allocator);
-            assert_eq!(
-                PanicReport::None.to_string(),
-                wasm_info.report.code.has_panic.to_string()
-            );
-        }
+        let content = Parser::new()
+            .parse_bytes(None, EMPTY_WITH_FAIL_ALLOCATOR.as_bytes())
+            .unwrap();
+        let wasm_info = WasmInfo::default()
+            .add_endpoints(&HashMap::from([("init", false)]))
+            .add_wasm_data(&content)
+            .populate_wasm_info(false, None, OpcodeVersion::V1)
+            .expect("Unable to parse WASM content.");
+        assert!(!wasm_info.report.memory_grow_flag);
+        assert!(wasm_info.report.code.has_allocator);
+        assert_eq!(
+            PanicReport::None.to_string(),
+            wasm_info.report.code.has_panic.to_string()
+        );
     }
 
     // should trigger in terminal warning: "Write storage operation in VIEW endpoint: add"
@@ -538,26 +541,27 @@ pub mod tests {
             (20, vec![]),
         ];
 
-        if let Ok(content) = Parser::new().parse_bytes(None, ADDER_WITH_ERR_IN_VIEW.as_bytes()) {
-            let wasm_info = WasmInfo::default()
-                .add_endpoints(&HashMap::from([("getSum", true), ("add", true)]))
-                .add_wasm_data(&content)
-                .populate_wasm_info(false, None, OpcodeVersion::V1)
-                .expect("Unable to parse WASM content.");
+        let content = Parser::new()
+            .parse_bytes(None, ADDER_WITH_ERR_IN_VIEW.as_bytes())
+            .unwrap();
+        let wasm_info = WasmInfo::default()
+            .add_endpoints(&HashMap::from([("getSum", true), ("add", true)]))
+            .add_wasm_data(&content)
+            .populate_wasm_info(false, None, OpcodeVersion::V1)
+            .expect("Unable to parse WASM content.");
 
-            assert_eq!(
-                expected_write_index_functions,
-                wasm_info.write_index_functions
-            );
-            assert_eq!(
-                expected_call_graph,
-                wasm_info.call_graph.get_function_calls()
-            );
-            assert_eq!(
-                expected_view_index,
-                get_view_endpoints(&wasm_info.call_graph.endpoints)
-            );
-        }
+        assert_eq!(
+            expected_write_index_functions,
+            wasm_info.write_index_functions
+        );
+        assert_eq!(
+            expected_call_graph,
+            wasm_info.call_graph.get_function_calls()
+        );
+        assert_eq!(
+            expected_view_index,
+            get_view_endpoints(&wasm_info.call_graph.endpoints)
+        );
     }
 
     // should trigger in terminal warning:
