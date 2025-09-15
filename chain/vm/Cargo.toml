@@ -39,7 +39,7 @@ ed25519-dalek = "2.1.0"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
 anyhow = "1.0"
-multiversx-bls = { version = "0.1.0", optional = true }
+multiversx-bls = { version = "0.1.0", optional = true, git = "https://github.com/multiversx/mx-bls-rs.git", branch = "verify-secret-key" }
 
 [dependencies.multiversx-chain-core]
 version = "=0.18.0"
