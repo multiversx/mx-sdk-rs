@@ -21,11 +21,13 @@ pub async fn delegation_sc_interact_cli() {
     let cli = delegation_sc_interact_cli::InteractCli::parse();
     match cli.command {
         Some(delegation_sc_interact_cli::InteractCliCommand::Create(args)) => {
+            interact.set_state(&interact.owner.to_address()).await;
             interact
-                .set_state(&interact.wallet_address.to_address())
-                .await;
-            interact
-                .create_new_delegation_contract(args.total_delegation_cap, args.service_fee)
+                .create_new_delegation_contract(
+                    args.total_delegation_cap,
+                    args.service_fee,
+                    1250000000000000000000u128,
+                )
                 .await;
         }
         Some(delegation_sc_interact_cli::InteractCliCommand::GetAllContractAddresses) => {
@@ -122,7 +124,7 @@ pub async fn delegation_sc_interact_cli() {
 
 pub struct DelegateCallsInteract {
     pub interactor: Interactor,
-    pub wallet_address: Bech32Address,
+    pub owner: Bech32Address,
     pub delegator1: Bech32Address,
     pub delegator2: Bech32Address,
     pub state: State,
@@ -140,11 +142,11 @@ impl DelegateCallsInteract {
         let delegator2 = interactor.register_wallet(test_wallets::dan()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,
-            wallet_address: wallet_address.into(),
+            owner: wallet_address.into(),
             delegator1: delegator1.into(),
             delegator2: delegator2.into(),
             state: State::load_state(),
@@ -153,7 +155,7 @@ impl DelegateCallsInteract {
 
     pub async fn set_state(&mut self, address: &Address) {
         let mut account = self.interactor.get_account(address).await;
-        account.balance = "10000000000000000000000".to_owned();
+        account.balance = "100000000000000000000000".to_owned();
         let set_state_account = SetStateAccount::from(account);
         let vec_state = vec![set_state_account];
 
@@ -176,14 +178,15 @@ impl DelegateCallsInteract {
         &mut self,
         total_delegation_cap: u128,
         service_fee: u64,
+        amount: u128,
     ) {
         let logs = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(DelegationManagerSCAddress)
             .typed(DelegationManagerSCProxy)
-            .create_new_delegation_contract(BigUint::from(total_delegation_cap), service_fee)
+            .create_new_delegation_contract(total_delegation_cap, service_fee, amount)
             .gas(60_000_000u64)
             .returns(ReturnsLogs)
             .run()
@@ -227,7 +230,7 @@ impl DelegateCallsInteract {
     pub async fn set_metadata(&mut self, name: &str, website: &str, identifier: &str) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
             .set_metadata(name, website, identifier)
@@ -241,7 +244,7 @@ impl DelegateCallsInteract {
     pub async fn change_service_fee(&mut self, service_fee: u64) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
             .change_service_fee(service_fee)
@@ -255,7 +258,7 @@ impl DelegateCallsInteract {
     pub async fn set_automatic_activation(&mut self, automatic_activation: bool) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
             .set_automatic_activation(automatic_activation)
@@ -269,10 +272,10 @@ impl DelegateCallsInteract {
     pub async fn modify_total_delegation_cap(&mut self, total_delegation_cap: u128) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .modify_total_delegation_cap(BigUint::from(total_delegation_cap))
+            .modify_total_delegation_cap(total_delegation_cap)
             .gas(60_000_000u64)
             .run()
             .await;
@@ -290,7 +293,7 @@ impl DelegateCallsInteract {
 
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
             .add_nodes(arg)
@@ -319,7 +322,7 @@ impl DelegateCallsInteract {
     pub async fn stake_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .typed(DelegationSCProxy)
@@ -365,9 +368,7 @@ impl DelegateCallsInteract {
             .query()
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .get_user_active_stake(&ManagedAddress::from_address(
-                &self.wallet_address.to_address(),
-            ))
+            .get_user_active_stake(&ManagedAddress::from_address(&self.owner.to_address()))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -379,7 +380,7 @@ impl DelegateCallsInteract {
     pub async fn unstake_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .typed(DelegationSCProxy)
@@ -393,7 +394,7 @@ impl DelegateCallsInteract {
     pub async fn restake_unstaked_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
             .restake_unstaked_nodes(MultiValueVec::from(bls_keys))
@@ -407,7 +408,7 @@ impl DelegateCallsInteract {
     pub async fn unbond_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .typed(DelegationSCProxy)
@@ -421,7 +422,7 @@ impl DelegateCallsInteract {
     pub async fn remove_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .typed(DelegationSCProxy)
@@ -435,7 +436,7 @@ impl DelegateCallsInteract {
     pub async fn unjail_nodes(&mut self, bls_keys: Vec<BLSKey>) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.owner)
             .to(self.state.current_delegation_address())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .typed(DelegationSCProxy)
@@ -480,7 +481,7 @@ impl DelegateCallsInteract {
             .from(sender)
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .undelegate(BigUint::from(egld_value)) // Example delegation amount
+            .undelegate(egld_value) // Example delegation amount
             .gas(12000000)
             .run()
             .await;
@@ -504,7 +505,7 @@ impl DelegateCallsInteract {
     pub async fn set_check_cap_on_redelegate_rewards(&mut self, state: bool) {
         self.interactor
             .tx()
-            .from(self.wallet_address.clone())
+            .from(self.owner.clone())
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
             .set_check_cap_on_redelegate_rewards(state) // Example delegation amount

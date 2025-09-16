@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk-dapp"
-version = "0.11.0"
+version = "0.11.3"
 edition = "2021"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -26,5 +26,5 @@ itertools = "0.14.0"
 log = "0.4.17"
 
 [dependencies.multiversx-sdk]
-version = "=0.11.0"
+version = "=0.11.3"
 path = "../core"

@@ -305,11 +305,11 @@ where
         name_key
     }
 
-    pub fn iter(&self) -> Iter<SA, A, T> {
+    pub fn iter(&self) -> Iter<'_, SA, A, T> {
         Iter::new(self)
     }
 
-    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, A, T> {
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<'_, SA, A, T> {
         Iter::new_from_node_id(self, node_id)
     }
 

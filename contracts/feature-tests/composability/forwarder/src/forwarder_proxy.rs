@@ -809,6 +809,93 @@ where
             .original_result()
     }
 
+    pub fn sync_call_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        endpoint_name: Arg1,
+        args: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("sync_call_fallible")
+            .argument(&to)
+            .argument(&endpoint_name)
+            .argument(&args)
+            .original_result()
+    }
+
+    pub fn forward_sync_fallible_accept_funds_multi_transfer<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payment_args: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_fallible_accept_funds_multi_transfer")
+            .argument(&to)
+            .argument(&payment_args)
+            .original_result()
+    }
+
+    pub fn forward_sync_reject_funds_multi_transfer<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payment_args: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_reject_funds_multi_transfer")
+            .argument(&to)
+            .argument(&payment_args)
+            .original_result()
+    }
+
+    pub fn transfer_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payments: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("transfer_fallible")
+            .argument(&to)
+            .argument(&payments)
+            .original_result()
+    }
+
+    /// Receiver needs to be an endpoint with no arguments, for simplicity. 
+    pub fn transfer_execute_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        endpoint_name: Arg1,
+        payments: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("transfer_execute_fallible")
+            .argument(&to)
+            .argument(&endpoint_name)
+            .argument(&payments)
+            .original_result()
+    }
+
     pub fn sft_issue<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,

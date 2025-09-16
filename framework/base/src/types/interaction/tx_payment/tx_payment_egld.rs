@@ -1,7 +1,9 @@
 use multiversx_sc_codec::Empty;
 
 use crate::{
+    api::quick_signal_error,
     contract_base::{SendRawWrapper, TransferExecuteFailed},
+    err_msg,
     types::{
         AnnotatedValue, BigUint, EgldOrEsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec,
         TxFrom, TxToSpecified,
@@ -42,8 +44,7 @@ where
     ) -> Result<(), TransferExecuteFailed> {
         self.0.with_value_ref(env, |egld_value| {
             if egld_value == &0u64 {
-                // will crash
-                ().perform_transfer_execute_fallible(env, to, gas_limit, fc)
+                quick_signal_error::<Env::Api>(err_msg::TRANSFER_EXECUTE_REQUIRES_PAYMENT)
             } else {
                 // TODO: can probably be further optimized
                 let mut payments = ManagedVec::new();
@@ -65,7 +66,11 @@ where
         to: &ManagedAddress<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
         self.0.with_value_ref(env, |egld_value| {
-            SendRawWrapper::<Env::Api>::new().direct_egld(to, egld_value, Empty);
+            if egld_value == &0u64 {
+                quick_signal_error::<Env::Api>(err_msg::TRANSFER_EXECUTE_REQUIRES_PAYMENT)
+            } else {
+                SendRawWrapper::<Env::Api>::new().direct_egld(to, egld_value, Empty);
+            }
         });
         Ok(())
     }

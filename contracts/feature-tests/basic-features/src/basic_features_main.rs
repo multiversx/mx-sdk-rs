@@ -115,4 +115,42 @@ pub trait BasicFeatures:
 
     #[storage_mapper("coolTree")]
     fn cool_tree(&self) -> OrderedBinaryTreeMapper<Self::Api, BigUint>;
+
+    /// TODO: it's duplicated in composability, de-duplicate after sorting out the interactors
+    #[view]
+    fn get_esdt_token_data(
+        &self,
+        address: ManagedAddress,
+        token_id: TokenIdentifier,
+        nonce: u64,
+    ) -> EsdtTokenDataMultiValue<Self::Api> {
+        let token_data = self
+            .blockchain()
+            .get_esdt_token_data(&address, &token_id, nonce);
+
+        (
+            token_data.token_type,
+            token_data.amount,
+            token_data.frozen,
+            token_data.hash,
+            token_data.name,
+            token_data.attributes,
+            token_data.creator,
+            token_data.royalties,
+            token_data.uris,
+        )
+            .into()
+    }
 }
+
+pub type EsdtTokenDataMultiValue<M> = MultiValue9<
+    EsdtTokenType,
+    BigUint<M>,
+    bool,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedAddress<M>,
+    BigUint<M>,
+    ManagedVec<M, ManagedBuffer<M>>,
+>;

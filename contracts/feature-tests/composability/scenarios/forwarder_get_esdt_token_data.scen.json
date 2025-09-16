@@ -139,6 +139,7 @@
         {
             "step": "scQuery",
             "id": "sft-attributes",
+            "comment": "token type currently not implemented properly in mandos, hence the *",
             "tx": {
                 "to": "sc:forwarder",
                 "function": "get_esdt_token_data",
@@ -150,7 +151,7 @@
             },
             "expect": {
                 "out": [
-                    "1",
+                    "*",
                     "300",
                     "true",
                     "keccak256:str:SFT-00003-HASH",
@@ -223,6 +224,7 @@
         {
             "step": "scQuery",
             "id": "missing-nonce",
+            "comment": "token type currently not implemented properly in mandos, hence the *",
             "tx": {
                 "to": "sc:forwarder",
                 "function": "get_esdt_token_data",
@@ -234,7 +236,7 @@
             },
             "expect": {
                 "out": [
-                    "1",
+                    "*",
                     "0",
                     "false",
                     "",

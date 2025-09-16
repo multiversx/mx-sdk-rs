@@ -3,7 +3,6 @@ use std::process;
 use super::error_message::sc_call_err_message;
 use crate::{network_response, InteractorBase};
 use anyhow::Error;
-use log::info;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario::ScenarioRunner,
@@ -35,7 +34,7 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
+        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash).await;
 
         sc_call_step.save_response(network_response::parse_tx_response(tx, return_code));
 
@@ -60,9 +59,15 @@ where
             .await;
         let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
 
-        if let Ok(tx_hash) = tx_hash.as_ref() {
-            println!("sc call tx hash: {tx_hash}");
-            info!("sc call tx hash: {tx_hash}");
+        match tx_hash.as_ref() {
+            Ok(tx_hash) => {
+                println!("sc call tx hash: {tx_hash}");
+                log::info!("sc call tx hash: {tx_hash}");
+            }
+            Err(err) => {
+                println!("sc call error: {err}");
+                log::error!("sc call error: {err}");
+            }
         }
 
         tx_hash
