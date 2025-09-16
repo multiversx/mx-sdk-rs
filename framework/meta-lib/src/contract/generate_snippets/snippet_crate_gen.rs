@@ -12,7 +12,7 @@ static LIB_SOURCE_FILE_NAME: &str = "interact.rs";
 static SC_CONFIG_FILE_NAME: &str = "sc-config.toml";
 static CONFIG_TOML_PATH: &str = "config.toml";
 static CONFIG_SOURCE_FILE_NAME: &str = "config.rs";
-static PROXY_FILE_NAME: &str = "proxy.rs";
+static PROXY_FILE_NAME: &str = "_proxy.rs";
 static INTERACTOR_CS_TEST_FILE_NAME: &str = "interact_cs_tests.rs";
 static INTERACTOR_TEST_FILE_NAME: &str = "interact_tests.rs";
 
@@ -170,8 +170,9 @@ pub(crate) fn create_test_folder_and_get_files(snippets_folder_path: &Path) -> (
     (interactor_file, interactor_cs_file)
 }
 
-pub(crate) fn create_sc_config_file(overwrite: bool) {
+pub(crate) fn create_sc_config_file(overwrite: bool, contract_crate_name: &str) {
     let sc_config_path = Path::new("..").join(SC_CONFIG_FILE_NAME);
+    let proxy_name = contract_crate_name.replace("-", "_") + PROXY_FILE_NAME;
 
     // check if the file should be overwritten or if it already exists
     let mut file = if overwrite || !sc_config_path.exists() {
@@ -184,7 +185,7 @@ pub(crate) fn create_sc_config_file(overwrite: bool) {
             .open(&sc_config_path)
             .unwrap();
 
-        if file_contains_proxy_path(&sc_config_path).unwrap_or(false) {
+        if file_contains_proxy_path(&sc_config_path, &proxy_name).unwrap_or(false) {
             return;
         }
 
@@ -195,11 +196,10 @@ pub(crate) fn create_sc_config_file(overwrite: bool) {
     // when deserializing from toml, backwards slashes are not allowed
     let full_proxy_entry = r#"
 [[proxy]]
-path = "interactor/src/proxy.rs"
-"#;
+path = "interactor/src"#;
 
     // write full proxy toml entry to the file
-    writeln!(&mut file, "\n{full_proxy_entry}").unwrap();
+    writeln!(&mut file, "\n{full_proxy_entry}/{proxy_name}\"").unwrap();
 }
 
 pub(crate) fn create_config_toml_file(snippets_folder_path: &Path) {
@@ -227,10 +227,10 @@ pub(crate) fn create_config_rust_file(snippets_folder_path: &Path) -> File {
     File::create(lib_path).unwrap()
 }
 
-fn file_contains_proxy_path(file_path: &PathBuf) -> std::io::Result<bool> {
+fn file_contains_proxy_path(file_path: &PathBuf, proxy_name: &str) -> std::io::Result<bool> {
     let file_content = fs::read_to_string(file_path)?;
 
-    let proxy_path = Path::new("interactor").join("src").join(PROXY_FILE_NAME);
+    let proxy_path = Path::new("interactor").join("src").join(proxy_name);
     let proxy_entry = format!("path = \"{}\"", &proxy_path.to_string_lossy());
 
     Ok(file_content.contains(&proxy_entry))
