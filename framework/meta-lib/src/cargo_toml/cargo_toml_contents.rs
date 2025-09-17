@@ -37,7 +37,7 @@ pub struct CargoTomlContents {
 
 impl CargoTomlContents {
     pub fn parse_string(raw_str: &str, path: &Path) -> Self {
-        let toml_value = raw_str.parse::<toml::Value>().unwrap_or_else(|e| {
+        let toml_value = toml::from_str::<toml::Value>(raw_str).unwrap_or_else(|e| {
             panic!(
                 "failed to parse Cargo.toml toml format, path:{}, error: {e}",
                 path.display()
