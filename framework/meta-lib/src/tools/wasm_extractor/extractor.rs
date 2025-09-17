@@ -5,15 +5,16 @@ use std::{
     path::{Path, PathBuf},
 };
 use wasmparser::{
-    BinaryReaderError, DataSectionReader, ElementItems, ElementSectionReader, ExportSectionReader,
-    FunctionBody, ImportSectionReader, Operator, Parser, Payload,
+    BinaryReaderError, CompositeInnerType, DataSectionReader, ElementItems, ElementSectionReader,
+    ExportSectionReader, FunctionBody, ImportSectionReader, Operator, Parser, Payload, TypeRef,
+    TypeSectionReader,
 };
 
 use crate::{ei::EIVersion, tools::CodeReport};
 
 use super::{
     opcode_whitelist::is_opcode_whitelisted, report::WasmReport, CallGraph, EndpointInfo,
-    FunctionInfo, OpcodeVersion,
+    FunctionInfo, FunctionType, OpcodeVersion,
 };
 
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
@@ -32,6 +33,7 @@ pub struct WasmInfo {
     pub write_index_functions: HashSet<usize>,
     pub report: WasmReport,
     pub data: Vec<u8>,
+    pub func_types: HashMap<u32, FunctionType>,
 }
 
 impl WasmInfo {
@@ -66,6 +68,9 @@ impl WasmInfo {
 
         for payload in parser.parse_all(&self.data) {
             match payload? {
+                Payload::TypeSection(type_section) => {
+                    wasm_info.parse_type_section(type_section);
+                }
                 Payload::ImportSection(import_section) => {
                     wasm_info.process_imports(import_section, import_extraction_enabled);
                     wasm_info.report.ei_check |= is_ei_valid(&wasm_info.report.imports, check_ei);
@@ -104,6 +109,21 @@ impl WasmInfo {
         wasm_info.detect_forbidden_opcodes();
 
         Ok(wasm_info)
+    }
+
+    fn parse_type_section(&mut self, type_section: TypeSectionReader) {
+        for (ty_index, ty_result) in type_section.into_iter().enumerate() {
+            let rec_group = ty_result.expect("Failed to read type section");
+            for sub_type in rec_group.into_types() {
+                if let CompositeInnerType::Func(func_ty) = sub_type.composite_type.inner {
+                    let ft = FunctionType {
+                        params: func_ty.params().to_vec(),
+                        returns: func_ty.results().to_vec(),
+                    };
+                    self.func_types.insert(ty_index as u32, ft);
+                }
+            }
+        }
     }
 
     pub(crate) fn add_endpoints(mut self, endpoints: &HashMap<&str, bool>) -> Self {
@@ -169,13 +189,28 @@ impl WasmInfo {
         import_section: ImportSectionReader,
         import_extraction_enabled: bool,
     ) {
+        let signature_map = super::vm_hook_signature::vm_hook_signature_map();
+
         for (index, import) in import_section.into_iter().flatten().enumerate() {
-            if import_extraction_enabled {
-                self.report.imports.push(import.name.to_string());
-            }
-            self.call_graph.insert_function(index, FunctionInfo::new());
-            if WRITE_OP.contains(&import.name) {
-                self.write_index_functions.insert(index);
+            if let TypeRef::Func(type_index) = &import.ty {
+                let func_type = self
+                    .func_types
+                    .get(type_index)
+                    .expect("invalid wasm function type index");
+
+                super::vm_hook_signature::check_vm_hook_signatures(
+                    import.name,
+                    &func_type.params,
+                    &func_type.returns,
+                    &signature_map,
+                );
+                if import_extraction_enabled {
+                    self.report.imports.push(import.name.to_string());
+                }
+                self.call_graph.insert_function(index, FunctionInfo::new());
+                if WRITE_OP.contains(&import.name) {
+                    self.write_index_functions.insert(index);
+                }
             }
         }
 
