@@ -2,13 +2,7 @@ use std::collections::HashMap;
 
 use wasmparser::ValType;
 
-use crate::tools::wasm_extractor::VM_HOOK_SIGNATURES;
-
-#[derive(Debug, Clone)]
-pub struct FunctionType {
-    pub params: Vec<ValType>,
-    pub returns: Vec<ValType>,
-}
+use super::VM_HOOK_SIGNATURES;
 
 #[derive(Debug, Clone)]
 pub struct VmHookSignature {

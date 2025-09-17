@@ -7,14 +7,14 @@ use std::{
 use wasmparser::{
     BinaryReaderError, CompositeInnerType, DataSectionReader, ElementItems, ElementSectionReader,
     ExportSectionReader, FunctionBody, ImportSectionReader, Operator, Parser, Payload, TypeRef,
-    TypeSectionReader,
+    TypeSectionReader, ValType,
 };
 
 use crate::{ei::EIVersion, tools::CodeReport};
 
 use super::{
     opcode_whitelist::is_opcode_whitelisted, report::WasmReport, CallGraph, EndpointInfo,
-    FunctionInfo, FunctionType, OpcodeVersion,
+    FunctionInfo, OpcodeVersion,
 };
 
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
@@ -34,6 +34,12 @@ pub struct WasmInfo {
     pub report: WasmReport,
     pub data: Vec<u8>,
     pub func_types: HashMap<u32, FunctionType>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FunctionType {
+    pub params: Vec<ValType>,
+    pub returns: Vec<ValType>,
 }
 
 impl WasmInfo {
@@ -189,7 +195,7 @@ impl WasmInfo {
         import_section: ImportSectionReader,
         import_extraction_enabled: bool,
     ) {
-        let signature_map = super::vm_hook_signature::vm_hook_signature_map();
+        let signature_map = crate::ei::vm_hook_signature_map();
 
         for (index, import) in import_section.into_iter().flatten().enumerate() {
             if let TypeRef::Func(type_index) = &import.ty {
@@ -198,7 +204,7 @@ impl WasmInfo {
                     .get(type_index)
                     .expect("invalid wasm function type index");
 
-                super::vm_hook_signature::check_vm_hook_signatures(
+                crate::ei::check_vm_hook_signatures(
                     import.name,
                     &func_type.params,
                     &func_type.returns,
