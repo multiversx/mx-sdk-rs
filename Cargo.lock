@@ -3103,9 +3103,9 @@ dependencies = [
 
 [[package]]
 name = "multiversx-bls"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fd7d3ec5fc03a7eb327daf5aa8250c728c28afc7d5736ffcfdc6a80834c016d"
+checksum = "f1806bbba4570d616d34b5f042ae9d7fe7aad5d29e50dd14e90a51d4cd5ac868"
 dependencies = [
  "criterion",
  "hex",
@@ -3323,6 +3323,7 @@ dependencies = [
  "hex",
  "itertools 0.14.0",
  "log",
+ "multiversx-bls",
  "multiversx-chain-scenario-format",
  "multiversx-chain-vm",
  "multiversx-chain-vm-executor",
