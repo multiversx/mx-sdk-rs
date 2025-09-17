@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
+description = "Generates contracts with a single specific import, for testing protocol flag activations"
+
 [[bin]]
 name = "wat-gen"
 path = "src/wat_gen_main.rs"
