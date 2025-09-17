@@ -17,7 +17,6 @@ keywords = ["multiversx", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
-multiversx-bls = { version = "0.2.0", optional = true }
 
 base64 = "0.22"
 num-bigint = "0.4"

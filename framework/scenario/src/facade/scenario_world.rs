@@ -152,7 +152,10 @@ impl ScenarioWorld {
         &mut self,
         pk_size: usize,
         message: &[u8],
-    ) -> Result<(multiversx_bls::G1, Vec<multiversx_bls::G2>), multiversx_bls::BlsError> {
+    ) -> Result<
+        (multiversx_chain_vm::G1, Vec<multiversx_chain_vm::G2>),
+        multiversx_chain_vm::BlsError,
+    > {
         multiversx_chain_vm::crypto_functions_bls::create_aggregated_signature(pk_size, message)
     }
 }
