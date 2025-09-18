@@ -25,25 +25,45 @@ fn test_added_names(base: &[&str], added: &[&str], expected_result: &[&str]) {
 
 #[test]
 fn test_added_names_ei_1_1() {
-    test_added_names(ei::EI_1_0_NAMES, ei::EI_1_1_ADDED_NAMES, ei::EI_1_1_NAMES);
+    test_added_names(
+        ei::EI_1_0_NAMES,
+        ei::delta::EI_1_1_ADDED_NAMES,
+        ei::EI_1_1_NAMES,
+    );
 }
 
 #[test]
 fn test_added_names_ei_1_2() {
-    test_added_names(ei::EI_1_1_NAMES, ei::EI_1_2_ADDED_NAMES, ei::EI_1_2_NAMES);
+    test_added_names(
+        ei::EI_1_1_NAMES,
+        ei::delta::EI_1_2_ADDED_NAMES,
+        ei::EI_1_2_NAMES,
+    );
 }
 
 #[test]
 fn test_added_names_ei_1_3() {
-    test_added_names(ei::EI_1_2_NAMES, ei::EI_1_3_ADDED_NAMES, ei::EI_1_3_NAMES);
+    test_added_names(
+        ei::EI_1_2_NAMES,
+        ei::delta::EI_1_3_ADDED_NAMES,
+        ei::EI_1_3_NAMES,
+    );
 }
 
 #[test]
 fn test_added_names_ei_1_4() {
-    test_added_names(ei::EI_1_3_NAMES, ei::EI_1_4_ADDED_NAMES, ei::EI_1_4_NAMES);
+    test_added_names(
+        ei::EI_1_3_NAMES,
+        ei::delta::EI_1_4_ADDED_NAMES,
+        ei::EI_1_4_NAMES,
+    );
 }
 
 #[test]
 fn test_added_names_ei_1_5() {
-    test_added_names(ei::EI_1_4_NAMES, ei::EI_1_5_ADDED_NAMES, ei::EI_1_5_NAMES);
+    test_added_names(
+        ei::EI_1_4_NAMES,
+        ei::delta::EI_1_5_ADDED_NAMES,
+        ei::EI_1_5_NAMES,
+    );
 }
