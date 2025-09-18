@@ -1,6 +1,6 @@
-use std::sync::Arc;
+use std::sync::Weak;
 
-use multiversx_chain_vm::host::context::TxContext;
+use multiversx_chain_vm::host::context::{TxContext, TxContextRef};
 use multiversx_sc::{
     api::{HandleConstraints, RawHandle},
     codec::TryStaticCast,
@@ -10,22 +10,22 @@ use crate::executor::debug::ContractDebugStack;
 
 #[derive(Clone)]
 pub struct DebugHandle {
-    /// TODO: would be nice to be an actual TxContextRef,
-    /// but that requires changing the debugger scripts
-    pub(crate) context: Arc<TxContext>,
+    /// Only keep a weak reference to the context, to avoid stray handles keeping the context from being released.
+    /// Using the pointer after the context is released will panic.
+    pub(crate) context: Weak<TxContext>,
     raw_handle: RawHandle,
 }
 
 impl DebugHandle {
     pub fn is_on_current_context(&self) -> bool {
-        Arc::ptr_eq(
+        Weak::ptr_eq(
             &self.context,
-            &ContractDebugStack::static_peek().tx_context_ref.into_ref(),
+            &ContractDebugStack::static_peek().tx_context_ref.downgrade(),
         )
     }
 
     pub fn is_on_same_context(&self, other: &DebugHandle) -> bool {
-        Arc::ptr_eq(&self.context, &other.context)
+        Weak::ptr_eq(&self.context, &other.context)
     }
 
     pub fn assert_current_context(&self) {
@@ -33,6 +33,16 @@ impl DebugHandle {
             self.is_on_current_context(),
             "Managed value not used in original context"
         );
+    }
+
+    pub fn to_tx_context_ref(&self) -> TxContextRef {
+        let tx_context_arc = self.context.upgrade().unwrap_or_else(|| {
+            panic!(
+                "TxContext is no longer valid for handle {}",
+                self.raw_handle
+            )
+        });
+        TxContextRef::new(tx_context_arc)
     }
 }
 
@@ -45,7 +55,7 @@ impl core::fmt::Debug for DebugHandle {
 impl HandleConstraints for DebugHandle {
     fn new(handle: multiversx_sc::api::RawHandle) -> Self {
         Self {
-            context: ContractDebugStack::static_peek().tx_context_ref.into_ref(),
+            context: ContractDebugStack::static_peek().tx_context_ref.downgrade(),
             raw_handle: handle,
         }
     }
@@ -73,7 +83,7 @@ impl PartialEq<RawHandle> for DebugHandle {
 
 impl PartialEq<DebugHandle> for DebugHandle {
     fn eq(&self, other: &DebugHandle) -> bool {
-        Arc::ptr_eq(&self.context, &other.context) && self.raw_handle == other.raw_handle
+        Weak::ptr_eq(&self.context, &other.context) && self.raw_handle == other.raw_handle
     }
 }
 

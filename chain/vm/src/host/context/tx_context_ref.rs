@@ -1,4 +1,7 @@
-use std::{ops::Deref, sync::Arc};
+use std::{
+    ops::Deref,
+    sync::{Arc, Weak},
+};
 
 use crate::host::context::{TxContext, TxResult};
 
@@ -64,5 +67,10 @@ impl TxContextRef {
 
     pub fn into_ref(self) -> Arc<TxContext> {
         self.0
+    }
+
+    /// Creates a new [`Weak`] pointer to the [`TxContext`].
+    pub fn downgrade(&self) -> Weak<TxContext> {
+        Arc::downgrade(&self.0)
     }
 }
