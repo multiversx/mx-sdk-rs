@@ -77,7 +77,7 @@ where
     pub async fn launch_deploy_tx_cost(
         &mut self,
         sc_deploy_step: &mut ScDeployStep,
-    ) -> Result<u128, Error> {
+    ) -> Result<u64, Error> {
         let transaction = self.launch_deploy(sc_deploy_step).await;
 
         let tx_gas_units = self.proxy.request(SimulateTxRequest(&transaction)).await;
@@ -134,7 +134,7 @@ where
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
     }
 
-    pub async fn sc_estimate_deploy<S>(&mut self, mut sc_deploy_step: S) -> u128
+    pub async fn sc_estimate_deploy<S>(&mut self, mut sc_deploy_step: S) -> u64
     where
         S: AsMut<ScDeployStep>,
     {

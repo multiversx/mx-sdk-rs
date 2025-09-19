@@ -60,7 +60,7 @@ async fn run_estimate_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH
         DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >,
-) -> u128
+) -> u64
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -121,7 +121,7 @@ where
     CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Result = u128;
+    type Result = u64;
 
     fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
         run_estimate_deploy(self)

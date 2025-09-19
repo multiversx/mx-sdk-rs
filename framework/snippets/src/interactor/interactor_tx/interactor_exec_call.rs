@@ -54,7 +54,7 @@ async fn estimate_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
         FunctionCall<StaticApi>,
         RH,
     >,
-) -> u128
+) -> u64
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -99,7 +99,7 @@ where
     Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Result = u128;
+    type Result = u64;
 
     fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
         estimate_async_call(self)

@@ -11,7 +11,7 @@ use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, Inter
 
 async fn estimate_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
     tx: Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>,
-) -> u128
+) -> u64
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -65,7 +65,7 @@ where
     Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
     Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Result = u128;
+    type Result = u64;
 
     fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
         estimate_async_transfer(self)

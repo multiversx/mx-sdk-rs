@@ -226,7 +226,7 @@ pub struct SendTransactionResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EstimateCostOfTransactionData {
-    pub tx_gas_units: u128,
+    pub tx_gas_units: u64,
 }
 
 // EstimateCostOfTransactionResponse holds the response received from the network when estimating cost of a transaction

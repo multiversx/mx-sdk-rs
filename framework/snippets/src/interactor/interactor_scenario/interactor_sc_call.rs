@@ -55,7 +55,7 @@ where
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    pub async fn sc_estimate<S>(&mut self, mut sc_call_step: S) -> u128
+    pub async fn sc_estimate<S>(&mut self, mut sc_call_step: S) -> u64
     where
         S: AsMut<ScCallStep>,
     {
@@ -103,7 +103,7 @@ where
         tx_hash
     }
 
-    async fn launch_sc_tx_cost(&mut self, sc_call_step: &mut ScCallStep) -> Result<u128, Error> {
+    async fn launch_sc_tx_cost(&mut self, sc_call_step: &mut ScCallStep) -> Result<u64, Error> {
         let transaction = self.launch_sc(sc_call_step).await;
 
         let tx_gas_units = self.proxy.request(SimulateTxRequest(&transaction)).await;

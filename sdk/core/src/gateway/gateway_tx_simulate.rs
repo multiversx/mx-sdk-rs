@@ -9,7 +9,7 @@ pub struct SimulateTxRequest<'a>(pub &'a Transaction);
 impl GatewayRequest for SimulateTxRequest<'_> {
     type Payload = Transaction;
     type DecodedJson = EstimateCostOfTransactionResponse;
-    type Result = u128;
+    type Result = u64;
 
     fn request_type(&self) -> GatewayRequestType {
         GatewayRequestType::Post

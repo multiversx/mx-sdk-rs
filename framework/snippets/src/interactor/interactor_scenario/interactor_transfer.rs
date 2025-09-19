@@ -40,7 +40,7 @@ where
         tx_hash
     }
 
-    pub async fn estimate_transfer(&mut self, transfer_step: TransferStep) -> u128 {
+    pub async fn estimate_transfer(&mut self, transfer_step: TransferStep) -> u64 {
         let transaction = self.launch_transfer(&transfer_step).await;
 
         let tx_gas_units = match self.proxy.request(SimulateTxRequest(&transaction)).await {
