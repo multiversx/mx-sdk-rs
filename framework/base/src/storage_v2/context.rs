@@ -1,10 +1,20 @@
 use core::marker::PhantomData;
 
-use crate::{api::ManagedTypeApi, storage_v2::DynamicKey, types::ManagedBuffer};
+use crate::{
+    api::{
+        ErrorApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+        StorageWriteApiImpl as _,
+    },
+    storage_v2::DynamicKey,
+    types::{ManagedBuffer, ManagedType},
+};
 
-pub trait StorageContext<M: ManagedTypeApi> {
-    type ReadAccess: StorageContextRead<M>;
-    type WriteAccess: StorageContextWrite<M>;
+pub trait StorageContext<A>
+where
+    A: ManagedTypeApi + ErrorApi + 'static,
+{
+    type ReadAccess: StorageContextRead<A>;
+    type WriteAccess: StorageContextWrite<A>;
 
     unsafe fn unsafe_clone(&self) -> Self;
 
@@ -12,15 +22,21 @@ pub trait StorageContext<M: ManagedTypeApi> {
 
     fn try_downcast_write(&self) -> Option<&Self::WriteAccess>;
 
-    fn subcontext(&self, delta: ManagedBuffer<M>) -> Self;
+    fn subcontext(&self, delta: ManagedBuffer<A>) -> Self;
 }
 
-pub trait StorageContextRead<M: ManagedTypeApi>: StorageContext<M> {
-    fn read_raw(&self) -> ManagedBuffer<M>;
+pub trait StorageContextRead<R>: StorageContext<R>
+where
+    R: ManagedTypeApi + ErrorApi + 'static,
+{
+    fn read_raw(&self) -> ManagedBuffer<R>;
 }
 
-pub trait StorageContextWrite<M: ManagedTypeApi>: StorageContextRead<M> {
-    fn write_raw(&self, value: ManagedBuffer<M>);
+pub trait StorageContextWrite<W>: StorageContextRead<W>
+where
+    W: ManagedTypeApi + ErrorApi + 'static,
+{
+    fn write_raw(&self, value: ManagedBuffer<W>);
 }
 
 /// Layout marker.
@@ -28,12 +44,12 @@ pub trait StorageContextWrite<M: ManagedTypeApi>: StorageContextRead<M> {
 /// Cannot create instance of this type.
 pub enum Layout {}
 
-impl<M> StorageContext<M> for Layout
+impl<A> StorageContext<A> for Layout
 where
-    M: ManagedTypeApi,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
-    type ReadAccess = NoAccess<M>;
-    type WriteAccess = NoAccess<M>;
+    type ReadAccess = NoAccess<A>;
+    type WriteAccess = NoAccess<A>;
 
     unsafe fn unsafe_clone(&self) -> Self {
         unreachable!()
@@ -47,24 +63,24 @@ where
         unreachable!()
     }
 
-    fn subcontext(&self, delta: ManagedBuffer<M>) -> Self {
+    fn subcontext(&self, _delta: ManagedBuffer<A>) -> Self {
         unreachable!()
     }
 }
 
-pub enum NoAccess<M>
+pub enum NoAccess<A>
 where
-    M: ManagedTypeApi,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
-    _Phantom(PhantomData<M>),
+    _Phantom(PhantomData<A>),
 }
 
-impl<M> StorageContext<M> for NoAccess<M>
+impl<A> StorageContext<A> for NoAccess<A>
 where
-    M: ManagedTypeApi,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
-    type ReadAccess = NoAccess<M>;
-    type WriteAccess = NoAccess<M>;
+    type ReadAccess = NoAccess<A>;
+    type WriteAccess = NoAccess<A>;
 
     unsafe fn unsafe_clone(&self) -> Self {
         unreachable!()
@@ -78,25 +94,25 @@ where
         unreachable!()
     }
 
-    fn subcontext(&self, delta: ManagedBuffer<M>) -> Self {
+    fn subcontext(&self, _delta: ManagedBuffer<A>) -> Self {
         unreachable!()
     }
 }
 
-impl<M> StorageContextRead<M> for NoAccess<M>
+impl<A> StorageContextRead<A> for NoAccess<A>
 where
-    M: ManagedTypeApi,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
-    fn read_raw(&self) -> ManagedBuffer<M> {
+    fn read_raw(&self) -> ManagedBuffer<A> {
         unreachable!()
     }
 }
 
-impl<M> StorageContextWrite<M> for NoAccess<M>
+impl<A> StorageContextWrite<A> for NoAccess<A>
 where
-    M: ManagedTypeApi,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
-    fn write_raw(&self, value: ManagedBuffer<M>) {
+    fn write_raw(&self, _value: ManagedBuffer<A>) {
         unreachable!()
     }
 }
@@ -104,7 +120,7 @@ where
 #[derive(Default)]
 pub struct SelfRead<'r, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi + 'static,
 {
     key: DynamicKey<M>,
     _phantom: PhantomData<&'r ()>,
@@ -112,7 +128,7 @@ where
 
 impl<M> SelfRead<'_, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi + 'static,
 {
     pub fn new(key: DynamicKey<M>) -> Self {
         SelfRead {
@@ -122,12 +138,12 @@ where
     }
 }
 
-impl<M> StorageContext<M> for SelfRead<'_, M>
+impl<A> StorageContext<A> for SelfRead<'_, A>
 where
-    M: ManagedTypeApi,
+    A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
     type ReadAccess = Self;
-    type WriteAccess = NoAccess<M>;
+    type WriteAccess = NoAccess<A>;
 
     unsafe fn unsafe_clone(&self) -> Self {
         Self {
@@ -144,27 +160,30 @@ where
         None
     }
 
-    fn subcontext(&self, delta: ManagedBuffer<M>) -> Self {
+    fn subcontext(&self, delta: ManagedBuffer<A>) -> Self {
         Self::new(self.key.clone().concat(delta))
     }
 }
 
-impl<M> StorageContextRead<M> for SelfRead<'_, M>
+impl<A> StorageContextRead<A> for SelfRead<'_, A>
 where
-    M: ManagedTypeApi,
+    A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    fn read_raw(&self) -> ManagedBuffer<M> {
-        // api::get()
-
-        // api::get(&self.key)
-        ManagedBuffer::new()
+    // took from /framework/base/src/storage/storage_get.rs
+    fn read_raw(&self) -> ManagedBuffer<A> {
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            A::storage_read_api_impl()
+                .storage_load_managed_buffer_raw(self.key.get_handle(), result.get_handle());
+            result
+        }
     }
 }
 
 #[derive(Default)]
 pub struct SelfWrite<'w, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi + 'static,
 {
     key: DynamicKey<M>,
     _phantom: PhantomData<&'w mut ()>,
@@ -172,7 +191,7 @@ where
 
 impl<M> SelfWrite<'_, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi + ErrorApi + 'static,
 {
     pub fn new(key: DynamicKey<M>) -> Self {
         SelfWrite {
@@ -182,9 +201,9 @@ where
     }
 }
 
-impl<M> StorageContext<M> for SelfWrite<'_, M>
+impl<A> StorageContext<A> for SelfWrite<'_, A>
 where
-    M: ManagedTypeApi,
+    A: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
     type ReadAccess = Self;
     type WriteAccess = Self;
@@ -204,26 +223,31 @@ where
         Some(self)
     }
 
-    fn subcontext(&self, delta: ManagedBuffer<M>) -> Self {
+    fn subcontext(&self, delta: ManagedBuffer<A>) -> Self {
         Self::new(self.key.clone().concat(delta))
     }
 }
 
-impl<M> StorageContextRead<M> for SelfWrite<'_, M>
+impl<A> StorageContextRead<A> for SelfWrite<'_, A>
 where
-    M: ManagedTypeApi,
+    A: StorageWriteApi + StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    fn read_raw(&self) -> ManagedBuffer<M> {
-        // api::get(&self.key)
-        ManagedBuffer::new()
+    fn read_raw(&self) -> ManagedBuffer<A> {
+        unsafe {
+            let result = ManagedBuffer::new_uninit();
+            A::storage_read_api_impl()
+                .storage_load_managed_buffer_raw(self.key.get_handle(), result.get_handle());
+            result
+        }
     }
 }
 
-impl<M> StorageContextWrite<M> for SelfWrite<'_, M>
+impl<A> StorageContextWrite<A> for SelfWrite<'_, A>
 where
-    M: ManagedTypeApi,
+    A: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    fn write_raw(&self, value: ManagedBuffer<M>) {
-        // api::set(self.key.clone(), value);
+    fn write_raw(&self, value: ManagedBuffer<A>) {
+        A::storage_write_api_impl()
+            .storage_store_managed_buffer_raw(self.key.get_handle(), value.handle.clone());
     }
 }
