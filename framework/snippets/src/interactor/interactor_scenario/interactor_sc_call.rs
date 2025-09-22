@@ -18,10 +18,7 @@ impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
-    pub async fn sc_call<S>(&mut self, mut sc_call_step: S)
-    where
-        S: AsMut<ScCallStep>,
-    {
+    pub async fn sc_call(&mut self, sc_call_step: &mut ScCallStep) {
         let sc_call_step = sc_call_step.as_mut();
         let tx_hash = match self.launch_sc_call(sc_call_step).await {
             Ok(hash) => hash,
