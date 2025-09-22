@@ -1,4 +1,7 @@
-use multiversx_sc_scenario::{imports::*, scenario_model::TxResponseStatus};
+use multiversx_sc_scenario::{
+    imports::*, multiversx_chain_vm::crypto_functions_bls::verify_bls_aggregated_signature,
+    scenario_model::TxResponseStatus,
+};
 
 use scenario_tester::*;
 
@@ -420,4 +423,29 @@ fn st_blackbox_storage_check_test() {
     world
         .check_account(ST_ADDRESS)
         .check_storage("str:otherMapper", "str:SomeValueInStorage");
+}
+
+#[test]
+fn create_bls_aggregate_signature() {
+    let mut world = world();
+
+    let (agg_signature, public_keys) = world
+        .create_aggregated_signature(3, b"st blackbox test")
+        .expect("failed to create aggregate signature");
+
+    let pk_bytes: Vec<Vec<u8>> = public_keys
+        .iter()
+        .map(|pk| pk.serialize().unwrap())
+        .collect();
+
+    assert!(verify_bls_aggregated_signature(
+        pk_bytes.clone(),
+        b"st blackbox test",
+        &agg_signature.serialize().unwrap()
+    ));
+    assert!(!verify_bls_aggregated_signature(
+        pk_bytes,
+        b"blackbox test",
+        &agg_signature.serialize().unwrap()
+    ));
 }

@@ -231,6 +231,7 @@ impl ContractVariant {
                 build_args.extract_imports,
                 self.settings.check_ei.as_ref(),
                 &endpoints,
+                self.settings.opcode_version,
             );
         }
 
@@ -243,6 +244,7 @@ impl ContractVariant {
             true,
             self.settings.check_ei.as_ref(),
             &endpoints,
+            self.settings.opcode_version,
         );
 
         write_imports_output(&output_imports_json_path, wasm_report.imports.as_slice());

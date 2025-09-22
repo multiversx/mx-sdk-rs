@@ -11,7 +11,7 @@ use crate::{
     },
     types::{
         ContractCallNoPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, MultiEgldOrEsdtPayment, MultiValueEncoded, TypedFunctionCall,
+        ManagedBuffer, MultiEgldOrEsdtPayment, MultiValueEncoded,
     },
 };
 
@@ -64,13 +64,6 @@ where
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Api>) -> Self {
         self.arg_buffer = raw;
         self
-    }
-
-    pub fn typed_result<R>(self) -> TypedFunctionCall<Api, R>
-    where
-        R: TopEncodeMulti + TopDecodeMulti,
-    {
-        self.into()
     }
 }
 

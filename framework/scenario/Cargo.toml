@@ -17,6 +17,7 @@ keywords = ["multiversx", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
+
 base64 = "0.22"
 num-bigint = "0.4"
 num-traits = "0.2"
@@ -30,12 +31,11 @@ itertools = "0.14.0"
 colored = "3.0"
 unwrap-infallible = "0.1.5"
 simple-error = "0.3.1"
-
 [features]
 default = ["wasm-incompatible"]
 wasm-incompatible = ["multiversx-chain-vm/wasm-incompatible"]
 compiled-sc-tests = []
-run-go-tests = ["compiled-sc-tests"] # backwards compatibility
+run-go-tests = ["compiled-sc-tests"]                              # backwards compatibility
 wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
 bls = ["multiversx-chain-vm/bls"]
 

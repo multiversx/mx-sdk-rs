@@ -96,11 +96,7 @@ where
         tx_gas_units
     }
 
-    pub async fn sc_deploy<S>(&mut self, mut sc_deploy_step: S)
-    where
-        S: AsMut<ScDeployStep>,
-    {
-        let sc_deploy_step = sc_deploy_step.as_mut();
+    pub async fn sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) {
         let tx_hash = match self.launch_sc_deploy(sc_deploy_step).await {
             Ok(hash) => hash,
             Err(err) => {

@@ -28,6 +28,7 @@ members = [
   "tools/interactor-delegation-func-calls/",
   "tools/interactor-governance-func-calls/",
   "tools/gas-schedule-generator",
+  "tools/wat-gen",
 
   "contracts/modules",
 
