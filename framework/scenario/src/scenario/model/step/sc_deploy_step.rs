@@ -1,7 +1,5 @@
 use multiversx_sc::types::H256;
 
-use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
-
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},
     scenario_model::TxResponse,
@@ -65,15 +63,6 @@ impl ScDeployStep {
         BytesValue: From<V>,
     {
         self.tx.contract_code = BytesValue::from(expr);
-        self
-    }
-
-    #[deprecated(
-        since = "0.42.0",
-        note = "Please use method `code` instead. To ease transition, it is also possible to call it with a tuple like so: `.code((expr, context))`"
-    )]
-    pub fn contract_code(mut self, expr: &str, context: &InterpreterContext) -> Self {
-        self.tx.contract_code = BytesValue::interpret_from(expr, context);
         self
     }
 
