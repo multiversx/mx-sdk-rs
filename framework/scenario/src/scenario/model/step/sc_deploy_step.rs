@@ -1,9 +1,6 @@
 use multiversx_sc::types::H256;
 
-use crate::{
-    api::StaticApi,
-    scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-};
+use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},
@@ -11,8 +8,6 @@ use crate::{
 };
 
 use crate::multiversx_sc::types::CodeMetadata;
-
-use super::{convert_call_args, TypedScDeploy};
 
 #[derive(Debug, Clone)]
 pub struct ScDeployStep {
@@ -95,25 +90,6 @@ impl ScDeployStep {
         self
     }
 
-    /// Sets following fields based on the smart contract proxy:
-    /// - "function"
-    /// - "arguments"
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    #[allow(deprecated)]
-    pub fn call<OriginalResult, CD>(mut self, contract_deploy: CD) -> TypedScDeploy<OriginalResult>
-    where
-        CD: Into<multiversx_sc::types::ContractDeploy<StaticApi, OriginalResult>>,
-    {
-        let (_, mandos_args) = process_contract_deploy(contract_deploy.into());
-        for arg in mandos_args {
-            self = self.argument(arg.as_str());
-        }
-        self.into()
-    }
-
     /// Adds a custom expect section to the tx.
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.expect = Some(expect);
@@ -155,23 +131,4 @@ impl AsMut<ScDeployStep> for ScDeployStep {
     fn as_mut(&mut self) -> &mut ScDeployStep {
         self
     }
-}
-
-/// Extracts
-/// - (optional) recipient (needed for contract upgrade, not yet used);
-/// - the arguments.
-#[deprecated(
-    since = "0.49.0",
-    note = "Please use the unified transaction syntax instead."
-)]
-#[allow(deprecated)]
-pub(crate) fn process_contract_deploy<OriginalResult>(
-    contract_deploy: multiversx_sc::types::ContractDeploy<StaticApi, OriginalResult>,
-) -> (Option<String>, Vec<String>) {
-    let to_str = contract_deploy
-        .to
-        .as_option()
-        .map(|to| format!("0x{}", hex::encode(to.to_address().as_bytes())));
-    let mandos_args = convert_call_args(&contract_deploy.arg_buffer);
-    (to_str, mandos_args)
 }
