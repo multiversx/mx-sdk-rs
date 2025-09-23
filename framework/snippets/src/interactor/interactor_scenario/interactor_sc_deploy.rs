@@ -75,7 +75,7 @@ where
         let mut transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
 
         if SimulateGas::is_mandos_simulate_gas_marker(&sc_deploy_step.tx.gas_limit) {
-            let sim_gas = self.sc_deploy_simulate(sc_deploy_step).await;
+            let sim_gas = self.sc_deploy_simulate_transaction(&transaction).await;
             let gas = SimulateGas::adjust_simulated_gas(sim_gas);
             sc_deploy_step.tx.gas_limit = gas.into();
             transaction.gas_limit = gas;

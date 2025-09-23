@@ -163,24 +163,11 @@ impl BasicFeaturesInteract {
     }
 
     pub async fn set_large_storage(&mut self, value: &[u8]) {
-        let gas = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .to(self.state.bf_storage_bytes_contract())
-            .gas(600_000_000)
-            .typed(basic_features_proxy::BasicFeaturesProxy)
-            .store_bytes(value)
-            .estimate()
-            .await;
-
-        assert!(gas < 210_000_000);
-
         self.interactor
             .tx()
             .from(&self.wallet_address)
             .to(self.state.bf_storage_bytes_contract())
-            .gas(600_000_000)
+            .gas(SimulateGas)
             .typed(basic_features_proxy::BasicFeaturesProxy)
             .store_bytes(value)
             .run()

@@ -67,7 +67,7 @@ where
     step_wrapper
         .env
         .world
-        .sc_estimate(&step_wrapper.step)
+        .sc_call_simulate(&step_wrapper.step)
         .await
 }
 

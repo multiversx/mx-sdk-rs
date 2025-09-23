@@ -3,9 +3,8 @@ use std::process;
 use super::error_message::sc_call_err_message;
 use crate::{
     interactor::interactor_scenario::error_message::estimate_sc_call_err_message, network_response,
-    InteractorBase,
+    InteractorBase, SimulateGas,
 };
-use anyhow::Error;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario::ScenarioRunner,
@@ -24,13 +23,22 @@ where
     GatewayProxy: GatewayAsyncService,
 {
     pub async fn sc_call(&mut self, sc_call_step: &mut ScCallStep) {
-        let tx_hash = match self.launch_sc_call(sc_call_step).await {
-            Ok(hash) => hash,
-            Err(err) => {
-                sc_call_err_message(&err);
-                process::exit(1);
-            }
-        };
+        let mut transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
+
+        if SimulateGas::is_mandos_simulate_gas_marker(&sc_call_step.tx.gas_limit) {
+            let sim_gas = self.sc_call_simulate_transaction(&transaction).await;
+            let gas = SimulateGas::adjust_simulated_gas(sim_gas);
+            sc_call_step.tx.gas_limit = gas.into();
+            transaction.gas_limit = gas;
+
+            // sign again, because gas changed
+            let sender_address = &sc_call_step.tx.from.value;
+            self.sign_tx(sender_address, &mut transaction);
+        }
+
+        self.pre_runners.run_sc_call_step(sc_call_step);
+
+        let tx_hash = self.launch_sc_call(&transaction).await;
 
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
@@ -51,16 +59,9 @@ where
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    pub async fn sc_estimate(&mut self, sc_call_step: &ScCallStep) -> u64 {
-        let tx_gas_units = match self.launch_sc_tx_cost(sc_call_step).await {
-            Ok(gas) => gas,
-            Err(err) => {
-                estimate_sc_call_err_message(&err);
-                process::exit(1);
-            }
-        };
-
-        tx_gas_units
+    pub async fn sc_call_simulate(&mut self, sc_call_step: &ScCallStep) -> u64 {
+        let transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
+        self.sc_call_simulate_transaction(&transaction).await
     }
 
     async fn tx_call_to_blockchain_signed_tx(&mut self, sc_call_step: &ScCallStep) -> Transaction {
@@ -73,42 +74,40 @@ where
         transaction
     }
 
-    async fn launch_sc_call(&mut self, sc_call_step: &ScCallStep) -> Result<String, Error> {
-        let transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
+    async fn launch_sc_call(&mut self, transaction: &Transaction) -> String {
+        let tx_hash = self.proxy.request(SendTxRequest(transaction)).await;
 
-        let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
-
-        match tx_hash.as_ref() {
+        match tx_hash {
             Ok(tx_hash) => {
                 println!("sc call tx hash: {tx_hash}");
                 log::info!("sc call tx hash: {tx_hash}");
+                tx_hash
             }
             Err(err) => {
                 println!("sc call error: {err}");
                 log::error!("sc call error: {err}");
+                sc_call_err_message(&err);
+                process::exit(1)
             }
         }
-
-        tx_hash
     }
 
-    async fn launch_sc_tx_cost(&mut self, sc_call_step: &ScCallStep) -> Result<u64, Error> {
-        let transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
+    async fn sc_call_simulate_transaction(&mut self, transaction: &Transaction) -> u64 {
+        let result = self.proxy.request(SimulateTxRequest(transaction)).await;
 
-        let tx_gas_units = self.proxy.request(SimulateTxRequest(&transaction)).await;
-
-        match tx_gas_units.as_ref() {
+        match result {
             Ok(gas) => {
                 println!("The SC call is estimated to cost {gas} gas units.");
                 log::info!("The SC call is estimated to cost {gas} gas units.");
+                gas
             }
             Err(err) => {
                 println!("Estimation cost error: {err}");
                 log::error!("Estimation cost error: {err}");
+                estimate_sc_call_err_message(&err);
+                process::exit(1)
             }
         }
-
-        tx_gas_units
     }
 
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {

@@ -66,7 +66,7 @@ async fn estimate_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
     step_wrapper
         .env
         .world
-        .sc_estimate(&step_wrapper.step)
+        .sc_call_simulate(&step_wrapper.step)
         .await;
 }
 
