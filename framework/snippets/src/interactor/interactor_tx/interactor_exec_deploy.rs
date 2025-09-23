@@ -69,11 +69,11 @@ where
     CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    let mut step_wrapper = tx.tx_to_step();
+    let step_wrapper = tx.tx_to_step();
     step_wrapper
         .env
         .world
-        .sc_deploy_simulate(&mut step_wrapper.step)
+        .sc_deploy_simulate(&step_wrapper.step)
         .await
 }
 

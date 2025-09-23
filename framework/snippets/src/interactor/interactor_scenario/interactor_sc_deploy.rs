@@ -3,9 +3,8 @@ use std::process;
 use super::error_message::deploy_err_message;
 use crate::{
     interactor::interactor_scenario::error_message::estimate_deploy_err_message, network_response,
-    InteractorBase,
+    InteractorBase, SimulateGas,
 };
-use anyhow::Error;
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     mandos_system::ScenarioRunner,
@@ -47,43 +46,48 @@ where
     ) -> Transaction {
         let sender_address = &sc_deploy_step.tx.from.value;
         let mut transaction = self.sc_deploy_to_blockchain_tx(sc_deploy_step);
-        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
+        self.set_tx_nonce_update_sender(sender_address, &mut transaction)
             .await;
+        self.sign_tx(sender_address, &mut transaction);
 
         transaction
     }
 
-    pub async fn launch_sc_deploy(
-        &mut self,
-        sc_deploy_step: &ScDeployStep,
-    ) -> Result<String, Error> {
-        let transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
+    async fn launch_sc_deploy(&mut self, transaction: &Transaction) -> String {
+        let tx_hash_result = self.proxy.request(SendTxRequest(transaction)).await;
 
-        let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
-
-        match tx_hash.as_ref() {
+        match tx_hash_result {
             Ok(tx_hash) => {
                 println!("sc deploy tx hash: {tx_hash}");
                 log::info!("sc deploy tx hash: {tx_hash}");
+                tx_hash
             }
             Err(err) => {
                 println!("sc deploy error: {err}");
                 log::error!("sc deploy error: {err}");
+                deploy_err_message(&err);
+                process::exit(1)
             }
         }
-
-        tx_hash
     }
 
     pub async fn sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) {
+        let mut transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
+
+        if SimulateGas::is_mandos_simulate_gas_marker(&sc_deploy_step.tx.gas_limit) {
+            let sim_gas = self.sc_deploy_simulate(sc_deploy_step).await;
+            let gas = SimulateGas::adjust_simulated_gas(sim_gas);
+            sc_deploy_step.tx.gas_limit = gas.into();
+            transaction.gas_limit = gas;
+
+            // sign again, because gas changed
+            let sender_address = &sc_deploy_step.tx.from.value;
+            self.sign_tx(sender_address, &mut transaction);
+        }
+
         self.pre_runners.run_sc_deploy_step(sc_deploy_step);
-        let tx_hash = match self.launch_sc_deploy(sc_deploy_step).await {
-            Ok(hash) => hash,
-            Err(err) => {
-                deploy_err_message(&err);
-                process::exit(1);
-            }
-        };
+
+        let tx_hash = self.launch_sc_deploy(&transaction).await;
 
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
@@ -110,10 +114,8 @@ where
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
     }
 
-    pub async fn sc_deploy_simulate(&mut self, sc_deploy_step: &ScDeployStep) -> u64 {
-        let transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
-
-        let gas_result = self.proxy.request(SimulateTxRequest(&transaction)).await;
+    async fn sc_deploy_simulate_transaction(&mut self, transaction: &Transaction) -> u64 {
+        let gas_result = self.proxy.request(SimulateTxRequest(transaction)).await;
 
         match gas_result {
             Ok(gas) => {
@@ -128,5 +130,10 @@ where
                 process::exit(1)
             }
         }
+    }
+
+    pub async fn sc_deploy_simulate(&mut self, sc_deploy_step: &ScDeployStep) -> u64 {
+        let transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
+        self.sc_deploy_simulate_transaction(&transaction).await
     }
 }

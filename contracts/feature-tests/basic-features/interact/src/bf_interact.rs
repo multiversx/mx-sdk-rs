@@ -145,21 +145,11 @@ impl BasicFeaturesInteract {
     pub async fn deploy_storage_bytes(&mut self) {
         self.set_state().await;
 
-        self.interactor
-            .tx()
-            .from(&self.wallet_address)
-            .gas(4_000_000)
-            .typed(basic_features_proxy::BasicFeaturesProxy)
-            .init()
-            .code(CODE_EXPR_STORAGE_BYTES)
-            .estimate()
-            .await;
-
         let new_address = self
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .gas(4_000_000)
+            .gas(SimulateGas)
             .typed(basic_features_proxy::BasicFeaturesProxy)
             .init()
             .code(CODE_EXPR_STORAGE_BYTES)

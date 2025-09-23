@@ -63,8 +63,9 @@ where
 
         let sender_address = &transfer_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
-        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
+        self.set_tx_nonce_update_sender(sender_address, &mut transaction)
             .await;
+        self.sign_tx(sender_address, &mut transaction);
 
         transaction
     }

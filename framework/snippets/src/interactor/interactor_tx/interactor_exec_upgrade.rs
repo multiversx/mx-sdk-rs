@@ -62,11 +62,11 @@ async fn estimate_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
     CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    let mut step_wrapper = tx.tx_to_step();
+    let step_wrapper = tx.tx_to_step();
     step_wrapper
         .env
         .world
-        .sc_estimate(&mut step_wrapper.step)
+        .sc_estimate(&step_wrapper.step)
         .await;
 }
 
