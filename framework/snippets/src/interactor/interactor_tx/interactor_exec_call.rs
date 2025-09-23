@@ -14,7 +14,7 @@ use multiversx_sc_scenario::{
 use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::{
-    interactor::interactor_tx::interactor_prepare_async::InteractorEstimateAsync, InteractorBase,
+    interactor::interactor_tx::interactor_prepare_async::InteractorSimulateGasAsync, InteractorBase,
 };
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
@@ -89,19 +89,16 @@ where
     }
 }
 
-impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorEstimateAsync
-    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+impl<'w, GatewayProxy, From, To, Payment, RH> InteractorSimulateGasAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, (), FunctionCall<StaticApi>, RH>
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
     To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
     Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
-    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Result = u64;
-
-    fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
+    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
         estimate_async_call(self)
     }
 }

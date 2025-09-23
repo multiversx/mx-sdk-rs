@@ -15,7 +15,7 @@ mod simulate_gas_marker;
 pub use interactor_exec_env::InteractorEnvExec;
 pub use interactor_exec_step::InteractorExecStep;
 pub use interactor_prepare_async::{
-    InteractorEstimateAsync, InteractorPrepareAsync, InteractorRunAsync,
+    InteractorPrepareAsync, InteractorRunAsync, InteractorSimulateGasAsync,
 };
 pub use interactor_query_env::InteractorEnvQuery;
 pub use interactor_query_step::InteractorQueryStep;

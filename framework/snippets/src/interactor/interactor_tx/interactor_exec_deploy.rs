@@ -12,7 +12,7 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::{InteractorBase, InteractorEstimateAsync};
+use crate::{InteractorBase, InteractorSimulateGasAsync};
 
 use super::{
     interactor_prepare_async::InteractorRunAsync, InteractorEnvExec, InteractorExecStep,
@@ -50,7 +50,7 @@ where
 }
 
 #[allow(clippy::type_complexity)]
-async fn run_estimate_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH>(
+async fn run_simulate_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
@@ -103,7 +103,7 @@ where
     }
 }
 
-impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorEstimateAsync
+impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorSimulateGasAsync
     for Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
@@ -121,10 +121,8 @@ where
     CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Result = u64;
-
-    fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
-        run_estimate_deploy(self)
+    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
+        run_simulate_deploy(self)
     }
 }
 

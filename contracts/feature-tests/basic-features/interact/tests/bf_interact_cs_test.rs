@@ -6,7 +6,7 @@ use multiversx_sc_snippets::{
         ManagedOption, ManagedVec, ReturnsNewTokenIdentifier, RustBigUint, StaticApi,
         TokenIdentifier,
     },
-    test_wallets, InteractorEstimateAsync, InteractorRunAsync,
+    test_wallets, InteractorRunAsync, InteractorSimulateGasAsync,
 };
 use serial_test::serial;
 use system_sc_interact::SysFuncCallsInteract;
@@ -20,8 +20,8 @@ async fn simulator_basic_features_test() {
     let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
 
     bf_interact.add_validator_key().await;
-    bf_interact.deploy_storage_bytes().await;
-    bf_interact.large_storage(15).await;
+    bf_interact.deploy_storage_bytes(false).await;
+    bf_interact.large_storage(15, false).await;
 
     bf_interact
         .interactor
@@ -29,7 +29,7 @@ async fn simulator_basic_features_test() {
         .from(&bf_interact.wallet_address)
         .to(bf_interact.state.bf_storage_bytes_contract())
         .egld(1000)
-        .estimate()
+        .simulate_gas()
         .await;
 
     let data = bf_interact.get_large_storage().await.to_vec();

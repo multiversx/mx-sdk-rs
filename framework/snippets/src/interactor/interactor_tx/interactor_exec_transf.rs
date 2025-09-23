@@ -5,7 +5,7 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::InteractorEstimateAsync;
+use crate::InteractorSimulateGasAsync;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
 
@@ -56,7 +56,7 @@ where
     }
 }
 
-impl<'w, GatewayProxy, From, To, Payment, Gas> InteractorEstimateAsync
+impl<'w, GatewayProxy, From, To, Payment, Gas> InteractorSimulateGasAsync
     for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>
 where
     GatewayProxy: GatewayAsyncService,
@@ -65,9 +65,7 @@ where
     Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
     Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Result = u64;
-
-    fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
+    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
         estimate_async_transfer(self)
     }
 }

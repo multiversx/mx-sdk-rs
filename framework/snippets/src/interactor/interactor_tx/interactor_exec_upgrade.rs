@@ -13,7 +13,7 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::{InteractorBase, InteractorEstimateAsync};
+use crate::{InteractorBase, InteractorSimulateGasAsync};
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
 
@@ -54,7 +54,8 @@ async fn estimate_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
         UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >,
-) where
+) -> u64
+where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
     To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -67,7 +68,7 @@ async fn estimate_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
         .env
         .world
         .sc_call_simulate(&step_wrapper.step)
-        .await;
+        .await
 }
 
 impl<'w, GatewayProxy, From, To, Gas, CodeValue, RH> InteractorRunAsync
@@ -96,13 +97,13 @@ where
     }
 }
 
-impl<'w, GatewayProxy, From, To, Gas, CodeValue, RH> InteractorEstimateAsync
+impl<'w, GatewayProxy, From, To, CodeValue, RH> InteractorSimulateGasAsync
     for Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
         To,
         NotPayable,
-        Gas,
+        (),
         UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >
@@ -110,13 +111,10 @@ where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
     To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
-    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
     CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    type Result = ();
-
-    fn estimate(self) -> impl std::future::Future<Output = Self::Result> {
+    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
         estimate_async_upgrade(self)
     }
 }

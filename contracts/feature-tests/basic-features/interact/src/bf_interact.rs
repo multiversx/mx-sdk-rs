@@ -29,11 +29,11 @@ pub async fn basic_features_cli() {
         Some(bf_interact_cli::InteractCliCommand::Deploy) => {
             bf_interact.deploy().await;
         }
-        Some(bf_interact_cli::InteractCliCommand::DeployStorageBytes) => {
-            bf_interact.deploy_storage_bytes().await;
+        Some(bf_interact_cli::InteractCliCommand::DeployStorageBytes(args)) => {
+            bf_interact.deploy_storage_bytes(args.simulate).await;
         }
         Some(bf_interact_cli::InteractCliCommand::LargeStorage(args)) => {
-            bf_interact.large_storage(args.size_kb).await;
+            bf_interact.large_storage(args.size_kb, args.simulate).await;
         }
         Some(bf_interact_cli::InteractCliCommand::ReturnsEGLDDecimals(args)) => {
             bf_interact.returns_egld_decimal(args.egld).await;
@@ -108,12 +108,12 @@ impl BasicFeaturesInteract {
             .expect("Failed to add validator key");
     }
 
-    pub async fn large_storage(&mut self, size_kb: usize) {
+    pub async fn large_storage(&mut self, size_kb: usize, simulate: bool) {
         let large_data = std::fs::read_to_string("pi.txt").unwrap().into_bytes();
         let payload = &large_data[0..size_kb * 1024];
         println!("payload size: {}", payload.len());
         self.large_storage_payload = payload.to_vec();
-        self.set_large_storage(payload).await;
+        self.set_large_storage(payload, simulate).await;
     }
 
     async fn set_state(&mut self) {
@@ -142,7 +142,24 @@ impl BasicFeaturesInteract {
         self.state.set_bf_address(new_address);
     }
 
-    pub async fn deploy_storage_bytes(&mut self) {
+    pub async fn deploy_storage_bytes(&mut self, simulate: bool) {
+        if simulate {
+            let sim_gas = self
+                .interactor
+                .tx()
+                .from(&self.wallet_address)
+                .gas(4_000_000)
+                .typed(basic_features_proxy::BasicFeaturesProxy)
+                .init()
+                .code(CODE_EXPR_STORAGE_BYTES)
+                .simulate_gas()
+                .await;
+
+            println!("simulated gas for deploy_storage_bytes: {sim_gas}");
+
+            return;
+        }
+
         self.set_state().await;
 
         let new_address = self
@@ -162,7 +179,23 @@ impl BasicFeaturesInteract {
         self.state.set_bf_address_storage_bytes(new_address);
     }
 
-    pub async fn set_large_storage(&mut self, value: &[u8]) {
+    pub async fn set_large_storage(&mut self, value: &[u8], simulate: bool) {
+        if simulate {
+            let sim_gas = self
+                .interactor
+                .tx()
+                .from(&self.wallet_address)
+                .to(self.state.bf_storage_bytes_contract())
+                .typed(basic_features_proxy::BasicFeaturesProxy)
+                .store_bytes(value)
+                .simulate_gas()
+                .await;
+
+            println!("simulated gas for store_bytes: {sim_gas}");
+
+            return;
+        }
+
         self.interactor
             .tx()
             .from(&self.wallet_address)
