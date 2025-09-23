@@ -41,9 +41,10 @@ where
         }
     }
 
-    async fn launch_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) -> Transaction {
-        self.pre_runners.run_sc_deploy_step(sc_deploy_step);
-
+    async fn sc_deploy_to_blockchain_signed_tx(
+        &mut self,
+        sc_deploy_step: &ScDeployStep,
+    ) -> Transaction {
         let sender_address = &sc_deploy_step.tx.from.value;
         let mut transaction = self.sc_deploy_to_blockchain_tx(sc_deploy_step);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
@@ -54,9 +55,9 @@ where
 
     pub async fn launch_sc_deploy(
         &mut self,
-        sc_deploy_step: &mut ScDeployStep,
+        sc_deploy_step: &ScDeployStep,
     ) -> Result<String, Error> {
-        let transaction = self.launch_deploy(sc_deploy_step).await;
+        let transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
 
         let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
 
@@ -74,29 +75,8 @@ where
         tx_hash
     }
 
-    pub async fn launch_deploy_tx_cost(
-        &mut self,
-        sc_deploy_step: &mut ScDeployStep,
-    ) -> Result<u64, Error> {
-        let transaction = self.launch_deploy(sc_deploy_step).await;
-
-        let tx_gas_units = self.proxy.request(SimulateTxRequest(&transaction)).await;
-
-        match tx_gas_units.as_ref() {
-            Ok(gas) => {
-                println!("The SC deploy is estimated to cost {gas} gas units");
-                log::info!("The SC deploy is estimated to cost {gas} gas units");
-            }
-            Err(err) => {
-                println!("Estimation cost error: {err}");
-                log::error!("Estimation cost error: {err}");
-            }
-        }
-
-        tx_gas_units
-    }
-
     pub async fn sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) {
+        self.pre_runners.run_sc_deploy_step(sc_deploy_step);
         let tx_hash = match self.launch_sc_deploy(sc_deploy_step).await {
             Ok(hash) => hash,
             Err(err) => {
@@ -130,21 +110,23 @@ where
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
     }
 
-    pub async fn sc_estimate_deploy<S>(&mut self, mut sc_deploy_step: S) -> u64
-    where
-        S: AsMut<ScDeployStep>,
-    {
-        let sc_deploy_step = sc_deploy_step.as_mut();
-        let tx_gas_units = match self.launch_deploy_tx_cost(sc_deploy_step).await {
-            Ok(gas) => gas,
-            Err(err) => {
-                estimate_deploy_err_message(&err);
-                process::exit(1);
+    pub async fn sc_deploy_simulate(&mut self, sc_deploy_step: &ScDeployStep) -> u64 {
+        let transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
+
+        let gas_result = self.proxy.request(SimulateTxRequest(&transaction)).await;
+
+        match gas_result {
+            Ok(gas) => {
+                println!("The SC deploy is estimated to cost {gas} gas units");
+                log::info!("The SC deploy is estimated to cost {gas} gas units");
+                gas
             }
-        };
-
-        self.post_runners.run_sc_deploy_step(sc_deploy_step);
-
-        tx_gas_units
+            Err(err) => {
+                println!("Estimation cost error: {err}");
+                log::error!("Estimation cost error: {err}");
+                estimate_deploy_err_message(&err);
+                process::exit(1)
+            }
+        }
     }
 }

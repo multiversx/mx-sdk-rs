@@ -73,7 +73,7 @@ where
     step_wrapper
         .env
         .world
-        .sc_estimate_deploy(&mut step_wrapper.step)
+        .sc_deploy_simulate(&mut step_wrapper.step)
         .await
 }
 

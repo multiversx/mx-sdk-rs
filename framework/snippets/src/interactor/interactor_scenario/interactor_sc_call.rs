@@ -51,11 +51,7 @@ where
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    pub async fn sc_estimate<S>(&mut self, mut sc_call_step: S) -> u64
-    where
-        S: AsMut<ScCallStep>,
-    {
-        let sc_call_step = sc_call_step.as_mut();
+    pub async fn sc_estimate(&mut self, sc_call_step: &ScCallStep) -> u64 {
         let tx_gas_units = match self.launch_sc_tx_cost(sc_call_step).await {
             Ok(gas) => gas,
             Err(err) => {
@@ -64,14 +60,10 @@ where
             }
         };
 
-        self.post_runners.run_sc_call_step(sc_call_step);
-
         tx_gas_units
     }
 
-    async fn launch_sc(&mut self, sc_call_step: &mut ScCallStep) -> Transaction {
-        self.pre_runners.run_sc_call_step(sc_call_step);
-
+    async fn tx_call_to_blockchain_signed_tx(&mut self, sc_call_step: &ScCallStep) -> Transaction {
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
@@ -80,8 +72,8 @@ where
         transaction
     }
 
-    async fn launch_sc_call(&mut self, sc_call_step: &mut ScCallStep) -> Result<String, Error> {
-        let transaction = self.launch_sc(sc_call_step).await;
+    async fn launch_sc_call(&mut self, sc_call_step: &ScCallStep) -> Result<String, Error> {
+        let transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
 
         let tx_hash = self.proxy.request(SendTxRequest(&transaction)).await;
 
@@ -99,8 +91,8 @@ where
         tx_hash
     }
 
-    async fn launch_sc_tx_cost(&mut self, sc_call_step: &mut ScCallStep) -> Result<u64, Error> {
-        let transaction = self.launch_sc(sc_call_step).await;
+    async fn launch_sc_tx_cost(&mut self, sc_call_step: &ScCallStep) -> Result<u64, Error> {
+        let transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
 
         let tx_gas_units = self.proxy.request(SimulateTxRequest(&transaction)).await;
 
