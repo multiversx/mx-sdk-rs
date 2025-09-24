@@ -4,7 +4,10 @@ version = "0.62.0"
 edition = "2021"
 rust-version = "1.83"
 
-authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
+authors = [
+    "Andrei Marinica <andrei.marinica@multiversx.com>",
+    "MultiversX <contact@multiversx.com>",
+]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
@@ -12,7 +15,12 @@ homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
 description = "MultiversX smart contract API"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
-categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
+categories = [
+    "no-std",
+    "wasm",
+    "cryptography::cryptocurrencies",
+    "development-tools",
+]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -26,6 +34,11 @@ esdt-token-payment-legacy-decode = []
 contract-call-legacy = []
 
 [dependencies]
+serde = { version = "1.0", default-features = false, features = [
+    "derive",
+    "alloc",
+] }
+postcard = { version = "1.0", default-features = false }
 hex-literal = "1.0"
 bitflags = "2.9"
 num-traits = { version = "=0.2.19", default-features = false }
