@@ -8,7 +8,7 @@ use multiversx_sc_snippets::{
 
 #[tokio::test]
 #[ignore = "configurable chain-simulator is not available in CI"]
-async fn cs_builtin_run_tests() {
+async fn cs_delegation_run_tests() {
     let mut interactor = DelegateCallsInteract::new(Config::chain_simulator_config()).await;
     let validator_1 =
         Validator::from_pem_file("./validatorKey1.pem").expect("unable to load validator key");
@@ -26,9 +26,7 @@ async fn cs_builtin_run_tests() {
         .await
         .unwrap();
 
-    interactor
-        .set_state(&interactor.wallet_address.to_address())
-        .await;
+    interactor.set_state(&interactor.owner.to_address()).await;
     interactor
         .set_state(&interactor.delegator1.to_address())
         .await;
@@ -36,7 +34,7 @@ async fn cs_builtin_run_tests() {
         .set_state(&interactor.delegator2.to_address())
         .await;
     interactor
-        .create_new_delegation_contract(51_000_000_000_000_000_000_000_u128, 3745u64)
+        .create_new_delegation_contract(0, 3745u64, 1250000000000000000000u128)
         .await;
     interactor.set_check_cap_on_redelegate_rewards(false).await;
 

@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          431
+// Endpoints:                          437
 // Async Callback:                       1
-// Total number of exported functions: 433
+// Total number of exported functions: 439
 
 #![no_std]
 
@@ -21,6 +21,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         panicWithMessage => panic_with_message
         count_ones => count_ones
         endpoint_with_mutable_arg => endpoint_with_mutable_arg
+        get_esdt_token_data => get_esdt_token_data
         sqrt_big_uint => sqrt_big_uint
         sqrt_big_uint_ref => sqrt_big_uint_ref
         log2_big_uint => log2_big_uint
@@ -119,6 +120,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         get_prev_block_round => get_prev_block_round
         get_prev_block_epoch => get_prev_block_epoch
         get_prev_block_random_seed => get_prev_block_random_seed
+        epoch_info => epoch_info
+        code_hash => code_hash
+        get_block_timestamps => get_block_timestamps
+        get_block_timestamp_ms => get_block_timestamp_ms
+        get_prev_block_timestamp_ms => get_prev_block_timestamp_ms
         get_caller => get_caller
         get_owner_address => get_owner_address
         get_shard_of_address => get_shard_of_address

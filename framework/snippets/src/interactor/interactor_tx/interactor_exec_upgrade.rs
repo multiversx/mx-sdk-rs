@@ -13,7 +13,7 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::InteractorBase;
+use crate::{InteractorBase, InteractorSimulateGasAsync};
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
 
@@ -43,6 +43,34 @@ where
     step_wrapper.process_result()
 }
 
+#[allow(clippy::type_complexity)]
+async fn simulate_gas_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
+    tx: Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        To,
+        NotPayable,
+        Gas,
+        UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >,
+) -> u64
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+{
+    let step_wrapper = tx.tx_to_step();
+    step_wrapper
+        .env
+        .world
+        .sc_call_simulate(&step_wrapper.step)
+        .await
+}
+
 impl<'w, GatewayProxy, From, To, Gas, CodeValue, RH> InteractorRunAsync
     for Tx<
         InteractorEnvExec<'w, GatewayProxy>,
@@ -66,6 +94,28 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_upgrade(self)
+    }
+}
+
+impl<'w, GatewayProxy, From, To, CodeValue, RH> InteractorSimulateGasAsync
+    for Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        To,
+        NotPayable,
+        (),
+        UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+{
+    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
+        simulate_gas_async_upgrade(self)
     }
 }
 

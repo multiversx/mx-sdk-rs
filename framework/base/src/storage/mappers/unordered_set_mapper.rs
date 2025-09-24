@@ -118,7 +118,7 @@ where
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'_, SA, T, A> {
         self.vec_mapper.iter()
     }
 }

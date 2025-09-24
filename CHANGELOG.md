@@ -33,6 +33,44 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.62.0, chain 0.19.0, sdk 0.12.0] - 2025-09-24
+- BLS signing support in tests.
+- Gas simulations available in the interactor:
+	- Simulation only;
+	- Auto-simulate to find gas estimation.
+- `sc-meta` post-build validation improvements:
+	- Fixed opcode checker to support `call_indirect`.
+	- Opcode versioning in `sc-config.toml` and opcodde checker.
+	- Post-build VM hook signature validation.
+- Proxy generator fix for enums with explicit discriminants.
+- Removed legacy typed mandos scenario and interactor syntax.
+
+
+## [sc 0.61.0, chain 0.18.0, sdk 0.11.3] - 2025-09-04
+- BLS crypto function support in the Rust VM. Functionality is guarded by the `bls` feature flag.
+- Managed buffer slices out of bounds handled in the framework.
+- Interactor - fixed log management.
+
+
+## [sc 0.60.0, chain 0.17.0, sdk 0.11.2] - 2025-08-08
+- Block info hooks:
+	- Rust VM support for the new block/round info hooks: `getBlockTimestampMs`, `getPrevBlockTimestampMs`, `getBlockRoundTimeMs`, `epochStartBlockTimestampMs`, `epochStartBlockNonce`, `epochStartBlockRound`;
+	- Blackbox test syntax for setting all block info.
+- Cleanup after Barnard:
+	- Removed the `barnard` feature. All functionality is routed to the new Barnard hooks, where appropriate.
+	- Reverted routing non-fallible transfer execute through the fallible vm hook. This preserves pre-Barnard behavior for most cases.
+- `sc-meta install mx-scenario-go` retries several times in case of connection issues.
+
+
+## [sc 0.59.1, codec 0.23.1, chain 0.16.1, sdk 0.11.1] - 2025-07-24
+- Governance proxy improvements.
+- Codec: added support for using u128.
+- SDK/interactors:
+	- Added logging for http requests and responses;
+	- Fixed an issue with retrieving results from transactions with multi-transfer ESDT.
+	- Fixed a VM query error handling issue.
+
+
 ## [sc 0.59.0, codec 0.23.0, chain 0.16.0, sdk 0.11.0] - 2025-07-03
 - Support for Barnard features
 	- `barnard` feature for smart contracts, can be enabled in the contract's `Cargo.toml` or `sc-config.toml`;

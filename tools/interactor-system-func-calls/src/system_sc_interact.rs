@@ -227,11 +227,11 @@ pub async fn system_sc_interact_cli() {
 }
 
 pub struct SysFuncCallsInteract {
-    interactor: Interactor,
-    wallet_address: Bech32Address,
-    other_wallet_address: Bech32Address,
+    pub interactor: Interactor,
+    pub wallet_address: Bech32Address,
+    pub other_wallet_address: Bech32Address,
     #[allow(unused)]
-    state: State,
+    pub state: State,
 }
 
 impl SysFuncCallsInteract {
@@ -245,7 +245,7 @@ impl SysFuncCallsInteract {
         let other_wallet_address = interactor.register_wallet(test_wallets::carol()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,
@@ -260,10 +260,8 @@ impl SysFuncCallsInteract {
 
         let res = self
             .interactor
-            .tx()
-            .from(&self.wallet_address)
+            .query()
             .to(ESDTSystemSCAddress)
-            .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .get_token_properties(token_id)
             .returns(ReturnsResult)
@@ -911,7 +909,7 @@ impl SysFuncCallsInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.other_wallet_address)
-            .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
+            .single_esdt(&token_id.into(), nonce, &amount.into())
             .run()
             .await;
     }

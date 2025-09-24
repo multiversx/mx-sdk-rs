@@ -163,7 +163,7 @@ where
     }
 
     /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'_, SA, T, A> {
         Iter::new(self)
     }
 }

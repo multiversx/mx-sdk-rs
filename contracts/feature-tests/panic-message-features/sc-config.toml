@@ -2,5 +2,11 @@
 name = "panic-message-features"
 panic-message = true
 
+[contracts.panic-message-std]
+std = true
+allocator = "leaking"
+rustc-target = "wasm32-unknown-unknown"
+panic-message = true
+
 [[proxy]]
 path = "tests/pmf_proxy.rs"

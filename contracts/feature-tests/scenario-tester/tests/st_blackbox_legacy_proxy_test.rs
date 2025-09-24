@@ -41,13 +41,6 @@ fn st_blackbox_legacy_proxy() {
         }))
         .run();
 
-    world.sc_query(
-        ScQueryStep::new()
-            .to(&st_contract)
-            .call(st_contract.sum())
-            .expect_value(SingleValue::from(BigUint::from(5u32))),
-    );
-
     let value = world
         .query()
         .legacy_proxy_call(st_contract.sum())

@@ -467,7 +467,7 @@ where
         }
     }
 
-    pub fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
+    pub fn get_storage_key(&self) -> crate::types::ManagedRef<'_, SA, StorageKey<SA>> {
         self.key.as_ref()
     }
 

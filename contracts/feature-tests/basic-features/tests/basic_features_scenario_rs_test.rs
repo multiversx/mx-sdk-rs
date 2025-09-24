@@ -63,6 +63,17 @@ fn block_info_rs() {
 }
 
 #[test]
+fn block_info_ms_rs() {
+    world().run("scenarios/block_info_ms.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn code_hash_rs() {
+    world().run("scenarios/code_hash.scen.json");
+}
+
+#[test]
 fn codec_err_rs() {
     world().run("scenarios/codec_err.scen.json");
 }
@@ -95,19 +106,16 @@ fn crypto_sha_256_rs() {
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_rs() {
     world().run("scenarios/crypto_verify_bls.scen.json");
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_aggregated_signature_rs() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_share_rs() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }

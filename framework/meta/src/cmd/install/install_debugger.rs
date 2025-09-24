@@ -1,3 +1,5 @@
+use colored::Colorize;
+
 use crate::cmd::template::RepoSource;
 use std::fs::{self};
 use std::path::{Path, PathBuf};
@@ -117,7 +119,22 @@ fn configure_vscode() {
     let path_to_settings = get_path_to_settings();
 
     let script_full_path = get_script_path(home::home_dir().unwrap().join(TARGET_PATH));
-    let json = fs::read_to_string(&path_to_settings).expect("Unable to read settings.json");
+    let json = match fs::read_to_string(&path_to_settings) {
+        Err(_) => {
+            eprintln!(
+                "{}",
+                format!(
+                "WARNING: Could not find settings.json at {}. Debugger configuration will be skipped.",
+                path_to_settings.display()
+            )
+                .bright_yellow()
+                .bold(),
+            );
+            return;
+        }
+        Ok(json) => json,
+    };
+
     let mut sub_values: serde_json::Value = serde_json::from_str(&json).unwrap_or_else(
         |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is located at line {}, column {}. This error might be caused either by a trailing comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
     );

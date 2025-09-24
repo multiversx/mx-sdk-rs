@@ -17,10 +17,6 @@ fn world() -> ScenarioWorld {
         forwarder::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:forwarder-barnard/output/forwarder-barnard.mxsc.json",
-        forwarder_barnard::ContractBuilder,
-    );
-    blockchain.register_contract(
         "mxsc:forwarder-raw/output/forwarder-raw.mxsc.json",
         forwarder_raw::ContractBuilder,
     );
@@ -169,6 +165,12 @@ fn forw_raw_sync_egld_rs() {
 #[ignore = "requires Barnard, unavailable: managed_execute_on_dest_context_with_error_return"]
 fn forw_raw_sync_fallible_rs() {
     world().run("scenarios/forw_raw_sync_fallible.scen.json");
+}
+
+#[test]
+#[ignore = "requires Barnard, unavailable: managed_execute_on_dest_context_with_error_return"]
+fn forw_raw_sync_fallible_legacy_rs() {
+    world().run("scenarios/forw_raw_sync_fallible_legacy.scen.json");
 }
 
 #[test]

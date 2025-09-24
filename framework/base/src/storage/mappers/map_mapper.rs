@@ -165,7 +165,7 @@ where
         None
     }
 
-    pub fn keys(&self) -> Keys<SA, A, K> {
+    pub fn keys(&self) -> Keys<'_, SA, A, K> {
         self.keys_set.iter()
     }
 
@@ -198,13 +198,13 @@ where
 
     /// An iterator visiting all values in arbitrary order.
     /// The iterator element type is `&'a V`.
-    pub fn values(&self) -> Values<SA, A, K, V> {
+    pub fn values(&self) -> Values<'_, SA, A, K, V> {
         Values::new(self)
     }
 
     /// An iterator visiting all key-value pairs in arbitrary order.
     /// The iterator element type is `(&'a K, &'a V)`.
-    pub fn iter(&self) -> Iter<SA, A, K, V> {
+    pub fn iter(&self) -> Iter<'_, SA, A, K, V> {
         Iter::new(self)
     }
 }

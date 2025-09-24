@@ -289,7 +289,7 @@ where
     SA: StorageMapperApi + CallTypeApi,
     A: StorageAddress<SA>,
 {
-    pub fn get_storage_key(&self) -> ManagedRef<SA, StorageKey<SA>> {
+    pub fn get_storage_key(&self) -> ManagedRef<'_, SA, StorageKey<SA>> {
         self.key.as_ref()
     }
 

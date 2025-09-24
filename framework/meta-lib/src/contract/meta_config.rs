@@ -73,13 +73,18 @@ impl MetaConfig {
         let crate_name = main_cargo_toml_contents.package_name();
 
         for contract in self.sc_config.contracts.iter() {
+            let mut framework_dependency = main_cargo_toml_contents
+                .dependency_raw_value(FRAMEWORK_NAME_BASE)
+                .expect("missing framework dependency in Cargo.toml");
+            if contract.settings.std {
+                framework_dependency.features.insert("std".to_owned());
+            }
+
             let cargo_toml_data = WasmCargoTomlData {
                 name: contract.wasm_crate_name.clone(),
                 edition: main_cargo_toml_contents.package_edition(),
                 profile: contract.settings.profile.clone(),
-                framework_dependency: main_cargo_toml_contents
-                    .dependency_raw_value(FRAMEWORK_NAME_BASE)
-                    .expect("missing framework dependency in Cargo.toml"),
+                framework_dependency,
                 contract_features: contract.settings.features.clone(),
                 contract_default_features: contract.settings.default_features,
             };
