@@ -23,6 +23,8 @@ alloc = []
 std = ["multiversx-chain-core/std"]
 managed-buffer-builder-cached = []
 esdt-token-payment-legacy-decode = []
+contract-call-legacy = []
+default = ["contract-call-legacy"]
 
 [dependencies]
 hex-literal = "1.0"
