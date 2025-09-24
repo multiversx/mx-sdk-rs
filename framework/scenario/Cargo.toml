@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.61.0"
+version = "0.62.0"
 edition = "2021"
 
 authors = [
@@ -42,12 +42,12 @@ unwrap-infallible = "0.1.5"
 simple-error = "0.3.1"
 
 [dependencies.multiversx-sc]
-version = "=0.61.0"
+version = "=0.62.0"
 features = ["alloc", "num-bigint", "std"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.61.0"
+version = "=0.62.0"
 path = "../meta-lib"
 
 [dependencies.multiversx-chain-scenario-format]
@@ -58,5 +58,5 @@ path = "../../sdk/scenario-format"
 version = "0.5.0"
 
 [dependencies.multiversx-chain-vm]
-version = "=0.18.0"
+version = "=0.19.0"
 path = "../../chain/vm"
