@@ -33,6 +33,19 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.62.0, chain 0.19.0, sdk 0.12.0] - 2025-09-24
+- BLS signing support in tests.
+- Gas simulations available in the interactor:
+	- Simulation only;
+	- Auto-simulate to find gas estimation.
+- `sc-meta` post-build validation improvements:
+	- Fixed opcode checker to support `call_indirect`.
+	- Opcode versioning in `sc-config.toml` and opcodde checker.
+	- Post-build VM hook signature validation.
+- Proxy generator fix for enums with explicit discriminants.
+- Removed legacy typed mandos scenario and interactor syntax.
+
+
 ## [sc 0.61.0, chain 0.18.0, sdk 0.11.3] - 2025-09-04
 - BLS crypto function support in the Rust VM. Functionality is guarded by the `bls` feature flag.
 - Managed buffer slices out of bounds handled in the framework.
