@@ -1,6 +1,6 @@
-use multiversx_bls::{BlsError, G1, G2};
+use multiversx_bls::{BlsError, SecretKey, G1, G2};
 
-pub const G2_STR: &str= "1 2345388737500083945391657505708625859903954047151773287623537600586029428359739211026111121073980842558223033704140 3558041178357727243543283929018475959655787667816024413880422701270944718005964809191925861299660390662341819212979 1111454484298065649047920916747797835589661734985194316226909186591481448224600088430816898704234962594609579273169 3988173108836042169913782128392219399166696378042311135661652175544044220584995583525611110036064603671142074680982";
+pub const G2_STR: &str = "1 2345388737500083945391657505708625859903954047151773287623537600586029428359739211026111121073980842558223033704140 3558041178357727243543283929018475959655787667816024413880422701270944718005964809191925861299660390662341819212979 1111454484298065649047920916747797835589661734985194316226909186591481448224600088430816898704234962594609579273169 3988173108836042169913782128392219399166696378042311135661652175544044220584995583525611110036064603671142074680982";
 
 pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     if message.is_empty() {
@@ -78,6 +78,39 @@ pub fn verify_bls_signature_share(key: &[u8], message: &[u8], signature: &[u8]) 
     verify_bls(key, message, signature)
 }
 
+pub fn create_aggregated_signature(
+    pk_size: usize,
+    message: &[u8],
+) -> Result<(G1, Vec<G2>), BlsError> {
+    if message.is_empty() {
+        return Err(BlsError::InvalidData);
+    }
+
+    let mut public_keys = Vec::new();
+    let mut signatures = Vec::new();
+
+    for _ in 0..pk_size {
+        let mut secret_key = SecretKey::default();
+        secret_key.set_by_csprng();
+
+        if !is_secret_key_valid(&secret_key) {
+            return Err(BlsError::InvalidData);
+        }
+
+        public_keys.push(secret_key.get_public_key());
+        signatures.push(secret_key.sign(message));
+    }
+
+    if public_keys.is_empty() || signatures.is_empty() {
+        return Err(BlsError::InvalidData);
+    }
+
+    let mut agg_signature = G1::default();
+    agg_signature.aggregate(&signatures);
+
+    Ok((agg_signature, public_keys))
+}
+
 fn create_public_key_from_bytes(key: &[u8]) -> Result<G2, BlsError> {
     if key.len() != 96 {
         return Err(BlsError::InvalidData);
@@ -114,6 +147,10 @@ fn is_public_key_point_valid(pk: &G2) -> bool {
 
 fn is_sig_valid_point(sig: &G1) -> bool {
     !sig.is_zero() && sig.is_valid_order() && sig.is_valid()
+}
+
+fn is_secret_key_valid(sk: &SecretKey) -> bool {
+    !sk.is_zero() && sk.is_valid()
 }
 
 #[cfg(test)]
@@ -398,6 +435,24 @@ mod tests {
         let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
 
         let success = verify_bls_signature_share(&pk_bytes, &msg_bytes, &sig_bytes);
+
+        assert!(success);
+    }
+
+    #[test]
+    fn test_create_aggregated_signature_ok() {
+        let pk_size = 3;
+        let message = b"6d657373616765";
+
+        let (agg_sig, pub_keys) = create_aggregated_signature(pk_size, message).unwrap();
+
+        assert_eq!(pub_keys.len(), pk_size);
+
+        let pub_keys_bytes: Vec<Vec<u8>> =
+            pub_keys.iter().map(|pk| pk.serialize().unwrap()).collect();
+
+        let success =
+            verify_bls_aggregated_signature(pub_keys_bytes, message, &agg_sig.serialize().unwrap());
 
         assert!(success);
     }

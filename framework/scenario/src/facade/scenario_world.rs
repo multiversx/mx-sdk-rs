@@ -146,4 +146,16 @@ impl ScenarioWorld {
     pub fn write_mandos_trace<P: AsRef<Path>>(&mut self, file_path: P) {
         self.write_scenario_trace(file_path);
     }
+
+    #[cfg(feature = "bls")]
+    pub fn create_aggregated_signature(
+        &mut self,
+        pk_size: usize,
+        message: &[u8],
+    ) -> Result<
+        (multiversx_chain_vm::G1, Vec<multiversx_chain_vm::G2>),
+        multiversx_chain_vm::BlsError,
+    > {
+        multiversx_chain_vm::crypto_functions_bls::create_aggregated_signature(pk_size, message)
+    }
 }

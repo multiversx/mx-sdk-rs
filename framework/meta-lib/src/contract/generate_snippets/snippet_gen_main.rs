@@ -58,7 +58,7 @@ fn create_snippets_crate_and_get_lib_file(
     create_snippets_gitignore(snippets_folder_path, overwrite);
     create_snippets_cargo_toml(snippets_folder_path, contract_crate_name, overwrite);
     create_src_folder(snippets_folder_path);
-    create_sc_config_file(overwrite);
+    create_sc_config_file(overwrite, contract_crate_name);
     create_main_file(snippets_folder_path, contract_crate_name);
     create_and_get_lib_file(snippets_folder_path, overwrite)
 }
