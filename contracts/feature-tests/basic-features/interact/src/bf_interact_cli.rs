@@ -18,7 +18,7 @@ pub enum InteractCliCommand {
         name = "deploy-storage-bytes",
         about = "Deploys storage-bytes contract variant"
     )]
-    DeployStorageBytes,
+    DeployStorageBytes(DeployStorageBytesArgs),
     #[command(
         name = "large-storage",
         about = "Experiment with large storage on storage-bytes contract variant"
@@ -45,10 +45,19 @@ pub enum InteractCliCommand {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct DeployStorageBytesArgs {
+    #[arg(short = 's', long = "simulate")]
+    pub simulate: bool,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct LargeStorageArgs {
     /// The value to add
     #[arg(long = "kb")]
     pub size_kb: usize,
+
+    #[arg(short = 's', long = "simulate")]
+    pub simulate: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

@@ -30,3 +30,7 @@ pub trait InteractorRunAsync {
 
     fn run(self) -> impl std::future::Future<Output = Self::Result>;
 }
+
+pub trait InteractorSimulateGasAsync {
+    fn simulate_gas(self) -> impl std::future::Future<Output = u64>;
+}

@@ -62,7 +62,7 @@ impl fmt::Display for FrameworkVersion {
 }
 
 pub fn is_sorted(versions: &[FrameworkVersion]) -> bool {
-    versions.windows(2).all(|window| (window[0] < window[1]))
+    versions.windows(2).all(|window| window[0] < window[1])
 }
 
 #[macro_export]
