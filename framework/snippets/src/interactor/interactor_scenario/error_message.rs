@@ -16,10 +16,13 @@ pub(super) fn transfer_err_message(err: &anyhow::Error) {
     );
 }
 
-pub(super) fn estimate_transfer_err_message(err: &anyhow::Error) {
+pub(super) fn simulate_gas_transfer_err_message(err: &anyhow::Error) {
     eprintln!(
         "{}{}",
-        "Transfer estimation failed: ".to_string().red().bold(),
+        "Gas simulation for transfer failed: "
+            .to_string()
+            .red()
+            .bold(),
         err.to_string().red().bold()
     );
 }
@@ -32,10 +35,13 @@ pub(super) fn deploy_err_message(err: &anyhow::Error) {
     );
 }
 
-pub(super) fn estimate_deploy_err_message(err: &anyhow::Error) {
+pub(super) fn simulate_gas_deploy_err_message(err: &anyhow::Error) {
     eprintln!(
         "{}{}",
-        "Deploy estimation failed: ".to_string().red().bold(),
+        "Gas simulation for deploy failed: "
+            .to_string()
+            .red()
+            .bold(),
         err.to_string().red().bold()
     );
 }
@@ -48,10 +54,13 @@ pub(crate) fn sc_call_err_message(err: &anyhow::Error) {
     );
 }
 
-pub(crate) fn estimate_sc_call_err_message(err: &anyhow::Error) {
+pub(crate) fn simulate_gas_sc_call_err_message(err: &anyhow::Error) {
     eprintln!(
         "{}{}",
-        "Call estimation failed: ".to_string().red().bold(),
+        "Gas simulation for SC call failed: "
+            .to_string()
+            .red()
+            .bold(),
         err.to_string().red().bold()
     );
 }

@@ -44,7 +44,7 @@ where
     step_wrapper.process_result()
 }
 
-async fn estimate_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
+async fn simulate_gas_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
@@ -99,7 +99,7 @@ where
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
     fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
-        estimate_async_call(self)
+        simulate_gas_async_call(self)
     }
 }
 

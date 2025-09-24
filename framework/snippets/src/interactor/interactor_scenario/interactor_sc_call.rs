@@ -1,10 +1,7 @@
 use std::process;
 
-use super::error_message::sc_call_err_message;
-use crate::{
-    interactor::interactor_scenario::error_message::estimate_sc_call_err_message, network_response,
-    InteractorBase, SimulateGas,
-};
+use super::error_message::{sc_call_err_message, simulate_gas_sc_call_err_message};
+use crate::{network_response, InteractorBase, SimulateGas};
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     scenario::ScenarioRunner,
@@ -97,14 +94,14 @@ where
 
         match result {
             Ok(gas) => {
-                println!("The SC call is estimated to cost {gas} gas units.");
-                log::info!("The SC call is estimated to cost {gas} gas units.");
+                println!("Gas simulation for the SC call: {gas} units.");
+                log::info!("Gas simulation for the SC call: {gas} units.");
                 gas
             }
             Err(err) => {
-                println!("Estimation cost error: {err}");
-                log::error!("Estimation cost error: {err}");
-                estimate_sc_call_err_message(&err);
+                println!("Gas simulation error: {err}");
+                log::error!("Gas simulation error: {err}");
+                simulate_gas_sc_call_err_message(&err);
                 process::exit(1)
             }
         }

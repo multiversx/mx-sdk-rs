@@ -44,7 +44,7 @@ where
 }
 
 #[allow(clippy::type_complexity)]
-async fn estimate_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
+async fn simulate_gas_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
@@ -115,7 +115,7 @@ where
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
     fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
-        estimate_async_upgrade(self)
+        simulate_gas_async_upgrade(self)
     }
 }
 

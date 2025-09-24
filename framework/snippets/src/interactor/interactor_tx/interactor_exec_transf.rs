@@ -9,7 +9,7 @@ use crate::InteractorSimulateGasAsync;
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
 
-async fn estimate_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
+async fn simulate_gas_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
     tx: Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>,
 ) -> u64
 where
@@ -23,7 +23,7 @@ where
     step_wrapper
         .env
         .world
-        .estimate_transfer(step_wrapper.step)
+        .simulate_gas_transfer(step_wrapper.step)
         .await
 }
 
@@ -66,7 +66,7 @@ where
     Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
 {
     fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
-        estimate_async_transfer(self)
+        simulate_gas_async_transfer(self)
     }
 }
 

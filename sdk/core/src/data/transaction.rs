@@ -226,16 +226,16 @@ pub struct SendTransactionResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct EstimateCostOfTransactionData {
+pub struct SimulateGasTransactionData {
     pub tx_gas_units: u64,
 }
 
-// EstimateCostOfTransactionResponse holds the response received from the network when estimating cost of a transaction
+// SimulateGasTransactionResponse holds the response received from the network when estimating cost of a transaction
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EstimateCostOfTransactionResponse {
+pub struct SimulateGasTransactionResponse {
     pub error: String,
     pub code: String,
-    pub data: Option<EstimateCostOfTransactionData>,
+    pub data: Option<SimulateGasTransactionData>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

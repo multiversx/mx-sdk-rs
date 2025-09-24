@@ -1,9 +1,7 @@
 use std::process;
 
-use super::error_message::transfer_err_message;
-use crate::{
-    interactor::interactor_scenario::error_message::estimate_transfer_err_message, InteractorBase,
-};
+use super::error_message::{simulate_gas_transfer_err_message, transfer_err_message};
+use crate::InteractorBase;
 use log::info;
 use multiversx_sc_scenario::{scenario::ScenarioRunner, scenario_model::TransferStep};
 use multiversx_sdk::{
@@ -40,17 +38,17 @@ where
         tx_hash
     }
 
-    pub async fn estimate_transfer(&mut self, transfer_step: TransferStep) -> u64 {
+    pub async fn simulate_gas_transfer(&mut self, transfer_step: TransferStep) -> u64 {
         let transaction = self.launch_transfer(&transfer_step).await;
 
         let tx_gas_units = match self.proxy.request(SimulateTxRequest(&transaction)).await {
             Ok(gas) => {
-                println!("The SC transfer is estimated to cost {gas} gas units.");
-                log::info!("The SC transfer is estimated to cost {gas} gas units.");
+                println!("Gas simulation for the SC transfer: {gas} units.");
+                log::info!("Gas simulation for the SC transfer: {gas} units.");
                 gas
             }
             Err(err) => {
-                estimate_transfer_err_message(&err);
+                simulate_gas_transfer_err_message(&err);
                 process::exit(1);
             }
         };
