@@ -8,9 +8,6 @@ publish = false
 [lib]
 path = "src/payable_features.rs"
 
-[features]
-barnard = ["multiversx-sc/barnard"]
-
 [dependencies.multiversx-sc]
 version = "0.61.0"
 path = "../../../framework/base"
