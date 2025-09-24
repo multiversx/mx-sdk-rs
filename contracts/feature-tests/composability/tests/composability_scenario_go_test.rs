@@ -367,7 +367,6 @@ fn forwarder_call_sync_retrieve_bt_legacy_nft_go() {
 }
 
 #[test]
-#[ignore = "TODO: Barnard fixes a bug with this"]
 fn forwarder_call_sync_retrieve_bt_multi_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_bt_multi.scen.json");
 }
@@ -383,13 +382,11 @@ fn forwarder_call_sync_retrieve_bt_multi_esdt_go() {
 }
 
 #[test]
-#[ignore = "TODO: Barnard"]
 fn forwarder_call_sync_retrieve_bt_multi_twice_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_bt_multi_twice.scen.json");
 }
 
 #[test]
-#[ignore = "TODO: Barnard"]
 fn forwarder_call_sync_retrieve_bt_multi_twice_reset_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_bt_multi_twice_reset.scen.json");
 }
