@@ -23,6 +23,7 @@ compiled-sc-tests = []
 run-go-tests = ["compiled-sc-tests"]                              # backwards compatibility
 wasmer-experimental = ["multiversx-chain-vm/wasmer-experimental"]
 bls = ["multiversx-chain-vm/bls"]
+contract-call-legacy = ["multiversx-sc/contract-call-legacy"] 
 
 
 [dependencies]

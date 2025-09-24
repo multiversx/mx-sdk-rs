@@ -6,12 +6,12 @@ use multiversx_sc_codec::{
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
     },
     types::{
-        ContractCallNoPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, MultiEgldOrEsdtPayment, MultiValueEncoded,
+        EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        MultiEgldOrEsdtPayment, MultiValueEncoded,
     },
 };
 
@@ -76,11 +76,12 @@ where
     }
 }
 
-impl<Api, R> From<ContractCallNoPayment<Api, R>> for FunctionCall<Api>
+#[cfg(feature = "contract-call-legacy")]
+impl<Api, R> From<crate::types::ContractCallNoPayment<Api, R>> for FunctionCall<Api>
 where
-    Api: CallTypeApi,
+    Api: crate::api::CallTypeApi,
 {
-    fn from(ccnp: ContractCallNoPayment<Api, R>) -> Self {
+    fn from(ccnp: crate::types::ContractCallNoPayment<Api, R>) -> Self {
         ccnp.function_call
     }
 }
