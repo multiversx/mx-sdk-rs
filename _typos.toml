@@ -1,7 +1,8 @@
 [default]
 extend-ignore-identifiers-re = [
-    "erd1*", # addresses
-    "65ba30" # some hex
+    "erd1*",  # addresses
+    "65ba30", # some hex
+    "0OTRl",  # some hex
 ]
 
 [default.extend-words]

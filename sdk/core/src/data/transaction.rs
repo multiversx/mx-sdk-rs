@@ -95,7 +95,8 @@ pub struct TransactionOnNetwork {
 pub struct Events {
     pub address: Bech32Address,
     pub identifier: String,
-    pub topics: Option<Vec<String>>,
+    #[serde(default)]
+    pub topics: Vec<String>,
     #[serde(default)]
     pub data: LogData,
 }
@@ -225,6 +226,20 @@ pub struct SendTransactionResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct SimulateGasTransactionData {
+    pub tx_gas_units: u64,
+}
+
+// SimulateGasTransactionResponse holds the response received from the network when estimating cost of a transaction
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimulateGasTransactionResponse {
+    pub error: String,
+    pub code: String,
+    pub data: Option<SimulateGasTransactionData>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SendTransactionsResponseData {
     pub num_of_sent_txs: i32,
     pub txs_hashes: HashMap<i32, String>,
@@ -243,7 +258,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn parse_event_log_0() {
+    fn parse_event_log_null_data() {
         let data = r#"
 {
     "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
@@ -255,11 +270,27 @@ mod test {
         "#;
 
         let event_log = serde_json::from_str::<Events>(data).unwrap();
+        assert!(event_log.topics.is_empty());
         assert_eq!(event_log.data, LogData::Empty);
     }
 
     #[test]
-    fn parse_event_log_1() {
+    fn parse_event_log_no_topics() {
+        let data = r#"
+{
+    "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
+    "identifier": "completedTxEvent",
+    "data": null,
+    "additionalData": null
+}
+        "#;
+
+        let event_log = serde_json::from_str::<Events>(data).unwrap();
+        assert!(event_log.topics.is_empty());
+    }
+
+    #[test]
+    fn parse_event_log_null_additional_data() {
         let data = r#"
 {
     "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
@@ -275,7 +306,7 @@ mod test {
     }
 
     #[test]
-    fn parse_event_log_2() {
+    fn parse_event_log_with_array_data() {
         let data = r#"
 {
     "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",

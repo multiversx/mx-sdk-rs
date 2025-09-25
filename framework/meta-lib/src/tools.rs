@@ -12,6 +12,7 @@ pub use git_describe::git_describe;
 pub use wasm_extractor::code_report::CodeReport;
 pub use wasm_extractor::extractor::WasmInfo;
 pub use wasm_extractor::report::WasmReport;
+pub use wasm_extractor::OpcodeVersion;
 pub use wasm_opt::install_wasm_opt;
 pub use wasm_opt::run_wasm_opt;
 pub use wasm_to_wat::wasm_to_wat;

@@ -586,24 +586,25 @@ pub struct OnlyShowsUpAsNested10 {}
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
     Zero,
-    Thirty,
-    Twelve,
-    Fifty,
+    Thirty = 30,
+    Twelve = 12,
+    Fifty = 50,
     FiftyOne,
 }
 
 #[rustfmt::skip]
+#[repr(u8)]
 #[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminantMixed {
     Zero,
-    Unit,
+    Unit = 3,
     Tuple(u16),
     Five,
     Struct {
         a: u8,
         b: u16,
-    },
+    } = 1,
 }
 
 #[type_abi]

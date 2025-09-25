@@ -4,7 +4,10 @@ mod stack_size;
 pub use contract_allocator::{parse_allocator, ContractAllocator};
 pub use stack_size::*;
 
-use crate::{ei::EIVersion, tools};
+use crate::{
+    ei::EIVersion,
+    tools::{self, OpcodeVersion},
+};
 
 use super::ContractVariantProfileSerde;
 
@@ -42,6 +45,8 @@ pub struct ContractVariantSettings {
 
     /// Rustc target when building WebAssembly.
     pub rustc_target: String,
+
+    pub opcode_version: OpcodeVersion,
 }
 
 impl Default for ContractVariantSettings {
@@ -58,6 +63,7 @@ impl Default for ContractVariantSettings {
             profile: Default::default(),
             std: false,
             rustc_target: tools::build_target::default_target().to_owned(),
+            opcode_version: OpcodeVersion::default(),
         }
     }
 }

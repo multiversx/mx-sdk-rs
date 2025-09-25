@@ -1,5 +1,4 @@
 use crate::{
-    multiversx_sc::codec::{PanicErrorHandler, TopEncodeMulti},
     scenario::model::{ScCallStep, TxESDT},
     scenario_model::TxResponse,
 };
@@ -9,7 +8,6 @@ use multiversx_chain_vm::host::{
     execution,
     runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
 };
-use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti};
 
 use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
@@ -22,32 +20,6 @@ impl ScenarioVMRunner {
             self.perform_sc_call_lambda_and_check(step, RuntimeInstanceCallLambdaDefault);
         let response = TxResponse::from_tx_result(tx_result);
         step.save_response(response);
-    }
-
-    /// Adds a SC call step, executes it and retrieves the transaction result ("out" field).
-    ///
-    /// The transaction is expected to complete successfully.
-    ///
-    /// It takes the `contract_call` argument separately from the SC call step,
-    /// so we can benefit from type inference in the result.
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    #[allow(deprecated)]
-    pub fn perform_sc_call_get_result<OriginalResult, RequestedResult>(
-        &mut self,
-        typed_sc_call: crate::scenario_model::TypedScCall<OriginalResult>,
-    ) -> RequestedResult
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
-    {
-        let sc_call_step: ScCallStep = typed_sc_call.into();
-        let tx_result =
-            self.perform_sc_call_lambda(&sc_call_step, RuntimeInstanceCallLambdaDefault);
-        let mut raw_result = tx_result.result_values;
-        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 
     pub fn perform_sc_call_lambda<F>(&mut self, sc_call_step: &ScCallStep, f: F) -> TxResult
