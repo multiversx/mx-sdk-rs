@@ -54,8 +54,8 @@
                     "balance": "0",
                     "storage": {
                         "str:pingAmount": "500,000,000,000",
-                        "str:activationTimestamp": "780",
-                        "str:deadline": "123,780"
+                        "str:activationTimestampMs": "780,000",
+                        "str:deadline": "123,780,000"
                     },
                     "code": "mxsc:../output/ping-pong-egld.mxsc.json"
                 }

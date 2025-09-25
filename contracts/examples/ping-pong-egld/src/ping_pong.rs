@@ -35,16 +35,16 @@ pub trait PingPong {
     fn init(
         &self,
         ping_amount: &BigUint,
-        duration_in_seconds: u64,
-        opt_activation_timestamp: Option<u64>,
+        duration_in_milliseconds: u64,
+        opt_activation_timestamp_ms: Option<u64>,
         max_funds: OptionalValue<BigUint>,
     ) {
         self.ping_amount().set(ping_amount);
-        let activation_timestamp =
-            opt_activation_timestamp.unwrap_or_else(|| self.blockchain().get_block_timestamp());
-        let deadline = activation_timestamp + duration_in_seconds;
+        let activation_timestamp_ms = opt_activation_timestamp_ms
+            .unwrap_or_else(|| self.blockchain().get_block_timestamp_ms());
+        let deadline = activation_timestamp_ms + duration_in_milliseconds;
         self.deadline().set(deadline);
-        self.activation_timestamp().set(activation_timestamp);
+        self.activation_timestamp_ms().set(activation_timestamp_ms);
         self.max_funds().set(max_funds.into_option());
     }
 
@@ -76,9 +76,9 @@ pub trait PingPong {
             "the payment must match the fixed sum"
         );
 
-        let block_timestamp = self.blockchain().get_block_timestamp();
+        let block_timestamp = self.blockchain().get_block_timestamp_ms();
         require!(
-            self.activation_timestamp().get() <= block_timestamp,
+            self.activation_timestamp_ms().get() <= block_timestamp,
             "smart contract not active yet"
         );
 
@@ -140,7 +140,7 @@ pub trait PingPong {
     #[endpoint]
     fn pong(&self) {
         require!(
-            self.blockchain().get_block_timestamp() >= self.deadline().get(),
+            self.blockchain().get_block_timestamp_ms() >= self.deadline().get(),
             "can't withdraw before deadline"
         );
 
@@ -159,7 +159,7 @@ pub trait PingPong {
     /// Can only be called after expiration.
     #[endpoint(pongAll)]
     fn pong_all(&self) -> OperationCompletionStatus {
-        let now = self.blockchain().get_block_timestamp();
+        let now = self.blockchain().get_block_timestamp_ms();
         require!(
             now >= self.deadline().get(),
             "can't withdraw before deadline"
@@ -207,7 +207,7 @@ pub trait PingPong {
         ContractState {
             ping_amount: self.ping_amount().get(),
             deadline: self.deadline().get(),
-            activation_timestamp: self.activation_timestamp().get(),
+            activation_timestamp: self.activation_timestamp_ms().get(),
             max_funds: self.max_funds().get(),
             pong_all_last_user: self.pong_all_last_user().get(),
         }
@@ -226,8 +226,8 @@ pub trait PingPong {
     /// Block timestamp of the block where the contract got activated.
     /// If not specified in the constructor it is the the deploy block timestamp.
     #[view(getActivationTimestamp)]
-    #[storage_mapper("activationTimestamp")]
-    fn activation_timestamp(&self) -> SingleValueMapper<u64>;
+    #[storage_mapper("activationTimestampMs")]
+    fn activation_timestamp_ms(&self) -> SingleValueMapper<u64>;
 
     /// Optional funding cap.
     #[view(getMaxFunds)]

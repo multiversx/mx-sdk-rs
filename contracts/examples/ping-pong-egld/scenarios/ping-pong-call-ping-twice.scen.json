@@ -54,8 +54,8 @@
                     "balance": "500,000,000,000",
                     "storage": {
                         "str:pingAmount": "500,000,000,000",
-                        "str:activationTimestamp": "780",
-                        "str:deadline": "123,780",
+                        "str:activationTimestampMs": "780,000",
+                        "str:deadline": "123,780,000",
                         "str:user_address_to_id|address:participant1": "1",
                         "str:user_id_to_address|0x0000001": "address:participant1",
                         "str:userStatus|0x0000001": "1",
