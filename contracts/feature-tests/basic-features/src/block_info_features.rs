@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 multiversx_sc::imports!();
 
 /// Block info getters.
