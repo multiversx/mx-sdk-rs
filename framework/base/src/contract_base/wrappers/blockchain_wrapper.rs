@@ -223,6 +223,10 @@ where
         A::blockchain_api_impl().get_gas_left()
     }
 
+    #[deprecated(
+        since = "0.62.1",
+        note = "Supernova introduces sub-second blocks. This method will produce imprecise, duplicate values. Use `get_block_timestamp_ms` instead."
+    )]
     #[inline]
     pub fn get_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp()
@@ -288,6 +292,10 @@ where
         }
     }
 
+    #[deprecated(
+        since = "0.62.1",
+        note = "Supernova introduces sub-second blocks. This method will produce imprecise, duplicate values. Use `get_prev_block_timestamp_ms` instead."
+    )]
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp()
