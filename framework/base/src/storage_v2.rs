@@ -1,5 +1,3 @@
-// #![allow(unused)]
-
 mod context;
 mod key;
 

@@ -8,6 +8,7 @@ use crate::{
     *,
 };
 
+#[derive(Default)]
 pub struct StorageKey<A>
 where
     A: ManagedTypeApi + ErrorApi + 'static,
@@ -114,5 +115,14 @@ impl<M: ManagedTypeApi> Clone for StorageKey<M> {
         StorageKey {
             buffer: self.buffer.clone(),
         }
+    }
+}
+
+impl<A> PartialEq for StorageKey<A>
+where
+    A: ManagedTypeApi + ErrorApi + 'static,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.buffer.eq(&other.buffer)
     }
 }

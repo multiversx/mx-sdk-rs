@@ -5,6 +5,7 @@ use crate::{
         ErrorApi, ManagedTypeApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
         StorageWriteApiImpl as _,
     },
+    storage::StorageKey,
     storage_v2::DynamicKey,
     types::{ManagedBuffer, ManagedType},
 };
@@ -22,14 +23,14 @@ where
 
     fn try_downcast_write(&self) -> Option<&Self::WriteAccess>;
 
-    fn subcontext(&self, delta: ManagedBuffer<A>) -> Self;
+    fn subcontext(&self, delta: StorageKey<A>) -> Self;
 }
 
 pub trait StorageContextRead<R>: StorageContext<R>
 where
     R: ManagedTypeApi + ErrorApi + 'static,
 {
-    fn read_raw(&self) -> ManagedBuffer<R>;
+    fn read_raw(&self) -> StorageKey<R>;
 }
 
 pub trait StorageContextWrite<W>: StorageContextRead<W>
@@ -63,7 +64,7 @@ where
         unreachable!()
     }
 
-    fn subcontext(&self, _delta: ManagedBuffer<A>) -> Self {
+    fn subcontext(&self, _delta: StorageKey<A>) -> Self {
         unreachable!()
     }
 }
@@ -94,7 +95,7 @@ where
         unreachable!()
     }
 
-    fn subcontext(&self, _delta: ManagedBuffer<A>) -> Self {
+    fn subcontext(&self, _delta: StorageKey<A>) -> Self {
         unreachable!()
     }
 }
@@ -103,7 +104,7 @@ impl<A> StorageContextRead<A> for NoAccess<A>
 where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
-    fn read_raw(&self) -> ManagedBuffer<A> {
+    fn read_raw(&self) -> StorageKey<A> {
         unreachable!()
     }
 }
@@ -160,8 +161,10 @@ where
         None
     }
 
-    fn subcontext(&self, delta: ManagedBuffer<A>) -> Self {
-        Self::new(self.key.clone().concat(delta))
+    fn subcontext(&self, delta: StorageKey<A>) -> Self {
+        let mut subcontext_key = self.key.clone();
+        subcontext_key.append_managed_buffer(&delta.buffer);
+        Self::new(subcontext_key)
     }
 }
 
@@ -169,13 +172,12 @@ impl<A> StorageContextRead<A> for SelfRead<'_, A>
 where
     A: StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    // took from /framework/base/src/storage/storage_get.rs
-    fn read_raw(&self) -> ManagedBuffer<A> {
+    fn read_raw(&self) -> StorageKey<A> {
         unsafe {
             let result = ManagedBuffer::new_uninit();
             A::storage_read_api_impl()
                 .storage_load_managed_buffer_raw(self.key.get_handle(), result.get_handle());
-            result
+            StorageKey::from(result)
         }
     }
 }
@@ -223,8 +225,10 @@ where
         Some(self)
     }
 
-    fn subcontext(&self, delta: ManagedBuffer<A>) -> Self {
-        Self::new(self.key.clone().concat(delta))
+    fn subcontext(&self, delta: StorageKey<A>) -> Self {
+        let mut subcontext_key = self.key.clone();
+        subcontext_key.append_managed_buffer(&delta.buffer);
+        Self::new(subcontext_key)
     }
 }
 
@@ -232,12 +236,12 @@ impl<A> StorageContextRead<A> for SelfWrite<'_, A>
 where
     A: StorageWriteApi + StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    fn read_raw(&self) -> ManagedBuffer<A> {
+    fn read_raw(&self) -> StorageKey<A> {
         unsafe {
             let result = ManagedBuffer::new_uninit();
             A::storage_read_api_impl()
                 .storage_load_managed_buffer_raw(self.key.get_handle(), result.get_handle());
-            result
+            StorageKey::from(result)
         }
     }
 }
