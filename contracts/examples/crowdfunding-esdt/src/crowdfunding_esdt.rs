@@ -14,15 +14,15 @@ pub enum Status {
 #[multiversx_sc::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BigUint, deadline: u64, token_identifier: EgldOrEsdtTokenIdentifier) {
+    fn init(&self, target: BigUint, deadline_ms: u64, token_identifier: EgldOrEsdtTokenIdentifier) {
         require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
         require!(
-            deadline > self.get_current_time(),
+            deadline_ms > self.get_current_time_ms(),
             "Deadline can't be in the past"
         );
-        self.deadline().set(deadline);
+        self.deadline_ms().set(deadline_ms);
 
         require!(token_identifier.is_valid(), "Invalid token provided");
         self.cf_token_identifier().set(token_identifier);
@@ -45,7 +45,7 @@ pub trait Crowdfunding {
 
     #[view]
     fn status(&self) -> Status {
-        if self.get_current_time() < self.deadline().get() {
+        if self.get_current_time_ms() < self.deadline_ms().get() {
             Status::FundingPeriod
         } else if self.get_current_funds() >= self.target().get() {
             Status::Successful
@@ -100,8 +100,8 @@ pub trait Crowdfunding {
 
     // private
 
-    fn get_current_time(&self) -> u64 {
-        self.blockchain().get_block_timestamp()
+    fn get_current_time_ms(&self) -> u64 {
+        self.blockchain().get_block_timestamp_ms()
     }
 
     // storage
@@ -114,7 +114,7 @@ pub trait Crowdfunding {
     #[view(getDeadline)]
     #[title("deadline")]
     #[storage_mapper("deadline")]
-    fn deadline(&self) -> SingleValueMapper<u64>;
+    fn deadline_ms(&self) -> SingleValueMapper<u64>;
 
     #[view(getDeposit)]
     #[title("deposit")]
