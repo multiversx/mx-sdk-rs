@@ -56,16 +56,16 @@ where
     >(
         self,
         ping_amount: Arg0,
-        duration_in_seconds: Arg1,
-        opt_activation_timestamp: Arg2,
+        duration_in_milliseconds: Arg1,
+        opt_activation_timestamp_ms: Arg2,
         max_funds: Arg3,
     ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_deploy()
             .argument(&ping_amount)
-            .argument(&duration_in_seconds)
-            .argument(&opt_activation_timestamp)
+            .argument(&duration_in_milliseconds)
+            .argument(&opt_activation_timestamp_ms)
             .argument(&max_funds)
             .original_result()
     }
@@ -193,7 +193,7 @@ where
 
     /// Block timestamp of the block where the contract got activated. 
     /// If not specified in the constructor it is the the deploy block timestamp. 
-    pub fn activation_timestamp(
+    pub fn activation_timestamp_ms(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx

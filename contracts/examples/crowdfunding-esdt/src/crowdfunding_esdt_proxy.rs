@@ -50,14 +50,14 @@ where
     >(
         self,
         target: Arg0,
-        deadline: Arg1,
+        deadline_ms: Arg1,
         token_identifier: Arg2,
     ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_deploy()
             .argument(&target)
-            .argument(&deadline)
+            .argument(&deadline_ms)
             .argument(&token_identifier)
             .original_result()
     }
@@ -116,7 +116,7 @@ where
             .original_result()
     }
 
-    pub fn deadline(
+    pub fn deadline_ms(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
