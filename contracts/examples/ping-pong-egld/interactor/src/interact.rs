@@ -333,7 +333,7 @@ impl PingPongEgldInteract {
             .query()
             .to(self.state.current_ping_pong_egld_address())
             .typed(proxy_ping_pong_egld::PingPongProxy)
-            .activation_timestamp()
+            .activation_timestamp_ms()
             .returns(ReturnsResultUnmanaged)
             .run()
             .await

@@ -27,7 +27,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         getContractState => get_contract_state
         getPingAmount => ping_amount
         getDeadline => deadline
-        getActivationTimestamp => activation_timestamp
+        getActivationTimestamp => activation_timestamp_ms
         getMaxFunds => max_funds
         getUserStatus => user_status
         pongAllLastUser => pong_all_last_user

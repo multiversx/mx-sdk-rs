@@ -17,6 +17,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
+          rustflags: ""
           toolchain: 1.87
           target: wasm32-unknown-unknown
 
