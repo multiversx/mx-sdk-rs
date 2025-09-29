@@ -6,7 +6,6 @@ use crate::{
         StorageWriteApiImpl as _,
     },
     storage::StorageKey,
-    storage_v2::DynamicKey,
     types::{ManagedBuffer, ManagedType},
 };
 
@@ -128,7 +127,7 @@ pub struct SelfRead<'r, M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    key: DynamicKey<M>,
+    key: StorageKey<M>,
     _phantom: PhantomData<&'r ()>,
 }
 
@@ -137,7 +136,7 @@ impl<M> SelfRead<'_, M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    pub fn new(key: DynamicKey<M>) -> Self {
+    pub fn new(key: StorageKey<M>) -> Self {
         SelfRead {
             key,
             _phantom: PhantomData,
@@ -194,7 +193,7 @@ pub struct SelfWrite<'w, M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    key: DynamicKey<M>,
+    key: StorageKey<M>,
     _phantom: PhantomData<&'w mut ()>,
 }
 
@@ -203,7 +202,7 @@ impl<M> SelfWrite<'_, M>
 where
     M: ManagedTypeApi + ErrorApi + 'static,
 {
-    pub fn new(key: DynamicKey<M>) -> Self {
+    pub fn new(key: StorageKey<M>) -> Self {
         SelfWrite {
             key,
             _phantom: PhantomData,

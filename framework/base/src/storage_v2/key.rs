@@ -15,62 +15,28 @@ use crate::{
     types::{ManagedBuffer, ManagedType},
 };
 
-#[derive(Default, Clone)]
-pub struct DynamicKey<A>(StorageKey<A>)
-where
-    A: ManagedTypeApi + ErrorApi + 'static;
-
-impl<A> PartialEq for DynamicKey<A>
-where
-    A: ManagedTypeApi + ErrorApi + 'static,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<A> Deref for DynamicKey<A>
-where
-    A: ManagedTypeApi + ErrorApi + 'static,
-{
-    type Target = StorageKey<A>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<A> DerefMut for DynamicKey<A>
-where
-    A: ManagedTypeApi + ErrorApi + 'static,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
 #[allow(dead_code)]
 pub trait Key<A>: 'static
 where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
-    fn full_key(&self) -> DynamicKey<A>;
+    fn full_key(&self) -> StorageKey<A>;
 
     fn key_eq<Other: Key<A>>(&self, other: &Other) -> bool {
         self.full_key().eq(&other.full_key())
     }
 
-    fn append_to(&self, target: &mut DynamicKey<A>) {
+    fn append_to(&self, target: &mut StorageKey<A>) {
         target.append_bytes(b".");
         target.append_managed_buffer(&self.full_key().buffer);
     }
 }
 
-impl<A> Key<A> for DynamicKey<A>
+impl<A> Key<A> for StorageKey<A>
 where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
-    fn full_key(&self) -> DynamicKey<A> {
+    fn full_key(&self) -> StorageKey<A> {
         self.clone()
     }
 }
@@ -113,8 +79,8 @@ impl<A> Key<A> for StrKey
 where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
-    fn full_key(&self) -> DynamicKey<A> {
-        DynamicKey(StorageKey::new(self.as_bytes()))
+    fn full_key(&self) -> StorageKey<A> {
+        StorageKey::new(self.as_bytes())
     }
 }
 
@@ -198,7 +164,7 @@ where
         }
     }
 
-    pub fn root_path(self, root_key: &DynamicKey<A>) -> SelfStorageRef<'a, A> {
+    pub fn root_path(self, root_key: &StorageKey<A>) -> SelfStorageRef<'a, A> {
         SelfStorageRef {
             source_ref: self,
             key: root_key.to_owned(),
@@ -229,7 +195,7 @@ where
         }
     }
 
-    pub fn root_path(self, root_key: &DynamicKey<A>) -> SelfStorageRefMut<'a, A> {
+    pub fn root_path(self, root_key: &StorageKey<A>) -> SelfStorageRefMut<'a, A> {
         SelfStorageRefMut {
             source_ref: self,
             key: root_key.to_owned(),
@@ -258,7 +224,7 @@ where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
     pub source_ref: SelfStorageRootRef<'a, A>,
-    pub key: DynamicKey<A>,
+    pub key: StorageKey<A>,
 }
 
 impl<'a, A> StoragePath<A> for SelfStorageRef<'a, A>
@@ -311,7 +277,7 @@ where
     A: ManagedTypeApi + ErrorApi + 'static,
 {
     pub source_ref: SelfStorageRootRefMut<'a, A>,
-    pub key: DynamicKey<A>,
+    pub key: StorageKey<A>,
 }
 
 impl<'a, A> StoragePath<A> for SelfStorageRefMut<'a, A>
@@ -403,7 +369,7 @@ pub fn _path_lifetimes<A>(root: SelfStorageRootRefMut<'_, A>)
 where
     A: StorageWriteApi + StorageReadApi + ManagedTypeApi + ErrorApi + 'static,
 {
-    let mut path1 = root.root_path(&DynamicKey(StorageKey::new(b"root")));
+    let mut path1 = root.root_path(&StorageKey::new(b"root"));
     let _path1a = path1.as_ref_mut().concat_key(StrKey("key1a"));
     // let path1b = path1.into_ref_mut().concat_key("key1a".to_owned());
     // let path1a = path1.concat_key("key1a".to_owned());
