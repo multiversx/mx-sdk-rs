@@ -34,6 +34,7 @@ pub mod types;
 
 #[cfg(feature = "std")]
 mod std_impl;
+mod storage_v2;
 
 pub use hex_call_data::*;
 pub use hex_literal;
