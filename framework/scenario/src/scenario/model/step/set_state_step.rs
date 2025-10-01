@@ -106,6 +106,18 @@ impl SetStateStep {
         self
     }
 
+    pub fn block_timestamp_ms<N>(mut self, block_timestamp_ms_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        let block_timestamp_ms = U64Value::from(block_timestamp_ms_expr);
+
+        let mut block_info = self.current_block_info.unwrap_or_default();
+        block_info.block_timestamp_ms = Some(block_timestamp_ms);
+        self.current_block_info = Box::new(Some(block_info));
+        self
+    }
+
     pub fn block_random_seed<B>(mut self, block_random_seed_expr: B) -> Self
     where
         BytesValue: From<B>,

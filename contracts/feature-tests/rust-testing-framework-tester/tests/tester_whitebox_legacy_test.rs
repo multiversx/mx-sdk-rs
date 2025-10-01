@@ -964,13 +964,13 @@ fn blockchain_state_test() {
 
     wrapper.set_block_epoch(expected_epoch);
     wrapper.set_block_nonce(expected_nonce);
-    wrapper.set_block_timestamp(expected_timestamp);
+    wrapper.set_block_timestamp_ms(expected_timestamp);
 
     wrapper
         .execute_query(&sc_wrapper, |sc| {
             let actual_epoch = sc.get_block_epoch();
             let actual_nonce = sc.get_block_nonce();
-            let actual_timestamp = sc.get_block_timestamp();
+            let actual_timestamp = sc.get_block_timestamp_ms();
 
             assert_eq!(expected_epoch, actual_epoch);
             assert_eq!(expected_nonce, actual_nonce);

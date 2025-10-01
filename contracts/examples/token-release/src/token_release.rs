@@ -210,7 +210,7 @@ pub trait TokenRelease {
         let token_identifier = self.token_identifier().get();
         let total_mint_tokens = self.token_total_supply().get();
         self.mint_all_tokens(&token_identifier, &total_mint_tokens);
-        let activation_timestamp = self.blockchain().get_block_timestamp();
+        let activation_timestamp = self.blockchain().get_block_timestamp_ms();
         self.activation_timestamp().set(activation_timestamp);
         self.setup_period_status().set(false);
     }
@@ -255,7 +255,7 @@ pub trait TokenRelease {
 
     fn calculate_claimable_tokens(&self, address: &ManagedAddress) -> BigUint {
         let starting_timestamp = self.activation_timestamp().get();
-        let current_timestamp = self.blockchain().get_block_timestamp();
+        let current_timestamp = self.blockchain().get_block_timestamp_ms();
         let address_groups = self.user_groups(address).get();
 
         let mut claimable_amount = BigUint::zero();

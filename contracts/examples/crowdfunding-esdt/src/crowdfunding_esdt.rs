@@ -19,7 +19,7 @@ pub trait Crowdfunding {
         self.target().set(target);
 
         require!(
-            deadline > self.get_current_time(),
+            deadline > self.get_current_time_ms(),
             "Deadline can't be in the past"
         );
         self.deadline().set(deadline);
@@ -45,7 +45,7 @@ pub trait Crowdfunding {
 
     #[view]
     fn status(&self) -> Status {
-        if self.get_current_time() < self.deadline().get() {
+        if self.get_current_time_ms() < self.deadline().get() {
             Status::FundingPeriod
         } else if self.get_current_funds() >= self.target().get() {
             Status::Successful
@@ -100,8 +100,8 @@ pub trait Crowdfunding {
 
     // private
 
-    fn get_current_time(&self) -> u64 {
-        self.blockchain().get_block_timestamp()
+    fn get_current_time_ms(&self) -> u64 {
+        self.blockchain().get_block_timestamp_ms()
     }
 
     // storage

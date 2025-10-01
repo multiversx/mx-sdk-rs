@@ -25,14 +25,14 @@ pub trait ZombieFeeding:
     fn trigger_cooldown(&self, zombie_id: usize) {
         let cooldown_time = self.cooldown_time().get();
         self.zombies(&zombie_id).update(|my_zombie| {
-            my_zombie.ready_time = self.blockchain().get_block_timestamp() + cooldown_time
+            my_zombie.ready_time = self.blockchain().get_block_timestamp_ms() + cooldown_time
         });
     }
 
     #[view]
     fn is_ready(&self, zombie_id: usize) -> bool {
         let my_zombie = self.zombies(&zombie_id).get();
-        my_zombie.ready_time <= self.blockchain().get_block_timestamp()
+        my_zombie.ready_time <= self.blockchain().get_block_timestamp_ms()
     }
 
     #[callback]

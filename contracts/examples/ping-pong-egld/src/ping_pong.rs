@@ -41,7 +41,7 @@ pub trait PingPong {
     ) {
         self.ping_amount().set(ping_amount);
         let activation_timestamp =
-            opt_activation_timestamp.unwrap_or_else(|| self.blockchain().get_block_timestamp());
+            opt_activation_timestamp.unwrap_or_else(|| self.blockchain().get_block_timestamp_ms());
         let deadline = activation_timestamp + duration_in_seconds;
         self.deadline().set(deadline);
         self.activation_timestamp().set(activation_timestamp);
@@ -76,7 +76,7 @@ pub trait PingPong {
             "the payment must match the fixed sum"
         );
 
-        let block_timestamp = self.blockchain().get_block_timestamp();
+        let block_timestamp = self.blockchain().get_block_timestamp_ms();
         require!(
             self.activation_timestamp().get() <= block_timestamp,
             "smart contract not active yet"
@@ -140,7 +140,7 @@ pub trait PingPong {
     #[endpoint]
     fn pong(&self) {
         require!(
-            self.blockchain().get_block_timestamp() >= self.deadline().get(),
+            self.blockchain().get_block_timestamp_ms() >= self.deadline().get(),
             "can't withdraw before deadline"
         );
 
@@ -159,7 +159,7 @@ pub trait PingPong {
     /// Can only be called after expiration.
     #[endpoint(pongAll)]
     fn pong_all(&self) -> OperationCompletionStatus {
-        let now = self.blockchain().get_block_timestamp();
+        let now = self.blockchain().get_block_timestamp_ms();
         require!(
             now >= self.deadline().get(),
             "can't withdraw before deadline"

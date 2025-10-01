@@ -390,7 +390,7 @@ pub trait KittyOwnership {
         let new_kitty_id = total_kitties;
         let kitty = Kitty::new(
             genes,
-            self.blockchain().get_block_timestamp(),
+            self.blockchain().get_block_timestamp_ms(),
             matron_id,
             sire_id,
             generation,
@@ -424,7 +424,7 @@ pub trait KittyOwnership {
 
     fn trigger_cooldown(&self, kitty: &mut Kitty) {
         let cooldown = kitty.get_next_cooldown_time();
-        kitty.cooldown_end = self.blockchain().get_block_timestamp() + cooldown;
+        kitty.cooldown_end = self.blockchain().get_block_timestamp_ms() + cooldown;
     }
 
     fn breed(&self, matron_id: u32, sire_id: u32) {
@@ -452,7 +452,7 @@ pub trait KittyOwnership {
     }
 
     fn is_kitty_ready_to_breed(&self, kitty: &Kitty) -> bool {
-        kitty.siring_with_id == 0 && kitty.cooldown_end < self.blockchain().get_block_timestamp()
+        kitty.siring_with_id == 0 && kitty.cooldown_end < self.blockchain().get_block_timestamp_ms()
     }
 
     fn is_siring_permitted(&self, matron_id: u32, sire_id: u32) -> bool {
@@ -464,7 +464,7 @@ pub trait KittyOwnership {
     }
 
     fn is_ready_to_give_birth(&self, matron: &Kitty) -> bool {
-        matron.siring_with_id != 0 && matron.cooldown_end < self.blockchain().get_block_timestamp()
+        matron.siring_with_id != 0 && matron.cooldown_end < self.blockchain().get_block_timestamp_ms()
     }
 
     fn is_valid_mating_pair(&self, matron_id: u32, sire_id: u32) -> bool {

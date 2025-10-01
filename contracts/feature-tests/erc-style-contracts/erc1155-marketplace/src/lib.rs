@@ -160,7 +160,7 @@ pub trait Erc1155Marketplace {
             "Can't bid on your own token"
         );
         require!(
-            self.blockchain().get_block_timestamp() < auction.deadline,
+            self.blockchain().get_block_timestamp_ms() < auction.deadline,
             "Auction ended already"
         );
         require!(
@@ -205,7 +205,7 @@ pub trait Erc1155Marketplace {
         let auction = self.auction_for_token(&type_id, &nft_id).get();
 
         require!(
-            self.blockchain().get_block_timestamp() > auction.deadline
+            self.blockchain().get_block_timestamp_ms() > auction.deadline
                 || auction.current_bid == auction.max_bid,
             "Auction deadline has not passed nor is the current bid equal to max bid"
         );
@@ -294,7 +294,7 @@ pub trait Erc1155Marketplace {
             "Min bid can't be 0 or higher than max bid"
         );
         require!(
-            deadline > self.blockchain().get_block_timestamp(),
+            deadline > self.blockchain().get_block_timestamp_ms(),
             "Deadline can't be in the past"
         );
 

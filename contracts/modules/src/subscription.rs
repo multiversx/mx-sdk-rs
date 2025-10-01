@@ -47,7 +47,7 @@ pub trait SubscriptionModule {
         uris: &ManagedVec<ManagedBuffer>,
     ) -> u64 {
         let subscription_attributes = SubscriptionAttributes::<T> {
-            expiration: self.blockchain().get_block_timestamp() + duration,
+            expiration: self.blockchain().get_block_timestamp_ms() + duration,
             attributes,
         };
 
@@ -105,7 +105,7 @@ pub trait SubscriptionModule {
         nonce: u64,
         duration: u64,
     ) {
-        let time = self.blockchain().get_block_timestamp();
+        let time = self.blockchain().get_block_timestamp_ms();
         let mut subscription_attributes: SubscriptionAttributes<T> =
             self.blockchain().get_token_attributes(id, nonce);
         let expiration = subscription_attributes.expiration;
