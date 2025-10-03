@@ -1,5 +1,8 @@
 use crate::{
-    blockchain::state::{AccountData, AccountEsdt, BlockchainStateRef},
+    blockchain::{
+        state::{AccountData, AccountEsdt, BlockchainStateRef},
+        VMConfig,
+    },
     host::{
         context::{
             async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
@@ -92,7 +95,7 @@ fn commit_async_call_and_callback(
     state: &mut BlockchainStateRef,
     runtime: &RuntimeRef,
 ) -> (TxResult, TxResult) {
-    if state.accounts.contains_key(&async_data.to) {
+    if state.account_exists(&async_data.to) {
         let async_input = async_call_tx_input(&async_data, CallType::AsyncCall);
 
         let async_result = commit_call_with_async_and_callback(
@@ -119,7 +122,7 @@ fn commit_async_call_and_callback(
         );
         (async_result, callback_result)
     } else {
-        let result = insert_ghost_account(&async_data, state);
+        let result = insert_ghost_account(&runtime.vm_ref, &async_data, state);
         match result {
             Ok(blockchain_updates) => {
                 state.commit_updates(blockchain_updates);
@@ -136,7 +139,7 @@ fn commit_promise_call_and_callback(
     state: &mut BlockchainStateRef,
     runtime: &RuntimeRef,
 ) -> (TxResult, TxResult) {
-    if state.accounts.contains_key(&promise.call.to) {
+    if state.account_exists(&promise.call.to) {
         let async_input = async_call_tx_input(&promise.call, CallType::AsyncCall);
         let async_result = commit_call_with_async_and_callback(
             async_input,
@@ -147,7 +150,7 @@ fn commit_promise_call_and_callback(
         let callback_result = commit_promises_callback(&async_result, promise, state, runtime);
         (async_result, callback_result)
     } else {
-        let result = insert_ghost_account(&promise.call, state);
+        let result = insert_ghost_account(&runtime.vm_ref, &promise.call, state);
         match result {
             Ok(blockchain_updates) => {
                 state.commit_updates(blockchain_updates);
@@ -184,13 +187,20 @@ fn commit_promises_callback(
 
 /// When calling a contract that is unknown to the state, we insert a ghost account.
 fn insert_ghost_account(
+    vm_config: &VMConfig,
     async_data: &AsyncCallTxData,
     state: &mut BlockchainStateRef,
 ) -> Result<BlockchainUpdate, TxPanic> {
+    let address = async_data.to.clone();
+
+    if !vm_config.insert_ghost_accounts {
+        panic!("Recipient account not found: {address}");
+    }
+
     let tx_cache = TxCache::new(state.get_arc());
     tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value)?;
     tx_cache.insert_account(AccountData {
-        address: async_data.to.clone(),
+        address,
         nonce: 0,
         egld_balance: async_data.call_value.clone(),
         esdt: AccountEsdt::default(),
