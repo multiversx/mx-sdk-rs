@@ -210,7 +210,7 @@ pub trait TokenRelease {
         let token_identifier = self.token_identifier().get();
         let total_mint_tokens = self.token_total_supply().get();
         self.mint_all_tokens(&token_identifier, &total_mint_tokens);
-        let activation_timestamp = self.blockchain().get_block_timestamp_ms();
+        let activation_timestamp = self.blockchain().get_block_timestamp_millis();
         self.activation_timestamp().set(activation_timestamp);
         self.setup_period_status().set(false);
     }
@@ -255,7 +255,7 @@ pub trait TokenRelease {
 
     fn calculate_claimable_tokens(&self, address: &ManagedAddress) -> BigUint {
         let starting_timestamp = self.activation_timestamp().get();
-        let current_timestamp = self.blockchain().get_block_timestamp_ms();
+        let current_timestamp = self.blockchain().get_block_timestamp_millis();
         let address_groups = self.user_groups(address).get();
 
         let mut claimable_amount = BigUint::zero();
@@ -272,7 +272,7 @@ pub trait TokenRelease {
                     release_period,
                     release_ticks,
                 } => {
-                    let mut periods_passed = time_passed / release_period;
+                    let mut periods_passed = time_passed.as_u64() / release_period;
                     if periods_passed == 0 {
                         continue;
                     }
@@ -287,7 +287,7 @@ pub trait TokenRelease {
                     release_period,
                     release_ticks,
                 } => {
-                    let mut periods_passed = time_passed / release_period;
+                    let mut periods_passed = time_passed.as_u64() / release_period;
                     if periods_passed == 0 {
                         continue;
                     }
@@ -335,7 +335,7 @@ pub trait TokenRelease {
 
     // storage
     #[storage_mapper("activationTimestamp")]
-    fn activation_timestamp(&self) -> SingleValueMapper<u64>;
+    fn activation_timestamp(&self) -> SingleValueMapper<TimestampMillis>;
 
     #[view(getTokenIdentifier)]
     #[storage_mapper("tokenIdentifier")]

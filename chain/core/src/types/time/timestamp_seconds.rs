@@ -6,10 +6,10 @@ use crate::codec::*;
 /// Represents a point in time as seconds since the Unix epoch.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
-pub struct TimestampSeconds(pub(super) u64);
+pub struct TimestampSeconds(pub(crate) u64);
 
 impl TimestampSeconds {
-    pub fn new(seconds: u64) -> Self {
+    pub const fn new(seconds: u64) -> Self {
         TimestampSeconds(seconds)
     }
 
@@ -20,6 +20,14 @@ impl TimestampSeconds {
     /// Explicit conversion to milliseconds
     pub fn to_millis(&self) -> TimestampMillis {
         TimestampMillis::new(self.0 * 1000)
+    }
+
+    pub const fn zero() -> Self {
+        TimestampSeconds(0)
+    }
+
+    pub const fn max() -> Self {
+        TimestampSeconds(u64::MAX)
     }
 }
 

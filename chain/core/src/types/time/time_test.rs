@@ -25,10 +25,10 @@ mod timestamp_millis_tests {
         let t = TimestampMillis::new(1500);
 
         // Value getter
-        assert_eq!(t.as_millis(), 1500);
+        assert_eq!(t.as_u64(), 1500);
 
         // Conversion to seconds (truncating)
-        assert_eq!(t.as_u64(), 1);
+        assert_eq!(t.to_seconds(), TimestampSeconds::new(1));
     }
 }
 
@@ -57,7 +57,7 @@ mod timestamp_seconds_tests {
 
         // Conversion to milliseconds
         let ms = t.to_millis();
-        assert_eq!(ms.as_millis(), 1000);
+        assert_eq!(ms.as_u64(), 1000);
     }
 }
 
@@ -122,11 +122,11 @@ mod unit_conversion_tests {
     fn test_timestamp_conversions() {
         // Test milliseconds to seconds conversion (truncating)
         let ts_millis = TimestampMillis::new(5000);
-        assert_eq!(ts_millis.as_u64(), 5);
+        assert_eq!(ts_millis.to_seconds(), TimestampSeconds::new(5));
 
         // Test seconds to milliseconds conversion
         let ts_seconds = TimestampSeconds::new(5);
-        assert_eq!(ts_seconds.to_millis().as_millis(), 5000);
+        assert_eq!(ts_seconds.to_millis().as_u64(), 5000);
     }
 
     #[test]

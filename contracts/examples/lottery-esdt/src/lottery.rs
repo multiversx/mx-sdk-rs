@@ -9,7 +9,7 @@ use lottery_info::LotteryInfo;
 use status::Status;
 
 const PERCENTAGE_TOTAL: u32 = 100;
-const THIRTY_DAYS_IN_MILLISECONDS: u64 = 60 * 60 * 24 * 30 * 1000;
+const THIRTY_DAYS_IN_MILLISECONDS: DurationMillis = DurationMillis::new(60 * 60 * 24 * 30 * 1000);
 const MAX_TICKETS: usize = 800;
 
 #[multiversx_sc::contract]
@@ -25,7 +25,7 @@ pub trait Lottery {
         token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
-        opt_deadline: Option<u64>,
+        opt_deadline: Option<TimestampMillis>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
         opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
@@ -52,7 +52,7 @@ pub trait Lottery {
         token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
-        opt_deadline: Option<u64>,
+        opt_deadline: Option<TimestampMillis>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
         opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
@@ -79,7 +79,7 @@ pub trait Lottery {
         token_identifier: EgldOrEsdtTokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
-        opt_deadline_ms: Option<u64>,
+        opt_deadline_ms: Option<TimestampMillis>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
         opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
@@ -87,7 +87,7 @@ pub trait Lottery {
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
-        let timestamp = self.blockchain().get_block_timestamp_ms();
+        let timestamp = self.blockchain().get_block_timestamp_millis();
         let total_tickets = opt_total_tickets.unwrap_or(MAX_TICKETS);
         let deadline = opt_deadline_ms.unwrap_or(timestamp + THIRTY_DAYS_IN_MILLISECONDS);
         let max_entries_per_user = opt_max_entries_per_user.unwrap_or(MAX_TICKETS);
@@ -200,7 +200,7 @@ pub trait Lottery {
         }
 
         let info = self.lottery_info(lottery_name).get();
-        let current_time = self.blockchain().get_block_timestamp_ms();
+        let current_time = self.blockchain().get_block_timestamp_millis();
         if current_time > info.deadline || info.tickets_left == 0 {
             return Status::Ended;
         }

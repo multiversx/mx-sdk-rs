@@ -71,19 +71,19 @@ pub trait BlockInfoFeatures {
 
     /// Prev block timestamp (ms, then s), current block timestamp (ms, then s)
     #[view]
-    fn get_block_timestamps(&self) -> MultiValue4<u64, u64, u64, u64> {
+    fn get_block_timestamps(&self) -> MultiValue4<u64, u64, TimestampMillis, u64> {
         (
             self.blockchain().get_prev_block_timestamp_ms(),
             self.blockchain().get_prev_block_timestamp(),
-            self.blockchain().get_block_timestamp_ms(),
+            self.blockchain().get_block_timestamp_millis(),
             self.blockchain().get_block_timestamp(),
         )
             .into()
     }
 
     #[view]
-    fn get_block_timestamp_ms(&self) -> u64 {
-        self.blockchain().get_block_timestamp_ms()
+    fn get_block_timestamp_millis(&self) -> TimestampMillis {
+        self.blockchain().get_block_timestamp_millis()
     }
 
     #[view]

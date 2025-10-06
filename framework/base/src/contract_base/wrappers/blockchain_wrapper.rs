@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use multiversx_chain_core::types::TimestampMillis;
+
 use crate::{
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, BlockchainApi, BlockchainApiImpl, ErrorApi,
@@ -229,9 +231,17 @@ where
     }
 
     /// Block timestamp, in milliseconds.
-    #[inline]
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_timestamp_millis, it returns a properly typed timestamps"
+    )]
     pub fn get_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp_ms()
+    }
+
+    /// Block timestamp, in milliseconds.
+    pub fn get_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().get_block_timestamp_ms())
     }
 
     #[inline]

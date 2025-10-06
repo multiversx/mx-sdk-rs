@@ -970,11 +970,11 @@ fn blockchain_state_test() {
         .execute_query(&sc_wrapper, |sc| {
             let actual_epoch = sc.get_block_epoch();
             let actual_nonce = sc.get_block_nonce();
-            let actual_timestamp = sc.get_block_timestamp_ms();
+            let actual_timestamp = sc.get_block_timestamp_millis();
 
             assert_eq!(expected_epoch, actual_epoch);
             assert_eq!(expected_nonce, actual_nonce);
-            assert_eq!(expected_timestamp, actual_timestamp);
+            assert_eq!(expected_timestamp, actual_timestamp.as_u64());
         })
         .assert_ok();
 }

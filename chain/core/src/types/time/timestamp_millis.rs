@@ -2,7 +2,7 @@ use core::ops::{Add, Sub};
 
 use super::DurationMillis;
 
-use crate::codec::*;
+use crate::{codec::*, types::TimestampSeconds};
 
 /// Represents a point in time as milliseconds since the Unix epoch.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -10,17 +10,25 @@ use crate::codec::*;
 pub struct TimestampMillis(pub(crate) u64);
 
 impl TimestampMillis {
-    pub fn new(millis: u64) -> Self {
+    pub const fn new(millis: u64) -> Self {
         TimestampMillis(millis)
     }
 
-    pub fn as_millis(&self) -> u64 {
+    pub fn as_u64(&self) -> u64 {
         self.0
     }
 
     /// Explicit conversion to seconds, truncating any millisecond precision
-    pub fn as_u64(&self) -> u64 {
-        self.0 / 1000
+    pub fn to_seconds(&self) -> TimestampSeconds {
+        TimestampSeconds(self.0 / 1000)
+    }
+
+    pub const fn zero() -> Self {
+        TimestampMillis(0)
+    }
+
+    pub const fn max() -> Self {
+        TimestampMillis(u64::MAX)
     }
 }
 

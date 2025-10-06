@@ -10,7 +10,7 @@ use crate::codec::*;
 pub struct DurationMillis(pub(crate) u64);
 
 impl DurationMillis {
-    pub fn new(millis: u64) -> Self {
+    pub const fn new(millis: u64) -> Self {
         DurationMillis(millis)
     }
 
@@ -22,6 +22,10 @@ impl DurationMillis {
     /// Explicit conversion to seconds, truncating any millisecond precision
     pub fn to_seconds(&self) -> DurationSeconds {
         DurationSeconds(self.0 / 1000)
+    }
+
+    pub const fn zero() -> Self {
+        DurationMillis(0)
     }
 }
 
