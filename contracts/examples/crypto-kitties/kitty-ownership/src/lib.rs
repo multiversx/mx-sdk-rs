@@ -464,7 +464,8 @@ pub trait KittyOwnership {
     }
 
     fn is_ready_to_give_birth(&self, matron: &Kitty) -> bool {
-        matron.siring_with_id != 0 && matron.cooldown_end < self.blockchain().get_block_timestamp_ms()
+        matron.siring_with_id != 0
+            && matron.cooldown_end < self.blockchain().get_block_timestamp_ms()
     }
 
     fn is_valid_mating_pair(&self, matron_id: u32, sire_id: u32) -> bool {
