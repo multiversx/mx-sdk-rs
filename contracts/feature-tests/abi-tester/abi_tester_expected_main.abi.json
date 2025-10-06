@@ -293,6 +293,25 @@
             ]
         },
         {
+            "name": "time_types",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TimestampMillis"
+                },
+                {
+                    "type": "TimestampSeconds"
+                },
+                {
+                    "type": "DurationMillis"
+                },
+                {
+                    "type": "DurationSeconds"
+                }
+            ]
+        },
+        {
             "name": "sample_storage_mapper",
             "mutability": "readonly",
             "inputs": [],

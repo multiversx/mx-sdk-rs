@@ -2,7 +2,8 @@ use super::*;
 
 use alloc::vec::Vec;
 use multiversx_chain_core::types::{
-    Address, BLSKey, BLSSignature, BoxedBytes, CodeMetadata, EsdtLocalRole, EsdtTokenType, H256,
+    Address, BLSKey, BLSSignature, BoxedBytes, CodeMetadata, DurationMillis, DurationSeconds,
+    EsdtLocalRole, EsdtTokenType, TimestampMillis, TimestampSeconds, H256,
 };
 
 impl TypeAbiFrom<Self> for H256 {}
@@ -228,5 +229,61 @@ impl TypeAbi for EsdtLocalRole {
                 ),
             );
         }
+    }
+}
+
+impl TypeAbiFrom<Self> for DurationMillis {}
+
+impl TypeAbi for DurationMillis {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        "DurationMillis".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "DurationMillis".into()
+    }
+}
+
+impl TypeAbiFrom<Self> for DurationSeconds {}
+
+impl TypeAbi for DurationSeconds {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        "DurationSeconds".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "DurationSeconds".into()
+    }
+}
+
+impl TypeAbiFrom<Self> for TimestampMillis {}
+
+impl TypeAbi for TimestampMillis {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        "TimestampMillis".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "TimestampMillis".into()
+    }
+}
+
+impl TypeAbiFrom<Self> for TimestampSeconds {}
+
+impl TypeAbi for TimestampSeconds {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        "TimestampSeconds".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "TimestampSeconds".into()
     }
 }
