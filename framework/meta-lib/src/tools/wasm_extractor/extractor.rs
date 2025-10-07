@@ -415,7 +415,7 @@ fn is_ei_valid(imports: &[String], check_ei: Option<&EIVersion>) -> bool {
             }
 
             if let Some(deprecated) = ei.deprecated_vm_hook(import) {
-                println!(
+                panic!(
                     "{} {} - {}",
                     "Deprecated VM hook used:".to_string().yellow().bold(),
                     deprecated.name.yellow().bold(),

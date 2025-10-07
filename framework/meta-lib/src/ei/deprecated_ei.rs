@@ -11,12 +11,60 @@ impl DeprecatedVMHook {
 
 pub const DEPRECATED_VM_HOOKS_1_5: &[DeprecatedVMHook] = &[
     DeprecatedVMHook::new(
-        "getBlockTimestamp",
-        "Performs poorly in Supernova due to sub-second blocks. Use the millisecond version.",
+        "getArgument",
+        "Arguments are now processed via `mBufferGetArgument`",
     ),
     DeprecatedVMHook::new(
-        "getPrevBlockTimestamp",
-        "Performs poorly in Supernova due to sub-second blocks. Use the millisecond version.",
+        "getCallValue",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getESDTValue",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getESDTValueByIndex",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getESDTTokenName",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getESDTTokenNameByIndex",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getESDTTokenNonce",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getESDTTokenNonceByIndex",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getESDTTokenType",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getESDTTokenTypeByIndex",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getNumESDTTransfers",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getCallValueTokenName",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "getCallValueTokenNameByIndex",
+        "Call value processing is now done via `managedGetAllTransfersCallValue`",
+    ),
+    DeprecatedVMHook::new(
+        "writeEventLog",
+        "Events are now logged via `managedWriteLog`",
     ),
 ];
 
