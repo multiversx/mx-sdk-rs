@@ -340,6 +340,7 @@ where
         A::blockchain_api_impl().get_prev_block_timestamp()
     }
 
+    /// Previous block timestamp, in seconds.
     pub fn get_prev_block_timestamp_seconds(&self) -> TimestampSeconds {
         TimestampSeconds::new(A::blockchain_api_impl().get_prev_block_timestamp())
     }
@@ -354,16 +355,19 @@ where
         A::blockchain_api_impl().get_prev_block_timestamp_ms()
     }
 
+    /// Previous block timestamp, in milliseconds.
     #[inline]
     pub fn get_prev_block_timestamp_millis(&self) -> TimestampMillis {
         TimestampMillis::new(A::blockchain_api_impl().get_prev_block_timestamp_ms())
     }
 
+    /// Previous block nonce.
     #[inline]
     pub fn get_prev_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_nonce()
     }
 
+    /// Previous block round.
     #[inline]
     pub fn get_prev_block_round(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_round()
