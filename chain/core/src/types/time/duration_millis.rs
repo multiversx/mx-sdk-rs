@@ -15,7 +15,7 @@ impl DurationMillis {
     }
 
     #[inline]
-    pub fn as_u64_milis(self) -> u64 {
+    pub fn as_u64_millis(self) -> u64 {
         self.0
     }
 

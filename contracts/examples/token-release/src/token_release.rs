@@ -272,7 +272,7 @@ pub trait TokenRelease {
                     release_period,
                     release_ticks,
                 } => {
-                    let mut periods_passed = time_passed.as_u64_milis() / release_period;
+                    let mut periods_passed = time_passed.as_u64_millis() / release_period;
                     if periods_passed == 0 {
                         continue;
                     }
@@ -287,7 +287,7 @@ pub trait TokenRelease {
                     release_period,
                     release_ticks,
                 } => {
-                    let mut periods_passed = time_passed.as_u64_milis() / release_period;
+                    let mut periods_passed = time_passed.as_u64_millis() / release_period;
                     if periods_passed == 0 {
                         continue;
                     }

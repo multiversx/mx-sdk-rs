@@ -81,7 +81,7 @@ mod duration_millis_tests {
         let d = DurationMillis::new(2500);
 
         // Raw value access
-        assert_eq!(d.as_u64_milis(), 2500);
+        assert_eq!(d.as_u64_millis(), 2500);
 
         // Convert to seconds (truncating)
         assert_eq!(d.to_seconds().as_u64_seconds(), 2);
@@ -111,7 +111,7 @@ mod duration_seconds_tests {
         assert_eq!(d.as_u64_seconds(), 2);
 
         // Convert to milliseconds and check value
-        assert_eq!(d.to_millis().as_u64_milis(), 2000);
+        assert_eq!(d.to_millis().as_u64_millis(), 2000);
     }
 }
 
@@ -137,6 +137,6 @@ mod unit_conversion_tests {
 
         // Test seconds to milliseconds conversion
         let dur_seconds = DurationSeconds::new(3);
-        assert_eq!(dur_seconds.to_millis().as_u64_milis(), 3000);
+        assert_eq!(dur_seconds.to_millis().as_u64_millis(), 3000);
     }
 }
