@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use multiversx_chain_core::types::TimestampMillis;
+use multiversx_chain_core::types::{TimestampMillis, TimestampSeconds};
 
 use crate::{
     api::{
@@ -225,15 +225,26 @@ where
         A::blockchain_api_impl().get_gas_left()
     }
 
+    /// Block timestamp, in seconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_timestamp_seconds instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp()
     }
 
+    /// Block timestamp, in seconds.
+    #[inline]
+    pub fn get_block_timestamp_seconds(&self) -> TimestampSeconds {
+        TimestampSeconds::new(A::blockchain_api_impl().get_block_timestamp())
+    }
+
     /// Block timestamp, in milliseconds.
     #[deprecated(
         since = "0.63.0",
-        note = "Use get_block_timestamp_millis, it returns a properly typed timestamps"
+        note = "Use get_block_timestamp_millis instead, it returns a properly typed timestamps"
     )]
     pub fn get_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp_ms()
@@ -264,9 +275,19 @@ where
         A::blockchain_api_impl().get_block_round_time_ms()
     }
 
+    /// Epoch start block timestamp, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use epoch_start_block_timestamp_millis instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_timestamp_ms()
+    }
+
+    /// Epoch start block timestamp, in milliseconds.
+    pub fn epoch_start_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().epoch_start_block_timestamp_ms())
     }
 
     #[inline]
@@ -298,14 +319,33 @@ where
         }
     }
 
+    /// Previous block timestamp, in seconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_prev_block_timestamp_seconds instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp()
     }
 
+    pub fn get_prev_block_timestamp_seconds(&self) -> TimestampSeconds {
+        TimestampSeconds::new(A::blockchain_api_impl().get_prev_block_timestamp())
+    }
+
+    /// Previous block timestamp, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_prev_block_timestamp_millis instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_prev_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp_ms()
+    }
+
+    #[inline]
+    pub fn get_prev_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().get_prev_block_timestamp_ms())
     }
 
     #[inline]

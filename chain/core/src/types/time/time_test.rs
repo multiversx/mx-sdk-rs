@@ -53,7 +53,7 @@ mod timestamp_seconds_tests {
         let t = TimestampSeconds::new(1);
 
         // Value getter
-        assert_eq!(t.as_seconds(), 1);
+        assert_eq!(t.as_u64(), 1);
 
         // Conversion to milliseconds
         let ms = t.to_millis();

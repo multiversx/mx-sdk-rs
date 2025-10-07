@@ -86,3 +86,9 @@ impl TopDecode for DurationMillis {
         Ok(DurationMillis(u64::top_decode_or_handle_err(input, h)?))
     }
 }
+
+impl core::fmt::Display for DurationMillis {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{} ms", self.0)
+    }
+}

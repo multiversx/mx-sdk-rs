@@ -45,7 +45,7 @@ where
 {
     pub fn init<
         Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg1: ProxyArg<TimestampMillis>,
         Arg2: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
@@ -118,7 +118,7 @@ where
 
     pub fn deadline(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TimestampMillis> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getDeadline")

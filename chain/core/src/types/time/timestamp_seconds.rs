@@ -13,7 +13,7 @@ impl TimestampSeconds {
         TimestampSeconds(seconds)
     }
 
-    pub fn as_seconds(&self) -> u64 {
+    pub fn as_u64(&self) -> u64 {
         self.0
     }
 
@@ -31,6 +31,15 @@ impl TimestampSeconds {
     }
 }
 
+// TimestampSeconds - TimestampSeconds = DurationSeconds
+impl Sub<TimestampSeconds> for TimestampSeconds {
+    type Output = DurationSeconds;
+
+    fn sub(self, rhs: TimestampSeconds) -> Self::Output {
+        DurationSeconds(self.0 - rhs.0)
+    }
+}
+
 // TimestampSeconds + DurationSeconds = TimestampSeconds
 impl Add<DurationSeconds> for TimestampSeconds {
     type Output = TimestampSeconds;
@@ -40,12 +49,12 @@ impl Add<DurationSeconds> for TimestampSeconds {
     }
 }
 
-// TimestampSeconds - TimestampSeconds = DurationSeconds
-impl Sub<TimestampSeconds> for TimestampSeconds {
-    type Output = DurationSeconds;
+// TimestampSeconds - DurationSeconds = TimestampSeconds
+impl Sub<DurationSeconds> for TimestampSeconds {
+    type Output = TimestampSeconds;
 
-    fn sub(self, rhs: TimestampSeconds) -> Self::Output {
-        DurationSeconds(self.0 - rhs.0)
+    fn sub(self, rhs: DurationSeconds) -> Self::Output {
+        TimestampSeconds(self.0 - rhs.0)
     }
 }
 
@@ -86,5 +95,11 @@ impl TopDecode for TimestampSeconds {
         H: DecodeErrorHandler,
     {
         Ok(TimestampSeconds(u64::top_decode_or_handle_err(input, h)?))
+    }
+}
+
+impl core::fmt::Display for TimestampSeconds {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{} s", self.0)
     }
 }

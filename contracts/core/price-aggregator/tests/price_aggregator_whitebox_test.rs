@@ -2,6 +2,7 @@ use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
     PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
+use multiversx_sc::types::TimestampSeconds;
 use multiversx_sc_modules::{pause::PauseModule, staking::StakingModule};
 use multiversx_sc_scenario::imports::*;
 
@@ -58,7 +59,7 @@ fn test_price_aggregator_submit() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                99,
+                TimestampSeconds::new(99),
                 managed_biguint!(100),
                 DECIMALS,
             )
@@ -83,7 +84,7 @@ fn test_price_aggregator_submit() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                10,
+                TimestampSeconds::new(10),
                 managed_biguint!(100),
                 DECIMALS,
             )
@@ -98,13 +99,13 @@ fn test_price_aggregator_submit() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                95,
+                TimestampSeconds::new(95),
                 managed_biguint!(100),
                 DECIMALS,
             )
         });
 
-    let current_timestamp = 100;
+    let current_timestamp = TimestampSeconds::new(100);
     world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
         |sc| {
@@ -149,7 +150,7 @@ fn test_price_aggregator_submit() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                95,
+                TimestampSeconds::new(95),
                 managed_biguint!(100),
                 DECIMALS,
             )
@@ -206,14 +207,16 @@ fn test_price_aggregator_submit_round_ok() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                95,
+                TimestampSeconds::new(95),
                 managed_biguint!(10_000),
                 DECIMALS,
             )
         });
 
-    let current_timestamp = 110;
-    world.current_block().block_timestamp(current_timestamp);
+    let current_timestamp = TimestampSeconds::new(110);
+    world
+        .current_block()
+        .block_timestamp(current_timestamp.as_u64());
 
     // submit second
     world
@@ -224,7 +227,7 @@ fn test_price_aggregator_submit_round_ok() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                101,
+                TimestampSeconds::new(101),
                 managed_biguint!(11_000),
                 DECIMALS,
             )
@@ -239,7 +242,7 @@ fn test_price_aggregator_submit_round_ok() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                105,
+                TimestampSeconds::new(105),
                 managed_biguint!(12_000),
                 DECIMALS,
             )
@@ -313,14 +316,17 @@ fn test_price_aggregator_discarded_round() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                95,
+                TimestampSeconds::new(95),
                 managed_biguint!(10_000),
                 DECIMALS,
             )
         });
 
-    let current_timestamp = 100 + MAX_ROUND_DURATION_SECONDS + 1;
-    world.current_block().block_timestamp(current_timestamp);
+    let current_timestamp =
+        TimestampSeconds::new(100) + MAX_ROUND_DURATION_SECONDS + DurationSeconds::new(1);
+    world
+        .current_block()
+        .block_timestamp(current_timestamp.as_u64());
 
     // submit second - this will discard the previous submission
     world
@@ -331,7 +337,7 @@ fn test_price_aggregator_discarded_round() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                current_timestamp - 1,
+                current_timestamp - DurationSeconds::new(1),
                 managed_biguint!(11_000),
                 DECIMALS,
             )
@@ -432,7 +438,7 @@ fn test_price_aggregator_slashing() {
             sc.submit(
                 managed_buffer!(EGLD_TICKER),
                 managed_buffer!(USD_TICKER),
-                95,
+                TimestampSeconds::new(95),
                 managed_biguint!(10_000),
                 DECIMALS,
             )

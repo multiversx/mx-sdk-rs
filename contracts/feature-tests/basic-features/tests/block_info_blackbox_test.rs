@@ -47,7 +47,7 @@ fn block_info_blackbox() {
     ) = result.into_tuple();
 
     assert_eq!(block_round_time_ms, 6000);
-    assert_eq!(epoch_start_block_timestamp_ms, 0);
+    assert_eq!(epoch_start_block_timestamp_ms, TimestampMillis::zero());
     assert_eq!(epoch_start_block_nonce, 0);
     assert_eq!(epoch_start_block_round, 0);
 
@@ -77,7 +77,10 @@ fn block_info_blackbox() {
     ) = result.into_tuple();
 
     assert_eq!(block_round_time_ms, 600);
-    assert_eq!(epoch_start_block_timestamp_ms, 123_000_000);
+    assert_eq!(
+        epoch_start_block_timestamp_ms,
+        TimestampMillis::new(123_000_000)
+    );
     assert_eq!(epoch_start_block_nonce, 15_000);
     assert_eq!(epoch_start_block_round, 17_000);
 }
