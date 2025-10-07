@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use multiversx_chain_core::types::{TimestampMillis, TimestampSeconds};
+use multiversx_chain_core::types::{DurationMillis, TimestampMillis, TimestampSeconds};
 
 use crate::{
     api::{
@@ -270,9 +270,20 @@ where
         A::blockchain_api_impl().get_block_epoch()
     }
 
+    /// Block round time, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_round_time_millis instead, it returns a properly typed duration"
+    )]
     #[inline]
     pub fn get_block_round_time_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_round_time_ms()
+    }
+
+    /// Block round time, in milliseconds.
+    #[inline]
+    pub fn get_block_round_time_millis(&self) -> DurationMillis {
+        DurationMillis::new(A::blockchain_api_impl().get_block_round_time_ms())
     }
 
     /// Epoch start block timestamp, in milliseconds.

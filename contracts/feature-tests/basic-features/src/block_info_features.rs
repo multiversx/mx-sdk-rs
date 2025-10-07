@@ -54,9 +54,9 @@ pub trait BlockInfoFeatures {
     }
 
     #[view]
-    fn epoch_info(&self) -> MultiValue4<u64, TimestampMillis, u64, u64> {
+    fn epoch_info(&self) -> MultiValue4<DurationMillis, TimestampMillis, u64, u64> {
         (
-            self.blockchain().get_block_round_time_ms(),
+            self.blockchain().get_block_round_time_millis(),
             self.blockchain().epoch_start_block_timestamp_millis(),
             self.blockchain().epoch_start_block_nonce(),
             self.blockchain().epoch_start_block_round(),
