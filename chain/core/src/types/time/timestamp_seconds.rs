@@ -13,7 +13,7 @@ impl TimestampSeconds {
         TimestampSeconds(seconds)
     }
 
-    pub fn as_u64(&self) -> u64 {
+    pub fn as_u64_seconds(&self) -> u64 {
         self.0
     }
 

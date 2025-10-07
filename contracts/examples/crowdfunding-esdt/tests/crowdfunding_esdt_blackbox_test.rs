@@ -108,10 +108,10 @@ impl CrowdfundingESDTTestState {
             .esdt_balance(CF_TOKEN_ID, balance);
     }
 
-    fn set_block_timestamp(&mut self, block_timestamp_expr: TimestampMillis) {
+    fn set_block_timestamp(&mut self, block_timestamp: TimestampMillis) {
         self.world
             .current_block()
-            .block_timestamp_ms(block_timestamp_expr.as_u64());
+            .block_timestamp_ms(block_timestamp);
     }
 }
 

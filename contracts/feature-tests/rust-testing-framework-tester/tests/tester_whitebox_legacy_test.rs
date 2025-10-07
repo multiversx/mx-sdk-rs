@@ -974,7 +974,7 @@ fn blockchain_state_test() {
 
             assert_eq!(expected_epoch, actual_epoch);
             assert_eq!(expected_nonce, actual_nonce);
-            assert_eq!(expected_timestamp, actual_timestamp.as_u64());
+            assert_eq!(expected_timestamp, actual_timestamp.as_u64_millis());
         })
         .assert_ok();
 }

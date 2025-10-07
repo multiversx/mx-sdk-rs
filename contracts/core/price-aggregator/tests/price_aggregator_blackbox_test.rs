@@ -274,7 +274,7 @@ fn test_price_aggregator_submit_round_ok() {
     state
         .world
         .current_block()
-        .block_timestamp(current_timestamp.as_u64());
+        .block_timestamp(current_timestamp);
 
     // submit second
     state.submit(
@@ -342,7 +342,7 @@ fn test_price_aggregator_discarded_round() {
     state
         .world
         .current_block()
-        .block_timestamp(current_timestamp.as_u64());
+        .block_timestamp(current_timestamp);
 
     // submit second - this will discard the previous submission
     state.submit(

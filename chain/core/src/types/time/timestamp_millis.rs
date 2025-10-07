@@ -14,7 +14,7 @@ impl TimestampMillis {
         TimestampMillis(millis)
     }
 
-    pub fn as_u64(&self) -> u64 {
+    pub fn as_u64_millis(&self) -> u64 {
         self.0
     }
 

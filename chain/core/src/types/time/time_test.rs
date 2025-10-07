@@ -25,7 +25,7 @@ mod timestamp_millis_tests {
         let t = TimestampMillis::new(1500);
 
         // Value getter
-        assert_eq!(t.as_u64(), 1500);
+        assert_eq!(t.as_u64_millis(), 1500);
 
         // Conversion to seconds (truncating)
         assert_eq!(t.to_seconds(), TimestampSeconds::new(1));
@@ -53,11 +53,11 @@ mod timestamp_seconds_tests {
         let t = TimestampSeconds::new(1);
 
         // Value getter
-        assert_eq!(t.as_u64(), 1);
+        assert_eq!(t.as_u64_seconds(), 1);
 
         // Conversion to milliseconds
         let ms = t.to_millis();
-        assert_eq!(ms.as_u64(), 1000);
+        assert_eq!(ms.as_u64_millis(), 1000);
     }
 }
 
@@ -81,10 +81,10 @@ mod duration_millis_tests {
         let d = DurationMillis::new(2500);
 
         // Raw value access
-        assert_eq!(d.as_u64(), 2500);
+        assert_eq!(d.as_u64_milis(), 2500);
 
         // Convert to seconds (truncating)
-        assert_eq!(d.to_seconds().as_u64(), 2);
+        assert_eq!(d.to_seconds().as_u64_seconds(), 2);
     }
 }
 
@@ -108,10 +108,10 @@ mod duration_seconds_tests {
         let d = DurationSeconds::new(2);
 
         // Raw value access
-        assert_eq!(d.as_u64(), 2);
+        assert_eq!(d.as_u64_seconds(), 2);
 
         // Convert to milliseconds and check value
-        assert_eq!(d.to_millis().as_u64(), 2000);
+        assert_eq!(d.to_millis().as_u64_milis(), 2000);
     }
 }
 
@@ -126,17 +126,17 @@ mod unit_conversion_tests {
 
         // Test seconds to milliseconds conversion
         let ts_seconds = TimestampSeconds::new(5);
-        assert_eq!(ts_seconds.to_millis().as_u64(), 5000);
+        assert_eq!(ts_seconds.to_millis().as_u64_millis(), 5000);
     }
 
     #[test]
     fn test_duration_conversions() {
         // Test milliseconds to seconds conversion (truncating)
         let dur_millis = DurationMillis::new(3000);
-        assert_eq!(dur_millis.to_seconds().as_u64(), 3);
+        assert_eq!(dur_millis.to_seconds().as_u64_seconds(), 3);
 
         // Test seconds to milliseconds conversion
         let dur_seconds = DurationSeconds::new(3);
-        assert_eq!(dur_seconds.to_millis().as_u64(), 3000);
+        assert_eq!(dur_seconds.to_millis().as_u64_milis(), 3000);
     }
 }
