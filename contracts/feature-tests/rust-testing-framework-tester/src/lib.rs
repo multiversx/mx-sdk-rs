@@ -152,8 +152,8 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[endpoint]
-    fn get_block_timestamp_ms(&self) -> u64 {
-        self.blockchain().get_block_timestamp_ms()
+    fn get_block_timestamp_millis(&self) -> TimestampMillis {
+        self.blockchain().get_block_timestamp_millis()
     }
 
     #[endpoint]

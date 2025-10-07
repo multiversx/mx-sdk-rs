@@ -26,8 +26,8 @@ pub async fn ping_pong_egld_cli() {
             interact
                 .deploy(
                     args.ping_amount.clone(),
-                    args.duration_in_seconds,
-                    args.opt_activation_timestamp,
+                    DurationMillis::new(args.duration),
+                    args.opt_activation_timestamp.map(TimestampMillis::new),
                     OptionalValue::from(args.max_funds.clone()),
                 )
                 .await;
@@ -36,8 +36,8 @@ pub async fn ping_pong_egld_cli() {
             interact
                 .upgrade(
                     args.ping_amount.clone(),
-                    args.duration_in_seconds,
-                    args.opt_activation_timestamp,
+                    DurationMillis::new(args.duration),
+                    args.opt_activation_timestamp.map(TimestampMillis::new),
                     OptionalValue::from(args.max_funds.clone()),
                 )
                 .await
@@ -148,8 +148,8 @@ impl PingPongEgldInteract {
     pub async fn deploy(
         &mut self,
         ping_amount: RustBigUint,
-        duration_in_seconds: u64,
-        opt_activation_timestamp: Option<u64>,
+        duration: DurationMillis,
+        opt_activation_timestamp: Option<TimestampMillis>,
         max_funds: OptionalValue<RustBigUint>,
     ) -> (u64, String) {
         self.set_state().await;
@@ -160,12 +160,7 @@ impl PingPongEgldInteract {
             .from(&self.ping_pong_owner_address)
             .gas(30_000_000u64)
             .typed(proxy_ping_pong_egld::PingPongProxy)
-            .init(
-                ping_amount,
-                duration_in_seconds,
-                opt_activation_timestamp,
-                max_funds,
-            )
+            .init(ping_amount, duration, opt_activation_timestamp, max_funds)
             .code(PING_PONG_CODE)
             .returns(ReturnsNewBech32Address)
             .returns(ReturnsStatus)
@@ -182,8 +177,8 @@ impl PingPongEgldInteract {
     pub async fn upgrade(
         &mut self,
         ping_amount: RustBigUint,
-        duration_in_seconds: u64,
-        opt_activation_timestamp: Option<u64>,
+        duration: DurationMillis,
+        opt_activation_timestamp: Option<TimestampMillis>,
         max_funds: OptionalValue<RustBigUint>,
     ) {
         let response = self
@@ -193,12 +188,7 @@ impl PingPongEgldInteract {
             .from(&self.wallet_address)
             .gas(30_000_000u64)
             .typed(proxy_ping_pong_egld::PingPongProxy)
-            .upgrade(
-                ping_amount,
-                duration_in_seconds,
-                opt_activation_timestamp,
-                max_funds,
-            )
+            .upgrade(ping_amount, duration, opt_activation_timestamp, max_funds)
             .code(PING_PONG_CODE)
             .returns(ReturnsNewAddress)
             .run()
@@ -317,7 +307,7 @@ impl PingPongEgldInteract {
             .await
     }
 
-    pub async fn get_deadline(&mut self) -> u64 {
+    pub async fn get_deadline(&mut self) -> TimestampMillis {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
@@ -328,7 +318,7 @@ impl PingPongEgldInteract {
             .await
     }
 
-    pub async fn get_activation_timestamp(&mut self) -> u64 {
+    pub async fn get_activation_timestamp(&mut self) -> TimestampMillis {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())

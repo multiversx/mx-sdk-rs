@@ -35,7 +35,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         create_nft => create_nft
         get_block_epoch => get_block_epoch
         get_block_nonce => get_block_nonce
-        get_block_timestamp_ms => get_block_timestamp_ms
+        get_block_timestamp_millis => get_block_timestamp_millis
         get_random_buffer_once => get_random_buffer_once
         get_random_buffer_twice => get_random_buffer_twice
         call_other_contract_execute_on_dest => call_other_contract_execute_on_dest

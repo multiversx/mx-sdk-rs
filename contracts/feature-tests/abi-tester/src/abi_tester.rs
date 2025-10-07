@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 mod abi_enum;
 pub mod abi_proxy;
@@ -130,6 +130,13 @@ pub trait AbiTester {
 
     #[endpoint]
     fn esdt_token_data(&self) -> EsdtTokenData<Self::Api> {
+        unreachable!()
+    }
+
+    #[endpoint]
+    fn time_types(
+        &self,
+    ) -> MultiValue4<TimestampMillis, TimestampSeconds, DurationMillis, DurationSeconds> {
         unreachable!()
     }
 

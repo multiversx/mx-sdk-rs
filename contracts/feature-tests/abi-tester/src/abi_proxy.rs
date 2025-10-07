@@ -276,6 +276,15 @@ where
             .original_result()
     }
 
+    pub fn time_types(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<TimestampMillis, TimestampSeconds, DurationMillis, DurationSeconds>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("time_types")
+            .original_result()
+    }
+
     pub fn sample_storage_mapper(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OnlyShowsUpAsNestedInSingleValueMapper> {

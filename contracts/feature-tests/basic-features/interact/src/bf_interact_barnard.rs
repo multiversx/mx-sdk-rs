@@ -67,8 +67,8 @@ impl BasicFeaturesInteract {
 
         println!(
             "Result: 
-    prev_block_timestamp: {prev_block_timestamp_ms} ms ({prev_block_timestamp} s)
-    block_timestamp:      {block_timestamp_ms} ms ({block_timestamp} s)
+    prev_block_timestamp: {prev_block_timestamp_ms} ({prev_block_timestamp})
+    block_timestamp:      {block_timestamp_ms} ({block_timestamp})
         "
         );
     }

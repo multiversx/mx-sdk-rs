@@ -13,7 +13,7 @@ pub trait KittyAuction {
         &self,
         gen_zero_kitty_starting_price: BigUint,
         gen_zero_kitty_ending_price: BigUint,
-        gen_zero_kitty_auction_duration: u64,
+        gen_zero_kitty_auction_duration: DurationMillis,
         opt_kitty_ownership_contract_address: OptionalValue<ManagedAddress>,
     ) {
         self.gen_zero_kitty_starting_price()
@@ -89,9 +89,9 @@ pub trait KittyAuction {
         kitty_id: u32,
         starting_price: BigUint,
         ending_price: BigUint,
-        duration: u64,
+        duration: DurationMillis,
     ) {
-        let deadline = self.blockchain().get_block_timestamp_ms() + duration;
+        let deadline = self.blockchain().get_block_timestamp_millis() + duration;
 
         require!(
             !self.is_up_for_auction(kitty_id),
@@ -103,7 +103,7 @@ pub trait KittyAuction {
             "starting price must be less than ending price!"
         );
         require!(
-            deadline > self.blockchain().get_block_timestamp_ms(),
+            deadline > self.blockchain().get_block_timestamp_millis(),
             "deadline can't be in the past!"
         );
 
@@ -122,9 +122,9 @@ pub trait KittyAuction {
         kitty_id: u32,
         starting_price: BigUint,
         ending_price: BigUint,
-        duration: u64,
+        duration: DurationMillis,
     ) {
-        let deadline = self.blockchain().get_block_timestamp_ms() + duration;
+        let deadline = self.blockchain().get_block_timestamp_millis() + duration;
 
         require!(
             !self.is_up_for_auction(kitty_id),
@@ -136,7 +136,7 @@ pub trait KittyAuction {
             "starting price must be less than ending price!"
         );
         require!(
-            deadline > self.blockchain().get_block_timestamp_ms(),
+            deadline > self.blockchain().get_block_timestamp_millis(),
             "deadline can't be in the past!"
         );
 
@@ -167,7 +167,7 @@ pub trait KittyAuction {
             "can't bid on your own kitty!"
         );
         require!(
-            self.blockchain().get_block_timestamp_ms() < auction.deadline,
+            self.blockchain().get_block_timestamp_millis() < auction.deadline,
             "auction ended already!"
         );
         require!(
@@ -207,7 +207,7 @@ pub trait KittyAuction {
         let auction = self.auction(kitty_id).get();
 
         require!(
-            self.blockchain().get_block_timestamp_ms() > auction.deadline
+            self.blockchain().get_block_timestamp_millis() > auction.deadline
                 || auction.current_bid == auction.ending_price,
             "auction has not ended yet!"
         );
@@ -235,7 +235,7 @@ pub trait KittyAuction {
         kitty_id: u32,
         starting_price: BigUint,
         ending_price: BigUint,
-        deadline: u64,
+        deadline: TimestampMillis,
     ) {
         let caller = self.blockchain().get_caller();
 
@@ -262,7 +262,7 @@ pub trait KittyAuction {
         let starting_price = self.gen_zero_kitty_starting_price().get();
         let ending_price = self.gen_zero_kitty_ending_price().get();
         let duration = self.gen_zero_kitty_auction_duration().get();
-        let deadline = self.blockchain().get_block_timestamp_ms() + duration;
+        let deadline = self.blockchain().get_block_timestamp_millis() + duration;
 
         let auction = Auction::new(
             AuctionType::Selling,
@@ -325,7 +325,7 @@ pub trait KittyAuction {
         cb_kitty_id: u32,
         starting_price: BigUint,
         ending_price: BigUint,
-        deadline: u64,
+        deadline: TimestampMillis,
         kitty_owner: ManagedAddress,
     ) {
         match result {
@@ -428,7 +428,7 @@ pub trait KittyAuction {
     fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("genZeroKittyAuctionDuration")]
-    fn gen_zero_kitty_auction_duration(&self) -> SingleValueMapper<u64>;
+    fn gen_zero_kitty_auction_duration(&self) -> SingleValueMapper<DurationMillis>;
 
     // auction
 

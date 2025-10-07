@@ -200,7 +200,7 @@ where
 
     pub fn cooldown_time(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, DurationMillis> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("cooldown_time")
@@ -299,7 +299,7 @@ where
     pub name: ManagedBuffer<Api>,
     pub dna: u64,
     pub level: u16,
-    pub ready_time: u64,
+    pub ready_time: TimestampMillis,
     pub win_count: usize,
     pub loss_count: usize,
 }

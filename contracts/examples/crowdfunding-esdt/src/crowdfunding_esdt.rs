@@ -1,6 +1,6 @@
 #![no_std]
 
-use multiversx_sc::{derive_imports::*, imports::*};
+use multiversx_sc::{chain_core::types::TimestampMillis, derive_imports::*, imports::*};
 pub mod crowdfunding_esdt_proxy;
 
 #[type_abi]
@@ -14,7 +14,12 @@ pub enum Status {
 #[multiversx_sc::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BigUint, deadline: u64, token_identifier: EgldOrEsdtTokenIdentifier) {
+    fn init(
+        &self,
+        target: BigUint,
+        deadline: TimestampMillis,
+        token_identifier: EgldOrEsdtTokenIdentifier,
+    ) {
         require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
@@ -100,8 +105,8 @@ pub trait Crowdfunding {
 
     // private
 
-    fn get_current_time_ms(&self) -> u64 {
-        self.blockchain().get_block_timestamp_ms()
+    fn get_current_time_ms(&self) -> TimestampMillis {
+        self.blockchain().get_block_timestamp_millis()
     }
 
     // storage
@@ -114,7 +119,7 @@ pub trait Crowdfunding {
     #[view(getDeadline)]
     #[title("deadline")]
     #[storage_mapper("deadline")]
-    fn deadline(&self) -> SingleValueMapper<u64>;
+    fn deadline(&self) -> SingleValueMapper<TimestampMillis>;
 
     #[view(getDeposit)]
     #[title("deposit")]
