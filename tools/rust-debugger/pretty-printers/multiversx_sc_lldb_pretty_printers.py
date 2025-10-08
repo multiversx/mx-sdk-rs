@@ -29,7 +29,7 @@ BIG_INT_TYPE = f"{MANAGED_BASIC_PATH}::big_int::BigInt<{DEBUG_API_TYPE} ?>"
 BIG_FLOAT_TYPE = f"{MANAGED_BASIC_PATH}::big_float::BigFloat<{DEBUG_API_TYPE} ?>"
 MANAGED_BUFFER_TYPE = f"{MANAGED_BASIC_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE} ?>"
 
-# 3 SC wasm - Managed wrapped types
+# 3. SC wasm - Managed wrapped types
 ## 3a. general
 MANAGED_WRAPPED_PATH = "multiversx_sc::types::managed::wrapped"
 BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
