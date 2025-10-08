@@ -704,12 +704,16 @@ fn proxy_test_init_rs() {
 
 #[test]
 fn proxy_test_message_other_shard_rs() {
-    world().run("scenarios/proxy_test_message_otherShard.scen.json");
+    world()
+        .insert_ghost_accounts()
+        .run("scenarios/proxy_test_message_otherShard.scen.json");
 }
 
 #[test]
 fn proxy_test_message_other_shard_callback_rs() {
-    world().run("scenarios/proxy_test_message_otherShard_callback.scen.json");
+    world()
+        .insert_ghost_accounts()
+        .run("scenarios/proxy_test_message_otherShard_callback.scen.json");
 }
 
 #[test]
@@ -724,12 +728,16 @@ fn proxy_test_message_same_shard_callback_rs() {
 
 #[test]
 fn proxy_test_payment_other_shard_rs() {
-    world().run("scenarios/proxy_test_payment_otherShard.scen.json");
+    world()
+        .insert_ghost_accounts()
+        .run("scenarios/proxy_test_payment_otherShard.scen.json");
 }
 
 #[test]
 fn proxy_test_payment_other_shard_callback_rs() {
-    world().run("scenarios/proxy_test_payment_otherShard_callback.scen.json");
+    world()
+        .insert_ghost_accounts()
+        .run("scenarios/proxy_test_payment_otherShard_callback.scen.json");
 }
 
 #[test]
