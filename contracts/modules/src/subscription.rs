@@ -27,7 +27,7 @@ multiversx_sc::derive_imports!();
 #[type_abi]
 #[derive(TopEncode, TopDecode)]
 pub struct SubscriptionAttributes<T: NestedEncode + NestedDecode + TypeAbi> {
-    pub expiration: u64,
+    pub expiration: TimestampMillis,
     pub attributes: T,
 }
 
@@ -42,12 +42,12 @@ pub trait SubscriptionModule {
         name: &ManagedBuffer,
         royalties: &BigUint,
         hash: &ManagedBuffer,
-        duration: u64,
+        duration: DurationMillis,
         attributes: T,
         uris: &ManagedVec<ManagedBuffer>,
     ) -> u64 {
         let subscription_attributes = SubscriptionAttributes::<T> {
-            expiration: self.blockchain().get_block_timestamp() + duration,
+            expiration: self.blockchain().get_block_timestamp_millis() + duration,
             attributes,
         };
 
@@ -96,16 +96,16 @@ pub trait SubscriptionModule {
         &self,
         #[indexed] token_id: &ManagedBuffer,
         #[indexed] token_nonce: u64,
-        #[indexed] expiration: u64,
+        #[indexed] expiration: TimestampMillis,
     );
 
     fn renew_subscription<T: NestedEncode + NestedDecode + TypeAbi>(
         &self,
         id: &TokenIdentifier,
         nonce: u64,
-        duration: u64,
+        duration: DurationMillis,
     ) {
-        let time = self.blockchain().get_block_timestamp();
+        let time = self.blockchain().get_block_timestamp_millis();
         let mut subscription_attributes: SubscriptionAttributes<T> =
             self.blockchain().get_token_attributes(id, nonce);
         let expiration = subscription_attributes.expiration;
@@ -133,12 +133,12 @@ pub trait SubscriptionModule {
     ) {
         let mut subscription_attributes: SubscriptionAttributes<T> =
             self.blockchain().get_token_attributes(id, nonce);
-        subscription_attributes.expiration = 0;
+        subscription_attributes.expiration = TimestampMillis::new(0);
 
         self.send()
             .nft_update_attributes(id, nonce, &subscription_attributes);
 
-        self.subscription_update_event(id.as_managed_buffer(), nonce, 0);
+        self.subscription_update_event(id.as_managed_buffer(), nonce, TimestampMillis::new(0));
     }
 
     // @dev should only be called if the nft is owned by the contract
@@ -146,7 +146,7 @@ pub trait SubscriptionModule {
         &self,
         id: &TokenIdentifier,
         nonce: u64,
-    ) -> u64 {
+    ) -> TimestampMillis {
         let subscription_attributes: SubscriptionAttributes<T> =
             self.blockchain().get_token_attributes(id, nonce);
 

@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use multiversx_chain_core::types::{DurationMillis, TimestampMillis, TimestampSeconds};
+
 use crate::{
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, BlockchainApi, BlockchainApiImpl, ErrorApi,
@@ -223,15 +225,34 @@ where
         A::blockchain_api_impl().get_gas_left()
     }
 
+    /// Block timestamp, in seconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_timestamp_seconds instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp()
     }
 
-    /// Block timestamp, in milliseconds.
+    /// Block timestamp, in seconds.
     #[inline]
+    pub fn get_block_timestamp_seconds(&self) -> TimestampSeconds {
+        TimestampSeconds::new(A::blockchain_api_impl().get_block_timestamp())
+    }
+
+    /// Block timestamp, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_timestamp_millis instead, it returns a properly typed timestamps"
+    )]
     pub fn get_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp_ms()
+    }
+
+    /// Block timestamp, in milliseconds.
+    pub fn get_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().get_block_timestamp_ms())
     }
 
     #[inline]
@@ -249,14 +270,35 @@ where
         A::blockchain_api_impl().get_block_epoch()
     }
 
+    /// Block round time, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_round_time_millis instead, it returns a properly typed duration"
+    )]
     #[inline]
     pub fn get_block_round_time_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_round_time_ms()
     }
 
+    /// Block round time, in milliseconds.
+    #[inline]
+    pub fn get_block_round_time_millis(&self) -> DurationMillis {
+        DurationMillis::new(A::blockchain_api_impl().get_block_round_time_ms())
+    }
+
+    /// Epoch start block timestamp, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use epoch_start_block_timestamp_millis instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_timestamp_ms()
+    }
+
+    /// Epoch start block timestamp, in milliseconds.
+    pub fn epoch_start_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().epoch_start_block_timestamp_ms())
     }
 
     #[inline]
@@ -288,21 +330,44 @@ where
         }
     }
 
+    /// Previous block timestamp, in seconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_prev_block_timestamp_seconds instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp()
     }
 
+    /// Previous block timestamp, in seconds.
+    pub fn get_prev_block_timestamp_seconds(&self) -> TimestampSeconds {
+        TimestampSeconds::new(A::blockchain_api_impl().get_prev_block_timestamp())
+    }
+
+    /// Previous block timestamp, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_prev_block_timestamp_millis instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_prev_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp_ms()
     }
 
+    /// Previous block timestamp, in milliseconds.
+    #[inline]
+    pub fn get_prev_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().get_prev_block_timestamp_ms())
+    }
+
+    /// Previous block nonce.
     #[inline]
     pub fn get_prev_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_nonce()
     }
 
+    /// Previous block round.
     #[inline]
     pub fn get_prev_block_round(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_round()

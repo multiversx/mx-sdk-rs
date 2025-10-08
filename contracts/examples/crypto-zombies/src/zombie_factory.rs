@@ -11,7 +11,7 @@ pub trait ZombieFactory: storage::Storage {
                 name,
                 dna,
                 level: 1u16,
-                ready_time: self.blockchain().get_block_timestamp(),
+                ready_time: self.blockchain().get_block_timestamp_millis(),
                 win_count: 0usize,
                 loss_count: 0usize,
             });

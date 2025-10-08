@@ -12,7 +12,7 @@ use multiversx_sc_modules::default_issue_callbacks;
 #[type_abi]
 #[derive(TopEncode, TopDecode)]
 pub struct ExampleAttributes {
-    pub creation_timestamp: u64,
+    pub creation_timestamp: TimestampMillis,
 }
 
 #[multiversx_sc::contract]
@@ -62,7 +62,7 @@ pub trait SeedNftMinter:
         };
 
         let attributes = ExampleAttributes {
-            creation_timestamp: self.blockchain().get_block_timestamp(),
+            creation_timestamp: self.blockchain().get_block_timestamp_millis(),
         };
         let nft_nonce = self.create_nft_with_attributes(
             name,

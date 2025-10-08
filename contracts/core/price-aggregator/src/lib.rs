@@ -12,8 +12,8 @@ use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair
 
 const SUBMISSION_LIST_MAX_LEN: usize = 50;
 const SUBMISSION_LIST_MIN_LEN: usize = 3;
-const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 30;
-pub const MAX_ROUND_DURATION_SECONDS: u64 = 1_800; // 30 minutes
+const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: DurationSeconds = DurationSeconds::new(30);
+pub const MAX_ROUND_DURATION_SECONDS: DurationSeconds = DurationSeconds::new(1_800); // 30 minutes
 const PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
 const PAIR_DECIMALS_NOT_CONFIGURED_ERROR: &[u8] = b"pair decimals not configured";
 const WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
@@ -161,7 +161,7 @@ pub trait PriceAggregator:
             round_id = wrapped_rounds.unwrap().len() + 1;
         }
 
-        let current_timestamp = self.blockchain().get_block_timestamp();
+        let current_timestamp = self.blockchain().get_block_timestamp_seconds();
         let mut is_first_submission = false;
         let mut first_submission_timestamp = if submissions.is_empty() {
             first_sub_time_mapper.set(current_timestamp);
@@ -216,8 +216,8 @@ pub trait PriceAggregator:
             });
     }
 
-    fn require_valid_submission_timestamp(&self, submission_timestamp: u64) {
-        let current_timestamp = self.blockchain().get_block_timestamp();
+    fn require_valid_submission_timestamp(&self, submission_timestamp: Timestamp) {
+        let current_timestamp = self.blockchain().get_block_timestamp_seconds();
         require!(
             submission_timestamp <= current_timestamp,
             "Timestamp is from the future"
@@ -291,7 +291,7 @@ pub trait PriceAggregator:
             let price = price_opt.unwrap_or_else(|| sc_panic!("no submissions"));
             let price_feed = TimestampedPrice {
                 price,
-                timestamp: self.blockchain().get_block_timestamp(),
+                timestamp: self.blockchain().get_block_timestamp_seconds(),
                 decimals,
             };
 
@@ -326,7 +326,7 @@ pub trait PriceAggregator:
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-    ) -> MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8> {
+    ) -> MultiValue6<u32, ManagedBuffer, ManagedBuffer, Timestamp, BigUint, u8> {
         require!(self.not_paused(), PAUSED_ERROR_MSG);
 
         let token_pair = TokenPair { from, to };
@@ -351,7 +351,7 @@ pub trait PriceAggregator:
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-    ) -> OptionalValue<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
+    ) -> OptionalValue<MultiValue6<u32, ManagedBuffer, ManagedBuffer, Timestamp, BigUint, u8>> {
         Some(self.latest_price_feed(from, to)).into()
     }
 

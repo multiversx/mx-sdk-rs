@@ -84,7 +84,7 @@ where
 
     pub fn epoch_info(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<u64, u64, u64, u64>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<DurationMillis, TimestampMillis, u64, u64>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("epoch_info")
@@ -107,7 +107,7 @@ where
     /// Prev block timestamp (ms, then s), current block timestamp (ms, then s) 
     pub fn get_block_timestamps(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<u64, u64, u64, u64>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<TimestampMillis, TimestampSeconds, TimestampMillis, TimestampSeconds>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("get_block_timestamps")
