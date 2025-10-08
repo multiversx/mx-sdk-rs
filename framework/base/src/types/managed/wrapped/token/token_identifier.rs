@@ -6,10 +6,10 @@ use crate::{
     codec::*,
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
-    types::{ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedRef, ManagedType},
 };
 
-use super::{EgldOrEsdtTokenIdentifier, ManagedRef};
+use super::EgldOrEsdtTokenIdentifier;
 
 /// Specialized type for handling token identifiers.
 /// It wraps a BoxedBytes with the full ASCII name of the token.

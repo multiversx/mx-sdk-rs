@@ -3,8 +3,9 @@ use generic_array::typenum::U16;
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType, ManagedVecItem,
-        TokenIdentifier,
+        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
+        EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType, ManagedVec, ManagedVecItem,
+        ManagedVecItemPayloadBuffer, ManagedVecRef, TokenIdentifier,
     },
 };
 
@@ -18,11 +19,7 @@ use crate::{
     derive::type_abi,
 };
 
-use super::{
-    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
-    EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, ManagedVec, ManagedVecItemPayloadBuffer,
-    ManagedVecRef, MultiEgldOrEsdtPayment,
-};
+use super::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, MultiEgldOrEsdtPayment};
 
 #[type_abi]
 #[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]

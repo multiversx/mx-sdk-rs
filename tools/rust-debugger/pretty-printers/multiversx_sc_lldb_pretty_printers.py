@@ -30,14 +30,17 @@ BIG_FLOAT_TYPE = f"{MANAGED_BASIC_PATH}::big_float::BigFloat<{DEBUG_API_TYPE} ?>
 MANAGED_BUFFER_TYPE = f"{MANAGED_BASIC_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE} ?>"
 
 # 3. SC wasm - Managed wrapped types
+## 3a. general
 MANAGED_WRAPPED_PATH = "multiversx_sc::types::managed::wrapped"
-
 BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
-TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
 MANAGED_ADDRESS_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
 MANAGED_BYTE_ARRAY_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
-ESDT_TOKEN_PAYMENT_TYPE = f"{MANAGED_WRAPPED_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
-EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
+## 3b. tokens & payments
+MANAGED_WRAPPED_TOKEN_PATH = "multiversx_sc::types::managed::wrapped::token"
+TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
+ESDT_TOKEN_PAYMENT_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
+EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
+
 # ManagedOption
 MANAGED_OPTION_INNER_TYPE_INDEX = 1
 MANAGED_OPTION_NONE_HANDLE = 2147483646  # i32::MAX - 1
