@@ -111,14 +111,14 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
                 );
                 self.burn_percentage_for_lottery(&lottery_name)
                     .set(burn_percentage);
-            },
-            OptionalValue::None => {},
+            }
+            OptionalValue::None => {}
         }
 
         if let Some(whitelist) = opt_whitelist.as_option() {
             let mut mapper = self.lottery_whitelist(&lottery_name);
             for addr in &*whitelist {
-                let addr_id = self.addres_to_id_mapper().get_id_or_insert(&addr);
+                let addr_id = self.address_to_id_mapper().get_id_or_insert(&addr);
                 mapper.insert(addr_id);
             }
         }

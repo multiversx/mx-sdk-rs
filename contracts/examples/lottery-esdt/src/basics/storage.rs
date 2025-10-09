@@ -29,7 +29,7 @@ pub trait StorageModule {
     ) -> SingleValueMapper<usize>;
 
     #[storage_mapper("addressToIdMapper")]
-    fn addres_to_id_mapper(&self) -> AddressToIdMapper;
+    fn address_to_id_mapper(&self) -> AddressToIdMapper;
 
     #[storage_mapper("burnPercentageForLottery")]
     fn burn_percentage_for_lottery(

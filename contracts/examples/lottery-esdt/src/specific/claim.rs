@@ -7,7 +7,7 @@ pub trait ClaimModule: storage::StorageModule {
     #[endpoint]
     fn claim_rewards(&self, tokens: MultiValueEncoded<TokenIdentifier>) {
         let caller = self.blockchain().get_caller();
-        let caller_id = self.addres_to_id_mapper().get_id_or_insert(&caller);
+        let caller_id = self.address_to_id_mapper().get_id_or_insert(&caller);
         require!(
             !self.user_accumulated_token_rewards(&caller_id).is_empty(),
             "You have no rewards to claim"
