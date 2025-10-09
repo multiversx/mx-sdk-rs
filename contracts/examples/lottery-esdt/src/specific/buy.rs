@@ -15,10 +15,10 @@ pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
             Status::Inactive => sc_panic!("Lottery is currently inactive."),
             Status::Running => {
                 self.update_after_buy_ticket(&lottery_name, &token_identifier, &payment)
-            },
+            }
             Status::Ended => {
                 sc_panic!("Lottery entry period has ended! Awaiting winner announcement.")
-            },
+            }
         };
     }
 
@@ -31,7 +31,7 @@ pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
         let info_mapper = self.lottery_info(lottery_name);
         let mut info = info_mapper.get();
         let caller = self.blockchain().get_caller();
-        let caller_id = self.addres_to_id_mapper().get_id_or_insert(&caller);
+        let caller_id = self.address_to_id_mapper().get_id_or_insert(&caller);
         let whitelist = self.lottery_whitelist(lottery_name);
 
         require!(
