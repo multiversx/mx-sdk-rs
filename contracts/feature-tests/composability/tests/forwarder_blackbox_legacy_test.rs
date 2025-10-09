@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-use forwarder_legacy::fwd_nft_legacy::{Color, ProxyTrait as _};
+use forwarder_legacy::fwd_nft_legacy::Color;
 
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -12,7 +12,7 @@ use multiversx_sc_scenario::{
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const FORWARDER_ADDRESS_EXPR: &str = "sc:forwarder_legacy";
-const FORWARDER_PATH_EXPR: &str = "mxsc:output/forwarder_legacy.mxsc.json";
+const FORWARDER_PATH_EXPR: &str = "mxsc:forwarder-legacy/output/forwarder-legacy.mxsc.json";
 
 const NFT_TOKEN_ID_EXPR: &str = "str:COOL-123456";
 const NFT_TOKEN_ID: &[u8] = b"COOL-123456";
@@ -29,7 +29,7 @@ fn world() -> ScenarioWorld {
 
 struct ForwarderTestState {
     world: ScenarioWorld,
-    forwarder_legacy_contract: ForwarderContract,
+    _forwarder_legacy_contract: ForwarderContract,
 }
 
 impl ForwarderTestState {
@@ -58,7 +58,7 @@ impl ForwarderTestState {
 
         Self {
             world,
-            forwarder_legacy_contract,
+            _forwarder_legacy_contract: forwarder_legacy_contract,
         }
     }
 }
@@ -70,13 +70,13 @@ fn test_nft_update_attributes_and_send() {
     let original_attributes = Color { r: 0, g: 0, b: 0 };
 
     state.world.sc_call(
-        ScCallStep::new().from(USER_ADDRESS_EXPR).call(
-            state.forwarder_legacy_contract.nft_create_compact(
-                NFT_TOKEN_ID,
-                1u64,
-                original_attributes,
-            ),
-        ),
+        ScCallStep::new()
+            .from(USER_ADDRESS_EXPR)
+            .to(FORWARDER_ADDRESS_EXPR)
+            .function("nft_create_compact")
+            .argument(NFT_TOKEN_ID)
+            .argument("1")
+            .argument("0x000000"),
     );
 
     state.world.transfer_step(
@@ -112,13 +112,13 @@ fn test_nft_update_attributes_and_send() {
     );
 
     state.world.sc_call(
-        ScCallStep::new().from(USER_ADDRESS_EXPR).call(
-            state.forwarder_legacy_contract.nft_update_attributes(
-                NFT_TOKEN_ID,
-                1u64,
-                new_attributes,
-            ),
-        ),
+        ScCallStep::new()
+            .from(USER_ADDRESS_EXPR)
+            .to(FORWARDER_ADDRESS_EXPR)
+            .function("nft_update_attributes")
+            .argument(NFT_TOKEN_ID)
+            .argument("1")
+            .argument("0xffffff"),
     );
 
     state.world.transfer_step(

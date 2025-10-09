@@ -21,14 +21,15 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.85
+          toolchain: 1.87
           target: wasm32-unknown-unknown
 
       - name: Install prerequisites
         run: |
           cargo install wasm-opt
           cargo install --path framework/meta
-          sc-meta install mx-scenario-go --tag v3.0.0
+          sc-meta install mx-scenario-go --tag v5.0.0
+          sc-meta install wasm32
 
           which wasm-opt
           which mx-scenario-go

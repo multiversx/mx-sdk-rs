@@ -1,6 +1,6 @@
-use crate::types::{
-    DeployRawResult, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, SyncCallRawResult,
-    TxEnv,
+use crate::{
+    contract_base::SyncCallRawResult,
+    types::{DeployRawResult, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, TxEnv},
 };
 
 /// Indicates that the raw result data will be returned.

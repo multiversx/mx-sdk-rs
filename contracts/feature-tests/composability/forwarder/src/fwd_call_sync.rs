@@ -87,7 +87,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_funds_egld_or_single_esdt()
+            .retrieve_received_funds_immediately()
             .egld(payment)
             .returns(ReturnsBackTransfersEGLD)
             .sync_call()
@@ -107,7 +107,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_funds_egld_or_single_esdt()
+            .retrieve_received_funds_immediately()
             .single_esdt(
                 &payment.token_identifier,
                 payment.token_nonce,
@@ -119,22 +119,23 @@ pub trait ForwarderSyncCallModule {
         result
     }
 
+    #[allow(deprecated)]
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds_rh_multi_esdt(
         &self,
         to: ManagedAddress,
     ) -> ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>> {
-        let payment = self.call_value().all_esdt_transfers().clone();
+        let payment = self.call_value().all_transfers();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.tx()
             .to(&to)
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
-            .retrieve_funds_multi_esdt()
-            .multi_esdt(payment)
-            .returns(ReturnsBackTransfersMultiESDT)
+            .retrieve_received_funds_immediately()
+            .payment(payment)
+            .returns(ReturnsBackTransfersLegacyMultiESDT)
             .sync_call()
     }
 
@@ -224,21 +225,13 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-            all_token_payments.push(payment);
-        }
-
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .payment(all_token_payments)
+            .payment(payment_args.convert_payment_multi_triples())
             .sync_call();
     }
 }

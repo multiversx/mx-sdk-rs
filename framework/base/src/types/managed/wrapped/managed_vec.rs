@@ -89,6 +89,18 @@ where
             _phantom: PhantomData,
         }
     }
+
+    /// Creates a new object, without initializing it.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    pub unsafe fn new_uninit() -> Self {
+        ManagedVec {
+            buffer: ManagedBuffer::new_uninit(),
+            _phantom: PhantomData,
+        }
+    }
 }
 
 impl<M, T, I> From<Vec<I>> for ManagedVec<M, T>
@@ -145,9 +157,14 @@ where
     fn load_item_payload(&self, index: usize, payload: &mut T::PAYLOAD) -> bool {
         let byte_index = index * T::payload_size();
 
+        if byte_index + T::payload_size() > self.byte_len() {
+            return false;
+        }
+
         self.buffer
-            .load_slice(byte_index, payload.payload_slice_mut())
-            .is_ok()
+            .load_slice(byte_index, payload.payload_slice_mut());
+
+        true
     }
 
     pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
@@ -203,7 +220,7 @@ where
         }
     }
 
-    pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<M, T> {
+    pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<'_, M, T> {
         ManagedVecRefMut::new(self.get_handle(), index)
     }
 
@@ -324,7 +341,7 @@ where
         result
     }
 
-    pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
+    pub fn iter(&self) -> ManagedVecRefIterator<'_, M, T> {
         ManagedVecRefIterator::new(self)
     }
 
@@ -562,11 +579,10 @@ where
         let mut byte_index = 0;
         while byte_index < self_len {
             let mut self_payload = T::PAYLOAD::new_buffer();
-            let _ = self
-                .buffer
+            self.buffer
                 .load_slice(byte_index, self_payload.payload_slice_mut());
             let mut other_payload = T::PAYLOAD::new_buffer();
-            let _ = other
+            other
                 .buffer
                 .load_slice(byte_index, other_payload.payload_slice_mut());
             let self_item = T::read_from_payload(&self_payload);

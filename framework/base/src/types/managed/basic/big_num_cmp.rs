@@ -15,6 +15,7 @@ where
     }
 }
 
+#[allow(unused)]
 pub(crate) fn bi_gt_zero<M>(bi_handle: M::BigIntHandle) -> bool
 where
     M: ManagedTypeApi,

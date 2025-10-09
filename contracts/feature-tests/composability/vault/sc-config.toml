@@ -3,11 +3,6 @@ name = "vault"
 add-unlabelled = true
 add-labels = ["upgrade"]
 
-[contracts.promises]
-name = "vault-promises"
-add-unlabelled = true
-add-labels = ["promises-endpoint"]
-
 [contracts.upgrade]
 name = "vault-upgrade"
 add-unlabelled = false
@@ -20,9 +15,6 @@ path = "../forwarder/src/vault_proxy.rs"
 path = "../forwarder/src/vault_upgrade_proxy.rs"
 add-unlabelled = false
 add-labels = ["upgrade"]
-
-[[proxy]]
-path = "../promises-features/src/vault_proxy.rs"
 
 [[proxy]]
 path = "../recursive-caller/src/vault_proxy.rs"

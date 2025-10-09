@@ -141,7 +141,7 @@ impl<const CB_NAME_MAX_LENGTH: usize> CallbackClosureMatcher<CB_NAME_MAX_LENGTH>
     pub fn new<M: ManagedTypeApi + ErrorApi>(callback_name: &ManagedBuffer<M>) -> Self {
         let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
         let name_len = callback_name.len();
-        let _ = callback_name.load_slice(0, &mut compare_buffer[..name_len]);
+        callback_name.load_slice(0, &mut compare_buffer[..name_len]);
         CallbackClosureMatcher {
             name_len,
             compare_buffer,

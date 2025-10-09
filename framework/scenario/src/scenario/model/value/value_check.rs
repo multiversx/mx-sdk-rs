@@ -37,7 +37,7 @@ where
             CheckBytesValueRaw::Star => CheckValue::Star,
             CheckBytesValueRaw::Equal(bytes_value) => {
                 CheckValue::Equal(T::interpret_from(bytes_value, context))
-            },
+            }
         }
     }
 }
@@ -105,6 +105,15 @@ impl IntoRaw<CheckValueListRaw> for CheckValueList {
     }
 }
 
+impl CheckValue<BytesValue> {
+    pub fn pretty_str(&self) -> String {
+        match self {
+            CheckValue::Star => "*".to_string(),
+            CheckValue::Equal(value) => String::from_utf8_lossy(&value.value).into_owned(),
+        }
+    }
+}
+
 impl CheckValueList {
     pub fn pretty_str(&self) -> String {
         match self {
@@ -120,7 +129,7 @@ impl CheckValueList {
                 }
                 s.push(']');
                 s
-            },
+            }
         }
     }
 }

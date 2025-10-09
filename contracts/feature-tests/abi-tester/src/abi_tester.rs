@@ -153,6 +153,11 @@ pub trait AbiTester {
     }
 
     #[view]
+    fn echo_permission(&self, p: Permission) -> Permission {
+        p
+    }
+
+    #[view]
     fn item_for_array(&self, _array: &[OnlyShowsUpAsNestedInArray; 5]) {}
 
     #[view]
@@ -213,6 +218,9 @@ pub trait AbiTester {
 
     #[event("address-h256-event")]
     fn address_h256_event(&self, #[indexed] address: &Address, #[indexed] h256: &H256);
+
+    #[event]
+    fn empty_identifier_event(&self);
 
     #[endpoint]
     #[label("label1")]

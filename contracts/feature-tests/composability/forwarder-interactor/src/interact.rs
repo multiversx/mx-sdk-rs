@@ -40,34 +40,34 @@ pub async fn forwarder_cli() {
         "forward_sync_accept_funds_rh_egld" => interact.forward_sync_accept_funds_rh_egld().await,
         "forward_sync_accept_funds_rh_single_esdt" => {
             interact.forward_sync_accept_funds_rh_single_esdt().await
-        },
+        }
         "forward_sync_accept_funds_rh_multi_esdt" => {
             interact.forward_sync_accept_funds_rh_multi_esdt().await
-        },
+        }
         "forward_sync_accept_funds_with_fees" => {
             interact.forward_sync_accept_funds_with_fees().await
-        },
+        }
         "forward_sync_accept_funds_then_read" => {
             interact.forward_sync_accept_funds_then_read().await
-        },
+        }
         "forward_sync_retrieve_funds" => interact.forward_sync_retrieve_funds().await,
         "forward_sync_retrieve_funds_with_accept_func" => {
             interact
                 .forward_sync_retrieve_funds_with_accept_func()
                 .await
-        },
+        }
         "accept_funds_func" => interact.accept_funds_func().await,
         "forward_sync_accept_funds_multi_transfer" => {
             interact.forward_sync_accept_funds_multi_transfer().await
-        },
+        }
         "echo_args_async" => interact.echo_args_async().await,
         "forward_async_accept_funds" => interact.forward_async_accept_funds().await,
         "forward_async_accept_funds_half_payment" => {
             interact.forward_async_accept_funds_half_payment().await
-        },
+        }
         "forward_async_accept_funds_with_fees" => {
             interact.forward_async_accept_funds_with_fees().await
-        },
+        }
         "forward_async_retrieve_funds" => interact.forward_async_retrieve_funds().await,
         "send_funds_twice" => interact.send_funds_twice().await,
         "send_async_accept_multi_transfer" => interact.send_async_accept_multi_transfer().await,
@@ -77,21 +77,16 @@ pub async fn forwarder_cli() {
         "forward_transf_exec_accept_funds" => interact.forward_transf_exec_accept_funds().await,
         "forward_transf_execu_accept_funds_with_fees" => {
             interact.forward_transf_execu_accept_funds_with_fees().await
-        },
+        }
         "forward_transf_exec_accept_funds_twice" => {
             interact.forward_transf_exec_accept_funds_twice().await
-        },
+        }
         "forward_transf_exec_accept_funds_return_values" => {
             interact
                 .forward_transf_exec_accept_funds_return_values()
                 .await
-        },
+        }
         "transf_exec_multi_accept_funds" => interact.transf_exec_multi_accept_funds().await,
-        "forward_transf_exec_reject_funds_multi_transfer" => {
-            interact
-                .forward_transf_exec_reject_funds_multi_transfer()
-                .await
-        },
         "transf_exec_multi_reject_funds" => interact.transf_exec_multi_reject_funds().await,
         "changeOwnerAddress" => interact.change_owner().await,
         "deploy_contract" => interact.deploy_contract().await,
@@ -196,7 +191,7 @@ impl ContractInteract {
 
         // Useful in the chain simulator setting
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         let contract_code = BytesValue::interpret_from(
             "mxsc:../forwarder/output/forwarder.mxsc.json",
@@ -223,12 +218,9 @@ impl ContractInteract {
             .returns(ReturnsNewAddress)
             .run()
             .await;
-        let new_address_bech32 = bech32::encode(&new_address);
-        self.state.set_address(Bech32Address::from_bech32_string(
-            new_address_bech32.clone(),
-        ));
-
+        let new_address_bech32 = new_address.to_bech32(self.interactor.get_hrp());
         println!("new address: {new_address_bech32}");
+        self.state.set_address(new_address_bech32);
     }
 
     pub async fn send_egld(&mut self) {
@@ -909,33 +901,6 @@ impl ContractInteract {
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
             .transf_exec_multi_accept_funds(to, token_payments)
-            .returns(ReturnsResultUnmanaged)
-            .run()
-            .await;
-
-        println!("Result: {response:?}");
-    }
-
-    pub async fn forward_transf_exec_reject_funds_multi_transfer(&mut self) {
-        let to = Address::zero();
-        let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
-            u64,
-            BigUint<StaticApi>,
-        >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
-            0u64,
-            BigUint::<StaticApi>::from(0u128),
-        ))]);
-
-        let response = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .to(self.state.current_address())
-            .gas(80_000_000u64)
-            .typed(proxy::ForwarderProxy)
-            .forward_transf_exec_reject_funds_multi_transfer(to, token_payments)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;

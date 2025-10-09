@@ -1,5 +1,4 @@
 use crate::{api::StorageMapperApi, storage::StorageKey, types::ManagedAddress};
-
 pub trait StorageMapper<SA>: 'static
 where
     SA: StorageMapperApi,

@@ -1,5 +1,4 @@
-use multiversx_sc::{abi::TypeAbiFrom, types::H256};
-use unwrap_infallible::UnwrapInfallible;
+use multiversx_sc::types::H256;
 
 use crate::{
     api::StaticApi,
@@ -7,10 +6,7 @@ use crate::{
     scenario_model::TxResponse,
 };
 
-use crate::multiversx_sc::{
-    codec::{PanicErrorHandler, TopEncodeMulti},
-    types::{ContractCall, ManagedArgBuffer},
-};
+use crate::multiversx_sc::types::ManagedArgBuffer;
 
 #[derive(Debug, Clone)]
 pub struct ScCallStep {
@@ -131,59 +127,6 @@ impl ScCallStep {
         self
     }
 
-    /// Sets following fields based on the smart contract proxy:
-    /// - "to"
-    /// - "function"
-    /// - "arguments"
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    #[allow(deprecated)]
-    pub fn call<CC>(mut self, contract_call: CC) -> super::TypedScCall<CC::OriginalResult>
-    where
-        CC: multiversx_sc::types::ContractCallBase<StaticApi>,
-    {
-        let (to_str, function, egld_value_expr, scenario_args) =
-            process_contract_call(contract_call);
-        self = self.to(to_str.as_str());
-
-        if self.tx.function.is_empty() {
-            self = self.function(function.as_str());
-        }
-        if self.tx.egld_value.value == 0u32.into() {
-            self = self.egld_value(egld_value_expr);
-        }
-        for arg in scenario_args {
-            self = self.argument(arg.as_str());
-        }
-        self.into()
-    }
-
-    /// Sets following fields based on the smart contract proxy:
-    /// - "to"
-    /// - "function"
-    /// - "arguments"
-    /// - "expect"
-    ///     - "out"
-    ///     - "status" set to 0
-    #[deprecated(
-        since = "0.42.0",
-        note = "Please use `call` followed by `expect`, there is no point in having a method that does both."
-    )]
-    #[allow(deprecated)]
-    pub fn call_expect<CC, ExpectedResult>(
-        self,
-        contract_call: CC,
-        expected_value: ExpectedResult,
-    ) -> super::TypedScCall<CC::OriginalResult>
-    where
-        CC: ContractCall<StaticApi>,
-        ExpectedResult: TypeAbiFrom<CC::OriginalResult> + TopEncodeMulti,
-    {
-        self.call(contract_call).expect_value(expected_value)
-    }
-
     /// Adds a custom expect section to the tx.
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.expect = Some(expect);
@@ -211,10 +154,12 @@ impl ScCallStep {
                 expect.update_from_response(&tx_response)
             }
         }
-        tx_response.tx_hash = self
-            .explicit_tx_hash
-            .as_ref()
-            .map(|vm_hash| vm_hash.as_array().into());
+        if tx_response.tx_hash.is_none() {
+            tx_response.tx_hash = self
+                .explicit_tx_hash
+                .as_ref()
+                .map(|vm_hash| vm_hash.as_array().into());
+        }
         self.response = Some(tx_response);
     }
 }
@@ -225,52 +170,10 @@ impl AsMut<ScCallStep> for ScCallStep {
     }
 }
 
-/// Extracts
-/// - recipient,
-/// - endpoint name,
-/// - the arguments.
-#[allow(deprecated)]
-pub(super) fn process_contract_call<CC>(
-    contract_call: CC,
-) -> (String, String, BigUintValue, Vec<String>)
-where
-    CC: multiversx_sc::types::ContractCallBase<StaticApi>,
-{
-    let normalized_cc = contract_call.into_normalized();
-    let to_str = format!(
-        "0x{}",
-        hex::encode(normalized_cc.basic.to.to_address().as_bytes())
-    );
-    let function = String::from_utf8(
-        normalized_cc
-            .basic
-            .function_call
-            .function_name
-            .to_boxed_bytes()
-            .into_vec(),
-    )
-    .unwrap();
-    let egld_value_expr = BigUintValue::from(normalized_cc.egld_payment);
-    let scenario_args = convert_call_args(&normalized_cc.basic.function_call.arg_buffer);
-    (to_str, function, egld_value_expr, scenario_args)
-}
-
 pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<StaticApi>) -> Vec<String> {
     arg_buffer
         .to_raw_args_vec()
         .iter()
         .map(|arg| format!("0x{}", hex::encode(arg)))
         .collect()
-}
-
-pub(super) fn format_expect<T: TopEncodeMulti>(t: T) -> TxExpect {
-    let mut encoded = Vec::<Vec<u8>>::new();
-    t.multi_encode_or_handle_err(&mut encoded, PanicErrorHandler)
-        .unwrap_infallible();
-    let mut expect = TxExpect::ok().no_result();
-    for encoded_res in encoded {
-        let encoded_hex_string = format!("0x{}", hex::encode(encoded_res.as_slice()));
-        expect = expect.result(encoded_hex_string.as_str());
-    }
-    expect
 }

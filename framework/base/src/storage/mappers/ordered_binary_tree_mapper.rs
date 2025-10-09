@@ -10,7 +10,7 @@ use crate::{
 };
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     StorageMapper,
 };
 
@@ -358,13 +358,13 @@ where
 
                     let root_key = self.build_root_key();
                     storage_set(root_key.as_ref(), to_add);
-                },
+                }
                 None => {
                     let root_key = self.build_root_key();
 
                     storage_set(root_id_key.as_ref(), &Empty);
                     storage_set(root_key.as_ref(), &Empty);
-                },
+                }
             };
 
             return;

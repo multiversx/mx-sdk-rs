@@ -8,6 +8,7 @@ use super::{BytesValue, U64Value};
 #[derive(Debug, Default, Clone)]
 pub struct BlockInfo {
     pub block_timestamp: Option<U64Value>,
+    pub block_timestamp_ms: Option<U64Value>,
     pub block_nonce: Option<U64Value>,
     pub block_round: Option<U64Value>,
     pub block_epoch: Option<U64Value>,
@@ -20,6 +21,7 @@ impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
             block_timestamp: from
                 .block_timestamp
                 .map(|v| U64Value::interpret_from(v, context)),
+            block_timestamp_ms: None,
             block_nonce: from
                 .block_nonce
                 .map(|v| U64Value::interpret_from(v, context)),

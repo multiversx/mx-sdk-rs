@@ -1,5 +1,5 @@
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
@@ -163,7 +163,7 @@ where
     }
 
     /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'_, SA, T, A> {
         Iter::new(self)
     }
 }

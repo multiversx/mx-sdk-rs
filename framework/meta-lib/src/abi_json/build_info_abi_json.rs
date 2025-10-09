@@ -19,6 +19,21 @@ impl From<&BuildInfoAbi> for BuildInfoAbiJson {
     }
 }
 
+impl From<&BuildInfoAbiJson> for BuildInfoAbi {
+    fn from(abi_json: &BuildInfoAbiJson) -> Self {
+        BuildInfoAbi {
+            contract_crate: ContractCrateBuildAbi::from(&abi_json.contract_crate),
+            framework: FrameworkBuildAbi::from(&abi_json.framework),
+        }
+    }
+}
+
+impl From<BuildInfoAbiJson> for BuildInfoAbi {
+    fn from(abi_json: BuildInfoAbiJson) -> Self {
+        BuildInfoAbi::from(&abi_json)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RustcAbiJson {
@@ -62,6 +77,27 @@ impl From<&ContractCrateBuildAbi> for ContractCrateBuildAbiJson {
     }
 }
 
+impl From<&ContractCrateBuildAbiJson> for ContractCrateBuildAbi {
+    fn from(_abi: &ContractCrateBuildAbiJson) -> Self {
+        // TODO: @Laur the abi struct should probably just own the strings
+        let name: &'static str = "";
+        let version: &'static str = "";
+        let git_version: &'static str = "";
+
+        ContractCrateBuildAbi {
+            name,
+            version,
+            git_version,
+        }
+    }
+}
+
+impl From<ContractCrateBuildAbiJson> for ContractCrateBuildAbi {
+    fn from(abi: ContractCrateBuildAbiJson) -> Self {
+        ContractCrateBuildAbi::from(&abi)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct FrameworkBuildAbiJson {
     pub name: String,
@@ -74,5 +110,21 @@ impl From<&FrameworkBuildAbi> for FrameworkBuildAbiJson {
             name: abi.name.to_string(),
             version: abi.version.to_string(),
         }
+    }
+}
+
+impl From<&FrameworkBuildAbiJson> for FrameworkBuildAbi {
+    fn from(_abi: &FrameworkBuildAbiJson) -> Self {
+        // TODO: @Laur the abi struct should probably just own the strings
+        let name: &'static str = "";
+        let version: &'static str = "";
+
+        FrameworkBuildAbi { name, version }
+    }
+}
+
+impl From<FrameworkBuildAbiJson> for FrameworkBuildAbi {
+    fn from(abi: FrameworkBuildAbiJson) -> Self {
+        FrameworkBuildAbi::from(&abi)
     }
 }

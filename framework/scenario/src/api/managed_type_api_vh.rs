@@ -8,6 +8,8 @@ use multiversx_sc::api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl};
 
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 
+use super::i32_to_bool;
+
 impl<VHB: VMHooksApiBackend> ManagedTypeApi for VMHooksApi<VHB> {
     type ManagedTypeApiImpl = Self;
 
@@ -69,6 +71,30 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
         });
     }
 
+    fn mb_to_small_int_unsigned(&self, buffer_handle: Self::ManagedBufferHandle) -> i64 {
+        self.with_vm_hooks_ctx_1(&buffer_handle, |vh| {
+            vh.mbuffer_to_small_int_unsigned(buffer_handle.get_raw_handle_unchecked())
+        })
+    }
+
+    fn mb_to_small_int_signed(&self, buffer_handle: Self::ManagedBufferHandle) -> i64 {
+        self.with_vm_hooks_ctx_1(&buffer_handle, |vh| {
+            vh.mbuffer_to_small_int_signed(buffer_handle.get_raw_handle_unchecked())
+        })
+    }
+
+    fn mb_from_small_int_unsigned(&self, buffer_handle: Self::ManagedBufferHandle, value: i64) {
+        self.with_vm_hooks_ctx_1(&buffer_handle, |vh| {
+            vh.mbuffer_from_small_int_unsigned(buffer_handle.get_raw_handle_unchecked(), value)
+        })
+    }
+
+    fn mb_from_small_int_signed(&self, buffer_handle: Self::ManagedBufferHandle, value: i64) {
+        self.with_vm_hooks_ctx_1(&buffer_handle, |vh| {
+            vh.mbuffer_from_small_int_signed(buffer_handle.get_raw_handle_unchecked(), value)
+        })
+    }
+
     fn mb_to_big_float(
         &self,
         buffer_handle: Self::ManagedBufferHandle,
@@ -93,5 +119,12 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
                 big_float_handle.get_raw_handle_unchecked(),
             )
         });
+    }
+
+    fn validate_token_identifier(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
+        let result = self.with_vm_hooks_ctx_1(&token_id_handle, |vh| {
+            vh.validate_token_identifier(token_id_handle.get_raw_handle_unchecked())
+        });
+        i32_to_bool(result)
     }
 }

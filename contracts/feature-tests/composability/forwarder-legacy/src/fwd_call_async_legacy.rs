@@ -40,7 +40,7 @@ pub trait ForwarderAsyncCallModule {
                 cb_result.append_vec(results.into_vec_of_buffers());
 
                 cb_result.into()
-            },
+            }
             ManagedAsyncCallResult::Err(err) => {
                 let mut cb_result =
                     ManagedVec::from_single_item(ManagedBuffer::new_from_bytes(b"error"));
@@ -50,7 +50,7 @@ pub trait ForwarderAsyncCallModule {
                 cb_result.push(err.err_msg);
 
                 cb_result.into()
-            },
+            }
         }
     }
 
@@ -178,21 +178,12 @@ pub trait ForwarderAsyncCallModule {
     fn send_async_accept_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .with_multi_token_transfer(payment_args.convert_payment_multi_triples())
             .async_call()
             .call_and_exit()
     }

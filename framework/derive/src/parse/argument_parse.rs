@@ -17,14 +17,14 @@ pub fn extract_method_args(m: &syn::TraitItemFn) -> Vec<MethodArgument> {
                 }
                 receiver_processed = true;
                 None
-            },
+            }
             syn::FnArg::Typed(pat_typed) => {
                 if !receiver_processed {
                     missing_self_panic(m);
                 }
 
                 Some(extract_method_arg(pat_typed))
-            },
+            }
         })
         .collect()
 }

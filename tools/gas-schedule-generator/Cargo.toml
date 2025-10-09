@@ -1,0 +1,20 @@
+[package]
+name = "gas-schedule-generator"
+version = "0.0.0"
+authors = ["MultiversX <contact@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "gas-schedule-generator"
+path = "src/main.rs"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+tokio = { version = "1.24" }
+clap = { version = "4.4.7", features = ["derive"] }
+env_logger = "0.11"
+convert_case = { version = "0.8.0" }
+multiversx-chain-vm = { path = "../../chain/vm" }

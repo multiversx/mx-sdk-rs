@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          414
+// Endpoints:                          437
 // Async Callback:                       1
-// Total number of exported functions: 416
+// Total number of exported functions: 439
 
 #![no_std]
 
@@ -21,6 +21,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         panicWithMessage => panic_with_message
         count_ones => count_ones
         endpoint_with_mutable_arg => endpoint_with_mutable_arg
+        get_esdt_token_data => get_esdt_token_data
         sqrt_big_uint => sqrt_big_uint
         sqrt_big_uint_ref => sqrt_big_uint_ref
         log2_big_uint => log2_big_uint
@@ -119,6 +120,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         get_prev_block_round => get_prev_block_round
         get_prev_block_epoch => get_prev_block_epoch
         get_prev_block_random_seed => get_prev_block_random_seed
+        epoch_info => epoch_info
+        code_hash => code_hash
+        get_block_timestamps => get_block_timestamps
+        get_block_timestamp_ms => get_block_timestamp_ms
+        get_prev_block_timestamp_ms => get_prev_block_timestamp_ms
         get_caller => get_caller
         get_owner_address => get_owner_address
         get_shard_of_address => get_shard_of_address
@@ -145,6 +151,9 @@ multiversx_sc_wasm_adapter::endpoints! {
         verify_secp256k1_signature => verify_secp256k1_signature
         verify_custom_secp256k1_signature => verify_custom_secp256k1_signature
         compute_secp256k1_der_signature => compute_secp256k1_der_signature
+        verify_secp256r1_signature => verify_secp256r1_signature
+        verify_bls_signature_share => verify_bls_signature_share
+        verify_bls_aggregated_signature => verify_bls_aggregated_signature
         echo_u64 => echo_u64
         echo_i64 => echo_i64
         echo_i32 => echo_i32
@@ -259,6 +268,16 @@ multiversx_sc_wasm_adapter::endpoints! {
         store_reserved_i64 => store_reserved_i64
         store_reserved_big_uint => store_reserved_big_uint
         store_reserved_vec_u8 => store_reserved_vec_u8
+        token_has_transfer_role => token_has_transfer_role
+        timelock_mapper => timelock_mapper
+        timelock_set_initial_value => timelock_set_initial_value
+        timelock_set_unlock_timestamp => timelock_set_unlock_timestamp
+        timelock_commit_action => timelock_commit_action
+        timelock_get_unlock_timestamp => timelock_get_unlock_timestamp
+        timelock_get_future_value => timelock_get_future_value
+        timelock_get_current_value_at_address => timelock_get_current_value_at_address
+        timelock_get_unlock_timestamp_at_address => timelock_get_unlock_timestamp_at_address
+        timelock_get_future_value_at_address => timelock_get_future_value_at_address
         address_to_id_mapper_get_id => address_to_id_mapper_get_id
         address_to_id_mapper_get_id_non_zero => address_to_id_mapper_get_id_non_zero
         address_to_id_mapper_get_address => address_to_id_mapper_get_address
@@ -432,6 +451,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         managed_decimal_eq_var => managed_decimal_eq_var
         managed_decimal_ln_var => managed_decimal_ln_var
         managed_decimal_log2_var => managed_decimal_log2_var
+        mm_get => mm_get
+        mm_contains => mm_contains
+        mm_remove_get => mm_remove_get
+        mm_mutable_input_test => mm_mutable_input_test
     )
 }
 

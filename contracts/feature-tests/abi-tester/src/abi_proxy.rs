@@ -312,6 +312,19 @@ where
             .original_result()
     }
 
+    pub fn echo_permission<
+        Arg0: ProxyArg<Permission>,
+    >(
+        self,
+        p: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Permission> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("echo_permission")
+            .argument(&p)
+            .original_result()
+    }
+
     pub fn item_for_array<
         Arg0: ProxyArg<[OnlyShowsUpAsNestedInArray; 5]>,
     >(
@@ -521,6 +534,10 @@ pub struct AbiManagedVecItem {
 }
 
 #[type_abi]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NestedDecode, NestedEncode, TopEncode, TopDecode)]
+pub struct Permission(u32);
+
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInArray {}
 
@@ -569,24 +586,25 @@ pub struct OnlyShowsUpAsNested10 {}
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
     Zero,
-    Thirty,
-    Twelve,
-    Fifty,
+    Thirty = 30,
+    Twelve = 12,
+    Fifty = 50,
     FiftyOne,
 }
 
 #[rustfmt::skip]
+#[repr(u8)]
 #[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminantMixed {
     Zero,
-    Unit,
+    Unit = 3,
     Tuple(u16),
     Five,
     Struct {
         a: u8,
         b: u16,
-    },
+    } = 1,
 }
 
 #[type_abi]

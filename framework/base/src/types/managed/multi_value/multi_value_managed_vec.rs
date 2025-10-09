@@ -139,7 +139,7 @@ where
         self.0.with_self_as_vec(f)
     }
 
-    pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
+    pub fn iter(&self) -> ManagedVecRefIterator<'_, M, T> {
         ManagedVecRefIterator::new(&self.0)
     }
 }

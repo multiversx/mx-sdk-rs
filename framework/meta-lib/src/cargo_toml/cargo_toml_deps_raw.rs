@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{collections::BTreeSet, path::PathBuf};
 
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct DependencyRawValue {
@@ -8,6 +8,7 @@ pub struct DependencyRawValue {
     pub branch: Option<String>,
     pub tag: Option<String>,
     pub path: Option<PathBuf>,
+    pub features: BTreeSet<String>,
 }
 
 impl DependencyRawValue {
@@ -42,7 +43,7 @@ impl DependencyRawValue {
                     result.tag = Some(tag.to_owned());
                 }
                 result
-            },
+            }
             _ => panic!("Unsupported dependency value"),
         }
     }
@@ -74,6 +75,18 @@ impl DependencyRawValue {
             table.insert(
                 "path".to_string(),
                 toml::Value::String(path.to_string_lossy().into_owned()),
+            );
+        }
+
+        if !self.features.is_empty() {
+            table.insert(
+                "features".to_string(),
+                toml::Value::Array(
+                    self.features
+                        .iter()
+                        .map(|feature| toml::Value::String(feature.clone()))
+                        .collect(),
+                ),
             );
         }
 

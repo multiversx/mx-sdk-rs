@@ -1,4 +1,5 @@
 use super::*;
+use alloc::borrow::ToOwned;
 use multiversx_sc_codec::Vec;
 
 pub trait TypeDescriptionContainer {
@@ -20,6 +21,28 @@ pub trait TypeDescriptionContainer {
 #[derive(Clone, Default, Debug)]
 pub struct TypeDescriptionContainerImpl(pub Vec<(TypeNames, TypeDescription)>);
 
+impl TypeDescriptionContainerImpl {
+    pub fn find(&self, abi_type_name: &str) -> Option<&TypeDescription> {
+        self.0
+            .iter()
+            .find(|(existing_type_name, _)| existing_type_name.abi == abi_type_name)
+            .map(|(_, description)| description)
+    }
+
+    pub fn find_or_default(&self, abi_type_name: &str) -> TypeDescription {
+        if let Some(type_description) = self.find(abi_type_name) {
+            type_description.clone()
+        } else {
+            TypeDescription {
+                docs: Vec::new(),
+                names: TypeNames::from_abi(abi_type_name.to_owned()),
+                contents: TypeContents::NotSpecified,
+                macro_attributes: Vec::new(),
+            }
+        }
+    }
+}
+
 impl TypeDescriptionContainer for TypeDescriptionContainerImpl {
     fn new() -> Self {
         TypeDescriptionContainerImpl(Vec::new())
@@ -32,12 +55,12 @@ impl TypeDescriptionContainer for TypeDescriptionContainerImpl {
     }
 
     fn insert(&mut self, type_names: TypeNames, type_description: TypeDescription) {
-        if let Some((_existing_type_name, exisiting_type_description)) = self
+        if let Some((_existing_type_name, existing_type_description)) = self
             .0
             .iter_mut()
             .find(|(name, _)| name.abi == type_names.abi)
         {
-            *exisiting_type_description = type_description;
+            *existing_type_description = type_description;
         } else {
             self.0.push((type_names, type_description));
         }

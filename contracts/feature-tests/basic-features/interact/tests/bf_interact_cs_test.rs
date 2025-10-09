@@ -1,16 +1,36 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
-use multiversx_sc_snippets::imports::{
-    BigUint, EgldDecimals, ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec, RustBigUint,
-    StaticApi,
+use multiversx_sc_snippets::{
+    imports::{
+        BigUint, ESDTSystemSCAddress, ESDTSystemSCProxy, EgldDecimals, EsdtLocalRole,
+        EsdtTokenPayment, EsdtTokenType, FungibleTokenProperties, ManagedBuffer, ManagedDecimal,
+        ManagedOption, ManagedVec, ReturnsNewTokenIdentifier, RustBigUint, StaticApi,
+        TokenIdentifier,
+    },
+    test_wallets, InteractorRunAsync, InteractorSimulateGasAsync,
 };
+use serial_test::serial;
+use system_sc_interact::SysFuncCallsInteract;
+
+const ISSUE_COST: u64 = 50000000000000000u64;
 
 #[tokio::test]
+#[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn simulator_basic_features_test() {
     let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
 
-    bf_interact.deploy_storage_bytes().await;
-    bf_interact.large_storage(15).await;
+    bf_interact.add_validator_key().await;
+    bf_interact.deploy_storage_bytes(false).await;
+    bf_interact.large_storage(15, false).await;
+
+    bf_interact
+        .interactor
+        .tx()
+        .from(&bf_interact.wallet_address)
+        .to(bf_interact.state.bf_storage_bytes_contract())
+        .egld(1000)
+        .simulate_gas()
+        .await;
 
     let data = bf_interact.get_large_storage().await.to_vec();
     assert_eq!(bf_interact.large_storage_payload, data);
@@ -30,11 +50,65 @@ async fn simulator_basic_features_test() {
 }
 
 #[tokio::test]
+#[serial]
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+async fn send_esdt_to_non_existent_address_test() {
+    let registered_wallet_address = test_wallets::mike().to_address();
+    let not_registered_wallet_address = test_wallets::alice().to_address();
+
+    let mut chain_simulator_interact =
+        BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+
+    let token = chain_simulator_interact
+        .interactor
+        .tx()
+        .from(&registered_wallet_address)
+        .to(ESDTSystemSCAddress)
+        .gas(100_000_000u64)
+        .typed(ESDTSystemSCProxy)
+        .issue_fungible(
+            BigUint::from(50000000000000000u64),
+            "test",
+            "TEST",
+            100u16,
+            FungibleTokenProperties {
+                num_decimals: 0usize,
+                can_freeze: true,
+                can_wipe: true,
+                can_pause: true,
+                can_mint: true,
+                can_burn: true,
+                can_change_owner: true,
+                can_upgrade: true,
+                can_add_special_roles: true,
+            },
+        )
+        .returns(ReturnsNewTokenIdentifier)
+        .run()
+        .await;
+
+    // send to not registered address
+    chain_simulator_interact
+        .interactor
+        .tx()
+        .from(&registered_wallet_address)
+        .to(&not_registered_wallet_address)
+        .esdt(EsdtTokenPayment::new(
+            TokenIdentifier::from_esdt_bytes(token.clone()),
+            1,
+            BigUint::from(10u16),
+        ))
+        .run()
+        .await;
+}
+
+#[tokio::test]
+#[serial]
 #[ignore = "signature verification is currently unavailable"]
 async fn simulator_crypto_test() {
     let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
 
-    bf_interact.deploy_crypto().await;
+    bf_interact.deploy().await;
 
     verify_secp256r1_signature(&mut bf_interact).await;
     verify_bls_signature(&mut bf_interact).await;
@@ -188,4 +262,39 @@ async fn verify_bls_aggregated_signature(interact: &mut BasicFeaturesInteract) {
             Some("aggregate signature is invalid"),
         )
         .await;
+}
+
+#[tokio::test]
+#[serial]
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+async fn chain_simulator_bf_get_special_roles_test() {
+    let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+    let mut system_interact =
+        SysFuncCallsInteract::init(system_sc_interact::Config::chain_simulator_config()).await;
+
+    // issue dynamic NFT
+    let dynamic_nft_token_id = system_interact
+        .issue_dynamic_token(
+            RustBigUint::from(ISSUE_COST),
+            b"TESTNFT",
+            b"TEST",
+            EsdtTokenType::DynamicNFT,
+            0usize,
+        )
+        .await;
+
+    // set transfer role
+    system_interact
+        .set_roles(&dynamic_nft_token_id, vec![EsdtLocalRole::Transfer])
+        .await;
+
+    // deploy bf
+    bf_interact.deploy().await;
+
+    // retrieve transfer role from sc explicit call
+    assert!(
+        bf_interact
+            .token_has_transfer_role(&dynamic_nft_token_id)
+            .await
+    );
 }

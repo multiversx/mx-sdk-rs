@@ -9,13 +9,13 @@ publish = false
 path = "src/proxy-test-first.rs"
 
 [dependencies]
-hex-literal = "0.4.1"
+hex-literal = "1.0"
 
 [dependencies.multiversx-sc]
-version = "0.56.1"
+version = "0.62.0"
 path = "../../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.56.1"
+version = "0.62.0"
 path = "../../../../framework/scenario"

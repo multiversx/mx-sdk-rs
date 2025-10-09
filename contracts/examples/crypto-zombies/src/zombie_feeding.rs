@@ -45,8 +45,8 @@ pub trait ZombieFeeding:
             ManagedAsyncCallResult::Ok(kitty) => {
                 let kitty_dna = kitty.genes.get_as_u64();
                 self.feed_and_multiply(zombie_id, kitty_dna, ManagedBuffer::from(b"kitty"));
-            },
-            ManagedAsyncCallResult::Err(_) => {},
+            }
+            ManagedAsyncCallResult::Err(_) => {}
         }
     }
 

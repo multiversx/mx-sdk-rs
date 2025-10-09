@@ -7,10 +7,10 @@ use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
     types::{
-        system_proxy, BigUint, ContractCallNoPayment, ESDTSystemSCAddress,
-        EgldOrEsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, NotPayable, OriginalResultMarker,
-        ReturnsRawResult, ReturnsResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
+        system_proxy, BigUint, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
+        FunctionCall, GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType,
+        ManagedVec, NotPayable, OriginalResultMarker, ReturnsRawResult, ReturnsResult, ToSelf,
+        TokenIdentifier, Tx, TxScEnv,
     },
 };
 
@@ -66,13 +66,17 @@ where
     /// Convenient way to quickly instance a minimal contract call (with no EGLD, no arguments, etc.)
     ///
     /// You can further configure this contract call by chaining methods to it.
-    #[inline]
+    #[cfg(feature = "contract-call-legacy")]
+    #[deprecated(
+        since = "0.62.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn contract_call<R>(
         &self,
         to: ManagedAddress<A>,
         endpoint_name: impl Into<ManagedBuffer<A>>,
-    ) -> ContractCallNoPayment<A, R> {
-        ContractCallNoPayment::new(to, endpoint_name)
+    ) -> crate::types::ContractCallNoPayment<A, R> {
+        crate::types::ContractCallNoPayment::new(to, endpoint_name)
     }
 
     /// Sends EGLD to a given address, directly.
@@ -138,7 +142,7 @@ where
         D: Into<ManagedBuffer<A>>,
     {
         if nonce == 0 {
-            let _ = self.send_raw_wrapper().transfer_esdt_execute(
+            self.send_raw_wrapper().transfer_esdt_execute(
                 to,
                 token_identifier,
                 amount,
@@ -147,7 +151,7 @@ where
                 &arguments.into(),
             );
         } else {
-            let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+            self.send_raw_wrapper().transfer_esdt_nft_execute(
                 to,
                 token_identifier,
                 nonce,
@@ -254,7 +258,7 @@ where
                 arguments,
             );
         } else {
-            let _ = self.send_raw_wrapper().direct_egld_execute(
+            self.send_raw_wrapper().direct_egld_execute(
                 to,
                 amount,
                 gas,
@@ -305,7 +309,7 @@ where
     ///
     /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.
     ///
-    /// Note that EGLD can NOT be transfered with this function.  
+    /// Note that EGLD can NOT be transferred with this function.  
     pub fn transfer_esdt_via_async_call(
         &self,
         to: ManagedAddress<A>,
@@ -325,7 +329,7 @@ where
     /// so only use as the last call in your endpoint.
     ///
     /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
-    /// Note that EGLD can NOT be transfered with this function.
+    /// Note that EGLD can NOT be transferred with this function.
     ///
     /// If the amount is 0, it returns without error.
     pub fn transfer_esdt_non_zero_via_async_call(
@@ -665,7 +669,7 @@ where
         );
         let royalties_amount = payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
 
-        let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+        self.send_raw_wrapper().transfer_esdt_nft_execute(
             buyer,
             nft_id,
             nft_nonce,

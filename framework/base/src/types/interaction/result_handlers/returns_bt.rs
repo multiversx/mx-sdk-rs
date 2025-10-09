@@ -3,7 +3,9 @@ use crate::{
     types::{BackTransfers, RHListItem, RHListItemExec, TxEnv},
 };
 
-/// Indicates that back-transfers will be returned.
+/// Returns all back-transfers, as a general multi-transfer structure.
+///
+/// It supports all transfer scenarios (EGLD, ESDT, mixed).
 pub struct ReturnsBackTransfers;
 
 impl<Env, Original> RHListItem<Env, Original> for ReturnsBackTransfers

@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           68
+// Endpoints:                           61
 // Async Callback:                       1
-// Total number of exported functions:  70
+// Total number of exported functions:  63
 
 #![no_std]
 
@@ -45,7 +45,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_transf_exec_accept_funds_return_values => forward_transf_exec_accept_funds_return_values
         transf_exec_multi_accept_funds => transf_exec_multi_accept_funds
         transf_exec_multi_accept_funds_v2 => transf_exec_multi_accept_funds_v2
-        forward_transf_exec_reject_funds_multi_transfer => forward_transf_exec_reject_funds_multi_transfer
         transf_exec_multi_reject_funds => transf_exec_multi_reject_funds
         changeOwnerAddress => change_owner
         deploy_contract => deploy_contract
@@ -53,8 +52,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         deploy_vault_from_source => deploy_vault_from_source
         upgradeVault => upgrade_vault
         upgrade_vault_from_source => upgrade_vault_from_source
-        getFungibleEsdtBalance => get_fungible_esdt_balance
-        getCurrentNftNonce => get_current_nft_nonce
         send_esdt => send_esdt
         send_esdt_with_fees => send_esdt_with_fees
         send_esdt_twice => send_esdt_twice
@@ -62,14 +59,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         issue_fungible_token => issue_fungible_token
         local_mint => local_mint
         local_burn => local_burn
-        get_esdt_local_roles => get_esdt_local_roles
-        get_esdt_token_data => get_esdt_token_data
-        is_esdt_frozen => is_esdt_frozen
-        is_esdt_paused => is_esdt_paused
-        is_esdt_limited_transfer => is_esdt_limited_transfer
-        validate_token_identifier => validate_token_identifier
+        sync_call_fallible => sync_call_fallible
+        forward_sync_fallible_accept_funds_multi_transfer => forward_sync_fallible_accept_funds_multi_transfer
+        forward_sync_reject_funds_multi_transfer => forward_sync_reject_funds_multi_transfer
         sft_issue => sft_issue
-        get_nft_balance => get_nft_balance
         buy_nft => buy_nft
         nft_issue => nft_issue
         nft_create => nft_create

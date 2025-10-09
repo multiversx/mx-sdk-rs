@@ -4,8 +4,6 @@ use multiversx_sc::api::{
 };
 
 use crate::{
-    api::StaticApi,
-    multiversx_sc::types::{ContractCall, EsdtTokenPayment},
     scenario::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
@@ -97,6 +95,7 @@ impl TxCall {
         note = "Please use the unified transaction syntax instead."
     )]
     #[allow(deprecated)]
+    #[cfg(feature = "contract-call-legacy")]
     pub fn to_contract_call(&self) -> multiversx_sc::types::ContractCallWithEgld<StaticApi, ()> {
         let mut contract_call = multiversx_sc::types::ContractCallWithEgld::new(
             (&self.to.value).into(),
@@ -168,7 +167,7 @@ impl TxCall {
                 } else {
                     self.construct_single_transfer_nft_call(payment)
                 }
-            },
+            }
             _ => self.construct_multi_transfer_esdt_call(),
         }
     }

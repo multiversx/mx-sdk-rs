@@ -3,7 +3,7 @@ use unwrap_infallible::UnwrapInfallible;
 use crate::{
     api::{
         const_handles, use_raw_handle, ErrorApi, ManagedBufferApiImpl, ManagedTypeApi,
-        StorageWriteApi, StorageWriteApiImpl,
+        StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },
     codec::*,
     contract_base::ExitCodecErrorHandler,
@@ -45,6 +45,24 @@ where
 
     fn set_slice_u8(self, bytes: &[u8]) {
         self.set_managed_buffer(&bytes.into())
+    }
+
+    fn set_u64(self, value: u64) {
+        use crate::api::ManagedTypeApiImpl;
+
+        let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::managed_type_impl().mb_from_small_int_unsigned(handle.clone(), value as i64);
+        let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
+        self.set_managed_buffer(&managed_buffer);
+    }
+
+    fn set_i64(self, value: i64) {
+        use crate::api::ManagedTypeApiImpl;
+
+        let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::managed_type_impl().mb_from_small_int_signed(handle.clone(), value);
+        let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
+        self.set_managed_buffer(&managed_buffer);
     }
 
     #[inline]
@@ -105,4 +123,21 @@ where
     A::managed_type_impl().mb_overwrite(value_handle.clone(), &[]);
 
     A::storage_write_api_impl().storage_store_managed_buffer_raw(key.get_handle(), value_handle);
+}
+
+/// Useful for storage mappers.
+/// Replaces the content from a key to another without decoding.
+pub fn storage_overwrite<A>(
+    from_key: ManagedRef<'_, A, StorageKey<A>>,
+    to_key: ManagedRef<'_, A, StorageKey<A>>,
+) where
+    A: StorageWriteApi + StorageReadApi + ManagedTypeApi + ErrorApi,
+{
+    let from_buffer_handle: A::ManagedBufferHandle =
+        use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+
+    A::storage_read_api_impl()
+        .storage_load_managed_buffer_raw(from_key.get_handle(), from_buffer_handle.clone());
+    A::storage_write_api_impl()
+        .storage_store_managed_buffer_raw(to_key.get_handle(), from_buffer_handle);
 }

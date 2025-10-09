@@ -8,7 +8,11 @@ multiversx_sc::imports!();
 #[multiversx_sc::contract]
 pub trait PanicMessageFeatures {
     #[init]
-    fn init(&self) {}
+    fn init(&self, should_panic: bool) {
+        if should_panic {
+            sc_panic!("sc_panic! in constructor");
+        }
+    }
 
     #[endpoint(panicWithMessage)]
     fn panic_with_message(&self, some_value: u32) {

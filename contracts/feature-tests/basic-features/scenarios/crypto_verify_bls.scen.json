@@ -1,6 +1,6 @@
 {
     "name": "crypto",
-    "comment": "does not currently work with scenarios-rs, because verify_bls function is not yet mocked",
+    "comment": "verify BLS signature with one public key",
     "gasSchedule": "v3",
     "steps": [
         {
@@ -58,7 +58,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:signature is invalid",
+                "message": "str:bls verify error",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

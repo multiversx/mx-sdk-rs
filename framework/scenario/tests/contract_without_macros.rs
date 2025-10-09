@@ -73,11 +73,11 @@ mod module_1 {
                 "callBack" => {
                     self.callback();
                     true
-                },
+                }
                 "version" => {
                     self.call_version();
                     true
-                },
+                }
                 _other => false,
             }
         }
@@ -320,7 +320,7 @@ mod sample_adder {
                 "callBack" => {
                     self::EndpointWrappers::callback(self);
                     true
-                },
+                }
                 "init"
                     if <Self::Api as multiversx_sc::api::VMApi>::external_view_init_override() =>
                 {
@@ -328,31 +328,31 @@ mod sample_adder {
                         Self::Api,
                     >();
                     true
-                },
+                }
                 "getSum" => {
                     self.call_sum();
                     true
-                },
+                }
                 "init"
                     if !<Self::Api as multiversx_sc::api::VMApi>::external_view_init_override() =>
                 {
                     self.call_init();
                     true
-                },
+                }
                 "upgrade" => {
                     self.call_upgrade();
                     true
-                },
+                }
                 "add" => {
                     self.call_add();
                     true
-                },
+                }
                 other => {
                     if super::module_1::EndpointWrappers::call(self, fn_name) {
                         return true;
                     }
                     false
-                },
+                }
             }
         }
         fn callback_selector(

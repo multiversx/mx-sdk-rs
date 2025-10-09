@@ -27,7 +27,7 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         self.buffer.set_random(U8_BYTES);
 
         let mut bytes = [0u8; U8_BYTES];
-        let _ = self.buffer.load_slice(0, &mut bytes[..]);
+        self.buffer.load_slice(0, &mut bytes[..]);
 
         u8::from_be_bytes(bytes)
     }
@@ -43,7 +43,7 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         self.buffer.set_random(U16_BYTES);
 
         let mut bytes = [0u8; U16_BYTES];
-        let _ = self.buffer.load_slice(0, &mut bytes[..]);
+        self.buffer.load_slice(0, &mut bytes[..]);
 
         u16::from_be_bytes(bytes)
     }
@@ -59,7 +59,7 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         self.buffer.set_random(U32_BYTES);
 
         let mut bytes = [0u8; U32_BYTES];
-        let _ = self.buffer.load_slice(0, &mut bytes[..]);
+        self.buffer.load_slice(0, &mut bytes[..]);
 
         u32::from_be_bytes(bytes)
     }
@@ -86,7 +86,7 @@ impl<M: ManagedTypeApi> RandomnessSource<M> {
         self.buffer.set_random(U64_BYTES);
 
         let mut bytes = [0u8; U64_BYTES];
-        let _ = self.buffer.load_slice(0, &mut bytes[..]);
+        self.buffer.load_slice(0, &mut bytes[..]);
 
         u64::from_be_bytes(bytes)
     }

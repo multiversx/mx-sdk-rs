@@ -233,17 +233,17 @@ where
 
     pub fn forward_sync_accept_funds_multi_transfer<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("forward_sync_accept_funds_multi_transfer")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -324,6 +324,18 @@ where
             .original_result()
     }
 
+    pub fn forward_async_reject_funds<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("forward_async_reject_funds")
+            .argument(&to)
+            .original_result()
+    }
+
     pub fn send_funds_twice<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
@@ -349,44 +361,29 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("send_async_accept_multi_transfer")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
-    pub fn callback_data(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, CallbackData<Env::Api>>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("callback_data")
-            .original_result()
-    }
-
-    pub fn callback_data_at_index<
-        Arg0: ProxyArg<usize>,
+    pub fn send_async_reject_multi_transfer<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
-        index: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("callback_data_at_index")
-            .argument(&index)
-            .original_result()
-    }
-
-    pub fn clear_callback_data(
-        self,
+        to: Arg0,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("clear_callback_data")
+            .raw_call("send_async_reject_multi_transfer")
+            .argument(&to)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -449,45 +446,29 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("transf_exec_multi_accept_funds")
             .argument(&to)
-            .argument(&token_payments)
-            .original_result()
-    }
-
-    pub fn forward_transf_exec_reject_funds_multi_transfer<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
-    >(
-        self,
-        to: Arg0,
-        token_payments: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("forward_transf_exec_reject_funds_multi_transfer")
-            .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
     pub fn transf_exec_multi_reject_funds<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("transf_exec_multi_reject_funds")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -678,13 +659,13 @@ where
     >(
         self,
         to: Arg0,
-        token_payments: Arg1,
+        payment_args: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("send_esdt_direct_multi_transfer")
             .argument(&to)
-            .argument(&token_payments)
+            .argument(&payment_args)
             .original_result()
     }
 
@@ -825,6 +806,93 @@ where
             .payment(NotPayable)
             .raw_call("validate_token_identifier")
             .argument(&token_id)
+            .original_result()
+    }
+
+    pub fn sync_call_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        endpoint_name: Arg1,
+        args: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("sync_call_fallible")
+            .argument(&to)
+            .argument(&endpoint_name)
+            .argument(&args)
+            .original_result()
+    }
+
+    pub fn forward_sync_fallible_accept_funds_multi_transfer<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payment_args: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_fallible_accept_funds_multi_transfer")
+            .argument(&to)
+            .argument(&payment_args)
+            .original_result()
+    }
+
+    pub fn forward_sync_reject_funds_multi_transfer<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payment_args: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_reject_funds_multi_transfer")
+            .argument(&to)
+            .argument(&payment_args)
+            .original_result()
+    }
+
+    pub fn transfer_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payments: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("transfer_fallible")
+            .argument(&to)
+            .argument(&payments)
+            .original_result()
+    }
+
+    /// Receiver needs to be an endpoint with no arguments, for simplicity. 
+    pub fn transfer_execute_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        endpoint_name: Arg1,
+        payments: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("transfer_execute_fallible")
+            .argument(&to)
+            .argument(&endpoint_name)
+            .argument(&payments)
             .original_result()
     }
 
@@ -1372,6 +1440,305 @@ where
             .raw_call("lastErrorMessage")
             .original_result()
     }
+
+    pub fn callback_data(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, CallbackData<Env::Api>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("callback_data")
+            .original_result()
+    }
+
+    pub fn callback_data_at_index<
+        Arg0: ProxyArg<usize>,
+    >(
+        self,
+        index: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("callback_data_at_index")
+            .argument(&index)
+            .original_result()
+    }
+
+    pub fn clear_callback_data(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("clear_callback_data")
+            .original_result()
+    }
+
+    pub fn forward_promise_accept_funds<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("forward_promise_accept_funds")
+            .argument(&to)
+            .original_result()
+    }
+
+    pub fn forward_promise_retrieve_funds<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+        token: Arg1,
+        token_nonce: Arg2,
+        amount: Arg3,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_promise_retrieve_funds")
+            .argument(&to)
+            .argument(&token)
+            .argument(&token_nonce)
+            .argument(&amount)
+            .original_result()
+    }
+
+    pub fn forward_payment_callback<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("forward_payment_callback")
+            .argument(&to)
+            .original_result()
+    }
+
+    pub fn forward_payment_gas_for_callback<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("forward_payment_gas_for_callback")
+            .argument(&to)
+            .original_result()
+    }
+
+    pub fn promise_raw_single_token_to_user<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<u64>,
+    >(
+        self,
+        to: Arg0,
+        gas_limit: Arg1,
+        extra_gas_for_callback: Arg2,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("promise_raw_single_token_to_user")
+            .argument(&to)
+            .argument(&gas_limit)
+            .argument(&extra_gas_for_callback)
+            .original_result()
+    }
+
+    pub fn promise_raw_single_token<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<u64>,
+        Arg4: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        endpoint_name: Arg1,
+        gas_limit: Arg2,
+        extra_gas_for_callback: Arg3,
+        args: Arg4,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        self.wrapped_tx
+            .raw_call("promise_raw_single_token")
+            .argument(&to)
+            .argument(&endpoint_name)
+            .argument(&gas_limit)
+            .argument(&extra_gas_for_callback)
+            .argument(&args)
+            .original_result()
+    }
+
+    pub fn promise_raw_multi_transfer<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        endpoint_name: Arg1,
+        extra_gas_for_callback: Arg2,
+        token_payment_args: Arg3,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("promise_raw_multi_transfer")
+            .argument(&to)
+            .argument(&endpoint_name)
+            .argument(&extra_gas_for_callback)
+            .argument(&token_payment_args)
+            .original_result()
+    }
+
+    pub fn forward_sync_retrieve_funds_bt_legacy<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+        token: Arg1,
+        token_nonce: Arg2,
+        amount: Arg3,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_retrieve_funds_bt_legacy")
+            .argument(&to)
+            .argument(&token)
+            .argument(&token_nonce)
+            .argument(&amount)
+            .original_result()
+    }
+
+    pub fn forward_sync_retrieve_funds_bt_legacy_reset_twice<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+        token: Arg1,
+        token_nonce: Arg2,
+        amount: Arg3,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_retrieve_funds_bt_legacy_reset_twice")
+            .argument(&to)
+            .argument(&token)
+            .argument(&token_nonce)
+            .argument(&amount)
+            .original_result()
+    }
+
+    pub fn forward_sync_retrieve_funds_bt_legacy_twice<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+        token: Arg1,
+        token_nonce: Arg2,
+        amount: Arg3,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_retrieve_funds_bt_legacy_twice")
+            .argument(&to)
+            .argument(&token)
+            .argument(&token_nonce)
+            .argument(&amount)
+            .original_result()
+    }
+
+    pub fn forward_sync_retrieve_funds_bt_multi<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        transfers: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_retrieve_funds_bt_multi")
+            .argument(&to)
+            .argument(&transfers)
+            .original_result()
+    }
+
+    /// Highlights the behavior when calling back transfers **without** reset. 
+    pub fn forward_sync_retrieve_funds_bt_multi_twice<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        transfers: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_retrieve_funds_bt_multi_twice")
+            .argument(&to)
+            .argument(&transfers)
+            .original_result()
+    }
+
+    /// Highlights the behavior when calling back transfers **with** reset. 
+    pub fn forward_sync_retrieve_funds_bt_multi_twice_reset<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        transfers: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_retrieve_funds_bt_multi_twice_reset")
+            .argument(&to)
+            .argument(&transfers)
+            .original_result()
+    }
+
+    pub fn forward_promise_retrieve_funds_back_transfers<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        to: Arg0,
+        token: Arg1,
+        token_nonce: Arg2,
+        amount: Arg3,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_promise_retrieve_funds_back_transfers")
+            .argument(&to)
+            .argument(&token)
+            .argument(&token_nonce)
+            .argument(&amount)
+            .original_result()
+    }
+}
+
+#[type_abi]
+#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug, Default)]
+pub struct Color {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
 }
 
 #[type_abi]
@@ -1385,12 +1752,4 @@ where
     pub token_nonce: u64,
     pub token_amount: BigUint<Api>,
     pub args: ManagedVec<Api, ManagedBuffer<Api>>,
-}
-
-#[type_abi]
-#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug, Default)]
-pub struct Color {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
 }

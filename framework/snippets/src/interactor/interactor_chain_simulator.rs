@@ -1,17 +1,20 @@
 use anyhow::Error;
-use multiversx_sc_scenario::imports::Address;
+use multiversx_sc_scenario::imports::Bech32Address;
 use multiversx_sdk::gateway::{
-    ChainSimulatorGenerateBlocksRequest, ChainSimulatorSendFundsRequest,
+    ChainSimulatorAddKeysRequest, ChainSimulatorGenerateBlocksRequest,
+    ChainSimulatorSendFundsRequest, ChainSimulatorSetStateOverwriteRequest,
     ChainSimulatorSetStateRequest, GatewayAsyncService, SetStateAccount,
 };
 
 use crate::InteractorBase;
 
+pub const ALL_ACTIVATIONS_EPOCH: u64 = 2;
+
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
-    pub async fn send_user_funds(&self, receiver: &Address) -> Result<String, Error> {
+    pub async fn send_user_funds(&self, receiver: &Bech32Address) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));
         }
@@ -31,6 +34,16 @@ where
             .await
     }
 
+    pub async fn add_key(&self, key: Vec<u8>) -> Result<String, Error> {
+        if !self.use_chain_simulator {
+            return Ok(String::from("no-simulator"));
+        }
+
+        self.proxy
+            .request(ChainSimulatorAddKeysRequest::with_keys(vec![key]))
+            .await
+    }
+
     pub async fn generate_blocks_until_epoch(&self, epoch_number: u64) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));
@@ -41,6 +54,14 @@ where
                 epoch_number,
             ))
             .await
+    }
+
+    /// Convenience method to wait enough blocks until all relevant activations are processed.
+    pub async fn generate_blocks_until_all_activations(&self) {
+        let _ = self
+            .generate_blocks_until_epoch(ALL_ACTIVATIONS_EPOCH)
+            .await
+            .expect("Failed to generate blocks until all activations");
     }
 
     pub async fn generate_blocks_until_tx_processed(&self, tx_hash: &str) -> Result<String, Error> {
@@ -62,6 +83,21 @@ where
 
         self.proxy
             .request(ChainSimulatorSetStateRequest::for_accounts(accounts))
+            .await
+    }
+
+    pub async fn set_state_overwrite(
+        &self,
+        accounts: Vec<SetStateAccount>,
+    ) -> Result<String, Error> {
+        if !self.use_chain_simulator {
+            return Ok(String::from("no-simulator"));
+        }
+
+        self.proxy
+            .request(ChainSimulatorSetStateOverwriteRequest::for_accounts(
+                accounts,
+            ))
             .await
     }
 

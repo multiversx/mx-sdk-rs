@@ -2,12 +2,17 @@ mod system_sc_interact_cli;
 mod system_sc_interact_config;
 mod system_sc_interact_state;
 
+use std::collections::HashMap;
+
 use clap::Parser;
 pub use system_sc_interact_cli::NftDummyAttributes;
 pub use system_sc_interact_config::Config;
 use system_sc_interact_state::State;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{
+    imports::*,
+    sdk::{data::esdt::EsdtBalance, utils::base64_decode},
+};
 
 pub async fn system_sc_interact_cli() {
     env_logger::init();
@@ -26,7 +31,7 @@ pub async fn system_sc_interact_cli() {
                     args.token_type.into(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::Mint(args)) => {
             basic_interact
                 .mint_token(
@@ -35,11 +40,11 @@ pub async fn system_sc_interact_cli() {
                     args.amount.clone(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::SetRoles(args)) => {
             basic_interact
                 .set_roles(
-                    args.token_id.as_bytes(),
+                    &args.token_id,
                     args.roles
                         .clone()
                         .into_iter()
@@ -47,18 +52,18 @@ pub async fn system_sc_interact_cli() {
                         .collect(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::Burn(args)) => {
             basic_interact
                 .burn_token(args.token_id.as_bytes(), args.nonce, args.amount.clone())
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::PauseToken(args)) => {
             basic_interact.pause_token(args.token_id.as_bytes()).await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::UnpauseToken(args)) => {
             basic_interact.unpause_token(args.token_id.as_bytes()).await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::FreezeToken(args)) => {
             basic_interact
                 .freeze_token(
@@ -66,7 +71,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::UnfreezeToken(args)) => {
             basic_interact
                 .unfreeze_token(
@@ -74,7 +79,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::FreezeNFT(args)) => {
             basic_interact
                 .freeze_nft(
@@ -83,7 +88,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::UnfreezeNFT(args)) => {
             basic_interact
                 .unfreeze_nft(
@@ -92,7 +97,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::WipeToken(args)) => {
             basic_interact
                 .wipe_token(
@@ -100,7 +105,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::WipeNFT(args)) => {
             basic_interact
                 .wipe_nft(
@@ -109,7 +114,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::IssueNFTCollection(args)) => {
             basic_interact
                 .issue_non_fungible_collection(
@@ -118,7 +123,7 @@ pub async fn system_sc_interact_cli() {
                     args.ticker.as_bytes(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::CreateNFT(args)) => {
             basic_interact
                 .mint_nft(
@@ -131,10 +136,10 @@ pub async fn system_sc_interact_cli() {
                         creation_epoch: 2u64,
                         cool_factor: 3u8,
                     },
-                    Vec::new(),
+                    &Vec::new(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::IssueFungible(args)) => {
             basic_interact
                 .issue_fungible_token(
@@ -145,7 +150,7 @@ pub async fn system_sc_interact_cli() {
                     args.num_decimals,
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::IssueSftCollection(args)) => {
             basic_interact
                 .issue_semi_fungible_collection(
@@ -154,7 +159,7 @@ pub async fn system_sc_interact_cli() {
                     args.ticker.as_bytes(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::MintSft(args)) => {
             basic_interact
                 .mint_sft(
@@ -165,7 +170,7 @@ pub async fn system_sc_interact_cli() {
                     args.hash.as_bytes(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::RegisterMetaEsdt(args)) => {
             basic_interact
                 .register_meta_esdt(
@@ -175,12 +180,12 @@ pub async fn system_sc_interact_cli() {
                     args.num_decimals,
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::ChangeSftMetaEsdt(args)) => {
             basic_interact
                 .change_sft_meta_esdt(args.token_id.as_bytes(), args.num_decimals)
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::UnsetRoles(args)) => {
             basic_interact
                 .unset_roles(
@@ -193,7 +198,7 @@ pub async fn system_sc_interact_cli() {
                         .collect(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::TransferOwnership(args)) => {
             basic_interact
                 .transfer_ownership(
@@ -201,7 +206,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.new_owner.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::TransferNftCreateRole(args)) => {
             basic_interact
                 .transfer_nft_create_role(
@@ -210,23 +215,23 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.new_owner.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::ControlChanges(args)) => {
             basic_interact
                 .control_changes(args.token_id.as_bytes())
                 .await;
-        },
+        }
 
-        None => {},
+        None => {}
     }
 }
 
 pub struct SysFuncCallsInteract {
-    interactor: Interactor,
-    wallet_address: Bech32Address,
-    other_wallet_address: Bech32Address,
+    pub interactor: Interactor,
+    pub wallet_address: Bech32Address,
+    pub other_wallet_address: Bech32Address,
     #[allow(unused)]
-    state: State,
+    pub state: State,
 }
 
 impl SysFuncCallsInteract {
@@ -236,11 +241,11 @@ impl SysFuncCallsInteract {
             .use_chain_simulator(config.is_chain_simulator());
 
         interactor.set_current_dir_from_workspace("tools/interactor-system-func-calls");
-        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
-        let other_wallet_address = interactor.register_wallet(test_wallets::mike()).await;
+        let wallet_address = interactor.register_wallet(test_wallets::carol()).await;
+        let other_wallet_address = interactor.register_wallet(test_wallets::carol()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,
@@ -248,6 +253,24 @@ impl SysFuncCallsInteract {
             other_wallet_address: other_wallet_address.into(),
             state: State::load_state(),
         }
+    }
+
+    pub async fn get_token_properties(&mut self, token_id: &[u8]) -> TokenPropertiesResult {
+        println!("Fetching token properties of token {token_id:?}...");
+
+        let res = self
+            .interactor
+            .query()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
+            .get_token_properties(token_id)
+            .returns(ReturnsResult)
+            .run()
+            .await;
+
+        println!("Token properties: {:?}", res);
+
+        res
     }
 
     pub async fn issue_fungible_token(
@@ -448,7 +471,7 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    pub async fn set_roles(&mut self, token_id: &[u8], roles: Vec<EsdtLocalRole>) {
+    pub async fn set_roles(&mut self, token_id: &str, roles: Vec<EsdtLocalRole>) {
         let wallet_address = &self.wallet_address.clone().into_address();
         println!("Setting the following roles: {roles:?} for {token_id:?}");
 
@@ -465,6 +488,24 @@ impl SysFuncCallsInteract {
             )
             .run()
             .await;
+    }
+
+    pub async fn get_roles(&mut self, token_id: &[u8]) {
+        println!("Retrieving special roles for {token_id:?}");
+
+        let result = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(ESDTSystemSCAddress)
+            .gas(100_000_000u64)
+            .typed(ESDTSystemSCProxy)
+            .get_special_roles(TokenIdentifier::from(token_id))
+            .returns(ReturnsRawResult)
+            .run()
+            .await;
+
+        println!("raw result for roles {result:?}");
     }
 
     pub async fn change_to_dynamic(&mut self, token_id: &[u8]) {
@@ -728,12 +769,12 @@ impl SysFuncCallsInteract {
         royalties: u64,
         hash: &[u8],
         attributes: &T,
-        uris: Vec<String>,
+        uris: &[String],
     ) -> u64 {
         println!("Minting NFT...");
 
         let uris = uris
-            .into_iter()
+            .iter()
             .map(ManagedBuffer::from)
             .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
@@ -842,11 +883,11 @@ impl SysFuncCallsInteract {
             .await;
     }
 
-    pub async fn set_new_uris(&mut self, token_id: &[u8], nonce: u64, new_uris: Vec<String>) {
+    pub async fn set_new_uris(&mut self, token_id: &[u8], nonce: u64, new_uris: &[String]) {
         println!("Setting new uris for token {token_id:?} with nonce {nonce:?}...");
 
         let uris = new_uris
-            .into_iter()
+            .iter()
             .map(ManagedBuffer::from)
             .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
@@ -868,7 +909,7 @@ impl SysFuncCallsInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.other_wallet_address)
-            .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
+            .single_esdt(&token_id.into(), nonce, &amount.into())
             .run()
             .await;
     }
@@ -899,12 +940,12 @@ impl SysFuncCallsInteract {
         royalties: u64,
         hash: &[u8],
         new_attributes: &T,
-        uris: Vec<String>,
+        uris: &[String],
     ) {
         println!("Recreating the token {token_id:?} with nonce {nonce:?} with new attributes...");
 
         let uris = uris
-            .into_iter()
+            .iter()
             .map(ManagedBuffer::from)
             .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
@@ -928,12 +969,12 @@ impl SysFuncCallsInteract {
         royalties: u64,
         hash: &[u8],
         new_attributes: &T,
-        uris: Vec<String>,
+        uris: &[String],
     ) {
         println!("Updating the token {token_id:?} with nonce {nonce:?} with new attributes...");
 
         let uris = uris
-            .into_iter()
+            .iter()
             .map(ManagedBuffer::from)
             .collect::<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>>();
 
@@ -946,5 +987,48 @@ impl SysFuncCallsInteract {
             .esdt_metadata_update(token_id, nonce, name, royalties, hash, new_attributes, uris)
             .run()
             .await;
+    }
+
+    pub async fn get_account_esdt_tokens(&mut self) -> HashMap<String, EsdtBalance> {
+        println!(
+            "Retrieving ESDT tokens for {}...",
+            self.wallet_address.to_bech32_str()
+        );
+
+        self.interactor
+            .get_account_esdt(&self.wallet_address.to_address())
+            .await
+    }
+
+    pub async fn check_nft_uris(
+        &mut self,
+        token_id: &String,
+        nonce: u64,
+        expected_uris: &[String],
+    ) {
+        let esdt_tokens = self.get_account_esdt_tokens().await;
+        let nft_token_id = if nonce <= 10 {
+            format!("{}-0{:x}", token_id, nonce)
+        } else {
+            format!("{}-{:x}", token_id, nonce)
+        };
+
+        let uris = esdt_tokens
+            .get(&nft_token_id)
+            .expect("nft token not owned by account")
+            .uris
+            .clone();
+
+        if expected_uris.is_empty() {
+            assert_eq!(1, uris.len());
+            assert_eq!(String::new(), uris[0]);
+            return;
+        }
+
+        assert_eq!(expected_uris.len(), uris.len());
+        for (index, uri) in uris.iter().enumerate() {
+            let uri_string = String::from_utf8(base64_decode(uri)).unwrap();
+            assert_eq!(expected_uris[index], uri_string);
+        }
     }
 }

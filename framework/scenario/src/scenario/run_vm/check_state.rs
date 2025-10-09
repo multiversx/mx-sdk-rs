@@ -5,8 +5,8 @@ use crate::scenario::model::{
 use num_traits::Zero;
 
 use multiversx_chain_vm::{
+    blockchain::state::{AccountEsdt, BlockchainState, EsdtData, EsdtInstance, EsdtInstances},
     display_util::{bytes_to_string, verbose_hex, verbose_hex_list},
-    world_mock::{AccountEsdt, BlockchainState, EsdtData, EsdtInstance, EsdtInstances},
 };
 
 use super::ScenarioVMRunner;
@@ -126,7 +126,7 @@ fn execute(state: &BlockchainState, accounts: &CheckAccounts) {
 
 pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual: &AccountEsdt) {
     match expected {
-        CheckEsdtMap::Star => {},
+        CheckEsdtMap::Star => {}
         CheckEsdtMap::Equal(contents) => {
             for (key, expected_value) in contents.contents.iter() {
                 let actual_value = actual.get_by_identifier_or_default(key.value.as_slice());
@@ -159,7 +159,7 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                                 bytes_to_string(key.value.as_slice()),
                             );
                         }
-                    },
+                    }
                     CheckEsdt::Full(expected_esdt) => {
                         check_esdt_data(
                             address,
@@ -167,7 +167,7 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                             expected_esdt,
                             &actual_value,
                         );
-                    },
+                    }
                 }
             }
 
@@ -184,7 +184,7 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                     );
                 }
             }
-        },
+        }
         CheckEsdtMap::Unspecified => {
             for (token_identifier, actual_value) in actual.iter() {
                 check_esdt_data(
@@ -194,7 +194,7 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                     actual_value,
                 );
             }
-        },
+        }
     }
 }
 
@@ -256,10 +256,10 @@ pub fn check_token_instances(
                     );
                 }
             }
-        },
+        }
         CheckEsdtInstances::Star => {
             // nothing to be done for *
-        },
+        }
     }
 }
 

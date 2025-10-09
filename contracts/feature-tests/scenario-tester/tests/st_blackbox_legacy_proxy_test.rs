@@ -5,16 +5,14 @@ use num_bigint::BigUint;
 
 use scenario_tester::*;
 
-const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
-
 const OWNER: TestAddress = TestAddress::new("owner");
-const CODE_EXPR: MxscPath = MxscPath::new("output/adder.mxsc.json");
+const CODE_EXPR: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
-    blockchain.register_contract(ADDER_PATH_EXPR, scenario_tester::ContractBuilder);
+    blockchain.register_contract(CODE_EXPR, scenario_tester::ContractBuilder);
     blockchain
 }
 
@@ -42,13 +40,6 @@ fn st_blackbox_legacy_proxy() {
             assert_eq!(new_address.to_address(), st_contract.to_address());
         }))
         .run();
-
-    world.sc_query(
-        ScQueryStep::new()
-            .to(&st_contract)
-            .call(st_contract.sum())
-            .expect_value(SingleValue::from(BigUint::from(5u32))),
-    );
 
     let value = world
         .query()

@@ -13,7 +13,9 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
-use crate::InteractorBase;
+use crate::{
+    interactor::interactor_tx::interactor_prepare_async::InteractorSimulateGasAsync, InteractorBase,
+};
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
 
@@ -42,6 +44,33 @@ where
     step_wrapper.process_result()
 }
 
+async fn simulate_gas_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
+    tx: Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        To,
+        Payment,
+        Gas,
+        FunctionCall<StaticApi>,
+        RH,
+    >,
+) -> u64
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+{
+    let step_wrapper = tx.tx_to_step();
+    step_wrapper
+        .env
+        .world
+        .sc_call_simulate(&step_wrapper.step)
+        .await
+}
+
 impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorRunAsync
     for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
 where
@@ -57,6 +86,20 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_call(self)
+    }
+}
+
+impl<'w, GatewayProxy, From, To, Payment, RH> InteractorSimulateGasAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, (), FunctionCall<StaticApi>, RH>
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+{
+    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
+        simulate_gas_async_call(self)
     }
 }
 

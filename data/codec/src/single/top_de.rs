@@ -9,7 +9,7 @@ use crate::{
 ///
 /// 'Top' stands for the fact that values are deserialized on their own,
 /// so we have the benefit of knowing their length.
-/// This is useful in many scnearios, such as not having to encode Vec length and others.
+/// This is useful in many scenarios, such as not having to encode Vec length and others.
 ///
 /// The opther optimization that can be done when deserializing top-level objects
 /// is using special functions from the underlying API that do some of the work for the deserializer.

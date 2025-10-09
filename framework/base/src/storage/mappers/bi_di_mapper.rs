@@ -10,7 +10,7 @@ use crate::{
 };
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     unordered_set_mapper, StorageMapper, StorageMapperFromAddress, UnorderedSetMapper,
 };
 use crate::{
@@ -21,8 +21,8 @@ use crate::{
     types::{ManagedType, MultiValueEncoded},
 };
 
-const VALUE_SUFIX: &[u8] = b"_value";
-const ID_SUFIX: &[u8] = b"_id";
+const VALUE_SUFFIX: &[u8] = b"_value";
+const ID_SUFFIX: &[u8] = b"_id";
 const VALUE_TO_ID_SUFFIX: &[u8] = b"_value_to_id";
 const ID_TO_VALUE_SUFFIX: &[u8] = b"_id_to_value";
 
@@ -52,10 +52,10 @@ where
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         let mut id_key = base_key.clone();
-        id_key.append_bytes(ID_SUFIX);
+        id_key.append_bytes(ID_SUFFIX);
 
         let mut value_key = base_key.clone();
-        value_key.append_bytes(VALUE_SUFIX);
+        value_key.append_bytes(VALUE_SUFFIX);
         BiDiMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
@@ -74,10 +74,10 @@ where
 {
     fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         let mut id_key = base_key.clone();
-        id_key.append_bytes(ID_SUFIX);
+        id_key.append_bytes(ID_SUFFIX);
 
         let mut value_key = base_key.clone();
-        value_key.append_bytes(VALUE_SUFIX);
+        value_key.append_bytes(VALUE_SUFFIX);
         BiDiMapper {
             _phantom_api: PhantomData,
             address: address.clone(),
@@ -127,15 +127,15 @@ where
         self.value_set_mapper.contains(value)
     }
 
-    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<SA, V, A> {
+    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<'_, SA, V, A> {
         self.value_set_mapper.iter()
     }
 
-    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<SA, K, A> {
+    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<'_, SA, K, A> {
         self.id_set_mapper.iter()
     }
 
-    pub fn iter(&self) -> Iter<SA, K, V, A> {
+    pub fn iter(&self) -> Iter<'_, SA, K, V, A> {
         Iter::new(self)
     }
 

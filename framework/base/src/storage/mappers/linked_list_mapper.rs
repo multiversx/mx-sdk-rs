@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
@@ -218,11 +218,11 @@ where
         Some(self.get_node(node_id))
     }
 
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'_, SA, T, A> {
         Iter::new(self)
     }
 
-    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T, A> {
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<'_, SA, T, A> {
         Iter::new_from_node_id(self, node_id)
     }
 

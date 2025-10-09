@@ -28,9 +28,9 @@ impl ProxyConfig {
     }
 
     pub fn output_dir_proxy_config(abi: ContractAbi) -> Self {
-        let default_path = Path::new("output").join("proxy.rs");
+        let proxy_output = abi.get_crate_name_for_code() + "_proxy.rs";
         ProxyConfig {
-            path: default_path,
+            path: Path::new("output").join(proxy_output),
             override_import: String::new(),
             path_rename: Vec::new(),
             abi,
