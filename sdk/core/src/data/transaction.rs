@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use super::{sdk_address::SdkAddress, vm::CallType};
+use super::vm::CallType;
+use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
 // Transaction holds the fields of a transaction to be broadcasted to the network
@@ -9,8 +10,8 @@ use serde::{Deserialize, Serialize};
 pub struct Transaction {
     pub nonce: u64,
     pub value: String,
-    pub receiver: SdkAddress,
-    pub sender: SdkAddress,
+    pub receiver: Bech32Address,
+    pub sender: Bech32Address,
     pub gas_price: u64,
     pub gas_limit: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,8 +59,8 @@ pub struct TransactionOnNetwork {
     pub round: u64,
     pub epoch: u64,
     pub value: String,
-    pub receiver: SdkAddress,
-    pub sender: SdkAddress,
+    pub receiver: Bech32Address,
+    pub sender: Bech32Address,
     pub gas_price: u64,
     pub gas_limit: u64,
     #[serde(default)]
@@ -92,9 +93,10 @@ pub struct TransactionOnNetwork {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Events {
-    pub address: SdkAddress,
+    pub address: Bech32Address,
     pub identifier: String,
-    pub topics: Option<Vec<String>>,
+    #[serde(default)]
+    pub topics: Vec<String>,
     #[serde(default)]
     pub data: LogData,
 }
@@ -111,7 +113,7 @@ pub enum LogData {
 impl LogData {
     pub fn for_each<F: FnMut(&String)>(&self, mut f: F) {
         match self {
-            LogData::Empty => {},
+            LogData::Empty => {}
             LogData::String(s) => f(s),
             LogData::Vec(v) => v.iter().for_each(f),
         }
@@ -122,7 +124,7 @@ impl LogData {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiLogs {
-    pub address: SdkAddress,
+    pub address: Bech32Address,
     pub events: Vec<Events>,
 }
 
@@ -132,8 +134,8 @@ pub struct ApiSmartContractResult {
     pub hash: String,
     pub nonce: u64,
     pub value: u64,
-    pub receiver: SdkAddress,
-    pub sender: SdkAddress,
+    pub receiver: Bech32Address,
+    pub sender: Bech32Address,
     #[serde(default)]
     pub data: String,
     pub prev_tx_hash: String,
@@ -147,6 +149,7 @@ pub struct ApiSmartContractResult {
     pub code_metadata: Option<String>,
     pub return_message: Option<String>,
     pub original_sender: Option<String>,
+    pub logs: Option<ApiLogs>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -195,8 +198,8 @@ pub struct TransactionProcessStatus {
 pub struct ArgCreateTransaction {
     pub nonce: u64,
     pub value: String,
-    pub rcv_addr: SdkAddress,
-    pub snd_addr: SdkAddress,
+    pub rcv_addr: Bech32Address,
+    pub snd_addr: Bech32Address,
     pub gas_price: u64,
     pub gas_limit: u64,
     pub data: Option<String>,
@@ -223,6 +226,20 @@ pub struct SendTransactionResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct SimulateGasTransactionData {
+    pub tx_gas_units: u64,
+}
+
+// SimulateGasTransactionResponse holds the response received from the network when estimating cost of a transaction
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimulateGasTransactionResponse {
+    pub error: String,
+    pub code: String,
+    pub data: Option<SimulateGasTransactionData>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SendTransactionsResponseData {
     pub num_of_sent_txs: i32,
     pub txs_hashes: HashMap<i32, String>,
@@ -241,7 +258,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn parse_event_log_0() {
+    fn parse_event_log_null_data() {
         let data = r#"
 {
     "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
@@ -253,11 +270,27 @@ mod test {
         "#;
 
         let event_log = serde_json::from_str::<Events>(data).unwrap();
+        assert!(event_log.topics.is_empty());
         assert_eq!(event_log.data, LogData::Empty);
     }
 
     #[test]
-    fn parse_event_log_1() {
+    fn parse_event_log_no_topics() {
+        let data = r#"
+{
+    "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
+    "identifier": "completedTxEvent",
+    "data": null,
+    "additionalData": null
+}
+        "#;
+
+        let event_log = serde_json::from_str::<Events>(data).unwrap();
+        assert!(event_log.topics.is_empty());
+    }
+
+    #[test]
+    fn parse_event_log_null_additional_data() {
         let data = r#"
 {
     "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",
@@ -273,7 +306,7 @@ mod test {
     }
 
     #[test]
-    fn parse_event_log_2() {
+    fn parse_event_log_with_array_data() {
         let data = r#"
 {
     "address": "erd1qqqqqqqqqqqqqpgq0628nau8zydgwu96fn8ksqklzhrggkcfq33sm4vmwv",

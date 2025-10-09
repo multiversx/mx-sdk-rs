@@ -61,14 +61,14 @@ impl<'w> CheckStateBuilder<'w> {
     where
         A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
-        self.add_current_acount();
+        self.add_current_account();
         let env = self.new_env_data();
         let address_value = address_annotated(&env, &address);
         self.reset_account(address_value.into());
         self
     }
 
-    fn add_current_acount(&mut self) {
+    fn add_current_account(&mut self) {
         if let Entry::Vacant(entry) = self
             .check_state_step
             .accounts
@@ -86,7 +86,7 @@ impl<'w> CheckStateBuilder<'w> {
 
     /// Finished and sets all account in the blockchain mock.
     fn commit_accounts(&mut self) {
-        self.add_current_acount();
+        self.add_current_account();
         self.world.run_check_state_step(&self.check_state_step);
     }
 
@@ -153,7 +153,7 @@ impl<'w> CheckStateBuilder<'w> {
                 };
 
                 self.current_account.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
-            },
+            }
             CheckEsdtMap::Equal(check_esdt_map) => {
                 if check_esdt_map.contents.contains_key(&token_id_key) {
                     let prev_entry = check_esdt_map.contents.get_mut(&token_id_key).unwrap();
@@ -165,7 +165,7 @@ impl<'w> CheckStateBuilder<'w> {
                         },
                     }
                 }
-            },
+            }
         }
 
         self
@@ -218,6 +218,7 @@ impl<'w> CheckStateBuilder<'w> {
             CheckStorage::Star => CheckStorageDetails::default(),
             CheckStorage::Equal(details) => details.clone(),
         };
+        details.other_storages_allowed = true;
         details.storages.insert(
             BytesKey::interpret_from(key, &InterpreterContext::default()),
             CheckValue::Equal(BytesValue::interpret_from(

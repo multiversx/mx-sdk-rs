@@ -18,56 +18,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Cache VS Build Tools
-        uses: actions/cache@v3
-        with:
-          path: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools
-          key: vs-build-tools-${{ runner.os }}
-          restore-keys: vs-build-tools-
-
-      - name: Check if the required Visual Studio components are installed
-        id: check_vs_tools
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          $vs_installer = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
-
-          if (Test-Path $vs_installer) {
-              $installed_vctools = & $vs_installer -latest -products * -requires Microsoft.VisualStudio.Workload.VCTools -property installationPath
-              $installed_vc = & $vs_installer -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-              $installed_sdk10 = & $vs_installer -latest -products * -requires Microsoft.VisualStudio.Component.Windows10SDK -property installationPath
-              $installed_sdk11 = & $vs_installer -latest -products * -requires Microsoft.VisualStudio.Component.Windows11SDK -property installationPath
-              $installed_cmake = & $vs_installer -latest -products * -requires Microsoft.VisualStudio.Component.CMake -property installationPath
-
-            if ($installed_vctools -and $installed_vc -and ($installed_sdk10 -or $installed_sdk11) -and $installed_cmake) {
-                echo "All required components are installed"
-                echo "VS_INSTALLED=true" >> $GITHUB_ENV
-            } else {
-                  echo "VS_INSTALLED=false" >> $GITHUB_ENV
-            }
-          } else {
-              echo "VS_INSTALLED=false" >> $GITHUB_ENV
-          }
-
-      - name: Install missing VS Build Tools components
-        if: env.VS_INSTALLED != 'true'
-        shell: pwsh
-        run: |
-          $missing_components = @()
-
-          if (-not $installed_vctools) { $missing_components += "--add Microsoft.VisualStudio.Workload.VCTools" }
-          if (-not $installed_vc) { $missing_components += "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64" }
-          if (-not $installed_sdk10) { $missing_components += "--add Microsoft.VisualStudio.Component.Windows10SDK" }
-          if (-not $installed_sdk11) { $missing_components += "--add Microsoft.VisualStudio.Component.Windows11SDK" }
-          if (-not $installed_cmake) { $missing_components += "--add Microsoft.VisualStudio.Component.CMake" }
-
-          if ($missing_components.Count -gt 0) {
-              Write-Output "Installing missing components: $($missing_components -join ', ')"
-              choco install visualstudio2022buildtools --package-parameters "$($missing_components -join ' ')" --includeRecommended -y --limit-output
-          } else {
-              Write-Output "No missing components found."
-          }
-
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -83,5 +33,6 @@ jobs:
           sc-meta all build
           sc-meta all proxy
           sc-meta all snippets
+          sc-meta test
           cd ../
           sc-meta new --template empty --name windows-template-test-sc

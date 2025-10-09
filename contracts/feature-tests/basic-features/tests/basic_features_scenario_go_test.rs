@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
@@ -50,6 +50,16 @@ fn block_info_go() {
 }
 
 #[test]
+fn block_info_ms_go() {
+    world().run("scenarios/block_info_ms.scen.json");
+}
+
+#[test]
+fn code_hash_go() {
+    world().run("scenarios/code_hash.scen.json");
+}
+
+#[test]
 fn codec_err_go() {
     world().run("scenarios/codec_err.scen.json");
 }
@@ -60,6 +70,7 @@ fn count_ones_go() {
 }
 
 #[test]
+#[ignore = "some hooks are being disabled (after-supernova)"]
 fn crypto_elliptic_curves_go() {
     world().run("scenarios/crypto_elliptic_curves.scen.json");
 }
@@ -85,13 +96,11 @@ fn crypto_verify_bls_go() {
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_bls_aggregated_signature_go() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_bls_share_go() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
@@ -107,7 +116,6 @@ fn crypto_verify_secp_256_k_1_go() {
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_secp_256_r_1_go() {
     world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }
@@ -299,6 +307,21 @@ fn managed_vec_biguint_push_go() {
 }
 
 #[test]
+fn mmap_get_go() {
+    world().run("scenarios/mmap_get.scen.json");
+}
+
+#[test]
+fn mmap_mutable_input_go() {
+    world().run("scenarios/mmap_mutable_input.scen.json");
+}
+
+#[test]
+fn mmap_remove_go() {
+    world().run("scenarios/mmap_remove.scen.json");
+}
+
+#[test]
 fn new_address_go() {
     world().run("scenarios/new_address.scen.json");
 }
@@ -331,6 +354,11 @@ fn return_codes_go() {
 #[test]
 fn sc_properties_go() {
     world().run("scenarios/sc_properties.scen.json");
+}
+
+#[test]
+fn send_esdt_to_nonexisting_account_go() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
 }
 
 #[test]
@@ -507,4 +535,14 @@ fn storage_usize_bad_go() {
 #[test]
 fn struct_eq_go() {
     world().run("scenarios/struct_eq.scen.json");
+}
+
+#[test]
+fn timelock_mapper_go() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn timelock_mapper_at_address_go() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }

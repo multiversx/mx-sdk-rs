@@ -6,7 +6,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{ei::parse_check_ei, print_util::print_sc_config_main_deprecated};
+use crate::{
+    ei::parse_check_ei,
+    print_util::print_sc_config_main_deprecated,
+    tools::{self, OpcodeVersion},
+};
 
 use super::{
     contract_variant_settings::{parse_allocator, parse_stack_size},
@@ -81,6 +85,15 @@ impl ContractVariantBuilder {
                     default_features: cms.default_features,
                     kill_legacy_callback: cms.kill_legacy_callback,
                     profile: ContractVariantProfile::from_serde(&cms.profile),
+                    std: cms.std.unwrap_or(default.settings.std),
+                    rustc_target: cms
+                        .rustc_target
+                        .clone()
+                        .unwrap_or_else(|| tools::build_target::default_target().to_owned()),
+                     opcode_version: cms.opcode_version.as_ref().map_or(
+                        default.settings.opcode_version,
+                        |v| OpcodeVersion::from_settings_str(v).expect("Invalid opcode version in contract variant settings; allowed values are '1' and '2'")
+                     ),
                 },
                 ..default
             },
@@ -182,7 +195,7 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
             multiversx_sc::abi::EndpointTypeAbi::Endpoint => endpoints.push(endpoint_abi),
             multiversx_sc::abi::EndpointTypeAbi::PromisesCallback => {
                 promise_callbacks.push(endpoint_abi)
-            },
+            }
         }
     }
     let has_callback = original_abi.has_callback
@@ -275,7 +288,7 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                 alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
 
                 contract_builders = HashMap::from([(contract_id, contract_builder)]);
-            },
+            }
             None => {
                 let mut contract_builder = ContractVariantBuilder::default();
                 alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
@@ -284,7 +297,7 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                     proxy_config.path.to_string_lossy().to_string(),
                     contract_builder,
                 );
-            },
+            }
         }
 
         collect_and_process_endpoints(
@@ -382,7 +395,7 @@ impl ScConfig {
                     &config_serde,
                     original_abi,
                 ))
-            },
+            }
             Err(_) => None,
         }
     }

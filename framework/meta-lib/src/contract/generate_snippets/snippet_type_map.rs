@@ -63,7 +63,7 @@ fn init_rust_types_map() -> HashMap<&'static str, RustTypeString> {
         "Address",
         RustTypeString {
             type_name: "ManagedAddress".to_string() + STATIC_API_SUFFIX,
-            default_value_expr: "bech32::decode(\"\")".to_string(),
+            default_value_expr: "ManagedAddress::<StaticApi>::zero()".to_string(),
             contains_custom_types: false,
         },
     );
@@ -184,18 +184,18 @@ pub fn handle_abi_type(type_string: &mut RustTypeString, abi_type_str: String) {
             type_string.default_value_expr +=
                 &format!("{}::{}::default()", user_type, STATIC_API_SUFFIX);
             type_string.contains_custom_types = true;
-        },
+        }
         AbiType::Basic(basic_type) => {
             type_string.type_name += &basic_type.type_name;
             type_string.default_value_expr += &basic_type.default_value_expr;
-        },
+        }
         AbiType::Variadic(inner_types) => handle_variadic_type(type_string, inner_types),
         AbiType::Optional(inner_types) => handle_optional_type(type_string, inner_types),
         AbiType::Multi(inner_types) => handle_multi_type(type_string, inner_types),
         AbiType::List(inner_types) => handle_list_type(type_string, inner_types),
         AbiType::Array(array_size, inner_types) => {
             handle_array_type(type_string, array_size, inner_types)
-        },
+        }
         AbiType::Option(inner_types) => handle_option_type(type_string, inner_types),
     }
 }

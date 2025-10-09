@@ -1,13 +1,18 @@
+#![allow(deprecated)]
+
 use crate::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
-    TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
+    DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, MultiValueLength,
+    TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 macro_rules! multi_value_impls_debug {
         ($(($mv_struct:ident $len:tt $($n:tt $name:ident)+) )+) => {
         $(
             #[derive(Clone, Debug, PartialEq)]
-            pub struct $mv_struct<$($name,)+>(pub ($($name,)+));
+            pub struct $mv_struct<$($name,)+>(
+                #[deprecated(since = "0.57.0", note = "use .into_tuple() or .as_tuple() instead")]
+                pub ($($name,)+)
+            );
         )+
     }
 }
@@ -15,7 +20,10 @@ macro_rules! multi_value_impls_no_debug {
         ($(($mv_struct:ident $len:tt $($n:tt $name:ident)+) )+) => {
         $(
             #[derive(Clone)]
-            pub struct $mv_struct<$($name,)+>(pub ($($name,)+));
+            pub struct $mv_struct<$($name,)+>(
+                #[deprecated(since = "0.57.0", note = "use .into_tuple() or .as_tuple() instead")]
+                pub ($($name,)+)
+            );
         )+
     }
 }
@@ -35,6 +43,11 @@ macro_rules! multi_value_impls {
                 pub fn into_tuple(self) -> ($($name,)+) {
                     self.0
                 }
+
+                #[inline]
+                pub fn as_tuple(&self) -> &($($name,)+) {
+                    &self.0
+                }
             }
 
             impl<$($name),+ > TopEncodeMulti for $mv_struct<$($name,)+>
@@ -53,13 +66,25 @@ macro_rules! multi_value_impls {
                 }
             }
 
-            impl<$($name),+ > TopDecodeMultiLength for $mv_struct<$($name,)+>
+            impl<$($name),+ > MultiValueLength for $mv_struct<$($name,)+>
             where
-                $($name: TopDecodeMulti + TopDecodeMultiLength,)+
+                $($name: TopDecodeMulti + MultiValueLength,)+
             {
-                const LEN: usize = 0
+                fn multi_value_len(&self) -> usize {
+                    0
+                    $(
+                        + <$name as MultiValueLength>::multi_value_len(&self.0.$n)
+                    )+
+                }
+            }
+
+            impl<$($name),+ > MultiValueConstLength for $mv_struct<$($name,)+>
+            where
+                $($name: TopDecodeMulti + MultiValueConstLength,)+
+            {
+                const MULTI_VALUE_CONST_LEN: usize = 0
                 $(
-                    + <$name as TopDecodeMultiLength>::LEN
+                    + <$name as MultiValueConstLength>::MULTI_VALUE_CONST_LEN
                 )+
                 ;
             }

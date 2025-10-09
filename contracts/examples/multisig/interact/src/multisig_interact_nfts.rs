@@ -53,7 +53,7 @@ impl MultisigInteract {
             .run()
             .await;
 
-        println!("successfully proposed issue colllection with roles all action `{action_id}`");
+        println!("successfully proposed issue collection with roles all action `{action_id}`");
         action_id
     }
 
@@ -61,7 +61,7 @@ impl MultisigInteract {
         println!("proposing issue collection with all roles...");
         let action_id = self.propose_issue_collection_with_all_roles().await;
 
-        println!("perfoming issue collection with all roles action `{action_id}`...");
+        println!("performing issue collection with all roles action `{action_id}`...");
 
         self.sign_if_quorum_not_reached(action_id).await;
 
@@ -103,7 +103,7 @@ impl MultisigInteract {
             .run()
             .await;
 
-        println!("successfully proposed issue colllection action `{action_id}`");
+        println!("successfully proposed issue collection action `{action_id}`");
         action_id
     }
 
@@ -111,7 +111,7 @@ impl MultisigInteract {
         println!("proposing issue collection...");
         let action_id = self.propose_issue_collection().await;
 
-        println!("perfoming issue collection action `{action_id}`...");
+        println!("performing issue collection action `{action_id}`...");
 
         self.sign_if_quorum_not_reached(action_id).await;
 

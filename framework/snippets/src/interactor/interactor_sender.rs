@@ -1,16 +1,19 @@
 use std::collections::HashMap;
 
 use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
-use log::debug;
 use multiversx_sc_scenario::multiversx_sc::types::Address;
 use multiversx_sdk::data::account::Account;
-use multiversx_sdk::gateway::{GatewayAsyncService, GetAccountRequest, GetAccountStorageRequest};
+use multiversx_sdk::data::esdt::EsdtBalance;
+use multiversx_sdk::gateway::{
+    GatewayAsyncService, GetAccountEsdtTokensRequest, GetAccountRequest, GetAccountStorageRequest,
+};
 
 use crate::InteractorBase;
 
 /// A user account that can sign transactions (a pem is present).
 pub struct Sender {
     pub address: Address,
+    pub hrp: String,
     pub wallet: Wallet,
     pub current_nonce: Option<u64>,
 }
@@ -22,27 +25,42 @@ where
     pub async fn recall_nonce(&self, address: &Address) -> u64 {
         let account = self
             .proxy
-            .request(GetAccountRequest::new(address))
+            .request(GetAccountRequest::new(&address.to_bech32(self.get_hrp())))
             .await
             .expect("failed to retrieve account nonce");
+
         account.nonce
     }
 
     pub async fn get_account(&self, address: &Address) -> Account {
         self.proxy
-            .request(GetAccountRequest::new(address))
+            .request(GetAccountRequest::new(&address.to_bech32(self.get_hrp())))
             .await
             .expect("failed to retrieve account")
     }
 
     pub async fn get_account_storage(&self, address: &Address) -> HashMap<String, String> {
         self.proxy
-            .request(GetAccountStorageRequest::new(address))
+            .request(GetAccountStorageRequest::new(
+                &address.to_bech32(self.get_hrp()),
+            ))
             .await
             .expect("failed to retrieve account")
     }
 
-    pub(crate) async fn set_nonce_and_sign_tx(
+    pub async fn get_account_esdt(&self, address: &Address) -> HashMap<String, EsdtBalance> {
+        self.proxy
+            .request(GetAccountEsdtTokensRequest::new(
+                &address.to_bech32(self.get_hrp()),
+            ))
+            .await
+            .expect("failed to retrieve account")
+    }
+
+    /// Updates:
+    /// - the transaction with the nonce read from the network
+    /// - the sender's current_nonce
+    pub(crate) async fn set_tx_nonce_update_sender(
         &mut self,
         sender_address: &Address,
         transaction: &mut Transaction,
@@ -67,10 +85,17 @@ where
             .get_mut(sender_address)
             .expect("the wallet that was supposed to sign is not registered");
         sender.current_nonce = Some(nonce + 1);
+    }
+
+    pub(crate) fn sign_tx(&self, sender_address: &Address, transaction: &mut Transaction) {
+        // read
+        let sender = self
+            .sender_map
+            .get(sender_address)
+            .expect("the wallet that was supposed to sign is not registered");
 
         // sign
         let signature = sender.wallet.sign_tx(transaction);
         transaction.signature = Some(hex::encode(signature));
-        debug!("transaction {:#?}", transaction);
     }
 }

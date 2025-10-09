@@ -37,10 +37,10 @@ pub trait ForwarderRolesModule: fwd_storage::ForwarderStorageModule {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 }

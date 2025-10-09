@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 pub use super::vec_mapper::Iter;
 use super::{
-    set_mapper::{CurrentStorage, StorageAddress},
+    source::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper, StorageMapperFromAddress, VecMapper,
 };
 use crate::{
@@ -118,7 +118,7 @@ where
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'_, SA, T, A> {
         self.vec_mapper.iter()
     }
 }

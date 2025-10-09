@@ -89,27 +89,27 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
                 arg_push_snippets.push(quote! {
                     .argument(&#pat)
                 });
-            },
+            }
             ArgPaymentMetadata::PaymentToken => {
                 token_count += 1;
                 let pat = &arg.pat;
                 token_expr = quote! { #pat };
-            },
+            }
             ArgPaymentMetadata::PaymentNonce => {
                 nonce_count += 1;
                 let pat = &arg.pat;
                 nonce_expr = quote! { #pat };
-            },
+            }
             ArgPaymentMetadata::PaymentAmount => {
                 payment_count += 1;
                 let pat = &arg.pat;
                 payment_expr = quote! { #pat };
-            },
+            }
             ArgPaymentMetadata::PaymentMulti => {
                 multi_count += 1;
                 let pat = &arg.pat;
                 multi_expr_opt = Some(quote! { #pat });
-            },
+            }
         }
     }
 
@@ -206,22 +206,22 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
                 arg_push_snippets.push(quote! {
                     .argument(&#pat)
                 });
-            },
+            }
             ArgPaymentMetadata::PaymentToken => {
                 token_count += 1;
-            },
+            }
             ArgPaymentMetadata::PaymentNonce => {
                 nonce_count += 1;
-            },
+            }
             ArgPaymentMetadata::PaymentAmount => {
                 payment_count += 1;
                 let payment_expr = &arg.pat;
                 payment_type = quote! { multiversx_sc::types::EgldPayment<Self::Api> };
                 payment_init = quote! { .egld(#payment_expr) };
-            },
+            }
             ArgPaymentMetadata::PaymentMulti => {
                 multi_count += 1;
-            },
+            }
         }
     }
 

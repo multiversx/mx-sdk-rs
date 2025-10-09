@@ -2,5 +2,5 @@ extern crate payable_interactor;
 
 #[tokio::main]
 pub async fn main() {
-    payable_interactor::adder_cli().await;
+    payable_interactor::payable_features_cli().await;
 }

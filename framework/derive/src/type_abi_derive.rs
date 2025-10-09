@@ -1,8 +1,10 @@
 use crate::parse::attributes::extract_macro_attributes;
 
 use super::parse::attributes::extract_doc;
-use quote::quote;
+use quote::{quote, ToTokens};
 
+const BITFLAGS_PATH: &str = ":: __private :: PublicFlags :: Internal";
+const BITFLAGS_PRIMITIVE: &str = "Primitive";
 pub struct ExplicitDiscriminant {
     pub variant_index: usize,
     pub value: usize,
@@ -15,7 +17,7 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
     } else {
         index.to_string()
     };
-    let field_ty = &field.ty;
+    let field_ty = sanitize_field_type_path(&field.ty);
     quote! {
         field_descriptions.push(multiversx_sc::abi::StructFieldDescription::new(
             &[ #(#field_docs),* ],
@@ -24,6 +26,24 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
         ));
         <#field_ty>::provide_type_descriptions(accumulator);
     }
+}
+
+fn sanitize_field_type_path(field_type: &syn::Type) -> syn::Type {
+    if let syn::Type::Path(p) = field_type {
+        let mut path = p.path.clone();
+
+        if path.to_token_stream().to_string().contains(BITFLAGS_PATH) {
+            let modified_path = path.segments.last_mut().unwrap();
+            modified_path.ident = syn::Ident::new(BITFLAGS_PRIMITIVE, modified_path.ident.span());
+
+            return syn::Type::Path(syn::TypePath {
+                qself: p.qself.clone(),
+                path,
+            });
+        }
+    }
+
+    field_type.clone()
 }
 
 fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
@@ -76,7 +96,7 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
                     }
                 }
             }
-        },
+        }
         syn::Data::Enum(data_enum) => {
             let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
             let enum_variant_snippets: Vec<proc_macro2::TokenStream> = data_enum
@@ -120,7 +140,7 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
                     }
                 }
             }
-        },
+        }
         syn::Data::Union(_) => panic!("Union not supported!"),
     };
 
@@ -166,7 +186,7 @@ pub fn get_discriminant(
                     value,
                 });
                 value
-            },
+            }
             _ => panic!("Only integer values as discriminants"), // theoretically covered by the compiler
         };
         return quote! { #lit};

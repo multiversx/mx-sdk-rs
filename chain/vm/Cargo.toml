@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-chain-vm"
-version = "0.13.1"
+version = "0.19.0"
 edition = "2021"
 
 authors = [
@@ -18,7 +18,10 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [features]
 # not supported when compiling to wasm
+bls = ["multiversx-bls"]
 wasm-incompatible = ["rand"]
+wasmer-experimental = ["multiversx-chain-vm-executor-wasmer-experimental"]
+# default = ["wasmer-experimental"] ## uncomment for easier development
 
 [dependencies]
 num-bigint = "0.4"
@@ -27,16 +30,24 @@ hex = "0.4"
 sha2 = "0.10.6"
 sha3 = "0.10.6"
 itertools = "0.14.0"
-hex-literal = "=0.4.1"
-bitflags = "=2.8.0"
-colored = "2.2"                               # TODO: doesn't support >v2.2 (can't build on nightly)
+hex-literal = "1.0"
+bitflags = "2.9"
+colored = "3.0"
 rand = { version = "0.8.5", optional = true }
 rand_seeder = "0.3.0"
 ed25519-dalek = "2.1.0"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.9"
+anyhow = "1.0"
+multiversx-bls = { version = "0.2.0", optional = true }
 
 [dependencies.multiversx-chain-core]
-version = "=0.13.1"
+version = "=0.19.0"
 path = "../core"
 
 [dependencies.multiversx-chain-vm-executor]
-version = "0.3.0"
+version = "0.5.0"
+
+[dependencies.multiversx-chain-vm-executor-wasmer-experimental]
+version = "0.5.0"
+optional = true

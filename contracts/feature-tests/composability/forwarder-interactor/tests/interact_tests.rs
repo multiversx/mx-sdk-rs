@@ -1,8 +1,4 @@
-use forwarder_interact::{
-    Color, Config, ContractInteract, FORWARDER_BUILTIN_INTERACTOR_TRACE_PATH,
-    FORWARDER_CHANGE_TO_DYNAMIC_INTERACTOR_TRACE_PATH, FORWARDER_DEPLOY_INTERACTOR_TRACE_PATH,
-    FORWARDER_MODIFY_CREATOR_INTERACTOR_TRACE_PATH, FORWARDER_UPDATE_TOKEN_INTERACTOR_TRACE_PATH,
-};
+use forwarder_interact::{Color, Config, ContractInteract};
 use multiversx_sc_snippets::imports::*;
 
 const ISSUE_COST: u64 = 50000000000000000u64;
@@ -13,8 +9,7 @@ const ISSUE_COST: u64 = 50000000000000000u64;
 #[tokio::test]
 #[ignore = "run on demand, relies on real blockchain state"]
 async fn deploy_test_forwarder() {
-    let mut interactor =
-        ContractInteract::new(Config::new(), Some(FORWARDER_DEPLOY_INTERACTOR_TRACE_PATH)).await;
+    let mut interactor = ContractInteract::new(Config::new(), None).await;
 
     interactor.deploy().await;
 }
@@ -22,8 +17,7 @@ async fn deploy_test_forwarder() {
 #[tokio::test]
 #[ignore = "run on demand"]
 async fn builtin_func_tokens_test() {
-    let mut interact =
-        ContractInteract::new(Config::new(), Some(FORWARDER_BUILTIN_INTERACTOR_TRACE_PATH)).await;
+    let mut interact = ContractInteract::new(Config::new(), None).await;
 
     // deploy forwarder
     interact.deploy().await;
@@ -176,11 +170,7 @@ async fn builtin_func_tokens_test() {
 #[tokio::test]
 #[ignore = "run on demand"]
 async fn change_to_dynamic_test() {
-    let mut interact = ContractInteract::new(
-        Config::new(),
-        Some(FORWARDER_CHANGE_TO_DYNAMIC_INTERACTOR_TRACE_PATH),
-    )
-    .await;
+    let mut interact = ContractInteract::new(Config::new(), None).await;
 
     // deploy forwarder
     interact.deploy().await;
@@ -203,7 +193,7 @@ async fn change_to_dynamic_test() {
             b"TESTNFT",
             b"TEST",
             18usize,
-            EsdtTokenType::Meta,
+            EsdtTokenType::MetaFungible,
         )
         .await;
 
@@ -234,11 +224,7 @@ async fn change_to_dynamic_test() {
 #[tokio::test]
 #[ignore = "run on demand"]
 async fn update_token_test() {
-    let mut interact = ContractInteract::new(
-        Config::new(),
-        Some(FORWARDER_UPDATE_TOKEN_INTERACTOR_TRACE_PATH),
-    )
-    .await;
+    let mut interact = ContractInteract::new(Config::new(), None).await;
 
     // deploy forwarder
     interact.deploy().await;
@@ -264,11 +250,7 @@ async fn update_token_test() {
 #[tokio::test]
 #[ignore = "run on demand"]
 async fn modify_creator() {
-    let mut interact = ContractInteract::new(
-        Config::new(),
-        Some(FORWARDER_MODIFY_CREATOR_INTERACTOR_TRACE_PATH),
-    )
-    .await;
+    let mut interact = ContractInteract::new(Config::new(), None).await;
 
     // deploy forwarder
     interact.deploy().await;

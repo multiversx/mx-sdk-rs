@@ -35,7 +35,7 @@ pub(super) fn perform_substitutions(
                     substituted_group.set_span(g.span());
                     result.push(substituted_group);
                     continue;
-                },
+                }
                 _ => result.push(tt),
             }
         } else {

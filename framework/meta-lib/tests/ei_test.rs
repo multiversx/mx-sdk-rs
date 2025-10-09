@@ -2,99 +2,6 @@ use multiversx_sc_meta_lib::ei;
 
 use std::collections::HashSet;
 
-/// Added around November-December 2021.
-pub const EI_1_1_ADDED_NAMES: &[&str] = &[
-    "mBufferSetByteSlice",
-    "managedSha256",
-    "managedKeccak256",
-    "mBufferStorageLoadFromAddress",
-    "validateTokenIdentifier",
-    "getESDTLocalRoles",
-    "cleanReturnData",
-    "deleteFromReturnData",
-];
-
-/// Added around May 2022.
-pub const EI_1_2_ADDED_NAMES: &[&str] = &[
-    // debugging/display utilities
-    "bigIntToString",
-    "managedBufferToHex",
-    // more managed crypto functions
-    "managedRipemd160",
-    "managedVerifyBLS",
-    "managedVerifyEd25519",
-    "managedVerifySecp256k1",
-    "managedVerifyCustomSecp256k1",
-    "managedEncodeSecp256k1DerSignature",
-    "managedScalarBaseMultEC",
-    "managedScalarMultEC",
-    "managedMarshalEC",
-    "managedUnmarshalEC",
-    "managedMarshalCompressedEC",
-    "managedUnmarshalCompressedEC",
-    "managedGenerateKeyEC",
-    "managedCreateEC",
-    // big floats
-    "mBufferToBigFloat",
-    "mBufferFromBigFloat",
-    "bigFloatNewFromParts",
-    "bigFloatNewFromFrac",
-    "bigFloatNewFromSci",
-    "bigFloatAdd",
-    "bigFloatSub",
-    "bigFloatMul",
-    "bigFloatDiv",
-    "bigFloatNeg",
-    "bigFloatClone",
-    "bigFloatCmp",
-    "bigFloatAbs",
-    "bigFloatSign",
-    "bigFloatSqrt",
-    "bigFloatPow",
-    "bigFloatFloor",
-    "bigFloatCeil",
-    "bigFloatTruncate",
-    "bigFloatSetInt64",
-    "bigFloatIsInt",
-    "bigFloatSetBigInt",
-    "bigFloatGetConstPi",
-    "bigFloatGetConstE",
-    // more ESDT utilities
-    "managedIsESDTFrozen",
-    "managedIsESDTPaused",
-    "managedIsESDTLimitedTransfer",
-];
-
-/// Planned to be released with VM 1.5.
-pub const EI_1_3_ADDED_NAMES: &[&str] = &[
-    "managedCreateAsyncCall",
-    "managedGetBackTransfers",
-    "managedGetCallbackClosure",
-    "managedGetCodeMetadata",
-    "managedIsBuiltinFunction",
-];
-
-pub const EI_1_4_ADDED_NAMES: &[&str] = &[
-    "isReservedFunctionName",
-    "managedGetOriginalCallerAddr",
-    "managedGetRelayerAddr",
-    "managedMultiTransferESDTNFTExecuteByUser",
-    "managedVerifySecp256r1",
-    "managedVerifyBLSSignatureShare",
-    "managedVerifyBLSAggregatedSignature",
-];
-
-pub const EI_1_5_ADDED_NAMES: &[&str] = &[
-    "getRoundTime",
-    "epochStartBlockTimeStamp",
-    "epochStartBlockNonce",
-    "epochStartBlockRound",
-    "mBufferToSmallIntUnsigned",
-    "mBufferToSmallIntSigned",
-    "mBufferFromSmallIntUnsigned",
-    "mBufferFromSmallIntSigned",
-];
-
 fn list_to_set<'a>(list: &[&'a str]) -> HashSet<&'a str> {
     let mut set = HashSet::new();
     for &item in list {
@@ -118,25 +25,45 @@ fn test_added_names(base: &[&str], added: &[&str], expected_result: &[&str]) {
 
 #[test]
 fn test_added_names_ei_1_1() {
-    test_added_names(ei::EI_1_0_NAMES, EI_1_1_ADDED_NAMES, ei::EI_1_1_NAMES);
+    test_added_names(
+        ei::EI_1_0_NAMES,
+        ei::delta::EI_1_1_ADDED_NAMES,
+        ei::EI_1_1_NAMES,
+    );
 }
 
 #[test]
 fn test_added_names_ei_1_2() {
-    test_added_names(ei::EI_1_1_NAMES, EI_1_2_ADDED_NAMES, ei::EI_1_2_NAMES);
+    test_added_names(
+        ei::EI_1_1_NAMES,
+        ei::delta::EI_1_2_ADDED_NAMES,
+        ei::EI_1_2_NAMES,
+    );
 }
 
 #[test]
 fn test_added_names_ei_1_3() {
-    test_added_names(ei::EI_1_2_NAMES, EI_1_3_ADDED_NAMES, ei::EI_1_3_NAMES);
+    test_added_names(
+        ei::EI_1_2_NAMES,
+        ei::delta::EI_1_3_ADDED_NAMES,
+        ei::EI_1_3_NAMES,
+    );
 }
 
 #[test]
 fn test_added_names_ei_1_4() {
-    test_added_names(ei::EI_1_3_NAMES, EI_1_4_ADDED_NAMES, ei::EI_1_4_NAMES);
+    test_added_names(
+        ei::EI_1_3_NAMES,
+        ei::delta::EI_1_4_ADDED_NAMES,
+        ei::EI_1_4_NAMES,
+    );
 }
 
 #[test]
 fn test_added_names_ei_1_5() {
-    test_added_names(ei::EI_1_4_NAMES, EI_1_5_ADDED_NAMES, ei::EI_1_5_NAMES);
+    test_added_names(
+        ei::EI_1_4_NAMES,
+        ei::delta::EI_1_5_ADDED_NAMES,
+        ei::EI_1_5_NAMES,
+    );
 }

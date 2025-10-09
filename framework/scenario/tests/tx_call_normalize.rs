@@ -1,6 +1,4 @@
-use multiversx_sc::api::ESDT_MULTI_TRANSFER_FUNC_NAME;
 use multiversx_sc_scenario::scenario_model::ScCallStep;
-use num_traits::Zero;
 
 #[test]
 fn test_tx_call_normalize_single_esdt_token_fungible() {
@@ -89,8 +87,12 @@ fn test_tx_call_normalize_single_esdt_token() {
 }
 
 #[test]
+#[cfg(feature = "contract-call-legacy")]
 #[allow(deprecated)]
 fn test_contract_call_multi_esdt_deprecated() {
+    use multiversx_sc::api::ESDT_MULTI_TRANSFER_FUNC_NAME;
+    use num_traits::Zero;
+
     let tx = ScCallStep::new()
         .from("address:sender")
         .to("address:recipient")

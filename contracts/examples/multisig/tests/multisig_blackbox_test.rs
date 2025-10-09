@@ -1,7 +1,8 @@
+mod adder_proxy;
+
 use multiversx_sc::codec::top_encode_to_vec_u8_or_panic;
 use multiversx_sc_scenario::imports::*;
 
-use adder::adder_proxy;
 use multisig::{multisig_proxy, multisig_view_proxy};
 use num_bigint::BigUint;
 
@@ -10,18 +11,17 @@ const ADDER_OWNER_ADDRESS: TestAddress = TestAddress::new("adder-owner");
 const ADDER_CODE_PATH: MxscPath = MxscPath::new("test-contracts/adder.mxsc.json");
 const BOARD_MEMBER_ADDRESS: TestAddress = TestAddress::new("board-member");
 const MULTISIG_ADDRESS: TestSCAddress = TestSCAddress::new("multisig");
-const MULTISIG_CODE_PATH: MxscPath = MxscPath::new("output/multisig.mxsc.json");
+const MULTISIG_CODE_PATH: MxscPath = MxscPath::new("output/multisig-full.mxsc.json");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const PROPOSER_ADDRESS: TestAddress = TestAddress::new("proposer");
 const PROPOSER_BALANCE: u64 = 100_000_000;
 const QUORUM_SIZE: usize = 1;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
     blockchain.register_contract(MULTISIG_CODE_PATH, multisig::ContractBuilder);
-    blockchain.register_contract(ADDER_CODE_PATH, adder::ContractBuilder);
     blockchain
 }
 
@@ -246,7 +246,7 @@ impl MultisigTestState {
 }
 
 #[test]
-fn test_add_board_member() {
+fn blackbox_add_board_member() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -277,7 +277,7 @@ fn test_add_board_member() {
 }
 
 #[test]
-fn test_add_proposer() {
+fn blackbox_add_proposer() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -311,7 +311,7 @@ fn test_add_proposer() {
 }
 
 #[test]
-fn test_remove_proposer() {
+fn blackbox_remove_proposer() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -333,7 +333,7 @@ fn test_remove_proposer() {
 }
 
 #[test]
-fn test_try_remove_all_board_members() {
+fn blackbox_try_remove_all_board_members() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -343,7 +343,7 @@ fn test_try_remove_all_board_members() {
 }
 
 #[test]
-fn test_change_quorum() {
+fn blackbox_change_quorum() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -413,7 +413,7 @@ fn test_change_quorum() {
 }
 
 #[test]
-fn test_transfer_execute_to_user() {
+fn blackbox_transfer_execute_to_user() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
@@ -465,7 +465,7 @@ fn test_transfer_execute_to_user() {
 }
 
 #[test]
-fn test_transfer_execute_sc_all() {
+fn blackbox_transfer_execute_sc_all() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
@@ -491,7 +491,7 @@ fn test_transfer_execute_sc_all() {
 }
 
 #[test]
-fn test_async_call_to_sc() {
+fn blackbox_async_call_to_sc() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
@@ -517,7 +517,7 @@ fn test_async_call_to_sc() {
 }
 
 #[test]
-fn test_deploy_and_upgrade_from_source() {
+fn blackbox_deploy_and_upgrade_from_source() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
@@ -569,10 +569,6 @@ fn test_deploy_and_upgrade_from_source() {
 
     let factorial_address: TestSCAddress = TestSCAddress::new("factorial");
     let factorial_path: MxscPath = MxscPath::new("test-contracts/factorial.mxsc.json");
-
-    state
-        .world
-        .register_contract(factorial_path, factorial::ContractBuilder);
 
     state.world.account(factorial_address).code(factorial_path);
 

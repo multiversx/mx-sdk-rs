@@ -1,7 +1,8 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
-    let mut blockchain = ScenarioWorld::new();
+    let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
+
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
     blockchain.register_contract(
@@ -11,10 +12,6 @@ fn world() -> ScenarioWorld {
     blockchain.register_contract(
         "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
         esdt_system_sc_mock::ContractBuilder,
-    );
-    blockchain.register_contract(
-        "mxsc:output/basic-features-crypto.mxsc.json",
-        basic_features::ContractBuilder,
     );
 
     blockchain
@@ -66,6 +63,17 @@ fn block_info_rs() {
 }
 
 #[test]
+fn block_info_ms_rs() {
+    world().run("scenarios/block_info_ms.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn code_hash_rs() {
+    world().run("scenarios/code_hash.scen.json");
+}
+
+#[test]
 fn codec_err_rs() {
     world().run("scenarios/codec_err.scen.json");
 }
@@ -98,19 +106,16 @@ fn crypto_sha_256_rs() {
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_rs() {
     world().run("scenarios/crypto_verify_bls.scen.json");
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_aggregated_signature_rs() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_share_rs() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
@@ -319,6 +324,21 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
+fn mmap_get_rs() {
+    world().run("scenarios/mmap_get.scen.json");
+}
+
+#[test]
+fn mmap_mutable_input_rs() {
+    world().run("scenarios/mmap_mutable_input.scen.json");
+}
+
+#[test]
+fn mmap_remove_rs() {
+    world().run("scenarios/mmap_remove.scen.json");
+}
+
+#[test]
 fn new_address_rs() {
     world().run("scenarios/new_address.scen.json");
 }
@@ -353,6 +373,12 @@ fn return_codes_rs() {
 #[test]
 fn sc_properties_rs() {
     world().run("scenarios/sc_properties.scen.json");
+}
+
+#[test]
+#[ignore = "unsupported"]
+fn send_esdt_to_nonexisting_account_rs() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
 }
 
 #[test]
@@ -530,4 +556,14 @@ fn storage_usize_bad_rs() {
 #[test]
 fn struct_eq_rs() {
     world().run("scenarios/struct_eq.scen.json");
+}
+
+#[test]
+fn timelock_mapper_rs() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn timelock_mapper_at_address_rs() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }

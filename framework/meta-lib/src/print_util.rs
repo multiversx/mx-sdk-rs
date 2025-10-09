@@ -77,9 +77,8 @@ pub fn print_check_ei(ei_version: &str) {
 pub fn print_invalid_vm_hook(import_name: &str, ei_version: &str) {
     print!(
         "\n{}",
-        format!(
-            "WARNING! Import '{import_name}' is not available on EI version {ei_version}! This will become a hard error in the next release."
-        ).yellow(),
+        format!("WARNING! Import '{import_name}' is not available on EI version {ei_version}!")
+            .yellow(),
     );
 }
 
@@ -109,5 +108,12 @@ pub fn print_sc_config_main_deprecated(path: &Path) {
             path.display()
         )
         .yellow(),
+    );
+}
+
+pub fn print_proxy_error(path: &Path, error: String) {
+    println!(
+        "{}",
+        format!("Could not write proxy file {}: {error}", path.display()).red(),
     );
 }

@@ -26,13 +26,13 @@ pub enum EIVersion {
     /// Latest VM Hooks version, released with VM 1.5 in January 2024: https://multiversx.com/release/release-sirius-v1-6-7
     ///
     /// It adds the new async call functionality (promises).
-    #[default]
     V1_3,
 
     /// Hooks made available in the Spica release, November 12, 2024: https://multiversx.com/release/release-spica-v1-8-4-0
     V1_4,
 
-    /// Version planned for Q3 2024.
+    /// Hooks made available in the Barnard release, activated July 26 2025: https://multiversx.com/release/release-barnard-v1-10-4
+    #[default]
     V1_5,
 }
 

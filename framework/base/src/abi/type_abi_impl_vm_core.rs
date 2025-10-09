@@ -2,7 +2,7 @@ use super::*;
 
 use alloc::vec::Vec;
 use multiversx_chain_core::types::{
-    Address, BoxedBytes, CodeMetadata, EsdtLocalRole, EsdtTokenType, H256,
+    Address, BLSKey, BLSSignature, BoxedBytes, CodeMetadata, EsdtLocalRole, EsdtTokenType, H256,
 };
 
 impl TypeAbiFrom<Self> for H256 {}
@@ -60,10 +60,38 @@ impl TypeAbi for CodeMetadata {
     }
 }
 
+impl TypeAbiFrom<Self> for BLSKey {}
+impl TypeAbi for BLSKey {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        <[u8; BLSKey::len()]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "BLSKey".into()
+    }
+}
+
+impl TypeAbiFrom<Self> for BLSSignature {}
+impl TypeAbiFrom<[u8; BLSSignature::len()]> for BLSSignature {}
+impl TypeAbiFrom<BLSSignature> for [u8; BLSSignature::len()] {}
+impl TypeAbi for BLSSignature {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        <[u8; BLSSignature::len()]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "BLSSignature".into()
+    }
+}
+
 impl TypeAbiFrom<Self> for EsdtTokenType {}
 impl TypeAbiFrom<&Self> for EsdtTokenType {}
 
-// implementation originally geneated via #[type_abi] attribute
+// implementation originally generated via #[type_abi] attribute
 impl TypeAbi for EsdtTokenType {
     type Unmanaged = Self;
     fn type_name() -> TypeName {
@@ -127,7 +155,7 @@ impl TypeAbi for EsdtTokenType {
 impl TypeAbiFrom<Self> for EsdtLocalRole {}
 impl TypeAbiFrom<&Self> for EsdtLocalRole {}
 
-// implementation originally geneated via #[type_abi] attribute
+// implementation originally generated via #[type_abi] attribute
 impl TypeAbi for EsdtLocalRole {
     type Unmanaged = Self;
 

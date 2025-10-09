@@ -4,7 +4,10 @@ mod stack_size;
 pub use contract_allocator::{parse_allocator, ContractAllocator};
 pub use stack_size::*;
 
-use crate::ei::EIVersion;
+use crate::{
+    ei::EIVersion,
+    tools::{self, OpcodeVersion},
+};
 
 use super::ContractVariantProfileSerde;
 
@@ -32,10 +35,18 @@ pub struct ContractVariantSettings {
     /// Allows disabling default features in the contract crate, from wasm.
     pub default_features: Option<bool>,
 
-    /// Forcibly remove the original contrct legacy callback.
+    /// Forcibly remove the original contract legacy callback.
     pub kill_legacy_callback: bool,
 
     pub profile: ContractVariantProfile,
+
+    /// Allows the contract to be built with std.
+    pub std: bool,
+
+    /// Rustc target when building WebAssembly.
+    pub rustc_target: String,
+
+    pub opcode_version: OpcodeVersion,
 }
 
 impl Default for ContractVariantSettings {
@@ -50,6 +61,9 @@ impl Default for ContractVariantSettings {
             default_features: None,
             kill_legacy_callback: false,
             profile: Default::default(),
+            std: false,
+            rustc_target: tools::build_target::default_target().to_owned(),
+            opcode_version: OpcodeVersion::default(),
         }
     }
 }

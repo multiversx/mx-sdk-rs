@@ -1,7 +1,7 @@
 use core::ops::Deref;
 
 use crate::{
-    contract_base::SendRawWrapper,
+    contract_base::{SendRawWrapper, TransferExecuteFailed},
     types::{BigUint, ManagedAddress, ManagedRef, MultiEgldOrEsdtPayment, TxFrom, TxToSpecified},
 };
 
@@ -15,14 +15,30 @@ where
         self.is_empty()
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        _env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute_fallible(
+            to,
+            self,
+            gas_limit,
+            &fc.function_name,
+            &fc.arg_buffer,
+        )
+    }
+
+    fn perform_transfer_execute_legacy(
         self,
         _env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        let _ = SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute(
+        SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute(
             to,
             self,
             gas_limit,
@@ -68,7 +84,19 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.deref()
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -76,7 +104,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         self.deref()
-            .perform_transfer_execute(env, to, gas_limit, fc)
+            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -111,14 +139,25 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        (&self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        (&self).perform_transfer_execute(env, to, gas_limit, fc);
+        (&self).perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]

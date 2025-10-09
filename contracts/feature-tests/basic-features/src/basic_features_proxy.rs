@@ -62,6 +62,58 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    /// TODO: it's duplicated in composability, de-duplicate after sorting out the interactors 
+    pub fn get_esdt_token_data<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+    >(
+        self,
+        address: Arg0,
+        token_id: Arg1,
+        nonce: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue9<EsdtTokenType, BigUint<Env::Api>, bool, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedAddress<Env::Api>, BigUint<Env::Api>, ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_esdt_token_data")
+            .argument(&address)
+            .argument(&token_id)
+            .argument(&nonce)
+            .original_result()
+    }
+
+    pub fn epoch_info(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<u64, u64, u64, u64>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("epoch_info")
+            .original_result()
+    }
+
+    pub fn code_hash<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        address: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("code_hash")
+            .argument(&address)
+            .original_result()
+    }
+
+    /// Prev block timestamp (ms, then s), current block timestamp (ms, then s) 
+    pub fn get_block_timestamps(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<u64, u64, u64, u64>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_block_timestamps")
+            .original_result()
+    }
+
     pub fn verify_secp256r1_signature<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
@@ -155,11 +207,170 @@ where
             .original_result()
     }
 
+    pub fn token_has_transfer_role<
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+    >(
+        self,
+        token_identifier: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("token_has_transfer_role")
+            .argument(&token_identifier)
+            .original_result()
+    }
+
+    pub fn timelock_mapper(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_mapper")
+            .original_result()
+    }
+
+    pub fn timelock_set_initial_value<
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        initial_value: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_set_initial_value")
+            .argument(&initial_value)
+            .original_result()
+    }
+
+    pub fn timelock_set_unlock_timestamp<
+        Arg0: ProxyArg<u64>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
+        self,
+        unlock_timestamp: Arg0,
+        future_value: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_set_unlock_timestamp")
+            .argument(&unlock_timestamp)
+            .argument(&future_value)
+            .original_result()
+    }
+
+    pub fn timelock_commit_action(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_commit_action")
+            .original_result()
+    }
+
+    pub fn timelock_get_unlock_timestamp(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_get_unlock_timestamp")
+            .original_result()
+    }
+
+    pub fn timelock_get_future_value(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_get_future_value")
+            .original_result()
+    }
+
+    pub fn timelock_get_current_value_at_address<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        address: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_get_current_value_at_address")
+            .argument(&address)
+            .original_result()
+    }
+
+    pub fn timelock_get_unlock_timestamp_at_address<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        address: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_get_unlock_timestamp_at_address")
+            .argument(&address)
+            .original_result()
+    }
+
+    pub fn timelock_get_future_value_at_address<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        address: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("timelock_get_future_value_at_address")
+            .argument(&address)
+            .original_result()
+    }
+
     pub fn returns_egld_decimal(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, ManagedDecimal<Env::Api, ConstDecimals<U18>>> {
         self.wrapped_tx
             .raw_call("returns_egld_decimal")
+            .original_result()
+    }
+
+    pub fn mm_get<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        key: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("mm_get")
+            .argument(&key)
+            .original_result()
+    }
+
+    pub fn mm_contains<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        key: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("mm_contains")
+            .argument(&key)
+            .original_result()
+    }
+
+    pub fn mm_remove_get<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+    >(
+        self,
+        remove_key: Arg0,
+        get_key: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue2<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("mm_remove_get")
+            .argument(&remove_key)
+            .argument(&get_key)
             .original_result()
     }
 }
