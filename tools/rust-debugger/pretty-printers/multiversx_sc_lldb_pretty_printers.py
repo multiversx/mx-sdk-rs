@@ -37,7 +37,8 @@ MANAGED_ADDRESS_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress
 MANAGED_BYTE_ARRAY_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
 ## 3b. tokens & payments
 MANAGED_WRAPPED_TOKEN_PATH = "multiversx_sc::types::managed::wrapped::token"
-TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::token_identifier::EsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
+ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::esdt_token_identifier::EsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
+TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
 ESDT_TOKEN_PAYMENT_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
 EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
 
@@ -525,7 +526,7 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     (MANAGED_BUFFER_TYPE, ManagedBuffer),
     # 3. SC wasm - Managed wrapped types
     (BIG_UINT_TYPE, BigUint),
-    (TOKEN_IDENTIFIER_TYPE, EsdtTokenIdentifier),
+    (ESDT_TOKEN_IDENTIFIER_TYPE, EsdtTokenIdentifier),
     (MANAGED_ADDRESS_TYPE, ManagedAddress),
     (MANAGED_BYTE_ARRAY_TYPE, ManagedByteArray),
     (ESDT_TOKEN_PAYMENT_TYPE, EsdtTokenPayment),
