@@ -5,11 +5,11 @@ use multiversx_bls::{BlsError, SecretKey, G1, G2};
 pub const G2_STR: &str = "1 2345388737500083945391657505708625859903954047151773287623537600586029428359739211026111121073980842558223033704140 3558041178357727243543283929018475959655787667816024413880422701270944718005964809191925861299660390662341819212979 1111454484298065649047920916747797835589661734985194316226909186591481448224600088430816898704234962594609579273169 3988173108836042169913782128392219399166696378042311135661652175544044220584995583525611110036064603671142074680982";
 
 thread_local!(
-    static BLS_STACK: Mutex<()> = Mutex::new(())
+    static BLS_MUTEX: Mutex<()> = Mutex::new(())
 );
 
 pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-    BLS_STACK.with(|_| {
+    BLS_MUTEX.with(|_| {
         if message.is_empty() {
             return false;
         }
@@ -47,7 +47,7 @@ pub fn verify_bls_aggregated_signature(
     message: &[u8],
     signature: &[u8],
 ) -> bool {
-    BLS_STACK.with(|_| {
+    BLS_MUTEX.with(|_| {
         if message.is_empty() {
             return false;
         }
@@ -81,7 +81,7 @@ pub fn verify_bls_aggregated_signature(
 }
 
 pub fn verify_bls_signature_share(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-    BLS_STACK.with(|_| {
+    BLS_MUTEX.with(|_| {
         if signature.is_empty() || key.is_empty() || message.is_empty() {
             return false;
         }
@@ -94,7 +94,7 @@ pub fn create_aggregated_signature(
     pk_size: usize,
     message: &[u8],
 ) -> Result<(G1, Vec<G2>), BlsError> {
-    BLS_STACK.with(|_| {
+    BLS_MUTEX.with(|_| {
         if message.is_empty() {
             return Err(BlsError::InvalidData);
         }
