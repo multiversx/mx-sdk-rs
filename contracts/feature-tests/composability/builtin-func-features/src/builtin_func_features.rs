@@ -9,7 +9,11 @@ pub mod esdt_features;
 #[multiversx_sc::contract]
 pub trait BuiltinFuncFeatures: esdt_features::EsdtFeaturesModule {
     #[init]
-    fn init(&self, fungible_token_id: TokenIdentifier, non_fungible_token_id: TokenIdentifier) {
+    fn init(
+        &self,
+        fungible_token_id: EsdtTokenIdentifier,
+        non_fungible_token_id: EsdtTokenIdentifier,
+    ) {
         self.fungible_esdt_token_id()
             .set_token_id(fungible_token_id);
         self.non_fungible_esdt_token_id()

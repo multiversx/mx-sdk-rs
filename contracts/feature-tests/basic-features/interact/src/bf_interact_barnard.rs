@@ -86,7 +86,7 @@ impl BasicFeaturesInteract {
             .from(&self.wallet_address)
             .to(self.state.bf_contract())
             .typed(basic_features_proxy::BasicFeaturesProxy)
-            .get_esdt_token_data(address, TokenIdentifier::from(token_id), nonce)
+            .get_esdt_token_data(address, EsdtTokenIdentifier::from(token_id), nonce)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;

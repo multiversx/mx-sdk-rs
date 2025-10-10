@@ -13,7 +13,7 @@ pub trait TokenRelease {
     // The SC initializes with the setup period started. After the initial setup, the SC offers a function that ends the setup period.
     // There is no function to start the setup period back on, so once the setup period is ended, it cannot be changed.
     #[init]
-    fn init(&self, token_identifier: TokenIdentifier) {
+    fn init(&self, token_identifier: EsdtTokenIdentifier) {
         require!(
             token_identifier.is_valid_esdt_identifier(),
             "Invalid token provided"
@@ -308,7 +308,7 @@ pub trait TokenRelease {
 
     fn send_tokens(
         &self,
-        token_identifier: &TokenIdentifier,
+        token_identifier: &EsdtTokenIdentifier,
         address: &ManagedAddress,
         amount: &BigUint,
     ) {
@@ -318,7 +318,7 @@ pub trait TokenRelease {
             .transfer();
     }
 
-    fn mint_all_tokens(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
+    fn mint_all_tokens(&self, token_identifier: &EsdtTokenIdentifier, amount: &BigUint) {
         self.send().esdt_local_mint(token_identifier, 0, amount);
     }
 
@@ -339,7 +339,7 @@ pub trait TokenRelease {
 
     #[view(getTokenIdentifier)]
     #[storage_mapper("tokenIdentifier")]
-    fn token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn token_identifier(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
 
     #[view(getTokenTotalSupply)]
     #[storage_mapper("tokenTotalSupply")]

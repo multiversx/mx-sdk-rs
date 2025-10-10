@@ -49,7 +49,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[endpoint]
-    fn get_esdt_balance(&self, token_id: TokenIdentifier, nonce: u64) -> BigUint {
+    fn get_esdt_balance(&self, token_id: EsdtTokenIdentifier, nonce: u64) -> BigUint {
         self.blockchain()
             .get_sc_balance(&EgldOrEsdtTokenIdentifier::esdt(token_id), nonce)
     }
@@ -69,7 +69,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[payable("*")]
     #[endpoint]
-    fn receive_esdt(&self) -> (TokenIdentifier, BigUint) {
+    fn receive_esdt(&self) -> (EsdtTokenIdentifier, BigUint) {
         let payment = self.call_value().single_esdt();
         (payment.token_identifier.clone(), payment.amount.clone())
     }
@@ -103,7 +103,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     fn send_nft(
         &self,
         to: ManagedAddress,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         nft_nonce: u64,
         amount: BigUint,
     ) {
@@ -114,19 +114,19 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[endpoint]
-    fn mint_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BigUint) {
+    fn mint_esdt(&self, token_id: EsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.send().esdt_local_mint(&token_id, nonce, &amount);
     }
 
     #[endpoint]
-    fn burn_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BigUint) {
+    fn burn_esdt(&self, token_id: EsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.send().esdt_local_burn(&token_id, nonce, &amount);
     }
 
     #[endpoint]
     fn create_nft(
         &self,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         amount: BigUint,
         attributes: NftDummyAttributes,
     ) -> u64 {

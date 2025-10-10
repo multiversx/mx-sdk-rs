@@ -105,7 +105,7 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_accept_funds(
         &self,
         to: ManagedAddress,
-        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
     ) {
         self.vault_proxy()
             .contract(to)
@@ -118,7 +118,7 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_accept_funds_v2(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
     ) {
         let mut tx = self
             .vault_proxy()
@@ -139,7 +139,7 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_reject_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
     ) {
         self.vault_proxy()
             .contract(to)

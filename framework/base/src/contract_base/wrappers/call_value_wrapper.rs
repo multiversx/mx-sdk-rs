@@ -10,9 +10,9 @@ use crate::{
     err_msg,
     types::{
         BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
-        EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedDecimal, ManagedRef, ManagedType,
-        ManagedVec, ManagedVecItem, ManagedVecItemPayload, ManagedVecPayloadIterator,
-        ManagedVecRef, TokenIdentifier,
+        EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment, ManagedDecimal, ManagedRef,
+        ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload, ManagedVecPayloadIterator,
+        ManagedVecRef,
     },
 };
 
@@ -199,7 +199,7 @@ where
     pub fn single_fungible_esdt(
         &self,
     ) -> (
-        ManagedRef<'static, A, TokenIdentifier<A>>,
+        ManagedRef<'static, A, EsdtTokenIdentifier<A>>,
         ManagedRef<'static, A, BigUint<A>>,
     ) {
         let payment = self.single_esdt();

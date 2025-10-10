@@ -11,23 +11,24 @@ use crate::{
 
 use super::EgldOrEsdtTokenIdentifier;
 
-/// Specialized type for handling token identifiers.
-/// It wraps a BoxedBytes with the full ASCII name of the token.
-/// EGLD is stored as an empty name.
+/// Legacy name, kept for backward compatibility.
+pub type TokenIdentifier<M> = EsdtTokenIdentifier<M>;
+
+/// Specialized type for handling ESDT token identifiers.
 ///
-/// Not yet implemented, but we might add additional restrictions when deserializing as argument.
+/// EGLD is not allowed, this types should not be instanced for EGLD.
 #[repr(transparent)]
 #[derive(Clone)]
-pub struct TokenIdentifier<M: ErrorApi + ManagedTypeApi> {
+pub struct EsdtTokenIdentifier<M: ErrorApi + ManagedTypeApi> {
     pub(crate) data: EgldOrEsdtTokenIdentifier<M>,
 }
 
-impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> ManagedType<M> for EsdtTokenIdentifier<M> {
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        TokenIdentifier {
+        EsdtTokenIdentifier {
             data: EgldOrEsdtTokenIdentifier::from_handle(handle),
         }
     }
@@ -49,8 +50,8 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TokenIdentifier<M> {
-    /// Creates a new TokenIdentifier without verifying that it is not EGLD-000000.
+impl<M: ManagedTypeApi> EsdtTokenIdentifier<M> {
+    /// Creates a new EsdtTokenIdentifier without verifying that it is not EGLD-000000.
     ///
     /// ## Safety
     ///
@@ -69,7 +70,7 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
 
     #[inline]
     pub fn from_esdt_bytes<B: Into<ManagedBuffer<M>>>(bytes: B) -> Self {
-        TokenIdentifier::from(bytes.into())
+        EsdtTokenIdentifier::from(bytes.into())
     }
 
     #[inline]
@@ -101,41 +102,41 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for EsdtTokenIdentifier<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
         EgldOrEsdtTokenIdentifier::from(buffer).unwrap_esdt()
     }
 }
 
-impl<M: ManagedTypeApi> From<&[u8]> for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> From<&[u8]> for EsdtTokenIdentifier<M> {
     fn from(bytes: &[u8]) -> Self {
         EgldOrEsdtTokenIdentifier::from(bytes).unwrap_esdt()
     }
 }
 
-impl<M: ManagedTypeApi> From<&str> for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> From<&str> for EsdtTokenIdentifier<M> {
     fn from(s: &str) -> Self {
-        TokenIdentifier::from(s.as_bytes())
+        EsdtTokenIdentifier::from(s.as_bytes())
     }
 }
 
-impl<M: ManagedTypeApi> From<&crate::types::heap::String> for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> From<&crate::types::heap::String> for EsdtTokenIdentifier<M> {
     fn from(s: &crate::types::heap::String) -> Self {
-        TokenIdentifier::from(s.as_bytes())
+        EsdtTokenIdentifier::from(s.as_bytes())
     }
 }
 
-impl<M: ManagedTypeApi> PartialEq for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> PartialEq for EsdtTokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.data == other.data
     }
 }
 
-impl<M: ManagedTypeApi> Eq for TokenIdentifier<M> {}
+impl<M: ManagedTypeApi> Eq for EsdtTokenIdentifier<M> {}
 
-impl<M: ManagedTypeApi> PartialEq<EgldOrEsdtTokenIdentifier<M>> for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> PartialEq<EgldOrEsdtTokenIdentifier<M>> for EsdtTokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &EgldOrEsdtTokenIdentifier<M>) -> bool {
         other.map_ref_or_else(
@@ -146,7 +147,7 @@ impl<M: ManagedTypeApi> PartialEq<EgldOrEsdtTokenIdentifier<M>> for TokenIdentif
     }
 }
 
-impl<M: ManagedTypeApi> NestedEncode for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> NestedEncode for EsdtTokenIdentifier<M> {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -157,7 +158,7 @@ impl<M: ManagedTypeApi> NestedEncode for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopEncode for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> TopEncode for EsdtTokenIdentifier<M> {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
@@ -168,14 +169,14 @@ impl<M: ManagedTypeApi> TopEncode for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> NestedDecode for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> NestedDecode for EsdtTokenIdentifier<M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
         let data = EgldOrEsdtTokenIdentifier::dep_decode_or_handle_err(input, h)?;
-        if let Some(ti) = TokenIdentifier::try_new(data) {
+        if let Some(ti) = EsdtTokenIdentifier::try_new(data) {
             Ok(ti)
         } else {
             Err(h.handle_error(err_msg::TOKEN_IDENTIFIER_ESDT_EXPECTED.into()))
@@ -183,14 +184,14 @@ impl<M: ManagedTypeApi> NestedDecode for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> TopDecode for EsdtTokenIdentifier<M> {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
         let data = EgldOrEsdtTokenIdentifier::top_decode_or_handle_err(input, h)?;
-        if let Some(ti) = TokenIdentifier::try_new(data) {
+        if let Some(ti) = EsdtTokenIdentifier::try_new(data) {
             Ok(ti)
         } else {
             Err(h.handle_error(err_msg::TOKEN_IDENTIFIER_ESDT_EXPECTED.into()))
@@ -198,25 +199,25 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
     }
 }
 
-impl<M> TypeAbiFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
-impl<M> TypeAbiFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&[u8]> for EsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<Vec<u8>> for EsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 
-impl<M: ManagedTypeApi> TypeAbiFrom<Self> for TokenIdentifier<M> {}
-impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for TokenIdentifier<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<Self> for EsdtTokenIdentifier<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for EsdtTokenIdentifier<M> {}
 
-impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> TypeAbi for EsdtTokenIdentifier<M> {
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        "TokenIdentifier".into()
+        "EsdtTokenIdentifier".into()
     }
 
     fn type_name_rust() -> TypeName {
-        "TokenIdentifier<$API>".into()
+        "EsdtTokenIdentifier<$API>".into()
     }
 }
 
-impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> SCDisplay for EsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let cast_handle = self.get_handle().cast_or_signal_error::<M, _>();
         let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
@@ -224,7 +225,7 @@ impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> SCLowerHex for EsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let cast_handle = self.get_handle().cast_or_signal_error::<M, _>();
         let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
@@ -232,7 +233,7 @@ impl<M: ManagedTypeApi> SCLowerHex for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> core::fmt::Display for EsdtTokenIdentifier<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let bytes = self.to_boxed_bytes();
         let s = alloc::string::String::from_utf8_lossy(bytes.as_slice());
@@ -240,9 +241,9 @@ impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
     }
 }
 
-impl<M: ManagedTypeApi> core::fmt::Debug for TokenIdentifier<M> {
+impl<M: ManagedTypeApi> core::fmt::Debug for EsdtTokenIdentifier<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_tuple("TokenIdentifier")
+        f.debug_tuple("EsdtTokenIdentifier")
             .field(&self.to_string())
             .finish()
     }

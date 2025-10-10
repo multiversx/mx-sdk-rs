@@ -65,7 +65,7 @@ where
     /// TODO: it's duplicated in composability, de-duplicate after sorting out the interactors 
     pub fn get_esdt_token_data<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
     >(
         self,
@@ -208,7 +208,7 @@ where
     }
 
     pub fn token_has_transfer_role<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,

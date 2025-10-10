@@ -13,9 +13,9 @@ use crate::{
     storage,
     types::{
         BackTransfers, BackTransfersLegacy, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier,
-        EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress,
-        TokenIdentifier,
+        EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenIdentifier,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType,
+        ManagedVec, SystemSCAddress,
     },
 };
 
@@ -401,7 +401,7 @@ where
     pub fn get_current_esdt_nft_nonce(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
     ) -> u64 {
         A::blockchain_api_impl()
             .get_current_esdt_nft_nonce(address.get_handle(), token_id.get_handle())
@@ -411,7 +411,7 @@ where
     pub fn get_esdt_balance(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nonce: u64,
     ) -> BigUint<A> {
         unsafe {
@@ -461,7 +461,7 @@ where
     pub fn get_esdt_token_data(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nonce: u64,
     ) -> EsdtTokenData<A> {
         // initializing outputs
@@ -577,7 +577,7 @@ where
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.
     pub fn get_token_attributes<T: TopDecode>(
         &self,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         token_nonce: u64,
     ) -> T {
         let own_sc_address = self.get_sc_address();
@@ -589,7 +589,7 @@ where
     pub fn is_esdt_frozen(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nonce: u64,
     ) -> bool {
         A::blockchain_api_impl().check_esdt_frozen(
@@ -600,17 +600,17 @@ where
     }
 
     #[inline]
-    pub fn is_esdt_paused(&self, token_id: &TokenIdentifier<A>) -> bool {
+    pub fn is_esdt_paused(&self, token_id: &EsdtTokenIdentifier<A>) -> bool {
         A::blockchain_api_impl().check_esdt_paused(token_id.get_handle())
     }
 
     #[inline]
-    pub fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier<A>) -> bool {
+    pub fn is_esdt_limited_transfer(&self, token_id: &EsdtTokenIdentifier<A>) -> bool {
         A::blockchain_api_impl().check_esdt_limited_transfer(token_id.get_handle())
     }
 
     #[inline]
-    pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
+    pub fn get_esdt_local_roles(&self, token_id: &EsdtTokenIdentifier<A>) -> EsdtLocalRoleFlags {
         A::blockchain_api_impl().load_esdt_local_roles(token_id.get_handle())
     }
 }
@@ -641,7 +641,7 @@ where
         result
     }
 
-    pub fn token_has_transfer_role(&self, token_identifier: TokenIdentifier<A>) -> bool {
+    pub fn token_has_transfer_role(&self, token_identifier: EsdtTokenIdentifier<A>) -> bool {
         // Prepare key
         let key_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_overwrite(key_handle.clone(), b"ELRONDtransferesdt");

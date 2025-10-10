@@ -12,4 +12,4 @@ pub use egld_or_multi_esdt_payment::{EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaym
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPayment};
 pub use multi_egld_or_esdt_token_payment::MultiEgldOrEsdtPayment;
-pub use token_identifier::TokenIdentifier;
+pub use token_identifier::{EsdtTokenIdentifier, TokenIdentifier};
