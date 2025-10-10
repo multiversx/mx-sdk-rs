@@ -9,11 +9,11 @@ thread_local!(
 );
 
 pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-    BLS_MUTEX.with(|_| {
-        if message.is_empty() {
-            return false;
-        }
+    if message.is_empty() {
+        return false;
+    }
 
+    BLS_MUTEX.with(|_| {
         let public_key = match create_public_key_from_bytes(key) {
             Ok(pk) => pk,
             Err(e) => {
@@ -47,11 +47,11 @@ pub fn verify_bls_aggregated_signature(
     message: &[u8],
     signature: &[u8],
 ) -> bool {
-    BLS_MUTEX.with(|_| {
-        if message.is_empty() {
-            return false;
-        }
+    if message.is_empty() {
+        return false;
+    }
 
+    BLS_MUTEX.with(|_| {
         let public_keys = match keys
             .iter()
             .map(|key| create_public_key_from_bytes(key))
@@ -81,27 +81,25 @@ pub fn verify_bls_aggregated_signature(
 }
 
 pub fn verify_bls_signature_share(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
-    BLS_MUTEX.with(|_| {
-        if signature.is_empty() || key.is_empty() || message.is_empty() {
-            return false;
-        }
+    if signature.is_empty() || key.is_empty() || message.is_empty() {
+        return false;
+    }
 
-        verify_bls(key, message, signature)
-    })
+    BLS_MUTEX.with(|_| verify_bls(key, message, signature))
 }
 
 pub fn create_aggregated_signature(
     pk_size: usize,
     message: &[u8],
 ) -> Result<(G1, Vec<G2>), BlsError> {
+    if message.is_empty() {
+        return Err(BlsError::InvalidData);
+    }
+
+    let mut public_keys = Vec::new();
+    let mut signatures = Vec::new();
+
     BLS_MUTEX.with(|_| {
-        if message.is_empty() {
-            return Err(BlsError::InvalidData);
-        }
-
-        let mut public_keys = Vec::new();
-        let mut signatures = Vec::new();
-
         for _ in 0..pk_size {
             let mut secret_key = SecretKey::default();
             secret_key.set_by_csprng();
