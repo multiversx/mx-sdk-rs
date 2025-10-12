@@ -6,8 +6,8 @@ use crate::{
     api::CallTypeApi,
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
-        EsdtTokenPayment, FunctionCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedVec, TokenIdentifier, Tx, TxScEnv,
+        EsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, ManagedVec, Tx, TxScEnv,
     },
 };
 
@@ -119,7 +119,7 @@ where
     )]
     pub fn add_esdt_token_transfer(
         self,
-        payment_token: TokenIdentifier<SA>,
+        payment_token: EsdtTokenIdentifier<SA>,
         payment_nonce: u64,
         payment_amount: BigUint<SA>,
     ) -> ContractCallWithMultiEsdt<SA, OriginalResult> {

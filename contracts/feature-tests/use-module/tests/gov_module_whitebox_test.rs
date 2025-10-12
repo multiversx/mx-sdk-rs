@@ -66,7 +66,7 @@ fn setup() -> ScenarioWorld {
         .returns(ReturnsNewBech32Address)
         .whitebox(use_module::contract_obj, |sc| {
             sc.init_governance_module(
-                TokenIdentifier::from(GOV_TOKEN_ID),
+                EsdtTokenIdentifier::from(GOV_TOKEN_ID),
                 BigUint::from(QUORUM),
                 BigUint::from(MIN_BALANCE_PROPOSAL),
                 VOTING_DELAY_BLOCKS,

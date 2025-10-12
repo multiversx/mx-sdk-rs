@@ -40,7 +40,7 @@ pub trait SeedNftMinter:
         royalties: BigUint,
         uri: ManagedBuffer,
         selling_price: BigUint,
-        opt_token_used_as_payment: OptionalValue<TokenIdentifier>,
+        opt_token_used_as_payment: OptionalValue<EsdtTokenIdentifier>,
         opt_token_used_as_payment_nonce: OptionalValue<u64>,
     ) {
         let token_used_as_payment = match opt_token_used_as_payment {

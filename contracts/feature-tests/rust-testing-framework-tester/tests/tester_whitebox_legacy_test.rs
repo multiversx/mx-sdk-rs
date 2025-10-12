@@ -1304,15 +1304,15 @@ fn test_managed_values_standalone_consistency() {
         BASIC_FEATURES_WASM_PATH,
     );
 
-    let foo_token = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1");
+    let foo_token = EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1");
     blockchain_wrapper
         .execute_query(&basic_features_wrapper, |_sc| {
-            let _bar = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"BAR-a1a1a1");
+            let _bar = EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"BAR-a1a1a1");
             // 'foo' and '_bar' have the same numerical handle value
             // check that the value of 'foo' is taken from the correct context
             assert_eq!(
                 foo_token,
-                TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
+                EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
             );
         })
         .assert_error(

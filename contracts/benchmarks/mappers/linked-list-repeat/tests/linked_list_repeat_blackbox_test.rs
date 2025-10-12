@@ -74,10 +74,10 @@ fn linked_list_repeat_struct_blackbox_raw() {
     let mut world = setup();
 
     let mut example = ExampleStruct {
-        first_token_id: TokenIdentifier::from_esdt_bytes(b"str:TESTTOK-1234"),
+        first_token_id: EsdtTokenIdentifier::from_esdt_bytes(b"str:TESTTOK-1234"),
         first_token_nonce: 0,
         first_token_amount: multiversx_sc::types::BigUint::from(1_000_000_000_000_000_000u64),
-        second_token_id: TokenIdentifier::from_esdt_bytes(b"str:TESTTOK-2345"),
+        second_token_id: EsdtTokenIdentifier::from_esdt_bytes(b"str:TESTTOK-2345"),
         second_token_nonce: 0,
         second_token_amount: multiversx_sc::types::BigUint::from(1_000_000_000_000_000_000u64),
     };

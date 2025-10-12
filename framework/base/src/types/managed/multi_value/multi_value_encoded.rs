@@ -5,7 +5,7 @@ use unwrap_infallible::UnwrapInfallible;
 use crate::codec::multi_types::MultiValueVec;
 use crate::types::{
     BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentMultiValue,
-    EsdtTokenPayment, TokenIdentifier,
+    EsdtTokenIdentifier, EsdtTokenPayment,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -208,7 +208,7 @@ where
     }
 }
 
-impl<M> MultiValueEncoded<M, MultiValue3<TokenIdentifier<M>, u64, BigUint<M>>>
+impl<M> MultiValueEncoded<M, MultiValue3<EsdtTokenIdentifier<M>, u64, BigUint<M>>>
 where
     M: ManagedTypeApi + ErrorApi,
 {

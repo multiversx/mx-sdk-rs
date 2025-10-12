@@ -360,7 +360,7 @@ impl BasicFeaturesInteract {
             .to(self.state.bf_contract())
             .gas(50_000_000)
             .typed(basic_features::basic_features_proxy::BasicFeaturesProxy)
-            .token_has_transfer_role(TokenIdentifier::from_esdt_bytes(token_id))
+            .token_has_transfer_role(EsdtTokenIdentifier::from_esdt_bytes(token_id))
             .returns(ReturnsResult)
             .run()
             .await

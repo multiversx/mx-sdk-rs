@@ -559,7 +559,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "TokenIdentifier"
+                    "type": "EsdtTokenIdentifier"
                 }
             ]
         },
@@ -726,7 +726,7 @@
             "inputs": [
                 {
                     "name": "tokens",
-                    "type": "variadic<TokenIdentifier>",
+                    "type": "variadic<EsdtTokenIdentifier>",
                     "multi_arg": true
                 }
             ],
@@ -739,7 +739,7 @@
             "inputs": [
                 {
                     "name": "tokens",
-                    "type": "variadic<TokenIdentifier>",
+                    "type": "variadic<EsdtTokenIdentifier>",
                     "multi_arg": true
                 }
             ],
@@ -751,7 +751,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "TokenIdentifier"
+                    "type": "EsdtTokenIdentifier"
                 }
             ]
         },
@@ -761,7 +761,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "variadic<TokenIdentifier>",
+                    "type": "variadic<EsdtTokenIdentifier>",
                     "multi_result": true
                 }
             ]
@@ -1031,7 +1031,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "TokenIdentifier"
+                    "type": "EsdtTokenIdentifier"
                 },
                 {
                     "name": "token_nonce",

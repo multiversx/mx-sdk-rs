@@ -488,7 +488,7 @@
             "inputs": [
                 {
                     "name": "token",
-                    "type": "TokenIdentifier",
+                    "type": "EsdtTokenIdentifier",
                     "indexed": true
                 },
                 {
@@ -784,7 +784,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "TokenIdentifier"
+                    "type": "EsdtTokenIdentifier"
                 },
                 {
                     "name": "token_nonce",

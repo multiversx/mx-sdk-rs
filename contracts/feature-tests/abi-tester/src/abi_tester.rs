@@ -221,7 +221,7 @@ pub trait AbiTester {
     fn external_view(&self) {}
 
     #[event("payable-event")]
-    fn payable_event(&self, #[indexed] token: &TokenIdentifier, amount: &BigUint);
+    fn payable_event(&self, #[indexed] token: &EsdtTokenIdentifier, amount: &BigUint);
 
     #[event("address-h256-event")]
     fn address_h256_event(&self, #[indexed] address: &Address, #[indexed] h256: &H256);

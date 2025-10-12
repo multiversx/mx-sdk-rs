@@ -37,7 +37,7 @@ pub trait SubscriptionModule {
 
     fn create_subscription_nft<T: NestedEncode + NestedDecode + TypeAbi>(
         &self,
-        token_id: &TokenIdentifier,
+        token_id: &EsdtTokenIdentifier,
         amount: &BigUint,
         name: &ManagedBuffer,
         royalties: &BigUint,
@@ -64,7 +64,7 @@ pub trait SubscriptionModule {
 
     fn update_subscription_attributes<T: NestedEncode + NestedDecode + TypeAbi>(
         &self,
-        id: &TokenIdentifier,
+        id: &EsdtTokenIdentifier,
         nonce: u64,
         attributes: T,
     ) {
@@ -80,7 +80,7 @@ pub trait SubscriptionModule {
     // @dev should only be called if the nft is owned by the contract
     fn get_subscription_attributes<T: NestedEncode + NestedDecode + TypeAbi>(
         &self,
-        id: &TokenIdentifier,
+        id: &EsdtTokenIdentifier,
         nonce: u64,
     ) -> T {
         let subscription_attributes: SubscriptionAttributes<T> =
@@ -101,7 +101,7 @@ pub trait SubscriptionModule {
 
     fn renew_subscription<T: NestedEncode + NestedDecode + TypeAbi>(
         &self,
-        id: &TokenIdentifier,
+        id: &EsdtTokenIdentifier,
         nonce: u64,
         duration: DurationMillis,
     ) {
@@ -128,7 +128,7 @@ pub trait SubscriptionModule {
 
     fn cancel_subscription<T: NestedEncode + NestedDecode + TypeAbi>(
         &self,
-        id: &TokenIdentifier,
+        id: &EsdtTokenIdentifier,
         nonce: u64,
     ) {
         let mut subscription_attributes: SubscriptionAttributes<T> =
@@ -144,7 +144,7 @@ pub trait SubscriptionModule {
     // @dev should only be called if the nft is owned by the contract
     fn get_subscription<T: NestedEncode + NestedDecode + TypeAbi>(
         &self,
-        id: &TokenIdentifier,
+        id: &EsdtTokenIdentifier,
         nonce: u64,
     ) -> TimestampMillis {
         let subscription_attributes: SubscriptionAttributes<T> =
