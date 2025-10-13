@@ -73,9 +73,7 @@ impl<M: ManagedTypeApi> TokenId<M> {
 
     #[inline]
     pub fn into_legacy(self) -> EgldOrEsdtTokenIdentifier<M> {
-        EgldOrEsdtTokenIdentifier {
-            token_id: self,
-        }
+        EgldOrEsdtTokenIdentifier { token_id: self }
     }
 
     pub fn as_legacy(&self) -> &EgldOrEsdtTokenIdentifier<M> {
