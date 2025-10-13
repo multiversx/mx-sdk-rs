@@ -74,7 +74,7 @@ impl<M: ManagedTypeApi> TokenId<M> {
     #[inline]
     pub fn into_legacy(self) -> EgldOrEsdtTokenIdentifier<M> {
         EgldOrEsdtTokenIdentifier {
-            buffer: self.buffer,
+            token_id: self,
         }
     }
 
@@ -128,9 +128,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenId<M> {
 impl<M: ManagedTypeApi> From<EgldOrEsdtTokenIdentifier<M>> for TokenId<M> {
     #[inline]
     fn from(token_id: EgldOrEsdtTokenIdentifier<M>) -> Self {
-        TokenId {
-            buffer: token_id.buffer,
-        }
+        token_id.token_id
     }
 }
 
