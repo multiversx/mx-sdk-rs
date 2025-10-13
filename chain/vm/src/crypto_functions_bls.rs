@@ -1,45 +1,43 @@
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 
 use multiversx_bls::{BlsError, SecretKey, G1, G2};
 
 pub const G2_STR: &str = "1 2345388737500083945391657505708625859903954047151773287623537600586029428359739211026111121073980842558223033704140 3558041178357727243543283929018475959655787667816024413880422701270944718005964809191925861299660390662341819212979 1111454484298065649047920916747797835589661734985194316226909186591481448224600088430816898704234962594609579273169 3988173108836042169913782128392219399166696378042311135661652175544044220584995583525611110036064603671142074680982";
 
-thread_local!(
-    static BLS_MUTEX: Mutex<()> = const { Mutex::new(())}
-);
+pub static BLS_MUTEX: LazyLock<Mutex<()>> = LazyLock::new(|| Mutex::new(()));
 
 pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     if message.is_empty() {
         return false;
     }
 
-    BLS_MUTEX.with(|_| {
-        let public_key = match create_public_key_from_bytes(key) {
-            Ok(pk) => pk,
-            Err(e) => {
-                eprintln!("Failed to deserialize public key: {key:?}. Error: {e}");
-                return false;
-            }
-        };
+    let _bls_guard = BLS_MUTEX.lock().unwrap();
 
-        if !is_public_key_point_valid(&public_key) {
+    let public_key = match create_public_key_from_bytes(key) {
+        Ok(pk) => pk,
+        Err(e) => {
+            eprintln!("Failed to deserialize public key: {key:?}. Error: {e}");
             return false;
         }
+    };
 
-        let sign = match create_signature_from_bytes(signature) {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("Failed to deserialize signature: {signature:?}. Error: {e}");
-                return false;
-            }
-        };
+    if !is_public_key_point_valid(&public_key) {
+        return false;
+    }
 
-        if !is_sig_valid_point(&sign) {
+    let sign = match create_signature_from_bytes(signature) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("Failed to deserialize signature: {signature:?}. Error: {e}");
             return false;
         }
+    };
 
-        sign.verify(public_key, message)
-    })
+    if !is_sig_valid_point(&sign) {
+        return false;
+    }
+
+    sign.verify(public_key, message)
 }
 
 pub fn verify_bls_aggregated_signature(
@@ -51,33 +49,33 @@ pub fn verify_bls_aggregated_signature(
         return false;
     }
 
-    BLS_MUTEX.with(|_| {
-        let public_keys = match keys
-            .iter()
-            .map(|key| create_public_key_from_bytes(key))
-            .collect::<Result<Vec<G2>, BlsError>>()
-        {
-            Ok(pks) => pks,
-            Err(e) => {
-                eprintln!("Failed to deserialize public keys. Error: {e}");
-                return false;
-            }
-        };
+    let _bls_guard = BLS_MUTEX.lock().unwrap();
 
-        if public_keys.is_empty() {
+    let public_keys = match keys
+        .iter()
+        .map(|key| create_public_key_from_bytes(key))
+        .collect::<Result<Vec<G2>, BlsError>>()
+    {
+        Ok(pks) => pks,
+        Err(e) => {
+            eprintln!("Failed to deserialize public keys. Error: {e}");
             return false;
         }
+    };
 
-        let sign = match create_signature_from_bytes(signature) {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("Failed to deserialize signature: {signature:?}. Error: {e}");
-                return false;
-            }
-        };
+    if public_keys.is_empty() {
+        return false;
+    }
 
-        sign.fast_aggregate_verify(&public_keys, message)
-    })
+    let sign = match create_signature_from_bytes(signature) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("Failed to deserialize signature: {signature:?}. Error: {e}");
+            return false;
+        }
+    };
+
+    sign.fast_aggregate_verify(&public_keys, message)
 }
 
 pub fn verify_bls_signature_share(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
@@ -85,7 +83,9 @@ pub fn verify_bls_signature_share(key: &[u8], message: &[u8], signature: &[u8]) 
         return false;
     }
 
-    BLS_MUTEX.with(|_| verify_bls(key, message, signature))
+    let _bls_guard = BLS_MUTEX.lock().unwrap();
+
+    verify_bls(key, message, signature)
 }
 
 pub fn create_aggregated_signature(
@@ -99,28 +99,28 @@ pub fn create_aggregated_signature(
     let mut public_keys = Vec::new();
     let mut signatures = Vec::new();
 
-    BLS_MUTEX.with(|_| {
-        for _ in 0..pk_size {
-            let mut secret_key = SecretKey::default();
-            secret_key.set_by_csprng();
+    let _bls_guard = BLS_MUTEX.lock().unwrap();
 
-            if !is_secret_key_valid(&secret_key) {
-                return Err(BlsError::InvalidData);
-            }
+    for _ in 0..pk_size {
+        let mut secret_key = SecretKey::default();
+        secret_key.set_by_csprng();
 
-            public_keys.push(secret_key.get_public_key());
-            signatures.push(secret_key.sign(message));
-        }
-
-        if public_keys.is_empty() || signatures.is_empty() {
+        if !is_secret_key_valid(&secret_key) {
             return Err(BlsError::InvalidData);
         }
 
-        let mut agg_signature = G1::default();
-        agg_signature.aggregate(&signatures);
+        public_keys.push(secret_key.get_public_key());
+        signatures.push(secret_key.sign(message));
+    }
 
-        Ok((agg_signature, public_keys))
-    })
+    if public_keys.is_empty() || signatures.is_empty() {
+        return Err(BlsError::InvalidData);
+    }
+
+    let mut agg_signature = G1::default();
+    agg_signature.aggregate(&signatures);
+
+    Ok((agg_signature, public_keys))
 }
 
 fn create_public_key_from_bytes(key: &[u8]) -> Result<G2, BlsError> {
