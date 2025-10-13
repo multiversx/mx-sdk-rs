@@ -491,7 +491,7 @@ where
             uris_handle.get_raw_handle(),
         );
 
-        let token_type = self.get_esdt_token_type(address, &token_id.data, nonce);
+        let token_type = self.get_esdt_token_type(address, token_id.token_id.as_legacy(), nonce);
 
         if managed_api_impl.mb_len(creator_handle.clone()) == 0 {
             managed_api_impl.mb_overwrite(creator_handle.clone(), &[0u8; 32][..]);

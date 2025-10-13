@@ -92,8 +92,10 @@ fn main() {
         ManagedByteArray::new_from_bytes(b"test");
     push!(to_check, managed_byte_array, "\"test\" - (4) 0x74657374");
 
-    let managed_option_some_token_identifier: ManagedOption<DebugApi, EsdtTokenIdentifier<DebugApi>> =
-        ManagedOption::some(token_identifier.clone());
+    let managed_option_some_token_identifier: ManagedOption<
+        DebugApi,
+        EsdtTokenIdentifier<DebugApi>,
+    > = ManagedOption::some(token_identifier.clone());
     push!(
         to_check,
         managed_option_some_token_identifier,
