@@ -369,7 +369,7 @@ class BigUint(PlainManagedVecItem, ManagedType):
 
 class EsdtTokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, token_identifier: lldb.value) -> lldb.value:
-        return token_identifier.data.buffer
+        return token_identifier.token_id.buffer
 
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
         return buffer_as_string(buffer)
@@ -454,7 +454,7 @@ class EsdtTokenPayment(ManagedVecItem, ManagedType):
 
 class EgldOrEsdtTokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, egld_or_esdt_token_identifier: lldb.value) -> lldb.value:
-        return egld_or_esdt_token_identifier.buffer
+        return egld_or_esdt_token_identifier.token_id.buffer
 
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
         token_id = buffer_as_string(buffer)
