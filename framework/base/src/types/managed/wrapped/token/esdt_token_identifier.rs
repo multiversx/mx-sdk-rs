@@ -20,7 +20,7 @@ pub type TokenIdentifier<M> = EsdtTokenIdentifier<M>;
 #[repr(transparent)]
 #[derive(Clone)]
 pub struct EsdtTokenIdentifier<M: ErrorApi + ManagedTypeApi> {
-    pub(crate) data: EgldOrEsdtTokenIdentifier<M>,
+    pub(crate) data: TokenId<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for EsdtTokenIdentifier<M> {
@@ -29,7 +29,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for EsdtTokenIdentifier<M> {
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         EsdtTokenIdentifier {
-            data: EgldOrEsdtTokenIdentifier::from_handle(handle),
+            data: TokenId::from_handle(handle),
         }
     }
 
@@ -57,7 +57,7 @@ impl<M: ManagedTypeApi> EsdtTokenIdentifier<M> {
     ///
     /// Calling it for the EGLD token might lead to unexpected bugs.
     pub unsafe fn esdt_unchecked(data: EgldOrEsdtTokenIdentifier<M>) -> Self {
-        Self { data }
+        Self { data: data.into() }
     }
 
     pub fn try_new(data: EgldOrEsdtTokenIdentifier<M>) -> Option<Self> {

@@ -81,7 +81,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         EsdtTokenIdentifier<M>: From<TI>,
     {
         let ti_obj = EsdtTokenIdentifier::from(token_identifier);
-        ti_obj.data
+        ti_obj.data.into()
     }
 
     pub fn parse(data: ManagedBuffer<M>) -> Self {

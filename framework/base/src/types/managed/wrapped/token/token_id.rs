@@ -8,12 +8,15 @@ use crate::{
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
-    types::{EgldOrEsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier},
+    types::{
+        EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType,
+        TokenIdentifier,
+    },
 };
 
 /// Specialized type for handling token identifiers (e.g. ABCDEF-123456).
 #[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct TokenId<M: ManagedTypeApi> {
     pub(crate) buffer: ManagedBuffer<M>,
 }
@@ -75,6 +78,16 @@ impl<M: ManagedTypeApi> TokenId<M> {
         }
     }
 
+    pub fn as_legacy(&self) -> &EgldOrEsdtTokenIdentifier<M> {
+        // safe because of #[repr(transparent)]
+        unsafe { core::mem::transmute(self) }
+    }
+
+    pub fn as_esdt(&self) -> &EsdtTokenIdentifier<M> {
+        // safe because of #[repr(transparent)]
+        unsafe { core::mem::transmute(self) }
+    }
+
     #[inline]
     pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
         self.buffer.to_boxed_bytes()
@@ -112,6 +125,15 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenId<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<EgldOrEsdtTokenIdentifier<M>> for TokenId<M> {
+    #[inline]
+    fn from(token_id: EgldOrEsdtTokenIdentifier<M>) -> Self {
+        TokenId {
+            buffer: token_id.buffer,
+        }
+    }
+}
+
 impl<M: ManagedTypeApi> From<&[u8]> for TokenId<M> {
     fn from(bytes: &[u8]) -> Self {
         TokenId {
@@ -139,6 +161,15 @@ impl<M: ManagedTypeApi> From<&String> for TokenId<M> {
         TokenId::from(s.as_bytes())
     }
 }
+
+impl<M: ManagedTypeApi> PartialEq for TokenId<M> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.buffer == other.buffer
+    }
+}
+
+impl<M: ManagedTypeApi> Eq for TokenId<M> {}
 
 impl<M: ManagedTypeApi> NestedEncode for TokenId<M> {
     #[inline]
