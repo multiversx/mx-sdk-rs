@@ -3,10 +3,7 @@ use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{
-        const_handles, use_raw_handle, ErrorApiImpl, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi,
-    },
+    api::{const_handles, use_raw_handle, ErrorApiImpl, ManagedBufferApiImpl, ManagedTypeApi},
     codec::*,
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
@@ -88,7 +85,9 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         if data == Self::EGLD_REPRESENTATION {
             Self::egld()
         } else {
-            Self { token_id: data.into() }
+            Self {
+                token_id: data.into(),
+            }
         }
     }
 
@@ -206,16 +205,16 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
-        EgldOrEsdtTokenIdentifier { token_id: buffer.into() }
+        EgldOrEsdtTokenIdentifier {
+            token_id: buffer.into(),
+        }
     }
 }
 
 impl<M: ManagedTypeApi> From<TokenId<M>> for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     fn from(token_id: TokenId<M>) -> Self {
-        EgldOrEsdtTokenIdentifier {
-            token_id,
-        }
+        EgldOrEsdtTokenIdentifier { token_id }
     }
 }
 
@@ -346,9 +345,7 @@ impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
         if self.is_egld() {
             f.append_bytes(Self::EGLD_REPRESENTATION);
         } else {
-            let cast_handle = self.token_id.get_handle().cast_or_signal_error::<M, _>();
-            let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
-            f.append_managed_buffer(&wrap_cast);
+            SCDisplay::fmt(&self.token_id, f)
         }
     }
 }
@@ -360,9 +357,7 @@ impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
         if self.is_egld() {
             f.append_bytes(EGLD_REPRESENTATION_HEX);
         } else {
-            let cast_handle = self.token_id.get_handle().cast_or_signal_error::<M, _>();
-            let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
-            f.append_managed_buffer_lower_hex(&wrap_cast);
+            SCLowerHex::fmt(&self.token_id, f)
         }
     }
 }
