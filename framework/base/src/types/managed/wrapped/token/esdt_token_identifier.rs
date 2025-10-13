@@ -6,7 +6,7 @@ use crate::{
     codec::*,
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
-    types::{ManagedBuffer, ManagedRef, ManagedType},
+    types::{ManagedBuffer, ManagedRef, ManagedType, TokenId},
 };
 
 use super::EgldOrEsdtTokenIdentifier;
@@ -106,6 +106,13 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for EsdtTokenIdentifier<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
         EgldOrEsdtTokenIdentifier::from(buffer).unwrap_esdt()
+    }
+}
+
+impl<M: ManagedTypeApi> From<TokenId<M>> for EsdtTokenIdentifier<M> {
+    #[inline]
+    fn from(token_id: TokenId<M>) -> Self {
+        EgldOrEsdtTokenIdentifier::from(token_id).unwrap_esdt()
     }
 }
 

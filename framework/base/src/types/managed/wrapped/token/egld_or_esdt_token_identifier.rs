@@ -11,7 +11,7 @@ use crate::{
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
-    types::{EsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType},
+    types::{EsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType, TokenId},
 };
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
@@ -207,6 +207,15 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for EgldOrEsdtTokenIdentifier<M> 
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
         EgldOrEsdtTokenIdentifier { buffer }
+    }
+}
+
+impl<M: ManagedTypeApi> From<TokenId<M>> for EgldOrEsdtTokenIdentifier<M> {
+    #[inline]
+    fn from(token_id: TokenId<M>) -> Self {
+        EgldOrEsdtTokenIdentifier {
+            buffer: token_id.buffer,
+        }
     }
 }
 
