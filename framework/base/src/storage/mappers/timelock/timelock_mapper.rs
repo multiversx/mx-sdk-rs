@@ -21,6 +21,9 @@ use crate::{
 const UNLOCK_TIMESTAMP_KEY: &[u8] = b"unlock_timestamp";
 const FUTURE_VALUE_KEY: &[u8] = b"future_value";
 
+/// Note that TimelockMapper uses the block time in seconds.
+///
+/// TODO: create a new timelock mapper that works with millisecond timestamp.
 pub struct TimelockMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,

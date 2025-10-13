@@ -19,19 +19,19 @@ pub type EsdtTokenDataMultiValue<M> = MultiValue9<
 #[multiversx_sc::module]
 pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
-    fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
+    fn get_fungible_esdt_balance(&self, token_identifier: &EsdtTokenIdentifier) -> BigUint {
         self.blockchain()
             .get_esdt_balance(&self.blockchain().get_sc_address(), token_identifier, 0)
     }
 
     #[view(getCurrentNftNonce)]
-    fn get_current_nft_nonce(&self, token_identifier: &TokenIdentifier) -> u64 {
+    fn get_current_nft_nonce(&self, token_identifier: &EsdtTokenIdentifier) -> u64 {
         self.blockchain()
             .get_current_esdt_nft_nonce(&self.blockchain().get_sc_address(), token_identifier)
     }
 
     #[endpoint]
-    fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BigUint) {
+    fn send_esdt(&self, to: &ManagedAddress, token_id: EsdtTokenIdentifier, amount: &BigUint) {
         self.tx()
             .to(to)
             .single_esdt(&token_id, 0, amount)
@@ -55,7 +55,7 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     fn send_esdt_twice(
         &self,
         to: &ManagedAddress,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         amount_first_time: &BigUint,
         amount_second_time: &BigUint,
     ) {
@@ -73,7 +73,7 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
     ) {
         self.tx()
             .to(&to)
@@ -141,17 +141,20 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn local_mint(&self, token_identifier: TokenIdentifier, amount: BigUint) {
+    fn local_mint(&self, token_identifier: EsdtTokenIdentifier, amount: BigUint) {
         self.send().esdt_local_mint(&token_identifier, 0, &amount);
     }
 
     #[endpoint]
-    fn local_burn(&self, token_identifier: TokenIdentifier, amount: BigUint) {
+    fn local_burn(&self, token_identifier: EsdtTokenIdentifier, amount: BigUint) {
         self.send().esdt_local_burn(&token_identifier, 0, &amount);
     }
 
     #[view]
-    fn get_esdt_local_roles(&self, token_id: TokenIdentifier) -> MultiValueEncoded<ManagedBuffer> {
+    fn get_esdt_local_roles(
+        &self,
+        token_id: EsdtTokenIdentifier,
+    ) -> MultiValueEncoded<ManagedBuffer> {
         let roles = self.blockchain().get_esdt_local_roles(&token_id);
         let mut result = MultiValueEncoded::new();
         for role in roles.iter_roles() {
@@ -164,7 +167,7 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     fn get_esdt_token_data(
         &self,
         address: ManagedAddress,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         nonce: u64,
     ) -> EsdtTokenDataMultiValue<Self::Api> {
         let token_data = self
@@ -189,24 +192,24 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     fn is_esdt_frozen(
         &self,
         address: &ManagedAddress,
-        token_id: &TokenIdentifier,
+        token_id: &EsdtTokenIdentifier,
         nonce: u64,
     ) -> bool {
         self.blockchain().is_esdt_frozen(address, token_id, nonce)
     }
 
     #[view]
-    fn is_esdt_paused(&self, token_id: &TokenIdentifier) -> bool {
+    fn is_esdt_paused(&self, token_id: &EsdtTokenIdentifier) -> bool {
         self.blockchain().is_esdt_paused(token_id)
     }
 
     #[view]
-    fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier) -> bool {
+    fn is_esdt_limited_transfer(&self, token_id: &EsdtTokenIdentifier) -> bool {
         self.blockchain().is_esdt_limited_transfer(token_id)
     }
 
     #[view]
-    fn validate_token_identifier(&self, token_id: TokenIdentifier) -> bool {
+    fn validate_token_identifier(&self, token_id: EsdtTokenIdentifier) -> bool {
         token_id.is_valid_esdt_identifier()
     }
 }

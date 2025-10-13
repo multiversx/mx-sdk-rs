@@ -1,6 +1,6 @@
 use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::types::{
-    AnnotatedValue, BigUint, Code, ManagedAddress, ManagedBuffer, TokenIdentifier, TxCodeValue,
+    AnnotatedValue, BigUint, Code, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer, TxCodeValue,
     TxEnv, TxGas,
 };
 
@@ -57,7 +57,7 @@ where
 pub fn token_identifier_annotated<Env, T>(env: &Env, value: T) -> BytesKey
 where
     Env: TxEnv,
-    T: AnnotatedValue<Env, TokenIdentifier<Env::Api>>,
+    T: AnnotatedValue<Env, EsdtTokenIdentifier<Env::Api>>,
 {
     let annotation = value.annotation(env).to_string();
     BytesKey {

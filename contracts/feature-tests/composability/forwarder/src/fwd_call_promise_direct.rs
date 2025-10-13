@@ -97,7 +97,7 @@ pub trait CallPromisesDirectModule {
     #[event("async_call_event_callback")]
     fn async_call_esdt_event_callback(
         &self,
-        #[indexed] token_id: TokenIdentifier,
+        #[indexed] token_id: EsdtTokenIdentifier,
         #[indexed] amount: BigUint,
     );
 }

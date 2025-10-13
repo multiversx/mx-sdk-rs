@@ -11,17 +11,17 @@ use crate::{
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
-    types::{ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier},
+    types::{EsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType},
 };
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
 ///
 /// Equivalent to a structure of the form
 /// ```
-/// # use multiversx_sc::{api::ManagedTypeApi, types::TokenIdentifier};
+/// # use multiversx_sc::{api::ManagedTypeApi, types::EsdtTokenIdentifier};
 /// enum EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
 ///     Egld,
-///     Esdt(TokenIdentifier<M>),
+///     Esdt(EsdtTokenIdentifier<M>),
 /// }
 /// ```
 ///
@@ -78,9 +78,9 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     pub fn esdt<TI>(token_identifier: TI) -> Self
     where
-        TokenIdentifier<M>: From<TI>,
+        EsdtTokenIdentifier<M>: From<TI>,
     {
-        let ti_obj = TokenIdentifier::from(token_identifier);
+        let ti_obj = EsdtTokenIdentifier::from(token_identifier);
         ti_obj.data
     }
 
@@ -147,32 +147,32 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     pub fn map_or_else<Context, D, F, R>(self, context: Context, for_egld: D, for_esdt: F) -> R
     where
         D: FnOnce(Context) -> R,
-        F: FnOnce(Context, TokenIdentifier<M>) -> R,
+        F: FnOnce(Context, EsdtTokenIdentifier<M>) -> R,
     {
         if self.is_egld() {
             for_egld(context)
         } else {
-            unsafe { for_esdt(context, TokenIdentifier::esdt_unchecked(self)) }
+            unsafe { for_esdt(context, EsdtTokenIdentifier::esdt_unchecked(self)) }
         }
     }
 
     pub fn map_ref_or_else<Context, D, F, R>(&self, context: Context, for_egld: D, for_esdt: F) -> R
     where
         D: FnOnce(Context) -> R,
-        F: FnOnce(Context, &TokenIdentifier<M>) -> R,
+        F: FnOnce(Context, &EsdtTokenIdentifier<M>) -> R,
     {
         if self.is_egld() {
             for_egld(context)
         } else {
             unsafe {
                 let token_identifier =
-                    ManagedRef::<'_, M, TokenIdentifier<M>>::wrap_handle(self.get_handle());
+                    ManagedRef::<'_, M, EsdtTokenIdentifier<M>>::wrap_handle(self.get_handle());
                 for_esdt(context, &token_identifier)
             }
         }
     }
 
-    pub fn unwrap_esdt(self) -> TokenIdentifier<M> {
+    pub fn unwrap_esdt(self) -> EsdtTokenIdentifier<M> {
         self.map_or_else(
             (),
             |()| {
@@ -185,12 +185,12 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     /// Representation of the object as an `Option`.
     ///
     /// Because it does not consume `self` only a reference to the ESDT token identifier can be returned.
-    pub fn as_esdt_option(&self) -> Option<ManagedRef<'_, M, TokenIdentifier<M>>> {
+    pub fn as_esdt_option(&self) -> Option<ManagedRef<'_, M, EsdtTokenIdentifier<M>>> {
         if self.is_egld() {
             None
         } else {
             unsafe {
-                Some(ManagedRef::<'_, M, TokenIdentifier<M>>::wrap_handle(
+                Some(ManagedRef::<'_, M, EsdtTokenIdentifier<M>>::wrap_handle(
                     self.get_handle(),
                 ))
             }
@@ -198,7 +198,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     }
 
     /// Converts `self` into an `Option`. Consumes `self` in the process.
-    pub fn into_esdt_option(self) -> Option<TokenIdentifier<M>> {
+    pub fn into_esdt_option(self) -> Option<EsdtTokenIdentifier<M>> {
         self.map_or_else((), |()| None, |(), token_identifier| Some(token_identifier))
     }
 }
@@ -239,9 +239,9 @@ impl<M: ManagedTypeApi> PartialEq for EgldOrEsdtTokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> Eq for EgldOrEsdtTokenIdentifier<M> {}
 
-impl<M: ManagedTypeApi> PartialEq<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> {
+impl<M: ManagedTypeApi> PartialEq<EsdtTokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
-    fn eq(&self, other: &TokenIdentifier<M>) -> bool {
+    fn eq(&self, other: &EsdtTokenIdentifier<M>) -> bool {
         self.map_ref_or_else(
             (),
             |()| false,
@@ -304,8 +304,9 @@ impl<M: ManagedTypeApi> TopDecode for EgldOrEsdtTokenIdentifier<M> {
     }
 }
 
-impl<M> TypeAbiFrom<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
-impl<M> TypeAbiFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<EsdtTokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&EsdtTokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi
+{}
 impl<M> TypeAbiFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 

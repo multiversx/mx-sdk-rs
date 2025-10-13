@@ -123,7 +123,7 @@ impl PriceAggregatorTestState {
             .run();
     }
 
-    fn submit(&mut self, from: &AddressValue, submission_timestamp: u64, price: u64) {
+    fn submit(&mut self, from: &AddressValue, submission_timestamp: TimestampSeconds, price: u64) {
         self.world
             .tx()
             .from(&from.to_address())
@@ -153,18 +153,26 @@ fn test_price_aggregator_submit() {
     state.unpause_endpoint();
 
     // submit first
-    state.submit(&state.oracles[0].clone(), 95, rand::random::<u64>());
+    state.submit(
+        &state.oracles[0].clone(),
+        TimestampSeconds::new(95),
+        rand::random::<u64>(),
+    );
 
     // submit ok
     for index in 1..SUBMISSION_COUNT - 1 {
-        state.submit(&state.oracles[index].clone(), 100, rand::random::<u64>());
+        state.submit(
+            &state.oracles[index].clone(),
+            TimestampSeconds::new(100),
+            rand::random::<u64>(),
+        );
     }
 
-    let current_timestamp = 100;
+    let current_timestamp = TimestampSeconds::new(100);
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
         |sc| {
-            let blockchain_timestamp = sc.blockchain().get_block_timestamp();
+            let blockchain_timestamp = sc.blockchain().get_block_timestamp_seconds();
 
             let token_pair = TokenPair {
                 from: managed_buffer!(EGLD_TICKER),
@@ -204,7 +212,7 @@ fn test_price_aggregator_submit() {
     // submit last that resets the round
     state.submit(
         &state.oracles[SUBMISSION_COUNT - 1].clone(),
-        100,
+        TimestampSeconds::new(100),
         rand::random::<u64>(),
     );
 }

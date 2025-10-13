@@ -10,7 +10,7 @@ use crate::{
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
-    types::{BigUint, EgldOrEsdtTokenPayment, ManagedVecItem, TokenIdentifier},
+    types::{BigUint, EgldOrEsdtTokenPayment, EsdtTokenIdentifier, ManagedVecItem},
 };
 
 /// Thin wrapper around EgldOrEsdtTokenPayment, which has different I/O behaviour:
@@ -100,7 +100,7 @@ where
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        MultiValue3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
+        MultiValue3::<EsdtTokenIdentifier<M>, u64, BigUint<M>>::type_name()
     }
 
     fn type_name_rust() -> TypeName {

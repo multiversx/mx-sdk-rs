@@ -8,7 +8,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockTimestamp": "1"
+                "blockTimestampMs": "1"
             }
         },
         {
@@ -60,7 +60,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockTimestamp": "2"
+                "blockTimestampMs": "2"
             }
         },
         {
@@ -112,7 +112,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockTimestamp": "10"
+                "blockTimestampMs": "10"
             }
         },
         {
@@ -164,7 +164,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockTimestamp": "11"
+                "blockTimestampMs": "11"
             }
         },
         {

@@ -425,7 +425,7 @@ pub trait RewardsDistribution:
 
     #[view(getNftTokenId)]
     #[storage_mapper("nftTokenIdentifier")]
-    fn nft_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn nft_token_id(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
 
     #[storage_mapper("tickets")]
     fn tickets(&self, position: u64) -> SingleValueMapper<u64>;

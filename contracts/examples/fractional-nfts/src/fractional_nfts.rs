@@ -36,7 +36,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
     fn claim_royalties_from_marketplace(
         &self,
         marketplace_address: ManagedAddress,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         token_nonce: u64,
     ) {
         let caller = self.blockchain().get_caller();

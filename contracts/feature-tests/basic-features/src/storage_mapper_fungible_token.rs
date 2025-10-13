@@ -45,7 +45,7 @@ pub trait FungibleTokenMapperFeatures:
     #[callback]
     fn custom_issue_zero_supply_cb(
         &self,
-        #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
+        #[call_result] result: ManagedAsyncCallResult<EsdtTokenIdentifier>,
     ) {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {

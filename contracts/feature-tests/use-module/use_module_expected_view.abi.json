@@ -275,7 +275,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "TokenIdentifier"
+                    "type": "EsdtTokenIdentifier"
                 },
                 {
                     "name": "token_nonce",

@@ -67,8 +67,8 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_managed_vec_of_token_identifier(
         &self,
-        mv: ManagedVec<TokenIdentifier>,
-    ) -> ManagedVec<TokenIdentifier> {
+        mv: ManagedVec<EsdtTokenIdentifier>,
+    ) -> ManagedVec<EsdtTokenIdentifier> {
         mv
     }
 

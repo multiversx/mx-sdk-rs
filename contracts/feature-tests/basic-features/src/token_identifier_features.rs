@@ -14,6 +14,6 @@ pub trait TokenIdentifierFeatures {
 
     #[endpoint]
     fn token_identifier_is_valid_2(&self, bytes: ManagedBuffer) -> bool {
-        TokenIdentifier::from(bytes).is_valid_esdt_identifier()
+        EsdtTokenIdentifier::from(bytes).is_valid_esdt_identifier()
     }
 }
