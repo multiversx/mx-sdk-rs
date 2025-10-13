@@ -77,7 +77,7 @@ Of course, this can be made as simple or as complex as wanted. You could even im
 
 # Kitty Auction Contract
 
-This is the contract that handles kitty auctioning. The are two types of auctions supported:
+This is the contract that handles kitty auctioning. There are two types of auctions supported:
 - selling auction: Once the auction is complete, the kitty is sold to the winner
 - siring auction: The winner of the auction gets the right to use the kitty as a sire for one of their matron kitties
 
