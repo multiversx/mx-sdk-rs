@@ -2,7 +2,7 @@ use alloc::string::{String, ToString};
 
 use super::{TypeAbi, TypeDescriptionContainerImpl, TypeName};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct EsdtAttributeAbi {
     pub ticker: String,
     pub ty: TypeName,
