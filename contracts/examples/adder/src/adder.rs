@@ -13,18 +13,18 @@ pub trait Adder {
     fn sum(&self) -> SingleValueMapper<BigUint>;
 
     #[init]
-    fn init(&self, initial_value: BigUint) {
+    fn init(&mut self, initial_value: BigUint) {
         self.sum().set(initial_value);
     }
 
     #[upgrade]
-    fn upgrade(&self, initial_value: BigUint) {
+    fn upgrade(&mut self, initial_value: BigUint) {
         self.init(initial_value);
     }
 
     /// Add desired amount to the storage variable.
     #[endpoint]
-    fn add(&self, value: BigUint) {
+    fn add(&mut self, value: BigUint) {
         self.sum().update(|sum| *sum += value);
     }
 }
