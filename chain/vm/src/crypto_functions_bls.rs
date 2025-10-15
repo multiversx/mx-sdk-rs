@@ -11,7 +11,7 @@ pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         return false;
     }
 
-    let _bls_guard = BLS_MUTEX.lock().unwrap();
+    let bls_guard = BLS_MUTEX.try_lock();
 
     let public_key = match create_public_key_from_bytes(key) {
         Ok(pk) => pk,
@@ -37,7 +37,10 @@ pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         return false;
     }
 
-    sign.verify(public_key, message)
+    let verify = sign.verify(public_key, message);
+    std::mem::drop(bls_guard);
+
+    verify
 }
 
 pub fn verify_bls_aggregated_signature(
@@ -49,7 +52,7 @@ pub fn verify_bls_aggregated_signature(
         return false;
     }
 
-    let _bls_guard = BLS_MUTEX.lock().unwrap();
+    let bls_guard = BLS_MUTEX.try_lock();
 
     let public_keys = match keys
         .iter()
@@ -75,15 +78,16 @@ pub fn verify_bls_aggregated_signature(
         }
     };
 
-    sign.fast_aggregate_verify(&public_keys, message)
+    let verify = sign.fast_aggregate_verify(&public_keys, message);
+    std::mem::drop(bls_guard);
+
+    verify
 }
 
 pub fn verify_bls_signature_share(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     if signature.is_empty() || key.is_empty() || message.is_empty() {
         return false;
     }
-
-    let _bls_guard = BLS_MUTEX.lock().unwrap();
 
     verify_bls(key, message, signature)
 }
@@ -99,7 +103,7 @@ pub fn create_aggregated_signature(
     let mut public_keys = Vec::new();
     let mut signatures = Vec::new();
 
-    let _bls_guard = BLS_MUTEX.lock().unwrap();
+    let bls_guard = BLS_MUTEX.lock().unwrap();
 
     for _ in 0..pk_size {
         let mut secret_key = SecretKey::default();
@@ -119,6 +123,8 @@ pub fn create_aggregated_signature(
 
     let mut agg_signature = G1::default();
     agg_signature.aggregate(&signatures);
+
+    std::mem::drop(bls_guard);
 
     Ok((agg_signature, public_keys))
 }
