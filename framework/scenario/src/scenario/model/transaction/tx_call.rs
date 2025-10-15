@@ -96,7 +96,11 @@ impl TxCall {
     )]
     #[allow(deprecated)]
     #[cfg(feature = "contract-call-legacy")]
-    pub fn to_contract_call(&self) -> multiversx_sc::types::ContractCallWithEgld<StaticApi, ()> {
+    pub fn to_contract_call(
+        &self,
+    ) -> multiversx_sc::types::ContractCallWithEgld<crate::imports::StaticApi, ()> {
+        use multiversx_sc::types::ContractCall;
+
         let mut contract_call = multiversx_sc::types::ContractCallWithEgld::new(
             (&self.to.value).into(),
             self.function.as_bytes(),
@@ -109,7 +113,7 @@ impl TxCall {
             self.esdt_value
                 .iter()
                 .map(|esdt| {
-                    EsdtTokenPayment::new(
+                    crate::imports::EsdtTokenPayment::new(
                         esdt.esdt_token_identifier.value.as_slice().into(),
                         esdt.nonce.value,
                         (&esdt.esdt_value.value).into(),
@@ -122,7 +126,9 @@ impl TxCall {
         // The contract call objects have no "from" field, since that is always part of the execution context.
         // On the static API there is no execution context, but a placeholder value is provided.
         // Here we already know the sender, so we can replace the placeholder with the actual value.
-        if StaticApi::is_current_address_placeholder(&contract_call.basic.to.to_address()) {
+        if crate::imports::StaticApi::is_current_address_placeholder(
+            &contract_call.basic.to.to_address(),
+        ) {
             contract_call.basic.to = self.from.value.clone().into();
         }
 
