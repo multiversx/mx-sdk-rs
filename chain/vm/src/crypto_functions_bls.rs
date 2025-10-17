@@ -11,7 +11,7 @@ pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         return false;
     }
 
-    let bls_guard = BLS_MUTEX.try_lock();
+    let bls_guard = BLS_MUTEX.lock().unwrap();
 
     let public_key = match create_public_key_from_bytes(key) {
         Ok(pk) => pk,
@@ -52,7 +52,7 @@ pub fn verify_bls_aggregated_signature(
         return false;
     }
 
-    let bls_guard = BLS_MUTEX.try_lock();
+    let bls_guard = BLS_MUTEX.lock().unwrap();
 
     let public_keys = match keys
         .iter()
