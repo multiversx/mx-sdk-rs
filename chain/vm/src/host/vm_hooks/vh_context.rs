@@ -85,7 +85,7 @@ pub trait VMHooksContext: Debug {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
-    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit>;
+    ) -> Result<TxResult, VMHooksEarlyExit>;
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,

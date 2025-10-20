@@ -1016,7 +1016,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         arguments_handle: i32,
         result_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        self.handler.execute_on_dest_context_fallible_raw(
+        self.handler.execute_on_dest_context_fallible(
             gas as u64,
             address_handle,
             value_handle,

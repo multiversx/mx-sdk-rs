@@ -154,7 +154,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
+    ) -> Result<TxResult, VMHooksEarlyExit> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
@@ -166,14 +166,12 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         );
 
         if tx_result.result_status.is_success() {
-            Ok(self.sync_call_post_processing_ok(tx_result, blockchain_updates))
+            self.sync_call_post_processing_ok(&tx_result, blockchain_updates);
         } else {
             self.sync_call_post_processing_err(&tx_result);
-
-            // also kill current execution
-            Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
-                .with_message(tx_result.result_message.clone()))
         }
+
+        Ok(tx_result)
     }
 
     fn perform_execute_on_dest_context_readonly(
@@ -195,7 +193,8 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         );
 
         if tx_result.result_status.is_success() {
-            Ok(self.sync_call_post_processing_ok(tx_result, blockchain_updates))
+            self.sync_call_post_processing_ok(&tx_result, blockchain_updates);
+            Ok(tx_result.result_values)
         } else {
             self.sync_call_post_processing_err(&tx_result);
 
@@ -239,10 +238,10 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         );
 
         match tx_result.result_status {
-            ReturnCode::Success => Ok((
-                new_address,
-                self.sync_call_post_processing_ok(tx_result, blockchain_updates),
-            )),
+            ReturnCode::Success => {
+                self.sync_call_post_processing_ok(&tx_result, blockchain_updates);
+                Ok((new_address, tx_result.result_values))
+            }
             ReturnCode::ExecutionFailed => {
                 self.sync_call_post_processing_err(&tx_result);
 
@@ -283,7 +282,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
                     .all_calls
                     .push(async_call_data);
 
-                let _ = self.sync_call_post_processing_ok(tx_result, blockchain_updates);
+                self.sync_call_post_processing_ok(&tx_result, blockchain_updates);
                 Ok(())
             }
             ReturnCode::ExecutionFailed => {
@@ -321,23 +320,21 @@ impl<S: InstanceState> TxVMHooksContext<S> {
 
     fn sync_call_post_processing_ok(
         &self,
-        tx_result: TxResult,
+        tx_result: &TxResult,
         blockchain_updates: BlockchainUpdate,
-    ) -> Vec<Vec<u8>> {
+    ) {
         self.tx_context_ref
             .blockchain_cache()
             .commit_updates(blockchain_updates);
 
         self.tx_context_ref
             .result_lock()
-            .merge_after_sync_call(&tx_result);
+            .merge_after_sync_call(tx_result);
 
         let contract_address = &self.tx_context_ref.input_ref().to;
         let builtin_functions = &self.tx_context_ref.runtime_ref.vm_ref.builtin_functions;
         self.back_transfers_lock()
-            .new_from_result(contract_address, &tx_result, builtin_functions);
-
-        tx_result.result_values
+            .new_from_result(contract_address, tx_result, builtin_functions);
     }
 
     fn sync_call_post_processing_err(&self, tx_result: &TxResult) {
