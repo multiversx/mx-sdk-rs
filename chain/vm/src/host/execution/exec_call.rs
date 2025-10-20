@@ -34,12 +34,15 @@ where
     state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
     let tx_cache = TxCache::new(state.get_arc());
-    let (tx_result, blockchain_updates) =
-        execute_builtin_function_or_default(tx_input, tx_cache, runtime, f);
+    let (mut tx_result, blockchain_updates) =
+        execute_builtin_function_or_default(tx_input.clone(), tx_cache, runtime, f);
 
     if tx_result.result_status.is_success() {
         blockchain_updates.apply(state);
     }
+
+    // TODO: not sure if this is the best place to put this, investigate
+    tx_result.append_internal_vm_errors_event_log(&tx_input);
 
     tx_result
 }

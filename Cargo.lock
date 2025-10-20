@@ -3116,6 +3116,7 @@ dependencies = [
  "hex",
  "hex-literal",
  "itertools 0.14.0",
+ "log",
  "multiversx-bls",
  "multiversx-chain-core",
  "multiversx-chain-vm-executor",

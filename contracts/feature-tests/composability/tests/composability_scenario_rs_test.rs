@@ -9,12 +9,16 @@ fn world() -> ScenarioWorld {
         builtin_func_features::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:forwarder-queue/output/forwarder-queue.mxsc.json",
-        forwarder_queue::ContractBuilder,
-    );
-    blockchain.register_contract(
         "mxsc:forwarder/output/forwarder.mxsc.json",
         forwarder::ContractBuilder,
+    );
+    blockchain.register_contract(
+        "mxsc:forwarder-legacy/output/forwarder-legacy.mxsc.json",
+        forwarder_legacy::ContractBuilder,
+    );
+    blockchain.register_contract(
+        "mxsc:forwarder-queue/output/forwarder-queue.mxsc.json",
+        forwarder_queue::ContractBuilder,
     );
     blockchain.register_contract(
         "mxsc:forwarder-raw/output/forwarder-raw.mxsc.json",
@@ -162,13 +166,11 @@ fn forw_raw_sync_egld_rs() {
 }
 
 #[test]
-#[ignore = "requires Barnard, unavailable: managed_execute_on_dest_context_with_error_return"]
 fn forw_raw_sync_fallible_rs() {
     world().run("scenarios/forw_raw_sync_fallible.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard, unavailable: managed_execute_on_dest_context_with_error_return"]
 fn forw_raw_sync_fallible_legacy_rs() {
     world().run("scenarios/forw_raw_sync_fallible_legacy.scen.json");
 }
@@ -401,13 +403,12 @@ fn forwarder_call_sync_accept_then_read_nft_rs() {
 }
 
 #[test]
-#[ignore = "not yet supported"]
 fn forwarder_call_sync_fallible_multi_transfer_egld_accept_rs() {
     world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_accept.scen.json");
 }
 
 #[test]
-#[ignore = "not yet supported"]
+#[ignore = "TODO: fix logs"]
 fn forwarder_call_sync_fallible_multi_transfer_egld_reject_rs() {
     world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_reject.scen.json");
 }

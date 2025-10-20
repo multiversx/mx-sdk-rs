@@ -2,9 +2,12 @@ use std::fmt;
 
 use multiversx_chain_core::types::ReturnCode;
 
-use crate::vm_err_msg;
+use crate::{
+    host::context::{TxFunctionName, TxInput},
+    vm_err_msg,
+};
 
-use super::{AsyncCallTxData, GasUsed, TxLog, TxPanic, TxResultCalls};
+use super::{AsyncCallTxData, GasUsed, TxErrorTrace, TxLog, TxPanic, TxResultCalls};
 
 #[derive(Clone, Debug)]
 #[must_use]
@@ -15,6 +18,15 @@ pub struct TxResult {
     pub result_logs: Vec<TxLog>,
 
     pub gas_used: GasUsed,
+
+    /// Accumulates errors when they occur.
+    ///
+    /// It mimics the behavior of the Go VM,
+    /// and they contribute to the the internalVMErrors event log.
+    ///
+    /// Of course, the data field of the internalVMErrors log is implementation-dependent,
+    /// so a 1:1 match is impossible.
+    pub error_trace: Vec<TxErrorTrace>,
 
     /// Calls that need to be executed.
     ///
@@ -35,6 +47,7 @@ impl Default for TxResult {
             result_values: Vec::new(),
             result_logs: Vec::new(),
             gas_used: GasUsed::Unknown,
+            error_trace: Vec::new(),
             pending_calls: TxResultCalls::empty(),
             all_calls: Vec::new(),
         }
@@ -86,9 +99,11 @@ impl TxResult {
 
     pub fn merge_after_sync_call(&mut self, sync_call_result: &TxResult) {
         self.result_values
-            .extend_from_slice(sync_call_result.result_values.as_slice());
+            .extend_from_slice(&sync_call_result.result_values);
         self.result_logs
-            .extend_from_slice(sync_call_result.result_logs.as_slice());
+            .extend_from_slice(&sync_call_result.result_logs);
+        self.error_trace
+            .extend_from_slice(&sync_call_result.error_trace);
         if let Some(sync_result_async) = &sync_call_result.pending_calls.async_call {
             assert!(
                 self.pending_calls.async_call.is_none(),
@@ -96,6 +111,16 @@ impl TxResult {
             );
             self.pending_calls.async_call = Some(sync_result_async.clone());
         }
+    }
+
+    /// Clears all TxResult fields, and replaces the error status and message fields.
+    ///
+    /// It also concatenates the error traces. In practice, the error_tx_result contains no error trace.
+    ///
+    /// Implementation note: this is done via `std::mem::replace` to ensure that all fields are cleared, except the ones related to errors.
+    pub fn merge_error(&mut self, mut error_tx_result: TxResult) {
+        error_tx_result.error_trace.append(&mut self.error_trace);
+        let _ = std::mem::replace(self, error_tx_result);
     }
 
     pub fn assert_ok(&self) {
@@ -157,4 +182,23 @@ pub fn result_values_to_string(values: &[Vec<u8>]) -> String {
         values.iter().map(|val| format!("0x{}", hex::encode(val))),
         ", ",
     )
+}
+
+impl TxResult {
+    pub fn append_internal_vm_errors_event_log(&mut self, input: &TxInput) {
+        if self.error_trace.is_empty() {
+            return;
+        }
+
+        self.result_logs.push(TxLog {
+            address: input.from.clone(),
+            endpoint: TxFunctionName::from_static("internalVMErrors"),
+            topics: vec![input.to.to_vec(), input.func_name.to_bytes()],
+            data: self
+                .error_trace
+                .iter()
+                .map(|err| err.error_trace_message.as_bytes().to_vec())
+                .collect(),
+        });
+    }
 }

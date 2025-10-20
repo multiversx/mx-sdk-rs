@@ -166,8 +166,10 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         );
 
         if tx_result.result_status.is_success() {
-            Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
+            Ok(self.sync_call_post_processing_ok(tx_result, blockchain_updates))
         } else {
+            self.sync_call_post_processing_err(&tx_result);
+
             // also kill current execution
             Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
                 .with_message(tx_result.result_message.clone()))
@@ -193,8 +195,10 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         );
 
         if tx_result.result_status.is_success() {
-            Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
+            Ok(self.sync_call_post_processing_ok(tx_result, blockchain_updates))
         } else {
+            self.sync_call_post_processing_err(&tx_result);
+
             // also kill current execution
             Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
                 .with_message(tx_result.result_message.clone()))
@@ -237,9 +241,11 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         match tx_result.result_status {
             ReturnCode::Success => Ok((
                 new_address,
-                self.sync_call_post_processing(tx_result, blockchain_updates),
+                self.sync_call_post_processing_ok(tx_result, blockchain_updates),
             )),
             ReturnCode::ExecutionFailed => {
+                self.sync_call_post_processing_err(&tx_result);
+
                 // TODO: not sure it's the right condition, it catches insufficient funds
                 Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                     .with_message(tx_result.result_message.clone()))
@@ -277,10 +283,12 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
                     .all_calls
                     .push(async_call_data);
 
-                let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
+                let _ = self.sync_call_post_processing_ok(tx_result, blockchain_updates);
                 Ok(())
             }
             ReturnCode::ExecutionFailed => {
+                self.sync_call_post_processing_err(&tx_result);
+
                 // TODO: not sure it's the right condition, it catches insufficient funds
                 Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                     .with_message(tx_result.result_message.clone()))
@@ -311,7 +319,7 @@ impl<S: InstanceState> TxVMHooksContext<S> {
         }
     }
 
-    fn sync_call_post_processing(
+    fn sync_call_post_processing_ok(
         &self,
         tx_result: TxResult,
         blockchain_updates: BlockchainUpdate,
@@ -330,6 +338,13 @@ impl<S: InstanceState> TxVMHooksContext<S> {
             .new_from_result(contract_address, &tx_result, builtin_functions);
 
         tx_result.result_values
+    }
+
+    fn sync_call_post_processing_err(&self, tx_result: &TxResult) {
+        self.tx_context_ref
+            .result_lock()
+            .error_trace
+            .extend_from_slice(&tx_result.error_trace);
     }
 
     fn check_reserved_key(&mut self, key: &[u8]) -> Result<(), VMHooksEarlyExit> {

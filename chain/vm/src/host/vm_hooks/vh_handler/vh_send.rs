@@ -442,6 +442,30 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         Ok(())
     }
 
+    pub fn execute_on_dest_context_fallible_raw(
+        &mut self,
+        gas: u64,
+        address_handle: i32,
+        value_handle: i32,
+        function_handle: i32,
+        arguments_handle: i32,
+        result_handle: i32,
+    ) -> Result<i32, VMHooksEarlyExit> {
+        let result = self.execute_on_dest_context_raw(
+            gas,
+            address_handle,
+            value_handle,
+            function_handle,
+            arguments_handle,
+            result_handle,
+        );
+
+        match result {
+            Ok(()) => Ok(0),
+            Err(_err) => Ok(1),
+        }
+    }
+
     pub fn execute_on_dest_context_readonly_raw(
         &mut self,
         _gas: u64,
