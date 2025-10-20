@@ -124,10 +124,7 @@ pub fn async_promise_callback_tx_input(
 pub fn merge_async_results(mut original: TxResult, mut new: TxResult) -> TxResult {
     if original.result_status.is_success() {
         original.result_values.append(&mut new.result_values);
-        if let Some(transfer_log) = new.esdt_transfer_log {
-            original.result_logs.push(transfer_log);
-        }
-        original.result_logs.append(&mut new.result_logs);
+        original.append_all_logs(&mut new);
         original.result_message = new.result_message;
         original
     } else {

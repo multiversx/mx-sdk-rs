@@ -113,6 +113,26 @@ impl TxResult {
         TxResult::from_error(ReturnCode::FunctionNotFound, vm_err_msg::FUNCTION_NOT_FOUND)
     }
 
+    /// Retrieves all logs, including the ESDT transfer log if present.
+    pub fn all_logs(&self) -> Vec<&TxLog> {
+        let mut all_logs = Vec::new();
+        if let Some(esdt_log) = &self.esdt_transfer_log {
+            all_logs.push(esdt_log);
+        }
+        for log in &self.result_logs {
+            all_logs.push(log);
+        }
+        all_logs
+    }
+
+    /// Just like Vec::append, consumes the source TxResult logs.
+    pub fn append_all_logs(&mut self, source: &mut TxResult) {
+        if let Some(esdt_log) = source.esdt_transfer_log.take() {
+            self.result_logs.push(esdt_log);
+        }
+        self.result_logs.append(&mut source.result_logs);
+    }
+
     pub fn merge_after_sync_call(&mut self, sync_call_result: &TxResult) {
         self.result_values
             .extend_from_slice(&sync_call_result.result_values);
