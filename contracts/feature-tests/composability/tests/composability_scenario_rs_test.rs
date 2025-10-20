@@ -408,7 +408,6 @@ fn forwarder_call_sync_fallible_multi_transfer_egld_accept_rs() {
 }
 
 #[test]
-#[ignore = "TODO: fix logs"]
 fn forwarder_call_sync_fallible_multi_transfer_egld_reject_rs() {
     world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_reject.scen.json");
 }

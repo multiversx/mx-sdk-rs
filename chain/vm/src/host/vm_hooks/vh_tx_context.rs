@@ -341,8 +341,11 @@ impl<S: InstanceState> TxVMHooksContext<S> {
     }
 
     fn sync_call_post_processing_err(&self, tx_result: &TxResult) {
-        self.tx_context_ref
-            .result_lock()
+        let mut own_tx_result = self.tx_context_ref.result_lock();
+        if let Some(transfer_log) = &tx_result.esdt_transfer_log {
+            own_tx_result.result_logs.push(transfer_log.clone());
+        }
+        own_tx_result
             .error_trace
             .extend_from_slice(&tx_result.error_trace);
     }
