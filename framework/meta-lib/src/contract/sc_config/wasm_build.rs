@@ -150,8 +150,12 @@ impl ContractVariant {
             &source_wasm_path.to_string_lossy(),
             &output_wasm_path.to_string_lossy(),
         );
-        fs::copy(source_wasm_path, output_wasm_path)
-            .expect("failed to copy compiled contract to output directory");
+        fs::copy(&source_wasm_path, output_wasm_path).unwrap_or_else(|err| {
+            panic!(
+                "failed to copy compiled contract to output directory, source: {}, err: {err}",
+                source_wasm_path.display()
+            )
+        });
     }
 
     fn pack_mxsc_file(&self, build_args: &BuildArgs, output_path: &Path, wasm_report: &WasmReport) {
