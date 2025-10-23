@@ -1,11 +1,8 @@
-use crate::contract::sc_config::execute_command::execute_command;
 use crate::tools::build_target;
-use colored::Colorize;
-use std::process::{exit, ExitStatus};
+use core::panic;
 use std::{
     collections::HashMap,
-    env,
-    ffi::{OsStr, OsString},
+    ffi::OsStr,
     fs,
     path::{Path, PathBuf},
     process::Command,
@@ -36,24 +33,18 @@ impl ContractVariant {
 
         let output_build_command = execute_spawn_command(&mut build_command, "cargo");
 
-        if let Err(ExecuteCommandError::JobFailed(_)) = output_build_command {
-            let mut rustup = self.rustup_target_command();
-            let target_list = rustup.arg("list").arg("--installed");
+        match output_build_command {
+            Ok(_) => {}
+            Err(ExecuteCommandError::JobFailed(_)) => {
+                if !self.is_target_installed() {
+                    self.install_wasm_target();
 
-            let output_rustup_command = execute_command(target_list, "rustup");
-
-            let str_output_rustup = match output_rustup_command {
-                Ok(output) => output,
-                Err(err) => {
-                    println!("\n{}", err.to_string().red().bold());
-                    exit(1);
+                    execute_spawn_command(&mut build_command, "cargo")
+                        .expect("error building contract");
                 }
-            };
-
-            let rustc_target_str = self.settings.rustc_target.as_str();
-
-            if !str_output_rustup.contains(rustc_target_str) {
-                self.install_wasm_target(rustc_target_str, build_command)?;
+            }
+            Err(_) => {
+                panic!("error building contract");
             }
         }
 
@@ -65,6 +56,7 @@ impl ContractVariant {
     fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
         let mut command = Command::new("cargo");
         command
+            .arg(self.settings.rustc_version.to_cli_arg())
             .arg("build")
             .arg(format!("--target={}", &self.settings.rustc_target))
             .arg("--release")
@@ -79,15 +71,6 @@ impl ContractVariant {
         if !rustflags.is_empty() {
             command.env("RUSTFLAGS", rustflags);
         }
-        command
-    }
-
-    fn rustup_target_command(&self) -> Command {
-        let rustup = env::var_os("RUSTUP").unwrap_or_else(|| OsString::from("rustup"));
-
-        let mut command = Command::new(rustup);
-        command.arg("target");
-
         command
     }
 
@@ -113,25 +96,15 @@ impl ContractVariant {
         rustflags
     }
 
-    fn install_wasm_target(
-        &self,
-        target: &str,
-        mut build_command: Command,
-    ) -> Result<ExitStatus, ExecuteCommandError> {
-        println!(
-            "\n{}{}{}",
-            "Installing target \"".yellow(),
-            target.yellow(),
-            "\"...".yellow()
+    fn is_target_installed(&self) -> bool {
+        build_target::is_target_installed(&self.settings.rustc_version, &self.settings.rustc_target)
+    }
+
+    fn install_wasm_target(&self) {
+        build_target::install_target(
+            Some(&self.settings.rustc_version),
+            &self.settings.rustc_target,
         );
-
-        if target == build_target::WASM32V1_TARGET {
-            build_target::install_target(tools::build_target::WASM32V1_TARGET);
-        } else {
-            build_target::install_target(tools::build_target::WASM32_TARGET);
-        }
-
-        execute_spawn_command(&mut build_command, "cargo")
     }
 
     fn finalize_build(&self, build_args: &BuildArgs, output_path: &Path) {

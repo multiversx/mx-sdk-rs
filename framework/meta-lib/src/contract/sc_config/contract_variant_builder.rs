@@ -9,7 +9,7 @@ use std::{
 use crate::{
     ei::parse_check_ei,
     print_util::print_sc_config_main_deprecated,
-    tools::{self, OpcodeVersion},
+    tools::{self, OpcodeVersion, RustcVersion},
 };
 
 use super::{
@@ -86,6 +86,7 @@ impl ContractVariantBuilder {
                     kill_legacy_callback: cms.kill_legacy_callback,
                     profile: ContractVariantProfile::from_serde(&cms.profile),
                     std: cms.std.unwrap_or(default.settings.std),
+                    rustc_version: RustcVersion::from_sc_config_serde(&cms.rustc_version),
                     rustc_target: cms
                         .rustc_target
                         .clone()
