@@ -5,6 +5,7 @@
             "commitHash": "<commit hash here>",
             "commitDate": "<commit date here>",
             "channel": "Channel",
+            "host": "<host>",
             "short": "rustc <version> (<short hash> <date>)"
         },
         "contractCrate": {

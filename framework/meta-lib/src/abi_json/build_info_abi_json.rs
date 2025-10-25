@@ -44,6 +44,7 @@ pub struct RustcAbiJson {
     pub commit_hash: String,
     pub commit_date: String,
     pub channel: String,
+    pub host: String,
     pub short: String,
 }
 
@@ -54,6 +55,7 @@ impl From<&RustcAbi> for RustcAbiJson {
             commit_hash: abi.commit_hash.clone(),
             commit_date: abi.commit_date.clone(),
             channel: abi.channel.clone(),
+            host: abi.host.clone(),
             short: abi.short.clone(),
         }
     }
@@ -66,6 +68,7 @@ impl From<&RustcAbiJson> for RustcAbi {
             commit_hash: abi_json.commit_hash.clone(),
             commit_date: abi_json.commit_date.clone(),
             channel: abi_json.channel.clone(),
+            host: abi_json.host.clone(),
             short: abi_json.short.clone(),
         }
     }

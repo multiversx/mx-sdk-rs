@@ -16,6 +16,7 @@ pub struct RustcAbi {
     pub commit_hash: String,
     pub commit_date: String,
     pub channel: String,
+    pub host: String,
     pub short: String,
 }
 

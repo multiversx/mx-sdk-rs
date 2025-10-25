@@ -41,6 +41,7 @@ pub fn abi_to_json_dummy_environment(contract_abi: &ContractAbi) -> String {
             commit_hash: "<commit hash here>".to_string(),
             commit_date: "<commit date here>".to_string(),
             channel: "Channel".to_string(),
+            host: "<host>".to_string(),
             short: "rustc <version> (<short hash> <date>)".to_string(),
         });
     }

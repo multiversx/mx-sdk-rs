@@ -53,6 +53,7 @@ impl RustcVersion {
             commit_hash: self.version_meta.commit_hash.clone().unwrap_or_default(),
             commit_date: self.version_meta.commit_date.clone().unwrap_or_default(),
             channel: format!("{:?}", self.version_meta.channel),
+            host: self.version_meta.host.clone(),
             short: self.version_meta.short_version_string.clone(),
         }
     }
