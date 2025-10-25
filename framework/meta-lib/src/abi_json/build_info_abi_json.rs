@@ -1,10 +1,12 @@
-use multiversx_sc::abi::{BuildInfoAbi, ContractCrateBuildAbi, FrameworkBuildAbi};
+use multiversx_sc::abi::{BuildInfoAbi, ContractCrateBuildAbi, FrameworkBuildAbi, RustcAbi};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BuildInfoAbiJson {
-    pub rustc: RustcAbiJson,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rustc: Option<RustcAbiJson>,
     pub contract_crate: ContractCrateBuildAbiJson,
     pub framework: FrameworkBuildAbiJson,
 }
@@ -12,7 +14,7 @@ pub struct BuildInfoAbiJson {
 impl From<&BuildInfoAbi> for BuildInfoAbiJson {
     fn from(abi: &BuildInfoAbi) -> Self {
         BuildInfoAbiJson {
-            rustc: RustcAbiJson::create(),
+            rustc: abi.rustc.as_ref().map(RustcAbiJson::from),
             contract_crate: ContractCrateBuildAbiJson::from(&abi.contract_crate),
             framework: FrameworkBuildAbiJson::from(&abi.framework),
         }
@@ -22,6 +24,7 @@ impl From<&BuildInfoAbi> for BuildInfoAbiJson {
 impl From<&BuildInfoAbiJson> for BuildInfoAbi {
     fn from(abi_json: &BuildInfoAbiJson) -> Self {
         BuildInfoAbi {
+            rustc: abi_json.rustc.as_ref().map(RustcAbi::from),
             contract_crate: ContractCrateBuildAbi::from(&abi_json.contract_crate),
             framework: FrameworkBuildAbi::from(&abi_json.framework),
         }
@@ -44,15 +47,26 @@ pub struct RustcAbiJson {
     pub short: String,
 }
 
-impl RustcAbiJson {
-    pub fn create() -> Self {
-        let meta = rustc_version::version_meta().unwrap();
+impl From<&RustcAbi> for RustcAbiJson {
+    fn from(abi: &RustcAbi) -> Self {
         RustcAbiJson {
-            version: meta.semver.to_string(),
-            commit_hash: meta.commit_hash.unwrap_or_default(),
-            commit_date: meta.commit_date.unwrap_or_default(),
-            channel: format!("{:?}", meta.channel),
-            short: meta.short_version_string,
+            version: abi.version.clone(),
+            commit_hash: abi.commit_hash.clone(),
+            commit_date: abi.commit_date.clone(),
+            channel: abi.channel.clone(),
+            short: abi.short.clone(),
+        }
+    }
+}
+
+impl From<&RustcAbiJson> for RustcAbi {
+    fn from(abi_json: &RustcAbiJson) -> Self {
+        RustcAbi {
+            version: abi_json.version.clone(),
+            commit_hash: abi_json.commit_hash.clone(),
+            commit_date: abi_json.commit_date.clone(),
+            channel: abi_json.channel.clone(),
+            short: abi_json.short.clone(),
         }
     }
 }

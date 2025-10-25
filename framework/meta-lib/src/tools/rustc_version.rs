@@ -1,5 +1,6 @@
 use std::process::Command;
 
+use multiversx_sc::abi::RustcAbi;
 use rustc_version::VersionMeta;
 use semver::Version;
 
@@ -44,6 +45,16 @@ impl RustcVersion {
     /// Formats as a CLI for cargo or rustup, e.g. `cargo +1.88 build`.
     pub fn to_cli_arg(&self) -> String {
         format!("+{}", self.short_string)
+    }
+
+    pub fn to_abi(&self) -> RustcAbi {
+        RustcAbi {
+            version: version_to_string(&self.version_meta.semver),
+            commit_hash: self.version_meta.commit_hash.clone().unwrap_or_default(),
+            commit_date: self.version_meta.commit_date.clone().unwrap_or_default(),
+            channel: format!("{:?}", self.version_meta.channel),
+            short: self.version_meta.short_version_string.clone(),
+        }
     }
 }
 

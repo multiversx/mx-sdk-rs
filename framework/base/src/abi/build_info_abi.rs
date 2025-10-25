@@ -1,10 +1,22 @@
+use alloc::string::String;
+
 /// Designed to hold metadata of the contract crate.
 /// Must be instanced inside the smart contract crate to work,
 /// that is why a `create` associated method would not make sense here.
 #[derive(Clone, Default, Debug)]
 pub struct BuildInfoAbi {
+    pub rustc: Option<RustcAbi>,
     pub contract_crate: ContractCrateBuildAbi,
     pub framework: FrameworkBuildAbi,
+}
+
+#[derive(Clone, Default, Debug)]
+pub struct RustcAbi {
+    pub version: String,
+    pub commit_hash: String,
+    pub commit_date: String,
+    pub channel: String,
+    pub short: String,
 }
 
 #[derive(Clone, Default, Debug)]

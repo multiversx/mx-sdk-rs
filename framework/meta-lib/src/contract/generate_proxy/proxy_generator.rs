@@ -671,6 +671,7 @@ pub mod tests {
     #[test]
     fn clean_paths_unsanitized_test() {
         let build_info = BuildInfoAbi {
+            rustc: None,
             contract_crate: ContractCrateBuildAbi {
                 name: "contract-crate",
                 version: "0.0.0",
@@ -702,6 +703,7 @@ pub mod tests {
     #[test]
     fn clean_paths_sanitized_test() {
         let build_info = BuildInfoAbi {
+            rustc: None,
             contract_crate: ContractCrateBuildAbi {
                 name: "contract-crate",
                 version: "0.0.0",

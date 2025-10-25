@@ -185,6 +185,8 @@ fn collect_add_endpoints(
 }
 
 fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAbi) -> ContractAbi {
+    let mut build_info = original_abi.build_info.clone();
+    build_info.rustc = Some(builder.settings.rustc_version.to_abi());
     let mut constructors = Vec::new();
     let mut upgrade_constructors = Vec::new();
     let mut endpoints = Vec::new();
@@ -203,7 +205,7 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
         && !builder.settings.external_view
         && !builder.settings.kill_legacy_callback;
     ContractAbi {
-        build_info: original_abi.build_info.clone(),
+        build_info,
         docs: original_abi.docs.clone(),
         name: original_abi.name.clone(),
         constructors,

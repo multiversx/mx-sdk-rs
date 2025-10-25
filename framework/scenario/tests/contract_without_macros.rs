@@ -397,6 +397,7 @@ mod sample_adder {
         fn abi() -> multiversx_sc::abi::ContractAbi {
             let mut contract_abi = multiversx_sc::abi::ContractAbi::new(
                 multiversx_sc::abi::BuildInfoAbi {
+                    rustc: None,
                     contract_crate: multiversx_sc::abi::ContractCrateBuildAbi {
                         name: "adder",
                         version: "0.0.0",
