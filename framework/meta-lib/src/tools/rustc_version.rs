@@ -83,7 +83,7 @@ fn rustc_version_to_string(version_meta: &VersionMeta) -> String {
     }
 }
 
-/// Outputs major.minor if the other fields are zer oor missing. Outputs the full string otherwise.
+/// Outputs major.minor if the other fields are zero or missing. Outputs the full string otherwise.
 fn version_to_string(version: &Version) -> String {
     if version.patch == 0 && version.pre.is_empty() && version.build.is_empty() {
         format!("{}.{}", version.major, version.minor)
