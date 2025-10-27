@@ -33,6 +33,11 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## [sc 0.62.1, chain 0.19.1, sdk 0.12.1] - 2025-10-27
+- BLS fix (Mutex over BLS library to prevent concurrent calls).
+- `wasmer-prod` build fix (`home` dependency fix).
+- Legacy syntax fix.
+
 ## [sc 0.62.0, chain 0.19.0, sdk 0.12.0] - 2025-09-24
 - BLS signing support in tests.
 - Gas simulations available in the interactor:
