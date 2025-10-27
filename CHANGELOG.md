@@ -33,6 +33,30 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
+## The dependency graph between crates
+
+And crate group being released requires all crate groups downstream to be released as well.
+
+```
+                             ┌──────────────────────────┐    
+                             │                          ▼                      
+┌─────────────────┐      ┌───┴───┐      ┌─────┐      ┌────┐
+│                 │      │       │      │     │      │    │
+│      codec      ├─────►│ chain ├─────►│ sdk ├───┬─►│ sc │
+│                 │      │       │      │     │   │  │    │
+└─────────────────┘      └───────┘      └─────┘   │  └────┘
+                                                  │               
+         ┌────────────────────────────────────────┘        
+         │                                                 
+┌────────┴────────┐                                        
+│                 │                                        
+│ scenario-format │                                        
+│                 │                                        
+└─────────────────┘                             
+```
+
+
+
 ## [sc 0.62.1, chain 0.19.1, sdk 0.12.1] - 2025-10-27
 - BLS fix (Mutex over BLS library to prevent concurrent calls).
 - `wasmer-prod` build fix (`home` dependency fix).
