@@ -673,9 +673,9 @@ pub mod tests {
         let build_info = BuildInfoAbi {
             rustc: None,
             contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate",
-                version: "0.0.0",
-                git_version: "0.0.0",
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
             },
             framework: FrameworkBuildAbi::create(),
         };
@@ -705,9 +705,9 @@ pub mod tests {
         let build_info = BuildInfoAbi {
             rustc: None,
             contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate",
-                version: "0.0.0",
-                git_version: "0.0.0",
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
             },
             framework: FrameworkBuildAbi::create(),
         };

@@ -95,16 +95,11 @@ impl From<&ContractCrateBuildAbi> for ContractCrateBuildAbiJson {
 }
 
 impl From<&ContractCrateBuildAbiJson> for ContractCrateBuildAbi {
-    fn from(_abi: &ContractCrateBuildAbiJson) -> Self {
-        // TODO: @Laur the abi struct should probably just own the strings
-        let name: &'static str = "";
-        let version: &'static str = "";
-        let git_version: &'static str = "";
-
+    fn from(abi_json: &ContractCrateBuildAbiJson) -> Self {
         ContractCrateBuildAbi {
-            name,
-            version,
-            git_version,
+            name: abi_json.name.clone(),
+            version: abi_json.version.clone(),
+            git_version: abi_json.git_version.clone(),
         }
     }
 }
@@ -131,12 +126,11 @@ impl From<&FrameworkBuildAbi> for FrameworkBuildAbiJson {
 }
 
 impl From<&FrameworkBuildAbiJson> for FrameworkBuildAbi {
-    fn from(_abi: &FrameworkBuildAbiJson) -> Self {
-        // TODO: @Laur the abi struct should probably just own the strings
-        let name: &'static str = "";
-        let version: &'static str = "";
-
-        FrameworkBuildAbi { name, version }
+    fn from(abi_json: &FrameworkBuildAbiJson) -> Self {
+        FrameworkBuildAbi {
+            name: abi_json.name.clone(),
+            version: abi_json.version.clone(),
+        }
     }
 }
 
