@@ -6,7 +6,6 @@ use clap::Parser;
 use lottery_esdt::lottery_proxy;
 pub use lottery_interactor_config::Config;
 use lottery_interactor_state::State;
-use num_bigint::BigUint;
 
 use multiversx_sc_snippets::imports::*;
 
@@ -23,13 +22,13 @@ pub async fn lottery_cli() {
     match &cli.command {
         Some(lottery_interactor_cli::InteractCliCommand::Deploy) => {
             lottery_interact.deploy().await;
-        },
+        }
         Some(lottery_interactor_cli::InteractCliCommand::CreateLotteryPool(args)) => {
             lottery_interact
                 .create_lottery_pool(
                     &args.lottery_name,
-                    TokenIdentifier::from(&args.token_identifier),
-                    args.ticket_price.clone(),
+                    &args.token_identifier,
+                    args.ticket_price,
                     args.opt_total_tickets,
                     args.opt_deadline,
                     args.opt_max_entries_per_user,
@@ -38,13 +37,13 @@ pub async fn lottery_cli() {
                     OptionalValue::from(args.opt_burn_percentage.clone()),
                 )
                 .await;
-        },
+        }
         Some(lottery_interactor_cli::InteractCliCommand::BuyTicket(args)) => {
             lottery_interact.buy_ticket(&args.name).await;
-        },
+        }
         Some(lottery_interactor_cli::InteractCliCommand::DetermineWinner(args)) => {
             lottery_interact.determine_winner(&args.name).await;
-        },
+        }
         Some(lottery_interactor_cli::InteractCliCommand::ClaimRewards(args)) => {
             lottery_interact
                 .claim_rewards(
@@ -54,8 +53,8 @@ pub async fn lottery_cli() {
                         .collect(),
                 )
                 .await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
@@ -135,7 +134,7 @@ impl LotteryInteract {
             .run()
             .await;
 
-        /* let tx_hash_string = String::from_utf8(tx_hash.to_vec()).unwrap();
+        let tx_hash_string = String::from_utf8(tx_hash.to_vec()).unwrap();
         let tx_on_network = self
             .interactor
             .proxy
@@ -146,10 +145,8 @@ impl LotteryInteract {
 
         if self.other_shard_account.shard as u32 == shard {
             // we want to have other_shard_account on another shard than the SC
-            let buffer_address_with_shard = self.other_shard_account.clone();
-            self.other_shard_account = self.account_2.clone();
-            self.account_2 = buffer_address_with_shard;
-        }*/
+            std::mem::swap(&mut self.account_1, &mut self.other_shard_account);
+        }
 
         return (new_address, 0);
     }
@@ -157,14 +154,14 @@ impl LotteryInteract {
     pub async fn create_lottery_pool(
         &mut self,
         lottery_name: &String,
-        token_identifier: TokenIdentifier<StaticApi>,
-        ticket_price: BigUint,
+        token_identifier: &String,
+        ticket_price: u128,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<Address>>,
-        opt_burn_percentage: OptionalValue<BigUint>,
+        opt_burn_percentage: OptionalValue<u128>,
     ) {
         self.interactor
             .tx()
@@ -174,7 +171,7 @@ impl LotteryInteract {
             .typed(lottery_proxy::LotteryProxy)
             .create_lottery_pool(
                 lottery_name,
-                token_identifier,
+                TokenIdentifier::from(token_identifier),
                 ticket_price,
                 opt_total_tickets,
                 opt_deadline,

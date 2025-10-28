@@ -2922,6 +2922,7 @@ version = "0.0.0"
 dependencies = [
  "clap",
  "lottery-esdt",
+ "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",
  "serde_json",

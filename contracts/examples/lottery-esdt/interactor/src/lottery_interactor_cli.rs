@@ -1,5 +1,5 @@
 use clap::{Args, Parser, Subcommand};
-use multiversx_sc_snippets::imports::{Address, RustBigUint};
+use multiversx_sc_snippets::imports::Address;
 
 /// Lottery Interact CLI
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -33,7 +33,7 @@ pub struct CreateLotteryPollArgs {
     #[arg(short = 'n', long = "name")]
     pub token_identifier: String,
     #[arg(short = 'n', long = "name")]
-    pub ticket_price: RustBigUint,
+    pub ticket_price: u128,
     #[arg(short = 'n', long = "name")]
     pub opt_total_tickets: Option<usize>,
     #[arg(short = 'n', long = "name")]
@@ -45,7 +45,7 @@ pub struct CreateLotteryPollArgs {
     #[arg(short = 'n', long = "name")]
     pub opt_whitelist: Option<Vec<String>>,
     #[arg(short = 'n', long = "name")]
-    pub opt_burn_percentage: Option<RustBigUint>,
+    pub opt_burn_percentage: Option<u128>,
 }
 
 impl CreateLotteryPollArgs {

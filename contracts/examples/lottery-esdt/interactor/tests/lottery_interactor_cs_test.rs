@@ -1,9 +1,5 @@
 use lottery_interactor::{Config, LotteryInteract};
-use multiversx_sc_snippets::{
-    imports::{num_bigint, GatewayHttpProxy, OptionalValue},
-    sdk::gateway::NetworkStatusRequest,
-};
-use num_bigint::BigUint;
+use multiversx_sc_snippets::{imports::*, sdk::gateway::NetworkStatusRequest};
 use serial_test::serial;
 
 pub const CHAIN_SIMULATOR_GATEWAY: &str = "http://localhost:8085";
@@ -16,21 +12,21 @@ async fn set_state_from_file_cs_test() {
     let mut interact = LotteryInteract::new(Config::chain_simulator_config()).await;
 
     interact.deploy().await;
-    /* let current_timestamp = get_current_timestamp().await;
+    let current_timestamp = get_current_timestamp().await;
 
-       interact
-    .create_lottery_pool(
-        &"lottery_name".to_string(),
-        "LOTTERY-123456".into(),
-        BigUint::from(100u64),
-        None,
-        Some(current_timestamp + TEN_MINUTES_IN_SECONDS),
-        None,
-        None,
-        None,
-        OptionalValue::None,
-    )
-    .await;*/
+    interact
+        .create_lottery_pool(
+            &"lottery_name".to_string(),
+            &"LOTTERY-123456".to_string(),
+            100u128,
+            None,
+            Some(current_timestamp + TEN_MINUTES_IN_SECONDS),
+            None,
+            None,
+            None,
+            OptionalValue::None,
+        )
+        .await;
 }
 
 async fn get_current_timestamp() -> u64 {
