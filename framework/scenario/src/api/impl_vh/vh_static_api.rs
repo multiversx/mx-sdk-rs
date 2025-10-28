@@ -111,7 +111,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
+    ) -> Result<TxResult, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 

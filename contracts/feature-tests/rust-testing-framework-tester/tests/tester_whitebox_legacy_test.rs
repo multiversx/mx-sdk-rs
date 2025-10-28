@@ -964,17 +964,17 @@ fn blockchain_state_test() {
 
     wrapper.set_block_epoch(expected_epoch);
     wrapper.set_block_nonce(expected_nonce);
-    wrapper.set_block_timestamp(expected_timestamp);
+    wrapper.set_block_timestamp_ms(expected_timestamp);
 
     wrapper
         .execute_query(&sc_wrapper, |sc| {
             let actual_epoch = sc.get_block_epoch();
             let actual_nonce = sc.get_block_nonce();
-            let actual_timestamp = sc.get_block_timestamp();
+            let actual_timestamp = sc.get_block_timestamp_millis();
 
             assert_eq!(expected_epoch, actual_epoch);
             assert_eq!(expected_nonce, actual_nonce);
-            assert_eq!(expected_timestamp, actual_timestamp);
+            assert_eq!(expected_timestamp, actual_timestamp.as_u64_millis());
         })
         .assert_ok();
 }
@@ -1304,15 +1304,15 @@ fn test_managed_values_standalone_consistency() {
         BASIC_FEATURES_WASM_PATH,
     );
 
-    let foo_token = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1");
+    let foo_token = EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1");
     blockchain_wrapper
         .execute_query(&basic_features_wrapper, |_sc| {
-            let _bar = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"BAR-a1a1a1");
+            let _bar = EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"BAR-a1a1a1");
             // 'foo' and '_bar' have the same numerical handle value
             // check that the value of 'foo' is taken from the correct context
             assert_eq!(
                 foo_token,
-                TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
+                EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
             );
         })
         .assert_error(

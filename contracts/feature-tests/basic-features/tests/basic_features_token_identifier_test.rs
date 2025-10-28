@@ -15,11 +15,11 @@ fn test_token_identifier_egld() {
 fn test_token_identifier_is_valid() {
     let bf = basic_features::contract_obj::<StaticApi>();
     let result = bf.token_identifier_is_valid_1(EgldOrEsdtTokenIdentifier::esdt(
-        TokenIdentifier::from(&b"ALC-6258d2"[..]),
+        EsdtTokenIdentifier::from(&b"ALC-6258d2"[..]),
     ));
     assert!(result);
     let result = bf.token_identifier_is_valid_1(EgldOrEsdtTokenIdentifier::esdt(
-        TokenIdentifier::from(&b"AL-C6258d2"[..]),
+        EsdtTokenIdentifier::from(&b"AL-C6258d2"[..]),
     ));
     assert!(!result);
     let result = bf.token_identifier_is_valid_2(ManagedBuffer::from(&b"12345-6258d2"[..]));
@@ -30,10 +30,10 @@ fn test_token_identifier_is_valid() {
 
 #[test]
 fn test_token_identifier_compare() {
-    let token_id = TokenIdentifier::<StaticApi>::from(&b"ALC-6258d2"[..]);
+    let token_id = EsdtTokenIdentifier::<StaticApi>::from(&b"ALC-6258d2"[..]);
     let esdt_token_id = EgldOrEsdtTokenIdentifier::esdt(token_id.clone());
     let wrong_esdt_token_id =
-        EgldOrEsdtTokenIdentifier::esdt(TokenIdentifier::from(&b"AAA-111111"[..]));
+        EgldOrEsdtTokenIdentifier::esdt(EsdtTokenIdentifier::from(&b"AAA-111111"[..]));
     let egld_token_id = EgldOrEsdtTokenIdentifier::egld();
 
     assert!(token_id == esdt_token_id);

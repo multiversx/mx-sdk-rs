@@ -230,7 +230,7 @@ where
 
     pub fn nft_token_id(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EsdtTokenIdentifier<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getNftTokenId")

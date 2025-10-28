@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 mod abi_enum;
 pub mod abi_proxy;
@@ -133,6 +133,13 @@ pub trait AbiTester {
         unreachable!()
     }
 
+    #[endpoint]
+    fn time_types(
+        &self,
+    ) -> MultiValue4<TimestampMillis, TimestampSeconds, DurationMillis, DurationSeconds> {
+        unreachable!()
+    }
+
     #[view]
     #[storage_mapper("sample_storage_mapper")]
     fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNestedInSingleValueMapper>;
@@ -214,7 +221,7 @@ pub trait AbiTester {
     fn external_view(&self) {}
 
     #[event("payable-event")]
-    fn payable_event(&self, #[indexed] token: &TokenIdentifier, amount: &BigUint);
+    fn payable_event(&self, #[indexed] token: &EsdtTokenIdentifier, amount: &BigUint);
 
     #[event("address-h256-event")]
     fn address_h256_event(&self, #[indexed] address: &Address, #[indexed] h256: &H256);

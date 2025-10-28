@@ -117,7 +117,7 @@ impl PriceAggregatorTestState {
             .run();
     }
 
-    fn submit(&mut self, from: &AddressValue, submission_timestamp: u64, price: u64) {
+    fn submit(&mut self, from: &AddressValue, submission_timestamp: TimestampSeconds, price: u64) {
         self.world
             .tx()
             .from(from)
@@ -136,7 +136,7 @@ impl PriceAggregatorTestState {
     fn submit_and_expect_err(
         &mut self,
         from: &AddressValue,
-        submission_timestamp: u64,
+        submission_timestamp: TimestampSeconds,
         price: u64,
         err_message: &str,
     ) {
@@ -177,7 +177,12 @@ fn test_price_aggregator_submit() {
     state.set_pair_decimals();
 
     // try submit while paused
-    state.submit_and_expect_err(&state.oracles[0].clone(), 99, 100, "Contract is paused");
+    state.submit_and_expect_err(
+        &state.oracles[0].clone(),
+        TimestampSeconds::new(99),
+        100,
+        "Contract is paused",
+    );
 
     // unpause
     state.unpause_endpoint();
@@ -185,15 +190,15 @@ fn test_price_aggregator_submit() {
     // submit first timestamp too old
     state.submit_and_expect_err(
         &state.oracles[0].clone(),
-        10,
+        TimestampSeconds::new(10),
         100,
         "First submission too old",
     );
 
     // submit ok
-    state.submit(&state.oracles[0].clone(), 95, 100);
+    state.submit(&state.oracles[0].clone(), TimestampSeconds::new(95), 100);
 
-    let current_timestamp = 100;
+    let current_timestamp = TimestampSeconds::new(100);
 
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
@@ -233,7 +238,7 @@ fn test_price_aggregator_submit() {
     );
 
     // first oracle submit again - submission not accepted
-    state.submit(&state.oracles[0].clone(), 95, 100);
+    state.submit(&state.oracles[0].clone(), TimestampSeconds::new(95), 100);
 
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
@@ -263,19 +268,27 @@ fn test_price_aggregator_submit_round_ok() {
     state.unpause_endpoint();
 
     // submit first
-    state.submit(&state.oracles[0].clone(), 95, 10_000);
+    state.submit(&state.oracles[0].clone(), TimestampSeconds::new(95), 10_000);
 
-    let current_timestamp = 110;
+    let current_timestamp = TimestampSeconds::new(110);
     state
         .world
         .current_block()
         .block_timestamp(current_timestamp);
 
     // submit second
-    state.submit(&state.oracles[1].clone(), 101, 11_000);
+    state.submit(
+        &state.oracles[1].clone(),
+        TimestampSeconds::new(101),
+        11_000,
+    );
 
     // submit third
-    state.submit(&state.oracles[2].clone(), 105, 12_000);
+    state.submit(
+        &state.oracles[2].clone(),
+        TimestampSeconds::new(105),
+        12_000,
+    );
 
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
@@ -322,16 +335,21 @@ fn test_price_aggregator_discarded_round() {
     state.unpause_endpoint();
 
     // submit first
-    state.submit(&state.oracles[0].clone(), 95, 10_000);
+    state.submit(&state.oracles[0].clone(), TimestampSeconds::new(95), 10_000);
 
-    let current_timestamp = 100 + MAX_ROUND_DURATION_SECONDS + 1;
+    let current_timestamp =
+        TimestampSeconds::new(100) + MAX_ROUND_DURATION_SECONDS + DurationSeconds::new(1);
     state
         .world
         .current_block()
         .block_timestamp(current_timestamp);
 
     // submit second - this will discard the previous submission
-    state.submit(&state.oracles[1].clone(), current_timestamp - 1, 11_000);
+    state.submit(
+        &state.oracles[1].clone(),
+        current_timestamp - DurationSeconds::new(1),
+        11_000,
+    );
 
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
@@ -376,7 +394,7 @@ fn test_price_aggregator_slashing() {
     // oracle 1 try submit after slashing
     state.submit_and_expect_err(
         &state.oracles[1].clone(),
-        95,
+        TimestampSeconds::new(95),
         10_000,
         "only oracles allowed",
     );

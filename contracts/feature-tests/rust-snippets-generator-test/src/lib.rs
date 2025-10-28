@@ -43,12 +43,12 @@ pub trait PayableFeatures {
     }
 
     #[endpoint]
-    fn multi_result(&self, _arg: TokenIdentifier) -> MultiValueEncoded<BigUint> {
+    fn multi_result(&self, _arg: EsdtTokenIdentifier) -> MultiValueEncoded<BigUint> {
         MultiValueEncoded::new()
     }
 
     #[endpoint]
-    fn nested_result(&self, _arg: TokenIdentifier) -> ManagedVec<ManagedVec<BigUint>> {
+    fn nested_result(&self, _arg: EsdtTokenIdentifier) -> ManagedVec<ManagedVec<BigUint>> {
         ManagedVec::new()
     }
 
@@ -60,19 +60,19 @@ pub trait PayableFeatures {
     }
 
     #[endpoint]
-    fn optional_type(&self, _arg: OptionalValue<BigUint>) -> OptionalValue<TokenIdentifier> {
+    fn optional_type(&self, _arg: OptionalValue<BigUint>) -> OptionalValue<EsdtTokenIdentifier> {
         OptionalValue::None
     }
 
     #[endpoint]
-    fn option_type(&self, _arg: Option<ManagedVec<TokenIdentifier>>) -> Option<u64> {
+    fn option_type(&self, _arg: Option<ManagedVec<EsdtTokenIdentifier>>) -> Option<u64> {
         None
     }
 
     #[endpoint]
     fn esdt_token_payment(&self, _arg: OptionalValue<EsdtTokenPayment>) -> EsdtTokenPayment {
         EsdtTokenPayment::new(
-            TokenIdentifier::from_esdt_bytes(b"COOL-123456"),
+            EsdtTokenIdentifier::from_esdt_bytes(b"COOL-123456"),
             0,
             BigUint::from(1_000u64),
         )
@@ -103,16 +103,16 @@ pub trait PayableFeatures {
     #[endpoint]
     fn multi_value_4(
         &self,
-        arg: MultiValue4<u64, BigUint, MyCoolStruct<Self::Api>, TokenIdentifier>,
-    ) -> MultiValue4<u64, BigUint, MyCoolStruct<Self::Api>, TokenIdentifier> {
+        arg: MultiValue4<u64, BigUint, MyCoolStruct<Self::Api>, EsdtTokenIdentifier>,
+    ) -> MultiValue4<u64, BigUint, MyCoolStruct<Self::Api>, EsdtTokenIdentifier> {
         arg
     }
 
     #[endpoint]
     fn complex_multi_values(
         &self,
-        arg: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
-    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>> {
+        arg: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
+    ) -> MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>> {
         arg
     }
 }

@@ -2,9 +2,9 @@ use basic_features_interact::{BasicFeaturesInteract, Config};
 use multiversx_sc_snippets::{
     imports::{
         BigUint, ESDTSystemSCAddress, ESDTSystemSCProxy, EgldDecimals, EsdtLocalRole,
-        EsdtTokenPayment, EsdtTokenType, FungibleTokenProperties, ManagedBuffer, ManagedDecimal,
-        ManagedOption, ManagedVec, ReturnsNewTokenIdentifier, RustBigUint, StaticApi,
-        TokenIdentifier,
+        EsdtTokenIdentifier, EsdtTokenPayment, EsdtTokenType, FungibleTokenProperties,
+        ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec, ReturnsNewTokenIdentifier,
+        RustBigUint, StaticApi,
     },
     test_wallets, InteractorRunAsync, InteractorSimulateGasAsync,
 };
@@ -94,7 +94,7 @@ async fn send_esdt_to_non_existent_address_test() {
         .from(&registered_wallet_address)
         .to(&not_registered_wallet_address)
         .esdt(EsdtTokenPayment::new(
-            TokenIdentifier::from_esdt_bytes(token.clone()),
+            EsdtTokenIdentifier::from_esdt_bytes(token.clone()),
             1,
             BigUint::from(10u16),
         ))

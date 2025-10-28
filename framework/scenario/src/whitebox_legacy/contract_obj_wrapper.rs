@@ -442,6 +442,11 @@ impl BlockchainStateWrapper {
             .set_state_step(SetStateStep::new().block_timestamp(block_timestamp));
     }
 
+    pub fn set_block_timestamp_ms(&mut self, block_timestamp_ms: u64) {
+        self.world
+            .set_state_step(SetStateStep::new().block_timestamp_ms(block_timestamp_ms));
+    }
+
     pub fn set_prev_block_epoch(&mut self, block_epoch: u64) {
         self.world
             .set_state_step(SetStateStep::new().prev_block_epoch(block_epoch));

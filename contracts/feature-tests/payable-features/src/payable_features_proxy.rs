@@ -184,7 +184,7 @@ where
 
     pub fn payable_token_2(
         self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, TokenIdentifier<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, EsdtTokenIdentifier<Env::Api>>> {
         self.wrapped_tx
             .raw_call("payable_token_2")
             .original_result()
@@ -200,7 +200,7 @@ where
 
     pub fn payable_token_4(
         self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, TokenIdentifier<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, EsdtTokenIdentifier<Env::Api>>> {
         self.wrapped_tx
             .raw_call("payable_token_4")
             .original_result()

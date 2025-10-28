@@ -151,7 +151,7 @@ pub trait PayableFeatures {
     fn payable_token_2(
         &self,
         #[payment] payment: BigUint,
-    ) -> MultiValue2<BigUint, TokenIdentifier> {
+    ) -> MultiValue2<BigUint, EsdtTokenIdentifier> {
         let token = self.call_value().single_esdt().token_identifier.clone();
         (payment, token).into()
     }
@@ -168,7 +168,7 @@ pub trait PayableFeatures {
 
     #[endpoint]
     #[payable("PAYABLE-FEATURES-TOKEN")]
-    fn payable_token_4(&self) -> MultiValue2<BigUint, TokenIdentifier> {
+    fn payable_token_4(&self) -> MultiValue2<BigUint, EsdtTokenIdentifier> {
         let payment = self.call_value().single_esdt().amount.clone();
         let token = self.call_value().single_esdt().token_identifier.clone();
         (payment, token).into()

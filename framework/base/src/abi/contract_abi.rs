@@ -60,7 +60,7 @@ impl ContractAbi {
 
     /// Contract main crate name.
     pub fn get_crate_name(&self) -> &str {
-        self.build_info.contract_crate.name
+        &self.build_info.contract_crate.name
     }
 
     /// Contract main crate name, but with underscores instead of dashes.

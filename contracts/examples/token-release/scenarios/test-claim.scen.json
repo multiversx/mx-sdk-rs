@@ -9,7 +9,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockTimestamp": "3602"
+                "blockTimestampMs": "3602"
             }
         },
         {
@@ -35,7 +35,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockTimestamp": "7203"
+                "blockTimestampMs": "7203"
             }
         },
         {

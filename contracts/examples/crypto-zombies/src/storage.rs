@@ -26,7 +26,7 @@ pub trait Storage {
 
     #[view]
     #[storage_mapper("cooldownTime")]
-    fn cooldown_time(&self) -> SingleValueMapper<u64>;
+    fn cooldown_time(&self) -> SingleValueMapper<DurationMillis>;
 
     #[view]
     #[storage_mapper("ownedZombies")]

@@ -1,11 +1,11 @@
 use crate::{
     proxy_imports::ManagedBufferBuilder,
-    types::{ManagedBuffer, TokenIdentifier},
+    types::{EsdtTokenIdentifier, ManagedBuffer},
 };
 
 use super::{AnnotatedValue, TxEnv};
 
-impl<Env> AnnotatedValue<Env, TokenIdentifier<Env::Api>> for TokenIdentifier<Env::Api>
+impl<Env> AnnotatedValue<Env, EsdtTokenIdentifier<Env::Api>> for EsdtTokenIdentifier<Env::Api>
 where
     Env: TxEnv,
 {
@@ -13,23 +13,23 @@ where
         (&self).annotation(env)
     }
 
-    fn to_value(&self, _env: &Env) -> TokenIdentifier<Env::Api> {
+    fn to_value(&self, _env: &Env) -> EsdtTokenIdentifier<Env::Api> {
         self.clone()
     }
 
-    fn into_value(self, _env: &Env) -> TokenIdentifier<Env::Api> {
+    fn into_value(self, _env: &Env) -> EsdtTokenIdentifier<Env::Api> {
         self
     }
 
     fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
-        F: FnOnce(&TokenIdentifier<Env::Api>) -> R,
+        F: FnOnce(&EsdtTokenIdentifier<Env::Api>) -> R,
     {
         f(self)
     }
 }
 
-impl<Env> AnnotatedValue<Env, TokenIdentifier<Env::Api>> for &TokenIdentifier<Env::Api>
+impl<Env> AnnotatedValue<Env, EsdtTokenIdentifier<Env::Api>> for &EsdtTokenIdentifier<Env::Api>
 where
     Env: TxEnv,
 {
@@ -39,17 +39,17 @@ where
         annot.into_managed_buffer()
     }
 
-    fn to_value(&self, _env: &Env) -> TokenIdentifier<Env::Api> {
+    fn to_value(&self, _env: &Env) -> EsdtTokenIdentifier<Env::Api> {
         (*self).clone()
     }
 
-    fn into_value(self, _env: &Env) -> TokenIdentifier<Env::Api> {
+    fn into_value(self, _env: &Env) -> EsdtTokenIdentifier<Env::Api> {
         (*self).clone()
     }
 
     fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
-        F: FnOnce(&TokenIdentifier<Env::Api>) -> R,
+        F: FnOnce(&EsdtTokenIdentifier<Env::Api>) -> R,
     {
         f(self)
     }

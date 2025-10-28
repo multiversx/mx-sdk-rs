@@ -6,8 +6,8 @@ use crate::{
         HandleConstraints, ManagedBufferApiImpl, RawHandle, SendApiImpl, StaticVarApiImpl,
     },
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenIdentifier, EsdtTokenPayment,
+        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
     },
 };
 
@@ -99,7 +99,7 @@ where
     pub fn transfer_esdt_execute(
         &self,
         to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         value: &BigUint<A>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
@@ -112,7 +112,7 @@ where
     pub fn transfer_esdt_nft_execute(
         &self,
         to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         nonce: u64,
         egld_value: &BigUint<A>,
         gas_limit: u64,

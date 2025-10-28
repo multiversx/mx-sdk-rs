@@ -6,7 +6,7 @@ pub use stack_size::*;
 
 use crate::{
     ei::EIVersion,
-    tools::{self, OpcodeVersion},
+    tools::{self, OpcodeVersion, RustcVersion},
 };
 
 use super::ContractVariantProfileSerde;
@@ -43,6 +43,9 @@ pub struct ContractVariantSettings {
     /// Allows the contract to be built with std.
     pub std: bool,
 
+    /// Explicit rustc version when building WebAssembly.
+    pub rustc_version: RustcVersion,
+
     /// Rustc target when building WebAssembly.
     pub rustc_target: String,
 
@@ -62,6 +65,7 @@ impl Default for ContractVariantSettings {
             kill_legacy_callback: false,
             profile: Default::default(),
             std: false,
+            rustc_version: RustcVersion::current_version(),
             rustc_target: tools::build_target::default_target().to_owned(),
             opcode_version: OpcodeVersion::default(),
         }

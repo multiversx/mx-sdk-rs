@@ -7,10 +7,10 @@ use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
     types::{
-        system_proxy, BigUint, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-        FunctionCall, GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType,
-        ManagedVec, NotPayable, OriginalResultMarker, ReturnsRawResult, ReturnsResult, ToSelf,
-        TokenIdentifier, Tx, TxScEnv,
+        system_proxy, BigUint, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier,
+        EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedType, ManagedVec, NotPayable, OriginalResultMarker, ReturnsRawResult, ReturnsResult,
+        ToSelf, Tx, TxScEnv,
     },
 };
 
@@ -132,7 +132,7 @@ where
     pub fn direct_esdt_with_gas_limit<D>(
         &self,
         to: &ManagedAddress<A>,
-        token_identifier: &TokenIdentifier<A>,
+        token_identifier: &EsdtTokenIdentifier<A>,
         nonce: u64,
         amount: &BigUint<A>,
         gas: u64,
@@ -172,7 +172,7 @@ where
     pub fn direct_non_zero_esdt_with_gas_limit<D>(
         &self,
         to: &ManagedAddress<A>,
-        token_identifier: &TokenIdentifier<A>,
+        token_identifier: &EsdtTokenIdentifier<A>,
         nonce: u64,
         amount: &BigUint<A>,
         gas: u64,
@@ -199,7 +199,7 @@ where
     pub fn direct_esdt(
         &self,
         to: &ManagedAddress<A>,
-        token_identifier: &TokenIdentifier<A>,
+        token_identifier: &EsdtTokenIdentifier<A>,
         token_nonce: u64,
         amount: &BigUint<A>,
     ) {
@@ -313,7 +313,7 @@ where
     pub fn transfer_esdt_via_async_call(
         &self,
         to: ManagedAddress<A>,
-        token: TokenIdentifier<A>,
+        token: EsdtTokenIdentifier<A>,
         nonce: u64,
         amount: BigUint<A>,
     ) -> ! {
@@ -335,7 +335,7 @@ where
     pub fn transfer_esdt_non_zero_via_async_call(
         &self,
         to: ManagedAddress<A>,
-        token: TokenIdentifier<A>,
+        token: EsdtTokenIdentifier<A>,
         nonce: u64,
         amount: BigUint<A>,
     ) {
@@ -424,7 +424,7 @@ where
     /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
     ///
     /// This function cannot be used for NFTs.
-    pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
+    pub fn esdt_local_mint(&self, token: &EsdtTokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
         Tx::new_tx_from_sc()
             .to(ToSelf)
             .gas(GasLeft)
@@ -444,7 +444,7 @@ where
     /// If the amount is 0, it returns without error.
     pub fn esdt_non_zero_local_mint(
         &self,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         nonce: u64,
         amount: &BigUint<A>,
     ) {
@@ -458,7 +458,7 @@ where
     ///
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed".
-    pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
+    pub fn esdt_local_burn(&self, token: &EsdtTokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
         Tx::new_tx_from_sc()
             .to(ToSelf)
             .gas(GasLeft)
@@ -475,7 +475,7 @@ where
     /// If the amount is 0, it returns without error.
     pub fn esdt_non_zero_local_burn(
         &self,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         nonce: u64,
         amount: &BigUint<A>,
     ) {
@@ -524,7 +524,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_create<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         amount: &BigUint<A>,
         name: &ManagedBuffer<A>,
         royalties: &BigUint<A>,
@@ -554,7 +554,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_non_zero_nft_create<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         amount: &BigUint<A>,
         name: &ManagedBuffer<A>,
         royalties: &BigUint<A>,
@@ -575,7 +575,7 @@ where
     #[inline]
     pub fn esdt_nft_create_compact<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         amount: &BigUint<A>,
         attributes: &T,
     ) -> u64 {
@@ -587,7 +587,7 @@ where
     /// Returns the new NFT nonce.
     pub fn esdt_nft_create_compact_named<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         amount: &BigUint<A>,
         name: &ManagedBuffer<A>,
         attributes: &T,
@@ -617,7 +617,7 @@ where
     #[inline]
     pub fn esdt_non_zero_nft_create_compact<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         amount: &BigUint<A>,
         attributes: &T,
     ) -> u64 {
@@ -636,7 +636,7 @@ where
     /// If the amount is 0, it returns without error.
     pub fn esdt_non_zero_nft_create_compact_named<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         amount: &BigUint<A>,
         name: &ManagedBuffer<A>,
         attributes: &T,
@@ -654,7 +654,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn sell_nft(
         &self,
-        nft_id: &TokenIdentifier<A>,
+        nft_id: &EsdtTokenIdentifier<A>,
         nft_nonce: u64,
         nft_amount: &BigUint<A>,
         buyer: &ManagedAddress<A>,
@@ -701,7 +701,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn sell_nft_non_zero(
         &self,
-        nft_id: &TokenIdentifier<A>,
+        nft_id: &EsdtTokenIdentifier<A>,
         nft_nonce: u64,
         nft_amount: &BigUint<A>,
         buyer: &ManagedAddress<A>,
@@ -727,7 +727,7 @@ where
     /// Adds a new URI to an NFT, via a synchronous builtin function call.
     pub fn nft_add_uri(
         &self,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nft_nonce: u64,
         new_uri: ManagedBuffer<A>,
     ) {
@@ -737,7 +737,7 @@ where
     /// Adds a multiple URIs to an NFT, via a synchronous builtin function call.
     pub fn nft_add_multiple_uri(
         &self,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nft_nonce: u64,
         new_uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) {
@@ -756,7 +756,7 @@ where
     /// Changes attributes of an NFT, via a synchronous builtin function call.
     pub fn nft_update_attributes<T: codec::TopEncode>(
         &self,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nft_nonce: u64,
         new_attributes: &T,
     ) {
@@ -771,7 +771,7 @@ where
     /// Modifies royalties for a specific token.
     pub fn esdt_modify_royalties(
         &self,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nonce: u64,
         new_royalty: u64,
     ) {
@@ -786,7 +786,7 @@ where
     /// Sets new uris for a specific token.
     pub fn esdt_nft_set_new_uris(
         &self,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nonce: u64,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) {
@@ -799,7 +799,7 @@ where
     }
 
     /// Changes the creator of a specific token into the caller.
-    pub fn esdt_nft_modify_creator(&self, token_id: &TokenIdentifier<A>, nonce: u64) {
+    pub fn esdt_nft_modify_creator(&self, token_id: &EsdtTokenIdentifier<A>, nonce: u64) {
         Tx::new_tx_from_sc()
             .to(ToSelf)
             .gas(GasLeft)
@@ -812,7 +812,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_metadata_recreate<T: codec::TopEncode>(
         &self,
-        token_id: TokenIdentifier<A>,
+        token_id: EsdtTokenIdentifier<A>,
         nonce: u64,
         name: ManagedBuffer<A>,
         royalties: u64,
@@ -832,7 +832,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_metadata_update<T: codec::TopEncode>(
         &self,
-        token_id: TokenIdentifier<A>,
+        token_id: EsdtTokenIdentifier<A>,
         nonce: u64,
         name: ManagedBuffer<A>,
         royalties: u64,

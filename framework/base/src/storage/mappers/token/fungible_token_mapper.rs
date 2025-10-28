@@ -29,8 +29,8 @@ use crate::{
     contract_base::{BlockchainWrapper, SendWrapper},
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer,
-        ManagedType, ManagedVec, TokenIdentifier,
+        BigUint, CallbackClosure, EsdtTokenIdentifier, EsdtTokenPayment, EsdtTokenType,
+        ManagedAddress, ManagedBuffer, ManagedType, ManagedVec,
     },
 };
 
@@ -220,7 +220,7 @@ where
             .transfer();
     }
 
-    pub fn set_if_empty(&mut self, token_id: TokenIdentifier<SA>) {
+    pub fn set_if_empty(&mut self, token_id: EsdtTokenIdentifier<SA>) {
         if self.is_empty() {
             self.set_token_id(token_id);
         }
@@ -252,12 +252,12 @@ where
             .async_call_and_exit()
     }
 
-    pub fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
+    pub fn set_token_id(&mut self, token_id: EsdtTokenIdentifier<SA>) {
         self.store_token_id(&token_id);
         self.token_state = TokenMapperState::Token(token_id);
     }
 
-    pub(crate) fn store_token_id(&self, token_id: &TokenIdentifier<SA>) {
+    pub(crate) fn store_token_id(&self, token_id: &EsdtTokenIdentifier<SA>) {
         if self.get_token_state().is_set() {
             SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
         }
@@ -297,7 +297,7 @@ where
         self.token_state.clone()
     }
 
-    pub fn get_token_id(&self) -> TokenIdentifier<SA> {
+    pub fn get_token_id(&self) -> EsdtTokenIdentifier<SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token.clone()
         } else {
@@ -305,7 +305,7 @@ where
         }
     }
 
-    pub fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
+    pub fn get_token_id_ref(&self) -> &EsdtTokenIdentifier<SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token
         } else {
@@ -323,7 +323,7 @@ where
         }
     }
 
-    pub fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
+    pub fn require_same_token(&self, expected_token_id: &EsdtTokenIdentifier<SA>) {
         let actual_token_id = self.get_token_id_ref();
         if actual_token_id != expected_token_id {
             SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
@@ -388,7 +388,7 @@ where
     }
 }
 
-impl<SA> TypeAbiFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+impl<SA> TypeAbiFrom<FungibleTokenMapper<SA>> for EsdtTokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
@@ -402,15 +402,15 @@ where
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        TokenIdentifier::<SA>::type_name()
+        EsdtTokenIdentifier::<SA>::type_name()
     }
 
     fn type_name_rust() -> TypeName {
-        TokenIdentifier::<SA>::type_name_rust()
+        EsdtTokenIdentifier::<SA>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-        TokenIdentifier::<SA>::provide_type_descriptions(accumulator);
+        EsdtTokenIdentifier::<SA>::provide_type_descriptions(accumulator);
     }
 
     fn is_variadic() -> bool {

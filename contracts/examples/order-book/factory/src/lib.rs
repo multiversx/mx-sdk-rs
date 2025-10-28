@@ -5,8 +5,8 @@ use multiversx_sc::{derive_imports::*, imports::*};
 #[type_abi]
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct TokenIdPair<M: ManagedTypeApi> {
-    first_token_id: TokenIdentifier<M>,
-    second_token_id: TokenIdentifier<M>,
+    first_token_id: EsdtTokenIdentifier<M>,
+    second_token_id: EsdtTokenIdentifier<M>,
 }
 
 #[multiversx_sc::contract]

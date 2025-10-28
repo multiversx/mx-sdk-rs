@@ -6,7 +6,7 @@ pub type RoundId = u32;
 pub type Round = usize;
 pub type Block = u64;
 pub type Epoch = u64;
-pub type Timestamp = u64;
+pub type Timestamp = TimestampSeconds;
 
 #[type_abi]
 #[derive(TopEncode)]

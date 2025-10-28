@@ -1,3 +1,4 @@
 [contracts.std-contract]
 std = true
+rustc-version = "1.86" # necessary for building std, without bulk memory operations
 rustc-target = "wasm32-unknown-unknown"

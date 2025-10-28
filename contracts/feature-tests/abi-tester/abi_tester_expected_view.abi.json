@@ -5,6 +5,7 @@
             "commitHash": "<commit hash here>",
             "commitDate": "<commit date here>",
             "channel": "Channel",
+            "host": "<host>",
             "short": "rustc <version> (<short hash> <date>)"
         },
         "contractCrate": {
@@ -74,7 +75,7 @@
             "inputs": [
                 {
                     "name": "token",
-                    "type": "TokenIdentifier",
+                    "type": "EsdtTokenIdentifier",
                     "indexed": true
                 },
                 {
@@ -370,7 +371,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "TokenIdentifier"
+                    "type": "EsdtTokenIdentifier"
                 },
                 {
                     "name": "token_nonce",

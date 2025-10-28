@@ -29,14 +29,15 @@ macro_rules! managed_address {
 #[macro_export]
 macro_rules! managed_token_id {
     ($bytes:expr) => {{
-        multiversx_sc::types::TokenIdentifier::from_esdt_bytes($bytes)
+        multiversx_sc::types::EsdtTokenIdentifier::from_esdt_bytes($bytes)
     }};
 }
 
 #[macro_export]
 macro_rules! managed_token_id_wrapped {
     ($bytes:expr) => {{
-        let ___esdt_token_id___ = multiversx_sc::types::TokenIdentifier::from_esdt_bytes($bytes);
+        let ___esdt_token_id___ =
+            multiversx_sc::types::EsdtTokenIdentifier::from_esdt_bytes($bytes);
         multiversx_sc::types::EgldOrEsdtTokenIdentifier::esdt(___esdt_token_id___)
     }};
 }

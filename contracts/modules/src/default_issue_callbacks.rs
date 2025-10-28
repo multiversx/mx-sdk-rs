@@ -11,7 +11,7 @@ pub trait DefaultIssueCallbacksModule {
         &self,
         initial_caller: ManagedAddress,
         storage_key: ManagedBuffer,
-        #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
+        #[call_result] result: ManagedAsyncCallResult<EsdtTokenIdentifier>,
     ) {
         let key = StorageKey::from(storage_key);
         match result {

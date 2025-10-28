@@ -1,5 +1,6 @@
 use multiversx_sc::derive_imports::*;
 
+use multiversx_sc::types::TimestampMillis;
 use multiversx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, ManagedAddress},
@@ -18,7 +19,7 @@ pub struct Auction<M: ManagedTypeApi> {
     pub auction_type: AuctionType,
     pub starting_price: BigUint<M>,
     pub ending_price: BigUint<M>,
-    pub deadline: u64,
+    pub deadline: TimestampMillis,
     pub kitty_owner: ManagedAddress<M>,
     pub current_bid: BigUint<M>,
     pub current_winner: ManagedAddress<M>,
@@ -29,7 +30,7 @@ impl<M: ManagedTypeApi> Auction<M> {
         auction_type: AuctionType,
         starting_price: BigUint<M>,
         ending_price: BigUint<M>,
-        deadline: u64,
+        deadline: TimestampMillis,
         kitty_owner: ManagedAddress<M>,
     ) -> Self {
         Auction {
