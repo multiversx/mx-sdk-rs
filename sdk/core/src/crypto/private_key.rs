@@ -26,7 +26,7 @@ impl PrivateKey {
                 let mut digest: [u8; 32] = [0u8; 32];
 
                 h.update(bytes);
-                hash.copy_from_slice(h.finalize().as_slice());
+                hash.copy_from_slice(h.finalize().as_ref());
 
                 digest.copy_from_slice(&hash[..32]);
 
@@ -90,7 +90,7 @@ impl PrivateKey {
         let mut hram_digest = [0u8; 64];
         let mut expanded_secret_key = [0u8; 32];
 
-        digest1.copy_from_slice(h.finalize_reset().as_slice());
+        digest1.copy_from_slice(h.finalize_reset().as_ref());
         expanded_secret_key.copy_from_slice(&digest1[..32]);
         expanded_secret_key[0] &= 248;
         expanded_secret_key[31] &= 63;
@@ -98,7 +98,7 @@ impl PrivateKey {
 
         h.update(&digest1[32..]);
         h.update(&message);
-        message_digest.copy_from_slice(h.finalize_reset().as_slice());
+        message_digest.copy_from_slice(h.finalize_reset().as_ref());
 
         let message_digest_reduced = sc_reduce(message_digest);
         let mut r = ExtendedGroupElement::default();
@@ -109,7 +109,7 @@ impl PrivateKey {
         h.update(encoded_r);
         h.update(&self.0[32..]);
         h.update(&message);
-        hram_digest.copy_from_slice(h.finalize_reset().as_slice());
+        hram_digest.copy_from_slice(h.finalize_reset().as_ref());
 
         let hram_digest_reduced = sc_reduce(hram_digest);
 
