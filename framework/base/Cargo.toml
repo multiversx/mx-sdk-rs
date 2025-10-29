@@ -4,7 +4,10 @@ version = "0.62.1"
 edition = "2021"
 rust-version = "1.83"
 
-authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
+authors = [
+    "Andrei Marinica <andrei.marinica@multiversx.com>",
+    "MultiversX <contact@multiversx.com>",
+]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
@@ -12,7 +15,12 @@ homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
 description = "MultiversX smart contract API"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
-categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
+categories = [
+    "no-std",
+    "wasm",
+    "cryptography::cryptocurrencies",
+    "development-tools",
+]
 
 [package.metadata.docs.rs]
 all-features = true

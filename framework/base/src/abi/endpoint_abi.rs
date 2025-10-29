@@ -5,14 +5,14 @@ use alloc::{
     vec::Vec,
 };
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct InputAbi {
     pub arg_name: String,
     pub type_names: TypeNames,
     pub multi_arg: bool,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct OutputAbi {
     pub output_name: String,
     pub type_names: TypeNames,
@@ -21,7 +21,7 @@ pub struct OutputAbi {
 
 pub type OutputAbis = Vec<OutputAbi>;
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub enum EndpointMutabilityAbi {
     #[default]
     Mutable,
@@ -29,7 +29,7 @@ pub enum EndpointMutabilityAbi {
     Pure,
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub enum EndpointTypeAbi {
     #[default]
     Init,
@@ -38,7 +38,7 @@ pub enum EndpointTypeAbi {
     PromisesCallback,
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct EndpointAbi {
     pub docs: Vec<String>,
     pub name: String,

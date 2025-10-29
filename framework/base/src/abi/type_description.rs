@@ -5,7 +5,7 @@ use alloc::{
 
 use super::TypeNames;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct TypeDescription {
     pub docs: Vec<String>,
     pub names: TypeNames,
@@ -46,7 +46,7 @@ impl TypeDescription {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TypeContents {
     NotSpecified,
     Enum(Vec<EnumVariantDescription>),
@@ -125,7 +125,7 @@ impl StructFieldDescription {
 /// This makes it easier for humans to read readable in the transaction output.
 ///
 /// It cannot have data fields, only simple enums allowed.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ExplicitEnumVariantDescription {
     pub docs: Vec<String>,
     pub name: String,
