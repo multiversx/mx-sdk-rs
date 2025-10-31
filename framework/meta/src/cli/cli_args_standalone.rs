@@ -313,6 +313,23 @@ impl AllArgs {
         }
         raw
     }
+
+    /// Produces the arguments for an abi call corresponding to a build.
+    ///
+    /// Used to get the rustc and framework versions configured for a build.
+    pub fn to_cargo_abi_for_build(&self) -> Vec<String> {
+        let processed = self.target_dir_all_override();
+        let mut raw = vec!["run".to_string()];
+        if let Some(target_dir_meta) = &processed.target_dir_meta {
+            raw.push("--target-dir".to_string());
+            raw.push(target_dir_meta.clone());
+        }
+        raw.push("abi".to_string());
+        if !processed.load_abi_git_version {
+            raw.push("--no-abi-git-version".to_string());
+        }
+        raw
+    }
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

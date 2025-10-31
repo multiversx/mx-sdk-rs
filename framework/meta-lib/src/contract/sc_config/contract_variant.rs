@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use super::{contract_variant_builder::default_wasm_crate_name, ContractVariantSettings};
-use crate::cli::BuildArgs;
+use crate::{cli::BuildArgs, tools::RustcVersion};
 use multiversx_sc::abi::ContractAbi;
 
 /// Represents a contract created by the framework when building.
@@ -41,16 +41,24 @@ pub struct ContractVariant {
 }
 
 impl ContractVariant {
-    pub fn default_from_abi(abi: &ContractAbi) -> Self {
-        let default_contract_config_name = abi.build_info.contract_crate.name.to_string();
+    /// Constructor that is called when no contract variants are configured.
+    ///
+    /// This single resulting variant takes all its data from the original ABI, and uses defaults for everything else.
+    pub fn default_from_abi(original_abi: &ContractAbi) -> Self {
+        let default_contract_config_name = original_abi.build_info.contract_crate.name.to_string();
         let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
+
+        // add the rustc version to the original ABI
+        let mut abi = original_abi.clone();
+        abi.build_info.rustc = Some(RustcVersion::current_version().to_abi());
+
         ContractVariant {
             wasm_dir_short_name: true,
             settings: ContractVariantSettings::default(),
             contract_id: default_contract_config_name.clone(),
             contract_name: default_contract_config_name,
             wasm_crate_name,
-            abi: abi.clone(),
+            abi,
         }
     }
 

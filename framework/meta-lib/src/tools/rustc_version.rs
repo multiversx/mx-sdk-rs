@@ -7,8 +7,8 @@ use semver::Version;
 /// Contains a representation of a Rust compiler (toolchain) version.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RustcVersion {
-    version_meta: VersionMeta,
-    short_string: String,
+    pub version_meta: VersionMeta,
+    pub short_string: String,
 }
 
 impl RustcVersion {
@@ -49,12 +49,43 @@ impl RustcVersion {
 
     pub fn to_abi(&self) -> RustcAbi {
         RustcAbi {
-            version: version_to_string(&self.version_meta.semver),
+            version: self.version_meta.semver.to_string(),
             commit_hash: self.version_meta.commit_hash.clone().unwrap_or_default(),
             commit_date: self.version_meta.commit_date.clone().unwrap_or_default(),
             channel: format!("{:?}", self.version_meta.channel),
             host: self.version_meta.host.clone(),
             short: self.version_meta.short_version_string.clone(),
+        }
+    }
+
+    pub fn from_abi(abi: &RustcAbi) -> Self {
+        let semver = Version::parse(&abi.version).expect("failed to parse version");
+        let channel = match abi.channel.as_str() {
+            "Stable" => rustc_version::Channel::Stable,
+            "Nightly" => rustc_version::Channel::Nightly,
+            _ => panic!("unsupported channel: {}", abi.channel),
+        };
+
+        RustcVersion {
+            version_meta: VersionMeta {
+                semver,
+                channel,
+                commit_hash: if abi.commit_hash.is_empty() {
+                    None
+                } else {
+                    Some(abi.commit_hash.clone())
+                },
+                commit_date: if abi.commit_date.is_empty() {
+                    None
+                } else {
+                    Some(abi.commit_date.clone())
+                },
+                build_date: None, // Not stored in ABI
+                host: abi.host.clone(),
+                short_version_string: abi.short.clone(),
+                llvm_version: None, // Not stored in ABI
+            },
+            short_string: abi.short.clone(),
         }
     }
 }
