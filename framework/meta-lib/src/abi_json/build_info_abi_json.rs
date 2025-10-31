@@ -44,6 +44,7 @@ pub struct RustcAbiJson {
     pub commit_hash: String,
     pub commit_date: String,
     pub channel: String,
+    #[serde(default)]
     pub host: String,
     pub short: String,
 }
