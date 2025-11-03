@@ -38,3 +38,4 @@ async fn get_current_timestamp() -> u64 {
         .unwrap();
     network_config.current_block_timestamp
 }
+

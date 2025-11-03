@@ -7,7 +7,7 @@ use lottery_esdt::lottery_proxy;
 pub use lottery_interactor_config::Config;
 use lottery_interactor_state::State;
 
-use multiversx_sc_snippets::imports::*;
+use multiversx_sc_snippets::{hex, imports::*};
 
 const LOTTERY_CODE_PATH: MxscPath = MxscPath::new("../output/lottery-esdt.mxsc.json");
 
@@ -134,7 +134,7 @@ impl LotteryInteract {
             .run()
             .await;
 
-        let tx_hash_string = String::from_utf8(tx_hash.to_vec()).unwrap();
+        let tx_hash_string = hex::encode(tx_hash.to_vec());
         let tx_on_network = self
             .interactor
             .proxy
