@@ -50,12 +50,7 @@ pub async fn lottery_cli() {
         }
         Some(lottery_interactor_cli::InteractCliCommand::ClaimRewards(args)) => {
             lottery_interact
-                .claim_rewards(
-                    args.tokens
-                        .iter()
-                        .map(TokenIdentifier::from)
-                        .collect(),
-                )
+                .claim_rewards(args.tokens.iter().map(TokenIdentifier::from).collect())
                 .await;
         }
         None => {}
@@ -142,6 +137,7 @@ impl LotteryInteract {
         self.state.set_lottery_address(new_address);
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn create_lottery_pool(
         &mut self,
         lottery_name: &String,
