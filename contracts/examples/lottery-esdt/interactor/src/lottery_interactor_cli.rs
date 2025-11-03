@@ -65,6 +65,9 @@ impl CreateLotteryPollArgs {
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct LotteryNameArg {
+    /// The caller address
+    #[arg(short = 'c', long = "address")]
+    pub caller: String,
     /// The name of the lottery
     #[arg(short = 'n', long = "name")]
     pub name: String,

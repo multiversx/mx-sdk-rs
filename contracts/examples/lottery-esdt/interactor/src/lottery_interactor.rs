@@ -7,7 +7,7 @@ use lottery_esdt::lottery_proxy;
 pub use lottery_interactor_config::Config;
 use lottery_interactor_state::State;
 
-use multiversx_sc_snippets::{hex, imports::*};
+use multiversx_sc_snippets::imports::*;
 
 const LOTTERY_CODE_PATH: MxscPath = MxscPath::new("../output/lottery-esdt.mxsc.json");
 
@@ -39,10 +39,14 @@ pub async fn lottery_cli() {
                 .await;
         }
         Some(lottery_interactor_cli::InteractCliCommand::BuyTicket(args)) => {
-            lottery_interact.buy_ticket(&args.name).await;
+            let caller = Bech32Address::from_bech32_string(args.caller.clone());
+            lottery_interact.buy_ticket(&caller, &args.name).await;
         }
         Some(lottery_interactor_cli::InteractCliCommand::DetermineWinner(args)) => {
-            lottery_interact.determine_winner(&args.name).await;
+            let caller = Bech32Address::from_bech32_string(args.caller.clone());
+            lottery_interact
+                .determine_winner(&caller, &args.name, None)
+                .await;
         }
         Some(lottery_interactor_cli::InteractCliCommand::ClaimRewards(args)) => {
             lottery_interact
@@ -81,9 +85,9 @@ impl LotteryInteract {
         interactor.set_current_dir_from_workspace("contracts/examples/lottery-esdt/interactor");
 
         let lottery_owner_wallet = test_wallets::heidi(); // shard 1
-        let account_1_wallet = test_wallets::alice(); // shard 0
+        let account_1_wallet = test_wallets::carol(); // shard 0
         let account_2_wallet = test_wallets::bob(); // shard 2
-        let other_shard_wallet = test_wallets::carol(); // shard 0
+        let other_shard_wallet = test_wallets::alice(); // shard 0
 
         let lottery_owner_address = interactor.register_wallet(lottery_owner_wallet).await;
         let account_1_address = interactor.register_wallet(account_1_wallet).await;
@@ -114,14 +118,15 @@ impl LotteryInteract {
         }
     }
 
-    pub async fn deploy(&mut self) {
-        let (new_address, shard) = self.handle_different_shard_address().await;
-        println!("new address: {new_address} on shard {shard}");
-        self.state.set_lottery_address(new_address);
+    pub async fn generate_blocks_until_epoch(&mut self, epoch: u64) {
+        self.interactor
+            .generate_blocks_until_epoch(epoch)
+            .await
+            .unwrap();
     }
 
-    async fn handle_different_shard_address(&mut self) -> (Bech32Address, u32) {
-        let (new_address, tx_hash) = self
+    pub async fn deploy(&mut self) {
+        let new_address = self
             .interactor
             .tx()
             .from(&self.lottery_owner.address)
@@ -130,25 +135,11 @@ impl LotteryInteract {
             .init()
             .code(LOTTERY_CODE_PATH)
             .returns(ReturnsNewBech32Address)
-            .returns(ReturnsTxHash)
             .run()
             .await;
-
-        let tx_hash_string = hex::encode(tx_hash.to_vec());
-        let tx_on_network = self
-            .interactor
-            .proxy
-            .get_transaction_info_with_results(&tx_hash_string)
-            .await
-            .unwrap();
-        let shard = tx_on_network.destination_shard;
-
-        if self.other_shard_account.shard as u32 == shard {
-            // we want to have other_shard_account on another shard than the SC
-            std::mem::swap(&mut self.account_1, &mut self.other_shard_account);
-        }
-
-        return (new_address, 0);
+        let shard = self.lottery_owner.shard; // SC shard is always the shard of the address deploying it
+        println!("new address: {new_address} on shard {shard}");
+        self.state.set_lottery_address(new_address);
     }
 
     pub async fn create_lottery_pool(
@@ -186,10 +177,10 @@ impl LotteryInteract {
         println!("Successfully performed create_lottery_poll");
     }
 
-    pub async fn buy_ticket(&mut self, lottery_name: &String) {
+    pub async fn buy_ticket(&mut self, caller: &Bech32Address, lottery_name: &String) {
         self.interactor
             .tx()
-            .from(&self.account_1.address)
+            .from(caller)
             .to(self.state.current_lottery_address())
             .gas(6_000_000u64)
             .typed(lottery_proxy::LotteryProxy)
@@ -200,17 +191,29 @@ impl LotteryInteract {
         println!("Successfully performed buy_ticket");
     }
 
-    pub async fn determine_winner(&mut self, lottery_name: &String) {
-        self.interactor
+    pub async fn determine_winner(
+        &mut self,
+        caller: &Bech32Address,
+        lottery_name: &String,
+        error: Option<ExpectError<'_>>,
+    ) {
+        let tx = self
+            .interactor
             .tx()
-            .from(&self.account_1.address)
+            .from(caller)
             .to(self.state.current_lottery_address())
             .gas(6_000_000u64)
             .typed(lottery_proxy::LotteryProxy)
-            .determine_winner(lottery_name)
-            .run()
-            .await;
-        println!("Successfully performed determine_winner");
+            .determine_winner(lottery_name);
+
+        match error {
+            None => {
+                tx.returns(ReturnsResultUnmanaged).run().await;
+            }
+            Some(expect_error) => {
+                tx.returns(expect_error).run().await;
+            }
+        }
     }
 
     pub async fn claim_rewards(

@@ -3,12 +3,13 @@ use multiversx_sc_snippets::{imports::*, sdk::gateway::NetworkStatusRequest};
 use serial_test::serial;
 
 pub const CHAIN_SIMULATOR_GATEWAY: &str = "http://localhost:8085";
-const TEN_MINUTES_IN_SECONDS: u64 = 60 * 10;
+const ONE_MINUTE_IN_SECONDS: u64 = 60;
+const LOTTERY_NAME: &str = "LOTTERY";
 
 #[tokio::test]
 #[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
-async fn set_state_from_file_cs_test() {
+async fn determine_winner_with_caller_shard_check_test() {
     let mut interact = LotteryInteract::new(Config::chain_simulator_config()).await;
 
     interact.deploy().await;
@@ -16,15 +17,35 @@ async fn set_state_from_file_cs_test() {
 
     interact
         .create_lottery_pool(
-            &"lottery_name".to_string(),
+            &LOTTERY_NAME.to_string(),
             &"LOTTERY-123456".to_string(),
             100u128,
-            None,
-            Some(current_timestamp + TEN_MINUTES_IN_SECONDS),
-            None,
-            None,
+            Some(11),
+            Some(current_timestamp + ONE_MINUTE_IN_SECONDS),
+            Some(1),
+            Some(vec![10, 50, 25, 5, 5, 1, 1, 1, 1, 1]),
             None,
             OptionalValue::None,
+        )
+        .await;
+
+    interact.generate_blocks_until_epoch(5).await;
+
+    // Call `determine_winner` from the same shard as the SC - should fail
+    interact
+        .determine_winner(
+            &interact.lottery_owner.address.clone(),
+            &LOTTERY_NAME.to_string(),
+            Some(ExpectError(4, "Caller needs to be on a remote shard")),
+        )
+        .await;
+
+    // Call `determine_winner` from a different shard - should pass
+    interact
+        .determine_winner(
+            &interact.other_shard_account.address.clone(),
+            &LOTTERY_NAME.to_string(),
+            None,
         )
         .await;
 }
@@ -38,4 +59,3 @@ async fn get_current_timestamp() -> u64 {
         .unwrap();
     network_config.current_block_timestamp
 }
-

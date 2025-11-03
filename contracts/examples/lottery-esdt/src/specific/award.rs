@@ -87,8 +87,13 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         let ticket_holders_mapper = self.ticket_holders(lottery_name);
         let total_tickets = ticket_holders_mapper.len();
 
-        let mut index_last_winner = self.index_last_winner(lottery_name).get();
         let total_winning_tickets = self.total_winning_tickets(lottery_name).get();
+        if total_winning_tickets == 0 {
+            self.clear_storage(lottery_name);
+            return AwardingStatus::Finished;
+        }
+
+        let mut index_last_winner = self.index_last_winner(lottery_name).get();
         require!(
             index_last_winner <= total_winning_tickets,
             "Awarding has ended"
