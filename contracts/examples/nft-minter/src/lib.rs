@@ -48,7 +48,7 @@ pub trait NftMinter: nft_module::NftModule {
             }
         };
 
-        let attributes: ExampleAttributes = ExampleAttributes {
+        let attributes = ExampleAttributes {
             creation_timestamp: self.blockchain().get_block_timestamp(),
         };
         self.create_nft_with_attributes(
