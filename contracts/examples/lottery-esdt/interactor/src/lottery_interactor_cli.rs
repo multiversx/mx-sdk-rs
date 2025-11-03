@@ -51,15 +51,13 @@ pub struct CreateLotteryPollArgs {
 impl CreateLotteryPollArgs {
     pub fn get_opt_whitelist_arg(&self) -> Option<Vec<Address>> {
         let mut opt_whitelist_with_addresses = Vec::new();
-        if self.opt_whitelist.is_none() {
-            return Option::None;
-        }
+        self.opt_whitelist.as_ref()?;
 
         for str_address in self.opt_whitelist.as_ref().unwrap() {
             opt_whitelist_with_addresses.push(Address::from_slice(str_address.as_bytes()));
         }
 
-        return Some(opt_whitelist_with_addresses);
+        Some(opt_whitelist_with_addresses)
     }
 }
 

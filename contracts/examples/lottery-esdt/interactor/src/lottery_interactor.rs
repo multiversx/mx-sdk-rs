@@ -34,7 +34,7 @@ pub async fn lottery_cli() {
                     args.opt_max_entries_per_user,
                     args.opt_prize_distribution.clone(),
                     args.get_opt_whitelist_arg(),
-                    OptionalValue::from(args.opt_burn_percentage.clone()),
+                    OptionalValue::from(args.opt_burn_percentage),
                 )
                 .await;
         }
@@ -53,7 +53,7 @@ pub async fn lottery_cli() {
                 .claim_rewards(
                     args.tokens
                         .iter()
-                        .map(|token| TokenIdentifier::from(token))
+                        .map(TokenIdentifier::from)
                         .collect(),
                 )
                 .await;
