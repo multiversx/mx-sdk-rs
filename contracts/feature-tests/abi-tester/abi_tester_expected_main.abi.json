@@ -6,7 +6,8 @@
             "commitDate": "<commit date here>",
             "channel": "Channel",
             "host": "<host>",
-            "short": "rustc <version> (<short hash> <date>)"
+            "short": "rustc <version> (<short hash> <date>)",
+            "llvmVersion": "x.x"
         },
         "contractCrate": {
             "name": "abi-tester",

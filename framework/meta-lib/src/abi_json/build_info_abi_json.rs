@@ -43,10 +43,16 @@ pub struct RustcAbiJson {
     pub version: String,
     pub commit_hash: String,
     pub commit_date: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub build_date: Option<String>,
     pub channel: String,
     #[serde(default)]
     pub host: String,
     pub short: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub llvm_version: Option<String>,
 }
 
 impl From<&RustcAbi> for RustcAbiJson {
@@ -55,9 +61,11 @@ impl From<&RustcAbi> for RustcAbiJson {
             version: abi.version.clone(),
             commit_hash: abi.commit_hash.clone(),
             commit_date: abi.commit_date.clone(),
+            build_date: abi.build_date.clone(),
             channel: abi.channel.clone(),
             host: abi.host.clone(),
             short: abi.short.clone(),
+            llvm_version: abi.llvm_version.clone(),
         }
     }
 }
@@ -68,9 +76,11 @@ impl From<&RustcAbiJson> for RustcAbi {
             version: abi_json.version.clone(),
             commit_hash: abi_json.commit_hash.clone(),
             commit_date: abi_json.commit_date.clone(),
+            build_date: abi_json.build_date.clone(),
             channel: abi_json.channel.clone(),
             host: abi_json.host.clone(),
             short: abi_json.short.clone(),
+            llvm_version: abi_json.llvm_version.clone(),
         }
     }
 }

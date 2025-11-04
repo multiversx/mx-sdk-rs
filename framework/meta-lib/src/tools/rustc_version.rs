@@ -1,7 +1,7 @@
-use std::process::Command;
+use std::{process::Command, str::FromStr};
 
 use multiversx_sc::abi::RustcAbi;
-use rustc_version::VersionMeta;
+use rustc_version::{LlvmVersion, VersionMeta};
 use semver::Version;
 
 /// Contains a representation of a Rust compiler (toolchain) version.
@@ -52,9 +52,15 @@ impl RustcVersion {
             version: self.version_meta.semver.to_string(),
             commit_hash: self.version_meta.commit_hash.clone().unwrap_or_default(),
             commit_date: self.version_meta.commit_date.clone().unwrap_or_default(),
+            build_date: self.version_meta.build_date.clone(),
             channel: format!("{:?}", self.version_meta.channel),
             host: self.version_meta.host.clone(),
             short: self.version_meta.short_version_string.clone(),
+            llvm_version: self
+                .version_meta
+                .llvm_version
+                .clone()
+                .map(|llvm_version| llvm_version.to_string()),
         }
     }
 
@@ -80,10 +86,13 @@ impl RustcVersion {
                 } else {
                     Some(abi.commit_date.clone())
                 },
-                build_date: None, // Not stored in ABI
+                build_date: abi.build_date.clone(),
                 host: abi.host.clone(),
                 short_version_string: abi.short.clone(),
-                llvm_version: None, // Not stored in ABI
+                llvm_version: abi.llvm_version.clone().map(|llvm_version_string| {
+                    LlvmVersion::from_str(&llvm_version_string)
+                        .expect("failed to parse LLVM version")
+                }),
             },
             short_string: abi.short.clone(),
         }
