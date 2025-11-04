@@ -35,7 +35,7 @@ Either upgrade the framework (to {MX_BULK_MEMORY_FIX_VERSION} or newer), or down
     // This is because in order to reach this point, the local meta crate needs to be built,
     // which will fail if the rustc version is below minimum.
     //
-    // It can be reached if rustc-version was confogured explicitly in sc-config.toml.
+    // It can be reached if rustc-version was configured explicitly in sc-config.toml.
     if let Some(minimum_version) = minimum_rustc_version(&framework_version) {
         if *rustc_semver < minimum_version {
             return Some(format!("
