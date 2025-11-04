@@ -45,6 +45,26 @@ impl RelevantDirectory {
     pub fn dir_name_underscores(&self) -> String {
         self.dir_name().replace('-', "_")
     }
+
+    /// Gets the local meta path.
+    pub fn meta_path(&self) -> PathBuf {
+        self.path.join("meta")
+    }
+
+    /// Panics if meta crate path is missing.
+    pub fn assert_meta_path_exists(&self) {
+        let meta_path = self.meta_path();
+        assert!(
+            meta_path.exists(),
+            "Contract meta crate not found at {}",
+            meta_path.as_path().display()
+        );
+    }
+
+    /// Gets the local output path.
+    pub fn output_path(&self) -> PathBuf {
+        self.path.join("output")
+    }
 }
 
 pub struct RelevantDirectories(pub(crate) Vec<RelevantDirectory>);
@@ -85,7 +105,7 @@ impl RelevantDirectories {
     pub fn count_for_version(&self, version: &FrameworkVersion) -> usize {
         self.0
             .iter()
-            .filter(|dir| dir.version.is_framework_version(version))
+            .filter(|dir| dir.version.eq_framework_version(version))
             .count()
     }
 
@@ -95,13 +115,13 @@ impl RelevantDirectories {
     ) -> impl Iterator<Item = &RelevantDirectory> {
         self.0
             .iter()
-            .filter(move |dir| dir.version.is_framework_version(version))
+            .filter(move |dir| dir.version.eq_framework_version(version))
     }
 
     /// Marks all appropriate directories as ready for upgrade.
     pub fn start_upgrade(&mut self, from_version: FrameworkVersion, to_version: FrameworkVersion) {
         for dir in self.0.iter_mut() {
-            if dir.version.is_framework_version(&from_version) {
+            if dir.version.eq_framework_version(&from_version) {
                 dir.upgrade_in_progress = Some((from_version.clone(), to_version.clone()));
             }
         }
