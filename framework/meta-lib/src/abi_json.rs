@@ -40,9 +40,11 @@ pub fn abi_to_json_dummy_environment(contract_abi: &ContractAbi) -> String {
             version: "x.x.x-nightly".to_string(),
             commit_hash: "<commit hash here>".to_string(),
             commit_date: "<commit date here>".to_string(),
+            build_date: None,
             channel: "Channel".to_string(),
             host: "<host>".to_string(),
             short: "rustc <version> (<short hash> <date>)".to_string(),
+            llvm_version: Some("x.x".to_string()),
         });
     }
     serialize_abi_to_json(&abi_json)

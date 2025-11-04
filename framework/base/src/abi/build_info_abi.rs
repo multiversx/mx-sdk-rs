@@ -15,9 +15,11 @@ pub struct RustcAbi {
     pub version: String,
     pub commit_hash: String,
     pub commit_date: String,
+    pub build_date: Option<String>,
     pub channel: String,
     pub host: String,
     pub short: String,
+    pub llvm_version: Option<String>,
 }
 
 #[derive(Clone, Default, Debug)]
