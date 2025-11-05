@@ -228,11 +228,11 @@ impl<M: ManagedTypeApi> TypeAbi for TokenId<M> {
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        "EgldOrEsdtTokenIdentifier".into()
+        "TokenId".into()
     }
 
     fn type_name_rust() -> TypeName {
-        "EgldOrEsdtTokenIdentifier<$API>".into()
+        "TokenId<$API>".into()
     }
 }
 
