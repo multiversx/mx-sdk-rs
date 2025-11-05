@@ -5,6 +5,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{quick_signal_error, HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
     codec::*,
+    contract_base::BlockchainWrapper,
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
@@ -89,6 +90,11 @@ impl<M: ManagedTypeApi> TokenId<M> {
     #[inline]
     pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
         self.buffer.to_boxed_bytes()
+    }
+
+    /// Checks if a token is the native one on the chain. Currently only returns true for `EGLD-000000`.
+    pub fn is_native(&self) -> bool {
+        BlockchainWrapper::<M>::new().is_native_token(self)
     }
 
     /// Checks the ESDT token identifier for validity.

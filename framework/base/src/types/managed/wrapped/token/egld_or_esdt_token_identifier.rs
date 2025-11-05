@@ -3,7 +3,7 @@ use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{const_handles, use_raw_handle, ErrorApiImpl, ManagedBufferApiImpl, ManagedTypeApi},
+    api::{ErrorApiImpl, ManagedTypeApi},
     codec::*,
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
@@ -93,14 +93,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
 
     #[inline]
     pub fn is_egld(&self) -> bool {
-        M::managed_type_impl().mb_overwrite(
-            use_raw_handle(const_handles::MBUF_EGLD_000000),
-            EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
-        );
-        M::managed_type_impl().mb_eq(
-            use_raw_handle(const_handles::MBUF_EGLD_000000),
-            self.token_id.buffer.handle.clone(),
-        )
+        self.token_id.is_native()
     }
 
     #[inline]

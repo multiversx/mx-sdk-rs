@@ -1,12 +1,11 @@
 use core::marker::PhantomData;
 
-use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
-
 use crate::{
     api::{
         const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
         ManagedBufferApiImpl, ManagedTypeApi, RawHandle, StaticVarApiFlags, StaticVarApiImpl,
     },
+    contract_base::BlockchainWrapper,
     err_msg,
     types::{
         BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
@@ -269,10 +268,7 @@ fn egld_000000_transfer_exists<A>(transfers_vec_handle: A::ManagedBufferHandle) 
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
-    A::managed_type_impl().mb_overwrite(
-        use_raw_handle(const_handles::MBUF_EGLD_000000),
-        EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
-    );
+    let native_token_handle = BlockchainWrapper::<A>::new().get_native_token_handle();
     unsafe {
         let mut iter: ManagedVecPayloadIterator<
             A,
@@ -282,7 +278,7 @@ where
         iter.any(|payload| {
             let token_identifier_handle = RawHandle::read_from_payload(payload.slice_unchecked(0));
             A::managed_type_impl().mb_eq(
-                use_raw_handle(const_handles::MBUF_EGLD_000000),
+                native_token_handle.clone(),
                 use_raw_handle(token_identifier_handle),
             )
         })
