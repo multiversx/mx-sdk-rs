@@ -48,6 +48,14 @@ async fn determine_winner_with_caller_shard_check_test() {
             None,
         )
         .await;
+    // Call `determine_winner` after awarding ended as a safe check that awarding the same lotteyr cannot be done twice - should fail-
+    interact
+        .determine_winner(
+            &interact.other_shard_account.address.clone(),
+            &LOTTERY_NAME.to_string(),
+            Some(ExpectError(4, "Lottery is inactive!")),
+        )
+        .await;
 }
 
 async fn get_current_timestamp() -> u64 {
