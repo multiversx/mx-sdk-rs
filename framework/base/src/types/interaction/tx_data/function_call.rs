@@ -203,7 +203,7 @@ where
         for payment in payments {
             // serializing token identifier buffer to get EGLD-00000 instead of EGLD
             result = result
-                .argument(&payment.token_identifier.buffer)
+                .argument(&payment.token_identifier.token_id)
                 .argument(&payment.token_nonce)
                 .argument(&payment.amount);
         }

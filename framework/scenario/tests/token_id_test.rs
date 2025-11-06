@@ -1,30 +1,30 @@
-use multiversx_sc::types::{
-    BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenIdentifier,
-    EsdtTokenPayment, ManagedBuffer,
+use multiversx_sc::{
+    chain_core::EGLD_000000_TOKEN_IDENTIFIER,
+    types::{
+        BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
+        ManagedBuffer, TokenId,
+    },
 };
 use multiversx_sc_scenario::{
-    api::StaticApi, managed_egld_token_id, managed_test_util::check_managed_top_encode_decode,
-    managed_token_id, managed_token_id_wrapped, multiversx_sc,
+    api::StaticApi, managed_test_util::check_managed_top_encode_decode, multiversx_sc, token_id,
 };
 
 #[test]
-fn test_egld() {
-    assert!(EgldOrEsdtTokenIdentifier::<StaticApi>::egld().is_egld());
+fn test_codec_top() {
+    check_managed_top_encode_decode(
+        TokenId::<StaticApi>::from(EGLD_000000_TOKEN_IDENTIFIER),
+        EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
+    );
 }
 
 #[test]
-fn test_codec() {
-    check_managed_top_encode_decode(
-        EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
-        EgldOrEsdtTokenIdentifier::<StaticApi>::EGLD_REPRESENTATION,
-    );
-
+fn test_codec_nested() {
     let expected = BoxedBytes::from_concat(&[
-        &[0, 0, 0, 4],
-        &EgldOrEsdtTokenIdentifier::<StaticApi>::EGLD_REPRESENTATION[..],
+        &[0, 0, 0, EGLD_000000_TOKEN_IDENTIFIER.len() as u8],
+        EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
     ]);
     check_managed_top_encode_decode(
-        vec![EgldOrEsdtTokenIdentifier::<StaticApi>::egld()],
+        vec![TokenId::<StaticApi>::from(EGLD_000000_TOKEN_IDENTIFIER)],
         expected.as_slice(),
     );
 }
@@ -33,34 +33,34 @@ fn test_codec() {
 #[rustfmt::skip]
 fn test_is_valid_esdt_identifier() {
     // valid identifier
-    assert!(EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2").is_valid_esdt_identifier());
+    assert!(TokenId::<StaticApi>::from("ALC-6258d2").is_valid_esdt_identifier());
 
     // valid identifier with numbers in ticker
-    assert!(EsdtTokenIdentifier::<StaticApi>::from("ALC123-6258d2").is_valid_esdt_identifier());
+    assert!(TokenId::<StaticApi>::from("ALC123-6258d2").is_valid_esdt_identifier());
 
     // valid ticker only numbers
-    assert!(EsdtTokenIdentifier::<StaticApi>::from("12345-6258d2").is_valid_esdt_identifier());
+    assert!(TokenId::<StaticApi>::from("12345-6258d2").is_valid_esdt_identifier());
 
     // missing dash
-    assert!(!EsdtTokenIdentifier::<StaticApi>::from("ALC6258d2").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("ALC6258d2").is_valid_esdt_identifier());
 
     // wrong dash position
-    assert!(!EsdtTokenIdentifier::<StaticApi>::from("AL-C6258d2").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("AL-C6258d2").is_valid_esdt_identifier());
 
     // lowercase ticker
-    assert!(!EsdtTokenIdentifier::<StaticApi>::from("alc-6258d2").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("alc-6258d2").is_valid_esdt_identifier());
 
     // uppercase random chars
-    assert!(!EsdtTokenIdentifier::<StaticApi>::from("ALC-6258D2").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("ALC-6258D2").is_valid_esdt_identifier());
 
     // too many random chars
-    assert!(!EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2ff").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("ALC-6258d2ff").is_valid_esdt_identifier());
 
     // ticker too short
-    assert!(!EsdtTokenIdentifier::<StaticApi>::from("AL-6258d2").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("AL-6258d2").is_valid_esdt_identifier());
 
     // ticker too long
-    assert!(!EsdtTokenIdentifier::<StaticApi>::from("ALCCCCCCCCC-6258d2").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("ALCCCCCCCCC-6258d2").is_valid_esdt_identifier());
 }
 
 #[test]
@@ -68,61 +68,61 @@ fn test_is_valid_esdt_identifier() {
 fn test_ticker() {
     // valid identifier
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2").ticker(),
+        TokenId::<StaticApi>::from("ALC-6258d2").ticker(),
         ManagedBuffer::<StaticApi>::from("ALC"),
     );
 
     // valid identifier with numbers in ticker
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("ALC123-6258d2").ticker(),
+        TokenId::<StaticApi>::from("ALC123-6258d2").ticker(),
         ManagedBuffer::<StaticApi>::from("ALC123"),
     );
 
     // valid ticker only numbers
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("12345-6258d2").ticker(),
+        TokenId::<StaticApi>::from("12345-6258d2").ticker(),
         ManagedBuffer::<StaticApi>::from("12345"),
     );
 
     // missing dash
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("ALC6258d2").ticker(),
+        TokenId::<StaticApi>::from("ALC6258d2").ticker(),
         ManagedBuffer::<StaticApi>::from("AL"),
     );
 
     // wrong dash position
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("AL-C6258d2").ticker(),
+        TokenId::<StaticApi>::from("AL-C6258d2").ticker(),
         ManagedBuffer::<StaticApi>::from("AL-"),
     );
 
     // lowercase ticker
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("alc-6258d2").ticker(),
+        TokenId::<StaticApi>::from("alc-6258d2").ticker(),
         ManagedBuffer::<StaticApi>::from("alc"),
     );
 
     // uppercase random chars
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258D2").ticker(),
+        TokenId::<StaticApi>::from("ALC-6258D2").ticker(),
         ManagedBuffer::<StaticApi>::from("ALC"),
     );
 
     // too many random chars
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2ff").ticker(),
+        TokenId::<StaticApi>::from("ALC-6258d2ff").ticker(),
         ManagedBuffer::<StaticApi>::from("ALC-6"),
     );
 
     // ticker too short
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("AL-6258d2").ticker(),
+        TokenId::<StaticApi>::from("AL-6258d2").ticker(),
         ManagedBuffer::<StaticApi>::from("AL"),
     );
 
     // ticker too long
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("ALCCCCCCCCC-6258d2").ticker(),
+        TokenId::<StaticApi>::from("ALCCCCCCCCC-6258d2").ticker(),
         ManagedBuffer::<StaticApi>::from("ALCCCCCCCCC"),
     );
 }
@@ -133,42 +133,37 @@ fn test_is_valid_egld_or_esdt() {
     assert!(EgldOrEsdtTokenIdentifier::<StaticApi>::egld().is_valid());
 
     // valid esdt
-    assert!(
-        EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(EsdtTokenIdentifier::from("ALC-6258d2"))
-            .is_valid()
-    );
+    assert!(EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(TokenId::from("ALC-6258d2")).is_valid());
 
     // invalid esdt, see above
     assert!(
-        !EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(EsdtTokenIdentifier::from(
-            "ALCCCCCCCCC-6258d2"
-        ))
-        .is_valid()
+        !EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(TokenId::from("ALCCCCCCCCC-6258d2"))
+            .is_valid()
     );
 }
 
 #[test]
 fn test_token_identifier_eq() {
     assert_eq!(
-        EsdtTokenIdentifier::<StaticApi>::from("ESDT-00000"),
-        EsdtTokenIdentifier::<StaticApi>::from("ESDT-00000")
+        TokenId::<StaticApi>::from("ESDT-00000"),
+        TokenId::<StaticApi>::from("ESDT-00000")
     );
     assert_ne!(
-        EsdtTokenIdentifier::<StaticApi>::from("ESDT-00001"),
-        EsdtTokenIdentifier::<StaticApi>::from("ESDT-00002")
+        TokenId::<StaticApi>::from("ESDT-00001"),
+        TokenId::<StaticApi>::from("ESDT-00002")
     );
 
     assert_eq!(
-        EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(EsdtTokenIdentifier::from("ESDT-00003")),
-        EsdtTokenIdentifier::<StaticApi>::from("ESDT-00003")
+        EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(TokenId::from("ESDT-00003")),
+        TokenId::<StaticApi>::from("ESDT-00003").into_legacy()
     );
     assert_ne!(
         EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
-        EsdtTokenIdentifier::<StaticApi>::from("ANYTHING-1234")
+        TokenId::<StaticApi>::from("ANYTHING-1234").into_legacy()
     );
     assert_ne!(
         EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
-        EsdtTokenIdentifier::<StaticApi>::from("EGLD")
+        TokenId::<StaticApi>::from("EGLD").into_legacy()
     );
 }
 
@@ -223,15 +218,7 @@ fn test_payment_eq() {
 #[test]
 fn test_managed_token_id_macro() {
     assert_eq!(
-        managed_egld_token_id!(),
-        EgldOrEsdtTokenIdentifier::<StaticApi>::egld()
+        token_id!(b"ALC-6258d2"),
+        TokenId::<StaticApi>::from("ALC-6258d2")
     );
-    assert_eq!(
-        managed_token_id!(b"ALC-6258d2"),
-        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2")
-    );
-    assert_eq!(
-        managed_token_id_wrapped!(b"ALC-6258d2").unwrap_esdt(),
-        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2")
-    )
 }
