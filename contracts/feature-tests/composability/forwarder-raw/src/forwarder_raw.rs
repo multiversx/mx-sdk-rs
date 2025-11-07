@@ -24,7 +24,7 @@ pub trait ForwarderRaw:
 
     #[callback_raw]
     fn callback_raw(&self, args: MultiValueEncoded<ManagedBuffer>) {
-        let payments = self.call_value().all_transfers();
+        let payments = self.call_value().all();
         for payment in payments.iter() {
             let _ = self.callback_payments().push(&(
                 payment.token_identifier.clone(),

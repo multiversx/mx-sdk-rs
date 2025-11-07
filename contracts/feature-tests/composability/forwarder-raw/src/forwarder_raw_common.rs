@@ -8,12 +8,12 @@ pub trait ForwarderRawCommon {
 
     #[view]
     #[storage_mapper("callback_payments")]
-    fn callback_payments(&self) -> VecMapper<(EgldOrEsdtTokenIdentifier, u64, BigUint)>;
+    fn callback_payments(&self) -> VecMapper<(TokenId, u64, BigUint)>;
 
     #[view]
     fn callback_payments_triples(
         &self,
-    ) -> MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>> {
+    ) -> MultiValueEncoded<MultiValue3<TokenId, u64, BigUint>> {
         let mut result = MultiValueEncoded::new();
         for payment_tuple in self.callback_payments().iter() {
             result.push(payment_tuple.into());
@@ -39,7 +39,7 @@ pub trait ForwarderRawCommon {
     fn callback_payment_at_index(
         &self,
         index: usize,
-    ) -> MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint> {
+    ) -> MultiValue3<TokenId, u64, BigUint> {
         self.callback_payments().get(index).into()
     }
 

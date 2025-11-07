@@ -113,7 +113,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
     #[endpoint]
     #[payable]
     fn forward_async_reject_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().all_transfers();
+        let payment = self.call_value().all();
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)

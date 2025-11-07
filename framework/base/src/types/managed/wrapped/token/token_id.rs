@@ -82,9 +82,13 @@ impl<M: ManagedTypeApi> TokenId<M> {
         unsafe { core::mem::transmute(self) }
     }
 
-    pub fn as_esdt(&self) -> &EsdtTokenIdentifier<M> {
+    pub unsafe fn as_esdt_unchecked(&self) -> &EsdtTokenIdentifier<M> {
         // safe because of #[repr(transparent)]
         unsafe { core::mem::transmute(self) }
+    }
+
+    pub unsafe fn into_esdt_unchecked(self) -> EsdtTokenIdentifier<M> {
+        EsdtTokenIdentifier { token_id: self }
     }
 
     #[inline]
