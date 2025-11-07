@@ -50,7 +50,7 @@ impl CrowdfundingESDTTestState {
             .init(
                 2_000u32,
                 CF_DEADLINE,
-                EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
+                CF_TOKEN_ID,
             )
             .code(CODE_PATH)
             .new_address(CROWDFUNDING_ADDRESS)
