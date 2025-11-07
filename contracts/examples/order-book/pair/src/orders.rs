@@ -5,8 +5,8 @@ use crate::common::{FEE_PENALTY_INCREASE_EPOCHS, FEE_PENALTY_INCREASE_PERCENT};
 use super::{common, events, validation};
 
 use super::common::{
-    Order, OrderInputParams, OrderType, Payment, Transfer, FREE_ORDER_FROM_STORAGE_MIN_PENALTIES,
-    PERCENT_BASE_POINTS,
+    FungiblePayment, Order, OrderInputParams, OrderType, Transfer,
+    FREE_ORDER_FROM_STORAGE_MIN_PENALTIES, PERCENT_BASE_POINTS,
 };
 
 #[multiversx_sc::module]
@@ -15,7 +15,7 @@ pub trait OrdersModule:
 {
     fn create_order(
         &self,
-        payment: Payment<Self::Api>,
+        payment: FungiblePayment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
     ) {
@@ -160,14 +160,14 @@ pub trait OrdersModule:
 
         let creator_transfer = Transfer {
             to: order.creator.clone(),
-            payment: Payment {
+            payment: FungiblePayment {
                 token_id: token_id.clone(),
                 amount,
             },
         };
         let caller_transfer = Transfer {
             to: caller.clone(),
-            payment: Payment {
+            payment: FungiblePayment {
                 token_id,
                 amount: penalty_amount,
             },
@@ -208,7 +208,7 @@ pub trait OrdersModule:
 
         let transfer = Transfer {
             to: caller.clone(),
-            payment: Payment { token_id, amount },
+            payment: FungiblePayment { token_id, amount },
         };
 
         self.orders(order_id).clear();
@@ -315,7 +315,7 @@ pub trait OrdersModule:
 
         let mut match_provider_transfer = Transfer {
             to: self.blockchain().get_caller(),
-            payment: Payment {
+            payment: FungiblePayment {
                 token_id: token_requested.clone(),
                 amount: BigUint::zero(),
             },
@@ -336,7 +336,7 @@ pub trait OrdersModule:
 
             transfers.push(Transfer {
                 to: order.creator.clone(),
-                payment: Payment {
+                payment: FungiblePayment {
                     token_id: token_requested.clone(),
                     amount: creator_amount + creator_deal_amount,
                 },
