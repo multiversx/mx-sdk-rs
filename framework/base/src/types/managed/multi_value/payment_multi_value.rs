@@ -10,7 +10,7 @@ use crate::{
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
-    types::{BigUint, EsdtTokenIdentifier, Payment, ManagedVecItem},
+    types::{BigUint, EsdtTokenIdentifier, ManagedVecItem, Payment},
 };
 
 /// Thin wrapper around Payment, which has different I/O behaviour:

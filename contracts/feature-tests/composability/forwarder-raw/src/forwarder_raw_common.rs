@@ -11,9 +11,7 @@ pub trait ForwarderRawCommon {
     fn callback_payments(&self) -> VecMapper<(TokenId, u64, BigUint)>;
 
     #[view]
-    fn callback_payments_triples(
-        &self,
-    ) -> MultiValueEncoded<MultiValue3<TokenId, u64, BigUint>> {
+    fn callback_payments_triples(&self) -> MultiValueEncoded<MultiValue3<TokenId, u64, BigUint>> {
         let mut result = MultiValueEncoded::new();
         for payment_tuple in self.callback_payments().iter() {
             result.push(payment_tuple.into());
@@ -36,10 +34,7 @@ pub trait ForwarderRawCommon {
 
     /// Used in the elrond-go tests, do not remove.
     #[view]
-    fn callback_payment_at_index(
-        &self,
-        index: usize,
-    ) -> MultiValue3<TokenId, u64, BigUint> {
+    fn callback_payment_at_index(&self, index: usize) -> MultiValue3<TokenId, u64, BigUint> {
         self.callback_payments().get(index).into()
     }
 
