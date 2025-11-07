@@ -136,6 +136,18 @@ impl<M: ManagedTypeApi> TokenId<M> {
     }
 }
 
+impl<M: ManagedTypeApi> AsRef<TokenId<M>> for TokenId<M> {
+    fn as_ref(&self) -> &TokenId<M> {
+        self
+    }
+}
+
+impl<M: ManagedTypeApi> AsRef<TokenId<M>> for EgldOrEsdtTokenIdentifier<M> {
+    fn as_ref(&self) -> &TokenId<M> {
+        self.as_token_id()
+    }
+}
+
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenId<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {

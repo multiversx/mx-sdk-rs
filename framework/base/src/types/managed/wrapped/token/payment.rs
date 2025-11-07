@@ -59,6 +59,11 @@ impl<M: ManagedTypeApi> Payment<M> {
         (self.token_identifier, self.token_nonce, self.amount)
     }
 
+    #[inline]
+    pub fn as_tuple(&self) -> (&TokenId<M>, u64, &BigUint<M>) {
+        (&self.token_identifier, self.token_nonce, &self.amount)
+    }
+
     /// Zero-cost conversion that loosens the EGLD restriction.
     ///
     /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
