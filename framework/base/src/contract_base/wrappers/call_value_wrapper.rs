@@ -11,7 +11,7 @@ use crate::{
         BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment, ManagedDecimal, ManagedRef,
         ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload, ManagedVecPayloadIterator,
-        ManagedVecRef,
+        ManagedVecRef, PaymentVec,
     },
 };
 
@@ -65,7 +65,7 @@ where
     ///
     /// Does not accept a multi-transfer with 2 or more transfers, not even 2 or more EGLD transfers.
     pub fn egld(&self) -> ManagedRef<'static, A, BigUint<A>> {
-        let all_transfers = self.all_transfers();
+        let all_transfers = self.all();
         match all_transfers.len() {
             0 => {
                 use crate::api::BigIntApiImpl;
@@ -77,7 +77,7 @@ where
             }
             1 => {
                 let first = all_transfers.get(0);
-                if !first.token_identifier.is_egld() {
+                if !first.token_identifier.is_native() {
                     A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
                 }
                 unsafe { ManagedRef::wrap_handle(first.amount.get_handle()) }
@@ -127,6 +127,17 @@ where
         unsafe { ManagedRef::wrap_handle(multi_esdt_handle) }
     }
 
+    fn all_transfers_handle(&self) -> A::ManagedBufferHandle {
+        let all_transfers_handle: A::ManagedBufferHandle =
+            use_raw_handle(const_handles::CALL_VALUE_ALL);
+        if !A::static_var_api_impl()
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED)
+        {
+            A::call_value_api_impl().load_all_transfers(all_transfers_handle.clone());
+        }
+        all_transfers_handle
+    }
+
     /// Will return all transfers in the form of a list of EgldOrEsdtTokenPayment.
     ///
     /// Both EGLD and ESDT can be returned.
@@ -136,13 +147,18 @@ where
     pub fn all_transfers(
         &self,
     ) -> ManagedRef<'static, A, ManagedVec<A, EgldOrEsdtTokenPayment<A>>> {
-        let all_transfers_handle: A::ManagedBufferHandle =
-            use_raw_handle(const_handles::CALL_VALUE_ALL);
-        if !A::static_var_api_impl()
-            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED)
-        {
-            A::call_value_api_impl().load_all_transfers(all_transfers_handle.clone());
-        }
+        let all_transfers_handle = self.all_transfers_handle();
+        unsafe { ManagedRef::wrap_handle(all_transfers_handle) }
+    }
+
+    /// Will return all transfers in the form of a list of Payment.
+    ///
+    /// It handles all tokens uniformly, including the native token (EGLD or lightspeed chain native tokens).
+    ///
+    /// In case of a single EGLD transfer, only one item will be returned,
+    /// the EGLD payment represented as an ESDT transfer (EGLD-000000).
+    pub fn all(&self) -> ManagedRef<'static, A, PaymentVec<A>> {
+        let all_transfers_handle = self.all_transfers_handle();
         unsafe { ManagedRef::wrap_handle(all_transfers_handle) }
     }
 

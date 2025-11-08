@@ -72,7 +72,7 @@ where
 
     pub fn echo_call_value(
         self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedVec<Env::Api, EgldOrEsdtTokenPayment<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedVec<Env::Api, Payment<Env::Api>>> {
         self.wrapped_tx
             .raw_call("echo_call_value")
             .original_result()

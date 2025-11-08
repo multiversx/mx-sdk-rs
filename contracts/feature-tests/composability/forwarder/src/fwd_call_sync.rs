@@ -126,7 +126,7 @@ pub trait ForwarderSyncCallModule {
         &self,
         to: ManagedAddress,
     ) -> ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>> {
-        let payment = self.call_value().all_transfers();
+        let payment = self.call_value().all();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.tx()
