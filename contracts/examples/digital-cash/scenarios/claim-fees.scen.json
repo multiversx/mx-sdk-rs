@@ -75,7 +75,7 @@
                             "4-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "0-tokenIdentifier": "nested:str:EGLD-000000",
                                     "1-nonce": "u64:0",
                                     "2-amount": "biguint:1,000"
                                 }
@@ -89,19 +89,19 @@
                             "4-fees": {
                                 "0-num_token_to_transfer": "u32:3",
                                 "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "0-tokenIdentifier": "nested:str:EGLD-000000",
                                     "1-nonce": "u64:0",
                                     "2-amount": "biguint:1,000"
                                 }
                             }
                         },
-                        "str:fee|nested:str:EGLD": "10",
+                        "str:fee|nested:str:EGLD-000000": "10",
                         "str:whitelistedFeeTokens|str:.len": "1",
-                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD-000000",
+                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD-000000": "1",
                         "str:allTimeFeeTokens|str:.len": "1",
-                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
+                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD-000000",
+                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD-000000": "1"
                     },
                     "code": "mxsc:../output/digital-cash.mxsc.json"
                 },

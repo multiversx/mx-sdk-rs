@@ -22,8 +22,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
 
         let mut funds = deposit.funds;
 
-        let fee =
-            EgldOrEsdtTokenPayment::new(paid_fee_token.token_identifier, 0, paid_fee_token.amount);
+        let fee = Payment::new(paid_fee_token.token_identifier, 0, paid_fee_token.amount);
         funds.push(fee);
 
         if !funds.is_empty() {
@@ -80,14 +79,19 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         forward_address: ManagedAddress,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let paid_fee = self.call_value().egld_or_single_esdt();
+        let transfers = self.call_value().all();
+        let paid_fee = match transfers.len() {
+            // TODO: the zero fee representation is a little dubious, maybe handle separately
+            0 => Payment::new(self.blockchain().get_native_token().clone(), 0, 0u32.into()),
+            1 => transfers.get(0).clone(),
+            _ => sc_panic!("only one fee transfer allowed"),
+        };
         let caller_address = self.blockchain().get_caller();
-        let fee_token = paid_fee.token_identifier.clone();
         self.require_signature(&address, &caller_address, signature);
-        self.update_fees(caller_address, &forward_address, paid_fee);
+        self.update_fees(caller_address, &forward_address, paid_fee.clone());
 
         let new_deposit = self.deposit(&forward_address);
-        let fee = self.fee(&fee_token).get();
+        let fee = self.fee(&paid_fee.token_identifier).get();
 
         let mut current_deposit = self.deposit(&address).take();
         let num_tokens = current_deposit.funds.len();
@@ -107,7 +111,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         let forward_fee = &fee * num_tokens as u64;
         current_deposit.fees.value.amount -= &forward_fee;
 
-        self.collected_fees(&fee_token)
+        self.collected_fees(&paid_fee.token_identifier)
             .update(|collected_fees| *collected_fees += forward_fee);
 
         if current_deposit.fees.value.amount > 0 {
