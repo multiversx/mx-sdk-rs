@@ -121,6 +121,12 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         )
     }
 
+    /// Converts reference to the newer, non-legacy TokenId.
+    pub fn as_token_id(&self) -> &TokenId<M> {
+        // safe because of #[repr(transparent)]
+        unsafe { core::mem::transmute(self) }
+    }
+
     #[inline]
     pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
         self.token_id.buffer

@@ -47,11 +47,7 @@ impl CrowdfundingESDTTestState {
             .tx()
             .from(OWNER_ADDRESS)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
-            .init(
-                2_000u32,
-                CF_DEADLINE,
-                EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
-            )
+            .init(2_000u32, CF_DEADLINE, CF_TOKEN_ID)
             .code(CODE_PATH)
             .new_address(CROWDFUNDING_ADDRESS)
             .run();

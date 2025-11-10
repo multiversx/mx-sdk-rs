@@ -183,14 +183,17 @@ where
     }
 
     #[inline]
-    pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
-        token.map_ref_or_else(
-            (),
-            |()| self.get_balance(&self.get_sc_address()),
-            |(), token_identifier| {
-                self.get_esdt_balance(&self.get_sc_address(), token_identifier, nonce)
-            },
-        )
+    pub fn get_sc_balance(&self, token_id: impl AsRef<TokenId<A>>, nonce: u64) -> BigUint<A> {
+        let token_id_ref = token_id.as_ref();
+        if self.is_native_token(token_id_ref) {
+            self.get_balance(&self.get_sc_address())
+        } else {
+            self.get_esdt_balance(
+                &self.get_sc_address(),
+                unsafe { token_id_ref.as_esdt_unchecked() },
+                nonce,
+            )
+        }
     }
 
     #[deprecated(

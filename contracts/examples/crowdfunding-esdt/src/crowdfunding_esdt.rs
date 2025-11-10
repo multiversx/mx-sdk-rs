@@ -14,12 +14,7 @@ pub enum Status {
 #[multiversx_sc::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(
-        &self,
-        target: BigUint,
-        deadline: TimestampMillis,
-        token_identifier: EgldOrEsdtTokenIdentifier,
-    ) {
+    fn init(&self, target: BigUint, deadline: TimestampMillis, token_identifier: TokenId) {
         require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
@@ -36,16 +31,20 @@ pub trait Crowdfunding {
     #[endpoint]
     #[payable]
     fn fund(&self) {
-        let (token, _, payment) = self.call_value().egld_or_single_esdt().into_tuple();
+        let payment = self.call_value().single();
 
         require!(
             self.status() == Status::FundingPeriod,
             "cannot fund after deadline"
         );
-        require!(token == self.cf_token_identifier().get(), "wrong token");
+        require!(
+            payment.token_identifier == self.cf_token_identifier().get(),
+            "wrong token"
+        );
 
         let caller = self.blockchain().get_caller();
-        self.deposit(&caller).update(|deposit| *deposit += payment);
+        self.deposit(&caller)
+            .update(|deposit| *deposit += &payment.amount);
     }
 
     #[view]
@@ -83,7 +82,7 @@ pub trait Crowdfunding {
 
                 self.tx()
                     .to(&caller)
-                    .egld_or_single_esdt(&token_identifier, 0, &sc_balance)
+                    .payment(Payment::new(token_identifier, 0, sc_balance))
                     .transfer();
             }
             Status::Failed => {
@@ -96,7 +95,7 @@ pub trait Crowdfunding {
                     self.deposit(&caller).clear();
                     self.tx()
                         .to(&caller)
-                        .egld_or_single_esdt(&token_identifier, 0, &deposit)
+                        .payment(Payment::new(token_identifier, 0, deposit))
                         .transfer();
                 }
             }
@@ -129,5 +128,5 @@ pub trait Crowdfunding {
     #[view(getCrowdfundingTokenIdentifier)]
     #[title("tokenIdentifier")]
     #[storage_mapper("tokenIdentifier")]
-    fn cf_token_identifier(&self) -> SingleValueMapper<EgldOrEsdtTokenIdentifier>;
+    fn cf_token_identifier(&self) -> SingleValueMapper<TokenId>;
 }

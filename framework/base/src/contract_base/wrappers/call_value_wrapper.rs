@@ -11,7 +11,7 @@ use crate::{
         BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment, ManagedDecimal, ManagedRef,
         ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload, ManagedVecPayloadIterator,
-        ManagedVecRef, PaymentVec,
+        ManagedVecRef, Payment, PaymentVec,
     },
 };
 
@@ -160,6 +160,18 @@ where
     pub fn all(&self) -> ManagedRef<'static, A, PaymentVec<A>> {
         let all_transfers_handle = self.all_transfers_handle();
         unsafe { ManagedRef::wrap_handle(all_transfers_handle) }
+    }
+
+    /// Accepts a single payment.
+    ///
+    /// Will halt execution if zero or more than one payment was received.
+    pub fn single(&self) -> ManagedVecRef<'static, Payment<A>> {
+        let esdt_transfers = self.all();
+        if esdt_transfers.len() != 1 {
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+        }
+        let value = esdt_transfers.get(0);
+        unsafe { core::mem::transmute(value) }
     }
 
     /// Verify and casts the received multi ESDT transfer in to an array.
