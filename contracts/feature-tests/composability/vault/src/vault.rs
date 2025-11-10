@@ -50,8 +50,8 @@ pub trait Vault {
         self.blockchain().get_caller()
     }
 
-    fn all_transfers_multi(&self) -> MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue> {
-        self.call_value().all_transfers().clone().into_multi_value()
+    fn all_transfers_multi(&self) -> MultiValueEncoded<PaymentMultiValue> {
+        self.call_value().all().clone().into_multi_value()
     }
 
     #[payable("*")]
@@ -66,7 +66,7 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn accept_funds_echo_payment(&self) -> MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue> {
+    fn accept_funds_echo_payment(&self) -> MultiValueEncoded<PaymentMultiValue> {
         let esdt_transfers_multi = self.all_transfers_multi();
         self.accept_funds_event(&esdt_transfers_multi);
 
@@ -205,13 +205,13 @@ pub trait Vault {
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,
-        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,
     );
 
     #[event("reject_funds")]
     fn reject_funds_event(
         &self,
-        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,
     );
 
     #[event("retrieve_funds")]
