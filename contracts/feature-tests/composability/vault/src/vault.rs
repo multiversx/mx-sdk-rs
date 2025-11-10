@@ -203,16 +203,10 @@ pub trait Vault {
     }
 
     #[event("accept_funds")]
-    fn accept_funds_event(
-        &self,
-        #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,
-    );
+    fn accept_funds_event(&self, #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>);
 
     #[event("reject_funds")]
-    fn reject_funds_event(
-        &self,
-        #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,
-    );
+    fn reject_funds_event(&self, #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>);
 
     #[event("retrieve_funds")]
     fn retrieve_funds_event(
