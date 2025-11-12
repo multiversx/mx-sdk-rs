@@ -26,29 +26,35 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
 
     fn handle_awarding(&self, lottery_name: &ManagedBuffer) -> AwardingStatus {
         if self.total_winning_tickets(lottery_name).is_empty() {
-            self.prepare_awarding(lottery_name);
+            return self.prepare_awarding(lottery_name);
+        } else {
+            self.distribute_prizes(lottery_name)
         }
-        self.distribute_prizes(lottery_name)
     }
 
-    fn prepare_awarding(&self, lottery_name: &ManagedBuffer) {
-        let mut info = self.lottery_info(lottery_name).get();
+    fn prepare_awarding(&self, lottery_name: &ManagedBuffer) -> AwardingStatus {
         let ticket_holders_mapper = self.ticket_holders(lottery_name);
         let total_tickets = ticket_holders_mapper.len();
 
+        // the case of no tickets sold
         if total_tickets == 0 {
-            return;
+            self.clear_storage(lottery_name);
+            return AwardingStatus::Finished;
         }
+
+        let mut info = self.lottery_info(lottery_name).get();
 
         self.burn_prize_percentage(lottery_name, &mut info);
 
         // if there are less tickets than the distributed prize pool,
         // the 1st place gets the leftover, maybe could split between the remaining
         // but this is a rare case anyway and it's not worth the overhead
-        let total_winning_tickets = if total_tickets < info.prize_distribution.len() {
+
+        let available_prizes_number = info.prize_distribution.len();
+        let total_winning_tickets = if total_tickets < available_prizes_number {
             total_tickets
         } else {
-            info.prize_distribution.len()
+            available_prizes_number
         };
 
         self.total_winning_tickets(lottery_name)
@@ -56,6 +62,7 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         self.index_last_winner(lottery_name).set(1);
 
         self.lottery_info(lottery_name).set(info);
+        self.distribute_prizes(lottery_name)
     }
 
     fn burn_prize_percentage(
@@ -87,8 +94,9 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         let ticket_holders_mapper = self.ticket_holders(lottery_name);
         let total_tickets = ticket_holders_mapper.len();
 
-        let mut index_last_winner = self.index_last_winner(lottery_name).get();
         let total_winning_tickets = self.total_winning_tickets(lottery_name).get();
+
+        let mut index_last_winner = self.index_last_winner(lottery_name).get();
         require!(
             index_last_winner <= total_winning_tickets,
             "Awarding has ended"
@@ -155,7 +163,7 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         // distribute to the first place last. Laws of probability say that order doesn't matter.
         // this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
         // 1st place will get the spare money instead.
-        if *index_last_winner <= total_winning_tickets {
+        if *index_last_winner < total_winning_tickets {
             let prize = self.calculate_percentage_of(
                 &info.prize_pool,
                 &BigUint::from(
