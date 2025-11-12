@@ -30,17 +30,3 @@ impl<'a, M: ManagedTypeApi> PaymentRefs<'a, M> {
         }
     }
 }
-
-// impl<'a, M: ManagedTypeApi> Borrow<PaymentRefs<'a, M>> for Payment<M> {
-//     fn borrow(&self) -> &PaymentRefs<'a, M> {
-//         todo!()
-//     }
-// }
-
-// impl<'a, M: ManagedTypeApi> ToOwned for PaymentRefs<'a, M> {
-//     type Owned = Payment<M>;
-
-//     fn to_owned(&self) -> Self::Owned {
-//         todo!()
-//     }
-// }
