@@ -51,7 +51,7 @@ pub use managed_vec_iter_payload::ManagedVecPayloadIterator;
 pub use managed_vec_iter_ref::ManagedVecRefIterator;
 pub use managed_vec_ref::ManagedVecRef;
 pub use managed_vec_ref_mut::ManagedVecRefMut;
-pub use num::BigUint;
+pub use num::*;
 pub use randomness_source::RandomnessSource;
 pub use token::*;
 

@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedType, ManagedVec, MultiEgldOrEsdtPayment, Payment, TokenId},
+    types::{ManagedType, ManagedVec, MultiEgldOrEsdtPayment, Payment},
 };
 
 /// Alias for a list of payments.
@@ -33,12 +33,5 @@ impl<M: ManagedTypeApi> From<Payment<M>> for PaymentVec<M> {
     #[inline]
     fn from(value: Payment<M>) -> Self {
         PaymentVec::from_single_item(value)
-    }
-}
-
-impl<M: ManagedTypeApi> From<(TokenId<M>, u64, BigUint<M>)> for PaymentVec<M> {
-    #[inline]
-    fn from(value: (TokenId<M>, u64, BigUint<M>)) -> Self {
-        PaymentVec::from_single_item(value.into())
     }
 }

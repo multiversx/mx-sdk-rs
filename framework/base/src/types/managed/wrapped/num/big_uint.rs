@@ -14,10 +14,13 @@ use crate::{
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
     types::{
         heap::BoxedBytes, BigInt, Decimals, LnDecimals, ManagedBuffer, ManagedBufferCachedBuilder,
-        ManagedDecimal, ManagedRef, ManagedType,
+        ManagedDecimal, ManagedRef, ManagedType, NonZeroBigUint,
     },
 };
 
+/// A big, unsigned number.
+///
+/// Guaranteed to never be negative by construction and guarded operations.
 #[repr(transparent)]
 pub struct BigUint<M: ManagedTypeApi> {
     pub(crate) value: BigInt<M>,
@@ -116,6 +119,10 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     pub fn into_big_int(self) -> BigInt<M> {
         self.value
+    }
+
+    pub fn into_non_zero(self) -> Option<NonZeroBigUint<M>> {
+        NonZeroBigUint::new(self)
     }
 }
 

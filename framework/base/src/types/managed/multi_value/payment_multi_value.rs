@@ -4,7 +4,7 @@ use crate::{
         multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
         TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    types::{ManagedVecRef, TokenId},
+    types::{ManagedVecRef, NonZeroBigUint, TokenId},
 };
 
 use crate::{
@@ -79,7 +79,7 @@ where
     {
         let token_identifier = TokenId::multi_decode_or_handle_err(input, h)?;
         let token_nonce = u64::multi_decode_or_handle_err(input, h)?;
-        let amount = BigUint::multi_decode_or_handle_err(input, h)?;
+        let amount = NonZeroBigUint::multi_decode_or_handle_err(input, h)?;
         Ok(Payment::new(token_identifier, token_nonce, amount).into())
     }
 }

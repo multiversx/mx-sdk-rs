@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedRef, Payment, TokenId},
+    types::{ManagedRef, NonZeroBigUint, Payment, TokenId},
 };
 
 /// The version of `Payment` that contains references instead of owned fields.
@@ -8,12 +8,16 @@ use crate::{
 pub struct PaymentRefs<'a, M: ManagedTypeApi> {
     pub token_identifier: ManagedRef<'a, M, TokenId<M>>,
     pub token_nonce: u64,
-    pub amount: ManagedRef<'a, M, BigUint<M>>,
+    pub amount: ManagedRef<'a, M, NonZeroBigUint<M>>,
 }
 
 impl<'a, M: ManagedTypeApi> PaymentRefs<'a, M> {
     #[inline]
-    pub fn new(token_identifier: &'a TokenId<M>, token_nonce: u64, amount: &'a BigUint<M>) -> Self {
+    pub fn new(
+        token_identifier: &'a TokenId<M>,
+        token_nonce: u64,
+        amount: &'a NonZeroBigUint<M>,
+    ) -> Self {
         PaymentRefs {
             token_identifier: ManagedRef::new(token_identifier),
             token_nonce,
