@@ -1,6 +1,3 @@
-mod big_uint;
-mod big_uint_cmp;
-mod big_uint_operators;
 mod builder;
 mod encoded_managed_vec_item;
 mod managed_address;
@@ -20,12 +17,12 @@ mod managed_vec_iter_payload;
 mod managed_vec_iter_ref;
 mod managed_vec_ref;
 mod managed_vec_ref_mut;
+mod num;
 pub(crate) mod preloaded_managed_buffer;
 mod randomness_source;
 mod token;
 mod traits;
 
-pub use big_uint::BigUint;
 pub use builder::*;
 pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use managed_address::ManagedAddress;
@@ -54,6 +51,7 @@ pub use managed_vec_iter_payload::ManagedVecPayloadIterator;
 pub use managed_vec_iter_ref::ManagedVecRefIterator;
 pub use managed_vec_ref::ManagedVecRef;
 pub use managed_vec_ref_mut::ManagedVecRefMut;
+pub use num::BigUint;
 pub use randomness_source::RandomnessSource;
 pub use token::*;
 
