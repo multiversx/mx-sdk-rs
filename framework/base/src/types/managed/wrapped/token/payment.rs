@@ -6,7 +6,7 @@ use crate::{
     types::{
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
         Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, EsdtTokenType, ManagedVecItem,
-        ManagedVecItemPayloadBuffer, ManagedVecRef, PaymentMultiValue, TokenId,
+        ManagedVecItemPayloadBuffer, ManagedVecRef, PaymentMultiValue, PaymentRefs, TokenId,
     },
 };
 
@@ -124,6 +124,10 @@ impl<M: ManagedTypeApi> Payment<M> {
             )
         }
     }
+
+    pub fn as_refs(&self) -> PaymentRefs<'_, M> {
+        PaymentRefs::new(&self.token_identifier, self.token_nonce, &self.amount)
+    }
 }
 
 impl<M: ManagedTypeApi> From<(TokenId<M>, u64, BigUint<M>)> for Payment<M> {
@@ -213,39 +217,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for Payment<M> {
             managed_vec_item_save_to_payload_index(self.token_identifier, payload, &mut index);
             managed_vec_item_save_to_payload_index(self.token_nonce, payload, &mut index);
             managed_vec_item_save_to_payload_index(self.amount, payload, &mut index);
-        }
-    }
-}
-
-/// The version of `EsdtTokenPayment` that contains references instead of owned fields.
-pub struct PaymentRefs<'a, M: ManagedTypeApi> {
-    pub token_identifier: &'a TokenId<M>,
-    pub token_nonce: u64,
-    pub amount: &'a BigUint<M>,
-}
-
-impl<M: ManagedTypeApi> Payment<M> {
-    pub fn as_refs(&self) -> PaymentRefs<'_, M> {
-        PaymentRefs::new(&self.token_identifier, self.token_nonce, &self.amount)
-    }
-}
-
-impl<'a, M: ManagedTypeApi> PaymentRefs<'a, M> {
-    #[inline]
-    pub fn new(token_identifier: &'a TokenId<M>, token_nonce: u64, amount: &'a BigUint<M>) -> Self {
-        PaymentRefs {
-            token_identifier,
-            token_nonce,
-            amount,
-        }
-    }
-
-    /// Will clone the referenced values.
-    pub fn to_owned_payment(&self) -> Payment<M> {
-        Payment {
-            token_identifier: self.token_identifier.clone(),
-            token_nonce: self.token_nonce,
-            amount: self.amount.clone(),
         }
     }
 }
