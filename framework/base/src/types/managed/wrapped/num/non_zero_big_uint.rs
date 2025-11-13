@@ -14,7 +14,7 @@ use crate::{
 
 /// A big, unsigned number that is guaranteed not to be zero.
 ///
-///
+/// The restriction is enforced by the constructors and the implementation of operations.
 #[repr(transparent)]
 pub struct NonZeroBigUint<M: ManagedTypeApi> {
     pub(super) value: BigInt<M>,

@@ -1,6 +1,6 @@
 use crate::{
     api::{const_handles, BigIntApiImpl, ManagedTypeApi},
-    types::{BigUint, ManagedType},
+    types::{BigUint, ManagedType, NonZeroBigUint},
 };
 use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
@@ -9,16 +9,38 @@ use core::ops::{
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait<Self> for BigUint<M> {
+        impl<'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for BigUint<M> {
             type Output = BigUint<M>;
 
-            fn $method(self, other: BigUint<M>) -> BigUint<M> {
+            fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 M::managed_type_impl().$api_func(
                     self.get_handle(),
                     self.get_handle(),
                     other.get_handle(),
                 );
                 self
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<Self> for BigUint<M> {
+            type Output = BigUint<M>;
+
+            #[inline]
+            fn $method(self, other: BigUint<M>) -> BigUint<M> {
+                self.$method(&other)
+            }
+        }
+
+        impl<'b, M: ManagedTypeApi> $trait<BigUint<M>> for &'b BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: BigUint<M>) -> BigUint<M> {
+                M::managed_type_impl().$api_func(
+                    other.get_handle(),
+                    self.get_handle(),
+                    other.get_handle(),
+                );
+                other
             }
         }
 
@@ -35,19 +57,6 @@ macro_rules! binary_operator {
                     );
                     result
                 }
-            }
-        }
-
-        impl<'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for BigUint<M> {
-            type Output = BigUint<M>;
-
-            fn $method(self, other: &BigUint<M>) -> BigUint<M> {
-                M::managed_type_impl().$api_func(
-                    self.get_handle(),
-                    self.get_handle(),
-                    other.get_handle(),
-                );
-                self
             }
         }
 
@@ -114,6 +123,38 @@ macro_rules! binary_operator {
                 }
             }
         }
+
+        impl<M: ManagedTypeApi> $trait<NonZeroBigUint<M>> for BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: NonZeroBigUint<M>) -> BigUint<M> {
+                self.$method(other.into_big_uint())
+            }
+        }
+
+        impl<'b, M: ManagedTypeApi> $trait<&'b NonZeroBigUint<M>> for BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: &NonZeroBigUint<M>) -> BigUint<M> {
+                self.$method(other.as_big_uint())
+            }
+        }
+
+        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b NonZeroBigUint<M>> for &'a BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: &NonZeroBigUint<M>) -> BigUint<M> {
+                self.$method(other.as_big_uint())
+            }
+        }
+
+        impl<'a, 'b, M: ManagedTypeApi> $trait<NonZeroBigUint<M>> for &'a BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: NonZeroBigUint<M>) -> BigUint<M> {
+                self.$method(other.into_big_uint())
+            }
+        }
     };
 }
 
@@ -169,6 +210,20 @@ macro_rules! binary_assign_operator {
                     self.value.handle.clone(),
                     big_int_temp_1,
                 );
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<NonZeroBigUint<M>> for BigUint<M> {
+            #[inline]
+            fn $method(&mut self, other: NonZeroBigUint<M>) {
+                self.$method(other.into_big_uint())
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<&NonZeroBigUint<M>> for BigUint<M> {
+            #[inline]
+            fn $method(&mut self, other: &NonZeroBigUint<M>) {
+                self.$method(other.as_big_uint())
             }
         }
     };
