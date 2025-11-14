@@ -22,7 +22,7 @@ macro_rules! binary_operator {
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<Self> for BigUint<M> {
+        impl<M: ManagedTypeApi> $trait<BigUint<M>> for BigUint<M> {
             type Output = BigUint<M>;
 
             #[inline]

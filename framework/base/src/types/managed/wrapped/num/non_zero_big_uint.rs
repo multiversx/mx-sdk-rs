@@ -9,7 +9,7 @@ use crate::{
     },
     err_msg,
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
-    types::{BigInt, BigUint, ManagedBuffer, ManagedType, NonZeroError},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedType, NonZeroError, Sign},
 };
 
 /// A big, unsigned number that is guaranteed not to be zero.
@@ -79,8 +79,12 @@ impl<M: ManagedTypeApi> TryFrom<&ManagedBuffer<M>> for NonZeroBigUint<M> {
 }
 
 impl<M: ManagedTypeApi> NonZeroBigUint<M> {
-    pub(crate) unsafe fn from_big_uint_unchecked(bu: BigUint<M>) -> Self {
-        NonZeroBigUint { value: bu.value }
+    pub(super) fn wrap_big_int_unchecked(value: BigInt<M>) -> Self {
+        NonZeroBigUint { value }
+    }
+
+    pub(crate) unsafe fn new_unchecked(bu: BigUint<M>) -> Self {
+        Self::wrap_big_int_unchecked(bu.value)
     }
 
     /// Will return either Some, with a non-zero value, or None, for zero.
@@ -88,38 +92,62 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
         if bu == 0u32 {
             None
         } else {
-            unsafe { Some(Self::from_big_uint_unchecked(bu)) }
+            unsafe { Some(Self::new_unchecked(bu)) }
         }
     }
 
-    /// Convenicen constructor, which will signal error if the input is 0.
+    /// Checks that value respects invariants. User after some operator calls.
+    pub(super) fn validate_after_op(&self) {
+        match self.value.sign() {
+            Sign::Minus => quick_signal_error::<M>(err_msg::BIG_UINT_SUB_NEGATIVE),
+            Sign::NoSign => quick_signal_error::<M>(err_msg::ZERO_VALUE_NOT_ALLOWED),
+            Sign::Plus => {}
+        }
+    }
+
+    /// Does nothing. Same signature as `validate_after_op`, for simpler macros.
+    pub(super) fn assume_valid_after_op(&self) {}
+
+    pub(super) fn wrap_big_int_assert_gt_zero(value: BigInt<M>) -> Self {
+        let result = Self::wrap_big_int_unchecked(value);
+        result.validate_after_op();
+        result
+    }
+
+    /// Convenience constructor, which will signal error if the input is 0.
     pub fn new_or_panic(bu: BigUint<M>) -> Self {
         Self::new(bu).unwrap_or_else(|| quick_signal_error::<M>(err_msg::ZERO_VALUE_NOT_ALLOWED))
     }
 
+    /// Drops the non-zero restriction.
     pub fn into_big_uint(self) -> BigUint<M> {
         BigUint { value: self.value }
     }
 
+    /// Drops the non-zero restriction.
     pub fn as_big_uint(&self) -> &BigUint<M> {
         // safe because of #repr(transparent) on both sides
         // also because it is a loosening of the non-zero restriction
         unsafe { core::mem::transmute(self) }
     }
 
+    /// Used in some operator definitions. Using it directly could violate invariant.
+    pub(super) unsafe fn as_big_uint_mut(&mut self) -> &mut BigUint<M> {
+        unsafe { core::mem::transmute(self) }
+    }
+
+    /// Drops the non-zero and positive restriction.
     pub fn as_big_int(&self) -> &BigInt<M> {
         &self.value
     }
 
+    /// Drops the non-zero and positive restriction.
     pub fn into_big_int(self) -> BigInt<M> {
         self.value
     }
 }
 
-#[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> TypeAbiFrom<crate::codec::num_bigint::BigUint> for NonZeroBigUint<M> {}
-#[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> TypeAbiFrom<NonZeroBigUint<M>> for crate::codec::num_bigint::BigUint {}
+// TODO: figure out what type should be used in a non-managed context
 
 impl<M> TypeAbiFrom<Self> for NonZeroBigUint<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Self> for NonZeroBigUint<M> where M: ManagedTypeApi {}
