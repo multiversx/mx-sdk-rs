@@ -50,6 +50,9 @@ pub struct ContractVariantSettings {
     pub rustc_target: String,
 
     pub opcode_version: OpcodeVersion,
+
+    /// Optional check of the `wasm-opt` version before building.
+    pub wasm_opt_version: Option<String>,
 }
 
 impl Default for ContractVariantSettings {
@@ -68,6 +71,7 @@ impl Default for ContractVariantSettings {
             rustc_version: RustcVersion::current_version(),
             rustc_target: tools::build_target::default_target().to_owned(),
             opcode_version: OpcodeVersion::default(),
+            wasm_opt_version: None,
         }
     }
 }
