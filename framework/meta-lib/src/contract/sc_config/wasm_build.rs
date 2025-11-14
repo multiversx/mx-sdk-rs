@@ -1,4 +1,4 @@
-use crate::tools::build_target;
+use crate::tools::{build_target, wasm_opt};
 use core::panic;
 use std::{
     collections::HashMap,
@@ -151,8 +151,38 @@ impl ContractVariant {
         save_mxsc_file_json(&mxsc_file_json, output_mxsc_path);
     }
 
+    /// Returns whether or not running wasm-opt should be attempted.
+    fn check_wasm_opt(&self, build_args: &BuildArgs) -> bool {
+        if let Some(config_wasm_opt_version) = &self.settings.wasm_opt_version {
+            let contract_name = &self.contract_name;
+
+            assert!(build_args.wasm_opt, "Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without.");
+
+            let installed_wasm_opt_version = wasm_opt::wasm_opt_version()
+                .unwrap_or_else(|| panic!("Missing wasm-opt. Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without."));
+
+            assert_eq!(config_wasm_opt_version, &installed_wasm_opt_version,
+                "Incorrect wasm-opt version installed. Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}");
+
+            true
+        } else {
+            if !build_args.wasm_opt {
+                return false;
+            }
+
+            if wasm_opt::wasm_opt_version().is_none() {
+                println!("Warning: {} not installed", wasm_opt::WASM_OPT_NAME);
+                return false;
+            }
+
+            true
+        }
+    }
+
     fn run_wasm_opt(&self, build_args: &BuildArgs, output_path: &Path) {
-        if !build_args.wasm_opt {
+        let should_run_wasm_opt = self.check_wasm_opt(build_args);
+
+        if !should_run_wasm_opt {
             return;
         }
 
