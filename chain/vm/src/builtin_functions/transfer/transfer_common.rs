@@ -85,7 +85,7 @@ where
         execution::execute_default(exec_input, tx_cache, runtime, f);
 
     // prepends esdt log
-    tx_result.result_logs.insert(0, log);
+    tx_result.esdt_transfer_log = Some(log);
 
     (tx_result, blockchain_updates)
 }

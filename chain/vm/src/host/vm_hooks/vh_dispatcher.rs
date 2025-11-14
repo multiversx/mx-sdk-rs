@@ -1016,7 +1016,14 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         arguments_handle: i32,
         result_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_execute_on_dest_context_with_error_return")
+        self.handler.execute_on_dest_context_fallible(
+            gas as u64,
+            address_handle,
+            value_handle,
+            function_handle,
+            arguments_handle,
+            result_handle,
+        )
     }
 
     fn managed_multi_transfer_esdt_nft_execute(

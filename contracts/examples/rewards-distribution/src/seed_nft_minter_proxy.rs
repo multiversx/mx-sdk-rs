@@ -74,7 +74,7 @@ where
         Arg1: ProxyArg<BigUint<Env::Api>>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
-        Arg4: ProxyArg<OptionalValue<TokenIdentifier<Env::Api>>>,
+        Arg4: ProxyArg<OptionalValue<EsdtTokenIdentifier<Env::Api>>>,
         Arg5: ProxyArg<OptionalValue<u64>>,
     >(
         self,
@@ -182,7 +182,7 @@ where
 
     pub fn nft_token_id(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EsdtTokenIdentifier<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getNftTokenId")

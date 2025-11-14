@@ -19,6 +19,7 @@ jobs:
         with:
           toolchain: 1.87
           target: wasm32-unknown-unknown
+          rustflags: ""
 
       - name: Install prerequisites
         run: |

@@ -30,14 +30,18 @@ BIG_FLOAT_TYPE = f"{MANAGED_BASIC_PATH}::big_float::BigFloat<{DEBUG_API_TYPE} ?>
 MANAGED_BUFFER_TYPE = f"{MANAGED_BASIC_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE} ?>"
 
 # 3. SC wasm - Managed wrapped types
+## 3a. general
 MANAGED_WRAPPED_PATH = "multiversx_sc::types::managed::wrapped"
-
 BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
-TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
 MANAGED_ADDRESS_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
 MANAGED_BYTE_ARRAY_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
-ESDT_TOKEN_PAYMENT_TYPE = f"{MANAGED_WRAPPED_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
-EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
+## 3b. tokens & payments
+MANAGED_WRAPPED_TOKEN_PATH = "multiversx_sc::types::managed::wrapped::token"
+ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::esdt_token_identifier::EsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
+TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
+ESDT_TOKEN_PAYMENT_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
+EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
+
 # ManagedOption
 MANAGED_OPTION_INNER_TYPE_INDEX = 1
 MANAGED_OPTION_NONE_HANDLE = 2147483646  # i32::MAX - 1
@@ -363,7 +367,7 @@ class BigUint(PlainManagedVecItem, ManagedType):
         return big_uint.sbvalue.GetSummary()
 
 
-class TokenIdentifier(PlainManagedVecItem, ManagedType):
+class EsdtTokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, token_identifier: lldb.value) -> lldb.value:
         return token_identifier.data.buffer
 
@@ -439,7 +443,7 @@ class EsdtTokenPayment(ManagedVecItem, ManagedType):
 
     def summarize_item(self, bytes: List[int], context: lldb.value, type_info: lldb.SBType) -> str:
         token_id_handle_bytes, nonce_bytes, amount_handle_bytes = split_bytes(bytes, self.COMPONENT_SIZES)
-        token_id = TokenIdentifier().summarize_item(token_id_handle_bytes, context, None)
+        token_id = EsdtTokenIdentifier().summarize_item(token_id_handle_bytes, context, None)
         nonce = bytes_to_int(nonce_bytes)
         amount = BigInt().summarize_item(amount_handle_bytes, context, None)
         return self.to_string(token_id, nonce, amount)
@@ -522,7 +526,7 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     (MANAGED_BUFFER_TYPE, ManagedBuffer),
     # 3. SC wasm - Managed wrapped types
     (BIG_UINT_TYPE, BigUint),
-    (TOKEN_IDENTIFIER_TYPE, TokenIdentifier),
+    (ESDT_TOKEN_IDENTIFIER_TYPE, EsdtTokenIdentifier),
     (MANAGED_ADDRESS_TYPE, ManagedAddress),
     (MANAGED_BYTE_ARRAY_TYPE, ManagedByteArray),
     (ESDT_TOKEN_PAYMENT_TYPE, EsdtTokenPayment),

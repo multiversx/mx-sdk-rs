@@ -105,7 +105,7 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
 
     fn find_instance(
         &self,
-        original_token_id: &TokenIdentifier<M>,
+        original_token_id: &EsdtTokenIdentifier<M>,
         original_token_nonce: u64,
     ) -> Option<usize> {
         self.instances.iter().position(|item| {

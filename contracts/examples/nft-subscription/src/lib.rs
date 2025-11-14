@@ -32,7 +32,7 @@ pub trait NftSubscription:
             &ManagedBuffer::new(),
             &BigUint::from(0u8),
             &ManagedBuffer::new(),
-            0,
+            DurationMillis::zero(),
             ManagedBuffer::from(b"common"),
             &ManagedVec::new(),
         );
@@ -68,7 +68,7 @@ pub trait NftSubscription:
 
     #[payable]
     #[endpoint]
-    fn renew(&self, duration: u64) {
+    fn renew(&self, duration: DurationMillis) {
         let payment = self.call_value().single_esdt();
         self.renew_subscription::<ManagedBuffer>(
             &payment.token_identifier,

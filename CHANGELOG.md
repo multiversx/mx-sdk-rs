@@ -1162,9 +1162,9 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- got rid of the `#[callback_arg]` annotation
 
 ### [elrond-wasm 0.11.0, elrond-codec 0.5.0, mandos 0.5.0] - 2021-02-05
-### Refactor
+#### Refactor
 - Major refactoring of the contract API: split into smaller traits
-### Added
+#### Added
 - Storage mappers:
 	- LinkedListMapper
 	- SetMapper
@@ -1192,9 +1192,9 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- Refactoring:
     	- parse_attr mod was split into a proper folder with many files, since it had grown too large
     	- an extensive refactoring of elrond-wasm-derive not yet performed, will come soon
-### Minor features
+#### Minor features
 - ABI enum discriminants generation
-### Fixed
+#### Fixed
 - Crypto API fixes:
 	- `keccak256:` prefix also supported in mandos
     - reorganized crypto mandos tests in basic-features

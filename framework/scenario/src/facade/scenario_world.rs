@@ -61,6 +61,15 @@ impl ScenarioWorld {
         self
     }
 
+    /// Flag that allows sending funds to inexistent accounts.
+    ///
+    /// Disabled by default, to better signal missing accounts.
+    pub fn insert_ghost_accounts(mut self) -> Self {
+        let vm = &mut self.get_mut_debugger_backend().vm_runner.blockchain_mock.vm;
+        vm.set_insert_ghost_accounts(true);
+        self
+    }
+
     pub fn vm_go() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),

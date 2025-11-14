@@ -413,6 +413,15 @@ fn is_ei_valid(imports: &[String], check_ei: Option<&EIVersion>) -> bool {
             if !ei.contains_vm_hook(import.as_str()) {
                 num_errors += 1;
             }
+
+            if let Some(deprecated) = ei.deprecated_vm_hook(import) {
+                panic!(
+                    "{} {} - {}",
+                    "Deprecated VM hook used:".to_string().yellow().bold(),
+                    deprecated.name.yellow().bold(),
+                    deprecated.note.yellow()
+                );
+            }
         }
 
         if num_errors == 0 {

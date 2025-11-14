@@ -5,7 +5,9 @@
             "commitHash": "<commit hash here>",
             "commitDate": "<commit date here>",
             "channel": "Channel",
-            "short": "rustc <version> (<short hash> <date>)"
+            "host": "<host>",
+            "short": "rustc <version> (<short hash> <date>)",
+            "llvmVersion": "x.x"
         },
         "contractCrate": {
             "name": "use-module",
@@ -275,7 +277,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "TokenIdentifier"
+                    "type": "EsdtTokenIdentifier"
                 },
                 {
                     "name": "token_nonce",

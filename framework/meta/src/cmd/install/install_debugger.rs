@@ -77,7 +77,7 @@ async fn install_script(custom_path: Option<PathBuf>) {
     let target_path = if let Some(unwrapped_custom_path) = custom_path {
         unwrapped_custom_path
     } else {
-        home::home_dir().unwrap().join(TARGET_PATH)
+        std::env::home_dir().unwrap().join(TARGET_PATH)
     };
 
     let _ = fs::create_dir_all(&target_path);
@@ -92,7 +92,7 @@ fn get_script_path(path: PathBuf) -> PathBuf {
 
 fn get_path_to_settings() -> PathBuf {
     let os = env::consts::OS;
-    let user_home = home::home_dir().unwrap();
+    let user_home = std::env::home_dir().unwrap();
     match os {
         "macos" => {
             // For macOS
@@ -118,7 +118,7 @@ fn get_path_to_settings() -> PathBuf {
 fn configure_vscode() {
     let path_to_settings = get_path_to_settings();
 
-    let script_full_path = get_script_path(home::home_dir().unwrap().join(TARGET_PATH));
+    let script_full_path = get_script_path(std::env::home_dir().unwrap().join(TARGET_PATH));
     let json = match fs::read_to_string(&path_to_settings) {
         Err(_) => {
             eprintln!(

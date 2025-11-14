@@ -4,7 +4,11 @@ use multiversx_sc_codec::IntoMultiValue;
 use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
-    types::{BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue},
+    types::{
+        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
+        EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPayment,
+        EsdtTokenPaymentRefs, ManagedVecItem, ManagedVecItemPayloadBuffer, ManagedVecRef,
+    },
 };
 
 use crate::codec::{
@@ -14,12 +18,6 @@ use crate::codec::{
 
 use crate as multiversx_sc; // needed by the TypeAbi generated code
 use crate::derive::type_abi;
-
-use super::{
-    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
-    EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem, ManagedVecItemPayloadBuffer,
-    ManagedVecRef,
-};
 
 #[type_abi]
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug)]

@@ -1,4 +1,5 @@
 pub mod delta;
+mod deprecated_ei;
 mod ei_1_0;
 mod ei_1_1;
 mod ei_1_2;
@@ -9,6 +10,7 @@ mod ei_version;
 mod vm_hook_signature;
 mod vm_hook_signature_list;
 
+pub use deprecated_ei::DeprecatedVMHook;
 pub use ei_1_0::EI_1_0_NAMES;
 pub use ei_1_1::EI_1_1_NAMES;
 pub use ei_1_2::EI_1_2_NAMES;

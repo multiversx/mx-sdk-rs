@@ -81,7 +81,7 @@ pub trait ForwarderQueue {
         to: ManagedAddress,
         gas_limit: u64,
         endpoint_name: ManagedBuffer,
-        token: TokenIdentifier,
+        token: EsdtTokenIdentifier,
         amount: BigUint,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {

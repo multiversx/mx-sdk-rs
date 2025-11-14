@@ -37,11 +37,19 @@ pub enum DependencyReference {
 }
 
 impl DependencyReference {
-    pub fn is_framework_version(&self, version: &FrameworkVersion) -> bool {
+    pub fn eq_framework_version(&self, version: &FrameworkVersion) -> bool {
         if let DependencyReference::Version(version_req) = self {
             &version_req.semver == version
         } else {
             false
+        }
+    }
+
+    pub fn to_framework_version(&self) -> Option<VersionReq> {
+        if let DependencyReference::Version(version_req) = self {
+            Some(version_req.clone())
+        } else {
+            None
         }
     }
 }

@@ -2,6 +2,8 @@ pub mod build_target;
 mod find_workspace;
 mod git_describe;
 pub(crate) mod panic_report;
+mod rustc_version;
+mod rustc_version_warning;
 pub mod twiggy;
 mod wasm_extractor;
 mod wasm_opt;
@@ -9,6 +11,8 @@ mod wasm_to_wat;
 
 pub use find_workspace::{find_current_workspace, find_workspace};
 pub use git_describe::git_describe;
+pub use rustc_version::RustcVersion;
+pub use rustc_version_warning::rustc_version_warning;
 pub use wasm_extractor::code_report::CodeReport;
 pub use wasm_extractor::extractor::WasmInfo;
 pub use wasm_extractor::report::WasmReport;

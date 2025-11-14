@@ -37,7 +37,7 @@ fn default_instance_call(instance_call: RuntimeInstanceCall<'_>) {
         .call(instance_call.func_name, instance_call.gas_limit);
     let mut tx_result_ref = instance_call.tx_context_ref.result_lock();
     if let Some(error_tx_result) = instance_call_error_result(result) {
-        *tx_result_ref = error_tx_result;
+        tx_result_ref.merge_error(error_tx_result);
     }
 
     if tx_result_ref.result_status.is_success() {

@@ -94,7 +94,7 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_funds_with_transfer_exec(
         &self,
-        token: TokenIdentifier,
+        token: EsdtTokenIdentifier,
         amount: BigUint,
         opt_receive_func: OptionalValue<ManagedBuffer>,
     ) {

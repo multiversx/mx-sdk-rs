@@ -23,7 +23,7 @@
                 }
             ],
             "currentBlockInfo": {
-                "blockTimestamp": "0"
+                "blockTimestampMs": "0"
             }
         },
         {

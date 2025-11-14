@@ -10,12 +10,9 @@ use super::VMHooksHandler;
 
 impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn signal_error(&mut self, message: &[u8]) -> Result<(), VMHooksEarlyExit> {
-        // can sometimes help in tests
-        // run `clear & cargo test -- --nocapture` to see the output
-        println!("{}", std::str::from_utf8(message).unwrap());
-
         match String::from_utf8(message.to_owned()) {
             Ok(message_string) => {
+                self.error_trace(&message_string);
                 Err(VMHooksEarlyExit::new(ReturnCode::UserError.as_u64())
                     .with_message(message_string))
             }

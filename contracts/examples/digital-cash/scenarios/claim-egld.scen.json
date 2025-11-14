@@ -32,7 +32,7 @@
             "step": "setState",
             "comment": "set block",
             "currentBlockInfo": {
-                "blockTimestamp": "511",
+                "blockTimestampMs": "511",
                 "blockNonce": "1555",
                 "blockRound": "1555",
                 "blockEpoch": "1"
@@ -65,7 +65,7 @@
             "step": "setState",
             "comment": "set block",
             "currentBlockInfo": {
-                "blockTimestamp": "511",
+                "blockTimestampMs": "511",
                 "blockNonce": "8",
                 "blockRound": "8",
                 "blockEpoch": "1"

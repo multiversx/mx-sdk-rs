@@ -27,7 +27,7 @@ pub trait MergedTokenSetupModule {
 
     #[only_owner]
     #[endpoint(addMergeableTokensToWhitelist)]
-    fn add_mergeable_tokens_to_whitelist(&self, tokens: MultiValueEncoded<TokenIdentifier>) {
+    fn add_mergeable_tokens_to_whitelist(&self, tokens: MultiValueEncoded<EsdtTokenIdentifier>) {
         let mut whitelist = self.mergeable_tokens_whitelist();
         for token in tokens {
             let _ = whitelist.insert(token);
@@ -36,7 +36,10 @@ pub trait MergedTokenSetupModule {
 
     #[only_owner]
     #[endpoint(removeMergeableTokensFromWhitelist)]
-    fn remove_mergeable_tokens_from_whitelist(&self, tokens: MultiValueEncoded<TokenIdentifier>) {
+    fn remove_mergeable_tokens_from_whitelist(
+        &self,
+        tokens: MultiValueEncoded<EsdtTokenIdentifier>,
+    ) {
         let mut whitelist = self.mergeable_tokens_whitelist();
         for token in tokens {
             let _ = whitelist.swap_remove(&token);
@@ -45,7 +48,7 @@ pub trait MergedTokenSetupModule {
 
     fn create_merged_token<AttributesCreator: MergedTokenAttributesCreator<ScType = Self>>(
         &self,
-        merged_token_id: TokenIdentifier,
+        merged_token_id: EsdtTokenIdentifier,
         merged_instances: &MergedTokenInstances<Self::Api>,
         attr_creator: &AttributesCreator,
     ) -> EsdtTokenPayment<Self::Api> {
@@ -145,5 +148,5 @@ pub trait MergedTokenSetupModule {
 
     #[view(getMergeableTokensWhitelist)]
     #[storage_mapper("mergeableTokensWhitelist")]
-    fn mergeable_tokens_whitelist(&self) -> UnorderedSetMapper<TokenIdentifier>;
+    fn mergeable_tokens_whitelist(&self) -> UnorderedSetMapper<EsdtTokenIdentifier>;
 }

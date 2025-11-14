@@ -34,7 +34,7 @@ pub trait ForwarderSftModule: fwd_storage::ForwarderStorageModule {
     fn sft_issue_callback(
         &self,
         caller: &ManagedAddress,
-        #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
+        #[call_result] result: ManagedAsyncCallResult<EsdtTokenIdentifier>,
     ) {
         match result {
             ManagedAsyncCallResult::Ok(token_identifier) => {

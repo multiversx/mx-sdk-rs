@@ -10,6 +10,7 @@ use crate::{
     types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
     vm_err_msg,
 };
+use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_traits::Zero;
 
@@ -413,7 +414,14 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.perform_upgrade_contract(to, egld_value, code, code_metadata, arg_buffer)
     }
 
-    pub fn execute_on_dest_context_raw(
+    /// Executes a sync call, and returns the TxResult, as-is.
+    ///
+    /// It is also used in the fallible variant, so it will not kill the current execution on execution error.
+    ///
+    /// However, it will cause a failure if any other failure occurs, such as parsing the arguments.
+    ///
+    /// Gas usage should also cause an immediate failure, but it isn't yet implemented.
+    fn execute_on_dest_context_fallible_raw(
         &mut self,
         _gas: u64,
         to_handle: RawHandle,
@@ -421,7 +429,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
         result_handle: RawHandle,
-    ) -> Result<(), VMHooksEarlyExit> {
+    ) -> Result<(ReturnCode, String), VMHooksEarlyExit> {
         let to = self.context.m_types_lock().mb_to_address(to_handle);
         let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
@@ -430,16 +438,69 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
-        let result = self.context.perform_execute_on_dest_context(
+        let tx_result = self.context.perform_execute_on_dest_context(
             to,
             egld_value,
             endpoint_name,
             arg_buffer,
         )?;
 
-        self.set_return_data(result_handle, result)?;
+        if tx_result.result_status.is_success() {
+            self.set_return_data(result_handle, tx_result.result_values)?;
+        }
 
-        Ok(())
+        Ok((tx_result.result_status, tx_result.result_message))
+    }
+
+    pub fn execute_on_dest_context_raw(
+        &mut self,
+        gas: u64,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
+        let (result_status, result_message) = self.execute_on_dest_context_fallible_raw(
+            gas,
+            to_handle,
+            egld_value_handle,
+            endpoint_name_handle,
+            arg_buffer_handle,
+            result_handle,
+        )?;
+
+        if result_status.is_success() {
+            Ok(())
+        } else {
+            // kill current execution
+            Err(VMHooksEarlyExit::new(result_status.as_u64()).with_message(result_message.clone()))
+        }
+    }
+
+    pub fn execute_on_dest_context_fallible(
+        &mut self,
+        gas: u64,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> Result<i32, VMHooksEarlyExit> {
+        let (result_status, _) = self.execute_on_dest_context_fallible_raw(
+            gas,
+            to_handle,
+            egld_value_handle,
+            endpoint_name_handle,
+            arg_buffer_handle,
+            result_handle,
+        )?;
+
+        if result_status.is_success() {
+            Ok(0)
+        } else {
+            Ok(1)
+        }
     }
 
     pub fn execute_on_dest_context_readonly_raw(
