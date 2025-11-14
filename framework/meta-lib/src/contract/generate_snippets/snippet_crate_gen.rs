@@ -12,7 +12,6 @@ static LIB_SOURCE_FILE_NAME: &str = "interact.rs";
 static SC_CONFIG_FILE_NAME: &str = "sc-config.toml";
 static CONFIG_TOML_PATH: &str = "config.toml";
 static CONFIG_SOURCE_FILE_NAME: &str = "config.rs";
-static PROXY_FILE_NAME: &str = "_proxy.rs";
 static INTERACTOR_CS_TEST_FILE_NAME: &str = "interact_cs_tests.rs";
 static INTERACTOR_TEST_FILE_NAME: &str = "interact_tests.rs";
 
@@ -172,14 +171,14 @@ pub(crate) fn create_test_folder_and_get_files(snippets_folder_path: &Path) -> (
 
 pub(crate) fn create_sc_config_file(overwrite: bool, contract_crate_name: &str) {
     let sc_config_path = Path::new("..").join(SC_CONFIG_FILE_NAME);
-    let proxy_name = contract_crate_name.replace("-", "_") + PROXY_FILE_NAME;
+    let proxy_name = format!("{}_proxy.rs", contract_crate_name.replace("-", "_"),);
 
     // check if the file should be overwritten or if it already exists
     let mut file = if overwrite || !sc_config_path.exists() {
         File::create(sc_config_path).unwrap()
     } else {
         // file already exists
-        let file = OpenOptions::new()
+        let mut file = OpenOptions::new()
             .read(true)
             .append(true)
             .open(&sc_config_path)
@@ -189,17 +188,18 @@ pub(crate) fn create_sc_config_file(overwrite: bool, contract_crate_name: &str) 
             return;
         }
 
+        writeln!(&mut file).unwrap();
+
         file
     };
 
     // will be deserialized into a PathBuf, which normalizes the path depending on the platform
     // when deserializing from toml, backwards slashes are not allowed
-    let full_proxy_entry = r#"
-[[proxy]]
+    let full_proxy_entry = r#"[[proxy]]
 path = "interactor/src"#;
 
     // write full proxy toml entry to the file
-    writeln!(&mut file, "\n{full_proxy_entry}/{proxy_name}\"").unwrap();
+    writeln!(&mut file, "{full_proxy_entry}/{proxy_name}\"").unwrap();
 }
 
 pub(crate) fn create_config_toml_file(snippets_folder_path: &Path) {
@@ -208,13 +208,11 @@ pub(crate) fn create_config_toml_file(snippets_folder_path: &Path) {
 
     writeln!(
         &mut file,
-        r#"
-# chain_type = 'simulator'
+        r#"# chain_type = 'simulator'
 # gateway_uri = 'http://localhost:8085'
 
 chain_type = 'real'
-gateway_uri = 'https://devnet-gateway.multiversx.com'
-"#
+gateway_uri = 'https://devnet-gateway.multiversx.com'"#
     )
     .unwrap();
 }
