@@ -158,7 +158,14 @@ impl ContractVariant {
 
             assert!(build_args.wasm_opt, "Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without.");
 
-            let installed_wasm_opt_version = wasm_opt::wasm_opt_version()
+            let opt_version = wasm_opt::wasm_opt_version();
+
+            if opt_version.is_none() {
+                // also print warning before failure
+                print_wasm_opt_not_installed(wasm_opt::WASM_OPT_NAME);
+            }
+
+            let installed_wasm_opt_version = opt_version
                 .unwrap_or_else(|| panic!("Missing wasm-opt. Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without."));
 
             assert_eq!(config_wasm_opt_version, &installed_wasm_opt_version,
@@ -171,7 +178,7 @@ impl ContractVariant {
             }
 
             if wasm_opt::wasm_opt_version().is_none() {
-                println!("Warning: {} not installed", wasm_opt::WASM_OPT_NAME);
+                print_wasm_opt_not_installed(wasm_opt::WASM_OPT_NAME);
                 return false;
             }
 

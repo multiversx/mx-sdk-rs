@@ -1,6 +1,6 @@
 use std::process::Command;
 
-pub const WASM_OPT_NAME: &str = "wasm-opt";
+pub const WASM_OPT_NAME: &str = "wasm-optx";
 pub const WASM_OPT_VERSION_PREFIX: &str = "wasm-opt version ";
 
 pub fn wasm_opt_version() -> Option<String> {

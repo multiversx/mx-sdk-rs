@@ -156,3 +156,10 @@ pub fn print_proxy_error(path: &Path, error: String) {
         format!("Could not write proxy file {}: {error}", path.display()).red(),
     );
 }
+
+pub fn print_wasm_opt_not_installed(wasm_opt_name: &str) {
+    println!(
+        "{}",
+        format!("Warning: {wasm_opt_name} not installed.").yellow(),
+    );
+}
