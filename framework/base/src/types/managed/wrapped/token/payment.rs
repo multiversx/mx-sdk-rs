@@ -6,7 +6,8 @@ use crate::{
     types::{
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
         Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, EsdtTokenType, ManagedVecItem,
-        ManagedVecItemPayloadBuffer, ManagedVecRef, PaymentMultiValue, PaymentRefs, TokenId,
+        ManagedVecItemPayloadBuffer, ManagedVecRef, NonZeroBigUint, PaymentMultiValue, PaymentRefs,
+        TokenId,
     },
 };
 
@@ -27,12 +28,12 @@ use super::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment};
 pub struct Payment<M: ManagedTypeApi> {
     pub token_identifier: TokenId<M>,
     pub token_nonce: u64,
-    pub amount: BigUint<M>,
+    pub amount: NonZeroBigUint<M>,
 }
 
 impl<M: ManagedTypeApi> Payment<M> {
     #[inline]
-    pub fn new(token_identifier: TokenId<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
+    pub fn new(token_identifier: TokenId<M>, token_nonce: u64, amount: NonZeroBigUint<M>) -> Self {
         Payment {
             token_identifier,
             token_nonce,
@@ -55,12 +56,12 @@ impl<M: ManagedTypeApi> Payment<M> {
     }
 
     #[inline]
-    pub fn into_tuple(self) -> (TokenId<M>, u64, BigUint<M>) {
+    pub fn into_tuple(self) -> (TokenId<M>, u64, NonZeroBigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
     }
 
     #[inline]
-    pub fn as_tuple(&self) -> (&TokenId<M>, u64, &BigUint<M>) {
+    pub fn as_tuple(&self) -> (&TokenId<M>, u64, &NonZeroBigUint<M>) {
         (&self.token_identifier, self.token_nonce, &self.amount)
     }
 
@@ -76,7 +77,7 @@ impl<M: ManagedTypeApi> Payment<M> {
         EgldOrEsdtTokenPayment {
             token_identifier: EgldOrEsdtTokenIdentifier::esdt(self.token_identifier),
             token_nonce: self.token_nonce,
-            amount: self.amount,
+            amount: self.amount.into_big_uint(),
         }
     }
 
@@ -93,14 +94,14 @@ impl<M: ManagedTypeApi> Payment<M> {
         F: FnOnce(Context, EsdtTokenPaymentRefs<'_, M>) -> U,
     {
         if self.token_identifier.is_native() {
-            for_egld(context, Egld(&self.amount))
+            for_egld(context, Egld(self.amount.as_big_uint()))
         } else {
             for_esdt(
                 context,
                 EsdtTokenPaymentRefs::new(
                     unsafe { self.token_identifier.as_esdt_unchecked() },
                     self.token_nonce,
-                    &self.amount,
+                    self.amount.as_big_uint(),
                 ),
             )
         }
@@ -112,14 +113,14 @@ impl<M: ManagedTypeApi> Payment<M> {
         F: FnOnce(Context, EsdtTokenPayment<M>) -> U,
     {
         if self.token_identifier.is_native() {
-            for_egld(context, Egld(self.amount))
+            for_egld(context, Egld(self.amount.into_big_uint()))
         } else {
             for_esdt(
                 context,
                 EsdtTokenPayment::new(
                     unsafe { self.token_identifier.into_esdt_unchecked() },
                     self.token_nonce,
-                    self.amount,
+                    self.amount.into_big_uint(),
                 ),
             )
         }
@@ -130,9 +131,9 @@ impl<M: ManagedTypeApi> Payment<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<(TokenId<M>, u64, BigUint<M>)> for Payment<M> {
+impl<M: ManagedTypeApi> From<(TokenId<M>, u64, NonZeroBigUint<M>)> for Payment<M> {
     #[inline]
-    fn from(value: (TokenId<M>, u64, BigUint<M>)) -> Self {
+    fn from(value: (TokenId<M>, u64, NonZeroBigUint<M>)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
         Self::new(token_identifier, token_nonce, amount)
     }
@@ -159,24 +160,10 @@ impl<M: ManagedTypeApi> NestedDecode for Payment<M> {
         I: codec::NestedDecodeInput,
         H: codec::DecodeErrorHandler,
     {
-        Self::regular_dep_decode_or_handle_err(input, h)
-    }
-}
-
-impl<M: ManagedTypeApi> Payment<M> {
-    #[doc(hidden)]
-    pub fn regular_dep_decode_or_handle_err<I, H>(
-        input: &mut I,
-        h: H,
-    ) -> Result<Self, H::HandledErr>
-    where
-        I: codec::NestedDecodeInput,
-        H: codec::DecodeErrorHandler,
-    {
         Ok(Payment {
             token_identifier: TokenId::<M>::dep_decode_or_handle_err(input, h)?,
             token_nonce: <u64>::dep_decode_or_handle_err(input, h)?,
-            amount: BigUint::<M>::dep_decode_or_handle_err(input, h)?,
+            amount: NonZeroBigUint::<M>::dep_decode_or_handle_err(input, h)?,
         })
     }
 }

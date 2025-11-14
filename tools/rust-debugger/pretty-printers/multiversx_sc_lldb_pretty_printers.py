@@ -32,7 +32,7 @@ MANAGED_BUFFER_TYPE = f"{MANAGED_BASIC_PATH}::managed_buffer::ManagedBuffer<{DEB
 # 3. SC wasm - Managed wrapped types
 ## 3a. general
 MANAGED_WRAPPED_PATH = "multiversx_sc::types::managed::wrapped"
-BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
+BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::num::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
 MANAGED_ADDRESS_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
 MANAGED_BYTE_ARRAY_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
 ## 3b. tokens & payments

@@ -9,8 +9,10 @@ impl<Env> TxPayment<Env> for &Payment<Env::Api>
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
-        self.amount == 0u32
+        // amount is NonZeroBigUint
+        false
     }
 
     fn perform_transfer_execute_fallible(

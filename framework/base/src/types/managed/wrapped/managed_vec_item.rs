@@ -11,7 +11,7 @@ use crate::{
     api::{use_raw_handle, HandleConstraints, ManagedTypeApi},
     types::{
         BigInt, BigUint, EllipticCurve, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
-        ManagedByteArray, ManagedRef, ManagedType, ManagedVec, TokenId,
+        ManagedByteArray, ManagedRef, ManagedType, ManagedVec, NonZeroBigUint, TokenId,
     },
 };
 
@@ -230,8 +230,9 @@ macro_rules! impl_managed_type {
 }
 
 impl_managed_type! {ManagedBuffer}
-impl_managed_type! {BigUint}
 impl_managed_type! {BigInt}
+impl_managed_type! {BigUint}
+impl_managed_type! {NonZeroBigUint}
 impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {EsdtTokenIdentifier}
