@@ -1,3 +1,4 @@
+use multiversx_chain_core::types::CodeMetadata;
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
@@ -8,17 +9,34 @@ use std::{
 };
 
 use crate::{
-    blockchain::reserved::STORAGE_REWARD_KEY, host::context::BlockchainUpdate, types::VMAddress,
+    blockchain::reserved::STORAGE_REWARD_KEY, host::context::BlockchainUpdate,
+    system_sc::ESDT_SYSTEM_SC_ADDRESS_ARRAY, types::VMAddress,
 };
 
 use super::{AccountData, BlockConfig};
 
-#[derive(Default, Clone)]
+#[derive(Clone)]
 pub struct BlockchainState {
     pub accounts: HashMap<VMAddress, AccountData>,
     pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
     pub block_config: BlockConfig,
     pub new_token_identifiers: Vec<String>,
+}
+
+impl Default for BlockchainState {
+    fn default() -> Self {
+        let mut state = Self {
+            accounts: Default::default(),
+            new_addresses: Default::default(),
+            block_config: Default::default(),
+            new_token_identifiers: Default::default(),
+        };
+
+        // pre-populating system SC(s)
+        state.add_empty_account(ESDT_SYSTEM_SC_ADDRESS_ARRAY.into());
+
+        state
+    }
 }
 
 impl BlockchainState {
@@ -31,22 +49,18 @@ impl BlockchainState {
     }
 
     pub fn increase_account_nonce(&mut self, address: &VMAddress) {
-        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(address.as_ref()).unwrap()
-            )
-        });
+        let account = self
+            .accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Account not found: {address}"));
         account.nonce += 1;
     }
 
     pub fn subtract_tx_gas(&mut self, address: &VMAddress, gas_limit: u64, gas_price: u64) {
-        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(address.as_ref()).unwrap()
-            )
-        });
+        let account = self
+            .accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Account not found: {address}"));
         let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
         assert!(
             account.egld_balance >= gas_cost,
@@ -56,12 +70,10 @@ impl BlockchainState {
     }
 
     pub fn increase_validator_reward(&mut self, address: &VMAddress, amount: &BigUint) {
-        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(address.as_ref()).unwrap()
-            )
-        });
+        let account = self
+            .accounts
+            .get_mut(address)
+            .unwrap_or_else(|| panic!("Account not found: {address}"));
         account.egld_balance += amount;
         let mut storage_v_rew =
             if let Some(old_storage_value) = account.storage.get(STORAGE_REWARD_KEY) {
@@ -85,6 +97,24 @@ impl BlockchainState {
 
     pub fn update_new_token_identifiers(&mut self, token_identifiers: Vec<String>) {
         self.new_token_identifiers = token_identifiers;
+    }
+
+    fn add_empty_account(&mut self, address: VMAddress) {
+        self.accounts.insert(
+            address.clone(),
+            AccountData {
+                address,
+                nonce: 0,
+                egld_balance: Default::default(),
+                esdt: Default::default(),
+                username: Vec::new(),
+                storage: HashMap::new(),
+                contract_path: None,
+                code_metadata: CodeMetadata::empty(),
+                contract_owner: None,
+                developer_rewards: BigUint::zero(),
+            },
+        );
     }
 }
 

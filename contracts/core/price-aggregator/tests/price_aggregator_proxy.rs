@@ -150,7 +150,7 @@ where
     pub fn submit<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg2: ProxyArg<u64>,
+        Arg2: ProxyArg<TimestampSeconds>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
         Arg4: ProxyArg<u8>,
     >(
@@ -173,7 +173,7 @@ where
     }
 
     pub fn submit_batch<
-        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue5<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue5<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, TimestampSeconds, BigUint<Env::Api>, u8>>>,
     >(
         self,
         submissions: Arg0,
@@ -201,7 +201,7 @@ where
         self,
         from: Arg0,
         to: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, TimestampSeconds, BigUint<Env::Api>, u8>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("latestPriceFeed")
@@ -217,7 +217,7 @@ where
         self,
         from: Arg0,
         to: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OptionalValue<MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OptionalValue<MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, TimestampSeconds, BigUint<Env::Api>, u8>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("latestPriceFeedOptional")
@@ -389,7 +389,7 @@ where
     pub round_id: u32,
     pub from: ManagedBuffer<Api>,
     pub to: ManagedBuffer<Api>,
-    pub timestamp: u64,
+    pub timestamp: TimestampSeconds,
     pub price: BigUint<Api>,
     pub decimals: u8,
 }
@@ -401,7 +401,7 @@ where
     Api: ManagedTypeApi,
 {
     pub price: BigUint<Api>,
-    pub timestamp: u64,
+    pub timestamp: TimestampSeconds,
     pub decimals: u8,
     pub block: u64,
     pub epoch: u64,
@@ -410,7 +410,7 @@ where
 #[type_abi]
 #[derive(TopEncode)]
 pub struct DiscardSubmissionEvent {
-    pub submission_timestamp: u64,
-    pub first_submission_timestamp: u64,
+    pub submission_timestamp: TimestampSeconds,
+    pub first_submission_timestamp: TimestampSeconds,
     pub has_caller_already_submitted: bool,
 }

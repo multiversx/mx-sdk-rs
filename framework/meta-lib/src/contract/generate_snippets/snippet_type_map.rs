@@ -84,10 +84,10 @@ fn init_rust_types_map() -> HashMap<&'static str, RustTypeString> {
         },
     );
     m.insert(
-        "TokenIdentifier",
+        "EsdtTokenIdentifier",
         RustTypeString {
-            type_name: "TokenIdentifier".to_string() + STATIC_API_SUFFIX,
-            default_value_expr: "TokenIdentifier::from_esdt_bytes(&b\"\"[..])".to_string(),
+            type_name: "EsdtTokenIdentifier".to_string() + STATIC_API_SUFFIX,
+            default_value_expr: "EsdtTokenIdentifier::from_esdt_bytes(&b\"\"[..])".to_string(),
             contains_custom_types: false,
         },
     );
@@ -105,7 +105,7 @@ fn init_rust_types_map() -> HashMap<&'static str, RustTypeString> {
         RustTypeString {
             type_name: "EsdtTokenPayment".to_string() + STATIC_API_SUFFIX,
             default_value_expr: "EsdtTokenPayment::new(
-            TokenIdentifier::from_esdt_bytes(&b\"\"[..]),
+            EsdtTokenIdentifier::from_esdt_bytes(&b\"\"[..]),
             0u64,
             BigUint::from(0u128),
         )"

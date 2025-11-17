@@ -3,8 +3,9 @@ use generic_array::typenum::U16;
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType, ManagedVecItem,
-        TokenIdentifier,
+        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
+        EsdtTokenIdentifier, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType, ManagedVec,
+        ManagedVecItem, ManagedVecItemPayloadBuffer, ManagedVecRef,
     },
 };
 
@@ -18,16 +19,12 @@ use crate::{
     derive::type_abi,
 };
 
-use super::{
-    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
-    EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, ManagedVec, ManagedVecItemPayloadBuffer,
-    ManagedVecRef, MultiEgldOrEsdtPayment,
-};
+use super::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, MultiEgldOrEsdtPayment};
 
 #[type_abi]
 #[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
-    pub token_identifier: TokenIdentifier<M>,
+    pub token_identifier: EsdtTokenIdentifier<M>,
     pub token_nonce: u64,
     pub amount: BigUint<M>,
 }
@@ -37,7 +34,11 @@ pub type MultiEsdtPayment<Api> = ManagedVec<Api, EsdtTokenPayment<Api>>;
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     #[inline]
-    pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
+    pub fn new(
+        token_identifier: EsdtTokenIdentifier<M>,
+        token_nonce: u64,
+        amount: BigUint<M>,
+    ) -> Self {
         EsdtTokenPayment {
             token_identifier,
             token_nonce,
@@ -60,7 +61,7 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 
     #[inline]
-    pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BigUint<M>) {
+    pub fn into_tuple(self) -> (EsdtTokenIdentifier<M>, u64, BigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
     }
 
@@ -81,9 +82,9 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<(TokenIdentifier<M>, u64, BigUint<M>)> for EsdtTokenPayment<M> {
+impl<M: ManagedTypeApi> From<(EsdtTokenIdentifier<M>, u64, BigUint<M>)> for EsdtTokenPayment<M> {
     #[inline]
-    fn from(value: (TokenIdentifier<M>, u64, BigUint<M>)) -> Self {
+    fn from(value: (EsdtTokenIdentifier<M>, u64, BigUint<M>)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
         Self::new(token_identifier, token_nonce, amount)
     }
@@ -135,7 +136,7 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
         H: codec::DecodeErrorHandler,
     {
         Ok(EsdtTokenPayment {
-            token_identifier: TokenIdentifier::<M>::dep_decode_or_handle_err(input, h)?,
+            token_identifier: EsdtTokenIdentifier::<M>::dep_decode_or_handle_err(input, h)?,
             token_nonce: <u64>::dep_decode_or_handle_err(input, h)?,
             amount: BigUint::<M>::dep_decode_or_handle_err(input, h)?,
         })
@@ -220,7 +221,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
 
 /// The version of `EsdtTokenPayment` that contains references instead of owned fields.
 pub struct EsdtTokenPaymentRefs<'a, M: ManagedTypeApi> {
-    pub token_identifier: &'a TokenIdentifier<M>,
+    pub token_identifier: &'a EsdtTokenIdentifier<M>,
     pub token_nonce: u64,
     pub amount: &'a BigUint<M>,
 }
@@ -234,7 +235,7 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
 impl<'a, M: ManagedTypeApi> EsdtTokenPaymentRefs<'a, M> {
     #[inline]
     pub fn new(
-        token_identifier: &'a TokenIdentifier<M>,
+        token_identifier: &'a EsdtTokenIdentifier<M>,
         token_nonce: u64,
         amount: &'a BigUint<M>,
     ) -> Self {
@@ -285,9 +286,9 @@ impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for MultiEsdtPayment<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<(TokenIdentifier<M>, u64, BigUint<M>)> for MultiEsdtPayment<M> {
+impl<M: ManagedTypeApi> From<(EsdtTokenIdentifier<M>, u64, BigUint<M>)> for MultiEsdtPayment<M> {
     #[inline]
-    fn from(value: (TokenIdentifier<M>, u64, BigUint<M>)) -> Self {
+    fn from(value: (EsdtTokenIdentifier<M>, u64, BigUint<M>)) -> Self {
         MultiEsdtPayment::from_single_item(value.into())
     }
 }

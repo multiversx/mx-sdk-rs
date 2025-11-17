@@ -18,7 +18,7 @@
                 }
             },
             "currentBlockInfo": {
-                "blockTimestamp": "123,567"
+                "blockTimestampMs": "123,567"
             }
         },
         {

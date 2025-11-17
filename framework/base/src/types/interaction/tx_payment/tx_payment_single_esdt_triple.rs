@@ -1,11 +1,13 @@
 use crate::{
     contract_base::TransferExecuteFailed,
-    types::{BigUint, EsdtTokenPayment, ManagedAddress, TokenIdentifier, TxFrom, TxToSpecified},
+    types::{
+        BigUint, EsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress, TxFrom, TxToSpecified,
+    },
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<Env> TxPayment<Env> for (TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>)
+impl<Env> TxPayment<Env> for (EsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>)
 where
     Env: TxEnv,
 {

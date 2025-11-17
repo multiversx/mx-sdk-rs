@@ -13,7 +13,7 @@ pub struct Auction<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
-    pub deadline: u64,
+    pub deadline: TimestampMillis,
     pub original_owner: ManagedAddress<M>,
     pub current_bid: BigUint<M>,
     pub current_winner: ManagedAddress<M>,
@@ -25,7 +25,7 @@ pub struct AuctionArgument<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub min_bid: BigUint<M>,
     pub max_bid: BigUint<M>,
-    pub deadline: u64,
+    pub deadline: TimestampMillis,
 }
 
 #[multiversx_sc::contract]
@@ -160,7 +160,7 @@ pub trait Erc1155Marketplace {
             "Can't bid on your own token"
         );
         require!(
-            self.blockchain().get_block_timestamp() < auction.deadline,
+            self.blockchain().get_block_timestamp_millis() < auction.deadline,
             "Auction ended already"
         );
         require!(
@@ -205,7 +205,7 @@ pub trait Erc1155Marketplace {
         let auction = self.auction_for_token(&type_id, &nft_id).get();
 
         require!(
-            self.blockchain().get_block_timestamp() > auction.deadline
+            self.blockchain().get_block_timestamp_millis() > auction.deadline
                 || auction.current_bid == auction.max_bid,
             "Auction deadline has not passed nor is the current bid equal to max bid"
         );
@@ -283,7 +283,7 @@ pub trait Erc1155Marketplace {
         token: &EgldOrEsdtTokenIdentifier,
         min_bid: &BigUint,
         max_bid: &BigUint,
-        deadline: u64,
+        deadline: TimestampMillis,
     ) {
         require!(
             !self.is_up_for_auction(type_id, nft_id),
@@ -294,7 +294,7 @@ pub trait Erc1155Marketplace {
             "Min bid can't be 0 or higher than max bid"
         );
         require!(
-            deadline > self.blockchain().get_block_timestamp(),
+            deadline > self.blockchain().get_block_timestamp_millis(),
             "Deadline can't be in the past"
         );
 

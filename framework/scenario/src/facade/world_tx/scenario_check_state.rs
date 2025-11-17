@@ -3,7 +3,7 @@ use std::collections::{btree_map::Entry, BTreeMap};
 use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 use multiversx_sc::{
     codec::{top_encode_to_vec_u8, TopEncode},
-    types::{AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier},
+    types::{AnnotatedValue, BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer},
 };
 
 use crate::{
@@ -135,7 +135,7 @@ impl<'w> CheckStateBuilder<'w> {
 
     pub fn esdt_balance<K, V>(mut self, token_id: K, balance: V) -> Self
     where
-        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        K: AnnotatedValue<ScenarioTxEnvData, EsdtTokenIdentifier<StaticApi>>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
     {
         let env = self.new_env_data();
@@ -179,7 +179,7 @@ impl<'w> CheckStateBuilder<'w> {
         attributes: T,
     ) -> Self
     where
-        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        K: AnnotatedValue<ScenarioTxEnvData, EsdtTokenIdentifier<StaticApi>>,
         N: AnnotatedValue<ScenarioTxEnvData, u64>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
         T: TopEncode,
