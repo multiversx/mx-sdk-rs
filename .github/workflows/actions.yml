@@ -19,6 +19,7 @@ jobs:
       rust-toolchain: 1.87
       rust-target: wasm32v1-none
       path-to-sc-meta: framework/meta
+      rust-target: wasm32v1-none
       mx-scenario-go-version: v5.1.0
       enable-interactor-tests: true
       coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
