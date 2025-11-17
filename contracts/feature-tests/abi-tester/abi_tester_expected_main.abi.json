@@ -5,7 +5,9 @@
             "commitHash": "<commit hash here>",
             "commitDate": "<commit date here>",
             "channel": "Channel",
-            "short": "rustc <version> (<short hash> <date>)"
+            "host": "<host>",
+            "short": "rustc <version> (<short hash> <date>)",
+            "llvmVersion": "x.x"
         },
         "contractCrate": {
             "name": "abi-tester",
@@ -293,6 +295,25 @@
             ]
         },
         {
+            "name": "time_types",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                },
+                {
+                    "type": "u64"
+                },
+                {
+                    "type": "u64"
+                },
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
             "name": "sample_storage_mapper",
             "mutability": "readonly",
             "inputs": [],
@@ -469,7 +490,7 @@
             "inputs": [
                 {
                     "name": "token",
-                    "type": "TokenIdentifier",
+                    "type": "EsdtTokenIdentifier",
                     "indexed": true
                 },
                 {
@@ -765,7 +786,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "TokenIdentifier"
+                    "type": "EsdtTokenIdentifier"
                 },
                 {
                     "name": "token_nonce",

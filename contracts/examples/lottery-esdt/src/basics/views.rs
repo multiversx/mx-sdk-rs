@@ -10,7 +10,7 @@ pub trait ViewsModule {
         }
 
         let info = self.lottery_info(lottery_name).get();
-        let current_time = self.blockchain().get_block_timestamp();
+        let current_time = self.blockchain().get_block_timestamp_millis();
         if current_time > info.deadline || info.tickets_left == 0 {
             return Status::Ended;
         }

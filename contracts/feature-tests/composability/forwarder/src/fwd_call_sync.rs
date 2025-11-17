@@ -200,7 +200,7 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_retrieve_funds_with_accept_func(
         &self,
         to: ManagedAddress,
-        token: TokenIdentifier,
+        token: EsdtTokenIdentifier,
         amount: BigUint,
     ) {
         let payments = self.call_value().all_esdt_transfers();

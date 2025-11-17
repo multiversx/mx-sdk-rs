@@ -165,7 +165,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     fn forward_async_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new();
         for multi_arg in token_payments.into_iter() {
@@ -187,7 +187,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     fn forwarder_async_send_and_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
-        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
     ) {
         self.tx()
             .raw_call("burn_and_create_retrieve_async")

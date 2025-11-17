@@ -1,11 +1,11 @@
-use super::{EsdtTokenPayment, ManagedVec};
+use super::EsdtTokenPayment;
 use crate::{
     api::ManagedTypeApi,
     codec::{
         self,
         derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     },
-    types::BigUint,
+    types::{BigUint, ManagedVec},
 };
 
 use crate as multiversx_sc; // needed by the TypeAbi generated code

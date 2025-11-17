@@ -10,8 +10,8 @@ use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 use crate::{
     api::{use_raw_handle, HandleConstraints, ManagedTypeApi},
     types::{
-        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
-        ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
+        BigInt, BigUint, EllipticCurve, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
+        ManagedByteArray, ManagedRef, ManagedType, ManagedVec,
     },
 };
 
@@ -234,7 +234,7 @@ impl_managed_type! {BigUint}
 impl_managed_type! {BigInt}
 impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
-impl_managed_type! {TokenIdentifier}
+impl_managed_type! {EsdtTokenIdentifier}
 impl_managed_type! {EgldOrEsdtTokenIdentifier}
 
 impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>

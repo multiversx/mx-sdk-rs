@@ -11,7 +11,7 @@ pub trait FirstContract {
     #[init]
     fn init(
         &self,
-        esdt_token_identifier: TokenIdentifier,
+        esdt_token_identifier: EsdtTokenIdentifier,
         second_contract_address: ManagedAddress,
     ) {
         self.set_contract_esdt_token_identifier(&esdt_token_identifier);
@@ -122,7 +122,7 @@ pub trait FirstContract {
 
     fn call_esdt_second_contract(
         &self,
-        esdt_token_identifier: &TokenIdentifier,
+        esdt_token_identifier: &EsdtTokenIdentifier,
         amount: &BigUint,
         to: &ManagedAddress,
         func_name: &ManagedBuffer,
@@ -146,11 +146,11 @@ pub trait FirstContract {
     // storage
 
     #[storage_set("esdtTokenName")]
-    fn set_contract_esdt_token_identifier(&self, esdt_token_identifier: &TokenIdentifier);
+    fn set_contract_esdt_token_identifier(&self, esdt_token_identifier: &EsdtTokenIdentifier);
 
     #[view(getesdtTokenName)]
     #[storage_get("esdtTokenName")]
-    fn get_contract_esdt_token_identifier(&self) -> TokenIdentifier;
+    fn get_contract_esdt_token_identifier(&self) -> EsdtTokenIdentifier;
 
     #[storage_set("secondContractAddress")]
     fn set_second_contract_address(&self, address: &ManagedAddress);

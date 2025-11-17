@@ -2,8 +2,8 @@ use core::fmt::Debug;
 use multiversx_sc::{
     api::ManagedTypeApi,
     types::{
-        BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedOption,
-        ManagedType, TokenIdentifier,
+        BigInt, BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer, ManagedByteArray,
+        ManagedOption, ManagedType,
     },
 };
 use multiversx_sc_scenario::api::StaticApi;
@@ -41,7 +41,7 @@ fn test_some() {
     test_some_for_value(|| ManagedBuffer::<StaticApi>::from(&b"3abc"[..]));
     test_some_for_value(|| ManagedByteArray::<StaticApi, 4>::from(&[4u8; 4]));
     test_some_for_value(|| ManagedAddress::<StaticApi>::from(&[5u8; 32]));
-    test_some_for_value(|| TokenIdentifier::<StaticApi>::from(&b"TOKEN-000006"[..]));
+    test_some_for_value(|| EsdtTokenIdentifier::<StaticApi>::from(&b"TOKEN-000006"[..]));
 }
 
 #[test]
@@ -51,7 +51,7 @@ fn test_none() {
     test_none_for_type::<StaticApi, ManagedBuffer<StaticApi>>();
     test_none_for_type::<StaticApi, ManagedByteArray<StaticApi, 4>>();
     test_none_for_type::<StaticApi, ManagedAddress<StaticApi>>();
-    test_none_for_type::<StaticApi, TokenIdentifier<StaticApi>>();
+    test_none_for_type::<StaticApi, EsdtTokenIdentifier<StaticApi>>();
 }
 
 #[test]

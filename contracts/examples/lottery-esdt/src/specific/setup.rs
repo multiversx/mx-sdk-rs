@@ -2,7 +2,7 @@ use multiversx_sc::imports::*;
 
 use crate::{
     basics::{
-        constants::{MAX_TICKETS, PERCENTAGE_TOTAL, THIRTY_DAYS_IN_SECONDS},
+        constants::{MAX_TICKETS, PERCENTAGE_TOTAL, THIRTY_DAYS_IN_MILLISECONDS},
         storage, utils, views,
     },
     specific::{lottery_info::LotteryInfo, status::Status},
@@ -18,7 +18,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
         token_identifier: TokenIdentifier,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
-        opt_deadline: Option<u64>,
+        opt_deadline: Option<TimestampMillis>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
         opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
@@ -26,9 +26,9 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
-        let timestamp = self.blockchain().get_block_timestamp();
+        let timestamp = self.blockchain().get_block_timestamp_millis();
         let total_tickets = opt_total_tickets.unwrap_or(MAX_TICKETS);
-        let deadline = opt_deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_SECONDS);
+        let deadline = opt_deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_MILLISECONDS);
         let max_entries_per_user = opt_max_entries_per_user.unwrap_or(MAX_TICKETS);
         let prize_distribution = opt_prize_distribution
             .unwrap_or_else(|| ManagedVec::from_single_item(PERCENTAGE_TOTAL as u8));
@@ -56,7 +56,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
         );
         require!(deadline > timestamp, "Deadline can't be in the past!");
         require!(
-            deadline <= timestamp + THIRTY_DAYS_IN_SECONDS,
+            deadline <= timestamp + THIRTY_DAYS_IN_MILLISECONDS,
             "Deadline can't be later than 30 days from now!"
         );
         require!(

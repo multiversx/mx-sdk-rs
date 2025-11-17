@@ -6,7 +6,7 @@ pub struct Zombie<M: ManagedTypeApi> {
     pub name: ManagedBuffer<M>,
     pub dna: u64,
     pub level: u16,
-    pub ready_time: u64,
+    pub ready_time: TimestampMillis,
     pub win_count: usize,
     pub loss_count: usize,
 }

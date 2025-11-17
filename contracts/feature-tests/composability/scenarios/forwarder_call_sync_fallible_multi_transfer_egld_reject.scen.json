@@ -40,7 +40,7 @@
         },
         {
             "step": "scCall",
-            "id": "2",
+            "id": "forward_sync_reject_funds_multi_transfer",
             "comment": "send all types",
             "tx": {
                 "from": "address:a_user",

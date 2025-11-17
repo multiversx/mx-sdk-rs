@@ -6,6 +6,7 @@ use crate::{builtin_functions::BuiltinFunctionContainer, schedule::GasSchedule};
 pub struct VMConfig {
     pub builtin_functions: BuiltinFunctionContainer,
     pub gas_schedule: GasSchedule,
+    pub insert_ghost_accounts: bool,
 }
 
 #[derive(Clone, Default)]
@@ -26,6 +27,11 @@ impl VMConfigRef {
         let vm_config =
             Arc::get_mut(&mut self.0).expect("cannot change gas schedule during execution");
         vm_config.gas_schedule = gas_schedule;
+    }
+
+    pub fn set_insert_ghost_accounts(&mut self, insert_ghost_accounts: bool) {
+        let vm_config = Arc::get_mut(&mut self.0).expect("cannot configure VM during execution");
+        vm_config.insert_ghost_accounts = insert_ghost_accounts;
     }
 }
 

@@ -13,9 +13,9 @@ pub trait EsdtTransferWithFee {
     #[endpoint(setExactValueFee)]
     fn set_exact_value_fee(
         &self,
-        fee_token: TokenIdentifier,
+        fee_token: EsdtTokenIdentifier,
         fee_amount: BigUint,
-        token: TokenIdentifier,
+        token: EsdtTokenIdentifier,
     ) {
         self.token_fee(&token)
             .set(Fee::ExactValue(EsdtTokenPayment::new(
@@ -25,7 +25,7 @@ pub trait EsdtTransferWithFee {
 
     #[only_owner]
     #[endpoint(setPercentageFee)]
-    fn set_percentage_fee(&self, fee: u32, token: TokenIdentifier) {
+    fn set_percentage_fee(&self, fee: u32, token: EsdtTokenIdentifier) {
         self.token_fee(&token).set(Fee::Percentage(fee));
     }
 
@@ -125,9 +125,9 @@ pub trait EsdtTransferWithFee {
 
     #[view(getTokenFee)]
     #[storage_mapper("token_fee")]
-    fn token_fee(&self, token: &TokenIdentifier) -> SingleValueMapper<Fee<Self::Api>>;
+    fn token_fee(&self, token: &EsdtTokenIdentifier) -> SingleValueMapper<Fee<Self::Api>>;
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]
-    fn paid_fees(&self) -> MapMapper<(TokenIdentifier, u64), BigUint>;
+    fn paid_fees(&self) -> MapMapper<(EsdtTokenIdentifier, u64), BigUint>;
 }
