@@ -76,6 +76,10 @@ pub struct ContractVariantSerde {
 
     #[serde(rename = "opcode-version")]
     pub opcode_version: Option<String>,
+
+    #[serde(rename = "wasm-opt-version")]
+    #[serde(default)]
+    pub wasm_opt_version: Option<String>,
 }
 
 #[derive(Deserialize, Default, Debug)]
