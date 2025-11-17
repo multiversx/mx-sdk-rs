@@ -57,6 +57,33 @@ And crate group being released requires all crate groups downstream to be releas
 
 ## Version history
 
+
+### [sc 0.63.0, chain 0.20.0, sdk 0.13.0, scenario-format 0.24.0] - 2025-11-27
+- New block info API, which returns timestamps as either `TimestampSeconds` or `TimestampMillis`, instead of just `u64`:
+	- New types for measuring time, not only timestamps, but also durations (`DurationSeconds` and `DurationMillis`);
+	- Previous functions deprecated in favor of the new ones as follows:
+		- `get_block_timestamp` -> `get_block_timestamp_seconds`
+		- `get_block_timestamp_ms` -> `get_block_timestamp_millis`
+		- same for previous block and epoch start block
+		- `get_block_round_time_ms` -> `get_block_round_time_millis`;
+	- Mandos support for millisecond timestamps, in both mandos-go and mandos-rs.
+- Rust VM support for fallible sync calls. Adjusted event logs to match the Go VM.
+- Contract build improvements:
+	- The Rust version is now sent to the wasm build command via CLI, always. This overrides all other settings, giving the framework full control over the Rust version used.
+	- The Rust version can be configured in `sc-config.toml`. This overrides all other settings. If missing, the current config will be detected and used explicitly.
+	- The LLVM version added to the ABI and `.mxsc.json` files.
+	- The `wasm-opt` version can be specified in `sc-config.toml`. While `sc-meta` cannot install or change this version, it will crash if there is a version mismatch, signalling problems with reproducible builds.
+	- The `sc-meta` standalone tool signals version incompatibilities when building contracts. Most importantly it writes a warning to console if multiversx-sc version < `v0.58` and rustc ≥ `v1.87`.
+	- Added a deprecated VM hooks checker mechanism. Currently only checks for legacy call value getters.
+	- ABI build info improvements:
+		- Added host;
+		- Added LLVM version;
+		- Rustc version guaranteed to match the one used for building the wasm binary;
+		- Ensured historical backwards compatibility, back to the first version of the ABI format.
+- `TokenIdentifier` renamed to `EsdtTokenIdentifier`, since the old name was misleading. Old name kept as alias, for backwards compatibility.
+- Fixed proxy imports in snippets.
+
+
 ### [sc 0.62.1, chain 0.19.1, sdk 0.12.1] - 2025-10-27
 - BLS fix (Mutex over BLS library to prevent concurrent calls).
 - `wasmer-prod` build fix (`home` dependency fix).

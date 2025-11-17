@@ -13,12 +13,12 @@ path = "src/wasmer_prod.rs"
 home = "=0.5.1" # downgrading, >= 0.5.2 requires rustc 1.88, which is causing linker problems on Linux
 
 [dependencies.multiversx-chain-core]
-version = "=0.19.1"
+version = "=0.20.0"
 path = "../core"
 
 
 [dependencies.multiversx-chain-vm]
-version = "=0.19.1"
+version = "=0.20.0"
 path = "../vm"
 
 [dependencies.multiversx-chain-vm-executor]
