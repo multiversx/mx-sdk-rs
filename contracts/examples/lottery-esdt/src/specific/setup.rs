@@ -11,33 +11,6 @@ use crate::{
 #[multiversx_sc::module]
 pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::UtilsModule {
     #[allow_multiple_var_args]
-    #[endpoint(createLotteryPool)]
-    fn create_lottery_pool(
-        &self,
-        lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
-        ticket_price: BigUint,
-        opt_total_tickets: Option<usize>,
-        opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<usize>,
-        opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
-        opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
-        opt_burn_percentage: OptionalValue<BigUint>,
-    ) {
-        self.start_lottery(
-            lottery_name,
-            token_identifier,
-            ticket_price,
-            opt_total_tickets,
-            opt_deadline,
-            opt_max_entries_per_user,
-            opt_prize_distribution,
-            opt_whitelist,
-            opt_burn_percentage,
-        );
-    }
-
-    #[allow_multiple_var_args]
     #[allow(clippy::too_many_arguments)]
     fn start_lottery(
         &self,
