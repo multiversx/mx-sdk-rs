@@ -12,7 +12,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:lottery#42",
-                "function": "createLotteryPool",
+                "function": "startLottery",
                 "arguments": [
                     "str:lottery_$$$$",
                     "str:LOTTO-123456",
