@@ -12,7 +12,7 @@ use crate::{
 pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::UtilsModule {
     #[allow_multiple_var_args]
     #[allow(clippy::too_many_arguments)]
-    #[endpoint]
+    #[endpoint(startLottery)]
     fn start_lottery(
         &self,
         lottery_name: ManagedBuffer,

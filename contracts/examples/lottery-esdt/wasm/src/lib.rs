@@ -24,7 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         getLotteryWhitelist => lottery_whitelist
         claim_rewards => claim_rewards
         buy_ticket => buy_ticket
-        start_lottery => start_lottery
+        startLottery => start_lottery
     )
 }
 
