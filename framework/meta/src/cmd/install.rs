@@ -36,9 +36,9 @@ async fn install_scenario_go(sg_args: &InstallMxScenarioGoArgs) {
 }
 
 fn install_wasm32(_wasm32_args: &InstallWasm32Args) {
-    install_target(tools::build_target::WASM32_TARGET);
+    install_target(None, tools::build_target::WASM32_TARGET);
     if tools::build_target::is_wasm32v1_available() {
-        install_target(tools::build_target::WASM32V1_TARGET);
+        install_target(None, tools::build_target::WASM32V1_TARGET);
     }
 }
 

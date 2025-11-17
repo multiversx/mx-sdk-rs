@@ -148,7 +148,7 @@
             "step": "setState",
             "comment": "set block",
             "currentBlockInfo": {
-                "blockTimestamp": "511",
+                "blockTimestampMs": "511",
                 "blockNonce": "300",
                 "blockRound": "300",
                 "blockEpoch": "1"

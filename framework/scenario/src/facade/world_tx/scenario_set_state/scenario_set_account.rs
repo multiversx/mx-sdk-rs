@@ -1,7 +1,7 @@
 use std::collections::btree_map::Entry;
 
 use multiversx_sc::types::{
-    AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier,
+    AnnotatedValue, BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
 };
 
 use crate::{
@@ -59,7 +59,7 @@ impl SetStateBuilder<'_, AccountItem> {
 
     pub fn esdt_balance<K, V>(mut self, token_id: K, balance: V) -> Self
     where
-        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        K: AnnotatedValue<ScenarioTxEnvData, EsdtTokenIdentifier<StaticApi>>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
     {
         let env = self.new_env_data();
@@ -80,7 +80,7 @@ impl SetStateBuilder<'_, AccountItem> {
         attributes: T,
     ) -> Self
     where
-        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        K: AnnotatedValue<ScenarioTxEnvData, EsdtTokenIdentifier<StaticApi>>,
         N: AnnotatedValue<ScenarioTxEnvData, u64>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
         T: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
@@ -114,7 +114,7 @@ impl SetStateBuilder<'_, AccountItem> {
         uris: Vec<U>,
     ) -> Self
     where
-        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        K: AnnotatedValue<ScenarioTxEnvData, EsdtTokenIdentifier<StaticApi>>,
         N: AnnotatedValue<ScenarioTxEnvData, u64>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
         T: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
@@ -156,7 +156,7 @@ impl SetStateBuilder<'_, AccountItem> {
 
     pub fn esdt_nft_last_nonce<K, N>(mut self, token_id: K, last_nonce: N) -> Self
     where
-        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        K: AnnotatedValue<ScenarioTxEnvData, EsdtTokenIdentifier<StaticApi>>,
         N: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
         let env = self.new_env_data();
@@ -174,7 +174,7 @@ impl SetStateBuilder<'_, AccountItem> {
     // TODO: Find a better way to pass roles
     pub fn esdt_roles<K>(mut self, token_id: K, roles: Vec<String>) -> Self
     where
-        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        K: AnnotatedValue<ScenarioTxEnvData, EsdtTokenIdentifier<StaticApi>>,
     {
         let env = self.new_env_data();
         let token_id_key = token_identifier_annotated(&env, token_id);

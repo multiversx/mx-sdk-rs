@@ -1,8 +1,8 @@
 use multiversx_sc::{
     hex_literal::hex,
     types::{
-        BigInt, BigUint, EgldOrEsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
-        ManagedByteArray, ManagedVec, TokenIdentifier,
+        BigInt, BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier, ManagedAddress,
+        ManagedBuffer, ManagedByteArray, ManagedVec,
     },
 };
 use multiversx_sc_scenario::api::StaticApi;
@@ -75,7 +75,7 @@ fn test_managed_vec_format_biguint() {
 fn test_managed_vec_format_egld_or_esdt() {
     let mut mv = ManagedVec::<StaticApi, EgldOrEsdtTokenIdentifier<StaticApi>>::new();
     mv.push(EgldOrEsdtTokenIdentifier::egld());
-    mv.push(EgldOrEsdtTokenIdentifier::esdt(TokenIdentifier::from(
+    mv.push(EgldOrEsdtTokenIdentifier::esdt(EsdtTokenIdentifier::from(
         "MYTOKEN-5678",
     )));
     let s = format!("{:?}", &mv);

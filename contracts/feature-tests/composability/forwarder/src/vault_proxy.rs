@@ -134,7 +134,7 @@ where
     }
 
     pub fn retrieve_funds_with_transfer_exec<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
         Arg2: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
     >(

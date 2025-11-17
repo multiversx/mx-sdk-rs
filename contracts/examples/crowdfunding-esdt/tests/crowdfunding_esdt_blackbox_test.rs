@@ -2,7 +2,7 @@ use crowdfunding_esdt::crowdfunding_esdt_proxy;
 
 use multiversx_sc_scenario::imports::*;
 
-const CF_DEADLINE: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
+const CF_DEADLINE: TimestampMillis = TimestampMillis::new(7 * 24 * 60 * 60 * 1000); // 1 week in milliseconds
 const CF_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("CROWD-123456");
 const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
@@ -108,10 +108,10 @@ impl CrowdfundingESDTTestState {
             .esdt_balance(CF_TOKEN_ID, balance);
     }
 
-    fn set_block_timestamp(&mut self, block_timestamp_expr: u64) {
+    fn set_block_timestamp(&mut self, block_timestamp: TimestampMillis) {
         self.world
             .current_block()
-            .block_timestamp(block_timestamp_expr);
+            .block_timestamp_ms(block_timestamp);
     }
 }
 
@@ -165,7 +165,7 @@ fn test_successful_cf() {
     state.check_deposit(SECOND_USER_ADDRESS, 1_000);
 
     // set block timestamp after deadline
-    state.set_block_timestamp(CF_DEADLINE + 1);
+    state.set_block_timestamp(CF_DEADLINE + DurationMillis::new(1));
 
     // check status successful
     state.check_status(crowdfunding_esdt_proxy::Status::Successful);
@@ -202,7 +202,7 @@ fn test_failed_cf() {
     state.check_deposit(SECOND_USER_ADDRESS, 600u64);
 
     // set block timestamp after deadline
-    state.set_block_timestamp(CF_DEADLINE + 1);
+    state.set_block_timestamp(CF_DEADLINE + DurationMillis::new(1));
 
     // check status failed
     state.check_status(crowdfunding_esdt_proxy::Status::Failed);
