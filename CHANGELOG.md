@@ -66,12 +66,12 @@ And crate group being released requires all crate groups downstream to be releas
 		- `get_block_timestamp_ms` -> `get_block_timestamp_millis`
 		- same for previous block and epoch start block
 		- `get_block_round_time_ms` -> `get_block_round_time_millis`;
+	- Support for `TimestampSeconds` and `TimestampMillis` when setting up blackbox tests;
 	- Mandos support for millisecond timestamps, in both mandos-go and mandos-rs.
 - Rust VM support for fallible sync calls. Adjusted event logs to match the Go VM.
 - Contract build improvements:
 	- The Rust version is now sent to the wasm build command via CLI, always. This overrides all other settings, giving the framework full control over the Rust version used.
 	- The Rust version can be configured in `sc-config.toml`. This overrides all other settings. If missing, the current config will be detected and used explicitly.
-	- The LLVM version added to the ABI and `.mxsc.json` files.
 	- The `wasm-opt` version can be specified in `sc-config.toml`. While `sc-meta` cannot install or change this version, it will crash if there is a version mismatch, signalling problems with reproducible builds.
 	- The `sc-meta` standalone tool signals version incompatibilities when building contracts. Most importantly it writes a warning to console if multiversx-sc version < `v0.58` and rustc ≥ `v1.87`.
 	- Added a deprecated VM hooks checker mechanism. Currently only checks for legacy call value getters.
