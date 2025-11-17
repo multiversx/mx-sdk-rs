@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                            6
+// Endpoints:                            7
 // Async Callback (empty):               1
-// Total number of exported functions:   9
+// Total number of exported functions:  10
 
 #![no_std]
 
@@ -26,6 +26,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         getLotteryWhitelist => lottery_whitelist
         claim_rewards => claim_rewards
         buy_ticket => buy_ticket
+        startLottery => start_lottery
     )
 }
 
