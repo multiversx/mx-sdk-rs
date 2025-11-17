@@ -1,7 +1,7 @@
 use crate::types::{
     heap::H256, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
-    EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
-    ManagedAddress, ManagedBuffer, ManagedVec, MultiEsdtPayment, TokenIdentifier,
+    EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment,
+    EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec, MultiEsdtPayment,
 };
 
 use multiversx_sc_codec::TopEncodeMulti;
@@ -196,7 +196,7 @@ where
     /// This is handy when we only want one ESDT transfer and we want to avoid unnecessary object clones.
     pub fn single_esdt<'a>(
         self,
-        token_identifier: &'a TokenIdentifier<Env::Api>,
+        token_identifier: &'a EsdtTokenIdentifier<Env::Api>,
         token_nonce: u64,
         amount: &'a BigUint<Env::Api>,
     ) -> Tx<Env, From, To, EsdtTokenPaymentRefs<'a, Env::Api>, Gas, Data, RH> {

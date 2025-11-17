@@ -205,7 +205,7 @@ fn write_contract_call(file: &mut File, proxy: &str, endpoint_abi: &EndpointAbi)
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
         "\n            .egld(egld_amount)"
     } else {
-        "\n            .payment((TokenIdentifier::from(token_id.as_str()), token_nonce, token_amount))"
+        "\n            .payment((EsdtTokenIdentifier::from(token_id.as_str()), token_nonce, token_amount))"
     };
 
     writeln!(

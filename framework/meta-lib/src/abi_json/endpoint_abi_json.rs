@@ -81,9 +81,10 @@ impl From<OutputAbiJson> for OutputAbi {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub enum EndpointMutabilityAbiJson {
+    #[default]
     Mutable,
     Readonly,
     Pure,
@@ -139,6 +140,7 @@ pub struct EndpointAbiJson {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub only_admin: Option<bool>,
 
+    #[serde(default)]
     pub mutability: EndpointMutabilityAbiJson,
 
     #[serde(rename = "payableInTokens")]

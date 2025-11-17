@@ -47,6 +47,11 @@ impl Address {
     pub fn to_bech32_default(&self) -> crate::std::Bech32Address {
         crate::std::Bech32Address::encode_address_default_hrp(self.clone())
     }
+
+    #[cfg(feature = "std")]
+    pub fn to_hex(&self) -> String {
+        self.0.to_hex()
+    }
 }
 
 impl From<H256> for Address {
@@ -225,6 +230,13 @@ impl TopDecode for Address {
         H: DecodeErrorHandler,
     {
         Ok(Address(H256::top_decode_or_handle_err(input, h)?))
+    }
+}
+
+#[cfg(feature = "std")]
+impl core::fmt::Display for Address {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Display::fmt(&self.to_hex(), f)
     }
 }
 
