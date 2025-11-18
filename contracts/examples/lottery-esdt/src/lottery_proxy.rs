@@ -138,6 +138,43 @@ where
             .argument(&lottery_name)
             .original_result()
     }
+
+    pub fn start_lottery<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<Option<usize>>,
+        Arg4: ProxyArg<Option<TimestampMillis>>,
+        Arg5: ProxyArg<Option<usize>>,
+        Arg6: ProxyArg<ManagedOption<Env::Api, ManagedVec<Env::Api, u8>>>,
+        Arg7: ProxyArg<ManagedOption<Env::Api, ManagedVec<Env::Api, ManagedAddress<Env::Api>>>>,
+        Arg8: ProxyArg<OptionalValue<BigUint<Env::Api>>>,
+    >(
+        self,
+        lottery_name: Arg0,
+        token_identifier: Arg1,
+        ticket_price: Arg2,
+        opt_total_tickets: Arg3,
+        opt_deadline: Arg4,
+        opt_max_entries_per_user: Arg5,
+        opt_prize_distribution: Arg6,
+        opt_whitelist: Arg7,
+        opt_burn_percentage: Arg8,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("startLottery")
+            .argument(&lottery_name)
+            .argument(&token_identifier)
+            .argument(&ticket_price)
+            .argument(&opt_total_tickets)
+            .argument(&opt_deadline)
+            .argument(&opt_max_entries_per_user)
+            .argument(&opt_prize_distribution)
+            .argument(&opt_whitelist)
+            .argument(&opt_burn_percentage)
+            .original_result()
+    }
 }
 
 #[type_abi]
