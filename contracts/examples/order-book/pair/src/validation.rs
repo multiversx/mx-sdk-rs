@@ -5,8 +5,8 @@ use crate::common::{FeeConfig, FeeConfigEnum};
 use super::{
     common,
     common::{
-        Order, OrderInputParams, Payment, FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER,
-        PERCENT_BASE_POINTS,
+        FungiblePayment, Order, OrderInputParams, FEE_PENALTY_INCREASE_PERCENT,
+        MAX_ORDERS_PER_USER, PERCENT_BASE_POINTS,
     },
 };
 
@@ -68,7 +68,7 @@ pub trait ValidationModule: common::CommonModule {
         self.require_valid_order_input_deal_config(params);
     }
 
-    fn require_valid_buy_payment(&self) -> Payment<Self::Api> {
+    fn require_valid_buy_payment(&self) -> FungiblePayment<Self::Api> {
         let (token_id, amount) = self.call_value().single_fungible_esdt();
         let second_token_id = self.second_token_id().get();
         require!(
@@ -76,13 +76,13 @@ pub trait ValidationModule: common::CommonModule {
             "Token in and second token id should be the same"
         );
 
-        Payment {
+        FungiblePayment {
             token_id: token_id.clone(),
             amount: amount.clone(),
         }
     }
 
-    fn require_valid_sell_payment(&self) -> Payment<Self::Api> {
+    fn require_valid_sell_payment(&self) -> FungiblePayment<Self::Api> {
         let (token_id, amount) = self.call_value().single_fungible_esdt();
         let first_token_id = self.first_token_id().get();
         require!(
@@ -90,7 +90,7 @@ pub trait ValidationModule: common::CommonModule {
             "Token in and first token id should be the same"
         );
 
-        Payment {
+        FungiblePayment {
             token_id: token_id.clone(),
             amount: amount.clone(),
         }

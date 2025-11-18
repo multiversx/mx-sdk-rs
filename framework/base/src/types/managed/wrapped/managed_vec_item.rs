@@ -11,7 +11,7 @@ use crate::{
     api::{use_raw_handle, HandleConstraints, ManagedTypeApi},
     types::{
         BigInt, BigUint, EllipticCurve, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
-        ManagedByteArray, ManagedRef, ManagedType, ManagedVec,
+        ManagedByteArray, ManagedRef, ManagedType, ManagedVec, TokenId,
     },
 };
 
@@ -236,6 +236,7 @@ impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {EsdtTokenIdentifier}
 impl_managed_type! {EgldOrEsdtTokenIdentifier}
+impl_managed_type! {TokenId}
 
 impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>
 where
