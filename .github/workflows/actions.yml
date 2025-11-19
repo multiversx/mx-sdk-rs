@@ -14,10 +14,11 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@23407e66cf02eae139bf8e7cf3004e453fddce2b
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@8d1dfd306b3b63c4cf2ef613afc02c2247d1bc7b
     with:
-      runs-on: self-hosted
       rust-toolchain: 1.87
+      setup-runs-on: self-hosted
+      test-coverage-runs-on: self-hosted
       rust-target: wasm32v1-none
       path-to-sc-meta: framework/meta
       mx-scenario-go-version: v5.1.0
