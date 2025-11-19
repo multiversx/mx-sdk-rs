@@ -10,6 +10,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 #[allow(clippy::redundant_clone)]
 pub trait BigIntOperators {
+    // Endpoints grouped into several sections:
 
     // Arithmetic binary operators
 

@@ -196,4 +196,5 @@ multiversx_sc::imports!();
 /// Checks that BigUint/BigInt operators work as expected.
 #[multiversx_sc::module]
 #[allow(clippy::redundant_clone)]
-pub trait BigIntOperators {"#;
+pub trait BigIntOperators {
+    // Endpoints grouped into several sections:"#;
