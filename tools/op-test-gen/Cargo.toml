@@ -1,0 +1,13 @@
+[package]
+name = "op-test-gen"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "op-test-gen"
+path = "src/op_gen_main.rs"
+
+[lib]
+path = "src/op_gen_lib.rs"
+
+[dependencies]
