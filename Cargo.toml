@@ -88,6 +88,7 @@ members = [
   "contracts/examples/fractional-nfts/meta",
   "contracts/examples/lottery-esdt",
   "contracts/examples/lottery-esdt/meta",
+  "contracts/examples/lottery-esdt/interactor",
   "contracts/examples/multisig",
   "contracts/examples/multisig/meta",
   "contracts/examples/multisig/interact",

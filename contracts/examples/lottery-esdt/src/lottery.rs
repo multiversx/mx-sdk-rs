@@ -25,4 +25,7 @@ pub trait Lottery:
 {
     #[init]
     fn init(&self) {}
+
+    #[upgrade]
+    fn upgrade(&self) {}
 }
