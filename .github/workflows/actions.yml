@@ -14,7 +14,7 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@8d1dfd306b3b63c4cf2ef613afc02c2247d1bc7b
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@c8e31bd629bd763000f9eb9ae2c6458c062f1134
     with:
       rust-toolchain: 1.87
       setup-runs-on: self-hosted
