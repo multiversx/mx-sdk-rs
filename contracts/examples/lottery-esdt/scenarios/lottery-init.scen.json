@@ -9,6 +9,10 @@
                     "nonce": "0",
                     "balance": "1,000,000"
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000"
+                },
                 "address:acc1": {
                     "nonce": "0",
                     "balance": "1,000,000"
@@ -22,7 +26,7 @@
                 {
                     "creatorAddress": "address:my_address",
                     "creatorNonce": "0",
-                    "newAddress": "sc:lottery"
+                    "newAddress": "sc:lottery#42"
                 }
             ]
         },
@@ -51,6 +55,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
                 "address:acc1": {
                     "nonce": "0",
                     "balance": "1,000,000",
@@ -61,7 +70,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
