@@ -9,22 +9,6 @@ pub trait BigIntOperators {
         a + b
     }
     #[endpoint]
-    fn add_big_int_big_uint(&self, a: BigInt, b: BigUint) -> BigInt {
-        a + b
-    }
-    #[endpoint]
-    fn add_big_uint_big_int(&self, a: BigUint, b: BigInt) -> BigInt {
-        a + b
-    }
-    #[endpoint]
-    fn add_big_int_big_uint_ref(&self, a: &BigInt, b: &BigUint) -> BigInt {
-        a + b
-    }
-    #[endpoint]
-    fn add_big_uint_big_int_ref(&self, a: &BigUint, b: &BigInt) -> BigInt {
-        a + b
-    }
-    #[endpoint]
     fn add_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a + b
     }
