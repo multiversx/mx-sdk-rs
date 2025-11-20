@@ -17,7 +17,6 @@ jobs:
     uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@5f01ee31621d570cdeca57e17928f53fc42617a4
     with:
       rust-toolchain: 1.87
-      skip-rust-setup: true
       setup-runs-on: self-hosted
       test-coverage-runs-on: self-hosted
       rust-target: wasm32v1-none
