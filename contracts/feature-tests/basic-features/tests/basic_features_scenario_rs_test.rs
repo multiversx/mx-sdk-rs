@@ -33,6 +33,11 @@ fn big_num_conversions_rs() {
 }
 
 #[test]
+fn big_num_ops_rs() {
+    world().run("scenarios/big_num_ops.scen.json");
+}
+
+#[test]
 fn big_uint_eq_u_64_rs() {
     world().run("scenarios/big_uint_eq_u64.scen.json");
 }
