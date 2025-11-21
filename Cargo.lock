@@ -3584,6 +3584,11 @@ checksum = "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
 [[package]]
 name = "op-test-gen"
 version = "0.1.0"
+dependencies = [
+ "multiversx-sc-scenario",
+ "num-bigint",
+ "num-traits",
+]
 
 [[package]]
 name = "openssl"

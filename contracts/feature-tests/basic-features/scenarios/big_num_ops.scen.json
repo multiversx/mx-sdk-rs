@@ -1,0 +1,1062 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_and_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_and_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_or_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_or_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_xor_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_xor_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "shr_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "shr_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "shl_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "shl_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_assign_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_assign_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_assign_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_assign_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_assign_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_assign_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_assign_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_assign_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_assign_big_int",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_assign_big_int_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_and_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_and_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_or_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_or_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_xor_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "bit_xor_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "shr_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "shr_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "shl_assign_big_uint",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "shl_assign_big_uint_ref",
+                "arguments": [
+                    "0",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0"
+            }
+        }
+    ]
+}
