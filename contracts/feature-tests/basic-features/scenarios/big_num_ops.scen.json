@@ -12,7 +12,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "add_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "add_big_int",
@@ -30,7 +30,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "add_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "add_big_int_ref",
@@ -48,7 +48,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "add_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "add_big_uint",
@@ -66,7 +66,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "add_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "add_big_uint_ref",
@@ -84,7 +84,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "sub_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "sub_big_int",
@@ -102,7 +102,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "sub_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "sub_big_int_ref",
@@ -120,7 +120,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "sub_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "sub_big_uint",
@@ -138,7 +138,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "sub_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "sub_big_uint_ref",
@@ -156,7 +156,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "mul_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mul_big_int",
@@ -174,7 +174,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "mul_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mul_big_int_ref",
@@ -192,7 +192,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "mul_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mul_big_uint",
@@ -210,7 +210,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "mul_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mul_big_uint_ref",
@@ -228,7 +228,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "div_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "div_big_int",
@@ -244,7 +244,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "div_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "div_big_int_ref",
@@ -260,7 +260,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "div_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "div_big_uint",
@@ -276,7 +276,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "div_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "div_big_uint_ref",
@@ -292,7 +292,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "rem_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "rem_big_int",
@@ -308,7 +308,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "rem_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "rem_big_int_ref",
@@ -324,7 +324,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "rem_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "rem_big_uint",
@@ -340,7 +340,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "rem_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "rem_big_uint_ref",
@@ -356,7 +356,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_and_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_and_big_uint",
@@ -374,7 +374,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_and_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_and_big_uint_ref",
@@ -392,7 +392,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_or_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_or_big_uint",
@@ -410,7 +410,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_or_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_or_big_uint_ref",
@@ -428,7 +428,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_xor_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_xor_big_uint",
@@ -446,7 +446,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_xor_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_xor_big_uint_ref",
@@ -464,7 +464,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "shr_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "shr_big_uint",
@@ -482,7 +482,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "shr_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "shr_big_uint_ref",
@@ -500,7 +500,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "shl_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "shl_big_uint",
@@ -518,7 +518,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "shl_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "shl_big_uint_ref",
@@ -536,7 +536,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "add_assign_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "add_assign_big_int",
@@ -554,7 +554,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "add_assign_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "add_assign_big_int_ref",
@@ -572,7 +572,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "add_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "add_assign_big_uint",
@@ -590,7 +590,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "add_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "add_assign_big_uint_ref",
@@ -608,7 +608,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "sub_assign_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "sub_assign_big_int",
@@ -626,7 +626,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "sub_assign_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "sub_assign_big_int_ref",
@@ -644,7 +644,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "sub_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "sub_assign_big_uint",
@@ -662,7 +662,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "sub_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "sub_assign_big_uint_ref",
@@ -680,7 +680,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "mul_assign_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mul_assign_big_int",
@@ -698,7 +698,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "mul_assign_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mul_assign_big_int_ref",
@@ -716,7 +716,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "mul_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mul_assign_big_uint",
@@ -734,7 +734,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "mul_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "mul_assign_big_uint_ref",
@@ -752,7 +752,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "div_assign_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "div_assign_big_int",
@@ -768,7 +768,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "div_assign_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "div_assign_big_int_ref",
@@ -784,7 +784,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "div_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "div_assign_big_uint",
@@ -800,7 +800,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "div_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "div_assign_big_uint_ref",
@@ -816,7 +816,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "rem_assign_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "rem_assign_big_int",
@@ -832,7 +832,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "rem_assign_big_int_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "rem_assign_big_int_ref",
@@ -848,7 +848,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "rem_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "rem_assign_big_uint",
@@ -864,7 +864,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "rem_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "rem_assign_big_uint_ref",
@@ -880,7 +880,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_and_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_and_assign_big_uint",
@@ -898,7 +898,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_and_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_and_assign_big_uint_ref",
@@ -916,7 +916,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_or_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_or_assign_big_uint",
@@ -934,7 +934,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_or_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_or_assign_big_uint_ref",
@@ -952,7 +952,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_xor_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_xor_assign_big_uint",
@@ -970,7 +970,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "bit_xor_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "bit_xor_assign_big_uint_ref",
@@ -988,7 +988,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "shr_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "shr_assign_big_uint",
@@ -1006,7 +1006,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "shr_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "shr_assign_big_uint_ref",
@@ -1024,7 +1024,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "shl_assign_big_uint(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "shl_assign_big_uint",
@@ -1042,7 +1042,7 @@
         },
         {
             "step": "scQuery",
-            "id": "",
+            "id": "shl_assign_big_uint_ref(0,0)",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "shl_assign_big_uint_ref",

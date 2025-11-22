@@ -81,6 +81,7 @@ fn add_query(
 
     scenario.steps.push(Step::ScQuery(
         ScQueryStep::new()
+            .id(format!("{}({},{})", endpoint.fn_name, a, b))
             .to(SC_ADDRESS_EXPR)
             .function(&endpoint.fn_name)
             .argument(&a.to_string())
