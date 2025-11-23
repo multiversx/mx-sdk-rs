@@ -1,5 +1,5 @@
 use num_traits::identities::Zero;
-use num_traits::ToPrimitive;
+use num_traits::{Signed, ToPrimitive};
 
 use multiversx_sc_scenario::imports::{
     Account, BytesValue, InterpretableFrom, ScQueryStep, Scenario, SetStateStep, TxExpect,
@@ -8,9 +8,10 @@ use multiversx_sc_scenario::scenario_format::interpret_trait::{InterpreterContex
 use multiversx_sc_scenario::scenario_model::Step;
 
 use crate::op_list::BaseOperator;
-use crate::{create_all_endpoints, BigNumOperatorTestEndpoint, OpInfo, OperatorList};
+use crate::{create_all_endpoints, BigNumOperatorTestEndpoint, OperatorList};
 
 const SC_ADDRESS_EXPR: &str = "sc:basic-features";
+const SHIFT_LIMIT: usize = 10000;
 
 pub fn write_scenario() {
     let scenario = create_scenario();
@@ -43,63 +44,124 @@ pub fn create_scenario() -> Scenario {
     scenario
 }
 
-fn eval_op(a: &num_bigint::BigInt, b: &num_bigint::BigInt, op: &OpInfo) -> num_bigint::BigInt {
-    println!("Evaluating: {} {} {}", a, op.symbol(), b);
-    match op.base_operator {
-        BaseOperator::Add => a + b,
-        BaseOperator::Sub => a - b,
-        BaseOperator::Mul => a * b,
-        BaseOperator::Div => a / b,
-        BaseOperator::Rem => a % b,
-        BaseOperator::BitAnd => a & b,
-        BaseOperator::BitOr => a | b,
-        BaseOperator::BitXor => a ^ b,
+fn tx_expect_ok(
+    endpoint: &BigNumOperatorTestEndpoint,
+    result: num_bigint::BigInt,
+) -> Option<TxExpect> {
+    Some(TxExpect::ok().result(&serialize_arg(&endpoint.return_type, &result)))
+}
+
+fn eval_op(
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
+    endpoint: &BigNumOperatorTestEndpoint,
+) -> Option<TxExpect> {
+    match endpoint.op_info.base_operator {
+        BaseOperator::Add => tx_expect_ok(endpoint, a + b),
+        BaseOperator::Sub => {
+            let result = a - b;
+            if !signed_type(&endpoint.return_type) && result.is_negative() {
+                Some(TxExpect::err(
+                    4,
+                    "str:cannot subtract because result would be negative",
+                ))
+            } else {
+                tx_expect_ok(endpoint, result)
+            }
+        }
+        BaseOperator::Mul => tx_expect_ok(endpoint, a * b),
+        BaseOperator::Div => {
+            if b.is_zero() {
+                Some(TxExpect::err(10, "str:division by 0"))
+            } else {
+                tx_expect_ok(endpoint, a / b)
+            }
+        }
+        BaseOperator::Rem => {
+            if b.is_zero() {
+                Some(TxExpect::err(10, "str:division by 0"))
+            } else {
+                tx_expect_ok(endpoint, a % b)
+            }
+        }
+        BaseOperator::BitAnd => tx_expect_ok(endpoint, a & b),
+        BaseOperator::BitOr => tx_expect_ok(endpoint, a | b),
+        BaseOperator::BitXor => tx_expect_ok(endpoint, a ^ b),
         BaseOperator::Shl => {
             // For shifts, BigInt does not support shifting by BigInt directly.
-            let shift_amount = b.to_usize().expect("Shift amount too large");
-            a << shift_amount
+            let shift_amount = b.to_usize()?;
+            if shift_amount > SHIFT_LIMIT {
+                return None;
+            }
+            tx_expect_ok(endpoint, a << shift_amount)
         }
         BaseOperator::Shr => {
-            let shift_amount = b.to_usize().expect("Shift amount too large");
-            a >> shift_amount
+            let shift_amount = b.to_usize()?;
+            if shift_amount > SHIFT_LIMIT {
+                return None;
+            }
+            tx_expect_ok(endpoint, a >> shift_amount)
         }
+    }
+}
+
+fn signed_type(arg_type: &str) -> bool {
+    arg_type == "BigInt" || arg_type == "&BigInt"
+}
+
+fn serialize_arg(arg_type: &str, n: &num_bigint::BigInt) -> String {
+    if signed_type(arg_type) && n.is_positive() {
+        format!("+{n}")
+    } else {
+        n.to_string()
     }
 }
 
 fn add_query(
     scenario: &mut Scenario,
     endpoint: &BigNumOperatorTestEndpoint,
-    a: num_bigint::BigInt,
-    b: num_bigint::BigInt,
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
 ) {
-    let tx_expect = if endpoint.op_info.base_operator.is_division() && b.is_zero() {
-        TxExpect::err(10, "str:division by 0")
-    } else {
-        let result = eval_op(&a, &b, &endpoint.op_info);
-        TxExpect::ok().result(&result.to_string())
+    let Some(tx_expect) = eval_op(a, b, endpoint) else {
+        return;
     };
+
+    println!("Adding step: {} {} {}", a, endpoint.op_info.symbol(), b);
 
     scenario.steps.push(Step::ScQuery(
         ScQueryStep::new()
             .id(format!("{}({},{})", endpoint.fn_name, a, b))
             .to(SC_ADDRESS_EXPR)
             .function(&endpoint.fn_name)
-            .argument(&a.to_string())
-            .argument(&b.to_string())
+            .argument(&serialize_arg(&endpoint.a_type, a))
+            .argument(&serialize_arg(&endpoint.b_type, b))
             .expect(tx_expect),
     ));
+}
+
+fn argument_values() -> Vec<num_bigint::BigInt> {
+    vec![
+        num_bigint::BigInt::from(0),
+        num_bigint::BigInt::from(1),
+        num_bigint::BigInt::from(2),
+        num_bigint::BigInt::from(12345),
+        num_bigint::BigInt::from(18446744073709551615i128),
+        num_bigint::BigInt::from(18446744073709551616i128),
+    ]
 }
 
 fn add_queries(scenario: &mut Scenario) {
     let ops = OperatorList::create();
     let endpoints = create_all_endpoints(&ops);
 
+    let numbers = argument_values();
+
     for endpoint in endpoints {
-        add_query(
-            scenario,
-            &endpoint,
-            num_bigint::BigInt::from(0),
-            num_bigint::BigInt::from(0),
-        );
+        for a in &numbers {
+            for b in &numbers {
+                add_query(scenario, &endpoint, a, b);
+            }
+        }
     }
 }
