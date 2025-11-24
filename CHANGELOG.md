@@ -58,6 +58,11 @@ And crate group being released requires all crate groups downstream to be releas
 ## Version history
 
 
+### [sc 0.63.1] - 2025-11-24
+- Blockchain API renames: `epoch_start_block_*` -> `get_epoch_start_block_*`, for consistency.
+- Set block timestamp methods renamed to `block_timestamp_seconds` and `block_timestamp_millis`, respectively, also for consistency.
+
+
 ### [sc 0.63.0, chain 0.20.0, sdk 0.13.0, scenario-format 0.24.0] - 2025-11-27
 - New block info API, which returns timestamps as either `TimestampSeconds` or `TimestampMillis`, instead of just `u64`:
 	- New types for measuring time, not only timestamps, but also durations (`DurationSeconds` and `DurationMillis`);
