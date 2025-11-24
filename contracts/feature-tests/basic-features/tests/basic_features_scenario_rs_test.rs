@@ -33,8 +33,18 @@ fn big_num_conversions_rs() {
 }
 
 #[test]
-fn big_num_ops_rs() {
-    world().run("scenarios/big_num_ops.scen.json");
+fn big_num_ops_arith_rs() {
+    world().run("scenarios/big_num_ops_arith.scen.json");
+}
+
+#[test]
+fn big_num_ops_bitwise_rs() {
+    world().run("scenarios/big_num_ops_bitwise.scen.json");
+}
+
+#[test]
+fn big_num_ops_shift_rs() {
+    world().run("scenarios/big_num_ops_shift.scen.json");
 }
 
 #[test]

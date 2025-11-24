@@ -3,7 +3,7 @@ mod op_gen_scenario;
 mod op_list;
 
 pub use op_gen_endpoints::{create_all_endpoints, BigNumOperatorTestEndpoint};
-pub use op_gen_scenario::write_scenario;
+pub use op_gen_scenario::write_scenarios;
 pub use op_list::{OpGroup, OpInfo, OperatorList};
 
 use std::fmt::Write;

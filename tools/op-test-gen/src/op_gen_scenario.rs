@@ -11,47 +11,106 @@ use crate::op_list::BaseOperator;
 use crate::{create_all_endpoints, BigNumOperatorTestEndpoint, OperatorList};
 
 const SC_ADDRESS_EXPR: &str = "sc:basic-features";
-const SHIFT_LIMIT: usize = 10000;
 
-pub fn write_scenario() {
-    let scenario = create_scenario();
-    let scenario_raw = scenario.into_raw();
-    let target_path =
-        "../../contracts/feature-tests/basic-features/scenarios/big_num_ops.scen.json";
-    scenario_raw.save_to_file(target_path);
-    println!("Successfully rewrote {}", target_path);
+pub fn write_scenarios() {
+    write_scenario_arith(
+        "../../contracts/feature-tests/basic-features/scenarios/big_num_ops_arith.scen.json",
+    );
+    write_scenario_bitwise(
+        "../../contracts/feature-tests/basic-features/scenarios/big_num_ops_bitwise.scen.json",
+    );
+    write_scenario_shift(
+        "../../contracts/feature-tests/basic-features/scenarios/big_num_ops_shift.scen.json",
+    );
 }
 
-pub fn create_scenario() -> Scenario {
-    let mut scenario = Scenario::default();
-    let interpreter_context = InterpreterContext::new().with_allowed_missing_files();
+pub fn write_scenario_arith(target_path: &str) {
+    let mut scenario = create_scenario();
+    let ops = OperatorList::create();
+    let endpoints = create_all_endpoints(&ops);
 
-    scenario.steps.push(Step::SetState(
-        SetStateStep::new().put_account(
-            SC_ADDRESS_EXPR,
-            Account::default()
-                .nonce("0")
-                .balance("0")
-                .code(BytesValue::interpret_from(
-                    "mxsc:../output/basic-features.mxsc.json",
-                    &interpreter_context,
-                )),
-        ),
-    ));
+    let numbers = vec![
+        num_bigint::BigInt::from(0),
+        num_bigint::BigInt::from(1),
+        num_bigint::BigInt::from(2),
+        num_bigint::BigInt::from(12345),
+        num_bigint::BigInt::from(18446744073709551615i128),
+        num_bigint::BigInt::from(18446744073709551616i128),
+    ];
 
-    add_queries(&mut scenario);
+    for endpoint in endpoints {
+        for a in &numbers {
+            for b in &numbers {
+                if let Some(tx_expect) = eval_op_arith(a, b, &endpoint) {
+                    add_query(&mut scenario, &endpoint, a, b, tx_expect);
+                }
+            }
+        }
+    }
 
-    scenario
+    save_scenario(scenario, target_path);
 }
 
-fn tx_expect_ok(
-    endpoint: &BigNumOperatorTestEndpoint,
-    result: num_bigint::BigInt,
-) -> Option<TxExpect> {
-    Some(TxExpect::ok().result(&serialize_arg(&endpoint.return_type, &result)))
+pub fn write_scenario_bitwise(target_path: &str) {
+    let mut scenario = create_scenario();
+    let ops = OperatorList::create();
+    let endpoints = create_all_endpoints(&ops);
+
+    let numbers = vec![
+        num_bigint::BigInt::from(0),
+        num_bigint::BigInt::from(1),
+        num_bigint::BigInt::from(2),
+        num_bigint::BigInt::from(255),
+        num_bigint::BigInt::from(256),
+        num_bigint::BigInt::from(18446744073709551615i128),
+        num_bigint::BigInt::from(18446744073709551616i128),
+    ];
+
+    for endpoint in endpoints {
+        for a in &numbers {
+            for b in &numbers {
+                if let Some(tx_expect) = eval_op_bitwise(a, b, &endpoint) {
+                    add_query(&mut scenario, &endpoint, a, b, tx_expect);
+                }
+            }
+        }
+    }
+
+    save_scenario(scenario, target_path);
 }
 
-fn eval_op(
+pub fn write_scenario_shift(target_path: &str) {
+    let mut scenario = create_scenario();
+    let ops = OperatorList::create();
+    let endpoints = create_all_endpoints(&ops);
+
+    let numbers = vec![
+        num_bigint::BigInt::from(0),
+        num_bigint::BigInt::from(1),
+        num_bigint::BigInt::from(18446744073709551615i128),
+        num_bigint::BigInt::from(18446744073709551616i128),
+    ];
+
+    let shift_amounts = vec![
+        num_bigint::BigInt::from(0),
+        num_bigint::BigInt::from(1),
+        num_bigint::BigInt::from(1000),
+    ];
+
+    for endpoint in endpoints {
+        for a in &numbers {
+            for b in &shift_amounts {
+                if let Some(tx_expect) = eval_op_shift(a, b, &endpoint) {
+                    add_query(&mut scenario, &endpoint, a, b, tx_expect);
+                }
+            }
+        }
+    }
+
+    save_scenario(scenario, target_path);
+}
+
+fn eval_op_arith(
     a: &num_bigint::BigInt,
     b: &num_bigint::BigInt,
     endpoint: &BigNumOperatorTestEndpoint,
@@ -84,25 +143,81 @@ fn eval_op(
                 tx_expect_ok(endpoint, a % b)
             }
         }
+        _ => None,
+    }
+}
+
+fn eval_op_bitwise(
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
+    endpoint: &BigNumOperatorTestEndpoint,
+) -> Option<TxExpect> {
+    if a.is_negative() || b.is_negative() {
+        return None;
+    }
+
+    match endpoint.op_info.base_operator {
         BaseOperator::BitAnd => tx_expect_ok(endpoint, a & b),
         BaseOperator::BitOr => tx_expect_ok(endpoint, a | b),
         BaseOperator::BitXor => tx_expect_ok(endpoint, a ^ b),
+        _ => None,
+    }
+}
+
+fn eval_op_shift(
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
+    endpoint: &BigNumOperatorTestEndpoint,
+) -> Option<TxExpect> {
+    if a.is_negative() || b.is_negative() {
+        return None;
+    }
+
+    match endpoint.op_info.base_operator {
         BaseOperator::Shl => {
             // For shifts, BigInt does not support shifting by BigInt directly.
             let shift_amount = b.to_usize()?;
-            if shift_amount > SHIFT_LIMIT {
-                return None;
-            }
             tx_expect_ok(endpoint, a << shift_amount)
         }
         BaseOperator::Shr => {
             let shift_amount = b.to_usize()?;
-            if shift_amount > SHIFT_LIMIT {
-                return None;
-            }
             tx_expect_ok(endpoint, a >> shift_amount)
         }
+        _ => None,
     }
+}
+
+pub fn create_scenario() -> Scenario {
+    let mut scenario = Scenario::default();
+    let interpreter_context = InterpreterContext::new().with_allowed_missing_files();
+
+    scenario.steps.push(Step::SetState(
+        SetStateStep::new().put_account(
+            SC_ADDRESS_EXPR,
+            Account::default()
+                .nonce("0")
+                .balance("0")
+                .code(BytesValue::interpret_from(
+                    "mxsc:../output/basic-features.mxsc.json",
+                    &interpreter_context,
+                )),
+        ),
+    ));
+
+    scenario
+}
+
+fn save_scenario(scenario: Scenario, target_path: &str) {
+    let scenario_raw = scenario.into_raw();
+    scenario_raw.save_to_file(target_path);
+    println!("Successfully rewrote {}", target_path);
+}
+
+fn tx_expect_ok(
+    endpoint: &BigNumOperatorTestEndpoint,
+    result: num_bigint::BigInt,
+) -> Option<TxExpect> {
+    Some(TxExpect::ok().result(&serialize_arg(&endpoint.return_type, &result)))
 }
 
 fn signed_type(arg_type: &str) -> bool {
@@ -122,13 +237,8 @@ fn add_query(
     endpoint: &BigNumOperatorTestEndpoint,
     a: &num_bigint::BigInt,
     b: &num_bigint::BigInt,
+    tx_expect: TxExpect,
 ) {
-    let Some(tx_expect) = eval_op(a, b, endpoint) else {
-        return;
-    };
-
-    println!("Adding step: {} {} {}", a, endpoint.op_info.symbol(), b);
-
     scenario.steps.push(Step::ScQuery(
         ScQueryStep::new()
             .id(format!("{}({},{})", endpoint.fn_name, a, b))
@@ -138,30 +248,4 @@ fn add_query(
             .argument(&serialize_arg(&endpoint.b_type, b))
             .expect(tx_expect),
     ));
-}
-
-fn argument_values() -> Vec<num_bigint::BigInt> {
-    vec![
-        num_bigint::BigInt::from(0),
-        num_bigint::BigInt::from(1),
-        num_bigint::BigInt::from(2),
-        num_bigint::BigInt::from(12345),
-        num_bigint::BigInt::from(18446744073709551615i128),
-        num_bigint::BigInt::from(18446744073709551616i128),
-    ]
-}
-
-fn add_queries(scenario: &mut Scenario) {
-    let ops = OperatorList::create();
-    let endpoints = create_all_endpoints(&ops);
-
-    let numbers = argument_values();
-
-    for endpoint in endpoints {
-        for a in &numbers {
-            for b in &numbers {
-                add_query(scenario, &endpoint, a, b);
-            }
-        }
-    }
 }
