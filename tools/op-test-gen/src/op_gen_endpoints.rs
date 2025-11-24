@@ -1,10 +1,10 @@
 use std::fmt::Write;
 
-use crate::{OpGroup, OpInfo, OperatorList};
+use crate::{OperatorGroup, OperatorInfo, OperatorList};
 
 pub struct BigNumOperatorTestEndpoint {
     pub fn_name: String,
-    pub op_info: OpInfo,
+    pub op_info: OperatorInfo,
     pub a_type: String,
     pub b_type: String,
     pub return_type: String,
@@ -14,7 +14,7 @@ pub struct BigNumOperatorTestEndpoint {
 impl BigNumOperatorTestEndpoint {
     pub fn new_bin(
         fn_name: &str,
-        op_info: &OpInfo,
+        op_info: &OperatorInfo,
         a_type: &str,
         b_type: &str,
         return_type: &str,
@@ -59,10 +59,10 @@ impl BigNumOperatorTestEndpoint {
     }
 }
 
-pub fn create_endpoints_for_op(op: &OpInfo) -> Vec<BigNumOperatorTestEndpoint> {
+pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpoint> {
     let mut endpoints = Vec::new();
 
-    if op.group == OpGroup::Arithmetic {
+    if op.group == OperatorGroup::Arithmetic {
         // Binary operator endpoint
         endpoints.push(BigNumOperatorTestEndpoint::new_bin(
             &format!("{}_big_int", op.name),
@@ -80,7 +80,7 @@ pub fn create_endpoints_for_op(op: &OpInfo) -> Vec<BigNumOperatorTestEndpoint> {
         ));
     }
 
-    if op.group == OpGroup::Shift {
+    if op.group == OperatorGroup::Shift {
         endpoints.push(BigNumOperatorTestEndpoint::new_bin(
             &format!("{}_big_uint", op.name),
             op,

@@ -4,7 +4,7 @@ mod op_list;
 
 pub use op_gen_endpoints::{create_all_endpoints, BigNumOperatorTestEndpoint};
 pub use op_gen_scenario::write_scenarios;
-pub use op_list::{OpGroup, OpInfo, OperatorList};
+pub use op_list::{OperatorGroup, OperatorInfo, OperatorList};
 
 use std::fmt::Write;
 
@@ -14,7 +14,7 @@ fn section_comment(out: &mut String, comment: &str) {
 
 fn write_filtered_endpoints(
     endpoints: &[BigNumOperatorTestEndpoint],
-    op_group: OpGroup,
+    op_group: OperatorGroup,
     assign: bool,
     out: &mut String,
 ) {
@@ -32,22 +32,22 @@ pub fn generate_big_int_operators_trait() -> String {
     let endpoints = create_all_endpoints(&ops);
 
     section_comment(&mut out, "Arithmetic binary operators");
-    write_filtered_endpoints(&endpoints, OpGroup::Arithmetic, false, &mut out);
+    write_filtered_endpoints(&endpoints, OperatorGroup::Arithmetic, false, &mut out);
 
     section_comment(&mut out, "Arithmetic assign operators");
-    write_filtered_endpoints(&endpoints, OpGroup::Arithmetic, true, &mut out);
+    write_filtered_endpoints(&endpoints, OperatorGroup::Arithmetic, true, &mut out);
 
     section_comment(&mut out, "Bitwise binary operators");
-    write_filtered_endpoints(&endpoints, OpGroup::Bitwise, false, &mut out);
+    write_filtered_endpoints(&endpoints, OperatorGroup::Bitwise, false, &mut out);
 
     section_comment(&mut out, "Bitwise assign operators");
-    write_filtered_endpoints(&endpoints, OpGroup::Bitwise, true, &mut out);
+    write_filtered_endpoints(&endpoints, OperatorGroup::Bitwise, true, &mut out);
 
     section_comment(&mut out, "Bitwise shift binary operators");
-    write_filtered_endpoints(&endpoints, OpGroup::Shift, false, &mut out);
+    write_filtered_endpoints(&endpoints, OperatorGroup::Shift, false, &mut out);
 
     section_comment(&mut out, "Bitwise shift assign operators");
-    write_filtered_endpoints(&endpoints, OpGroup::Shift, true, &mut out);
+    write_filtered_endpoints(&endpoints, OperatorGroup::Shift, true, &mut out);
 
     writeln!(&mut out, "\n}}").unwrap();
 

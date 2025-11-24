@@ -34,15 +34,15 @@ impl BaseOperator {
 }
 
 #[derive(Debug, Clone)]
-pub struct OpInfo {
+pub struct OperatorInfo {
     pub name: String,
     pub base_operator: BaseOperator,
     pub assign: bool,
-    pub group: OpGroup,
+    pub group: OperatorGroup,
 }
 
-impl OpInfo {
-    pub fn new(name: &str, base_operator: BaseOperator, group: OpGroup) -> Self {
+impl OperatorInfo {
+    pub fn new(name: &str, base_operator: BaseOperator, group: OperatorGroup) -> Self {
         Self {
             name: name.to_owned(),
             base_operator,
@@ -71,30 +71,30 @@ impl OpInfo {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OpGroup {
+pub enum OperatorGroup {
     Arithmetic,
     Bitwise,
     Shift,
 }
 
-pub struct OperatorList(pub Vec<OpInfo>);
+pub struct OperatorList(pub Vec<OperatorInfo>);
 
 impl OperatorList {
     pub fn create() -> Self {
         let binary_operators = vec![
             // Arithmetic binary operators
-            OpInfo::new("add", BaseOperator::Add, OpGroup::Arithmetic),
-            OpInfo::new("sub", BaseOperator::Sub, OpGroup::Arithmetic),
-            OpInfo::new("mul", BaseOperator::Mul, OpGroup::Arithmetic),
-            OpInfo::new("div", BaseOperator::Div, OpGroup::Arithmetic),
-            OpInfo::new("rem", BaseOperator::Rem, OpGroup::Arithmetic),
+            OperatorInfo::new("add", BaseOperator::Add, OperatorGroup::Arithmetic),
+            OperatorInfo::new("sub", BaseOperator::Sub, OperatorGroup::Arithmetic),
+            OperatorInfo::new("mul", BaseOperator::Mul, OperatorGroup::Arithmetic),
+            OperatorInfo::new("div", BaseOperator::Div, OperatorGroup::Arithmetic),
+            OperatorInfo::new("rem", BaseOperator::Rem, OperatorGroup::Arithmetic),
             // Bitwise binary operators
-            OpInfo::new("bit_and", BaseOperator::BitAnd, OpGroup::Bitwise),
-            OpInfo::new("bit_or", BaseOperator::BitOr, OpGroup::Bitwise),
-            OpInfo::new("bit_xor", BaseOperator::BitXor, OpGroup::Bitwise),
+            OperatorInfo::new("bit_and", BaseOperator::BitAnd, OperatorGroup::Bitwise),
+            OperatorInfo::new("bit_or", BaseOperator::BitOr, OperatorGroup::Bitwise),
+            OperatorInfo::new("bit_xor", BaseOperator::BitXor, OperatorGroup::Bitwise),
             // Bitwise shift binary operators
-            OpInfo::new("shr", BaseOperator::Shr, OpGroup::Shift),
-            OpInfo::new("shl", BaseOperator::Shl, OpGroup::Shift),
+            OperatorInfo::new("shr", BaseOperator::Shr, OperatorGroup::Shift),
+            OperatorInfo::new("shl", BaseOperator::Shl, OperatorGroup::Shift),
         ];
 
         let mut all_operators = Vec::new();
