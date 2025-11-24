@@ -32,10 +32,11 @@ pub fn write_scenario_arith(target_path: &str) {
     let numbers = vec![
         num_bigint::BigInt::from(0),
         num_bigint::BigInt::from(1),
-        num_bigint::BigInt::from(2),
-        num_bigint::BigInt::from(12345),
+        num_bigint::BigInt::from(255),
         num_bigint::BigInt::from(18446744073709551615i128),
         num_bigint::BigInt::from(18446744073709551616i128),
+        num_bigint::BigInt::from(-1),
+        num_bigint::BigInt::from(-256),
     ];
 
     for endpoint in endpoints {
@@ -49,6 +50,50 @@ pub fn write_scenario_arith(target_path: &str) {
     }
 
     save_scenario(scenario, target_path);
+}
+
+fn eval_op_arith(
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
+    endpoint: &BigNumOperatorTestEndpoint,
+) -> Option<TxExpect> {
+    if !signed_type(&endpoint.a_type) && a.is_negative() {
+        return None;
+    }
+    if !signed_type(&endpoint.b_type) && b.is_negative() {
+        return None;
+    }
+
+    match endpoint.op_info.base_operator {
+        BaseOperator::Add => tx_expect_ok(endpoint, a + b),
+        BaseOperator::Sub => {
+            let result = a - b;
+            if !signed_type(&endpoint.return_type) && result.is_negative() {
+                Some(TxExpect::err(
+                    4,
+                    "str:cannot subtract because result would be negative",
+                ))
+            } else {
+                tx_expect_ok(endpoint, result)
+            }
+        }
+        BaseOperator::Mul => tx_expect_ok(endpoint, a * b),
+        BaseOperator::Div => {
+            if b.is_zero() {
+                Some(TxExpect::err(10, "str:division by 0"))
+            } else {
+                tx_expect_ok(endpoint, a / b)
+            }
+        }
+        BaseOperator::Rem => {
+            if b.is_zero() {
+                Some(TxExpect::err(10, "str:division by 0"))
+            } else {
+                tx_expect_ok(endpoint, a % b)
+            }
+        }
+        _ => None,
+    }
 }
 
 pub fn write_scenario_bitwise(target_path: &str) {
@@ -77,6 +122,24 @@ pub fn write_scenario_bitwise(target_path: &str) {
     }
 
     save_scenario(scenario, target_path);
+}
+
+fn eval_op_bitwise(
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
+    endpoint: &BigNumOperatorTestEndpoint,
+) -> Option<TxExpect> {
+    assert!(
+        !a.is_negative() && !b.is_negative(),
+        "Bitwise ops only for non-negative numbers"
+    );
+
+    match endpoint.op_info.base_operator {
+        BaseOperator::BitAnd => tx_expect_ok(endpoint, a & b),
+        BaseOperator::BitOr => tx_expect_ok(endpoint, a | b),
+        BaseOperator::BitXor => tx_expect_ok(endpoint, a ^ b),
+        _ => None,
+    }
 }
 
 pub fn write_scenario_shift(target_path: &str) {
@@ -110,68 +173,15 @@ pub fn write_scenario_shift(target_path: &str) {
     save_scenario(scenario, target_path);
 }
 
-fn eval_op_arith(
-    a: &num_bigint::BigInt,
-    b: &num_bigint::BigInt,
-    endpoint: &BigNumOperatorTestEndpoint,
-) -> Option<TxExpect> {
-    match endpoint.op_info.base_operator {
-        BaseOperator::Add => tx_expect_ok(endpoint, a + b),
-        BaseOperator::Sub => {
-            let result = a - b;
-            if !signed_type(&endpoint.return_type) && result.is_negative() {
-                Some(TxExpect::err(
-                    4,
-                    "str:cannot subtract because result would be negative",
-                ))
-            } else {
-                tx_expect_ok(endpoint, result)
-            }
-        }
-        BaseOperator::Mul => tx_expect_ok(endpoint, a * b),
-        BaseOperator::Div => {
-            if b.is_zero() {
-                Some(TxExpect::err(10, "str:division by 0"))
-            } else {
-                tx_expect_ok(endpoint, a / b)
-            }
-        }
-        BaseOperator::Rem => {
-            if b.is_zero() {
-                Some(TxExpect::err(10, "str:division by 0"))
-            } else {
-                tx_expect_ok(endpoint, a % b)
-            }
-        }
-        _ => None,
-    }
-}
-
-fn eval_op_bitwise(
-    a: &num_bigint::BigInt,
-    b: &num_bigint::BigInt,
-    endpoint: &BigNumOperatorTestEndpoint,
-) -> Option<TxExpect> {
-    if a.is_negative() || b.is_negative() {
-        return None;
-    }
-
-    match endpoint.op_info.base_operator {
-        BaseOperator::BitAnd => tx_expect_ok(endpoint, a & b),
-        BaseOperator::BitOr => tx_expect_ok(endpoint, a | b),
-        BaseOperator::BitXor => tx_expect_ok(endpoint, a ^ b),
-        _ => None,
-    }
-}
-
 fn eval_op_shift(
     a: &num_bigint::BigInt,
     b: &num_bigint::BigInt,
     endpoint: &BigNumOperatorTestEndpoint,
 ) -> Option<TxExpect> {
-    if a.is_negative() || b.is_negative() {
-        return None;
-    }
+    assert!(
+        !a.is_negative() && !b.is_negative(),
+        "Shift ops only for non-negative numbers"
+    );
 
     match endpoint.op_info.base_operator {
         BaseOperator::Shl => {
