@@ -128,7 +128,9 @@ impl BasicFeaturesState {
     }
 
     fn set_env_timestamp(&mut self, new_timestamp: u64) {
-        self.world.current_block().block_timestamp(new_timestamp);
+        self.world
+            .current_block()
+            .block_timestamp_seconds(new_timestamp);
     }
 }
 fn world() -> ScenarioWorld {
