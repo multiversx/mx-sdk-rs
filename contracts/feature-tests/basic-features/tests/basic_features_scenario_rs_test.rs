@@ -33,16 +33,19 @@ fn big_num_conversions_rs() {
 }
 
 #[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
 fn big_num_ops_arith_rs() {
     world().run("scenarios/big_num_ops_arith.scen.json");
 }
 
 #[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
 fn big_num_ops_bitwise_rs() {
     world().run("scenarios/big_num_ops_bitwise.scen.json");
 }
 
 #[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
 fn big_num_ops_shift_rs() {
     world().run("scenarios/big_num_ops_shift.scen.json");
 }
