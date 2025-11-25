@@ -95,8 +95,16 @@ impl SetStateBuilder<'_, BlockItem> {
         self
     }
 
+    #[deprecated(since = "0.63.1", note = "Renamed to block_timestamp_seconds")]
+    pub fn block_timestamp<N>(self, block_timestamp: N) -> Self
+    where
+        N: AnnotatedValue<ScenarioTxEnvData, TimestampSeconds>,
+    {
+        self.block_timestamp_seconds(block_timestamp)
+    }
+
     /// Sets the current block timestamp, in seconds.
-    pub fn block_timestamp<N>(mut self, block_timestamp: N) -> Self
+    pub fn block_timestamp_seconds<N>(mut self, block_timestamp: N) -> Self
     where
         N: AnnotatedValue<ScenarioTxEnvData, TimestampSeconds>,
     {
@@ -109,8 +117,16 @@ impl SetStateBuilder<'_, BlockItem> {
         self
     }
 
+    #[deprecated(since = "0.63.1", note = "Renamed to block_timestamp_millis")]
+    pub fn block_timestamp_ms<N>(self, block_timestamp: N) -> Self
+    where
+        N: AnnotatedValue<ScenarioTxEnvData, TimestampMillis>,
+    {
+        self.block_timestamp_millis(block_timestamp)
+    }
+
     /// Sets the current block timestamp, in milliseconds.
-    pub fn block_timestamp_ms<N>(mut self, block_timestamp_ms: N) -> Self
+    pub fn block_timestamp_millis<N>(mut self, block_timestamp_ms: N) -> Self
     where
         N: AnnotatedValue<ScenarioTxEnvData, TimestampMillis>,
     {

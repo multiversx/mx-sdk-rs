@@ -111,7 +111,7 @@ impl CrowdfundingESDTTestState {
     fn set_block_timestamp(&mut self, block_timestamp: TimestampMillis) {
         self.world
             .current_block()
-            .block_timestamp_ms(block_timestamp);
+            .block_timestamp_millis(block_timestamp);
     }
 }
 

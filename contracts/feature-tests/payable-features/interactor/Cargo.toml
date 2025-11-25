@@ -16,7 +16,7 @@ path = "src/payable_interactor.rs"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.63.0"
+version = "0.63.1"
 path = "../../../../framework/snippets"
 
 [dependencies]
