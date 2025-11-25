@@ -214,7 +214,9 @@ fn test_price_aggregator_submit_round_ok() {
         });
 
     let current_timestamp = TimestampSeconds::new(110);
-    world.current_block().block_timestamp(current_timestamp);
+    world
+        .current_block()
+        .block_timestamp_seconds(current_timestamp);
 
     // submit second
     world
@@ -322,7 +324,9 @@ fn test_price_aggregator_discarded_round() {
 
     let current_timestamp =
         TimestampSeconds::new(100) + MAX_ROUND_DURATION_SECONDS + DurationSeconds::new(1);
-    world.current_block().block_timestamp(current_timestamp);
+    world
+        .current_block()
+        .block_timestamp_seconds(current_timestamp);
 
     // submit second - this will discard the previous submission
     world
@@ -446,7 +450,7 @@ fn setup() -> (ScenarioWorld, Vec<Address>) {
     let mut world = world();
 
     world.account(OWNER_ADDRESS).nonce(1);
-    world.current_block().block_timestamp(100);
+    world.current_block().block_timestamp_seconds(100);
 
     let mut oracles = Vec::new();
     for i in 1..=NR_ORACLES {
