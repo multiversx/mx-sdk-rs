@@ -57,7 +57,7 @@ fn block_info_blackbox() {
 
     world
         .epoch_start_block()
-        .block_timestamp_ms(block_timestamp_ms)
+        .block_timestamp_millis(block_timestamp_ms)
         .block_nonce(15_000)
         .block_round(17_000);
 

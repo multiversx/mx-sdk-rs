@@ -46,11 +46,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         bigint_overwrite_i64 => bigint_overwrite_i64
         big_int_to_parts => big_int_to_parts
         big_int_from_biguint => big_int_from_biguint
-        add_big_int => add_big_int
         add_big_int_big_uint => add_big_int_big_uint
         add_big_uint_big_int => add_big_uint_big_int
         add_big_int_big_uint_ref => add_big_int_big_uint_ref
         add_big_uint_big_int_ref => add_big_uint_big_int_ref
+        add_big_int => add_big_int
         add_big_int_ref => add_big_int_ref
         add_big_uint => add_big_uint
         add_big_uint_ref => add_big_uint_ref

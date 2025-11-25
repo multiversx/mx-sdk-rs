@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta-lib"
-version = "0.62.1"
+version = "0.63.1"
 edition = "2021"
 
 authors = [
@@ -24,14 +24,14 @@ rustc_version = "0.4"
 toml = { version = "0.9", features = ["preserve_order"] }
 colored = "3.0"
 lazy_static = "1.4.0"
-convert_case = "0.8"
+convert_case = "0.9"
 hex = "0.4"
-wasmparser = "0.239"
-wasmprinter = "0.239"
+wasmparser = "0.241"
+wasmprinter = "0.241"
 semver = "1.0.20"
 wat = "1.217.0"
 
 [dependencies.multiversx-sc]
-version = "=0.62.1"
+version = "=0.63.1"
 path = "../base"
 features = ["alloc", "num-bigint"]

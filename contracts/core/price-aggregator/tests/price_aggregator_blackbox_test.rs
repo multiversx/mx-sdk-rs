@@ -43,7 +43,7 @@ impl PriceAggregatorTestState {
         let mut world = world();
 
         world.account(OWNER_ADDRESS).nonce(1);
-        world.current_block().block_timestamp(100);
+        world.current_block().block_timestamp_seconds(100);
 
         world.new_address(OWNER_ADDRESS, 1, PRICE_AGGREGATOR_ADDRESS);
 
@@ -274,7 +274,7 @@ fn test_price_aggregator_submit_round_ok() {
     state
         .world
         .current_block()
-        .block_timestamp(current_timestamp);
+        .block_timestamp_seconds(current_timestamp);
 
     // submit second
     state.submit(
@@ -342,7 +342,7 @@ fn test_price_aggregator_discarded_round() {
     state
         .world
         .current_block()
-        .block_timestamp(current_timestamp);
+        .block_timestamp_seconds(current_timestamp);
 
     // submit second - this will discard the previous submission
     state.submit(
