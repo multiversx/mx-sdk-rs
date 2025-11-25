@@ -15,6 +15,55 @@ use crate::{
 /// A big, unsigned number that is guaranteed not to be zero.
 ///
 /// The restriction is enforced by the constructors and the implementation of operations.
+///
+/// ## Constructor
+///
+/// To build a NonZeroBigUint, the best way is via NonZeroBigUint::new(BigUint), which returns an Option:
+/// - Some(NonZeroBigUint) if the input is non-zero, or
+/// - None if the input is zero.
+///
+/// This way the user can handle the zero case as they see fit.
+///
+/// The quicker alternative is NonZeroBigUint::new_or_panic(BigUint), which will signal an error if the input is zero.
+///
+/// ## Binary Operators
+///
+/// Naturally, some operations between two NonZeroBigUint can never yield zero,
+/// so no validation is needed after those operations.
+///
+/// For all others, there is an additional check at the end, which will crash execution if the invariant is violated.
+///
+/// Specifically, for the binary operators, we have implemented:
+///
+/// - NonZeroBigUint + NonZeroBigUint = guaranteed non-zero, no validation needed
+/// - NonZeroBigUint * NonZeroBigUint = guaranteed non-zero, no validation needed
+/// - NonZeroBigUint / NonZeroBigUint = could yield zero, validation needed
+/// - NonZeroBigUint * NonZeroBigUint = could yield zero or negative, validation needed
+///
+/// ## Assign Operators
+///
+/// For the assign operators, we have similar logic, but we've added a few more operations for convenience:
+/// - BigUint
+/// - u32
+/// - u64
+///
+/// Again, no validation is needed when the operation guarantees a non-zero result:
+/// - NonZeroBigUint += NonZeroBigUint
+/// - NonZeroBigUint += &NonZeroBigUint
+/// - NonZeroBigUint += BigUint
+/// - NonZeroBigUint += u32
+/// - NonZeroBigUint += u64
+/// - NonZeroBigUint *= NonZeroBigUint
+/// - NonZeroBigUint *= &NonZeroBigUint
+///
+/// Everything else gets a runtime check.
+///
+/// ## Usage in Payments
+///
+/// Since token payments cannot be zero, NonZeroBigUint is used in the Payment object.
+///
+/// Getting a call value is guaranteed to yield non-zero amounts,
+/// so in that case NonZeroBigUint is getting its invariant from the VM.
 #[repr(transparent)]
 pub struct NonZeroBigUint<M: ManagedTypeApi> {
     pub(super) value: BigInt<M>,
