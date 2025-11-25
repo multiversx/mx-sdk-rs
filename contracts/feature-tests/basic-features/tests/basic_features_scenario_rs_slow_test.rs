@@ -1,4 +1,4 @@
-//! These tests ar too slow when running with wasmer-experimental.
+//! These tests are too slow when running with wasmer-experimental.
 //!
 //! They are moved here, where they are only run using the debugger. With the debugger they run fast.
 
