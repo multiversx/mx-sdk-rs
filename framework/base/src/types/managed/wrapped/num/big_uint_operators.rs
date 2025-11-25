@@ -123,38 +123,6 @@ macro_rules! binary_operator {
                 }
             }
         }
-
-        impl<M: ManagedTypeApi> $trait<NonZeroBigUint<M>> for BigUint<M> {
-            type Output = BigUint<M>;
-
-            fn $method(self, other: NonZeroBigUint<M>) -> BigUint<M> {
-                self.$method(other.into_big_uint())
-            }
-        }
-
-        impl<'b, M: ManagedTypeApi> $trait<&'b NonZeroBigUint<M>> for BigUint<M> {
-            type Output = BigUint<M>;
-
-            fn $method(self, other: &NonZeroBigUint<M>) -> BigUint<M> {
-                self.$method(other.as_big_uint())
-            }
-        }
-
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b NonZeroBigUint<M>> for &'a BigUint<M> {
-            type Output = BigUint<M>;
-
-            fn $method(self, other: &NonZeroBigUint<M>) -> BigUint<M> {
-                self.$method(other.as_big_uint())
-            }
-        }
-
-        impl<'a, 'b, M: ManagedTypeApi> $trait<NonZeroBigUint<M>> for &'a BigUint<M> {
-            type Output = BigUint<M>;
-
-            fn $method(self, other: NonZeroBigUint<M>) -> BigUint<M> {
-                self.$method(other.into_big_uint())
-            }
-        }
     };
 }
 
