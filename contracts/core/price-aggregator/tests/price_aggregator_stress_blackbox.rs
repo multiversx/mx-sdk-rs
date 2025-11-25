@@ -47,7 +47,7 @@ impl PriceAggregatorTestState {
             .nonce(1)
             .new_address(OWNER, 1, PRICE_AGGREGATOR_ADDRESS)
             .current_block()
-            .block_timestamp(100);
+            .block_timestamp_seconds(100);
 
         let mut oracles = Vec::new();
         for i in 1..=NR_ORACLES {

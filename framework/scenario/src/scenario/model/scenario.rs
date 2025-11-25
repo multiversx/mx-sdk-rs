@@ -13,6 +13,13 @@ pub struct Scenario {
     pub steps: Vec<Step>,
 }
 
+impl Scenario {
+    pub fn with_comment(mut self, comment: &str) -> Self {
+        self.comment = Some(comment.to_string());
+        self
+    }
+}
+
 impl InterpretableFrom<ScenarioRaw> for Scenario {
     fn interpret_from(from: ScenarioRaw, context: &InterpreterContext) -> Self {
         Scenario {
