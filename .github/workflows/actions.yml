@@ -17,6 +17,7 @@ jobs:
     uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@e79085092b6edfc7885e0b9fdda05df7638622a9
     with:
       rust-toolchain: 1.87
+      wasm-opt-version: 125
       setup-runs-on: self-hosted
       test-coverage-runs-on: self-hosted
       rust-target: wasm32v1-none
