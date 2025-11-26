@@ -8,7 +8,7 @@ use multiversx_sc_scenario::scenario_format::interpret_trait::{InterpreterContex
 use multiversx_sc_scenario::scenario_model::Step;
 
 use crate::op_list::BaseOperator;
-use crate::{create_all_endpoints, BigNumOperatorTestEndpoint, OperatorList};
+use crate::{create_all_endpoints, BigNumOperatorTestEndpoint, OperatorList, ValueType};
 
 const SC_ADDRESS_EXPR: &str = "sc:basic-features";
 
@@ -57,10 +57,10 @@ fn eval_op_arith(
     b: &num_bigint::BigInt,
     endpoint: &BigNumOperatorTestEndpoint,
 ) -> Option<TxExpect> {
-    if !signed_type(&endpoint.a_type) && a.is_negative() {
+    if !endpoint.a_type.is_signed() && a.is_negative() {
         return None;
     }
-    if !signed_type(&endpoint.b_type) && b.is_negative() {
+    if !endpoint.b_type.is_signed() && b.is_negative() {
         return None;
     }
 
@@ -68,7 +68,7 @@ fn eval_op_arith(
         BaseOperator::Add => tx_expect_ok(endpoint, a + b),
         BaseOperator::Sub => {
             let result = a - b;
-            if !signed_type(&endpoint.return_type) && result.is_negative() {
+            if !endpoint.return_type.is_signed() && result.is_negative() {
                 Some(TxExpect::err(
                     4,
                     "str:cannot subtract because result would be negative",
@@ -228,15 +228,11 @@ fn tx_expect_ok(
     endpoint: &BigNumOperatorTestEndpoint,
     result: num_bigint::BigInt,
 ) -> Option<TxExpect> {
-    Some(TxExpect::ok().result(&serialize_arg(&endpoint.return_type, &result)))
+    Some(TxExpect::ok().result(&serialize_arg(endpoint.return_type, &result)))
 }
 
-fn signed_type(arg_type: &str) -> bool {
-    arg_type == "BigInt" || arg_type == "&BigInt"
-}
-
-fn serialize_arg(arg_type: &str, n: &num_bigint::BigInt) -> String {
-    if signed_type(arg_type) && n.is_positive() {
+fn serialize_arg(arg_type: ValueType, n: &num_bigint::BigInt) -> String {
+    if arg_type.is_signed() && n.is_positive() {
         format!("+{n}")
     } else {
         n.to_string()
@@ -255,8 +251,8 @@ fn add_query(
             .id(format!("{}({},{})", endpoint.fn_name, a, b))
             .to(SC_ADDRESS_EXPR)
             .function(&endpoint.fn_name)
-            .argument(&serialize_arg(&endpoint.a_type, a))
-            .argument(&serialize_arg(&endpoint.b_type, b))
+            .argument(&serialize_arg(endpoint.a_type, a))
+            .argument(&serialize_arg(endpoint.b_type, b))
             .expect(tx_expect),
     ));
 }
