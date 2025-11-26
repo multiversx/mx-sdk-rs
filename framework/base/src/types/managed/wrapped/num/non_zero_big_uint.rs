@@ -9,7 +9,7 @@ use crate::{
     },
     err_msg,
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
-    types::{BigInt, BigUint, ManagedBuffer, ManagedType, NonZeroError, Sign},
+    types::{BigInt, BigUint, ManagedBuffer, ManagedType, NonZeroError},
 };
 
 /// A big, unsigned number that is guaranteed not to be zero.
@@ -143,21 +143,6 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
         } else {
             unsafe { Some(Self::new_unchecked(bu)) }
         }
-    }
-
-    /// Checks that value respects invariants. User after some operator calls.
-    pub(super) fn validate_after_op(&self) {
-        match self.value.sign() {
-            Sign::Minus => quick_signal_error::<M>(err_msg::BIG_UINT_SUB_NEGATIVE),
-            Sign::NoSign => quick_signal_error::<M>(err_msg::ZERO_VALUE_NOT_ALLOWED),
-            Sign::Plus => {}
-        }
-    }
-
-    pub(super) fn wrap_big_int_assert_gt_zero(value: BigInt<M>) -> Self {
-        let result = Self::wrap_big_int_unchecked(value);
-        result.validate_after_op();
-        result
     }
 
     /// Convenience constructor, which will signal error if the input is 0.

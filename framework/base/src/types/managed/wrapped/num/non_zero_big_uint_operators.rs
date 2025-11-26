@@ -1,8 +1,26 @@
 use crate::{
-    api::ManagedTypeApi,
-    types::{BigUint, NonZeroBigUint},
+    api::{quick_signal_error, ManagedTypeApi},
+    err_msg,
+    types::{BigInt, BigUint, NonZeroBigUint, Sign},
 };
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
+
+impl<M: ManagedTypeApi> NonZeroBigUint<M> {
+    /// Checks that value respects invariants. User after some operator calls.
+    fn validate_after_op(&self) {
+        match self.value.sign() {
+            Sign::Minus => quick_signal_error::<M>(err_msg::BIG_UINT_SUB_NEGATIVE),
+            Sign::NoSign => quick_signal_error::<M>(err_msg::ZERO_VALUE_NOT_ALLOWED),
+            Sign::Plus => {}
+        }
+    }
+
+    fn wrap_big_int_assert_gt_zero(value: BigInt<M>) -> Self {
+        let result = Self::wrap_big_int_unchecked(value);
+        result.validate_after_op();
+        result
+    }
+}
 
 macro_rules! nz_binary_operator {
     ($trait:ident, $method:ident, $wrap_method:ident) => {
