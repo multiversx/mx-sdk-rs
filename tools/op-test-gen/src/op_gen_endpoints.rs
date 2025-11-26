@@ -57,7 +57,7 @@ pub struct BigNumOperatorTestEndpoint {
 
 impl BigNumOperatorTestEndpoint {
     pub fn new(
-        fn_name: &str,
+        fn_name: String,
         op_info: &OperatorInfo,
         a_type: ValueType,
         b_type: ValueType,
@@ -82,7 +82,7 @@ impl BigNumOperatorTestEndpoint {
         };
 
         Self {
-            fn_name: fn_name.to_string(),
+            fn_name,
             op_info: op_info.clone(),
             a_type,
             b_type,
@@ -113,14 +113,14 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
     if op.group == OperatorGroup::Arithmetic {
         // Binary operator endpoint
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_big_int", op.name),
+            format!("{}_big_int", op.name),
             op,
             ValueType::BigInt,
             ValueType::BigInt,
             ValueType::BigInt,
         ));
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_big_int_ref", op.name),
+            format!("{}_big_int_ref", op.name),
             op,
             if op.assign {
                 ValueType::BigInt
@@ -134,14 +134,14 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
 
     if op.group == OperatorGroup::Shift {
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_big_uint", op.name),
+            format!("{}_big_uint", op.name),
             op,
             ValueType::BigUint,
             ValueType::Usize,
             ValueType::BigUint,
         ));
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_big_uint_ref", op.name),
+            format!("{}_big_uint_ref", op.name),
             op,
             if op.assign {
                 ValueType::BigUint
@@ -153,14 +153,14 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
         ));
     } else {
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_big_uint", op.name),
+            format!("{}_big_uint", op.name),
             op,
             ValueType::BigUint,
             ValueType::BigUint,
             ValueType::BigUint,
         ));
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_big_uint_ref", op.name),
+            format!("{}_big_uint_ref", op.name),
             op,
             if op.assign {
                 ValueType::BigUint
@@ -174,14 +174,14 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
 
     if op.group == OperatorGroup::Arithmetic {
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_non_zero_big_uint", op.name),
+            format!("{}_non_zero_big_uint", op.name),
             op,
             ValueType::NonZeroBigUint,
             ValueType::NonZeroBigUint,
             ValueType::NonZeroBigUint,
         ));
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_non_zero_big_uint_ref", op.name),
+            format!("{}_non_zero_big_uint_ref", op.name),
             op,
             if op.assign {
                 ValueType::NonZeroBigUint
@@ -194,28 +194,28 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
 
         if op.assign {
             endpoints.push(BigNumOperatorTestEndpoint::new(
-                &format!("{}_non_zero_big_uint_big_uint", op.name),
+                format!("{}_non_zero_big_uint_big_uint", op.name),
                 op,
                 ValueType::NonZeroBigUint,
                 ValueType::BigUint,
                 ValueType::NonZeroBigUint,
             ));
             endpoints.push(BigNumOperatorTestEndpoint::new(
-                &format!("{}_non_zero_big_uint_ref_big_uint_ref", op.name),
+                format!("{}_non_zero_big_uint_ref_big_uint_ref", op.name),
                 op,
                 ValueType::NonZeroBigUint,
                 ValueType::BigUintRef,
                 ValueType::NonZeroBigUint,
             ));
             endpoints.push(BigNumOperatorTestEndpoint::new(
-                &format!("{}_non_zero_big_uint_ref_u32", op.name),
+                format!("{}_non_zero_big_uint_ref_u32", op.name),
                 op,
                 ValueType::NonZeroBigUint,
                 ValueType::U32,
                 ValueType::NonZeroBigUint,
             ));
             endpoints.push(BigNumOperatorTestEndpoint::new(
-                &format!("{}_non_zero_big_uint_ref_u64", op.name),
+                format!("{}_non_zero_big_uint_ref_u64", op.name),
                 op,
                 ValueType::NonZeroBigUint,
                 ValueType::U64,
