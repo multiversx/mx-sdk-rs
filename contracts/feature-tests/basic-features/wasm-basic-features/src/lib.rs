@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          437
+// Endpoints:                          457
 // Async Callback:                       1
-// Total number of exported functions: 439
+// Total number of exported functions: 459
 
 #![no_std]
 
@@ -54,42 +54,62 @@ multiversx_sc_wasm_adapter::endpoints! {
         add_big_int_ref => add_big_int_ref
         add_big_uint => add_big_uint
         add_big_uint_ref => add_big_uint_ref
+        add_nzbu => add_nzbu
+        add_nzbu_ref => add_nzbu_ref
         sub_big_int => sub_big_int
         sub_big_int_ref => sub_big_int_ref
         sub_big_uint => sub_big_uint
         sub_big_uint_ref => sub_big_uint_ref
+        sub_nzbu => sub_nzbu
+        sub_nzbu_ref => sub_nzbu_ref
         mul_big_int => mul_big_int
         mul_big_int_ref => mul_big_int_ref
         mul_big_uint => mul_big_uint
         mul_big_uint_ref => mul_big_uint_ref
+        mul_nzbu => mul_nzbu
+        mul_nzbu_ref => mul_nzbu_ref
         div_big_int => div_big_int
         div_big_int_ref => div_big_int_ref
         div_big_uint => div_big_uint
         div_big_uint_ref => div_big_uint_ref
+        div_nzbu => div_nzbu
+        div_nzbu_ref => div_nzbu_ref
         rem_big_int => rem_big_int
         rem_big_int_ref => rem_big_int_ref
         rem_big_uint => rem_big_uint
         rem_big_uint_ref => rem_big_uint_ref
+        rem_nzbu => rem_nzbu
+        rem_nzbu_ref => rem_nzbu_ref
         add_assign_big_int => add_assign_big_int
         add_assign_big_int_ref => add_assign_big_int_ref
         add_assign_big_uint => add_assign_big_uint
         add_assign_big_uint_ref => add_assign_big_uint_ref
+        add_assign_nzbu => add_assign_nzbu
+        add_assign_nzbu_ref => add_assign_nzbu_ref
         sub_assign_big_int => sub_assign_big_int
         sub_assign_big_int_ref => sub_assign_big_int_ref
         sub_assign_big_uint => sub_assign_big_uint
         sub_assign_big_uint_ref => sub_assign_big_uint_ref
+        sub_assign_nzbu => sub_assign_nzbu
+        sub_assign_nzbu_ref => sub_assign_nzbu_ref
         mul_assign_big_int => mul_assign_big_int
         mul_assign_big_int_ref => mul_assign_big_int_ref
         mul_assign_big_uint => mul_assign_big_uint
         mul_assign_big_uint_ref => mul_assign_big_uint_ref
+        mul_assign_nzbu => mul_assign_nzbu
+        mul_assign_nzbu_ref => mul_assign_nzbu_ref
         div_assign_big_int => div_assign_big_int
         div_assign_big_int_ref => div_assign_big_int_ref
         div_assign_big_uint => div_assign_big_uint
         div_assign_big_uint_ref => div_assign_big_uint_ref
+        div_assign_nzbu => div_assign_nzbu
+        div_assign_nzbu_ref => div_assign_nzbu_ref
         rem_assign_big_int => rem_assign_big_int
         rem_assign_big_int_ref => rem_assign_big_int_ref
         rem_assign_big_uint => rem_assign_big_uint
         rem_assign_big_uint_ref => rem_assign_big_uint_ref
+        rem_assign_nzbu => rem_assign_nzbu
+        rem_assign_nzbu_ref => rem_assign_nzbu_ref
         bit_and_big_uint => bit_and_big_uint
         bit_and_big_uint_ref => bit_and_big_uint_ref
         bit_or_big_uint => bit_or_big_uint

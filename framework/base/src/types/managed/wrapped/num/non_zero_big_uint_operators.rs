@@ -1,11 +1,8 @@
-
-
 use crate::{
     api::ManagedTypeApi,
     types::{BigUint, NonZeroBigUint},
 };
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
-
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 
 macro_rules! nz_binary_operator {
     ($trait:ident, $method:ident, $wrap_method:ident) => {
@@ -48,6 +45,7 @@ nz_binary_operator! {Add, add, wrap_big_int_unchecked}
 nz_binary_operator! {Sub, sub, wrap_big_int_assert_gt_zero}
 nz_binary_operator! {Mul, mul, wrap_big_int_unchecked}
 nz_binary_operator! {Div, div, wrap_big_int_assert_gt_zero}
+nz_binary_operator! {Rem, rem, wrap_big_int_assert_gt_zero}
 
 // assignment operators
 
@@ -209,3 +207,4 @@ macro_rules! nz_checked_assign_operator {
 
 nz_checked_assign_operator! {SubAssign, sub_assign}
 nz_checked_assign_operator! {DivAssign, div_assign}
+nz_checked_assign_operator! {RemAssign, rem_assign}
