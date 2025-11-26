@@ -38,7 +38,7 @@ use crate::{
 /// - NonZeroBigUint + NonZeroBigUint = guaranteed non-zero, no validation needed
 /// - NonZeroBigUint * NonZeroBigUint = guaranteed non-zero, no validation needed
 /// - NonZeroBigUint / NonZeroBigUint = could yield zero, validation needed
-/// - NonZeroBigUint * NonZeroBigUint = could yield zero or negative, validation needed
+/// - NonZeroBigUint - NonZeroBigUint = could yield zero or negative, validation needed
 ///
 /// ## Assign Operators
 ///
