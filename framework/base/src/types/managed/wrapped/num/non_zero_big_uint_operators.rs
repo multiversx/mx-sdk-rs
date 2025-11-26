@@ -6,7 +6,7 @@ use crate::{
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 
 impl<M: ManagedTypeApi> NonZeroBigUint<M> {
-    /// Checks that value respects invariants. User after some operator calls.
+    /// Checks that value respects invariants. Used after some operator calls.
     fn validate_after_op(&self) {
         match self.value.sign() {
             Sign::Minus => quick_signal_error::<M>(err_msg::BIG_UINT_SUB_NEGATIVE),
