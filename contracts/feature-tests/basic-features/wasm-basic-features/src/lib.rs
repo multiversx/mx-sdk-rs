@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          457
+// Endpoints:                          478
 // Async Callback:                       1
-// Total number of exported functions: 459
+// Total number of exported functions: 480
 
 #![no_std]
 
@@ -86,30 +86,50 @@ multiversx_sc_wasm_adapter::endpoints! {
         add_assign_big_uint_ref => add_assign_big_uint_ref
         add_assign_nzbu => add_assign_nzbu
         add_assign_nzbu_ref => add_assign_nzbu_ref
+        add_assign_nzbu_big_uint => add_assign_nzbu_big_uint
+        add_assign_nzbu_ref_big_uint_ref => add_assign_nzbu_ref_big_uint_ref
+        add_assign_nzbu_ref_u32 => add_assign_nzbu_ref_u32
+        add_assign_nzbu_ref_u64 => add_assign_nzbu_ref_u64
         sub_assign_big_int => sub_assign_big_int
         sub_assign_big_int_ref => sub_assign_big_int_ref
         sub_assign_big_uint => sub_assign_big_uint
         sub_assign_big_uint_ref => sub_assign_big_uint_ref
         sub_assign_nzbu => sub_assign_nzbu
         sub_assign_nzbu_ref => sub_assign_nzbu_ref
+        sub_assign_nzbu_big_uint => sub_assign_nzbu_big_uint
+        sub_assign_nzbu_ref_big_uint_ref => sub_assign_nzbu_ref_big_uint_ref
+        sub_assign_nzbu_ref_u32 => sub_assign_nzbu_ref_u32
+        sub_assign_nzbu_ref_u64 => sub_assign_nzbu_ref_u64
         mul_assign_big_int => mul_assign_big_int
         mul_assign_big_int_ref => mul_assign_big_int_ref
         mul_assign_big_uint => mul_assign_big_uint
         mul_assign_big_uint_ref => mul_assign_big_uint_ref
         mul_assign_nzbu => mul_assign_nzbu
         mul_assign_nzbu_ref => mul_assign_nzbu_ref
+        mul_assign_nzbu_big_uint => mul_assign_nzbu_big_uint
+        mul_assign_nzbu_ref_big_uint_ref => mul_assign_nzbu_ref_big_uint_ref
+        mul_assign_nzbu_ref_u32 => mul_assign_nzbu_ref_u32
+        mul_assign_nzbu_ref_u64 => mul_assign_nzbu_ref_u64
         div_assign_big_int => div_assign_big_int
         div_assign_big_int_ref => div_assign_big_int_ref
         div_assign_big_uint => div_assign_big_uint
         div_assign_big_uint_ref => div_assign_big_uint_ref
         div_assign_nzbu => div_assign_nzbu
         div_assign_nzbu_ref => div_assign_nzbu_ref
+        div_assign_nzbu_big_uint => div_assign_nzbu_big_uint
+        div_assign_nzbu_ref_big_uint_ref => div_assign_nzbu_ref_big_uint_ref
+        div_assign_nzbu_ref_u32 => div_assign_nzbu_ref_u32
+        div_assign_nzbu_ref_u64 => div_assign_nzbu_ref_u64
         rem_assign_big_int => rem_assign_big_int
         rem_assign_big_int_ref => rem_assign_big_int_ref
         rem_assign_big_uint => rem_assign_big_uint
         rem_assign_big_uint_ref => rem_assign_big_uint_ref
         rem_assign_nzbu => rem_assign_nzbu
         rem_assign_nzbu_ref => rem_assign_nzbu_ref
+        rem_assign_nzbu_big_uint => rem_assign_nzbu_big_uint
+        rem_assign_nzbu_ref_big_uint_ref => rem_assign_nzbu_ref_big_uint_ref
+        rem_assign_nzbu_ref_u32 => rem_assign_nzbu_ref_u32
+        rem_assign_nzbu_ref_u64 => rem_assign_nzbu_ref_u64
         bit_and_big_uint => bit_and_big_uint
         bit_and_big_uint_ref => bit_and_big_uint_ref
         bit_or_big_uint => bit_or_big_uint
@@ -196,6 +216,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_arrayvec => echo_arrayvec
         echo_big_uint => echo_big_uint
         echo_big_int => echo_big_int
+        echo_non_zero_big_uint => echo_non_zero_big_uint
         echo_managed_buffer => echo_managed_buffer
         echo_managed_address => echo_managed_address
         echo_managed_option => echo_managed_option
