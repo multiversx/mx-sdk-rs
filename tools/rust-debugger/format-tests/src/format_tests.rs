@@ -41,6 +41,9 @@ fn main() {
     let biguint: BigUint<DebugApi> = num_bigint_large.to_biguint().unwrap().into();
     push!(to_check, biguint, "1000000000000000000000000000000");
 
+    let nonzerobiguint: NonZeroBigUint<DebugApi> = NonZeroBigUint::new_or_panic(biguint);
+    push!(to_check, nonzerobiguint, "1000000000000000000000000000000");
+
     let bigint: BigInt<DebugApi> = num_bigint_negative.clone().into();
     push!(to_check, bigint, "-1000000000000000000000000000000");
 
