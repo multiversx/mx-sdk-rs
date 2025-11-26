@@ -44,7 +44,7 @@ pub trait Crowdfunding {
 
         let caller = self.blockchain().get_caller();
         self.deposit(&caller)
-            .update(|deposit| *deposit += &payment.amount);
+            .update(|deposit| *deposit += payment.amount.as_big_uint());
     }
 
     #[view]

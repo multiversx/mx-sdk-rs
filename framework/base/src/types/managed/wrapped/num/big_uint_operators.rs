@@ -1,6 +1,6 @@
 use crate::{
     api::{const_handles, BigIntApiImpl, ManagedTypeApi},
-    types::{BigUint, ManagedType, NonZeroBigUint},
+    types::{BigUint, ManagedType},
 };
 use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
@@ -178,20 +178,6 @@ macro_rules! binary_assign_operator {
                     self.value.handle.clone(),
                     big_int_temp_1,
                 );
-            }
-        }
-
-        impl<M: ManagedTypeApi> $trait<NonZeroBigUint<M>> for BigUint<M> {
-            #[inline]
-            fn $method(&mut self, other: NonZeroBigUint<M>) {
-                self.$method(other.into_big_uint())
-            }
-        }
-
-        impl<M: ManagedTypeApi> $trait<&NonZeroBigUint<M>> for BigUint<M> {
-            #[inline]
-            fn $method(&mut self, other: &NonZeroBigUint<M>) {
-                self.$method(other.as_big_uint())
             }
         }
     };
