@@ -122,7 +122,7 @@ impl<M: ManagedTypeApi> MulAssign<BigUint<M>> for NonZeroBigUint<M> {
     #[inline]
     fn mul_assign(&mut self, other: BigUint<M>) {
         self.value.mul_assign(other.into_big_int());
-        self.assume_valid_after_op(); // validation needed, as BigUint can be zero
+        self.validate_after_op(); // validation needed, as BigUint can be zero
     }
 }
 
@@ -130,7 +130,7 @@ impl<M: ManagedTypeApi> MulAssign<&BigUint<M>> for NonZeroBigUint<M> {
     #[inline]
     fn mul_assign(&mut self, other: &BigUint<M>) {
         self.value.mul_assign(other.as_big_int());
-        self.assume_valid_after_op(); // validation needed, as BigUint can be zero
+        self.validate_after_op(); // validation needed, as BigUint can be zero
     }
 }
 
@@ -139,7 +139,7 @@ impl<M: ManagedTypeApi> MulAssign<u32> for NonZeroBigUint<M> {
         unsafe {
             self.as_big_uint_mut().mul_assign(other);
         }
-        self.assume_valid_after_op(); // validation needed, as u32 can be zero
+        self.validate_after_op(); // validation needed, as u32 can be zero
     }
 }
 impl<M: ManagedTypeApi> MulAssign<u64> for NonZeroBigUint<M> {
@@ -147,7 +147,7 @@ impl<M: ManagedTypeApi> MulAssign<u64> for NonZeroBigUint<M> {
         unsafe {
             self.as_big_uint_mut().mul_assign(other);
         }
-        self.assume_valid_after_op(); // validation needed, as u64 can be zero
+        self.validate_after_op(); // validation needed, as u64 can be zero
     }
 }
 

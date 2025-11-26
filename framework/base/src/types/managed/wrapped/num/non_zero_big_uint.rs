@@ -154,9 +154,6 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
         }
     }
 
-    /// Does nothing. Same signature as `validate_after_op`, for simpler macros.
-    pub(super) fn assume_valid_after_op(&self) {}
-
     pub(super) fn wrap_big_int_assert_gt_zero(value: BigInt<M>) -> Self {
         let result = Self::wrap_big_int_unchecked(value);
         result.validate_after_op();

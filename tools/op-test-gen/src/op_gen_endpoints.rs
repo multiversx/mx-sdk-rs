@@ -39,7 +39,10 @@ impl ValueType {
     }
 
     pub fn is_non_zero(self) -> bool {
-        matches!(self, ValueType::NonZeroBigUint | ValueType::NonZeroBigUintRef)
+        matches!(
+            self,
+            ValueType::NonZeroBigUint | ValueType::NonZeroBigUintRef
+        )
     }
 }
 
@@ -172,6 +175,37 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
             ValueType::NonZeroBigUintRef,
             ValueType::NonZeroBigUint,
         ));
+
+        if op.assign {
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                &format!("{}_nzbu_big_uint", op.name),
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::BigUint,
+                ValueType::NonZeroBigUint,
+            ));
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                &format!("{}_nzbu_ref_big_uint_ref", op.name),
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::BigUintRef,
+                ValueType::NonZeroBigUint,
+            ));
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                &format!("{}_nzbu_ref_u32", op.name),
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::U32,
+                ValueType::NonZeroBigUint,
+            ));
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                &format!("{}_nzbu_ref_u64", op.name),
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::U64,
+                ValueType::NonZeroBigUint,
+            ));
+        }
     }
 
     endpoints

@@ -174,6 +174,30 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
+    fn add_assign_nzbu_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r += b;
+        r
+    }
+    #[endpoint]
+    fn add_assign_nzbu_ref_big_uint_ref(&self, a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r += b;
+        r
+    }
+    #[endpoint]
+    fn add_assign_nzbu_ref_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r += b;
+        r
+    }
+    #[endpoint]
+    fn add_assign_nzbu_ref_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r += b;
+        r
+    }
+    #[endpoint]
     fn sub_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         let mut r = a.clone();
         r -= b;
@@ -205,6 +229,30 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn sub_assign_nzbu_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r -= b;
+        r
+    }
+    #[endpoint]
+    fn sub_assign_nzbu_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r -= b;
+        r
+    }
+    #[endpoint]
+    fn sub_assign_nzbu_ref_big_uint_ref(&self, a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r -= b;
+        r
+    }
+    #[endpoint]
+    fn sub_assign_nzbu_ref_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r -= b;
+        r
+    }
+    #[endpoint]
+    fn sub_assign_nzbu_ref_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
         let mut r = a.clone();
         r -= b;
         r
@@ -246,6 +294,30 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
+    fn mul_assign_nzbu_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r *= b;
+        r
+    }
+    #[endpoint]
+    fn mul_assign_nzbu_ref_big_uint_ref(&self, a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r *= b;
+        r
+    }
+    #[endpoint]
+    fn mul_assign_nzbu_ref_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r *= b;
+        r
+    }
+    #[endpoint]
+    fn mul_assign_nzbu_ref_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r *= b;
+        r
+    }
+    #[endpoint]
     fn div_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         let mut r = a.clone();
         r /= b;
@@ -282,6 +354,30 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
+    fn div_assign_nzbu_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r /= b;
+        r
+    }
+    #[endpoint]
+    fn div_assign_nzbu_ref_big_uint_ref(&self, a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r /= b;
+        r
+    }
+    #[endpoint]
+    fn div_assign_nzbu_ref_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r /= b;
+        r
+    }
+    #[endpoint]
+    fn div_assign_nzbu_ref_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r /= b;
+        r
+    }
+    #[endpoint]
     fn rem_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         let mut r = a.clone();
         r %= b;
@@ -313,6 +409,30 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn rem_assign_nzbu_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r %= b;
+        r
+    }
+    #[endpoint]
+    fn rem_assign_nzbu_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r %= b;
+        r
+    }
+    #[endpoint]
+    fn rem_assign_nzbu_ref_big_uint_ref(&self, a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r %= b;
+        r
+    }
+    #[endpoint]
+    fn rem_assign_nzbu_ref_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        let mut r = a.clone();
+        r %= b;
+        r
+    }
+    #[endpoint]
+    fn rem_assign_nzbu_ref_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
         let mut r = a.clone();
         r %= b;
         r
