@@ -49,6 +49,7 @@ impl ValueType {
 pub struct BigNumOperatorTestEndpoint {
     pub fn_name: String,
     pub op_info: OperatorInfo,
+    pub a_mut: bool,
     pub a_type: ValueType,
     pub b_type: ValueType,
     pub return_type: ValueType,
@@ -66,9 +67,8 @@ impl BigNumOperatorTestEndpoint {
         let body = if op_info.assign {
             format!(
                 "
-        let mut r = a;
-        r {op} b;
-        r
+        a {op} b;
+        a
     ",
                 op = op_info.symbol()
             )
@@ -84,6 +84,7 @@ impl BigNumOperatorTestEndpoint {
         Self {
             fn_name,
             op_info: op_info.clone(),
+            a_mut: op_info.assign, // "mut a", for assign operator, so we can change a directly
             a_type,
             b_type,
             return_type,
@@ -96,8 +97,9 @@ impl BigNumOperatorTestEndpoint {
             out,
             "
     #[endpoint]
-    fn {}(&self, a: {}, b: {}) -> {} {{{}}}",
+    fn {}(&self, {}a: {}, b: {}) -> {} {{{}}}",
             self.fn_name,
+            if self.a_mut { "mut " } else { "" },
             self.a_type.as_str(),
             self.b_type.as_str(),
             self.return_type.as_str(),
