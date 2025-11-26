@@ -162,14 +162,14 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
 
     if op.group == OperatorGroup::Arithmetic {
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_nzbu", op.name),
+            &format!("{}_non_zero_big_uint", op.name),
             op,
             ValueType::NonZeroBigUint,
             ValueType::NonZeroBigUint,
             ValueType::NonZeroBigUint,
         ));
         endpoints.push(BigNumOperatorTestEndpoint::new(
-            &format!("{}_nzbu_ref", op.name),
+            &format!("{}_non_zero_big_uint_ref", op.name),
             op,
             ValueType::NonZeroBigUintRef,
             ValueType::NonZeroBigUintRef,
@@ -178,28 +178,28 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
 
         if op.assign {
             endpoints.push(BigNumOperatorTestEndpoint::new(
-                &format!("{}_nzbu_big_uint", op.name),
+                &format!("{}_non_zero_big_uint_big_uint", op.name),
                 op,
                 ValueType::NonZeroBigUint,
                 ValueType::BigUint,
                 ValueType::NonZeroBigUint,
             ));
             endpoints.push(BigNumOperatorTestEndpoint::new(
-                &format!("{}_nzbu_ref_big_uint_ref", op.name),
+                &format!("{}_non_zero_big_uint_ref_big_uint_ref", op.name),
                 op,
                 ValueType::NonZeroBigUint,
                 ValueType::BigUintRef,
                 ValueType::NonZeroBigUint,
             ));
             endpoints.push(BigNumOperatorTestEndpoint::new(
-                &format!("{}_nzbu_ref_u32", op.name),
+                &format!("{}_non_zero_big_uint_ref_u32", op.name),
                 op,
                 ValueType::NonZeroBigUint,
                 ValueType::U32,
                 ValueType::NonZeroBigUint,
             ));
             endpoints.push(BigNumOperatorTestEndpoint::new(
-                &format!("{}_nzbu_ref_u64", op.name),
+                &format!("{}_non_zero_big_uint_ref_u64", op.name),
                 op,
                 ValueType::NonZeroBigUint,
                 ValueType::U64,
