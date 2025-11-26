@@ -4,7 +4,7 @@ use core::ops::{
 
 use crate::{
     api::{BigIntApiImpl, ManagedTypeApi},
-    types::{BigInt, BigUint, ManagedType},
+    types::{BigInt, ManagedType},
 };
 
 macro_rules! binary_operator {
@@ -37,14 +37,6 @@ macro_rules! binary_operator {
                     );
                     result
                 }
-            }
-        }
-
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for &'a BigInt<M> {
-            type Output = BigInt<M>;
-
-            fn $method(self, other: &BigUint<M>) -> BigInt<M> {
-                self.$method(other.as_big_int())
             }
         }
     };
