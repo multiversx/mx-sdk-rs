@@ -64,7 +64,7 @@ multiversx_sc::imports!();
 
 /// Checks that BigUint/BigInt operators work as expected.
 #[multiversx_sc::module]
-#[allow(clippy::redundant_clone)]
+#[rustfmt::skip]
 pub trait BigIntOperators {
     // Endpoints grouped into several sections:"#;
 

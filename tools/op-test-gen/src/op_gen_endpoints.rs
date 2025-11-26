@@ -66,7 +66,7 @@ impl BigNumOperatorTestEndpoint {
         let body = if op_info.assign {
             format!(
                 "
-        let mut r = a.clone();
+        let mut r = a;
         r {op} b;
         r
     ",
@@ -122,7 +122,11 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
         endpoints.push(BigNumOperatorTestEndpoint::new(
             &format!("{}_big_int_ref", op.name),
             op,
-            ValueType::BigIntRef,
+            if op.assign {
+                ValueType::BigInt
+            } else {
+                ValueType::BigIntRef
+            },
             ValueType::BigIntRef,
             ValueType::BigInt,
         ));
@@ -139,7 +143,11 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
         endpoints.push(BigNumOperatorTestEndpoint::new(
             &format!("{}_big_uint_ref", op.name),
             op,
-            ValueType::BigUintRef,
+            if op.assign {
+                ValueType::BigUint
+            } else {
+                ValueType::BigUintRef
+            },
             ValueType::Usize,
             ValueType::BigUint,
         ));
@@ -154,7 +162,11 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
         endpoints.push(BigNumOperatorTestEndpoint::new(
             &format!("{}_big_uint_ref", op.name),
             op,
-            ValueType::BigUintRef,
+            if op.assign {
+                ValueType::BigUint
+            } else {
+                ValueType::BigUintRef
+            },
             ValueType::BigUintRef,
             ValueType::BigUint,
         ));
@@ -171,7 +183,11 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
         endpoints.push(BigNumOperatorTestEndpoint::new(
             &format!("{}_non_zero_big_uint_ref", op.name),
             op,
-            ValueType::NonZeroBigUintRef,
+            if op.assign {
+                ValueType::NonZeroBigUint
+            } else {
+                ValueType::NonZeroBigUintRef
+            },
             ValueType::NonZeroBigUintRef,
             ValueType::NonZeroBigUint,
         ));
