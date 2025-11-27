@@ -20,6 +20,11 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
         result.validate_after_op();
         result
     }
+
+    /// Used in some operator definitions. Using it directly could violate invariant.
+    unsafe fn as_big_uint_mut(&mut self) -> &mut BigUint<M> {
+        unsafe { core::mem::transmute(self) }
+    }
 }
 
 macro_rules! nz_binary_operator {

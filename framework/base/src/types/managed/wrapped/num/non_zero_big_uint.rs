@@ -163,11 +163,6 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
         unsafe { core::mem::transmute(self) }
     }
 
-    /// Used in some operator definitions. Using it directly could violate invariant.
-    pub(super) unsafe fn as_big_uint_mut(&mut self) -> &mut BigUint<M> {
-        unsafe { core::mem::transmute(self) }
-    }
-
     /// Drops the non-zero and positive restriction.
     pub fn as_big_int(&self) -> &BigInt<M> {
         &self.value
