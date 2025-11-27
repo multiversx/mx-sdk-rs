@@ -20,6 +20,21 @@ fn big_num_conversions_go() {
 }
 
 #[test]
+fn big_num_ops_arith_go() {
+    world().run("scenarios/big_num_ops_arith.scen.json");
+}
+
+#[test]
+fn big_num_ops_bitwise_go() {
+    world().run("scenarios/big_num_ops_bitwise.scen.json");
+}
+
+#[test]
+fn big_num_ops_shift_go() {
+    world().run("scenarios/big_num_ops_shift.scen.json");
+}
+
+#[test]
 fn big_uint_eq_u_64_go() {
     world().run("scenarios/big_uint_eq_u64.scen.json");
 }
