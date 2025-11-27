@@ -47,6 +47,22 @@ pub trait BigIntOperators {
         a + b
     }
     #[endpoint]
+    fn add_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a + b
+    }
+    #[endpoint]
     fn add_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
         a + b
     }
@@ -92,6 +108,22 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn sub_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
         a - b
     }
     #[endpoint]
@@ -143,6 +175,22 @@ pub trait BigIntOperators {
         a * b
     }
     #[endpoint]
+    fn mul_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a * b
+    }
+    #[endpoint]
     fn mul_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
         a * b
     }
@@ -188,6 +236,22 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn div_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
         a / b
     }
     #[endpoint]
@@ -239,6 +303,22 @@ pub trait BigIntOperators {
         a % b
     }
     #[endpoint]
+    fn rem_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a % b
+    }
+    #[endpoint]
     fn rem_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
         a % b
     }
@@ -274,6 +354,16 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn add_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a += b;
+        a
+    }
+    #[endpoint]
+    fn add_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a += b;
+        a
+    }
+    #[endpoint]
+    fn add_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
         a += b;
         a
     }
@@ -328,6 +418,16 @@ pub trait BigIntOperators {
         a
     }
     #[endpoint]
+    fn sub_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a -= b;
+        a
+    }
+    #[endpoint]
+    fn sub_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a -= b;
+        a
+    }
+    #[endpoint]
     fn sub_assign_non_zero_big_uint_non_zero_big_uint(&self, mut a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
         a -= b;
         a
@@ -374,6 +474,16 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn mul_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
         a *= b;
         a
     }
@@ -428,6 +538,16 @@ pub trait BigIntOperators {
         a
     }
     #[endpoint]
+    fn div_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
     fn div_assign_non_zero_big_uint_non_zero_big_uint(&self, mut a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
         a /= b;
         a
@@ -474,6 +594,16 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn rem_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
         a %= b;
         a
     }
@@ -527,6 +657,22 @@ pub trait BigIntOperators {
         a & b
     }
     #[endpoint]
+    fn bit_and_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_and_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_and_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_and_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a & b
+    }
+    #[endpoint]
     fn bit_or_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
         a | b
     }
@@ -540,6 +686,22 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn bit_or_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
         a | b
     }
     #[endpoint]
@@ -558,6 +720,22 @@ pub trait BigIntOperators {
     fn bit_xor_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
         a ^ b
     }
+    #[endpoint]
+    fn bit_xor_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a ^ b
+    }
 
     // Bitwise assign operators
 
@@ -572,6 +750,16 @@ pub trait BigIntOperators {
         a
     }
     #[endpoint]
+    fn bit_and_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a &= b;
+        a
+    }
+    #[endpoint]
+    fn bit_and_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a &= b;
+        a
+    }
+    #[endpoint]
     fn bit_or_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
         a |= b;
         a
@@ -582,12 +770,32 @@ pub trait BigIntOperators {
         a
     }
     #[endpoint]
+    fn bit_or_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a |= b;
+        a
+    }
+    #[endpoint]
+    fn bit_or_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a |= b;
+        a
+    }
+    #[endpoint]
     fn bit_xor_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
         a ^= b;
         a
     }
     #[endpoint]
     fn bit_xor_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a ^= b;
+        a
+    }
+    #[endpoint]
+    fn bit_xor_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a ^= b;
+        a
+    }
+    #[endpoint]
+    fn bit_xor_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
         a ^= b;
         a
     }

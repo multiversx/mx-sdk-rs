@@ -146,13 +146,48 @@ fn append_all_combinations(
     }
 }
 
+fn add_big_uint_u32_u64_endpoints(
+    op: &OperatorInfo,
+    add_ref: bool,
+    endpoints: &mut Vec<BigNumOperatorTestEndpoint>,
+) {
+    endpoints.push(BigNumOperatorTestEndpoint::new(
+        op,
+        ValueType::BigUint,
+        ValueType::U32,
+        ValueType::BigUint,
+    ));
+    if add_ref {
+        endpoints.push(BigNumOperatorTestEndpoint::new(
+            op,
+            ValueType::BigUintRef,
+            ValueType::U32,
+            ValueType::BigUint,
+        ));
+    }
+    endpoints.push(BigNumOperatorTestEndpoint::new(
+        op,
+        ValueType::BigUint,
+        ValueType::U64,
+        ValueType::BigUint,
+    ));
+    if add_ref {
+        endpoints.push(BigNumOperatorTestEndpoint::new(
+            op,
+            ValueType::BigUintRef,
+            ValueType::U64,
+            ValueType::BigUint,
+        ));
+    }
+}
+
 pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpoint> {
     let mut endpoints = Vec::new();
 
     match op.group {
         OperatorGroup::Arithmetic => {
             if op.assign {
-                // assign operators only have the owned type as first argument
+                // Assign operators only have the owned type as first argument
                 // BigInt
                 endpoints.push(BigNumOperatorTestEndpoint::new(
                     op,
@@ -179,6 +214,8 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUintRef,
                     ValueType::BigUint,
                 ));
+                add_big_uint_u32_u64_endpoints(op, false, &mut endpoints);
+
                 // NonZeroBigUint
                 endpoints.push(BigNumOperatorTestEndpoint::new(
                     op,
@@ -192,6 +229,7 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::NonZeroBigUintRef,
                     ValueType::NonZeroBigUint,
                 ));
+
                 // NonZeroBigUint += BigUint/u32/u64
                 endpoints.push(BigNumOperatorTestEndpoint::new(
                     op,
@@ -218,6 +256,7 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::NonZeroBigUint,
                 ));
             } else {
+                // BigInt
                 append_all_combinations(
                     op,
                     ValueType::BigInt,
@@ -225,6 +264,8 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigInt,
                     &mut endpoints,
                 );
+
+                // BigUint
                 append_all_combinations(
                     op,
                     ValueType::BigUint,
@@ -232,6 +273,9 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUint,
                     &mut endpoints,
                 );
+                add_big_uint_u32_u64_endpoints(op, true, &mut endpoints);
+
+                // NonZeroBigUint
                 append_all_combinations(
                     op,
                     ValueType::NonZeroBigUint,
@@ -240,7 +284,6 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     &mut endpoints,
                 );
             }
-            // Arithmetic operators are defined for both BigInt and BigUint
         }
         OperatorGroup::Bitwise => {
             // Bitwise operators are only defined for BigUint
@@ -257,6 +300,8 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUintRef,
                     ValueType::BigUint,
                 ));
+
+                add_big_uint_u32_u64_endpoints(op, false, &mut endpoints);
             } else {
                 append_all_combinations(
                     op,
@@ -265,6 +310,8 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUint,
                     &mut endpoints,
                 );
+
+                add_big_uint_u32_u64_endpoints(op, true, &mut endpoints);
             }
         }
         OperatorGroup::Shift => {
