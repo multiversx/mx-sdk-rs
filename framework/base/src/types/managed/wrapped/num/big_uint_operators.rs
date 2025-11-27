@@ -9,16 +9,38 @@ use core::ops::{
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait<Self> for BigUint<M> {
+        impl<'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for BigUint<M> {
             type Output = BigUint<M>;
 
-            fn $method(self, other: BigUint<M>) -> BigUint<M> {
+            fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 M::managed_type_impl().$api_func(
                     self.get_handle(),
                     self.get_handle(),
                     other.get_handle(),
                 );
                 self
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<BigUint<M>> for BigUint<M> {
+            type Output = BigUint<M>;
+
+            #[inline]
+            fn $method(self, other: BigUint<M>) -> BigUint<M> {
+                self.$method(&other)
+            }
+        }
+
+        impl<'b, M: ManagedTypeApi> $trait<BigUint<M>> for &'b BigUint<M> {
+            type Output = BigUint<M>;
+
+            fn $method(self, other: BigUint<M>) -> BigUint<M> {
+                M::managed_type_impl().$api_func(
+                    other.get_handle(),
+                    self.get_handle(),
+                    other.get_handle(),
+                );
+                other
             }
         }
 
@@ -35,19 +57,6 @@ macro_rules! binary_operator {
                     );
                     result
                 }
-            }
-        }
-
-        impl<'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for BigUint<M> {
-            type Output = BigUint<M>;
-
-            fn $method(self, other: &BigUint<M>) -> BigUint<M> {
-                M::managed_type_impl().$api_func(
-                    self.get_handle(),
-                    self.get_handle(),
-                    other.get_handle(),
-                );
-                self
             }
         }
 

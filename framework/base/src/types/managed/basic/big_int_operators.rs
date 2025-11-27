@@ -9,10 +9,10 @@ use crate::{
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait for BigInt<M> {
+        impl<M: ManagedTypeApi> $trait<&BigInt<M>> for BigInt<M> {
             type Output = BigInt<M>;
 
-            fn $method(self, other: BigInt<M>) -> BigInt<M> {
+            fn $method(self, other: &BigInt<M>) -> BigInt<M> {
                 let api = M::managed_type_impl();
                 api.$api_func(
                     self.handle.clone(),
@@ -20,6 +20,14 @@ macro_rules! binary_operator {
                     other.handle.clone(),
                 );
                 self
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<BigInt<M>> for BigInt<M> {
+            type Output = BigInt<M>;
+
+            fn $method(self, other: BigInt<M>) -> BigInt<M> {
+                self.$method(&other)
             }
         }
 

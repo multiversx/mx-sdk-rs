@@ -33,6 +33,17 @@ impl ValueType {
     pub fn is_signed(self) -> bool {
         matches!(self, ValueType::BigInt | ValueType::BigIntRef)
     }
+
+    pub fn is_big_uint(self) -> bool {
+        matches!(self, ValueType::BigUint | ValueType::BigUintRef)
+    }
+
+    pub fn is_non_zero(self) -> bool {
+        matches!(
+            self,
+            ValueType::NonZeroBigUint | ValueType::NonZeroBigUintRef
+        )
+    }
 }
 
 pub struct BigNumOperatorTestEndpoint {
@@ -147,6 +158,54 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
             ValueType::BigUintRef,
             ValueType::BigUint,
         ));
+    }
+
+    if op.group == OperatorGroup::Arithmetic {
+        endpoints.push(BigNumOperatorTestEndpoint::new(
+            &format!("{}_non_zero_big_uint", op.name),
+            op,
+            ValueType::NonZeroBigUint,
+            ValueType::NonZeroBigUint,
+            ValueType::NonZeroBigUint,
+        ));
+        endpoints.push(BigNumOperatorTestEndpoint::new(
+            &format!("{}_non_zero_big_uint_ref", op.name),
+            op,
+            ValueType::NonZeroBigUintRef,
+            ValueType::NonZeroBigUintRef,
+            ValueType::NonZeroBigUint,
+        ));
+
+        if op.assign {
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                &format!("{}_non_zero_big_uint_big_uint", op.name),
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::BigUint,
+                ValueType::NonZeroBigUint,
+            ));
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                &format!("{}_non_zero_big_uint_ref_big_uint_ref", op.name),
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::BigUintRef,
+                ValueType::NonZeroBigUint,
+            ));
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                &format!("{}_non_zero_big_uint_ref_u32", op.name),
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::U32,
+                ValueType::NonZeroBigUint,
+            ));
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                &format!("{}_non_zero_big_uint_ref_u64", op.name),
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::U64,
+                ValueType::NonZeroBigUint,
+            ));
+        }
     }
 
     endpoints

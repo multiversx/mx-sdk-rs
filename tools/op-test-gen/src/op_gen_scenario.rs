@@ -63,34 +63,64 @@ fn eval_op_arith(
     if !endpoint.b_type.is_signed() && b.is_negative() {
         return None;
     }
+    if endpoint.a_type.is_non_zero() && a.is_zero() {
+        return None;
+    }
+    if endpoint.b_type.is_non_zero() && b.is_zero() {
+        return None;
+    }
+    if endpoint.b_type == ValueType::U32 && b > &num_bigint::BigInt::from(u32::MAX) {
+        return None;
+    }
+    if endpoint.b_type == ValueType::U64 && b > &num_bigint::BigInt::from(i64::MAX) {
+        // conversion to i64 is needed, as BigInt does not support u64 directly
+        // anything above i64::MAX is not supported
+        return None;
+    }
 
     match endpoint.op_info.base_operator {
         BaseOperator::Add => tx_expect_ok(endpoint, a + b),
         BaseOperator::Sub => {
             let result = a - b;
             if !endpoint.return_type.is_signed() && result.is_negative() {
-                Some(TxExpect::err(
+                return Some(TxExpect::err(
                     4,
                     "str:cannot subtract because result would be negative",
-                ))
-            } else {
-                tx_expect_ok(endpoint, result)
+                ));
             }
+            if endpoint.return_type.is_non_zero() && result.is_zero() {
+                return Some(TxExpect::err(4, "str:zero value not allowed"));
+            }
+            tx_expect_ok(endpoint, result)
         }
-        BaseOperator::Mul => tx_expect_ok(endpoint, a * b),
+        BaseOperator::Mul => {
+            let result = a * b;
+            if endpoint.return_type.is_non_zero() && result.is_zero() {
+                return Some(TxExpect::err(4, "str:zero value not allowed"));
+            }
+            tx_expect_ok(endpoint, result)
+        }
         BaseOperator::Div => {
             if b.is_zero() {
-                Some(TxExpect::err(10, "str:division by 0"))
-            } else {
-                tx_expect_ok(endpoint, a / b)
+                return Some(TxExpect::err(10, "str:division by 0"));
             }
+
+            let result = a / b;
+            if endpoint.return_type.is_non_zero() && result.is_zero() {
+                return Some(TxExpect::err(4, "str:zero value not allowed"));
+            }
+            tx_expect_ok(endpoint, result)
         }
         BaseOperator::Rem => {
             if b.is_zero() {
-                Some(TxExpect::err(10, "str:division by 0"))
-            } else {
-                tx_expect_ok(endpoint, a % b)
+                return Some(TxExpect::err(10, "str:division by 0"));
             }
+
+            let result = a % b;
+            if endpoint.return_type.is_non_zero() && result.is_zero() {
+                return Some(TxExpect::err(4, "str:zero value not allowed"));
+            }
+            tx_expect_ok(endpoint, result)
         }
         _ => None,
     }
