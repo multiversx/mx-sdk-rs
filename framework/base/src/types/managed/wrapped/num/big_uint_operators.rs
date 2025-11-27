@@ -50,7 +50,7 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
-                // both arguments are references, so a new BigInt needs to be created
+                // both arguments are references, so a new BigUint needs to be created
                 unsafe {
                     let result = BigUint::new_uninit();
                     M::managed_type_impl().$api_func(
