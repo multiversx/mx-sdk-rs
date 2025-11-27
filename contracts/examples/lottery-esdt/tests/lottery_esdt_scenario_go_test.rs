@@ -25,6 +25,7 @@ fn buy_ticket_after_deadline_go() {
 }
 
 #[test]
+#[ignore = "cannot simulate shard on address"]
 fn buy_ticket_after_determined_winner_go() {
     world().run("scenarios/buy-ticket-after-determined-winner.scen.json");
 }
@@ -65,26 +66,31 @@ fn buy_ticket_wrong_fee_go() {
 }
 
 #[test]
+#[ignore = "cannot simulate shard on address"]
 fn complex_prize_distribution_go() {
     world().run("scenarios/complex-prize-distribution.scen.json");
 }
 
 #[test]
+#[ignore = "cannot simulate shard on address"]
 fn determine_winner_different_ticket_holders_winner_acc_1_go() {
     world().run("scenarios/determine-winner-different-ticket-holders-winner-acc1.scen.json");
 }
 
 #[test]
+#[ignore = "cannot simulate shard on address"]
 fn determine_winner_early_go() {
     world().run("scenarios/determine-winner-early.scen.json");
 }
 
 #[test]
+#[ignore = "cannot simulate shard on address"]
 fn determine_winner_same_ticket_holder_go() {
     world().run("scenarios/determine-winner-same-ticket-holder.scen.json");
 }
 
 #[test]
+#[ignore = "cannot simulate shard on address"]
 fn determine_winner_split_prize_pool_go() {
     world().run("scenarios/determine-winner-split-prize-pool.scen.json");
 }
@@ -95,11 +101,13 @@ fn lottery_init_go() {
 }
 
 #[test]
+#[ignore = "cannot simulate shard on address"]
 fn lottery_with_burn_percentage_go() {
     world().run("scenarios/lottery-with-burn-percentage.scen.json");
 }
 
 #[test]
+#[ignore = "cannot simulate shard on address"]
 fn start_after_announced_winner_go() {
     world().run("scenarios/start-after-announced-winner.scen.json");
 }
