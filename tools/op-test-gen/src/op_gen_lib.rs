@@ -31,6 +31,8 @@ pub fn generate_big_int_operators_trait() -> String {
     let ops = OperatorList::create();
     let endpoints = create_all_endpoints(&ops);
 
+    println!("Generated {} endpoints.", endpoints.len());
+
     section_comment(&mut out, "Arithmetic binary operators");
     write_filtered_endpoints(&endpoints, OperatorGroup::Arithmetic, false, &mut out);
 

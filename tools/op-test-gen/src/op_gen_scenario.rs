@@ -49,6 +49,11 @@ pub fn write_scenario_arith(target_path: &str) {
         }
     }
 
+    println!(
+        "Generated {} test queries for arithmetic operators.",
+        scenario.steps.len() - 1
+    );
+
     save_scenario(scenario, target_path);
 }
 
@@ -151,6 +156,11 @@ pub fn write_scenario_bitwise(target_path: &str) {
         }
     }
 
+    println!(
+        "Generated {} test queries for bitwise operators.",
+        scenario.steps.len() - 1
+    );
+
     save_scenario(scenario, target_path);
 }
 
@@ -207,6 +217,11 @@ pub fn write_scenario_shift(target_path: &str) {
             }
         }
     }
+
+    println!(
+        "Generated {} test queries for shift operators.",
+        scenario.steps.len() - 1
+    );
 
     save_scenario(scenario, target_path);
 }
