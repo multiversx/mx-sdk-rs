@@ -49,6 +49,11 @@ pub fn write_scenario_arith(target_path: &str) {
         }
     }
 
+    println!(
+        "Generated {} test queries for arithmetic operators.",
+        scenario.steps.len() - 1
+    );
+
     save_scenario(scenario, target_path);
 }
 
@@ -151,6 +156,11 @@ pub fn write_scenario_bitwise(target_path: &str) {
         }
     }
 
+    println!(
+        "Generated {} test queries for bitwise operators.",
+        scenario.steps.len() - 1
+    );
+
     save_scenario(scenario, target_path);
 }
 
@@ -163,6 +173,14 @@ fn eval_op_bitwise(
         !a.is_negative() && !b.is_negative(),
         "Bitwise ops only for non-negative numbers"
     );
+    if endpoint.b_type == ValueType::U32 && b > &num_bigint::BigInt::from(u32::MAX) {
+        return None;
+    }
+    if endpoint.b_type == ValueType::U64 && b > &num_bigint::BigInt::from(i64::MAX) {
+        // conversion to i64 is needed, as BigInt does not support u64 directly
+        // anything above i64::MAX is not supported
+        return None;
+    }
 
     match endpoint.op_info.base_operator {
         BaseOperator::BitAnd => tx_expect_ok(endpoint, a & b),
@@ -199,6 +217,11 @@ pub fn write_scenario_shift(target_path: &str) {
             }
         }
     }
+
+    println!(
+        "Generated {} test queries for shift operators.",
+        scenario.steps.len() - 1
+    );
 
     save_scenario(scenario, target_path);
 }

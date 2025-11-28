@@ -13,6 +13,7 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
+                // self gets destroyed, so reusing it for the result
                 M::managed_type_impl().$api_func(
                     self.get_handle(),
                     self.get_handle(),
@@ -35,6 +36,7 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: BigUint<M>) -> BigUint<M> {
+                // other gets destroyed, so reusing it for the result
                 M::managed_type_impl().$api_func(
                     other.get_handle(),
                     self.get_handle(),
@@ -48,6 +50,7 @@ macro_rules! binary_operator {
             type Output = BigUint<M>;
 
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
+                // both arguments are references, so a new BigUint needs to be created
                 unsafe {
                     let result = BigUint::new_uninit();
                     M::managed_type_impl().$api_func(
