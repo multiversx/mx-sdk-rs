@@ -35,6 +35,12 @@ impl ScQueryStep {
         Self::default()
     }
 
+    /// Sets the tx id for mandos.
+    pub fn id(mut self, id: impl ToString) -> Self {
+        self.id = id.to_string();
+        self
+    }
+
     pub fn to<A>(mut self, address: A) -> Self
     where
         AddressValue: From<A>,

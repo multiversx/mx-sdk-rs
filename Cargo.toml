@@ -28,6 +28,7 @@ members = [
   "tools/interactor-delegation-func-calls/",
   "tools/interactor-governance-func-calls/",
   "tools/gas-schedule-generator",
+  "tools/op-test-gen",
   "tools/wat-gen",
 
   "contracts/modules",
@@ -64,8 +65,8 @@ members = [
   "contracts/examples/esdt-transfer-with-fee/meta",
   "contracts/examples/bonding-curve-contract",
   "contracts/examples/bonding-curve-contract/meta",
-  "contracts/examples/crowdfunding-esdt",
-  "contracts/examples/crowdfunding-esdt/meta",
+  "contracts/examples/crowdfunding",
+  "contracts/examples/crowdfunding/meta",
   "contracts/examples/crypto-bubbles",
   "contracts/examples/crypto-bubbles/meta",
   "contracts/examples/crypto-zombies",

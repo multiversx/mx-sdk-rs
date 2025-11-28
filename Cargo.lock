@@ -895,6 +895,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 
 [[package]]
+name = "crowdfunding"
+version = "0.0.0"
+dependencies = [
+ "hex",
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "num-bigint",
+ "num-traits",
+]
+
+[[package]]
 name = "crowdfunding-erc20"
 version = "0.0.0"
 dependencies = [
@@ -912,21 +923,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "crowdfunding-esdt"
+name = "crowdfunding-meta"
 version = "0.0.0"
 dependencies = [
- "hex",
- "multiversx-sc",
- "multiversx-sc-scenario",
- "num-bigint",
- "num-traits",
-]
-
-[[package]]
-name = "crowdfunding-esdt-meta"
-version = "0.0.0"
-dependencies = [
- "crowdfunding-esdt",
+ "crowdfunding",
  "multiversx-sc-meta-lib",
 ]
 
@@ -3580,6 +3580,15 @@ name = "oorandom"
 version = "11.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
+
+[[package]]
+name = "op-test-gen"
+version = "0.1.0"
+dependencies = [
+ "multiversx-sc-scenario",
+ "num-bigint",
+ "num-traits",
+]
 
 [[package]]
 name = "openssl"

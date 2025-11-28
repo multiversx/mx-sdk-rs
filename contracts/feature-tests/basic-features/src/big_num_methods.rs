@@ -123,4 +123,23 @@ pub trait BigIntMethods {
     fn big_int_from_biguint(&self, sign: Sign, unsigned: BigUint) -> BigInt {
         BigInt::from_biguint(sign, unsigned)
     }
+
+    // mixed operations (explicit conversions)
+
+    #[endpoint]
+    fn add_big_int_big_uint(&self, a: BigInt, b: BigUint) -> BigInt {
+        a + b.into_big_int()
+    }
+    #[endpoint]
+    fn add_big_uint_big_int(&self, a: BigUint, b: BigInt) -> BigInt {
+        a.into_big_int() + b
+    }
+    #[endpoint]
+    fn add_big_int_big_uint_ref(&self, a: &BigInt, b: &BigUint) -> BigInt {
+        a + b.as_big_int()
+    }
+    #[endpoint]
+    fn add_big_uint_big_int_ref(&self, a: &BigUint, b: &BigInt) -> BigInt {
+        a.as_big_int() + b
+    }
 }

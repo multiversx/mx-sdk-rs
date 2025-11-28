@@ -16,7 +16,7 @@ pub enum OrderType {
 }
 
 #[derive(ManagedVecItem, Clone)]
-pub struct Payment<M: ManagedTypeApi> {
+pub struct FungiblePayment<M: ManagedTypeApi> {
     pub token_id: EsdtTokenIdentifier<M>,
     pub amount: BigUint<M>,
 }
@@ -24,7 +24,7 @@ pub struct Payment<M: ManagedTypeApi> {
 #[derive(ManagedVecItem, Clone)]
 pub struct Transfer<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
-    pub payment: Payment<M>,
+    pub payment: FungiblePayment<M>,
 }
 
 #[type_abi]
@@ -83,7 +83,7 @@ pub trait CommonModule {
     fn new_order(
         &self,
         id: u64,
-        payment: Payment<Self::Api>,
+        payment: FungiblePayment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
     ) -> Order<Self::Api> {

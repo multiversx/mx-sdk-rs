@@ -1,0 +1,348 @@
+use std::fmt::Write;
+
+use crate::{OperatorGroup, OperatorInfo, OperatorList};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ValueType {
+    BigInt,
+    BigIntRef,
+    BigUint,
+    BigUintRef,
+    NonZeroBigUint,
+    NonZeroBigUintRef,
+    Usize,
+    U32,
+    U64,
+}
+
+impl ValueType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ValueType::BigInt => "BigInt",
+            ValueType::BigIntRef => "&BigInt",
+            ValueType::BigUint => "BigUint",
+            ValueType::BigUintRef => "&BigUint",
+            ValueType::NonZeroBigUint => "NonZeroBigUint",
+            ValueType::NonZeroBigUintRef => "&NonZeroBigUint",
+            ValueType::Usize => "usize",
+            ValueType::U32 => "u32",
+            ValueType::U64 => "u64",
+        }
+    }
+
+    pub fn as_method_name_item(&self) -> &'static str {
+        match self {
+            ValueType::BigInt => "big_int",
+            ValueType::BigIntRef => "big_int_ref",
+            ValueType::BigUint => "big_uint",
+            ValueType::BigUintRef => "big_uint_ref",
+            ValueType::NonZeroBigUint => "non_zero_big_uint",
+            ValueType::NonZeroBigUintRef => "non_zero_big_uint_ref",
+            ValueType::Usize => "usize",
+            ValueType::U32 => "u32",
+            ValueType::U64 => "u64",
+        }
+    }
+
+    pub fn is_signed(self) -> bool {
+        matches!(self, ValueType::BigInt | ValueType::BigIntRef)
+    }
+
+    pub fn is_big_uint(self) -> bool {
+        matches!(self, ValueType::BigUint | ValueType::BigUintRef)
+    }
+
+    pub fn is_non_zero(self) -> bool {
+        matches!(
+            self,
+            ValueType::NonZeroBigUint | ValueType::NonZeroBigUintRef
+        )
+    }
+}
+
+pub struct BigNumOperatorTestEndpoint {
+    pub fn_name: String,
+    pub op_info: OperatorInfo,
+    pub a_mut: bool,
+    pub a_type: ValueType,
+    pub b_type: ValueType,
+    pub return_type: ValueType,
+    pub body: String,
+}
+
+impl BigNumOperatorTestEndpoint {
+    pub fn new(
+        op_info: &OperatorInfo,
+        a_type: ValueType,
+        b_type: ValueType,
+        return_type: ValueType,
+    ) -> Self {
+        let body = if op_info.assign {
+            format!(
+                "
+        a {op} b;
+        a
+    ",
+                op = op_info.symbol()
+            )
+        } else {
+            format!(
+                "
+        a {op} b
+    ",
+                op = op_info.symbol()
+            )
+        };
+
+        Self {
+            fn_name: format!(
+                "{}_{}_{}",
+                op_info.name,
+                a_type.as_method_name_item(),
+                b_type.as_method_name_item()
+            ),
+            op_info: op_info.clone(),
+            a_mut: op_info.assign, // "mut a", for assign operator, so we can change a directly
+            a_type,
+            b_type,
+            return_type,
+            body,
+        }
+    }
+
+    pub fn write_endpoint(&self, out: &mut String) {
+        write!(
+            out,
+            "
+    #[endpoint]
+    fn {}(&self, {}a: {}, b: {}) -> {} {{{}}}",
+            self.fn_name,
+            if self.a_mut { "mut " } else { "" },
+            self.a_type.as_str(),
+            self.b_type.as_str(),
+            self.return_type.as_str(),
+            self.body
+        )
+        .unwrap();
+    }
+}
+
+fn append_all_combinations(
+    op: &OperatorInfo,
+    type_1: ValueType,
+    type_2: ValueType,
+    return_type: ValueType,
+    endpoints: &mut Vec<BigNumOperatorTestEndpoint>,
+) {
+    for a_type in [type_1, type_2] {
+        for b_type in [type_1, type_2] {
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                op,
+                a_type,
+                b_type,
+                return_type,
+            ));
+        }
+    }
+}
+
+fn add_big_uint_u32_u64_endpoints(
+    op: &OperatorInfo,
+    add_ref: bool,
+    endpoints: &mut Vec<BigNumOperatorTestEndpoint>,
+) {
+    endpoints.push(BigNumOperatorTestEndpoint::new(
+        op,
+        ValueType::BigUint,
+        ValueType::U32,
+        ValueType::BigUint,
+    ));
+    if add_ref {
+        endpoints.push(BigNumOperatorTestEndpoint::new(
+            op,
+            ValueType::BigUintRef,
+            ValueType::U32,
+            ValueType::BigUint,
+        ));
+    }
+    endpoints.push(BigNumOperatorTestEndpoint::new(
+        op,
+        ValueType::BigUint,
+        ValueType::U64,
+        ValueType::BigUint,
+    ));
+    if add_ref {
+        endpoints.push(BigNumOperatorTestEndpoint::new(
+            op,
+            ValueType::BigUintRef,
+            ValueType::U64,
+            ValueType::BigUint,
+        ));
+    }
+}
+
+pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpoint> {
+    let mut endpoints = Vec::new();
+
+    match op.group {
+        OperatorGroup::Arithmetic => {
+            if op.assign {
+                // Assign operators only have the owned type as first argument
+                // BigInt
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigInt,
+                    ValueType::BigInt,
+                    ValueType::BigInt,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigInt,
+                    ValueType::BigIntRef,
+                    ValueType::BigInt,
+                ));
+                // BigUint
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUint,
+                    ValueType::BigUint,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUintRef,
+                    ValueType::BigUint,
+                ));
+                add_big_uint_u32_u64_endpoints(op, false, &mut endpoints);
+
+                // NonZeroBigUint
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::NonZeroBigUint,
+                    ValueType::NonZeroBigUint,
+                    ValueType::NonZeroBigUint,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::NonZeroBigUint,
+                    ValueType::NonZeroBigUintRef,
+                    ValueType::NonZeroBigUint,
+                ));
+
+                // NonZeroBigUint += BigUint/u32/u64
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::NonZeroBigUint,
+                    ValueType::BigUint,
+                    ValueType::NonZeroBigUint,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::NonZeroBigUint,
+                    ValueType::BigUintRef,
+                    ValueType::NonZeroBigUint,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::NonZeroBigUint,
+                    ValueType::U32,
+                    ValueType::NonZeroBigUint,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::NonZeroBigUint,
+                    ValueType::U64,
+                    ValueType::NonZeroBigUint,
+                ));
+            } else {
+                // BigInt
+                append_all_combinations(
+                    op,
+                    ValueType::BigInt,
+                    ValueType::BigIntRef,
+                    ValueType::BigInt,
+                    &mut endpoints,
+                );
+
+                // BigUint
+                append_all_combinations(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUintRef,
+                    ValueType::BigUint,
+                    &mut endpoints,
+                );
+                add_big_uint_u32_u64_endpoints(op, true, &mut endpoints);
+
+                // NonZeroBigUint
+                append_all_combinations(
+                    op,
+                    ValueType::NonZeroBigUint,
+                    ValueType::NonZeroBigUintRef,
+                    ValueType::NonZeroBigUint,
+                    &mut endpoints,
+                );
+            }
+        }
+        OperatorGroup::Bitwise => {
+            // Bitwise operators are only defined for BigUint
+            if op.assign {
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUint,
+                    ValueType::BigUint,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUintRef,
+                    ValueType::BigUint,
+                ));
+
+                add_big_uint_u32_u64_endpoints(op, false, &mut endpoints);
+            } else {
+                append_all_combinations(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUintRef,
+                    ValueType::BigUint,
+                    &mut endpoints,
+                );
+
+                add_big_uint_u32_u64_endpoints(op, true, &mut endpoints);
+            }
+        }
+        OperatorGroup::Shift => {
+            // Shift operators are only defined for BigUint and usize
+            if op.assign {
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::Usize,
+                    ValueType::BigUint,
+                ));
+            } else {
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::Usize,
+                    ValueType::BigUint,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUintRef,
+                    ValueType::Usize,
+                    ValueType::BigUint,
+                ));
+            }
+        }
+    }
+
+    endpoints
+}
+
+pub fn create_all_endpoints(ops: &OperatorList) -> Vec<BigNumOperatorTestEndpoint> {
+    ops.0.iter().flat_map(create_endpoints_for_op).collect()
+}

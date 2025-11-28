@@ -19,7 +19,7 @@ use multiversx_sc_codec::{
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
-use core::{cmp::Ordering, ops::Deref};
+use core::cmp::Ordering;
 
 use super::{
     decimals::{ConstDecimals, Decimals, NumDecimals},
@@ -38,7 +38,7 @@ pub struct ManagedDecimalSigned<M: ManagedTypeApi, D: Decimals> {
 
 impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     pub fn trunc(&self) -> BigInt<M> {
-        &self.data / self.decimals.scaling_factor().deref()
+        &self.data / self.decimals.scaling_factor().as_big_int()
     }
 
     pub fn into_raw_units(&self) -> &BigInt<M> {
