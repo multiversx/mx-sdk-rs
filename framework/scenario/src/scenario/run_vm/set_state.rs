@@ -7,6 +7,7 @@ use multiversx_chain_vm::{
     },
     types::VMCodeMetadata,
 };
+use multiversx_sc::types::{TimestampMillis, TimestampSeconds};
 
 use super::ScenarioVMRunner;
 
@@ -187,10 +188,10 @@ fn update_block_info(
     scenario_block_info: &crate::scenario::model::BlockInfo,
 ) {
     if let Some(u64_value) = &scenario_block_info.block_timestamp {
-        block_info.block_timestamp_ms = u64_value.value * 1000;
+        block_info.block_timestamp_millis = TimestampSeconds::new(u64_value.value).to_millis();
     }
     if let Some(u64_value) = &scenario_block_info.block_timestamp_ms {
-        block_info.block_timestamp_ms = u64_value.value;
+        block_info.block_timestamp_millis = TimestampMillis::new(u64_value.value);
     }
     if let Some(u64_value) = &scenario_block_info.block_nonce {
         block_info.block_nonce = u64_value.value;
