@@ -1,0 +1,3 @@
+chain_type = 'real'
+gateway_uri = 'https://testnet-gateway.multiversx.com'
+

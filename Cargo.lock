@@ -5318,6 +5318,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "tiny"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "tiny-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "multiversx-sc-snippets",
+ "serde",
+ "serial_test",
+ "tokio",
+ "toml 0.9.8",
+]
+
+[[package]]
 name = "tinystr"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
