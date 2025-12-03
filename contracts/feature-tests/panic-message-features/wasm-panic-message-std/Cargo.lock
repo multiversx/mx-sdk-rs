@@ -16,9 +16,9 @@ checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
 name = "bech32"
-version = "0.11.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d965446196e3b7decd44aa7ee49e31d630118f90ef12f97900f262eb915c951d"
+checksum = "32637268377fc7b10a8c6d51de3e7fba1ce5dd371a96e342b34e6078db558e7f"
 
 [[package]]
 name = "bitflags"
@@ -67,7 +67,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.63.1"
+version = "0.63.2"
 dependencies = [
  "bitflags",
  "generic-array",
@@ -101,7 +101,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.63.1"
+version = "0.63.2"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -112,7 +112,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.63.1"
+version = "0.63.2"
 dependencies = [
  "multiversx-sc",
 ]

@@ -12,14 +12,14 @@ path = "src/check_pause.rs"
 num-bigint = "0.4"
 
 [dependencies.multiversx-sc]
-version = "0.63.1"
+version = "0.63.2"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.63.1"
+version = "0.63.2"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.1"
+version = "0.63.2"
 path = "../../../framework/scenario"
 
