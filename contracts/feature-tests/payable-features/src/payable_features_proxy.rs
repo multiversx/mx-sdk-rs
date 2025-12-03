@@ -142,6 +142,14 @@ where
             .original_result()
     }
 
+    pub fn payable_any_5(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, OptionalValue<PaymentMultiValue<Env::Api>>> {
+        self.wrapped_tx
+            .raw_call("payable_any_5")
+            .original_result()
+    }
+
     pub fn payable_egld_1(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>>> {
@@ -171,6 +179,14 @@ where
     ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>>> {
         self.wrapped_tx
             .raw_call("payable_egld_4")
+            .original_result()
+    }
+
+    pub fn payable_egld_5(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, OptionalValue<PaymentMultiValue<Env::Api>>> {
+        self.wrapped_tx
+            .raw_call("payable_egld_5")
             .original_result()
     }
 

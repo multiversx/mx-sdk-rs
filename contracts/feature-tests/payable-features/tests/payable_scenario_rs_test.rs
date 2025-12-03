@@ -52,6 +52,11 @@ fn payable_any_4_rs() {
 }
 
 #[test]
+fn payable_any_5_rs() {
+    world().run("scenarios/payable_any_5.scen.json");
+}
+
+#[test]
 fn payable_egld_1_rs() {
     world().run("scenarios/payable_egld_1.scen.json");
 }
@@ -69,6 +74,11 @@ fn payable_egld_3_rs() {
 #[test]
 fn payable_egld_4_rs() {
     world().run("scenarios/payable_egld_4.scen.json");
+}
+
+#[test]
+fn payable_egld_5_rs() {
+    world().run("scenarios/payable_egld_5.scen.json");
 }
 
 #[test]

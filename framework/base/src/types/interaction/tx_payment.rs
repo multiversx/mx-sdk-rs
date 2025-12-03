@@ -11,6 +11,7 @@ mod tx_payment_multi_payment;
 mod tx_payment_none;
 mod tx_payment_not_payable;
 mod tx_payment_payment;
+mod tx_payment_payment_option;
 mod tx_payment_single_esdt;
 mod tx_payment_single_esdt_ref;
 mod tx_payment_single_esdt_triple;

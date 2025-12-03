@@ -73,7 +73,7 @@ impl<M: ManagedTypeApi> Payment<M> {
     }
 
     /// Conversion that loosens the EGLD restriction.
-    pub fn into_multi_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
+    pub fn into_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
         EgldOrEsdtTokenPayment {
             token_identifier: EgldOrEsdtTokenIdentifier::esdt(self.token_identifier),
             token_nonce: self.token_nonce,
