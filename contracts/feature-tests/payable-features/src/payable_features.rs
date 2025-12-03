@@ -24,8 +24,8 @@ pub trait PayableFeatures {
 
     #[view]
     #[payable("*")]
-    fn echo_call_value(&self) -> ManagedVec<EgldOrEsdtTokenPayment> {
-        self.call_value().all_transfers().clone()
+    fn echo_call_value(&self) -> ManagedVec<Payment> {
+        self.call_value().all().clone()
     }
 
     #[endpoint]

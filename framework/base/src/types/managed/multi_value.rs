@@ -6,6 +6,7 @@ mod multi_value_encoded_counted;
 mod multi_value_encoded_iter;
 mod multi_value_managed_vec;
 mod multi_value_managed_vec_counted;
+mod payment_multi_value;
 
 pub use async_call_result_managed::{ManagedAsyncCallError, ManagedAsyncCallResult};
 pub use egld_or_esdt_token_payment_multi_value::EgldOrEsdtTokenPaymentMultiValue;
@@ -19,3 +20,4 @@ pub use multi_value_managed_vec::{
 pub use multi_value_managed_vec_counted::{
     ManagedCountedMultiResultVec, ManagedCountedVarArgs, MultiValueManagedVecCounted,
 };
+pub use payment_multi_value::PaymentMultiValue;

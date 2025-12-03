@@ -37,8 +37,11 @@ const ZERO: &str = "0";
 const TYPES_FROM_FRAMEWORK: &[&str] = &[
     "EsdtTokenPayment",
     "EgldOrEsdtTokenPayment",
+    "Payment",
     "EsdtTokenData",
     "EgldOrEsdtTokenIdentifier",
+    "TokenIdentifier",
+    "TokenId",
     "EgldOrMultiEsdtPayment",
     "EsdtLocalRole",
     "EsdtTokenType",

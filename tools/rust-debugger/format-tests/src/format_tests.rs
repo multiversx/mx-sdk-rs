@@ -41,6 +41,9 @@ fn main() {
     let biguint: BigUint<DebugApi> = num_bigint_large.to_biguint().unwrap().into();
     push!(to_check, biguint, "1000000000000000000000000000000");
 
+    let nonzerobiguint: NonZeroBigUint<DebugApi> = NonZeroBigUint::new_or_panic(biguint);
+    push!(to_check, nonzerobiguint, "1000000000000000000000000000000");
+
     let bigint: BigInt<DebugApi> = num_bigint_negative.clone().into();
     push!(to_check, bigint, "-1000000000000000000000000000000");
 
@@ -92,8 +95,10 @@ fn main() {
         ManagedByteArray::new_from_bytes(b"test");
     push!(to_check, managed_byte_array, "\"test\" - (4) 0x74657374");
 
-    let managed_option_some_token_identifier: ManagedOption<DebugApi, EsdtTokenIdentifier<DebugApi>> =
-        ManagedOption::some(token_identifier.clone());
+    let managed_option_some_token_identifier: ManagedOption<
+        DebugApi,
+        EsdtTokenIdentifier<DebugApi>,
+    > = ManagedOption::some(token_identifier.clone());
     push!(
         to_check,
         managed_option_some_token_identifier,
