@@ -71,7 +71,6 @@ where
     }
 }
 
-
 impl<Env> TxPayment<Env> for Option<ManagedVecRef<'_, Payment<Env::Api>>>
 where
     Env: TxEnv,

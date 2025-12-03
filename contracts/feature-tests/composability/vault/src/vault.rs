@@ -134,10 +134,7 @@ pub trait Vault {
                 payment.amount.as_big_uint(),
             );
 
-            self.tx()
-                .to(ToCaller)
-                .payment(&*payment)
-                .transfer();
+            self.tx().to(ToCaller).payment(&*payment).transfer();
         }
     }
 
