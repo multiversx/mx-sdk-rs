@@ -9,16 +9,16 @@ publish = false
 path = "src/basic_features_main.rs"
 
 [dependencies.multiversx-sc]
-version = "0.63.1"
+version = "0.63.2"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.1"
+version = "0.63.2"
 features = ["wasmer-experimental", "bls"]
 path = "../../../framework/scenario"
 
 [dependencies.multiversx-sc-modules]
-version = "0.63.1"
+version = "0.63.2"
 path = "../../../contracts/modules"
 
 [dev-dependencies.esdt-system-sc-mock]

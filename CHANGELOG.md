@@ -58,6 +58,10 @@ And crate group being released requires all crate groups downstream to be releas
 ## Version history
 
 
+### [sc 0.63.2] - 2025-12-03
+- Legacy whitebox test block timestamp APIs renamed and made type-safe.
+
+
 ### [sc 0.63.1] - 2025-11-24
 - Blockchain API renames: `epoch_start_block_*` -> `get_epoch_start_block_*`, for consistency.
 - Set block timestamp methods renamed to `block_timestamp_seconds` and `block_timestamp_millis`, respectively, also for consistency.
