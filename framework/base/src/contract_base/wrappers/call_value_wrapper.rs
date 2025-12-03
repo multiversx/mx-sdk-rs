@@ -174,6 +174,24 @@ where
         unsafe { core::mem::transmute(value) }
     }
 
+    /// Accepts either a single payment, or no payment at all.
+    ///
+    /// Will halt execution if zero or more than one payment was received.
+    pub fn option_single(&self) -> Option<ManagedVecRef<'static, Payment<A>>> {
+        let esdt_transfers: ManagedRef<'static, A, ManagedVec<A, Payment<A>>> = self.all();
+        match esdt_transfers.len() {
+            0 => None,
+            1 => {
+                let value = esdt_transfers.get(0);
+                // transmute only used because the compiler doesn't seem to be able to unify the 'static lifetime properly
+                let lifetime_fix =
+                    unsafe { core::mem::transmute::<_, ManagedVecRef<'static, Payment<A>>>(value) };
+                Some(lifetime_fix)
+            }
+            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
+        }
+    }
+
     /// Verify and casts the received multi ESDT transfer in to an array.
     ///
     /// Can be used to extract all payments in one line like this:
