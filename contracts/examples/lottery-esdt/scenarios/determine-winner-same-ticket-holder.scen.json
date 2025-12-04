@@ -17,10 +17,31 @@
             "id": "determine-winner-same-ticket-holder",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery#42",
+                "function": "claim_rewards",
+                "arguments": [
+                    "str:LOTTERY-123456"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -40,8 +61,13 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
                 "address:acc1": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "1,000,000",
                     "esdt": {
                         "str:LOTTERY-123456": "200"
@@ -53,10 +79,14 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "str:addressToIdMapper|str:lastId": "1",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1"
+                    },
                     "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             }
