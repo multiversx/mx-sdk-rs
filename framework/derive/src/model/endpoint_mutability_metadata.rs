@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum EndpointMutabilityMetadata {
     Mutable,
     Readonly,
@@ -18,5 +18,9 @@ impl EndpointMutabilityMetadata {
                 quote! { multiversx_sc::abi::EndpointMutabilityAbi::Pure }
             }
         }
+    }
+
+    pub fn is_mutable(&self) -> bool {
+        matches!(self, EndpointMutabilityMetadata::Mutable)
     }
 }
