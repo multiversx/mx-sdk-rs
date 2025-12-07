@@ -182,7 +182,7 @@ where
     /// Accepts either a single payment, or no payment at all.
     ///
     /// Will halt execution if zero or more than one payment was received.
-    pub fn option_single(&self) -> Option<ManagedVecRef<'static, Payment<A>>> {
+    pub fn single_optional(&self) -> Option<ManagedVecRef<'static, Payment<A>>> {
         let esdt_transfers: ManagedRef<'static, A, ManagedVec<A, Payment<A>>> = self.all();
         match esdt_transfers.len() {
             0 => None,

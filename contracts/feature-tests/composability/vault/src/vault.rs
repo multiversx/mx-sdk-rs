@@ -127,7 +127,7 @@ pub trait Vault {
     #[endpoint]
     #[payable("*")]
     fn retrieve_funds_egld_or_single_esdt(&self) {
-        if let Some(payment) = self.call_value().option_single() {
+        if let Some(payment) = self.call_value().single_optional() {
             self.retrieve_funds_event(
                 payment.token_identifier.as_legacy(),
                 payment.token_nonce,

@@ -101,7 +101,7 @@ pub trait PayableFeatures {
     #[endpoint]
     #[payable]
     fn payable_any_5(&self) -> OptionalValue<PaymentMultiValue> {
-        optional_payment_to_multi_value(self.call_value().option_single())
+        optional_payment_to_multi_value(self.call_value().single_optional())
     }
 
     #[endpoint]
@@ -145,7 +145,7 @@ pub trait PayableFeatures {
     #[endpoint]
     #[payable("EGLD")]
     fn payable_egld_5(&self) -> OptionalValue<PaymentMultiValue> {
-        optional_payment_to_multi_value(self.call_value().option_single())
+        optional_payment_to_multi_value(self.call_value().single_optional())
     }
 
     #[endpoint]
