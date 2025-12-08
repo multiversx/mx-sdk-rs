@@ -232,7 +232,7 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::NonZeroBigUint,
                 ));
 
-                // NonZeroBigUint += BigUint/u32/u64
+                // NonZeroBigUint += BigUint/&BigUint
                 endpoints.push(BigNumOperatorTestEndpoint::new(
                     op,
                     ValueType::NonZeroBigUint,
@@ -245,18 +245,9 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUintRef,
                     ValueType::NonZeroBigUint,
                 ));
-                endpoints.push(BigNumOperatorTestEndpoint::new(
-                    op,
-                    ValueType::NonZeroBigUint,
-                    ValueType::U32,
-                    ValueType::NonZeroBigUint,
-                ));
-                endpoints.push(BigNumOperatorTestEndpoint::new(
-                    op,
-                    ValueType::NonZeroBigUint,
-                    ValueType::U64,
-                    ValueType::NonZeroBigUint,
-                ));
+
+                // NonZeroBigUint += u32/u64
+                add_u32_u64_endpoints(op, ValueType::NonZeroBigUint, None, &mut endpoints);
             } else {
                 // Direct, non-assign operators, +-*/%
                 // BigInt
@@ -289,6 +280,13 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::NonZeroBigUint,
                     ValueType::NonZeroBigUintRef,
                     ValueType::NonZeroBigUint,
+                    &mut endpoints,
+                );
+
+                add_u32_u64_endpoints(
+                    op,
+                    ValueType::NonZeroBigUint,
+                    Some(ValueType::NonZeroBigUintRef),
                     &mut endpoints,
                 );
             }

@@ -64,11 +64,53 @@ macro_rules! nz_binary_operator {
     };
 }
 
-nz_binary_operator! {Add, add, wrap_big_int_unchecked}
-nz_binary_operator! {Sub, sub, wrap_big_int_assert_gt_zero}
-nz_binary_operator! {Mul, mul, wrap_big_int_unchecked}
-nz_binary_operator! {Div, div, wrap_big_int_assert_gt_zero}
-nz_binary_operator! {Rem, rem, wrap_big_int_assert_gt_zero}
+nz_binary_operator! {Add, add, wrap_big_int_unchecked} // non zero + non zero = guaranteed non zero
+nz_binary_operator! {Sub, sub, wrap_big_int_assert_gt_zero} // non zero - non zero = needs validation
+nz_binary_operator! {Mul, mul, wrap_big_int_unchecked} // non zero * non zero = guaranteed non zero
+nz_binary_operator! {Div, div, wrap_big_int_assert_gt_zero} // non zero / non zero = needs validation
+nz_binary_operator! {Rem, rem, wrap_big_int_assert_gt_zero} // non zero % non zero = needs validation
+
+macro_rules! nz_binary_operator_small_int {
+    ($trait:ident, $method:ident, $wrap_method:ident) => {
+        impl<M: ManagedTypeApi> $trait<u32> for NonZeroBigUint<M> {
+            type Output = NonZeroBigUint<M>;
+
+            fn $method(self, other: u32) -> NonZeroBigUint<M> {
+                NonZeroBigUint::$wrap_method(self.into_big_uint().$method(other).into_big_int())
+            }
+        }
+
+        impl<'a, M: ManagedTypeApi> $trait<u32> for &'a NonZeroBigUint<M> {
+            type Output = NonZeroBigUint<M>;
+
+            fn $method(self, other: u32) -> NonZeroBigUint<M> {
+                NonZeroBigUint::$wrap_method(self.as_big_uint().$method(other).into_big_int())
+            }
+        }
+
+        impl<M: ManagedTypeApi> $trait<u64> for NonZeroBigUint<M> {
+            type Output = NonZeroBigUint<M>;
+
+            fn $method(self, other: u64) -> NonZeroBigUint<M> {
+                NonZeroBigUint::$wrap_method(self.into_big_uint().$method(other).into_big_int())
+            }
+        }
+
+        impl<'a, M: ManagedTypeApi> $trait<u64> for &'a NonZeroBigUint<M> {
+            type Output = NonZeroBigUint<M>;
+
+            fn $method(self, other: u64) -> NonZeroBigUint<M> {
+                NonZeroBigUint::$wrap_method(self.as_big_uint().$method(other).into_big_int())
+            }
+        }
+    };
+}
+
+nz_binary_operator_small_int! {Add, add, wrap_big_int_unchecked} // non zero + unsigned = guaranteed non zero
+nz_binary_operator_small_int! {Sub, sub, wrap_big_int_assert_gt_zero} // non zero - unsigned = needs validation
+nz_binary_operator_small_int! {Mul, mul, wrap_big_int_assert_gt_zero} // non zero * unsigned = needs validation
+nz_binary_operator_small_int! {Div, div, wrap_big_int_assert_gt_zero} // non zero / unsigned = needs validation
+nz_binary_operator_small_int! {Rem, rem, wrap_big_int_assert_gt_zero} // non zero % unsigned = needs validation
 
 // assignment operators
 

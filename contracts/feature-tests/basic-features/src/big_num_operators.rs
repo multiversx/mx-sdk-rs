@@ -79,6 +79,22 @@ pub trait BigIntOperators {
         a + b
     }
     #[endpoint]
+    fn add_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
     fn sub_big_int_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a - b
     }
@@ -140,6 +156,22 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn sub_non_zero_big_uint_ref_non_zero_big_uint_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
         a - b
     }
     #[endpoint]
@@ -207,6 +239,22 @@ pub trait BigIntOperators {
         a * b
     }
     #[endpoint]
+    fn mul_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
     fn div_big_int_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a / b
     }
@@ -271,6 +319,22 @@ pub trait BigIntOperators {
         a / b
     }
     #[endpoint]
+    fn div_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
     fn rem_big_int_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a % b
     }
@@ -332,6 +396,22 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn rem_non_zero_big_uint_ref_non_zero_big_uint_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
         a % b
     }
 
