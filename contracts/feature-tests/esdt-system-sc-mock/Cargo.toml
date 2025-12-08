@@ -9,9 +9,9 @@ publish = false
 path = "src/esdt_system_sc_mock.rs"
 
 [dependencies.multiversx-sc]
-version = "0.63.2"
+version = "0.63.3"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.2"
+version = "0.63.3"
 path = "../../../framework/scenario"
