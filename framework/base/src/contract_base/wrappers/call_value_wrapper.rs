@@ -171,7 +171,34 @@ where
             A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
         }
         let value = esdt_transfers.get(0);
-        unsafe { core::mem::transmute(value) }
+        unsafe {
+            // transmute only used because the compiler doesn't seem to be able to unify the 'static lifetime properly
+            core::mem::transmute::<ManagedVecRef<'_, Payment<A>>, ManagedVecRef<'static, Payment<A>>>(
+                value,
+            )
+        }
+    }
+
+    /// Accepts either a single payment, or no payment at all.
+    ///
+    /// Will halt execution if zero or more than one payment was received.
+    pub fn single_optional(&self) -> Option<ManagedVecRef<'static, Payment<A>>> {
+        let esdt_transfers: ManagedRef<'static, A, ManagedVec<A, Payment<A>>> = self.all();
+        match esdt_transfers.len() {
+            0 => None,
+            1 => {
+                let value = esdt_transfers.get(0);
+                // transmute only used because the compiler doesn't seem to be able to unify the 'static lifetime properly
+                let lifetime_fix = unsafe {
+                    core::mem::transmute::<
+                        ManagedVecRef<'_, Payment<A>>,
+                        ManagedVecRef<'static, Payment<A>>,
+                    >(value)
+                };
+                Some(lifetime_fix)
+            }
+            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
+        }
     }
 
     /// Verify and casts the received multi ESDT transfer in to an array.

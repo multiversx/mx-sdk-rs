@@ -99,6 +99,12 @@ pub trait PayableFeatures {
     }
 
     #[endpoint]
+    #[payable]
+    fn payable_any_5(&self) -> OptionalValue<PaymentMultiValue> {
+        optional_payment_to_multi_value(self.call_value().single_optional())
+    }
+
+    #[endpoint]
     #[payable("EGLD")]
     fn payable_egld_1(
         &self,
@@ -137,6 +143,12 @@ pub trait PayableFeatures {
     }
 
     #[endpoint]
+    #[payable("EGLD")]
+    fn payable_egld_5(&self) -> OptionalValue<PaymentMultiValue> {
+        optional_payment_to_multi_value(self.call_value().single_optional())
+    }
+
+    #[endpoint]
     #[payable("PAYABLE-FEATURES-TOKEN")]
     fn payable_token_1(
         &self,
@@ -172,5 +184,18 @@ pub trait PayableFeatures {
         let payment = self.call_value().single_esdt().amount.clone();
         let token = self.call_value().single_esdt().token_identifier.clone();
         (payment, token).into()
+    }
+}
+
+fn optional_payment_to_multi_value<M>(
+    opt_payment: Option<ManagedVecRef<'static, Payment<M>>>,
+) -> OptionalValue<PaymentMultiValue<M>>
+where
+    M: ManagedTypeApi,
+{
+    if let Some(payment) = opt_payment {
+        OptionalValue::Some(payment.clone().into_multi_value())
+    } else {
+        OptionalValue::None
     }
 }
