@@ -4,7 +4,7 @@ use crate::{
         multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
         TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    types::{ManagedVecRef, TokenId},
+    types::{NonZeroBigUint, Ref, TokenId},
 };
 
 use crate::{
@@ -37,14 +37,14 @@ impl<M: ManagedTypeApi> PaymentMultiValue<M> {
 impl<M: ManagedTypeApi> ManagedVecItem for PaymentMultiValue<M> {
     type PAYLOAD = <Payment<M> as ManagedVecItem>::PAYLOAD;
     const SKIPS_RESERIALIZATION: bool = Payment::<M>::SKIPS_RESERIALIZATION;
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         Payment::read_from_payload(payload).into()
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        Ref::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -79,7 +79,7 @@ where
     {
         let token_identifier = TokenId::multi_decode_or_handle_err(input, h)?;
         let token_nonce = u64::multi_decode_or_handle_err(input, h)?;
-        let amount = BigUint::multi_decode_or_handle_err(input, h)?;
+        let amount = NonZeroBigUint::multi_decode_or_handle_err(input, h)?;
         Ok(Payment::new(token_identifier, token_nonce, amount).into())
     }
 }

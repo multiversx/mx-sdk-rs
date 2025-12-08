@@ -33,10 +33,10 @@ path = "recursive-caller"
 path = "vault"
 
 [dependencies.multiversx-sc]
-version = "0.62.1"
+version = "0.63.1"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.62.1"
+version = "0.63.1"
 path = "../../../framework/scenario"
 features = ["wasmer-experimental"]

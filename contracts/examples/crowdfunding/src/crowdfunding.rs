@@ -44,7 +44,7 @@ pub trait Crowdfunding {
 
         let caller = self.blockchain().get_caller();
         self.deposit(&caller)
-            .update(|deposit| *deposit += &payment.amount);
+            .update(|deposit| *deposit += payment.amount.as_big_uint());
     }
 
     #[view]
@@ -80,10 +80,12 @@ pub trait Crowdfunding {
                 let token_identifier = self.cf_token_identifier().get();
                 let sc_balance = self.get_current_funds();
 
-                self.tx()
-                    .to(&caller)
-                    .payment(Payment::new(token_identifier, 0, sc_balance))
-                    .transfer();
+                if let Some(sc_balance_non_zero) = sc_balance.into_non_zero() {
+                    self.tx()
+                        .to(&caller)
+                        .payment(Payment::new(token_identifier, 0, sc_balance_non_zero))
+                        .transfer();
+                }
             }
             Status::Failed => {
                 let caller = self.blockchain().get_caller();
@@ -93,10 +95,13 @@ pub trait Crowdfunding {
                     let token_identifier = self.cf_token_identifier().get();
 
                     self.deposit(&caller).clear();
-                    self.tx()
-                        .to(&caller)
-                        .payment(Payment::new(token_identifier, 0, deposit))
-                        .transfer();
+
+                    if let Some(deposit_non_zero) = deposit.into_non_zero() {
+                        self.tx()
+                            .to(&caller)
+                            .payment(Payment::new(token_identifier, 0, deposit_non_zero))
+                            .transfer();
+                    }
                 }
             }
         }

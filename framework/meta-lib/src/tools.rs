@@ -6,7 +6,7 @@ mod rustc_version;
 mod rustc_version_warning;
 pub mod twiggy;
 mod wasm_extractor;
-mod wasm_opt;
+pub mod wasm_opt;
 mod wasm_to_wat;
 
 pub use find_workspace::{find_current_workspace, find_workspace};
@@ -24,10 +24,6 @@ pub use wasm_to_wat::wasm_to_wat;
 use crate::cli::BuildArgs;
 
 pub fn check_tools_installed(build_args: &mut BuildArgs) {
-    if build_args.wasm_opt && !wasm_opt::is_wasm_opt_installed() {
-        println!("Warning: {} not installed", wasm_opt::WASM_OPT_NAME);
-        build_args.wasm_opt = false;
-    }
     if build_args.has_twiggy_call() && !twiggy::is_twiggy_installed() {
         println!("Warning: {} not installed", twiggy::TWIGGY_NAME);
         build_args.twiggy_top = false;

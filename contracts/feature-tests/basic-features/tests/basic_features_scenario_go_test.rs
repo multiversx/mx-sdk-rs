@@ -20,6 +20,21 @@ fn big_num_conversions_go() {
 }
 
 #[test]
+fn big_num_ops_arith_go() {
+    world().run("scenarios/big_num_ops_arith.scen.json");
+}
+
+#[test]
+fn big_num_ops_bitwise_go() {
+    world().run("scenarios/big_num_ops_bitwise.scen.json");
+}
+
+#[test]
+fn big_num_ops_shift_go() {
+    world().run("scenarios/big_num_ops_shift.scen.json");
+}
+
+#[test]
 fn big_uint_eq_u_64_go() {
     world().run("scenarios/big_uint_eq_u64.scen.json");
 }
@@ -178,6 +193,11 @@ fn echo_managed_vec_go() {
 #[test]
 fn echo_multi_value_tuples_go() {
     world().run("scenarios/echo_multi_value_tuples.scen.json");
+}
+
+#[test]
+fn echo_non_zero_big_uint_go() {
+    world().run("scenarios/echo_non_zero_big_uint.scen.json");
 }
 
 #[test]

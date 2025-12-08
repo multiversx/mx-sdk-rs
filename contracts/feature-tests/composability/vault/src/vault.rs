@@ -127,16 +127,14 @@ pub trait Vault {
     #[endpoint]
     #[payable("*")]
     fn retrieve_funds_egld_or_single_esdt(&self) {
-        let token = self.call_value().egld_or_single_esdt();
-        self.retrieve_funds_event(&token.token_identifier, token.token_nonce, &token.amount);
+        if let Some(payment) = self.call_value().single_optional() {
+            self.retrieve_funds_event(
+                payment.token_identifier.as_legacy(),
+                payment.token_nonce,
+                payment.amount.as_big_uint(),
+            );
 
-        if let Some(esdt_token_id) = token.token_identifier.into_esdt_option() {
-            self.tx()
-                .to(ToCaller)
-                .esdt((esdt_token_id, token.token_nonce, token.amount))
-                .transfer();
-        } else {
-            self.tx().to(ToCaller).egld(token.amount).transfer();
+            self.tx().to(ToCaller).payment(&*payment).transfer();
         }
     }
 

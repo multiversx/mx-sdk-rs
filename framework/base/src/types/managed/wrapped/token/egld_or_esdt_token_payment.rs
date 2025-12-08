@@ -6,8 +6,8 @@ use crate::{
     api::ManagedTypeApi,
     types::{
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
-        EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPayment,
-        EsdtTokenPaymentRefs, ManagedVecItem, ManagedVecItemPayloadBuffer, ManagedVecRef,
+        EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue, EgldOrEsdtTokenPaymentRefs,
+        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref,
     },
 };
 
@@ -148,60 +148,10 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
     }
 }
 
-/// Similar to `EgldOrEsdtTokenPayment`, but only contains references.
-pub struct EgldOrEsdtTokenPaymentRefs<'a, M: ManagedTypeApi> {
-    pub token_identifier: &'a EgldOrEsdtTokenIdentifier<M>,
-    pub token_nonce: u64,
-    pub amount: &'a BigUint<M>,
-}
-
-impl<'a, M: ManagedTypeApi> EgldOrEsdtTokenPaymentRefs<'a, M> {
-    pub fn new(
-        token_identifier: &'a EgldOrEsdtTokenIdentifier<M>,
-        token_nonce: u64,
-        amount: &'a BigUint<M>,
-    ) -> EgldOrEsdtTokenPaymentRefs<'a, M> {
-        EgldOrEsdtTokenPaymentRefs {
-            token_identifier,
-            token_nonce,
-            amount,
-        }
-    }
-
-    pub fn to_owned_payment(&self) -> EgldOrEsdtTokenPayment<M> {
-        EgldOrEsdtTokenPayment {
-            token_identifier: self.token_identifier.clone(),
-            token_nonce: self.token_nonce,
-            amount: self.amount.clone(),
-        }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.amount == &0u32
-    }
-
-    pub fn map_egld_or_esdt<Context, D, F, U>(self, context: Context, for_egld: D, for_esdt: F) -> U
-    where
-        D: FnOnce(Context, &BigUint<M>) -> U,
-        F: FnOnce(Context, EsdtTokenPaymentRefs<M>) -> U,
-    {
-        self.token_identifier.map_ref_or_else(
-            context,
-            |context| for_egld(context, self.amount),
-            |context, token_identifier| {
-                for_esdt(
-                    context,
-                    EsdtTokenPaymentRefs::new(token_identifier, self.token_nonce, self.amount),
-                )
-            },
-        )
-    }
-}
-
 impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPayment<M> {
     type PAYLOAD = ManagedVecItemPayloadBuffer<U16>;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
@@ -215,7 +165,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPayment<M> {
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        Ref::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
