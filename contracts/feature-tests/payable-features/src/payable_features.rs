@@ -188,7 +188,7 @@ pub trait PayableFeatures {
 }
 
 fn optional_payment_to_multi_value<M>(
-    opt_payment: Option<ManagedVecRef<'static, Payment<M>>>,
+    opt_payment: Option<Ref<'static, Payment<M>>>,
 ) -> OptionalValue<PaymentMultiValue<M>>
 where
     M: ManagedTypeApi,

@@ -1,6 +1,6 @@
 use crate::{
     contract_base::TransferExecuteFailed,
-    types::{BigUint, ManagedAddress, ManagedVecRef, Payment, TxFrom, TxToSpecified},
+    types::{BigUint, ManagedAddress, Payment, Ref, TxFrom, TxToSpecified},
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
@@ -71,7 +71,7 @@ where
     }
 }
 
-impl<Env> TxPayment<Env> for Option<ManagedVecRef<'_, Payment<Env::Api>>>
+impl<Env> TxPayment<Env> for Option<Ref<'_, Payment<Env::Api>>>
 where
     Env: TxEnv,
 {
