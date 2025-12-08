@@ -54,10 +54,17 @@ pub trait PayableFeatures {
 
     #[endpoint]
     #[payable("*")]
-    fn payment_array_egld_esdt_3(
+    fn payment_array_egld_or_esdt_3(
         &self,
     ) -> MultiValue3<EgldOrEsdtTokenPayment, EgldOrEsdtTokenPayment, EgldOrEsdtTokenPayment> {
         let [payment_a, payment_b, payment_c] = self.call_value().multi_egld_or_esdt();
+        (payment_a.clone(), payment_b.clone(), payment_c.clone()).into()
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn payment_array_3(&self) -> MultiValue3<Payment, Payment, Payment> {
+        let [payment_a, payment_b, payment_c] = self.call_value().array();
         (payment_a.clone(), payment_b.clone(), payment_c.clone()).into()
     }
 

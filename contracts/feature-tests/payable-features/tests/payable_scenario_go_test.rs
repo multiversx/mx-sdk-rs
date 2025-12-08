@@ -50,6 +50,21 @@ fn payable_any_5_go() {
 }
 
 #[test]
+fn payable_array_go() {
+    world().run("scenarios/payable_array.scen.json");
+}
+
+#[test]
+fn payable_array_egld_or_esdt_go() {
+    world().run("scenarios/payable_array_egld_or_esdt.scen.json");
+}
+
+#[test]
+fn payable_array_esdt_go() {
+    world().run("scenarios/payable_array_esdt.scen.json");
+}
+
+#[test]
 fn payable_egld_1_go() {
     world().run("scenarios/payable_egld_1.scen.json");
 }
@@ -72,16 +87,6 @@ fn payable_egld_4_go() {
 #[test]
 fn payable_egld_5_go() {
     world().run("scenarios/payable_egld_5.scen.json");
-}
-
-#[test]
-fn payable_multi_array_go() {
-    world().run("scenarios/payable_multi_array.scen.json");
-}
-
-#[test]
-fn payable_multi_array_egld_go() {
-    world().run("scenarios/payable_multi_array_egld.scen.json");
 }
 
 #[test]

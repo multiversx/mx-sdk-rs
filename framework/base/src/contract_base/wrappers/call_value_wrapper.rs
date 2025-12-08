@@ -200,13 +200,26 @@ where
     ///
     /// Can be used to extract all payments in one line like this:
     ///
+    /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_egld_or_esdt();`.
+    pub fn array<const N: usize>(&self) -> [Ref<'static, Payment<A>>; N] {
+        let list = self.all();
+        let array = list.to_array_of_refs::<N>().unwrap_or_else(|| {
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+        });
+        unsafe { core::mem::transmute(array) }
+    }
+
+    /// Verify and casts the received multi ESDT transfer in to an array.
+    ///
+    /// Can be used to extract all payments in one line like this:
+    ///
     /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();`.
     ///
     /// Rejects EGLD transfers. Switch to `multi_egld_or_esdt` to accept mixed transfers.
     pub fn multi_esdt<const N: usize>(&self) -> [Ref<'static, EsdtTokenPayment<A>>; N] {
         let esdt_transfers = self.all_esdt_transfers();
         let array = esdt_transfers.to_array_of_refs::<N>().unwrap_or_else(|| {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
         });
         unsafe { core::mem::transmute(array) }
     }
@@ -234,7 +247,7 @@ where
     pub fn single_esdt(&self) -> Ref<'static, EsdtTokenPayment<A>> {
         let esdt_transfers = self.all_esdt_transfers();
         if esdt_transfers.len() != 1 {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
         }
         let value = esdt_transfers.get(0);
         unsafe { core::mem::transmute(value) }
@@ -280,7 +293,7 @@ where
                 amount: self.egld_direct_non_strict().clone(),
             },
             1 => esdt_transfers.get(0).clone(),
-            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes()),
+            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
         }
     }
 
