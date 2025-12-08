@@ -146,37 +146,38 @@ fn append_all_combinations(
     }
 }
 
-fn add_big_uint_u32_u64_endpoints(
+fn add_u32_u64_endpoints(
     op: &OperatorInfo,
-    add_ref: bool,
+    owned_type: ValueType,
+    opt_ref_type: Option<ValueType>,
     endpoints: &mut Vec<BigNumOperatorTestEndpoint>,
 ) {
     endpoints.push(BigNumOperatorTestEndpoint::new(
         op,
-        ValueType::BigUint,
+        owned_type,
         ValueType::U32,
-        ValueType::BigUint,
+        owned_type,
     ));
-    if add_ref {
+    if let Some(ref_type) = opt_ref_type {
         endpoints.push(BigNumOperatorTestEndpoint::new(
             op,
-            ValueType::BigUintRef,
+            ref_type,
             ValueType::U32,
-            ValueType::BigUint,
+            owned_type,
         ));
     }
     endpoints.push(BigNumOperatorTestEndpoint::new(
         op,
-        ValueType::BigUint,
+        owned_type,
         ValueType::U64,
-        ValueType::BigUint,
+        owned_type,
     ));
-    if add_ref {
+    if let Some(ref_type) = opt_ref_type {
         endpoints.push(BigNumOperatorTestEndpoint::new(
             op,
-            ValueType::BigUintRef,
+            ref_type,
             ValueType::U64,
-            ValueType::BigUint,
+            owned_type,
         ));
     }
 }
@@ -187,7 +188,8 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
     match op.group {
         OperatorGroup::Arithmetic => {
             if op.assign {
-                // Assign operators only have the owned type as first argument
+                // Assign operators, +=, -=, etc.
+                // They only have the owned type as first argument
                 // BigInt
                 endpoints.push(BigNumOperatorTestEndpoint::new(
                     op,
@@ -214,7 +216,7 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUintRef,
                     ValueType::BigUint,
                 ));
-                add_big_uint_u32_u64_endpoints(op, false, &mut endpoints);
+                add_u32_u64_endpoints(op, ValueType::BigUint, None, &mut endpoints);
 
                 // NonZeroBigUint
                 endpoints.push(BigNumOperatorTestEndpoint::new(
@@ -256,6 +258,7 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::NonZeroBigUint,
                 ));
             } else {
+                // Direct, non-assign operators, +-*/%
                 // BigInt
                 append_all_combinations(
                     op,
@@ -273,7 +276,12 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUint,
                     &mut endpoints,
                 );
-                add_big_uint_u32_u64_endpoints(op, true, &mut endpoints);
+                add_u32_u64_endpoints(
+                    op,
+                    ValueType::BigUint,
+                    Some(ValueType::BigUintRef),
+                    &mut endpoints,
+                );
 
                 // NonZeroBigUint
                 append_all_combinations(
@@ -301,7 +309,7 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUint,
                 ));
 
-                add_big_uint_u32_u64_endpoints(op, false, &mut endpoints);
+                add_u32_u64_endpoints(op, ValueType::BigUint, None, &mut endpoints);
             } else {
                 append_all_combinations(
                     op,
@@ -311,7 +319,12 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     &mut endpoints,
                 );
 
-                add_big_uint_u32_u64_endpoints(op, true, &mut endpoints);
+                add_u32_u64_endpoints(
+                    op,
+                    ValueType::BigUint,
+                    Some(ValueType::BigUintRef),
+                    &mut endpoints,
+                );
             }
         }
         OperatorGroup::Shift => {
