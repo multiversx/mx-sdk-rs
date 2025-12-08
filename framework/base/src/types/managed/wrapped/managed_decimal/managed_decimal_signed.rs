@@ -9,7 +9,7 @@ use crate::{
     typenum::{Unsigned, U4, U8},
     types::{
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigFloat,
-        BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, ManagedVecRef, Sign,
+        BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref, Sign,
     },
 };
 
@@ -194,7 +194,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
 
     const SKIPS_RESERIALIZATION: bool = false;
 
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
@@ -207,7 +207,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        Ref::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -226,14 +226,14 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
 
     const SKIPS_RESERIALIZATION: bool = false;
 
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         Self::const_decimals_from_raw(BigInt::read_from_payload(payload))
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        Ref::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
