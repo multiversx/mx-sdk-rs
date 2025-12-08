@@ -31,7 +31,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-too-many",
+            "id": "payment_array_esdt_3-too-many",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -62,7 +62,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:incorrect number of ESDT transfers",
+                "message": "str:incorrect number of transfers",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -70,7 +70,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-too-few",
+            "id": "payment_array_esdt_3-too-few",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -93,7 +93,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:incorrect number of ESDT transfers",
+                "message": "str:incorrect number of transfers",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -101,7 +101,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-bad-egld",
+            "id": "payment_array_esdt_3-bad-egld",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -137,7 +137,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-ok",
+            "id": "payment_array_esdt_3-ok",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
