@@ -110,6 +110,14 @@ where
             .original_result()
     }
 
+    pub fn payment_array_3(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue3<Payment<Env::Api>, Payment<Env::Api>, Payment<Env::Api>>> {
+        self.wrapped_tx
+            .raw_call("payment_array_3")
+            .original_result()
+    }
+
     pub fn payable_any_1(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>>> {
