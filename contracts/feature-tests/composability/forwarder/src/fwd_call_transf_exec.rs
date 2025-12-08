@@ -40,15 +40,19 @@ pub trait ForwarderTransferExecuteModule {
     #[endpoint]
     #[payable("*")]
     fn forward_transf_exec_accept_funds_twice(&self, to: ManagedAddress) {
-        let (token, token_nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
-        let half_payment = payment / 2u32;
+        let payment = self.call_value().single();
+        let half_payment = &payment.amount / 2u32;
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .egld_or_single_esdt(&token, token_nonce, &half_payment)
+            .payment(PaymentRefs::new(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &half_payment,
+            ))
             .gas(half_gas)
             .transfer_execute();
 
@@ -56,7 +60,11 @@ pub trait ForwarderTransferExecuteModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .egld_or_single_esdt(&token, token_nonce, &half_payment)
+            .payment(PaymentRefs::new(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &half_payment,
+            ))
             .gas(half_gas)
             .transfer_execute();
     }

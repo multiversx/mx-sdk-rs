@@ -5,7 +5,7 @@ use crate::{
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-/// TxPayment should work for any Option, 
+/// TxPayment should work for any Option,
 /// where for Some(payment) it behaves like payment,
 /// and for None it behaves like no payment.
 impl<Env, P> TxPayment<Env> for Option<P>
