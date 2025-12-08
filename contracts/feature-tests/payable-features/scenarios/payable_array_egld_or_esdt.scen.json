@@ -31,7 +31,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-egld-too-many",
+            "id": "payment_array_egld_or_esdt_3-too-many",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -59,7 +59,7 @@
                         "value": "103"
                     }
                 ],
-                "function": "payment_array_egld_esdt_3",
+                "function": "payment_array_egld_or_esdt_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -75,7 +75,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-egld-too-few",
+            "id": "payment_array_egld_or_esdt_3-too-few",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -90,7 +90,7 @@
                         "value": "10"
                     }
                 ],
-                "function": "payment_array_egld_esdt_3",
+                "function": "payment_array_egld_or_esdt_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -106,7 +106,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-ok",
+            "id": "payment_array_egld_or_esdt_3-ok",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -125,7 +125,7 @@
                         "value": "10"
                     }
                 ],
-                "function": "payment_array_egld_esdt_3",
+                "function": "payment_array_egld_or_esdt_3",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

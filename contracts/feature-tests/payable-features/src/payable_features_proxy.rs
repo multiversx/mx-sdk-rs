@@ -102,11 +102,11 @@ where
             .original_result()
     }
 
-    pub fn payment_array_egld_esdt_3(
+    pub fn payment_array_egld_or_esdt_3(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue3<EgldOrEsdtTokenPayment<Env::Api>, EgldOrEsdtTokenPayment<Env::Api>, EgldOrEsdtTokenPayment<Env::Api>>> {
         self.wrapped_tx
-            .raw_call("payment_array_egld_esdt_3")
+            .raw_call("payment_array_egld_or_esdt_3")
             .original_result()
     }
 

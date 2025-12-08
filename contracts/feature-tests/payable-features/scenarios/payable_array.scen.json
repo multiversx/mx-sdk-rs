@@ -31,7 +31,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-egld-too-many",
+            "id": "payment_array_3-too-many",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -75,7 +75,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-egld-too-few",
+            "id": "payment_array_3-too-few",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
@@ -106,7 +106,7 @@
         },
         {
             "step": "scCall",
-            "id": "payment-array-ok",
+            "id": "payment_array_3-ok",
             "tx": {
                 "from": "address:an-account",
                 "to": "sc:payable-features",
