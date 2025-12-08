@@ -5,7 +5,9 @@
             "commitHash": "<commit hash here>",
             "commitDate": "<commit date here>",
             "channel": "Channel",
-            "short": "rustc <version> (<short hash> <date>)"
+            "host": "<host>",
+            "short": "rustc <version> (<short hash> <date>)",
+            "llvmVersion": "x.x"
         },
         "contractCrate": {
             "name": "use-module",
@@ -14,7 +16,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.62.0"
+            "version": "0.63.2"
         }
     },
     "docs": [

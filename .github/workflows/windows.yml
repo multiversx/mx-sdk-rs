@@ -23,6 +23,7 @@ jobs:
         with:
           toolchain: stable
           target: wasm32-unknown-unknown
+          rustflags: ""
 
       - name: Install sc-meta
         run: cargo install multiversx-sc-meta

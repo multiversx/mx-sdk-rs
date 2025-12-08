@@ -121,10 +121,10 @@ pub fn async_promise_callback_tx_input(
     callback_input
 }
 
-pub fn merge_results(mut original: TxResult, mut new: TxResult) -> TxResult {
+pub fn merge_async_results(mut original: TxResult, mut new: TxResult) -> TxResult {
     if original.result_status.is_success() {
         original.result_values.append(&mut new.result_values);
-        original.result_logs.append(&mut new.result_logs);
+        original.append_all_logs(&mut new);
         original.result_message = new.result_message;
         original
     } else {

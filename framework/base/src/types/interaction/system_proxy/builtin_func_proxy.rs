@@ -1,8 +1,8 @@
 use multiversx_sc_codec::{Empty, TopEncode};
 
 use crate::types::{
-    BigUint, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg, TokenIdentifier, Tx,
-    TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+    BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer, ManagedVec, NotPayable, ProxyArg,
+    Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
 };
 
 use crate::chain_core::builtin_func_names::{
@@ -85,7 +85,7 @@ where
     }
 
     pub fn esdt_local_burn<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
@@ -113,7 +113,7 @@ where
     }
 
     pub fn esdt_local_mint<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
@@ -139,7 +139,7 @@ where
             .original_result()
     }
 
-    pub fn nft_add_multiple_uri<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn nft_add_multiple_uri<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_id: Arg0,
         nft_nonce: u64,
@@ -159,7 +159,7 @@ where
         tx.original_result()
     }
 
-    pub fn nft_update_attributes<T: TopEncode, Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn nft_update_attributes<T: TopEncode, Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_id: Arg0,
         nft_nonce: u64,
@@ -177,7 +177,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_create<
         T: TopEncode,
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
@@ -218,7 +218,7 @@ where
     }
 
     pub fn esdt_modify_royalties<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<u64>,
     >(
@@ -238,7 +238,10 @@ where
         tx.original_result()
     }
 
-    pub fn esdt_nft_set_new_uris<Arg0: ProxyArg<TokenIdentifier<Env::Api>>, Arg1: ProxyArg<u64>>(
+    pub fn esdt_nft_set_new_uris<
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+    >(
         self,
         token_id: Arg0,
         nonce: Arg1,
@@ -266,7 +269,7 @@ where
     }
 
     pub fn esdt_nft_modify_creator<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
     >(
         self,
@@ -286,7 +289,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_metadata_recreate<
         T: TopEncode,
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg3: ProxyArg<u64>,
@@ -329,7 +332,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_metadata_update<
         T: TopEncode,
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg3: ProxyArg<u64>,

@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use multiversx_chain_core::types::{DurationMillis, TimestampMillis, TimestampSeconds};
+
 use crate::{
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, BlockchainApi, BlockchainApiImpl, ErrorApi,
@@ -11,9 +13,9 @@ use crate::{
     storage,
     types::{
         BackTransfers, BackTransfersLegacy, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier,
-        EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType, ManagedVec, SystemSCAddress,
-        TokenIdentifier,
+        EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenIdentifier,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType,
+        ManagedVec, SystemSCAddress,
     },
 };
 
@@ -223,15 +225,34 @@ where
         A::blockchain_api_impl().get_gas_left()
     }
 
+    /// Block timestamp, in seconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_timestamp_seconds instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp()
     }
 
-    /// Block timestamp, in milliseconds.
+    /// Block timestamp, in seconds.
     #[inline]
+    pub fn get_block_timestamp_seconds(&self) -> TimestampSeconds {
+        TimestampSeconds::new(A::blockchain_api_impl().get_block_timestamp())
+    }
+
+    /// Block timestamp, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_timestamp_millis instead, it returns a properly typed timestamps"
+    )]
     pub fn get_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_timestamp_ms()
+    }
+
+    /// Block timestamp, in milliseconds.
+    pub fn get_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().get_block_timestamp_ms())
     }
 
     #[inline]
@@ -249,24 +270,61 @@ where
         A::blockchain_api_impl().get_block_epoch()
     }
 
+    /// Block round time, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_block_round_time_millis instead, it returns a properly typed duration"
+    )]
     #[inline]
     pub fn get_block_round_time_ms(&self) -> u64 {
         A::blockchain_api_impl().get_block_round_time_ms()
     }
 
+    /// Block round time, in milliseconds.
     #[inline]
-    pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
-        A::blockchain_api_impl().epoch_start_block_timestamp_ms()
+    pub fn get_block_round_time_millis(&self) -> DurationMillis {
+        DurationMillis::new(A::blockchain_api_impl().get_block_round_time_ms())
     }
 
-    #[inline]
-    pub fn epoch_start_block_nonce(&self) -> u64 {
+    /// Epoch start block timestamp, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use epoch_start_block_timestamp_millis instead, it returns a properly typed timestamps"
+    )]
+    pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
+        self.get_epoch_start_block_timestamp_millis()
+            .as_u64_millis()
+    }
+
+    #[deprecated(
+        since = "0.63.1",
+        note = "Renamed to get_epoch_start_block_timestamp_millis"
+    )]
+    pub fn epoch_start_block_timestamp_millis(&self) -> TimestampMillis {
+        self.get_epoch_start_block_timestamp_millis()
+    }
+
+    /// Epoch start block timestamp, in milliseconds.
+    pub fn get_epoch_start_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().epoch_start_block_timestamp_ms())
+    }
+
+    pub fn get_epoch_start_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_nonce()
     }
 
-    #[inline]
-    pub fn epoch_start_block_round(&self) -> u64 {
+    #[deprecated(since = "0.63.1", note = "Renamed to get_epoch_start_block_nonce")]
+    pub fn epoch_start_block_nonce(&self) -> u64 {
+        self.get_epoch_start_block_nonce()
+    }
+
+    pub fn get_epoch_start_block_round(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_round()
+    }
+
+    #[deprecated(since = "0.63.1", note = "Renamed to get_epoch_start_block_round")]
+    pub fn epoch_start_block_round(&self) -> u64 {
+        self.get_epoch_start_block_round()
     }
 
     #[deprecated(
@@ -288,21 +346,44 @@ where
         }
     }
 
+    /// Previous block timestamp, in seconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_prev_block_timestamp_seconds instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_prev_block_timestamp(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp()
     }
 
+    /// Previous block timestamp, in seconds.
+    pub fn get_prev_block_timestamp_seconds(&self) -> TimestampSeconds {
+        TimestampSeconds::new(A::blockchain_api_impl().get_prev_block_timestamp())
+    }
+
+    /// Previous block timestamp, in milliseconds.
+    #[deprecated(
+        since = "0.63.0",
+        note = "Use get_prev_block_timestamp_millis instead, it returns a properly typed timestamps"
+    )]
     #[inline]
     pub fn get_prev_block_timestamp_ms(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_timestamp_ms()
     }
 
+    /// Previous block timestamp, in milliseconds.
+    #[inline]
+    pub fn get_prev_block_timestamp_millis(&self) -> TimestampMillis {
+        TimestampMillis::new(A::blockchain_api_impl().get_prev_block_timestamp_ms())
+    }
+
+    /// Previous block nonce.
     #[inline]
     pub fn get_prev_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_nonce()
     }
 
+    /// Previous block round.
     #[inline]
     pub fn get_prev_block_round(&self) -> u64 {
         A::blockchain_api_impl().get_prev_block_round()
@@ -336,7 +417,7 @@ where
     pub fn get_current_esdt_nft_nonce(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
     ) -> u64 {
         A::blockchain_api_impl()
             .get_current_esdt_nft_nonce(address.get_handle(), token_id.get_handle())
@@ -346,7 +427,7 @@ where
     pub fn get_esdt_balance(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nonce: u64,
     ) -> BigUint<A> {
         unsafe {
@@ -396,7 +477,7 @@ where
     pub fn get_esdt_token_data(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nonce: u64,
     ) -> EsdtTokenData<A> {
         // initializing outputs
@@ -512,7 +593,7 @@ where
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.
     pub fn get_token_attributes<T: TopDecode>(
         &self,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         token_nonce: u64,
     ) -> T {
         let own_sc_address = self.get_sc_address();
@@ -524,7 +605,7 @@ where
     pub fn is_esdt_frozen(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &EsdtTokenIdentifier<A>,
         nonce: u64,
     ) -> bool {
         A::blockchain_api_impl().check_esdt_frozen(
@@ -535,17 +616,17 @@ where
     }
 
     #[inline]
-    pub fn is_esdt_paused(&self, token_id: &TokenIdentifier<A>) -> bool {
+    pub fn is_esdt_paused(&self, token_id: &EsdtTokenIdentifier<A>) -> bool {
         A::blockchain_api_impl().check_esdt_paused(token_id.get_handle())
     }
 
     #[inline]
-    pub fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier<A>) -> bool {
+    pub fn is_esdt_limited_transfer(&self, token_id: &EsdtTokenIdentifier<A>) -> bool {
         A::blockchain_api_impl().check_esdt_limited_transfer(token_id.get_handle())
     }
 
     #[inline]
-    pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
+    pub fn get_esdt_local_roles(&self, token_id: &EsdtTokenIdentifier<A>) -> EsdtLocalRoleFlags {
         A::blockchain_api_impl().load_esdt_local_roles(token_id.get_handle())
     }
 }
@@ -576,7 +657,7 @@ where
         result
     }
 
-    pub fn token_has_transfer_role(&self, token_identifier: TokenIdentifier<A>) -> bool {
+    pub fn token_has_transfer_role(&self, token_identifier: EsdtTokenIdentifier<A>) -> bool {
         // Prepare key
         let key_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_overwrite(key_handle.clone(), b"ELRONDtransferesdt");

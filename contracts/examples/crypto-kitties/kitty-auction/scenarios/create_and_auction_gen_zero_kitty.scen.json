@@ -9,7 +9,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockTimestamp": "123,456",
+                "blockTimestampMs": "123,456",
                 "blockRandomSeed": "0xd1d2d3d4d5d6d70000000000000000000000000000000000000000000000000000000000000000000000000000000000"
             }
         },

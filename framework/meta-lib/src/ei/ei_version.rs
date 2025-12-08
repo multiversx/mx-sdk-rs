@@ -1,3 +1,7 @@
+use crate::ei::deprecated_ei::deprecated_vm_hooks_1_5;
+
+use super::DeprecatedVMHook;
+
 /// The version of the SC environment interface (EI), it deals with the VM hooks available at a certain point in time.
 ///
 /// It is not tied to the version of the VM, hence the different numbering.
@@ -73,6 +77,17 @@ impl EIVersion {
 
     pub fn contains_vm_hook(&self, vm_hook_names: &str) -> bool {
         self.vm_hook_names().contains(&vm_hook_names)
+    }
+
+    pub fn deprecated_vm_hook(&self, name: &str) -> Option<&'static DeprecatedVMHook> {
+        match self {
+            EIVersion::V1_0
+            | EIVersion::V1_1
+            | EIVersion::V1_2
+            | EIVersion::V1_3
+            | EIVersion::V1_4 => None,
+            EIVersion::V1_5 => deprecated_vm_hooks_1_5(name),
+        }
     }
 }
 

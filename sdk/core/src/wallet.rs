@@ -221,7 +221,7 @@ impl Wallet {
         if should_sign_on_tx_hash {
             let mut h = Keccak256::new();
             h.update(tx_bytes);
-            tx_bytes = h.finalize().as_slice().to_vec();
+            tx_bytes = h.finalize().to_vec();
         }
 
         self.priv_key.sign(tx_bytes)
@@ -275,7 +275,7 @@ impl Wallet {
         input_mac.update(&ciphertext);
         let computed_mac = input_mac.finalize().into_bytes();
 
-        if computed_mac.as_slice() == json_mac.as_slice() {
+        if computed_mac.to_vec() == json_mac {
             println!("Password is correct");
             Ok(DecryptionParams {
                 derived_key_first_half,

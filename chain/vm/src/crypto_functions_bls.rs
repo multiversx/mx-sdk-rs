@@ -1,11 +1,17 @@
+use std::sync::Mutex;
+
 use multiversx_bls::{BlsError, SecretKey, G1, G2};
 
 pub const G2_STR: &str = "1 2345388737500083945391657505708625859903954047151773287623537600586029428359739211026111121073980842558223033704140 3558041178357727243543283929018475959655787667816024413880422701270944718005964809191925861299660390662341819212979 1111454484298065649047920916747797835589661734985194316226909186591481448224600088430816898704234962594609579273169 3988173108836042169913782128392219399166696378042311135661652175544044220584995583525611110036064603671142074680982";
+
+pub static BLS_MUTEX: Mutex<()> = Mutex::new(());
 
 pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     if message.is_empty() {
         return false;
     }
+
+    let bls_guard = BLS_MUTEX.lock().unwrap();
 
     let public_key = match create_public_key_from_bytes(key) {
         Ok(pk) => pk,
@@ -31,7 +37,10 @@ pub fn verify_bls(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
         return false;
     }
 
-    sign.verify(public_key, message)
+    let verify = sign.verify(public_key, message);
+    std::mem::drop(bls_guard);
+
+    verify
 }
 
 pub fn verify_bls_aggregated_signature(
@@ -42,6 +51,8 @@ pub fn verify_bls_aggregated_signature(
     if message.is_empty() {
         return false;
     }
+
+    let bls_guard = BLS_MUTEX.lock().unwrap();
 
     let public_keys = match keys
         .iter()
@@ -67,7 +78,10 @@ pub fn verify_bls_aggregated_signature(
         }
     };
 
-    sign.fast_aggregate_verify(&public_keys, message)
+    let verify = sign.fast_aggregate_verify(&public_keys, message);
+    std::mem::drop(bls_guard);
+
+    verify
 }
 
 pub fn verify_bls_signature_share(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
@@ -89,6 +103,8 @@ pub fn create_aggregated_signature(
     let mut public_keys = Vec::new();
     let mut signatures = Vec::new();
 
+    let bls_guard = BLS_MUTEX.lock().unwrap();
+
     for _ in 0..pk_size {
         let mut secret_key = SecretKey::default();
         secret_key.set_by_csprng();
@@ -107,6 +123,8 @@ pub fn create_aggregated_signature(
 
     let mut agg_signature = G1::default();
     agg_signature.aggregate(&signatures);
+
+    std::mem::drop(bls_guard);
 
     Ok((agg_signature, public_keys))
 }

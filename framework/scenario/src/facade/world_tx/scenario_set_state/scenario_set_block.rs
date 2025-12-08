@@ -1,9 +1,10 @@
-use multiversx_sc::types::{AnnotatedValue, ManagedBuffer};
+use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
+use multiversx_sc::types::{AnnotatedValue, ManagedBuffer, TimestampMillis, TimestampSeconds};
 
 use crate::{
     imports::StaticApi,
     scenario::tx_to_step::{bytes_annotated, u64_annotated},
-    scenario_model::{BlockInfo, SetStateStep},
+    scenario_model::{BlockInfo, SetStateStep, U64Value},
     ScenarioTxEnvData,
 };
 
@@ -94,25 +95,47 @@ impl SetStateBuilder<'_, BlockItem> {
         self
     }
 
-    pub fn block_timestamp<N>(mut self, block_timestamp: N) -> Self
+    #[deprecated(since = "0.63.1", note = "Renamed to block_timestamp_seconds")]
+    pub fn block_timestamp<N>(self, block_timestamp: N) -> Self
     where
-        N: AnnotatedValue<ScenarioTxEnvData, u64>,
+        N: AnnotatedValue<ScenarioTxEnvData, TimestampSeconds>,
+    {
+        self.block_timestamp_seconds(block_timestamp)
+    }
+
+    /// Sets the current block timestamp, in seconds.
+    pub fn block_timestamp_seconds<N>(mut self, block_timestamp: N) -> Self
+    where
+        N: AnnotatedValue<ScenarioTxEnvData, TimestampSeconds>,
     {
         let env = self.new_env_data();
-        let block_timestamp_value = u64_annotated(&env, &block_timestamp);
-
-        self.item.block_info.block_timestamp = Some(block_timestamp_value);
+        let annotation = block_timestamp.annotation(&env).to_string();
+        self.item.block_info.block_timestamp = Some(U64Value {
+            value: block_timestamp.to_value(&env).as_u64_seconds(),
+            original: ValueSubTree::Str(annotation),
+        });
         self
     }
 
-    pub fn block_timestamp_ms<N>(mut self, block_timestamp_ms: N) -> Self
+    #[deprecated(since = "0.63.1", note = "Renamed to block_timestamp_millis")]
+    pub fn block_timestamp_ms<N>(self, block_timestamp: N) -> Self
     where
-        N: AnnotatedValue<ScenarioTxEnvData, u64>,
+        N: AnnotatedValue<ScenarioTxEnvData, TimestampMillis>,
+    {
+        self.block_timestamp_millis(block_timestamp)
+    }
+
+    /// Sets the current block timestamp, in milliseconds.
+    pub fn block_timestamp_millis<N>(mut self, block_timestamp_ms: N) -> Self
+    where
+        N: AnnotatedValue<ScenarioTxEnvData, TimestampMillis>,
     {
         let env = self.new_env_data();
-        let block_timestamp_ms_value = u64_annotated(&env, &block_timestamp_ms);
-
-        self.item.block_info.block_timestamp_ms = Some(block_timestamp_ms_value);
+        let annotation = block_timestamp_ms.annotation(&env).to_string();
+        self.item.block_info.block_timestamp_ms = Some(U64Value {
+            value: block_timestamp_ms.to_value(&env).as_u64_millis(),
+            original: ValueSubTree::Str(annotation),
+        });
         self
     }
 

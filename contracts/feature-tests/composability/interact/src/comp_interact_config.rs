@@ -60,7 +60,7 @@ impl Config {
     pub fn token_id(&self) -> EgldOrEsdtTokenIdentifier<StaticApi> {
         match self.token_id.as_str() {
             "EGLD" => EgldOrEsdtTokenIdentifier::egld(),
-            _ => EgldOrEsdtTokenIdentifier::esdt(TokenIdentifier::from(self.token_id.as_str())),
+            _ => EgldOrEsdtTokenIdentifier::esdt(EsdtTokenIdentifier::from(self.token_id.as_str())),
         }
     }
 

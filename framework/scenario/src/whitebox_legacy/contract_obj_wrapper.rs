@@ -16,7 +16,7 @@ use crate::{
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 use multiversx_chain_vm::host::context::{TxFunctionName, TxResult};
-use multiversx_sc::types::{BigUint, H256};
+use multiversx_sc::types::{BigUint, TimestampMillis, TimestampSeconds, H256};
 use num_traits::Zero;
 
 use super::{
@@ -437,9 +437,24 @@ impl BlockchainStateWrapper {
             .set_state_step(SetStateStep::new().block_round(block_round));
     }
 
+    #[deprecated(since = "0.63.2", note = "Renamed to set_block_timestamp_seconds")]
     pub fn set_block_timestamp(&mut self, block_timestamp: u64) {
+        self.set_block_timestamp_seconds(TimestampSeconds::new(block_timestamp));
+    }
+
+    pub fn set_block_timestamp_seconds(&mut self, block_timestamp: TimestampSeconds) {
         self.world
-            .set_state_step(SetStateStep::new().block_timestamp(block_timestamp));
+            .set_state_step(SetStateStep::new().block_timestamp_seconds(block_timestamp));
+    }
+
+    #[deprecated(since = "0.63.2", note = "Renamed to set_block_timestamp_millis")]
+    pub fn set_block_timestamp_ms(&mut self, block_timestamp_ms: u64) {
+        self.set_block_timestamp_millis(TimestampMillis::new(block_timestamp_ms));
+    }
+
+    pub fn set_block_timestamp_millis(&mut self, block_timestamp: TimestampMillis) {
+        self.world
+            .set_state_step(SetStateStep::new().block_timestamp_millis(block_timestamp));
     }
 
     pub fn set_prev_block_epoch(&mut self, block_epoch: u64) {
