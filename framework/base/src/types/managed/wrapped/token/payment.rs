@@ -54,6 +54,10 @@ impl<M: ManagedTypeApi> Payment<M> {
         }
     }
 
+    pub fn is_fungible(&self) -> bool {
+        self.token_nonce == 0
+    }
+
     #[inline]
     pub fn into_tuple(self) -> (TokenId<M>, u64, NonZeroBigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
