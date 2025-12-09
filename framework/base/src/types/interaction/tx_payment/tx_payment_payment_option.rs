@@ -5,14 +5,13 @@ use crate::{
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<Env> TxPayment<Env> for &Payment<Env::Api>
+impl<Env> TxPayment<Env> for Option<&Payment<Env::Api>>
 where
     Env: TxEnv,
 {
     #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
-        // amount is NonZeroBigUint
-        false
+        self.is_none()
     }
 
     fn perform_transfer_execute_fallible(
@@ -22,15 +21,11 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
-        self.map_ref_egld_or_esdt(
-            (to, fc),
-            |(to, fc), egld_payment| {
-                egld_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
-            },
-            |(to, fc), esdt_payment| {
-                esdt_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
-            },
-        )
+        if let Some(payment) = self {
+            payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
+        } else {
+            ().perform_transfer_execute_fallible(env, to, gas_limit, fc)
+        }
     }
 
     fn perform_transfer_execute_legacy(
@@ -40,15 +35,11 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        self.map_ref_egld_or_esdt(
-            (to, fc),
-            |(to, fc), egld_payment| {
-                egld_payment.perform_transfer_execute_legacy(env, to, gas_limit, fc)
-            },
-            |(to, fc), esdt_payment| {
-                esdt_payment.perform_transfer_execute_legacy(env, to, gas_limit, fc)
-            },
-        )
+        if let Some(payment) = self {
+            payment.perform_transfer_execute_legacy(env, to, gas_limit, fc)
+        } else {
+            ().perform_transfer_execute_legacy(env, to, gas_limit, fc)
+        }
     }
 
     fn with_normalized<From, To, F, R>(
@@ -64,30 +55,29 @@ where
         To: TxToSpecified<Env>,
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
-        self.map_ref_egld_or_esdt(
-            (to, fc, f),
-            |(to, fc, f), egld_payment| egld_payment.with_normalized(env, from, to, fc, f),
-            |(to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
-        )
+        if let Some(payment) = self {
+            payment.with_normalized(env, from, to, fc, f)
+        } else {
+            ().with_normalized(env, from, to, fc, f)
+        }
     }
 
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        self.map_ref_egld_or_esdt(
-            (),
-            |(), egld_payment| TxPayment::<Env>::into_full_payment_data(egld_payment, env),
-            |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment, env),
-        )
+        if let Some(payment) = self {
+            payment.into_full_payment_data(env)
+        } else {
+            ().into_full_payment_data(env)
+        }
     }
 }
 
-impl<Env> TxPayment<Env> for Ref<'_, Payment<Env::Api>>
+impl<Env> TxPayment<Env> for Option<Ref<'_, Payment<Env::Api>>>
 where
     Env: TxEnv,
 {
     #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
-        // amount is NonZeroBigUint
-        false
+        self.is_none()
     }
 
     fn perform_transfer_execute_fallible(
@@ -97,7 +87,11 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
-        (&*self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
+        if let Some(payment) = self {
+            payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
+        } else {
+            ().perform_transfer_execute_fallible(env, to, gas_limit, fc)
+        }
     }
 
     fn perform_transfer_execute_legacy(
@@ -107,7 +101,11 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        (&*self).perform_transfer_execute_legacy(env, to, gas_limit, fc)
+        if let Some(payment) = self {
+            payment.perform_transfer_execute_legacy(env, to, gas_limit, fc)
+        } else {
+            ().perform_transfer_execute_legacy(env, to, gas_limit, fc)
+        }
     }
 
     fn with_normalized<From, To, F, R>(
@@ -123,21 +121,29 @@ where
         To: TxToSpecified<Env>,
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
-        (&*self).with_normalized(env, from, to, fc, f)
+        if let Some(payment) = self {
+            payment.with_normalized(env, from, to, fc, f)
+        } else {
+            ().with_normalized(env, from, to, fc, f)
+        }
     }
 
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        (&*self).into_full_payment_data(env)
+        if let Some(payment) = self {
+            payment.into_full_payment_data(env)
+        } else {
+            ().into_full_payment_data(env)
+        }
     }
 }
 
-impl<Env> TxPayment<Env> for Payment<Env::Api>
+impl<Env> TxPayment<Env> for Option<Payment<Env::Api>>
 where
     Env: TxEnv,
 {
     #[inline]
     fn is_no_payment(&self, env: &Env) -> bool {
-        (&self).is_no_payment(env)
+        self.as_ref().is_no_payment(env)
     }
 
     #[inline]
@@ -148,7 +154,8 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
-        (&self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
+        self.as_ref()
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -159,7 +166,8 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        (&self).perform_transfer_execute_legacy(env, to, gas_limit, fc)
+        self.as_ref()
+            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     fn with_normalized<From, To, F, R>(
@@ -175,18 +183,18 @@ where
         To: TxToSpecified<Env>,
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
-        self.map_egld_or_esdt(
-            (to, fc, f),
-            |(to, fc, f), egld_payment| egld_payment.with_normalized(env, from, to, fc, f),
-            |(to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
-        )
+        if let Some(payment) = self {
+            payment.with_normalized(env, from, to, fc, f)
+        } else {
+            ().with_normalized(env, from, to, fc, f)
+        }
     }
 
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        self.map_egld_or_esdt(
-            (),
-            |(), egld_payment| TxPayment::<Env>::into_full_payment_data(egld_payment, env),
-            |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment, env),
-        )
+        if let Some(payment) = self {
+            payment.into_full_payment_data(env)
+        } else {
+            ().into_full_payment_data(env)
+        }
     }
 }

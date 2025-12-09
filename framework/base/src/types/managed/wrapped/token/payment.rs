@@ -6,8 +6,7 @@ use crate::{
     types::{
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
         Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, EsdtTokenType, ManagedVecItem,
-        ManagedVecItemPayloadBuffer, ManagedVecRef, NonZeroBigUint, PaymentMultiValue, PaymentRefs,
-        TokenId,
+        ManagedVecItemPayloadBuffer, NonZeroBigUint, PaymentMultiValue, PaymentRefs, Ref, TokenId,
     },
 };
 
@@ -73,7 +72,7 @@ impl<M: ManagedTypeApi> Payment<M> {
     }
 
     /// Conversion that loosens the EGLD restriction.
-    pub fn into_multi_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
+    pub fn into_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
         EgldOrEsdtTokenPayment {
             token_identifier: EgldOrEsdtTokenIdentifier::esdt(self.token_identifier),
             token_nonce: self.token_nonce,
@@ -180,7 +179,7 @@ impl<M: ManagedTypeApi> IntoMultiValue for Payment<M> {
 impl<M: ManagedTypeApi> ManagedVecItem for Payment<M> {
     type PAYLOAD = ManagedVecItemPayloadBuffer<U16>;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
@@ -194,7 +193,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for Payment<M> {
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        Ref::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

@@ -54,10 +54,17 @@ pub trait PayableFeatures {
 
     #[endpoint]
     #[payable("*")]
-    fn payment_array_egld_esdt_3(
+    fn payment_array_egld_or_esdt_3(
         &self,
     ) -> MultiValue3<EgldOrEsdtTokenPayment, EgldOrEsdtTokenPayment, EgldOrEsdtTokenPayment> {
         let [payment_a, payment_b, payment_c] = self.call_value().multi_egld_or_esdt();
+        (payment_a.clone(), payment_b.clone(), payment_c.clone()).into()
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn payment_array_3(&self) -> MultiValue3<Payment, Payment, Payment> {
+        let [payment_a, payment_b, payment_c] = self.call_value().array();
         (payment_a.clone(), payment_b.clone(), payment_c.clone()).into()
     }
 
@@ -99,6 +106,12 @@ pub trait PayableFeatures {
     }
 
     #[endpoint]
+    #[payable]
+    fn payable_any_5(&self) -> OptionalValue<PaymentMultiValue> {
+        optional_payment_to_multi_value(self.call_value().single_optional())
+    }
+
+    #[endpoint]
     #[payable("EGLD")]
     fn payable_egld_1(
         &self,
@@ -137,6 +150,12 @@ pub trait PayableFeatures {
     }
 
     #[endpoint]
+    #[payable("EGLD")]
+    fn payable_egld_5(&self) -> OptionalValue<PaymentMultiValue> {
+        optional_payment_to_multi_value(self.call_value().single_optional())
+    }
+
+    #[endpoint]
     #[payable("PAYABLE-FEATURES-TOKEN")]
     fn payable_token_1(
         &self,
@@ -172,5 +191,18 @@ pub trait PayableFeatures {
         let payment = self.call_value().single_esdt().amount.clone();
         let token = self.call_value().single_esdt().token_identifier.clone();
         (payment, token).into()
+    }
+}
+
+fn optional_payment_to_multi_value<M>(
+    opt_payment: Option<Ref<'static, Payment<M>>>,
+) -> OptionalValue<PaymentMultiValue<M>>
+where
+    M: ManagedTypeApi,
+{
+    if let Some(payment) = opt_payment {
+        OptionalValue::Some(payment.clone().into_multi_value())
+    } else {
+        OptionalValue::None
     }
 }

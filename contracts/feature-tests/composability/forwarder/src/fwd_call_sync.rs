@@ -61,7 +61,7 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().egld_or_single_esdt();
+        let payment = self.call_value().single_optional();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result = self
@@ -164,7 +164,7 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds_then_read(&self, to: ManagedAddress) -> usize {
-        let payment = self.call_value().egld_or_single_esdt();
+        let payment = self.call_value().single_optional();
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
