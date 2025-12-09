@@ -16,33 +16,6 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         self.tx().to(&to).payment(payments).transfer();
     }
 
-    fn forward_contract_call(
-        &self,
-        to: ManagedAddress,
-        payment_token: EgldOrEsdtTokenIdentifier,
-        payment_amount: BigUint,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) -> Tx<
-        TxScEnv<Self::Api>,
-        (),
-        ManagedAddress,
-        EgldOrEsdtTokenPayment<Self::Api>,
-        (),
-        FunctionCall<Self::Api>,
-        (),
-    > {
-        self.tx()
-            .to(to)
-            .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
-            .payment(EgldOrEsdtTokenPayment::new(
-                payment_token,
-                0,
-                payment_amount,
-            ))
-    }
-
     #[endpoint]
     #[payable("*")]
     fn forward_async_call(
@@ -51,8 +24,12 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
-        self.forward_contract_call(to, token, payment, endpoint_name, args)
+        let opt_payment = self.call_value().single_optional();
+        self.tx()
+            .to(to)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .payment(opt_payment)
             .async_call_and_exit()
     }
 
@@ -64,9 +41,16 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
-        let half_payment = payment / 2u32;
-        self.forward_contract_call(to, token, half_payment, endpoint_name, args)
+        let payment = self.call_value().single();
+        self.tx()
+            .to(to)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .payment(PaymentRefs::new(
+                &payment.token_identifier,
+                0u64,
+                &(&payment.amount / 2u32),
+            ))
             .async_call_and_exit()
     }
 
@@ -79,71 +63,11 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
         let payment = self.call_value().egld();
-        self.forward_contract_call(
-            to,
-            EgldOrEsdtTokenIdentifier::egld(),
-            payment.clone(),
-            endpoint_name,
-            args,
-        )
-        .gas(self.blockchain().get_gas_left() / 2)
-        .transfer_execute();
-    }
-
-    #[endpoint]
-    #[payable("*")]
-    fn forward_transf_exec_esdt(
-        &self,
-        to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let (token, payment) = self.call_value().single_fungible_esdt();
-        self.forward_contract_call(
-            to,
-            EgldOrEsdtTokenIdentifier::esdt(token.clone()),
-            payment.clone(),
-            endpoint_name,
-            args,
-        )
-        .gas(self.blockchain().get_gas_left() / 2)
-        .transfer_execute();
-    }
-
-    #[endpoint]
-    #[payable("*")]
-    fn forward_transf_exec(
-        &self,
-        to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
-        self.forward_contract_call(to, token, payment, endpoint_name, args)
-            .gas(self.blockchain().get_gas_left() / 2)
-            .transfer_execute();
-    }
-
-    #[endpoint]
-    #[payable("*")]
-    fn forward_transf_exec_twice(
-        &self,
-        to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
-        let half_payment = payment / 2u32;
-        self.forward_contract_call(
-            to.clone(),
-            token.clone(),
-            half_payment.clone(),
-            endpoint_name.clone(),
-            args.clone(),
-        )
-        .gas(self.blockchain().get_gas_left() / 2)
-        .transfer_execute();
-        self.forward_contract_call(to, token, half_payment, endpoint_name, args)
+        self.tx()
+            .to(to)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .egld(payment)
             .gas(self.blockchain().get_gas_left() / 2)
             .transfer_execute();
     }
