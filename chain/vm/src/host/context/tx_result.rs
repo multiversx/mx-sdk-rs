@@ -37,7 +37,7 @@ pub struct TxResult {
     /// Accumulates errors when they occur.
     ///
     /// It mimics the behavior of the Go VM,
-    /// and they contribute to the the internalVMErrors event log.
+    /// and they contribute to the internalVMErrors event log.
     ///
     /// Of course, the data field of the internalVMErrors log is implementation-dependent,
     /// so a 1:1 match is impossible.
