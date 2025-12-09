@@ -1,7 +1,7 @@
 use crate::{
     api::ManagedTypeApi,
     typenum::Unsigned,
-    types::{BigUint, Decimals, ManagedDecimalSigned, NumDecimals},
+    types::{BigInt, Decimals, ManagedDecimalSigned, NumDecimals},
 };
 
 use core::ops::{Div, DivAssign, Sub};
@@ -31,7 +31,7 @@ impl<M: ManagedTypeApi, D: Decimals> Div<NumDecimals> for ManagedDecimalSigned<M
 
     fn div(self, other: NumDecimals) -> Self::Output {
         ManagedDecimalSigned {
-            data: self.data / BigUint::from(other),
+            data: self.data / BigInt::from(other as i64),
             decimals: self.decimals,
         }
     }
