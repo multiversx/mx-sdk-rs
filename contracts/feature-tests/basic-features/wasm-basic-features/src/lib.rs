@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          560
+// Endpoints:                          580
 // Async Callback:                       1
-// Total number of exported functions: 562
+// Total number of exported functions: 582
 
 #![no_std]
 
@@ -66,6 +66,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         add_non_zero_big_uint_non_zero_big_uint_ref => add_non_zero_big_uint_non_zero_big_uint_ref
         add_non_zero_big_uint_ref_non_zero_big_uint => add_non_zero_big_uint_ref_non_zero_big_uint
         add_non_zero_big_uint_ref_non_zero_big_uint_ref => add_non_zero_big_uint_ref_non_zero_big_uint_ref
+        add_non_zero_big_uint_u32 => add_non_zero_big_uint_u32
+        add_non_zero_big_uint_ref_u32 => add_non_zero_big_uint_ref_u32
+        add_non_zero_big_uint_u64 => add_non_zero_big_uint_u64
+        add_non_zero_big_uint_ref_u64 => add_non_zero_big_uint_ref_u64
         sub_big_int_big_int => sub_big_int_big_int
         sub_big_int_big_int_ref => sub_big_int_big_int_ref
         sub_big_int_ref_big_int => sub_big_int_ref_big_int
@@ -82,6 +86,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         sub_non_zero_big_uint_non_zero_big_uint_ref => sub_non_zero_big_uint_non_zero_big_uint_ref
         sub_non_zero_big_uint_ref_non_zero_big_uint => sub_non_zero_big_uint_ref_non_zero_big_uint
         sub_non_zero_big_uint_ref_non_zero_big_uint_ref => sub_non_zero_big_uint_ref_non_zero_big_uint_ref
+        sub_non_zero_big_uint_u32 => sub_non_zero_big_uint_u32
+        sub_non_zero_big_uint_ref_u32 => sub_non_zero_big_uint_ref_u32
+        sub_non_zero_big_uint_u64 => sub_non_zero_big_uint_u64
+        sub_non_zero_big_uint_ref_u64 => sub_non_zero_big_uint_ref_u64
         mul_big_int_big_int => mul_big_int_big_int
         mul_big_int_big_int_ref => mul_big_int_big_int_ref
         mul_big_int_ref_big_int => mul_big_int_ref_big_int
@@ -98,6 +106,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         mul_non_zero_big_uint_non_zero_big_uint_ref => mul_non_zero_big_uint_non_zero_big_uint_ref
         mul_non_zero_big_uint_ref_non_zero_big_uint => mul_non_zero_big_uint_ref_non_zero_big_uint
         mul_non_zero_big_uint_ref_non_zero_big_uint_ref => mul_non_zero_big_uint_ref_non_zero_big_uint_ref
+        mul_non_zero_big_uint_u32 => mul_non_zero_big_uint_u32
+        mul_non_zero_big_uint_ref_u32 => mul_non_zero_big_uint_ref_u32
+        mul_non_zero_big_uint_u64 => mul_non_zero_big_uint_u64
+        mul_non_zero_big_uint_ref_u64 => mul_non_zero_big_uint_ref_u64
         div_big_int_big_int => div_big_int_big_int
         div_big_int_big_int_ref => div_big_int_big_int_ref
         div_big_int_ref_big_int => div_big_int_ref_big_int
@@ -114,6 +126,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         div_non_zero_big_uint_non_zero_big_uint_ref => div_non_zero_big_uint_non_zero_big_uint_ref
         div_non_zero_big_uint_ref_non_zero_big_uint => div_non_zero_big_uint_ref_non_zero_big_uint
         div_non_zero_big_uint_ref_non_zero_big_uint_ref => div_non_zero_big_uint_ref_non_zero_big_uint_ref
+        div_non_zero_big_uint_u32 => div_non_zero_big_uint_u32
+        div_non_zero_big_uint_ref_u32 => div_non_zero_big_uint_ref_u32
+        div_non_zero_big_uint_u64 => div_non_zero_big_uint_u64
+        div_non_zero_big_uint_ref_u64 => div_non_zero_big_uint_ref_u64
         rem_big_int_big_int => rem_big_int_big_int
         rem_big_int_big_int_ref => rem_big_int_big_int_ref
         rem_big_int_ref_big_int => rem_big_int_ref_big_int
@@ -130,6 +146,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         rem_non_zero_big_uint_non_zero_big_uint_ref => rem_non_zero_big_uint_non_zero_big_uint_ref
         rem_non_zero_big_uint_ref_non_zero_big_uint => rem_non_zero_big_uint_ref_non_zero_big_uint
         rem_non_zero_big_uint_ref_non_zero_big_uint_ref => rem_non_zero_big_uint_ref_non_zero_big_uint_ref
+        rem_non_zero_big_uint_u32 => rem_non_zero_big_uint_u32
+        rem_non_zero_big_uint_ref_u32 => rem_non_zero_big_uint_ref_u32
+        rem_non_zero_big_uint_u64 => rem_non_zero_big_uint_u64
+        rem_non_zero_big_uint_ref_u64 => rem_non_zero_big_uint_ref_u64
         add_assign_big_int_big_int => add_assign_big_int_big_int
         add_assign_big_int_big_int_ref => add_assign_big_int_big_int_ref
         add_assign_big_uint_big_uint => add_assign_big_uint_big_uint
