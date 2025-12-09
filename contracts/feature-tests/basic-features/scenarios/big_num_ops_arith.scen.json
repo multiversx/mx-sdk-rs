@@ -7573,6 +7573,870 @@
         },
         {
             "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "256"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "256"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "510"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551870"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551617"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551871"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "256"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "256"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "510"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551870"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551617"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551871"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "256"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "256"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "510"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551870"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551617"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551871"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "256"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "256"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "510"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551870"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551617"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "add_non_zero_big_uint_ref_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "add_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551871"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
             "id": "sub_big_int_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
@@ -14945,6 +15809,846 @@
             "expect": {
                 "status": "4",
                 "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:cannot subtract because result would be negative"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "254"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551614"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551360"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551361"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:cannot subtract because result would be negative"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "254"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551614"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551360"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551361"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:cannot subtract because result would be negative"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "254"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551614"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551360"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551361"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:cannot subtract because result would be negative"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "254"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551614"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551360"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "sub_non_zero_big_uint_ref_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "sub_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551361"
+                ],
+                "status": "0"
             }
         },
         {
@@ -22509,6 +24213,838 @@
         },
         {
             "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "65025"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4703919738795935661825"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4703919738795935662080"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "65025"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4703919738795935661825"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4703919738795935662080"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "65025"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4703919738795935661825"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4703919738795935662080"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "65025"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4703919738795935661825"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "mul_non_zero_big_uint_ref_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "mul_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "4703919738795935662080"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
             "id": "div_big_int_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
@@ -29885,6 +32421,830 @@
         },
         {
             "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "72340172838076673"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "72340172838076673"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "72340172838076673"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "72340172838076673"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "72340172838076673"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "72340172838076673"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "255"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551615"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "72340172838076673"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "18446744073709551616"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "div_non_zero_big_uint_ref_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "div_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "72340172838076673"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
             "id": "rem_big_int_big_int(0,0)",
             "tx": {
                 "to": "sc:basic-features",
@@ -37241,6 +40601,790 @@
             "expect": {
                 "status": "4",
                 "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u32(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u32",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(1,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "1",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(255,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(255,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(255,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "255",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(18446744073709551615,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(18446744073709551615,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(18446744073709551615,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551615",
+                    "255"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(18446744073709551616,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "0"
+                ]
+            },
+            "expect": {
+                "status": "10",
+                "message": "str:division by 0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(18446744073709551616,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "1"
+                ]
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:zero value not allowed"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "rem_non_zero_big_uint_ref_u64(18446744073709551616,255)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "rem_non_zero_big_uint_ref_u64",
+                "arguments": [
+                    "18446744073709551616",
+                    "255"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0"
             }
         },
         {
