@@ -3,15 +3,8 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     #[endpoint]
-    #[payable("*")]
-    fn forward_payment(&self, to: ManagedAddress) {
-        let payment = self.call_value().single();
-        self.tx().to(to).payment(payment).transfer();
-    }
-
-    #[endpoint]
-    #[payable("*")]
-    fn forward_direct_esdt_multi(&self, to: ManagedAddress) {
+    #[payable]
+    fn forward_direct_transfer(&self, to: ManagedAddress) {
         let payments = self.call_value().all();
         self.tx().to(&to).payment(payments).transfer();
     }

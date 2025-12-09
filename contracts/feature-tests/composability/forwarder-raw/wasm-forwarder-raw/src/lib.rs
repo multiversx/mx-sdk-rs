@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           21
+// Endpoints:                           20
 // Async Callback:                       1
-// Total number of exported functions:  23
+// Total number of exported functions:  22
 
 #![no_std]
 
@@ -24,8 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         clear_callback_info => clear_callback_info
         callback_args_at_index => callback_args_at_index
         callback_payment_at_index => callback_payment_at_index
-        forward_payment => forward_payment
-        forward_direct_esdt_multi => forward_direct_esdt_multi
+        forward_direct_transfer => forward_direct_transfer
         forward_async_call => forward_async_call
         forward_async_call_half_payment => forward_async_call_half_payment
         forward_transf_exec_egld => forward_transf_exec_egld
