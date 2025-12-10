@@ -960,21 +960,49 @@ fn blockchain_state_test() {
 
     let expected_epoch = 10;
     let expected_nonce = 20;
-    let expected_timestamp = 30;
+    let expected_timestamp_millis: TimestampMillis = TimestampMillis::new(40);
 
     wrapper.set_block_epoch(expected_epoch);
     wrapper.set_block_nonce(expected_nonce);
-    wrapper.set_block_timestamp_ms(expected_timestamp);
+    wrapper.set_block_timestamp_millis(expected_timestamp_millis);
 
     wrapper
         .execute_query(&sc_wrapper, |sc| {
             let actual_epoch = sc.get_block_epoch();
             let actual_nonce = sc.get_block_nonce();
-            let actual_timestamp = sc.get_block_timestamp_millis();
+            let actual_timestamp_millis = sc.get_block_timestamp_millis();
 
             assert_eq!(expected_epoch, actual_epoch);
             assert_eq!(expected_nonce, actual_nonce);
-            assert_eq!(expected_timestamp, actual_timestamp.as_u64_millis());
+            assert_eq!(expected_timestamp_millis, actual_timestamp_millis);
+        })
+        .assert_ok();
+}
+
+#[test]
+fn blockchain_state_seconds_test() {
+    let rust_zero = rust_biguint!(0);
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_zero,
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    let expected_timestamp_seconds: TimestampSeconds = TimestampSeconds::new(30_000);
+    wrapper.set_block_timestamp_seconds(expected_timestamp_seconds);
+
+    wrapper
+        .execute_query(&sc_wrapper, |sc| {
+            let actual_timestamp_seconds = sc.get_block_timestamp_seconds();
+            let actual_timestamp_millis = sc.get_block_timestamp_millis();
+
+            assert_eq!(expected_timestamp_seconds, actual_timestamp_seconds);
+            assert_eq!(
+                expected_timestamp_seconds.to_millis(),
+                actual_timestamp_millis
+            );
         })
         .assert_ok();
 }

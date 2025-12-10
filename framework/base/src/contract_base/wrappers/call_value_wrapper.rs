@@ -252,7 +252,7 @@ where
         (payment.token_identifier, payment.amount)
     }
 
-    /// Accepts any sort of patyment, which is either:
+    /// Accepts any sort of payment, which is either:
     /// - EGLD (can be zero in case of no payment whatsoever);
     /// - Multi-ESDT (one or more ESDT transfers).
     pub fn any_payment(&self) -> EgldOrMultiEsdtPayment<A> {

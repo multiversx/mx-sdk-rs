@@ -24,7 +24,7 @@ system-sc-interact = { path = "../../../../tools/interactor-system-func-calls" }
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.63.0"
+version = "0.63.3"
 path = "../../../../framework/snippets"
 
 [features]
