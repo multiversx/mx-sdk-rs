@@ -44,15 +44,14 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     fn forward_async_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<PaymentMultiValue>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new();
         for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-
-            arg_buffer.push_arg(token_identifier);
-            arg_buffer.push_arg(token_nonce);
-            arg_buffer.push_arg(amount);
+            let payment = multi_arg.into_inner();
+            arg_buffer.push_arg(payment.token_identifier);
+            arg_buffer.push_arg(payment.token_nonce);
+            arg_buffer.push_arg(payment.amount);
         }
 
         self.tx()
@@ -66,12 +65,12 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     fn forwarder_async_send_and_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
-        payment_args: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<PaymentMultiValue>,
     ) {
         self.tx()
             .raw_call("burn_and_create_retrieve_async")
             .to(&to)
-            .payment(&payment_args.convert_payment_multi_triples())
+            .payment(&payment_args.convert_payment())
             .async_call_and_exit()
     }
 }

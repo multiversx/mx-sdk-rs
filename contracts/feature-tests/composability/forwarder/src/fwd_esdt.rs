@@ -73,11 +73,11 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        payment_args: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<PaymentMultiValue>,
     ) {
         self.tx()
             .to(&to)
-            .payment(payment_args.convert_payment_multi_triples())
+            .payment(payment_args.convert_payment())
             .transfer();
     }
 

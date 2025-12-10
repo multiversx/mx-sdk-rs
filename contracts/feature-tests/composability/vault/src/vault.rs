@@ -147,7 +147,7 @@ pub trait Vault {
     }
 
     #[endpoint]
-    fn retrieve_funds_multi(&self, transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>) {
+    fn retrieve_funds_multi(&self, transfers: MultiValueEncoded<PaymentMultiValue>) {
         self.retrieve_funds_multi_event(&transfers);
 
         self.tx()
@@ -217,7 +217,7 @@ pub trait Vault {
     #[event("retrieve_funds_multi")]
     fn retrieve_funds_multi_event(
         &self,
-        #[indexed] transfers: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        #[indexed] transfers: &MultiValueEncoded<PaymentMultiValue>,
     );
 
     #[endpoint]
