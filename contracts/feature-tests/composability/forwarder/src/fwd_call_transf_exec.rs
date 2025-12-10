@@ -20,20 +20,20 @@ pub trait ForwarderTransferExecuteModule {
 
     #[endpoint]
     #[payable("*")]
-    fn forward_transf_execu_accept_funds_with_fees(
-        &self,
-        to: ManagedAddress,
-        percentage_fees: u32,
-    ) {
-        let (token_id, payment) = self.call_value().egld_or_single_fungible_esdt();
-        let fees = &payment * percentage_fees / PERCENTAGE_TOTAL;
-        let amount_to_send = payment - fees;
+    fn forward_transf_exec_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: u32) {
+        let payment = self.call_value().single();
+        let fees = &payment.amount * percentage_fees / PERCENTAGE_TOTAL;
+        let amount_to_send = &payment.amount - fees;
 
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .egld_or_single_esdt(&token_id, 0u64, &amount_to_send)
+            .payment(PaymentRefs::new(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &amount_to_send,
+            ))
             .transfer_execute();
     }
 

@@ -158,7 +158,7 @@ where
 
     pub fn forward_sync_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -289,7 +289,7 @@ where
 
     pub fn forward_async_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -399,16 +399,16 @@ where
             .original_result()
     }
 
-    pub fn forward_transf_execu_accept_funds_with_fees<
+    pub fn forward_transf_exec_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
         percentage_fees: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .raw_call("forward_transf_execu_accept_funds_with_fees")
+            .raw_call("forward_transf_exec_accept_funds_with_fees")
             .argument(&to)
             .argument(&percentage_fees)
             .original_result()
@@ -433,7 +433,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue4<u64, u64, BigUint<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue3<u64, u64, TokenId<Env::Api>>> {
         self.wrapped_tx
             .raw_call("forward_transf_exec_accept_funds_return_values")
             .argument(&to)
@@ -618,7 +618,7 @@ where
 
     pub fn send_esdt_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<NonZeroBigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,

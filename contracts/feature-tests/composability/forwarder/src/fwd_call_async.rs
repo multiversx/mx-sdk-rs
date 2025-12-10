@@ -77,20 +77,20 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
 
     #[payable("*")]
     #[endpoint]
-    fn forward_async_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
-        let payment = self.call_value().egld_or_single_esdt();
-        let fees = &payment.amount * &percentage_fees / PERCENTAGE_TOTAL;
+    fn forward_async_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: u32) {
+        let payment = self.call_value().single();
+        let fees = &payment.amount * percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = &payment.amount - &fees;
 
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .egld_or_single_esdt(
+            .payment(PaymentRefs::new(
                 &payment.token_identifier,
                 payment.token_nonce,
                 &amount_to_send,
-            )
+            ))
             .async_call_and_exit();
     }
 
