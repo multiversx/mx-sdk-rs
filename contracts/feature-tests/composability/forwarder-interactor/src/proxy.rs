@@ -618,7 +618,7 @@ where
 
     pub fn send_esdt_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -655,7 +655,7 @@ where
 
     pub fn send_esdt_direct_multi_transfer<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1662,7 +1662,7 @@ where
 
     pub fn forward_sync_retrieve_funds_bt_multi<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1679,7 +1679,7 @@ where
     /// Highlights the behavior when calling back transfers **without** reset. 
     pub fn forward_sync_retrieve_funds_bt_multi_twice<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1696,7 +1696,7 @@ where
     /// Highlights the behavior when calling back transfers **with** reset. 
     pub fn forward_sync_retrieve_funds_bt_multi_twice_reset<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,

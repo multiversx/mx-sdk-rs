@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 
 use super::fwd_storage;
 
-const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
+const PERCENTAGE_TOTAL: u32 = 10_000; // 100%
 
 pub type EsdtTokenDataMultiValue<M> = MultiValue9<
     EsdtTokenType,
@@ -40,19 +40,19 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
 
     #[payable("*")]
     #[endpoint]
-    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: NonZeroBigUint) {
+    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: u32) {
         let payment = self.call_value().single();
-        let fees = percentage_fees * &payment.amount / PERCENTAGE_TOTAL;
-        let amount_to_send = &payment.amount - fees;
-
-        self.tx()
-            .to(&to)
-            .payment(PaymentRefs::new(
-                &payment.token_identifier,
-                0,
-                &amount_to_send,
-            ))
-            .transfer();
+        let fees = payment.amount.as_big_uint() * percentage_fees / PERCENTAGE_TOTAL;
+        if let Some(amount_to_send) = NonZeroBigUint::new(payment.amount.as_big_uint() - fees) {
+            self.tx()
+                .to(&to)
+                .payment(PaymentRefs::new(
+                    &payment.token_identifier,
+                    0,
+                    &amount_to_send,
+                ))
+                .transfer();
+        }
     }
 
     #[endpoint]

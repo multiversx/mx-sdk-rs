@@ -1108,7 +1108,7 @@ impl ContractInteract {
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = NonZeroBigUint::<StaticApi>::try_from(0u128).unwrap();
 
         let response = self
             .interactor
@@ -1153,15 +1153,12 @@ impl ContractInteract {
 
     pub async fn send_esdt_direct_multi_transfer(&mut self) {
         let to = Address::zero();
-        let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            EsdtTokenIdentifier<StaticApi>,
-            u64,
-            BigUint<StaticApi>,
-        >::from((
-            EsdtTokenIdentifier::from_esdt_bytes(&b""[..]),
+        let token_payments = MultiValueVec::from(vec![Payment::new(
+            TokenId::new(ManagedBuffer::from(&b""[..])),
             0u64,
-            BigUint::<StaticApi>::from(0u128),
-        ))]);
+            NonZeroBigUint::<StaticApi>::try_from(10u128).unwrap(),
+        )
+        .into_multi_value()]);
 
         let response = self
             .interactor

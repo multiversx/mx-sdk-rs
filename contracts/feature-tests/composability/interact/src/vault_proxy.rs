@@ -187,7 +187,7 @@ where
     }
 
     pub fn retrieve_funds_multi<
-        Arg0: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         transfers: Arg0,
