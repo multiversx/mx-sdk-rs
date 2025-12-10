@@ -58,20 +58,21 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
             .async_call_and_exit()
     }
 
+    /// TODO: not tested, investigate
     #[endpoint]
     #[payable("*")]
     fn forward_async_accept_funds_half_payment(&self, to: ManagedAddress) {
-        let payment = self.call_value().egld_or_single_esdt();
-        let half_payment = payment.amount / 2u32;
+        let payment = self.call_value().single();
+        let half_payment = &payment.amount / 2u32;
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .egld_or_single_esdt(
+            .payment(PaymentRefs::new(
                 &payment.token_identifier,
                 payment.token_nonce,
                 &half_payment,
-            )
+            ))
             .async_call_and_exit()
     }
 
