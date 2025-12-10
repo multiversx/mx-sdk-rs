@@ -302,24 +302,40 @@ where
         since = "0.63.0",
         note = "Use epoch_start_block_timestamp_millis instead, it returns a properly typed timestamps"
     )]
-    #[inline]
     pub fn epoch_start_block_timestamp_ms(&self) -> u64 {
-        A::blockchain_api_impl().epoch_start_block_timestamp_ms()
+        self.get_epoch_start_block_timestamp_millis()
+            .as_u64_millis()
+    }
+
+    #[deprecated(
+        since = "0.63.1",
+        note = "Renamed to get_epoch_start_block_timestamp_millis"
+    )]
+    pub fn epoch_start_block_timestamp_millis(&self) -> TimestampMillis {
+        self.get_epoch_start_block_timestamp_millis()
     }
 
     /// Epoch start block timestamp, in milliseconds.
-    pub fn epoch_start_block_timestamp_millis(&self) -> TimestampMillis {
+    pub fn get_epoch_start_block_timestamp_millis(&self) -> TimestampMillis {
         TimestampMillis::new(A::blockchain_api_impl().epoch_start_block_timestamp_ms())
     }
 
-    #[inline]
-    pub fn epoch_start_block_nonce(&self) -> u64 {
+    pub fn get_epoch_start_block_nonce(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_nonce()
     }
 
-    #[inline]
-    pub fn epoch_start_block_round(&self) -> u64 {
+    #[deprecated(since = "0.63.1", note = "Renamed to get_epoch_start_block_nonce")]
+    pub fn epoch_start_block_nonce(&self) -> u64 {
+        self.get_epoch_start_block_nonce()
+    }
+
+    pub fn get_epoch_start_block_round(&self) -> u64 {
         A::blockchain_api_impl().epoch_start_block_round()
+    }
+
+    #[deprecated(since = "0.63.1", note = "Renamed to get_epoch_start_block_round")]
+    pub fn epoch_start_block_round(&self) -> u64 {
+        self.get_epoch_start_block_round()
     }
 
     #[deprecated(

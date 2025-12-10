@@ -7,9 +7,9 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 #[multiversx_sc::module]
 pub trait ForwarderTransferExecuteModule {
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn forward_transf_exec_accept_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().egld_or_single_esdt();
+        let payment = self.call_value().single_optional();
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)

@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-chain-vm"
-version = "0.19.1"
+version = "0.20.0"
 edition = "2021"
 
 authors = [
@@ -43,7 +43,7 @@ multiversx-bls = { version = "0.2.0", optional = true }
 log = "0.4.17"
 
 [dependencies.multiversx-chain-core]
-version = "=0.19.1"
+version = "=0.20.0"
 path = "../core"
 features = ["std"]
 

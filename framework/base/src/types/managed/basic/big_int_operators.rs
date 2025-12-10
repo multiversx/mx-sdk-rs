@@ -4,17 +4,17 @@ use core::ops::{
 
 use crate::{
     api::{BigIntApiImpl, ManagedTypeApi},
-    types::{BigInt, BigUint, ManagedType, Sign},
+    types::{BigInt, ManagedType},
 };
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait for BigInt<M> {
+        impl<M: ManagedTypeApi> $trait<&BigInt<M>> for BigInt<M> {
             type Output = BigInt<M>;
 
-            fn $method(self, other: BigInt<M>) -> BigInt<M> {
-                let api = M::managed_type_impl();
-                api.$api_func(
+            fn $method(self, other: &BigInt<M>) -> BigInt<M> {
+                // self gets destroyed, so reusing it for the result
+                M::managed_type_impl().$api_func(
                     self.handle.clone(),
                     self.handle.clone(),
                     other.handle.clone(),
@@ -23,19 +23,25 @@ macro_rules! binary_operator {
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<BigUint<M>> for BigInt<M> {
-            type Output = BigInt<M>;
-
-            fn $method(self, other: BigUint<M>) -> BigInt<M> {
-                self.$method(BigInt::from_biguint(Sign::Plus, other))
-            }
-        }
-
-        impl<M: ManagedTypeApi> $trait<BigInt<M>> for BigUint<M> {
+        impl<M: ManagedTypeApi> $trait<BigInt<M>> for BigInt<M> {
             type Output = BigInt<M>;
 
             fn $method(self, other: BigInt<M>) -> BigInt<M> {
-                BigInt::from_biguint(Sign::Plus, self).$method(other)
+                self.$method(&other)
+            }
+        }
+
+        impl<'a, 'b, M: ManagedTypeApi> $trait<BigInt<M>> for &'a BigInt<M> {
+            type Output = BigInt<M>;
+
+            fn $method(self, other: BigInt<M>) -> BigInt<M> {
+                // other gets destroyed, so reusing it for the result
+                M::managed_type_impl().$api_func(
+                    other.handle.clone(),
+                    self.handle.clone(),
+                    other.handle.clone(),
+                );
+                other
             }
         }
 
@@ -43,32 +49,16 @@ macro_rules! binary_operator {
             type Output = BigInt<M>;
 
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {
-                let api = M::managed_type_impl();
+                // both arguments are references, so a new BigInt needs to be created
                 unsafe {
                     let result = BigInt::new_uninit();
-                    api.$api_func(
+                    M::managed_type_impl().$api_func(
                         result.get_handle(),
                         self.handle.clone(),
                         other.handle.clone(),
                     );
                     result
                 }
-            }
-        }
-
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for &'a BigInt<M> {
-            type Output = BigInt<M>;
-
-            fn $method(self, other: &BigUint<M>) -> BigInt<M> {
-                self.$method(other.as_big_int())
-            }
-        }
-
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigInt<M>> for &'a BigUint<M> {
-            type Output = BigInt<M>;
-
-            fn $method(self, other: &BigInt<M>) -> BigInt<M> {
-                self.as_big_int().$method(other)
             }
         }
     };

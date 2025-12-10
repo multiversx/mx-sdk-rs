@@ -46,6 +46,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(BigFloat));
     add_managed_type(substitutions, &quote!(BigInt));
     add_managed_type(substitutions, &quote!(BigUint));
+    add_managed_type(substitutions, &quote!(NonZeroBigUint));
     add_managed_type(substitutions, &quote!(EllipticCurveComponents));
     add_managed_type(substitutions, &quote!(EllipticCurve));
     add_managed_type(substitutions, &quote!(ManagedBuffer));
@@ -83,6 +84,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedVecOwnedIterator));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVecRefIterator));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVecRef));
+    add_managed_type_with_generics(substitutions, &quote!(Ref));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVec));
     add_managed_type_with_generics(substitutions, &quote!(PreloadedManagedBuffer));
     add_managed_type(substitutions, &quote!(RandomnessSource));

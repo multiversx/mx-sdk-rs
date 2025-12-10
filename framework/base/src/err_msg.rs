@@ -8,7 +8,6 @@ pub const SINGLE_ESDT_EXPECTED: &str = "single ESDT payment expected";
 pub const TOO_MANY_ESDT_TRANSFERS: &str = "too many ESDT transfers";
 pub const ESDT_INVALID_TOKEN_INDEX: &str = "invalid token index";
 pub const ESDT_UNEXPECTED_EGLD: &str = "unexpected EGLD transfer";
-pub const INCORRECT_NUM_ESDT_TRANSFERS: &str = "incorrect number of ESDT transfers";
 pub const INCORRECT_NUM_TRANSFERS: &str = "incorrect number of transfers";
 pub const FUNGIBLE_TOKEN_EXPECTED_ERR_MSG: &str = "fungible ESDT token expected";
 pub const TOKEN_IDENTIFIER_ESDT_EXPECTED: &str = "ESDT expected";
@@ -48,6 +47,7 @@ pub const CAST_TO_I64_ERROR: &str = "cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &str = "big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &str = "cannot subtract because result would be negative";
 pub const UNSIGNED_NEGATIVE: &str = "cannot convert to unsigned, number is negative";
+pub const ZERO_VALUE_NOT_ALLOWED: &str = "zero value not allowed";
 
 pub const DESERIALIZATION_INVALID_BYTE: &str = "call data deserialization error: not a valid byte";
 pub const DESERIALIZATION_NOT_32_BYTES: &str =
