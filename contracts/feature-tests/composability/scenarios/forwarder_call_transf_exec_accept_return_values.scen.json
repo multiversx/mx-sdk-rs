@@ -38,8 +38,7 @@
                 "out": [
                     "*",
                     "*",
-                    "0",
-                    "str:EGLD"
+                    "str:EGLD-000000"
                 ],
                 "status": "0",
                 "logs": [

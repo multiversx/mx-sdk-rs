@@ -23,10 +23,10 @@ pub trait ForwarderTransferExecuteModule {
     fn forward_transf_execu_accept_funds_with_fees(
         &self,
         to: ManagedAddress,
-        percentage_fees: BigUint,
+        percentage_fees: u32,
     ) {
         let (token_id, payment) = self.call_value().egld_or_single_fungible_esdt();
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
+        let fees = &payment * percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
         self.tx()
@@ -76,16 +76,15 @@ pub trait ForwarderTransferExecuteModule {
     fn forward_transf_exec_accept_funds_return_values(
         &self,
         to: ManagedAddress,
-    ) -> MultiValue4<u64, u64, BigUint, EgldOrEsdtTokenIdentifier> {
-        let payment = self.call_value().egld_or_single_esdt();
-        let payment_token = payment.token_identifier.clone();
+    ) -> MultiValue3<u64, u64, TokenId> {
+        let payment = self.call_value().single();
         let gas_left_before = self.blockchain().get_gas_left();
 
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .payment(payment)
+            .payment(&*payment)
             .transfer_execute();
 
         let gas_left_after = self.blockchain().get_gas_left();
@@ -93,8 +92,7 @@ pub trait ForwarderTransferExecuteModule {
         (
             gas_left_before,
             gas_left_after,
-            BigUint::zero(),
-            payment_token,
+            payment.token_identifier.clone(),
         )
             .into()
     }
