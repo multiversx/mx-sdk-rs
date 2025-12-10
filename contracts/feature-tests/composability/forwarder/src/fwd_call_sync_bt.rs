@@ -30,7 +30,11 @@ pub trait BackTransfersModule {
             let balance = self
                 .blockchain()
                 .get_sc_balance(&payment.token_identifier, payment.token_nonce);
-            balances_after.push(MultiValue3::from((payment.token_identifier, payment.token_nonce, balance)));
+            balances_after.push(MultiValue3::from((
+                payment.token_identifier,
+                payment.token_nonce,
+                balance,
+            )));
         }
         self.balances_after(balances_after);
     }
