@@ -23,7 +23,7 @@
             "id": "buy-ticket",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -52,6 +52,11 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
                 "address:acc1": {
                     "nonce": "1",
                     "balance": "1,000,000",
@@ -62,7 +67,7 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -76,11 +81,13 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:1",
                             "5-prize_distribution": "u32:2|u8:75|u8:25",
-                            "6-prize_pool": "biguint:100"
+                            "6-prize_pool": "biguint:100",
+                            "7-unawarded_amount": "biguint:100"
                         },
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "1",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1",
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "2",
+                        "str:addressToIdMapper|str:addr|address:my_address": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:my_address",
                         "+": ""
                     },
                     "code": "mxsc:../output/lottery-esdt.mxsc.json"

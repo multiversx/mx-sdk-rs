@@ -11,8 +11,8 @@
             "id": "start limited tickets, fixed deadline. Again.",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
-                "function": "start",
+                "to": "sc:lottery#42",
+                "function": "startLottery",
                 "arguments": [
                     "str:lottery_name",
                     "str:LOTTERY-123456",
@@ -37,12 +37,17 @@
             "step": "checkState",
             "accounts": {
                 "address:my_address": {
-                    "nonce": "4",
+                    "nonce": "3",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:other_shard_address#41": {
+                    "nonce": "1",
                     "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce": "1",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "esdt": {
                         "str:LOTTERY-123456": "200"
@@ -54,10 +59,15 @@
                     "balance": "1,000,000",
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
+                        "str:addressToIdMapper|str:lastId": "2",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1",
+                        "str:addressToIdMapper|str:addr|address:acc2": "2",
+                        "str:addressToIdMapper|str:addrId|u64:2": "address:acc2",
                         "str:lotteryInfo|nested:str:lottery_name": {
                             "0-token_identifier": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:1000",
@@ -65,7 +75,8 @@
                             "3-deadline": "u64:12345678905",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-prize_pool": "biguint:0"
+                            "6-prize_pool": "biguint:0",
+                            "7-unawarded_amount": "biguint:0"
                         }
                     },
                     "code": "mxsc:../output/lottery-esdt.mxsc.json"

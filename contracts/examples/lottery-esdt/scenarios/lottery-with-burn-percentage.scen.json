@@ -12,8 +12,8 @@
             "comment": "try starting lottery without setting local burn role",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
-                "function": "start",
+                "to": "sc:lottery#42",
+                "function": "startLottery",
                 "arguments": [
                     "str:lottery_name",
                     "str:LOTTERY-123456",
@@ -47,7 +47,7 @@
                         "str:LOTTERY-123456": "200"
                     }
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -67,8 +67,8 @@
             "comment": "start lottery after setting local burn role",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
-                "function": "start",
+                "to": "sc:lottery#42",
+                "function": "startLottery",
                 "arguments": [
                     "str:lottery_name",
                     "str:LOTTERY-123456",
@@ -94,7 +94,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -112,7 +112,8 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-prize_pool": "biguint:0"
+                            "6-prize_pool": "biguint:0",
+                            "7-unawarded_amount": "biguint:0"
                         },
                         "str:burnPercentageForLottery|nested:str:lottery_name": "50"
                     },
@@ -126,7 +127,7 @@
             "id": "buy first ticket",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -153,7 +154,7 @@
             "id": "buy second ticket",
             "tx": {
                 "from": "address:acc1",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:LOTTERY-123456",
@@ -186,7 +187,7 @@
                     },
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -210,13 +211,17 @@
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-prize_pool": "biguint:200"
+                            "6-prize_pool": "biguint:200",
+                            "7-unawarded_amount": "biguint:200"
                         },
                         "str:burnPercentageForLottery|nested:str:lottery_name": "50",
                         "str:ticketHolder|nested:str:lottery_name|str:.len": "2",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "address:acc1",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:2": "address:acc1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "2"
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "1",
+                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:2": "1",
+                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|u64:1": "2",
+                        "str:addressToIdMapper|str:lastId": "1",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1"
                     },
                     "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 },
@@ -228,7 +233,7 @@
             "id": "determine-winner-same-ticket-holder",
             "tx": {
                 "from": "address:my_address",
-                "to": "sc:lottery",
+                "to": "sc:lottery#42",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
@@ -237,9 +242,30 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
+                "out": [
+                    "1"
+                ],
                 "status": "0",
                 "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery#42",
+                "function": "claim_rewards",
+                "arguments": [
+                    "str:LOTTERY-123456"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
                 "gas": "*",
                 "refund": "*"
             }
@@ -249,14 +275,14 @@
             "comment": "check that 50% was burned, and 50% returned to acc1",
             "accounts": {
                 "address:acc1": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "1,000,000",
                     "esdt": {
                         "str:LOTTERY-123456": "100"
                     },
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -267,6 +293,9 @@
                         }
                     },
                     "storage": {
+                        "str:addressToIdMapper|str:lastId": "1",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1",
                         "str:lotteryInfo|nested:str:lottery_name": "",
                         "str:burnPercentageForLottery|nested:str:lottery_name": "0"
                     },

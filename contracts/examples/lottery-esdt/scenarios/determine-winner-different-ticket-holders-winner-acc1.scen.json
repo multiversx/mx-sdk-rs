@@ -15,11 +15,32 @@
         {
             "step": "scCall",
             "tx": {
-                "from": "address:my_address",
-                "to": "sc:lottery",
+                "from": "address:other_shard_address#41",
+                "to": "sc:lottery#42",
                 "function": "determine_winner",
                 "arguments": [
                     "str:lottery_name"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery#42",
+                "function": "claim_rewards",
+                "arguments": [
+                    "str:LOTTERY-123456"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -35,12 +56,17 @@
             "step": "checkState",
             "accounts": {
                 "address:my_address": {
-                    "nonce": "3",
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:other_shard_address#41": {
+                    "nonce": "1",
                     "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce": "1",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "esdt": {
                         "str:LOTTERY-123456": "200"
@@ -50,12 +76,21 @@
                 "address:acc2": {
                     "nonce": "1",
                     "balance": "1,000,000",
+                    "esdt": {
+                        "str:LOTTERY-123456": "0"
+                    },
                     "storage": {}
                 },
-                "sc:lottery": {
+                "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "str:addressToIdMapper|str:lastId": "2",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1",
+                        "str:addressToIdMapper|str:addr|address:acc2": "2",
+                        "str:addressToIdMapper|str:addrId|u64:2": "address:acc2"
+                    },
                     "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             }
