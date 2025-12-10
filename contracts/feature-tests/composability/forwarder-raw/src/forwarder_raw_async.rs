@@ -48,19 +48,19 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     }
 
     #[endpoint]
-    #[payable("EGLD")]
-    fn forward_transf_exec_egld(
+    #[payable]
+    fn forward_transf_exec(
         &self,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payment = self.call_value().egld();
+        let payment = self.call_value().all();
         self.tx()
             .to(to)
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
-            .egld(payment)
+            .payment(payment)
             .gas(self.blockchain().get_gas_left() / 2)
             .transfer_execute();
     }

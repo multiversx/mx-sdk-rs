@@ -27,7 +27,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_direct_transfer => forward_direct_transfer
         forward_async_call => forward_async_call
         forward_async_call_half_payment => forward_async_call_half_payment
-        forward_transf_exec_egld => forward_transf_exec_egld
+        forward_transf_exec => forward_transf_exec
         forward_async_retrieve_multi_transfer_funds => forward_async_retrieve_multi_transfer_funds
         forwarder_async_send_and_retrieve_multi_transfer_funds => forwarder_async_send_and_retrieve_multi_transfer_funds
         call_execute_on_dest_context => call_execute_on_dest_context
