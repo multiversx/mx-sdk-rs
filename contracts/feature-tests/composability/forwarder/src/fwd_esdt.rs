@@ -40,14 +40,18 @@ pub trait ForwarderEsdtModule: fwd_storage::ForwarderStorageModule {
 
     #[payable("*")]
     #[endpoint]
-    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
-        let (token_id, payment) = self.call_value().single_fungible_esdt();
-        let fees = percentage_fees * &*payment / PERCENTAGE_TOTAL;
-        let amount_to_send = payment.clone() - fees;
+    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: NonZeroBigUint) {
+        let payment = self.call_value().single();
+        let fees = percentage_fees * &payment.amount / PERCENTAGE_TOTAL;
+        let amount_to_send = &payment.amount - fees;
 
         self.tx()
             .to(&to)
-            .single_esdt(&token_id, 0, &amount_to_send)
+            .payment(PaymentRefs::new(
+                &payment.token_identifier,
+                0,
+                &amount_to_send,
+            ))
             .transfer();
     }
 
