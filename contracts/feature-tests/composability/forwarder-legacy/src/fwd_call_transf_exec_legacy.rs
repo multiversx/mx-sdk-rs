@@ -34,11 +34,7 @@ pub trait ForwarderTransferExecuteModule {
 
     #[endpoint]
     #[payable("*")]
-    fn forward_transf_exec_accept_funds_with_fees(
-        &self,
-        to: ManagedAddress,
-        percentage_fees: u32,
-    ) {
+    fn forward_transf_exec_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: u32) {
         let (token_id, payment) = self.call_value().egld_or_single_fungible_esdt();
         let fees = &payment * percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
