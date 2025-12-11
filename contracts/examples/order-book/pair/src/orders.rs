@@ -133,8 +133,8 @@ pub trait OrdersModule:
         &self,
         order_id: u64,
         caller: &ManagedAddress,
-        first_token_id: &EsdtTokenIdentifier,
-        second_token_id: &EsdtTokenIdentifier,
+        first_token_id: &TokenId,
+        second_token_id: &TokenId,
         epoch: u64,
     ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
@@ -186,8 +186,8 @@ pub trait OrdersModule:
         &self,
         order_id: u64,
         caller: &ManagedAddress,
-        first_token_id: &EsdtTokenIdentifier,
-        second_token_id: &EsdtTokenIdentifier,
+        first_token_id: &TokenId,
+        second_token_id: &TokenId,
         epoch: u64,
     ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
@@ -308,7 +308,7 @@ pub trait OrdersModule:
         &self,
         orders: MultiValueManagedVec<Order<Self::Api>>,
         total_paid: BigUint,
-        token_requested: EsdtTokenIdentifier,
+        token_requested: TokenId,
         leftover: BigUint,
     ) -> ManagedVec<Transfer<Self::Api>> {
         let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();

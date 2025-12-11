@@ -1,12 +1,12 @@
 use multiversx_sc::imports::*;
 
-use crate::common::{FeeConfig, FeeConfigEnum};
+use crate::common::{FeeConfig, FeeConfigEnum, FungiblePayment};
 
 use super::{
     common,
     common::{
-        FungiblePayment, Order, OrderInputParams, FEE_PENALTY_INCREASE_PERCENT,
-        MAX_ORDERS_PER_USER, PERCENT_BASE_POINTS,
+        Order, OrderInputParams, FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER,
+        PERCENT_BASE_POINTS,
     },
 };
 
@@ -69,30 +69,38 @@ pub trait ValidationModule: common::CommonModule {
     }
 
     fn require_valid_buy_payment(&self) -> FungiblePayment<Self::Api> {
-        let (token_id, amount) = self.call_value().single_fungible_esdt();
+        let payment = self.call_value().single();
         let second_token_id = self.second_token_id().get();
         require!(
-            *token_id == second_token_id,
-            "Token in and second token id should be the same"
+            payment.token_identifier.is_valid_esdt_identifier(),
+            "Payment is not a fungible token"
+        );
+        require!(
+            payment.token_identifier == second_token_id,
+            "Token id and second token id should be the same"
         );
 
         FungiblePayment {
-            token_id: token_id.clone(),
-            amount: amount.clone(),
+            token_id: payment.token_identifier.clone(),
+            amount: payment.amount.as_big_uint().clone(),
         }
     }
 
     fn require_valid_sell_payment(&self) -> FungiblePayment<Self::Api> {
-        let (token_id, amount) = self.call_value().single_fungible_esdt();
+        let payment = self.call_value().single();
         let first_token_id = self.first_token_id().get();
         require!(
-            *token_id == first_token_id,
-            "Token in and first token id should be the same"
+            payment.token_type() == EsdtTokenType::Fungible,
+            "Payment is not a fungible token"
+        );
+        require!(
+            payment.token_identifier == first_token_id,
+            "Token id and first token id should be the same"
         );
 
         FungiblePayment {
-            token_id: token_id.clone(),
-            amount: amount.clone(),
+            token_id: payment.token_identifier.clone(),
+            amount: payment.amount.as_big_uint().clone(),
         }
     }
 
