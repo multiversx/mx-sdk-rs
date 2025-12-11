@@ -275,6 +275,7 @@ where
             .original_result()
     }
 
+    /// TODO: not tested, investigate 
     pub fn forward_async_accept_funds_half_payment<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
