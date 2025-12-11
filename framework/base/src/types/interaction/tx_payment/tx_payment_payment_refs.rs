@@ -1,20 +1,20 @@
 use crate::{
     contract_base::TransferExecuteFailed,
-    types::{BigUint, ManagedAddress, Payment, TxFrom, TxToSpecified},
+    types::{BigUint, ManagedAddress, PaymentRefs, TxFrom, TxToSpecified},
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<Env> TxPayment<Env> for Payment<Env::Api>
+impl<Env> TxPayment<Env> for PaymentRefs<'_, Env::Api>
 where
     Env: TxEnv,
 {
     #[inline]
-    fn is_no_payment(&self, env: &Env) -> bool {
-        (&self).is_no_payment(env)
+    fn is_no_payment(&self, _env: &Env) -> bool {
+        // amount is NonZeroBigUint
+        false
     }
 
-    #[inline]
     fn perform_transfer_execute_fallible(
         self,
         env: &Env,
@@ -22,11 +22,17 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
-        self.as_refs()
-            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
+        self.map_egld_or_esdt(
+            fc,
+            |fc, egld_payment| {
+                egld_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
+            },
+            |fc, esdt_payment| {
+                esdt_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
+            },
+        )
     }
 
-    #[inline]
     fn perform_transfer_execute_legacy(
         self,
         env: &Env,
@@ -34,8 +40,11 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        self.as_refs()
-            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
+        self.map_egld_or_esdt(
+            fc,
+            |fc, egld_payment| egld_payment.perform_transfer_execute_legacy(env, to, gas_limit, fc),
+            |fc, esdt_payment| esdt_payment.perform_transfer_execute_legacy(env, to, gas_limit, fc),
+        )
     }
 
     fn with_normalized<From, To, F, R>(

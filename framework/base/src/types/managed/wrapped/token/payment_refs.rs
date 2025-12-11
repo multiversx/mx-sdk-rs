@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{ManagedRef, NonZeroBigUint, Payment, TokenId},
+    types::{BigUint, Egld, EsdtTokenPaymentRefs, ManagedRef, NonZeroBigUint, Payment, TokenId},
 };
 
 /// The version of `Payment` that contains references instead of owned fields.
@@ -31,6 +31,31 @@ impl<'a, M: ManagedTypeApi> PaymentRefs<'a, M> {
             token_identifier: self.token_identifier.clone(),
             token_nonce: self.token_nonce,
             amount: self.amount.clone(),
+        }
+    }
+
+    /// Mostly used for communication with the VM.
+    pub fn map_egld_or_esdt<Context, D, F, U>(
+        &self,
+        context: Context,
+        for_egld: D,
+        for_esdt: F,
+    ) -> U
+    where
+        D: FnOnce(Context, Egld<&BigUint<M>>) -> U,
+        F: FnOnce(Context, EsdtTokenPaymentRefs<'_, M>) -> U,
+    {
+        if self.token_identifier.is_native() {
+            for_egld(context, Egld(self.amount.as_big_uint()))
+        } else {
+            for_esdt(
+                context,
+                EsdtTokenPaymentRefs::new(
+                    unsafe { self.token_identifier.as_esdt_unchecked() },
+                    self.token_nonce,
+                    self.amount.as_big_uint(),
+                ),
+            )
         }
     }
 }

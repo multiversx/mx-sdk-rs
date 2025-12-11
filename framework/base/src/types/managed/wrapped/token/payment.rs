@@ -54,6 +54,10 @@ impl<M: ManagedTypeApi> Payment<M> {
         }
     }
 
+    pub fn is_fungible(&self) -> bool {
+        self.token_nonce == 0
+    }
+
     #[inline]
     pub fn into_tuple(self) -> (TokenId<M>, u64, NonZeroBigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
@@ -92,18 +96,7 @@ impl<M: ManagedTypeApi> Payment<M> {
         D: FnOnce(Context, Egld<&BigUint<M>>) -> U,
         F: FnOnce(Context, EsdtTokenPaymentRefs<'_, M>) -> U,
     {
-        if self.token_identifier.is_native() {
-            for_egld(context, Egld(self.amount.as_big_uint()))
-        } else {
-            for_esdt(
-                context,
-                EsdtTokenPaymentRefs::new(
-                    unsafe { self.token_identifier.as_esdt_unchecked() },
-                    self.token_nonce,
-                    self.amount.as_big_uint(),
-                ),
-            )
-        }
+        self.as_refs().map_egld_or_esdt(context, for_egld, for_esdt)
     }
 
     pub fn map_egld_or_esdt<Context, D, F, U>(self, context: Context, for_egld: D, for_esdt: F) -> U
