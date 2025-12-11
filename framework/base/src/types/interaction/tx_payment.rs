@@ -1,4 +1,5 @@
 mod test_esdt_transfer;
+mod tx_payment_compact;
 mod tx_payment_egld;
 mod tx_payment_egld_or_esdt;
 mod tx_payment_egld_or_esdt_refs;

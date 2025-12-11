@@ -10,12 +10,12 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let opt_payment = self.call_value().single_optional();
+        let payment = self.call_value().all();
         self.tx()
             .to(to)
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
-            .payment(opt_payment)
+            .payment(Compact(payment))
             .async_call_and_exit()
     }
 

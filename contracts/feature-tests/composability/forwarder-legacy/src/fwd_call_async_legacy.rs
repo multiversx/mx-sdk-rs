@@ -57,11 +57,11 @@ pub trait ForwarderAsyncCallModule {
     #[endpoint]
     #[payable("*")]
     fn forward_async_accept_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().single_optional();
+        let payment = self.call_value().all();
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .payment(payment)
+            .payment(Compact(payment))
             .async_call()
             .call_and_exit()
     }
