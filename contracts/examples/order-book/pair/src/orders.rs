@@ -353,9 +353,11 @@ pub trait OrdersModule:
     fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
         for transfer in &transfers {
             if transfer.payment.amount > 0 {
+                let token_id = transfer.payment.token_id.clone();
+                let amount = NonZeroBigUint::new(transfer.payment.amount.clone()).unwrap();
                 self.tx()
                     .to(&transfer.to)
-                    .single_esdt(&transfer.payment.token_id, 0, &transfer.payment.amount)
+                    .payment(Payment::new(token_id, 0, amount))
                     .transfer();
             }
         }
