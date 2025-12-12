@@ -99,6 +99,16 @@ where
     }
 }
 
+impl<M, T> AsRef<T> for ManagedRef<'_, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
+{
+    fn as_ref(&self) -> &T {
+        self.deref()
+    }
+}
+
 impl<'a, M, T> From<&'a T> for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,

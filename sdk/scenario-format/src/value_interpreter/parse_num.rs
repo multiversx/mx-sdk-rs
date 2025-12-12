@@ -110,7 +110,7 @@ fn parse_unsigned(s: &str) -> Vec<u8> {
     let clean = s.replace(&['_', ','][..], "");
     if clean.starts_with("0x") || clean.starts_with("0X") {
         let clean = &clean[2..];
-        return if clean.len() % 2 == 0 {
+        return if clean.len().is_multiple_of(2) {
             hex::decode(clean).unwrap()
         } else {
             let even_bytes = format!("0{clean}");

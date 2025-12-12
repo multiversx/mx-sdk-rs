@@ -11,7 +11,7 @@ pub fn calculate<M: ManagedTypeApi>(
     list.sort_unstable();
     let len = list.len();
     let middle_index = len / 2;
-    if len % 2 == 0 {
+    if len.is_multiple_of(2) {
         let median1 = list.get(middle_index - 1).ok_or("median1 invalid index")?;
         let median2 = list.get(middle_index).ok_or("median2 invalid index")?;
         Result::Ok(Some((median1.clone() + median2.clone()) / 2u64))

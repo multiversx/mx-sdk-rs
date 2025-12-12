@@ -66,6 +66,15 @@ where
     }
 }
 
+impl<T> AsRef<T> for Ref<'_, T>
+where
+    T: ManagedVecItem,
+{
+    fn as_ref(&self) -> &T {
+        self.deref()
+    }
+}
+
 impl<T> Debug for Ref<'_, T>
 where
     T: ManagedVecItem + Debug,
