@@ -7,7 +7,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint(payFeeAndFund)]
     #[payable]
     fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
-        let mut payments = self.call_value().all_transfers().clone_value();
+        let mut payments = self.call_value().all().clone_value();
         require!(!payments.is_empty(), "no payment was provided");
 
         let mut fee_token = payments.get(0).clone();
@@ -30,7 +30,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
 
         if provided_fee_token.amount > fee_without_first_token {
             fee_token.amount = fee_with_first_token;
-            let extracted_fee = EgldOrEsdtTokenPayment::new(
+            let extracted_fee = Payment::new(
                 provided_fee_token.token_identifier,
                 provided_fee_token.token_nonce,
                 provided_fee_token.amount - &fee_token.amount,
@@ -60,7 +60,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         let deposited_fee_token = deposit_mapper.fees.value;
         let fee_amount = self.fee(&deposited_fee_token.token_identifier).get();
         // TODO: switch to egld+esdt multi transfer handling
-        let payment = self.call_value().all_transfers().clone_value();
+        let payment = self.call_value().all().clone_value();
 
         let num_tokens = payment.len();
         self.check_fees_cover_number_of_tokens(num_tokens, fee_amount, deposited_fee_token.amount);
@@ -71,8 +71,8 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint(depositFees)]
     #[payable("EGLD")]
     fn deposit_fees(&self, address: &ManagedAddress) {
-        let payment = self.call_value().egld_or_single_esdt();
+        let payment = self.call_value().single();
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, address, payment);
+        self.update_fees(caller_address, address, payment.clone());
     }
 }
