@@ -125,6 +125,17 @@ where
     }
 }
 
+impl<M, T> AsRef<ManagedVec<M, T>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    #[inline]
+    fn as_ref(&self) -> &ManagedVec<M, T> {
+        self
+    }
+}
+
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,

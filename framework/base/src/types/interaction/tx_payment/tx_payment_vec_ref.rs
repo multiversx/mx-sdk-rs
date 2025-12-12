@@ -1,17 +1,17 @@
 use crate::{
     contract_base::TransferExecuteFailed,
-    types::{BigUint, Compact, CompactPayment, ManagedAddress, PaymentVec, TxFrom, TxToSpecified},
+    types::{BigUint, ManagedAddress, MultiTransfer, PaymentVec, TxFrom, TxToSpecified},
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<Env, P> TxPayment<Env> for Compact<P>
+impl<Env, P> TxPayment<Env> for P
 where
     Env: TxEnv,
-    P: CompactPayment + AsRef<PaymentVec<Env::Api>>,
+    P: AsRef<PaymentVec<Env::Api>>,
 {
     fn is_no_payment(&self, _env: &Env) -> bool {
-        let pv = self.0.as_ref();
+        let pv = self.as_ref();
         pv.is_empty()
     }
 
@@ -22,13 +22,13 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
-        let pv = self.0.as_ref();
+        let pv = self.as_ref();
         match pv.len() {
             0 => ().perform_transfer_execute_fallible(env, to, gas_limit, fc),
             1 => pv
                 .get(0)
                 .perform_transfer_execute_fallible(env, to, gas_limit, fc),
-            _ => pv.perform_transfer_execute_fallible(env, to, gas_limit, fc),
+            _ => MultiTransfer(pv).perform_transfer_execute_fallible(env, to, gas_limit, fc),
         }
     }
 
@@ -39,13 +39,13 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        let pv = self.0.as_ref();
+        let pv = self.as_ref();
         match pv.len() {
             0 => ().perform_transfer_execute_legacy(env, to, gas_limit, fc),
             1 => pv
                 .get(0)
                 .perform_transfer_execute_legacy(env, to, gas_limit, fc),
-            _ => pv.perform_transfer_execute_legacy(env, to, gas_limit, fc),
+            _ => MultiTransfer(pv).perform_transfer_execute_legacy(env, to, gas_limit, fc),
         }
     }
 
@@ -62,20 +62,20 @@ where
         To: TxToSpecified<Env>,
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
-        let pv = self.0.as_ref();
+        let pv = self.as_ref();
         match pv.len() {
             0 => ().with_normalized(env, from, to, fc, f),
             1 => pv.get(0).with_normalized(env, from, to, fc, f),
-            _ => pv.with_normalized(env, from, to, fc, f),
+            _ => MultiTransfer(pv).with_normalized(env, from, to, fc, f),
         }
     }
 
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        let pv = self.0.as_ref();
+        let pv = self.as_ref();
         match pv.len() {
             0 => ().into_full_payment_data(env),
             1 => pv.get(0).into_full_payment_data(env),
-            _ => pv.into_full_payment_data(env),
+            _ => MultiTransfer(pv).into_full_payment_data(env),
         }
     }
 }

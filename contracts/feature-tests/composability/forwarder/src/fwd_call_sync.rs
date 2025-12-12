@@ -70,7 +70,7 @@ pub trait ForwarderSyncCallModule {
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
             .accept_funds_echo_payment()
-            .payment(Compact(payment))
+            .payment(payment)
             .returns(ReturnsResult)
             .sync_call();
 
@@ -173,7 +173,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .payment(Compact(payment))
+            .payment(payment)
             .sync_call();
 
         self.tx()

@@ -14,7 +14,7 @@ pub trait ForwarderTransferExecuteModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .payment(Compact(payment))
+            .payment(payment)
             .transfer_execute();
     }
 

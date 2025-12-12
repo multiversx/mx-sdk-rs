@@ -54,7 +54,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .payment(Compact(payment))
+            .payment(payment)
             .async_call_and_exit()
     }
 

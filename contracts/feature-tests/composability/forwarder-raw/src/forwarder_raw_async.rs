@@ -15,7 +15,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             .to(to)
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
-            .payment(Compact(payment))
+            .payment(payment)
             .async_call_and_exit()
     }
 
