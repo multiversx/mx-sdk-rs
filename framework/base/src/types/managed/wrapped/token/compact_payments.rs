@@ -8,7 +8,7 @@ use crate::{
 /// - ESDTTransfer for single fungible tranasfers,
 /// - MultiESDTNFTTransfer for everything else.
 ///
-/// This contracts with simple PaymentVec, which always does a multi-transfer.
+/// This contrasts with unwrapped PaymentVec, which always does a multi-transfer.
 pub struct Compact<P>(pub P)
 where
     P: CompactPayment;
