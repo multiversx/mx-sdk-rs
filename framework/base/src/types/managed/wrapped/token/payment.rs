@@ -40,20 +40,6 @@ impl<M: ManagedTypeApi> Payment<M> {
         }
     }
 
-    pub fn token_type(&self) -> EsdtTokenType {
-        if self.amount != 0 {
-            if self.token_nonce == 0 {
-                EsdtTokenType::Fungible
-            } else if self.amount == 1u64 {
-                EsdtTokenType::NonFungible
-            } else {
-                EsdtTokenType::SemiFungible
-            }
-        } else {
-            EsdtTokenType::Invalid
-        }
-    }
-
     pub fn is_fungible(&self) -> bool {
         self.token_nonce == 0
     }

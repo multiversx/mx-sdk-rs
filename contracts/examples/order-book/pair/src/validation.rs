@@ -89,10 +89,7 @@ pub trait ValidationModule: common::CommonModule {
     fn require_valid_sell_payment(&self) -> FungiblePayment<Self::Api> {
         let payment = self.call_value().single();
         let first_token_id = self.first_token_id().get();
-        require!(
-            payment.token_type() == EsdtTokenType::Fungible,
-            "Payment is not a fungible token"
-        );
+        require!(payment.is_fungible(), "Payment is not a fungible token");
         require!(
             payment.token_identifier == first_token_id,
             "Token id and first token id should be the same"
