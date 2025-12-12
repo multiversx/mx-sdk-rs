@@ -133,8 +133,8 @@ pub trait OrdersModule:
         &self,
         order_id: u64,
         caller: &ManagedAddress,
-        first_token_id: &EsdtTokenIdentifier,
-        second_token_id: &EsdtTokenIdentifier,
+        first_token_id: &TokenId,
+        second_token_id: &TokenId,
         epoch: u64,
     ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
@@ -186,8 +186,8 @@ pub trait OrdersModule:
         &self,
         order_id: u64,
         caller: &ManagedAddress,
-        first_token_id: &EsdtTokenIdentifier,
-        second_token_id: &EsdtTokenIdentifier,
+        first_token_id: &TokenId,
+        second_token_id: &TokenId,
         epoch: u64,
     ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
@@ -308,7 +308,7 @@ pub trait OrdersModule:
         &self,
         orders: MultiValueManagedVec<Order<Self::Api>>,
         total_paid: BigUint,
-        token_requested: EsdtTokenIdentifier,
+        token_requested: TokenId,
         leftover: BigUint,
     ) -> ManagedVec<Transfer<Self::Api>> {
         let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
@@ -353,9 +353,11 @@ pub trait OrdersModule:
     fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
         for transfer in &transfers {
             if transfer.payment.amount > 0 {
+                let token_id = transfer.payment.token_id.clone();
+                let amount = NonZeroBigUint::new(transfer.payment.amount.clone()).unwrap();
                 self.tx()
                     .to(&transfer.to)
-                    .single_esdt(&transfer.payment.token_id, 0, &transfer.payment.amount)
+                    .payment(Payment::new(token_id, 0, amount))
                     .transfer();
             }
         }

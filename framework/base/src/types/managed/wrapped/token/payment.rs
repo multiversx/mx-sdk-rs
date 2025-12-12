@@ -5,8 +5,8 @@ use crate::{
     api::ManagedTypeApi,
     types::{
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
-        Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, EsdtTokenType, ManagedVecItem,
-        ManagedVecItemPayloadBuffer, NonZeroBigUint, PaymentMultiValue, PaymentRefs, Ref, TokenId,
+        Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem, ManagedVecItemPayloadBuffer,
+        NonZeroBigUint, PaymentMultiValue, PaymentRefs, Ref, TokenId,
     },
 };
 
@@ -37,20 +37,6 @@ impl<M: ManagedTypeApi> Payment<M> {
             token_identifier,
             token_nonce,
             amount,
-        }
-    }
-
-    pub fn token_type(&self) -> EsdtTokenType {
-        if self.amount != 0 {
-            if self.token_nonce == 0 {
-                EsdtTokenType::Fungible
-            } else if self.amount == 1u64 {
-                EsdtTokenType::NonFungible
-            } else {
-                EsdtTokenType::SemiFungible
-            }
-        } else {
-            EsdtTokenType::Invalid
         }
     }
 
