@@ -17,7 +17,7 @@ pub enum OrderType {
 
 #[derive(ManagedVecItem, Clone)]
 pub struct FungiblePayment<M: ManagedTypeApi> {
-    pub token_id: EsdtTokenIdentifier<M>,
+    pub token_id: TokenId<M>,
     pub amount: BigUint<M>,
 }
 
@@ -121,9 +121,9 @@ pub trait CommonModule {
 
     #[view(getFirstTokenId)]
     #[storage_mapper("first_token_id")]
-    fn first_token_id(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
+    fn first_token_id(&self) -> SingleValueMapper<TokenId>;
 
     #[view(getSecondTokenId)]
     #[storage_mapper("second_token_id")]
-    fn second_token_id(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
+    fn second_token_id(&self) -> SingleValueMapper<TokenId>;
 }
