@@ -216,6 +216,11 @@ fn echo_multi_value_tuples_rs() {
 }
 
 #[test]
+fn echo_non_zero_big_uint_rs() {
+    world().run("scenarios/echo_non_zero_big_uint.scen.json");
+}
+
+#[test]
 fn echo_nothing_rs() {
     world().run("scenarios/echo_nothing.scen.json");
 }

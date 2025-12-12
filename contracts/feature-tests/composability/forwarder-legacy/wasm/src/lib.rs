@@ -40,7 +40,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         clear_callback_data => clear_callback_data
         forward_transf_exec_accept_funds => forward_transf_exec_accept_funds
         forward_transf_exec_accept_single_esdt => forward_transf_exec_accept_single_esdt
-        forward_transf_execu_accept_funds_with_fees => forward_transf_execu_accept_funds_with_fees
+        forward_transf_exec_accept_funds_with_fees => forward_transf_exec_accept_funds_with_fees
         forward_transf_exec_accept_funds_twice => forward_transf_exec_accept_funds_twice
         forward_transf_exec_accept_funds_return_values => forward_transf_exec_accept_funds_return_values
         transf_exec_multi_accept_funds => transf_exec_multi_accept_funds

@@ -1,0 +1,96 @@
+{
+    "name": "payable",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:payable-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/payable-features.mxsc.json"
+                },
+                "address:an-account": {
+                    "nonce": "0",
+                    "balance": "1,000,000,000,000",
+                    "esdt": {
+                        "str:PAYABLE-FEATURES-TOKEN": "1,000,000,000,000",
+                        "str:OTHER-TOKEN": "1,000,000,000,000"
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_any_5.1",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "function": "payable_any_5",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_any_5.2",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "egldValue": "5",
+                "function": "payable_any_5",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:EGLD-000000",
+                    "0",
+                    "5"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payable_any_5.3",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:payable-features",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:PAYABLE-FEATURES-TOKEN",
+                        "value": "100"
+                    }
+                ],
+                "function": "payable_any_5",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:PAYABLE-FEATURES-TOKEN",
+                    "0",
+                    "100"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

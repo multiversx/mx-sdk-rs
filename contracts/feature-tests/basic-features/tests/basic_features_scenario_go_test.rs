@@ -196,6 +196,11 @@ fn echo_multi_value_tuples_go() {
 }
 
 #[test]
+fn echo_non_zero_big_uint_go() {
+    world().run("scenarios/echo_non_zero_big_uint.scen.json");
+}
+
+#[test]
 fn echo_nothing_go() {
     world().run("scenarios/echo_nothing.scen.json");
 }

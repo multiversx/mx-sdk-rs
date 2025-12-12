@@ -105,7 +105,7 @@
                         "value": "100"
                     }
                 ],
-                "function": "forward_transf_execu_accept_funds_with_fees",
+                "function": "forward_transf_exec_accept_funds_with_fees",
                 "arguments": [
                     "sc:vault",
                     "1000"

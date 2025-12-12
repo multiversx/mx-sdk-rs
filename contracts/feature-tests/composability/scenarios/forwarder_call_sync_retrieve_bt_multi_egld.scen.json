@@ -96,7 +96,7 @@
                         "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
                         "topics": [
                             "str:back_transfers_multi_event",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "1000"
                         ],
@@ -109,7 +109,7 @@
                         "endpoint": "str:forward_sync_retrieve_funds_bt_multi",
                         "topics": [
                             "str:balances_after",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "",
                             "1000"
                         ],

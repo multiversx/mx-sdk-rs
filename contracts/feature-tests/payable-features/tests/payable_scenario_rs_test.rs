@@ -52,6 +52,26 @@ fn payable_any_4_rs() {
 }
 
 #[test]
+fn payable_any_5_rs() {
+    world().run("scenarios/payable_any_5.scen.json");
+}
+
+#[test]
+fn payable_array_rs() {
+    world().run("scenarios/payable_array.scen.json");
+}
+
+#[test]
+fn payable_array_egld_or_esdt_rs() {
+    world().run("scenarios/payable_array_egld_or_esdt.scen.json");
+}
+
+#[test]
+fn payable_array_esdt_rs() {
+    world().run("scenarios/payable_array_esdt.scen.json");
+}
+
+#[test]
 fn payable_egld_1_rs() {
     world().run("scenarios/payable_egld_1.scen.json");
 }
@@ -72,13 +92,8 @@ fn payable_egld_4_rs() {
 }
 
 #[test]
-fn payable_multi_array_rs() {
-    world().run("scenarios/payable_multi_array.scen.json");
-}
-
-#[test]
-fn payable_multi_array_egld_rs() {
-    world().run("scenarios/payable_multi_array_egld.scen.json");
+fn payable_egld_5_rs() {
+    world().run("scenarios/payable_egld_5.scen.json");
 }
 
 #[test]

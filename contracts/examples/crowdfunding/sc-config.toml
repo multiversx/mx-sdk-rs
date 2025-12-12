@@ -1,0 +1,2 @@
+[[proxy]]
+path = "src/crowdfunding_proxy.rs"

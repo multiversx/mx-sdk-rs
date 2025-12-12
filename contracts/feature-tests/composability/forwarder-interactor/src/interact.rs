@@ -75,8 +75,8 @@ pub async fn forwarder_cli() {
         "callback_data_at_index" => interact.callback_data_at_index().await,
         "clear_callback_data" => interact.clear_callback_data().await,
         "forward_transf_exec_accept_funds" => interact.forward_transf_exec_accept_funds().await,
-        "forward_transf_execu_accept_funds_with_fees" => {
-            interact.forward_transf_execu_accept_funds_with_fees().await
+        "forward_transf_exec_accept_funds_with_fees" => {
+            interact.forward_transf_exec_accept_funds_with_fees().await
         }
         "forward_transf_exec_accept_funds_twice" => {
             interact.forward_transf_exec_accept_funds_twice().await
@@ -406,7 +406,7 @@ impl ContractInteract {
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = 0u32;
 
         let response = self
             .interactor
@@ -636,7 +636,7 @@ impl ContractInteract {
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = 0u32;
 
         let response = self
             .interactor
@@ -799,13 +799,13 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn forward_transf_execu_accept_funds_with_fees(&mut self) {
+    pub async fn forward_transf_exec_accept_funds_with_fees(&mut self) {
         let token_id = String::new();
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = 0u32;
 
         let response = self
             .interactor
@@ -814,7 +814,7 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .forward_transf_execu_accept_funds_with_fees(to, percentage_fees)
+            .forward_transf_exec_accept_funds_with_fees(to, percentage_fees)
             .payment((
                 EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
@@ -1108,7 +1108,7 @@ impl ContractInteract {
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = 0u32;
 
         let response = self
             .interactor
@@ -1153,15 +1153,12 @@ impl ContractInteract {
 
     pub async fn send_esdt_direct_multi_transfer(&mut self) {
         let to = Address::zero();
-        let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            EsdtTokenIdentifier<StaticApi>,
-            u64,
-            BigUint<StaticApi>,
-        >::from((
-            EsdtTokenIdentifier::from_esdt_bytes(&b""[..]),
+        let token_payments = MultiValueVec::from(vec![Payment::new(
+            TokenId::new(ManagedBuffer::from(&b""[..])),
             0u64,
-            BigUint::<StaticApi>::from(0u128),
-        ))]);
+            NonZeroBigUint::<StaticApi>::try_from(10u128).unwrap(),
+        )
+        .into_multi_value()]);
 
         let response = self
             .interactor

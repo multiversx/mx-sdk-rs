@@ -11,13 +11,13 @@ use crate::{
     api::{use_raw_handle, HandleConstraints, ManagedTypeApi},
     types::{
         BigInt, BigUint, EllipticCurve, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
-        ManagedByteArray, ManagedRef, ManagedType, ManagedVec,
+        ManagedByteArray, ManagedRef, ManagedType, ManagedVec, NonZeroBigUint, TokenId,
     },
 };
 
 use super::{
     EgldOrEsdtTokenIdentifier, ManagedVecItemPayload, ManagedVecItemPayloadAdd,
-    ManagedVecItemPayloadBuffer, ManagedVecItemStructPayloadTuple, ManagedVecRef,
+    ManagedVecItemPayloadBuffer, ManagedVecItemStructPayloadTuple, Ref,
 };
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
@@ -173,7 +173,7 @@ where
     type PAYLOAD =
         <ManagedVecItemPayloadBuffer<U1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let (p1, p2) = <ManagedVecItemPayloadBuffer<U1> as ManagedVecItemPayloadAdd<
@@ -189,7 +189,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        Ref::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -230,12 +230,14 @@ macro_rules! impl_managed_type {
 }
 
 impl_managed_type! {ManagedBuffer}
-impl_managed_type! {BigUint}
 impl_managed_type! {BigInt}
+impl_managed_type! {BigUint}
+impl_managed_type! {NonZeroBigUint}
 impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {EsdtTokenIdentifier}
 impl_managed_type! {EgldOrEsdtTokenIdentifier}
+impl_managed_type! {TokenId}
 
 impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>
 where
@@ -330,7 +332,7 @@ where
 {
     type PAYLOAD = <(T1, (T2, ())) as ManagedVecItemStructPayloadTuple>::StructPayload;
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
@@ -344,7 +346,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        Ref::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -367,7 +369,7 @@ where
 {
     type PAYLOAD = <(T1, (T2, (T3, ()))) as ManagedVecItemStructPayloadTuple>::StructPayload;
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
@@ -382,7 +384,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        Ref::new(Self::read_from_payload(payload))
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
