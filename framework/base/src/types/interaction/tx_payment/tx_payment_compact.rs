@@ -1,9 +1,6 @@
 use crate::{
     contract_base::TransferExecuteFailed,
-    types::{
-        BigUint, Compact, CompactPayment, ManagedAddress, PaymentVec, TxFrom,
-        TxToSpecified,
-    },
+    types::{BigUint, Compact, CompactPayment, ManagedAddress, PaymentVec, TxFrom, TxToSpecified},
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
