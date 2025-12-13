@@ -119,7 +119,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .reject_funds()
-            .payment(payment)
+            .payment(MultiTransfer(payment))
             .callback(self.callbacks().retrieve_funds_callback())
             .async_call_and_exit()
     }
