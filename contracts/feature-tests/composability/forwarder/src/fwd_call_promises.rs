@@ -18,7 +18,7 @@ pub trait CallPromisesModule: common::CommonModule {
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
             .gas(gas_limit)
-            .payment(Compact(payment))
+            .payment(payment)
             .register_promise();
     }
 

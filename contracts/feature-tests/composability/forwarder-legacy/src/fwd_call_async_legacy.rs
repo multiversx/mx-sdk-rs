@@ -61,7 +61,7 @@ pub trait ForwarderAsyncCallModule {
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .payment(Compact(payment))
+            .payment(payment)
             .async_call()
             .call_and_exit()
     }
