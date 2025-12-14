@@ -1,6 +1,6 @@
 use crate::{
     api::CallTypeApi,
-    types::{heap::H256, ManagedAddress, ManagedBuffer},
+    types::{ManagedAddress, ManagedBuffer, heap::H256},
 };
 
 use super::{AnnotatedValue, TxFromSpecified};

@@ -68,7 +68,6 @@ pub const STORAGE_NOT_32_BYTES: &str = "32 bytes of data expected in storage at 
 
 /// An additional non-VM status, meant just to signal an error in the debugger infrastructure of in the tests.
 pub const DEBUG_API_ERR_STATUS: u64 = 100;
-pub const DEBUG_API_ERR_HANDLE_STALE: &str =
-    "VMHooksApi misuse: operation called with a handle that does not point to the top context of the call stack";
+pub const DEBUG_API_ERR_HANDLE_STALE: &str = "VMHooksApi misuse: operation called with a handle that does not point to the top context of the call stack";
 pub const DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH: &str =
     "VMHooksApi misuse: operation called with handles from 2 different contexts";

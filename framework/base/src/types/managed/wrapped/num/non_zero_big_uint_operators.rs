@@ -1,5 +1,5 @@
 use crate::{
-    api::{quick_signal_error, ManagedTypeApi},
+    api::{ManagedTypeApi, quick_signal_error},
     err_msg,
     types::{BigInt, BigUint, NonZeroBigUint, Sign},
 };

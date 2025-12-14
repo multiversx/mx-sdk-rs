@@ -5,9 +5,10 @@ use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
     types::{
-        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
-        EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue, EgldOrEsdtTokenPaymentRefs,
-        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref,
+        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue,
+        EgldOrEsdtTokenPaymentRefs, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem,
+        ManagedVecItemPayloadBuffer, Ref, managed_vec_item_read_from_payload_index,
+        managed_vec_item_save_to_payload_index,
     },
 };
 
@@ -165,7 +166,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPayment<M> {
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

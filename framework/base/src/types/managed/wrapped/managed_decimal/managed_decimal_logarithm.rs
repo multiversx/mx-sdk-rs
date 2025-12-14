@@ -1,5 +1,5 @@
-use super::decimals::{Decimals, LnDecimals};
 use super::ManagedDecimalSigned;
+use super::decimals::{Decimals, LnDecimals};
 use super::{ManagedDecimal, NumDecimals};
 
 use crate::types::ManagedRef;

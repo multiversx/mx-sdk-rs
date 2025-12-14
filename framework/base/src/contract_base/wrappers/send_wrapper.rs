@@ -7,10 +7,10 @@ use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
     types::{
-        system_proxy, BigUint, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier,
+        BigUint, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier,
         EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedType, ManagedVec, NotPayable, OriginalResultMarker, ReturnsRawResult, ReturnsResult,
-        ToSelf, Tx, TxScEnv,
+        ToSelf, Tx, TxScEnv, system_proxy,
     },
 };
 

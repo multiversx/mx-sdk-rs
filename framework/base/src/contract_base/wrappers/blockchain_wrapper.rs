@@ -1,15 +1,15 @@
 use core::marker::PhantomData;
 
 use multiversx_chain_core::{
-    types::{DurationMillis, TimestampMillis, TimestampSeconds},
     EGLD_000000_TOKEN_IDENTIFIER,
+    types::{DurationMillis, TimestampMillis, TimestampSeconds},
 };
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, BlockchainApi, BlockchainApiImpl, ErrorApi,
-        ErrorApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
-        StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        BigIntApiImpl, BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl, HandleConstraints,
+        ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl, StaticVarApiImpl, StorageReadApi,
+        StorageReadApiImpl, const_handles, use_raw_handle,
     },
     codec::TopDecode,
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
