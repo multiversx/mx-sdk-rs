@@ -378,3 +378,18 @@ where
         )
     }
 }
+
+impl<M: ManagedTypeApi> core::fmt::Display for EgldOrEsdtTokenIdentifier<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.map_ref_or_else(
+            f,
+            |f| f.write_str("EgldOrEsdtTokenIdentifier::Egld"),
+            |f, token_identifier| {
+                let token_id_str = token_identifier.to_string();
+                f.debug_tuple("EgldOrEsdtTokenIdentifier::Esdt")
+                    .field(&token_id_str)
+                    .finish()
+            },
+        )
+    }
+}
