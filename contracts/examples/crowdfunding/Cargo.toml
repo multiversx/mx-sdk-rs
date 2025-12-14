@@ -2,7 +2,7 @@
 name = "crowdfunding"
 version = "0.0.0"
 authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]

@@ -14,7 +14,7 @@ documentation = "https://docs.multiversx.com/"
 description = "MultiversX Wrapped EGLD Smart Contract"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
-edition = "2021"
+edition = "2024"
 
 [lib]
 path = "src/wegld.rs"

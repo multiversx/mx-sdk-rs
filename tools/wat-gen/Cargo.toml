@@ -1,7 +1,7 @@
 [package]
 name = "wat-gen"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 description = "Generates contracts with a single specific import, for testing protocol flag activations"

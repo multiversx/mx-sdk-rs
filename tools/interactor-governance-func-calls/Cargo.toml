@@ -9,7 +9,7 @@ path = "src/governance_sc_interact.rs"
 name = "governance-sc-interact"
 version = "0.0.0"
 publish = false
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 toml = "0.9"
