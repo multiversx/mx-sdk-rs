@@ -378,3 +378,13 @@ where
         )
     }
 }
+
+impl<M: ManagedTypeApi> core::fmt::Display for EgldOrEsdtTokenIdentifier<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.map_ref_or_else(
+            f,
+            |f| core::fmt::Display::fmt("EGLD", f),
+            |f, token_identifier| core::fmt::Display::fmt(token_identifier, f),
+        )
+    }
+}

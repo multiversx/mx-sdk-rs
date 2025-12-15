@@ -1,4 +1,4 @@
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 
 use crate::{
@@ -17,7 +17,7 @@ use crate::{
 
 /// Specialized type for handling token identifiers (e.g. ABCDEF-123456).
 #[repr(transparent)]
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct TokenId<M: ManagedTypeApi> {
     pub(crate) buffer: ManagedBuffer<M>,
 }
@@ -281,5 +281,19 @@ impl<M: ManagedTypeApi> SCLowerHex for TokenId<M> {
         let cast_handle = self.buffer.get_handle().cast_or_signal_error::<M, _>();
         let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
         f.append_managed_buffer_lower_hex(&wrap_cast);
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Display for TokenId<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let bytes = self.buffer.to_boxed_bytes();
+        let s = alloc::string::String::from_utf8_lossy(bytes.as_slice());
+        s.fmt(f)
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Debug for TokenId<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("TokenId").field(&self.to_string()).finish()
     }
 }
