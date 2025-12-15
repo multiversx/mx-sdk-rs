@@ -1,8 +1,8 @@
 use multiversx_sc::{
     chain_core::EGLD_000000_TOKEN_IDENTIFIER,
     types::{
-        BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
-        ManagedBuffer, TokenId,
+        BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenIdentifier,
+        EsdtTokenPayment, ManagedBuffer, TokenId,
     },
 };
 use multiversx_sc_scenario::{
@@ -220,5 +220,29 @@ fn test_managed_token_id_macro() {
     assert_eq!(
         token_id!(b"ALC-6258d2"),
         TokenId::<StaticApi>::from("ALC-6258d2")
+    );
+}
+
+#[test]
+fn test_token_id_to_string() {
+    assert_eq!(
+        TokenId::<StaticApi>::from("ALC-6258d2").to_string(),
+        "ALC-6258d2"
+    );
+    assert_eq!(
+        TokenId::<StaticApi>::from("EGLD-00000").to_string(),
+        "EGLD-00000"
+    );
+    assert_eq!(
+        EgldOrEsdtTokenIdentifier::<StaticApi>::egld().to_string(),
+        "EGLD"
+    );
+    assert_eq!(
+        EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(TokenId::from("EGLDORESDT-00001")).to_string(),
+        "EGLDORESDT-00001"
+    );
+    assert_eq!(
+        EsdtTokenIdentifier::<StaticApi>::from_esdt_bytes("ESDT-00001").to_string(),
+        "ESDT-00001"
     );
 }
