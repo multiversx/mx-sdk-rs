@@ -7,16 +7,8 @@ use crate::{
 };
 #[multiversx_sc::module]
 pub trait HelpersModule: storage::StorageModule {
-    fn send_fee_to_address(&self, fee: &EgldOrEsdtTokenPayment, address: &ManagedAddress) {
-        if fee.token_identifier == EgldOrEsdtTokenIdentifier::egld() {
-            self.tx().to(address).egld(&fee.amount).transfer();
-        } else {
-            let esdt_fee = fee.clone().unwrap_esdt();
-            self.tx()
-                .to(address)
-                .single_esdt(&esdt_fee.token_identifier, 0, &esdt_fee.amount)
-                .transfer();
-        }
+    fn send_fee_to_address(&self, fee: &Payment, address: &ManagedAddress) {
+        self.tx().to(address).payment(fee).transfer();
     }
 
     fn get_expiration_round(&self, valability: u64) -> u64 {
@@ -24,7 +16,7 @@ pub trait HelpersModule: storage::StorageModule {
         self.blockchain().get_block_round() + valability_rounds
     }
 
-    fn get_fee_for_token(&self, token: &EgldOrEsdtTokenIdentifier) -> BigUint {
+    fn get_fee_for_token(&self, token: &TokenId) -> NonZeroBigUint {
         require!(
             self.whitelisted_fee_tokens().contains(token),
             "invalid fee toke provided"
@@ -33,12 +25,7 @@ pub trait HelpersModule: storage::StorageModule {
         fee_token.get()
     }
 
-    fn make_fund(
-        &self,
-        payment: ManagedVec<EgldOrEsdtTokenPayment>,
-        address: ManagedAddress,
-        valability: u64,
-    ) {
+    fn make_fund(&self, payment: ManagedVec<Payment>, address: ManagedAddress, valability: u64) {
         let deposit_mapper = self.deposit(&address);
 
         deposit_mapper.update(|deposit| {
@@ -54,8 +41,8 @@ pub trait HelpersModule: storage::StorageModule {
     fn check_fees_cover_number_of_tokens(
         &self,
         num_tokens: usize,
-        fee: BigUint,
-        paid_fee: BigUint,
+        fee: NonZeroBigUint,
+        paid_fee: NonZeroBigUint,
     ) {
         require!(num_tokens > 0, "amount must be greater than 0");
         require!(
@@ -68,7 +55,7 @@ pub trait HelpersModule: storage::StorageModule {
         &self,
         caller_address: ManagedAddress,
         address: &ManagedAddress,
-        payment: EgldOrEsdtTokenPayment,
+        payment: Payment,
     ) {
         self.get_fee_for_token(&payment.token_identifier);
         let deposit_mapper = self.deposit(address);

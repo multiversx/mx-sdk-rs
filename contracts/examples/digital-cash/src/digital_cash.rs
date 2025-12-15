@@ -21,13 +21,13 @@ pub trait DigitalCash:
     + storage::StorageModule
 {
     #[init]
-    fn init(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
+    fn init(&self, fee: NonZeroBigUint, token: TokenId) {
         self.whitelist_fee_token(fee, token);
     }
 
     #[endpoint(whitelistFeeToken)]
     #[only_owner]
-    fn whitelist_fee_token(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
+    fn whitelist_fee_token(&self, fee: NonZeroBigUint, token: TokenId) {
         require!(self.fee(&token).is_empty(), "Token already whitelisted");
         self.fee(&token).set(fee);
         self.whitelisted_fee_tokens().insert(token.clone());
@@ -36,7 +36,7 @@ pub trait DigitalCash:
 
     #[endpoint(blacklistFeeToken)]
     #[only_owner]
-    fn blacklist_fee_token(&self, token: EgldOrEsdtTokenIdentifier) {
+    fn blacklist_fee_token(&self, token: TokenId) {
         require!(!self.fee(&token).is_empty(), "Token is not whitelisted");
         self.fee(&token).clear();
         self.whitelisted_fee_tokens().swap_remove(&token);
@@ -54,12 +54,9 @@ pub trait DigitalCash:
             if fee == 0 {
                 continue;
             }
-            if token == EgldOrEsdtTokenIdentifier::egld() {
-                self.tx().to(&caller_address).egld(&fee).transfer();
-            } else {
-                let collected_fee = EsdtTokenPayment::new(token.unwrap_esdt(), 0, fee);
-                collected_esdt_fees.push(collected_fee);
-            }
+            let collected_fee = Payment::new(token, 0, fee);
+
+            collected_esdt_fees.push(collected_fee);
         }
         if !collected_esdt_fees.is_empty() {
             self.tx()
@@ -70,12 +67,7 @@ pub trait DigitalCash:
     }
 
     #[view(getAmount)]
-    fn get_amount(
-        &self,
-        address: ManagedAddress,
-        token: EgldOrEsdtTokenIdentifier,
-        nonce: u64,
-    ) -> BigUint {
+    fn get_amount(&self, address: ManagedAddress, token: TokenId, nonce: u64) -> BigUint {
         let deposit_mapper = self.deposit(&address);
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
@@ -83,7 +75,7 @@ pub trait DigitalCash:
 
         for fund in deposit.funds.into_iter() {
             if fund.token_identifier == token && fund.token_nonce == nonce {
-                return fund.amount;
+                return fund.amount.as_big_uint().clone();
             }
         }
 

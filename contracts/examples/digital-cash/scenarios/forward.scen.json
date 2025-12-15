@@ -162,13 +162,13 @@
                     "storage": {
                         "str:deposit|0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440": {
                             "0-depositor_address": "address:acc2",
-                            "1-funds": "u32:1|nested:str:EGLD|u64:0|biguint:1,000",
+                            "1-funds": "u32:1|nested:str:EGLD-000000|u64:0|biguint:1,000",
                             "2-valability": "u64:60",
                             "3-expiration_round": "u64:10",
                             "4-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "0-tokenIdentifier": "nested:str:EGLD-000000",
                                     "1-nonce": "u64:0",
                                     "2-amount": "biguint:1,000"
                                 }
@@ -182,7 +182,7 @@
                             "4-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "0-tokenIdentifier": "nested:str:EGLD-000000",
                                     "1-nonce": "u64:0",
                                     "2-amount": "biguint:1,000"
                                 }
@@ -196,20 +196,20 @@
                             "4-fees": {
                                 "0-num_token_to_transfer": "u32:3",
                                 "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "0-tokenIdentifier": "nested:str:EGLD-000000",
                                     "1-nonce": "u64:0",
                                     "2-amount": "biguint:1,000"
                                 }
                             }
                         },
-                        "str:fee|nested:str:EGLD": "10",
+                        "str:fee|nested:str:EGLD-000000": "10",
                         "str:whitelistedFeeTokens|str:.len": "1",
-                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD-000000",
+                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD-000000": "1",
                         "str:allTimeFeeTokens|str:.len": "1",
-                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1",
-                        "str:collectedFees|nested:str:EGLD": "40"
+                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD-000000",
+                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD-000000": "1",
+                        "str:collectedFees|nested:str:EGLD-000000": "40"
                     },
                     "code": "mxsc:../output/digital-cash.mxsc.json"
                 },

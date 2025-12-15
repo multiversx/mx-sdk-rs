@@ -22,8 +22,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
 
         let mut funds = deposit.funds;
 
-        let fee =
-            EgldOrEsdtTokenPayment::new(paid_fee_token.token_identifier, 0, paid_fee_token.amount);
+        let fee = Payment::new(paid_fee_token.token_identifier, 0, paid_fee_token.amount);
         funds.push(fee);
 
         if !funds.is_empty() {
@@ -68,7 +67,10 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
                 .transfer();
         }
         if deposited_fee.amount > 0 {
-            self.send_fee_to_address(&deposited_fee, &deposit.depositor_address);
+            self.tx()
+                .to(&deposit.depositor_address)
+                .payment(&deposited_fee)
+                .transfer();
         }
     }
 
@@ -80,7 +82,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         forward_address: ManagedAddress,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let paid_fee = self.call_value().egld_or_single_esdt();
+        let paid_fee = self.call_value().single().clone();
         let caller_address = self.blockchain().get_caller();
         let fee_token = paid_fee.token_identifier.clone();
         self.require_signature(&address, &caller_address, signature);
