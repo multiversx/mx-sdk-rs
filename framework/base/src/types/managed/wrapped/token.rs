@@ -1,4 +1,3 @@
-mod compact_payments;
 mod egld_or_esdt_token_identifier;
 mod egld_or_esdt_token_payment;
 mod egld_or_esdt_token_payment_refs;
@@ -13,7 +12,6 @@ mod payment_refs;
 mod payment_vec;
 mod token_id;
 
-pub use compact_payments::{Compact, CompactPayment};
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::EgldOrEsdtTokenPayment;
 pub use egld_or_esdt_token_payment_refs::EgldOrEsdtTokenPaymentRefs;
