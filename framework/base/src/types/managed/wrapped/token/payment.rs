@@ -109,6 +109,16 @@ impl<M: ManagedTypeApi> Payment<M> {
     }
 }
 
+impl<M> AsRef<Payment<M>> for &Payment<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn as_ref(&self) -> &Payment<M> {
+        self
+    }
+}
+
 impl<M: ManagedTypeApi> From<(TokenId<M>, u64, NonZeroBigUint<M>)> for Payment<M> {
     #[inline]
     fn from(value: (TokenId<M>, u64, NonZeroBigUint<M>)) -> Self {

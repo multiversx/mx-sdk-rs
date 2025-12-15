@@ -9,7 +9,7 @@ pub trait ForwarderTransferExecuteModule {
     #[endpoint]
     #[payable]
     fn forward_transf_exec_accept_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().single_optional();
+        let payment = self.call_value().all();
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)

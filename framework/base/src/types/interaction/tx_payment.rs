@@ -7,16 +7,17 @@ mod tx_payment_egld_or_multi_esdt_refs;
 mod tx_payment_egld_value;
 mod tx_payment_multi_egld_or_esdt;
 mod tx_payment_multi_esdt;
+mod tx_payment_multi_transfer_marker;
 mod tx_payment_none;
 mod tx_payment_not_payable;
 mod tx_payment_payment;
 mod tx_payment_payment_option;
 mod tx_payment_payment_ref;
 mod tx_payment_payment_refs;
-mod tx_payment_payment_vec;
 mod tx_payment_single_esdt;
 mod tx_payment_single_esdt_ref;
 mod tx_payment_single_esdt_triple;
+mod tx_payment_vec_ref;
 
 pub use test_esdt_transfer::TestEsdtTransfer;
 pub use tx_payment_egld::{Egld, EgldPayment};

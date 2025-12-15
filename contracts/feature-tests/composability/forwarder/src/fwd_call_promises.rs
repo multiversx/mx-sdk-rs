@@ -10,7 +10,7 @@ pub trait CallPromisesModule: common::CommonModule {
     #[endpoint]
     #[payable("*")]
     fn forward_promise_accept_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().single_optional();
+        let payment = self.call_value().all();
         let gas_limit = self.blockchain().get_gas_left() / 2;
 
         self.tx()
