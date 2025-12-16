@@ -82,7 +82,7 @@ where
     ///  
     /// Arguments: 
     ///  
-    /// * `address` The address to query the the balance of 
+    /// * `address` The address to query the balance of 
     ///  
     pub fn token_balance<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,

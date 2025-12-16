@@ -15,7 +15,7 @@ pub trait SimpleErc20Token {
     ///
     /// Arguments:
     ///
-    /// * `address` The address to query the the balance of
+    /// * `address` The address to query the balance of
     ///
     #[view(balanceOf)]
     #[storage_mapper("balance")]
