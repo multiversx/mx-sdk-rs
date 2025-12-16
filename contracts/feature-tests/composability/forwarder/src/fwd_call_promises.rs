@@ -44,22 +44,33 @@ pub trait CallPromisesModule: common::CommonModule {
 
     #[promises_callback]
     fn retrieve_funds_callback(&self) {
-        let (token, nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
-        self.retrieve_funds_callback_event(&token, nonce, &payment);
+        self.promises_callback_event();
 
-        let _ = self.callback_data().push(&CallbackData {
-            callback_name: ManagedBuffer::from(b"retrieve_funds_callback"),
-            token_identifier: token,
-            token_nonce: nonce,
-            token_amount: payment,
-            args: ManagedVec::new(),
-        });
+        let call_value = self.call_value().all();
+        for payment in &*call_value {
+            self.retrieve_funds_callback_event(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            );
+
+            let _ = self.callback_data().push(&CallbackData {
+                callback_name: ManagedBuffer::from(b"retrieve_funds_callback"),
+                token_identifier: payment.token_identifier.clone(),
+                token_nonce: payment.token_nonce,
+                token_amount: payment.amount.clone(),
+                args: ManagedVec::new(),
+            });
+        }
     }
+
+    #[event("promises_callback")]
+    fn promises_callback_event(&self);
 
     #[endpoint]
     #[payable("*")]
     fn forward_payment_callback(&self, to: ManagedAddress) {
-        let payment = self.call_value().any_payment();
+        let payment = self.call_value().all();
         let gas_limit = self.blockchain().get_gas_left() / 2;
 
         self.tx()
@@ -73,7 +84,7 @@ pub trait CallPromisesModule: common::CommonModule {
     #[endpoint]
     #[payable("*")]
     fn forward_payment_gas_for_callback(&self, to: ManagedAddress) {
-        let payment = self.call_value().any_payment();
+        let payment = self.call_value().all();
         let half_gas = self.blockchain().get_gas_left() / 3;
 
         self.tx()
@@ -89,31 +100,24 @@ pub trait CallPromisesModule: common::CommonModule {
     fn transfer_callback(&self, #[call_result] result: MultiValueEncoded<ManagedBuffer>) {
         self.callback_result(result);
 
-        let call_value = self.call_value().any_payment();
-        match call_value {
-            EgldOrMultiEsdtPayment::Egld(egld) => {
-                self.retrieve_funds_callback_event(&EgldOrEsdtTokenIdentifier::egld(), 0, &egld);
-                let _ = self.callback_data().push(&CallbackData {
-                    callback_name: ManagedBuffer::from(b"transfer_callback"),
-                    token_identifier: EgldOrEsdtTokenIdentifier::egld(),
-                    token_nonce: 0,
-                    token_amount: egld,
-                    args: ManagedVec::new(),
-                });
-            }
-            EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt) => {
-                for esdt in multi_esdt.into_iter() {
-                    let token_identifier = EgldOrEsdtTokenIdentifier::esdt(esdt.token_identifier);
-                    self.retrieve_funds_callback_event(&token_identifier, 0, &esdt.amount);
-                    let _ = self.callback_data().push(&CallbackData {
-                        callback_name: ManagedBuffer::from(b"transfer_callback"),
-                        token_identifier,
-                        token_nonce: 0,
-                        token_amount: esdt.amount,
-                        args: ManagedVec::new(),
-                    });
-                }
-            }
+        let call_value = self.call_value().all();
+        for payment in &*call_value {
+            self.retrieve_funds_callback_event(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            );
+
+            let _ = self.callback_data().push(&CallbackData {
+                callback_name: ManagedBuffer::from(b"transfer_callback"),
+                token_identifier: payment.token_identifier.clone(),
+                token_nonce: payment.token_nonce,
+                token_amount: payment.amount.clone(),
+                args: ManagedVec::new(),
+            });
         }
     }
+
+    #[event("callback_result")]
+    fn callback_result(&self, #[indexed] result: MultiValueEncoded<ManagedBuffer>);
 }
