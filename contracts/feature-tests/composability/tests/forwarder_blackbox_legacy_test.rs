@@ -3,11 +3,11 @@
 use forwarder_legacy::fwd_nft_legacy::Color;
 
 use multiversx_sc_scenario::{
+    ContractInfo, ScenarioWorld,
     api::StaticApi,
     scenario_model::{
         Account, CheckAccount, CheckStateStep, ScCallStep, SetStateStep, TransferStep,
     },
-    ContractInfo, ScenarioWorld,
 };
 
 const USER_ADDRESS_EXPR: &str = "address:user";

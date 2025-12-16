@@ -1,10 +1,10 @@
 use multiversx_sc_codec as codec;
 
 use codec::{
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     test_util::{check_dep_encode_decode, check_top_encode_decode},
-    top_decode_from_nested_or_handle_err, top_encode_from_nested, DecodeError, DecodeErrorHandler,
-    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    top_decode_from_nested_or_handle_err, top_encode_from_nested,
 };
 
 #[derive(PartialEq, Eq, Clone, Debug)]

@@ -2,7 +2,7 @@ use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
     crypto_functions,
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+    host::vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     types::RawHandle,
     vm_err_msg,
 };
@@ -93,7 +93,9 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         _message_handle: RawHandle,
         _signature_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        panic!("BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it");
+        panic!(
+            "BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it"
+        );
     }
 
     #[cfg(feature = "bls")]
@@ -123,7 +125,9 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         _message_handle: RawHandle,
         _signature_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        panic!("BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it");
+        panic!(
+            "BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it"
+        );
     }
 
     #[cfg(feature = "bls")]
@@ -154,6 +158,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         _message_handle: RawHandle,
         _signature_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        panic!("BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it");
+        panic!(
+            "BLS support is not enabled. Add the `bls` feature to `multiversx-sc-scenario` to enable it"
+        );
     }
 }

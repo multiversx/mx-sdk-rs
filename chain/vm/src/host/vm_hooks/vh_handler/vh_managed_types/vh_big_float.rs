@@ -1,5 +1,5 @@
 use crate::{
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext, VMHooksHandler},
+    host::vm_hooks::{VMHooksContext, VMHooksHandler, vh_early_exit::early_exit_vm_error},
     types::RawHandle,
     vm_err_msg,
 };
@@ -187,11 +187,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             return Err(early_exit_vm_error(vm_err_msg::NUMBER_IS_NOT_NORMAL));
         }
 
-        if bf.is_sign_positive() {
-            Ok(1)
-        } else {
-            Ok(-1)
-        }
+        if bf.is_sign_positive() { Ok(1) } else { Ok(-1) }
     }
 
     pub fn bf_clone(&mut self, dest: RawHandle, x: RawHandle) -> Result<(), VMHooksEarlyExit> {

@@ -5,7 +5,7 @@ use crate::common::{FeeConfig, FeeConfigEnum, FungiblePayment};
 use super::{
     common,
     common::{
-        Order, OrderInputParams, FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER,
+        FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER, Order, OrderInputParams,
         PERCENT_BASE_POINTS,
     },
 };

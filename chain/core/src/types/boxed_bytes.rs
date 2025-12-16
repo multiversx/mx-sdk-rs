@@ -1,5 +1,5 @@
 use alloc::{
-    alloc::{alloc, realloc, Layout},
+    alloc::{Layout, alloc, realloc},
     boxed::Box,
     vec,
     vec::Vec,

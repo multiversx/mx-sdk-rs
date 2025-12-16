@@ -1,4 +1,4 @@
-use super::{heap_h256::HeapH256, BoxedBytes};
+use super::{BoxedBytes, heap_h256::HeapH256};
 
 use alloc::{boxed::Box, vec::Vec};
 use core::fmt::Debug;

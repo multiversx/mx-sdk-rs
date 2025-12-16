@@ -1,6 +1,6 @@
 use multiversx_price_aggregator_sc::{
-    price_aggregator_data::{OracleStatus, TokenPair},
     PriceAggregator,
+    price_aggregator_data::{OracleStatus, TokenPair},
 };
 
 use multiversx_sc_scenario::imports::*;

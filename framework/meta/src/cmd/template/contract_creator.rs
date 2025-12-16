@@ -3,8 +3,8 @@ use convert_case::{Case, Casing};
 use crate::{cli::TemplateArgs, version::FrameworkVersion, version_history::LAST_TEMPLATE_VERSION};
 
 use super::{
-    template_source::{template_sources, TemplateSource},
     ContractCreatorTarget, RepoSource, RepoVersion, TemplateAdjuster,
+    template_source::{TemplateSource, template_sources},
 };
 
 /// Creates a new contract on disk, from a template, given a name.

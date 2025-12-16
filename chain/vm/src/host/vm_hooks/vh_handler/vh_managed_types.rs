@@ -8,7 +8,7 @@ use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use crate::{
     host::{
         context::{big_int_signed_bytes, big_int_to_i64, big_uint_to_u64, big_uint_unsigned_bytes},
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+        vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     },
     types::RawHandle,
     vm_err_msg,

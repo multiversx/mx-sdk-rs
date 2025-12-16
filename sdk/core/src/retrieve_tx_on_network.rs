@@ -76,9 +76,9 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
 
     // retries have been exhausted
     println!(
-            "Fetching transaction failed and retries exhausted, returning default transaction. Total elapsed time: {:?}s",
-            proxy.elapsed_seconds(&start_time)
-        );
+        "Fetching transaction failed and retries exhausted, returning default transaction. Total elapsed time: {:?}s",
+        proxy.elapsed_seconds(&start_time)
+    );
 
     let error_message = ReturnCode::message(ReturnCode::NetworkTimeout);
     let failed_transaction: TransactionOnNetwork = create_tx_failed(error_message);

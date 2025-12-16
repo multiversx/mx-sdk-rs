@@ -2,7 +2,7 @@ mod op_gen_endpoints;
 mod op_gen_scenario;
 mod op_list;
 
-pub use op_gen_endpoints::{create_all_endpoints, BigNumOperatorTestEndpoint, ValueType};
+pub use op_gen_endpoints::{BigNumOperatorTestEndpoint, ValueType, create_all_endpoints};
 pub use op_gen_scenario::write_scenarios;
 pub use op_list::{OperatorGroup, OperatorInfo, OperatorList};
 

@@ -2,7 +2,7 @@ use multiversx_sc::types::{FunctionCall, RHListExec, Tx, TxEnv, TxNoPayment, TxT
 
 use crate::scenario_model::{ScQueryStep, TxExpect, TxResponse};
 
-use super::{address_annotated, StepWrapper, TxToQueryStep};
+use super::{StepWrapper, TxToQueryStep, address_annotated};
 
 impl<Env, To, Payment, RH> TxToQueryStep<Env, RH>
     for Tx<Env, (), To, Payment, (), FunctionCall<Env::Api>, RH>

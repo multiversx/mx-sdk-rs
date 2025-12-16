@@ -1,4 +1,4 @@
-use super::memory_grow::{memory_grow, PageCount, PAGE_SIZE};
+use super::memory_grow::{PAGE_SIZE, PageCount, memory_grow};
 use core::{
     alloc::{GlobalAlloc, Layout},
     cell::UnsafeCell,

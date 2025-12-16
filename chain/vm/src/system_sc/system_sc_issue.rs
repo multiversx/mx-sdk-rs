@@ -3,7 +3,7 @@ use num_bigint::BigUint;
 use crate::{
     crypto_functions::keccak256,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
-    types::{top_decode_u64, VMTokenType},
+    types::{VMTokenType, top_decode_u64},
 };
 
 /// Issues a new fungible token.

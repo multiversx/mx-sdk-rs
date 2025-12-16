@@ -371,7 +371,7 @@ pub trait Lottery {
     #[view(getLotteryWhitelist)]
     #[storage_mapper("lotteryWhitelist")]
     fn lottery_whitelist(&self, lottery_name: &ManagedBuffer)
-        -> UnorderedSetMapper<ManagedAddress>;
+    -> UnorderedSetMapper<ManagedAddress>;
 
     #[storage_mapper("ticketHolder")]
     fn ticket_holders(&self, lottery_name: &ManagedBuffer) -> VecMapper<ManagedAddress>;

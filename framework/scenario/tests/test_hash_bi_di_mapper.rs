@@ -1,6 +1,6 @@
 use multiversx_sc::storage::{
-    mappers::{BiDiMapper, StorageMapper},
     StorageKey,
+    mappers::{BiDiMapper, StorageMapper},
 };
 use multiversx_sc_scenario::api::SingleTxApi;
 

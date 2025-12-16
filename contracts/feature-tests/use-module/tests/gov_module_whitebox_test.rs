@@ -1,6 +1,6 @@
 use multiversx_sc_modules::governance::{
-    governance_configurable::GovernanceConfigurablePropertiesModule, governance_proposal::VoteType,
-    GovernanceModule,
+    GovernanceModule, governance_configurable::GovernanceConfigurablePropertiesModule,
+    governance_proposal::VoteType,
 };
 use multiversx_sc_scenario::imports::*;
 

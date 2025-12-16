@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{imports::InterpreterContext, ScenarioTxEnvData};
+use multiversx_sc_scenario::{ScenarioTxEnvData, imports::InterpreterContext};
 use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::InteractorBase;
