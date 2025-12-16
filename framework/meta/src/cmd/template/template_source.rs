@@ -32,18 +32,18 @@ pub fn template_sources(repo_temp_dir: &RepoSource) -> Vec<TemplateSource<'_>> {
     let mut sources = Vec::new();
     for dir in dirs.iter_contract_crates() {
         let template_metadata_path = dir.path.join(TEMPLATE_TOML_FILE_NAME);
-        if template_metadata_path.is_file() {
-            if let Ok(s) = fs::read_to_string(&template_metadata_path) {
-                let metadata: TemplateMetadata =
-                    toml::from_str(s.as_str()).unwrap_or_else(|error| {
-                        panic!("error parsing {TEMPLATE_TOML_FILE_NAME}: {error}")
-                    });
-                sources.push(TemplateSource {
-                    repo_temp_dir,
-                    source_path: dir.path.clone(),
-                    metadata,
-                })
-            }
+        if template_metadata_path.is_file()
+            && let Ok(s) = fs::read_to_string(&template_metadata_path)
+        {
+            let metadata: TemplateMetadata =
+                toml::from_str(s.as_str()).unwrap_or_else(|error| {
+                    panic!("error parsing {TEMPLATE_TOML_FILE_NAME}: {error}")
+                });
+            sources.push(TemplateSource {
+                repo_temp_dir,
+                source_path: dir.path.clone(),
+                metadata,
+            })
         }
     }
     sources

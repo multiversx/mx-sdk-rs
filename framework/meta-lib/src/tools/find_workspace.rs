@@ -10,12 +10,11 @@ pub fn find_workspace(path: &Path) -> Option<PathBuf> {
         .arg("--workspace")
         .arg("--message-format=plain")
         .output()
+        && let Ok(convert) = std::str::from_utf8(&output.stdout)
     {
-        if let Ok(convert) = std::str::from_utf8(&output.stdout) {
-            let path = Path::new(convert.trim());
-            if let Some(parent) = path.parent() {
-                return Some(parent.to_path_buf());
-            }
+        let path = Path::new(convert.trim());
+        if let Some(parent) = path.parent() {
+            return Some(parent.to_path_buf());
         }
     }
 

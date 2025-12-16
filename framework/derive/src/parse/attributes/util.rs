@@ -1,14 +1,14 @@
 use crate::model::EsdtAttribute;
 
 pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bool {
-    if let Some(first_seg) = attr.path().segments.first() {
-        if first_seg.ident == name {
-            assert!(
-                attr.meta.require_path_only().is_ok(),
-                "no arguments allowed for attribute `{name}`"
-            );
-            return true;
-        }
+    if let Some(first_seg) = attr.path().segments.first()
+        && first_seg.ident == name
+    {
+        assert!(
+            attr.meta.require_path_only().is_ok(),
+            "no arguments allowed for attribute `{name}`"
+        );
+        return true;
     };
 
     false
@@ -19,8 +19,7 @@ pub(super) fn get_attribute_with_one_type_arg(
     name: &str,
 ) -> Option<EsdtAttribute> {
     let attr_path = &attr.path();
-    if let Some(first_seg) = attr_path.segments.first() {
-        if first_seg.ident == name {
+    if let Some(first_seg) = attr_path.segments.first() && first_seg.ident == name {
             let (ticker, ty) = match attr.meta.clone() {
                 syn::Meta::Path(_) => {
                     panic!("attribute needs 2 arguments: ticker (string) and type")
@@ -74,7 +73,7 @@ pub(super) fn get_attribute_with_one_type_arg(
 
             return Some(esdt_attribute);
         }
-    }
+    
 
     None
 }

@@ -122,10 +122,10 @@ pub fn find_code_and_message(reason: &str) -> (Option<ReturnCode>, String) {
             if error_code.is_none() {
                 error_code = ReturnCode::from_u64(code);
             }
-        } else if let Ok(hex_decode_error_message) = hex::decode(part) {
-            if let Ok(str) = String::from_utf8(hex_decode_error_message.clone()) {
-                error_message = str;
-            }
+        } else if let Ok(hex_decode_error_message) = hex::decode(part)
+            && let Ok(str) = String::from_utf8(hex_decode_error_message.clone())
+        {
+            error_message = str;
         }
     }
 
@@ -167,10 +167,10 @@ pub fn replace_with_error_message(tx: &mut TransactionOnNetwork, error_message: 
 
     let error_message_encoded = base64_encode(error_message);
 
-    if let Some(event) = find_log(tx) {
-        if event.topics.len() >= 2 && event.topics[1] != error_message_encoded {
-            event.topics[1] = error_message_encoded;
-        }
+    if let Some(event) = find_log(tx)
+        && event.topics.len() >= 2 && event.topics[1] != error_message_encoded
+    {
+        event.topics[1] = error_message_encoded;
     }
 }
 

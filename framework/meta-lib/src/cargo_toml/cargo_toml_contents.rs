@@ -304,10 +304,10 @@ impl CargoTomlContents {
 
 /// Checks that path == ".." in a dependency.
 fn is_dep_path_above(dep: &Value) -> bool {
-    if let Some(path) = dep.get("path") {
-        if let Some(s) = path.as_str() {
-            return s == "..";
-        }
+    if let Some(path) = dep.get("path")
+        && let Some(s) = path.as_str()
+    {
+        return s == "..";
     }
 
     false

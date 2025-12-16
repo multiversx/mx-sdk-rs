@@ -26,12 +26,11 @@ pub fn deep_find_files_with_ext(dir: &str, ext: &str) -> Result<Vec<String>, Tes
         let path = entry.path();
         if path.is_dir() {
             result.append(&mut deep_find_files_with_ext(path.to_str().unwrap(), ext)?);
-        } else if path.is_file() {
-            if let Some(file_ext) = path.extension() {
-                if file_ext == ext {
-                    result.push(path.to_str().unwrap().to_string());
-                }
-            }
+        } else if path.is_file()
+            && let Some(file_ext) = path.extension()
+            && file_ext == ext
+        {
+            result.push(path.to_str().unwrap().to_string());
         }
     }
 

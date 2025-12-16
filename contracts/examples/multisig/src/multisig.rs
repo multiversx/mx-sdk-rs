@@ -122,10 +122,10 @@ pub trait Multisig:
         let mut result = MultiValueEncoded::new();
         let num_users = self.user_mapper().get_user_count();
         for user_id in 1..=num_users {
-            if self.user_id_to_role(user_id).get() == role {
-                if let Some(address) = self.user_mapper().get_user_address(user_id) {
-                    result.push(address);
-                }
+            if self.user_id_to_role(user_id).get() == role
+                && let Some(address) = self.user_mapper().get_user_address(user_id)
+            {
+                result.push(address);
             }
         }
         result

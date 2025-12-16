@@ -49,12 +49,11 @@ pub fn verify_rustc_version(contract_crate: &RelevantDirectory, args: &AllArgs) 
     for entry in read_dir {
         let entry = entry.expect("error reading directory entry");
         let path = entry.path();
-        if path.is_file() {
-            if let Some(file_name) = path.file_name().and_then(|s| s.to_str()) {
-                if let Some(contract_name) = file_name.strip_suffix(".abi.json") {
-                    verify_abi_rustc_version(contract_name, &path);
-                }
-            }
+        if path.is_file()
+            && let Some(file_name) = path.file_name().and_then(|s| s.to_str())
+            && let Some(contract_name) = file_name.strip_suffix(".abi.json")
+        {
+            verify_abi_rustc_version(contract_name, &path);
         }
     }
 }

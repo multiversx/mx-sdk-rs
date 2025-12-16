@@ -41,7 +41,7 @@ where
     pub async fn simulate_gas_transfer(&mut self, transfer_step: TransferStep) -> u64 {
         let transaction = self.launch_transfer(&transfer_step).await;
 
-        let tx_gas_units = match self.proxy.request(SimulateTxRequest(&transaction)).await {
+        match self.proxy.request(SimulateTxRequest(&transaction)).await {
             Ok(gas) => {
                 println!("Gas simulation for the SC transfer: {gas} units.");
                 log::info!("Gas simulation for the SC transfer: {gas} units.");
@@ -51,9 +51,7 @@ where
                 simulate_gas_transfer_err_message(&err);
                 process::exit(1);
             }
-        };
-
-        tx_gas_units
+        }
     }
 
     async fn launch_transfer(&mut self, transfer_step: &TransferStep) -> Transaction {

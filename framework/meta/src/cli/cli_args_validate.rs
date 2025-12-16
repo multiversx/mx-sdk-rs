@@ -11,19 +11,19 @@ use super::{
 
 impl TemplateArgs {
     pub fn validate_args(&self) {
-        if let Some(name) = &self.name {
-            if !validate_contract_name(name) {
-                user_error(&format!(
-                    "Invalid contract name `{}`: Rust crate names must start with a letter or underscore and contain only letters, numbers, and underscores (_). Dots (.) and dashes (-) are not allowed.",
-                    name
-                ));
-            }
+        if let Some(name) = &self.name
+            && !validate_contract_name(name)
+        {
+            user_error(&format!(
+                "Invalid contract name `{}`: Rust crate names must start with a letter or underscore and contain only letters, numbers, underscores, and dashes",
+                name
+            ));
         }
 
-        if let Some(tag) = &self.tag {
-            if !validate_template_tag(tag) {
-                user_error(&format!("Invalid template tag `{}`.", tag));
-            }
+        if let Some(tag) = &self.tag
+            && !validate_template_tag(tag)
+        {
+            user_error(&format!("Invalid template tag `{}`.", tag));
         }
     }
 }
@@ -38,10 +38,10 @@ impl InstallArgs {
 
 impl TemplateListArgs {
     pub fn validate_args(&self) {
-        if let Some(tag) = &self.tag {
-            if !validate_template_tag(tag) {
-                user_error(&format!("Invalid template tag `{}`.", tag));
-            }
+        if let Some(tag) = &self.tag
+            && !validate_template_tag(tag)
+        {
+            user_error(&format!("Invalid template tag `{}`.", tag));
         }
     }
 }
@@ -98,10 +98,10 @@ impl AccountArgs {
 
 impl UpgradeArgs {
     pub fn validate_args(&self) {
-        if let Some(override_target_v) = &self.override_target_version {
-            if !VERSIONS.iter().any(|v| v.to_string() == *override_target_v) {
-                user_error(&format!("Invalid requested version: {}", override_target_v));
-            }
+        if let Some(override_target_v) = &self.override_target_version
+            && !VERSIONS.iter().any(|v| v.to_string() == *override_target_v)
+        {
+            user_error(&format!("Invalid requested version: {}", override_target_v));
         }
     }
 }

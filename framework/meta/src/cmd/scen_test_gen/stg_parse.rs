@@ -43,13 +43,13 @@ pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
     if all_commented_out && ignore_line.is_none() {
         ignore_line = Some(IGNORE_ANNOTATION.to_string());
     }
-    if let Some(first_line) = section_str.lines().next() {
-        if let Some(comment) = first_line.strip_prefix("/*") {
-            ignore_line = Some(format!(
-                "{IGNORE_ANNOTATION_PREFIX} = \"{}\"]",
-                comment.trim()
-            ));
-        }
+    if let Some(first_line) = section_str.lines().next()
+        && let Some(comment) = first_line.strip_prefix("/*")
+    {
+        ignore_line = Some(format!(
+            "{IGNORE_ANNOTATION_PREFIX} = \"{}\"]",
+            comment.trim()
+        ));
     }
 
     if let (Some(test_line), Some(scenario_file_name)) = (opt_test_line, opt_scenario_file_name) {
@@ -69,10 +69,10 @@ pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
 ///
 /// Could be done with regex, but this is more lightweight, and good enough in here.
 fn find_scenario_name(s: &str) -> Option<&str> {
-    if let Some(prefix_index) = s.find(SCEN_PATTERN_PREFIX) {
-        if let Some(suffix_index) = s.find(SCEN_PATTERN_SUFFIX) {
-            return s.get(prefix_index + SCEN_PATTERN_PREFIX.len()..suffix_index);
-        }
+    if let Some(prefix_index) = s.find(SCEN_PATTERN_PREFIX)
+        && let Some(suffix_index) = s.find(SCEN_PATTERN_SUFFIX)
+    {
+        return s.get(prefix_index + SCEN_PATTERN_PREFIX.len()..suffix_index);
     }
     None
 }
