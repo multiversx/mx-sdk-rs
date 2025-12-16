@@ -129,14 +129,12 @@ fn generate_token_identifier_from_ticker(
     let new_random = keccak256(&new_random_base);
     let new_random_for_ticker = &new_random[..3];
 
-    let token_identifier = [
+    [
         ticker,
         "-".as_bytes(),
         hex::encode(new_random_for_ticker).as_bytes(),
     ]
-    .concat();
-
-    token_identifier
+    .concat()
 }
 
 #[cfg(test)]
