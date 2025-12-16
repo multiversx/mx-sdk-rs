@@ -1,6 +1,9 @@
 use crate::{
     contract_base::{SendRawWrapper, TransferExecuteFailed},
-    types::{BigUint, ManagedAddress, MultiTransfer, PaymentVec, TxFrom, TxToSpecified},
+    types::{
+        BigUint, ManagedAddress, MultiTransfer, MultiTransferMarkerArg, PaymentVec, TxFrom,
+        TxToSpecified,
+    },
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
@@ -8,7 +11,7 @@ use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 impl<Env, P> TxPayment<Env> for MultiTransfer<P>
 where
     Env: TxEnv,
-    P: AsRef<PaymentVec<Env::Api>>,
+    P: MultiTransferMarkerArg + AsRef<PaymentVec<Env::Api>>,
 {
     fn is_no_payment(&self, _env: &Env) -> bool {
         let pv = self.0.as_ref();
