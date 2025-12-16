@@ -2,6 +2,7 @@
 #![recursion_limit = "1024"]
 
 // TODO: remove once minimum version is 1.87+
+#![allow(unknown_lints)]
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::manual_is_multiple_of)]
 
