@@ -10,6 +10,11 @@ pub enum BaseOperator {
     BitXor,
     Shr,
     Shl,
+    Eq,
+    Gt,
+    Ge,
+    Lt,
+    Le,
 }
 
 impl BaseOperator {
@@ -25,6 +30,11 @@ impl BaseOperator {
             BaseOperator::BitXor => "^",
             BaseOperator::Shr => ">>",
             BaseOperator::Shl => "<<",
+            BaseOperator::Eq => "==",
+            BaseOperator::Gt => ">",
+            BaseOperator::Ge => ">=",
+            BaseOperator::Lt => "<",
+            BaseOperator::Le => "<=",
         }
     }
 
@@ -53,6 +63,11 @@ impl OperatorInfo {
 
     pub fn assign(self) -> Self {
         assert!(!self.assign, "Operator is already an assign operator");
+        assert_ne!(
+            self.group,
+            OperatorGroup::Cmp,
+            "comparison groups have no assign variant"
+        );
         Self {
             name: format!("{}_assign", self.name),
             base_operator: self.base_operator,
@@ -75,31 +90,42 @@ pub enum OperatorGroup {
     Arithmetic,
     Bitwise,
     Shift,
+    Cmp,
 }
 
 pub struct OperatorList(pub Vec<OperatorInfo>);
 
 impl OperatorList {
     pub fn create() -> Self {
-        let binary_operators = vec![
-            // Arithmetic binary operators
+        OperatorList(vec![
+            // Direct variants
             OperatorInfo::new("add", BaseOperator::Add, OperatorGroup::Arithmetic),
             OperatorInfo::new("sub", BaseOperator::Sub, OperatorGroup::Arithmetic),
             OperatorInfo::new("mul", BaseOperator::Mul, OperatorGroup::Arithmetic),
             OperatorInfo::new("div", BaseOperator::Div, OperatorGroup::Arithmetic),
             OperatorInfo::new("rem", BaseOperator::Rem, OperatorGroup::Arithmetic),
-            // Bitwise binary operators
             OperatorInfo::new("bit_and", BaseOperator::BitAnd, OperatorGroup::Bitwise),
             OperatorInfo::new("bit_or", BaseOperator::BitOr, OperatorGroup::Bitwise),
             OperatorInfo::new("bit_xor", BaseOperator::BitXor, OperatorGroup::Bitwise),
-            // Bitwise shift binary operators
             OperatorInfo::new("shr", BaseOperator::Shr, OperatorGroup::Shift),
             OperatorInfo::new("shl", BaseOperator::Shl, OperatorGroup::Shift),
-        ];
-
-        let mut all_operators = Vec::new();
-        all_operators.extend(binary_operators.iter().cloned());
-        all_operators.extend(binary_operators.iter().cloned().map(|op| op.assign()));
-        OperatorList(all_operators)
+            // Assign variants
+            OperatorInfo::new("add", BaseOperator::Add, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("sub", BaseOperator::Sub, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("mul", BaseOperator::Mul, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("div", BaseOperator::Div, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("rem", BaseOperator::Rem, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("bit_and", BaseOperator::BitAnd, OperatorGroup::Bitwise).assign(),
+            OperatorInfo::new("bit_or", BaseOperator::BitOr, OperatorGroup::Bitwise).assign(),
+            OperatorInfo::new("bit_xor", BaseOperator::BitXor, OperatorGroup::Bitwise).assign(),
+            OperatorInfo::new("shr", BaseOperator::Shr, OperatorGroup::Shift).assign(),
+            OperatorInfo::new("shl", BaseOperator::Shl, OperatorGroup::Shift).assign(),
+            // Equality/comparison
+            OperatorInfo::new("eq", BaseOperator::Eq, OperatorGroup::Cmp),
+            OperatorInfo::new("gt", BaseOperator::Gt, OperatorGroup::Cmp),
+            OperatorInfo::new("ge", BaseOperator::Ge, OperatorGroup::Cmp),
+            OperatorInfo::new("lt", BaseOperator::Lt, OperatorGroup::Cmp),
+            OperatorInfo::new("le", BaseOperator::Le, OperatorGroup::Cmp),
+        ])
     }
 }

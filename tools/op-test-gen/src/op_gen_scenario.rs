@@ -22,6 +22,9 @@ pub fn write_scenarios() {
     write_scenario_shift(
         "../../contracts/feature-tests/basic-features/scenarios/big_num_ops_shift.scen.json",
     );
+    write_scenario_cmp(
+        "../../contracts/feature-tests/basic-features/scenarios/big_num_ops_cmp.scen.json",
+    );
 }
 
 pub fn write_scenario_arith(target_path: &str) {
@@ -57,11 +60,14 @@ pub fn write_scenario_arith(target_path: &str) {
     save_scenario(scenario, target_path);
 }
 
-fn eval_op_arith(
+/// Returns an Option to allow the `?` syntax.
+///
+/// `None` means that the combination of inputs should be ignored (and not produce a test).
+fn discard_invalid_inputs(
     a: &num_bigint::BigInt,
     b: &num_bigint::BigInt,
     endpoint: &BigNumOperatorTestEndpoint,
-) -> Option<TxExpect> {
+) -> Option<()> {
     if !endpoint.a_type.is_signed() && a.is_negative() {
         return None;
     }
@@ -82,9 +88,18 @@ fn eval_op_arith(
         // anything above i64::MAX is not supported
         return None;
     }
+    Some(())
+}
+
+fn eval_op_arith(
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
+    endpoint: &BigNumOperatorTestEndpoint,
+) -> Option<TxExpect> {
+    discard_invalid_inputs(a, b, endpoint)?;
 
     match endpoint.op_info.base_operator {
-        BaseOperator::Add => tx_expect_ok(endpoint, a + b),
+        BaseOperator::Add => tx_expect_big_num_ok(endpoint, a + b),
         BaseOperator::Sub => {
             let result = a - b;
             if !endpoint.return_type.is_signed() && result.is_negative() {
@@ -96,14 +111,14 @@ fn eval_op_arith(
             if endpoint.return_type.is_non_zero() && result.is_zero() {
                 return Some(TxExpect::err(4, "str:zero value not allowed"));
             }
-            tx_expect_ok(endpoint, result)
+            tx_expect_big_num_ok(endpoint, result)
         }
         BaseOperator::Mul => {
             let result = a * b;
             if endpoint.return_type.is_non_zero() && result.is_zero() {
                 return Some(TxExpect::err(4, "str:zero value not allowed"));
             }
-            tx_expect_ok(endpoint, result)
+            tx_expect_big_num_ok(endpoint, result)
         }
         BaseOperator::Div => {
             if b.is_zero() {
@@ -114,7 +129,7 @@ fn eval_op_arith(
             if endpoint.return_type.is_non_zero() && result.is_zero() {
                 return Some(TxExpect::err(4, "str:zero value not allowed"));
             }
-            tx_expect_ok(endpoint, result)
+            tx_expect_big_num_ok(endpoint, result)
         }
         BaseOperator::Rem => {
             if b.is_zero() {
@@ -125,7 +140,7 @@ fn eval_op_arith(
             if endpoint.return_type.is_non_zero() && result.is_zero() {
                 return Some(TxExpect::err(4, "str:zero value not allowed"));
             }
-            tx_expect_ok(endpoint, result)
+            tx_expect_big_num_ok(endpoint, result)
         }
         _ => None,
     }
@@ -183,9 +198,9 @@ fn eval_op_bitwise(
     }
 
     match endpoint.op_info.base_operator {
-        BaseOperator::BitAnd => tx_expect_ok(endpoint, a & b),
-        BaseOperator::BitOr => tx_expect_ok(endpoint, a | b),
-        BaseOperator::BitXor => tx_expect_ok(endpoint, a ^ b),
+        BaseOperator::BitAnd => tx_expect_big_num_ok(endpoint, a & b),
+        BaseOperator::BitOr => tx_expect_big_num_ok(endpoint, a | b),
+        BaseOperator::BitXor => tx_expect_big_num_ok(endpoint, a ^ b),
         _ => None,
     }
 }
@@ -240,12 +255,57 @@ fn eval_op_shift(
         BaseOperator::Shl => {
             // For shifts, BigInt does not support shifting by BigInt directly.
             let shift_amount = b.to_usize()?;
-            tx_expect_ok(endpoint, a << shift_amount)
+            tx_expect_big_num_ok(endpoint, a << shift_amount)
         }
         BaseOperator::Shr => {
             let shift_amount = b.to_usize()?;
-            tx_expect_ok(endpoint, a >> shift_amount)
+            tx_expect_big_num_ok(endpoint, a >> shift_amount)
         }
+        _ => None,
+    }
+}
+
+pub fn write_scenario_cmp(target_path: &str) {
+    let mut scenario = create_scenario();
+    let ops = OperatorList::create();
+    let endpoints = create_all_endpoints(&ops);
+
+    let numbers = vec![
+        num_bigint::BigInt::from(0),
+        num_bigint::BigInt::from(1),
+        num_bigint::BigInt::from(-1),
+    ];
+
+    for endpoint in endpoints {
+        for a in &numbers {
+            for b in &numbers {
+                if let Some(tx_expect) = eval_op_cmp(a, b, &endpoint) {
+                    add_query(&mut scenario, &endpoint, a, b, tx_expect);
+                }
+            }
+        }
+    }
+
+    println!(
+        "Generated {} test queries for comparison operators.",
+        scenario.steps.len() - 1
+    );
+
+    save_scenario(scenario, target_path);
+}
+
+fn eval_op_cmp(
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
+    endpoint: &BigNumOperatorTestEndpoint,
+) -> Option<TxExpect> {
+    discard_invalid_inputs(a, b, endpoint)?;
+    match endpoint.op_info.base_operator {
+        BaseOperator::Eq => tx_expect_bool_ok(a == b),
+        BaseOperator::Gt => tx_expect_bool_ok(a > b),
+        BaseOperator::Ge => tx_expect_bool_ok(a >= b),
+        BaseOperator::Lt => tx_expect_bool_ok(a < b),
+        BaseOperator::Le => tx_expect_bool_ok(a <= b),
         _ => None,
     }
 }
@@ -277,11 +337,16 @@ fn save_scenario(scenario: Scenario, target_path: &str) {
     println!("Successfully rewrote {}", target_path);
 }
 
-fn tx_expect_ok(
+fn tx_expect_big_num_ok(
     endpoint: &BigNumOperatorTestEndpoint,
     result: num_bigint::BigInt,
 ) -> Option<TxExpect> {
     Some(TxExpect::ok().result(&serialize_arg(endpoint.return_type, &result)))
+}
+
+fn tx_expect_bool_ok(result: bool) -> Option<TxExpect> {
+    let bool_str = if result { "true" } else { "false" };
+    Some(TxExpect::ok().result(bool_str))
 }
 
 fn serialize_arg(arg_type: ValueType, n: &num_bigint::BigInt) -> String {

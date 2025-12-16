@@ -30,6 +30,11 @@ fn big_num_ops_bitwise_go() {
 }
 
 #[test]
+fn big_num_ops_cmp_go() {
+    world().run("scenarios/big_num_ops_cmp.scen.json");
+}
+
+#[test]
 fn big_num_ops_shift_go() {
     world().run("scenarios/big_num_ops_shift.scen.json");
 }

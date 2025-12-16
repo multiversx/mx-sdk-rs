@@ -45,6 +45,11 @@ fn big_num_ops_bitwise_rs() {
 }
 
 #[test]
+fn big_num_ops_cmp_rs() {
+    world().run("scenarios/big_num_ops_cmp.scen.json");
+}
+
+#[test]
 #[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
 fn big_num_ops_shift_rs() {
     world().run("scenarios/big_num_ops_shift.scen.json");

@@ -51,6 +51,9 @@ pub fn generate_big_int_operators_trait() -> String {
     section_comment(&mut out, "Bitwise shift assign operators");
     write_filtered_endpoints(&endpoints, OperatorGroup::Shift, true, &mut out);
 
+    section_comment(&mut out, "Equality/comparison operators");
+    write_filtered_endpoints(&endpoints, OperatorGroup::Cmp, false, &mut out);
+
     writeln!(&mut out, "\n}}").unwrap();
 
     out
