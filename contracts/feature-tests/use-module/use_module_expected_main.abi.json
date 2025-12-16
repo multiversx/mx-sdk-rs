@@ -16,7 +16,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.63.1"
+            "version": "0.63.3"
         }
     },
     "docs": [
@@ -561,7 +561,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "EsdtTokenIdentifier"
+                    "type": "TokenIdentifier"
                 }
             ]
         },
@@ -728,7 +728,7 @@
             "inputs": [
                 {
                     "name": "tokens",
-                    "type": "variadic<EsdtTokenIdentifier>",
+                    "type": "variadic<TokenIdentifier>",
                     "multi_arg": true
                 }
             ],
@@ -741,7 +741,7 @@
             "inputs": [
                 {
                     "name": "tokens",
-                    "type": "variadic<EsdtTokenIdentifier>",
+                    "type": "variadic<TokenIdentifier>",
                     "multi_arg": true
                 }
             ],
@@ -753,7 +753,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "EsdtTokenIdentifier"
+                    "type": "TokenIdentifier"
                 }
             ]
         },
@@ -763,7 +763,7 @@
             "inputs": [],
             "outputs": [
                 {
-                    "type": "variadic<EsdtTokenIdentifier>",
+                    "type": "variadic<TokenIdentifier>",
                     "multi_result": true
                 }
             ]
@@ -1033,7 +1033,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "EsdtTokenIdentifier"
+                    "type": "TokenIdentifier"
                 },
                 {
                     "name": "token_nonce",
