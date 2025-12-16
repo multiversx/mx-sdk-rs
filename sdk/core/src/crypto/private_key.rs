@@ -3,7 +3,6 @@ use std::fmt::Display;
 use super::edwards25519::{sc_mul_add, sc_reduce};
 use crate::crypto::edwards25519::extended_group_element::ExtendedGroupElement;
 use anyhow::{anyhow, Result};
-use rand::{CryptoRng, RngCore};
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
@@ -62,9 +61,13 @@ impl PrivateKey {
         PrivateKey::from_bytes(bytes.as_slice())
     }
 
+    /// Currently not in use.
+    ///
+    /// Guarded by feature "wallet-full", to avoid unnecessarily importing `rand`.
+    #[cfg(feature = "wallet-full")]
     pub fn generate<T>(r: &mut T) -> PrivateKey
     where
-        T: CryptoRng + RngCore,
+        T: rand::CryptoRng + rand::RngCore,
     {
         let mut secret_key = PrivateKey([0u8; 64]);
 

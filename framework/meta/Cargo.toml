@@ -40,8 +40,9 @@ zip = { version = "6.0", features = ["deflate"], default-features = false }
 copy_dir = "0.1.2"
 pathdiff = "0.2.1"
 common-path = "1.0.0"
-bip39 = "2.0.0"
+bip39 = { version = "2.0.0", features = ["rand"] }
 anyhow = "1.0"
+hex = "0.4.3"
 
 [dependencies.multiversx-sc-meta-lib]
 version = "=0.63.3"
@@ -55,3 +56,8 @@ features = ["alloc", "num-bigint"]
 [dependencies.multiversx-sc-snippets]
 version = "=0.63.3"
 path = "../snippets"
+
+[dependencies.multiversx-sdk]
+version = "=0.13.0"
+path = "../../sdk/core"
+features = ["wallet-full"]
