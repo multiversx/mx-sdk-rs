@@ -94,7 +94,15 @@ impl SetStateStep {
         self
     }
 
-    pub fn block_timestamp<N>(mut self, block_timestamp_expr: N) -> Self
+    #[deprecated(since = "0.63.2", note = "Renamed to block_timestamp_seconds")]
+    pub fn block_timestamp<N>(self, block_timestamp_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        self.block_timestamp_seconds(block_timestamp_expr)
+    }
+
+    pub fn block_timestamp_seconds<N>(mut self, block_timestamp_expr: N) -> Self
     where
         U64Value: From<N>,
     {
@@ -106,7 +114,15 @@ impl SetStateStep {
         self
     }
 
-    pub fn block_timestamp_ms<N>(mut self, block_timestamp_ms_expr: N) -> Self
+    #[deprecated(since = "0.63.2", note = "Renamed to block_timestamp_millis")]
+    pub fn block_timestamp_ms<N>(self, block_timestamp_ms_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        self.block_timestamp_millis(block_timestamp_ms_expr)
+    }
+
+    pub fn block_timestamp_millis<N>(mut self, block_timestamp_ms_expr: N) -> Self
     where
         U64Value: From<N>,
     {

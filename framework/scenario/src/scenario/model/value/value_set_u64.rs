@@ -4,7 +4,10 @@ use crate::scenario_format::{
     value_interpreter::{interpret_string, interpret_subtree},
 };
 
-use multiversx_sc::chain_core::types::ReturnCode;
+use multiversx_sc::{
+    chain_core::types::ReturnCode,
+    types::{TimestampMillis, TimestampSeconds},
+};
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use std::fmt;
@@ -99,6 +102,18 @@ impl From<u32> for U64Value {
             value: from as u64,
             original: ValueSubTree::Str(from.to_string()),
         }
+    }
+}
+
+impl From<TimestampSeconds> for U64Value {
+    fn from(from: TimestampSeconds) -> Self {
+        U64Value::from(from.as_u64_seconds())
+    }
+}
+
+impl From<TimestampMillis> for U64Value {
+    fn from(from: TimestampMillis) -> Self {
+        U64Value::from(from.as_u64_millis())
     }
 }
 

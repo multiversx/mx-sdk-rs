@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           26
+// Endpoints:                           27
 // Async Callback:                       1
-// Total number of exported functions:  28
+// Total number of exported functions:  29
 
 #![no_std]
 
@@ -35,6 +35,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         create_nft => create_nft
         get_block_epoch => get_block_epoch
         get_block_nonce => get_block_nonce
+        get_block_timestamp_seconds => get_block_timestamp_seconds
         get_block_timestamp_millis => get_block_timestamp_millis
         get_random_buffer_once => get_random_buffer_once
         get_random_buffer_twice => get_random_buffer_twice

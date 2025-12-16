@@ -9,10 +9,10 @@ publish = false
 path = "src/big_float_main.rs"
 
 [dependencies.multiversx-sc]
-version = "0.63.1"
+version = "0.63.3"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.1"
+version = "0.63.3"
 features = ["wasmer-experimental"]
 path = "../../../framework/scenario"

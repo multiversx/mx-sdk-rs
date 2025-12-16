@@ -213,7 +213,8 @@ impl<M: ManagedTypeApi> TypeAbi for EsdtTokenIdentifier<M> {
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        "EsdtTokenIdentifier".into()
+        // for backwards compatibility with existing tooling
+        "TokenIdentifier".into()
     }
 
     fn type_name_rust() -> TypeName {
