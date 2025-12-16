@@ -76,6 +76,6 @@ impl StaticVarApiImpl for VmApiImpl {
     }
 
     fn set_scaling_factor_cached(&self, decimals: usize) {
-        { unsafe { SCALING_FACTOR_INIT[decimals] = true } }
+        unsafe { SCALING_FACTOR_INIT[decimals] = true }
     }
 }
