@@ -1,5 +1,4 @@
 #![no_std]
-
 // TODO: remove once minimum version is 1.87+
 #![allow(clippy::collapsible_if)]
 

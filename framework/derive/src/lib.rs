@@ -1,6 +1,5 @@
 // ensure we don't run out of macro stack
 #![recursion_limit = "1024"]
-
 // TODO: remove once minimum version is 1.87+
 #![allow(unknown_lints)]
 #![allow(clippy::collapsible_if)]
