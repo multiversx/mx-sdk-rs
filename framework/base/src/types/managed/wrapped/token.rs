@@ -20,7 +20,7 @@ pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_identifier::{EsdtTokenIdentifier, TokenIdentifier};
 pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPayment};
 pub use multi_egld_or_esdt_token_payment::MultiEgldOrEsdtPayment;
-pub use multi_transfer_marker::MultiTransfer;
+pub use multi_transfer_marker::{MultiTransfer, MultiTransferMarkerArg};
 pub use payment::Payment;
 pub use payment_refs::PaymentRefs;
 pub use payment_vec::PaymentVec;
