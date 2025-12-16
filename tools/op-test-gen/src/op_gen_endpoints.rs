@@ -11,8 +11,11 @@ pub enum ValueType {
     NonZeroBigUint,
     NonZeroBigUintRef,
     Usize,
+    I32,
+    I64,
     U32,
     U64,
+    Bool,
 }
 
 impl ValueType {
@@ -25,8 +28,11 @@ impl ValueType {
             ValueType::NonZeroBigUint => "NonZeroBigUint",
             ValueType::NonZeroBigUintRef => "&NonZeroBigUint",
             ValueType::Usize => "usize",
+            ValueType::I32 => "i32",
+            ValueType::I64 => "i64",
             ValueType::U32 => "u32",
             ValueType::U64 => "u64",
+            ValueType::Bool => "bool",
         }
     }
 
@@ -38,9 +44,7 @@ impl ValueType {
             ValueType::BigUintRef => "big_uint_ref",
             ValueType::NonZeroBigUint => "non_zero_big_uint",
             ValueType::NonZeroBigUintRef => "non_zero_big_uint_ref",
-            ValueType::Usize => "usize",
-            ValueType::U32 => "u32",
-            ValueType::U64 => "u64",
+            _ => self.as_str(),
         }
     }
 
@@ -178,6 +182,26 @@ fn add_u32_u64_endpoints(
             ref_type,
             ValueType::U64,
             owned_type,
+        ));
+    }
+}
+
+fn add_cmp_small_int_endpoints(
+    op: &OperatorInfo,
+    owned_type: ValueType,
+    endpoints: &mut Vec<BigNumOperatorTestEndpoint>,
+) {
+    for small_int_type in [
+        ValueType::I32,
+        ValueType::I64,
+        ValueType::U32,
+        ValueType::U64,
+    ] {
+        endpoints.push(BigNumOperatorTestEndpoint::new(
+            op,
+            owned_type,
+            small_int_type,
+            ValueType::Bool,
         ));
     }
 }
@@ -348,6 +372,29 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                     ValueType::BigUint,
                 ));
             }
+        }
+        OperatorGroup::Cmp => {
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                op,
+                ValueType::BigInt,
+                ValueType::BigInt,
+                ValueType::Bool,
+            ));
+            add_cmp_small_int_endpoints(op, ValueType::BigInt, &mut endpoints);
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                op,
+                ValueType::BigUint,
+                ValueType::BigUint,
+                ValueType::Bool,
+            ));
+            add_cmp_small_int_endpoints(op, ValueType::BigUint, &mut endpoints);
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::NonZeroBigUint,
+                ValueType::Bool,
+            ));
+            add_cmp_small_int_endpoints(op, ValueType::NonZeroBigUint, &mut endpoints);
         }
     }
 
