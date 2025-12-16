@@ -3,15 +3,12 @@ use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{
-        const_handles, use_raw_handle, ErrorApiImpl, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi,
-    },
+    api::{ErrorApiImpl, ManagedTypeApi},
     codec::*,
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
-    types::{EsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType},
+    types::{EsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType, TokenId},
 };
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
@@ -32,7 +29,7 @@ use crate::{
 #[repr(transparent)]
 #[derive(Clone)]
 pub struct EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
-    pub(crate) buffer: ManagedBuffer<M>,
+    pub(crate) token_id: TokenId<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for EgldOrEsdtTokenIdentifier<M> {
@@ -41,16 +38,16 @@ impl<M: ManagedTypeApi> ManagedType<M> for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
         EgldOrEsdtTokenIdentifier {
-            buffer: ManagedBuffer::from_handle(handle),
+            token_id: TokenId::from_handle(handle),
         }
     }
 
     fn get_handle(&self) -> M::ManagedBufferHandle {
-        self.buffer.get_handle()
+        self.token_id.get_handle()
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.buffer.forget_into_handle()
+        self.token_id.forget_into_handle()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -70,7 +67,7 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     pub fn egld() -> Self {
         EgldOrEsdtTokenIdentifier {
-            buffer: ManagedBuffer::from(EGLD_000000_TOKEN_IDENTIFIER),
+            token_id: TokenId::from(EGLD_000000_TOKEN_IDENTIFIER),
         }
     }
 
@@ -81,27 +78,22 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         EsdtTokenIdentifier<M>: From<TI>,
     {
         let ti_obj = EsdtTokenIdentifier::from(token_identifier);
-        ti_obj.data
+        ti_obj.token_id.into()
     }
 
     pub fn parse(data: ManagedBuffer<M>) -> Self {
         if data == Self::EGLD_REPRESENTATION {
             Self::egld()
         } else {
-            Self { buffer: data }
+            Self {
+                token_id: data.into(),
+            }
         }
     }
 
     #[inline]
     pub fn is_egld(&self) -> bool {
-        M::managed_type_impl().mb_overwrite(
-            use_raw_handle(const_handles::MBUF_EGLD_000000),
-            EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
-        );
-        M::managed_type_impl().mb_eq(
-            use_raw_handle(const_handles::MBUF_EGLD_000000),
-            self.buffer.handle.clone(),
-        )
+        self.token_id.is_native()
     }
 
     #[inline]
@@ -129,19 +121,25 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         )
     }
 
+    /// Converts reference to the newer, non-legacy TokenId.
+    pub fn as_token_id(&self) -> &TokenId<M> {
+        // safe because of #[repr(transparent)]
+        unsafe { core::mem::transmute(self) }
+    }
+
     #[inline]
     pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
-        self.buffer
+        self.token_id.buffer
     }
 
     #[inline]
     pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
-        &self.buffer
+        &self.token_id.buffer
     }
 
     #[inline]
     pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
-        self.buffer.to_boxed_bytes()
+        self.token_id.to_boxed_bytes()
     }
 
     pub fn map_or_else<Context, D, F, R>(self, context: Context, for_egld: D, for_esdt: F) -> R
@@ -206,14 +204,23 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
-        EgldOrEsdtTokenIdentifier { buffer }
+        EgldOrEsdtTokenIdentifier {
+            token_id: buffer.into(),
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> From<TokenId<M>> for EgldOrEsdtTokenIdentifier<M> {
+    #[inline]
+    fn from(token_id: TokenId<M>) -> Self {
+        EgldOrEsdtTokenIdentifier { token_id }
     }
 }
 
 impl<M: ManagedTypeApi> From<&[u8]> for EgldOrEsdtTokenIdentifier<M> {
     fn from(bytes: &[u8]) -> Self {
         EgldOrEsdtTokenIdentifier {
-            buffer: ManagedBuffer::new_from_bytes(bytes),
+            token_id: TokenId::from(bytes),
         }
     }
 }
@@ -233,7 +240,7 @@ impl<M: ManagedTypeApi> From<&String> for EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> PartialEq for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.buffer == other.buffer
+        self.token_id == other.token_id
     }
 }
 
@@ -260,7 +267,7 @@ impl<M: ManagedTypeApi> NestedEncode for EgldOrEsdtTokenIdentifier<M> {
         if self.is_egld() {
             (&Self::EGLD_REPRESENTATION[..]).dep_encode_or_handle_err(dest, h)
         } else {
-            self.buffer.dep_encode_or_handle_err(dest, h)
+            self.token_id.dep_encode_or_handle_err(dest, h)
         }
     }
 }
@@ -275,7 +282,7 @@ impl<M: ManagedTypeApi> TopEncode for EgldOrEsdtTokenIdentifier<M> {
         if self.is_egld() {
             (&Self::EGLD_REPRESENTATION[..]).top_encode_or_handle_err(output, h)
         } else {
-            self.buffer.top_encode_or_handle_err(output, h)
+            self.token_id.top_encode_or_handle_err(output, h)
         }
     }
 }
@@ -337,9 +344,7 @@ impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
         if self.is_egld() {
             f.append_bytes(Self::EGLD_REPRESENTATION);
         } else {
-            let cast_handle = self.buffer.get_handle().cast_or_signal_error::<M, _>();
-            let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
-            f.append_managed_buffer(&wrap_cast);
+            SCDisplay::fmt(&self.token_id, f)
         }
     }
 }
@@ -351,9 +356,7 @@ impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
         if self.is_egld() {
             f.append_bytes(EGLD_REPRESENTATION_HEX);
         } else {
-            let cast_handle = self.buffer.get_handle().cast_or_signal_error::<M, _>();
-            let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
-            f.append_managed_buffer_lower_hex(&wrap_cast);
+            SCLowerHex::fmt(&self.token_id, f)
         }
     }
 }
@@ -372,6 +375,16 @@ where
                     .field(&token_id_str)
                     .finish()
             },
+        )
+    }
+}
+
+impl<M: ManagedTypeApi> core::fmt::Display for EgldOrEsdtTokenIdentifier<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.map_ref_or_else(
+            f,
+            |f| core::fmt::Display::fmt("EGLD", f),
+            |f, token_identifier| core::fmt::Display::fmt(token_identifier, f),
         )
     }
 }

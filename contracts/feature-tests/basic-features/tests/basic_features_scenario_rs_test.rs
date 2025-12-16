@@ -45,6 +45,11 @@ fn big_num_ops_bitwise_rs() {
 }
 
 #[test]
+fn big_num_ops_cmp_rs() {
+    world().run("scenarios/big_num_ops_cmp.scen.json");
+}
+
+#[test]
 #[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
 fn big_num_ops_shift_rs() {
     world().run("scenarios/big_num_ops_shift.scen.json");
@@ -213,6 +218,11 @@ fn echo_managed_vec_rs() {
 #[test]
 fn echo_multi_value_tuples_rs() {
     world().run("scenarios/echo_multi_value_tuples.scen.json");
+}
+
+#[test]
+fn echo_non_zero_big_uint_rs() {
+    world().run("scenarios/echo_non_zero_big_uint.scen.json");
 }
 
 #[test]

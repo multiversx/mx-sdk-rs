@@ -3,7 +3,7 @@ use crate::{
     err_msg,
     types::{
         BigUint, EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPayment,
-        ManagedVec, MultiValueEncoded,
+        ManagedType, ManagedVec, MultiValueEncoded, PaymentVec,
     },
 };
 
@@ -45,5 +45,11 @@ where
         }
 
         encoded
+    }
+
+    /// Converts to the newer PaymentVec (ManagedVec<Payment>).
+    pub fn into_payment_vec(self) -> PaymentVec<M> {
+        // safe, because it is the same layout
+        unsafe { PaymentVec::from_handle(self.forget_into_handle()) }
     }
 }

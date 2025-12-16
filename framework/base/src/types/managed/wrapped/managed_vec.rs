@@ -14,12 +14,8 @@ use crate::{
 };
 use alloc::{format, vec::Vec};
 use core::{
-    borrow::Borrow,
-    cmp::Ordering,
-    fmt::Debug,
-    iter::FromIterator,
-    marker::PhantomData,
-    mem::{transmute_copy, ManuallyDrop, MaybeUninit},
+    borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData,
+    mem::MaybeUninit,
 };
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
@@ -129,6 +125,17 @@ where
     }
 }
 
+impl<M, T> AsRef<ManagedVec<M, T>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    #[inline]
+    fn as_ref(&self) -> &ManagedVec<M, T> {
+        self
+    }
+}
+
 impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -184,8 +191,7 @@ where
             return None;
         }
 
-        let mut result_uninit =
-            unsafe { MaybeUninit::<[MaybeUninit<T::Ref<'_>>; N]>::uninit().assume_init() };
+        let mut result_uninit: [MaybeUninit<T::Ref<'_>>; N] = [const { MaybeUninit::uninit() }; N];
 
         for (index, value) in self.iter().enumerate() {
             // length already checked
@@ -194,7 +200,8 @@ where
             }
         }
 
-        let result = unsafe { transmute_copy(&ManuallyDrop::new(result_uninit)) };
+        // TODO: replace with MaybeUninit::array_assume_init when it gets stabilized
+        let result = unsafe { core::mem::transmute_copy(&result_uninit) };
         Some(result)
     }
 

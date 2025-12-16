@@ -8,325 +8,1210 @@ multiversx_sc::imports!();
 
 /// Checks that BigUint/BigInt operators work as expected.
 #[multiversx_sc::module]
-#[allow(clippy::redundant_clone)]
+#[rustfmt::skip]
 pub trait BigIntOperators {
     // Endpoints grouped into several sections:
 
     // Arithmetic binary operators
 
     #[endpoint]
-    fn add_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
+    fn add_big_int_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a + b
     }
     #[endpoint]
-    fn add_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
+    fn add_big_int_big_int_ref(&self, a: BigInt, b: &BigInt) -> BigInt {
         a + b
     }
     #[endpoint]
-    fn add_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn add_big_int_ref_big_int(&self, a: &BigInt, b: BigInt) -> BigInt {
         a + b
     }
     #[endpoint]
-    fn add_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn add_big_int_ref_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a + b
     }
     #[endpoint]
-    fn sub_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
+    fn add_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_non_zero_big_uint_ref(&self, a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_ref_non_zero_big_uint(&self, a: &NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_ref_non_zero_big_uint_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn add_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a + b
+    }
+    #[endpoint]
+    fn sub_big_int_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a - b
     }
     #[endpoint]
-    fn sub_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
+    fn sub_big_int_big_int_ref(&self, a: BigInt, b: &BigInt) -> BigInt {
         a - b
     }
     #[endpoint]
-    fn sub_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn sub_big_int_ref_big_int(&self, a: &BigInt, b: BigInt) -> BigInt {
         a - b
     }
     #[endpoint]
-    fn sub_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn sub_big_int_ref_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a - b
     }
     #[endpoint]
-    fn mul_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
+    fn sub_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_non_zero_big_uint_ref(&self, a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_ref_non_zero_big_uint(&self, a: &NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_ref_non_zero_big_uint_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn sub_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a - b
+    }
+    #[endpoint]
+    fn mul_big_int_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a * b
     }
     #[endpoint]
-    fn mul_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
+    fn mul_big_int_big_int_ref(&self, a: BigInt, b: &BigInt) -> BigInt {
         a * b
     }
     #[endpoint]
-    fn mul_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn mul_big_int_ref_big_int(&self, a: &BigInt, b: BigInt) -> BigInt {
         a * b
     }
     #[endpoint]
-    fn mul_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn mul_big_int_ref_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a * b
     }
     #[endpoint]
-    fn div_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
+    fn mul_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_non_zero_big_uint_ref(&self, a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_ref_non_zero_big_uint(&self, a: &NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_ref_non_zero_big_uint_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn mul_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a * b
+    }
+    #[endpoint]
+    fn div_big_int_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a / b
     }
     #[endpoint]
-    fn div_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
+    fn div_big_int_big_int_ref(&self, a: BigInt, b: &BigInt) -> BigInt {
         a / b
     }
     #[endpoint]
-    fn div_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn div_big_int_ref_big_int(&self, a: &BigInt, b: BigInt) -> BigInt {
         a / b
     }
     #[endpoint]
-    fn div_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn div_big_int_ref_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
         a / b
     }
     #[endpoint]
-    fn rem_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
+    fn div_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_non_zero_big_uint_ref(&self, a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_ref_non_zero_big_uint(&self, a: &NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_ref_non_zero_big_uint_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn div_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a / b
+    }
+    #[endpoint]
+    fn rem_big_int_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
         a % b
     }
     #[endpoint]
-    fn rem_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
+    fn rem_big_int_big_int_ref(&self, a: BigInt, b: &BigInt) -> BigInt {
         a % b
     }
     #[endpoint]
-    fn rem_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn rem_big_int_ref_big_int(&self, a: &BigInt, b: BigInt) -> BigInt {
         a % b
     }
     #[endpoint]
-    fn rem_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn rem_big_int_ref_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_non_zero_big_uint_ref(&self, a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_ref_non_zero_big_uint(&self, a: &NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_ref_non_zero_big_uint_ref(&self, a: &NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_ref_u32(&self, a: &NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a % b
+    }
+    #[endpoint]
+    fn rem_non_zero_big_uint_ref_u64(&self, a: &NonZeroBigUint, b: u64) -> NonZeroBigUint {
         a % b
     }
 
     // Arithmetic assign operators
 
     #[endpoint]
-    fn add_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
-        let mut r = a.clone();
-        r += b;
-        r
+    fn add_assign_big_int_big_int(&self, mut a: BigInt, b: BigInt) -> BigInt {
+        a += b;
+        a
     }
     #[endpoint]
-    fn add_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
-        let mut r = a.clone();
-        r += b;
-        r
+    fn add_assign_big_int_big_int_ref(&self, mut a: BigInt, b: &BigInt) -> BigInt {
+        a += b;
+        a
     }
     #[endpoint]
-    fn add_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
-        let mut r = a.clone();
-        r += b;
-        r
+    fn add_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn add_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
-        let mut r = a.clone();
-        r += b;
-        r
+    fn add_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn sub_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
-        let mut r = a.clone();
-        r -= b;
-        r
+    fn add_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn sub_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
-        let mut r = a.clone();
-        r -= b;
-        r
+    fn add_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn sub_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
-        let mut r = a.clone();
-        r -= b;
-        r
+    fn add_assign_non_zero_big_uint_non_zero_big_uint(&self, mut a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn sub_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
-        let mut r = a.clone();
-        r -= b;
-        r
+    fn add_assign_non_zero_big_uint_non_zero_big_uint_ref(&self, mut a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn mul_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
-        let mut r = a.clone();
-        r *= b;
-        r
+    fn add_assign_non_zero_big_uint_big_uint(&self, mut a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn mul_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
-        let mut r = a.clone();
-        r *= b;
-        r
+    fn add_assign_non_zero_big_uint_big_uint_ref(&self, mut a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn mul_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
-        let mut r = a.clone();
-        r *= b;
-        r
+    fn add_assign_non_zero_big_uint_u32(&self, mut a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn mul_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
-        let mut r = a.clone();
-        r *= b;
-        r
+    fn add_assign_non_zero_big_uint_u64(&self, mut a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a += b;
+        a
     }
     #[endpoint]
-    fn div_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
-        let mut r = a.clone();
-        r /= b;
-        r
+    fn sub_assign_big_int_big_int(&self, mut a: BigInt, b: BigInt) -> BigInt {
+        a -= b;
+        a
     }
     #[endpoint]
-    fn div_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
-        let mut r = a.clone();
-        r /= b;
-        r
+    fn sub_assign_big_int_big_int_ref(&self, mut a: BigInt, b: &BigInt) -> BigInt {
+        a -= b;
+        a
     }
     #[endpoint]
-    fn div_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
-        let mut r = a.clone();
-        r /= b;
-        r
+    fn sub_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a -= b;
+        a
     }
     #[endpoint]
-    fn div_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
-        let mut r = a.clone();
-        r /= b;
-        r
+    fn sub_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a -= b;
+        a
     }
     #[endpoint]
-    fn rem_assign_big_int(&self, a: BigInt, b: BigInt) -> BigInt {
-        let mut r = a.clone();
-        r %= b;
-        r
+    fn sub_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a -= b;
+        a
     }
     #[endpoint]
-    fn rem_assign_big_int_ref(&self, a: &BigInt, b: &BigInt) -> BigInt {
-        let mut r = a.clone();
-        r %= b;
-        r
+    fn sub_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a -= b;
+        a
     }
     #[endpoint]
-    fn rem_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
-        let mut r = a.clone();
-        r %= b;
-        r
+    fn sub_assign_non_zero_big_uint_non_zero_big_uint(&self, mut a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a -= b;
+        a
     }
     #[endpoint]
-    fn rem_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
-        let mut r = a.clone();
-        r %= b;
-        r
+    fn sub_assign_non_zero_big_uint_non_zero_big_uint_ref(&self, mut a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a -= b;
+        a
+    }
+    #[endpoint]
+    fn sub_assign_non_zero_big_uint_big_uint(&self, mut a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        a -= b;
+        a
+    }
+    #[endpoint]
+    fn sub_assign_non_zero_big_uint_big_uint_ref(&self, mut a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        a -= b;
+        a
+    }
+    #[endpoint]
+    fn sub_assign_non_zero_big_uint_u32(&self, mut a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a -= b;
+        a
+    }
+    #[endpoint]
+    fn sub_assign_non_zero_big_uint_u64(&self, mut a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a -= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_big_int_big_int(&self, mut a: BigInt, b: BigInt) -> BigInt {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_big_int_big_int_ref(&self, mut a: BigInt, b: &BigInt) -> BigInt {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_non_zero_big_uint_non_zero_big_uint(&self, mut a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_non_zero_big_uint_non_zero_big_uint_ref(&self, mut a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_non_zero_big_uint_big_uint(&self, mut a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_non_zero_big_uint_big_uint_ref(&self, mut a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_non_zero_big_uint_u32(&self, mut a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn mul_assign_non_zero_big_uint_u64(&self, mut a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a *= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_big_int_big_int(&self, mut a: BigInt, b: BigInt) -> BigInt {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_big_int_big_int_ref(&self, mut a: BigInt, b: &BigInt) -> BigInt {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_non_zero_big_uint_non_zero_big_uint(&self, mut a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_non_zero_big_uint_non_zero_big_uint_ref(&self, mut a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_non_zero_big_uint_big_uint(&self, mut a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_non_zero_big_uint_big_uint_ref(&self, mut a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_non_zero_big_uint_u32(&self, mut a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn div_assign_non_zero_big_uint_u64(&self, mut a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a /= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_big_int_big_int(&self, mut a: BigInt, b: BigInt) -> BigInt {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_big_int_big_int_ref(&self, mut a: BigInt, b: &BigInt) -> BigInt {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_non_zero_big_uint_non_zero_big_uint(&self, mut a: NonZeroBigUint, b: NonZeroBigUint) -> NonZeroBigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_non_zero_big_uint_non_zero_big_uint_ref(&self, mut a: NonZeroBigUint, b: &NonZeroBigUint) -> NonZeroBigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_non_zero_big_uint_big_uint(&self, mut a: NonZeroBigUint, b: BigUint) -> NonZeroBigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_non_zero_big_uint_big_uint_ref(&self, mut a: NonZeroBigUint, b: &BigUint) -> NonZeroBigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_non_zero_big_uint_u32(&self, mut a: NonZeroBigUint, b: u32) -> NonZeroBigUint {
+        a %= b;
+        a
+    }
+    #[endpoint]
+    fn rem_assign_non_zero_big_uint_u64(&self, mut a: NonZeroBigUint, b: u64) -> NonZeroBigUint {
+        a %= b;
+        a
     }
 
     // Bitwise binary operators
 
     #[endpoint]
-    fn bit_and_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_and_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
         a & b
     }
     #[endpoint]
-    fn bit_and_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_and_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
         a & b
     }
     #[endpoint]
-    fn bit_or_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_and_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_and_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_and_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_and_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_and_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_and_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a & b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
         a | b
     }
     #[endpoint]
-    fn bit_or_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_or_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
         a | b
     }
     #[endpoint]
-    fn bit_xor_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_or_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_or_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a | b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
         a ^ b
     }
     #[endpoint]
-    fn bit_xor_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_xor_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a ^ b
+    }
+    #[endpoint]
+    fn bit_xor_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
         a ^ b
     }
 
     // Bitwise assign operators
 
     #[endpoint]
-    fn bit_and_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
-        let mut r = a.clone();
-        r &= b;
-        r
+    fn bit_and_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a &= b;
+        a
     }
     #[endpoint]
-    fn bit_and_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
-        let mut r = a.clone();
-        r &= b;
-        r
+    fn bit_and_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a &= b;
+        a
     }
     #[endpoint]
-    fn bit_or_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
-        let mut r = a.clone();
-        r |= b;
-        r
+    fn bit_and_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a &= b;
+        a
     }
     #[endpoint]
-    fn bit_or_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
-        let mut r = a.clone();
-        r |= b;
-        r
+    fn bit_and_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a &= b;
+        a
     }
     #[endpoint]
-    fn bit_xor_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
-        let mut r = a.clone();
-        r ^= b;
-        r
+    fn bit_or_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a |= b;
+        a
     }
     #[endpoint]
-    fn bit_xor_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
-        let mut r = a.clone();
-        r ^= b;
-        r
+    fn bit_or_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a |= b;
+        a
+    }
+    #[endpoint]
+    fn bit_or_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a |= b;
+        a
+    }
+    #[endpoint]
+    fn bit_or_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a |= b;
+        a
+    }
+    #[endpoint]
+    fn bit_xor_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a ^= b;
+        a
+    }
+    #[endpoint]
+    fn bit_xor_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a ^= b;
+        a
+    }
+    #[endpoint]
+    fn bit_xor_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a ^= b;
+        a
+    }
+    #[endpoint]
+    fn bit_xor_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a ^= b;
+        a
     }
 
     // Bitwise shift binary operators
 
     #[endpoint]
-    fn shr_big_uint(&self, a: BigUint, b: usize) -> BigUint {
+    fn shr_big_uint_usize(&self, a: BigUint, b: usize) -> BigUint {
         a >> b
     }
     #[endpoint]
-    fn shr_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint {
+    fn shr_big_uint_ref_usize(&self, a: &BigUint, b: usize) -> BigUint {
         a >> b
     }
     #[endpoint]
-    fn shl_big_uint(&self, a: BigUint, b: usize) -> BigUint {
+    fn shl_big_uint_usize(&self, a: BigUint, b: usize) -> BigUint {
         a << b
     }
     #[endpoint]
-    fn shl_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint {
+    fn shl_big_uint_ref_usize(&self, a: &BigUint, b: usize) -> BigUint {
         a << b
     }
 
     // Bitwise shift assign operators
 
     #[endpoint]
-    fn shr_assign_big_uint(&self, a: BigUint, b: usize) -> BigUint {
-        let mut r = a.clone();
-        r >>= b;
-        r
+    fn shr_assign_big_uint_usize(&self, mut a: BigUint, b: usize) -> BigUint {
+        a >>= b;
+        a
     }
     #[endpoint]
-    fn shr_assign_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint {
-        let mut r = a.clone();
-        r >>= b;
-        r
+    fn shl_assign_big_uint_usize(&self, mut a: BigUint, b: usize) -> BigUint {
+        a <<= b;
+        a
+    }
+
+    // Equality/comparison operators
+
+    #[endpoint]
+    fn eq_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a == b
     }
     #[endpoint]
-    fn shl_assign_big_uint(&self, a: BigUint, b: usize) -> BigUint {
-        let mut r = a.clone();
-        r <<= b;
-        r
+    fn eq_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a == b
     }
     #[endpoint]
-    fn shl_assign_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint {
-        let mut r = a.clone();
-        r <<= b;
-        r
+    fn eq_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn gt_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn ge_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn lt_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn le_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a <= b
     }
 }

@@ -61,7 +61,7 @@ pub trait ForwarderSyncCallModule {
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().egld_or_single_esdt();
+        let payment = self.call_value().all();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         let result = self
@@ -126,7 +126,7 @@ pub trait ForwarderSyncCallModule {
         &self,
         to: ManagedAddress,
     ) -> ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>> {
-        let payment = self.call_value().all_transfers();
+        let payment = self.call_value().all();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
         self.tx()
@@ -141,16 +141,20 @@ pub trait ForwarderSyncCallModule {
 
     #[payable("*")]
     #[endpoint]
-    fn forward_sync_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
-        let (token_id, payment) = self.call_value().egld_or_single_fungible_esdt();
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
-        let amount_to_send = payment - fees;
+    fn forward_sync_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: u32) {
+        let payment = self.call_value().single();
+        let fees = &payment.amount * percentage_fees / PERCENTAGE_TOTAL;
+        let amount_to_send = &payment.amount - fees;
 
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .egld_or_single_esdt(&token_id, 0u64, &amount_to_send)
+            .payment(PaymentRefs::new(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &amount_to_send,
+            ))
             .returns(ReturnsResult)
             .sync_call();
     }
@@ -158,13 +162,13 @@ pub trait ForwarderSyncCallModule {
     #[event("accept_funds_sync_result")]
     fn accept_funds_sync_result_event(
         &self,
-        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,
     );
 
     #[endpoint]
     #[payable("*")]
     fn forward_sync_accept_funds_then_read(&self, to: ManagedAddress) -> usize {
-        let payment = self.call_value().egld_or_single_esdt();
+        let payment = self.call_value().all();
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)

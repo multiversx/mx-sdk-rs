@@ -158,7 +158,7 @@ where
 
     pub fn forward_sync_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -275,6 +275,7 @@ where
             .original_result()
     }
 
+    /// TODO: not tested, investigate 
     pub fn forward_async_accept_funds_half_payment<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
@@ -289,7 +290,7 @@ where
 
     pub fn forward_async_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -399,16 +400,16 @@ where
             .original_result()
     }
 
-    pub fn forward_transf_execu_accept_funds_with_fees<
+    pub fn forward_transf_exec_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
         percentage_fees: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .raw_call("forward_transf_execu_accept_funds_with_fees")
+            .raw_call("forward_transf_exec_accept_funds_with_fees")
             .argument(&to)
             .argument(&percentage_fees)
             .original_result()
@@ -433,7 +434,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue4<u64, u64, BigUint<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue3<u64, u64, TokenId<Env::Api>>> {
         self.wrapped_tx
             .raw_call("forward_transf_exec_accept_funds_return_values")
             .argument(&to)
@@ -618,7 +619,7 @@ where
 
     pub fn send_esdt_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -655,7 +656,7 @@ where
 
     pub fn send_esdt_direct_multi_transfer<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1455,7 +1456,7 @@ where
     >(
         self,
         index: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, TokenId<Env::Api>, u64, NonZeroBigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("callback_data_at_index")
@@ -1576,7 +1577,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg3: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1662,7 +1663,7 @@ where
 
     pub fn forward_sync_retrieve_funds_bt_multi<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1679,7 +1680,7 @@ where
     /// Highlights the behavior when calling back transfers **without** reset. 
     pub fn forward_sync_retrieve_funds_bt_multi_twice<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1696,7 +1697,7 @@ where
     /// Highlights the behavior when calling back transfers **with** reset. 
     pub fn forward_sync_retrieve_funds_bt_multi_twice_reset<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1748,8 +1749,8 @@ where
     Api: ManagedTypeApi,
 {
     pub callback_name: ManagedBuffer<Api>,
-    pub token_identifier: EgldOrEsdtTokenIdentifier<Api>,
+    pub token_identifier: TokenId<Api>,
     pub token_nonce: u64,
-    pub token_amount: BigUint<Api>,
+    pub token_amount: NonZeroBigUint<Api>,
     pub args: ManagedVec<Api, ManagedBuffer<Api>>,
 }

@@ -1,6 +1,9 @@
 use core::marker::PhantomData;
 
-use multiversx_chain_core::types::{DurationMillis, TimestampMillis, TimestampSeconds};
+use multiversx_chain_core::{
+    types::{DurationMillis, TimestampMillis, TimestampSeconds},
+    EGLD_000000_TOKEN_IDENTIFIER,
+};
 
 use crate::{
     api::{
@@ -14,8 +17,8 @@ use crate::{
     types::{
         BackTransfers, BackTransfersLegacy, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier,
         EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenIdentifier,
-        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRefMut, ManagedType,
-        ManagedVec, SystemSCAddress,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef, ManagedRefMut,
+        ManagedType, ManagedVec, SystemSCAddress, TokenId,
     },
 };
 
@@ -28,21 +31,26 @@ use crate::{
 #[derive(Default)]
 pub struct BlockchainWrapper<A>
 where
-    A: BlockchainApi + ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     _phantom: PhantomData<A>,
 }
 
 impl<A> BlockchainWrapper<A>
 where
-    A: BlockchainApi + ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     pub fn new() -> Self {
         BlockchainWrapper {
             _phantom: PhantomData,
         }
     }
+}
 
+impl<A> BlockchainWrapper<A>
+where
+    A: BlockchainApi + ManagedTypeApi + ErrorApi,
+{
     #[deprecated(since = "0.41.0", note = "Please use method `get_caller` instead.")]
     #[cfg(feature = "alloc")]
     #[inline]
@@ -175,14 +183,17 @@ where
     }
 
     #[inline]
-    pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
-        token.map_ref_or_else(
-            (),
-            |()| self.get_balance(&self.get_sc_address()),
-            |(), token_identifier| {
-                self.get_esdt_balance(&self.get_sc_address(), token_identifier, nonce)
-            },
-        )
+    pub fn get_sc_balance(&self, token_id: impl AsRef<TokenId<A>>, nonce: u64) -> BigUint<A> {
+        let token_id_ref = token_id.as_ref();
+        if self.is_native_token(token_id_ref) {
+            self.get_balance(&self.get_sc_address())
+        } else {
+            self.get_esdt_balance(
+                &self.get_sc_address(),
+                unsafe { token_id_ref.as_esdt_unchecked() },
+                nonce,
+            )
+        }
     }
 
     #[deprecated(
@@ -441,7 +452,36 @@ where
             result
         }
     }
+}
 
+impl<A> BlockchainWrapper<A>
+where
+    A: ManagedTypeApi + ErrorApi,
+{
+    pub(crate) fn get_native_token_handle(&self) -> A::ManagedBufferHandle {
+        let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_EGLD_000000);
+        A::managed_type_impl()
+            .mb_overwrite(handle.clone(), EGLD_000000_TOKEN_IDENTIFIER.as_bytes());
+        handle
+    }
+
+    /// The native token of the given chain. It can currently only return `EGLD-000000`.
+    pub fn get_native_token(&self) -> ManagedRef<'static, A, TokenId<A>> {
+        let handle = self.get_native_token_handle();
+        unsafe { ManagedRef::wrap_handle(handle) }
+    }
+
+    /// Checks if a token is the native one on the chain. Currently only returns true for `EGLD-000000`.
+    pub fn is_native_token(&self, token_id: &TokenId<A>) -> bool {
+        let handle = self.get_native_token_handle();
+        A::managed_type_impl().mb_eq(handle, token_id.buffer.handle.clone())
+    }
+}
+
+impl<A> BlockchainWrapper<A>
+where
+    A: BlockchainApi + ManagedTypeApi + ErrorApi,
+{
     fn get_esdt_token_type_raw(
         &self,
         address: &ManagedAddress<A>,
@@ -507,7 +547,7 @@ where
             uris_handle.get_raw_handle(),
         );
 
-        let token_type = self.get_esdt_token_type(address, &token_id.data, nonce);
+        let token_type = self.get_esdt_token_type(address, token_id.token_id.as_legacy(), nonce);
 
         if managed_api_impl.mb_len(creator_handle.clone()) == 0 {
             managed_api_impl.mb_overwrite(creator_handle.clone(), &[0u8; 32][..]);

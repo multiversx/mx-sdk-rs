@@ -2,7 +2,7 @@ mod op_gen_endpoints;
 mod op_gen_scenario;
 mod op_list;
 
-pub use op_gen_endpoints::{create_all_endpoints, BigNumOperatorTestEndpoint};
+pub use op_gen_endpoints::{create_all_endpoints, BigNumOperatorTestEndpoint, ValueType};
 pub use op_gen_scenario::write_scenarios;
 pub use op_list::{OperatorGroup, OperatorInfo, OperatorList};
 
@@ -31,6 +31,8 @@ pub fn generate_big_int_operators_trait() -> String {
     let ops = OperatorList::create();
     let endpoints = create_all_endpoints(&ops);
 
+    println!("Generated {} endpoints.", endpoints.len());
+
     section_comment(&mut out, "Arithmetic binary operators");
     write_filtered_endpoints(&endpoints, OperatorGroup::Arithmetic, false, &mut out);
 
@@ -49,6 +51,9 @@ pub fn generate_big_int_operators_trait() -> String {
     section_comment(&mut out, "Bitwise shift assign operators");
     write_filtered_endpoints(&endpoints, OperatorGroup::Shift, true, &mut out);
 
+    section_comment(&mut out, "Equality/comparison operators");
+    write_filtered_endpoints(&endpoints, OperatorGroup::Cmp, false, &mut out);
+
     writeln!(&mut out, "\n}}").unwrap();
 
     out
@@ -64,7 +69,7 @@ multiversx_sc::imports!();
 
 /// Checks that BigUint/BigInt operators work as expected.
 #[multiversx_sc::module]
-#[allow(clippy::redundant_clone)]
+#[rustfmt::skip]
 pub trait BigIntOperators {
     // Endpoints grouped into several sections:"#;
 

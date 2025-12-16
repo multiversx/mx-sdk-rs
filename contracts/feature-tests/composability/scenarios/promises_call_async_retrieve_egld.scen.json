@@ -96,8 +96,18 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:retrieve_funds_callback",
                         "topics": [
+                            "str:promises_callback"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:retrieve_funds_callback",
+                        "topics": [
                             "str:retrieve_funds_callback",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "1000"
                         ],

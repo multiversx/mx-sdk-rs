@@ -1,18 +1,17 @@
 use core::marker::PhantomData;
 
-use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
-
 use crate::{
     api::{
         const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
         ManagedBufferApiImpl, ManagedTypeApi, RawHandle, StaticVarApiFlags, StaticVarApiImpl,
     },
+    contract_base::BlockchainWrapper,
     err_msg,
     types::{
         BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment, ManagedDecimal, ManagedRef,
         ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayload, ManagedVecPayloadIterator,
-        ManagedVecRef,
+        Payment, PaymentVec, Ref,
     },
 };
 
@@ -66,7 +65,7 @@ where
     ///
     /// Does not accept a multi-transfer with 2 or more transfers, not even 2 or more EGLD transfers.
     pub fn egld(&self) -> ManagedRef<'static, A, BigUint<A>> {
-        let all_transfers = self.all_transfers();
+        let all_transfers = self.all();
         match all_transfers.len() {
             0 => {
                 use crate::api::BigIntApiImpl;
@@ -78,7 +77,7 @@ where
             }
             1 => {
                 let first = all_transfers.get(0);
-                if !first.token_identifier.is_egld() {
+                if !first.token_identifier.is_native() {
                     A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
                 }
                 unsafe { ManagedRef::wrap_handle(first.amount.get_handle()) }
@@ -128,6 +127,17 @@ where
         unsafe { ManagedRef::wrap_handle(multi_esdt_handle) }
     }
 
+    fn all_transfers_handle(&self) -> A::ManagedBufferHandle {
+        let all_transfers_handle: A::ManagedBufferHandle =
+            use_raw_handle(const_handles::CALL_VALUE_ALL);
+        if !A::static_var_api_impl()
+            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED)
+        {
+            A::call_value_api_impl().load_all_transfers(all_transfers_handle.clone());
+        }
+        all_transfers_handle
+    }
+
     /// Will return all transfers in the form of a list of EgldOrEsdtTokenPayment.
     ///
     /// Both EGLD and ESDT can be returned.
@@ -137,14 +147,66 @@ where
     pub fn all_transfers(
         &self,
     ) -> ManagedRef<'static, A, ManagedVec<A, EgldOrEsdtTokenPayment<A>>> {
-        let all_transfers_handle: A::ManagedBufferHandle =
-            use_raw_handle(const_handles::CALL_VALUE_ALL);
-        if !A::static_var_api_impl()
-            .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ALL_INITIALIZED)
-        {
-            A::call_value_api_impl().load_all_transfers(all_transfers_handle.clone());
-        }
+        let all_transfers_handle = self.all_transfers_handle();
         unsafe { ManagedRef::wrap_handle(all_transfers_handle) }
+    }
+
+    /// Will return all transfers in the form of a list of Payment.
+    ///
+    /// It handles all tokens uniformly, including the native token (EGLD or lightspeed chain native tokens).
+    ///
+    /// In case of a single EGLD transfer, only one item will be returned,
+    /// the EGLD payment represented as an ESDT transfer (EGLD-000000).
+    pub fn all(&self) -> ManagedRef<'static, A, PaymentVec<A>> {
+        let all_transfers_handle = self.all_transfers_handle();
+        unsafe { ManagedRef::wrap_handle(all_transfers_handle) }
+    }
+
+    /// Accepts a single payment.
+    ///
+    /// Will halt execution if zero or more than one payment was received.
+    pub fn single(&self) -> Ref<'static, Payment<A>> {
+        let esdt_transfers = self.all();
+        if esdt_transfers.len() != 1 {
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+        }
+        let value = esdt_transfers.get(0);
+        unsafe {
+            // transmute only used because the compiler doesn't seem to be able to unify the 'static lifetime properly
+            core::mem::transmute::<Ref<'_, Payment<A>>, Ref<'static, Payment<A>>>(value)
+        }
+    }
+
+    /// Accepts either a single payment, or no payment at all.
+    ///
+    /// Will halt execution if zero or more than one payment was received.
+    pub fn single_optional(&self) -> Option<Ref<'static, Payment<A>>> {
+        let esdt_transfers: ManagedRef<'static, A, ManagedVec<A, Payment<A>>> = self.all();
+        match esdt_transfers.len() {
+            0 => None,
+            1 => {
+                let value = esdt_transfers.get(0);
+                // transmute only used because the compiler doesn't seem to be able to unify the 'static lifetime properly
+                let lifetime_fix = unsafe {
+                    core::mem::transmute::<Ref<'_, Payment<A>>, Ref<'static, Payment<A>>>(value)
+                };
+                Some(lifetime_fix)
+            }
+            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
+        }
+    }
+
+    /// Verify and casts the received multi ESDT transfer in to an array.
+    ///
+    /// Can be used to extract all payments in one line like this:
+    ///
+    /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_egld_or_esdt();`.
+    pub fn array<const N: usize>(&self) -> [Ref<'static, Payment<A>>; N] {
+        let list = self.all();
+        let array = list.to_array_of_refs::<N>().unwrap_or_else(|| {
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+        });
+        unsafe { core::mem::transmute(array) }
     }
 
     /// Verify and casts the received multi ESDT transfer in to an array.
@@ -154,10 +216,10 @@ where
     /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_esdt();`.
     ///
     /// Rejects EGLD transfers. Switch to `multi_egld_or_esdt` to accept mixed transfers.
-    pub fn multi_esdt<const N: usize>(&self) -> [ManagedVecRef<'static, EsdtTokenPayment<A>>; N] {
+    pub fn multi_esdt<const N: usize>(&self) -> [Ref<'static, EsdtTokenPayment<A>>; N] {
         let esdt_transfers = self.all_esdt_transfers();
         let array = esdt_transfers.to_array_of_refs::<N>().unwrap_or_else(|| {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
         });
         unsafe { core::mem::transmute(array) }
     }
@@ -169,7 +231,7 @@ where
     /// `let [payment_a, payment_b, payment_c] = self.call_value().multi_egld_or_esdt();`.
     pub fn multi_egld_or_esdt<const N: usize>(
         &self,
-    ) -> [ManagedVecRef<'static, EgldOrEsdtTokenPayment<A>>; N] {
+    ) -> [Ref<'static, EgldOrEsdtTokenPayment<A>>; N] {
         let esdt_transfers = self.all_transfers();
         let array = esdt_transfers.to_array_of_refs::<N>().unwrap_or_else(|| {
             A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
@@ -182,10 +244,10 @@ where
     /// Will return the received ESDT payment.
     ///
     /// The amount cannot be 0, since that would not qualify as an ESDT transfer.
-    pub fn single_esdt(&self) -> ManagedVecRef<'static, EsdtTokenPayment<A>> {
+    pub fn single_esdt(&self) -> Ref<'static, EsdtTokenPayment<A>> {
         let esdt_transfers = self.all_esdt_transfers();
         if esdt_transfers.len() != 1 {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes())
+            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
         }
         let value = esdt_transfers.get(0);
         unsafe { core::mem::transmute(value) }
@@ -231,7 +293,7 @@ where
                 amount: self.egld_direct_non_strict().clone(),
             },
             1 => esdt_transfers.get(0).clone(),
-            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes()),
+            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
         }
     }
 
@@ -255,6 +317,10 @@ where
     /// Accepts any sort of payment, which is either:
     /// - EGLD (can be zero in case of no payment whatsoever);
     /// - Multi-ESDT (one or more ESDT transfers).
+    #[deprecated(
+        note = "It comes from a time when only 1 EGLD payment, or ESDT multi-transfer was possible. This is no longer the case. Use `any` instead.",
+        since = "0.64.0"
+    )]
     pub fn any_payment(&self) -> EgldOrMultiEsdtPayment<A> {
         let esdt_transfers = self.all_esdt_transfers();
         if esdt_transfers.is_empty() {
@@ -269,10 +335,7 @@ fn egld_000000_transfer_exists<A>(transfers_vec_handle: A::ManagedBufferHandle) 
 where
     A: CallValueApi + ErrorApi + ManagedTypeApi,
 {
-    A::managed_type_impl().mb_overwrite(
-        use_raw_handle(const_handles::MBUF_EGLD_000000),
-        EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
-    );
+    let native_token_handle = BlockchainWrapper::<A>::new().get_native_token_handle();
     unsafe {
         let mut iter: ManagedVecPayloadIterator<
             A,
@@ -282,7 +345,7 @@ where
         iter.any(|payload| {
             let token_identifier_handle = RawHandle::read_from_payload(payload.slice_unchecked(0));
             A::managed_type_impl().mb_eq(
-                use_raw_handle(const_handles::MBUF_EGLD_000000),
+                native_token_handle.clone(),
                 use_raw_handle(token_identifier_handle),
             )
         })

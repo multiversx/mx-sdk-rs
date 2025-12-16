@@ -36,9 +36,9 @@ macro_rules! managed_token_id {
 #[macro_export]
 macro_rules! managed_token_id_wrapped {
     ($bytes:expr) => {{
-        let ___esdt_token_id___ =
-            multiversx_sc::types::EsdtTokenIdentifier::from_esdt_bytes($bytes);
-        multiversx_sc::types::EgldOrEsdtTokenIdentifier::esdt(___esdt_token_id___)
+        multiversx_sc::types::EgldOrEsdtTokenIdentifier::esdt(
+            multiversx_sc::types::EsdtTokenIdentifier::from_esdt_bytes($bytes),
+        )
     }};
 }
 
@@ -46,6 +46,13 @@ macro_rules! managed_token_id_wrapped {
 macro_rules! managed_egld_token_id {
     () => {{
         multiversx_sc::types::EgldOrEsdtTokenIdentifier::egld()
+    }};
+}
+
+#[macro_export]
+macro_rules! token_id {
+    ($bytes:expr) => {{
+        multiversx_sc::types::TokenId::from($bytes)
     }};
 }
 

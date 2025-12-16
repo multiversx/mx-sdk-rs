@@ -2,7 +2,6 @@ multiversx_sc::imports!();
 
 /// Used for testing overflow on small int types
 #[multiversx_sc::module]
-#[allow(clippy::redundant_clone)]
 pub trait SmallIntOverflow {
     #[endpoint]
     #[allow(arithmetic_overflow)]

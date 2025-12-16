@@ -5,8 +5,8 @@ use crate::common::{FEE_PENALTY_INCREASE_EPOCHS, FEE_PENALTY_INCREASE_PERCENT};
 use super::{common, events, validation};
 
 use super::common::{
-    Order, OrderInputParams, OrderType, Payment, Transfer, FREE_ORDER_FROM_STORAGE_MIN_PENALTIES,
-    PERCENT_BASE_POINTS,
+    FungiblePayment, Order, OrderInputParams, OrderType, Transfer,
+    FREE_ORDER_FROM_STORAGE_MIN_PENALTIES, PERCENT_BASE_POINTS,
 };
 
 #[multiversx_sc::module]
@@ -15,7 +15,7 @@ pub trait OrdersModule:
 {
     fn create_order(
         &self,
-        payment: Payment<Self::Api>,
+        payment: FungiblePayment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
     ) {
@@ -133,8 +133,8 @@ pub trait OrdersModule:
         &self,
         order_id: u64,
         caller: &ManagedAddress,
-        first_token_id: &EsdtTokenIdentifier,
-        second_token_id: &EsdtTokenIdentifier,
+        first_token_id: &TokenId,
+        second_token_id: &TokenId,
         epoch: u64,
     ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
@@ -160,14 +160,14 @@ pub trait OrdersModule:
 
         let creator_transfer = Transfer {
             to: order.creator.clone(),
-            payment: Payment {
+            payment: FungiblePayment {
                 token_id: token_id.clone(),
                 amount,
             },
         };
         let caller_transfer = Transfer {
             to: caller.clone(),
-            payment: Payment {
+            payment: FungiblePayment {
                 token_id,
                 amount: penalty_amount,
             },
@@ -186,8 +186,8 @@ pub trait OrdersModule:
         &self,
         order_id: u64,
         caller: &ManagedAddress,
-        first_token_id: &EsdtTokenIdentifier,
-        second_token_id: &EsdtTokenIdentifier,
+        first_token_id: &TokenId,
+        second_token_id: &TokenId,
         epoch: u64,
     ) -> Order<Self::Api> {
         let order = self.orders(order_id).get();
@@ -208,7 +208,7 @@ pub trait OrdersModule:
 
         let transfer = Transfer {
             to: caller.clone(),
-            payment: Payment { token_id, amount },
+            payment: FungiblePayment { token_id, amount },
         };
 
         self.orders(order_id).clear();
@@ -308,14 +308,14 @@ pub trait OrdersModule:
         &self,
         orders: MultiValueManagedVec<Order<Self::Api>>,
         total_paid: BigUint,
-        token_requested: EsdtTokenIdentifier,
+        token_requested: TokenId,
         leftover: BigUint,
     ) -> ManagedVec<Transfer<Self::Api>> {
         let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
 
         let mut match_provider_transfer = Transfer {
             to: self.blockchain().get_caller(),
-            payment: Payment {
+            payment: FungiblePayment {
                 token_id: token_requested.clone(),
                 amount: BigUint::zero(),
             },
@@ -336,7 +336,7 @@ pub trait OrdersModule:
 
             transfers.push(Transfer {
                 to: order.creator.clone(),
-                payment: Payment {
+                payment: FungiblePayment {
                     token_id: token_requested.clone(),
                     amount: creator_amount + creator_deal_amount,
                 },
@@ -353,9 +353,11 @@ pub trait OrdersModule:
     fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
         for transfer in &transfers {
             if transfer.payment.amount > 0 {
+                let token_id = transfer.payment.token_id.clone();
+                let amount = NonZeroBigUint::new(transfer.payment.amount.clone()).unwrap();
                 self.tx()
                     .to(&transfer.to)
-                    .single_esdt(&transfer.payment.token_id, 0, &transfer.payment.amount)
+                    .payment(Payment::new(token_id, 0, amount))
                     .transfer();
             }
         }
