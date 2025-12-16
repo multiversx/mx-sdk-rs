@@ -35,10 +35,8 @@ pub fn template_sources(repo_temp_dir: &RepoSource) -> Vec<TemplateSource<'_>> {
         if template_metadata_path.is_file()
             && let Ok(s) = fs::read_to_string(&template_metadata_path)
         {
-            let metadata: TemplateMetadata =
-                toml::from_str(s.as_str()).unwrap_or_else(|error| {
-                    panic!("error parsing {TEMPLATE_TOML_FILE_NAME}: {error}")
-                });
+            let metadata: TemplateMetadata = toml::from_str(s.as_str())
+                .unwrap_or_else(|error| panic!("error parsing {TEMPLATE_TOML_FILE_NAME}: {error}"));
             sources.push(TemplateSource {
                 repo_temp_dir,
                 source_path: dir.path.clone(),

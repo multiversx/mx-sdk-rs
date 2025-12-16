@@ -19,61 +19,62 @@ pub(super) fn get_attribute_with_one_type_arg(
     name: &str,
 ) -> Option<EsdtAttribute> {
     let attr_path = &attr.path();
-    if let Some(first_seg) = attr_path.segments.first() && first_seg.ident == name {
-            let (ticker, ty) = match attr.meta.clone() {
-                syn::Meta::Path(_) => {
-                    panic!("attribute needs 2 arguments: ticker (string) and type")
-                }
-                syn::Meta::List(list) => {
-                    assert!(
-                        !list.tokens.is_empty(),
-                        "argument can not be empty. attribute needs 2 arguments: ticker (string) and type"
-                    );
+    if let Some(first_seg) = attr_path.segments.first()
+        && first_seg.ident == name
+    {
+        let (ticker, ty) = match attr.meta.clone() {
+            syn::Meta::Path(_) => {
+                panic!("attribute needs 2 arguments: ticker (string) and type")
+            }
+            syn::Meta::List(list) => {
+                assert!(
+                    !list.tokens.is_empty(),
+                    "argument can not be empty. attribute needs 2 arguments: ticker (string) and type"
+                );
 
-                    let mut iter = list.tokens.into_iter();
+                let mut iter = list.tokens.into_iter();
 
-                    let first_literal = match iter.next() {
-                        Some(proc_macro2::TokenTree::Literal(literal)) => literal.to_string(),
-                        _ => {
-                            panic!("expected a string as the first token in the attribute argument")
-                        }
-                    };
-
-                    let ticker = clean_string(first_literal);
-
-                    let _ = match iter.next() {
-                        Some(proc_macro2::TokenTree::Punct(punct)) => punct,
-                        _ => panic!("expected a punctuation token after the first literal"),
-                    };
-
-                    let mut ty = proc_macro2::TokenStream::new();
-
-                    for token in &mut iter {
-                        match token {
-                            proc_macro2::TokenTree::Punct(punct) => {
-                                ty.extend(quote! { #punct });
-                            }
-                            proc_macro2::TokenTree::Ident(ident) => {
-                                ty.extend(quote! { #ident });
-                            }
-                            _ => break,
-                        }
+                let first_literal = match iter.next() {
+                    Some(proc_macro2::TokenTree::Literal(literal)) => literal.to_string(),
+                    _ => {
+                        panic!("expected a string as the first token in the attribute argument")
                     }
+                };
 
-                    if ticker.trim().is_empty() {
-                        panic!("ticker field can't be empty");
+                let ticker = clean_string(first_literal);
+
+                let _ = match iter.next() {
+                    Some(proc_macro2::TokenTree::Punct(punct)) => punct,
+                    _ => panic!("expected a punctuation token after the first literal"),
+                };
+
+                let mut ty = proc_macro2::TokenStream::new();
+
+                for token in &mut iter {
+                    match token {
+                        proc_macro2::TokenTree::Punct(punct) => {
+                            ty.extend(quote! { #punct });
+                        }
+                        proc_macro2::TokenTree::Ident(ident) => {
+                            ty.extend(quote! { #ident });
+                        }
+                        _ => break,
                     }
-
-                    (ticker, ty)
                 }
-                syn::Meta::NameValue(_) => panic!("arguments can not be name value"),
-            };
 
-            let esdt_attribute = EsdtAttribute { ticker, ty };
+                if ticker.trim().is_empty() {
+                    panic!("ticker field can't be empty");
+                }
 
-            return Some(esdt_attribute);
-        }
-    
+                (ticker, ty)
+            }
+            syn::Meta::NameValue(_) => panic!("arguments can not be name value"),
+        };
+
+        let esdt_attribute = EsdtAttribute { ticker, ty };
+
+        return Some(esdt_attribute);
+    }
 
     None
 }

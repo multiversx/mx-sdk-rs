@@ -641,8 +641,7 @@ impl BlockchainStateWrapper {
         }
 
         let sc = (sc_wrapper.obj_builder)();
-        self
-            .world
+        self.world
             .get_mut_debugger_backend()
             .vm_runner
             .perform_sc_call_lambda_and_check(

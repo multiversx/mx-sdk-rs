@@ -29,9 +29,8 @@ fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> T
     if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR)
         && event.topics.len() >= 2
     {
-        let error_message = String::from_utf8(base64_decode(&event.topics[1])).expect(
-            "Failed to decode base64-encoded error message from transaction event topic",
-        );
+        let error_message = String::from_utf8(base64_decode(&event.topics[1]))
+            .expect("Failed to decode base64-encoded error message from transaction event topic");
         return TxResponseStatus::new(return_code, &error_message);
     }
 
