@@ -81,25 +81,29 @@ pub struct OperatorList(pub Vec<OperatorInfo>);
 
 impl OperatorList {
     pub fn create() -> Self {
-        let binary_operators = vec![
-            // Arithmetic binary operators
+        OperatorList(vec![
+            // Direct variants:
             OperatorInfo::new("add", BaseOperator::Add, OperatorGroup::Arithmetic),
             OperatorInfo::new("sub", BaseOperator::Sub, OperatorGroup::Arithmetic),
             OperatorInfo::new("mul", BaseOperator::Mul, OperatorGroup::Arithmetic),
             OperatorInfo::new("div", BaseOperator::Div, OperatorGroup::Arithmetic),
             OperatorInfo::new("rem", BaseOperator::Rem, OperatorGroup::Arithmetic),
-            // Bitwise binary operators
             OperatorInfo::new("bit_and", BaseOperator::BitAnd, OperatorGroup::Bitwise),
             OperatorInfo::new("bit_or", BaseOperator::BitOr, OperatorGroup::Bitwise),
             OperatorInfo::new("bit_xor", BaseOperator::BitXor, OperatorGroup::Bitwise),
-            // Bitwise shift binary operators
             OperatorInfo::new("shr", BaseOperator::Shr, OperatorGroup::Shift),
             OperatorInfo::new("shl", BaseOperator::Shl, OperatorGroup::Shift),
-        ];
-
-        let mut all_operators = Vec::new();
-        all_operators.extend(binary_operators.iter().cloned());
-        all_operators.extend(binary_operators.iter().cloned().map(|op| op.assign()));
-        OperatorList(all_operators)
+            // Assign variants:
+            OperatorInfo::new("add", BaseOperator::Add, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("sub", BaseOperator::Sub, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("mul", BaseOperator::Mul, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("div", BaseOperator::Div, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("rem", BaseOperator::Rem, OperatorGroup::Arithmetic).assign(),
+            OperatorInfo::new("bit_and", BaseOperator::BitAnd, OperatorGroup::Bitwise).assign(),
+            OperatorInfo::new("bit_or", BaseOperator::BitOr, OperatorGroup::Bitwise).assign(),
+            OperatorInfo::new("bit_xor", BaseOperator::BitXor, OperatorGroup::Bitwise).assign(),
+            OperatorInfo::new("shr", BaseOperator::Shr, OperatorGroup::Shift).assign(),
+            OperatorInfo::new("shl", BaseOperator::Shl, OperatorGroup::Shift).assign(),
+        ])
     }
 }
