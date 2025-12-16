@@ -58,10 +58,12 @@
                         "address": "sc:forwarder-queue",
                         "endpoint": "str:forward_queued_calls",
                         "topics": [
-                            "str:forward_queued_call_egld",
+                            "str:forward_queued_call_payment",
                             "1",
                             "sc:vault",
                             "str:accept_funds",
+                            "str:EGLD-000000",
+                            "0",
                             "1000"
                         ],
                         "data": "*"
