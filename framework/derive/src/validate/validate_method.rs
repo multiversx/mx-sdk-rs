@@ -28,7 +28,10 @@ fn validate_method_name(m: &Method) {
             endpoint_name_str != UPGRADE_ENDPOINT_NAME,
             "Cannot declare endpoint with name 'upgrade'. Use #[upgrade] instead."
         );
-        assert!(!reserved::is_reserved(endpoint_name_str.as_str()), "Cannot declare endpoint with name '{endpoint_name_str}', because that name is reserved by the Arwen API.");
+        assert!(
+            !reserved::is_reserved(endpoint_name_str.as_str()),
+            "Cannot declare endpoint with name '{endpoint_name_str}', because that name is reserved by the Arwen API."
+        );
     }
 }
 
@@ -74,9 +77,17 @@ fn validate_payment_args(m: &Method) {
         m.name
     );
     if !m.is_payable() {
-        assert!(num_payment_amount == 0, "`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name);
+        assert!(
+            num_payment_amount == 0,
+            "`#[payment]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)",
+            m.name
+        );
 
-        assert!(num_payment_token == 0, "`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name);
+        assert!(
+            num_payment_token == 0,
+            "`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)",
+            m.name
+        );
     }
     if let PublicRole::Init(init_metadata) | PublicRole::Upgrade(init_metadata) = &m.public_role {
         assert!(
@@ -92,7 +103,9 @@ pub fn validate_payment_args_not_reference(m: &Method) {
         match &payment_arg.ty {
             syn::Type::Path(_) => {}
             syn::Type::Reference(_) => {
-                panic!("The payment argument is expected to be an owned BigUint, references are not allowed.");
+                panic!(
+                    "The payment argument is expected to be an owned BigUint, references are not allowed."
+                );
             }
             _ => panic!("Unsupported payment argument type"),
         }

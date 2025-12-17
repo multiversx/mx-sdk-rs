@@ -2,8 +2,8 @@ use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    GatewayRequest, GatewayRequestType, GENERATE_BLOCKS_ENDPOINT,
-    GENERATE_BLOCKS_UNTIL_EPOCH_REACHED_ENDPOINT, GENERATE_BLOCKS_UNTIL_TX_PROCESSED_ENDPOINT,
+    GENERATE_BLOCKS_ENDPOINT, GENERATE_BLOCKS_UNTIL_EPOCH_REACHED_ENDPOINT,
+    GENERATE_BLOCKS_UNTIL_TX_PROCESSED_ENDPOINT, GatewayRequest, GatewayRequestType,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

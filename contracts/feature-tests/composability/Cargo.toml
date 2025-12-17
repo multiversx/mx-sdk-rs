@@ -2,7 +2,7 @@
 name = "composability-tests"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dev-dependencies.builtin-func-features]

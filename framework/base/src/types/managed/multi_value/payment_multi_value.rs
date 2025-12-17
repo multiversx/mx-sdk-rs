@@ -1,8 +1,8 @@
 use crate::{
     abi::TypeAbiFrom,
     codec::{
-        multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
-        TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
+        DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecodeMulti,
+        TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput, multi_types::MultiValue3,
     },
     types::{NonZeroBigUint, Ref, TokenId},
 };
@@ -44,7 +44,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for PaymentMultiValue<M> {
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

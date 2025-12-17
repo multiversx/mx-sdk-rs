@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose, Engine as _};
+use base64::{Engine as _, engine::general_purpose};
 
 pub fn base64_decode<T>(to_decode: T) -> Vec<u8>
 where

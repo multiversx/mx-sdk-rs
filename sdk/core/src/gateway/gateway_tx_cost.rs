@@ -1,7 +1,7 @@
 use crate::data::transaction::{ResponseTxCost, Transaction, TxCostResponseData};
 use anyhow::anyhow;
 
-use super::{GatewayRequest, GatewayRequestType, COST_TRANSACTION_ENDPOINT};
+use super::{COST_TRANSACTION_ENDPOINT, GatewayRequest, GatewayRequestType};
 
 /// Verifies the cost of a transaction.
 ///

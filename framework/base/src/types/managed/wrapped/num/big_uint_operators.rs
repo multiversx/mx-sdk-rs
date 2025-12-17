@@ -1,5 +1,5 @@
 use crate::{
-    api::{const_handles, BigIntApiImpl, ManagedTypeApi},
+    api::{BigIntApiImpl, ManagedTypeApi, const_handles},
     types::{BigUint, ManagedType},
 };
 use core::ops::{

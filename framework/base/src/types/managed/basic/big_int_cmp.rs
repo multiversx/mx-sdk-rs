@@ -5,7 +5,7 @@ use crate::{
     types::ManagedType,
 };
 
-use super::{big_num_cmp::bi_cmp_i64, BigInt};
+use super::{BigInt, big_num_cmp::bi_cmp_i64};
 
 impl<M: ManagedTypeApi> PartialEq for BigInt<M> {
     #[inline]

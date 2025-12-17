@@ -7,10 +7,10 @@ use multiversx_sc::{
 };
 
 use crate::{
+    ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
     api::StaticApi,
     scenario::tx_to_step::TxToQueryStep,
     scenario_model::{TxExpect, TxResponse},
-    ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
 pub struct ScenarioEnvQuery<'w> {

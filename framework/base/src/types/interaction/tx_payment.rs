@@ -26,7 +26,7 @@ pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
 pub use tx_payment_not_payable::NotPayable;
 
 use crate::{
-    api::{quick_signal_error, CallTypeApi, ManagedTypeApi},
+    api::{CallTypeApi, ManagedTypeApi, quick_signal_error},
     contract_base::TransferExecuteFailed,
     err_msg,
     types::{BigUint, ManagedAddress, ManagedBuffer, MultiEgldOrEsdtPayment},

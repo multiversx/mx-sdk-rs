@@ -4,14 +4,14 @@ use std::{
     io::{self, Read},
 };
 
-use aes::{cipher::KeyIvInit, Aes128};
+use aes::{Aes128, cipher::KeyIvInit};
 use anyhow::Result;
 use bip39::Mnemonic;
-use ctr::{cipher::StreamCipher, Ctr128BE};
+use ctr::{Ctr128BE, cipher::StreamCipher};
 use hmac::{Hmac, Mac};
 use multiversx_chain_core::{std::Bech32Address, types::Address};
 use pbkdf2::pbkdf2;
-use scrypt::{scrypt, Params};
+use scrypt::{Params, scrypt};
 use serde_json::json;
 use sha2::{Digest, Sha256, Sha512};
 use sha3::Keccak256;
@@ -19,7 +19,7 @@ use zeroize::Zeroize;
 
 use crate::{
     crypto::{
-        private_key::{PrivateKey, PRIVATE_KEY_LENGTH},
+        private_key::{PRIVATE_KEY_LENGTH, PrivateKey},
         public_key::PublicKey,
     },
     data::{keystore::*, transaction::Transaction},

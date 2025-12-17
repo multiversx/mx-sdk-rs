@@ -3,8 +3,8 @@ pub use crate::{
     api::{ErrorApiImpl, ManagedTypeApi, VMApi},
     arrayvec::ArrayVec,
     codec::{
-        multi_types::*, DecodeError, Empty, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
-        TopEncode,
+        DecodeError, Empty, IntoMultiValue, NestedDecode, NestedEncode, TopDecode, TopEncode,
+        multi_types::*,
     },
     contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
     err_msg,
@@ -14,7 +14,7 @@ pub use crate::{
     require, sc_format, sc_panic, sc_print,
     storage::mappers::*,
     typenum::{
-        self, U0, U1, U10, U11, U12, U13, U14, U15, U16, U17, U18, U2, U3, U4, U5, U6, U7, U8, U9,
+        self, U0, U1, U2, U3, U4, U5, U6, U7, U8, U9, U10, U11, U12, U13, U14, U15, U16, U17, U18,
     },
     types::{system_proxy::*, *},
 };

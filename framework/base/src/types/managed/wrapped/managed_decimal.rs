@@ -19,7 +19,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    typenum::{Unsigned, U4, U8},
+    typenum::{U4, U8, Unsigned},
     types::BigUint,
 };
 
@@ -32,8 +32,8 @@ use multiversx_sc_codec::{
 use core::{cmp::Ordering, ops::Deref};
 
 use super::{
-    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     ManagedBufferCachedBuilder, ManagedRef, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref,
+    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
 };
 
 /// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
@@ -157,7 +157,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimal<M, NumDecimals> {
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -183,7 +183,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

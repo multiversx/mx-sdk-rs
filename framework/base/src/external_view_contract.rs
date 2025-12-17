@@ -3,8 +3,8 @@ use alloc::string::ToString;
 use crate::{
     abi::{EndpointAbi, EndpointMutabilityAbi, EndpointTypeAbi, InputAbi, TypeAbi},
     api::{
-        const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApiImpl, StorageWriteApiImpl,
-        VMApi, EXTERNAL_VIEW_TARGET_ADDRESS_KEY,
+        CallValueApiImpl, EXTERNAL_VIEW_TARGET_ADDRESS_KEY, ManagedBufferApiImpl,
+        StorageWriteApiImpl, VMApi, const_handles, use_raw_handle,
     },
     io::load_endpoint_args,
     types::ManagedType,

@@ -1,7 +1,7 @@
 use std::process;
 
 use super::error_message::{deploy_err_message, simulate_gas_deploy_err_message};
-use crate::{network_response, InteractorBase, SimulateGas};
+use crate::{InteractorBase, SimulateGas, network_response};
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     mandos_system::ScenarioRunner,

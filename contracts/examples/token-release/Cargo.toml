@@ -2,7 +2,7 @@
 name = "token-release"
 version = "0.0.1"
 authors = [ "you",]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]

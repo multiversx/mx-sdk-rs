@@ -8,7 +8,7 @@ use multiversx_sc_scenario::scenario_format::interpret_trait::{InterpreterContex
 use multiversx_sc_scenario::scenario_model::Step;
 
 use crate::op_list::BaseOperator;
-use crate::{create_all_endpoints, BigNumOperatorTestEndpoint, OperatorList, ValueType};
+use crate::{BigNumOperatorTestEndpoint, OperatorList, ValueType, create_all_endpoints};
 
 const SC_ADDRESS_EXPR: &str = "sc:basic-features";
 

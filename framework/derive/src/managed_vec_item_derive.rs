@@ -194,7 +194,9 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
 fn single_fields_type(fields: &syn::Fields) -> Option<syn::Type> {
     match fields {
         syn::Fields::Named(_) => {
-            panic!("named fields currently not supported, only single unnamed fields supported, of type Variant(T)")
+            panic!(
+                "named fields currently not supported, only single unnamed fields supported, of type Variant(T)"
+            )
         }
         syn::Fields::Unnamed(fields_unnamed) => {
             assert_eq!(

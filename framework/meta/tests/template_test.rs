@@ -3,7 +3,7 @@ use std::{fs, process::Command};
 use convert_case::{Case, Casing};
 use multiversx_sc_meta::{
     cmd::template::{
-        template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
+        ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion, template_names_from_repo,
     },
     version_history::{self, LAST_TEMPLATE_VERSION},
 };

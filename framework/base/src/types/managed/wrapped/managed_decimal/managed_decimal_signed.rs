@@ -1,15 +1,15 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, HandleConstraints,
-        ManagedBufferApiImpl, ManagedTypeApi,
+        BigFloatApiImpl, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi,
+        const_handles, use_raw_handle,
     },
     err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    typenum::{Unsigned, U4, U8},
+    typenum::{U4, U8, Unsigned},
     types::{
-        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigFloat,
-        BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref, Sign,
+        BigFloat, BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref, Sign,
+        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
 };
 
@@ -21,11 +21,11 @@ use multiversx_sc_codec::{
 
 use core::cmp::Ordering;
 
-use super::{
-    decimals::{ConstDecimals, Decimals, NumDecimals},
-    ManagedDecimal,
-};
 use super::{ManagedBufferCachedBuilder, ManagedRef};
+use super::{
+    ManagedDecimal,
+    decimals::{ConstDecimals, Decimals, NumDecimals},
+};
 
 /// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
 ///
@@ -207,7 +207,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -233,7 +233,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

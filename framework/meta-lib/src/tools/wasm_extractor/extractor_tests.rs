@@ -9,9 +9,9 @@ pub mod tests {
     use wat::Parser;
 
     use crate::tools::{
-        panic_report::PanicReport,
-        wasm_extractor::extractor::{get_view_endpoints, WasmInfo},
         OpcodeVersion,
+        panic_report::PanicReport,
+        wasm_extractor::extractor::{WasmInfo, get_view_endpoints},
     };
 
     const ADDER_WITH_ERR_IN_VIEW: &str = r#"

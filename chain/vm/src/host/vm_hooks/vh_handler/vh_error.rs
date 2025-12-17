@@ -2,7 +2,7 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+    host::vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     types::RawHandle,
 };
 

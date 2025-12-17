@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use super::edwards25519::{sc_mul_add, sc_reduce};
 use crate::crypto::edwards25519::extended_group_element::ExtendedGroupElement;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},

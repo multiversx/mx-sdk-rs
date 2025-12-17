@@ -5,7 +5,7 @@ pub mod custom_merged_token_attributes;
 pub mod merged_token_instances;
 pub mod merged_token_setup;
 
-use merged_token_instances::{MergedTokenInstances, MAX_MERGED_TOKENS};
+use merged_token_instances::{MAX_MERGED_TOKENS, MergedTokenInstances};
 
 use self::custom_merged_token_attributes::MergedTokenAttributesCreator;
 

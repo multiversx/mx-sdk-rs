@@ -2,13 +2,13 @@ use multiversx_sc_codec::DecodeError;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{quick_signal_error, ManagedTypeApi},
+    api::{ManagedTypeApi, quick_signal_error},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     },
     err_msg,
-    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
+    formatter::{FormatByteReceiver, SCDisplay, hex_util::encode_bytes_as_hex},
     types::{BigInt, BigUint, ManagedBuffer, ManagedType, NonZeroError},
 };
 
@@ -74,8 +74,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for NonZeroBigUint<M> {
     type OwnHandle = M::BigIntHandle;
 
     unsafe fn from_handle(handle: M::BigIntHandle) -> Self {
-        NonZeroBigUint {
-            value: BigInt::from_handle(handle),
+        unsafe {
+            NonZeroBigUint {
+                value: BigInt::from_handle(handle),
+            }
         }
     }
 
@@ -84,7 +86,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for NonZeroBigUint<M> {
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.value.forget_into_handle()
+        unsafe { self.value.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::BigIntHandle) -> &Self {

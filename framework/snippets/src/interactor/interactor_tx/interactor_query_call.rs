@@ -1,4 +1,5 @@
 use multiversx_sc_scenario::{
+    ScenarioTxEnvData,
     api::StaticApi,
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
@@ -6,7 +7,6 @@ use multiversx_sc_scenario::{
     },
     scenario::tx_to_step::TxToQueryStep,
     scenario_model::TxResponse,
-    ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 

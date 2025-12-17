@@ -2,10 +2,10 @@ use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::types::{AnnotatedValue, ManagedBuffer, TimestampMillis, TimestampSeconds};
 
 use crate::{
+    ScenarioTxEnvData,
     imports::StaticApi,
     scenario::tx_to_step::{bytes_annotated, u64_annotated},
     scenario_model::{BlockInfo, SetStateStep, U64Value},
-    ScenarioTxEnvData,
 };
 
 use super::{SetStateBuilder, SetStateBuilderItem};

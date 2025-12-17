@@ -3,18 +3,18 @@ use core::convert::TryInto;
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi, ManagedTypeApiImpl, RawHandle,
+        BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
+        RawHandle, const_handles, use_raw_handle,
     },
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
     contract_base::ErrorHelper,
-    formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
+    formatter::{FormatBuffer, FormatByteReceiver, SCDisplay, hex_util::encode_bytes_as_hex},
     types::{
-        heap::BoxedBytes, BigInt, Decimals, LnDecimals, ManagedBuffer, ManagedBufferCachedBuilder,
-        ManagedDecimal, ManagedRef, ManagedType, NonZeroBigUint,
+        BigInt, Decimals, LnDecimals, ManagedBuffer, ManagedBufferCachedBuilder, ManagedDecimal,
+        ManagedRef, ManagedType, NonZeroBigUint, heap::BoxedBytes,
     },
 };
 
@@ -30,8 +30,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     type OwnHandle = M::BigIntHandle;
 
     unsafe fn from_handle(handle: M::BigIntHandle) -> Self {
-        BigUint {
-            value: BigInt::from_handle(handle),
+        unsafe {
+            BigUint {
+                value: BigInt::from_handle(handle),
+            }
         }
     }
 
@@ -40,7 +42,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.value.forget_into_handle()
+        unsafe { self.value.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::BigIntHandle) -> &Self {
@@ -81,8 +83,10 @@ impl<M: ManagedTypeApi> BigUint<M> {
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        BigUint {
-            value: BigInt::new_uninit(),
+        unsafe {
+            BigUint {
+                value: BigInt::new_uninit(),
+            }
         }
     }
 

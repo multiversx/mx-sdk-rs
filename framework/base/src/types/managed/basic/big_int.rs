@@ -3,16 +3,16 @@ use core::{convert::TryInto, marker::PhantomData};
 use crate::{
     abi::{TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
+        RawHandle, StaticVarApiImpl, const_handles, use_raw_handle,
     },
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
-    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
+    formatter::{FormatByteReceiver, SCDisplay, hex_util::encode_bytes_as_hex},
     types::{
-        heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedRef, ManagedType, Sign,
+        BigUint, ManagedBuffer, ManagedOption, ManagedRef, ManagedType, Sign, heap::BoxedBytes,
     },
 };
 
@@ -83,8 +83,11 @@ impl<M: ManagedTypeApi> BigInt<M> {
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        let new_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        BigInt::from_handle(new_handle)
+        unsafe {
+            let new_handle: M::BigIntHandle =
+                use_raw_handle(M::static_var_api_impl().next_handle());
+            BigInt::from_handle(new_handle)
+        }
     }
 
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)

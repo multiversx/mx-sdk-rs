@@ -3,8 +3,8 @@ mod adder_proxy;
 use multiversx_sc_scenario::imports::*;
 
 use multisig::{
-    multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
-    user_role::UserRole, Multisig,
+    Multisig, multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
+    user_role::UserRole,
 };
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");

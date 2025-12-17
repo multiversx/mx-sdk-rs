@@ -2,7 +2,7 @@
 name = "kitty-genetic-alg"
 version = "0.0.0"
 authors = [ "dorin-iancu <dorin.iancu@multiversx.com>",]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]

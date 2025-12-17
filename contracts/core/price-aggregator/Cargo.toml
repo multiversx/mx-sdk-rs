@@ -13,7 +13,7 @@ documentation = "https://docs.multiversx.com/"
 description = "MultiversX Price aggregator Smart Contract"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
-edition = "2021"
+edition = "2024"
 
 [lib]
 path = "src/lib.rs"
