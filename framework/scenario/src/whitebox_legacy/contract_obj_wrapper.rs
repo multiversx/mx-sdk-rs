@@ -641,8 +641,7 @@ impl BlockchainStateWrapper {
         }
 
         let sc = (sc_wrapper.obj_builder)();
-        let tx_result = self
-            .world
+        self.world
             .get_mut_debugger_backend()
             .vm_runner
             .perform_sc_call_lambda_and_check(
@@ -651,9 +650,7 @@ impl BlockchainStateWrapper {
                     tx_fn(sc);
                 })
                 .panic_message(false),
-            );
-
-        tx_result
+            )
     }
 
     /// Creates a temporary DebugApi context to run lambda function.

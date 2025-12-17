@@ -97,7 +97,7 @@ impl ManagedTypeContainer {
         let mut num_bytes_copied = 0;
         let data = self.mb_get(source_handle);
         assert!(
-            data.len().is_multiple_of(4),
+            data.len() % 4 == 0,
             "malformed ManagedVec<ManagedBuffer> data"
         );
         for chunk in data.chunks(4) {
@@ -134,7 +134,7 @@ impl ManagedTypeContainer {
         let mut num_bytes_copied = 0;
         let data = self.mb_get(source_handle);
         assert!(
-            data.len().is_multiple_of(16),
+            data.len() % 16 == 0,
             "malformed ManagedVec<EsdtTokenPayment> data"
         );
         for chunk in data.chunks(16) {

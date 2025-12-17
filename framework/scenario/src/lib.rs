@@ -1,4 +1,7 @@
-#![allow(clippy::type_complexity)]
+// TODO: remove once minimum version is 1.87+
+#![allow(unknown_lints)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::manual_is_multiple_of)]
 
 pub mod api;
 pub mod display_util;
