@@ -39,7 +39,7 @@ pub enum InteractCliCommand {
     GetDeadline,
     #[command(
         name = "activation-timestamp",
-        about = "Block timestamp of the block where the contract got activated. If not specified in the constructor it is the the deploy block timestamp."
+        about = "Block timestamp of the block where the contract got activated. If not specified in the constructor it is the deploy block timestamp."
     )]
     GetActivationTimestamp,
     #[command(name = "max-funds", about = "Optional funding cap.")]
