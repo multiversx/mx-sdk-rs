@@ -26,6 +26,7 @@ jobs:
 
       - name: Prerequisites
         run: |
+          sudo apt-get update
           sudo apt install pkg-config libfreetype6-dev libfontconfig1-dev
 
       - name: Run plotter tests
