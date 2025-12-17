@@ -37,8 +37,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for EgldOrEsdtTokenIdentifier<M> {
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        EgldOrEsdtTokenIdentifier {
-            token_id: TokenId::from_handle(handle),
+        unsafe {
+            EgldOrEsdtTokenIdentifier {
+                token_id: TokenId::from_handle(handle),
+            }
         }
     }
 
@@ -47,7 +49,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for EgldOrEsdtTokenIdentifier<M> {
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.token_id.forget_into_handle()
+        unsafe { self.token_id.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {

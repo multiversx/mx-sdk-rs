@@ -2,8 +2,8 @@ use core::{convert::Infallible, marker::PhantomData};
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, HandleConstraints,
-        ManagedBufferApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl,
+        ErrorApi, ErrorApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi,
+        StorageReadApi, StorageReadApiImpl, const_handles, use_raw_handle,
     },
     codec::*,
     err_msg,

@@ -3,7 +3,7 @@ use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{quick_signal_error, HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
+    api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl, quick_signal_error},
     codec::*,
     contract_base::BlockchainWrapper,
     err_msg,
@@ -27,8 +27,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenId<M> {
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        TokenId {
-            buffer: ManagedBuffer::from_handle(handle),
+        unsafe {
+            TokenId {
+                buffer: ManagedBuffer::from_handle(handle),
+            }
         }
     }
 
@@ -37,7 +39,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenId<M> {
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.buffer.forget_into_handle()
+        unsafe { self.buffer.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {

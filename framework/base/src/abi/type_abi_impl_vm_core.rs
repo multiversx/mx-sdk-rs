@@ -3,7 +3,7 @@ use super::*;
 use alloc::vec::Vec;
 use multiversx_chain_core::types::{
     Address, BLSKey, BLSSignature, BoxedBytes, CodeMetadata, DurationMillis, DurationSeconds,
-    EsdtLocalRole, EsdtTokenType, TimestampMillis, TimestampSeconds, H256,
+    EsdtLocalRole, EsdtTokenType, H256, TimestampMillis, TimestampSeconds,
 };
 
 impl TypeAbiFrom<Self> for H256 {}

@@ -2,7 +2,7 @@
 name = "nft-subscription-meta"
 version = "0.0.0"
 authors = ["Thouny <thouny@tuta.io>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dependencies.nft-subscription]

@@ -2,8 +2,9 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        ManagedBufferApiImpl, ManagedTypeApi, RawHandle, StaticVarApiFlags, StaticVarApiImpl,
+        CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
+        ManagedTypeApi, RawHandle, StaticVarApiFlags, StaticVarApiImpl, const_handles,
+        use_raw_handle,
     },
     contract_base::BlockchainWrapper,
     err_msg,

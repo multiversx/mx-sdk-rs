@@ -42,9 +42,11 @@ where
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        ManagedVec {
-            buffer: ManagedBuffer::from_handle(handle),
-            _phantom: PhantomData,
+        unsafe {
+            ManagedVec {
+                buffer: ManagedBuffer::from_handle(handle),
+                _phantom: PhantomData,
+            }
         }
     }
 
@@ -53,7 +55,7 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.buffer.forget_into_handle()
+        unsafe { self.buffer.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -92,9 +94,11 @@ where
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        ManagedVec {
-            buffer: ManagedBuffer::new_uninit(),
-            _phantom: PhantomData,
+        unsafe {
+            ManagedVec {
+                buffer: ManagedBuffer::new_uninit(),
+                _phantom: PhantomData,
+            }
         }
     }
 }

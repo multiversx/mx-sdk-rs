@@ -7,7 +7,7 @@
 [package]
 name = "large-storage-wasm"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]

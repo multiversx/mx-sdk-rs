@@ -4,18 +4,17 @@ use multiversx_sc_codec::IntoMultiValue;
 use crate::{
     api::ManagedTypeApi,
     types::{
-        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigUint,
-        Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem, ManagedVecItemPayloadBuffer,
-        NonZeroBigUint, PaymentMultiValue, PaymentRefs, Ref, TokenId,
+        BigUint, Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem,
+        ManagedVecItemPayloadBuffer, NonZeroBigUint, PaymentMultiValue, PaymentRefs, Ref, TokenId,
+        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
 };
 
 use crate as multiversx_sc; // needed by the codec and TypeAbi generated code
 use crate::{
     codec::{
-        self,
+        self, NestedDecode, TopDecode,
         derive::{NestedEncode, TopEncode},
-        NestedDecode, TopDecode,
     },
     derive::type_abi,
 };
@@ -182,7 +181,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for Payment<M> {
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

@@ -2,8 +2,8 @@ use unwrap_infallible::UnwrapInfallible;
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, ErrorApi, ManagedBufferApiImpl, ManagedTypeApi,
-        StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
+        ErrorApi, ManagedBufferApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl,
+        StorageWriteApi, StorageWriteApiImpl, const_handles, use_raw_handle,
     },
     codec::*,
     contract_base::ExitCodecErrorHandler,

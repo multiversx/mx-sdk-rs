@@ -2,7 +2,7 @@
 name = "forwarder-queue"
 version = "0.0.0"
 authors = ["Costin Carabas <costin.carabas@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]

@@ -1,7 +1,7 @@
 [package]
 name = "multiversx-chain-vm-wasmer-prod"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 description = "MultiversX VM adapter for the Wasmer Production executor"
