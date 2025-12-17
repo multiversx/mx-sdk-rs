@@ -138,8 +138,9 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .context
             .get_block_config()
             .current_block_info
-            .block_timestamp_ms as i64
-            / 1000)
+            .block_timestamp_millis
+            .to_seconds()
+            .as_u64_seconds() as i64)
     }
 
     pub fn get_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
@@ -149,7 +150,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .context
             .get_block_config()
             .current_block_info
-            .block_timestamp_ms as i64)
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
     }
 
     pub fn get_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
@@ -203,8 +205,9 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .context
             .get_block_config()
             .previous_block_info
-            .block_timestamp_ms as i64
-            / 1000)
+            .block_timestamp_millis
+            .to_seconds()
+            .as_u64_seconds() as i64)
     }
 
     pub fn get_prev_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
@@ -214,7 +217,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .context
             .get_block_config()
             .previous_block_info
-            .block_timestamp_ms as i64)
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
     }
 
     pub fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
@@ -254,7 +258,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .context
             .get_block_config()
             .epoch_start_block_info
-            .block_timestamp_ms as i64)
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
     }
 
     pub fn get_epoch_start_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
