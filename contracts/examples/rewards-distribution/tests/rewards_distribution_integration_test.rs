@@ -6,7 +6,7 @@ use multiversx_sc_scenario::imports::*;
 use std::iter::zip;
 
 use rewards_distribution::{
-    rewards_distribution_proxy, RewardsDistribution, DIVISION_SAFETY_CONSTANT,
+    DIVISION_SAFETY_CONSTANT, RewardsDistribution, rewards_distribution_proxy,
 };
 
 const ALICE_ADDRESS: TestAddress = TestAddress::new("alice");

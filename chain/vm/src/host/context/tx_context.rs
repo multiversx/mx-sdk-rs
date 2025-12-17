@@ -1,7 +1,7 @@
 use crate::{
     blockchain::{
-        state::{AccountData, AccountEsdt, BlockchainState},
         VMConfigRef,
+        state::{AccountData, AccountEsdt, BlockchainState},
     },
     host::runtime::RuntimeRef,
     types::{VMAddress, VMCodeMetadata},

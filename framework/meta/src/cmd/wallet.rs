@@ -40,7 +40,9 @@ fn convert(convert_args: &WalletConvertArgs) {
                 write_resulted_pem(&hrp, &public_key_str, &private_key_str, outfile);
             }
             None => {
-                println!("Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.");
+                println!(
+                    "Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
+                );
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
                 (private_key_str, public_key_str) = Wallet::get_wallet_keys_mnemonic(mnemonic_str);
                 write_resulted_pem(&hrp, &public_key_str, &private_key_str, outfile);

@@ -1153,12 +1153,14 @@ impl ContractInteract {
 
     pub async fn send_esdt_direct_multi_transfer(&mut self) {
         let to = Address::zero();
-        let token_payments = MultiValueVec::from(vec![Payment::new(
-            TokenId::new(ManagedBuffer::from(&b""[..])),
-            0u64,
-            NonZeroBigUint::<StaticApi>::try_from(10u128).unwrap(),
-        )
-        .into_multi_value()]);
+        let token_payments = MultiValueVec::from(vec![
+            Payment::new(
+                TokenId::new(ManagedBuffer::from(&b""[..])),
+                0u64,
+                NonZeroBigUint::<StaticApi>::try_from(10u128).unwrap(),
+            )
+            .into_multi_value(),
+        ]);
 
         let response = self
             .interactor
@@ -1758,7 +1760,9 @@ impl ContractInteract {
         num_decimals: usize,
         token_type: EsdtTokenType,
     ) {
-        println!("Registering and setting all roles for token {token_ticker:?} of type {token_type:?}...");
+        println!(
+            "Registering and setting all roles for token {token_ticker:?} of type {token_type:?}..."
+        );
 
         let result = self
             .interactor
@@ -1969,7 +1973,9 @@ impl ContractInteract {
         token_type: EsdtTokenType,
         num_decimals: usize,
     ) -> String {
-        println!("Registering dynamic token {token_ticker:?} of type {token_type:?} from the test wallet...");
+        println!(
+            "Registering dynamic token {token_ticker:?} of type {token_type:?} from the test wallet..."
+        );
 
         let token_id = self
             .interactor

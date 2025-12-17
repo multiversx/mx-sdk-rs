@@ -1,8 +1,8 @@
 use alloc::boxed::Box;
 
 use crate::{
-    codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecode,
-    NestedDecodeInput, TopDecodeInput,
+    DecodeErrorHandler, DefaultErrorHandler, NestedDecode, NestedDecodeInput, TopDecodeInput,
+    codec_err::DecodeError,
 };
 
 /// Trait that allows zero-copy read of values from an underlying API in big endian format.

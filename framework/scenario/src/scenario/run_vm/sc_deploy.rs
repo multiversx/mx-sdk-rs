@@ -11,7 +11,7 @@ use multiversx_chain_vm::{
     types::VMCodeMetadata,
 };
 
-use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
+use super::{ScenarioVMRunner, check_tx_output, tx_input_util::generate_tx_hash};
 
 impl ScenarioVMRunner {
     /// Adds a SC deploy step, as specified in the `step` argument, then executes it.

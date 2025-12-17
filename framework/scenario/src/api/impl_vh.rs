@@ -13,6 +13,6 @@ pub use single_tx_api::SingleTxApi;
 pub use static_api::StaticApi;
 pub use vh_single_tx_api::{SingleTxApiData, SingleTxApiVMHooksContext};
 pub use vh_static_api::StaticApiVMHooksContext;
-pub(crate) use vm_hooks_api::i32_to_bool;
 pub use vm_hooks_api::VMHooksApi;
+pub(crate) use vm_hooks_api::i32_to_bool;
 pub use vm_hooks_backend::VMHooksApiBackend;

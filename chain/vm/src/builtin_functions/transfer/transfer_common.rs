@@ -6,7 +6,7 @@ use crate::{
     },
     host::execution,
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::{top_decode_u64, VMAddress},
+    types::{VMAddress, top_decode_u64},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;

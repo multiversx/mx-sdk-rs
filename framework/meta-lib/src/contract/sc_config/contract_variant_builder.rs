@@ -13,11 +13,11 @@ use crate::{
 };
 
 use super::{
+    ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
+    ProxyConfigSerde, ScConfig, ScConfigSerde,
     contract_variant_settings::{parse_allocator, parse_stack_size},
     proxy_config::ProxyConfig,
     sc_config_model::SC_CONFIG_FILE_NAMES,
-    ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
-    ProxyConfigSerde, ScConfig, ScConfigSerde,
 };
 
 /// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.

@@ -1,4 +1,4 @@
-use proc_macro::{token_stream::IntoIter, TokenStream};
+use proc_macro::{TokenStream, token_stream::IntoIter};
 use radix_trie::Trie;
 use std::iter::once;
 

@@ -2,8 +2,8 @@ use std::collections::{BTreeSet, HashMap};
 
 use super::{
     stg_parse::parse_section,
-    stg_section::{concat_sections, split_sections, Section},
-    stg_write::{contains_world_fn, format_section, WriteTestFn},
+    stg_section::{Section, concat_sections, split_sections},
+    stg_write::{WriteTestFn, contains_world_fn, format_section},
 };
 
 pub fn process_code(

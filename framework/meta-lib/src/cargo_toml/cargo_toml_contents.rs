@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use toml::{value::Table, Value};
+use toml::{Value, value::Table};
 
 use crate::contract::sc_config::ContractVariantProfile;
 

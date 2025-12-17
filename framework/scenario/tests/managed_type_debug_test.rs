@@ -46,7 +46,10 @@ fn test_managed_byte_array() {
 fn test_managed_address() {
     let addr = hex!("000000000000000000010000000000000000000000000000000000000002ffff");
     let s = format!("{:?}", ManagedAddress::<StaticApi>::from(&addr));
-    assert_eq!("ManagedAddress { handle: -200, hex-value: \"000000000000000000010000000000000000000000000000000000000002ffff\" }", s);
+    assert_eq!(
+        "ManagedAddress { handle: -200, hex-value: \"000000000000000000010000000000000000000000000000000000000002ffff\" }",
+        s
+    );
 }
 
 #[test]
@@ -68,7 +71,10 @@ fn test_managed_vec_format_biguint() {
     mv.push(BigUint::from(1u32));
     mv.push(BigUint::from(2u32));
     let s = format!("{:?}", &mv);
-    assert_eq!("[BigUint { handle: -201, hex-value-be: \"01\" }, BigUint { handle: -202, hex-value-be: \"02\" }]", s);
+    assert_eq!(
+        "[BigUint { handle: -201, hex-value-be: \"01\" }, BigUint { handle: -202, hex-value-be: \"02\" }]",
+        s
+    );
 }
 
 #[test]

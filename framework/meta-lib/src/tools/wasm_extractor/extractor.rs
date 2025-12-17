@@ -13,8 +13,8 @@ use wasmparser::{
 use crate::{ei::EIVersion, tools::CodeReport};
 
 use super::{
-    opcode_whitelist::is_opcode_whitelisted, report::WasmReport, CallGraph, EndpointInfo,
-    FunctionInfo, OpcodeVersion,
+    CallGraph, EndpointInfo, FunctionInfo, OpcodeVersion, opcode_whitelist::is_opcode_whitelisted,
+    report::WasmReport,
 };
 
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";

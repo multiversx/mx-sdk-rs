@@ -11,7 +11,7 @@ use crate::{
     },
 };
 
-use super::{tx_interpret_util::interpret_egld_value, TxESDT};
+use super::{TxESDT, tx_interpret_util::interpret_egld_value};
 
 pub const DEFAULT_GAS_EXPR: &str = "5,000,000";
 
@@ -160,7 +160,8 @@ impl TxCall {
     fn process_payments(&self) -> (String, Vec<BytesValue>, bool) {
         assert!(
             self.egld_value.is_zero() || self.esdt_value.is_empty(),
-            "Cannot have both EGLD and ESDT fields filled. To transfer EGLD and ESDT in the same transaction, represent EGLD as EGLD-000000 in the ESDTs.");
+            "Cannot have both EGLD and ESDT fields filled. To transfer EGLD and ESDT in the same transaction, represent EGLD as EGLD-000000 in the ESDTs."
+        );
 
         match self.esdt_value.len() {
             0 => (self.function.clone(), self.arguments.clone(), false),

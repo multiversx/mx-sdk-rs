@@ -1,6 +1,7 @@
 use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use crate::{
+    ScenarioWorld,
     api::DebugApi,
     executor::debug::{
         ContractContainer, ContractDebugInstance, ContractDebugStack, ContractDebugWhiteboxLambda,
@@ -8,20 +9,19 @@ use crate::{
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
-        types::{heap::Address, EsdtLocalRole},
+        types::{EsdtLocalRole, heap::Address},
     },
     scenario_model::{Account, BytesValue, ScCallStep, SetStateStep},
     testing_framework::raw_converter::bytes_to_hex,
-    ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 use multiversx_chain_vm::host::context::{TxFunctionName, TxResult};
-use multiversx_sc::types::{BigUint, TimestampMillis, TimestampSeconds, H256};
+use multiversx_sc::types::{BigUint, H256, TimestampMillis, TimestampSeconds};
 use num_traits::Zero;
 
 use super::{
-    tx_mandos::{ScCallMandos, TxExpectMandos},
     AddressFactory, MandosGenerator, ScQueryMandos,
+    tx_mandos::{ScCallMandos, TxExpectMandos},
 };
 
 pub use multiversx_chain_vm::host::context::TxTokenTransfer;

@@ -5,9 +5,9 @@ use crate::{
     },
     host::{
         context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+        vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     },
-    types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
+    types::{RawHandle, VMAddress, VMCodeMetadata, top_encode_big_uint, top_encode_u64},
     vm_err_msg,
 };
 use multiversx_chain_core::types::ReturnCode;

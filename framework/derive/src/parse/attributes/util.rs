@@ -26,7 +26,10 @@ pub(super) fn get_attribute_with_one_type_arg(
                     panic!("attribute needs 2 arguments: ticker (string) and type")
                 }
                 syn::Meta::List(list) => {
-                    assert!(!list.tokens.is_empty(), "argument can not be empty. attribute needs 2 arguments: ticker (string) and type");
+                    assert!(
+                        !list.tokens.is_empty(),
+                        "argument can not be empty. attribute needs 2 arguments: ticker (string) and type"
+                    );
 
                     let mut iter = list.tokens.into_iter();
 

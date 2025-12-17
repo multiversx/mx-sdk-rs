@@ -1,6 +1,6 @@
 use crate::{
-    num_conv::{top_encode_number, top_encode_number_buffer},
     EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStaticCast,
+    num_conv::{top_encode_number, top_encode_number_buffer},
 };
 use alloc::vec::Vec;
 

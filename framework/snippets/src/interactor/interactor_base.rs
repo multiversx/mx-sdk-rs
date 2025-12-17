@@ -14,7 +14,7 @@ use std::{
     time::Duration,
 };
 
-use crate::{account_tool::retrieve_account_as_scenario_set_state, Sender};
+use crate::{Sender, account_tool::retrieve_account_as_scenario_set_state};
 
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 pub const INTERACTOR_SET_STATE_PATH: &str = "set_state.json";

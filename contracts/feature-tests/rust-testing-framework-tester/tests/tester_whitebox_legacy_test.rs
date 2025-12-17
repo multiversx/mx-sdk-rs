@@ -1034,10 +1034,9 @@ fn execute_on_dest_context_query_test() {
     wrapper
         .execute_query(&sc_wrapper, |sc| {
             let expected_result = managed_biguint!(5);
-            let actual_result =
-                sc.call_other_contract_execute_on_dest(managed_address!(&other_sc_wrapper
-                    .address_ref()
-                    .clone()));
+            let actual_result = sc.call_other_contract_execute_on_dest(managed_address!(
+                &other_sc_wrapper.address_ref().clone()
+            ));
 
             assert_eq!(expected_result, actual_result);
         })

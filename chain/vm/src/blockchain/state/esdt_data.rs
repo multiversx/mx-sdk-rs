@@ -3,7 +3,7 @@ use num_traits::Zero;
 
 use crate::{display_util::key_hex, types::VMTokenType};
 use std::{
-    collections::{hash_map::Iter, HashMap},
+    collections::{HashMap, hash_map::Iter},
     fmt::{self, Write},
 };
 
