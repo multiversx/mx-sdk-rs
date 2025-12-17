@@ -1,5 +1,3 @@
-extern crate rand;
-
 use core::str;
 use std::{
     fs::{self},
@@ -8,12 +6,11 @@ use std::{
 
 use aes::{Aes128, cipher::KeyIvInit};
 use anyhow::Result;
-use bip39::{Language, Mnemonic};
+use bip39::Mnemonic;
 use ctr::{Ctr128BE, cipher::StreamCipher};
 use hmac::{Hmac, Mac};
 use multiversx_chain_core::{std::Bech32Address, types::Address};
 use pbkdf2::pbkdf2;
-use rand::RngCore;
 use scrypt::{Params, scrypt};
 use serde_json::json;
 use sha2::{Digest, Sha256, Sha512};
@@ -29,8 +26,6 @@ use crate::{
     utils::*,
 };
 
-use uuid::Uuid;
-
 const EGLD_COIN_TYPE: u32 = 508;
 const HARDENED: u32 = 0x80000000;
 const CIPHER_ALGORITHM_AES_128_CTR: &str = "aes-128-ctr";
@@ -45,11 +40,6 @@ pub struct Wallet {
 }
 
 impl Wallet {
-    // GenerateMnemonic will generate a new mnemonic value using the bip39 implementation
-    pub fn generate_mnemonic() -> Mnemonic {
-        Mnemonic::generate_in(Language::English, 24).unwrap()
-    }
-
     fn seed_from_mnemonic(mnemonic: Mnemonic, password: &str) -> [u8; 64] {
         let mut salt = String::with_capacity(8 + password.len());
         salt.push_str("mnemonic");
@@ -299,6 +289,10 @@ impl Wallet {
         decrypted
     }
 
+    /// Not available in dapps, since it uses randomness to generate the keystore.
+    ///
+    /// Only available in the sc-meta standalone CLI.
+    #[cfg(feature = "wallet-full")]
     pub fn encrypt_keystore(
         data: &[u8],
         hrp: &str,
@@ -306,13 +300,15 @@ impl Wallet {
         public_key: &str,
         password: &str,
     ) -> String {
+        use rand::RngCore;
+
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P, KDF_DKLEN).unwrap();
         let mut rand_salt: [u8; 32] = [0u8; 32];
-        rand::thread_rng().fill_bytes(&mut rand_salt);
+        rand::rng().fill_bytes(&mut rand_salt);
         let salt_hex = hex::encode(rand_salt);
 
         let mut rand_iv: [u8; 16] = [0u8; 16];
-        rand::thread_rng().fill_bytes(&mut rand_iv);
+        rand::rng().fill_bytes(&mut rand_iv);
         let iv_hex = hex::encode(rand_iv);
 
         let mut derived_key = vec![0u8; 32];
@@ -347,7 +343,7 @@ impl Wallet {
                 },
                 mac: hex::encode(mac),
             },
-            id: Uuid::new_v4().to_string(),
+            id: uuid::Uuid::new_v4().to_string(),
             version: KEYSTORE_VERSION,
             kind: "secretKey".to_string(),
             address: public_key.to_string(),
