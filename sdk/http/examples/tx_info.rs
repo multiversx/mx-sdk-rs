@@ -1,9 +1,9 @@
-use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
+use multiversx_sdk_http::*;
 
 #[tokio::main]
 async fn main() {
-    let tx_hash = "fd21782ddb9e2217a3239e849e39d1d2c8fa74142a73f2dda3adb3028c0514e9";
-    let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
+    let tx_hash = "dd810b6daeed111d5425cdbb47e2b125694580012c8682d155117d2967a549cb";
+    let blockchain = GatewayHttpProxy::new(MAINNET_GATEWAY.to_string());
 
     let status = blockchain.get_transaction_status(tx_hash).await;
     assert!(status.is_ok());
