@@ -62,7 +62,7 @@ And crate group being released requires all crate groups downstream to be releas
 - Switched to Rust edition 2024, minimum compiler version becomes 1.85.
 - New payments API:
 	- New objects: `TokenId` and `Payment`. Besides them having shorter names, they treat EGLD the same as all other ESDTs, making their handling easier. EGLD is always serialized as `EGLD-000000`.
-	- `Payment` amounts are `NonZeroBigUint`, a new refinement type that prevents the value from being zero. This prevents at compile time zero-value payments from occuring.
+	- `Payment` amounts are `NonZeroBigUint`, a new refinement type that prevents the value from being zero. This prevents at compile time zero-value payments from occurring.
 	- New `call_value` methods:
 		- `all()` - all payments, EGLD and ESDT;
     	- `single()` - expect precisely one payment, and retrieve that payment. Crash for no payments, or for multiple payments;
