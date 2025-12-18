@@ -1,9 +1,9 @@
 use std::{error::Error, fmt::Display};
 
 use crate::{
+    SingleValue, StructField, StructValue,
     format::HumanReadableValue,
     multiversx_sc::abi::{TypeContents, TypeDescription},
-    SingleValue, StructField, StructValue,
 };
 use multiversx_sc_scenario::{
     imports::Bech32Address,
