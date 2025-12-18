@@ -13,7 +13,7 @@ documentation = "https://docs.multiversx.com/"
 description = "MultiversX Price aggregator Smart Contract"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
-edition = "2021"
+edition = "2024"
 
 [lib]
 path = "src/lib.rs"
@@ -31,5 +31,5 @@ version = "0.63.3"
 path = "../../../framework/scenario"
 
 [dev-dependencies]
-rand = { version = "0.8.5" }
-getrandom = { version = "0.2", features = ["js"] }
+rand = { version = "0.9" }
+getrandom = { version = "0.3" }

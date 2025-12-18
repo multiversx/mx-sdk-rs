@@ -3,7 +3,7 @@ use storage_get_from_address::storage_get_len_from_address;
 use crate::{
     api::StorageMapperApi,
     codec::TopDecode,
-    storage::{storage_get_from_address, StorageKey},
+    storage::{StorageKey, storage_get_from_address},
     storage_get, storage_get_len,
     types::{ManagedAddress, ManagedRef, ManagedType},
 };

@@ -48,19 +48,14 @@ pub trait CallPromisesDirectModule {
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
         extra_gas_for_callback: u64,
-        token_payment_args: MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        token_payment_args: MultiValueEncoded<PaymentMultiValue>,
     ) {
-        let mut token_payments_vec = ManagedVec::new();
-        for token_payment_arg in token_payment_args {
-            token_payments_vec.push(token_payment_arg.into_inner());
-        }
-
         let gas_limit = (self.blockchain().get_gas_left() - extra_gas_for_callback) * 9 / 10;
 
         self.tx()
             .to(&to)
             .raw_call(endpoint_name)
-            .payment(EgldOrMultiEsdtPayment::MultiEsdt(token_payments_vec))
+            .payment(MultiTransfer(token_payment_args.convert_payment()))
             .gas(gas_limit)
             .callback(self.callbacks().the_one_callback(2001, 2002u32.into()))
             .gas_for_callback(extra_gas_for_callback)

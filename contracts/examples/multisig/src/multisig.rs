@@ -1,4 +1,6 @@
 #![no_std]
+// TODO: remove once minimum version is 1.87+
+#![allow(clippy::collapsible_if)]
 
 pub mod action;
 pub mod multisig_events;

@@ -8,7 +8,7 @@ pub trait BackTransfersModule {
     fn forward_sync_retrieve_funds_bt_multi(
         &self,
         to: ManagedAddress,
-        transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        transfers: MultiValueEncoded<PaymentMultiValue>,
     ) {
         let bt_multi = self
             .tx()
@@ -22,7 +22,7 @@ pub trait BackTransfersModule {
         if egld_sum > 0u32 {
             self.back_transfers_egld_event(egld_sum);
         }
-        self.back_transfers_multi_event(bt_multi.into_multi_value());
+        self.back_transfers_multi_event(bt_multi.into_payment_vec().into_multi_value());
 
         let mut balances_after = MultiValueEncoded::new();
         for transfer in transfers {
@@ -30,9 +30,11 @@ pub trait BackTransfersModule {
             let balance = self
                 .blockchain()
                 .get_sc_balance(&payment.token_identifier, payment.token_nonce);
-            let balance_info =
-                EgldOrEsdtTokenPayment::new(payment.token_identifier, payment.token_nonce, balance);
-            balances_after.push(EgldOrEsdtTokenPaymentMultiValue::from(balance_info));
+            balances_after.push(MultiValue3::from((
+                payment.token_identifier,
+                payment.token_nonce,
+                balance,
+            )));
         }
         self.balances_after(balances_after);
     }
@@ -42,7 +44,7 @@ pub trait BackTransfersModule {
     fn forward_sync_retrieve_funds_bt_multi_twice(
         &self,
         to: ManagedAddress,
-        transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        transfers: MultiValueEncoded<PaymentMultiValue>,
     ) {
         self.tx()
             .to(&to)
@@ -58,7 +60,7 @@ pub trait BackTransfersModule {
             .returns(ReturnsBackTransfers)
             .sync_call();
 
-        self.back_transfers_multi_event(back_transfers.into_multi_value());
+        self.back_transfers_multi_event(back_transfers.into_payment_vec().into_multi_value());
     }
 
     /// Highlights the behavior when calling back transfers **with** reset.
@@ -66,7 +68,7 @@ pub trait BackTransfersModule {
     fn forward_sync_retrieve_funds_bt_multi_twice_reset(
         &self,
         to: ManagedAddress,
-        transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        transfers: MultiValueEncoded<PaymentMultiValue>,
     ) {
         self.tx()
             .to(&to)
@@ -82,13 +84,13 @@ pub trait BackTransfersModule {
             .returns(ReturnsBackTransfersReset)
             .sync_call();
 
-        self.back_transfers_multi_event(back_transfers.into_multi_value());
+        self.back_transfers_multi_event(back_transfers.into_payment_vec().into_multi_value());
     }
 
     #[event("back_transfers_multi_event")]
     fn back_transfers_multi_event(
         &self,
-        #[indexed] back_transfers: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        #[indexed] back_transfers: MultiValueEncoded<PaymentMultiValue>,
     );
 
     #[event("back_transfers_egld_event")]
@@ -97,6 +99,6 @@ pub trait BackTransfersModule {
     #[event]
     fn balances_after(
         &self,
-        #[indexed] balances_after: MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
+        #[indexed] balances_after: MultiValueEncoded<MultiValue3<TokenId, u64, BigUint>>,
     );
 }

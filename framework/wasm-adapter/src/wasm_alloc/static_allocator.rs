@@ -38,18 +38,20 @@ unsafe impl<const SIZE: usize> Sync for StaticAllocator<SIZE> {}
 
 unsafe impl<const SIZE: usize> GlobalAlloc for StaticAllocator<SIZE> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        let size = layout.size();
-        let align = layout.align();
+        unsafe {
+            let size = layout.size();
+            let align = layout.align();
 
-        // Find the next address that has the right alignment.
-        let idx = (*self.head.get()).next_multiple_of(align);
-        // Bump the head to the next free byte
-        *self.head.get() = idx + size;
-        let arena: &mut [u8; SIZE] = &mut (*self.arena.get());
-        // If we ran out of arena space, kill execution with mem_alloc_error.
-        match arena.get_mut(idx) {
-            Some(item) => item as *mut u8,
-            _ => super::mem_alloc_error(),
+            // Find the next address that has the right alignment.
+            let idx = (*self.head.get()).next_multiple_of(align);
+            // Bump the head to the next free byte
+            *self.head.get() = idx + size;
+            let arena: &mut [u8; SIZE] = &mut (*self.arena.get());
+            // If we ran out of arena space, kill execution with mem_alloc_error.
+            match arena.get_mut(idx) {
+                Some(item) => item as *mut u8,
+                _ => super::mem_alloc_error(),
+            }
         }
     }
 

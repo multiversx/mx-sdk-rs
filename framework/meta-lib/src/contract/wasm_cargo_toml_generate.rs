@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use super::wasm_cargo_toml_data::WasmCargoTomlData;
-use crate::cargo_toml::{change_from_base_to_adapter_path, CargoTomlContents, DependencyRawValue};
+use crate::cargo_toml::{CargoTomlContents, DependencyRawValue, change_from_base_to_adapter_path};
 
 const WASM_ADAPTER: &str = "multiversx-sc-wasm-adapter";
 const CDYLIB_CRATE_TYPE: &str = "cdylib";

@@ -2,7 +2,7 @@ use multiversx_sc::types::{Tx, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpe
 
 use crate::{imports::TxESDT, scenario_model::TransferStep};
 
-use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
+use super::{StepWrapper, TxToStep, address_annotated, gas_annotated};
 
 impl<Env, From, To, Payment, Gas> TxToStep<Env, ()> for Tx<Env, From, To, Payment, Gas, (), ()>
 where

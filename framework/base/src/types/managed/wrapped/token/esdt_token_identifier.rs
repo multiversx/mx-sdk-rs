@@ -2,11 +2,11 @@ use alloc::string::ToString;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ErrorApi, ErrorApiImpl, HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl},
+    api::{ErrorApi, HandleConstraints, ManagedTypeApi},
     codec::*,
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
-    types::{ManagedBuffer, ManagedRef, ManagedType},
+    types::{ManagedBuffer, ManagedRef, ManagedType, TokenId},
 };
 
 use super::EgldOrEsdtTokenIdentifier;
@@ -20,7 +20,7 @@ pub type TokenIdentifier<M> = EsdtTokenIdentifier<M>;
 #[repr(transparent)]
 #[derive(Clone)]
 pub struct EsdtTokenIdentifier<M: ErrorApi + ManagedTypeApi> {
-    pub(crate) data: EgldOrEsdtTokenIdentifier<M>,
+    pub(crate) token_id: TokenId<M>,
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for EsdtTokenIdentifier<M> {
@@ -28,17 +28,19 @@ impl<M: ManagedTypeApi> ManagedType<M> for EsdtTokenIdentifier<M> {
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        EsdtTokenIdentifier {
-            data: EgldOrEsdtTokenIdentifier::from_handle(handle),
+        unsafe {
+            EsdtTokenIdentifier {
+                token_id: TokenId::from_handle(handle),
+            }
         }
     }
 
     fn get_handle(&self) -> M::ManagedBufferHandle {
-        self.data.get_handle()
+        self.token_id.get_handle()
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.data.forget_into_handle()
+        unsafe { self.token_id.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -57,7 +59,9 @@ impl<M: ManagedTypeApi> EsdtTokenIdentifier<M> {
     ///
     /// Calling it for the EGLD token might lead to unexpected bugs.
     pub unsafe fn esdt_unchecked(data: EgldOrEsdtTokenIdentifier<M>) -> Self {
-        Self { data }
+        Self {
+            token_id: data.into(),
+        }
     }
 
     pub fn try_new(data: EgldOrEsdtTokenIdentifier<M>) -> Option<Self> {
@@ -75,30 +79,25 @@ impl<M: ManagedTypeApi> EsdtTokenIdentifier<M> {
 
     #[inline]
     pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
-        self.data.into_managed_buffer()
+        self.token_id.into_managed_buffer()
     }
 
     #[inline]
     pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
-        self.data.as_managed_buffer()
+        self.token_id.as_managed_buffer()
     }
 
     #[inline]
     pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
-        self.data.to_boxed_bytes()
+        self.token_id.to_boxed_bytes()
     }
 
     pub fn is_valid_esdt_identifier(&self) -> bool {
-        M::managed_type_impl().validate_token_identifier(self.data.buffer.handle.clone())
+        self.token_id.is_valid()
     }
 
     pub fn ticker(&self) -> ManagedBuffer<M> {
-        let buffer = self.as_managed_buffer();
-        let token_id_len = buffer.len();
-        let ticker_len = M::managed_type_impl().get_token_ticker_len(token_id_len);
-        buffer.copy_slice(0, ticker_len).unwrap_or_else(|| {
-            M::error_api_impl().signal_error(err_msg::BAD_TOKEN_TICKER_FORMAT.as_bytes())
-        })
+        self.token_id.ticker()
     }
 }
 
@@ -106,6 +105,13 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for EsdtTokenIdentifier<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
         EgldOrEsdtTokenIdentifier::from(buffer).unwrap_esdt()
+    }
+}
+
+impl<M: ManagedTypeApi> From<TokenId<M>> for EsdtTokenIdentifier<M> {
+    #[inline]
+    fn from(token_id: TokenId<M>) -> Self {
+        EgldOrEsdtTokenIdentifier::from(token_id).unwrap_esdt()
     }
 }
 
@@ -130,7 +136,7 @@ impl<M: ManagedTypeApi> From<&crate::types::heap::String> for EsdtTokenIdentifie
 impl<M: ManagedTypeApi> PartialEq for EsdtTokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.data == other.data
+        self.token_id == other.token_id
     }
 }
 
@@ -154,7 +160,7 @@ impl<M: ManagedTypeApi> NestedEncode for EsdtTokenIdentifier<M> {
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.data.dep_encode_or_handle_err(dest, h)
+        self.token_id.dep_encode_or_handle_err(dest, h)
     }
 }
 
@@ -165,7 +171,7 @@ impl<M: ManagedTypeApi> TopEncode for EsdtTokenIdentifier<M> {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.data.top_encode_or_handle_err(output, h)
+        self.token_id.top_encode_or_handle_err(output, h)
     }
 }
 

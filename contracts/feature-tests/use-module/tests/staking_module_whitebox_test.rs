@@ -213,9 +213,10 @@ fn test_staking_module() {
                     .len(),
                 1
             );
-            assert!(sc
-                .slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
-                .contains(&ALICE_ADDRESS.to_managed_address()));
+            assert!(
+                sc.slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
+                    .contains(&ALICE_ADDRESS.to_managed_address())
+            );
         });
 
     // bob vote to slash alice
@@ -277,18 +278,22 @@ fn test_staking_module() {
                     .len(),
                 3
             );
-            assert!(sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .contains(&BOB_ADDRESS.to_managed_address()));
-            assert!(sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .contains(&CAROL_ADDRESS.to_managed_address()));
-            assert!(sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .contains(&PAUL_ADDRESS.to_managed_address()));
-            assert!(!sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .contains(&SALLY_ADDRESS.to_managed_address()));
+            assert!(
+                sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .contains(&BOB_ADDRESS.to_managed_address())
+            );
+            assert!(
+                sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .contains(&CAROL_ADDRESS.to_managed_address())
+            );
+            assert!(
+                sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .contains(&PAUL_ADDRESS.to_managed_address())
+            );
+            assert!(
+                !sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .contains(&SALLY_ADDRESS.to_managed_address())
+            );
         });
 
     // slash alice
@@ -304,9 +309,10 @@ fn test_staking_module() {
                 BigUint::from(REQUIRED_STAKE_AMOUNT - SLASH_AMOUNT)
             );
             assert_eq!(sc.total_slashed_amount().get(), BigUint::from(SLASH_AMOUNT));
-            assert!(sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .is_empty());
+            assert!(
+                sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .is_empty()
+            );
         });
 
     // alice try vote after slash
@@ -336,21 +342,24 @@ fn test_staking_module() {
         .to(USE_MODULE_ADDRESS)
         .whitebox(use_module::contract_obj, |sc| {
             // check alice's votes before slash
-            assert!(sc
-                .slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
-                .contains(&ALICE_ADDRESS.to_managed_address()));
+            assert!(
+                sc.slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
+                    .contains(&ALICE_ADDRESS.to_managed_address())
+            );
 
             sc.remove_board_member(&ALICE_ADDRESS.to_managed_address());
 
             assert_eq!(sc.user_whitelist().len(), 4);
-            assert!(!sc
-                .user_whitelist()
-                .contains(&ALICE_ADDRESS.to_managed_address()));
+            assert!(
+                !sc.user_whitelist()
+                    .contains(&ALICE_ADDRESS.to_managed_address())
+            );
 
             // alice's vote gets removed
-            assert!(sc
-                .slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
-                .is_empty());
+            assert!(
+                sc.slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
+                    .is_empty()
+            );
         });
 
     // alice unstake ok

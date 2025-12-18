@@ -2,7 +2,7 @@
 name = "fractional-nfts"
 version = "0.0.0"
 authors = ["Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]

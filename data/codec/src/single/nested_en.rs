@@ -1,4 +1,4 @@
-use crate::{codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncodeOutput};
+use crate::{DefaultErrorHandler, EncodeErrorHandler, NestedEncodeOutput, codec_err::EncodeError};
 use alloc::vec::Vec;
 
 /// Trait that allows zero-copy write of value-references to slices in LE format.

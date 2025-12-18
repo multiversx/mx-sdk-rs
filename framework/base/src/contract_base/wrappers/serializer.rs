@@ -9,7 +9,7 @@ use crate::codec::{
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedType, heap::BoxedBytes},
 };
 
 #[derive(Default)]

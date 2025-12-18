@@ -24,7 +24,7 @@
         },
         {
             "step": "scCall",
-            "id": "1",
+            "id": "forward_payment_callback-ESDT",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -84,19 +84,6 @@
                         "data": [
                             ""
                         ]
-                    },
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:transfer_callback",
-                        "topics": [
-                            "str:retrieve_funds_callback",
-                            "str:EGLD",
-                            "",
-                            ""
-                        ],
-                        "data": [
-                            ""
-                        ]
                     }
                 ],
                 "gas": "*",
@@ -105,7 +92,7 @@
         },
         {
             "step": "scCall",
-            "id": "2",
+            "id": "forward_payment_gas_for_callback-ESDT",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
@@ -165,19 +152,6 @@
                         "data": [
                             ""
                         ]
-                    },
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:transfer_callback",
-                        "topics": [
-                            "str:retrieve_funds_callback",
-                            "str:EGLD",
-                            "",
-                            ""
-                        ],
-                        "data": [
-                            ""
-                        ]
                     }
                 ],
                 "gas": "*",
@@ -207,23 +181,6 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "str:callback_data.len": "2",
-                        "str:callback_data.item|u32:1": [
-                            "nested:str:transfer_callback",
-                            "nested:str:EGLD",
-                            "u64:0",
-                            "u32:0",
-                            "u32:0"
-                        ],
-                        "str:callback_data.item|u32:2": [
-                            "nested:str:transfer_callback",
-                            "nested:str:EGLD",
-                            "u64:0",
-                            "u32:0",
-                            "u32:0"
-                        ]
-                    },
                     "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }

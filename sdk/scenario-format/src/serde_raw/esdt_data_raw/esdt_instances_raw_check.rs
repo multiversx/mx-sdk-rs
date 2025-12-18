@@ -1,8 +1,8 @@
 use super::*;
 use serde::{
+    Deserialize, Serialize,
     de::{self, Deserializer, SeqAccess, Visitor},
     ser::{SerializeMap, SerializeSeq, Serializer},
-    Deserialize, Serialize,
 };
 use std::fmt;
 

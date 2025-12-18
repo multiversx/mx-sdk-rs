@@ -1,9 +1,9 @@
 use colored::Colorize;
-use rustc_version::{version_meta, Version};
+use rustc_version::{Version, version_meta};
 use std::{
     env,
     ffi::OsString,
-    process::{exit, Command},
+    process::{Command, exit},
 };
 
 use crate::{

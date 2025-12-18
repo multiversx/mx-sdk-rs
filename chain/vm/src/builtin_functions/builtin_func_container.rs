@@ -1,4 +1,5 @@
 use super::{
+    BuiltinFunctionEsdtTransferInfo,
     builtin_func_trait::BuiltinFunction,
     esdt_nft::{
         ESDTLocalBurn, ESDTLocalMint, ESDTNftAddQuantity, ESDTNftAddUri, ESDTNftBurn,
@@ -6,7 +7,6 @@ use super::{
     },
     general::{ChangeOwner, ClaimDeveloperRewards, DeleteUsername, SetUsername, UpgradeContract},
     transfer::{ESDTMultiTransfer, ESDTNftTransfer, ESDTTransfer},
-    BuiltinFunctionEsdtTransferInfo,
 };
 
 use crate::{

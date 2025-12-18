@@ -22,7 +22,7 @@ mod tx_to;
 pub use annotated::*;
 pub use back_transfers::{BackTransfers, BackTransfersLegacy};
 pub use callback_closure::{
-    new_callback_call, CallbackClosure, CallbackClosureForDeser, CallbackClosureMatcher,
+    CallbackClosure, CallbackClosureForDeser, CallbackClosureMatcher, new_callback_call,
 };
 pub use callback_selector_result::CallbackSelectorResult;
 pub use expr::*;

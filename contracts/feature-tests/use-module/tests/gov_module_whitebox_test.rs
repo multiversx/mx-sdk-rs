@@ -1,6 +1,6 @@
 use multiversx_sc_modules::governance::{
-    governance_configurable::GovernanceConfigurablePropertiesModule, governance_proposal::VoteType,
-    GovernanceModule,
+    GovernanceModule, governance_configurable::GovernanceConfigurablePropertiesModule,
+    governance_proposal::VoteType,
 };
 use multiversx_sc_scenario::imports::*;
 
@@ -21,12 +21,6 @@ const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
 const SECOND_USER_ADDRESS: TestAddress = TestAddress::new("second-user");
 const THIRD_USER_ADDRESS: TestAddress = TestAddress::new("third-user");
-
-pub struct Payment {
-    pub token: Vec<u8>,
-    pub nonce: u64,
-    pub amount: u64,
-}
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

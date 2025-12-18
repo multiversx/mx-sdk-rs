@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use super::{template_metadata::TemplateMetadata, ContractCreatorTarget};
+use super::{ContractCreatorTarget, template_metadata::TemplateMetadata};
 use crate::{
     cmd::upgrade::upgrade_common::{rename_files, replace_in_files},
     version::FrameworkVersion,

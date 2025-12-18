@@ -5,7 +5,7 @@ use multiversx_sc::types::{
 
 use crate::scenario_model::{ScCallStep, TxESDT, TxExpect, TxResponse};
 
-use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
+use super::{StepWrapper, TxToStep, address_annotated, gas_annotated};
 
 impl<Env, From, To, Payment, Gas, RH> TxToStep<Env, RH>
     for Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
