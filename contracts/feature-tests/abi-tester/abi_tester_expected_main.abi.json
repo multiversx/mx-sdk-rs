@@ -16,7 +16,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.63.3"
+            "version": "0.64.0"
         }
     },
     "docs": [

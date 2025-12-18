@@ -6,7 +6,7 @@ edition = "2024"
 publish = false
 
 [dependencies.multiversx-sc]
-version = "0.63.3"
+version = "0.64.0"
 path = "../../../framework/base"
 features = [ "alloc" ]
 
@@ -17,7 +17,7 @@ path = "../../examples/adder"
 path = "../../feature-tests/basic-features"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.3"
+version = "0.64.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies]
