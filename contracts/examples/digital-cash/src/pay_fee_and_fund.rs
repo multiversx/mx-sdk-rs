@@ -13,7 +13,8 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         let mut fee_token = payments.get(0).clone();
         let provided_fee_token = payments.get(0).clone();
 
-        fee_token.amount = self.get_fee_for_token(&fee_token.token_identifier);
+        fee_token.amount =
+            NonZeroBigUint::new(self.get_fee_for_token(&fee_token.token_identifier)).unwrap();
         let nr_of_payments = payments.len();
 
         let fee_with_first_token = fee_token.amount.clone() * nr_of_payments as u32;
@@ -60,7 +61,11 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         let payment = self.call_value().all().clone_value();
 
         let num_tokens = payment.len();
-        self.check_fees_cover_number_of_tokens(num_tokens, fee_amount, deposited_fee_token.amount);
+        self.check_fees_cover_number_of_tokens(
+            num_tokens,
+            &fee_amount,
+            &deposited_fee_token.amount.as_big_uint(),
+        );
 
         self.make_fund(payment, address, valability);
     }

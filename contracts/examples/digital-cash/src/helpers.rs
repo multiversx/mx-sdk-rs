@@ -16,10 +16,10 @@ pub trait HelpersModule: storage::StorageModule {
         self.blockchain().get_block_round() + valability_rounds
     }
 
-    fn get_fee_for_token(&self, token: &TokenId) -> NonZeroBigUint {
+    fn get_fee_for_token(&self, token: &TokenId) -> BigUint {
         require!(
             self.whitelisted_fee_tokens().contains(token),
-            "invalid fee toke provided"
+            "invalid fee token provided"
         );
         let fee_token = self.fee(token);
         fee_token.get()
@@ -41,12 +41,12 @@ pub trait HelpersModule: storage::StorageModule {
     fn check_fees_cover_number_of_tokens(
         &self,
         num_tokens: usize,
-        fee: NonZeroBigUint,
-        paid_fee: NonZeroBigUint,
+        fee: &BigUint,
+        paid_fee: &BigUint,
     ) {
         require!(num_tokens > 0, "amount must be greater than 0");
         require!(
-            fee * num_tokens as u64 <= paid_fee,
+            fee * num_tokens as u64 <= *paid_fee,
             CANNOT_DEPOSIT_FUNDS_ERR_MSG
         );
     }

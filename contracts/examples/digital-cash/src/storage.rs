@@ -9,10 +9,10 @@ pub trait StorageModule {
     fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<Self::Api>>;
 
     #[storage_mapper("fee")]
-    fn fee(&self, token: &TokenId) -> SingleValueMapper<NonZeroBigUint>;
+    fn fee(&self, token: &TokenId) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("collectedFees")]
-    fn collected_fees(&self, token: &TokenId) -> SingleValueMapper<NonZeroBigUint>;
+    fn collected_fees(&self, token: &TokenId) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("whitelistedFeeTokens")]
     fn whitelisted_fee_tokens(&self) -> UnorderedSetMapper<TokenId>;

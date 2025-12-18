@@ -21,13 +21,13 @@ pub trait DigitalCash:
     + storage::StorageModule
 {
     #[init]
-    fn init(&self, fee: NonZeroBigUint, token: TokenId) {
+    fn init(&self, fee: BigUint, token: TokenId) {
         self.whitelist_fee_token(fee, token);
     }
 
     #[endpoint(whitelistFeeToken)]
     #[only_owner]
-    fn whitelist_fee_token(&self, fee: NonZeroBigUint, token: TokenId) {
+    fn whitelist_fee_token(&self, fee: BigUint, token: TokenId) {
         require!(self.fee(&token).is_empty(), "Token already whitelisted");
         self.fee(&token).set(fee);
         self.whitelisted_fee_tokens().insert(token.clone());
@@ -54,7 +54,7 @@ pub trait DigitalCash:
             if fee == 0 {
                 continue;
             }
-            let collected_fee = Payment::new(token, 0, fee);
+            let collected_fee = Payment::new(token, 0, NonZeroBigUint::new(fee).unwrap());
 
             collected_esdt_fees.push(collected_fee);
         }

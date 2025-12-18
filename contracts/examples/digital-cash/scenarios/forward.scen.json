@@ -23,7 +23,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:cannot deposit funds without covering the fee cost first",
+                "message": "str:incorrect number of transfers",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

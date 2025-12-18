@@ -96,7 +96,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         new_deposit.update(|fwd_deposit| {
             require!(fwd_deposit.funds.is_empty(), "key already used");
             require!(
-                &fee * num_tokens as u64 <= fwd_deposit.fees.value.amount,
+                &fee * num_tokens as u64 <= *fwd_deposit.fees.value.amount.as_big_uint(),
                 "cannot deposit funds without covering the fee cost first"
             );
 
