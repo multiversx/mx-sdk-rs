@@ -50,7 +50,7 @@ checksum = "e712f64ec3850b98572bffac52e2c6f282b29fe6c5fa6d42334b30be438d95c1"
 
 [[package]]
 name = "multiversx-chain-core"
-version = "0.20.0"
+version = "0.21.0"
 dependencies = [
  "bitflags",
  "multiversx-sc-codec",
@@ -58,7 +58,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.63.3"
+version = "0.64.0"
 dependencies = [
  "bitflags",
  "generic-array",
@@ -72,7 +72,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.23.1"
+version = "0.24.0"
 dependencies = [
  "arrayvec",
  "bitflags",
@@ -82,7 +82,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.23.1"
+version = "0.24.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -92,7 +92,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.63.3"
+version = "0.64.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -103,7 +103,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.63.3"
+version = "0.64.0"
 dependencies = [
  "multiversx-sc",
 ]
