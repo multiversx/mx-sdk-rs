@@ -62,19 +62,11 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn echo_call_value_legacy(
+    pub fn payable_legacy_egld_esdt(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, ManagedVec<Env::Api, EsdtTokenPayment<Env::Api>>>> {
         self.wrapped_tx
-            .raw_call("echo_call_value_legacy")
-            .original_result()
-    }
-
-    pub fn echo_call_value(
-        self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedVec<Env::Api, Payment<Env::Api>>> {
-        self.wrapped_tx
-            .raw_call("echo_call_value")
+            .raw_call("payable_legacy_egld_esdt")
             .original_result()
     }
 
@@ -91,6 +83,14 @@ where
     ) -> TxTypedCall<Env, From, To, (), Gas, ManagedVec<Env::Api, EgldOrEsdtTokenPayment<Env::Api>>> {
         self.wrapped_tx
             .raw_call("payable_all_transfers")
+            .original_result()
+    }
+
+    pub fn payable_all(
+        self,
+    ) -> TxTypedCall<Env, From, To, (), Gas, ManagedVec<Env::Api, Payment<Env::Api>>> {
+        self.wrapped_tx
+            .raw_call("payable_all")
             .original_result()
     }
 

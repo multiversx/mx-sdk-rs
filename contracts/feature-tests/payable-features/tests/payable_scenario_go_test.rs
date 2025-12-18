@@ -5,13 +5,18 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn call_value_check_go() {
-    world().run("scenarios/call-value-check.scen.json");
+fn payable_all_1_go() {
+    world().run("scenarios/payable_all_1.scen.json");
 }
 
 #[test]
-fn call_value_check_multi_egld_go() {
-    world().run("scenarios/call-value-check-multi-egld.scen.json");
+fn payable_all_2_go() {
+    world().run("scenarios/payable_all_2.scen.json");
+}
+
+#[test]
+fn payable_all_3_go() {
+    world().run("scenarios/payable_all_3.scen.json");
 }
 
 #[test]
@@ -87,6 +92,11 @@ fn payable_egld_4_go() {
 #[test]
 fn payable_egld_5_go() {
     world().run("scenarios/payable_egld_5.scen.json");
+}
+
+#[test]
+fn payable_legacy_egld_esdt_go() {
+    world().run("scenarios/payable_legacy_egld_esdt.scen.json");
 }
 
 #[test]
