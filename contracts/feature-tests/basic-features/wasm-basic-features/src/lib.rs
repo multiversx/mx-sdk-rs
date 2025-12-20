@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          580
+// Endpoints:                          655
 // Async Callback:                       1
-// Total number of exported functions: 582
+// Total number of exported functions: 657
 
 #![no_std]
 
@@ -252,6 +252,81 @@ multiversx_sc_wasm_adapter::endpoints! {
         shl_big_uint_ref_usize => shl_big_uint_ref_usize
         shr_assign_big_uint_usize => shr_assign_big_uint_usize
         shl_assign_big_uint_usize => shl_assign_big_uint_usize
+        eq_big_int_big_int => eq_big_int_big_int
+        eq_big_int_i32 => eq_big_int_i32
+        eq_big_int_i64 => eq_big_int_i64
+        eq_big_int_u32 => eq_big_int_u32
+        eq_big_int_u64 => eq_big_int_u64
+        eq_big_uint_big_uint => eq_big_uint_big_uint
+        eq_big_uint_i32 => eq_big_uint_i32
+        eq_big_uint_i64 => eq_big_uint_i64
+        eq_big_uint_u32 => eq_big_uint_u32
+        eq_big_uint_u64 => eq_big_uint_u64
+        eq_non_zero_big_uint_non_zero_big_uint => eq_non_zero_big_uint_non_zero_big_uint
+        eq_non_zero_big_uint_i32 => eq_non_zero_big_uint_i32
+        eq_non_zero_big_uint_i64 => eq_non_zero_big_uint_i64
+        eq_non_zero_big_uint_u32 => eq_non_zero_big_uint_u32
+        eq_non_zero_big_uint_u64 => eq_non_zero_big_uint_u64
+        gt_big_int_big_int => gt_big_int_big_int
+        gt_big_int_i32 => gt_big_int_i32
+        gt_big_int_i64 => gt_big_int_i64
+        gt_big_int_u32 => gt_big_int_u32
+        gt_big_int_u64 => gt_big_int_u64
+        gt_big_uint_big_uint => gt_big_uint_big_uint
+        gt_big_uint_i32 => gt_big_uint_i32
+        gt_big_uint_i64 => gt_big_uint_i64
+        gt_big_uint_u32 => gt_big_uint_u32
+        gt_big_uint_u64 => gt_big_uint_u64
+        gt_non_zero_big_uint_non_zero_big_uint => gt_non_zero_big_uint_non_zero_big_uint
+        gt_non_zero_big_uint_i32 => gt_non_zero_big_uint_i32
+        gt_non_zero_big_uint_i64 => gt_non_zero_big_uint_i64
+        gt_non_zero_big_uint_u32 => gt_non_zero_big_uint_u32
+        gt_non_zero_big_uint_u64 => gt_non_zero_big_uint_u64
+        ge_big_int_big_int => ge_big_int_big_int
+        ge_big_int_i32 => ge_big_int_i32
+        ge_big_int_i64 => ge_big_int_i64
+        ge_big_int_u32 => ge_big_int_u32
+        ge_big_int_u64 => ge_big_int_u64
+        ge_big_uint_big_uint => ge_big_uint_big_uint
+        ge_big_uint_i32 => ge_big_uint_i32
+        ge_big_uint_i64 => ge_big_uint_i64
+        ge_big_uint_u32 => ge_big_uint_u32
+        ge_big_uint_u64 => ge_big_uint_u64
+        ge_non_zero_big_uint_non_zero_big_uint => ge_non_zero_big_uint_non_zero_big_uint
+        ge_non_zero_big_uint_i32 => ge_non_zero_big_uint_i32
+        ge_non_zero_big_uint_i64 => ge_non_zero_big_uint_i64
+        ge_non_zero_big_uint_u32 => ge_non_zero_big_uint_u32
+        ge_non_zero_big_uint_u64 => ge_non_zero_big_uint_u64
+        lt_big_int_big_int => lt_big_int_big_int
+        lt_big_int_i32 => lt_big_int_i32
+        lt_big_int_i64 => lt_big_int_i64
+        lt_big_int_u32 => lt_big_int_u32
+        lt_big_int_u64 => lt_big_int_u64
+        lt_big_uint_big_uint => lt_big_uint_big_uint
+        lt_big_uint_i32 => lt_big_uint_i32
+        lt_big_uint_i64 => lt_big_uint_i64
+        lt_big_uint_u32 => lt_big_uint_u32
+        lt_big_uint_u64 => lt_big_uint_u64
+        lt_non_zero_big_uint_non_zero_big_uint => lt_non_zero_big_uint_non_zero_big_uint
+        lt_non_zero_big_uint_i32 => lt_non_zero_big_uint_i32
+        lt_non_zero_big_uint_i64 => lt_non_zero_big_uint_i64
+        lt_non_zero_big_uint_u32 => lt_non_zero_big_uint_u32
+        lt_non_zero_big_uint_u64 => lt_non_zero_big_uint_u64
+        le_big_int_big_int => le_big_int_big_int
+        le_big_int_i32 => le_big_int_i32
+        le_big_int_i64 => le_big_int_i64
+        le_big_int_u32 => le_big_int_u32
+        le_big_int_u64 => le_big_int_u64
+        le_big_uint_big_uint => le_big_uint_big_uint
+        le_big_uint_i32 => le_big_uint_i32
+        le_big_uint_i64 => le_big_uint_i64
+        le_big_uint_u32 => le_big_uint_u32
+        le_big_uint_u64 => le_big_uint_u64
+        le_non_zero_big_uint_non_zero_big_uint => le_non_zero_big_uint_non_zero_big_uint
+        le_non_zero_big_uint_i32 => le_non_zero_big_uint_i32
+        le_non_zero_big_uint_i64 => le_non_zero_big_uint_i64
+        le_non_zero_big_uint_u32 => le_non_zero_big_uint_u32
+        le_non_zero_big_uint_u64 => le_non_zero_big_uint_u64
         get_block_timestamp => get_block_timestamp
         get_block_nonce => get_block_nonce
         get_block_round => get_block_round

@@ -84,7 +84,7 @@ impl<M: ManagedTypeApi> TokenId<M> {
         unsafe { core::mem::transmute(self) }
     }
 
-    /// Converts to a specialized ESDT token idnetifier.
+    /// Converts to a specialized ESDT token identifier.
     ///
     /// ## Safety
     ///
@@ -94,7 +94,7 @@ impl<M: ManagedTypeApi> TokenId<M> {
         unsafe { core::mem::transmute(self) }
     }
 
-    /// Converts to a specialized ESDT token idnetifier.
+    /// Converts to a specialized ESDT token identifier.
     ///
     /// ## Safety
     ///

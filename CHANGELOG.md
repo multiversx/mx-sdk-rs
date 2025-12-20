@@ -57,6 +57,26 @@ And crate group being released requires all crate groups downstream to be releas
 
 ## Version history
 
+
+### [sc 0.64.0, codec 0.24.0, chain 0.21.0, sdk 0.14.0, scenario-format 0.25.0] - 2025-12-18
+- Switched to Rust edition 2024, minimum compiler version becomes 1.85.
+- New payments API:
+	- New objects: `TokenId` and `Payment`. Besides them having shorter names, they treat EGLD the same as all other ESDTs, making their handling easier. EGLD is always serialized as `EGLD-000000`.
+	- `Payment` amounts are `NonZeroBigUint`, a new refinement type that prevents the value from being zero. This prevents at compile time zero-value payments from occurring.
+	- New `call_value` methods:
+		- `all()` - all payments, EGLD and ESDT;
+    	- `single()` - expect precisely one payment, and retrieve that payment. Crash for no payments, or for multiple payments;
+    	- `single_optional()` - expect either zero or one payments. Returns an Option of Payment reference;
+    	- `array()` - expect the exact number of payments and retrieve them as array.
+	- `MultiTransfer` marker for forcing an ESDT multi transfer, even when not strictly necessary.
+	- Deprecated `EgldOrMultiEsdtPayment` and `call_value``any_payment`.
+	- `ManagedVecRef` renamed to `Ref`.
+	- Token identifier display fix.
+- `NonZeroBigUint` implementation, including all common operators. Additional fixes for the `BigInt` and `BigUint` operators.
+- SDK - fixed an issue with parsing transactions with large values in SCRs.
+- Upgraded all dependencies.
+
+
 ### [sc 0.63.3] - 2025-12-08
 - Reverted the EsdtTokenIdentifier ABI name to TokenIdentifier.
 
