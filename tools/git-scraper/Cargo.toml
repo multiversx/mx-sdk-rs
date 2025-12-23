@@ -1,0 +1,20 @@
+[[bin]]
+name = "git-scraper"
+path = "src/scraper.rs"
+
+[package]
+name = "git-scraper"
+version = "0.0.0"
+publish = false
+edition = "2024"
+authors = ["you"]
+
+[dependencies]
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dotenv = "0.15"
+toml = "0.9"
+
+[workspace]
+members = ["."]

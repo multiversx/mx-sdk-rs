@@ -25,7 +25,7 @@ pub trait CryptoZombies:
         self.dna_digits().set(16u8);
         self.attack_victory_probability().set(70u8);
         self.level_up_fee().set(BigUint::from(1000000000000000u64));
-        self.cooldown_time().set(86400u64);
+        self.cooldown_time().set(DurationMillis::new(86400u64));
     }
 
     #[upgrade]

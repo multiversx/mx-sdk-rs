@@ -2,8 +2,8 @@ use core::fmt::Debug;
 use multiversx_sc::{
     api::ManagedTypeApi,
     types::{
-        BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef, ManagedType,
-        TokenIdentifier,
+        BigInt, BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer, ManagedByteArray,
+        ManagedRef, ManagedType,
     },
 };
 use multiversx_sc_scenario::api::StaticApi;
@@ -30,7 +30,7 @@ fn test_managed_ref() {
     test_managed_ref_for_type(ManagedBuffer::<StaticApi>::from(&b"3abc"[..]));
     test_managed_ref_for_type(ManagedByteArray::<StaticApi, 4>::from(&[4u8; 4]));
     test_managed_ref_for_type(ManagedAddress::<StaticApi>::from(&[5u8; 32]));
-    test_managed_ref_for_type(TokenIdentifier::<StaticApi>::from(&b"TOKEN-000006"[..]));
+    test_managed_ref_for_type(EsdtTokenIdentifier::<StaticApi>::from(&b"TOKEN-000006"[..]));
 }
 
 #[test]

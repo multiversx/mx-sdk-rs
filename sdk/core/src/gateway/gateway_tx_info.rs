@@ -2,7 +2,7 @@ use crate::data::transaction::{TransactionInfo, TransactionOnNetwork};
 use anyhow::anyhow;
 
 use super::{
-    GatewayRequest, GatewayRequestType, GET_TRANSACTION_INFO_ENDPOINT, WITH_RESULTS_QUERY_PARAM,
+    GET_TRANSACTION_INFO_ENDPOINT, GatewayRequest, GatewayRequestType, WITH_RESULTS_QUERY_PARAM,
 };
 
 /// Retrieves transaction data from the network.

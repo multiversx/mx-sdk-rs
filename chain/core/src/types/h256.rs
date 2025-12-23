@@ -137,6 +137,11 @@ impl H256 {
     pub fn is_zero(&self) -> bool {
         self.as_bytes() == ZERO_32
     }
+
+    #[cfg(feature = "std")]
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.0[..])
+    }
 }
 
 use crate::codec::*;

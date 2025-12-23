@@ -2,7 +2,7 @@
 name = "serde-features"
 version = "0.0.0"
 authors = [ "you",]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
@@ -15,11 +15,11 @@ serde-json-core = { version = "0.6.0", optional = false, default-features = true
 # serde_json = { version = "1.0", optional = false, default-features = false, features = ["alloc", "raw_value"] }
 
 [dependencies.multiversx-sc]
-version = "0.60.0"
+version = "0.64.0"
 path = "../../../framework/base"
 features = ["alloc", "serde-util", "serde"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.60.0"
+version = "0.64.0"
 features = ["wasmer-experimental"]
 path = "../../../framework/scenario"

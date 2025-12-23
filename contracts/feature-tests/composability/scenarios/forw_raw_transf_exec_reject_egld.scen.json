@@ -27,7 +27,7 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "egldValue": "1000",
-                "function": "forward_transf_exec_egld",
+                "function": "forward_transf_exec",
                 "arguments": [
                     "sc:vault",
                     "str:reject_funds"

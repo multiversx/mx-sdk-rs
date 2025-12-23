@@ -56,7 +56,7 @@ pub trait ManagedBufferApiImpl: HandleTypeInfo {
     fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]);
 
     fn mb_eq(&self, handle1: Self::ManagedBufferHandle, handle2: Self::ManagedBufferHandle)
-        -> bool;
+    -> bool;
 
     fn mb_to_hex(
         &self,

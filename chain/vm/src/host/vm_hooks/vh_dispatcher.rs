@@ -1016,7 +1016,14 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         arguments_handle: i32,
         result_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_execute_on_dest_context_with_error_return")
+        self.handler.execute_on_dest_context_fallible(
+            gas as u64,
+            address_handle,
+            value_handle,
+            function_handle,
+            arguments_handle,
+            result_handle,
+        )
     }
 
     fn managed_multi_transfer_esdt_nft_execute(
@@ -2142,7 +2149,9 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         message_handle: i32,
         sig_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_verify_bls")
+        self.handler
+            .verify_bls_managed(key_handle, message_handle, sig_handle)?;
+        Ok(0)
     }
 
     fn verify_ed25519(
@@ -2483,20 +2492,26 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     ) -> Result<i32, VMHooksEarlyExit> {
         panic!("Unavailable: managed_verify_secp256r1")
     }
+
     fn managed_verify_blssignature_share(
         &mut self,
         key_handle: i32,
         message_handle: i32,
         sig_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_verify_blssignature_share")
+        self.handler
+            .verify_bls_signature_share(key_handle, message_handle, sig_handle)?;
+        Ok(0)
     }
+
     fn managed_verify_blsaggregated_signature(
         &mut self,
         key_handle: i32,
         message_handle: i32,
         sig_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        panic!("Unavailable: managed_verify_blsaggregated_signature")
+        self.handler
+            .verify_bls_aggregated_signature(key_handle, message_handle, sig_handle)?;
+        Ok(0)
     }
 }

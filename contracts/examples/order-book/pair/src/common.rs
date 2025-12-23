@@ -16,15 +16,15 @@ pub enum OrderType {
 }
 
 #[derive(ManagedVecItem, Clone)]
-pub struct Payment<M: ManagedTypeApi> {
-    pub token_id: TokenIdentifier<M>,
+pub struct FungiblePayment<M: ManagedTypeApi> {
+    pub token_id: TokenId<M>,
     pub amount: BigUint<M>,
 }
 
 #[derive(ManagedVecItem, Clone)]
 pub struct Transfer<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
-    pub payment: Payment<M>,
+    pub payment: FungiblePayment<M>,
 }
 
 #[type_abi]
@@ -83,7 +83,7 @@ pub trait CommonModule {
     fn new_order(
         &self,
         id: u64,
-        payment: Payment<Self::Api>,
+        payment: FungiblePayment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
     ) -> Order<Self::Api> {
@@ -121,9 +121,9 @@ pub trait CommonModule {
 
     #[view(getFirstTokenId)]
     #[storage_mapper("first_token_id")]
-    fn first_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn first_token_id(&self) -> SingleValueMapper<TokenId>;
 
     #[view(getSecondTokenId)]
     #[storage_mapper("second_token_id")]
-    fn second_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn second_token_id(&self) -> SingleValueMapper<TokenId>;
 }

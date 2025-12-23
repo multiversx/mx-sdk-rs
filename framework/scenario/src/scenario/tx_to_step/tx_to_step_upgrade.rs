@@ -8,7 +8,7 @@ use crate::{
     scenario_model::{TxExpect, TxResponse},
 };
 
-use super::{address_annotated, code_annotated, gas_annotated, StepWrapper, TxToStep};
+use super::{StepWrapper, TxToStep, address_annotated, code_annotated, gas_annotated};
 
 impl<Env, From, To, Gas, RH, CodeValue> TxToStep<Env, RH>
     for Tx<Env, From, To, NotPayable, Gas, UpgradeCall<Env, Code<CodeValue>>, RH>

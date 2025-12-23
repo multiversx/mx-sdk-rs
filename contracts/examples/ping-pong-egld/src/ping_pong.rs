@@ -35,14 +35,14 @@ pub trait PingPong {
     fn init(
         &self,
         ping_amount: &BigUint,
-        duration_in_seconds: u64,
-        opt_activation_timestamp: Option<u64>,
+        duration: DurationMillis,
+        opt_activation_timestamp: Option<TimestampMillis>,
         max_funds: OptionalValue<BigUint>,
     ) {
         self.ping_amount().set(ping_amount);
-        let activation_timestamp =
-            opt_activation_timestamp.unwrap_or_else(|| self.blockchain().get_block_timestamp());
-        let deadline = activation_timestamp + duration_in_seconds;
+        let activation_timestamp = opt_activation_timestamp
+            .unwrap_or_else(|| self.blockchain().get_block_timestamp_millis());
+        let deadline = activation_timestamp + duration;
         self.deadline().set(deadline);
         self.activation_timestamp().set(activation_timestamp);
         self.max_funds().set(max_funds.into_option());
@@ -52,16 +52,11 @@ pub trait PingPong {
     fn upgrade(
         &self,
         ping_amount: &BigUint,
-        duration_in_seconds: u64,
-        opt_activation_timestamp: Option<u64>,
+        duration: DurationMillis,
+        opt_activation_timestamp: Option<TimestampMillis>,
         max_funds: OptionalValue<BigUint>,
     ) {
-        self.init(
-            ping_amount,
-            duration_in_seconds,
-            opt_activation_timestamp,
-            max_funds,
-        )
+        self.init(ping_amount, duration, opt_activation_timestamp, max_funds)
     }
 
     /// User sends some EGLD to be locked in the contract for a period of time.
@@ -76,7 +71,7 @@ pub trait PingPong {
             "the payment must match the fixed sum"
         );
 
-        let block_timestamp = self.blockchain().get_block_timestamp();
+        let block_timestamp = self.blockchain().get_block_timestamp_millis();
         require!(
             self.activation_timestamp().get() <= block_timestamp,
             "smart contract not active yet"
@@ -91,7 +86,7 @@ pub trait PingPong {
             require!(
                 &self
                     .blockchain()
-                    .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
+                    .get_sc_balance(EgldOrEsdtTokenIdentifier::egld(), 0)
                     + &*payment
                     <= max_funds,
                 "smart contract full"
@@ -140,7 +135,7 @@ pub trait PingPong {
     #[endpoint]
     fn pong(&self) {
         require!(
-            self.blockchain().get_block_timestamp() >= self.deadline().get(),
+            self.blockchain().get_block_timestamp_millis() >= self.deadline().get(),
             "can't withdraw before deadline"
         );
 
@@ -159,7 +154,7 @@ pub trait PingPong {
     /// Can only be called after expiration.
     #[endpoint(pongAll)]
     fn pong_all(&self) -> OperationCompletionStatus {
-        let now = self.blockchain().get_block_timestamp();
+        let now = self.blockchain().get_block_timestamp_millis();
         require!(
             now >= self.deadline().get(),
             "can't withdraw before deadline"
@@ -221,13 +216,13 @@ pub trait PingPong {
 
     #[view(getDeadline)]
     #[storage_mapper("deadline")]
-    fn deadline(&self) -> SingleValueMapper<u64>;
+    fn deadline(&self) -> SingleValueMapper<TimestampMillis>;
 
     /// Block timestamp of the block where the contract got activated.
-    /// If not specified in the constructor it is the the deploy block timestamp.
+    /// If not specified in the constructor it is the deploy block timestamp.
     #[view(getActivationTimestamp)]
     #[storage_mapper("activationTimestamp")]
-    fn activation_timestamp(&self) -> SingleValueMapper<u64>;
+    fn activation_timestamp(&self) -> SingleValueMapper<TimestampMillis>;
 
     /// Optional funding cap.
     #[view(getMaxFunds)]
@@ -265,7 +260,7 @@ pub trait PingPong {
     #[event]
     fn pong_all_event(
         &self,
-        #[indexed] timestamp: u64,
+        #[indexed] timestamp: TimestampMillis,
         #[indexed] status: &OperationCompletionStatus,
         #[indexed] pong_all_last_user: usize,
     );

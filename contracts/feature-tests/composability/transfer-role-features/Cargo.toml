@@ -2,7 +2,7 @@
 name = "transfer-role-features"
 version = "0.0.0"
 authors = ["Dorin Marian Iancu <dorin.iancu@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
@@ -12,13 +12,13 @@ path = "src/lib.rs"
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.60.0"
+version = "0.64.0"
 path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.60.0"
+version = "0.64.0"
 path = "../../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.60.0"
+version = "0.64.0"
 path = "../../../../framework/scenario"

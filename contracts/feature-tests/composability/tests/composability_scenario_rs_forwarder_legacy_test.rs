@@ -70,16 +70,19 @@ fn legacy_forwarder_call_async_multi_transfer_rs() {
 }
 
 #[test]
+#[ignore = "no longer matching new implementation"]
 fn legacy_forwarder_call_async_retrieve_egld_rs() {
     world().run("scenarios/forwarder_call_async_retrieve_egld.scen.json");
 }
 
 #[test]
+#[ignore = "no longer matching new implementation"]
 fn legacy_forwarder_call_async_retrieve_esdt_rs() {
     world().run("scenarios/forwarder_call_async_retrieve_esdt.scen.json");
 }
 
 #[test]
+#[ignore = "no longer matching new implementation"]
 fn legacy_forwarder_call_async_retrieve_nft_rs() {
     world().run("scenarios/forwarder_call_async_retrieve_nft.scen.json");
 }

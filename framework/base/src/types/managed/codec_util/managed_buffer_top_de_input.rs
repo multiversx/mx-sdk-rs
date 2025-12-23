@@ -1,7 +1,7 @@
 use crate::{
     api::ManagedTypeApi,
     codec::{
-        try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
+        DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast, try_execute_then_cast,
     },
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer},
@@ -67,8 +67,7 @@ where
         if let Some(value) = self.parse_as_i64() {
             Ok(value)
         } else {
-            // TODO: replace with err_msg::VALUE_TOO_LONG after Barnard activation
-            Err(h.handle_error(err_msg::ARG_OUT_OF_RANGE.into()))
+            Err(h.handle_error(err_msg::VALUE_TOO_LONG.into()))
         }
     }
 
@@ -79,8 +78,7 @@ where
         if let Some(value) = self.parse_as_u64() {
             Ok(value)
         } else {
-            // TODO: replace with err_msg::VALUE_TOO_LONG after Barnard activation
-            Err(h.handle_error(DecodeError::INPUT_TOO_LONG))
+            Err(h.handle_error(err_msg::VALUE_TOO_LONG.into()))
         }
     }
 

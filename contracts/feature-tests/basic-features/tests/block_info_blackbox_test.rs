@@ -46,16 +46,18 @@ fn block_info_blackbox() {
         epoch_start_block_round,
     ) = result.into_tuple();
 
-    assert_eq!(block_round_time_ms, 6000);
-    assert_eq!(epoch_start_block_timestamp_ms, 0);
+    assert_eq!(block_round_time_ms, DurationMillis::new(6000));
+    assert_eq!(epoch_start_block_timestamp_ms, TimestampMillis::zero());
     assert_eq!(epoch_start_block_nonce, 0);
     assert_eq!(epoch_start_block_round, 0);
 
     // actual values
 
+    let block_timestamp_ms = TimestampMillis::new(123_000_000);
+
     world
         .epoch_start_block()
-        .block_timestamp_ms(123_000_000)
+        .block_timestamp_millis(block_timestamp_ms)
         .block_nonce(15_000)
         .block_round(17_000);
 
@@ -76,8 +78,8 @@ fn block_info_blackbox() {
         epoch_start_block_round,
     ) = result.into_tuple();
 
-    assert_eq!(block_round_time_ms, 600);
-    assert_eq!(epoch_start_block_timestamp_ms, 123_000_000);
+    assert_eq!(block_round_time_ms, DurationMillis::new(600));
+    assert_eq!(epoch_start_block_timestamp_ms, block_timestamp_ms);
     assert_eq!(epoch_start_block_nonce, 15_000);
     assert_eq!(epoch_start_block_round, 17_000);
 }

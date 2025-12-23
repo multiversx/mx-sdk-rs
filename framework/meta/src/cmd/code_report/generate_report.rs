@@ -1,11 +1,11 @@
 use std::{
-    fs::{read_dir, File},
+    fs::{File, read_dir},
     io::{BufReader, Write},
     path::{Path, PathBuf},
 };
 
 use crate::{
-    cli::{matches_extension, CompareArgs, CompileArgs, ConvertArgs},
+    cli::{CompareArgs, CompileArgs, ConvertArgs, matches_extension},
     folder_structure::RelevantDirectories,
 };
 

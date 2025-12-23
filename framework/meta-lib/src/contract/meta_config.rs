@@ -110,6 +110,12 @@ impl MetaConfig {
         }
     }
 
+    /// Triggers a build in all wasm crates.
+    ///
+    /// The following operations are performed in this order:
+    /// 1. check installed tools
+    /// 2. update the wasm crates, if needed
+    /// 3. build each wasm crate, and copy the outputs to the output directory  
     pub fn build(&mut self, mut build_args: BuildArgs) {
         check_tools_installed(&mut build_args);
         adjust_target_dir_wasm(&mut build_args);

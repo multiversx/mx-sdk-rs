@@ -4,8 +4,6 @@ use multiversx_sc::api::{
 };
 
 use crate::{
-    api::StaticApi,
-    multiversx_sc::types::{ContractCall, EsdtTokenPayment},
     scenario::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
@@ -13,7 +11,7 @@ use crate::{
     },
 };
 
-use super::{tx_interpret_util::interpret_egld_value, TxESDT};
+use super::{TxESDT, tx_interpret_util::interpret_egld_value};
 
 pub const DEFAULT_GAS_EXPR: &str = "5,000,000";
 
@@ -97,7 +95,12 @@ impl TxCall {
         note = "Please use the unified transaction syntax instead."
     )]
     #[allow(deprecated)]
-    pub fn to_contract_call(&self) -> multiversx_sc::types::ContractCallWithEgld<StaticApi, ()> {
+    #[cfg(feature = "contract-call-legacy")]
+    pub fn to_contract_call(
+        &self,
+    ) -> multiversx_sc::types::ContractCallWithEgld<crate::imports::StaticApi, ()> {
+        use multiversx_sc::types::ContractCall;
+
         let mut contract_call = multiversx_sc::types::ContractCallWithEgld::new(
             (&self.to.value).into(),
             self.function.as_bytes(),
@@ -110,7 +113,7 @@ impl TxCall {
             self.esdt_value
                 .iter()
                 .map(|esdt| {
-                    EsdtTokenPayment::new(
+                    crate::imports::EsdtTokenPayment::new(
                         esdt.esdt_token_identifier.value.as_slice().into(),
                         esdt.nonce.value,
                         (&esdt.esdt_value.value).into(),
@@ -123,7 +126,9 @@ impl TxCall {
         // The contract call objects have no "from" field, since that is always part of the execution context.
         // On the static API there is no execution context, but a placeholder value is provided.
         // Here we already know the sender, so we can replace the placeholder with the actual value.
-        if StaticApi::is_current_address_placeholder(&contract_call.basic.to.to_address()) {
+        if crate::imports::StaticApi::is_current_address_placeholder(
+            &contract_call.basic.to.to_address(),
+        ) {
             contract_call.basic.to = self.from.value.clone().into();
         }
 
@@ -155,7 +160,8 @@ impl TxCall {
     fn process_payments(&self) -> (String, Vec<BytesValue>, bool) {
         assert!(
             self.egld_value.is_zero() || self.esdt_value.is_empty(),
-            "Cannot have both EGLD and ESDT fields filled. To transfer EGLD and ESDT in the same transaction, represent EGLD as EGLD-000000 in the ESDTs.");
+            "Cannot have both EGLD and ESDT fields filled. To transfer EGLD and ESDT in the same transaction, represent EGLD as EGLD-000000 in the ESDTs."
+        );
 
         match self.esdt_value.len() {
             0 => (self.function.clone(), self.arguments.clone(), false),

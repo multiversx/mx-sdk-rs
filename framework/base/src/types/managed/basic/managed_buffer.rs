@@ -1,8 +1,8 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
-        ManagedTypeApi, RawHandle, StaticVarApiImpl,
+        ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl, ManagedTypeApi,
+        RawHandle, StaticVarApiImpl, use_raw_handle,
     },
     codec::{
         DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -11,12 +11,12 @@ use crate::{
     },
     err_msg,
     formatter::{
-        hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay,
-        SCLowerHex,
+        FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
+        hex_util::encode_bytes_as_hex,
     },
     types::{
-        heap::BoxedBytes, ManagedBufferCachedBuilder, ManagedRef, ManagedRefMut, ManagedType,
-        StaticBufferRef,
+        ManagedBufferCachedBuilder, ManagedRef, ManagedRefMut, ManagedType, StaticBufferRef,
+        heap::BoxedBytes,
     },
 };
 
@@ -85,9 +85,11 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        let new_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        ManagedBuffer::from_handle(new_handle)
+        unsafe {
+            let new_handle: M::ManagedBufferHandle =
+                use_raw_handle(M::static_var_api_impl().next_handle());
+            ManagedBuffer::from_handle(new_handle)
+        }
     }
 
     /// Creates a shared managed reference to a given raw handle.
@@ -98,7 +100,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub unsafe fn temp_const_ref(
         raw_handle: RawHandle,
     ) -> ManagedRef<'static, M, ManagedBuffer<M>> {
-        ManagedRef::wrap_handle(use_raw_handle(raw_handle))
+        unsafe { ManagedRef::wrap_handle(use_raw_handle(raw_handle)) }
     }
 
     /// Creates a shared managed reference to a given raw handle.
@@ -109,7 +111,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub unsafe fn temp_const_ref_mut(
         raw_handle: RawHandle,
     ) -> ManagedRefMut<'static, M, ManagedBuffer<M>> {
-        ManagedRefMut::wrap_handle(use_raw_handle(raw_handle))
+        unsafe { ManagedRefMut::wrap_handle(use_raw_handle(raw_handle)) }
     }
 
     fn load_static_cache(&self) -> StaticBufferRef<M>

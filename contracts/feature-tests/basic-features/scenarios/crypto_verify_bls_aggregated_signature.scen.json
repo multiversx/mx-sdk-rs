@@ -1,6 +1,6 @@
 {
     "name": "crypto",
-    "comment": "does not currently work with scenarios-rs, because verify_bls function is not yet mocked",
+    "comment": "verify BLS Signature with aggregated public keys",
     "gasSchedule": "v3",
     "steps": [
         {

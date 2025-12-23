@@ -1,3 +1,5 @@
+use multiversx_chain_core::types::TimestampMillis;
+
 pub const DEFAULT_BLOCK_ROUND_TIME_MS: u64 = 6000;
 
 #[derive(Clone, Debug)]
@@ -21,7 +23,7 @@ impl Default for BlockConfig {
 
 #[derive(Clone, Debug)]
 pub struct BlockInfo {
-    pub block_timestamp_ms: u64,
+    pub block_timestamp_millis: TimestampMillis,
     pub block_nonce: u64,
     pub block_round: u64,
     pub block_epoch: u64,
@@ -31,7 +33,7 @@ pub struct BlockInfo {
 impl BlockInfo {
     pub fn new() -> Self {
         BlockInfo {
-            block_timestamp_ms: 0,
+            block_timestamp_millis: TimestampMillis::new(0),
             block_nonce: 0,
             block_round: 0,
             block_epoch: 0,

@@ -1,6 +1,6 @@
 use multiversx_chain_core::types::CodeMetadata;
 
-use super::{hex_util, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex};
+use super::{FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex, hex_util};
 
 impl SCDisplay for CodeMetadata {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {

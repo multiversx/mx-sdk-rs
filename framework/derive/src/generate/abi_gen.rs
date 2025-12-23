@@ -271,11 +271,11 @@ fn generate_abi_method_body(
     quote! {
         let mut contract_abi = multiversx_sc::abi::ContractAbi::new(
             multiversx_sc::abi::BuildInfoAbi {
-                contract_crate: multiversx_sc::abi::ContractCrateBuildAbi {
-                    name: env!("CARGO_PKG_NAME"),
-                    version: env!("CARGO_PKG_VERSION"),
-                    git_version: "",
-                },
+                rustc: None,
+                contract_crate: multiversx_sc::abi::ContractCrateBuildAbi::new(
+                    env!("CARGO_PKG_NAME"),
+                    env!("CARGO_PKG_VERSION"),
+                ),
                 framework: multiversx_sc::abi::FrameworkBuildAbi::create(),
             },
             &[ #(#contract_docs),* ],

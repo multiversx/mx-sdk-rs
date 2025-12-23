@@ -1,3 +1,5 @@
+use alloc::string::String;
+use multiversx_chain_core::types::{Address, EsdtTokenType};
 use multiversx_sc_codec::{
     DecodeErrorHandler, TopDecodeInput, TopDecodeMulti, TopDecodeMultiInput,
 };
@@ -20,8 +22,11 @@ const PREFIXES: &[&[u8]] = &[
     b"NumWiped-",
 ];
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct TokenPropertiesResult {
+    pub token_name: String,
+    pub token_type: EsdtTokenType,
+    pub owner_address: Address,
     pub num_decimals: usize,
     pub is_paused: bool,
     pub can_upgrade: bool,
@@ -63,6 +68,27 @@ impl TokenPropertiesResult {
             }
         }
     }
+
+    fn default() -> Self {
+        TokenPropertiesResult {
+            token_name: String::new(),
+            token_type: EsdtTokenType::Invalid,
+            owner_address: Address::zero(),
+            num_decimals: 0,
+            is_paused: false,
+            can_upgrade: false,
+            can_mint: false,
+            can_burn: false,
+            can_change_owner: false,
+            can_pause: false,
+            can_freeze: false,
+            can_wipe: false,
+            can_add_special_roles: false,
+            can_transfer_nft_create_role: false,
+            nft_create_stopped: false,
+            num_wiped: 0,
+        }
+    }
 }
 
 impl TopDecodeMulti for TokenPropertiesResult {
@@ -72,6 +98,11 @@ impl TopDecodeMulti for TokenPropertiesResult {
         H: DecodeErrorHandler,
     {
         let mut token_properties = TokenPropertiesResult::default();
+
+        token_properties.token_name = String::multi_decode_or_handle_err(input, h)?;
+        let token_type = String::multi_decode_or_handle_err(input, h)?;
+        token_properties.token_type = EsdtTokenType::collection_from_string(token_type.as_str());
+        token_properties.owner_address = Address::multi_decode_or_handle_err(input, h)?;
         while input.has_next() {
             let value = input.next_value_input(h)?;
             let mut buffer = [0u8; MAX_BUFFER_SIZE];

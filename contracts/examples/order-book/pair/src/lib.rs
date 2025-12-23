@@ -19,7 +19,7 @@ pub trait Pair:
     + validation::ValidationModule
 {
     #[init]
-    fn init(&self, first_token_id: TokenIdentifier, second_token_id: TokenIdentifier) {
+    fn init(&self, first_token_id: TokenId, second_token_id: TokenId) {
         self.first_token_id().set_if_empty(&first_token_id);
         self.second_token_id().set_if_empty(&second_token_id);
     }

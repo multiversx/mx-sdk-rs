@@ -10,6 +10,8 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
     let crate_path = crate_name.replace("_", "-");
     let mxsc_file_name = format!("{crate_path}.mxsc.json");
     let wasm_output_file_path = Path::new("..").join("output").join(mxsc_file_name);
+    let proxy_file_name = format!("{}_proxy", crate_name.replace("-", "_"));
+    let proxy = format!("{}::{}Proxy", proxy_file_name, abi.name);
 
     let wasm_output_file_path_expr =
         format!("\"mxsc:{}\"", &wasm_output_file_path.to_string_lossy());
@@ -45,24 +47,24 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
         crate_path, wasm_output_file_path_expr,
     )
     .unwrap();
-    write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
+
+    write_deploy_method_impl(file, &proxy, &abi.constructors[0]);
 
     for upgrade_abi in &abi.upgrade_constructors {
-        write_upgrade_endpoint_impl(file, upgrade_abi, &abi.name);
+        write_upgrade_endpoint_impl(file, &proxy, upgrade_abi);
     }
 
     for endpoint_abi in &abi.endpoints {
-        write_endpoint_impl(file, endpoint_abi, &abi.name);
+        write_endpoint_impl(file, &proxy, endpoint_abi);
     }
 
     // close impl block brackets
     writeln!(file, "}}").unwrap();
 }
 
-fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &String) {
+fn write_deploy_method_impl(file: &mut File, proxy: &str, init_abi: &EndpointAbi) {
     write_method_declaration(file, "deploy");
     write_endpoint_args_declaration(file, &init_abi.inputs);
-    let proxy_name = format!("{}Proxy", name);
 
     writeln!(
         file,
@@ -71,7 +73,7 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
             .tx()
             .from(&self.wallet_address)
             .gas({DEFAULT_GAS})
-            .typed(proxy::{})
+            .typed({proxy})
             .init({})
             .code(&self.contract_code)
             .returns(ReturnsNewAddress)
@@ -80,7 +82,6 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
         let new_address_bech32 = new_address.to_bech32_default();
         println!("new address: {{new_address_bech32}}");
         self.state.set_address(new_address_bech32);"#,
-        proxy_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
     )
     .unwrap();
@@ -90,10 +91,9 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &Stri
     write_newline(file);
 }
 
-fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name: &String) {
+fn write_upgrade_endpoint_impl(file: &mut File, proxy: &str, upgrade_abi: &EndpointAbi) {
     write_method_declaration(file, "upgrade");
     write_endpoint_args_declaration(file, &upgrade_abi.inputs);
-    let proxy_name = format!("{}Proxy", name);
 
     writeln!(
         file,
@@ -103,7 +103,7 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
             .to(self.state.current_address())
             .from(&self.wallet_address)
             .gas({DEFAULT_GAS})
-            .typed(proxy::{})
+            .typed({proxy})
             .upgrade({})
             .code(&self.contract_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
@@ -112,7 +112,6 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
             .await;
 
         println!("Result: {{response:?}}");"#,
-        proxy_name,
         endpoint_args_when_called(upgrade_abi.inputs.as_slice()),
     )
     .unwrap();
@@ -122,14 +121,14 @@ fn write_upgrade_endpoint_impl(file: &mut File, upgrade_abi: &EndpointAbi, name:
     write_newline(file);
 }
 
-fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi, name: &String) {
+fn write_endpoint_impl(file: &mut File, proxy: &str, endpoint_abi: &EndpointAbi) {
     write_method_declaration(file, &endpoint_abi.rust_method_name);
     write_payments_declaration(file, &endpoint_abi.payable_in_tokens);
     write_endpoint_args_declaration(file, &endpoint_abi.inputs);
     if matches!(endpoint_abi.mutability, EndpointMutabilityAbi::Readonly) {
-        write_contract_query(file, endpoint_abi, name);
+        write_contract_query(file, proxy, endpoint_abi);
     } else {
-        write_contract_call(file, endpoint_abi, name);
+        write_contract_call(file, proxy, endpoint_abi);
     }
 
     // close method block brackets
@@ -200,13 +199,13 @@ fn endpoint_args_when_called(inputs: &[InputAbi]) -> String {
     result
 }
 
-fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &String) {
+fn write_contract_call(file: &mut File, proxy: &str, endpoint_abi: &EndpointAbi) {
     let payment_snippet = if endpoint_abi.payable_in_tokens.is_empty() {
         ""
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
         "\n            .egld(egld_amount)"
     } else {
-        "\n            .payment((TokenIdentifier::from(token_id.as_str()), token_nonce, token_amount))"
+        "\n            .payment((EsdtTokenIdentifier::from(token_id.as_str()), token_nonce, token_amount))"
     };
 
     writeln!(
@@ -217,14 +216,13 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
             .from(&self.wallet_address)
             .to(self.state.current_address())
             .gas({DEFAULT_GAS})
-            .typed(proxy::{}Proxy)
+            .typed({proxy})
             .{}({}){}
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 
         println!("Result: {{response:?}}");"#,
-        name,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
         payment_snippet,
@@ -232,21 +230,20 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
     .unwrap();
 }
 
-fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi, name: &String) {
+fn write_contract_query(file: &mut File, proxy: &str, endpoint_abi: &EndpointAbi) {
     writeln!(
         file,
         r#"        let result_value = self
             .interactor
             .query()
             .to(self.state.current_address())
-            .typed(proxy::{}Proxy)
+            .typed({proxy})
             .{}({})
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 
         println!("Result: {{result_value:?}}");"#,
-        name,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
     )

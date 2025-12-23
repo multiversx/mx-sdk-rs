@@ -121,7 +121,7 @@ pub trait BasicFeatures:
     fn get_esdt_token_data(
         &self,
         address: ManagedAddress,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         nonce: u64,
     ) -> EsdtTokenDataMultiValue<Self::Api> {
         let token_data = self

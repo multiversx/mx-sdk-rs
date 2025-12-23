@@ -1,4 +1,4 @@
-use multiversx_sc_snippets::imports::RustBigUint;
+use multiversx_sc_snippets::imports::{DurationMillis, RustBigUint, TimestampMillis};
 use ping_pong_egld_interact::{Config, PingPongEgldInteract};
 
 #[tokio::test]
@@ -11,15 +11,15 @@ async fn test_ping_pong_egld() {
     let ping_amount = 1u64;
 
     // test_ping_unmatched_amount
-    let duration_in_seconds = 5u64;
-    let opt_activation_timestamp = 2u64;
+    let duration = DurationMillis::new(5000u64);
+    let activation_timestamp = TimestampMillis::new(2000u64);
     let max_funds = 100_000u64;
 
     interact
         .deploy(
             ping_amount.into(),
-            duration_in_seconds,
-            Some(opt_activation_timestamp),
+            duration,
+            Some(activation_timestamp),
             multiversx_sc_snippets::imports::OptionalValue::Some(max_funds.into()),
         )
         .await;
@@ -33,15 +33,15 @@ async fn test_ping_pong_egld() {
         .await;
 
     // test_ping_inactive_contracts
-    let duration_in_seconds = 5u64;
-    let opt_activation_timestamp = 2_000_000_000u64;
+    let duration = DurationMillis::new(5000);
+    let activation_timestamp = TimestampMillis::new(2_000_000_000_000);
     let max_funds = 100_000u64;
 
     interact
         .deploy(
             ping_amount.into(),
-            duration_in_seconds,
-            Some(opt_activation_timestamp),
+            duration,
+            Some(activation_timestamp),
             multiversx_sc_snippets::imports::OptionalValue::Some(max_funds.into()),
         )
         .await;
@@ -51,15 +51,15 @@ async fn test_ping_pong_egld() {
         .await;
 
     // test_ping_passed_deadline
-    let duration_in_seconds = 5u64;
-    let opt_activation_timestamp = 2u64;
+    let duration = DurationMillis::new(5000);
+    let activation_timestamp = TimestampMillis::new(2_000);
     let max_funds = 100_000u64;
 
     interact
         .deploy(
             ping_amount.into(),
-            duration_in_seconds,
-            Some(opt_activation_timestamp),
+            duration,
+            Some(activation_timestamp),
             multiversx_sc_snippets::imports::OptionalValue::Some(max_funds.into()),
         )
         .await;
@@ -70,13 +70,13 @@ async fn test_ping_pong_egld() {
 
     // test_ping_max_funds
     let ping_amount = 10u64;
-    let duration_in_seconds = 30000u64;
+    let duration = DurationMillis::new(30_000_000);
     let max_funds = 10u64;
 
     interact
         .deploy(
             ping_amount.into(),
-            duration_in_seconds,
+            duration,
             None,
             multiversx_sc_snippets::imports::OptionalValue::Some(max_funds.into()),
         )
@@ -88,13 +88,13 @@ async fn test_ping_pong_egld() {
 
     // test ping
     let ping_amount = 1u64;
-    let duration_in_seconds = 20u64;
+    let duration = DurationMillis::new(20_000);
     let max_funds = 100_000u64;
 
     interact
         .deploy(
             ping_amount.into(),
-            duration_in_seconds,
+            duration,
             None,
             multiversx_sc_snippets::imports::OptionalValue::Some(max_funds.into()),
         )
@@ -115,13 +115,13 @@ async fn test_ping_pong_egld() {
 
     // test_pong_all
     let ping_amount = 1u64;
-    let duration_in_seconds = 18u64;
+    let duration = DurationMillis::new(18_000);
     let max_funds = 100_000u64;
 
     interact
         .deploy(
             ping_amount.into(),
-            duration_in_seconds,
+            duration,
             None,
             multiversx_sc_snippets::imports::OptionalValue::Some(max_funds.into()),
         )

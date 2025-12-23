@@ -5,7 +5,11 @@ use multiversx_sc::abi::{
     TypeDescription,
 };
 
-use crate::contract::{meta_config::MetaConfig, sc_config::proxy_config::ProxyConfig};
+use crate::contract::{
+    generate_proxy::proxy_process_type_name::{c_enum_representation, explicit_discriminant},
+    meta_config::MetaConfig,
+    sc_config::proxy_config::ProxyConfig,
+};
 
 use super::proxy_process_type_name::{
     extract_paths, extract_struct_crate, process_rust_type, proxy_methods_type_name,
@@ -33,11 +37,12 @@ const ZERO: &str = "0";
 const TYPES_FROM_FRAMEWORK: &[&str] = &[
     "EsdtTokenPayment",
     "EgldOrEsdtTokenPayment",
+    "Payment",
     "EsdtTokenData",
     "EgldOrEsdtTokenIdentifier",
-    "EgldOrEsdtTokenPayment",
+    "TokenIdentifier",
+    "TokenId",
     "EgldOrMultiEsdtPayment",
-    "EsdtTokenData",
     "EsdtLocalRole",
     "EsdtTokenType",
 ];
@@ -435,12 +440,16 @@ where
 
     fn write_enum(
         &mut self,
-        enum_variants: &Vec<EnumVariantDescription>,
+        enum_variants: &[EnumVariantDescription],
         type_description: &TypeDescription,
         name: &str,
     ) {
         if self.enum_contains_struct_variant(enum_variants) {
             self.write("\n#[rustfmt::skip]");
+
+            if let Some(c_type) = c_enum_representation(enum_variants) {
+                self.write(format!("\n#[repr({})]", c_type));
+            };
         }
 
         self.start_write_type("enum", type_description, name);
@@ -452,17 +461,23 @@ where
 
         self.insert_open_brace(name);
 
-        for variant in enum_variants {
+        for (i, variant) in enum_variants.iter().enumerate() {
             self.write(format!("    {}", variant.name));
+            let discriminant = explicit_discriminant(i, variant, enum_variants);
+
             if variant.fields.is_empty() {
+                if discriminant.is_some() {
+                    self.write(format!(" = {}", variant.discriminant));
+                }
+
                 self.writeln(",");
                 continue;
             }
 
             if variant.fields[0].name == ZERO {
-                self.write_tuple_in_variant(&variant.fields, COMMA);
+                self.write_tuple_in_variant(&variant.fields, discriminant, COMMA);
             } else {
-                self.write_struct_in_variant(&variant.fields);
+                self.write_struct_in_variant(&variant.fields, discriminant);
             }
         }
         self.writeln("}");
@@ -470,7 +485,7 @@ where
 
     fn write_struct(
         &mut self,
-        struct_fields: &Vec<StructFieldDescription>,
+        struct_fields: &[StructFieldDescription],
         type_description: &TypeDescription,
         name: &str,
     ) {
@@ -482,7 +497,7 @@ where
         }
 
         if struct_fields.len() == 1 && struct_fields[0].name == ZERO {
-            self.write_tuple_in_variant(struct_fields, SEMICOLON);
+            self.write_tuple_in_variant(struct_fields, None, SEMICOLON);
             return;
         }
 
@@ -496,7 +511,12 @@ where
         self.writeln("}");
     }
 
-    fn write_tuple_in_variant(&mut self, fields: &[StructFieldDescription], punctuation: char) {
+    fn write_tuple_in_variant(
+        &mut self,
+        fields: &[StructFieldDescription],
+        discriminant: Option<usize>,
+        punctuation: char,
+    ) {
         self.write("(");
         for (i, field) in fields.iter().enumerate() {
             if i > 0 {
@@ -506,10 +526,17 @@ where
             self.write(adjusted_type_name);
         }
 
-        self.writeln(format!("){}", punctuation));
+        match discriminant {
+            Some(d) => self.write(format!(") = {}{}", d, punctuation)),
+            None => self.writeln(format!("){}", punctuation)),
+        }
     }
 
-    fn write_struct_in_variant(&mut self, fields: &[StructFieldDescription]) {
+    fn write_struct_in_variant(
+        &mut self,
+        fields: &[StructFieldDescription],
+        discriminant: Option<usize>,
+    ) {
         self.writeln(" {");
 
         for field in fields {
@@ -517,7 +544,13 @@ where
             self.writeln(format!("        {}: {adjusted_type_name},", field.name,));
         }
 
-        self.writeln("    },");
+        self.write("    }");
+
+        if let Some(d) = discriminant {
+            self.write(format!(" = {}", d));
+        }
+
+        self.writeln(",");
     }
 
     pub fn clean_paths(&mut self, rust_type: &str) -> String {
@@ -615,7 +648,7 @@ where
         processed_paths
     }
 
-    fn enum_contains_struct_variant(&self, enum_variants: &Vec<EnumVariantDescription>) -> bool {
+    fn enum_contains_struct_variant(&self, enum_variants: &[EnumVariantDescription]) -> bool {
         for variant in enum_variants {
             if variant.fields.is_empty() {
                 continue;
@@ -641,10 +674,11 @@ pub mod tests {
     #[test]
     fn clean_paths_unsanitized_test() {
         let build_info = BuildInfoAbi {
+            rustc: None,
             contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate",
-                version: "0.0.0",
-                git_version: "0.0.0",
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
             },
             framework: FrameworkBuildAbi::create(),
         };
@@ -672,10 +706,11 @@ pub mod tests {
     #[test]
     fn clean_paths_sanitized_test() {
         let build_info = BuildInfoAbi {
+            rustc: None,
             contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate",
-                version: "0.0.0",
-                git_version: "0.0.0",
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
             },
             framework: FrameworkBuildAbi::create(),
         };

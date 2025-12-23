@@ -75,8 +75,8 @@ pub async fn forwarder_cli() {
         "callback_data_at_index" => interact.callback_data_at_index().await,
         "clear_callback_data" => interact.clear_callback_data().await,
         "forward_transf_exec_accept_funds" => interact.forward_transf_exec_accept_funds().await,
-        "forward_transf_execu_accept_funds_with_fees" => {
-            interact.forward_transf_execu_accept_funds_with_fees().await
+        "forward_transf_exec_accept_funds_with_fees" => {
+            interact.forward_transf_exec_accept_funds_with_fees().await
         }
         "forward_transf_exec_accept_funds_twice" => {
             interact.forward_transf_exec_accept_funds_twice().await
@@ -259,7 +259,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .echo_arguments_sync(to, args)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -287,7 +287,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .echo_arguments_sync_twice(to, args)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -314,7 +314,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -362,7 +362,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_rh_single_esdt(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -389,7 +389,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_rh_multi_esdt(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -406,7 +406,7 @@ impl ContractInteract {
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = 0u32;
 
         let response = self
             .interactor
@@ -417,7 +417,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_with_fees(to, percentage_fees)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -444,7 +444,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_sync_accept_funds_then_read(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -482,7 +482,7 @@ impl ContractInteract {
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let token = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -494,7 +494,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_sync_retrieve_funds_with_accept_func(to, token, amount)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -519,7 +519,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .accept_funds_func()
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -533,11 +533,11 @@ impl ContractInteract {
     pub async fn forward_sync_accept_funds_multi_transfer(&mut self) {
         let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
+            EsdtTokenIdentifier<StaticApi>,
             u64,
             BigUint<StaticApi>,
         >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
+            EsdtTokenIdentifier::from_esdt_bytes(&b""[..]),
             0u64,
             BigUint::<StaticApi>::from(0u128),
         ))]);
@@ -592,7 +592,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_async_accept_funds(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -619,7 +619,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_async_accept_funds_half_payment(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -636,7 +636,7 @@ impl ContractInteract {
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = 0u32;
 
         let response = self
             .interactor
@@ -647,7 +647,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_async_accept_funds_with_fees(to, percentage_fees)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -702,11 +702,11 @@ impl ContractInteract {
     pub async fn send_async_accept_multi_transfer(&mut self) {
         let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
+            EsdtTokenIdentifier<StaticApi>,
             u64,
             BigUint<StaticApi>,
         >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
+            EsdtTokenIdentifier::from_esdt_bytes(&b""[..]),
             0u64,
             BigUint::<StaticApi>::from(0u128),
         ))]);
@@ -788,7 +788,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_transf_exec_accept_funds(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -799,13 +799,13 @@ impl ContractInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn forward_transf_execu_accept_funds_with_fees(&mut self) {
+    pub async fn forward_transf_exec_accept_funds_with_fees(&mut self) {
         let token_id = String::new();
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = 0u32;
 
         let response = self
             .interactor
@@ -814,9 +814,9 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .forward_transf_execu_accept_funds_with_fees(to, percentage_fees)
+            .forward_transf_exec_accept_funds_with_fees(to, percentage_fees)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -843,7 +843,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_transf_exec_accept_funds_twice(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -870,7 +870,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .forward_transf_exec_accept_funds_return_values(to)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -884,11 +884,11 @@ impl ContractInteract {
     pub async fn transf_exec_multi_accept_funds(&mut self) {
         let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
+            EsdtTokenIdentifier<StaticApi>,
             u64,
             BigUint<StaticApi>,
         >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
+            EsdtTokenIdentifier::from_esdt_bytes(&b""[..]),
             0u64,
             BigUint::<StaticApi>::from(0u128),
         ))]);
@@ -911,11 +911,11 @@ impl ContractInteract {
     pub async fn transf_exec_multi_reject_funds(&mut self) {
         let to = Address::zero();
         let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
+            EsdtTokenIdentifier<StaticApi>,
             u64,
             BigUint<StaticApi>,
         >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
+            EsdtTokenIdentifier::from_esdt_bytes(&b""[..]),
             0u64,
             BigUint::<StaticApi>::from(0u128),
         ))]);
@@ -1051,7 +1051,7 @@ impl ContractInteract {
     }
 
     pub async fn get_fungible_esdt_balance(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
 
         let result_value = self
             .interactor
@@ -1067,7 +1067,7 @@ impl ContractInteract {
     }
 
     pub async fn get_current_nft_nonce(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
 
         let result_value = self
             .interactor
@@ -1084,7 +1084,7 @@ impl ContractInteract {
 
     pub async fn send_esdt(&mut self) {
         let to = Address::zero();
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -1108,7 +1108,7 @@ impl ContractInteract {
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
         let to = Address::zero();
-        let percentage_fees = BigUint::<StaticApi>::from(0u128);
+        let percentage_fees = 0u32;
 
         let response = self
             .interactor
@@ -1119,7 +1119,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .send_esdt_with_fees(to, percentage_fees)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -1132,7 +1132,7 @@ impl ContractInteract {
 
     pub async fn send_esdt_twice(&mut self) {
         let to = Address::zero();
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount_first_time = BigUint::<StaticApi>::from(0u128);
         let amount_second_time = BigUint::<StaticApi>::from(0u128);
 
@@ -1153,15 +1153,14 @@ impl ContractInteract {
 
     pub async fn send_esdt_direct_multi_transfer(&mut self) {
         let to = Address::zero();
-        let token_payments = MultiValueVec::from(vec![MultiValue3::<
-            TokenIdentifier<StaticApi>,
-            u64,
-            BigUint<StaticApi>,
-        >::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
-            0u64,
-            BigUint::<StaticApi>::from(0u128),
-        ))]);
+        let token_payments = MultiValueVec::from(vec![
+            Payment::new(
+                TokenId::new(ManagedBuffer::from(&b""[..])),
+                0u64,
+                NonZeroBigUint::<StaticApi>::try_from(10u128).unwrap(),
+            )
+            .into_multi_value(),
+        ]);
 
         let response = self
             .interactor
@@ -1202,7 +1201,7 @@ impl ContractInteract {
     }
 
     pub async fn local_mint(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -1221,7 +1220,7 @@ impl ContractInteract {
     }
 
     pub async fn local_burn(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
 
         let response = self
@@ -1240,7 +1239,7 @@ impl ContractInteract {
     }
 
     pub async fn get_esdt_local_roles(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
 
         let result_value = self
             .interactor
@@ -1257,7 +1256,7 @@ impl ContractInteract {
 
     pub async fn get_esdt_token_data(&mut self) {
         let address = Address::zero();
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
 
         let result_value = self
@@ -1275,7 +1274,7 @@ impl ContractInteract {
 
     pub async fn is_esdt_frozen(&mut self) {
         let address = Address::zero();
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
 
         let result_value = self
@@ -1292,7 +1291,7 @@ impl ContractInteract {
     }
 
     pub async fn is_esdt_paused(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
 
         let result_value = self
             .interactor
@@ -1308,7 +1307,7 @@ impl ContractInteract {
     }
 
     pub async fn is_esdt_limited_transfer(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
 
         let result_value = self
             .interactor
@@ -1324,7 +1323,7 @@ impl ContractInteract {
     }
 
     pub async fn validate_token_identifier(&mut self) {
-        let token_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
 
         let result_value = self
             .interactor
@@ -1362,7 +1361,7 @@ impl ContractInteract {
     }
 
     pub async fn get_nft_balance(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
 
         let result_value = self
@@ -1383,7 +1382,7 @@ impl ContractInteract {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let nft_id = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let nft_id = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nft_nonce = 0u64;
         let nft_amount = BigUint::<StaticApi>::from(0u128);
 
@@ -1396,7 +1395,7 @@ impl ContractInteract {
             .typed(proxy::ForwarderProxy)
             .buy_nft(nft_id, nft_nonce, nft_amount)
             .payment((
-                TokenIdentifier::from(token_id.as_str()),
+                EsdtTokenIdentifier::from(token_id.as_str()),
                 token_nonce,
                 token_amount,
             ))
@@ -1466,7 +1465,7 @@ impl ContractInteract {
     }
 
     pub async fn nft_create_compact(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
         let color = Color::default();
 
@@ -1486,7 +1485,7 @@ impl ContractInteract {
     }
 
     pub async fn nft_add_uris(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
         let uris = MultiValueVec::from(vec![ManagedBuffer::new_from_bytes(&b""[..])]);
 
@@ -1506,7 +1505,7 @@ impl ContractInteract {
     }
 
     pub async fn nft_update_attributes(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
         let new_attributes = Color::default();
 
@@ -1526,7 +1525,7 @@ impl ContractInteract {
     }
 
     pub async fn nft_decode_complex_attributes(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
         let name = ManagedBuffer::new_from_bytes(&b""[..]);
         let royalties = BigUint::<StaticApi>::from(0u128);
@@ -1535,13 +1534,13 @@ impl ContractInteract {
         let attrs_arg = MultiValue5::<
             BigUint<StaticApi>,
             ManagedBuffer<StaticApi>,
-            TokenIdentifier<StaticApi>,
+            EsdtTokenIdentifier<StaticApi>,
             bool,
             ManagedBuffer<StaticApi>,
         >::from((
             BigUint::<StaticApi>::from(0u128),
             ManagedBuffer::new_from_bytes(&b""[..]),
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
+            EsdtTokenIdentifier::from_esdt_bytes(&b""[..]),
             false,
             ManagedBuffer::new_from_bytes(&b""[..]),
         ));
@@ -1570,7 +1569,7 @@ impl ContractInteract {
     }
 
     pub async fn nft_add_quantity(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
         let amount = BigUint::<StaticApi>::from(0u128);
 
@@ -1590,7 +1589,7 @@ impl ContractInteract {
     }
 
     pub async fn nft_burn(&mut self) {
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
         let amount = BigUint::<StaticApi>::from(0u128);
 
@@ -1611,7 +1610,7 @@ impl ContractInteract {
 
     pub async fn transfer_nft_via_async_call(&mut self) {
         let to = Address::zero();
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
         let amount = BigUint::<StaticApi>::from(0u128);
 
@@ -1632,7 +1631,7 @@ impl ContractInteract {
 
     pub async fn transfer_nft_and_execute(&mut self) {
         let to = Address::zero();
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let nonce = 0u64;
         let amount = BigUint::<StaticApi>::from(0u128);
         let function = ManagedBuffer::new_from_bytes(&b""[..]);
@@ -1655,7 +1654,7 @@ impl ContractInteract {
 
     pub async fn create_and_send(&mut self) {
         let to = Address::zero();
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let amount = BigUint::<StaticApi>::from(0u128);
         let name = ManagedBuffer::new_from_bytes(&b""[..]);
         let royalties = BigUint::<StaticApi>::from(0u128);
@@ -1689,7 +1688,7 @@ impl ContractInteract {
 
     pub async fn set_local_roles(&mut self) {
         let address = Address::zero();
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let roles = MultiValueVec::<EsdtLocalRole>::new();
 
         let response = self
@@ -1709,7 +1708,7 @@ impl ContractInteract {
 
     pub async fn unset_local_roles(&mut self) {
         let address = Address::zero();
-        let token_identifier = TokenIdentifier::from_esdt_bytes(&b""[..]);
+        let token_identifier = EsdtTokenIdentifier::from_esdt_bytes(&b""[..]);
         let roles = MultiValueVec::<EsdtLocalRole>::new();
 
         let response = self
@@ -1761,7 +1760,9 @@ impl ContractInteract {
         num_decimals: usize,
         token_type: EsdtTokenType,
     ) {
-        println!("Registering and setting all roles for token {token_ticker:?} of type {token_type:?}...");
+        println!(
+            "Registering and setting all roles for token {token_ticker:?} of type {token_type:?}..."
+        );
 
         let result = self
             .interactor
@@ -1789,7 +1790,7 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .change_to_dynamic(TokenIdentifier::from(token_id))
+            .change_to_dynamic(EsdtTokenIdentifier::from(token_id))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1805,7 +1806,7 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .update_token(TokenIdentifier::from(token_id))
+            .update_token(EsdtTokenIdentifier::from(token_id))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1823,7 +1824,7 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .modify_royalties(TokenIdentifier::from(token_id), nonce, new_royalty)
+            .modify_royalties(EsdtTokenIdentifier::from(token_id), nonce, new_royalty)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1860,7 +1861,7 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(80_000_000u64)
             .typed(proxy::ForwarderProxy)
-            .modify_creator(TokenIdentifier::from(token_id), nonce)
+            .modify_creator(EsdtTokenIdentifier::from(token_id), nonce)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -1972,7 +1973,9 @@ impl ContractInteract {
         token_type: EsdtTokenType,
         num_decimals: usize,
     ) -> String {
-        println!("Registering dynamic token {token_ticker:?} of type {token_type:?} from the test wallet...");
+        println!(
+            "Registering dynamic token {token_ticker:?} of type {token_type:?} from the test wallet..."
+        );
 
         let token_id = self
             .interactor
@@ -2013,7 +2016,7 @@ impl ContractInteract {
             .typed(ESDTSystemSCProxy)
             .set_special_roles(
                 ManagedAddress::from_address(for_address),
-                TokenIdentifier::from(token_id),
+                EsdtTokenIdentifier::from(token_id),
                 roles.into_iter(),
             )
             .run()

@@ -227,11 +227,11 @@ pub async fn system_sc_interact_cli() {
 }
 
 pub struct SysFuncCallsInteract {
-    interactor: Interactor,
-    wallet_address: Bech32Address,
-    other_wallet_address: Bech32Address,
+    pub interactor: Interactor,
+    pub wallet_address: Bech32Address,
+    pub other_wallet_address: Bech32Address,
     #[allow(unused)]
-    state: State,
+    pub state: State,
 }
 
 impl SysFuncCallsInteract {
@@ -260,10 +260,8 @@ impl SysFuncCallsInteract {
 
         let res = self
             .interactor
-            .tx()
-            .from(&self.wallet_address)
+            .query()
             .to(ESDTSystemSCAddress)
-            .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .get_token_properties(token_id)
             .returns(ReturnsResult)
@@ -429,7 +427,9 @@ impl SysFuncCallsInteract {
         num_decimals: usize,
         token_type: EsdtTokenType,
     ) -> String {
-        println!("Registering and setting all roles for token {token_ticker:?} of type {token_type:?}...");
+        println!(
+            "Registering and setting all roles for token {token_ticker:?} of type {token_type:?}..."
+        );
 
         let token_id = self
             .interactor
@@ -466,7 +466,7 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .set_special_roles(
                 ManagedAddress::from_address(wallet_address),
-                TokenIdentifier::from(token_id),
+                EsdtTokenIdentifier::from(token_id),
                 roles.into_iter(),
             )
             .run()
@@ -485,7 +485,7 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .set_special_roles(
                 ManagedAddress::from_address(wallet_address),
-                TokenIdentifier::from(token_id),
+                EsdtTokenIdentifier::from(token_id),
                 roles.into_iter(),
             )
             .run()
@@ -502,7 +502,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .get_special_roles(TokenIdentifier::from(token_id))
+            .get_special_roles(EsdtTokenIdentifier::from(token_id))
             .returns(ReturnsRawResult)
             .run()
             .await;
@@ -519,7 +519,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .change_to_dynamic(TokenIdentifier::from(token_id))
+            .change_to_dynamic(EsdtTokenIdentifier::from(token_id))
             .run()
             .await;
     }
@@ -533,7 +533,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .update_token(TokenIdentifier::from(token_id))
+            .update_token(EsdtTokenIdentifier::from(token_id))
             .run()
             .await;
     }
@@ -911,7 +911,7 @@ impl SysFuncCallsInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.other_wallet_address)
-            .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
+            .single_esdt(&token_id.into(), nonce, &amount.into())
             .run()
             .await;
     }

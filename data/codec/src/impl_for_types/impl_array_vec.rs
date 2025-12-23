@@ -78,7 +78,7 @@ impl<T: NestedDecode, const CAP: usize> NestedDecode for ArrayVec<T, CAP> {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{test_util::check_top_encode_decode, DecodeError, PanicErrorHandler, TopDecode};
+    use crate::{DecodeError, PanicErrorHandler, TopDecode, test_util::check_top_encode_decode};
     use arrayvec::ArrayVec;
 
     /// [1, 2, 3]

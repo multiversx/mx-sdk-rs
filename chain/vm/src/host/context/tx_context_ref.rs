@@ -51,10 +51,10 @@ impl TxContextRef {
     ///
     /// Note: does not terminate execution or panic, that is handled separately.
     pub fn replace_tx_result_with_error(self, tx_panic: TxPanic) {
-        let _ = std::mem::replace(
-            &mut *self.tx_result_cell.lock().unwrap(),
-            TxResult::from_panic_obj(&tx_panic),
-        );
+        self.tx_result_cell
+            .lock()
+            .unwrap()
+            .merge_error(TxResult::from_panic_obj(&tx_panic));
     }
 
     /// Returns true if the references point to the same `TxContext`.

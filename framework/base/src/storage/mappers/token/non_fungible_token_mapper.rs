@@ -4,24 +4,24 @@ use crate::{
     abi::TypeAbiFrom,
     codec::{EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput},
     storage::mappers::{
-        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
+        source::{CurrentStorage, StorageAddress},
     },
     storage_clear, storage_get, storage_get_len, storage_set,
     types::{
-        system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
-        ManagedVec, OriginalResultMarker, Tx, TxScEnv,
+        ESDTSystemSCAddress, EgldPayment, FunctionCall, ManagedVec, OriginalResultMarker, Tx,
+        TxScEnv, system_proxy::ESDTSystemSCProxy,
     },
 };
 
 use super::{
     super::StorageMapper,
+    TokenMapperState,
     error::{
         INVALID_PAYMENT_TOKEN_ERR_MSG, INVALID_TOKEN_ID_ERR_MSG, MUST_SET_TOKEN_ID_ERR_MSG,
         PENDING_ERR_MSG, TOKEN_ID_ALREADY_SET_ERR_MSG,
     },
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
-    TokenMapperState,
 };
 use crate::{
     abi::{TypeAbi, TypeName},
@@ -29,11 +29,11 @@ use crate::{
     contract_base::{BlockchainWrapper, SendWrapper},
     storage::StorageKey,
     types::{
+        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenIdentifier, EsdtTokenPayment,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
         system_proxy::{
             MetaTokenProperties, NonFungibleTokenProperties, SemiFungibleTokenProperties,
         },
-        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedType, TokenIdentifier,
     },
 };
 
@@ -46,7 +46,7 @@ pub type IssueCallTo<Api> = Tx<
     EgldPayment<Api>,
     (),
     FunctionCall<Api>,
-    OriginalResultMarker<TokenIdentifier<Api>>,
+    OriginalResultMarker<EsdtTokenIdentifier<Api>>,
 >;
 
 pub struct NonFungibleTokenMapper<SA, A = CurrentStorage>
@@ -346,12 +346,12 @@ where
             .transfer();
     }
 
-    pub fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
+    pub fn set_token_id(&mut self, token_id: EsdtTokenIdentifier<SA>) {
         self.store_token_id(&token_id);
         self.token_state = TokenMapperState::Token(token_id);
     }
 
-    pub fn set_if_empty(&mut self, token_id: TokenIdentifier<SA>) {
+    pub fn set_if_empty(&mut self, token_id: EsdtTokenIdentifier<SA>) {
         if self.is_empty() {
             self.set_token_id(token_id);
         }
@@ -383,7 +383,7 @@ where
             .async_call_and_exit()
     }
 
-    pub(crate) fn store_token_id(&self, token_id: &TokenIdentifier<SA>) {
+    pub(crate) fn store_token_id(&self, token_id: &EsdtTokenIdentifier<SA>) {
         if self.get_token_state().is_set() {
             SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
         }
@@ -451,7 +451,7 @@ where
         }
     }
 
-    pub fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
+    pub fn require_same_token(&self, expected_token_id: &EsdtTokenIdentifier<SA>) {
         let actual_token_id = self.get_token_id_ref();
         if actual_token_id != expected_token_id {
             SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
@@ -475,7 +475,7 @@ where
         self.token_state.clone()
     }
 
-    pub fn get_token_id(&self) -> TokenIdentifier<SA> {
+    pub fn get_token_id(&self) -> EsdtTokenIdentifier<SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token.clone()
         } else {
@@ -483,7 +483,7 @@ where
         }
     }
 
-    pub fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
+    pub fn get_token_id_ref(&self) -> &EsdtTokenIdentifier<SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token
         } else {
@@ -520,7 +520,7 @@ where
     }
 }
 
-impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for EsdtTokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
@@ -534,15 +534,15 @@ where
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        TokenIdentifier::<SA>::type_name()
+        EsdtTokenIdentifier::<SA>::type_name()
     }
 
     fn type_name_rust() -> TypeName {
-        TokenIdentifier::<SA>::type_name_rust()
+        EsdtTokenIdentifier::<SA>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-        TokenIdentifier::<SA>::provide_type_descriptions(accumulator);
+        EsdtTokenIdentifier::<SA>::provide_type_descriptions(accumulator);
     }
 
     fn is_variadic() -> bool {

@@ -1,10 +1,10 @@
 use multiversx_sc_scenario::{
+    ScenarioTxEnv, ScenarioTxEnvData,
     api::StaticApi,
     multiversx_sc::types::{
-        ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv, TxEnv, TxEnvWithTxHash, H256,
+        H256, ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv, TxEnv, TxEnvWithTxHash,
     },
     scenario_model::TxExpect,
-    ScenarioTxEnv, ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 

@@ -57,7 +57,7 @@ impl TxFunctionName {
     /// Can be viewed as an "upgrade constructor".
     pub const UPGRADE: TxFunctionName = TxFunctionName::from_static("upgrade");
 
-    /// The the legacy async central callback name of any smart contract.
+    /// The legacy async central callback name of any smart contract.
     pub const CALLBACK: TxFunctionName = TxFunctionName::from_static("callBack");
 
     /// Not a real function name (in fact it is an illegal name), just a flag to mark whitebox calls.

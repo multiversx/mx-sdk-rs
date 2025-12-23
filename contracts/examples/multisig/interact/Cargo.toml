@@ -2,7 +2,7 @@
 name = "multisig-interact"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [[bin]]
@@ -12,24 +12,24 @@ path = "src/multisig_interact.rs"
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.8"
+toml = "0.9"
 tokio = { version = "1.24" }
 
 [dependencies.multisig]
 path = ".."
 
 [dependencies.multiversx-sc-modules]
-version = "0.60.0"
+version = "0.64.0"
 path = "../../../../contracts/modules"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.60.0"
+version = "0.64.0"
 path = "../../../../framework/snippets"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.60.0"
+version = "=0.64.0"
 path = "../../../../framework/scenario"
 
 [dependencies.multiversx-sc]
-version = "=0.60.0"
+version = "=0.64.0"
 path = "../../../../framework/base"

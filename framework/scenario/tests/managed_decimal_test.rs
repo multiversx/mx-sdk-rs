@@ -1,7 +1,7 @@
 use multiversx_sc::{
     codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
     derive::{debug_const_managed_decimal, debug_managed_decimal},
-    typenum::{self, U0, U1, U10, U2, U3, U4, U5, U6, U7, U8},
+    typenum::{self, U0, U1, U2, U3, U4, U5, U6, U7, U8, U10},
     types::{
         BigFloat, BigInt, BigUint, ConstDecimals, Decimals, ManagedDecimal, ManagedDecimalSigned,
         NumDecimals,

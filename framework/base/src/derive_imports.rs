@@ -3,5 +3,5 @@ pub use crate::{
     codec::derive::{
         NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault,
     },
-    derive::{type_abi, ManagedVecItem, TypeAbi},
+    derive::{ManagedVecItem, TypeAbi, type_abi},
 };
