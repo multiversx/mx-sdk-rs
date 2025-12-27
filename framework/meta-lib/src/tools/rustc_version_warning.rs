@@ -36,12 +36,12 @@ Either upgrade the framework (to {MX_BULK_MEMORY_FIX_VERSION} or newer), or down
     // which will fail if the rustc version is below minimum.
     //
     // It can be reached if rustc-version was configured explicitly in sc-config.toml.
-    if let Some(minimum_version) = minimum_rustc_version(&framework_version) {
-        if *rustc_semver < minimum_version {
-            return Some(format!("
+    if let Some(minimum_version) = minimum_rustc_version(&framework_version)
+        && *rustc_semver < minimum_version
+    {
+        return Some(format!("
 WARNING! Contract {contract_name} is using multiversx-sc v{framework_version} with Rust {rustc_semver}.
 This is below the minimum rustc version for this release, which is v{minimum_version}."));
-        }
     }
 
     None

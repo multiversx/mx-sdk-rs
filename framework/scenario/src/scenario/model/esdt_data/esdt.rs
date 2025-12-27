@@ -14,10 +14,10 @@ pub enum Esdt {
 
 impl Esdt {
     pub fn convert_to_short_if_possible(&mut self) {
-        if let Esdt::Full(esdt_obj) = self {
-            if esdt_obj.is_short_form() {
-                *self = Self::Short(esdt_obj.instances[0].balance.clone().unwrap())
-            }
+        if let Esdt::Full(esdt_obj) = self
+            && esdt_obj.is_short_form()
+        {
+            *self = Self::Short(esdt_obj.instances[0].balance.clone().unwrap())
         }
     }
 
