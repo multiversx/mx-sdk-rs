@@ -32,7 +32,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:invalid fee toke provided",
+                "message": "str:invalid fee token provided",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

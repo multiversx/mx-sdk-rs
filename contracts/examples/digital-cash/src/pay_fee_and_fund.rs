@@ -4,44 +4,45 @@ use crate::{constants::*, helpers, storage};
 
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
+    /// Pays the required fee and funds a deposit for the given address with specified valability.
     #[endpoint(payFeeAndFund)]
     #[payable]
     fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
         let mut payments = self.call_value().all().clone_value();
         require!(!payments.is_empty(), "no payment was provided");
 
-        let mut fee_token = payments.get(0).clone();
-        let provided_fee_token = payments.get(0).clone();
-
-        fee_token.amount =
-            NonZeroBigUint::new(self.get_fee_for_token(&fee_token.token_identifier)).unwrap();
-        let nr_of_payments = payments.len();
-
-        let fee_with_first_token = fee_token.amount.clone() * nr_of_payments as u32;
-        let fee_without_first_token = fee_token.amount.clone() * (nr_of_payments as u32 - 1);
-
+        let input_fee_token = payments.get(0).clone();
+        let fee_per_token = self.get_fee_for_token(&input_fee_token.token_identifier);
+        let (total_fee_with_first, total_fee_without_first, _num_payments) =
+            self.calculate_fee_adjustments(&payments, &fee_per_token);
         require!(
-            (provided_fee_token.amount == fee_without_first_token || // case when the first token is the exact fee amount
-                provided_fee_token.amount > fee_with_first_token), // case when the first token also covers part of the funds
+            input_fee_token.amount.as_big_uint() == &total_fee_without_first
+                || input_fee_token.amount.as_big_uint() > &total_fee_with_first,
             "payment not covering fees"
         );
 
-        if provided_fee_token.amount > fee_without_first_token {
-            fee_token.amount = fee_with_first_token;
-            let extracted_fee = Payment::new(
-                provided_fee_token.token_identifier,
-                provided_fee_token.token_nonce,
-                provided_fee_token.amount - &fee_token.amount,
-            );
-            let _ = payments.set(0, extracted_fee);
+        // Adjust payments
+        let mut fee_payment_for_deposit = input_fee_token.clone();
+        if input_fee_token.amount.as_big_uint() > &total_fee_without_first {
+            fee_payment_for_deposit.amount =
+                NonZeroBigUint::new(total_fee_with_first.clone()).unwrap();
+            if input_fee_token.amount.as_big_uint() > &total_fee_with_first {
+                let fund_from_fee_payment = Payment::new(
+                    input_fee_token.token_identifier,
+                    input_fee_token.token_nonce,
+                    input_fee_token.amount - &fee_payment_for_deposit.amount,
+                );
+                let _ = payments.set(0, fund_from_fee_payment);
+            } else {
+                payments.remove(0);
+            }
         } else {
             payments.remove(0);
-            fee_token.amount = fee_without_first_token;
+            fee_payment_for_deposit.amount = NonZeroBigUint::new(total_fee_without_first).unwrap();
         }
 
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, &address, fee_token);
-
+        self.update_fees(caller_address, &address, fee_payment_for_deposit);
         self.make_fund(payments, address, valability)
     }
 
@@ -64,7 +65,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         self.check_fees_cover_number_of_tokens(
             num_tokens,
             &fee_amount,
-            &deposited_fee_token.amount.as_big_uint(),
+            deposited_fee_token.amount.as_big_uint(),
         );
 
         self.make_fund(payment, address, valability);

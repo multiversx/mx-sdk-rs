@@ -12,7 +12,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
         let deposit = deposit_mapper.take();
-        let paid_fee_token = deposit.fees.value;
+        let original_fee_payment = deposit.fees.value;
 
         let block_round = self.blockchain().get_block_round();
         require!(
@@ -22,8 +22,12 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
 
         let mut funds = deposit.funds;
 
-        let fee = Payment::new(paid_fee_token.token_identifier, 0, paid_fee_token.amount);
-        funds.push(fee);
+        let fee_payment_to_return = Payment::new(
+            original_fee_payment.token_identifier,
+            0,
+            original_fee_payment.amount,
+        );
+        funds.push(fee_payment_to_return);
 
         if !funds.is_empty() {
             self.tx()
@@ -48,17 +52,16 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         let block_round = self.blockchain().get_block_round();
         let deposit = deposit_mapper.take();
         let num_tokens_transferred = deposit.funds.len();
-        let mut deposited_fee = deposit.fees.value;
+        let mut remaining_fee_payment = deposit.fees.value;
 
-        let fee_token = deposited_fee.token_identifier.clone();
+        let fee_token = remaining_fee_payment.token_identifier.clone();
         let fee = self.fee(&fee_token).get();
         require!(deposit.expiration_round >= block_round, "deposit expired");
 
         let fee_cost = fee * num_tokens_transferred as u64;
-        deposited_fee.amount -= &fee_cost;
+        remaining_fee_payment.amount -= &fee_cost;
 
-        self.collected_fees(&fee_token)
-            .update(|collected_fees| *collected_fees += fee_cost);
+        self.deduct_and_collect_fees(&fee_token, fee_cost);
 
         if !deposit.funds.is_empty() {
             self.tx()
@@ -66,10 +69,10 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
                 .payment(&deposit.funds)
                 .transfer();
         }
-        if deposited_fee.amount > 0 {
+        if remaining_fee_payment.amount > 0 {
             self.tx()
                 .to(&deposit.depositor_address)
-                .payment(&deposited_fee)
+                .payment(&remaining_fee_payment)
                 .transfer();
         }
     }
@@ -82,7 +85,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         forward_address: ManagedAddress,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let paid_fee = self.call_value().single_optional();
+        let additional_fee_payment = self.call_value().single_optional();
         let caller_address = self.blockchain().get_caller();
         self.require_signature(&address, &caller_address, signature);
         let new_deposit = self.deposit(&forward_address);
@@ -93,35 +96,40 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         let mut fee_token: Option<TokenId<Self::Api>> = None;
         let mut fee = BigUint::zero();
 
-        new_deposit.update(|fwd_deposit| {
-            fee_token = Some(if let Some(unwrapped_token) = paid_fee {
-                self.update_fees(caller_address, &forward_address, unwrapped_token.clone());
-                unwrapped_token.token_identifier.clone()
+        require!(
+            !new_deposit.is_empty(),
+            "cannot deposit funds without covering the fee cost first"
+        );
+        new_deposit.update(|target_deposit| {
+            fee_token = Some(if let Some(additional_fee_token) = additional_fee_payment {
+                self.update_fees(
+                    caller_address,
+                    &forward_address,
+                    additional_fee_token.clone(),
+                );
+                additional_fee_token.token_identifier.clone()
             } else {
-                fwd_deposit.fees.value.token_identifier.clone()
+                target_deposit.fees.value.token_identifier.clone()
             });
 
             fee = self.fee(fee_token.as_ref().unwrap()).get();
 
-            require!(fwd_deposit.funds.is_empty(), "key already used");
+            require!(target_deposit.funds.is_empty(), "key already used");
             require!(
-                &fee * num_tokens as u64 <= *fwd_deposit.fees.value.amount.as_big_uint(),
+                &fee * num_tokens as u64 <= *target_deposit.fees.value.amount.as_big_uint(),
                 "cannot deposit funds without covering the fee cost first"
             );
 
-            fwd_deposit.fees.num_token_to_transfer += num_tokens;
-            fwd_deposit.valability = current_deposit.valability;
-            fwd_deposit.expiration_round = self.get_expiration_round(current_deposit.valability);
-            fwd_deposit.funds = current_deposit.funds;
+            target_deposit.fees.num_token_to_transfer += num_tokens;
+            target_deposit.valability = current_deposit.valability;
+            target_deposit.expiration_round = self.get_expiration_round(current_deposit.valability);
+            target_deposit.funds = current_deposit.funds;
         });
-
-        let fee_token = fee_token.expect("fee token should be set by deposit update");
 
         let forward_fee = &fee * num_tokens as u64;
         current_deposit.fees.value.amount -= &forward_fee;
 
-        self.collected_fees(&fee_token)
-            .update(|collected_fees| *collected_fees += forward_fee);
+        self.deduct_and_collect_fees(&fee_token.unwrap(), forward_fee);
 
         if current_deposit.fees.value.amount > 0 {
             self.send_fee_to_address(
@@ -137,9 +145,9 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         caller_address: &ManagedAddress,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let addr = address.as_managed_buffer();
-        let message = caller_address.as_managed_buffer();
+        let address_buffer = address.as_managed_buffer();
+        let caller_buffer = caller_address.as_managed_buffer();
         self.crypto()
-            .verify_ed25519(addr, message, signature.as_managed_buffer());
+            .verify_ed25519(address_buffer, caller_buffer, signature.as_managed_buffer());
     }
 }

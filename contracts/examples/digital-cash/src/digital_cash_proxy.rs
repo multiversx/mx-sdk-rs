@@ -126,6 +126,7 @@ where
             .original_result()
     }
 
+    /// Pays the required fee and funds a deposit for the given address with specified valability. 
     pub fn pay_fee_and_fund<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<u64>,

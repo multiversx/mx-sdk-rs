@@ -117,7 +117,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:invalid depositor address",
+                "message": "str:cannot deposit funds without covering the fee cost first",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -198,7 +198,7 @@
                                 "1-value": {
                                     "0-tokenIdentifier": "nested:str:EGLD-000000",
                                     "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
+                                    "2-amount": "biguint:500"
                                 }
                             }
                         },

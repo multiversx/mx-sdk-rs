@@ -21,8 +21,8 @@ pub trait HelpersModule: storage::StorageModule {
             self.whitelisted_fee_tokens().contains(token),
             "invalid fee token provided"
         );
-        let fee_token = self.fee(token);
-        fee_token.get()
+        let fee_mapper = self.fee(token);
+        fee_mapper.get()
     }
 
     fn make_fund(&self, payment: ManagedVec<Payment>, address: ManagedAddress, valability: u64) {
@@ -85,5 +85,23 @@ pub trait HelpersModule: storage::StorageModule {
             },
         };
         deposit_mapper.set(new_deposit);
+    }
+
+    /// Deducts the specified fee amount and adds it to the collected fees for the token.
+    fn deduct_and_collect_fees(&self, fee_token: &TokenId, fee_amount: BigUint) {
+        self.collected_fees(fee_token)
+            .update(|collected| *collected += fee_amount);
+    }
+
+    /// Calculates total fees for payments, considering whether the first payment covers fees.
+    fn calculate_fee_adjustments(
+        &self,
+        payments: &ManagedVec<Payment>,
+        fee_per_token: &BigUint,
+    ) -> (BigUint, BigUint, usize) {
+        let num_payments = payments.len();
+        let total_fee_with_first = fee_per_token * num_payments as u64;
+        let total_fee_without_first = fee_per_token * (num_payments as u64 - 1);
+        (total_fee_with_first, total_fee_without_first, num_payments)
     }
 }
