@@ -17,6 +17,14 @@ pub struct DebugHandle {
 }
 
 impl DebugHandle {
+    /// Should almost never call directly, only used directly in a test.
+    pub fn new_with_explicit_context_ref(context: Weak<TxContext>, raw_handle: RawHandle) -> Self {
+        Self {
+            context,
+            raw_handle,
+        }
+    }
+
     pub fn is_on_current_context(&self) -> bool {
         std::ptr::eq(
             self.context.as_ptr(),
@@ -68,10 +76,8 @@ impl core::fmt::Debug for DebugHandle {
 
 impl HandleConstraints for DebugHandle {
     fn new(handle: multiversx_sc::api::RawHandle) -> Self {
-        Self {
-            context: ContractDebugStack::static_peek().tx_context_ref.downgrade(),
-            raw_handle: handle,
-        }
+        let context = ContractDebugStack::static_peek().tx_context_ref.downgrade();
+        DebugHandle::new_with_explicit_context_ref(context, handle)
     }
 
     fn to_be_bytes(&self) -> [u8; 4] {

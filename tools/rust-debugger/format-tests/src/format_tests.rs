@@ -1,4 +1,7 @@
-use multiversx_sc_scenario::imports::*;
+use multiversx_sc_scenario::{
+    executor::debug::{ContractDebugInstance, ContractDebugStack},
+    imports::*,
+};
 
 macro_rules! push {
     ($list: ident, $name:ident, $expected: expr ) => {{
@@ -13,7 +16,8 @@ macro_rules! push {
 // they have to be cloned if used before that point
 #[allow(clippy::redundant_clone)]
 fn main() {
-    DebugApi::dummy();
+    // Set up a dummy context on the debug stack, required for all managed types
+    ContractDebugStack::static_push(ContractDebugInstance::dummy());
 
     // Used by the python script which checks the variable summaries
     let mut to_check: Vec<(String, String)> = Vec::new();
@@ -76,7 +80,11 @@ fn main() {
     let hex_esdt_safe_address = Address::new(hex_esdt_safe);
     let esdt_safe_managed_address: ManagedAddress<DebugApi> =
         ManagedAddress::from(hex_esdt_safe_address);
-    push!(to_check, esdt_safe_managed_address, "\"esdt-safe_____________\" - (32) 0x00000000000000000500657364742d736166655f5f5f5f5f5f5f5f5f5f5f5f5f");
+    push!(
+        to_check,
+        esdt_safe_managed_address,
+        "\"esdt-safe_____________\" - (32) 0x00000000000000000500657364742d736166655f5f5f5f5f5f5f5f5f5f5f5f5f"
+    );
 
     let test_token_identifier: TestTokenIdentifier = TestTokenIdentifier::new("TEST-123456");
     push!(to_check, test_token_identifier, "\"str:TEST-123456\"");
@@ -137,7 +145,11 @@ fn main() {
         100,
         5000u64.into(),
     ));
-    push!(to_check, managed_vec_of_payments, "(2) { [0] = { token_identifier: \"MYTOK-123456\", nonce: 42, amount: 1000 }, [1] = { token_identifier: \"MYTOK-abcdef\", nonce: 100, amount: 5000 } }");
+    push!(
+        to_check,
+        managed_vec_of_payments,
+        "(2) { [0] = { token_identifier: \"MYTOK-123456\", nonce: 42, amount: 1000 }, [1] = { token_identifier: \"MYTOK-abcdef\", nonce: 100, amount: 5000 } }"
+    );
 
     let egld_or_esdt_token_identifier_egld: EgldOrEsdtTokenIdentifier<DebugApi> =
         EgldOrEsdtTokenIdentifier::egld();
@@ -169,7 +181,11 @@ fn main() {
         DebugApi,
         ManagedVec<DebugApi, ManagedAddress<DebugApi>>,
     > = ManagedOption::some(managed_vec_of_addresses.clone());
-    push!(to_check, managed_option_of_vec_of_addresses, "ManagedOption::some((1) { [0] = (32) 0x000000000000000000010000000000000000000000000000000000000002ffff })");
+    push!(
+        to_check,
+        managed_option_of_vec_of_addresses,
+        "ManagedOption::some((1) { [0] = (32) 0x000000000000000000010000000000000000000000000000000000000002ffff })"
+    );
 
     // 5. SC wasm - heap
     let heap_address: Address = managed_address.to_address();
@@ -244,7 +260,26 @@ fn main() {
         "OptionalValue::Some(<invalid handle: raw_handle -1000 not found in big_int_map>)"
     );
 
+    // Invalid TxContext test - simulate access after context change
+    // This test relies on the debugger pretty printer's error handling
+    // to detect when a weak pointer becomes invalid
+    let dropped_context = 
+    let biguint_with_invalid_context =
+        unsafe { BigUint::<DebugApi>::from_handle(create_handle_from_dropped_context()) };
+    push!(
+        to_check,
+        biguint_with_invalid_context,
+        "<invalid weak pointer: TxContext has been dropped for handle -100>"
+    );
+
     breakpoint_marker_end_of_main();
+
+    // Clean up the dummy entry on stack
+    ContractDebugStack::static_pop();
+}
+
+fn create_handle_from_dropped_context() -> DebugHandle {
+    DebugHandle::new_with_explicit_context_ref(std::sync::Weak::new(), -100i32)
 }
 
 fn breakpoint_marker_end_of_main() {}

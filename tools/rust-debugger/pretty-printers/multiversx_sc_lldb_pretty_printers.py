@@ -78,12 +78,23 @@ class InvalidHandle(Exception):
         super().__init__(error)
 
 
+class InvalidWeakPointer(Exception):
+    def __init__(self, raw_handle: int) -> None:
+        error = f"<invalid weak pointer: TxContext has been dropped for handle {raw_handle}>"
+        super().__init__(error)
+
+
 def check_invalid_handle(callable: Callable) -> Callable:
     def wrapped(*args) -> str:
         try:
             return callable(*args)
         except InvalidHandle as e:
             return str(e)
+        except InvalidWeakPointer as e:
+            return str(e)
+        except Exception as e:
+            # Catch any other exceptions that might occur during pointer dereferencing
+            return f"<debugger error: {str(e)}>"
     return wrapped
 
 
@@ -278,11 +289,19 @@ class ManagedType(Handler):
         return full_value
 
     def extract_value_from_raw_handle(self, context: lldb.value, raw_handle: int, map_picker: Callable) -> lldb.value:
+        weak_inner = context.ptr.pointer # object is of Rust type: ArcInner
+            
+        # Check the strong count to see if the object is still alive
+        # If strong count is 0, the object has been dropped
+        strong_atomic_usize = weak_inner.strong # object is of Rust type: Atomic<usize>
+        strong_count = int(strong_atomic_usize.v.value)
+        if strong_count == 0:
+            raise InvalidWeakPointer(raw_handle)
+        
         # Handle Weak<TxContext> by accessing the ptr field directly
         # context is Weak<TxContext>, which contains ptr that points to the WeakInner<TxContext>
         # The WeakInner contains a pointer to the actual TxContext data
         # In LLDB, we access: context.ptr.pointer (NonNull<WeakInner<T>>) -> pointer.data -> TxContext
-        weak_inner = context.ptr.pointer
         tx_context = weak_inner.data
         managed_types = tx_context.managed_types.data.value
         chosen_map = map_picker(managed_types)
