@@ -78,6 +78,16 @@ impl TxContextRef {
     }
 
     /// Creates a new [`Weak`] pointer to the [`TxContext`].
+    ///
+    /// This is the preferred way to obtain a non‑owning reference to the underlying
+    /// `TxContext` when you need to store a handle that should not keep the transaction
+    /// alive on its own. In particular, this method underpins the weak‑pointer pattern
+    /// used by [`DebugHandle`], which holds a `Weak<TxContext>` so that debug tooling
+    /// can observe a transaction while it exists, without extending its lifetime.
+    ///
+    /// Callers that use the returned [`Weak`] must call [`Weak::upgrade`] before
+    /// accessing the `TxContext` and be prepared to handle the case where upgrading
+    /// fails because the transaction context has already been dropped.
     pub fn downgrade(&self) -> Weak<TxContext> {
         Arc::downgrade(&self.0)
     }
