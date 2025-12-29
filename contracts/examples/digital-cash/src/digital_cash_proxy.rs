@@ -45,7 +45,7 @@ where
 {
     pub fn init<
         Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<TokenId<Env::Api>>,
     >(
         self,
         fee: Arg0,
@@ -71,7 +71,7 @@ where
 {
     pub fn whitelist_fee_token<
         Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<TokenId<Env::Api>>,
     >(
         self,
         fee: Arg0,
@@ -86,7 +86,7 @@ where
     }
 
     pub fn blacklist_fee_token<
-        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenId<Env::Api>>,
     >(
         self,
         token: Arg0,
@@ -109,7 +109,7 @@ where
 
     pub fn get_amount<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<TokenId<Env::Api>>,
         Arg2: ProxyArg<u64>,
     >(
         self,
@@ -236,7 +236,7 @@ where
     Api: ManagedTypeApi,
 {
     pub depositor_address: ManagedAddress<Api>,
-    pub funds: ManagedVec<Api, EgldOrEsdtTokenPayment<Api>>,
+    pub funds: ManagedVec<Api, Payment<Api>>,
     pub valability: u64,
     pub expiration_round: u64,
     pub fees: Fee<Api>,
@@ -249,5 +249,5 @@ where
     Api: ManagedTypeApi,
 {
     pub num_token_to_transfer: usize,
-    pub value: EgldOrEsdtTokenPayment<Api>,
+    pub value: Payment<Api>,
 }

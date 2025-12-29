@@ -82,18 +82,27 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         forward_address: ManagedAddress,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let paid_fee = self.call_value().single().clone();
+        let paid_fee = self.call_value().single_optional();
         let caller_address = self.blockchain().get_caller();
-        let fee_token = paid_fee.token_identifier.clone();
         self.require_signature(&address, &caller_address, signature);
-        self.update_fees(caller_address, &forward_address, paid_fee);
-
         let new_deposit = self.deposit(&forward_address);
-        let fee = self.fee(&fee_token).get();
 
         let mut current_deposit = self.deposit(&address).take();
         let num_tokens = current_deposit.funds.len();
+
+        let mut fee_token: Option<TokenId<Self::Api>> = None;
+        let mut fee = BigUint::zero();
+
         new_deposit.update(|fwd_deposit| {
+            fee_token = Some(if let Some(unwrapped_token) = paid_fee {
+                self.update_fees(caller_address, &forward_address, unwrapped_token.clone());
+                unwrapped_token.token_identifier.clone()
+            } else {
+                fwd_deposit.fees.value.token_identifier.clone()
+            });
+
+            fee = self.fee(fee_token.as_ref().unwrap()).get();
+
             require!(fwd_deposit.funds.is_empty(), "key already used");
             require!(
                 &fee * num_tokens as u64 <= *fwd_deposit.fees.value.amount.as_big_uint(),
@@ -105,6 +114,8 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
             fwd_deposit.expiration_round = self.get_expiration_round(current_deposit.valability);
             fwd_deposit.funds = current_deposit.funds;
         });
+
+        let fee_token = fee_token.expect("fee token should be set by deposit update");
 
         let forward_fee = &fee * num_tokens as u64;
         current_deposit.fees.value.amount -= &forward_fee;
