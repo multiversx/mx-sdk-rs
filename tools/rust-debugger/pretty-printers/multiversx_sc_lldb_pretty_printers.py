@@ -7,8 +7,8 @@
 from functools import partial
 import string
 from typing import Callable, Collection, Iterable, List, Tuple, Type
-from lldb import SBValue, SBDebugger
-import lldb
+from lldb import SBValue, SBDebugger # type: ignore[import]
+import lldb # type: ignore[import]
 from pathlib import Path
 import re
 import struct
