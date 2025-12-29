@@ -18,9 +18,9 @@ pub struct DebugHandle {
 
 impl DebugHandle {
     pub fn is_on_current_context(&self) -> bool {
-        Weak::ptr_eq(
-            &self.context,
-            &ContractDebugStack::static_peek().tx_context_ref.downgrade(),
+        std::ptr::eq(
+            self.context.as_ptr(),
+            ContractDebugStack::static_peek().tx_context_ref.as_ptr(),
         )
     }
 

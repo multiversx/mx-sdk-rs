@@ -65,6 +65,14 @@ impl TxContextRef {
         Arc::ptr_eq(&this.0, &other.0)
     }
 
+    /// Returns a raw pointer to the underlying `TxContext`.
+    ///
+    /// This is useful for pointer comparisons, particularly when comparing
+    /// with weak references to determine if they point to the same context.
+    pub fn as_ptr(&self) -> *const TxContext {
+        Arc::as_ptr(&self.0)
+    }
+
     pub fn into_ref(self) -> Arc<TxContext> {
         self.0
     }
