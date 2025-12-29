@@ -278,7 +278,13 @@ class ManagedType(Handler):
         return full_value
 
     def extract_value_from_raw_handle(self, context: lldb.value, raw_handle: int, map_picker: Callable) -> lldb.value:
-        managed_types = context[0].managed_types.data.value
+        # Handle Weak<TxContext> by accessing the ptr field directly
+        # context is Weak<TxContext>, which contains ptr that points to the WeakInner<TxContext>
+        # The WeakInner contains a pointer to the actual TxContext data
+        # In LLDB, we access: context.ptr.pointer (NonNull<WeakInner<T>>) -> pointer.data -> TxContext
+        weak_inner = context.ptr.pointer
+        tx_context = weak_inner.data
+        managed_types = tx_context.managed_types.data.value
         chosen_map = map_picker(managed_types)
         value = map_lookup(chosen_map, raw_handle)
         return value
@@ -294,6 +300,7 @@ class ManagedType(Handler):
         managed_value = self.lookup(original_value)
         handle = managed_value.handle
         raw_handle = int(handle.raw_handle)
+        # Handle Weak<TxContext> by getting the context from the handle
         context = handle.context
         return self.summary_from_raw_handle(raw_handle, context, type_info)
 
