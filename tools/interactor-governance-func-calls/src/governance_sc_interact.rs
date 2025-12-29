@@ -140,7 +140,9 @@ impl GovernanceCallsInteract {
         start_vote_epoch: usize,
         end_vote_epoch: usize,
     ) {
-        println!("proposing hash: {commit_hash}, start epoch: {start_vote_epoch}, end epoch: {end_vote_epoch}");
+        println!(
+            "proposing hash: {commit_hash}, start epoch: {start_vote_epoch}, end epoch: {end_vote_epoch}"
+        );
 
         let logs = self
             .interactor

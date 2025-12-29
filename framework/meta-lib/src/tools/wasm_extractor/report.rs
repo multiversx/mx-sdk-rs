@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use super::{code_report::CodeReport, EndpointName};
+use super::{EndpointName, code_report::CodeReport};
 
 #[derive(Default, PartialEq, Eq, Debug, Clone)]
 pub struct WasmReport {

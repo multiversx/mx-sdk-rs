@@ -68,11 +68,18 @@ pub struct ContractVariantSerde {
     #[serde(default)]
     pub std: Option<bool>,
 
+    #[serde(rename = "rustc-version")]
+    pub rustc_version: Option<String>,
+
     #[serde(rename = "rustc-target")]
     pub rustc_target: Option<String>,
 
     #[serde(rename = "opcode-version")]
     pub opcode_version: Option<String>,
+
+    #[serde(rename = "wasm-opt-version")]
+    #[serde(default)]
+    pub wasm_opt_version: Option<String>,
 }
 
 #[derive(Deserialize, Default, Debug)]

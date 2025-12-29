@@ -13,8 +13,8 @@ pub enum UserStatus {
 #[derive(TopEncode, TopDecode, Default)]
 pub struct ContractState<M: ManagedTypeApi> {
     pub ping_amount: BigUint<M>,
-    pub deadline: u64,
-    pub activation_timestamp: u64,
+    pub deadline: TimestampMillis,
+    pub activation_timestamp: TimestampMillis,
     pub max_funds: Option<BigUint<M>>,
     pub pong_all_last_user: usize,
 }

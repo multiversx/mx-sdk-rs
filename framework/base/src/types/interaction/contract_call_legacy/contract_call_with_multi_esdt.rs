@@ -3,13 +3,13 @@ use crate::codec::TopEncodeMulti;
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
+        BigUint, EsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec,
     },
 };
 
 use super::{
-    contract_call_no_payment::ContractCallNoPayment, contract_call_trait::ContractCallBase,
-    ContractCall, ContractCallWithEgld,
+    ContractCall, ContractCallWithEgld, contract_call_no_payment::ContractCallNoPayment,
+    contract_call_trait::ContractCallBase,
 };
 
 #[deprecated(
@@ -89,7 +89,7 @@ where
     )]
     pub fn add_esdt_token_transfer(
         self,
-        payment_token: TokenIdentifier<SA>,
+        payment_token: EsdtTokenIdentifier<SA>,
         payment_nonce: u64,
         payment_amount: BigUint<SA>,
     ) -> Self {

@@ -21,7 +21,9 @@ impl InterpretableFrom<BlockInfoRaw> for BlockInfo {
             block_timestamp: from
                 .block_timestamp
                 .map(|v| U64Value::interpret_from(v, context)),
-            block_timestamp_ms: None,
+            block_timestamp_ms: from
+                .block_timestamp_ms
+                .map(|v| U64Value::interpret_from(v, context)),
             block_nonce: from
                 .block_nonce
                 .map(|v| U64Value::interpret_from(v, context)),
@@ -42,6 +44,7 @@ impl IntoRaw<BlockInfoRaw> for BlockInfo {
     fn into_raw(self) -> BlockInfoRaw {
         BlockInfoRaw {
             block_timestamp: self.block_timestamp.map(|value| value.original),
+            block_timestamp_ms: self.block_timestamp_ms.map(|value| value.original),
             block_nonce: self.block_nonce.map(|value| value.original),
             block_round: self.block_round.map(|value| value.original),
             block_epoch: self.block_epoch.map(|value| value.original),

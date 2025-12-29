@@ -21,7 +21,7 @@ pub struct QueuedCall<M: ManagedTypeApi> {
     pub gas_limit: u64,
     pub endpoint_name: ManagedBuffer<M>,
     pub args: ManagedArgBuffer<M>,
-    pub payments: EgldOrMultiEsdtPayment<M>,
+    pub payments: PaymentVec<M>,
 }
 
 /// Testing multiple calls per transaction.
@@ -81,15 +81,10 @@ pub trait ForwarderQueue {
         to: ManagedAddress,
         gas_limit: u64,
         endpoint_name: ManagedBuffer,
-        token: TokenIdentifier,
-        amount: BigUint,
+        token: TokenId,
+        amount: NonZeroBigUint,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let mut payment = ManagedVec::new();
-        payment.push(EsdtTokenPayment::new(token, 0, amount));
-
-        let payments = EgldOrMultiEsdtPayment::MultiEsdt(payment);
-
         let call_type = QueuedCallType::Promise;
         self.queued_calls().push_back(QueuedCall {
             call_type,
@@ -97,7 +92,7 @@ pub trait ForwarderQueue {
             gas_limit,
             endpoint_name,
             args: args.to_arg_buffer(),
-            payments,
+            payments: PaymentVec::from_single_item(Payment::new(token, 0, amount)),
         });
     }
 
@@ -123,21 +118,14 @@ pub trait ForwarderQueue {
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let payments = self.call_value().any_payment();
+        let payments = self.call_value().all();
 
-        match &payments {
-            EgldOrMultiEsdtPayment::Egld(egld_value) => {
-                self.add_queued_call_egld_event(&call_type, &to, &endpoint_name, egld_value);
-            }
-            EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => {
-                self.add_queued_call_esdt_event(
-                    &call_type,
-                    &to,
-                    &endpoint_name,
-                    &esdt_payments.clone().into_multi_value(),
-                );
-            }
-        }
+        self.add_queued_call_event(
+            &call_type,
+            &to,
+            &endpoint_name,
+            &payments.clone().into_multi_value(),
+        );
 
         self.queued_calls().push_back(QueuedCall {
             call_type,
@@ -145,7 +133,7 @@ pub trait ForwarderQueue {
             gas_limit,
             endpoint_name,
             args: args.to_arg_buffer(),
-            payments,
+            payments: payments.clone(),
         });
     }
 
@@ -155,24 +143,12 @@ pub trait ForwarderQueue {
         while let Some(node) = self.queued_calls().pop_front() {
             let call = node.clone().into_value();
 
-            match &call.payments {
-                EgldOrMultiEsdtPayment::Egld(egld_value) => {
-                    self.forward_queued_call_egld_event(
-                        &call.call_type,
-                        &call.to,
-                        &call.endpoint_name,
-                        egld_value,
-                    );
-                }
-                EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => {
-                    self.forward_queued_call_esdt_event(
-                        &call.call_type,
-                        &call.to,
-                        &call.endpoint_name,
-                        &esdt_payments.clone().into_multi_value(),
-                    );
-                }
-            };
+            self.forward_queued_call_payment_event(
+                &call.call_type,
+                &call.to,
+                &call.endpoint_name,
+                &call.payments.clone().into_multi_value(),
+            );
 
             let contract_call = self
                 .tx()
@@ -205,7 +181,7 @@ pub trait ForwarderQueue {
     #[label("promises-callback")]
     fn promises_callback_method(&self) {
         self.callback_count().update(|c| *c += 1);
-        let payments = self.call_value().any_payment();
+        let payments = self.call_value().all();
 
         let payments_data_string = self
             .tx()
@@ -225,42 +201,21 @@ pub trait ForwarderQueue {
     #[storage_mapper("callback_payments")]
     fn callback_payments(&self) -> SingleValueMapper<ManagedBuffer>;
 
-    #[event("forward_queued_callback")]
-    fn forward_queued_callback_event(&self);
-
-    #[event("forward_queued_call_egld")]
-    fn forward_queued_call_egld_event(
+    #[event("forward_queued_call_payment")]
+    fn forward_queued_call_payment_event(
         &self,
         #[indexed] call_type: &QueuedCallType,
         #[indexed] to: &ManagedAddress,
         #[indexed] endpoint_name: &ManagedBuffer,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,
     );
 
-    #[event("forward_queued_call_esdt")]
-    fn forward_queued_call_esdt_event(
+    #[event("add_queued_call")]
+    fn add_queued_call_event(
         &self,
         #[indexed] call_type: &QueuedCallType,
         #[indexed] to: &ManagedAddress,
         #[indexed] endpoint_name: &ManagedBuffer,
-        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
-    );
-
-    #[event("add_queued_call_egld")]
-    fn add_queued_call_egld_event(
-        &self,
-        #[indexed] call_type: &QueuedCallType,
-        #[indexed] to: &ManagedAddress,
-        #[indexed] endpoint_name: &ManagedBuffer,
-        #[indexed] egld_value: &BigUint,
-    );
-
-    #[event("add_queued_call_esdt")]
-    fn add_queued_call_esdt_event(
-        &self,
-        #[indexed] call_type: &QueuedCallType,
-        #[indexed] to: &ManagedAddress,
-        #[indexed] endpoint_name: &ManagedBuffer,
-        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,
     );
 }

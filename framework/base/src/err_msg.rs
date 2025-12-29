@@ -8,7 +8,6 @@ pub const SINGLE_ESDT_EXPECTED: &str = "single ESDT payment expected";
 pub const TOO_MANY_ESDT_TRANSFERS: &str = "too many ESDT transfers";
 pub const ESDT_INVALID_TOKEN_INDEX: &str = "invalid token index";
 pub const ESDT_UNEXPECTED_EGLD: &str = "unexpected EGLD transfer";
-pub const INCORRECT_NUM_ESDT_TRANSFERS: &str = "incorrect number of ESDT transfers";
 pub const INCORRECT_NUM_TRANSFERS: &str = "incorrect number of transfers";
 pub const FUNGIBLE_TOKEN_EXPECTED_ERR_MSG: &str = "fungible ESDT token expected";
 pub const TOKEN_IDENTIFIER_ESDT_EXPECTED: &str = "ESDT expected";
@@ -48,6 +47,7 @@ pub const CAST_TO_I64_ERROR: &str = "cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &str = "big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &str = "cannot subtract because result would be negative";
 pub const UNSIGNED_NEGATIVE: &str = "cannot convert to unsigned, number is negative";
+pub const ZERO_VALUE_NOT_ALLOWED: &str = "zero value not allowed";
 
 pub const DESERIALIZATION_INVALID_BYTE: &str = "call data deserialization error: not a valid byte";
 pub const DESERIALIZATION_NOT_32_BYTES: &str =
@@ -68,7 +68,6 @@ pub const STORAGE_NOT_32_BYTES: &str = "32 bytes of data expected in storage at 
 
 /// An additional non-VM status, meant just to signal an error in the debugger infrastructure of in the tests.
 pub const DEBUG_API_ERR_STATUS: u64 = 100;
-pub const DEBUG_API_ERR_HANDLE_STALE: &str =
-    "VMHooksApi misuse: operation called with a handle that does not point to the top context of the call stack";
+pub const DEBUG_API_ERR_HANDLE_STALE: &str = "VMHooksApi misuse: operation called with a handle that does not point to the top context of the call stack";
 pub const DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH: &str =
     "VMHooksApi misuse: operation called with handles from 2 different contexts";

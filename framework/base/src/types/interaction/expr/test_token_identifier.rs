@@ -5,7 +5,7 @@ use multiversx_sc_codec::{
 use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
-    types::{AnnotatedValue, ManagedBuffer, TokenIdentifier, TxEnv},
+    types::{AnnotatedValue, EsdtTokenIdentifier, ManagedBuffer, TxEnv},
 };
 
 const STR_PREFIX: &str = "str:";
@@ -29,7 +29,7 @@ impl<'a> TestTokenIdentifier<'a> {
         alloc::format!("{STR_PREFIX}{}", self.name)
     }
 
-    pub fn to_token_identifier<Api: ManagedTypeApi>(&self) -> TokenIdentifier<Api> {
+    pub fn to_token_identifier<Api: ManagedTypeApi>(&self) -> EsdtTokenIdentifier<Api> {
         self.name.into()
     }
 
@@ -42,7 +42,7 @@ impl<'a> TestTokenIdentifier<'a> {
     }
 }
 
-impl<Env> AnnotatedValue<Env, TokenIdentifier<Env::Api>> for TestTokenIdentifier<'_>
+impl<Env> AnnotatedValue<Env, EsdtTokenIdentifier<Env::Api>> for TestTokenIdentifier<'_>
 where
     Env: TxEnv,
 {
@@ -52,17 +52,17 @@ where
         result
     }
 
-    fn to_value(&self, _env: &Env) -> TokenIdentifier<Env::Api> {
+    fn to_value(&self, _env: &Env) -> EsdtTokenIdentifier<Env::Api> {
         self.name.into()
     }
 }
 
-impl<'a, Api> From<TestTokenIdentifier<'a>> for TokenIdentifier<Api>
+impl<'a, Api> From<TestTokenIdentifier<'a>> for EsdtTokenIdentifier<Api>
 where
     Api: ManagedTypeApi,
 {
     fn from(value: TestTokenIdentifier<'a>) -> Self {
-        TokenIdentifier::from_esdt_bytes(value.name)
+        EsdtTokenIdentifier::from_esdt_bytes(value.name)
     }
 }
 
@@ -87,4 +87,5 @@ impl NestedEncode for TestTokenIdentifier<'_> {
     }
 }
 
-impl<Api> TypeAbiFrom<TestTokenIdentifier<'_>> for TokenIdentifier<Api> where Api: ManagedTypeApi {}
+impl<Api> TypeAbiFrom<TestTokenIdentifier<'_>> for EsdtTokenIdentifier<Api> where Api: ManagedTypeApi
+{}

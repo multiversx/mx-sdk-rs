@@ -9,8 +9,8 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
-        heap::ArgBuffer, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType,
-        ManagedVec, ManagedVecRefIterator, MultiValueEncoded,
+        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType, ManagedVec,
+        ManagedVecRefIterator, MultiValueEncoded, heap::ArgBuffer,
     },
 };
 use alloc::vec::Vec;
@@ -34,8 +34,10 @@ where
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        ManagedArgBuffer {
-            data: ManagedVec::from_handle(handle),
+        unsafe {
+            ManagedArgBuffer {
+                data: ManagedVec::from_handle(handle),
+            }
         }
     }
 
@@ -44,7 +46,7 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.data.forget_into_handle()
+        unsafe { self.data.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {

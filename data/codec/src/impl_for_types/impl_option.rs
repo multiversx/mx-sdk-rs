@@ -90,8 +90,8 @@ pub mod tests {
     use alloc::vec::Vec;
 
     use crate::{
-        test_util::{check_top_decode, check_top_encode_decode},
         DecodeError, TopDecode,
+        test_util::{check_top_decode, check_top_encode_decode},
     };
 
     #[test]

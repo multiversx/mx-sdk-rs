@@ -1,12 +1,12 @@
 use core::marker::PhantomData;
 
 use super::{
-    source::{CurrentStorage, StorageAddress},
     StorageMapper, StorageMapperFromAddress,
+    source::{CurrentStorage, StorageAddress},
 };
 use crate::{
     api::{ErrorApiImpl, StorageMapperApi},
-    storage::{storage_clear, storage_set, StorageKey},
+    storage::{StorageKey, storage_clear, storage_set},
     types::{ManagedAddress, ManagedType},
 };
 

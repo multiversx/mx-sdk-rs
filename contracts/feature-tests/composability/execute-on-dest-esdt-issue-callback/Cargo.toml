@@ -2,7 +2,7 @@
 name = "execute-on-dest-esdt-issue-callback"
 version = "0.0.0"
 authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
@@ -16,9 +16,9 @@ path = "parent"
 path = "child"
 
 [dependencies.multiversx-sc]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/scenario"

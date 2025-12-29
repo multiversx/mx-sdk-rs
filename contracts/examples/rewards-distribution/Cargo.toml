@@ -2,20 +2,20 @@
 name = "rewards-distribution"
 version = "0.0.0"
 authors = ["Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/rewards_distribution.rs"
 
 [dependencies.multiversx-sc]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/scenario"

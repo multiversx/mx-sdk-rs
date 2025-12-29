@@ -22,6 +22,13 @@ pub async fn install_debugger(custom_path: Option<PathBuf>) {
     }
 }
 
+// home_dir is deprecated on older version of Rust (1.85 ...), but we are keeping it
+// not deprecated on newer versions (1.90 for sure)
+#[allow(deprecated)]
+fn home_dir() -> PathBuf {
+    std::env::home_dir().expect("Could not find home directory")
+}
+
 fn remove_old_lldb_extension() {
     let extension_id = "vadimcn.vscode-lldb";
 
@@ -77,7 +84,7 @@ async fn install_script(custom_path: Option<PathBuf>) {
     let target_path = if let Some(unwrapped_custom_path) = custom_path {
         unwrapped_custom_path
     } else {
-        home::home_dir().unwrap().join(TARGET_PATH)
+        home_dir().join(TARGET_PATH)
     };
 
     let _ = fs::create_dir_all(&target_path);
@@ -92,7 +99,7 @@ fn get_script_path(path: PathBuf) -> PathBuf {
 
 fn get_path_to_settings() -> PathBuf {
     let os = env::consts::OS;
-    let user_home = home::home_dir().unwrap();
+    let user_home = home_dir();
     match os {
         "macos" => {
             // For macOS
@@ -118,7 +125,7 @@ fn get_path_to_settings() -> PathBuf {
 fn configure_vscode() {
     let path_to_settings = get_path_to_settings();
 
-    let script_full_path = get_script_path(home::home_dir().unwrap().join(TARGET_PATH));
+    let script_full_path = get_script_path(home_dir().join(TARGET_PATH));
     let json = match fs::read_to_string(&path_to_settings) {
         Err(_) => {
             eprintln!(

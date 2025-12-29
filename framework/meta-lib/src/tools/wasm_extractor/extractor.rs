@@ -13,8 +13,8 @@ use wasmparser::{
 use crate::{ei::EIVersion, tools::CodeReport};
 
 use super::{
-    opcode_whitelist::is_opcode_whitelisted, report::WasmReport, CallGraph, EndpointInfo,
-    FunctionInfo, OpcodeVersion,
+    CallGraph, EndpointInfo, FunctionInfo, OpcodeVersion, opcode_whitelist::is_opcode_whitelisted,
+    report::WasmReport,
 };
 
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
@@ -412,6 +412,15 @@ fn is_ei_valid(imports: &[String], check_ei: Option<&EIVersion>) -> bool {
         for import in imports {
             if !ei.contains_vm_hook(import.as_str()) {
                 num_errors += 1;
+            }
+
+            if let Some(deprecated) = ei.deprecated_vm_hook(import) {
+                panic!(
+                    "{} {} - {}",
+                    "Deprecated VM hook used:".to_string().yellow().bold(),
+                    deprecated.name.yellow().bold(),
+                    deprecated.note.yellow()
+                );
             }
         }
 

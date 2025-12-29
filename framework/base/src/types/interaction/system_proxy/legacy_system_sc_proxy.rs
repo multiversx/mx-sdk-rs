@@ -6,7 +6,7 @@ use crate::{
     api::{CallTypeApi, SendApi},
     types::{
         BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, ESDTSystemSCAddress,
-        EsdtLocalRole, EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
+        EsdtLocalRole, EsdtTokenIdentifier, EsdtTokenType, ManagedAddress, ManagedBuffer,
     },
 };
 
@@ -321,7 +321,7 @@ where
     /// It will fail if the SC is not the owner of the token.
     pub fn mint(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         amount: &BigUint<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("mint")
@@ -333,7 +333,7 @@ where
     /// which causes it to burn fungible ESDT tokens owned by the SC.
     pub fn burn(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         amount: &BigUint<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("ESDTBurn")
@@ -343,13 +343,19 @@ where
 
     /// The manager of an ESDT token may choose to suspend all transactions of the token,
     /// except minting, freezing/unfreezing and wiping.
-    pub fn pause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
+    pub fn pause(
+        self,
+        token_identifier: &EsdtTokenIdentifier<SA>,
+    ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("pause")
             .argument(token_identifier)
     }
 
     /// The reverse operation of `pause`.
-    pub fn unpause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
+    pub fn unpause(
+        self,
+        token_identifier: &EsdtTokenIdentifier<SA>,
+    ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("unPause")
             .argument(token_identifier)
     }
@@ -359,7 +365,7 @@ where
     /// Freezing and unfreezing the tokens of an account are operations designed to help token managers to comply with regulations.
     pub fn freeze(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("freeze")
@@ -370,7 +376,7 @@ where
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("unFreeze")
@@ -384,7 +390,7 @@ where
     /// Wiping the tokens of an account is an operation designed to help token managers to comply with regulations.
     pub fn wipe(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("wipe")
@@ -397,7 +403,7 @@ where
     /// Freezing and unfreezing a single NFT of an Account are operations designed to help token managers to comply with regulations.
     pub fn freeze_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         nft_nonce: u64,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
@@ -410,7 +416,7 @@ where
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         nft_nonce: u64,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
@@ -426,7 +432,7 @@ where
     /// Wiping the tokens of an Account is an operation designed to help token managers to comply with regulations.
     pub fn wipe_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         nft_nonce: u64,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
@@ -440,7 +446,7 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn change_sft_to_meta_esdt(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         num_decimals: usize,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("changeSFTToMetaESDT")
@@ -455,7 +461,7 @@ where
     pub fn set_special_roles<RoleIter: Iterator<Item = EsdtLocalRole>>(
         self,
         address: &ManagedAddress<SA>,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         roles_iter: RoleIter,
     ) -> ContractCallNoPayment<SA, ()> {
         let mut contract_call = self
@@ -478,7 +484,7 @@ where
     pub fn unset_special_roles<RoleIter: Iterator<Item = EsdtLocalRole>>(
         self,
         address: &ManagedAddress<SA>,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         roles_iter: RoleIter,
     ) -> ContractCallNoPayment<SA, ()> {
         let mut contract_call = self
@@ -496,7 +502,7 @@ where
 
     pub fn transfer_ownership(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         new_owner: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("transferOwnership")
@@ -506,7 +512,7 @@ where
 
     pub fn transfer_nft_create_role(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         old_creator: &ManagedAddress<SA>,
         new_creator: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
@@ -518,7 +524,7 @@ where
 
     pub fn control_changes(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &EsdtTokenIdentifier<SA>,
         property_arguments: &TokenPropertyArguments,
     ) -> ContractCallNoPayment<SA, ()> {
         let mut contract_call = self
@@ -545,11 +551,7 @@ const TRUE_STR: &str = "true";
 const FALSE_STR: &str = "false";
 
 fn bool_name_bytes(b: bool) -> &'static str {
-    if b {
-        TRUE_STR
-    } else {
-        FALSE_STR
-    }
+    if b { TRUE_STR } else { FALSE_STR }
 }
 
 fn set_token_property<SA, CC>(contract_call: &mut CC, name: &str, value: bool)

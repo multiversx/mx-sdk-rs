@@ -4,8 +4,8 @@ use multiversx_sc::abi::EsdtAttributeAbi;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    convert_type_descriptions_to_json, empty_type_description_container, EsdtAttributeJson,
-    TypeDescriptionJson,
+    EsdtAttributeJson, TypeDescriptionJson, convert_type_descriptions_to_json,
+    empty_type_description_container,
 };
 
 /// Represents an entire ESDT attribute ABI file. The type descriptions only show up here.

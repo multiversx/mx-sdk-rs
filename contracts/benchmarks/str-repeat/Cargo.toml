@@ -2,7 +2,7 @@
 name = "str-repeat"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
@@ -12,10 +12,10 @@ path = "src/str_repeat.rs"
 managed-buffer-builder-cached = ["multiversx-sc/managed-buffer-builder-cached"]
 
 [dependencies.multiversx-sc]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/scenario"

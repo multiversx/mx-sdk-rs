@@ -2,23 +2,23 @@
 name = "abi-tester"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/abi_tester.rs"
 
 [dependencies.multiversx-sc]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies.multiversx-sc-meta-lib]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/meta-lib"
 
 [dependencies]

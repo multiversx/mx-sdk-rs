@@ -4,8 +4,8 @@ use core::{
 };
 
 use crate::{
-    api::{const_handles, use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
-    typenum::{Unsigned, U18, U9},
+    api::{BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl, const_handles, use_raw_handle},
+    typenum::{U9, U18, Unsigned},
     types::{BigUint, ManagedRef},
 };
 

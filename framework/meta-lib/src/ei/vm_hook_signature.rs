@@ -23,6 +23,36 @@ impl VmHookSignature {
             returns,
         }
     }
+
+    pub fn to_wat_func_type_declaration(&self, comment: &str) -> String {
+        let mut sc_wat = String::new();
+        sc_wat.push_str("(type");
+        sc_wat.push_str(comment);
+        sc_wat.push_str(" (func");
+        if !self.params.is_empty() {
+            sc_wat.push_str(" (param");
+            for param in self.params {
+                sc_wat.push(' ');
+                sc_wat.push_str(val_type_to_wat(*param));
+            }
+            sc_wat.push(')');
+        }
+        if let Some(ret) = self.returns {
+            sc_wat.push_str(" (result ");
+            sc_wat.push_str(val_type_to_wat(ret));
+            sc_wat.push(')');
+        }
+        sc_wat.push_str("))");
+        sc_wat
+    }
+}
+
+fn val_type_to_wat(val_type: ValType) -> &'static str {
+    match val_type {
+        ValType::I32 => "i32",
+        ValType::I64 => "i64",
+        _ => panic!("unsupported return type in vm hook signature"),
+    }
 }
 
 pub fn vm_hook_signature_map() -> HashMap<&'static str, VmHookSignature> {

@@ -1,13 +1,13 @@
 [package]
 name = "str-repeat-meta"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dependencies.str-repeat]
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../../framework/meta-lib"
 default-features = false

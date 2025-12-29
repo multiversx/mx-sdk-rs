@@ -94,7 +94,9 @@ impl<T> Shareable<T> {
                     }
                     Err(rc) => {
                         std::mem::forget(rc);
-                        panic!("failed to recover Owned ShareableMut from Shared, not all Rc pointers dropped")
+                        panic!(
+                            "failed to recover Owned ShareableMut from Shared, not all Rc pointers dropped"
+                        )
                     }
                 }
             } else {

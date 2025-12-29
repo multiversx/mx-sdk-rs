@@ -2,7 +2,7 @@ use multiversx_chain_scenario_format::{
     interpret_trait::InterpreterContext,
     reconstruct_trait::ReconstructorContext,
     serde_raw::ValueSubTree,
-    value_interpreter::{interpret_string, reconstruct, ExprReconstructorHint},
+    value_interpreter::{ExprReconstructorHint, interpret_string, reconstruct},
 };
 
 #[test]

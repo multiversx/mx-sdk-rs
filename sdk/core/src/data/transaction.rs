@@ -133,7 +133,7 @@ pub struct ApiLogs {
 pub struct ApiSmartContractResult {
     pub hash: String,
     pub nonce: u64,
-    pub value: u64,
+    pub value: u128, // consider switching to BigUint if this proves insufficient
     pub receiver: Bech32Address,
     pub sender: Bech32Address,
     #[serde(default)]
@@ -222,6 +222,20 @@ pub struct SendTransactionResponse {
     pub error: String,
     pub code: String,
     pub data: Option<SendTransactionData>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SimulateGasTransactionData {
+    pub tx_gas_units: u64,
+}
+
+// SimulateGasTransactionResponse holds the response received from the network when estimating cost of a transaction
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimulateGasTransactionResponse {
+    pub error: String,
+    pub code: String,
+    pub data: Option<SimulateGasTransactionData>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -8,7 +8,7 @@ pub trait ForwarderRolesModule: fwd_storage_legacy::ForwarderStorageModule {
     fn set_local_roles(
         &self,
         address: ManagedAddress,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
@@ -23,7 +23,7 @@ pub trait ForwarderRolesModule: fwd_storage_legacy::ForwarderStorageModule {
     fn unset_local_roles(
         &self,
         address: ManagedAddress,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()

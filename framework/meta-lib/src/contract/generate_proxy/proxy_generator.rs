@@ -37,8 +37,11 @@ const ZERO: &str = "0";
 const TYPES_FROM_FRAMEWORK: &[&str] = &[
     "EsdtTokenPayment",
     "EgldOrEsdtTokenPayment",
+    "Payment",
     "EsdtTokenData",
     "EgldOrEsdtTokenIdentifier",
+    "TokenIdentifier",
+    "TokenId",
     "EgldOrMultiEsdtPayment",
     "EsdtLocalRole",
     "EsdtTokenType",
@@ -671,10 +674,11 @@ pub mod tests {
     #[test]
     fn clean_paths_unsanitized_test() {
         let build_info = BuildInfoAbi {
+            rustc: None,
             contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate",
-                version: "0.0.0",
-                git_version: "0.0.0",
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
             },
             framework: FrameworkBuildAbi::create(),
         };
@@ -702,10 +706,11 @@ pub mod tests {
     #[test]
     fn clean_paths_sanitized_test() {
         let build_info = BuildInfoAbi {
+            rustc: None,
             contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate",
-                version: "0.0.0",
-                git_version: "0.0.0",
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
             },
             framework: FrameworkBuildAbi::create(),
         };

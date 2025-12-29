@@ -41,7 +41,7 @@ fn test_big_int_from() {
 
 fn check_big_uint_bitwise_and(a: u64, b: u64) {
     let bf = basic_features::contract_obj::<StaticApi>();
-    let result = bf.bit_and_big_uint(BigUint::from(a), BigUint::from(b));
+    let result = bf.bit_and_big_uint_big_uint(BigUint::from(a), BigUint::from(b));
     assert_eq!(BigUint::from(a & b), result);
 }
 
@@ -55,9 +55,9 @@ fn test_big_uint_bitwise_and() {
 
 fn check_big_uint_shift(a: u64, b: usize) {
     let bf = basic_features::contract_obj::<StaticApi>();
-    let result = bf.shl_big_uint(BigUint::from(a), b);
+    let result = bf.shl_big_uint_usize(BigUint::from(a), b);
     assert_eq!(BigUint::from(a << b), result);
-    let result = bf.shr_big_uint(BigUint::from(a), b);
+    let result = bf.shr_big_uint_usize(BigUint::from(a), b);
     assert_eq!(BigUint::from(a >> b), result);
 }
 

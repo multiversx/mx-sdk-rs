@@ -31,7 +31,7 @@ where
     unsafe fn wrap_as_managed_vec(
         managed_vec_handle: M::ManagedBufferHandle,
     ) -> ManagedRef<'static, M, ManagedVec<M, T>> {
-        ManagedRef::wrap_handle(managed_vec_handle)
+        unsafe { ManagedRef::wrap_handle(managed_vec_handle) }
     }
 
     pub(super) fn new(managed_vec_handle: M::ManagedBufferHandle, item_index: usize) -> Self {

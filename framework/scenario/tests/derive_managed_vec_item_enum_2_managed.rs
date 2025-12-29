@@ -7,7 +7,7 @@ use multiversx_sc::{
     derive::ManagedVecItem,
     types::{
         BigUint, ManagedBuffer, ManagedType, ManagedVecItemPayload, ManagedVecItemPayloadBuffer,
-        ManagedVecRef,
+        Ref,
     },
 };
 use multiversx_sc_scenario::api::StaticApi;
@@ -76,7 +76,7 @@ fn enum_from_bytes_reader_variant_2() {
         ;
         assert_eq!(
             enum_from_bytes,
-            ManagedVecRef::new(EnumWithFieldsManaged::<StaticApi>::Variant2(mb))
+            Ref::new(EnumWithFieldsManaged::<StaticApi>::Variant2(mb))
         );
     }
 }

@@ -55,9 +55,10 @@
 #
 # 13. (optional) Test the new framework on one of the contracts that are not in the same repo, e.g. DNS, DEX, etc.
 #
-# 14. Post in Slack to `release-announcements`.
+# 14. Add a `explained-x.x.x.md`` under `tools/releases-explained`, and notify the current DevRel/Marketing responsible with the Releases page on the website.
+# The current responsible is Anca Boglea.
 #
-# 15. Write a release announcement in Confluence.
+# 15. Announce on X and Telegram (@MultiversXDevelopers).
 #
 
 cd data/codec-derive

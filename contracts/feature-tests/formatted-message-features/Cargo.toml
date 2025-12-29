@@ -2,18 +2,18 @@
 name = "formatted-message-features"
 version = "0.0.0"
 authors = [ "you",]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/formatted_message_features.rs"
 
 [dependencies.multiversx-sc]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.61.0"
+version = "0.64.0"
 features = ["wasmer-experimental"]
 path = "../../../framework/scenario"

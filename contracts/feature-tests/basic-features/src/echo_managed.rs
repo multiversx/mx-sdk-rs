@@ -4,13 +4,18 @@ use multiversx_sc::imports::*;
 #[multiversx_sc::module]
 pub trait EchoManagedTypes {
     #[endpoint]
-    fn echo_big_uint(&self, bi: BigUint) -> BigUint {
-        bi
+    fn echo_big_uint(&self, bu: BigUint) -> BigUint {
+        bu
     }
 
     #[endpoint]
     fn echo_big_int(&self, bi: BigInt) -> BigInt {
         bi
+    }
+
+    #[endpoint]
+    fn echo_non_zero_big_uint(&self, nzbu: NonZeroBigUint) -> NonZeroBigUint {
+        nzbu
     }
 
     #[endpoint]
@@ -67,8 +72,8 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_managed_vec_of_token_identifier(
         &self,
-        mv: ManagedVec<TokenIdentifier>,
-    ) -> ManagedVec<TokenIdentifier> {
+        mv: ManagedVec<EsdtTokenIdentifier>,
+    ) -> ManagedVec<EsdtTokenIdentifier> {
         mv
     }
 

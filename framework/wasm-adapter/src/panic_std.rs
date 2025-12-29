@@ -1,4 +1,4 @@
-use crate::panic::{signal_error_with_managed_panic_message, ManagedPanicMessage};
+use crate::panic::{ManagedPanicMessage, signal_error_with_managed_panic_message};
 pub use alloc::alloc::Layout;
 
 pub fn set_panic_hook() {

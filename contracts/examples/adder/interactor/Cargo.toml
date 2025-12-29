@@ -2,7 +2,7 @@
 name = "basic-interactor"
 version = "0.0.0"
 authors = ["MultiversX <contact@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [[bin]]
@@ -16,13 +16,13 @@ path = "src/basic_interactor.rs"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../../framework/snippets"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.8"
+toml = "0.9"
 tokio = { version = "1.24" }
 serial_test = { version = "3.2.0" }
 

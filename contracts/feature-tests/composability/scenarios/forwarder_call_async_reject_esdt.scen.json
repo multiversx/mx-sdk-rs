@@ -23,7 +23,7 @@
         },
         {
             "step": "scCall",
-            "id": "2",
+            "id": "forward_async_reject_funds-single-ESDT",
             "comment": "tokens returned after a failed call do not currently show up as callback call value",
             "tx": {
                 "from": "address:a_user",
@@ -85,10 +85,7 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:callBack",
                         "topics": [
-                            "str:retrieve_funds_callback",
-                            "str:EGLD",
-                            "",
-                            ""
+                            "str:async_callback"
                         ],
                         "data": [
                             ""

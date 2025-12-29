@@ -2,18 +2,18 @@
 name = "ping-pong-egld"
 version = "0.0.2"
 authors = [ "Bruda Claudiu-Marcel <claudiu725@yahoo.com>",]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/ping_pong.rs"
 
 [dependencies.multiversx-sc]
-version = "0.61.0"
+version = "0.64.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.61.0"
+version = "0.64.0"
 features = ["wasmer-experimental"]
 path = "../../../framework/scenario"
 
