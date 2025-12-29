@@ -8,7 +8,7 @@ use crate::{
         BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
     },
     schedule::GasSchedule,
-    types::{VMAddress, VMCodeMetadata, H256},
+    types::{H256, VMAddress, VMCodeMetadata},
 };
 
 /// Abstracts away the borrowing of a managed types structure.

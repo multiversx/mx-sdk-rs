@@ -911,4 +911,307 @@ pub trait BigIntOperators {
         a <<= b;
         a
     }
+
+    // Equality/comparison operators
+
+    #[endpoint]
+    fn eq_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn eq_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a == b
+    }
+    #[endpoint]
+    fn gt_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn ge_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn ge_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a >= b
+    }
+    #[endpoint]
+    fn lt_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn lt_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a < b
+    }
+    #[endpoint]
+    fn le_big_int_big_int(&self, a: BigInt, b: BigInt) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_int_i32(&self, a: BigInt, b: i32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_int_i64(&self, a: BigInt, b: i64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_int_u32(&self, a: BigInt, b: u32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_int_u64(&self, a: BigInt, b: u64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_i32(&self, a: BigUint, b: i32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_i64(&self, a: BigUint, b: i64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_u32(&self, a: BigUint, b: u32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_big_uint_u64(&self, a: BigUint, b: u64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_i64(&self, a: NonZeroBigUint, b: i64) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_u32(&self, a: NonZeroBigUint, b: u32) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
+        a <= b
+    }
 }

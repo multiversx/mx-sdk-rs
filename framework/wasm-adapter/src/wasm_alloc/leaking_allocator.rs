@@ -1,4 +1,4 @@
-use super::memory_grow::{memory_grow, PageCount, PAGE_SIZE};
+use super::memory_grow::{PAGE_SIZE, PageCount, memory_grow};
 use core::{
     alloc::{GlobalAlloc, Layout},
     cell::UnsafeCell,
@@ -30,8 +30,8 @@ impl LeakingAllocator {
 
 unsafe impl GlobalAlloc for LeakingAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        let size: &mut usize = &mut *self.size.get();
-        let used: &mut usize = &mut *self.used.get();
+        let size: &mut usize = unsafe { &mut *self.size.get() };
+        let used: &mut usize = unsafe { &mut *self.used.get() };
         // This assumes PAGE_SIZE is always a multiple of the required alignment, which should be true for all practical use.
         // If this is not true, this could go past size.
         let alignment = layout.align();

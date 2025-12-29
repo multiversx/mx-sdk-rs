@@ -2,7 +2,7 @@
 [package]
 name = "op-test-gen"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 [[bin]]
@@ -17,5 +17,5 @@ num-bigint = "0.4"
 num-traits = "0.2"
 
 [dependencies.multiversx-sc-scenario]
-version = "0.63.0"
+version = "0.64.0"
 path = "../../framework/scenario"

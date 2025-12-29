@@ -1,14 +1,14 @@
 use core::borrow::Borrow;
 
 use generic_array::{
-    typenum::{U1, U2, U4, U8},
     GenericArray,
+    typenum::{U1, U2, U4, U8},
 };
 use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
 use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 
 use crate::{
-    api::{use_raw_handle, HandleConstraints, ManagedTypeApi},
+    api::{HandleConstraints, ManagedTypeApi, use_raw_handle},
     types::{
         BigInt, BigUint, EllipticCurve, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
         ManagedByteArray, ManagedRef, ManagedType, ManagedVec, NonZeroBigUint, TokenId,
@@ -77,9 +77,11 @@ where
     T: ManagedVecItem,
     P: ManagedVecItemPayload,
 {
-    let value = T::read_from_payload(payload.slice_unchecked(*index));
-    *index += T::PAYLOAD::payload_size();
-    value
+    unsafe {
+        let value = T::read_from_payload(payload.slice_unchecked(*index));
+        *index += T::PAYLOAD::payload_size();
+        value
+    }
 }
 
 /// Used by the ManagedVecItem derive.
@@ -95,8 +97,10 @@ pub unsafe fn managed_vec_item_save_to_payload_index<T, P>(
     T: ManagedVecItem,
     P: ManagedVecItemPayload,
 {
-    item.save_to_payload(payload.slice_unchecked_mut(*index));
-    *index += T::PAYLOAD::payload_size();
+    unsafe {
+        item.save_to_payload(payload.slice_unchecked_mut(*index));
+        *index += T::PAYLOAD::payload_size();
+    }
 }
 
 macro_rules! impl_int {
@@ -189,7 +193,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -217,8 +221,10 @@ macro_rules! impl_managed_type {
             }
 
             unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-                let handle = use_raw_handle(i32::read_from_payload(payload));
-                ManagedRef::wrap_handle(handle)
+                unsafe {
+                    let handle = use_raw_handle(i32::read_from_payload(payload));
+                    ManagedRef::wrap_handle(handle)
+                }
             }
 
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -253,8 +259,10 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        let handle = use_raw_handle(i32::read_from_payload(payload));
-        ManagedRef::wrap_handle(handle)
+        unsafe {
+            let handle = use_raw_handle(i32::read_from_payload(payload));
+            ManagedRef::wrap_handle(handle)
+        }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -278,8 +286,10 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        let handle = use_raw_handle(i32::read_from_payload(payload));
-        ManagedRef::wrap_handle(handle)
+        unsafe {
+            let handle = use_raw_handle(i32::read_from_payload(payload));
+            ManagedRef::wrap_handle(handle)
+        }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -346,7 +356,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -384,7 +394,7 @@ where
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Ref::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

@@ -5,23 +5,23 @@ use crate::{
     api::ErrorApiImpl,
     codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     storage::mappers::{
-        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
+        source::{CurrentStorage, StorageAddress},
     },
     storage_clear, storage_get, storage_get_len, storage_set,
     types::{
-        system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
         ESDTSystemSCAddress, ManagedRef, Tx,
+        system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
     },
 };
 
 use super::{
     super::StorageMapper,
+    TokenMapperState,
     error::{
         INVALID_PAYMENT_TOKEN_ERR_MSG, INVALID_TOKEN_ID_ERR_MSG, MUST_SET_TOKEN_ID_ERR_MSG,
         PENDING_ERR_MSG, TOKEN_ID_ALREADY_SET_ERR_MSG,
     },
-    TokenMapperState,
 };
 use crate::{
     abi::TypeName,

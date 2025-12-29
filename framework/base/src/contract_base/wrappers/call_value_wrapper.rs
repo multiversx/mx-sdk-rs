@@ -2,8 +2,9 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        ManagedBufferApiImpl, ManagedTypeApi, RawHandle, StaticVarApiFlags, StaticVarApiImpl,
+        CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
+        ManagedTypeApi, RawHandle, StaticVarApiFlags, StaticVarApiImpl, const_handles,
+        use_raw_handle,
     },
     contract_base::BlockchainWrapper,
     err_msg,
@@ -317,6 +318,10 @@ where
     /// Accepts any sort of payment, which is either:
     /// - EGLD (can be zero in case of no payment whatsoever);
     /// - Multi-ESDT (one or more ESDT transfers).
+    #[deprecated(
+        note = "It comes from a time when only 1 EGLD payment, or ESDT multi-transfer was possible. This is no longer the case. Use `any` instead.",
+        since = "0.64.0"
+    )]
     pub fn any_payment(&self) -> EgldOrMultiEsdtPayment<A> {
         let esdt_transfers = self.all_esdt_transfers();
         if esdt_transfers.is_empty() {

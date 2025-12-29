@@ -2,9 +2,9 @@ use std::{collections::BTreeMap, fmt};
 
 use super::*;
 use serde::{
+    Deserialize, Serialize,
     de::{Deserializer, MapAccess, Visitor},
     ser::{SerializeMap, Serializer},
-    Deserialize, Serialize,
 };
 pub struct CheckStorageDetailsRaw {
     pub storages: BTreeMap<String, CheckBytesValueRaw>,

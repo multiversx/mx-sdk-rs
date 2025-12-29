@@ -8,8 +8,8 @@ use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
     types::{
-        heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom,
-        TxFromSpecified, TxTo, TxToSpecified,
+        AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
+        TxToSpecified, heap::Address,
     },
 };
 

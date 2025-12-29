@@ -8,7 +8,7 @@ use multiversx_chain_vm_executor::{ExecutorError, Instance, InstanceCallResult};
 use multiversx_sc::chain_core::types::ReturnCode;
 
 use super::{
-    catch_tx_panic, ContractContainer, ContractContainerRef, ContractDebugStack, StaticVarData,
+    ContractContainer, ContractContainerRef, ContractDebugStack, StaticVarData, catch_tx_panic,
 };
 
 /// Used as a flag to check the instance under lambda calls.

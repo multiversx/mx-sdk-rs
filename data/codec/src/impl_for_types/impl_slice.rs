@@ -1,6 +1,6 @@
 use crate::{
-    vec_into_boxed_slice, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedEncode, NestedEncodeOutput,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, vec_into_boxed_slice,
 };
 use alloc::{boxed::Box, vec::Vec};
 

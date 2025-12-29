@@ -1,7 +1,7 @@
 use crate::data::network_status::{NetworkStatus, NetworkStatusResponse};
 use anyhow::anyhow;
 
-use super::{GatewayRequest, GatewayRequestType, GET_NETWORK_STATUS_ENDPOINT, METACHAIN_SHARD_ID};
+use super::{GET_NETWORK_STATUS_ENDPOINT, GatewayRequest, GatewayRequestType, METACHAIN_SHARD_ID};
 
 /// Retrieves the network status from the proxy.
 pub struct NetworkStatusRequest {

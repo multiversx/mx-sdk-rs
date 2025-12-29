@@ -8,7 +8,7 @@ mod routes;
 use components::Footer;
 use context::ConfigProvider;
 use log::Level;
-use routes::{switch, Route};
+use routes::{Route, switch};
 use yew::prelude::*;
 use yew_router::{BrowserRouter, Switch};
 

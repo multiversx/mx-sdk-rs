@@ -1456,7 +1456,7 @@ where
     >(
         self,
         index: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, TokenId<Env::Api>, u64, NonZeroBigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("callback_data_at_index")
@@ -1577,7 +1577,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg3: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1749,8 +1749,8 @@ where
     Api: ManagedTypeApi,
 {
     pub callback_name: ManagedBuffer<Api>,
-    pub token_identifier: EgldOrEsdtTokenIdentifier<Api>,
+    pub token_identifier: TokenId<Api>,
     pub token_nonce: u64,
-    pub token_amount: BigUint<Api>,
+    pub token_amount: NonZeroBigUint<Api>,
     pub args: ManagedVec<Api, ManagedBuffer<Api>>,
 }

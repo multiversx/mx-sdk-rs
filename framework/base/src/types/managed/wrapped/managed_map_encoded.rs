@@ -1,7 +1,7 @@
 use multiversx_sc_codec::{TopDecode, TopEncode};
 use unwrap_infallible::UnwrapInfallible;
 
-use crate::api::{const_handles, ErrorApi, ManagedTypeApi};
+use crate::api::{ErrorApi, ManagedTypeApi, const_handles};
 use crate::contract_base::ExitCodecErrorHandler;
 use crate::err_msg;
 use crate::types::{ManagedBuffer, ManagedMap, ManagedRefMut};

@@ -2,8 +2,8 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, BlockchainApiImpl, CallTypeApi,
-        HandleConstraints, ManagedBufferApiImpl, RawHandle, SendApiImpl, StaticVarApiImpl,
+        BigIntApiImpl, BlockchainApiImpl, CallTypeApi, HandleConstraints, ManagedBufferApiImpl,
+        RawHandle, SendApiImpl, StaticVarApiImpl, const_handles, use_raw_handle,
     },
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenIdentifier, EsdtTokenPayment,

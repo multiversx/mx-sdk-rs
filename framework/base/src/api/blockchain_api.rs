@@ -1,7 +1,7 @@
 use super::{HandleTypeInfo, ManagedTypeApi, ManagedTypeApiImpl, RawHandle};
 use crate::types::{
-    heap::{Address, Box, H256},
     EsdtLocalRoleFlags,
+    heap::{Address, Box, H256},
 };
 
 pub trait BlockchainApi: ManagedTypeApi {

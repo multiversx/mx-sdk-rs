@@ -573,19 +573,16 @@ fn promises_call_async_accept_esdt_go() {
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_async_retrieve_egld_go() {
     world().run("scenarios/promises_call_async_retrieve_egld.scen.json");
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_async_retrieve_esdt_go() {
     world().run("scenarios/promises_call_async_retrieve_esdt.scen.json");
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_callback_directly_go() {
     world().run("scenarios/promises_call_callback_directly.scen.json");
 }

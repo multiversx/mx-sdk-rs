@@ -1,6 +1,6 @@
 use std::{path::Path, process};
 
-use multiversx_sc_meta_lib::version_history::{validate_template_tag, VERSIONS};
+use multiversx_sc_meta_lib::version_history::{VERSIONS, validate_template_tag};
 
 use crate::cmd::code_report::generate_report::{JSON, MD};
 

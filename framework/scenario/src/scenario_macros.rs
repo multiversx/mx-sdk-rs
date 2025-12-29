@@ -1,36 +1,26 @@
 #[macro_export]
 macro_rules! rust_biguint {
-    ($value:expr) => {{
-        multiversx_sc_scenario::num_bigint::BigUint::from($value as u64)
-    }};
+    ($value:expr) => {{ multiversx_sc_scenario::num_bigint::BigUint::from($value as u64) }};
 }
 
 #[macro_export]
 macro_rules! managed_biguint {
-    ($value:expr) => {{
-        multiversx_sc::types::BigUint::from($value as u64)
-    }};
+    ($value:expr) => {{ multiversx_sc::types::BigUint::from($value as u64) }};
 }
 
 #[macro_export]
 macro_rules! managed_buffer {
-    ($value:expr) => {{
-        multiversx_sc::types::ManagedBuffer::new_from_bytes($value)
-    }};
+    ($value:expr) => {{ multiversx_sc::types::ManagedBuffer::new_from_bytes($value) }};
 }
 
 #[macro_export]
 macro_rules! managed_address {
-    ($address:expr) => {{
-        multiversx_sc::types::ManagedAddress::from_address($address)
-    }};
+    ($address:expr) => {{ multiversx_sc::types::ManagedAddress::from_address($address) }};
 }
 
 #[macro_export]
 macro_rules! managed_token_id {
-    ($bytes:expr) => {{
-        multiversx_sc::types::EsdtTokenIdentifier::from_esdt_bytes($bytes)
-    }};
+    ($bytes:expr) => {{ multiversx_sc::types::EsdtTokenIdentifier::from_esdt_bytes($bytes) }};
 }
 
 #[macro_export]
@@ -44,16 +34,12 @@ macro_rules! managed_token_id_wrapped {
 
 #[macro_export]
 macro_rules! managed_egld_token_id {
-    () => {{
-        multiversx_sc::types::EgldOrEsdtTokenIdentifier::egld()
-    }};
+    () => {{ multiversx_sc::types::EgldOrEsdtTokenIdentifier::egld() }};
 }
 
 #[macro_export]
 macro_rules! token_id {
-    ($bytes:expr) => {{
-        multiversx_sc::types::TokenId::from($bytes)
-    }};
+    ($bytes:expr) => {{ multiversx_sc::types::TokenId::from($bytes) }};
 }
 
 #[macro_export]

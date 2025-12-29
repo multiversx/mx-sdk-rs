@@ -6,7 +6,7 @@ use crate::{
 };
 use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 
-use super::{raw_converter::*, ScCallMandos, ScQueryMandos, TxExpectMandos};
+use super::{ScCallMandos, ScQueryMandos, TxExpectMandos, raw_converter::*};
 use multiversx_chain_vm::blockchain::state::AccountData;
 
 pub(crate) struct MandosGenerator<'a> {

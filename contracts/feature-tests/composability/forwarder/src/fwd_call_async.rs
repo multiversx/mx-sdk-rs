@@ -49,7 +49,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
     #[endpoint]
     #[payable("*")]
     fn forward_async_accept_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().single_optional();
+        let payment = self.call_value().all();
         self.tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
@@ -119,23 +119,31 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .reject_funds()
-            .payment(payment)
+            .payment(MultiTransfer(payment))
             .callback(self.callbacks().retrieve_funds_callback())
             .async_call_and_exit()
     }
 
     #[callback]
     fn retrieve_funds_callback(&self) {
-        let (token, nonce, payment) = self.call_value().egld_or_single_esdt().into_tuple();
-        self.retrieve_funds_callback_event(&token, nonce, &payment);
+        self.async_callback_event();
 
-        let _ = self.callback_data().push(&CallbackData {
-            callback_name: ManagedBuffer::from(b"retrieve_funds_callback"),
-            token_identifier: token,
-            token_nonce: nonce,
-            token_amount: payment,
-            args: ManagedVec::new(),
-        });
+        let call_value = self.call_value().all();
+        for payment in &*call_value {
+            self.retrieve_funds_callback_event(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            );
+
+            let _ = self.callback_data().push(&CallbackData {
+                callback_name: ManagedBuffer::from(b"retrieve_funds_callback"),
+                token_identifier: payment.token_identifier.clone(),
+                token_nonce: payment.token_nonce,
+                token_amount: payment.amount.clone(),
+                args: ManagedVec::new(),
+            });
+        }
     }
 
     #[endpoint]
@@ -199,4 +207,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
             .payment(payment_args.convert_payment_multi_triples())
             .async_call_and_exit();
     }
+
+    #[event("async_callback")]
+    fn async_callback_event(&self);
 }

@@ -1,7 +1,7 @@
 use crate::{
     host::{
         context::big_int_to_i64,
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext, VMHooksHandler},
+        vm_hooks::{VMHooksContext, VMHooksHandler, vh_early_exit::early_exit_vm_error},
     },
     types::RawHandle,
     vm_err_msg,
@@ -11,7 +11,7 @@ use core::{
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
-use num_traits::{pow, sign::Signed, Zero};
+use num_traits::{Zero, pow, sign::Signed};
 use std::convert::TryInto;
 
 /// Provides VM hook implementations for methods that deal big ints.

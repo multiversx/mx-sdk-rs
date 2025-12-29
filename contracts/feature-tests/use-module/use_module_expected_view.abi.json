@@ -16,7 +16,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.63.1"
+            "version": "0.64.0"
         }
     },
     "docs": [
@@ -277,7 +277,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "EsdtTokenIdentifier"
+                    "type": "TokenIdentifier"
                 },
                 {
                     "name": "token_nonce",

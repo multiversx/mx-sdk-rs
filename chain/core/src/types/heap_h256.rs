@@ -91,7 +91,7 @@ impl HeapH256 {
     /// Allocates directly in heap.
     /// Minimal resulting wasm code (14 bytes if not inlined).
     pub fn zero() -> Self {
-        use alloc::alloc::{alloc_zeroed, Layout};
+        use alloc::alloc::{Layout, alloc_zeroed};
         unsafe {
             let ptr = alloc_zeroed(Layout::new::<[u8; 32]>()) as *mut [u8; 32];
             HeapH256(Box::from_raw(ptr))

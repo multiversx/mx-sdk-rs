@@ -18,10 +18,10 @@ multiversx_sc_wasm_adapter::endpoints! {
     payable_features
     (
         init => init
-        echo_call_value_legacy => echo_call_value_legacy
-        echo_call_value => echo_call_value
+        payable_legacy_egld_esdt => payable_legacy_egld_esdt
         payment_multiple => payment_multiple
         payable_all_transfers => payable_all_transfers
+        payable_all => payable_all
         payment_array_esdt_3 => payment_array_esdt_3
         payment_array_egld_or_esdt_3 => payment_array_egld_or_esdt_3
         payment_array_3 => payment_array_3

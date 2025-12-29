@@ -2,13 +2,13 @@
 name = "queue-repeat-meta"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dependencies.queue-repeat]
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]
-version = "0.63.1"
+version = "0.64.0"
 path = "../../../../../framework/meta-lib"
 default-features = false

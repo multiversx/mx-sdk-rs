@@ -1,4 +1,7 @@
-#![allow(clippy::type_complexity)]
+// TODO: remove once minimum version is 1.87+
+#![allow(unknown_lints)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::manual_is_multiple_of)]
 
 pub mod api;
 pub mod display_util;
@@ -35,7 +38,7 @@ pub use crate::scenario as mandos_system;
 // Re-exporting the whole mandos crate for easier use in tests.
 pub use multiversx_chain_scenario_format as scenario_format;
 
-pub use facade::{result_handlers::*, world_tx::*, ContractInfo, ScenarioWorld, WhiteboxContract};
+pub use facade::{ContractInfo, ScenarioWorld, WhiteboxContract, result_handlers::*, world_tx::*};
 
 use std::path::Path;
 

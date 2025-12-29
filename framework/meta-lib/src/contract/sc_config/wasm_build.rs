@@ -8,14 +8,14 @@ use std::{
     process::Command,
 };
 
-use super::execute_command::{execute_spawn_command, ExecuteCommandError};
 use super::ContractVariant;
+use super::execute_command::{ExecuteCommandError, execute_spawn_command};
 use crate::{
     abi_json::ContractAbiJson,
     cli::BuildArgs,
     ei::EIVersion,
     ei_check_json::EiCheckJson,
-    mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
+    mxsc_file_json::{MxscFileJson, save_mxsc_file_json},
     print_util::*,
     report_info_json::ReportInfoJson,
     tools::{self, WasmInfo, WasmReport},
@@ -156,7 +156,10 @@ impl ContractVariant {
         if let Some(config_wasm_opt_version) = &self.settings.wasm_opt_version {
             let contract_name = &self.contract_name;
 
-            assert!(build_args.wasm_opt, "Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without.");
+            assert!(
+                build_args.wasm_opt,
+                "Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without."
+            );
 
             let opt_version = wasm_opt::wasm_opt_version();
 
@@ -168,8 +171,10 @@ impl ContractVariant {
             let installed_wasm_opt_version = opt_version
                 .unwrap_or_else(|| panic!("Missing wasm-opt. Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without."));
 
-            assert_eq!(config_wasm_opt_version, &installed_wasm_opt_version,
-                "Incorrect wasm-opt version installed. Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}");
+            assert_eq!(
+                config_wasm_opt_version, &installed_wasm_opt_version,
+                "Incorrect wasm-opt version installed. Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}"
+            );
 
             true
         } else {

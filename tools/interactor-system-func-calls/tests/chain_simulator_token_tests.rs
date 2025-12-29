@@ -160,7 +160,9 @@ async fn cs_builtin_func_tokens_test() {
     interact
         .check_nft_uris(&dynamic_nft_token_id, nonce, &uris)
         .await;
-    println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
+    println!(
+        "Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created."
+    );
 
     // metadata recreate with empty uris
     interact
@@ -180,7 +182,9 @@ async fn cs_builtin_func_tokens_test() {
     interact
         .check_nft_uris(&dynamic_nft_token_id, nonce, &[])
         .await;
-    println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
+    println!(
+        "Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created."
+    );
 }
 
 async fn change_to_dynamic_test() {

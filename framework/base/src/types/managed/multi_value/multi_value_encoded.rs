@@ -1,5 +1,5 @@
-use multiversx_sc_codec::multi_types::MultiValue3;
 use multiversx_sc_codec::MultiValueLength;
+use multiversx_sc_codec::multi_types::MultiValue3;
 use unwrap_infallible::UnwrapInfallible;
 
 use crate::codec::multi_types::MultiValueVec;
@@ -11,9 +11,9 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
-        try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
-        TopDecode, TopDecodeMulti, TopDecodeMultiInput, TopEncode, TopEncodeMulti,
-        TopEncodeMultiOutput,
+        DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecode, TopDecodeMulti,
+        TopDecodeMultiInput, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        try_cast_execute_or_else,
     },
     contract_base::{ExitCodecErrorHandler, ManagedSerializer},
     err_msg,

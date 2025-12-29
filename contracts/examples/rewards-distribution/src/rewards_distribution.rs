@@ -438,17 +438,9 @@ pub trait RewardsDistribution:
 }
 
 fn ticket_to_storage(position: u64, ticket_id: u64) -> u64 {
-    if position == ticket_id {
-        0
-    } else {
-        ticket_id
-    }
+    if position == ticket_id { 0 } else { ticket_id }
 }
 
 fn ticket_from_storage(position: u64, ticket_id: u64) -> u64 {
-    if ticket_id == 0 {
-        position
-    } else {
-        ticket_id
-    }
+    if ticket_id == 0 { position } else { ticket_id }
 }

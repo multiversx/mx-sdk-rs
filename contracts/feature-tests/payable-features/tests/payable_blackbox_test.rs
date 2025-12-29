@@ -43,7 +43,7 @@ fn payable_multi_legacy() {
         .from(USER)
         .to(PAYABLE_FEATURES_ADDRESS)
         .typed(payable_features_proxy::PayableFeaturesProxy)
-        .echo_call_value_legacy()
+        .payable_legacy_egld_esdt()
         .esdt(TestEsdtTransfer(TOKEN_1, 0, 100))
         .esdt(TestEsdtTransfer(TOKEN_2, 0, 400))
         .returns(ReturnsResultUnmanaged)

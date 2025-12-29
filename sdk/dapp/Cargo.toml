@@ -1,7 +1,7 @@
 [package]
 name = "multiversx-sdk-dapp"
-version = "0.13.0"
-edition = "2021"
+version = "0.14.0"
+edition = "2024"
 
 authors = ["MultiversX <contact@multiversx.com>"]
 license = "MIT"
@@ -14,7 +14,7 @@ categories = ["cryptography::cryptocurrencies", "api-bindings"]
 keywords = ["multiversx", "blockchain", "sdk", "wasm", "wasm-bindgen"]
 
 [dependencies]
-getrandom = { version = "0.2.15", features = ["js"] } # js feature overrides import from sdk
+getrandom = { version = "0.3", features = ["wasm_js"] } # wasm_js feature overrides import from sdk
 web-sys = { version = "0.3.70" }
 js-sys = { version = "0.3.70" }
 wasm-bindgen = { version = "0.2.93" }
@@ -26,5 +26,5 @@ itertools = "0.14.0"
 log = "0.4.17"
 
 [dependencies.multiversx-sdk]
-version = "=0.13.0"
+version = "=0.14.0"
 path = "../core"

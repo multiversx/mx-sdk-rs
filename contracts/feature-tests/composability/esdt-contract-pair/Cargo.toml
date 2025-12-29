@@ -2,7 +2,7 @@
 name = "esdt-contract-pair"
 version = "0.0.0"
 authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dev-dependencies.first-contract]
@@ -12,9 +12,9 @@ path = "first-contract"
 path = "second-contract"
 
 [dev-dependencies.multiversx-sc]
-version = "0.63.1"
+version = "0.64.0"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.1"
+version = "0.64.0"
 path = "../../../../framework/scenario"

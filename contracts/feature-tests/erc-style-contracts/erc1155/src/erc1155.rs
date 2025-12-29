@@ -433,7 +433,7 @@ pub trait Erc1155 {
     #[view(getTokenOwner)]
     #[storage_mapper("tokenOwner")]
     fn token_owner(&self, type_id: &BigUint, nft_id: &BigUint)
-        -> SingleValueMapper<ManagedAddress>;
+    -> SingleValueMapper<ManagedAddress>;
 
     // token creator
 

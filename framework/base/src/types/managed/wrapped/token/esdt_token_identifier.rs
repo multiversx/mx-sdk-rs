@@ -28,8 +28,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for EsdtTokenIdentifier<M> {
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        EsdtTokenIdentifier {
-            token_id: TokenId::from_handle(handle),
+        unsafe {
+            EsdtTokenIdentifier {
+                token_id: TokenId::from_handle(handle),
+            }
         }
     }
 
@@ -38,7 +40,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for EsdtTokenIdentifier<M> {
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.token_id.forget_into_handle()
+        unsafe { self.token_id.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -213,7 +215,8 @@ impl<M: ManagedTypeApi> TypeAbi for EsdtTokenIdentifier<M> {
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        "EsdtTokenIdentifier".into()
+        // for backwards compatibility with existing tooling
+        "TokenIdentifier".into()
     }
 
     fn type_name_rust() -> TypeName {
