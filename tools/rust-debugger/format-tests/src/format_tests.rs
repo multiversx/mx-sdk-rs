@@ -263,7 +263,6 @@ fn main() {
     // Invalid TxContext test - simulate access after context change
     // This test relies on the debugger pretty printer's error handling
     // to detect when a weak pointer becomes invalid
-    let dropped_context = 
     let biguint_with_invalid_context =
         unsafe { BigUint::<DebugApi>::from_handle(create_handle_from_dropped_context()) };
     push!(
