@@ -12,21 +12,64 @@ permissions:
   pull-requests: write
 
 jobs:
-  contracts:
-    name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+  contracts-setup:
+    name: Setup Environment
+    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
     with:
       rust-toolchain: 1.87
-      wasm-opt-version: 125
-      setup-runs-on: ubuntu-latest
-      test-coverage-runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
       rust-target: wasm32v1-none
       path-to-sc-meta: framework/meta
       mx-scenario-go-version: v5.1.0
-      enable-interactor-tests: true
-      coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
+      wasm-opt-version: 125
+
+  contracts-rust-tests:
+    name: Rust Tests
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+
+  contracts-clippy-check:
+    name: Clippy Check
+    uses: multiversx/mx-sc-actions/.github/workflows/clippy-check.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+      clippy-args: "--all-targets --all-features"
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
+
+  contracts-wasm-tests:
+    name: Wasm Tests
+    needs: contracts-setup
+    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+      rust-target: wasm32v1-none
+      # path-to-sc-meta: framework/meta
+      enable-contracts-size-report: true
+
+  contracts-interactor-tests:
+    name: Interactor Tests
+    needs: contracts-setup
+    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+      rust-target: wasm32v1-none
+      # path-to-sc-meta: framework/meta
+
+  contracts-test-coverage:
+    name: Test Coverage
+    needs: contracts-setup
+    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+      rust-target: wasm32v1-none
+      coverage-args: "--ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md"
 
   formatting:
     name: cargo fmt
