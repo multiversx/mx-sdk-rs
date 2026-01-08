@@ -14,7 +14,10 @@ pub enum Status {
 #[multiversx_sc::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BigUint, deadline: TimestampMillis, token_identifier: TokenId) {
+    fn init(&self, token_identifier: TokenId, target: BigUint, deadline: TimestampMillis) {
+        require!(token_identifier.is_valid(), "Invalid token provided");
+        self.cf_token_identifier().set(token_identifier);
+
         require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
@@ -23,9 +26,6 @@ pub trait Crowdfunding {
             "Deadline can't be in the past"
         );
         self.deadline().set(deadline);
-
-        require!(token_identifier.is_valid(), "Invalid token provided");
-        self.cf_token_identifier().set(token_identifier);
     }
 
     #[endpoint]
@@ -34,12 +34,13 @@ pub trait Crowdfunding {
         let payment = self.call_value().single();
 
         require!(
-            self.status() == Status::FundingPeriod,
-            "cannot fund after deadline"
-        );
-        require!(
             payment.token_identifier == self.cf_token_identifier().get(),
             "wrong token"
+        );
+        require!(payment.is_fungible(), "only fungible tokens accepted");
+        require!(
+            self.status() == Status::FundingPeriod,
+            "cannot fund after deadline"
         );
 
         let caller = self.blockchain().get_caller();
