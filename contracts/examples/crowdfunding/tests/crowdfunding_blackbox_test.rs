@@ -18,11 +18,11 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-struct CrowdfundingESDTTestState {
+struct CrowdfundingTestState {
     world: ScenarioWorld,
 }
 
-impl CrowdfundingESDTTestState {
+impl CrowdfundingTestState {
     fn new() -> Self {
         let mut world = world();
 
@@ -113,7 +113,7 @@ impl CrowdfundingESDTTestState {
 
 #[test]
 fn test_fund() {
-    let mut state = CrowdfundingESDTTestState::new();
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     state.fund(FIRST_USER_ADDRESS, 1_000u64);
@@ -122,7 +122,7 @@ fn test_fund() {
 
 #[test]
 fn test_status() {
-    let mut state = CrowdfundingESDTTestState::new();
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     state.check_status(crowdfunding_proxy::Status::FundingPeriod);
@@ -130,7 +130,7 @@ fn test_status() {
 
 #[test]
 fn test_sc_error() {
-    let mut state = CrowdfundingESDTTestState::new();
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     state
@@ -149,7 +149,7 @@ fn test_sc_error() {
 
 #[test]
 fn test_successful_cf() {
-    let mut state = CrowdfundingESDTTestState::new();
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     // first user fund
@@ -186,7 +186,7 @@ fn test_successful_cf() {
 
 #[test]
 fn test_failed_cf() {
-    let mut state = CrowdfundingESDTTestState::new();
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     // first user fund

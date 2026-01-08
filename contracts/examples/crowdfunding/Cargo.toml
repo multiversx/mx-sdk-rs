@@ -16,8 +16,3 @@ path = "../../../framework/base"
 version = "0.64.0"
 features = ["wasmer-experimental"]
 path = "../../../framework/scenario"
-
-[dev-dependencies]
-num-bigint = "0.4"
-num-traits = "0.2"
-hex = "0.4"
