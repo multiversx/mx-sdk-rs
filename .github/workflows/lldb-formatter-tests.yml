@@ -12,10 +12,9 @@ jobs:
     name: LLDB formatter tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          default: true
           toolchain: 1.87
 
       - name: Download vscode-lldb
@@ -28,8 +27,8 @@ jobs:
       - name: Setup vscode-lldb
         run: |
           unzip codelldb-linux-x64.vsix -d vscode-lldb
-          mkdir -p $HOME/.vscode/extensions/vadimcn.vscode-lldb
-          mv vscode-lldb/extension/* $HOME/.vscode/extensions/vadimcn.vscode-lldb
+          mkdir -p "$HOME"/.vscode/extensions/vadimcn.vscode-lldb
+          mv vscode-lldb/extension/* "$HOME"/.vscode/extensions/vadimcn.vscode-lldb
 
       - name: Run the rust tests
         run: |
