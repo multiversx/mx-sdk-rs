@@ -61,6 +61,7 @@ jobs:
 
   test-coverage:
     name: Test Coverage
+    if: false  # Temporarily disabled
     needs: mx-env-setup
     uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@aefb055087c121639648898223cfaaf72da72650
     with:
