@@ -33,7 +33,9 @@ jobs:
           mkdir -p "$HOME"/.vscode/extensions/vadimcn.vscode-lldb
           mv vscode-lldb/extension/* "$HOME"/.vscode/extensions/vadimcn.vscode-lldb
 
-      - name: Run the rust tests
+      - name: Run the LLDB tests
+        env:
+          CARGO_PROFILE_DEV_DEBUG: 2
         run: |
           cd tools/rust-debugger/format-tests
           cargo test
