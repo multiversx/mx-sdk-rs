@@ -82,6 +82,7 @@ jobs:
 
   proxy-compare:
     name: Proxy Compare
+    needs: setup
     uses: multiversx/mx-sc-actions/.github/workflows/proxy-compare.yml@b4c4e6c942f6d35578beddac98a16055735cd0c2
     with:
       rust-toolchain: 1.87
