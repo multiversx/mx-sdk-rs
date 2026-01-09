@@ -14,7 +14,7 @@ permissions:
 jobs:
   contracts-setup:
     name: Setup Environment
-    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -25,14 +25,14 @@ jobs:
 
   contracts-rust-tests:
     name: Rust Tests
-    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
 
   contracts-clippy-check:
     name: Clippy Check
-    uses: multiversx/mx-sc-actions/.github/workflows/clippy-check.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    uses: multiversx/mx-sc-actions/.github/workflows/clippy-check.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -43,28 +43,26 @@ jobs:
   contracts-wasm-tests:
     name: Wasm Tests
     needs: contracts-setup
-    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
       rust-target: wasm32v1-none
-      # path-to-sc-meta: framework/meta
       enable-contracts-size-report: true
 
   contracts-interactor-tests:
     name: Interactor Tests
     needs: contracts-setup
-    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
       rust-target: wasm32v1-none
-      # path-to-sc-meta: framework/meta
 
   contracts-test-coverage:
     name: Test Coverage
     needs: contracts-setup
-    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@f0a63c5e19f5f1be4f98b2731bf7de2d41374869
+    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
