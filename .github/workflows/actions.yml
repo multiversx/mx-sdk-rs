@@ -12,9 +12,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  mx-env-setup:
+  setup:
     name: Setup Environment
-    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@9f9a38201543fa689c54c61536bfca0419fcff1d
+    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@b68fa0ce2e2c347b14db8ad421b0cf47bbec83fd
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -25,8 +25,8 @@ jobs:
 
   build-contracts:
     name: Build Contracts
-    needs: mx-env-setup
-    uses: multiversx/mx-sc-actions/.github/workflows/build-contracts.yml@9f9a38201543fa689c54c61536bfca0419fcff1d
+    needs: setup
+    uses: multiversx/mx-sc-actions/.github/workflows/build-contracts.yml@b68fa0ce2e2c347b14db8ad421b0cf47bbec83fd
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -34,25 +34,15 @@ jobs:
 
   rust-tests:
     name: Rust Tests
-    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@9f9a38201543fa689c54c61536bfca0419fcff1d
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@b68fa0ce2e2c347b14db8ad421b0cf47bbec83fd
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
-
-  clippy-check:
-    name: Clippy Check
-    uses: multiversx/mx-sc-actions/.github/workflows/clippy-check.yml@9f9a38201543fa689c54c61536bfca0419fcff1d
-    with:
-      rust-toolchain: 1.87
-      runs-on: ubuntu-latest
-      clippy-args: "--all-targets --all-features"
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
 
   wasm-tests:
     name: Wasm Tests
     needs: build-contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@9f9a38201543fa689c54c61536bfca0419fcff1d
+    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@b68fa0ce2e2c347b14db8ad421b0cf47bbec83fd
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -60,15 +50,15 @@ jobs:
   interactor-tests:
     name: Interactor Tests
     needs: build-contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@9f9a38201543fa689c54c61536bfca0419fcff1d
+    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@b68fa0ce2e2c347b14db8ad421b0cf47bbec83fd
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
 
-  generate_report:
+  generate-report:
     name: Generate Report
     needs: build-contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/report.yml@9f9a38201543fa689c54c61536bfca0419fcff1d
+    uses: multiversx/mx-sc-actions/.github/workflows/report.yml@b68fa0ce2e2c347b14db8ad421b0cf47bbec83fd
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -76,13 +66,28 @@ jobs:
   test-coverage:
     name: Test Coverage
     if: false  # Temporarily disabled
-    needs: mx-env-setup
-    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@9f9a38201543fa689c54c61536bfca0419fcff1d
+    needs: setup
+    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@b68fa0ce2e2c347b14db8ad421b0cf47bbec83fd
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
-      rust-target: wasm32v1-none
       coverage-args: "--ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md"
+
+  clippy-check:
+    name: Clippy linter check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.87
+          components: clippy
+      - uses: giraffate/clippy-action@v1
+        env:
+          RUSTFLAGS: ""
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          clippy_flags: "--all-targets --all-features"
 
   formatting:
     name: cargo fmt
