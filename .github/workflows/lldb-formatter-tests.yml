@@ -1,4 +1,4 @@
-name: CI
+name: LLDB
 
 on:
   push:
@@ -33,4 +33,6 @@ jobs:
       - name: Run the rust tests
         run: |
           cd tools/rust-debugger/format-tests
+          # Build in debug mode to ensure debug symbols are available
+          cargo build
           cargo test
