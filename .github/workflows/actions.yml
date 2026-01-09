@@ -14,7 +14,7 @@ permissions:
 jobs:
   mx-env-setup:
     name: Setup Environment
-    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@aefb055087c121639648898223cfaaf72da72650
+    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@5c809a2c240e25e1176e5a5cc2fcc0df7fa09334
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -23,16 +23,25 @@ jobs:
       mx-scenario-go-version: v5.1.0
       wasm-opt-version: 125
 
+  build-contracts:
+    name: Build Contracts
+    needs: mx-env-setup
+    uses: multiversx/mx-sc-actions/.github/workflows/build-contracts.yml@5c809a2c240e25e1176e5a5cc2fcc0df7fa09334
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+      rust-target: wasm32v1-none
+
   rust-tests:
     name: Rust Tests
-    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@aefb055087c121639648898223cfaaf72da72650
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@5c809a2c240e25e1176e5a5cc2fcc0df7fa09334
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
 
   clippy-check:
     name: Clippy Check
-    uses: multiversx/mx-sc-actions/.github/workflows/clippy-check.yml@aefb055087c121639648898223cfaaf72da72650
+    uses: multiversx/mx-sc-actions/.github/workflows/clippy-check.yml@5c809a2c240e25e1176e5a5cc2fcc0df7fa09334
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -42,8 +51,8 @@ jobs:
 
   wasm-tests:
     name: Wasm Tests
-    needs: mx-env-setup
-    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@aefb055087c121639648898223cfaaf72da72650
+    needs: build-contracts
+    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@5c809a2c240e25e1176e5a5cc2fcc0df7fa09334
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -52,8 +61,8 @@ jobs:
 
   interactor-tests:
     name: Interactor Tests
-    needs: mx-env-setup
-    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@aefb055087c121639648898223cfaaf72da72650
+    needs: build-contracts
+    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@5c809a2c240e25e1176e5a5cc2fcc0df7fa09334
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -63,7 +72,7 @@ jobs:
     name: Test Coverage
     if: false  # Temporarily disabled
     needs: mx-env-setup
-    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@aefb055087c121639648898223cfaaf72da72650
+    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@5c809a2c240e25e1176e5a5cc2fcc0df7fa09334
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
