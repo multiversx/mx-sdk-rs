@@ -2,7 +2,7 @@ use multiversx_sc::{
     chain_core::EGLD_000000_TOKEN_IDENTIFIER,
     types::{
         BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenIdentifier,
-        EsdtTokenPayment, ManagedBuffer, TokenId,
+        EsdtTokenPayment, ManagedBuffer, ManagedVec, TokenId,
     },
 };
 use multiversx_sc_scenario::{
@@ -244,5 +244,47 @@ fn test_token_id_to_string() {
     assert_eq!(
         EsdtTokenIdentifier::<StaticApi>::from_esdt_bytes("ESDT-00001").to_string(),
         "ESDT-00001"
+    );
+}
+
+/// This test proves that ManagedVecItem::read_from_payload applies backward compatibility.
+///
+/// BEFORE THE FIX: This test would FAIL because:
+/// - ManagedVecItem for TokenId used `impl_managed_type!` macro
+/// - That macro called `TokenId::from_handle()` directly
+/// - No conversion of "EGLD" -> "EGLD-000000" was applied
+/// - Result: token_id.to_string() == "EGLD" (4 bytes, not converted)
+///
+/// AFTER THE FIX: This test PASSES because:
+/// - Custom ManagedVecItem impl calls `TokenId::new_backwards_compatible()`
+/// - "EGLD" is converted to "EGLD-000000"
+/// - Result: token_id.to_string() == "EGLD-000000"
+#[test]
+fn test_managed_vec_item_egld_backward_compat_regression() {
+    // Simulate what happens when the VM provides "EGLD" (old format) in a ManagedVec payload.
+    // This is exactly the path used by call_value().all() -> ManagedVec<Payment>
+    //
+    // The ManagedVec stores TokenId as a 4-byte handle pointing to a buffer.
+    // We create a TokenId with "EGLD" content, push it to a ManagedVec,
+    // then read it back via .get() which uses ManagedVecItem::read_from_payload.
+
+    // Create a TokenId containing "EGLD" (the old 4-byte representation)
+    // Using TokenId::new() directly to bypass any automatic conversion
+    let egld_old = TokenId::<StaticApi>::new(ManagedBuffer::from(b"EGLD"));
+
+    // Push to ManagedVec - this calls save_to_payload
+    let mut vec: ManagedVec<StaticApi, TokenId<StaticApi>> = ManagedVec::new();
+    vec.push(egld_old);
+
+    // Read back via .get() - this calls ManagedVecItem::read_from_payload
+    // BEFORE FIX: would return "EGLD" (not converted)
+    // AFTER FIX: returns "EGLD-000000" (converted by new_backwards_compatible)
+    let token_id_read_back = vec.get(0);
+
+    // This assertion would FAIL before the fix (would be "EGLD")
+    assert_eq!(
+        token_id_read_back.to_string(),
+        "EGLD-000000",
+        "ManagedVecItem::read_from_payload should convert 'EGLD' to 'EGLD-000000'"
     );
 }

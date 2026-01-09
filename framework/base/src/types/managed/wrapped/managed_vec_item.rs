@@ -243,7 +243,32 @@ impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {EsdtTokenIdentifier}
 impl_managed_type! {EgldOrEsdtTokenIdentifier}
-impl_managed_type! {TokenId}
+// Custom implementation for TokenId to apply backward compatibility conversion
+// when reading from ManagedVec (e.g., from call_value().all()).
+// This ensures "EGLD" is converted to "EGLD-000000" consistently.
+impl<M: ManagedTypeApi> ManagedVecItem for TokenId<M> {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>;
+    const SKIPS_RESERIALIZATION: bool = false;
+    type Ref<'a> = ManagedRef<'a, M, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let handle = use_raw_handle(i32::read_from_payload(payload));
+        let buffer = unsafe { ManagedBuffer::from_handle(handle) };
+        Self::new_backwards_compatible(buffer)
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        unsafe {
+            let token_id = Self::read_from_payload(payload);
+            ManagedRef::wrap_handle(token_id.into_managed_buffer().get_handle())
+        }
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        let handle = unsafe { self.forget_into_handle() };
+        handle.get_raw_handle().save_to_payload(payload);
+    }
+}
 
 impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>
 where
