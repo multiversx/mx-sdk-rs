@@ -12,6 +12,20 @@ permissions:
   pull-requests: write
 
 jobs:
+  rust-tests-min:
+    name: Rust Tests (rustc 1.85)
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@a7c6f6203974b11bb08337066fdbee89b898ca7e
+    with:
+      rust-toolchain: 1.85
+      runs-on: ubuntu-latest
+
+  rust-tests-max:
+    name: Rust Tests (rustc 1.92)
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@a7c6f6203974b11bb08337066fdbee89b898ca7e
+    with:
+      rust-toolchain: 1.92
+      runs-on: ubuntu-latest
+
   setup:
     name: Setup Environment
     uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@a7c6f6203974b11bb08337066fdbee89b898ca7e
@@ -31,13 +45,6 @@ jobs:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
       rust-target: wasm32v1-none
-
-  rust-tests:
-    name: Rust Tests
-    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@a7c6f6203974b11bb08337066fdbee89b898ca7e
-    with:
-      rust-toolchain: 1.87
-      runs-on: ubuntu-latest
 
   wasm-tests:
     name: Wasm Tests
