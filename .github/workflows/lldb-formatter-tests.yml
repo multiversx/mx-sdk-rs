@@ -33,6 +33,7 @@ jobs:
       - name: Run the rust tests
         run: |
           cd tools/rust-debugger/format-tests
-          # Build in debug mode to ensure debug symbols are available
+          # Build with explicit debug info for LLDB compatibility
+          export RUSTFLAGS="-C debuginfo=2 -C opt-level=0"
           cargo build
           cargo test
