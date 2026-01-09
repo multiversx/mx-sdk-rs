@@ -12,7 +12,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  contracts-setup:
+  mx-env-setup:
     name: Setup Environment
     uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@aefb055087c121639648898223cfaaf72da72650
     with:
@@ -23,14 +23,14 @@ jobs:
       mx-scenario-go-version: v5.1.0
       wasm-opt-version: 125
 
-  contracts-rust-tests:
+  rust-tests:
     name: Rust Tests
     uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
 
-  contracts-clippy-check:
+  clippy-check:
     name: Clippy Check
     uses: multiversx/mx-sc-actions/.github/workflows/clippy-check.yml@aefb055087c121639648898223cfaaf72da72650
     with:
@@ -40,9 +40,9 @@ jobs:
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
-  contracts-wasm-tests:
+  wasm-tests:
     name: Wasm Tests
-    needs: contracts-setup
+    needs: mx-env-setup
     uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
@@ -50,18 +50,18 @@ jobs:
       rust-target: wasm32v1-none
       enable-contracts-size-report: true
 
-  contracts-interactor-tests:
+  interactor-tests:
     name: Interactor Tests
-    needs: contracts-setup
+    needs: mx-env-setup
     uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
       rust-target: wasm32v1-none
 
-  contracts-test-coverage:
+  test-coverage:
     name: Test Coverage
-    needs: contracts-setup
+    needs: mx-env-setup
     uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@aefb055087c121639648898223cfaaf72da72650
     with:
       rust-toolchain: 1.87
