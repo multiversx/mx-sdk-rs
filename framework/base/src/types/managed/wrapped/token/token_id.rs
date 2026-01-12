@@ -194,7 +194,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenId<M> {
 impl<M: ManagedTypeApi> From<EgldOrEsdtTokenIdentifier<M>> for TokenId<M> {
     #[inline]
     fn from(token_id: EgldOrEsdtTokenIdentifier<M>) -> Self {
-        // EgldOrEsdtTokenIdentifier is also kept in memory as with the same representation as TokenId
+        // EgldOrEsdtTokenIdentifier is also kept in memory with the same representation as TokenId
         // EGLD legacy conversion is performed at deserialization, creation and conversion
         token_id.token_id
     }
