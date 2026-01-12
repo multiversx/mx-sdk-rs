@@ -174,23 +174,20 @@ fn test_token_identifier_eq() {
     );
 }
 
-/// TODO: signal error in StaticApi raises VMHooksEarlyExit instead of a nice string message
 #[test]
-#[should_panic]
+#[should_panic = "StaticApi signal error: ESDT expected"]
 pub fn esdt_token_identifier_unwrap_1() {
     let _ = EsdtTokenIdentifier::<StaticApi>::from("");
 }
 
-/// TODO: signal error in StaticApi raises VMHooksEarlyExit instead of a nice string message
 #[test]
-#[should_panic]
+#[should_panic = "StaticApi signal error: ESDT expected"]
 pub fn esdt_token_identifier_unwrap_2() {
     let _ = EsdtTokenIdentifier::<StaticApi>::from("EGLD");
 }
 
-/// TODO: signal error in StaticApi raises VMHooksEarlyExit instead of a nice string message
 #[test]
-#[should_panic]
+#[should_panic = "StaticApi signal error: ESDT expected"]
 pub fn esdt_token_identifier_unwrap_3() {
     let _ = EsdtTokenIdentifier::<StaticApi>::from(EGLD_000000_TOKEN_IDENTIFIER);
 }
