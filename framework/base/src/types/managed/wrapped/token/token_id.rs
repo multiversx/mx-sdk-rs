@@ -10,8 +10,8 @@ use crate::{
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
     types::{
-        EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType,
-        TokenIdentifier,
+        EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier, LEGACY_EGLD_REPRESENTATION, ManagedBuffer,
+        ManagedRef, ManagedType, TokenIdentifier,
     },
 };
 
@@ -52,16 +52,50 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenId<M> {
 }
 
 impl<M: ManagedTypeApi> TokenId<M> {
+    /// Creates a new TokenId from a ManagedBuffer.
+    ///
+    /// Automatically handles backwards compatibility by converting:
+    /// - Empty buffers to the native token (EGLD-000000)
+    /// - Legacy "EGLD" representation to the native token (EGLD-000000)
+    /// - All other values are stored as-is
     pub fn new(data: ManagedBuffer<M>) -> Self {
+        Self::new_backwards_compatible(data)
+    }
+
+    /// Creates a new TokenId with backwards compatibility for legacy EGLD representations.
+    ///
+    /// This method handles the conversion of legacy EGLD representations to the current standard:
+    /// - Empty buffers are converted to the native token (EGLD-000000)
+    /// - The legacy "EGLD" representation is converted to "EGLD-000000"
+    /// - All other token identifiers are stored without modification
+    ///
+    /// This ensures consistency across the codebase when dealing with the native token.
+    pub fn new_backwards_compatible(data: ManagedBuffer<M>) -> Self {
+        const LEGACY_EGLD_REPRESENTATION_LEN: usize = LEGACY_EGLD_REPRESENTATION.len();
+        match data.len() {
+            0 => Self::native(),
+            LEGACY_EGLD_REPRESENTATION_LEN if data == LEGACY_EGLD_REPRESENTATION => Self::native(),
+            _ => unsafe { Self::new_unchecked(data) },
+        }
+    }
+
+    /// Creates a TokenId without any conversion or validation.
+    ///
+    /// ## Safety
+    ///
+    /// It does not convert the legacy EGLD representation ("EGLD" -> "EGLD-000000"). Only use if you are certain you are not in this scenario.
+    pub unsafe fn new_unchecked(data: ManagedBuffer<M>) -> Self {
         Self { buffer: data }
     }
 
-    pub fn new_backwards_compatible(data: ManagedBuffer<M>) -> Self {
-        if data == EgldOrEsdtTokenIdentifier::<M>::EGLD_REPRESENTATION {
-            Self::from(EGLD_000000_TOKEN_IDENTIFIER.as_bytes())
-        } else {
-            Self { buffer: data }
-        }
+    /// Creates a TokenId representing the native token on the chain.
+    ///
+    /// Returns a TokenId with the value "EGLD-000000", which is the current standard
+    /// representation for the native EGLD token.
+    ///
+    /// Future developments might make this configurable for custom chains.
+    pub fn native() -> Self {
+        unsafe { Self::new_unchecked(ManagedBuffer::from(EGLD_000000_TOKEN_IDENTIFIER)) }
     }
 
     #[inline]
@@ -153,30 +187,28 @@ impl<M: ManagedTypeApi> AsRef<TokenId<M>> for EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenId<M> {
     #[inline]
     fn from(buffer: ManagedBuffer<M>) -> Self {
-        TokenId { buffer }
+        Self::new_backwards_compatible(buffer)
     }
 }
 
 impl<M: ManagedTypeApi> From<EgldOrEsdtTokenIdentifier<M>> for TokenId<M> {
     #[inline]
     fn from(token_id: EgldOrEsdtTokenIdentifier<M>) -> Self {
+        // EgldOrEsdtTokenIdentifier is also kept in memory as with the same representation as TokenId
+        // EGLD legacy conversion is performed at deserialization, creation and conversion
         token_id.token_id
     }
 }
 
 impl<M: ManagedTypeApi> From<&[u8]> for TokenId<M> {
     fn from(bytes: &[u8]) -> Self {
-        TokenId {
-            buffer: ManagedBuffer::new_from_bytes(bytes),
-        }
+        Self::new_backwards_compatible(ManagedBuffer::new_from_bytes(bytes))
     }
 }
 
 impl<M: ManagedTypeApi, const N: usize> From<&[u8; N]> for TokenId<M> {
     fn from(bytes: &[u8; N]) -> Self {
-        TokenId {
-            buffer: ManagedBuffer::new_from_bytes(bytes),
-        }
+        Self::new_backwards_compatible(ManagedBuffer::new_from_bytes(bytes))
     }
 }
 

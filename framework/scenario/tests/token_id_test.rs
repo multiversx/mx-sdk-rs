@@ -2,12 +2,21 @@ use multiversx_sc::{
     chain_core::EGLD_000000_TOKEN_IDENTIFIER,
     types::{
         BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenIdentifier,
-        EsdtTokenPayment, ManagedBuffer, ManagedVec, TokenId,
+        EsdtTokenPayment, ManagedBuffer, TokenId,
     },
 };
 use multiversx_sc_scenario::{
-    api::StaticApi, managed_test_util::check_managed_top_encode_decode, multiversx_sc, token_id,
+    api::StaticApi,
+    managed_test_util::{check_managed_top_decode, check_managed_top_encode_decode},
+    multiversx_sc, token_id,
 };
+
+#[test]
+fn test_egld() {
+    assert!(EgldOrEsdtTokenIdentifier::<StaticApi>::egld().is_egld());
+    assert!(TokenId::<StaticApi>::native().is_native());
+    assert!(TokenId::<StaticApi>::native().as_legacy().is_egld());
+}
 
 #[test]
 fn test_codec_top() {
@@ -15,6 +24,16 @@ fn test_codec_top() {
         TokenId::<StaticApi>::from(EGLD_000000_TOKEN_IDENTIFIER),
         EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
     );
+}
+
+#[test]
+fn test_decode_top_backwards_compatibility() {
+    for egld_token_id_str in ["", "EGLD", EGLD_000000_TOKEN_IDENTIFIER] {
+        let deserialized: TokenId<StaticApi> =
+            check_managed_top_decode(egld_token_id_str.as_bytes());
+        assert!(deserialized.is_native());
+        assert!(deserialized.as_legacy().is_egld());
+    }
 }
 
 #[test]
@@ -27,6 +46,21 @@ fn test_codec_nested() {
         vec![TokenId::<StaticApi>::from(EGLD_000000_TOKEN_IDENTIFIER)],
         expected.as_slice(),
     );
+}
+
+#[test]
+fn test_decode_nested_backwards_compatibility() {
+    for egld_token_id_str in ["", "EGLD", EGLD_000000_TOKEN_IDENTIFIER] {
+        let encoded_vec = BoxedBytes::from_concat(&[
+            &[0, 0, 0, egld_token_id_str.len() as u8],
+            egld_token_id_str.as_bytes(),
+        ]);
+        let deserialized: Vec<TokenId<StaticApi>> =
+            check_managed_top_decode(encoded_vec.as_slice());
+        assert_eq!(deserialized.len(), 1);
+        assert!(deserialized[0].is_native());
+        assert!(deserialized[0].as_legacy().is_egld());
+    }
 }
 
 #[test]
@@ -143,7 +177,45 @@ fn test_is_valid_egld_or_esdt() {
 }
 
 #[test]
-fn test_token_identifier_eq() {
+fn test_token_id_backwards_compatibility() {
+    for egld_token_id_str in ["", "EGLD", "EGLD-000000"] {
+        let token_id =
+            TokenId::<StaticApi>::new(ManagedBuffer::<StaticApi>::from(egld_token_id_str));
+        assert!(token_id.is_native());
+        assert!(token_id.as_legacy().is_egld());
+        let token_id = TokenId::<StaticApi>::new_backwards_compatible(
+            ManagedBuffer::<StaticApi>::from(egld_token_id_str),
+        );
+        assert!(token_id.is_native());
+        assert!(token_id.as_legacy().is_egld());
+        let token_id =
+            TokenId::<StaticApi>::from(ManagedBuffer::<StaticApi>::from(egld_token_id_str));
+        assert!(token_id.is_native());
+        assert!(token_id.as_legacy().is_egld());
+        let token_id = TokenId::<StaticApi>::from(egld_token_id_str);
+        assert!(token_id.is_native());
+        assert!(token_id.as_legacy().is_egld());
+    }
+}
+
+#[test]
+fn test_egld_or_esdt_token_identifier_backwards_compatibility() {
+    for egld_token_id_str in ["", "EGLD", "EGLD-000000"] {
+        let old_token_id = EgldOrEsdtTokenIdentifier::<StaticApi>::parse(
+            ManagedBuffer::<StaticApi>::from(egld_token_id_str),
+        );
+        assert!(old_token_id.is_egld());
+        let old_token_id = EgldOrEsdtTokenIdentifier::<StaticApi>::from(
+            ManagedBuffer::<StaticApi>::from(egld_token_id_str),
+        );
+        assert!(old_token_id.is_egld());
+        let old_token_id = EgldOrEsdtTokenIdentifier::<StaticApi>::from(egld_token_id_str);
+        assert!(old_token_id.is_egld());
+    }
+}
+
+#[test]
+fn test_token_id_eq() {
     assert_eq!(
         TokenId::<StaticApi>::from("ESDT-00000"),
         TokenId::<StaticApi>::from("ESDT-00000")
@@ -161,7 +233,7 @@ fn test_token_identifier_eq() {
         EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
         TokenId::<StaticApi>::from("ANYTHING-1234").into_legacy()
     );
-    assert_ne!(
+    assert_eq!(
         EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
         TokenId::<StaticApi>::from("EGLD").into_legacy()
     );
@@ -244,47 +316,5 @@ fn test_token_id_to_string() {
     assert_eq!(
         EsdtTokenIdentifier::<StaticApi>::from_esdt_bytes("ESDT-00001").to_string(),
         "ESDT-00001"
-    );
-}
-
-/// This test proves that ManagedVecItem::read_from_payload applies backward compatibility.
-///
-/// BEFORE THE FIX: This test would FAIL because:
-/// - ManagedVecItem for TokenId used `impl_managed_type!` macro
-/// - That macro called `TokenId::from_handle()` directly
-/// - No conversion of "EGLD" -> "EGLD-000000" was applied
-/// - Result: token_id.to_string() == "EGLD" (4 bytes, not converted)
-///
-/// AFTER THE FIX: This test PASSES because:
-/// - Custom ManagedVecItem impl calls `TokenId::new_backwards_compatible()`
-/// - "EGLD" is converted to "EGLD-000000"
-/// - Result: token_id.to_string() == "EGLD-000000"
-#[test]
-fn test_managed_vec_item_egld_backward_compat_regression() {
-    // Simulate what happens when the VM provides "EGLD" (old format) in a ManagedVec payload.
-    // This is exactly the path used by call_value().all() -> ManagedVec<Payment>
-    //
-    // The ManagedVec stores TokenId as a 4-byte handle pointing to a buffer.
-    // We create a TokenId with "EGLD" content, push it to a ManagedVec,
-    // then read it back via .get() which uses ManagedVecItem::read_from_payload.
-
-    // Create a TokenId containing "EGLD" (the old 4-byte representation)
-    // Using TokenId::new() directly to bypass any automatic conversion
-    let egld_old = TokenId::<StaticApi>::new(ManagedBuffer::from(b"EGLD"));
-
-    // Push to ManagedVec - this calls save_to_payload
-    let mut vec: ManagedVec<StaticApi, TokenId<StaticApi>> = ManagedVec::new();
-    vec.push(egld_old);
-
-    // Read back via .get() - this calls ManagedVecItem::read_from_payload
-    // BEFORE FIX: would return "EGLD" (not converted)
-    // AFTER FIX: returns "EGLD-000000" (converted by new_backwards_compatible)
-    let token_id_read_back = vec.get(0);
-
-    // This assertion would FAIL before the fix (would be "EGLD")
-    assert_eq!(
-        token_id_read_back.to_string(),
-        "EGLD-000000",
-        "ManagedVecItem::read_from_payload should convert 'EGLD' to 'EGLD-000000'"
     );
 }
