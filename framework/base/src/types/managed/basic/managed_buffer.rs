@@ -591,3 +591,47 @@ impl<M: ManagedTypeApi> core::fmt::Display for ManagedBuffer<M> {
         s.fmt(f)
     }
 }
+
+#[cfg(feature = "serde")]
+impl<M: ManagedTypeApi> serde::Serialize for ManagedBuffer<M> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let bytes = self.to_boxed_bytes();
+        let s = alloc::string::String::from_utf8(bytes.into_vec())
+            .map_err(serde::ser::Error::custom)?;
+        serializer.serialize_str(&s)
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, M: ManagedTypeApi> serde::Deserialize<'de> for ManagedBuffer<M> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct ManagedBufferVisitor<M: ManagedTypeApi> {
+            _phantom: core::marker::PhantomData<M>,
+        }
+
+        impl<'de, M: ManagedTypeApi> serde::de::Visitor<'de> for ManagedBufferVisitor<M> {
+            type Value = ManagedBuffer<M>;
+
+            fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
+                formatter.write_str("ManagedBuffer, as string")
+            }
+
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Ok(ManagedBuffer::new_from_bytes(v.as_bytes()))
+            }
+        }
+
+        deserializer.deserialize_str(ManagedBufferVisitor {
+            _phantom: core::marker::PhantomData,
+        })
+    }
+}
