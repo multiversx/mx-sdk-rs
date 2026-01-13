@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-modules"
-version = "0.64.0"
+version = "0.64.1"
 edition = "2024"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -17,5 +17,5 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 alloc = ["multiversx-sc/alloc"]
 
 [dependencies.multiversx-sc]
-version = "0.64.0"
+version = "0.64.1"
 path = "../../framework/base"
