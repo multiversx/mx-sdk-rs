@@ -6,8 +6,17 @@ use multiversx_sc::{
     },
 };
 use multiversx_sc_scenario::{
-    api::StaticApi, managed_test_util::check_managed_top_encode_decode, multiversx_sc, token_id,
+    api::StaticApi,
+    managed_test_util::{check_managed_top_decode, check_managed_top_encode_decode},
+    multiversx_sc, token_id,
 };
+
+#[test]
+fn test_egld() {
+    assert!(EgldOrEsdtTokenIdentifier::<StaticApi>::egld().is_egld());
+    assert!(TokenId::<StaticApi>::native().is_native());
+    assert!(TokenId::<StaticApi>::native().as_legacy().is_egld());
+}
 
 #[test]
 fn test_codec_top() {
@@ -15,6 +24,16 @@ fn test_codec_top() {
         TokenId::<StaticApi>::from(EGLD_000000_TOKEN_IDENTIFIER),
         EGLD_000000_TOKEN_IDENTIFIER.as_bytes(),
     );
+}
+
+#[test]
+fn test_decode_top_backwards_compatibility() {
+    for egld_token_id_str in ["", "EGLD", EGLD_000000_TOKEN_IDENTIFIER] {
+        let deserialized: TokenId<StaticApi> =
+            check_managed_top_decode(egld_token_id_str.as_bytes());
+        assert!(deserialized.is_native());
+        assert!(deserialized.as_legacy().is_egld());
+    }
 }
 
 #[test]
@@ -27,6 +46,21 @@ fn test_codec_nested() {
         vec![TokenId::<StaticApi>::from(EGLD_000000_TOKEN_IDENTIFIER)],
         expected.as_slice(),
     );
+}
+
+#[test]
+fn test_decode_nested_backwards_compatibility() {
+    for egld_token_id_str in ["", "EGLD", EGLD_000000_TOKEN_IDENTIFIER] {
+        let encoded_vec = BoxedBytes::from_concat(&[
+            &[0, 0, 0, egld_token_id_str.len() as u8],
+            egld_token_id_str.as_bytes(),
+        ]);
+        let deserialized: Vec<TokenId<StaticApi>> =
+            check_managed_top_decode(encoded_vec.as_slice());
+        assert_eq!(deserialized.len(), 1);
+        assert!(deserialized[0].is_native());
+        assert!(deserialized[0].as_legacy().is_egld());
+    }
 }
 
 #[test]
@@ -143,7 +177,45 @@ fn test_is_valid_egld_or_esdt() {
 }
 
 #[test]
-fn test_token_identifier_eq() {
+fn test_token_id_backwards_compatibility() {
+    for egld_token_id_str in ["", "EGLD", "EGLD-000000"] {
+        let token_id =
+            TokenId::<StaticApi>::new(ManagedBuffer::<StaticApi>::from(egld_token_id_str));
+        assert!(token_id.is_native());
+        assert!(token_id.as_legacy().is_egld());
+        let token_id = TokenId::<StaticApi>::new_backwards_compatible(
+            ManagedBuffer::<StaticApi>::from(egld_token_id_str),
+        );
+        assert!(token_id.is_native());
+        assert!(token_id.as_legacy().is_egld());
+        let token_id =
+            TokenId::<StaticApi>::from(ManagedBuffer::<StaticApi>::from(egld_token_id_str));
+        assert!(token_id.is_native());
+        assert!(token_id.as_legacy().is_egld());
+        let token_id = TokenId::<StaticApi>::from(egld_token_id_str);
+        assert!(token_id.is_native());
+        assert!(token_id.as_legacy().is_egld());
+    }
+}
+
+#[test]
+fn test_egld_or_esdt_token_identifier_backwards_compatibility() {
+    for egld_token_id_str in ["", "EGLD", "EGLD-000000"] {
+        let old_token_id = EgldOrEsdtTokenIdentifier::<StaticApi>::parse(
+            ManagedBuffer::<StaticApi>::from(egld_token_id_str),
+        );
+        assert!(old_token_id.is_egld());
+        let old_token_id = EgldOrEsdtTokenIdentifier::<StaticApi>::from(
+            ManagedBuffer::<StaticApi>::from(egld_token_id_str),
+        );
+        assert!(old_token_id.is_egld());
+        let old_token_id = EgldOrEsdtTokenIdentifier::<StaticApi>::from(egld_token_id_str);
+        assert!(old_token_id.is_egld());
+    }
+}
+
+#[test]
+fn test_token_id_eq() {
     assert_eq!(
         TokenId::<StaticApi>::from("ESDT-00000"),
         TokenId::<StaticApi>::from("ESDT-00000")
@@ -161,7 +233,7 @@ fn test_token_identifier_eq() {
         EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
         TokenId::<StaticApi>::from("ANYTHING-1234").into_legacy()
     );
-    assert_ne!(
+    assert_eq!(
         EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
         TokenId::<StaticApi>::from("EGLD").into_legacy()
     );
