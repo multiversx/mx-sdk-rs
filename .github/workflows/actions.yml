@@ -14,21 +14,21 @@ permissions:
 jobs:
   rust-tests-min:
     name: Rust Tests (rustc 1.85)
-    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.85
       runs-on: ubuntu-latest
 
   rust-tests-max:
     name: Rust Tests (rustc 1.92)
-    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.92
       runs-on: ubuntu-latest
 
   setup:
     name: Setup Environment
-    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
   build-contracts:
     name: Build Contracts
     needs: setup
-    uses: multiversx/mx-sc-actions/.github/workflows/build-contracts.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/build-contracts.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -49,7 +49,7 @@ jobs:
   wasm-tests:
     name: Wasm Tests
     needs: build-contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
   interactor-tests:
     name: Interactor Tests
     needs: build-contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -65,7 +65,7 @@ jobs:
   generate-report:
     name: Generate Report
     needs: build-contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/report.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/report.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -74,7 +74,7 @@ jobs:
     name: Test Coverage
     if: false  # Temporarily disabled
     needs: setup
-    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
@@ -83,7 +83,7 @@ jobs:
   proxy-compare:
     name: Proxy Compare
     needs: setup
-    uses: multiversx/mx-sc-actions/.github/workflows/proxy-compare.yml@a64d92b76421c95601f103405b346aff531b6e96
+    uses: multiversx/mx-sc-actions/.github/workflows/proxy-compare.yml@ad6494a1873c838b7e0502020462b91715f402a4
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
