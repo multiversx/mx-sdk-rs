@@ -11,7 +11,7 @@ mod vh_storage;
 
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
-use crate::{blockchain::state::AccountData, host::context::TxErrorTrace, schedule::GasSchedule};
+use crate::{blockchain::state::AccountData, schedule::GasSchedule};
 
 use super::VMHooksContext;
 
@@ -55,26 +55,5 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.context
             .account_data(&self.context.input_ref().to)
             .expect("missing current account")
-    }
-
-    /// Logs an error, in 2 ways:
-    /// - in the `error_trace` field of the `TxResult`,
-    /// - in the standard log, at info level.
-    ///
-    /// TODO: call from more places in the codebase, similar to the Go VM.
-    ///
-    /// TODO: consider re-design in both Go and Rust VM,
-    /// the current implementation is very implementation-dependent.
-    fn error_trace(&mut self, trace_message: &str) {
-        let func_name = self.context.input_ref().func_name.clone();
-
-        log::info!("Error in {func_name}: {trace_message}");
-
-        let mut tx_result = self.context.result_lock();
-        tx_result.error_trace.push(TxErrorTrace {
-            function_name: func_name,
-            error_trace_message: trace_message.to_string(),
-            additional_info: Vec::new(),
-        });
     }
 }

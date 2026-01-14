@@ -49,13 +49,13 @@ impl SetStateBuilderItem for BlockItem {
         let block_info = core::mem::take(&mut self.block_info);
         match self.target {
             BlockItemTarget::Current => {
-                step.current_block_info = Box::new(Some(block_info));
+                *step.current_block_info = Some(block_info);
             }
             BlockItemTarget::Previous => {
-                step.previous_block_info = Box::new(Some(block_info));
+                *step.previous_block_info = Some(block_info);
             }
             BlockItemTarget::EpochStart => {
-                step.epoch_start_block_info = Box::new(Some(block_info));
+                *step.epoch_start_block_info = Some(block_info);
             }
         }
     }
