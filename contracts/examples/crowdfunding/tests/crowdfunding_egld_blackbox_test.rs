@@ -3,12 +3,15 @@ use crowdfunding::crowdfunding_proxy;
 use multiversx_sc_scenario::imports::*;
 
 const CF_DEADLINE: TimestampMillis = TimestampMillis::new(7 * 24 * 60 * 60 * 1000); // 1 week in milliseconds
-const CF_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("CROWD-123456");
+
 const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const SECOND_USER_ADDRESS: TestAddress = TestAddress::new("second-user");
+
 const CODE_PATH: MxscPath = MxscPath::new("output/crowdfunding.mxsc.json");
 const CROWDFUNDING_ADDRESS: TestSCAddress = TestSCAddress::new("crowdfunding-sc");
+
+const OTHER_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("OTHER-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
@@ -32,12 +35,9 @@ impl CrowdfundingTestState {
             .account(FIRST_USER_ADDRESS)
             .nonce(1)
             .balance(1000)
-            .esdt_balance(CF_TOKEN_ID, 1000);
+            .esdt_balance(OTHER_TOKEN_ID, 1000);
 
-        world
-            .account(SECOND_USER_ADDRESS)
-            .nonce(1)
-            .esdt_balance(CF_TOKEN_ID, 1000);
+        world.account(SECOND_USER_ADDRESS).nonce(1).balance(1000);
 
         Self { world }
     }
@@ -47,7 +47,7 @@ impl CrowdfundingTestState {
             .tx()
             .from(OWNER_ADDRESS)
             .typed(crowdfunding_proxy::CrowdfundingProxy)
-            .init(CF_TOKEN_ID, 2_000u32, CF_DEADLINE)
+            .init(TokenId::native(), 2_000u32, CF_DEADLINE)
             .code(CODE_PATH)
             .new_address(CROWDFUNDING_ADDRESS)
             .run();
@@ -60,11 +60,7 @@ impl CrowdfundingTestState {
             .to(CROWDFUNDING_ADDRESS)
             .typed(crowdfunding_proxy::CrowdfundingProxy)
             .fund()
-            .egld_or_single_esdt(
-                &EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
-                0u64,
-                &multiversx_sc::proxy_imports::BigUint::from(amount),
-            )
+            .egld(amount)
             .run();
     }
 
@@ -98,10 +94,8 @@ impl CrowdfundingTestState {
             .run();
     }
 
-    fn check_esdt_balance(&mut self, address: TestAddress, balance: u64) {
-        self.world
-            .check_account(address)
-            .esdt_balance(CF_TOKEN_ID, balance);
+    fn check_balance(&mut self, address: TestAddress, balance: u64) {
+        self.world.check_account(address).balance(balance);
     }
 
     fn set_block_timestamp(&mut self, block_timestamp: TimestampMillis) {
@@ -112,7 +106,7 @@ impl CrowdfundingTestState {
 }
 
 #[test]
-fn test_fund() {
+fn test_fund_egld() {
     let mut state = CrowdfundingTestState::new();
     state.deploy();
 
@@ -121,7 +115,7 @@ fn test_fund() {
 }
 
 #[test]
-fn test_status() {
+fn test_status_egld() {
     let mut state = CrowdfundingTestState::new();
     state.deploy();
 
@@ -129,8 +123,9 @@ fn test_status() {
 }
 
 #[test]
-fn test_sc_error() {
+fn test_sc_error_egld() {
     let mut state = CrowdfundingTestState::new();
+
     state.deploy();
 
     state
@@ -140,7 +135,11 @@ fn test_sc_error() {
         .to(CROWDFUNDING_ADDRESS)
         .typed(crowdfunding_proxy::CrowdfundingProxy)
         .fund()
-        .egld(1000)
+        .payment(Payment::new(
+            OTHER_TOKEN_ID.as_str().into(),
+            0,
+            NonZeroBigUint::try_from(1000u128).unwrap(),
+        ))
         .with_result(ExpectError(4, "wrong token"))
         .run();
 
@@ -148,7 +147,7 @@ fn test_sc_error() {
 }
 
 #[test]
-fn test_successful_cf() {
+fn test_successful_cf_egld() {
     let mut state = CrowdfundingTestState::new();
     state.deploy();
 
@@ -179,13 +178,13 @@ fn test_successful_cf() {
     // owner claim
     state.claim(OWNER_ADDRESS);
 
-    state.check_esdt_balance(OWNER_ADDRESS, 2000);
-    state.check_esdt_balance(FIRST_USER_ADDRESS, 0);
-    state.check_esdt_balance(SECOND_USER_ADDRESS, 0);
+    state.check_balance(OWNER_ADDRESS, 2000);
+    state.check_balance(FIRST_USER_ADDRESS, 0);
+    state.check_balance(SECOND_USER_ADDRESS, 0);
 }
 
 #[test]
-fn test_failed_cf() {
+fn test_failed_cf_egld() {
     let mut state = CrowdfundingTestState::new();
     state.deploy();
 
@@ -209,7 +208,7 @@ fn test_failed_cf() {
     // second user claim
     state.claim(SECOND_USER_ADDRESS);
 
-    state.check_esdt_balance(OWNER_ADDRESS, 0);
-    state.check_esdt_balance(FIRST_USER_ADDRESS, 1000);
-    state.check_esdt_balance(SECOND_USER_ADDRESS, 1000);
+    state.check_balance(OWNER_ADDRESS, 0);
+    state.check_balance(FIRST_USER_ADDRESS, 1000);
+    state.check_balance(SECOND_USER_ADDRESS, 1000);
 }
