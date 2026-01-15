@@ -138,12 +138,12 @@ where
             .original_result()
     }
 
-    pub fn cf_token_identifier(
+    pub fn cf_token_id(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenId<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("getCrowdfundingTokenIdentifier")
+            .raw_call("getCrowdfundingTokenId")
             .original_result()
     }
 }
