@@ -1,18 +1,18 @@
 [package]
 name = "gas_tests"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/gas_tests.rs"
 
 [dependencies.multiversx-sc]
-version = "0.63.1"
+version = "0.64.1"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.1"
+version = "0.64.1"
 path = "../../../framework/scenario"
 
 [dependencies.multiversx-chain-vm-wasmer-prod]

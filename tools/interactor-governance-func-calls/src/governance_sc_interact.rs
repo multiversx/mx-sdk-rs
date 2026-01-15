@@ -140,7 +140,9 @@ impl GovernanceCallsInteract {
         start_vote_epoch: usize,
         end_vote_epoch: usize,
     ) {
-        println!("proposing hash: {commit_hash}, start epoch: {start_vote_epoch}, end epoch: {end_vote_epoch}");
+        println!(
+            "proposing hash: {commit_hash}, start epoch: {start_vote_epoch}, end epoch: {end_vote_epoch}"
+        );
 
         let logs = self
             .interactor
@@ -240,8 +242,8 @@ impl GovernanceCallsInteract {
         match response {
             Ok(_) => println!("Delegate vote successfully done!"),
             Err(err) => {
-                if err_message.is_some() {
-                    assert_eq!(err_message.unwrap(), err.message.to_string());
+                if let Some(expected_msg) = err_message {
+                    assert_eq!(expected_msg, err.message.to_string());
                 } else {
                     panic!("Unexpected error: {}", err);
                 }

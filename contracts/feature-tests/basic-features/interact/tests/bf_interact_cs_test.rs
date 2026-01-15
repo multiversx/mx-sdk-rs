@@ -1,12 +1,13 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
 use multiversx_sc_snippets::{
+    InteractorRunAsync, InteractorSimulateGasAsync,
     imports::{
         BigUint, ESDTSystemSCAddress, ESDTSystemSCProxy, EgldDecimals, EsdtLocalRole,
         EsdtTokenIdentifier, EsdtTokenPayment, EsdtTokenType, FungibleTokenProperties,
         ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec, ReturnsNewTokenIdentifier,
         RustBigUint, StaticApi,
     },
-    test_wallets, InteractorRunAsync, InteractorSimulateGasAsync,
+    test_wallets,
 };
 use serial_test::serial;
 use system_sc_interact::SysFuncCallsInteract;

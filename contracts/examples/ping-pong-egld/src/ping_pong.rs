@@ -86,7 +86,7 @@ pub trait PingPong {
             require!(
                 &self
                     .blockchain()
-                    .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
+                    .get_sc_balance(EgldOrEsdtTokenIdentifier::egld(), 0)
                     + &*payment
                     <= max_funds,
                 "smart contract full"
@@ -219,7 +219,7 @@ pub trait PingPong {
     fn deadline(&self) -> SingleValueMapper<TimestampMillis>;
 
     /// Block timestamp of the block where the contract got activated.
-    /// If not specified in the constructor it is the the deploy block timestamp.
+    /// If not specified in the constructor it is the deploy block timestamp.
     #[view(getActivationTimestamp)]
     #[storage_mapper("activationTimestamp")]
     fn activation_timestamp(&self) -> SingleValueMapper<TimestampMillis>;

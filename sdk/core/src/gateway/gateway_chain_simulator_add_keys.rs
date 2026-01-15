@@ -5,7 +5,7 @@ use anyhow::anyhow;
 use crate::{gateway::ADD_KEYS, utils::base64_encode};
 
 use super::{
-    gateway_chain_simulator_blocks::GenerateBlocksResponse, GatewayRequest, GatewayRequestType,
+    GatewayRequest, GatewayRequestType, gateway_chain_simulator_blocks::GenerateBlocksResponse,
 };
 
 /// Allows to add new validator private keys in the multi key handler.

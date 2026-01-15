@@ -49,7 +49,7 @@ where
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        Self(ManagedVec::from_handle(handle))
+        unsafe { Self(ManagedVec::from_handle(handle)) }
     }
 
     fn get_handle(&self) -> M::ManagedBufferHandle {
@@ -57,7 +57,7 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.0.forget_into_handle()
+        unsafe { self.0.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {

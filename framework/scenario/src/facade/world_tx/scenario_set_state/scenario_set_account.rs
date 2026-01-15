@@ -5,13 +5,13 @@ use multiversx_sc::types::{
 };
 
 use crate::{
+    ScenarioTxEnvData,
     imports::StaticApi,
     scenario::tx_to_step::{
         address_annotated, big_uint_annotated, bytes_annotated, token_identifier_annotated,
         u64_annotated,
     },
     scenario_model::{Account, AddressKey, BytesKey, Esdt, EsdtObject, SetStateStep},
-    ScenarioTxEnvData,
 };
 
 use super::{SetStateBuilder, SetStateBuilderItem};

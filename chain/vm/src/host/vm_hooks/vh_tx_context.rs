@@ -12,16 +12,16 @@ use crate::schedule::GasSchedule;
 use crate::{
     blockchain::{reserved::STORAGE_RESERVED_PREFIX, state::AccountData},
     host::context::{
-        async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType,
-        ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxResult,
+        AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, ManagedTypeContainer, TxCache,
+        TxContextRef, TxFunctionName, TxInput, TxResult, async_call_tx_input,
     },
     host::execution,
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
 };
 
-use super::vh_early_exit::{early_exit_async_call, early_exit_vm_error};
 use super::VMHooksContext;
+use super::vh_early_exit::{early_exit_async_call, early_exit_vm_error};
 
 pub struct TxVMHooksContext<S: InstanceState> {
     tx_context_ref: TxContextRef,

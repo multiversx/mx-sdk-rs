@@ -1,7 +1,7 @@
 ##############################################################################
 ### LLDB support for displaying MultiversX SpaceCraft SDK types in debug mode
 ##############################################################################
-### Version: 0.63.1
+### Version: 0.64.1
 ##############################################################################
 
 from functools import partial
@@ -32,7 +32,8 @@ MANAGED_BUFFER_TYPE = f"{MANAGED_BASIC_PATH}::managed_buffer::ManagedBuffer<{DEB
 # 3. SC wasm - Managed wrapped types
 ## 3a. general
 MANAGED_WRAPPED_PATH = "multiversx_sc::types::managed::wrapped"
-BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
+BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::num::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
+NON_ZERO_BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::num::non_zero_big_uint::NonZeroBigUint<{DEBUG_API_TYPE} ?>"
 MANAGED_ADDRESS_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
 MANAGED_BYTE_ARRAY_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
 ## 3b. tokens & payments
@@ -369,7 +370,7 @@ class BigUint(PlainManagedVecItem, ManagedType):
 
 class EsdtTokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, token_identifier: lldb.value) -> lldb.value:
-        return token_identifier.data.buffer
+        return token_identifier.token_id.buffer
 
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
         return buffer_as_string(buffer)
@@ -454,7 +455,7 @@ class EsdtTokenPayment(ManagedVecItem, ManagedType):
 
 class EgldOrEsdtTokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, egld_or_esdt_token_identifier: lldb.value) -> lldb.value:
-        return egld_or_esdt_token_identifier.buffer
+        return egld_or_esdt_token_identifier.token_id.buffer
 
     def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
         token_id = buffer_as_string(buffer)
@@ -526,6 +527,7 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     (MANAGED_BUFFER_TYPE, ManagedBuffer),
     # 3. SC wasm - Managed wrapped types
     (BIG_UINT_TYPE, BigUint),
+    (NON_ZERO_BIG_UINT_TYPE, BigUint),
     (ESDT_TOKEN_IDENTIFIER_TYPE, EsdtTokenIdentifier),
     (MANAGED_ADDRESS_TYPE, ManagedAddress),
     (MANAGED_BYTE_ARRAY_TYPE, ManagedByteArray),

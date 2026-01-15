@@ -1,7 +1,7 @@
 use crate::{
     api::ManagedTypeApi,
     codec::{
-        try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
+        DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast, try_execute_then_cast,
     },
     err_msg,
     types::{BigInt, BigUint, ManagedBuffer},

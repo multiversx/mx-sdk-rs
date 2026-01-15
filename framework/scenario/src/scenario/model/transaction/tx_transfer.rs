@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-use super::{tx_interpret_util::interpret_egld_value, TxCall, TxESDT};
+use super::{TxCall, TxESDT, tx_interpret_util::interpret_egld_value};
 
 #[derive(Debug, Default, Clone)]
 pub struct TxTransfer {

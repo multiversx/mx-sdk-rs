@@ -1,11 +1,12 @@
 use crate::{
-    api::{use_raw_handle, BlockchainApiImpl, CallTypeApi, StaticVarApiImpl, StorageWriteApi},
+    api::{BlockchainApiImpl, CallTypeApi, StaticVarApiImpl, StorageWriteApi, use_raw_handle},
     codec::TopDecodeMulti,
     contract_base::SendRawWrapper,
     formatter::SCLowerHex,
     types::{
-        decode_result, AsyncCall, AsyncCallPromises, BigUint, EsdtTokenPayment, ManagedBuffer,
-        ManagedBufferBuilder, ManagedType, ManagedVec, Tx, TRANSFER_EXECUTE_DEFAULT_LEFTOVER,
+        AsyncCall, AsyncCallPromises, BigUint, EsdtTokenPayment, ManagedBuffer,
+        ManagedBufferBuilder, ManagedType, ManagedVec, TRANSFER_EXECUTE_DEFAULT_LEFTOVER, Tx,
+        decode_result,
     },
 };
 

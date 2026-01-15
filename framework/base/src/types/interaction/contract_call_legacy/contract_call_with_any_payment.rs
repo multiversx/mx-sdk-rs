@@ -6,8 +6,8 @@ use crate::{
 };
 
 use super::{
-    contract_call_no_payment::ContractCallNoPayment, contract_call_trait::ContractCallBase,
-    ContractCall, ContractCallWithEgld,
+    ContractCall, ContractCallWithEgld, contract_call_no_payment::ContractCallNoPayment,
+    contract_call_trait::ContractCallBase,
 };
 
 /// Holds data for calling another contract, with any type of payment: none, EGLD, Multi-ESDT.

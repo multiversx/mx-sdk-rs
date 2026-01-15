@@ -4,24 +4,24 @@ use crate::{
     abi::TypeAbiFrom,
     codec::{EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput},
     storage::mappers::{
-        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
+        source::{CurrentStorage, StorageAddress},
     },
     storage_clear, storage_get, storage_get_len, storage_set,
     types::{
-        system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
-        ManagedVec, OriginalResultMarker, Tx, TxScEnv,
+        ESDTSystemSCAddress, EgldPayment, FunctionCall, ManagedVec, OriginalResultMarker, Tx,
+        TxScEnv, system_proxy::ESDTSystemSCProxy,
     },
 };
 
 use super::{
     super::StorageMapper,
+    TokenMapperState,
     error::{
         INVALID_PAYMENT_TOKEN_ERR_MSG, INVALID_TOKEN_ID_ERR_MSG, MUST_SET_TOKEN_ID_ERR_MSG,
         PENDING_ERR_MSG, TOKEN_ID_ALREADY_SET_ERR_MSG,
     },
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
-    TokenMapperState,
 };
 use crate::{
     abi::{TypeAbi, TypeName},
@@ -29,11 +29,11 @@ use crate::{
     contract_base::{BlockchainWrapper, SendWrapper},
     storage::StorageKey,
     types::{
+        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenIdentifier, EsdtTokenPayment,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
         system_proxy::{
             MetaTokenProperties, NonFungibleTokenProperties, SemiFungibleTokenProperties,
         },
-        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenIdentifier, EsdtTokenPayment,
-        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
     },
 };
 

@@ -427,7 +427,9 @@ impl SysFuncCallsInteract {
         num_decimals: usize,
         token_type: EsdtTokenType,
     ) -> String {
-        println!("Registering and setting all roles for token {token_ticker:?} of type {token_type:?}...");
+        println!(
+            "Registering and setting all roles for token {token_ticker:?} of type {token_type:?}..."
+        );
 
         let token_id = self
             .interactor

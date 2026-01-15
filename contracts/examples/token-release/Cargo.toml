@@ -2,17 +2,17 @@
 name = "token-release"
 version = "0.0.1"
 authors = [ "you",]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/token_release.rs"
 
 [dependencies.multiversx-sc]
-version = "0.63.1"
+version = "0.64.1"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.1"
+version = "0.64.1"
 path = "../../../framework/scenario"
 

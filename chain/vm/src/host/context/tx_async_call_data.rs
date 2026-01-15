@@ -1,7 +1,7 @@
 use crate::{
     builtin_functions::BuiltinFunctionContainer,
     host::context::{TxInput, TxResult},
-    types::{top_encode_u64, VMAddress, H256},
+    types::{H256, VMAddress, top_encode_u64},
 };
 
 use num_bigint::BigUint;

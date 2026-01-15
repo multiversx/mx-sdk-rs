@@ -9,7 +9,7 @@ mod template_list;
 mod template_metadata;
 mod template_source;
 
-pub use contract_creator::{create_contract, ContractCreator};
+pub use contract_creator::{ContractCreator, create_contract};
 pub use contract_creator_target::ContractCreatorTarget;
 pub use repo_source::RepoSource;
 pub use repo_temp_download::RepoTempDownload;

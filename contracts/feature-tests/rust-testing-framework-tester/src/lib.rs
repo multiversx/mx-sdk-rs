@@ -45,13 +45,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn get_egld_balance(&self) -> BigUint {
         self.blockchain()
-            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
+            .get_sc_balance(EgldOrEsdtTokenIdentifier::egld(), 0)
     }
 
     #[endpoint]
     fn get_esdt_balance(&self, token_id: EsdtTokenIdentifier, nonce: u64) -> BigUint {
         self.blockchain()
-            .get_sc_balance(&EgldOrEsdtTokenIdentifier::esdt(token_id), nonce)
+            .get_sc_balance(EgldOrEsdtTokenIdentifier::esdt(token_id), nonce)
     }
 
     #[payable("EGLD")]
@@ -149,6 +149,11 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[endpoint]
     fn get_block_nonce(&self) -> u64 {
         self.blockchain().get_block_nonce()
+    }
+
+    #[endpoint]
+    fn get_block_timestamp_seconds(&self) -> TimestampSeconds {
+        self.blockchain().get_block_timestamp_seconds()
     }
 
     #[endpoint]

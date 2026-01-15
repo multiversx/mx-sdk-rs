@@ -1,7 +1,7 @@
 use multiversx_sc::{
-    codec::{test_util::check_top_encode, TopDecode, TopEncode},
+    codec::{TopDecode, TopEncode, test_util::check_top_encode},
     contract_base::ManagedSerializer,
-    types::{heap::BoxedBytes, ManagedBuffer},
+    types::{ManagedBuffer, heap::BoxedBytes},
 };
 
 use core::fmt::Debug;

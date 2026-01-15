@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use multiversx_sc_codec::{TopDecode, TopEncode};
 
 use super::{
-    source::{CurrentStorage, StorageAddress},
     SingleValueMapper, StorageMapper, StorageMapperFromAddress,
+    source::{CurrentStorage, StorageAddress},
 };
 use crate::{
     api::{ErrorApiImpl, StorageMapperApi},

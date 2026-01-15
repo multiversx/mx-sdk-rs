@@ -2,7 +2,7 @@ use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
-    host::vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+    host::vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     types::RawHandle,
 };
 
@@ -12,7 +12,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn signal_error(&mut self, message: &[u8]) -> Result<(), VMHooksEarlyExit> {
         match String::from_utf8(message.to_owned()) {
             Ok(message_string) => {
-                self.error_trace(&message_string);
+                self.context.log_error_trace(&message_string);
                 Err(VMHooksEarlyExit::new(ReturnCode::UserError.as_u64())
                     .with_message(message_string))
             }

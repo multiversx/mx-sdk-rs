@@ -123,12 +123,14 @@ pub fn universal_decode_number_unchecked(bytes: &[u8], signed: bool) -> u64 {
 }
 
 unsafe fn universal_decode_number_impl(bytes: *const u8, len: usize, signed: bool) -> u64 {
-    let negative = signed && len > 0 && msbit_is_one(*bytes);
+    let negative = signed && len > 0 && msbit_is_one(unsafe { *bytes });
     let skippable_byte = skippable_byte(negative);
 
     let mut extended_buffer = [skippable_byte; 8];
     let offset = 8usize.wrapping_sub(len);
-    core::ptr::copy_nonoverlapping(bytes, extended_buffer.as_mut_ptr().add(offset), len);
+    unsafe {
+        core::ptr::copy_nonoverlapping(bytes, extended_buffer.as_mut_ptr().add(offset), len);
+    }
 
     u64::from_be_bytes(extended_buffer)
 }

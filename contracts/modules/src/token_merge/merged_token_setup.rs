@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 
 use super::{
     custom_merged_token_attributes::MergedTokenAttributesCreator,
-    merged_token_instances::{MergedTokenInstances, MAX_MERGED_TOKENS},
+    merged_token_instances::{MAX_MERGED_TOKENS, MergedTokenInstances},
 };
 
 const NFT_AMOUNT: u64 = 1;

@@ -65,12 +65,14 @@ pub async fn ping_pong_egld_cli() {
         }
         Some(interact_cli::InteractCliCommand::GetContractState) => {
             let contract_state = interact.get_contract_state().await;
-            println!("Contract state: ping_amount -> {:#?} | deadline -> {:#?} | activation_timestamp -> {:#?} | max_funds -> {:#?} | pong_all_last_user -> {:#?}", 
-            contract_state.ping_amount,
-            contract_state.deadline,
-            contract_state.activation_timestamp,
-            contract_state.max_funds,
-            contract_state.pong_all_last_user);
+            println!(
+                "Contract state: ping_amount -> {:#?} | deadline -> {:#?} | activation_timestamp -> {:#?} | max_funds -> {:#?} | pong_all_last_user -> {:#?}",
+                contract_state.ping_amount,
+                contract_state.deadline,
+                contract_state.activation_timestamp,
+                contract_state.max_funds,
+                contract_state.pong_all_last_user
+            );
         }
         Some(interact_cli::InteractCliCommand::GetPingAmount) => {
             let ping_amount = interact.get_ping_amount().await;

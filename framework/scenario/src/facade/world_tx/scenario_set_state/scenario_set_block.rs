@@ -2,10 +2,10 @@ use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::types::{AnnotatedValue, ManagedBuffer, TimestampMillis, TimestampSeconds};
 
 use crate::{
+    ScenarioTxEnvData,
     imports::StaticApi,
     scenario::tx_to_step::{bytes_annotated, u64_annotated},
     scenario_model::{BlockInfo, SetStateStep, U64Value},
-    ScenarioTxEnvData,
 };
 
 use super::{SetStateBuilder, SetStateBuilderItem};
@@ -49,13 +49,13 @@ impl SetStateBuilderItem for BlockItem {
         let block_info = core::mem::take(&mut self.block_info);
         match self.target {
             BlockItemTarget::Current => {
-                step.current_block_info = Box::new(Some(block_info));
+                *step.current_block_info = Some(block_info);
             }
             BlockItemTarget::Previous => {
-                step.previous_block_info = Box::new(Some(block_info));
+                *step.previous_block_info = Some(block_info);
             }
             BlockItemTarget::EpochStart => {
-                step.epoch_start_block_info = Box::new(Some(block_info));
+                *step.epoch_start_block_info = Some(block_info);
             }
         }
     }

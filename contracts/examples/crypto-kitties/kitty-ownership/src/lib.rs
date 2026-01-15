@@ -51,7 +51,7 @@ pub trait KittyOwnership {
         let caller = self.blockchain().get_caller();
         let egld_balance = self
             .blockchain()
-            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0);
+            .get_sc_balance(EgldOrEsdtTokenIdentifier::egld(), 0);
 
         self.tx().to(&caller).egld(&egld_balance).transfer();
     }
