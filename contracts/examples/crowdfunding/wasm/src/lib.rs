@@ -25,7 +25,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         getTarget => target
         getDeadline => deadline
         getDeposit => deposit
-        getCrowdfundingTokenIdentifier => cf_token_identifier
+        getCrowdfundingTokenId => cf_token_id
     )
 }
 

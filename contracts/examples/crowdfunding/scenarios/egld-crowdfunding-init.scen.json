@@ -24,9 +24,9 @@
                 "from": "address:my_address",
                 "contractCode": "mxsc:../output/crowdfunding.mxsc.json",
                 "arguments": [
+                    "str:EGLD-000000",
                     "500,000,000,000",
-                    "123,000",
-                    "str:EGLD-000000"
+                    "123,000"
                 ],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"

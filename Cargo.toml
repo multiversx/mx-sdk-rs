@@ -1,5 +1,5 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 
 members = [
   "data/codec",
@@ -193,6 +193,8 @@ members = [
   "contracts/feature-tests/scenario-tester/meta",
   "contracts/feature-tests/std-contract",
   "contracts/feature-tests/std-contract/meta",
+  "contracts/feature-tests/tiny",
+  "contracts/feature-tests/tiny/interactor",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
 

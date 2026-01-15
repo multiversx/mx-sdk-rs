@@ -12,30 +12,107 @@ permissions:
   pull-requests: write
 
 jobs:
-  contracts:
-    name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v5.0.0
+  rust-tests-min:
+    name: Rust Tests (rustc 1.85)
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@v6.0.0
+    with:
+      rust-toolchain: 1.85
+      runs-on: ubuntu-latest
+
+  rust-tests-max:
+    name: Rust Tests (rustc 1.92)
+    uses: multiversx/mx-sc-actions/.github/workflows/rust-tests.yml@v6.0.0
+    with:
+      rust-toolchain: 1.92
+      runs-on: ubuntu-latest
+
+  setup:
+    name: Setup Environment
+    uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@v6.0.0
     with:
       rust-toolchain: 1.87
-      wasm-opt-version: 125
-      setup-runs-on: ubuntu-latest
-      test-coverage-runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
       rust-target: wasm32v1-none
       path-to-sc-meta: framework/meta
       mx-scenario-go-version: v5.1.0
-      enable-interactor-tests: true
-      coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+      wasm-opt-version: 125
+
+  build-contracts:
+    name: Build Contracts
+    needs: setup
+    uses: multiversx/mx-sc-actions/.github/workflows/build-contracts.yml@v6.0.0
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+      rust-target: wasm32v1-none
+
+  wasm-tests:
+    name: Wasm Tests
+    needs: build-contracts
+    uses: multiversx/mx-sc-actions/.github/workflows/wasm-tests.yml@v6.0.0
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+
+  interactor-tests:
+    name: Interactor Tests
+    needs: build-contracts
+    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@v6.0.0
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+
+  generate-report:
+    name: Generate Report
+    needs: build-contracts
+    uses: multiversx/mx-sc-actions/.github/workflows/report.yml@v6.0.0
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+
+  test-coverage:
+    name: Test Coverage
+    if: false  # Temporarily disabled
+    needs: setup
+    uses: multiversx/mx-sc-actions/.github/workflows/coverage.yml@v6.0.0
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+      coverage-args: "--ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md"
+
+  proxy-compare:
+    name: Proxy Compare
+    needs: setup
+    uses: multiversx/mx-sc-actions/.github/workflows/proxy-compare.yml@v6.0.0
+    with:
+      rust-toolchain: 1.87
+      runs-on: ubuntu-latest
+
+  clippy-check:
+    name: Clippy linter check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.87
+          components: clippy
+      - uses: giraffate/clippy-action@v1
+        env:
+          RUSTFLAGS: ""
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          clippy_flags: "--all-targets --all-features"
 
   formatting:
     name: cargo fmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # Ensure rustfmt is installed and setup problem matcher
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: rustfmt
       - name: Rustfmt Check
         uses: actions-rust-lang/rustfmt@v1
+

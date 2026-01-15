@@ -1,6 +1,9 @@
-use multiversx_sc::types::{
-    BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenIdentifier,
-    EsdtTokenPayment, ManagedBuffer,
+use multiversx_sc::{
+    chain_core::EGLD_000000_TOKEN_IDENTIFIER,
+    types::{
+        BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenIdentifier,
+        EsdtTokenPayment, ManagedBuffer,
+    },
 };
 use multiversx_sc_scenario::{
     api::StaticApi, managed_egld_token_id, managed_test_util::check_managed_top_encode_decode,
@@ -169,10 +172,24 @@ fn test_token_identifier_eq() {
         EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
         EsdtTokenIdentifier::<StaticApi>::from("ANYTHING-1234")
     );
-    assert_ne!(
-        EgldOrEsdtTokenIdentifier::<StaticApi>::egld(),
-        EsdtTokenIdentifier::<StaticApi>::from("EGLD")
-    );
+}
+
+#[test]
+#[should_panic = "StaticApi signal error: ESDT expected"]
+pub fn esdt_token_identifier_unwrap_1() {
+    let _ = EsdtTokenIdentifier::<StaticApi>::from("");
+}
+
+#[test]
+#[should_panic = "StaticApi signal error: ESDT expected"]
+pub fn esdt_token_identifier_unwrap_2() {
+    let _ = EsdtTokenIdentifier::<StaticApi>::from("EGLD");
+}
+
+#[test]
+#[should_panic = "StaticApi signal error: ESDT expected"]
+pub fn esdt_token_identifier_unwrap_3() {
+    let _ = EsdtTokenIdentifier::<StaticApi>::from(EGLD_000000_TOKEN_IDENTIFIER);
 }
 
 #[test]

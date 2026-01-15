@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.64.0"
+version = "0.64.1"
 edition = "2024"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -31,7 +31,7 @@ colored = "3.0"
 tokio = { version = "1.24", features = ["full"], optional = true }
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.64.0"
+version = "=0.64.1"
 path = "../scenario"
 
 [dependencies.multiversx-chain-scenario-format]
@@ -39,16 +39,16 @@ version = "0.25.0"
 path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-sdk]
-version = "=0.14.0"
+version = "=0.14.1"
 path = "../../sdk/core"
 
 [dependencies.multiversx-sdk-http]
-version = "=0.14.0"
+version = "=0.14.1"
 path = "../../sdk/http"
 optional = true
 default-features = false
 
 [dependencies.multiversx-sdk-dapp]
-version = "=0.14.0"
+version = "=0.14.1"
 path = "../../sdk/dapp"
 optional = true

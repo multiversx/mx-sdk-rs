@@ -1,5 +1,4 @@
 use alloc::string::{String, ToString};
-use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
@@ -8,7 +7,10 @@ use crate::{
     err_msg,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     proxy_imports::TestTokenIdentifier,
-    types::{EsdtTokenIdentifier, ManagedBuffer, ManagedRef, ManagedType, TokenId},
+    types::{
+        EsdtTokenIdentifier, LEGACY_EGLD_REPRESENTATION, ManagedBuffer, ManagedRef, ManagedType,
+        TokenId,
+    },
 };
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
@@ -63,13 +65,13 @@ impl<M: ManagedTypeApi> ManagedType<M> for EgldOrEsdtTokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     /// This special representation is interpreted as the EGLD token.
-    pub const EGLD_REPRESENTATION: &'static [u8; 4] = b"EGLD";
+    pub const EGLD_REPRESENTATION: &'static [u8; 4] = LEGACY_EGLD_REPRESENTATION;
 
     /// New instance of the special EGLD token representation.
     #[inline]
     pub fn egld() -> Self {
         EgldOrEsdtTokenIdentifier {
-            token_id: TokenId::from(EGLD_000000_TOKEN_IDENTIFIER),
+            token_id: TokenId::native(),
         }
     }
 
