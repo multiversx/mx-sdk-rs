@@ -10,7 +10,7 @@ const STATE_FILE: &str = "state.toml";
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
-    adder_address: Option<Bech32Address>,
+    sc_address: Option<Bech32Address>,
 }
 
 impl State {
@@ -26,13 +26,13 @@ impl State {
         }
     }
 
-    pub fn set_adder_address(&mut self, address: Bech32Address) {
-        self.adder_address = Some(address);
+    pub fn set_sc_address(&mut self, address: Bech32Address) {
+        self.sc_address = Some(address);
     }
 
     /// Returns the contract address
     pub fn current_contract_address(&self) -> &Bech32Address {
-        self.adder_address
+        self.sc_address
             .as_ref()
             .expect("no known contract, deploy first")
     }

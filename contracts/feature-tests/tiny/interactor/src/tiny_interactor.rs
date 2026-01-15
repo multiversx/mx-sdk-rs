@@ -31,7 +31,7 @@ pub async fn tiny_interactor_cli() {
 
 pub struct BasicInteractor {
     pub interactor: Interactor,
-    pub adder_owner_address: Bech32Address,
+    pub owner_address: Bech32Address,
     pub wallet_address: Bech32Address,
     pub state: State,
 }
@@ -42,14 +42,14 @@ impl BasicInteractor {
             .await
             .use_chain_simulator(config.use_chain_simulator());
 
-        let adder_owner_address = interactor.register_wallet(test_wallets::mike()).await;
+        let owner_address = interactor.register_wallet(test_wallets::mike()).await;
         let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
 
         interactor.generate_blocks(30u64).await.unwrap();
 
         BasicInteractor {
             interactor,
-            adder_owner_address: adder_owner_address.into(),
+            owner_address: owner_address.into(),
             wallet_address: wallet_address.into(),
             state: State::load_state(),
         }
@@ -66,7 +66,7 @@ impl BasicInteractor {
         let new_address = self
             .interactor
             .tx()
-            .from(&self.adder_owner_address.clone())
+            .from(&self.owner_address.clone())
             .gas(600_000)
             .raw_deploy()
             .code(CODE_PATH)
@@ -75,7 +75,7 @@ impl BasicInteractor {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_adder_address(new_address);
+        self.state.set_sc_address(new_address);
     }
 
     pub async fn call_x(&mut self) {

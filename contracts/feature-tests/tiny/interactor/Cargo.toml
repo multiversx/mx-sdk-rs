@@ -8,7 +8,7 @@ publish = false
 [[bin]]
 name = "tiny-interactor"
 path = "src/tiny_interactor_main.rs"
-    
+
 [lib]
 path = "src/tiny_interactor.rs"
 

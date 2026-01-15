@@ -1,5 +1,4 @@
 {
-    "name": "empty",
     "steps": [
         {
             "step": "setState",
@@ -13,7 +12,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "1",
-                    "newAddress": "sc:empty"
+                    "newAddress": "sc:tiny"
                 }
             ]
         },
