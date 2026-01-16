@@ -18,7 +18,7 @@ use crate::{
         BackTransfers, BackTransfersLegacy, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier,
         EgldOrEsdtTokenPayment, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenIdentifier,
         EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef, ManagedRefMut,
-        ManagedType, ManagedVec, SystemSCAddress, TokenId, TokenIdentifier,
+        ManagedType, ManagedVec, SystemSCAddress, TokenId,
     },
 };
 

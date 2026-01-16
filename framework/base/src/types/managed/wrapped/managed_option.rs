@@ -207,13 +207,15 @@ where
     type Ref<'a> = Self;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        let handle = use_raw_handle(i32::read_from_payload(payload));
-        Self::new_with_handle(handle)
+        unsafe {
+            let handle = use_raw_handle(i32::read_from_payload(payload));
+            Self::new_with_handle(handle)
+        }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
         // TODO: managed ref
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

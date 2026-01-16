@@ -40,7 +40,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPaymentMultiValue<M> {
     type Ref<'a> = Ref<'a, Self>;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        EgldOrEsdtTokenPayment::read_from_payload(payload).into()
+        unsafe { EgldOrEsdtTokenPayment::read_from_payload(payload).into() }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {

@@ -2,9 +2,8 @@ use core::fmt::Debug;
 use multiversx_sc::{
     api::{ManagedTypeApi, use_raw_handle},
     types::{
-        BigInt, BigInt, BigUint, BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedAddress,
-        ManagedBuffer, ManagedBuffer, ManagedByteArray, ManagedByteArray, ManagedRef, ManagedRef,
-        ManagedRefMut, ManagedType, ManagedType, TokenIdentifier,
+        BigInt, BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer, ManagedByteArray,
+        ManagedRef, ManagedRefMut, ManagedType,
     },
 };
 use multiversx_sc_scenario::api::StaticApi;

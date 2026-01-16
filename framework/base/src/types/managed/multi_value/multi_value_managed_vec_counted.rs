@@ -101,11 +101,11 @@ where
     type Ref<'a> = Self;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        Self::from(ManagedVec::<M, T>::read_from_payload(payload))
+        unsafe { Self::from(ManagedVec::<M, T>::read_from_payload(payload)) }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

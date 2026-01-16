@@ -161,11 +161,11 @@ impl ManagedVecItem for usize {
     type Ref<'a> = Self;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        u32::read_from_payload(payload) as usize
+        unsafe { u32::read_from_payload(payload) as usize }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -179,11 +179,11 @@ impl ManagedVecItem for bool {
     type Ref<'a> = Self;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        u8::read_from_payload(payload) > 0
+        unsafe { u8::read_from_payload(payload) > 0 }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -208,11 +208,11 @@ where
             T::PAYLOAD,
         >>::split_from_add(payload);
 
-        let disc = u8::read_from_payload(p1);
+        let disc = unsafe { u8::read_from_payload(p1) };
         if disc == 0 {
             None
         } else {
-            Some(T::read_from_payload(p2))
+            Some(unsafe { T::read_from_payload(p2) })
         }
     }
 
@@ -244,7 +244,7 @@ macro_rules! impl_managed_type {
             type Ref<'a> = ManagedRef<'a, M, Self>;
 
             unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-                let handle = use_raw_handle(i32::read_from_payload(payload));
+                let handle = use_raw_handle(unsafe { i32::read_from_payload(payload) });
                 unsafe { Self::from_handle(handle) }
             }
 
@@ -282,7 +282,7 @@ where
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        let handle = use_raw_handle(i32::read_from_payload(payload));
+        let handle = use_raw_handle(unsafe { i32::read_from_payload(payload) });
         unsafe { Self::from_handle(handle) }
     }
 
@@ -313,7 +313,7 @@ where
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        let handle = use_raw_handle(i32::read_from_payload(payload));
+        let handle = use_raw_handle(unsafe { i32::read_from_payload(payload) });
         unsafe { Self::from_handle(handle) }
     }
 
@@ -340,11 +340,11 @@ impl ManagedVecItem for EsdtTokenType {
     type Ref<'a> = Self;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        u8::read_from_payload(payload).into()
+        unsafe { u8::read_from_payload(payload).into() }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -358,11 +358,11 @@ impl ManagedVecItem for EsdtLocalRole {
     type Ref<'a> = Self;
 
     unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        u16::read_from_payload(payload).into()
+        unsafe { u16::read_from_payload(payload).into() }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

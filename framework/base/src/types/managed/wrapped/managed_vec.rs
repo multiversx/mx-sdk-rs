@@ -243,7 +243,7 @@ where
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
         let mut payload = T::PAYLOAD::new_buffer();
         if self.load_item_payload(index, &mut payload) {
-            T::read_from_payload(&payload)
+            unsafe { T::read_from_payload(&payload) }
         } else {
             M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
         }
