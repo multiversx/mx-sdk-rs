@@ -516,11 +516,11 @@ impl BlockchainStateWrapper {
     }
 
     pub fn add_mandos_check_account(&mut self, address: &Address) {
-        if let Some(acc) = self.world.get_state().accounts.get(address).cloned() {
-            if let Some(trace) = &mut self.world.get_mut_debugger_backend().trace {
-                MandosGenerator::new(&mut trace.scenario_trace, &mut self.current_tx_id)
-                    .check_account(&acc);
-            }
+        if let Some(acc) = self.world.get_state().accounts.get(address).cloned()
+            && let Some(trace) = &mut self.world.get_mut_debugger_backend().trace
+        {
+            MandosGenerator::new(&mut trace.scenario_trace, &mut self.current_tx_id)
+                .check_account(&acc);
         }
     }
 }

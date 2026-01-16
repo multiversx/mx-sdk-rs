@@ -165,15 +165,14 @@ pub fn get_discriminant(
 }
 
 pub fn sanitize_type_path(mut field: syn::Type) -> proc_macro2::TokenStream {
-    if let syn::Type::Path(ref mut p) = field {
-        if p.path
+    if let syn::Type::Path(ref mut p) = field
+        && p.path
             .to_token_stream()
             .to_string()
             .contains(BITFLAGS_INTERNAL_PATH)
-        {
-            let modified_path = p.path.segments.last_mut().unwrap();
-            modified_path.ident = syn::Ident::new(PRIMITIVE, modified_path.ident.span());
-        }
+    {
+        let modified_path = p.path.segments.last_mut().unwrap();
+        modified_path.ident = syn::Ident::new(PRIMITIVE, modified_path.ident.span());
     }
 
     quote! (#field)
