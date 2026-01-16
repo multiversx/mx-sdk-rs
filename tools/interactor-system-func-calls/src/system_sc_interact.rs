@@ -31,7 +31,7 @@ pub async fn system_sc_interact_cli() {
                     args.token_type.into(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::Mint(args)) => {
             basic_interact
                 .mint_token(
@@ -40,7 +40,7 @@ pub async fn system_sc_interact_cli() {
                     args.amount.clone(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::SetRoles(args)) => {
             basic_interact
                 .set_roles(
@@ -52,18 +52,18 @@ pub async fn system_sc_interact_cli() {
                         .collect(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::Burn(args)) => {
             basic_interact
                 .burn_token(args.token_id.as_bytes(), args.nonce, args.amount.clone())
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::PauseToken(args)) => {
             basic_interact.pause_token(args.token_id.as_bytes()).await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::UnpauseToken(args)) => {
             basic_interact.unpause_token(args.token_id.as_bytes()).await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::FreezeToken(args)) => {
             basic_interact
                 .freeze_token(
@@ -71,7 +71,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::UnfreezeToken(args)) => {
             basic_interact
                 .unfreeze_token(
@@ -79,7 +79,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::FreezeNFT(args)) => {
             basic_interact
                 .freeze_nft(
@@ -88,7 +88,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::UnfreezeNFT(args)) => {
             basic_interact
                 .unfreeze_nft(
@@ -97,7 +97,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::WipeToken(args)) => {
             basic_interact
                 .wipe_token(
@@ -105,7 +105,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::WipeNFT(args)) => {
             basic_interact
                 .wipe_nft(
@@ -114,7 +114,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.address.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::IssueNFTCollection(args)) => {
             basic_interact
                 .issue_non_fungible_collection(
@@ -123,7 +123,7 @@ pub async fn system_sc_interact_cli() {
                     args.ticker.as_bytes(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::CreateNFT(args)) => {
             basic_interact
                 .mint_nft(
@@ -139,7 +139,7 @@ pub async fn system_sc_interact_cli() {
                     &Vec::new(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::IssueFungible(args)) => {
             basic_interact
                 .issue_fungible_token(
@@ -150,7 +150,7 @@ pub async fn system_sc_interact_cli() {
                     args.num_decimals,
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::IssueSftCollection(args)) => {
             basic_interact
                 .issue_semi_fungible_collection(
@@ -159,7 +159,7 @@ pub async fn system_sc_interact_cli() {
                     args.ticker.as_bytes(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::MintSft(args)) => {
             basic_interact
                 .mint_sft(
@@ -170,7 +170,7 @@ pub async fn system_sc_interact_cli() {
                     args.hash.as_bytes(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::RegisterMetaEsdt(args)) => {
             basic_interact
                 .register_meta_esdt(
@@ -180,12 +180,12 @@ pub async fn system_sc_interact_cli() {
                     args.num_decimals,
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::ChangeSftMetaEsdt(args)) => {
             basic_interact
                 .change_sft_meta_esdt(args.token_id.as_bytes(), args.num_decimals)
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::UnsetRoles(args)) => {
             basic_interact
                 .unset_roles(
@@ -198,7 +198,7 @@ pub async fn system_sc_interact_cli() {
                         .collect(),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::TransferOwnership(args)) => {
             basic_interact
                 .transfer_ownership(
@@ -206,7 +206,7 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.new_owner.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::TransferNftCreateRole(args)) => {
             basic_interact
                 .transfer_nft_create_role(
@@ -215,23 +215,23 @@ pub async fn system_sc_interact_cli() {
                     &Bech32Address::from_bech32_string(args.new_owner.clone()),
                 )
                 .await;
-        },
+        }
         Some(system_sc_interact_cli::InteractCliCommand::ControlChanges(args)) => {
             basic_interact
                 .control_changes(args.token_id.as_bytes())
                 .await;
-        },
+        }
 
-        None => {},
+        None => {}
     }
 }
 
 pub struct SysFuncCallsInteract {
-    interactor: Interactor,
-    wallet_address: Bech32Address,
-    other_wallet_address: Bech32Address,
+    pub interactor: Interactor,
+    pub wallet_address: Bech32Address,
+    pub other_wallet_address: Bech32Address,
     #[allow(unused)]
-    state: State,
+    pub state: State,
 }
 
 impl SysFuncCallsInteract {
@@ -245,7 +245,7 @@ impl SysFuncCallsInteract {
         let other_wallet_address = interactor.register_wallet(test_wallets::carol()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,
@@ -260,10 +260,8 @@ impl SysFuncCallsInteract {
 
         let res = self
             .interactor
-            .tx()
-            .from(&self.wallet_address)
+            .query()
             .to(ESDTSystemSCAddress)
-            .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
             .get_token_properties(token_id)
             .returns(ReturnsResult)
@@ -429,7 +427,9 @@ impl SysFuncCallsInteract {
         num_decimals: usize,
         token_type: EsdtTokenType,
     ) -> String {
-        println!("Registering and setting all roles for token {token_ticker:?} of type {token_type:?}...");
+        println!(
+            "Registering and setting all roles for token {token_ticker:?} of type {token_type:?}..."
+        );
 
         let token_id = self
             .interactor
@@ -466,7 +466,7 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .set_special_roles(
                 ManagedAddress::from_address(wallet_address),
-                TokenIdentifier::from(token_id),
+                EsdtTokenIdentifier::from(token_id),
                 roles.into_iter(),
             )
             .run()
@@ -485,7 +485,7 @@ impl SysFuncCallsInteract {
             .typed(ESDTSystemSCProxy)
             .set_special_roles(
                 ManagedAddress::from_address(wallet_address),
-                TokenIdentifier::from(token_id),
+                EsdtTokenIdentifier::from(token_id),
                 roles.into_iter(),
             )
             .run()
@@ -502,7 +502,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .get_special_roles(TokenIdentifier::from(token_id))
+            .get_special_roles(EsdtTokenIdentifier::from(token_id))
             .returns(ReturnsRawResult)
             .run()
             .await;
@@ -519,7 +519,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .change_to_dynamic(TokenIdentifier::from(token_id))
+            .change_to_dynamic(EsdtTokenIdentifier::from(token_id))
             .run()
             .await;
     }
@@ -533,7 +533,7 @@ impl SysFuncCallsInteract {
             .to(ESDTSystemSCAddress)
             .gas(100_000_000u64)
             .typed(ESDTSystemSCProxy)
-            .update_token(TokenIdentifier::from(token_id))
+            .update_token(EsdtTokenIdentifier::from(token_id))
             .run()
             .await;
     }
@@ -911,7 +911,7 @@ impl SysFuncCallsInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.other_wallet_address)
-            .single_esdt(&token_id.into(), nonce, &amount.into()) // .transfer()
+            .single_esdt(&token_id.into(), nonce, &amount.into())
             .run()
             .await;
     }

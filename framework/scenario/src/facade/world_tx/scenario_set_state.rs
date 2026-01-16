@@ -3,13 +3,13 @@ mod scenario_set_block;
 mod scenario_set_new_address;
 
 use crate::{
+    ScenarioTxEnvData, ScenarioWorld,
     imports::StaticApi,
     scenario::{
-        tx_to_step::{address_annotated, big_uint_annotated, u64_annotated},
         ScenarioRunner,
+        tx_to_step::{address_annotated, big_uint_annotated, u64_annotated},
     },
     scenario_model::{AddressKey, BigUintValue, NewAddress, SetStateStep},
-    ScenarioTxEnvData, ScenarioWorld,
 };
 
 use multiversx_chain_vm::blockchain::state::EsdtInstanceMetadata;
@@ -192,6 +192,23 @@ impl ScenarioWorld {
     pub fn previous_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
         self.empty_builder().previous_block()
     }
+
+    pub fn epoch_start_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
+        self.empty_builder().epoch_start_block()
+    }
+
+    /// Sets the block round time in the VM.
+    ///
+    /// Does not trace to Mandos, since Mandos doesn't have this field yet.
+    pub fn block_round_time_ms<N>(&mut self, block_round_time_ms: N)
+    where
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
+    {
+        let env = self.new_env_data();
+        let block_round_time_ms_value = u64_annotated(&env, &block_round_time_ms);
+
+        self.get_mut_state().block_config.block_round_time_ms = block_round_time_ms_value.value;
+    }
 }
 
 pub trait SetStateBuilderItem {
@@ -306,6 +323,15 @@ where
         SetStateBuilder {
             base: Some(base),
             item: BlockItem::new_prev(),
+        }
+    }
+
+    pub fn epoch_start_block(&mut self) -> SetStateBuilder<'w, BlockItem> {
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        SetStateBuilder {
+            base: Some(base),
+            item: BlockItem::new_epoch_start(),
         }
     }
 

@@ -3,7 +3,7 @@ use multiversx_sc::{
     types::{Address, TestAddress, TestSCAddress},
 };
 
-use super::{value_from_slice, AddressValue};
+use super::{AddressValue, value_from_slice};
 use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     value_interpreter::interpret_string,

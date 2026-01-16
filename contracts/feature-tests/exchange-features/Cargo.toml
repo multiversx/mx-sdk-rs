@@ -2,16 +2,16 @@
 name = "exchange-features"
 version = "0.0.0"
 authors = ["Alin-Marius Cruceat <alin.cruceat@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/exchange_features.rs"
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../framework/scenario"

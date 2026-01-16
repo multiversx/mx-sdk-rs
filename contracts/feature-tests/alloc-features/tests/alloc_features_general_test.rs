@@ -1,7 +1,7 @@
 mod af_proxy;
 use multiversx_sc::types::{TestAddress, TestSCAddress};
 use multiversx_sc_scenario::{
-    imports::ExecutorConfig, ExpectMessage, ScenarioTxRun, ScenarioWorld,
+    ExpectMessage, ScenarioTxRun, ScenarioWorld, imports::ExecutorConfig,
 };
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");

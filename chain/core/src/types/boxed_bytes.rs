@@ -1,5 +1,5 @@
 use alloc::{
-    alloc::{alloc, realloc, Layout},
+    alloc::{Layout, alloc, realloc},
     boxed::Box,
     vec,
     vec::Vec,
@@ -86,7 +86,8 @@ impl BoxedBytes {
                 );
                 current_index += slice.len();
             }
-            let bytes_box = Box::from_raw(core::slice::from_raw_parts_mut(result_ptr, result_len));
+            let bytes_box =
+                Box::from_raw(core::ptr::slice_from_raw_parts_mut(result_ptr, result_len));
             BoxedBytes(bytes_box)
         }
     }
@@ -115,9 +116,10 @@ impl BoxedBytes {
                 let realloc_ptr = realloc(self_ptr, self_layout, at);
 
                 // packaging the resulting parts nicely
-                let bytes_box_1 = Box::from_raw(core::slice::from_raw_parts_mut(realloc_ptr, at));
+                let bytes_box_1 =
+                    Box::from_raw(core::ptr::slice_from_raw_parts_mut(realloc_ptr, at));
                 let bytes_box_2 =
-                    Box::from_raw(core::slice::from_raw_parts_mut(other_ptr, other_len));
+                    Box::from_raw(core::ptr::slice_from_raw_parts_mut(other_ptr, other_len));
                 (BoxedBytes(bytes_box_1), BoxedBytes(bytes_box_2))
             }
         }

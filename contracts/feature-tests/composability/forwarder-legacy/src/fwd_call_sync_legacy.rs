@@ -73,9 +73,9 @@ pub trait ForwarderSyncCallModule {
 
     #[payable("*")]
     #[endpoint]
-    fn forward_sync_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
+    fn forward_sync_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: u32) {
         let (token_id, payment) = self.call_value().egld_or_single_fungible_esdt();
-        let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
+        let fees = &payment * percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
         let () = self
@@ -129,7 +129,7 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_retrieve_funds_with_accept_func(
         &self,
         to: ManagedAddress,
-        token: TokenIdentifier,
+        token: EsdtTokenIdentifier,
         amount: BigUint,
     ) {
         let payments = self.call_value().all_esdt_transfers();
@@ -153,7 +153,7 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        payment_args: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
     ) {
         let () = self
             .vault_proxy()

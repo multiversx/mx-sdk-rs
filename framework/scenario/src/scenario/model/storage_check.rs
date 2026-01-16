@@ -24,7 +24,7 @@ impl InterpretableFrom<CheckStorageRaw> for CheckStorage {
             CheckStorageRaw::Star => CheckStorage::Star,
             CheckStorageRaw::Equal(m) => {
                 CheckStorage::Equal(CheckStorageDetails::interpret_from(m, context))
-            },
+            }
         }
     }
 }

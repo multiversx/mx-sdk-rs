@@ -1,6 +1,6 @@
-use std::sync::Arc;
+use std::sync::Weak;
 
-use multiversx_chain_vm::host::context::TxContext;
+use multiversx_chain_vm::host::context::{TxContext, TxContextRef};
 use multiversx_sc::{
     api::{HandleConstraints, RawHandle},
     codec::TryStaticCast,
@@ -10,22 +10,30 @@ use crate::executor::debug::ContractDebugStack;
 
 #[derive(Clone)]
 pub struct DebugHandle {
-    /// TODO: would be nice to be an actual TxContextRef,
-    /// but that requires changing the debugger scripts
-    pub(crate) context: Arc<TxContext>,
+    /// Only keep a weak reference to the context, to avoid stray handles keeping the context from being released.
+    /// Using the pointer after the context is released will panic.
+    pub(crate) context: Weak<TxContext>,
     raw_handle: RawHandle,
 }
 
 impl DebugHandle {
+    /// Should almost never call directly, only used directly in a test.
+    pub fn new_with_explicit_context_ref(context: Weak<TxContext>, raw_handle: RawHandle) -> Self {
+        Self {
+            context,
+            raw_handle,
+        }
+    }
+
     pub fn is_on_current_context(&self) -> bool {
-        Arc::ptr_eq(
-            &self.context,
-            &ContractDebugStack::static_peek().tx_context_ref.into_ref(),
+        std::ptr::eq(
+            self.context.as_ptr(),
+            ContractDebugStack::static_peek().tx_context_ref.as_ptr(),
         )
     }
 
     pub fn is_on_same_context(&self, other: &DebugHandle) -> bool {
-        Arc::ptr_eq(&self.context, &other.context)
+        Weak::ptr_eq(&self.context, &other.context)
     }
 
     pub fn assert_current_context(&self) {
@@ -33,6 +41,30 @@ impl DebugHandle {
             self.is_on_current_context(),
             "Managed value not used in original context"
         );
+    }
+
+    /// Upgrades the weak reference to a strong `TxContextRef`.
+    ///
+    /// This method attempts to upgrade the weak reference stored in this handle
+    /// to a strong reference. This is necessary when you need to access the
+    /// underlying `TxContext` for operations.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the `TxContext` is no longer valid (has been dropped). This can
+    /// happen if the object was created on a VM execution stack frame that has
+    /// already been popped, or if objects are mixed between different execution
+    /// contexts during whitebox testing.
+    pub fn to_tx_context_ref(&self) -> TxContextRef {
+        let tx_context_arc = self.context.upgrade().unwrap_or_else(|| {
+            panic!(
+                "TxContext is no longer valid for handle {}.
+The object was created on a VM execution stack frame that has already been popped.
+This can sometimes happen during whitebox testing if the objects are mixed between execution contexts.",
+                self.raw_handle
+            )
+        });
+        TxContextRef::new(tx_context_arc)
     }
 }
 
@@ -45,10 +77,8 @@ impl core::fmt::Debug for DebugHandle {
 impl HandleConstraints for DebugHandle {
     fn new(handle: multiversx_sc::api::RawHandle) -> Self {
         println!("new handle {handle}");
-        Self {
-            context: ContractDebugStack::static_peek().tx_context_ref.into_ref(),
-            raw_handle: handle,
-        }
+        let context = ContractDebugStack::static_peek().tx_context_ref.downgrade();
+        DebugHandle::new_with_explicit_context_ref(context, handle)
     }
 
     fn to_be_bytes(&self) -> [u8; 4] {
@@ -74,7 +104,7 @@ impl PartialEq<RawHandle> for DebugHandle {
 
 impl PartialEq<DebugHandle> for DebugHandle {
     fn eq(&self, other: &DebugHandle) -> bool {
-        Arc::ptr_eq(&self.context, &other.context) && self.raw_handle == other.raw_handle
+        Weak::ptr_eq(&self.context, &other.context) && self.raw_handle == other.raw_handle
     }
 }
 

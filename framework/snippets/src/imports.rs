@@ -1,7 +1,8 @@
 pub use crate::multiversx_sc_scenario::imports::*;
 
 pub use crate::{
-    dns_address_for_name, InteractorBase, InteractorPrepareAsync, InteractorRunAsync, StepBuffer,
+    InteractorBase, InteractorPrepareAsync, InteractorRunAsync, InteractorSimulateGasAsync,
+    SimulateGas, StepBuffer, dns_address_for_name,
 };
 
 pub use crate::sdk::{

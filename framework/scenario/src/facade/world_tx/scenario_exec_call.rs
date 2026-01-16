@@ -1,18 +1,18 @@
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        heap::H256, Code, FunctionCall, ManagedAddress, ManagedBuffer, NotPayable, RHListExec, Tx,
+        Code, FunctionCall, ManagedAddress, ManagedBuffer, NotPayable, RHListExec, Tx,
         TxBaseWithEnv, TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFromSpecified, TxGas,
-        TxPayment, TxToSpecified, UpgradeCall,
+        TxPayment, TxToSpecified, UpgradeCall, heap::H256,
     },
 };
 
 use crate::{
+    ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
     api::StaticApi,
     imports::MxscPath,
-    scenario::tx_to_step::{address_annotated, TxToStep},
+    scenario::tx_to_step::{TxToStep, address_annotated},
     scenario_model::{SetStateStep, TxExpect, TxResponse},
-    ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
 };
 
 use super::ScenarioTxEnvData;

@@ -13,7 +13,7 @@ use crate::{
 
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{const_handles, use_raw_handle, ErrorApiImpl, ManagedTypeApi},
+    api::{ErrorApiImpl, ManagedTypeApi, const_handles, use_raw_handle},
     types::{ManagedRef, ManagedType},
 };
 
@@ -85,7 +85,7 @@ where
     ///
     /// Must always be called under an `if` checking `.is_some()`, otherwise will lead to undefined behaviour.
     pub unsafe fn unwrap_no_check(self) -> T {
-        T::from_handle(self.handle)
+        unsafe { T::from_handle(self.handle) }
     }
 
     pub fn into_option(self) -> Option<T> {

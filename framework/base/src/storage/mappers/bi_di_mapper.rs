@@ -3,20 +3,21 @@ use core::marker::PhantomData;
 use crate::{
     abi::TypeAbiFrom,
     codec::{
-        multi_encode_iter_or_handle_err, multi_types::MultiValue2, EncodeErrorHandler,
-        NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti,
+        TopEncodeMultiOutput, multi_encode_iter_or_handle_err, multi_types::MultiValue2,
     },
     types::ManagedAddress,
 };
 
 use super::{
+    StorageMapper, StorageMapperFromAddress, UnorderedSetMapper,
     source::{CurrentStorage, StorageAddress},
-    unordered_set_mapper, StorageMapper, StorageMapperFromAddress, UnorderedSetMapper,
+    unordered_set_mapper,
 };
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
-    storage::{storage_set, StorageKey},
+    storage::{StorageKey, storage_set},
     storage_clear,
     types::{ManagedType, MultiValueEncoded},
 };
@@ -127,15 +128,15 @@ where
         self.value_set_mapper.contains(value)
     }
 
-    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<SA, V, A> {
+    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<'_, SA, V, A> {
         self.value_set_mapper.iter()
     }
 
-    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<SA, K, A> {
+    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<'_, SA, K, A> {
         self.id_set_mapper.iter()
     }
 
-    pub fn iter(&self) -> Iter<SA, K, V, A> {
+    pub fn iter(&self) -> Iter<'_, SA, K, V, A> {
         Iter::new(self)
     }
 

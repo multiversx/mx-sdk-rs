@@ -1,6 +1,6 @@
 use multiversx_chain_vm::host::context::TxFunctionName;
 
-use super::{value_set_big_uint::*, BytesValue, CheckValue, U64Value};
+use super::{BytesValue, CheckValue, U64Value, value_set_big_uint::*};
 use num_bigint::BigUint;
 
 pub trait Checkable<V> {

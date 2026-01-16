@@ -2,13 +2,13 @@ use core::convert::{TryFrom, TryInto};
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{use_raw_handle, ManagedTypeApi, RawHandle},
+    api::{ManagedTypeApi, RawHandle, use_raw_handle},
     codec::{
         DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     },
-    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
-    types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
+    formatter::{FormatByteReceiver, SCLowerHex, hex_util::encode_bytes_as_hex},
+    types::{ManagedBuffer, ManagedByteArray, ManagedType, heap::Address},
 };
 
 use super::ManagedRef;
@@ -35,7 +35,7 @@ where
 
     pub fn to_address(&self) -> Address {
         let mut result = Address::zero();
-        let _ = self.bytes.buffer.load_slice(0, result.as_mut());
+        self.bytes.buffer.load_slice(0, result.as_mut());
         result
     }
 
@@ -57,8 +57,10 @@ where
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        ManagedAddress {
-            bytes: ManagedByteArray::new_uninit(),
+        unsafe {
+            ManagedAddress {
+                bytes: ManagedByteArray::new_uninit(),
+            }
         }
     }
 
@@ -70,7 +72,7 @@ where
     pub unsafe fn temp_const_ref(
         raw_handle: RawHandle,
     ) -> ManagedRef<'static, M, ManagedAddress<M>> {
-        ManagedRef::wrap_handle(use_raw_handle(raw_handle))
+        unsafe { ManagedRef::wrap_handle(use_raw_handle(raw_handle)) }
     }
 
     #[inline]
@@ -158,8 +160,10 @@ where
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        ManagedAddress {
-            bytes: ManagedByteArray::from_handle(handle),
+        unsafe {
+            ManagedAddress {
+                bytes: ManagedByteArray::from_handle(handle),
+            }
         }
     }
 
@@ -168,7 +172,7 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.bytes.forget_into_handle()
+        unsafe { self.bytes.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {

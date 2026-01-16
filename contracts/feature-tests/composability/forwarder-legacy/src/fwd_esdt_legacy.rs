@@ -25,9 +25,9 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
 
     #[payable("*")]
     #[endpoint]
-    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
+    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: u32) {
         let (token_id, payment) = self.call_value().single_fungible_esdt();
-        let fees = &*payment * &percentage_fees / PERCENTAGE_TOTAL;
+        let fees = &*payment * percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment.clone() - fees;
 
         self.send().direct_esdt(&to, &token_id, 0, &amount_to_send);
@@ -109,7 +109,7 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
             ManagedAsyncCallResult::Ok(()) => {
                 self.last_issued_token().set(token_identifier.unwrap_esdt());
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
@@ -117,7 +117,7 @@ pub trait ForwarderEsdtModule: fwd_storage_legacy::ForwarderStorageModule {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 

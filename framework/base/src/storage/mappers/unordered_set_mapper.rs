@@ -2,15 +2,15 @@ use core::marker::PhantomData;
 
 pub use super::vec_mapper::Iter;
 use super::{
-    source::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper, StorageMapperFromAddress, VecMapper,
+    source::{CurrentStorage, StorageAddress},
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
-        multi_encode_iter_or_handle_err, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
-        TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti,
+        TopEncodeMultiOutput, multi_encode_iter_or_handle_err,
     },
     storage::StorageKey,
     storage_clear, storage_set,
@@ -118,7 +118,7 @@ where
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'_, SA, T, A> {
         self.vec_mapper.iter()
     }
 }

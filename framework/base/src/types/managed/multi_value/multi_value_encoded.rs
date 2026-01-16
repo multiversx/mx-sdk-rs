@@ -1,19 +1,19 @@
-use multiversx_sc_codec::multi_types::MultiValue3;
 use multiversx_sc_codec::MultiValueLength;
+use multiversx_sc_codec::multi_types::MultiValue3;
 use unwrap_infallible::UnwrapInfallible;
 
 use crate::codec::multi_types::MultiValueVec;
 use crate::types::{
     BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentMultiValue,
-    EsdtTokenPayment, TokenIdentifier,
+    EsdtTokenIdentifier, EsdtTokenPayment, NonZeroBigUint, Payment, PaymentMultiValue, TokenId,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
-        try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
-        TopDecode, TopDecodeMulti, TopDecodeMultiInput, TopEncode, TopEncodeMulti,
-        TopEncodeMultiOutput,
+        DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecode, TopDecodeMulti,
+        TopDecodeMultiInput, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        try_cast_execute_or_else,
     },
     contract_base::{ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
@@ -212,7 +212,7 @@ where
     }
 }
 
-impl<M> MultiValueEncoded<M, MultiValue3<TokenIdentifier<M>, u64, BigUint<M>>>
+impl<M> MultiValueEncoded<M, MultiValue3<EsdtTokenIdentifier<M>, u64, BigUint<M>>>
 where
     M: ManagedTypeApi + ErrorApi,
 {
@@ -223,6 +223,25 @@ where
         for multi_arg in self.into_iter() {
             let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
             let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
+
+            payments_vec.push(payment);
+        }
+
+        payments_vec
+    }
+}
+
+impl<M> MultiValueEncoded<M, MultiValue3<TokenId<M>, u64, NonZeroBigUint<M>>>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    /// Convenience function to convert a payment multi-argument into a usable structure.
+    pub fn convert_payment_multi_triples(self) -> ManagedVec<M, Payment<M>> {
+        let mut payments_vec = ManagedVec::new();
+
+        for multi_arg in self.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+            let payment = Payment::new(token_identifier, token_nonce, amount);
 
             payments_vec.push(payment);
         }
@@ -246,7 +265,7 @@ where
         payments_vec
     }
 
-    /// Contrsucts a multi-value from a list of payments.
+    /// Constructs a multi-value from a list of payments.
     pub fn from_vec(v: ManagedVec<M, EgldOrEsdtTokenPayment<M>>) -> Self {
         let mut encoded = MultiValueEncoded::new();
 
@@ -255,6 +274,22 @@ where
         }
 
         encoded
+    }
+}
+
+impl<M> MultiValueEncoded<M, PaymentMultiValue<M>>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    /// Convenience function to convert a payment multi-argument into a usable structure.
+    pub fn convert_payment(self) -> ManagedVec<M, Payment<M>> {
+        let mut payments_vec = ManagedVec::new();
+
+        for multi_arg in self.into_iter() {
+            payments_vec.push(multi_arg.into_inner());
+        }
+
+        payments_vec
     }
 }
 

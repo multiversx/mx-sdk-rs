@@ -132,8 +132,8 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg3: ProxyArg<TokenIdentifier<Env::Api>>,
-        Arg4: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<TokenId<Env::Api>>,
+        Arg4: ProxyArg<NonZeroBigUint<Env::Api>>,
         Arg5: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
@@ -238,7 +238,7 @@ where
     pub gas_limit: u64,
     pub endpoint_name: ManagedBuffer<Api>,
     pub args: ManagedArgBuffer<Api>,
-    pub payments: EgldOrMultiEsdtPayment<Api>,
+    pub payments: ManagedVec<Api, Payment<Api>>,
 }
 
 #[type_abi]

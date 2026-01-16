@@ -2,19 +2,19 @@
 name = "erc1155"
 version = "0.0.0"
 authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/erc1155.rs"
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../../framework/scenario"
 
 [dev-dependencies.erc1155-user-mock]

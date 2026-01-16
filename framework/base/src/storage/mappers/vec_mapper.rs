@@ -1,15 +1,15 @@
 use super::{
-    source::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper, StorageMapperFromAddress,
+    source::{CurrentStorage, StorageAddress},
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, StorageMapperApi},
     codec::{
-        multi_encode_iter_or_handle_err, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti,
-        TopEncodeMultiOutput,
+        EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        multi_encode_iter_or_handle_err,
     },
-    storage::{storage_clear, storage_set, StorageKey},
+    storage::{StorageKey, storage_clear, storage_set},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use core::marker::PhantomData;
@@ -163,7 +163,7 @@ where
     }
 
     /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'_, SA, T, A> {
         Iter::new(self)
     }
 }

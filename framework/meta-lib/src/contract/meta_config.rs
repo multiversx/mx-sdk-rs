@@ -73,13 +73,18 @@ impl MetaConfig {
         let crate_name = main_cargo_toml_contents.package_name();
 
         for contract in self.sc_config.contracts.iter() {
+            let mut framework_dependency = main_cargo_toml_contents
+                .dependency_raw_value(FRAMEWORK_NAME_BASE)
+                .expect("missing framework dependency in Cargo.toml");
+            if contract.settings.std {
+                framework_dependency.features.insert("std".to_owned());
+            }
+
             let cargo_toml_data = WasmCargoTomlData {
                 name: contract.wasm_crate_name.clone(),
                 edition: main_cargo_toml_contents.package_edition(),
                 profile: contract.settings.profile.clone(),
-                framework_dependency: main_cargo_toml_contents
-                    .dependency_raw_value(FRAMEWORK_NAME_BASE)
-                    .expect("missing framework dependency in Cargo.toml"),
+                framework_dependency,
                 contract_features: contract.settings.features.clone(),
                 contract_default_features: contract.settings.default_features,
             };
@@ -96,6 +101,12 @@ impl MetaConfig {
         }
     }
 
+    /// Triggers a build in all wasm crates.
+    ///
+    /// The following operations are performed in this order:
+    /// 1. check installed tools
+    /// 2. update the wasm crates, if needed
+    /// 3. build each wasm crate, and copy the outputs to the output directory  
     pub fn build(&mut self, mut build_args: BuildArgs) {
         check_tools_installed(&mut build_args);
         adjust_target_dir_wasm(&mut build_args);

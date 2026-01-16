@@ -65,7 +65,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn buy_token<T>(
         &self,
         requested_amount: BigUint,
-        requested_token: TokenIdentifier,
+        requested_token: EsdtTokenIdentifier,
         requested_nonce: OptionalValue<u64>,
     ) where
         T: CurveFunction<Self::Api>
@@ -116,10 +116,10 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                     self.token_details(&requested_token)
                         .update(|details| details.remove_nonce(nonce));
                 }
-            },
+            }
             OptionalValue::None => {
                 self.send_next_available_tokens(&caller, requested_token, requested_amount);
-            },
+            }
         };
 
         self.tx()
@@ -133,7 +133,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn send_next_available_tokens(
         &self,
         caller: &ManagedAddress,
-        token: TokenIdentifier,
+        token: EsdtTokenIdentifier,
         amount: BigUint,
     ) {
         let mut nonces = self.token_details(&token).get().token_nonces;
@@ -168,7 +168,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             .update(|token_ownership| token_ownership.token_nonces = nonces);
     }
 
-    fn get_buy_price<T>(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint
+    fn get_buy_price<T>(&self, amount: BigUint, identifier: EsdtTokenIdentifier) -> BigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode
@@ -183,7 +183,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         self.compute_buy_price::<T>(&identifier, &amount)
     }
 
-    fn get_sell_price<T>(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint
+    fn get_sell_price<T>(&self, amount: BigUint, identifier: EsdtTokenIdentifier) -> BigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode
@@ -198,7 +198,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         self.compute_sell_price::<T>(&identifier, &amount)
     }
 
-    fn check_token_exists(&self, issued_token: &TokenIdentifier) {
+    fn check_token_exists(&self, issued_token: &EsdtTokenIdentifier) {
         require!(
             !self.bonding_curve(issued_token).is_empty(),
             "Token is not issued yet!"
@@ -208,7 +208,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     #[view(getTokenAvailability)]
     fn get_token_availability(
         &self,
-        identifier: TokenIdentifier,
+        identifier: EsdtTokenIdentifier,
     ) -> MultiValueEncoded<MultiValue2<u64, BigUint>> {
         let token_nonces = self.token_details(&identifier).get().token_nonces;
         let mut availability = MultiValueEncoded::new();
@@ -224,7 +224,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn check_owned_return_payment_token<T>(
         &self,
-        issued_token: &TokenIdentifier,
+        issued_token: &EsdtTokenIdentifier,
         amount: &BigUint,
     ) -> EgldOrEsdtTokenIdentifier
     where
@@ -263,7 +263,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         );
     }
 
-    fn compute_buy_price<T>(&self, identifier: &TokenIdentifier, amount: &BigUint) -> BigUint
+    fn compute_buy_price<T>(&self, identifier: &EsdtTokenIdentifier, amount: &BigUint) -> BigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode
@@ -285,7 +285,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         function_selector.calculate_price(token_start, amount, arguments)
     }
 
-    fn compute_sell_price<T>(&self, identifier: &TokenIdentifier, amount: &BigUint) -> BigUint
+    fn compute_sell_price<T>(&self, identifier: &EsdtTokenIdentifier, amount: &BigUint) -> BigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode

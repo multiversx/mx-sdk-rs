@@ -1,14 +1,9 @@
-use multiversx_sc::{abi::TypeAbiFrom, types::H256};
-use num_traits::Zero;
+use multiversx_sc::types::H256;
 
 use crate::{
-    api::StaticApi,
-    multiversx_sc::{codec::TopEncodeMulti, types::ContractCall},
     scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery},
     scenario_model::TxResponse,
 };
-
-use super::{process_contract_call, TypedScQuery};
 
 #[derive(Debug, Clone)]
 pub struct ScQueryStep {
@@ -40,6 +35,12 @@ impl ScQueryStep {
         Self::default()
     }
 
+    /// Sets the tx id for mandos.
+    pub fn id(mut self, id: impl ToString) -> Self {
+        self.id = id.to_string();
+        self
+    }
+
     pub fn to<A>(mut self, address: A) -> Self
     where
         AddressValue: From<A>,
@@ -56,57 +57,6 @@ impl ScQueryStep {
     pub fn argument(mut self, expr: &str) -> Self {
         self.tx.arguments.push(BytesValue::from(expr));
         self
-    }
-
-    /// Sets following fields based on the smart contract proxy:
-    /// - "to"
-    /// - "function"
-    /// - "arguments"
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    #[allow(deprecated)]
-    pub fn call<CC>(mut self, contract_call: CC) -> TypedScQuery<CC::OriginalResult>
-    where
-        CC: multiversx_sc::types::ContractCallBase<StaticApi>,
-    {
-        let (to_str, function, egld_value_expr, mandos_args) = process_contract_call(contract_call);
-        assert!(
-            egld_value_expr.value.is_zero(),
-            "cannot send EGLD value in queries"
-        );
-        self = self.to(to_str.as_str());
-        self = self.function(function.as_str());
-        for arg in mandos_args {
-            self = self.argument(arg.as_str());
-        }
-        self.into()
-    }
-
-    /// Sets following fields based on the smart contract proxy:
-    /// - "to"
-    /// - "function"
-    /// - "arguments"
-    /// - "expect"
-    ///     - "out"
-    ///     - "status" set to 0
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    #[allow(deprecated)]
-    pub fn call_expect<CC, ExpectedResult>(
-        self,
-        contract_call: CC,
-        expected_value: ExpectedResult,
-    ) -> TypedScQuery<CC::OriginalResult>
-    where
-        CC: ContractCall<StaticApi>,
-        ExpectedResult: TypeAbiFrom<CC::OriginalResult> + TopEncodeMulti,
-    {
-        let typed = self.call(contract_call);
-        typed.expect_value(expected_value)
     }
 
     /// Adds a custom expect section to the tx.
@@ -137,5 +87,11 @@ impl ScQueryStep {
             }
         }
         self.response = Some(tx_response);
+    }
+}
+
+impl AsMut<ScQueryStep> for ScQueryStep {
+    fn as_mut(&mut self) -> &mut ScQueryStep {
+        self
     }
 }

@@ -65,7 +65,7 @@ pub fn clear_all_type_lifetimes(ty: &mut syn::Type) {
     match ty {
         syn::Type::Reference(r) => {
             r.lifetime = None;
-        },
+        }
         syn::Type::Path(type_path) => {
             type_path.path.segments.iter_mut().for_each(|path_segm| {
                 if let syn::PathArguments::AngleBracketed(angle_backeted) = &mut path_segm.arguments
@@ -77,7 +77,7 @@ pub fn clear_all_type_lifetimes(ty: &mut syn::Type) {
                     });
                 }
             });
-        },
-        _ => {},
+        }
+        _ => {}
     }
 }

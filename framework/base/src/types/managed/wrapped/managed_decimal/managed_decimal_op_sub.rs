@@ -45,12 +45,12 @@ impl<M: ManagedTypeApi> Sub<ManagedDecimal<M, NumDecimals>> for ManagedDecimal<M
             core::cmp::Ordering::Less => {
                 self = self.rescale(rhs.decimals);
                 self.data -= rhs.data;
-            },
+            }
             core::cmp::Ordering::Equal => self.data -= rhs.data,
             core::cmp::Ordering::Greater => {
                 let rhs_data = rhs.rescale_data(self.decimals);
                 self.data -= rhs_data;
-            },
+            }
         }
         self
     }

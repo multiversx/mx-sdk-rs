@@ -17,14 +17,14 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimalSign
             Ordering::Less => {
                 let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
-                &self.data * scaling_factor == other.data
-            },
+                &self.data * scaling_factor.as_big_int() == other.data
+            }
             Ordering::Equal => self.data == other.data,
             Ordering::Greater => {
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
-                &other.data * scaling_factor == self.data
-            },
+                &other.data * scaling_factor.as_big_int() == self.data
+            }
         }
     }
 }
@@ -42,14 +42,14 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialOrd<ManagedDecimalSig
                 let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
 
-                Some((&self.data * scaling_factor).cmp(&other.data))
-            },
+                Some((&self.data * scaling_factor.as_big_int()).cmp(&other.data))
+            }
             Ordering::Equal => Some((self.data).cmp(&other.data)),
             Ordering::Greater => {
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
-                Some((&other.data * scaling_factor).cmp(&self.data))
-            },
+                Some((&other.data * scaling_factor.as_big_int()).cmp(&self.data))
+            }
         }
     }
 }

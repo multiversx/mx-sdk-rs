@@ -50,7 +50,7 @@ pub trait Crowdfunding {
             Status::FundingPeriod
         } else if self
             .blockchain()
-            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
+            .get_sc_balance(EgldOrEsdtTokenIdentifier::egld(), 0)
             >= self.target().get()
         {
             Status::Successful
@@ -79,7 +79,7 @@ pub trait Crowdfunding {
                     .typed(erc20_proxy::SimpleErc20TokenProxy)
                     .transfer(caller, balance)
                     .async_call_and_exit();
-            },
+            }
             Status::Failed => {
                 let caller = self.blockchain().get_caller();
                 let deposit = self.deposit(&caller).get();
@@ -95,7 +95,7 @@ pub trait Crowdfunding {
                         .transfer(caller, deposit)
                         .async_call_and_exit();
                 }
-            },
+            }
         }
     }
 
@@ -122,8 +122,8 @@ pub trait Crowdfunding {
                 self.deposit(&cb_sender)
                     .update(|deposit| *deposit += &cb_amount);
                 self.total_balance().update(|balance| *balance += cb_amount);
-            },
-            ManagedAsyncCallResult::Err(_) => {},
+            }
+            ManagedAsyncCallResult::Err(_) => {}
         }
     }
 

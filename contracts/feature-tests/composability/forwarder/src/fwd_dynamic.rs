@@ -57,7 +57,7 @@ pub trait ForwarderDynamicModule:
     }
 
     #[endpoint]
-    fn change_to_dynamic(&self, token_id: TokenIdentifier) {
+    fn change_to_dynamic(&self, token_id: EsdtTokenIdentifier) {
         self.send()
             .esdt_system_sc_proxy()
             .change_to_dynamic(token_id)
@@ -65,7 +65,7 @@ pub trait ForwarderDynamicModule:
     }
 
     #[endpoint]
-    fn update_token(&self, token_id: TokenIdentifier) {
+    fn update_token(&self, token_id: EsdtTokenIdentifier) {
         self.send()
             .esdt_system_sc_proxy()
             .update_token(token_id)
@@ -73,7 +73,7 @@ pub trait ForwarderDynamicModule:
     }
 
     #[endpoint]
-    fn modify_royalties(&self, token_id: TokenIdentifier, nonce: u64, new_royalty: u64) {
+    fn modify_royalties(&self, token_id: EsdtTokenIdentifier, nonce: u64, new_royalty: u64) {
         self.send()
             .esdt_modify_royalties(&token_id, nonce, new_royalty);
     }
@@ -81,7 +81,7 @@ pub trait ForwarderDynamicModule:
     #[endpoint]
     fn set_new_uris(
         &self,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         nonce: u64,
         new_uris: MultiValueEncoded<ManagedBuffer>,
     ) {
@@ -91,14 +91,14 @@ pub trait ForwarderDynamicModule:
     }
 
     #[endpoint]
-    fn modify_creator(&self, token_id: TokenIdentifier, nonce: u64) {
+    fn modify_creator(&self, token_id: EsdtTokenIdentifier, nonce: u64) {
         self.send().esdt_nft_modify_creator(&token_id, nonce);
     }
 
     #[endpoint]
     fn metadata_recreate(
         &self,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         nonce: u64,
         name: ManagedBuffer,
         royalties: u64,
@@ -122,7 +122,7 @@ pub trait ForwarderDynamicModule:
     #[endpoint]
     fn metadata_update(
         &self,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         nonce: u64,
         name: ManagedBuffer,
         royalties: u64,

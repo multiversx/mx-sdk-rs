@@ -1,12 +1,13 @@
 use basic_features_interact::{BasicFeaturesInteract, Config};
 use multiversx_sc_snippets::{
+    InteractorRunAsync, InteractorSimulateGasAsync,
     imports::{
         BigUint, ESDTSystemSCAddress, ESDTSystemSCProxy, EgldDecimals, EsdtLocalRole,
-        EsdtTokenPayment, EsdtTokenType, FungibleTokenProperties, ManagedBuffer, ManagedDecimal,
-        ManagedOption, ManagedVec, ReturnsNewTokenIdentifier, RustBigUint, StaticApi,
-        TokenIdentifier,
+        EsdtTokenIdentifier, EsdtTokenPayment, EsdtTokenType, FungibleTokenProperties,
+        ManagedBuffer, ManagedDecimal, ManagedOption, ManagedVec, ReturnsNewTokenIdentifier,
+        RustBigUint, StaticApi,
     },
-    test_wallets, InteractorRunAsync,
+    test_wallets,
 };
 use serial_test::serial;
 use system_sc_interact::SysFuncCallsInteract;
@@ -20,8 +21,17 @@ async fn simulator_basic_features_test() {
     let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
 
     bf_interact.add_validator_key().await;
-    bf_interact.deploy_storage_bytes().await;
-    bf_interact.large_storage(15).await;
+    bf_interact.deploy_storage_bytes(false).await;
+    bf_interact.large_storage(15, false).await;
+
+    bf_interact
+        .interactor
+        .tx()
+        .from(&bf_interact.wallet_address)
+        .to(bf_interact.state.bf_storage_bytes_contract())
+        .egld(1000)
+        .simulate_gas()
+        .await;
 
     let data = bf_interact.get_large_storage().await.to_vec();
     assert_eq!(bf_interact.large_storage_payload, data);
@@ -85,7 +95,7 @@ async fn send_esdt_to_non_existent_address_test() {
         .from(&registered_wallet_address)
         .to(&not_registered_wallet_address)
         .esdt(EsdtTokenPayment::new(
-            TokenIdentifier::from_esdt_bytes(token.clone()),
+            EsdtTokenIdentifier::from_esdt_bytes(token.clone()),
             1,
             BigUint::from(10u16),
         ))

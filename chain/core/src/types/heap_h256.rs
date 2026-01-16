@@ -91,7 +91,7 @@ impl HeapH256 {
     /// Allocates directly in heap.
     /// Minimal resulting wasm code (14 bytes if not inlined).
     pub fn zero() -> Self {
-        use alloc::alloc::{alloc_zeroed, Layout};
+        use alloc::alloc::{Layout, alloc_zeroed};
         unsafe {
             let ptr = alloc_zeroed(Layout::new::<[u8; 32]>()) as *mut [u8; 32];
             HeapH256(Box::from_raw(ptr))
@@ -149,7 +149,7 @@ impl HeapH256 {
     pub fn into_boxed_bytes(self) -> BoxedBytes {
         let raw = Box::into_raw(self.0) as *mut u8;
         unsafe {
-            let bytes_box = Box::<[u8]>::from_raw(core::slice::from_raw_parts_mut(raw, 32));
+            let bytes_box = Box::<[u8]>::from_raw(core::ptr::slice_from_raw_parts_mut(raw, 32));
             bytes_box.into()
         }
     }

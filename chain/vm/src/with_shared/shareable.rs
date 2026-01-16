@@ -58,7 +58,7 @@ impl<T> DerefMut for Shareable<T> {
             Shareable::Owned(t) => t,
             Shareable::Shared(_) => {
                 panic!("cannot mutably dereference ShareableMut when in Shared state")
-            },
+            }
         }
     }
 }
@@ -91,11 +91,13 @@ impl<T> Shareable<T> {
                 match Arc::try_unwrap(arc) {
                     Ok(t) => {
                         std::ptr::write(self, Shareable::Owned(t));
-                    },
+                    }
                     Err(rc) => {
                         std::mem::forget(rc);
-                        panic!("failed to recover Owned ShareableMut from Shared, not all Rc pointers dropped")
-                    },
+                        panic!(
+                            "failed to recover Owned ShareableMut from Shared, not all Rc pointers dropped"
+                        )
+                    }
                 }
             } else {
                 std::mem::forget(temp);

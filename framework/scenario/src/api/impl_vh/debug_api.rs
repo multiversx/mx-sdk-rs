@@ -1,6 +1,5 @@
 use multiversx_chain_vm::{
     executor::VMHooksEarlyExit,
-    host::context::TxContextRef,
     host::vm_hooks::{TxVMHooksContext, VMHooksDispatcher},
 };
 use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
@@ -35,7 +34,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
-        let tx_context_ref = TxContextRef(handle.context.clone());
+        let tx_context_ref = handle.to_tx_context_ref();
         let vh_context = TxVMHooksContext::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(vh_context);
         let result = f(&mut dispatcher);

@@ -18,10 +18,10 @@ fn generate_struct_payload_nested_tuple(fields: &syn::Fields) -> proc_macro2::To
                 result = quote! { (#ty, #result) };
             }
             result
-        },
+        }
         _ => {
             panic!("ManagedVecItem only supports named fields")
-        },
+        }
     }
 }
 
@@ -52,7 +52,7 @@ fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_mac
             .collect(),
         _ => {
             panic!("ManagedVecItem only supports named fields")
-        },
+        }
     }
 }
 
@@ -156,7 +156,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemEnumPayloadTuple>::EnumPayload;
             const SKIPS_RESERIALIZATION: bool = #skips_reserialization;
-            type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
+            type Ref<'a> = multiversx_sc::types::Ref<'a, Self>;
 
             unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let mut index = 0;
@@ -174,7 +174,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
             }
 
             unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-                multiversx_sc::types::ManagedVecRef::new(Self::read_from_payload(payload))
+                multiversx_sc::types::Ref::new(Self::read_from_payload(payload))
             }
 
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -194,8 +194,10 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
 fn single_fields_type(fields: &syn::Fields) -> Option<syn::Type> {
     match fields {
         syn::Fields::Named(_) => {
-            panic!("named fields currently not supported, only single unnamed fields supported, of type Variant(T)")
-        },
+            panic!(
+                "named fields currently not supported, only single unnamed fields supported, of type Variant(T)"
+            )
+        }
         syn::Fields::Unnamed(fields_unnamed) => {
             assert_eq!(
                 fields_unnamed.unnamed.len(),
@@ -203,7 +205,7 @@ fn single_fields_type(fields: &syn::Fields) -> Option<syn::Type> {
                 "only single unnamed fields supported, of type Variant(T)"
             );
             Some(fields_unnamed.unnamed.first().unwrap().ty.clone())
-        },
+        }
         syn::Fields::Unit => None,
     }
 }
@@ -221,7 +223,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemStructPayloadTuple>::StructPayload;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
-            type Ref<'a> = multiversx_sc::types::ManagedVecRef<'a, Self>;
+            type Ref<'a> = multiversx_sc::types::Ref<'a, Self>;
 
             unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let mut index = 0;
@@ -234,7 +236,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
             }
 
             unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-                multiversx_sc::types::ManagedVecRef::new(Self::read_from_payload(payload))
+                multiversx_sc::types::Ref::new(Self::read_from_payload(payload))
             }
 
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

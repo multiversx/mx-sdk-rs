@@ -9,7 +9,7 @@ use multiversx_chain_vm::host::{
     runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
 };
 
-use super::{tx_input_util::generate_tx_hash, ScenarioVMRunner};
+use super::{ScenarioVMRunner, tx_input_util::generate_tx_hash};
 
 impl ScenarioVMRunner {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.

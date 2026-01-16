@@ -2,7 +2,7 @@
 name = "kitty-auction"
 version = "0.0.0"
 authors = [ "dorin-iancu <dorin.iancu@multiversx.com>",]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
@@ -17,9 +17,9 @@ version = "0.0.0"
 path = "../kitty-ownership"
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../../framework/scenario"

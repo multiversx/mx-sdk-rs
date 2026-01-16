@@ -29,7 +29,7 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../forwarder-barnard/output/forwarder-barnard.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -120,7 +120,7 @@
                             "str:NFT-123456",
                             "1",
                             "1",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "100",
                             "str:SFT-456789",

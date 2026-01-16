@@ -24,7 +24,7 @@ pub use map_mapper::MapMapper;
 pub use map_storage_mapper::MapStorageMapper;
 pub use mapper::{StorageClearable, StorageMapper, StorageMapperFromAddress};
 pub use ordered_binary_tree_mapper::{
-    NodeId, OrderedBinaryTreeMapper, OrderedBinaryTreeNode, NULL_NODE_ID,
+    NULL_NODE_ID, NodeId, OrderedBinaryTreeMapper, OrderedBinaryTreeNode,
 };
 pub use queue_mapper::QueueMapper;
 pub use set_mapper::SetMapper;

@@ -4,15 +4,23 @@ mod http_chain_simulator;
 mod http_network;
 mod http_tx;
 
+use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest, GatewayRequestType};
+use reqwest::Method;
 use std::time::Duration;
-
-use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest};
 
 /// Allows communication with the MultiversX gateway API.
 #[derive(Clone, Debug)]
 pub struct GatewayHttpProxy {
     pub(crate) proxy_uri: String,
     pub(crate) client: reqwest::Client,
+}
+
+/// Converts from common sdk type to reqwest type.
+fn reqwest_method(request_type: GatewayRequestType) -> Method {
+    match request_type {
+        GatewayRequestType::Get => Method::GET,
+        GatewayRequestType::Post => Method::POST,
+    }
 }
 
 impl GatewayHttpProxy {
@@ -30,25 +38,21 @@ impl GatewayHttpProxy {
         G: GatewayRequest,
     {
         let url = format!("{}/{}", self.proxy_uri, request.get_endpoint());
-        let mut request_builder;
-        match request.request_type() {
-            multiversx_sdk::gateway::GatewayRequestType::Get => {
-                request_builder = self.client.get(url);
-            },
-            multiversx_sdk::gateway::GatewayRequestType::Post => {
-                request_builder = self.client.post(url);
-            },
-        }
+        let method = request.request_type();
+        log::info!("{method} request: {url}");
 
+        let mut request_builder = self.client.request(reqwest_method(method), url);
         if let Some(payload) = request.get_payload() {
+            log::trace!("{method} payload: {}", serde_json::to_string(payload)?);
             request_builder = request_builder.json(&payload);
         }
 
-        let decoded = request_builder
-            .send()
-            .await?
-            .json::<G::DecodedJson>()
-            .await?;
+        let http_request = request_builder.build()?;
+        let http_response = self.client.execute(http_request).await?;
+        let http_response_text = http_response.text().await?;
+        log::trace!("{method} response: {http_response_text}");
+
+        let decoded = serde_json::from_str::<G::DecodedJson>(&http_response_text)?;
 
         request.process_json(decoded)
     }

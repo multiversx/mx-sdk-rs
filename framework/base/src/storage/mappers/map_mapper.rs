@@ -1,18 +1,18 @@
 use core::marker::PhantomData;
 
 use super::{
+    SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
     set_mapper::{self},
     source::{CurrentStorage, StorageAddress},
-    SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
-        multi_encode_iter_or_handle_err, multi_types::MultiValue2, EncodeErrorHandler,
-        NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti,
+        TopEncodeMultiOutput, multi_encode_iter_or_handle_err, multi_types::MultiValue2,
     },
-    storage::{storage_clear, storage_set, StorageKey},
+    storage::{StorageKey, storage_clear, storage_set},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
@@ -165,7 +165,7 @@ where
         None
     }
 
-    pub fn keys(&self) -> Keys<SA, A, K> {
+    pub fn keys(&self) -> Keys<'_, SA, A, K> {
         self.keys_set.iter()
     }
 
@@ -198,13 +198,13 @@ where
 
     /// An iterator visiting all values in arbitrary order.
     /// The iterator element type is `&'a V`.
-    pub fn values(&self) -> Values<SA, A, K, V> {
+    pub fn values(&self) -> Values<'_, SA, A, K, V> {
         Values::new(self)
     }
 
     /// An iterator visiting all key-value pairs in arbitrary order.
     /// The iterator element type is `(&'a K, &'a V)`.
-    pub fn iter(&self) -> Iter<SA, A, K, V> {
+    pub fn iter(&self) -> Iter<'_, SA, A, K, V> {
         Iter::new(self)
     }
 }
@@ -403,7 +403,7 @@ where
             Entry::Vacant(entry) => {
                 let value = default(entry.key());
                 entry.insert(value)
-            },
+            }
         }
     }
 
@@ -417,7 +417,7 @@ where
             Entry::Occupied(mut entry) => {
                 entry.update(f);
                 Entry::Occupied(entry)
-            },
+            }
             Entry::Vacant(entry) => Entry::Vacant(entry),
         }
     }

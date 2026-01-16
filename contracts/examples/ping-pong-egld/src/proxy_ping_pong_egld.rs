@@ -50,13 +50,13 @@ where
     /// `max_funds` - optional funding cap, no more funds than this can be added to the contract. 
     pub fn init<
         Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<u64>,
-        Arg2: ProxyArg<Option<u64>>,
+        Arg1: ProxyArg<DurationMillis>,
+        Arg2: ProxyArg<Option<TimestampMillis>>,
         Arg3: ProxyArg<OptionalValue<BigUint<Env::Api>>>,
     >(
         self,
         ping_amount: Arg0,
-        duration_in_seconds: Arg1,
+        duration: Arg1,
         opt_activation_timestamp: Arg2,
         max_funds: Arg3,
     ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
@@ -64,7 +64,7 @@ where
             .payment(NotPayable)
             .raw_deploy()
             .argument(&ping_amount)
-            .argument(&duration_in_seconds)
+            .argument(&duration)
             .argument(&opt_activation_timestamp)
             .argument(&max_funds)
             .original_result()
@@ -82,13 +82,13 @@ where
 {
     pub fn upgrade<
         Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<u64>,
-        Arg2: ProxyArg<Option<u64>>,
+        Arg1: ProxyArg<DurationMillis>,
+        Arg2: ProxyArg<Option<TimestampMillis>>,
         Arg3: ProxyArg<OptionalValue<BigUint<Env::Api>>>,
     >(
         self,
         ping_amount: Arg0,
-        duration_in_seconds: Arg1,
+        duration: Arg1,
         opt_activation_timestamp: Arg2,
         max_funds: Arg3,
     ) -> TxTypedUpgrade<Env, From, To, NotPayable, Gas, ()> {
@@ -96,7 +96,7 @@ where
             .payment(NotPayable)
             .raw_upgrade()
             .argument(&ping_amount)
-            .argument(&duration_in_seconds)
+            .argument(&duration)
             .argument(&opt_activation_timestamp)
             .argument(&max_funds)
             .original_result()
@@ -184,7 +184,7 @@ where
 
     pub fn deadline(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TimestampMillis> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getDeadline")
@@ -192,10 +192,10 @@ where
     }
 
     /// Block timestamp of the block where the contract got activated. 
-    /// If not specified in the constructor it is the the deploy block timestamp. 
+    /// If not specified in the constructor it is the deploy block timestamp. 
     pub fn activation_timestamp(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TimestampMillis> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getActivationTimestamp")
@@ -248,8 +248,8 @@ where
     Api: ManagedTypeApi,
 {
     pub ping_amount: BigUint<Api>,
-    pub deadline: u64,
-    pub activation_timestamp: u64,
+    pub deadline: TimestampMillis,
+    pub activation_timestamp: TimestampMillis,
     pub max_funds: Option<BigUint<Api>>,
     pub pong_all_last_user: usize,
 }

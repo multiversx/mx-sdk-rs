@@ -1,6 +1,6 @@
-use multiversx_sc::api::{use_raw_handle, HandleConstraints, ManagedMapApiImpl};
+use multiversx_sc::api::{HandleConstraints, ManagedMapApiImpl, use_raw_handle};
 
-use crate::api::{i32_to_bool, VMHooksApi, VMHooksApiBackend};
+use crate::api::{VMHooksApi, VMHooksApiBackend, i32_to_bool};
 
 impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
     fn mm_new(&self) -> Self::ManagedMapHandle {

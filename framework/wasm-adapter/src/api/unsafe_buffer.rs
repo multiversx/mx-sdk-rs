@@ -13,10 +13,10 @@ static mut BUFFER_2: [u8; BUFFER_2_SIZE] = [0u8; BUFFER_2_SIZE];
 
 #[allow(static_mut_refs)]
 pub(crate) unsafe fn buffer_1_ptr() -> *mut u8 {
-    BUFFER_1.as_mut_ptr()
+    unsafe { BUFFER_1.as_mut_ptr() }
 }
 
 #[allow(static_mut_refs)]
 pub(crate) unsafe fn buffer_2_ptr() -> *mut u8 {
-    BUFFER_2.as_mut_ptr()
+    unsafe { BUFFER_2.as_mut_ptr() }
 }

@@ -92,6 +92,19 @@ where
     }
 }
 
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for u128
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        BigUint::from(*self).to_display()
+    }
+
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        BigUint::from(*self)
+    }
+}
+
 impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for i32
 where
     Env: TxEnv,

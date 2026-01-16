@@ -3,7 +3,7 @@ use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::{api::RawHandle, types::Address};
 use std::sync::Mutex;
 
-use crate::executor::debug::{ContractDebugInstanceState, StaticVarData, VMHooksDebugger};
+use crate::executor::debug::{StaticVarData, VMHooksDebugger};
 
 use super::{StaticApiVMHooksContext, VMHooksApi, VMHooksApiBackend};
 
@@ -27,12 +27,12 @@ impl VMHooksApiBackend for StaticApiBackend {
     where
         F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
-        STATIC_API_VH_CELL.with(|vh_mutex| {
+        let result = STATIC_API_VH_CELL.with(|vh_mutex| {
             let mut vh = vh_mutex.lock().unwrap();
-            let result = f(&mut *vh);
-            std::mem::drop(vh);
-            result.unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
-        })
+            f(&mut *vh)
+        });
+
+        result.unwrap_or_else(|err| panic!("StaticApi signal error: {}", err.message))
     }
 
     fn with_static_data<R, F>(f: F) -> R
