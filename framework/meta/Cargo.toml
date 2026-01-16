@@ -35,7 +35,7 @@ convert_case = "0.10"
 semver = "1.0.20"
 ruplacer = { version = "0.10", default-features = false }
 regex = "1.11"
-reqwest = { version = "0.12", features = ["blocking", "json"] }
+reqwest = { version = "0.13", features = ["rustls", "blocking", "json"] }
 zip = { version = "6.0", features = ["deflate"], default-features = false }
 copy_dir = "0.1.2"
 pathdiff = "0.2.1"
