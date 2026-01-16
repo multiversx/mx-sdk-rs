@@ -1,7 +1,7 @@
 use crate::{
-    dep_encode_num_mimic, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-    TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    dep_encode_num_mimic,
 };
 
 // No reversing needed for u8, because it is a single byte.
@@ -48,6 +48,7 @@ macro_rules! dep_encode_num_unsigned {
     };
 }
 
+dep_encode_num_unsigned! {u128, 128}
 dep_encode_num_unsigned! {u64, 64}
 dep_encode_num_unsigned! {u32, 32}
 dep_encode_num_unsigned! {u16, 16}
@@ -68,6 +69,7 @@ macro_rules! top_encode_num_unsigned {
     };
 }
 
+top_encode_num_unsigned! {u128, 128}
 top_encode_num_unsigned! {u64, 64}
 top_encode_num_unsigned! {u32, 32}
 top_encode_num_unsigned! {usize, 32}
@@ -112,6 +114,7 @@ macro_rules! dep_decode_num_unsigned {
 dep_decode_num_unsigned!(u16, 2);
 dep_decode_num_unsigned!(u32, 4);
 dep_decode_num_unsigned!(u64, 8);
+dep_decode_num_unsigned!(u128, 16);
 
 impl NestedDecode for usize {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -148,6 +151,7 @@ top_decode_num_unsigned!(u16, u16);
 top_decode_num_unsigned!(u32, u32);
 top_decode_num_unsigned!(usize, u32); // even if usize can be 64 bits on some platforms, we always deserialize as max 32 bits
 top_decode_num_unsigned!(u64, u64);
+top_decode_num_unsigned!(u128, u128);
 
 #[cfg(test)]
 pub mod tests {
@@ -161,12 +165,14 @@ pub mod tests {
         check_top_encode_decode(0u32, &[]);
         check_top_encode_decode(0u64, &[]);
         check_top_encode_decode(0usize, &[]);
+        check_top_encode_decode(0u128, &[]);
         // unsigned positive
         check_top_encode_decode(5u8, &[5]);
         check_top_encode_decode(5u16, &[5]);
         check_top_encode_decode(5u32, &[5]);
         check_top_encode_decode(5u64, &[5]);
         check_top_encode_decode(5usize, &[5]);
+        check_top_encode_decode(5u128, &[5]);
     }
 
     #[test]
@@ -177,11 +183,13 @@ pub mod tests {
         check_dep_encode_decode(0u32, &[0, 0, 0, 0]);
         check_dep_encode_decode(0usize, &[0, 0, 0, 0]);
         check_dep_encode_decode(0u64, &[0, 0, 0, 0, 0, 0, 0, 0]);
+        check_dep_encode_decode(0u128, &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         // unsigned positive
         check_dep_encode_decode(5u8, &[5]);
         check_dep_encode_decode(5u16, &[0, 5]);
         check_dep_encode_decode(5u32, &[0, 0, 0, 5]);
         check_dep_encode_decode(5usize, &[0, 0, 0, 5]);
         check_dep_encode_decode(5u64, &[0, 0, 0, 0, 0, 0, 0, 5]);
+        check_dep_encode_decode(5u128, &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5]);
     }
 }

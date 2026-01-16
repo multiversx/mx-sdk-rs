@@ -11,6 +11,10 @@ pub struct BlockInfoRaw {
 
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub block_timestamp_ms: Option<ValueSubTree>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub block_nonce: Option<ValueSubTree>,
 
     #[serde(default)]

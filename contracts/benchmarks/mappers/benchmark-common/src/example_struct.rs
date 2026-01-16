@@ -9,10 +9,10 @@ pub struct ExampleStruct<M>
 where
     M: ManagedTypeApi,
 {
-    pub first_token_id: TokenIdentifier<M>,
+    pub first_token_id: EsdtTokenIdentifier<M>,
     pub first_token_nonce: Nonce,
     pub first_token_amount: BigUint<M>,
-    pub second_token_id: TokenIdentifier<M>,
+    pub second_token_id: EsdtTokenIdentifier<M>,
     pub second_token_nonce: Nonce,
     pub second_token_amount: BigUint<M>,
 }

@@ -1,4 +1,4 @@
-use multiversx_sc_meta::cmd::scen_test_gen::{format_test_fn_go, process_code, DEFAULT_SETUP_GO};
+use multiversx_sc_meta::cmd::scen_test_gen::{DEFAULT_SETUP_GO, format_test_fn_go, process_code};
 
 const GO_TEST_1: &str = r#"use multiversx_sc_scenario::imports::*;
 

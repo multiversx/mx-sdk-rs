@@ -13,11 +13,11 @@ impl<T: NestedEncode> NestedEncode for Option<T> {
             Some(v) => {
                 dest.push_byte(1u8);
                 v.dep_encode_or_handle_err(dest, h)
-            },
+            }
             None => {
                 dest.push_byte(0u8);
                 Ok(())
-            },
+            }
         }
     }
 }
@@ -50,10 +50,10 @@ impl<T: NestedEncode> TopEncode for Option<T> {
                 buffer.push_byte(1u8);
                 v.dep_encode_or_handle_err(&mut buffer, h)?;
                 output.finalize_nested_encode(buffer);
-            },
+            }
             None => {
                 output.set_slice_u8(&[]);
-            },
+            }
         }
         Ok(())
     }
@@ -90,8 +90,8 @@ pub mod tests {
     use alloc::vec::Vec;
 
     use crate::{
-        test_util::{check_top_decode, check_top_encode_decode},
         DecodeError, TopDecode,
+        test_util::{check_top_decode, check_top_encode_decode},
     };
 
     #[test]

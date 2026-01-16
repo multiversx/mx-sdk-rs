@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{imports::InterpreterContext, ScenarioTxEnvData};
+use multiversx_sc_scenario::{ScenarioTxEnvData, imports::InterpreterContext};
 use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::InteractorBase;
@@ -29,4 +29,8 @@ pub trait InteractorRunAsync {
     type Result;
 
     fn run(self) -> impl std::future::Future<Output = Self::Result>;
+}
+
+pub trait InteractorSimulateGasAsync {
+    fn simulate_gas(self) -> impl std::future::Future<Output = u64>;
 }

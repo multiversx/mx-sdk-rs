@@ -2,12 +2,12 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, BlockchainApiImpl, CallTypeApi,
-        HandleConstraints, ManagedBufferApiImpl, RawHandle, SendApiImpl, StaticVarApiImpl,
+        BigIntApiImpl, BlockchainApiImpl, CallTypeApi, HandleConstraints, ManagedBufferApiImpl,
+        RawHandle, SendApiImpl, StaticVarApiImpl, const_handles, use_raw_handle,
     },
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenIdentifier, EsdtTokenPayment,
+        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
     },
 };
 
@@ -99,7 +99,7 @@ where
     pub fn transfer_esdt_execute(
         &self,
         to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         value: &BigUint<A>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
@@ -112,7 +112,7 @@ where
     pub fn transfer_esdt_nft_execute(
         &self,
         to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
+        token: &EsdtTokenIdentifier<A>,
         nonce: u64,
         egld_value: &BigUint<A>,
         gas_limit: u64,
@@ -209,7 +209,6 @@ where
         );
     }
 
-    #[cfg(feature = "barnard")]
     pub fn multi_egld_or_esdt_transfer_execute_fallible(
         &self,
         to: &ManagedAddress<A>,
@@ -237,27 +236,6 @@ where
         } else {
             Err(TransferExecuteFailed)
         }
-    }
-
-    #[cfg(not(feature = "barnard"))]
-    #[allow(deprecated)]
-    pub fn multi_egld_or_esdt_transfer_execute_fallible(
-        &self,
-        to: &ManagedAddress<A>,
-        payments: &ManagedVec<A, EgldOrEsdtTokenPayment<A>>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), TransferExecuteFailed> {
-        self.multi_egld_or_esdt_transfer_execute(
-            to,
-            payments,
-            gas_limit,
-            endpoint_name,
-            arg_buffer,
-        );
-        // no fallibility before Barnard
-        Ok(())
     }
 
     pub fn async_call_raw(

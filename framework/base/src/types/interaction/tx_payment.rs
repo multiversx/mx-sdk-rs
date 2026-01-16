@@ -3,15 +3,21 @@ mod tx_payment_egld;
 mod tx_payment_egld_or_esdt;
 mod tx_payment_egld_or_esdt_refs;
 mod tx_payment_egld_or_multi_esdt;
-mod tx_payment_egld_or_multi_esdt_ref;
+mod tx_payment_egld_or_multi_esdt_refs;
 mod tx_payment_egld_value;
 mod tx_payment_multi_egld_or_esdt;
 mod tx_payment_multi_esdt;
+mod tx_payment_multi_transfer_marker;
 mod tx_payment_none;
 mod tx_payment_not_payable;
+mod tx_payment_payment;
+mod tx_payment_payment_option;
+mod tx_payment_payment_ref;
+mod tx_payment_payment_refs;
 mod tx_payment_single_esdt;
 mod tx_payment_single_esdt_ref;
 mod tx_payment_single_esdt_triple;
+mod tx_payment_vec_ref;
 
 pub use test_esdt_transfer::TestEsdtTransfer;
 pub use tx_payment_egld::{Egld, EgldPayment};
@@ -20,7 +26,7 @@ pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
 pub use tx_payment_not_payable::NotPayable;
 
 use crate::{
-    api::{quick_signal_error, CallTypeApi, ManagedTypeApi},
+    api::{CallTypeApi, ManagedTypeApi, quick_signal_error},
     contract_base::TransferExecuteFailed,
     err_msg,
     types::{BigUint, ManagedAddress, ManagedBuffer, MultiEgldOrEsdtPayment},
@@ -70,10 +76,7 @@ where
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
-    ) {
-        let result = self.perform_transfer_execute_fallible(env, to, gas_limit, fc);
-        transfer_execute_failed_error::<Env::Api>(result);
-    }
+    );
 
     /// Converts an ESDT call to a built-in function call, if necessary.
     fn with_normalized<From, To, F, R>(
@@ -160,6 +163,7 @@ where
     }
 }
 
+#[allow(unused)]
 pub(crate) fn transfer_execute_failed_error<Api: CallTypeApi>(
     result: Result<(), TransferExecuteFailed>,
 ) {

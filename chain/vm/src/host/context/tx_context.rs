@@ -1,7 +1,7 @@
 use crate::{
     blockchain::{
-        state::{AccountData, AccountEsdt, BlockchainState},
         VMConfigRef,
+        state::{AccountData, AccountEsdt, BlockchainState},
     },
     host::runtime::RuntimeRef,
     types::{VMAddress, VMCodeMetadata},
@@ -130,15 +130,15 @@ impl TxContext {
         self.with_account_mut(&self.tx_input_box.to, f)
     }
 
-    pub fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
+    pub fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer> {
         self.managed_types.lock().unwrap()
     }
 
-    pub fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+    pub fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers> {
         self.back_transfers.lock().unwrap()
     }
 
-    pub fn result_lock(&self) -> MutexGuard<TxResult> {
+    pub fn result_lock(&self) -> MutexGuard<'_, TxResult> {
         self.tx_result_cell.lock().unwrap()
     }
 
@@ -146,7 +146,7 @@ impl TxContext {
         std::mem::replace(&mut *self.tx_result_cell.lock().unwrap(), TxResult::empty())
     }
 
-    pub fn rng_lock(&self) -> MutexGuard<BlockchainRng> {
+    pub fn rng_lock(&self) -> MutexGuard<'_, BlockchainRng> {
         self.b_rng.lock().unwrap()
     }
 

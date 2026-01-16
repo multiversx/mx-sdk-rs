@@ -93,7 +93,7 @@ impl fmt::Display for CheckValueListRaw {
                     write!(f, "{check_value}")?;
                 }
                 write!(f, "]")
-            },
+            }
         }
     }
 }

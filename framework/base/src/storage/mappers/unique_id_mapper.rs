@@ -1,14 +1,14 @@
 use crate::{
     abi::TypeAbiFrom,
     codec::{
-        multi_encode_iter_or_handle_err, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput,
+        EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, multi_encode_iter_or_handle_err,
     },
     types::ManagedAddress,
 };
 
 use super::{
-    source::{CurrentStorage, StorageAddress},
     StorageMapper, StorageMapperFromAddress, VecMapper,
+    source::{CurrentStorage, StorageAddress},
 };
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
@@ -78,15 +78,11 @@ where
     /// Gets the value for the given `index`. If the entry is empty, `index` is returned.
     pub fn get(&self, index: usize) -> UniqueId {
         let id: UniqueId = self.vec_mapper.get(index);
-        if id == EMPTY_ENTRY {
-            index
-        } else {
-            id
-        }
+        if id == EMPTY_ENTRY { index } else { id }
     }
 
     /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, A> {
+    pub fn iter(&self) -> Iter<'_, SA, A> {
         Iter::new(self)
     }
 }

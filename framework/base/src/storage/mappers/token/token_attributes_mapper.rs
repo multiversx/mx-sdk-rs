@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use crate::{
     codec::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     storage::mappers::{
-        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
+        source::{CurrentStorage, StorageAddress},
     },
     types::ManagedAddress,
 };
@@ -12,8 +12,8 @@ use crate::{
 use super::super::StorageMapper;
 use crate::{
     api::{ErrorApiImpl, ManagedTypeApi, StorageMapperApi},
-    storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},
-    types::{ManagedType, TokenIdentifier},
+    storage::{StorageKey, storage_clear, storage_get, storage_get_len, storage_set},
+    types::{EsdtTokenIdentifier, ManagedType},
 };
 
 const MAPPING_SUFFIX: &[u8] = b".mapping";
@@ -71,7 +71,7 @@ where
 {
     pub fn set<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &EsdtTokenIdentifier<M>,
         token_nonce: u64,
         attributes: &T,
     ) {
@@ -103,7 +103,7 @@ where
     ///Use carefully. Update should be used mainly when backed up by the protocol.
     pub fn update<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &EsdtTokenIdentifier<M>,
         token_nonce: u64,
         attributes: &T,
     ) {
@@ -127,7 +127,7 @@ where
 
     pub fn clear<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &EsdtTokenIdentifier<M>,
         token_nonce: u64,
     ) {
         let has_mapping = self.has_mapping_value(token_id);
@@ -150,7 +150,7 @@ where
         storage_set(self.build_key_token_id_counter().as_ref(), &value);
     }
 
-    fn set_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>, value: u8) {
+    fn set_mapping_value<M: ManagedTypeApi>(&self, token_id: &EsdtTokenIdentifier<M>, value: u8) {
         storage_set(self.build_key_token_id_mapping(token_id).as_ref(), &value);
     }
 
@@ -202,7 +202,7 @@ where
 {
     pub fn has_attributes<M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &EsdtTokenIdentifier<M>,
         token_nonce: u64,
     ) -> bool {
         let has_mapping = self.has_mapping_value(token_id);
@@ -216,7 +216,7 @@ where
 
     pub fn has_nonce<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &EsdtTokenIdentifier<M>,
         attr: &T,
     ) -> bool {
         let has_mapping = self.has_mapping_value(token_id);
@@ -233,7 +233,7 @@ where
         M: ManagedTypeApi,
     >(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &EsdtTokenIdentifier<M>,
         token_nonce: u64,
     ) -> T {
         let has_mapping = self.has_mapping_value(token_id);
@@ -252,7 +252,7 @@ where
 
     pub fn get_nonce<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &EsdtTokenIdentifier<M>,
         attr: &T,
     ) -> u64 {
         let has_mapping = self.has_mapping_value(token_id);
@@ -269,7 +269,7 @@ where
         self.get_attributes_to_nonce_mapping(mapping, attr)
     }
 
-    fn has_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
+    fn has_mapping_value<M: ManagedTypeApi>(&self, token_id: &EsdtTokenIdentifier<M>) -> bool {
         !self.is_empty_mapping_value(token_id)
     }
 
@@ -293,7 +293,7 @@ where
 
     fn build_key_token_id_mapping<M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &EsdtTokenIdentifier<M>,
     ) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
         key.append_bytes(MAPPING_SUFFIX);
@@ -325,11 +325,11 @@ where
         storage_get(self.build_key_token_id_counter().as_ref())
     }
 
-    fn get_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> u8 {
+    fn get_mapping_value<M: ManagedTypeApi>(&self, token_id: &EsdtTokenIdentifier<M>) -> u8 {
         storage_get(self.build_key_token_id_mapping(token_id).as_ref())
     }
 
-    fn is_empty_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
+    fn is_empty_mapping_value<M: ManagedTypeApi>(&self, token_id: &EsdtTokenIdentifier<M>) -> bool {
         storage_get_len(self.build_key_token_id_mapping(token_id).as_ref()) == 0
     }
 

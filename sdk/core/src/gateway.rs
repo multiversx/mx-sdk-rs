@@ -16,8 +16,11 @@ mod gateway_tx_info;
 mod gateway_tx_process_status;
 mod gateway_tx_send;
 mod gateway_tx_send_multi;
+mod gateway_tx_simulate;
 mod gateway_tx_status;
 mod gateway_tx_vmquery;
+
+use std::fmt::Display;
 
 pub use gateway_account::GetAccountRequest;
 pub use gateway_account_esdt_roles::GetAccountEsdtRolesRequest;
@@ -37,6 +40,7 @@ pub use gateway_tx_info::GetTxInfo;
 pub use gateway_tx_process_status::GetTxProcessStatus;
 pub use gateway_tx_send::SendTxRequest;
 pub use gateway_tx_send_multi::SendMultiTxRequest;
+pub use gateway_tx_simulate::SimulateTxRequest;
 pub use gateway_tx_status::GetTxStatus;
 pub use gateway_tx_vmquery::VMQueryRequest;
 
@@ -56,6 +60,7 @@ const GET_HYPER_BLOCK_BY_NONCE_ENDPOINT: &str = "hyperblock/by-nonce";
 const GET_HYPER_BLOCK_BY_HASH_ENDPOINT: &str = "hyperblock/by-hash";
 const COST_TRANSACTION_ENDPOINT: &str = "transaction/cost";
 const SEND_TRANSACTION_ENDPOINT: &str = "transaction/send";
+const TRANSACTION_COST_ENDPOINT: &str = "transaction/cost";
 const SEND_MULTIPLE_TRANSACTIONS_ENDPOINT: &str = "transaction/send-multiple";
 const GET_TRANSACTION_INFO_ENDPOINT: &str = "transaction";
 const WITH_RESULTS_QUERY_PARAM: &str = "?withResults=true";
@@ -71,9 +76,21 @@ const SET_STATE_ENDPOINT: &str = "simulator/set-state";
 const SET_STATE_OVERWRITE_ENDPOINT: &str = "simulator/set-state-overwrite";
 const ADD_KEYS: &str = "simulator/add-keys";
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum GatewayRequestType {
     Get,
     Post,
+}
+
+impl Display for GatewayRequestType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // padding makes the logs prettier
+        let padded_str = match self {
+            GatewayRequestType::Get => "GET ",
+            GatewayRequestType::Post => "POST",
+        };
+        padded_str.fmt(f)
+    }
 }
 
 /// Models requests to the gateway.

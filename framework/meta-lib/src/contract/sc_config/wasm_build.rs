@@ -1,24 +1,21 @@
-use crate::contract::sc_config::execute_command::execute_command;
-use crate::tools::build_target;
-use colored::Colorize;
-use std::process::{exit, ExitStatus};
+use crate::tools::{build_target, wasm_opt};
+use core::panic;
 use std::{
     collections::HashMap,
-    env,
-    ffi::{OsStr, OsString},
+    ffi::OsStr,
     fs,
     path::{Path, PathBuf},
     process::Command,
 };
 
-use super::execute_command::{execute_spawn_command, ExecuteCommandError};
 use super::ContractVariant;
+use super::execute_command::{ExecuteCommandError, execute_spawn_command};
 use crate::{
     abi_json::ContractAbiJson,
     cli::BuildArgs,
     ei::EIVersion,
     ei_check_json::EiCheckJson,
-    mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
+    mxsc_file_json::{MxscFileJson, save_mxsc_file_json},
     print_util::*,
     report_info_json::ReportInfoJson,
     tools::{self, WasmInfo, WasmReport},
@@ -36,24 +33,18 @@ impl ContractVariant {
 
         let output_build_command = execute_spawn_command(&mut build_command, "cargo");
 
-        if let Err(ExecuteCommandError::JobFailed(_)) = output_build_command {
-            let mut rustup = self.rustup_target_command();
-            let target_list = rustup.arg("list").arg("--installed");
+        match output_build_command {
+            Ok(_) => {}
+            Err(ExecuteCommandError::JobFailed(_)) => {
+                if !self.is_target_installed() {
+                    self.install_wasm_target();
 
-            let output_rustup_command = execute_command(target_list, "rustup");
-
-            let str_output_rustup = match output_rustup_command {
-                Ok(output) => output,
-                Err(err) => {
-                    println!("\n{}", err.to_string().red().bold());
-                    exit(1);
-                },
-            };
-
-            let rustc_target_str = self.settings.rustc_target.as_str();
-
-            if !str_output_rustup.contains(rustc_target_str) {
-                self.install_wasm_target(rustc_target_str, build_command)?;
+                    execute_spawn_command(&mut build_command, "cargo")
+                        .expect("error building contract");
+                }
+            }
+            Err(_) => {
+                panic!("error building contract");
             }
         }
 
@@ -65,6 +56,7 @@ impl ContractVariant {
     fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
         let mut command = Command::new("cargo");
         command
+            .arg(self.settings.rustc_version.to_cli_arg())
             .arg("build")
             .arg(format!("--target={}", &self.settings.rustc_target))
             .arg("--release")
@@ -79,15 +71,6 @@ impl ContractVariant {
         if !rustflags.is_empty() {
             command.env("RUSTFLAGS", rustflags);
         }
-        command
-    }
-
-    fn rustup_target_command(&self) -> Command {
-        let rustup = env::var_os("RUSTUP").unwrap_or_else(|| OsString::from("rustup"));
-
-        let mut command = Command::new(rustup);
-        command.arg("target");
-
         command
     }
 
@@ -113,25 +96,15 @@ impl ContractVariant {
         rustflags
     }
 
-    fn install_wasm_target(
-        &self,
-        target: &str,
-        mut build_command: Command,
-    ) -> Result<ExitStatus, ExecuteCommandError> {
-        println!(
-            "\n{}{}{}",
-            "Installing target \"".yellow(),
-            target.yellow(),
-            "\"...".yellow()
+    fn is_target_installed(&self) -> bool {
+        build_target::is_target_installed(&self.settings.rustc_version, &self.settings.rustc_target)
+    }
+
+    fn install_wasm_target(&self) {
+        build_target::install_target(
+            Some(&self.settings.rustc_version),
+            &self.settings.rustc_target,
         );
-
-        if target == build_target::WASM32V1_TARGET {
-            build_target::install_target(tools::build_target::WASM32V1_TARGET);
-        } else {
-            build_target::install_target(tools::build_target::WASM32_TARGET);
-        }
-
-        execute_spawn_command(&mut build_command, "cargo")
     }
 
     fn finalize_build(&self, build_args: &BuildArgs, output_path: &Path) {
@@ -150,8 +123,12 @@ impl ContractVariant {
             &source_wasm_path.to_string_lossy(),
             &output_wasm_path.to_string_lossy(),
         );
-        fs::copy(source_wasm_path, output_wasm_path)
-            .expect("failed to copy compiled contract to output directory");
+        fs::copy(&source_wasm_path, output_wasm_path).unwrap_or_else(|err| {
+            panic!(
+                "failed to copy compiled contract to output directory, source: {}, err: {err}",
+                source_wasm_path.display()
+            )
+        });
     }
 
     fn pack_mxsc_file(&self, build_args: &BuildArgs, output_path: &Path, wasm_report: &WasmReport) {
@@ -174,8 +151,50 @@ impl ContractVariant {
         save_mxsc_file_json(&mxsc_file_json, output_mxsc_path);
     }
 
+    /// Returns whether or not running wasm-opt should be attempted.
+    fn check_wasm_opt(&self, build_args: &BuildArgs) -> bool {
+        if let Some(config_wasm_opt_version) = &self.settings.wasm_opt_version {
+            let contract_name = &self.contract_name;
+
+            assert!(
+                build_args.wasm_opt,
+                "Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without."
+            );
+
+            let opt_version = wasm_opt::wasm_opt_version();
+
+            if opt_version.is_none() {
+                // also print warning before failure
+                print_wasm_opt_not_installed(wasm_opt::WASM_OPT_NAME);
+            }
+
+            let installed_wasm_opt_version = opt_version
+                .unwrap_or_else(|| panic!("Missing wasm-opt. Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}, and cannot be built without."));
+
+            assert_eq!(
+                config_wasm_opt_version, &installed_wasm_opt_version,
+                "Incorrect wasm-opt version installed. Contract {contract_name} requires wasm-opt version {config_wasm_opt_version}"
+            );
+
+            true
+        } else {
+            if !build_args.wasm_opt {
+                return false;
+            }
+
+            if wasm_opt::wasm_opt_version().is_none() {
+                print_wasm_opt_not_installed(wasm_opt::WASM_OPT_NAME);
+                return false;
+            }
+
+            true
+        }
+    }
+
     fn run_wasm_opt(&self, build_args: &BuildArgs, output_path: &Path) {
-        if !build_args.wasm_opt {
+        let should_run_wasm_opt = self.check_wasm_opt(build_args);
+
+        if !should_run_wasm_opt {
             return;
         }
 
@@ -231,6 +250,7 @@ impl ContractVariant {
                 build_args.extract_imports,
                 self.settings.check_ei.as_ref(),
                 &endpoints,
+                self.settings.opcode_version,
             );
         }
 
@@ -243,6 +263,7 @@ impl ContractVariant {
             true,
             self.settings.check_ei.as_ref(),
             &endpoints,
+            self.settings.opcode_version,
         );
 
         write_imports_output(&output_imports_json_path, wasm_report.imports.as_slice());

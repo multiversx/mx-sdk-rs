@@ -1,11 +1,12 @@
 use builtin_func_features::{
-    esdt_features::{EsdtFeaturesModule, TransferResult},
     BuiltinFuncFeatures,
+    esdt_features::{EsdtFeaturesModule, TransferResult},
 };
 use multiversx_sc::{codec::Empty, types::Address};
 use multiversx_sc_scenario::{
+    DebugApi,
     imports::{BlockchainStateWrapper, ContractObjWrapper},
-    managed_address, managed_biguint, managed_token_id, rust_biguint, DebugApi,
+    managed_address, managed_biguint, managed_token_id, rust_biguint,
 };
 
 pub static FUNGIBLE_TOKEN_ID: &[u8] = b"FUNG-123456";

@@ -1,16 +1,16 @@
 use crate::{
     abi::TypeAbiFrom,
     codec::{
-        multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
-        TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
+        DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecodeMulti,
+        TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput, multi_types::MultiValue3,
     },
-    types::ManagedVecRef,
+    types::Ref,
 };
 
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
-    types::{BigUint, EsdtTokenPayment, ManagedVecItem, TokenIdentifier},
+    types::{BigUint, EsdtTokenIdentifier, EsdtTokenPayment, ManagedVecItem},
 };
 
 /// Thin wrapper around EsdtTokenPayment, which has different I/O behaviour:
@@ -43,14 +43,14 @@ impl<M: ManagedTypeApi> EsdtTokenPaymentMultiValue<M> {
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     type PAYLOAD = <EsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD;
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         EsdtTokenPayment::read_from_payload(payload).into()
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -83,7 +83,7 @@ where
         I: TopDecodeMultiInput,
         H: DecodeErrorHandler,
     {
-        let token_identifier = TokenIdentifier::multi_decode_or_handle_err(input, h)?;
+        let token_identifier = EsdtTokenIdentifier::multi_decode_or_handle_err(input, h)?;
         let token_nonce = u64::multi_decode_or_handle_err(input, h)?;
         let amount = BigUint::multi_decode_or_handle_err(input, h)?;
         Ok(EsdtTokenPayment::new(token_identifier, token_nonce, amount).into())
@@ -106,7 +106,7 @@ where
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        MultiValue3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
+        MultiValue3::<EsdtTokenIdentifier<M>, u64, BigUint<M>>::type_name()
     }
 
     fn type_name_rust() -> TypeName {

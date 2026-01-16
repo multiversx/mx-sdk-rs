@@ -1,5 +1,5 @@
 use crate::sdk::data::transaction::{Transaction, TransactionOnNetwork};
-use crate::{multiversx_sc::types::Address, InteractorBase, Sender};
+use crate::{InteractorBase, Sender, multiversx_sc::types::Address};
 use futures::future::join_all;
 use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sdk::gateway::{GatewayAsyncService, SendTxRequest};

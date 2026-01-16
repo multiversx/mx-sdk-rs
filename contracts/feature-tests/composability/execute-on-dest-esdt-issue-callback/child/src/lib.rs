@@ -45,13 +45,14 @@ pub trait Child {
 
     #[callback]
     fn esdt_issue_callback(&self, #[call_result] _result: IgnoreValue) {
-        let (token_identifier, _amount) = self.call_value().single_fungible_esdt();
-        self.wrapped_egld_token_identifier().set(token_identifier);
+        let payment = self.call_value().single();
+        self.wrapped_egld_token_identifier()
+            .set(&payment.token_identifier);
     }
 
     // storage
 
     #[view(getWrappedEgldTokenIdentifier)]
     #[storage_mapper("wrappedEgldTokenIdentifier")]
-    fn wrapped_egld_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn wrapped_egld_token_identifier(&self) -> SingleValueMapper<TokenId>;
 }

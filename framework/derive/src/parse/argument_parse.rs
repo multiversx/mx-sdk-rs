@@ -17,14 +17,14 @@ pub fn extract_method_args(m: &syn::TraitItemFn) -> Vec<MethodArgument> {
                 }
                 receiver_processed = true;
                 None
-            },
+            }
             syn::FnArg::Typed(pat_typed) => {
                 if !receiver_processed {
                     missing_self_panic(m);
                 }
 
                 Some(extract_method_arg(pat_typed))
-            },
+            }
         })
         .collect()
 }
@@ -86,7 +86,10 @@ fn process_arg_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) 
 }
 
 fn check_no_other_payment_attr(arg_metadata: &ArgMetadata) {
-    assert!(!arg_metadata.payment.is_payment_arg(), "Can only annotate argument with one of the following attributes: `#[payment_token]`, `#[payment_nonce]` or `#[payment_amount]`/`#[payment]`.");
+    assert!(
+        !arg_metadata.payment.is_payment_arg(),
+        "Can only annotate argument with one of the following attributes: `#[payment_token]`, `#[payment_nonce]` or `#[payment_amount]`/`#[payment]`."
+    );
 }
 
 fn process_payment_token_attribute(attr: &syn::Attribute, arg_metadata: &mut ArgMetadata) -> bool {

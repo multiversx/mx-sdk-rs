@@ -1,9 +1,10 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 
 members = [
   "data/codec",
   "data/codec-derive",
+  "data/human-readable",
 
   "framework/base",
   "framework/derive",
@@ -25,7 +26,10 @@ members = [
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
   "tools/interactor-delegation-func-calls/",
+  "tools/interactor-governance-func-calls/",
   "tools/gas-schedule-generator",
+  "tools/op-test-gen",
+  "tools/wat-gen",
 
   "contracts/modules",
 
@@ -61,8 +65,8 @@ members = [
   "contracts/examples/esdt-transfer-with-fee/meta",
   "contracts/examples/bonding-curve-contract",
   "contracts/examples/bonding-curve-contract/meta",
-  "contracts/examples/crowdfunding-esdt",
-  "contracts/examples/crowdfunding-esdt/meta",
+  "contracts/examples/crowdfunding",
+  "contracts/examples/crowdfunding/meta",
   "contracts/examples/crypto-bubbles",
   "contracts/examples/crypto-bubbles/meta",
   "contracts/examples/crypto-zombies",
@@ -115,9 +119,6 @@ members = [
   "contracts/feature-tests/abi-tester/meta",
   "contracts/feature-tests/alloc-features",
   "contracts/feature-tests/alloc-features/meta",
-  "contracts/feature-tests/barnard-features",
-  "contracts/feature-tests/barnard-features/meta",
-  "contracts/feature-tests/barnard-features/interactor",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/meta",
   "contracts/feature-tests/basic-features/interact",
@@ -138,8 +139,6 @@ members = [
   "contracts/feature-tests/composability/execute-on-dest-esdt-issue-callback/child/meta",
   "contracts/feature-tests/composability/forwarder",
   "contracts/feature-tests/composability/forwarder/meta",
-  "contracts/feature-tests/composability/forwarder-barnard",
-  "contracts/feature-tests/composability/forwarder-barnard/meta",
   "contracts/feature-tests/composability/forwarder-interactor",
   "contracts/feature-tests/composability/forwarder-legacy",
   "contracts/feature-tests/composability/forwarder-legacy/meta",
@@ -194,6 +193,8 @@ members = [
   "contracts/feature-tests/scenario-tester/meta",
   "contracts/feature-tests/std-contract",
   "contracts/feature-tests/std-contract/meta",
+  "contracts/feature-tests/tiny",
+  "contracts/feature-tests/tiny/interactor",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
 

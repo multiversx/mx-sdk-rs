@@ -24,9 +24,12 @@ pub(super) fn get_attribute_with_one_type_arg(
             let (ticker, ty) = match attr.meta.clone() {
                 syn::Meta::Path(_) => {
                     panic!("attribute needs 2 arguments: ticker (string) and type")
-                },
+                }
                 syn::Meta::List(list) => {
-                    assert!(!list.tokens.is_empty(), "argument can not be empty. attribute needs 2 arguments: ticker (string) and type");
+                    assert!(
+                        !list.tokens.is_empty(),
+                        "argument can not be empty. attribute needs 2 arguments: ticker (string) and type"
+                    );
 
                     let mut iter = list.tokens.into_iter();
 
@@ -34,7 +37,7 @@ pub(super) fn get_attribute_with_one_type_arg(
                         Some(proc_macro2::TokenTree::Literal(literal)) => literal.to_string(),
                         _ => {
                             panic!("expected a string as the first token in the attribute argument")
-                        },
+                        }
                     };
 
                     let ticker = clean_string(first_literal);
@@ -50,10 +53,10 @@ pub(super) fn get_attribute_with_one_type_arg(
                         match token {
                             proc_macro2::TokenTree::Punct(punct) => {
                                 ty.extend(quote! { #punct });
-                            },
+                            }
                             proc_macro2::TokenTree::Ident(ident) => {
                                 ty.extend(quote! { #ident });
-                            },
+                            }
                             _ => break,
                         }
                     }
@@ -63,7 +66,7 @@ pub(super) fn get_attribute_with_one_type_arg(
                     }
 
                     (ticker, ty)
-                },
+                }
                 syn::Meta::NameValue(_) => panic!("arguments can not be name value"),
             };
 
@@ -88,7 +91,7 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
                 Some(_) => panic!("unexpected attribute argument tokens"),
                 None => panic!("unexpected attribute argument tokens"),
             }
-        },
+        }
         syn::Meta::List(list) => {
             assert!(
                 list.delimiter == syn::MacroDelimiter::Paren(syn::token::Paren::default()),
@@ -120,19 +123,19 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
                         "the argument can not be an empty string or whitespace"
                     );
                     clean
-                },
+                }
                 Some(_) => {
                     panic!("unexpected attribute argument tokens: attribute has to be a string")
-                },
+                }
                 None => panic!("attribute needs to have at least one argument"),
             };
 
             assert!(iter.next().is_none(), "too many tokens in attribute");
             arg_token_tree
-        },
+        }
         syn::Meta::NameValue(_) => {
             panic!("unexpected attribute argument tokens: argument can not be name value")
-        },
+        }
     }
 }
 
@@ -162,7 +165,7 @@ fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::Tok
             };
 
             arg_token_tree
-        },
+        }
         syn::Meta::List(val) => {
             assert!(
                 val.delimiter == syn::MacroDelimiter::Paren(syn::token::Paren::default()),
@@ -178,14 +181,14 @@ fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::Tok
             let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
                 Some(proc_macro2::TokenTree::Ident(ident)) => {
                     Some(proc_macro2::TokenTree::Ident(ident))
-                },
+                }
                 Some(_) => panic!("unexpected attribute argument tokens"),
                 None => None,
             };
 
             assert!(iter.next().is_none(), "too many tokens in attribute");
             arg_token_tree
-        },
+        }
         syn::Meta::NameValue(_) => panic!("unexpected attribute argument tokens"),
     }
 }

@@ -33,7 +33,144 @@ They are:
 	- `multiversx-sdk-dapp`
 
 
-## [sc 0.59.0, codec 0.23.0, chain 0.16.0, sdk 0.11.0] - 2025-07-03
+## The dependency graph between crates
+
+And crate group being released requires all crate groups downstream to be released as well.
+
+```
+                             ┌──────────────────────────┐    
+                             │                          ▼                      
+┌─────────────────┐      ┌───┴───┐      ┌─────┐      ┌────┐
+│                 │      │       │      │     │      │    │
+│      codec      ├─────►│ chain ├─────►│ sdk ├───┬─►│ sc │
+│                 │      │       │      │     │   │  │    │
+└─────────────────┘      └───────┘      └─────┘   │  └────┘
+                                                  │               
+         ┌────────────────────────────────────────┘        
+         │                                                 
+┌────────┴────────┐                                        
+│                 │                                        
+│ scenario-format │                                        
+│                 │                                        
+└─────────────────┘                             
+```
+
+## Version history
+
+
+### [sc 0.64.1, chain 0.21.1, sdk 0.14.1] - 2026-01-13
+- `TokenId` backwards compatibility conversions:
+	- Converting empty token identifiers, as well as `EGLD` to `EGLD-000000`;
+	- Converting not only upon decode, but also in constructors and conversions (`from`);
+	- Added an unsafe unchecked constructor;
+	- The same conversions apply to `EgldOrEsdtTokenIdentifier`.
+- Debugger fixes:
+	- Fixed error messages when using the `StaticApi`. Following changes to the VM a few releases ago, the error messages were being swallowed by the API.
+	- Fixed a crash caused by the error trace in the `StaticApi`.
+
+
+### [sc 0.64.0, codec 0.24.0, chain 0.21.0, sdk 0.14.0, scenario-format 0.25.0] - 2025-12-18
+- Switched to Rust edition 2024, minimum compiler version becomes 1.85.
+- New payments API:
+	- New objects: `TokenId` and `Payment`. Besides them having shorter names, they treat EGLD the same as all other ESDTs, making their handling easier. EGLD is always serialized as `EGLD-000000`.
+	- `Payment` amounts are `NonZeroBigUint`, a new refinement type that prevents the value from being zero. This prevents at compile time zero-value payments from occurring.
+	- New `call_value` methods:
+		- `all()` - all payments, EGLD and ESDT;
+    	- `single()` - expect precisely one payment, and retrieve that payment. Crash for no payments, or for multiple payments;
+    	- `single_optional()` - expect either zero or one payments. Returns an Option of Payment reference;
+    	- `array()` - expect the exact number of payments and retrieve them as array.
+	- `MultiTransfer` marker for forcing an ESDT multi transfer, even when not strictly necessary.
+	- Deprecated `EgldOrMultiEsdtPayment` and `call_value``any_payment`.
+	- `ManagedVecRef` renamed to `Ref`.
+	- Token identifier display fix.
+- `NonZeroBigUint` implementation, including all common operators. Additional fixes for the `BigInt` and `BigUint` operators.
+- SDK - fixed an issue with parsing transactions with large values in SCRs.
+- Upgraded all dependencies.
+
+
+### [sc 0.63.3] - 2025-12-08
+- Reverted the EsdtTokenIdentifier ABI name to TokenIdentifier.
+
+
+### [sc 0.63.2] - 2025-12-03
+- Legacy whitebox test block timestamp APIs renamed and made type-safe.
+
+
+### [sc 0.63.1] - 2025-11-24
+- Blockchain API renames: `epoch_start_block_*` -> `get_epoch_start_block_*`, for consistency.
+- Set block timestamp methods renamed to `block_timestamp_seconds` and `block_timestamp_millis`, respectively, also for consistency.
+
+
+### [sc 0.63.0, chain 0.20.0, sdk 0.13.0, scenario-format 0.24.0] - 2025-11-27
+- New block info API, which returns timestamps as either `TimestampSeconds` or `TimestampMillis`, instead of just `u64`:
+	- New types for measuring time, not only timestamps, but also durations (`DurationSeconds` and `DurationMillis`);
+	- Previous functions deprecated in favor of the new ones as follows:
+		- `get_block_timestamp` -> `get_block_timestamp_seconds`
+		- `get_block_timestamp_ms` -> `get_block_timestamp_millis`
+		- same for previous block and epoch start block
+		- `get_block_round_time_ms` -> `get_block_round_time_millis`;
+	- Support for `TimestampSeconds` and `TimestampMillis` when setting up blackbox tests;
+	- Mandos support for millisecond timestamps, in both mandos-go and mandos-rs.
+- Rust VM support for fallible sync calls. Adjusted event logs to match the Go VM.
+- Contract build improvements:
+	- The Rust version is now sent to the wasm build command via CLI, always. This overrides all other settings, giving the framework full control over the Rust version used.
+	- The Rust version can be configured in `sc-config.toml`. This overrides all other settings. If missing, the current config will be detected and used explicitly.
+	- The `wasm-opt` version can be specified in `sc-config.toml`. While `sc-meta` cannot install or change this version, it will crash if there is a version mismatch, signalling problems with reproducible builds.
+	- The `sc-meta` standalone tool signals version incompatibilities when building contracts. Most importantly it writes a warning to console if multiversx-sc version < `v0.58` and rustc ≥ `v1.87`.
+	- Added a deprecated VM hooks checker mechanism. Currently only checks for legacy call value getters.
+	- ABI build info improvements:
+		- Added host;
+		- Added LLVM version;
+		- Rustc version guaranteed to match the one used for building the wasm binary;
+		- Ensured historical backwards compatibility, back to the first version of the ABI format.
+- `TokenIdentifier` renamed to `EsdtTokenIdentifier`, since the old name was misleading. Old name kept as alias, for backwards compatibility.
+- Fixed proxy imports in snippets.
+
+
+### [sc 0.62.1, chain 0.19.1, sdk 0.12.1] - 2025-10-27
+- BLS fix (Mutex over BLS library to prevent concurrent calls).
+- `wasmer-prod` build fix (`home` dependency fix).
+- Legacy syntax fix.
+
+### [sc 0.62.0, chain 0.19.0, sdk 0.12.0] - 2025-09-24
+- BLS signing support in tests.
+- Gas simulations available in the interactor:
+	- Simulation only;
+	- Auto-simulate to find gas estimation.
+- `sc-meta` post-build validation improvements:
+	- Fixed opcode checker to support `call_indirect`.
+	- Opcode versioning in `sc-config.toml` and opcodde checker.
+	- Post-build VM hook signature validation.
+- Proxy generator fix for enums with explicit discriminants.
+- Removed legacy typed mandos scenario and interactor syntax.
+
+
+### [sc 0.61.0, chain 0.18.0, sdk 0.11.3] - 2025-09-04
+- BLS crypto function support in the Rust VM. Functionality is guarded by the `bls` feature flag.
+- Managed buffer slices out of bounds handled in the framework.
+- Interactor - fixed log management.
+
+
+### [sc 0.60.0, chain 0.17.0, sdk 0.11.2] - 2025-08-08
+- Block info hooks:
+	- Rust VM support for the new block/round info hooks: `getBlockTimestampMs`, `getPrevBlockTimestampMs`, `getBlockRoundTimeMs`, `epochStartBlockTimestampMs`, `epochStartBlockNonce`, `epochStartBlockRound`;
+	- Blackbox test syntax for setting all block info.
+- Cleanup after Barnard:
+	- Removed the `barnard` feature. All functionality is routed to the new Barnard hooks, where appropriate.
+	- Reverted routing non-fallible transfer execute through the fallible vm hook. This preserves pre-Barnard behavior for most cases.
+- `sc-meta install mx-scenario-go` retries several times in case of connection issues.
+
+
+### [sc 0.59.1, codec 0.23.1, chain 0.16.1, sdk 0.11.1] - 2025-07-24
+- Governance proxy improvements.
+- Codec: added support for using u128.
+- SDK/interactors:
+	- Added logging for http requests and responses;
+	- Fixed an issue with retrieving results from transactions with multi-transfer ESDT.
+	- Fixed a VM query error handling issue.
+
+
+### [sc 0.59.0, codec 0.23.0, chain 0.16.0, sdk 0.11.0] - 2025-07-03
 - Support for Barnard features
 	- `barnard` feature for smart contracts, can be enabled in the contract's `Cargo.toml` or `sc-config.toml`;
 	- Blockchain API new features:
@@ -77,7 +214,7 @@ They are:
 - Codec: improved multi-value length handling.
 
 
-## [sc 0.58.0, codec 0.22.1, chain 0.15.0, sdk 0.10.0] - 2025-05-26
+### [sc 0.58.0, codec 0.22.1, chain 0.15.0, sdk 0.10.0] - 2025-05-26
 - Rust VM and debugger redesign:
 	- VM major refactoring: runtime, execution, debugger, VM hooks handler;
 	- Integration of the new executor interface: new instance, executor & VM hooks interfaces;
@@ -100,7 +237,7 @@ They are:
 - Fixed typos.
 - Updated dependencies.
 
-## [sc 0.57.1, sdk 0.9.1] - 2025-04-04
+### [sc 0.57.1, sdk 0.9.1] - 2025-04-04
 - Retrieve token properties using `get_token_properties`;
 - Fixed URIs for `esdt_metadata_recreate` and `esdt_metadata_update`;
 - `sc-meta`:
@@ -111,7 +248,7 @@ They are:
   - Fixed `ReturnsTxHash` result handler.
 - Enhanced `checkState` to allow partial key verification.
 
-## [sc 0.57.0, codec 0.22.0, chain 0.14.0, sdk 0.9.0, scenario-format 0.23.1] - 2025-03-11
+### [sc 0.57.0, codec 0.22.0, chain 0.14.0, sdk 0.9.0, scenario-format 0.23.1] - 2025-03-11
 - Newer compiler support:
 	- Dropped support for Rust compiler versions older than 1.83.
 	- Support and optimizations for using Rust 1.85.
@@ -138,13 +275,13 @@ They are:
 - Dependencies upgraded.
 
 
-## [sc 0.56.1, chain 0.13.1, sdk 0.8.2] - 2025-02-06
+### [sc 0.56.1, chain 0.13.1, sdk 0.8.2] - 2025-02-06
 - Allow setting gas for callback for direct transfers.
 - NestedEncode for interaction types: TestAddress, TestScAddress and TestTokenIdentifier.
 - Bugfix: pretty representation for ManagedAddress when debugging.
 - Upgrade dependency: ruplacer.
 
-## [sc 0.56.0, chain 0.13.0, sdk 0.8.1] - 2025-01-23
+### [sc 0.56.0, chain 0.13.0, sdk 0.8.1] - 2025-01-23
 - Rust VM support for readonly sync calls.
 - `ManagedMapEncoded`, a map type that can use any key or value types that are serializable.
 - `ManagedDecimal` implements `ManagedVecItem`.
@@ -154,7 +291,7 @@ They are:
 	- API fix of an issue that was preventing set state in chain simulator;
 	- Snippets generator fixes involving the crate path and the upgrade result handler.
 
-## [sc 0.55.0, codec 0.21.2, chain 0.12.0, sdk 0.8.0] - 2025-01-08
+### [sc 0.55.0, codec 0.21.2, chain 0.12.0, sdk 0.8.0] - 2025-01-08
 - Integrating Spica changes into the framework:
 	- EGLD+ESDT multi-transfers are now possible:
 		- changed the handling of call values: EGLD is treated almost the same as an ESDT in `all_transfers` and `multi_egld_or_esdt`, old ESDT methods are given some protection against unexpected scenarios
@@ -171,34 +308,34 @@ They are:
 	- Performance improvements in ManagedVec iterators;
 	- Removed some unnecessary bound checks in `multi_esdt`.
 
-## [sc 0.54.6] - 2024-12-04
+### [sc 0.54.6] - 2024-12-04
 - `ManagedDecimal` bugfixes:
 	- ABI/proxy bugfix;
 	- Rescale bugfix.
 
-## [sc 0.54.5] - 2024-11-28
+### [sc 0.54.5] - 2024-11-28
 - `ManagedVec` - deprecated `sort` and guarded it by the `alloc` feature, since it uses the allocator.
 - `sc-meta`
 	- versioning fix;
 	- interactor generator fix.
 - Interactors - fixed code metadata on deploy.
 
-## [sc 0.54.4] - 2024-11-22
+### [sc 0.54.4] - 2024-11-22
 - `sc-meta`
 	- `install debugger` CLI that prepares VSCode extension for debugging;
 	- fixed a crash involving templates and installers.
 - Deprecated `#[derive(TypeAbi)]` and added an additional warning in the macro.
 
-## [sc 0.54.3] - 2024-11-18
+### [sc 0.54.3] - 2024-11-18
 - `#[storage_mapper_from_address]` fixes for: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `TokenAttributesMapper`, `UniqueIdMapper`, `UserMapper`, `AddressToIdMapper`.
 
-## [sc 0.54.2, codec 0.21.1, chain 0.11.1, sdk 0.7.1] - 2024-11-15
+### [sc 0.54.2, codec 0.21.1, chain 0.11.1, sdk 0.7.1] - 2024-11-15
 - Codec improvements:
 	- `MultiValueX` - `TopDecodeMultiLength` implementation fix;
 	- `ManagedVecItem` implemented for MultiValue2 and MultiValue3.
 - `sc-meta snippets` improvements.
 
-## [sc 0.54.1] - 2024-11-13
+### [sc 0.54.1] - 2024-11-13
 - `sc-meta` `cs` - ChainSimulator CLI, which provides handy functionality to:
 	- install the chain simulator image in Docker;
 	- start/stop the chain simulator;
@@ -207,7 +344,7 @@ They are:
 - Interactor - `use_chain_simulator` builder method, for improved backwards compatibility.
 - `MultiValueEncodedCounted` - a lazy multi-value encoding, but with known number of elements.
 
-## [sc 0.54.0, sdk 0.7.0, chain 0.11.0] - 2024-11-06
+### [sc 0.54.0, sdk 0.7.0, chain 0.11.0] - 2024-11-06
 - New crate, `multiversx-chain-core`, to be used in both framework and Rust VM. It contains common types, flags, and constants that refer to the protocol.
 - Major SDK/interactor refactor:
 	- Added support for Chain Simulator in interactors:
@@ -246,15 +383,15 @@ They are:
 	- `title` field and annotation;
 	- Refactoring.
 
-## [sc 0.53.2] - 2024-10-02
+### [sc 0.53.2] - 2024-10-02
 - `StakingModule` fix.
 
-## [sc 0.53.1, sdk 0.6.1] - 2024-10-01
+### [sc 0.53.1, sdk 0.6.1] - 2024-10-01
 - Interactor: 
   - Allow signature to be empty in TransactionOnNetwork;
   - Allow return data to be empty in VMOutputApi.
 
-## [sc 0.53.0 codec 0.21.0, vm 0.10.0, sdk 0.6.0, scenario-format 0.23.0] - 2024-09-04
+### [sc 0.53.0 codec 0.21.0, vm 0.10.0, sdk 0.6.0, scenario-format 0.23.0] - 2024-09-04
 - Unified syntax:
   -  Whitebox testing;
   -  Proxy fix for ManagedOption;
@@ -276,25 +413,25 @@ They are:
 - Substitution list: AddressToIdMapper
 - Dependencies updated.
 
-## [sc 0.52.3] - 2024-08-06
+### [sc 0.52.3] - 2024-08-06
 - Pause module events.
 
-## [sc 0.52.2] - 2024-08-01
+### [sc 0.52.2] - 2024-08-01
 - `ManagedBufferReadToEnd` extract data methods.
 
-## [sc 0.52.1] - 2024-07-31
+### [sc 0.52.1] - 2024-07-31
 - `ManagedBufferReadToEnd` `TypeAbi` implementation.
 
-## [sc 0.52.0, codec 0.20.1] - 2024-07-31
+### [sc 0.52.0, codec 0.20.1] - 2024-07-31
 - ManagedBufferReadToEnd type, which flushed a nested data buffer.
 - Fixed hex and binary formatters for byte slices.
 - Added EI 1.4 and 1.5 configs.
 - Dependency upgrades.
 
-## [sc 0.51.1]
+### [sc 0.51.1]
 - `sc-meta upgrade` bugfix.
 
-## [sc 0.51.0, codec 0.20.0, vm 0.9.0, sdk 0.5.0, scenario-format 0.22.3] - 2024-07-06
+### [sc 0.51.0, codec 0.20.0, vm 0.9.0, sdk 0.5.0, scenario-format 0.22.3] - 2024-07-06
 - Major refactoring of `multiversx-sc-meta`
 	- Crate `multiversx-sc-meta` split in 2:
 		1. `multiversx-sc-meta` remains the standalone tool. For backwards compatibility, it can still be used in contract meta crates, but a warning will be issued.
@@ -325,21 +462,21 @@ They are:
 - Bugfix: `sync_call_readonly` can now be used with proxies.
 
 
-## [sc 0.50.6] - 2024-07-05
+### [sc 0.50.6] - 2024-07-05
 - Temporarily removed dependency to rustc 1.78, to ease transition from older versions. Will be re-enabled in 0.51.0.
 
-## [sc 0.50.5] - 2024-06-21
+### [sc 0.50.5] - 2024-06-21
 - `#[storage_mapper_from_address] annotation.
 - Added missing equality operator for test addresses (`TestAddress`, `TestSCAddress`).
 
-## [sc 0.50.4] - 2024-06-06
+### [sc 0.50.4] - 2024-06-06
 - Compiler version requirement (1.78).
 - Minor imports fix.
 
-## [sc 0.50.3] - 2024-05-25
+### [sc 0.50.3] - 2024-05-25
 - Dependency update and fix. There was an issue with the `zip` dependency in sc-meta.
 
-## [sc 0.50.2] - 2024-05-24
+### [sc 0.50.2] - 2024-05-24
 - Unified transaction syntax:
 	- Better compilation error messages for malformed transactions;
 	- Deprecated methods `async_call` and `async_call_promises`, which are kept for backwards compatibility, but causing confusion among developers;
@@ -349,14 +486,14 @@ They are:
 - Removed jitter from interactor transaction fetch.
 - Fixed an issue in the snippets generator.
 
-## [sc 0.50.1] - 2024-05-16
+### [sc 0.50.1] - 2024-05-16
 - `sc-meta all snippets` generates unified syntax.
 - Proxy generator can reference multi-contract variant.
 - Fixes:
 	- `BoxedBytes` - fixed memory leak.
 	- `ManagedVecItem` - allowing larger payloads (up to 128 bytes).
 
-## [sc 0.50.0, codec 0.19.0, vm 0.8.4, sdk 0.4.1] - 2024-05-10
+### [sc 0.50.0, codec 0.19.0, vm 0.8.4, sdk 0.4.1] - 2024-05-10
 - Framework now runs on **stable** Rust. All unstable features were removed. The most important changes enabling this:
 	- `CodecFrom` completely removed, `TypeAbiFrom` was used instead since 0.49.0.
 	- `ManagedVecItem` payload redesigned.
@@ -364,7 +501,7 @@ They are:
 - Unified syntax:
 	- `NotPayable` marker type in proxies, which prevents callers to add payment to a non-payable endpoint.
 
-## [sc 0.49.0, codec 0.18.8, sdk 0.4.0] - 2024-05-07
+### [sc 0.49.0, codec 0.18.8, sdk 0.4.0] - 2024-05-07
 - Unified transaction syntax
 	- new syntax for sending transactions from contracts
 	- new syntax for integration tests: tx, set state, check state, etc.
@@ -373,53 +510,53 @@ They are:
 	- support for upgrade in new proxies
 - Improved interactor tx result polling performance.
 
-## [sc 0.48.1, codec 0.18.7] - 2024-04-30
+### [sc 0.48.1, codec 0.18.7] - 2024-04-30
 - Simplified decoding of small numbers (i64/u64).
 - Manual reset of the `StaticApi`, in order to free memory for long-running tasks.
 
-## [sc 0.49.0-alpha.4, sdk 0.4.0-alpha.4] - 2024-04-23
+### [sc 0.49.0-alpha.4, sdk 0.4.0-alpha.4] - 2024-04-23
 Fourth pre-release, contains many interactor improvements, including improved tx polling.
 
-## [sc 0.49.0-alpha.3] - 2024-04-13
+### [sc 0.49.0-alpha.3] - 2024-04-13
 Third pre-release of the unified syntax, includes backwards compatibility fixes and testing set state/check state.
 
-## [sc 0.49.0-alpha.2] - 2024-04-09
+### [sc 0.49.0-alpha.2] - 2024-04-09
 Second pre-release of the unified syntax. Most features done, including fully featured interactors.
 Still missing: set state/check state in tests.
 
-## [sc 0.48.0] - 2024-04-09
+### [sc 0.48.0] - 2024-04-09
 - When serializing to a managed buffer, static buffer caching is disabled by default.
 - `sc-meta:` - installers for wasm32 target and wasm-opt.
 - Integrated traits for token management: `FixedSupplyToken`, `Mergeable`.
 
-## [sc 0.48.0-alpha.1] - 2024-03-27 (actually alpha release of 0.49.0)
+### [sc 0.48.0-alpha.1] - 2024-03-27 (actually alpha release of 0.49.0)
 First pre-release of the unified syntax. Syntax not yet stabilized, should only be used for experimenting with various smart contracts.
 
-## [sc 0.47.8] - 2024-03-22
+### [sc 0.47.8] - 2024-03-22
 - Test coverage functionality in sc-meta.
 - Removed deprecation from legacy whitebox testing framework, since it is still used extensively.
 
-## [sc 0.47.7] - 2024-03-15
+### [sc 0.47.7] - 2024-03-15
 - Template bugfix (concerning the interactor).
 
-## [sc 0.47.6] - 2024-03-14
+### [sc 0.47.6] - 2024-03-14
 - Template naming bugfix, regarding numbers in the project name.
 - Added the interactor to the adder template.
 
-## [sc 0.47.5] - 2024-03-08
+### [sc 0.47.5] - 2024-03-08
 - Fixed an issue with `MapMapper` when reading from another contract.
 - Got rid of nightly feature `maybe_uninit_uninit_array`/`maybe_uninit_array_assume_init`.
 
-## [sc 0.47.4, vm 0.8.3] - 2024-02-08
+### [sc 0.47.4, vm 0.8.3] - 2024-02-08
 - Post-build wasm report added to `.mxsc.json` file.
 - Fixed a dependency issue involving ed25519-dalek (downgraded dependency).
 
-## [sc 0.47.3, sdk 0.3.2] - 2024-02-06
+### [sc 0.47.3, sdk 0.3.2] - 2024-02-06
 - SDK: changed the way to retrieve the new deployed address after deploy/
 - Support for reading from another contract for the following storage mappers: `AddressToIdMapper`, `BiDiMapper`, `LinkedListMapper`, `SetMapper`, `SingleValueMapper`, `UniqueIdMapper`, `UnorderedSetMapper`, `UserMapper`, `VecMapper`, `WhitelistMapper`.
 - Additional methods to access data nodes directly in the `SetMapper` and `QueueMapper`.
 
-## [sc 0.47.2, codec 0.18.6, vm 0.8.2, scenario-format 0.22.2] - 2024-02-02
+### [sc 0.47.2, codec 0.18.6, vm 0.8.2, scenario-format 0.22.2] - 2024-02-02
 - Scenario testing infrastructure:
 	- The Rust VM can generate mock addresses, if not specified in advance.
 	- The `sc:` syntax now generates addresses with VM type 0x0500, same as the latest version of mx-scenario-go.
@@ -428,12 +565,12 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Optimized `top_encode_number` function. It no longer contains branches or loops.
 - Removed reliance on Rust nightly features `is_sorted` and `slice_partition_dedup`.
 
-## [sc 0.47.1, codec 0.18.5, vm 0.8.1, scenario-format 0.22.1] - 2024-01-29
+### [sc 0.47.1, codec 0.18.5, vm 0.8.1, scenario-format 0.22.1] - 2024-01-29
 - Blockchain hooks: `get_code_metadata`, `is_builtin_function`.
 - Support for `mxsc:` syntax in scenarios.
 - Updated dependencies.
 
-## [sc 0.47.0, codec 0.18.4, vm 0.8.0, scenario-format 0.22.0] - 2024-01-23
+### [sc 0.47.0, codec 0.18.4, vm 0.8.0, scenario-format 0.22.0] - 2024-01-23
 - Added support for the code metadata in the Rust VM and Rust scenarios backend.
 - `sc-meta`:
 	- New `mx-scenario-go` installer;
@@ -442,27 +579,27 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - `SetMapper` and `QueueMapper` can read from another contract.
 - Fixed an edge case when generating enum encoding.
 
-## [sc 0.46.1] - 2024-01-10
+### [sc 0.46.1] - 2024-01-10
 - Interactor: fixed parsing of newly issued token identifier.
 
-## [sc 0.46.0] - 2024-01-05
+### [sc 0.46.0] - 2024-01-05
 - Promises callback memory allocator bugfix.
 - Removed features: `promises`, `managed-map`, `back-transfers`.
 - Removed `hashbrown` dependency from framework.
 - Imports in output now sorted.
 
-## [sc 0.45.2, codec 0.18.3, vm 0.7.1, scenario-format 0.21.1, sdk 0.3.1] - 2023-12-18
+### [sc 0.45.2, codec 0.18.3, vm 0.7.1, scenario-format 0.21.1, sdk 0.3.1] - 2023-12-18
 - Updated framework dependencies to the latest versions: syn, bitflags, wasmparser, base64, sha2, sha3, itertools, hmac, pem, pbkdf2, etc.
 - `sc-meta` improvements:
 	- `overflow-checks` field in `sc-config.toml`;
 	- Upgrade: new `--no-check` flag, which disables the compile check after major version upgrades;
 	- Template: `wasm` crates no longer copied for new versions; retroactively patched missing `multiversx.json` file for older versions.
 
-## [sc 0.45.1, codec 0.18.2] - 2023-11-24
+### [sc 0.45.1, codec 0.18.2] - 2023-11-24
 - Fixed sc-meta standalone install backwards compatibility.
 - Better hygiene in codec derive.
 
-## [sc 0.45.0, vm 0.7.0, scenario-format 0.21.0, sdk 0.3.0] - 2023-11-24
+### [sc 0.45.0, vm 0.7.0, scenario-format 0.21.0, sdk 0.3.0] - 2023-11-24
 - Replicated VM 1.5 in the Rust VM. This includes support for:
 	- promises,
 	- back-transfers,
@@ -472,7 +609,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- `wasm` crates now fully generated based on data from `sc-config.toml` and root `Cargo.toml`.
 	- Setting wasm target dir automatically, if not specified, based on workspace.
 
-## [sc 0.44.0, vm 0.6.0] - 2023-11-03
+### [sc 0.44.0, vm 0.6.0] - 2023-11-03
 - Back-transfer:
 	- API support in framework (not yet implemented in the Rust VM);
 	- Feature flag: `"back-transfers"`;
@@ -486,34 +623,34 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - `AddressToId` storage mapper.
 
 
-## [sc 0.43.5] - 2023-10-16
+### [sc 0.43.5] - 2023-10-16
 - Meta crate: removed external dependencies to `wasm2wat` and `wasm-objdump`, replaces with internal implementation.
 - NFT subscription module.
 - EsdtTokenData implements `ManagedVecItem`.
 - Contract call `argument` method.
 - `SendRawWrapper` made public.
 
-## [sc 0.43.4] - 2023-09-18
+### [sc 0.43.4] - 2023-09-18
 - Bugfix in `sc-meta`: fixed `--locked argument` in `all` command.
 - Template fix: added `multiversx.json` files.
 - Testing framework: check NFT balances and attributes.
 
-## [sc 0.43.3, vm 0.5.2] - 2023-09-08
+### [sc 0.43.3, vm 0.5.2] - 2023-09-08
 - Added several new methods in the `SendWrapper`, which perform EGLD & ESDT transfers but don't do anything if the value is zero.
 - Added the `DeleteUsername` builtin function to the VM.
 - Minor fixes in API wrapper constructors.
 
-## [sc 0.43.2] - 2023-08-18
+### [sc 0.43.2] - 2023-08-18
 - Template tool tag argument validation bugfix.
 
-## [sc 0.43.1, vm 0.5.1] - 2023-08-18
+### [sc 0.43.1, vm 0.5.1] - 2023-08-18
 - Template tool improvements:
 	- Ability to specify for which framework version to download (based on git tag). The first allowed version is 0.43.0.
 	- Ability to specify path where to create new contract.
 	- Various bugfixes.
 - VM implementation for `get_shard_of_address` VM hook.
 
-## [sc 0.43.0, codec 0.18.1, vm 0.5.0] - 2023-08-16
+### [sc 0.43.0, codec 0.18.1, vm 0.5.0] - 2023-08-16
 - Fixed a rustc compatibility issue when building contracts. The meta crate looks at the rustc version when generating the wasm crate code:
 	- pre-rustc-1.71;
 	- between rustc-1.71 and rustc-1.73;
@@ -527,7 +664,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Arguments `--target-dir-wasm`, `--target-dir-meta`, and `--target-dir-all` in the `multiversx-sc-meta` CLI.
 - Fixed an issue with contract calls and ESDT transfers in the `StaticApi` environment.
 
-## [sc 0.42.0, codec 0.18.0, vm 0.4.0, scenario-format 0.20.0, sdk 0.2.0] - 2023-07-15
+### [sc 0.42.0, codec 0.18.0, vm 0.4.0, scenario-format 0.20.0, sdk 0.2.0] - 2023-07-15
 - Multi-endpoints in multi-contracts:
 	- It is now possible to have multiple versions of the same endpoint in different multi-contract variants.
 	- We can also have multiple versions of the constructor.
@@ -562,17 +699,17 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- Updated all contract interactors and blackbox tests with the new syntax;
 	- Upgraded the snippets generator to produce new syntax.
 
-## [sc 0.41.3, vm 0.3.3] - 2023-06-19
+### [sc 0.41.3, vm 0.3.3] - 2023-06-19
 - Bugfix on `ManagedBufferCachedBuilder`, involving large inputs.
 - Explicit enum ABI: `OperationCompletionStatus` is now properly described in the ABI as an enum that gets serialized by name instead of discriminant.
 
-## [sc 0.41.2, codec 0.17.2, vm 0.3.2] - 2023-06-09
+### [sc 0.41.2, codec 0.17.2, vm 0.3.2] - 2023-06-09
 - Releasing a new version of the codec, without the dependency to `wee_alloc`.
 
-## [sc 0.41.1, vm 0.3.1] - 2023-05-15
+### [sc 0.41.1, vm 0.3.1] - 2023-05-15
 - Fixed an edge case for the token storage mappers (`FungibleTokenMapper`, `NonFungibleTokenMapper`).
 
-## [sc 0.41.0, vm 0.3.0] - 2023-05-05
+### [sc 0.41.0, vm 0.3.0] - 2023-05-05
 - Fixed compatibility with rustc v1.71.0.
 - Allocator system:
 	- Contracts can now choose their own allocator. This works in multi-contract contexts.
@@ -585,40 +722,40 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Refactor: reorganized the meta crate.
 - Deprecated some legacy methods in the API wrappers.
 
-## [sc 0.40.1, vm 0.2.1] - 2023-04-24
+### [sc 0.40.1, vm 0.2.1] - 2023-04-24
 - Building contracts also triggers an EI check, which verifies compatibility with various VM versions. It currently only issues warnings.
 - `ManagedVecItem` implementation for arrays.
 
-## [sc 0.40.0, vm 0.2.0] - 2023-04-20
+### [sc 0.40.0, vm 0.2.0] - 2023-04-20
 - Call value `egld_value` and `all_esdt_transfers` methods return `ManagedRef` instead of owned objects, because they are cached (to avoid accidental corruption of the underlying cache).
 
-## [sc 0.39.8, vm 0.1.8] - 2023-03-29
+### [sc 0.39.8, vm 0.1.8] - 2023-03-29
 - `multiversx-sc-meta` `test-gen` command: generates Rust integration tests based on scenarios present in the `scenarios` folder.
  - `UnorderedSetMapper` `swap_indexes` method.
 
-## [sc 0.39.7, vm 0.1.7] - 2023-03-18
+### [sc 0.39.7, vm 0.1.7] - 2023-03-18
  - `TokenIdentifier` `ticker` method.
  - `ManagedBuffer` `concat` method.
 
-## [sc 0.39.6, vm 0.1.6] - 2023-03-16
+### [sc 0.39.6, vm 0.1.6] - 2023-03-16
 - `multiversx-sc-meta` improvements:
 	- Bugfix: custom names in the main contract no longer crash the multi-contract build.
 	- Bugfix: the `--mir` flag works correctly in `sc-meta all build`;
 	- Multi-contract configs can now specify separate cargo features for individual contracts, for conditional compilation.
 
-## [sc 0.39.5, vm 0.1.5] - 2023-02-06
+### [sc 0.39.5, vm 0.1.5] - 2023-02-06
 - `multiversx-sc-meta` improvements:
 	- Rust snippet generator fixes. The generator creates compilable code with appropriate argument types.
 	- `local-deps` command: generates a report on the local dependencies of contract crates. Will explore indirect dependencies too.
 	- Upgrade tool minor fix.
 
-## [sc 0.39.4, vm 0.1.4] - 2023-01-26
+### [sc 0.39.4, vm 0.1.4] - 2023-01-26
 - `multiversx-sc-meta` improvements:
 	- `--locked` flag get passed to the build command, preserves dependencies in Cargo.lock.
 	- `update` command updates Cargo.lock files without building the contracts.
 - Backwards compatibility for running scenarios using the VM Go infrastructure.
 
-## [sc 0.39.3, vm 0.1.3] - 2023-01-26
+### [sc 0.39.3, vm 0.1.3] - 2023-01-26
 - `multiversx-sc-meta` improvements:
 	- `upgrade` can handle crates as early as `0.28.0`;
 	- `--ignore` flag for the `all` command: will ignore folders with given names, by default set to `target`;
@@ -627,18 +764,18 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- printing to console the build command.
 - `BigUint` from `u128` conversion.
 
-## [sc 0.39.2, vm 0.1.2] - 2023-01-19
+### [sc 0.39.2, vm 0.1.2] - 2023-01-19
 - `multiversx-sc-meta` improvements:
 	- `all` command that allows calling all contract meta crates in a folder;
 	- `upgrade` also re-generates wasm crates after reaching 0.39.1.
 - Cleaned up dependencies.
 
-## [sc 0.39.1, codec 0.17.1, vm 0.1.1, scenario-format 0.19.1, sdk 0.1.1] - 2023-01-18
+### [sc 0.39.1, codec 0.17.1, vm 0.1.1, scenario-format 0.19.1, sdk 0.1.1] - 2023-01-18
 - `multiversx-sc-meta` can be installed as a standalone tool (`sc-meta`), and used to automatically upgrade contracts.
 - Many dependencies updates across the repo.
 - Updated readme files.
 
-## [sc 0.39.0, codec 0.17.0, vm 0.1.0, scenario-format 0.19.0, sdk 0.1.0] - 2023-01-12
+### [sc 0.39.0, codec 0.17.0, vm 0.1.0, scenario-format 0.19.0, sdk 0.1.0] - 2023-01-12
 - All crates were renamed, in line with the MultiversX brand.
 - New crate: `multiversx-chain-vm`, extracted from the old debug crate.
 - New crate: `multiversx-sdk`, adapted from a solution proposed by the community.
@@ -648,7 +785,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - `ManagedVec` supports sorting and deduplication.
 - `migrateUserName` builtin function mock.
 
-## [elrond-wasm 0.38.0, elrond-codec 0.16.0, mandos 0.18.0] - 2022-12-15
+### [elrond-wasm 0.38.0, elrond-codec 0.16.0, mandos 0.18.0] - 2022-12-15
 - `ContractCall` refactor. Building a contract call comes with harder compile-time constraints. This also reduces compiled code size.
 - `ContractBase` supertrait can be now stated explicitly for contract and module traits.
 - Debugger:
@@ -658,7 +795,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - New utility functions: `self.send().esdt_local_burn_multi(...`, `self.blockchain().get_token_attributes(...)`.
 - Updated all crates to Rust 2021.
 
-## [elrond-wasm 0.37.0, elrond-codec 0.15.0] - 2022-12-09
+### [elrond-wasm 0.37.0, elrond-codec 0.15.0] - 2022-12-09
 - Multi-contract build system:
 	- build system refactor;
 	- `multicontract.toml` config system with labels,
@@ -682,15 +819,15 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- Added `take` and `replace` methods for `SingleValueMapper`;
 	- Implemented `Extend` trait for `UnorderedSetMapper`.
 
-## [elrond-wasm 0.36.1] - 2022-11-01
+### [elrond-wasm 0.36.1] - 2022-11-01
 - Deprecated `ContractCall` `execute_on_dest_context_ignore_result` method, since it is currently redundant.
 
-## [elrond-wasm 0.36.0, elrond-codec 0.14.0] - 2022-10-13
+### [elrond-wasm 0.36.0, elrond-codec 0.14.0] - 2022-10-13
 - `EsdtTokenPayment` legacy decode: objects encoded by older versions of the framework can now also be decoded, if flag `esdt-token-payment-legacy-decode` is active.
 - Codec `NestedDecodeInput` new  `peek_into` method.
 - `FungibleTokenMapper` caches the token identifier.
 
-## [elrond-wasm 0.35.0, elrond-codec 0.13.0, mandos 0.17.0] - 2022-09-20
+### [elrond-wasm 0.35.0, elrond-codec 0.13.0, mandos 0.17.0] - 2022-09-20
 - Rust interactor snippet generator.
 - Added some missing substitution rules in the contract preprocessor.
 - Allow single zero byte when top-decoding Option::None.
@@ -699,12 +836,12 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - `FromIterator` trait for `ManagedVec`.
 - Mandos `"id"` accepted as synonym to `"txId"`.
 
-## [elrond-wasm 0.34.1] - 2022-07-19
+### [elrond-wasm 0.34.1] - 2022-07-19
 - `#[only_admin]` annotation
 - Safer BigUint/BigInt conversions
 - Added and published `price-aggregator` and `wegld-swap` core contracts.
 
-## [elrond-wasm 0.34.0, elrond-codec 0.12.0, mandos 0.16.0, elrond-interact-snippets 0.1.0] - 2022-07-08
+### [elrond-wasm 0.34.0, elrond-codec 0.12.0, mandos 0.16.0, elrond-interact-snippets 0.1.0] - 2022-07-08
 - Major refactor of the mandos-rs infrastructure.
 	- High-level Mandos objects moved to elrond-wasm-debug;
 	- The `mandos` crate no longer depends on `elrond-wasm-debug` (as originally intended and implemented);
@@ -720,15 +857,15 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - `#[only_user_account]` annotation. Only user accounts can call these endpoints.
 - ABI - fixed missing event logs from modules.
 
-## [elrond-wasm 0.33.1, mandos 0.15.1] - 2022-06-24
+### [elrond-wasm 0.33.1, mandos 0.15.1] - 2022-06-24
 - CodecSelf for BigInt
 
-## [elrond-wasm 0.33.0, mandos 0.15.0] - 2022-06-20
+### [elrond-wasm 0.33.0, mandos 0.15.0] - 2022-06-20
 - Removed the data field for direct EGLD & ESDT transfers.
 - Testing and debugging environment aligned with VM version 1.4.53.
 - Call value and token data infrastructure additional cleanup.
 
-## [elrond-wasm 0.32.0, mandos 0.14.0] - 2022-06-03
+### [elrond-wasm 0.32.0, mandos 0.14.0] - 2022-06-03
 - VM new functionality added as part of the environment interface 1.2:
 	- Fully managed functionality for elliptic curves (no allocator);
 	- Fully managed cryptographic functions (no allocator);
@@ -749,10 +886,10 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - New standard module: `StakingModule`.
 
 
-## [elrond-wasm 0.31.1, mandos 0.13.1] - 2022-05-04
+### [elrond-wasm 0.31.1, mandos 0.13.1] - 2022-05-04
 - Bugfix - formatter single char issue.
 
-## [elrond-wasm 0.31.0, elrond-codec 0.11.0, mandos 0.13.0] - 2022-05-02
+### [elrond-wasm 0.31.0, elrond-codec 0.11.0, mandos 0.13.0] - 2022-05-02
 - Improved formatter. Strings can be formatted similarly to the standard Rust ones, but without allocator, using managed buffers. Macros `require!`, `sc_panic!`, `sc_format!`, `sc_print!` use it.
 - Removed build flag `ei-1-1`, following mainnet updated and new VM endpoints being available. Among others, managed `sha256` and `keccak256` APIs can be used freely.
 - `CodecFrom` and `CodecInto` traits to define equivalent encodings and conversions via codec.
@@ -764,7 +901,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Fixed behavior of blockchain API `get_esdt_token_data`.
 - Git tag/commit info in ABI (fixed & reintroduced).
 
-## [elrond-wasm 0.30.0, elrond-codec 0.10.0] - 2022-03-17
+### [elrond-wasm 0.30.0, elrond-codec 0.10.0] - 2022-03-17
 - Feature flags in `elrond-wasm`:
 	- `alloc` allows contracts to use the heap allocator. It is not a hard restriction, there is still access to the implementations of the heap-allocated types, but they are not imported. Some methods are only available with this flag.
 	- `ei-1-1` allows contracts to use VM endpoints that are not yet available on the mainnet.
@@ -773,14 +910,14 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Rust testing framework: Allow checking NFT balance without also checking attributes.
 - View for `MapMapper`.
 
-## [elrond-wasm 0.29.3] - 2022-03-03
+### [elrond-wasm 0.29.3] - 2022-03-03
 - `ManagedVec` backwards compatible implementation for `set`.
 - Implemented `ManagedVecItem` for `Option<T>`.
 
-## [elrond-wasm 0.29.2] - 2022-03-01
+### [elrond-wasm 0.29.2] - 2022-03-01
 - Disabled git tag/commit info in ABI due to issue in standard modules.
 
-## [elrond-wasm 0.29.0] - 2022-03-01
+### [elrond-wasm 0.29.0] - 2022-03-01
 - Cleaned up allocator from modules: `DnsModule`, `EsdtModule`, `FeaturesModule`, `PauseModule`, `UsersModule`.
 - Crypto API managed wrapper over legacy VM endpoints.
 - Managed multi-value types refactor and rename.
@@ -789,7 +926,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Feature `cb_closure_managed_deser` replaced by `cb_closure_unmanaged_deser`, managed implementation is now the default.
 - Git tag/commit info in ABI.
 
-## [elrond-wasm 0.28.0, elrond-codec 0.9.0, mandos 0.12.0] - 2022-02-22
+### [elrond-wasm 0.28.0, elrond-codec 0.9.0, mandos 0.12.0] - 2022-02-22
 - Major elrond-codec refactor:
 	- Redesigned the error handling for single value encoding
 	- Introduced multi-value encoding, which replaces the previous endpoint argument and result mechanisms
@@ -800,21 +937,21 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - New storage mappers: `FungibleTokenMapper`, `NonFungibleTokenMapper`, `WhitelistMapper`
 - Call value wrapper avoids using invalid token index in requests
 
-## [elrond-wasm 0.27.4, elrond-codec 0.8.5] - 2022-02-02
+### [elrond-wasm 0.27.4, elrond-codec 0.8.5] - 2022-02-02
 - Backwards compatibility fix.
 
-## [elrond-wasm 0.27.3] - 2022-01-31
+### [elrond-wasm 0.27.3] - 2022-01-31
 - Backwards compatibility fix.
 - Trailing commas are allowed in `sc_panic!`, `require!` and `sc_print!`.
 - EsdtTokenData `decode_attributes_or_exit` for easier error handling.
 
-## [elrond-wasm 0.27.2, elrond-codec 0.8.4] - 2022-01-27
+### [elrond-wasm 0.27.2, elrond-codec 0.8.4] - 2022-01-27
 - Added missing non-specialized decode implementations for managed types.
 
-## [elrond-wasm 0.27.1] - 2022-01-27
+### [elrond-wasm 0.27.1] - 2022-01-27
 - Deriving `PartialEq` now works on structs that contain managed types.
 
-## [elrond-wasm 0.27.0] - 2022-01-25
+### [elrond-wasm 0.27.0] - 2022-01-25
 - Fixed certain compilation error messages. The previous implementation of the macro preprocessor would have concealed the location of many issues.
 - Changed implementation of `require!`:
 	- `require!` no longer returns a `SCResult` type, when the condition is false it now stops the transaction immediately, via `signal_error`;
@@ -826,7 +963,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Refactored `CodeMetadata` and added "payable by SC" field.
 - Empty contract template.
 
-## [elrond-wasm 0.26.0] - 2022-01-19
+### [elrond-wasm 0.26.0] - 2022-01-19
 - Major VM API trait refactoring. All API methods can be accessed from a static context. Removed api instance variables from all objects.
 - External view contracts
 	- Annotating one or more endpoints with `#[external_view]` triggers the framework to create a second "external view" contract where all these endpoints are placed. This is primarily to reduce the main contract size.
@@ -842,75 +979,75 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- `sc_panic!` macro
 - Random number generator wrapper over randomness source from the VM.
 
-## [elrond-wasm 0.25.0] - 2021-12-14
+### [elrond-wasm 0.25.0] - 2021-12-14
 - Rust testing framework - mandos generation fixes and some more getters
 - Standard modules moved to `elrond-wasm-modules` crates
 
-## [elrond-wasm 0.24.0] - 2021-12-07
+### [elrond-wasm 0.24.0] - 2021-12-07
 - Rust testing framework
 - Managed Crypto API - keccak256 and sha256
 - New hook for ESDT local roles
 - Only-owner module annotation
 
-## [elrond-wasm 0.23.1, elrond-codec 0.8.3] - 2021-11-25
+### [elrond-wasm 0.23.1, elrond-codec 0.8.3] - 2021-11-25
 - `ArrayVec` serialization
 - `ManagedAddress` additional conversions
 
-## [elrond-wasm 0.23.0] - 2021-11-23
+### [elrond-wasm 0.23.0] - 2021-11-23
 - Static access to API. Static thread-local context stack in the debugger.
 
-## [elrond-wasm 0.22.11] - 2021-11-17
+### [elrond-wasm 0.22.11] - 2021-11-17
 - Derive `ManagedVecItem` generics fix
 - Constructor can reside in module
 
-## [elrond-wasm 0.22.10] - 2021-11-12
+### [elrond-wasm 0.22.10] - 2021-11-12
 - `ManagedMultiResultVec` push accepts multi result
 
-## [elrond-wasm 0.22.9] - 2021-11-12
+### [elrond-wasm 0.22.9] - 2021-11-12
 - `ManagedVarArgsEager` implementation
 - `EsdtLocalRoleFlags`, no heap allocation in `get_esdt_local_roles`
 
-## [elrond-wasm 0.22.8, elrond-codec 0.8.2] - 2021-11-12
+### [elrond-wasm 0.22.8, elrond-codec 0.8.2] - 2021-11-12
 - Optimized decode unsigned number from slice
 
-## [elrond-wasm 0.22.7] - 2021-11-12
+### [elrond-wasm 0.22.7] - 2021-11-12
 - Optimized decode unsigned number from slice
 - Optimized blockchain API: managed get token nonce, get esdt balance
 - `ManagedVecItem` for `ManagedByteArray`
 
-## [elrond-wasm 0.22.6] - 2021-11-11
+### [elrond-wasm 0.22.6] - 2021-11-11
 - Optimized decode u64 from `ManagedBuffer`
 - `ManagedVecItem` in `derive_imports`
 
-## [elrond-wasm 0.22.5] - 2021-11-11
+### [elrond-wasm 0.22.5] - 2021-11-11
 - Implemented `ManagedVecItem` for `bool`.
 - Substitution for `ManagedMultiResultVec::new()`.
 
-## [elrond-wasm 0.22.4] - 2021-11-11
+### [elrond-wasm 0.22.4] - 2021-11-11
 - Derive `ManagedVecItem`.
 - Nested encode and decode from ManagedBuffers cached in a static singleton buffer.
 - Implemented `ExactSizeIterator` for `ManagedVecIterator`.
 
-## [elrond-wasm 0.22.3] - 2021-11-10
+### [elrond-wasm 0.22.3] - 2021-11-10
 - Memory allocation optimisations.
 
-## [elrond-wasm 0.22.2] - 2021-11-06
+### [elrond-wasm 0.22.2] - 2021-11-06
 - Callback endpoint automatically created empty for contracts that have no callbacks. This is determined by the `meta` crate, based on the ABI of the contract and its modules.
 - `UnorderedSetMapper`
 - `IgnoreVarArgs` variadic argument type that ignores input
 
-## [elrond-wasm 0.22.1] - 2021-11-04
+### [elrond-wasm 0.22.1] - 2021-11-04
 - Made the generated code in `wasm/lib.rs` more compact with the use of macros.
 
-## [elrond-wasm 0.22.0] - 2021-11-02
+### [elrond-wasm 0.22.0] - 2021-11-02
 - Mechanism for generating contract endpoints based on ABI. Previously, all endpoints from all modules from a crate were automatically included, now they can be filtered based on what modules are used.
 - Contract `meta` crates are now capable of building the respective contracts and the ABIs without relying on `erdpy`.
 - Renamed feature `arwen-tests` to `mandos-go-tests`
 
-## [elrond-wasm 0.21.2] - 2021-10-26
+### [elrond-wasm 0.21.2] - 2021-10-26
 - Bugfix regarding contract upgrade args in `elrond-wasm-debug`
 
-## [elrond-wasm 0.21.1, elrond-codec 0.8.1, mandos 0.11.1] - 2021-10-26
+### [elrond-wasm 0.21.1, elrond-codec 0.8.1, mandos 0.11.1] - 2021-10-26
 - Relative path improvements and fixes in `elrond-wasm-debug`:
 	- mandos-rs `file:` syntax now actually loads files and correctly unifies equivalent paths
 	- debugging now works seamlessly, without needing to temporarily change paths in the tests
@@ -918,7 +1055,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Debugger builtin function mocks check for ESDT roles
 - ABI provides definitions for EsdtTokenPayment, EsdtTokenData, EsdtTokenType
 
-## [elrond-wasm 0.21.0, elrond-codec 0.8.0, mandos 0.11.0] - 2021-10-22
+### [elrond-wasm 0.21.0, elrond-codec 0.8.0, mandos 0.11.0] - 2021-10-22
 - Mandos support for NFT syntax. Many more small improvements and some major refactoring.
 - Major refactoring of the `elrond-wasm-debug` crate, which enables the debugger and the coverage tool. Many features added:
 	- support for synchronous calls, also nested synchronous calls
@@ -931,11 +1068,11 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - ABI contains endpoint mutability flag (mutable/readonly)
 - reverse iteration for `ManagedVec`
 
-## [elrond-wasm 0.20.1] - 2021-10-05
+### [elrond-wasm 0.20.1] - 2021-10-05
 - Added missing managed methods in blockchain API: `is_smart_contract`, `get_shard_of_address`, `get_balance`.
 - Improved preprocessor substitutions: `ManagedAddress`, `TokenIdentifier`.
 
-## [elrond-wasm 0.20.0, elrond-codec 0.7.0, mandos 0.10.0] - 2021-10-02
+### [elrond-wasm 0.20.0, elrond-codec 0.7.0, mandos 0.10.0] - 2021-10-02
 - Managed callback handling
 - Managed async call result
 - ManagedVec improvements, deserialization fix
@@ -943,10 +1080,10 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Improved preprocessor substitutions: hidden generics for most managed types
 - Build info in ABI - rustc version, framework version, crate version
 
-## [elrond-wasm 0.19.1] - 2021-09-17
+### [elrond-wasm 0.19.1] - 2021-09-17
 - Legacy Send API implementation fix
 
-## [elrond-wasm 0.19.0, elrond-codec 0.6.0, mandos 0.9.0] - 2021-09-10
+### [elrond-wasm 0.19.0, elrond-codec 0.6.0, mandos 0.9.0] - 2021-09-10
 - Managed types used extensively. Because of this, the recommended Arwen minimum version is `v1.4.10`.
 	- Redesigned parts of the elrond-codec, so as to allow custom type specializations. These specializations allow serializers and types to bypass the limitations of the codec traits to provide optimized implementations. Managed type serialization relies on this.
 	- Redesigned existing managed types: `BigInt`, `BigUint`, `EllipticCurve`.
@@ -974,13 +1111,13 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- Support for ESDT multi-transfer.
 
 
-## [elrond-wasm 0.18.2] - 2021-08-20
+### [elrond-wasm 0.18.2] - 2021-08-20
 - Crypto API: `ripemd160` function, custom secp256k1 signature verification (`verify_custom_secp256k1`) and signature generation (`encode_secp256k1_der_signature`).
 
-## [elrond-wasm 0.18.1] - 2021-08-05
+### [elrond-wasm 0.18.1] - 2021-08-05
 - Added "safe" storage mappers, which serialize keys using nested encoding instead of top. The old respective mappers only kept for backwards compatibility, are now deprecated.
 
-## [elrond-wasm 0.18.0, mandos 0.8.0] - 2021-07-28
+### [elrond-wasm 0.18.0, mandos 0.8.0] - 2021-07-28
 
 - New math hooks exposed from Arwen:
 	- `pow`, `log2`, `sqrt`
@@ -993,19 +1130,19 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - A better `#[only_owner]` annotation, which can be applied directly to endpoint methods. This annotation also shows up in the ABI.
 - `elrond-wasm-derive` now an optional dependency of `elrond-wasm`. Use `#[elrond_wasm::contract]` instead of `#[elrond_wasm_derive::contract]` now. Same for proxies and modules.
 
-## [elrond-wasm 0.17.4] - 2021-06-30
+### [elrond-wasm 0.17.4] - 2021-06-30
 - conversions from big ints to small int: `BigUint::to_u64`, `BigInt::to_i64`
 
-## [elrond-wasm 0.17.3] - 2021-06-11
+### [elrond-wasm 0.17.3] - 2021-06-11
 - `SingleValueMapper` `set_if_empty` method
 
-## [elrond-wasm 0.17.2] - 2021-06-04
+### [elrond-wasm 0.17.2] - 2021-06-04
 - callbacks can now declared in modules only (manual forwarding from the main contract no longer required)
 
-## [elrond-wasm 0.17.1] - 2021-06-04
+### [elrond-wasm 0.17.1] - 2021-06-04
 - `legacy-nft-transfer` feature for interacting with older versions of Arwen
 
-## [elrond-wasm 0.17.0] - 2021-05-28
+### [elrond-wasm 0.17.0] - 2021-05-28
 - Integration tests can now call Arwen-Mandos (mandos-go)
 - Send API refactoring and cleanup
 	- ESDT builtin function calls no longer require explicit gas
@@ -1013,15 +1150,15 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - `#[payment_nonce]` endpoint argument annotation
 - `#[payable]` annotation no longer allowed without argument
 
-## [elrond-wasm 0.16.2, mandos 0.7.2] - 2021-05-20
+### [elrond-wasm 0.16.2, mandos 0.7.2] - 2021-05-20
 - New implementation for the `Try` trait for `SCResult`, in accordance to feature `try_trait_v2`
 - Published DNS module, which helps contracts register usernames for themselves
 - `ESDTLocalRole` more expressive type ABI
 
-## [elrond-wasm 0.16.1, mandos 0.7.1] - 2021-05-18
+### [elrond-wasm 0.16.1, mandos 0.7.1] - 2021-05-18
 - Improvements in mandos-rs: username, contract owner, nested async calls
 
-## [elrond-wasm 0.16.0, mandos 0.7.0, elrond-codec 0.5.3] - 2021-05-14
+### [elrond-wasm 0.16.0, mandos 0.7.0, elrond-codec 0.5.3] - 2021-05-14
 ### Major redesign of important framework components:
 - The arguments to contract/module/proxy annotations are gone. All items are generated in the same Rust module. Both submodule inclusion and contract calls are now Rust-module-aware.
 - Submodule imports are now expressed as supertraits instead of the module getter annotated methods. Note: explicitly specifying the Rust module is required, in order for the framework to fetch generated types and functions from that module.
@@ -1037,10 +1174,10 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 ### Mandos
 - mandos-rs syntax synchronized with mandos-go (`sc:` syntax, new ESDT call value syntax, _no NFTs yet_).
 
-## [elrond-wasm 0.15.1] - 2021-04-30
+### [elrond-wasm 0.15.1] - 2021-04-30
 - Mitigating nested sync calls with Send API `execute_on_dest_context_raw_custom_result_range`
 
-## [elrond-wasm 0.15.0, elrond-codec 0.5.2] - 2021-04-19
+### [elrond-wasm 0.15.0, elrond-codec 0.5.2] - 2021-04-19
 - ABI
 	- Constructor representation
 	- Simplified ABI syntax for tuples and fixed-size arrays
@@ -1049,13 +1186,13 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - `TokenIdentifier` validation
 - Minor refactoring in the elrond-codec 
 
-## [elrond-wasm 0.14.2] - 2021-03-29
+### [elrond-wasm 0.14.2] - 2021-03-29
 - Fixed contract call/callback logs in mandos-rs
 
-## [elrond-wasm 0.14.1] - 2021-03-25
+### [elrond-wasm 0.14.1] - 2021-03-25
 - Unified variadic arguments with respective variadic results
 
-## [elrond-wasm 0.14.0, mandos 0.6.0, elrond-codec 0.5.1] - 2021-03-22
+### [elrond-wasm 0.14.0, mandos 0.6.0, elrond-codec 0.5.1] - 2021-03-22
 - ESDT functionality:
 	- ESDT system smart contract proxy, though which it is possible to mint, burn, issue, freeze, pause, etc.
 	- Endpoints to handle NFTs. Also added NFT management in the  ESDT system smart contract proxy
@@ -1074,7 +1211,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - `elrond-codec-derive` dix - `TopDecodeOrDefault` works with generics
 - Upgraded to Rust2021.
 
-## [elrond-wasm 0.13.0] - 2021-03-04
+### [elrond-wasm 0.13.0] - 2021-03-04
 ### Main feature
 - Events revamped:
 	- any event name of any length is accepted. The event name is now expressed as ASCII instead of hex
@@ -1086,7 +1223,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 ### Minor features
 - SingleValueMapper redesigned for easier use. It no longer keeps the storage value cached.
 
-## [elrond-wasm 0.12.0] - 2021-02-25
+### [elrond-wasm 0.12.0] - 2021-02-25
 - Reorganized ESDT and EGLD direct send api.
 - New async call syntax
 	- redesigned contract proxies
@@ -1094,10 +1231,10 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- callbacks now specified programmatically
 	- got rid of the `#[callback_arg]` annotation
 
-## [elrond-wasm 0.11.0, elrond-codec 0.5.0, mandos 0.5.0] - 2021-02-05
-### Refactor
+### [elrond-wasm 0.11.0, elrond-codec 0.5.0, mandos 0.5.0] - 2021-02-05
+#### Refactor
 - Major refactoring of the contract API: split into smaller traits
-### Added
+#### Added
 - Storage mappers:
 	- LinkedListMapper
 	- SetMapper
@@ -1125,116 +1262,116 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- Refactoring:
     	- parse_attr mod was split into a proper folder with many files, since it had grown too large
     	- an extensive refactoring of elrond-wasm-derive not yet performed, will come soon
-### Minor features
+#### Minor features
 - ABI enum discriminants generation
-### Fixed
+#### Fixed
 - Crypto API fixes:
 	- `keccak256:` prefix also supported in mandos
     - reorganized crypto mandos tests in basic-features
     - mandos-rs was accidentally providing keccak256 instead of sha256
 
 
-## [elrond-wasm 0.10.5] - 2021-01-27
+### [elrond-wasm 0.10.5] - 2021-01-27
 - Temporary fix: callbacks allow error message argument to be missing
 
-## [elrond-wasm 0.10.4, mandos 0.4.2] - 2021-01-13
+### [elrond-wasm 0.10.4, mandos 0.4.2] - 2021-01-13
 - Codec derive with defaults
 - Storage mapper infrastructure
 
-## [elrond-wasm 0.10.3] - 2020-12-29
+### [elrond-wasm 0.10.3] - 2020-12-29
 - ABI generation of endpoint output names
 
-## [elrond-wasm 0.10.2, elrond-codec 0.4.2] - 2020-12-28
+### [elrond-wasm 0.10.2, elrond-codec 0.4.2] - 2020-12-28
 - Codec type hygiene
 
-## [elrond-wasm 0.10.1, elrond-codec 0.4.1, mandos 0.4.1] - 2020-12-23
+### [elrond-wasm 0.10.1, elrond-codec 0.4.1, mandos 0.4.1] - 2020-12-23
 - Minor fixes, support for strings
 
-## [elrond-wasm 0.10.0, elrond-codec 0.4.0] - 2020-12-21
+### [elrond-wasm 0.10.0, elrond-codec 0.4.0] - 2020-12-21
 - Codec derive
 - ABI generation framework
 - New example contracts
 
-## [elrond-wasm 0.9.8, elrond-codec 0.3.2, mandos 0.3.1] - 2020-11-23
+### [elrond-wasm 0.9.8, elrond-codec 0.3.2, mandos 0.3.1] - 2020-11-23
 - SC deploy API
 
-## [elrond-wasm 0.9.7, elrond-codec 0.3.1, mandos 0.3.0] - 2020-11-11
+### [elrond-wasm 0.9.7, elrond-codec 0.3.1, mandos 0.3.0] - 2020-11-11
 - Monomorphization via codec trait instead of TypeInfo for arguments and storage
 - Reorganized all contracts in the `contracts` folder
 
-## [elrond-wasm 0.9.6] - 2020-11-09
+### [elrond-wasm 0.9.6] - 2020-11-09
 - H256 & BoxedBytes fixes
 
-## [elrond-wasm 0.9.5] - 2020-11-09
+### [elrond-wasm 0.9.5] - 2020-11-09
 - H256 is_zero, minor fixes
 
-## [elrond-wasm 0.9.4] - 2020-11-09
+### [elrond-wasm 0.9.4] - 2020-11-09
 - BoxedBytes
 	- optimized allocation, used in hooks
 	- used for error messages
 
-## [elrond-wasm 0.9.3] - 2020-11-08
+### [elrond-wasm 0.9.3] - 2020-11-08
 - Optimized Address/H256 hooks
 
-## [elrond-wasm 0.9.2] - 2020-11-06
+### [elrond-wasm 0.9.2] - 2020-11-06
 - Allow slices as arguments 
 - `storage_is_empty` annotation
 
-## [elrond-wasm 0.9.1] - 2020-11-05
+### [elrond-wasm 0.9.1] - 2020-11-05
 - BigUint serialization bugfix
 
-## [elrond-wasm 0.9.0, elrond-codec 0.3.0, mandos 0.2.0] - 2020-11-04
+### [elrond-wasm 0.9.0, elrond-codec 0.3.0, mandos 0.2.0] - 2020-11-04
 - Serialization completely refactored to use "fast exit" methods
 - Storage/argument/result traits completely redesigned, simplified and optimized
 - Completely ditched the approach from elrond-wasm 0.8.0.
 
-## [elrond-wasm 0.8.0, elrond-codec 0.2.0] - 2020-11-02
+### [elrond-wasm 0.8.0, elrond-codec 0.2.0] - 2020-11-02
 - Was the first version to split Encode/Decode into TopEncode/NestedEncode/TopDecode/NestedDecode
 - Attempted to optimize the serializer to use "fast exit" closures. It worked, but the resulting bytecode size was not satisfactory. Even though it was completely replaced and never got to be used, it historically remains the solution of this release.
 - Some of the storage/argument/result trait refactorings, survived.
 
-## [elrond-wasm 0.7.2] - 2020-10-16
+### [elrond-wasm 0.7.2] - 2020-10-16
 - small int EI
 - minor refactors, serialization fixes
 
-## [elrond-wasm 0.7.1] - 2020-10-07
+### [elrond-wasm 0.7.1] - 2020-10-07
 - Avoid function selector infinite loop
 - Crowdfunding contract initial commit
 
-## [elrond-wasm 0.7.0, mandos 0.1.0] - 2020-10-06
+### [elrond-wasm 0.7.0, mandos 0.1.0] - 2020-10-06
 - Code coverage now possible
 - Mandos in Rust
 - Modules properly integrated in the build process
 
-## [elrond-wasm 0.6.2] - 2020-09-16
+### [elrond-wasm 0.6.2] - 2020-09-16
 - NonZeroUsize iterator and utils
 
-## [elrond-wasm 0.6.1, elrond-codec 0.1.3] - 2020-09-15
+### [elrond-wasm 0.6.1, elrond-codec 0.1.3] - 2020-09-15
 - Integrated NonZeroUsize into the framework
 - Specialized small int top encoding/decoding
 - `only_owner!` macro
 
-## [elrond-wasm 0.6.0, elrond-codec 0.1.2] - 2020-08-25
+### [elrond-wasm 0.6.0, elrond-codec 0.1.2] - 2020-08-25
 - Redesigned the entire build process with wasm crates
 - Standard modules
 - Moved all example contracts from sc-examples-rs to the framework
 
-## [elrond-wasm 0.5.5] - 2020-07-27
+### [elrond-wasm 0.5.5] - 2020-07-27
 - H256 now boxed
 - SCResult is_ok, is_err
 
-## [elrond-wasm 0.5.4, elrond-codec 0.1.1] - 2020-07-18
+### [elrond-wasm 0.5.4, elrond-codec 0.1.1] - 2020-07-18
 - MultiResultVec - new, from_iter
 - EncodeError type
 
-## [elrond-wasm 0.5.3, elrond-codec 0.1.0] - 2020-07-10
+### [elrond-wasm 0.5.3, elrond-codec 0.1.0] - 2020-07-10
 - Extracted elrond-codec to separate crate
 - Fixed non_snake_case endpoint handling
 
-## [elrond-wasm 0.5.2] - 2020-07-09
+### [elrond-wasm 0.5.2] - 2020-07-09
 - Queue type
 
-## [elrond-wasm 0.5.1] - 2020-07-02
+### [elrond-wasm 0.5.1] - 2020-07-02
 - `#[view]` attribute, same as `#[endpoint]`
 - `#[init]` attribute
 - `storage get mut` annotation + BorrowedMutStorage
@@ -1244,15 +1381,15 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - Arg name in error message
 - Async call arguments based on traits
 
-## [elrond-wasm 0.5.0] - 2020-06-29
+### [elrond-wasm 0.5.0] - 2020-06-29
 - EndpointResult trait, arg serialization trait, arg loader
 - Variadic args/results: OptionalArg, OptionalResult, MultiResultX
 
-## [elrond-wasm 0.4.6] - 2020-06-21
+### [elrond-wasm 0.4.6] - 2020-06-21
 - MultiResultVec implementation
 - Callback varargs
 
-## [elrond-wasm 0.4.5] - 2020-06-09
+### [elrond-wasm 0.4.5] - 2020-06-09
 - `storage_set` allows slices
 - H256 to_vec
 - async call and callback argument fixes
@@ -1261,45 +1398,45 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 - imports macro
 - OtherContractHandle implementation
 
-## [elrond-wasm 0.4.4] - 2020-05-19
+### [elrond-wasm 0.4.4] - 2020-05-19
 - Serialization fixes for small ints
 - `get_cumulated_validator_rewards` hook
 
-## [elrond-wasm 0.4.3] - 2020-05-11
+### [elrond-wasm 0.4.3] - 2020-05-11
 - Allow any (macro-based) serializable argument in async call
 - `#[var_args]`
 - Call data serialization refactoring
 
-## [elrond-wasm 0.4.2] - 2020-05-07
+### [elrond-wasm 0.4.2] - 2020-05-07
 - Tutorial setup (later abandoned)
 
-## [elrond-wasm 0.4.1] - 2020-05-06
+### [elrond-wasm 0.4.1] - 2020-05-06
 - Direct storage conversion for simple types
 - Block info hooks
 
-## [elrond-wasm 0.4.0] - 2020-05-06
+### [elrond-wasm 0.4.0] - 2020-05-06
 - Serde-based serializer (later abandoned)
 - Major storage improvements:
 	- Generate storage getters & setters
 	- Variable length storage keys
 
-## [elrond-wasm 0.3.2] - 2020-04-13
+### [elrond-wasm 0.3.2] - 2020-04-13
 - Fixes in the macro-based argument handling
 
-## [elrond-wasm 0.3.0] - 2020-04-03
+### [elrond-wasm 0.3.0] - 2020-04-03
 - Raw callback support
 - `storage_load_len` hook
 - Multi args
 - Multi args in async calls
 
-## [elrond-wasm 0.2.0] - 2020-03-18
+### [elrond-wasm 0.2.0] - 2020-03-18
 - BigUint trait created, added operators (including bitwise)
 - BigUint used for balances
 
-## [elrond-wasm 0.1.1] - 2020-02-27
+### [elrond-wasm 0.1.1] - 2020-02-27
 - Async call contract proxy infrastructure
 
-## [elrond-wasm 0.1.0] - 2020-02-05 
+### [elrond-wasm 0.1.0] - 2020-02-05 
 - Initial release of the framework
 - Main features at this time:
 	- contract main macro
@@ -1307,7 +1444,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- BigInt generic type, hooked directly to the Arwen big int heap
 	- `#[private]` attribute
 
-## [Initial commit] - 2020-01-04
+### [Initial commit] - 2020-01-04
 - Early framework moved here from sc-examples
 - 4 crates:
 	- elrond-wasm

@@ -126,7 +126,7 @@ where
                     .nested_handlers
                     .list_process_result(sync_call_raw_result);
                 Ok(tuple_result.flatten_unpack())
-            },
+            }
             SyncCallRawResultOrError::Error(error_code) => Err(*error_code),
         }
     }

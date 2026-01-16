@@ -123,7 +123,7 @@ pub trait MultisigPerformModule:
             Action::AddBoardMember(board_member_address) => {
                 self.change_user_role(action_id, board_member_address, UserRole::BoardMember);
                 OptionalValue::None
-            },
+            }
             Action::AddProposer(proposer_address) => {
                 self.change_user_role(action_id, proposer_address, UserRole::Proposer);
 
@@ -133,7 +133,7 @@ pub trait MultisigPerformModule:
                     "quorum cannot exceed board size"
                 );
                 OptionalValue::None
-            },
+            }
             Action::RemoveUser(user_address) => {
                 self.change_user_role(action_id, user_address, UserRole::None);
                 let num_board_members = self.num_board_members().get();
@@ -147,7 +147,7 @@ pub trait MultisigPerformModule:
                     "quorum cannot exceed board size"
                 );
                 OptionalValue::None
-            },
+            }
             Action::ChangeQuorum(new_quorum) => {
                 require!(
                     new_quorum <= self.num_board_members().get(),
@@ -156,7 +156,7 @@ pub trait MultisigPerformModule:
                 self.quorum().set(new_quorum);
                 self.perform_change_quorum_event(action_id, new_quorum);
                 OptionalValue::None
-            },
+            }
             Action::SendTransferExecute(call_data) => {
                 let gas = self.gas_for_transfer_exec();
                 self.perform_transfer_execute_event(
@@ -175,7 +175,7 @@ pub trait MultisigPerformModule:
                     .arguments_raw(call_data.arguments.into())
                     .transfer_execute();
                 OptionalValue::None
-            },
+            }
             Action::SendAsyncCall(call_data) => {
                 let gas_left = self.blockchain().get_gas_left();
                 self.perform_async_call_event(
@@ -194,7 +194,7 @@ pub trait MultisigPerformModule:
                     .egld(call_data.egld_amount)
                     .callback(self.callbacks().perform_async_call_callback())
                     .async_call_and_exit();
-            },
+            }
             Action::SCDeployFromSource {
                 amount,
                 source,
@@ -221,7 +221,7 @@ pub trait MultisigPerformModule:
                     .returns(ReturnsNewManagedAddress)
                     .sync_call();
                 OptionalValue::Some(new_address)
-            },
+            }
             Action::SCUpgradeFromSource {
                 sc_address,
                 amount,
@@ -249,7 +249,7 @@ pub trait MultisigPerformModule:
                     .arguments_raw(arguments.into())
                     .upgrade_async_call_and_exit();
                 OptionalValue::None
-            },
+            }
         }
     }
 
@@ -262,10 +262,10 @@ pub trait MultisigPerformModule:
         match call_result {
             ManagedAsyncCallResult::Ok(results) => {
                 self.async_call_success(results);
-            },
+            }
             ManagedAsyncCallResult::Err(err) => {
                 self.async_call_error(err.err_code, err.err_msg);
-            },
+            }
         }
     }
 

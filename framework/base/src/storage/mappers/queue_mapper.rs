@@ -1,19 +1,19 @@
 use core::marker::PhantomData;
 
 use super::{
-    source::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper, StorageMapperFromAddress,
+    source::{CurrentStorage, StorageAddress},
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
-        self,
+        self, DecodeDefault, EncodeDefault, EncodeErrorHandler, TopDecode, TopEncode,
+        TopEncodeMulti, TopEncodeMultiOutput,
         derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
-        multi_encode_iter_or_handle_err, DecodeDefault, EncodeDefault, EncodeErrorHandler,
-        TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        multi_encode_iter_or_handle_err,
     },
-    storage::{storage_set, StorageKey},
+    storage::{StorageKey, storage_set},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
@@ -305,11 +305,11 @@ where
         name_key
     }
 
-    pub fn iter(&self) -> Iter<SA, A, T> {
+    pub fn iter(&self) -> Iter<'_, SA, A, T> {
         Iter::new(self)
     }
 
-    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, A, T> {
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<'_, SA, A, T> {
         Iter::new_from_node_id(self, node_id)
     }
 

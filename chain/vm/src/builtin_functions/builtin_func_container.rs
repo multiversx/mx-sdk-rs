@@ -1,4 +1,5 @@
 use super::{
+    BuiltinFunctionEsdtTransferInfo,
     builtin_func_trait::BuiltinFunction,
     esdt_nft::{
         ESDTLocalBurn, ESDTLocalMint, ESDTNftAddQuantity, ESDTNftAddUri, ESDTNftBurn,
@@ -6,7 +7,6 @@ use super::{
     },
     general::{ChangeOwner, ClaimDeveloperRewards, DeleteUsername, SetUsername, UpgradeContract},
     transfer::{ESDTMultiTransfer, ESDTNftTransfer, ESDTTransfer},
-    BuiltinFunctionEsdtTransferInfo,
 };
 
 use crate::{
@@ -85,22 +85,22 @@ impl<'a> BuiltinFunctionCall<'a> {
         match self.tx_input.func_name.as_str() {
             ESDT_LOCAL_MINT_FUNC_NAME => {
                 self.check_role_and_execute(EsdtLocalRole::Mint, ESDTLocalMint, f)
-            },
+            }
             ESDT_LOCAL_BURN_FUNC_NAME => {
                 self.check_role_and_execute(EsdtLocalRole::Burn, ESDTLocalBurn, f)
-            },
+            }
             ESDT_NFT_CREATE_FUNC_NAME => {
                 self.check_role_and_execute(EsdtLocalRole::NftCreate, ESDTNftCreate, f)
-            },
+            }
             ESDT_NFT_BURN_FUNC_NAME => {
                 self.check_role_and_execute(EsdtLocalRole::NftBurn, ESDTNftBurn, f)
-            },
+            }
             ESDT_NFT_ADD_QUANTITY_FUNC_NAME => {
                 self.check_role_and_execute(EsdtLocalRole::NftAddQuantity, ESDTNftAddQuantity, f)
-            },
+            }
             ESDT_NFT_ADD_URI_FUNC_NAME => {
                 self.check_role_and_execute(EsdtLocalRole::NftAddUri, ESDTNftAddUri, f)
-            },
+            }
             ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME => self.check_role_and_execute(
                 EsdtLocalRole::NftUpdateAttributes,
                 ESDTNftUpdateAttributes,
@@ -117,7 +117,7 @@ impl<'a> BuiltinFunctionCall<'a> {
             UPGRADE_CONTRACT_FUNC_NAME => self.execute_bf(UpgradeContract, f),
             MIGRATE_USERNAME_FUNC_NAME => {
                 panic!("builtin function {MIGRATE_USERNAME_FUNC_NAME} was dropped")
-            },
+            }
             _ => or_else(self.tx_input, self.tx_cache, f),
         }
     }

@@ -2,7 +2,7 @@
 name = "forwarder-interact"
 version = "0.0.0"
 authors = ["you"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [[bin]]
@@ -16,17 +16,17 @@ path = "src/interact.rs"
 path = "../forwarder"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../../framework/snippets"
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../../framework/base"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.8"
+toml = "0.9"
 
 [features]
 chain-simulator-tests = []

@@ -1,3 +1,5 @@
+use colored::Colorize;
+
 use crate::cmd::template::RepoSource;
 use std::fs::{self};
 use std::path::{Path, PathBuf};
@@ -18,6 +20,13 @@ pub async fn install_debugger(custom_path: Option<PathBuf>) {
         // if we are testing we skip the configuration path, not to mess up with the current vscode configuration
         configure_vscode();
     }
+}
+
+// home_dir is deprecated on older version of Rust (1.85 ...), but we are keeping it
+// not deprecated on newer versions (1.90 for sure)
+#[allow(deprecated)]
+fn home_dir() -> PathBuf {
+    std::env::home_dir().expect("Could not find home directory")
 }
 
 fn remove_old_lldb_extension() {
@@ -75,7 +84,7 @@ async fn install_script(custom_path: Option<PathBuf>) {
     let target_path = if let Some(unwrapped_custom_path) = custom_path {
         unwrapped_custom_path
     } else {
-        home::home_dir().unwrap().join(TARGET_PATH)
+        home_dir().join(TARGET_PATH)
     };
 
     let _ = fs::create_dir_all(&target_path);
@@ -90,7 +99,7 @@ fn get_script_path(path: PathBuf) -> PathBuf {
 
 fn get_path_to_settings() -> PathBuf {
     let os = env::consts::OS;
-    let user_home = home::home_dir().unwrap();
+    let user_home = home_dir();
     match os {
         "macos" => {
             // For macOS
@@ -100,7 +109,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("Code")
                 .join("User")
                 .join("settings.json")
-        },
+        }
         "linux" => {
             // For Linux
             Path::new(&user_home)
@@ -108,7 +117,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("Code")
                 .join("User")
                 .join("settings.json")
-        },
+        }
         _ => panic!("OS not supported"),
     }
 }
@@ -116,8 +125,23 @@ fn get_path_to_settings() -> PathBuf {
 fn configure_vscode() {
     let path_to_settings = get_path_to_settings();
 
-    let script_full_path = get_script_path(home::home_dir().unwrap().join(TARGET_PATH));
-    let json = fs::read_to_string(&path_to_settings).expect("Unable to read settings.json");
+    let script_full_path = get_script_path(home_dir().join(TARGET_PATH));
+    let json = match fs::read_to_string(&path_to_settings) {
+        Err(_) => {
+            eprintln!(
+                "{}",
+                format!(
+                "WARNING: Could not find settings.json at {}. Debugger configuration will be skipped.",
+                path_to_settings.display()
+            )
+                .bright_yellow()
+                .bold(),
+            );
+            return;
+        }
+        Ok(json) => json,
+    };
+
     let mut sub_values: serde_json::Value = serde_json::from_str(&json).unwrap_or_else(
         |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is located at line {}, column {}. This error might be caused either by a trailing comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
     );

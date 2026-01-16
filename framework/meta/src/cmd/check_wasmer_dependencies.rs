@@ -29,10 +29,10 @@ pub fn check_wasmer_dependencies(path: &Path) {
                         .bold(),
                 );
             }
-        },
+        }
         Err(err) => {
             println!("{}", err.to_string().to_string().red().bold());
-        },
+        }
     };
 }
 

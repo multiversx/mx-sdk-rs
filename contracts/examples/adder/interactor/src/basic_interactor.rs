@@ -22,21 +22,21 @@ pub async fn adder_cli() {
     match &cli.command {
         Some(basic_interactor_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
-        },
+        }
         Some(basic_interactor_cli::InteractCliCommand::Upgrade(args)) => {
             let owner_address = basic_interact.adder_owner_address.clone();
             basic_interact
                 .upgrade(args.value, &owner_address, None)
                 .await
-        },
+        }
         Some(basic_interactor_cli::InteractCliCommand::Add(args)) => {
             basic_interact.add(args.value).await;
-        },
+        }
         Some(basic_interactor_cli::InteractCliCommand::Sum) => {
             let sum = basic_interact.get_sum().await;
             println!("sum: {sum}");
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
@@ -109,11 +109,11 @@ impl BasicInteractor {
         match response {
             Ok(_) => {
                 println!("Contract successfully upgraded.");
-            },
+            }
             Err(tx_err) => {
                 println!("Contract failed upgrade with error: {}", tx_err.message);
                 assert_eq!(tx_err.message, err.unwrap_or_default());
-            },
+            }
         }
     }
 

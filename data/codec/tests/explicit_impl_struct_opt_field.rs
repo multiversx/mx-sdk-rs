@@ -2,8 +2,8 @@ use multiversx_sc_codec as codec;
 
 // Some structures with explicit encode/decode, for testing.
 use codec::{
-    test_util::check_top_encode_decode, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
-    NestedDecodeInput, NestedEncode, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, test_util::check_top_encode_decode,
 };
 use core::fmt::Debug;
 

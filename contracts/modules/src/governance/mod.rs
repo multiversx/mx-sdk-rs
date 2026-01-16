@@ -202,25 +202,25 @@ pub trait GovernanceModule:
                     total_votes.up_votes += &payment.amount.clone();
                 });
                 self.up_vote_cast_event(&voter, proposal_id, &payment.amount);
-            },
+            }
             VoteType::DownVote => {
                 self.proposal_votes(proposal_id).update(|total_votes| {
                     total_votes.down_votes += &payment.amount.clone();
                 });
                 self.down_vote_cast_event(&voter, proposal_id, &payment.amount);
-            },
+            }
             VoteType::DownVetoVote => {
                 self.proposal_votes(proposal_id).update(|total_votes| {
                     total_votes.down_veto_votes += &payment.amount.clone();
                 });
                 self.down_veto_vote_cast_event(&voter, proposal_id, &payment.amount);
-            },
+            }
             VoteType::AbstainVote => {
                 self.proposal_votes(proposal_id).update(|total_votes| {
                     total_votes.abstain_votes += &payment.amount.clone();
                 });
                 self.abstain_vote_cast_event(&voter, proposal_id, &payment.amount);
-            },
+            }
         }
     }
 
@@ -299,7 +299,7 @@ pub trait GovernanceModule:
         match self.get_proposal_status(proposal_id) {
             GovernanceProposalStatus::None => {
                 sc_panic!("Proposal does not exist");
-            },
+            }
             GovernanceProposalStatus::Pending => {
                 let proposal = self.proposals().get(proposal_id);
                 let caller = self.blockchain().get_caller();
@@ -308,14 +308,14 @@ pub trait GovernanceModule:
                     caller == proposal.proposer,
                     "Only original proposer may cancel a pending proposal"
                 );
-            },
-            GovernanceProposalStatus::Defeated => {},
+            }
+            GovernanceProposalStatus::Defeated => {}
             GovernanceProposalStatus::WaitingForFees => {
                 self.refund_payments(proposal_id);
-            },
+            }
             _ => {
                 sc_panic!("Action may not be cancelled");
-            },
+            }
         }
 
         self.clear_proposal(proposal_id);

@@ -53,7 +53,7 @@ Examples of actions that can be proposed:
 
 After a period of `voting_delay_in_blocks` blocks, in which governance members can evaluate the proposal, the voting/downvoting period starts.
 
-To express their desire for the proposal to be executed, governance members should deposit governance tokens through the `vote` endpoint. If they do not wish for it to executed, they should use the `downvote` endpoint.
+To express their desire for the proposal to be executed, governance members should deposit governance tokens through the `vote` endpoint. If they do not wish for it to be executed, they should use the `downvote` endpoint.
 
 This period lasts an amount of blocks equal to `voting_period_in_blocks`.
 

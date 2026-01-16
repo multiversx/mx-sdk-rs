@@ -1,7 +1,7 @@
 use multiversx_chain_core::types::{BLSKey, BLSSignature};
 use multiversx_sc_codec::{
-    multi_types::{MultiValue2, MultiValueVec},
     MultiValueLength,
+    multi_types::{MultiValue2, MultiValueVec},
 };
 
 use crate::types::{
@@ -219,9 +219,9 @@ where
     }
 
     /// The minimum value for undelegating is 1 EGLD
-    pub fn undelegate(
+    pub fn undelegate<Arg0: ProxyArg<BigUint<Env::Api>>>(
         self,
-        undelegate_egld_amount: BigUint<Env::Api>,
+        undelegate_egld_amount: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .raw_call("unDelegate")

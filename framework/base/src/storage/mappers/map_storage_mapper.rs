@@ -1,9 +1,9 @@
 use core::marker::PhantomData;
 
 use super::{
+    SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
     set_mapper::{self},
     source::{CurrentStorage, StorageAddress},
-    SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
 };
 use crate::{
     api::StorageMapperApi,
@@ -131,7 +131,7 @@ where
         None
     }
 
-    pub fn keys(&self) -> Keys<SA, A, K> {
+    pub fn keys(&self) -> Keys<'_, SA, A, K> {
         self.keys_set.iter()
     }
 
@@ -151,7 +151,7 @@ where
     }
 
     /// Gets the given key's corresponding entry in the map for in-place manipulation.
-    pub fn entry(&mut self, key: K) -> Entry<SA, A, K, V> {
+    pub fn entry(&mut self, key: K) -> Entry<'_, SA, A, K, V> {
         if self.contains_key(&key) {
             Entry::Occupied(OccupiedEntry {
                 key,
@@ -169,13 +169,13 @@ where
 
     /// An iterator visiting all values in arbitrary order.
     /// The iterator element type is `&'a V`.
-    pub fn values(&self) -> Values<SA, A, K, V> {
+    pub fn values(&self) -> Values<'_, SA, A, K, V> {
         Values::new(self)
     }
 
     /// An iterator visiting all key-value pairs in arbitrary order.
     /// The iterator element type is `(&'a K, &'a V)`.
-    pub fn iter(&self) -> Iter<SA, A, K, V> {
+    pub fn iter(&self) -> Iter<'_, SA, A, K, V> {
         Iter::new(self)
     }
 }
@@ -367,7 +367,7 @@ where
             Entry::Occupied(mut entry) => {
                 entry.update(f);
                 Entry::Occupied(entry)
-            },
+            }
             Entry::Vacant(entry) => Entry::Vacant(entry),
         }
     }

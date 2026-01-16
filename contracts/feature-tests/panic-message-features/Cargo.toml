@@ -2,17 +2,17 @@
 name = "panic-message-features"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/panic_features.rs"
 
 [dependencies.multiversx-sc]
-version = "0.59.0"
+version = "0.64.1"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.59.0"
+version = "0.64.1"
 features = ["wasmer-experimental"]
 path = "../../../framework/scenario"

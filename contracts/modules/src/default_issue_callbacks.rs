@@ -11,17 +11,17 @@ pub trait DefaultIssueCallbacksModule {
         &self,
         initial_caller: ManagedAddress,
         storage_key: ManagedBuffer,
-        #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
+        #[call_result] result: ManagedAsyncCallResult<EsdtTokenIdentifier>,
     ) {
         let key = StorageKey::from(storage_key);
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
                 storage_set(key.as_ref(), &TokenMapperState::Token(token_id));
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
                 storage_clear(key.as_ref());
-            },
+            }
         }
     }
 
@@ -37,11 +37,11 @@ pub trait DefaultIssueCallbacksModule {
             ManagedAsyncCallResult::Ok(()) => {
                 let token_id = self.call_value().single_esdt().token_identifier.clone();
                 storage_set(key.as_ref(), &TokenMapperState::Token(token_id));
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
                 storage_clear(key.as_ref());
-            },
+            }
         }
     }
 

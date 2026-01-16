@@ -45,10 +45,11 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
     );
 
     match &tx_expect.logs {
-        CheckLogs::Star => {},
+        CheckLogs::Star => {}
         CheckLogs::List(expected_logs) => {
+            let result_logs = tx_result.all_logs();
             assert!(
-                tx_result.result_logs.len() >= expected_logs.list.len(),
+                result_logs.len() >= expected_logs.list.len(),
                 "{}",
                 error_no_message(
                     "too few logs. ",
@@ -58,7 +59,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                 )
             );
 
-            for (i, actual_log) in tx_result.result_logs.iter().enumerate() {
+            for (i, &actual_log) in result_logs.iter().enumerate() {
                 if i < expected_logs.list.len() {
                     let expected_log = &expected_logs.list[i];
                     if let Err(main_message) = scenario_check(actual_log, expected_log) {
@@ -78,7 +79,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                     )
                 }
             }
-        },
+        }
     }
 }
 

@@ -6,7 +6,7 @@ use std::{
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use multiversx_chain_vm::{
-    blockchain::state::{AccountData, BlockInfo},
+    blockchain::state::{AccountData, BlockConfig},
     host::{
         context::{BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxResult},
         vm_hooks::VMHooksContext,
@@ -25,8 +25,7 @@ pub struct SingleTxApiData {
     pub accounts: Mutex<HashMap<VMAddress, AccountData>>,
     pub managed_types: Mutex<ManagedTypeContainer>,
     pub tx_result_cell: Mutex<TxResult>,
-    pub previous_block_info: BlockInfo,
-    pub current_block_info: BlockInfo,
+    pub block_config: BlockConfig,
 }
 
 impl SingleTxApiData {
@@ -68,7 +67,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         }
     }
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer> {
         self.0.managed_types.lock().unwrap()
     }
 
@@ -88,7 +87,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         panic!("cannot access the random bytes generator in the SingleTxApi")
     }
 
-    fn result_lock(&self) -> MutexGuard<TxResult> {
+    fn result_lock(&self) -> MutexGuard<'_, TxResult> {
         self.0.tx_result_cell.lock().unwrap()
     }
 
@@ -105,15 +104,11 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         Ok(())
     }
 
-    fn get_previous_block_info(&self) -> &BlockInfo {
-        &self.0.previous_block_info
+    fn get_block_config(&self) -> &BlockConfig {
+        &self.0.block_config
     }
 
-    fn get_current_block_info(&self) -> &BlockInfo {
-        &self.0.current_block_info
-    }
-
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers> {
         panic!("cannot access back transfers in the SingleTxApi")
     }
 
@@ -141,7 +136,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
-    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
+    ) -> Result<TxResult, VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
