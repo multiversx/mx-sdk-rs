@@ -132,7 +132,7 @@ pub trait ForwarderQueue {
             to,
             gas_limit,
             endpoint_name,
-            args: args.to_arg_buffer(),
+            args: args.into_arg_buffer(),
             payments: payments.clone(),
         });
     }

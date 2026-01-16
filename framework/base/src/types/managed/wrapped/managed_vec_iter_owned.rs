@@ -54,7 +54,8 @@ where
 
     fn next(&mut self) -> Option<T> {
         let payload = self.payload_iter.next()?;
-        Some(T::read_from_payload(&payload))
+        // ok, because the iterator has ownership over the payload and no drop
+        unsafe { Some(T::read_from_payload(&payload)) }
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -76,7 +77,8 @@ where
 {
     fn next_back(&mut self) -> Option<Self::Item> {
         let payload = self.payload_iter.next_back()?;
-        Some(T::read_from_payload(&payload))
+        // ok, because the iterator has ownership over the payload and no drop
+        unsafe { Some(T::read_from_payload(&payload)) }
     }
 }
 

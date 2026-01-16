@@ -14,7 +14,9 @@ where
     T: ManagedVecItem,
 {
     pub(crate) fn decode(&self) -> T {
-        T::read_from_payload(&self.encoded)
+        // TODO: not safe!!
+        // must revisit
+        unsafe { T::read_from_payload(&self.encoded) }
     }
 }
 

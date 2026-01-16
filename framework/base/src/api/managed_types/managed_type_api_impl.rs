@@ -60,6 +60,9 @@ pub trait ManagedTypeApiImpl:
         token_identifier_util::get_token_ticker_len(token_id_len)
     }
 
+    fn requires_managed_type_drop(&self) -> bool {
+        false
+    }
     fn drop_managed_buffer(&self, _handle: Self::ManagedBufferHandle) {}
     fn drop_big_float(&self, _handle: Self::BigFloatHandle) {}
     fn drop_big_int(&self, _handle: Self::BigIntHandle) {}

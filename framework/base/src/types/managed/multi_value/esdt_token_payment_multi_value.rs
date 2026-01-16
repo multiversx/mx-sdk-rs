@@ -45,8 +45,8 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        EsdtTokenPayment::read_from_payload(payload).into()
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe { EsdtTokenPayment::read_from_payload(payload).into() }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {

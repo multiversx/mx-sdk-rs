@@ -52,7 +52,7 @@ where
 
         let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_from_small_int_unsigned(handle.clone(), value as i64);
-        let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
+        let managed_buffer = unsafe { ManagedRef::wrap_handle(handle) };
         self.set_managed_buffer(&managed_buffer);
     }
 
@@ -61,7 +61,7 @@ where
 
         let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_from_small_int_signed(handle.clone(), value);
-        let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
+        let managed_buffer = unsafe { ManagedRef::wrap_handle(handle) };
         self.set_managed_buffer(&managed_buffer);
     }
 

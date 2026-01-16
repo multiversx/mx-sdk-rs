@@ -35,7 +35,7 @@ pub trait CallPromisesDirectModule {
             .to(&to)
             .raw_call(endpoint_name)
             .payment(payment)
-            .arguments_raw(args.to_arg_buffer())
+            .arguments_raw(args.into_arg_buffer())
             .gas(gas_limit)
             .callback(self.callbacks().the_one_callback(1001, 1002u32.into()))
             .gas_for_callback(extra_gas_for_callback)

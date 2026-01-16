@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl, ManagedTypeApi,
-        RawHandle, StaticVarApiImpl, use_raw_handle,
+        ManagedTypeApiImpl, RawHandle, StaticVarApiImpl, use_raw_handle,
     },
     codec::{
         DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -411,17 +411,15 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     fn clone(&self) -> Self {
-        let api = M::managed_type_impl();
-        let clone_handle = api.mb_new_empty();
-        api.mb_append(clone_handle.clone(), self.handle.clone());
-        unsafe { ManagedBuffer::from_handle(clone_handle) }
+        let cloned = ManagedBuffer::new();
+        M::managed_type_impl().mb_append(cloned.get_handle(), self.handle.clone());
+        cloned
     }
 }
 
 impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
     fn drop(&mut self) {
-        // TODO: enable, after fixing all ownership issues
-        // M::managed_type_impl().drop_managed_buffer(self.handle.clone());
+        M::managed_type_impl().drop_managed_buffer(self.handle.clone());
     }
 }
 

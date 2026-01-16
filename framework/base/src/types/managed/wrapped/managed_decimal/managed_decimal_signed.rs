@@ -196,7 +196,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
 
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
         unsafe {
             Self {
@@ -228,8 +228,8 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
 
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        Self::const_decimals_from_raw(BigInt::read_from_payload(payload))
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe { Self::const_decimals_from_raw(BigInt::read_from_payload(payload)) }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
