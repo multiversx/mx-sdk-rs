@@ -12,7 +12,7 @@ use random::Random;
 use status::Status;
 
 const PERCENTAGE_TOTAL: u16 = 100;
-const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
+const THIRTY_DAYS_IN_SECONDS: DurationSeconds = DurationSeconds::new(60 * 60 * 24 * 30);
 
 #[multiversx_sc::contract]
 pub trait Lottery {
@@ -28,7 +28,7 @@ pub trait Lottery {
         lottery_name: BoxedBytes,
         ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
-        opt_deadline: Option<u64>,
+        opt_deadline: Option<TimestampSeconds>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<ManagedAddress>>,
@@ -51,7 +51,7 @@ pub trait Lottery {
         lottery_name: BoxedBytes,
         ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
-        opt_deadline: Option<u64>,
+        opt_deadline: Option<TimestampSeconds>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<ManagedAddress>>,
@@ -74,14 +74,14 @@ pub trait Lottery {
         lottery_name: BoxedBytes,
         ticket_price: BigUint,
         opt_total_tickets: Option<u32>,
-        opt_deadline: Option<u64>,
+        opt_deadline: Option<TimestampSeconds>,
         opt_max_entries_per_user: Option<u32>,
         opt_prize_distribution: Option<Vec<u8>>,
         opt_whitelist: Option<Vec<ManagedAddress>>,
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
-        let timestamp = self.blockchain().get_block_timestamp();
+        let timestamp = self.blockchain().get_block_timestamp_seconds();
 
         let total_tickets = opt_total_tickets.unwrap_or(u32::MAX);
         let deadline = opt_deadline.unwrap_or(timestamp + THIRTY_DAYS_IN_SECONDS);
@@ -141,10 +141,10 @@ pub trait Lottery {
             Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
             Status::Ended => {
                 sc_panic!("Lottery entry period has ended! Awaiting winner announcement.")
-            },
+            }
             Status::DistributingPrizes => {
                 sc_panic!("Prizes are currently being distributed. Can't buy tickets!")
-            },
+            }
         }
     }
 
@@ -161,7 +161,7 @@ pub trait Lottery {
                 }
 
                 self.distribute_prizes(&lottery_name);
-            },
+            }
             Status::DistributingPrizes => sc_panic!("Prizes are currently being distributed!"),
         }
     }
@@ -180,7 +180,8 @@ pub trait Lottery {
 
         let info = self.get_lottery_info(lottery_name);
 
-        if self.blockchain().get_block_timestamp() > info.deadline || info.tickets_left == 0 {
+        if self.blockchain().get_block_timestamp_seconds() > info.deadline || info.tickets_left == 0
+        {
             return Status::Ended;
         }
 
@@ -349,11 +350,11 @@ pub trait Lottery {
                 info.prize_pool += ticket_price;
 
                 self.set_number_of_entries_for_user(cb_lottery_name, cb_sender, entries);
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 // payment error, return ticket to pool
                 info.tickets_left += 1;
-            },
+            }
         }
 
         info.queued_tickets -= 1;
@@ -371,7 +372,7 @@ pub trait Lottery {
             ManagedAsyncCallResult::Ok(()) => self.distribute_prizes(cb_lottery_name),
             ManagedAsyncCallResult::Err(_) => {
                 // nothing we can do if an error occurs in the erc20 contract
-            },
+            }
         }
     }
 

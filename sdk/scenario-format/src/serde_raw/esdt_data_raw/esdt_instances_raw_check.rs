@@ -1,8 +1,8 @@
 use super::*;
 use serde::{
+    Deserialize, Serialize,
     de::{self, Deserializer, SeqAccess, Visitor},
     ser::{SerializeMap, SerializeSeq, Serializer},
-    Deserialize, Serialize,
 };
 use std::fmt;
 
@@ -33,7 +33,7 @@ impl Serialize for CheckEsdtInstancesRaw {
             CheckEsdtInstancesRaw::Unspecified => {
                 let map = serializer.serialize_map(Some(0))?;
                 map.end()
-            },
+            }
             CheckEsdtInstancesRaw::Star => serializer.serialize_str("*"),
             CheckEsdtInstancesRaw::Equal(m) => {
                 let mut map = serializer.serialize_seq(Some(m.len()))?;
@@ -41,7 +41,7 @@ impl Serialize for CheckEsdtInstancesRaw {
                     map.serialize_element(v)?;
                 }
                 map.end()
-            },
+            }
         }
     }
 }

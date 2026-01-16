@@ -37,7 +37,7 @@ fn default_instance_call(instance_call: RuntimeInstanceCall<'_>) {
         .call(instance_call.func_name, instance_call.gas_limit);
     let mut tx_result_ref = instance_call.tx_context_ref.result_lock();
     if let Some(error_tx_result) = instance_call_error_result(result) {
-        *tx_result_ref = error_tx_result;
+        tx_result_ref.merge_error(error_tx_result);
     }
 
     if tx_result_ref.result_status.is_success() {
@@ -59,17 +59,17 @@ fn instance_call_error_result(call_result: InstanceCallResult) -> Option<TxResul
         InstanceCallResult::RuntimeError(error) => Some(TxResult::from_vm_error(error.to_string())),
         InstanceCallResult::VMHooksEarlyExit(vm_hooks_early_exit) => {
             vm_hooks_early_exit_result(vm_hooks_early_exit)
-        },
+        }
         InstanceCallResult::Breakpoint(BreakpointValue::None) => {
             Some(TxResult::from_vm_error("invalid breakpoint".to_string()))
-        },
+        }
         InstanceCallResult::Breakpoint(BreakpointValue::OutOfGas) => Some(TxResult::from_error(
             ReturnCode::OutOfGas,
             vm_err_msg::NOT_ENOUGH_GAS,
         )),
         InstanceCallResult::Breakpoint(BreakpointValue::MemoryLimit) => {
             Some(TxResult::from_vm_error("memory limit".to_string()))
-        },
+        }
     }
 }
 

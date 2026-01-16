@@ -1,4 +1,5 @@
 use multiversx_sc_scenario::{
+    ScenarioTxEnvData,
     api::StaticApi,
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
@@ -6,7 +7,6 @@ use multiversx_sc_scenario::{
     },
     scenario::tx_to_step::TxToQueryStep,
     scenario_model::TxResponse,
-    ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
@@ -28,7 +28,7 @@ where
     step_wrapper
         .env
         .world
-        .sc_query(&mut step_wrapper.step)
+        .perform_sc_query(&mut step_wrapper.step)
         .await;
     step_wrapper.process_result()
 }
@@ -77,7 +77,7 @@ where
         self.step_wrapper
             .env
             .world
-            .sc_query(&mut self.step_wrapper.step)
+            .perform_sc_query(&mut self.step_wrapper.step)
             .await;
         self.step_wrapper.process_result()
     }
@@ -102,7 +102,7 @@ where
         let tx = f(tx_base);
 
         let mut step_wrapper = tx.tx_to_query_step();
-        self.sc_query(&mut step_wrapper.step).await;
+        self.perform_sc_query(&mut step_wrapper.step).await;
         step_wrapper.process_result();
         self
     }

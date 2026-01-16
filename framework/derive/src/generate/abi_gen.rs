@@ -67,7 +67,7 @@ fn generate_endpoint_snippet(
                 endpoint_abi.add_output::<#res_type>(&[ #(#output_names),* ]);
                 contract_abi.add_type_descriptions::<#res_type>();
             }
-        },
+        }
     };
 
     let label_names = &m.label_names;
@@ -114,7 +114,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     #endpoint_def
                     contract_abi.constructors.push(endpoint_abi);
                 })
-            },
+            }
             PublicRole::Upgrade(_) => {
                 let endpoint_def = generate_endpoint_snippet(
                     m,
@@ -129,7 +129,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     #endpoint_def
                     contract_abi.upgrade_constructors.push(endpoint_abi);
                 })
-            },
+            }
             PublicRole::Endpoint(endpoint_metadata) => {
                 let endpoint_def = generate_endpoint_snippet(
                     m,
@@ -144,7 +144,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     #endpoint_def
                     contract_abi.endpoints.push(endpoint_abi);
                 })
-            },
+            }
             PublicRole::CallbackPromise(callback_metadata) => {
                 let endpoint_def = generate_endpoint_snippet(
                     m,
@@ -159,7 +159,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     #endpoint_def
                     contract_abi.promise_callbacks.push(endpoint_abi);
                 })
-            },
+            }
             _ => None,
         })
         .collect()
@@ -271,11 +271,11 @@ fn generate_abi_method_body(
     quote! {
         let mut contract_abi = multiversx_sc::abi::ContractAbi::new(
             multiversx_sc::abi::BuildInfoAbi {
-                contract_crate: multiversx_sc::abi::ContractCrateBuildAbi {
-                    name: env!("CARGO_PKG_NAME"),
-                    version: env!("CARGO_PKG_VERSION"),
-                    git_version: "",
-                },
+                rustc: None,
+                contract_crate: multiversx_sc::abi::ContractCrateBuildAbi::new(
+                    env!("CARGO_PKG_NAME"),
+                    env!("CARGO_PKG_VERSION"),
+                ),
                 framework: multiversx_sc::abi::FrameworkBuildAbi::create(),
             },
             &[ #(#contract_docs),* ],

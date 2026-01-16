@@ -1,5 +1,5 @@
 use crate::sdk::{
-    data::transaction::{ApiSmartContractResult, Events, TransactionOnNetwork},
+    data::transaction::{ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork},
     utils::base64_decode,
 };
 use multiversx_sc_scenario::{
@@ -27,10 +27,12 @@ pub fn parse_tx_response(tx: TransactionOnNetwork, return_code: ReturnCode) -> T
 
 fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> TxResponseStatus {
     if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR) {
-        let topics = event.topics.as_ref();
-
-        let error = topics.unwrap().first().unwrap();
-        return TxResponseStatus::new(return_code, error);
+        if event.topics.len() >= 2 {
+            let error_message = String::from_utf8(base64_decode(&event.topics[1])).expect(
+                "Failed to decode base64-encoded error message from transaction event topic",
+            );
+            return TxResponseStatus::new(return_code, &error_message);
+        }
     }
 
     TxResponseStatus::default()
@@ -57,13 +59,23 @@ fn process_tx_hash(tx: &TransactionOnNetwork) -> Option<H256> {
 }
 
 fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
+    let out_multi_transfer = tx.smart_contract_results.iter().find(is_multi_transfer);
     let out_scr = tx.smart_contract_results.iter().find(is_out_scr);
 
-    if let Some(out_scr) = out_scr {
-        decode_scr_data_or_panic(&out_scr.data)
-    } else {
-        process_out_from_log(tx).unwrap_or_default()
+    if let Some(out_multi_transfer) = out_multi_transfer {
+        log::trace!("Parsing result from multi transfer: {out_multi_transfer:?}");
+        if let Some(data) = decode_multi_transfer_data_or_panic(out_multi_transfer.logs.clone()) {
+            return data;
+        }
     }
+
+    if let Some(out_scr) = out_scr {
+        log::trace!("Parsing result from scr: {out_scr:?}");
+        return decode_scr_data_or_panic(&out_scr.data);
+    }
+
+    log::trace!("Parsing result from logs");
+    process_out_from_log(tx).unwrap_or_default()
 }
 
 fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
@@ -95,7 +107,6 @@ fn extract_topics(event: &Events) -> Vec<Vec<u8>> {
     event
         .topics
         .clone()
-        .unwrap_or_default()
         .into_iter()
         .map(|s| s.into_bytes())
         .collect()
@@ -105,15 +116,7 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
-                let mut out = Vec::new();
-                event.data.for_each(|data_member| {
-                    let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
-
-                    if decoded_data.starts_with('@') {
-                        let out_content = decode_scr_data_or_panic(decoded_data.as_str());
-                        out.extend(out_content);
-                    }
-                });
+                let out = extract_write_log_data(event);
                 return Some(out);
             }
 
@@ -238,7 +241,42 @@ pub fn decode_scr_data_or_panic(data: &str) -> Vec<Vec<u8>> {
         .collect()
 }
 
+/// Decodes the data of a multi transfer result.
+pub fn decode_multi_transfer_data_or_panic(logs: Option<ApiLogs>) -> Option<Vec<Vec<u8>>> {
+    let logs = logs?;
+
+    if let Some(event) = logs
+        .events
+        .iter()
+        .find(|event| event.identifier == "writeLog")
+    {
+        let out = extract_write_log_data(event);
+        return Some(out);
+    }
+
+    None
+}
+
+fn extract_write_log_data(event: &Events) -> Vec<Vec<u8>> {
+    let mut out = Vec::new();
+    event.data.for_each(|data_member| {
+        let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
+
+        if decoded_data.starts_with('@') {
+            let out_content = decode_scr_data_or_panic(decoded_data.as_str());
+            out.extend(out_content);
+        }
+    });
+
+    out
+}
+
 /// Checks if the given smart contract result is an out smart contract result.
 pub fn is_out_scr(scr: &&ApiSmartContractResult) -> bool {
     scr.nonce != 0 && scr.data.starts_with('@')
+}
+
+/// Checks if the given smart contract result is a multi transfer smart contract result.
+pub fn is_multi_transfer(scr: &&ApiSmartContractResult) -> bool {
+    scr.data.starts_with("MultiESDTNFTTransfer@")
 }

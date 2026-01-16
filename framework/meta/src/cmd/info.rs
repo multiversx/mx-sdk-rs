@@ -2,7 +2,7 @@ use std::path::Path;
 
 use crate::{
     cli::InfoArgs,
-    folder_structure::{dir_pretty_print, RelevantDirectories},
+    folder_structure::{RelevantDirectories, dir_pretty_print},
     version_history::LAST_UPGRADE_VERSION,
 };
 

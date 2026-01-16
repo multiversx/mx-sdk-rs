@@ -43,7 +43,7 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
             core::result::Result::Ok(instances) => Self::new_from_instances(instances),
             core::result::Result::Err(_) => {
                 M::error_api_impl().signal_error(b"Error decoding tokens from URI")
-            },
+            }
         }
     }
 
@@ -58,7 +58,7 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
         match search_result {
             Some(existing_index) => {
                 self.instances[existing_index].amount += new_instance.amount;
-            },
+            }
             None => {
                 if self.instances.len() >= MAX_MERGED_TOKENS {
                     M::error_api_impl().signal_error(TOO_MANY_TOKENS_ERR_MSG);
@@ -67,7 +67,7 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
                 unsafe {
                     self.instances.push_unchecked(new_instance);
                 }
-            },
+            }
         }
     }
 
@@ -93,7 +93,7 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
                 if found_instance.amount == 0 {
                     let _ = self.instances.remove(index);
                 }
-            },
+            }
             None => M::error_api_impl().signal_error(INSUFFICIENT_BALANCE_IN_MERGED_INST_ERR_MSG),
         }
     }
@@ -105,7 +105,7 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
 
     fn find_instance(
         &self,
-        original_token_id: &TokenIdentifier<M>,
+        original_token_id: &EsdtTokenIdentifier<M>,
         original_token_nonce: u64,
     ) -> Option<usize> {
         self.instances.iter().position(|item| {

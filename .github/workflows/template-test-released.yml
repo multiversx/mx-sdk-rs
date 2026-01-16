@@ -1,4 +1,4 @@
-name: CI
+name: Templates CI
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -28,7 +28,7 @@ jobs:
         run: |
           cargo install wasm-opt
           cargo install --path framework/meta
-          sc-meta install mx-scenario-go --tag v4.0.0
+          sc-meta install mx-scenario-go --tag v5.1.0
           sc-meta install wasm32
 
           which wasm-opt

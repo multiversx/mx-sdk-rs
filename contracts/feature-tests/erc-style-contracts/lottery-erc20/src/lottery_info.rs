@@ -1,6 +1,6 @@
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedAddress, Vec},
+    types::{BigUint, ManagedAddress, TimestampSeconds, Vec},
 };
 multiversx_sc::derive_imports!();
 
@@ -9,7 +9,7 @@ multiversx_sc::derive_imports!();
 pub struct LotteryInfo<M: ManagedTypeApi> {
     pub ticket_price: BigUint<M>,
     pub tickets_left: u32,
-    pub deadline: u64,
+    pub deadline: TimestampSeconds,
     pub max_entries_per_user: u32,
     pub prize_distribution: Vec<u8>,
     pub whitelist: Vec<ManagedAddress<M>>,

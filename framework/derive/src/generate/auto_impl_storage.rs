@@ -36,7 +36,7 @@ pub fn generate_getter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
                     )
                 }
             }
-        },
+        }
     }
 }
 
@@ -78,7 +78,7 @@ pub fn generate_mapper_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
                     )
                 }
             }
-        },
+        }
     }
 }
 
@@ -103,7 +103,7 @@ pub fn generate_mapper_from_address_impl(m: &Method, identifier: &str) -> proc_m
                     )
                 }
             }
-        },
+        }
     }
 }
 

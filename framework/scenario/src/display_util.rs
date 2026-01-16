@@ -1,7 +1,7 @@
 use crate::{num_bigint, num_bigint::BigInt};
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{heap::BoxedBytes, BigUint, ManagedType},
+    types::{BigUint, ManagedType, heap::BoxedBytes},
 };
 use std::fmt;
 

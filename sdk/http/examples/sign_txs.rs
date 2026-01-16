@@ -1,5 +1,5 @@
 use multiversx_sdk::{data::transaction::Transaction, wallet::Wallet};
-use multiversx_sdk_http::{GatewayHttpProxy, DEVNET_GATEWAY};
+use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 
 #[tokio::main]
 async fn main() {

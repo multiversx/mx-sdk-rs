@@ -5,8 +5,9 @@ use crate::{
     contract_base::{SendRawWrapper, SyncCallRawResult, SyncCallRawResultOrError},
     tuple_util::NestedTupleFlatten,
     types::{
-        decode_result, BackTransfersLegacy, ManagedBuffer, ManagedVec, OriginalResultMarker,
-        RHListExec, Tx, TxDataFunctionCall, TxGas, TxNoPayment, TxPayment, TxScEnv, TxToSpecified,
+        BackTransfersLegacy, ManagedBuffer, ManagedVec, RHListExec, Tx, TxDataFunctionCall,
+        TxEmptyResultHandler, TxGas, TxNoPayment, TxPayment, TxResultHandler, TxScEnv,
+        TxToSpecified, decode_result,
     },
 };
 
@@ -17,8 +18,7 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
-    RH: RHListExec<SyncCallRawResult<Api>, TxScEnv<Api>>,
-    RH::ListReturns: NestedTupleFlatten,
+    RH: TxResultHandler<TxScEnv<Api>>,
 {
     fn execute_sync_call_raw(self) -> (SyncCallRawResult<Api>, RH) {
         let gas_limit = self.gas.gas_value(&self.env);
@@ -43,7 +43,18 @@ where
 
         (raw_result, self.result_handler)
     }
+}
 
+impl<Api, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, RH>
+where
+    Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    FC: TxDataFunctionCall<TxScEnv<Api>>,
+    RH: RHListExec<SyncCallRawResult<Api>, TxScEnv<Api>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
     /// Executes transaction synchronously.
     ///
     /// Only works with contracts from the same shard.
@@ -99,10 +110,9 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
-    RH: RHListExec<SyncCallRawResultOrError<Api>, TxScEnv<Api>>,
-    RH::ListReturns: NestedTupleFlatten,
+    RH: TxResultHandler<TxScEnv<Api>>,
 {
-    fn execute_sync_call_return_error_raw(self) -> (SyncCallRawResultOrError<Api>, RH) {
+    fn execute_sync_call_fallible_raw(self) -> (SyncCallRawResultOrError<Api>, RH) {
         let gas_limit = self.gas.gas_value(&self.env);
 
         let raw_result = self.payment.with_normalized(
@@ -125,7 +135,18 @@ where
 
         (raw_result, self.result_handler)
     }
+}
 
+impl<Api, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, RH>
+where
+    Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    FC: TxDataFunctionCall<TxScEnv<Api>>,
+    RH: RHListExec<SyncCallRawResultOrError<Api>, TxScEnv<Api>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
     /// Executes transaction synchronously.
     ///
     /// Only works with contracts from the same shard.
@@ -134,7 +155,7 @@ where
     /// The execution will not stop, the error code will be available to result handler.
     pub fn sync_call_fallible(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
         self.result_handler.list_preprocessing();
-        let (result_or_err, result_handler) = self.execute_sync_call_return_error_raw();
+        let (result_or_err, result_handler) = self.execute_sync_call_fallible_raw();
         let tuple_result = result_handler.list_process_result(&result_or_err);
         tuple_result.flatten_unpack()
     }
@@ -180,16 +201,19 @@ where
     }
 }
 
-impl<Api, To, Payment, Gas, FC, OriginalResult>
-    Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, OriginalResultMarker<OriginalResult>>
+impl<Api, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, RH>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
+    RH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
     /// Backwards compatibility.
+    ///
+    /// Incompatible with result handlers.
+    #[deprecated(since = "0.61.0", note = "Please use `.sync_call()` instead.")]
     pub fn execute_on_dest_context<RequestedResult>(self) -> RequestedResult
     where
         RequestedResult: TopDecodeMulti,
@@ -199,6 +223,12 @@ where
     }
 
     /// Backwards compatibility.
+    ///
+    /// Incompatible with result handlers.
+    #[deprecated(
+        since = "0.61.0",
+        note = "Please use `.returns(ReturnsBackTransfers).sync_call()` instead."
+    )]
     pub fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
     ) -> (RequestedResult, BackTransfersLegacy<Api>)
@@ -210,5 +240,24 @@ where
             crate::contract_base::BlockchainWrapper::<Api>::new().get_back_transfers_legacy();
 
         (result, back_transfers)
+    }
+
+    /// Reimagined, based on the old syntax. Please use `.returns(ReturnsHandledOrError::new().returns(...)).sync_call_fallible()` instead.
+    ///
+    /// Incompatible with result handlers.
+    #[deprecated(
+        since = "0.61.0",
+        note = "Please use `.returns(ReturnsHandledOrError::new().returns(...)).sync_call_fallible()` instead."
+    )]
+    pub fn execute_on_dest_context_fallible<RequestedResult>(self) -> Result<RequestedResult, u32>
+    where
+        RequestedResult: TopDecodeMulti,
+    {
+        let (raw_result, _) = self.execute_sync_call_fallible_raw();
+
+        match raw_result {
+            SyncCallRawResultOrError::Success(result) => Ok(decode_result(result.0)),
+            SyncCallRawResultOrError::Error(err_code) => Err(err_code),
+        }
     }
 }

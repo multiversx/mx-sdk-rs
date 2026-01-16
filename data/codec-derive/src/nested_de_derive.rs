@@ -65,7 +65,7 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
                     }
                 }
             }
-        },
+        }
         syn::Data::Enum(data_enum) => {
             validate_enum_variants(&data_enum.variants);
 
@@ -86,7 +86,7 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
                     }
                 }
             }
-        },
+        }
         syn::Data::Union(_) => panic!("Union not supported"),
     };
 

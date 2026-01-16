@@ -24,8 +24,8 @@ where
 
     let tx_cache = TxCache::new(state.get_arc());
 
-    let (tx_result, new_address, blockchain_updates) = execute_deploy(
-        tx_input,
+    let (mut tx_result, new_address, blockchain_updates) = execute_deploy(
+        tx_input.clone(),
         contract_path.to_vec(),
         code_metadata,
         tx_cache,
@@ -33,7 +33,12 @@ where
         f,
     );
 
-    blockchain_updates.apply(state);
+    if tx_result.result_status.is_success() {
+        blockchain_updates.apply(state);
+    }
+
+    // TODO: not sure if this is the best place to put this, investigate
+    tx_result.append_internal_vm_errors_event_log(&tx_input);
 
     (new_address, tx_result)
 }

@@ -3,8 +3,8 @@ use unwrap_infallible::UnwrapInfallible;
 use super::{EndpointDynArgLoader, EndpointSingleArgLoader};
 use crate::{
     api::{
-        const_handles, EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl,
-        ManagedTypeApi, StaticVarApiImpl, VMApi,
+        EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi, ErrorApiImpl, ManagedTypeApi,
+        StaticVarApiImpl, VMApi, const_handles,
     },
     codec::{DecodeError, TopDecodeMulti, TopDecodeMultiInput},
     err_msg,

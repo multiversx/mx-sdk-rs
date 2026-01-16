@@ -5,7 +5,7 @@ authors = ["MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
 repository = "https://github.com/multiversx/mx-sdk-rs"
 description = "Web app for displaying function graphs from the framework"
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
@@ -21,11 +21,11 @@ plotters-canvas = "^0.3.0"
 lto = true
 
 [dependencies.multiversx-sc]
-version = "=0.59.0"
+version = "=0.64.1"
 path = "../../framework/base"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.59.0"
+version = "=0.64.1"
 path = "../../framework/scenario"
 default-features = false
 

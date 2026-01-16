@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use crate::api::{use_raw_handle, BigFloatApiImpl, ManagedTypeApi, StaticVarApiImpl};
+use crate::api::{BigFloatApiImpl, ManagedTypeApi, StaticVarApiImpl, use_raw_handle};
 
 use super::{BigFloat, BigInt};
 

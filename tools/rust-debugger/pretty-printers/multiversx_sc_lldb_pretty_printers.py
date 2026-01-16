@@ -1,17 +1,18 @@
 ##############################################################################
 ### LLDB support for displaying MultiversX SpaceCraft SDK types in debug mode
 ##############################################################################
-### Version: 0.59.0
+### Version: 0.64.1
 ##############################################################################
 
-from functools import partial
-import string
-from typing import Callable, Collection, Iterable, List, Tuple, Type
-from lldb import SBValue, SBDebugger
-import lldb
-from pathlib import Path
 import re
+import string
 import struct
+from functools import partial
+from pathlib import Path
+from typing import Callable, Collection, Iterable, List, Tuple, Type
+
+import lldb  # type: ignore[import]
+from lldb import SBDebugger, SBValue  # type: ignore[import]
 
 VM_TYPE_ADDRESS = "0000000050"
 DEBUG_API_TYPE = "multiversx_sc_scenario::api::impl_vh::vm_hooks_api::VMHooksApi<multiversx_sc_scenario::api::impl_vh::debug_api::DebugApiBackend>"
@@ -27,24 +28,37 @@ MANAGED_BASIC_PATH = "multiversx_sc::types::managed::basic"
 
 BIG_INT_TYPE = f"{MANAGED_BASIC_PATH}::big_int::BigInt<{DEBUG_API_TYPE} ?>"
 BIG_FLOAT_TYPE = f"{MANAGED_BASIC_PATH}::big_float::BigFloat<{DEBUG_API_TYPE} ?>"
-MANAGED_BUFFER_TYPE = f"{MANAGED_BASIC_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE} ?>"
+MANAGED_BUFFER_TYPE = (
+    f"{MANAGED_BASIC_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE} ?>"
+)
 
 # 3. SC wasm - Managed wrapped types
+## 3a. general
 MANAGED_WRAPPED_PATH = "multiversx_sc::types::managed::wrapped"
+BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::num::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
+NON_ZERO_BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::num::non_zero_big_uint::NonZeroBigUint<{DEBUG_API_TYPE} ?>"
+MANAGED_ADDRESS_TYPE = (
+    f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
+)
+MANAGED_BYTE_ARRAY_TYPE = (
+    f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
+)
+## 3b. tokens & payments
+MANAGED_WRAPPED_TOKEN_PATH = "multiversx_sc::types::managed::wrapped::token"
+ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::esdt_token_identifier::EsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
+TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
+ESDT_TOKEN_PAYMENT_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
+EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
 
-BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::big_uint::BigUint<{DEBUG_API_TYPE} ?>"
-TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE} ?>"
-MANAGED_ADDRESS_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
-MANAGED_BYTE_ARRAY_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
-ESDT_TOKEN_PAYMENT_TYPE = f"{MANAGED_WRAPPED_PATH}::esdt_token_payment::EsdtTokenPayment<{DEBUG_API_TYPE} ?>"
-EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_PATH}::egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
 # ManagedOption
 MANAGED_OPTION_INNER_TYPE_INDEX = 1
 MANAGED_OPTION_NONE_HANDLE = 2147483646  # i32::MAX - 1
 MANAGED_OPTION_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_option::ManagedOption<{DEBUG_API_TYPE}, {ANY_TYPE}>"
 # ManagedVec
 MANAGED_VEC_INNER_TYPE_INDEX = 1
-MANAGED_VEC_TYPE = f"{MANAGED_WRAPPED_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_TYPE}>"
+MANAGED_VEC_TYPE = (
+    f"{MANAGED_WRAPPED_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_TYPE}>"
+)
 
 # 4. SC wasm - Managed multi value types
 
@@ -59,17 +73,28 @@ INTERACTION_EXPR_PATH = "multiversx_sc::types::interaction::expr"
 
 TEST_SC_ADDRESS_TYPE = f"{INTERACTION_EXPR_PATH}::test_sc_address::TestSCAddress"
 TEST_ADDRESS_TYPE = f"{INTERACTION_EXPR_PATH}::test_address::TestAddress"
-TEST_TOKEN_IDENTIFIER_TYPE = f"{INTERACTION_EXPR_PATH}::test_token_identifier::TestTokenIdentifier"
+TEST_TOKEN_IDENTIFIER_TYPE = (
+    f"{INTERACTION_EXPR_PATH}::test_token_identifier::TestTokenIdentifier"
+)
 
 # 7. MultiversX codec - Multi-types
 MULTI_TYPES_PATH = "multiversx_sc_codec::multi_types"
 
-OPTIONAL_VALUE_TYPE = f"{MULTI_TYPES_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>"
+OPTIONAL_VALUE_TYPE = (
+    f"{MULTI_TYPES_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>"
+)
+
 
 class InvalidHandle(Exception):
     def __init__(self, raw_handle: int, map_: lldb.value) -> None:
         map_name = map_.sbvalue.GetName()
         error = f"<invalid handle: raw_handle {raw_handle} not found in {map_name}>"
+        super().__init__(error)
+
+
+class InvalidWeakPointer(Exception):
+    def __init__(self, raw_handle: int) -> None:
+        error = f"<invalid weak pointer: TxContext has been dropped for handle {raw_handle}>"
         super().__init__(error)
 
 
@@ -79,6 +104,12 @@ def check_invalid_handle(callable: Callable) -> Callable:
             return callable(*args)
         except InvalidHandle as e:
             return str(e)
+        except InvalidWeakPointer as e:
+            return str(e)
+        except Exception as e:
+            # Catch any other exceptions that might occur during pointer dereferencing
+            return f"<debugger error: {str(e)}>"
+
     return wrapped
 
 
@@ -146,12 +177,12 @@ def bytes_to_int(bytes: Collection[int]) -> int:
 
 
 def num_bigint_data_to_int(value_vec_u64: lldb.value) -> int:
-    value_hex = ''.join(reversed(list(map(sb_value_to_hex, value_vec_u64.sbvalue))))
+    value_hex = "".join(reversed(list(map(sb_value_to_hex, value_vec_u64.sbvalue))))
     return hex_to_int(value_hex)
 
 
 def ints_to_hex(ints: Iterable[int]) -> str:
-    return ''.join(map(u8_to_hex, ints))
+    return "".join(map(u8_to_hex, ints))
 
 
 def buffer_to_bytes(buffer: lldb.value) -> List[int]:
@@ -174,7 +205,7 @@ def bytes_to_handle(bytes: List[int]) -> int:
     -112
     """
     bytes_hex = ints_to_hex(bytes)
-    return struct.unpack('>i', bytearray.fromhex(bytes_hex))[0]
+    return struct.unpack(">i", bytearray.fromhex(bytes_hex))[0]
 
 
 def format_buffer_hex_string(buffer_hex: str) -> str:
@@ -194,26 +225,30 @@ def ascii_to_string(buffer_iterator: Iterable[int]) -> str:
     >>> ascii_to_string([116, 101, 115, 116])
     'test'
     """
-    return ''.join(map(chr, buffer_iterator))
+    return "".join(map(chr, buffer_iterator))
+
 
 def buffer_to_bytes_without_vm_type(buffer: lldb.value) -> List[int]:
     buffer_ints = buffer_to_bytes(buffer)
     buffer_vm_type = buffer_to_bytes(VM_TYPE_ADDRESS)
 
-    if buffer_ints[:len(buffer_vm_type)] == buffer_vm_type:
-        return buffer_ints[len(buffer_vm_type):] 
+    if buffer_ints[: len(buffer_vm_type)] == buffer_vm_type:
+        return buffer_ints[len(buffer_vm_type) :]
 
     return buffer_ints
+
 
 def buffer_as_string(buffer: lldb.value) -> str:
     buffer_ints = buffer_to_bytes_without_vm_type(buffer)
     buffer_string = ascii_to_string(buffer_ints)
     return f'"{buffer_string}"'
 
+
 def interaction_type_as_string(buffer: lldb.value, prefix: str) -> str:
     buffer_ints = buffer_to_bytes(buffer)
     buffer_string = ascii_to_string(buffer_ints)
     return f'"{prefix}:{buffer_string}"'
+
 
 def mixed_representation(buffer: lldb.value) -> str:
     buffer_hex = format_buffer_hex(buffer)
@@ -232,8 +267,8 @@ def parse_handles_from_buffer_hex(buffer_hex: str) -> List[int]:
     """
     raw_handles = []
     for handle_bytes_iter in zip(*[iter(buffer_hex)] * 8):
-        handle_bytes_hex = ''.join(handle_bytes_iter)
-        raw_handle = struct.unpack('>i', bytearray.fromhex(handle_bytes_hex))[0]
+        handle_bytes_hex = "".join(handle_bytes_iter)
+        raw_handle = struct.unpack(">i", bytearray.fromhex(handle_bytes_hex))[0]
         raw_handles.append(raw_handle)
     return raw_handles
 
@@ -272,14 +307,32 @@ class ManagedType(Handler):
     def lookup(self, full_value: lldb.value) -> lldb.value:
         return full_value
 
-    def extract_value_from_raw_handle(self, context: lldb.value, raw_handle: int, map_picker: Callable) -> lldb.value:
-        managed_types = context[0].managed_types.data.value
+    def extract_value_from_raw_handle(
+        self, context: lldb.value, raw_handle: int, map_picker: Callable
+    ) -> lldb.value:
+        weak_inner = context.ptr.pointer  # object is of Rust type: ArcInner
+
+        # Check the strong count to see if the object is still alive
+        # If strong count is 0, the object has been dropped
+        strong_atomic_usize = weak_inner.strong  # object is of Rust type: Atomic<usize>
+        strong_count = int(strong_atomic_usize.v.value)
+        if strong_count == 0:
+            raise InvalidWeakPointer(raw_handle)
+
+        # Handle Weak<TxContext> by accessing the ptr field directly
+        # context is Weak<TxContext>, which contains ptr that points to the WeakInner<TxContext>
+        # The WeakInner contains a pointer to the actual TxContext data
+        # In LLDB, we access: context.ptr.pointer (NonNull<WeakInner<T>>) -> pointer.data -> TxContext
+        tx_context = weak_inner.data
+        managed_types = tx_context.managed_types.data.value
         chosen_map = map_picker(managed_types)
         value = map_lookup(chosen_map, raw_handle)
         return value
 
     @check_invalid_handle
-    def summary_from_raw_handle(self, raw_handle: int, context: lldb.value, type_info: lldb.SBType) -> str:
+    def summary_from_raw_handle(
+        self, raw_handle: int, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         map_picker = self.map_picker()
         value = self.extract_value_from_raw_handle(context, raw_handle, map_picker)
         return self.value_summary(value, context, type_info)
@@ -289,10 +342,13 @@ class ManagedType(Handler):
         managed_value = self.lookup(original_value)
         handle = managed_value.handle
         raw_handle = int(handle.raw_handle)
+        # Handle Weak<TxContext> by getting the context from the handle
         context = handle.context
         return self.summary_from_raw_handle(raw_handle, context, type_info)
 
-    def value_summary(self, value: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, value: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         pass
 
 
@@ -300,7 +356,9 @@ class ManagedVecItem(Handler):
     def item_size(self) -> int:
         pass
 
-    def summarize_item(self, bytes: List[int], context: lldb.value, type_info: lldb.SBType) -> str:
+    def summarize_item(
+        self, bytes: List[int], context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         pass
 
 
@@ -312,7 +370,9 @@ class PlainManagedVecItem(ManagedVecItem, ManagedType):
     def item_size(self) -> int:
         return 4
 
-    def summarize_item(self, handle_bytes: List[int], context: lldb.value, type_info: lldb.SBType) -> str:
+    def summarize_item(
+        self, handle_bytes: List[int], context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         raw_handle = bytes_to_handle(handle_bytes)
         return self.summary_from_raw_handle(raw_handle, context, type_info)
 
@@ -320,7 +380,7 @@ class PlainManagedVecItem(ManagedVecItem, ManagedType):
 class NumBigInt(Handler):
     def summary(self, num_big_int: lldb.value) -> str:
         value_int = num_bigint_data_to_int(num_big_int.data.data)
-        if num_big_int.sign.sbvalue.GetValue() == 'Minus':
+        if num_big_int.sign.sbvalue.GetValue() == "Minus":
             return str(-value_int)
         return str(value_int)
 
@@ -335,7 +395,9 @@ class BigInt(PlainManagedVecItem, ManagedType):
     def map_picker(self) -> Callable:
         return pick_big_int
 
-    def value_summary(self, value: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, value: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         return str(value.sbvalue.GetSummary())
 
 
@@ -343,31 +405,39 @@ class BigFloat(PlainManagedVecItem, ManagedType):
     def map_picker(self) -> Callable:
         return pick_big_float
 
-    def value_summary(self, value: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, value: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         return str(value.sbvalue.GetValue())
 
 
 class ManagedBuffer(PlainManagedVecItem, ManagedType):
-    def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         return mixed_representation(buffer)
 
 
 class BigUint(PlainManagedVecItem, ManagedType):
     def map_picker(self) -> Callable:
         return pick_big_int
-    
+
     def lookup(self, big_uint: lldb.value) -> lldb.value:
         return big_uint.value
 
-    def value_summary(self, big_uint: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, big_uint: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         return big_uint.sbvalue.GetSummary()
 
 
-class TokenIdentifier(PlainManagedVecItem, ManagedType):
+class EsdtTokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, token_identifier: lldb.value) -> lldb.value:
-        return token_identifier.data.buffer
+        return token_identifier.token_id.buffer
 
-    def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         return buffer_as_string(buffer)
 
 
@@ -375,24 +445,35 @@ class ManagedAddress(PlainManagedVecItem, ManagedType):
     def lookup(self, managed_address: lldb.value) -> lldb.value:
         return managed_address.bytes.buffer
 
-    def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         return mixed_representation(buffer)
+
 
 class ManagedByteArray(PlainManagedVecItem, ManagedType):
     def lookup(self, managed_byte_array: lldb.value) -> lldb.value:
         return managed_byte_array.buffer
 
-    def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         return mixed_representation(buffer)
 
 
 class ManagedOption(PlainManagedVecItem, ManagedType):
-    def summary_from_raw_handle(self, raw_handle: int, context: lldb.value, type_info: lldb.SBType) -> str:
+    def summary_from_raw_handle(
+        self, raw_handle: int, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         if raw_handle == MANAGED_OPTION_NONE_HANDLE:
             return "ManagedOption::none()"
-        inner_type_handler, inner_type = get_inner_type_handler(type_info, MANAGED_OPTION_INNER_TYPE_INDEX)
-        assert(isinstance(inner_type_handler, ManagedType))
-        inner_summary = inner_type_handler.summary_from_raw_handle(raw_handle, context, inner_type)
+        inner_type_handler, inner_type = get_inner_type_handler(
+            type_info, MANAGED_OPTION_INNER_TYPE_INDEX
+        )
+        assert isinstance(inner_type_handler, ManagedType)
+        inner_summary = inner_type_handler.summary_from_raw_handle(
+            raw_handle, context, inner_type
+        )
         return f"ManagedOption::some({inner_summary})"
 
 
@@ -405,7 +486,7 @@ def split_bytes(bytes: List[int], sizes: Iterable[int]) -> List[List[int]]:
     chunks = []
     i = 0
     for size in sizes:
-        chunks.append(bytes[i: i + size])
+        chunks.append(bytes[i : i + size])
         i += size
     return chunks
 
@@ -420,7 +501,7 @@ def split_bytes_fixed_size(bytes: List[int], size: int) -> List[List[int]]:
     i = 0
     byte_count = len(bytes)
     while i < byte_count:
-        chunks.append(bytes[i: i + size])
+        chunks.append(bytes[i : i + size])
         i += size
     return chunks
 
@@ -437,9 +518,15 @@ class EsdtTokenPayment(ManagedVecItem, ManagedType):
     def item_size(self) -> int:
         return sum(self.COMPONENT_SIZES)
 
-    def summarize_item(self, bytes: List[int], context: lldb.value, type_info: lldb.SBType) -> str:
-        token_id_handle_bytes, nonce_bytes, amount_handle_bytes = split_bytes(bytes, self.COMPONENT_SIZES)
-        token_id = TokenIdentifier().summarize_item(token_id_handle_bytes, context, None)
+    def summarize_item(
+        self, bytes: List[int], context: lldb.value, type_info: lldb.SBType
+    ) -> str:
+        token_id_handle_bytes, nonce_bytes, amount_handle_bytes = split_bytes(
+            bytes, self.COMPONENT_SIZES
+        )
+        token_id = EsdtTokenIdentifier().summarize_item(
+            token_id_handle_bytes, context, None
+        )
         nonce = bytes_to_int(nonce_bytes)
         amount = BigInt().summarize_item(amount_handle_bytes, context, None)
         return self.to_string(token_id, nonce, amount)
@@ -450,26 +537,35 @@ class EsdtTokenPayment(ManagedVecItem, ManagedType):
 
 class EgldOrEsdtTokenIdentifier(PlainManagedVecItem, ManagedType):
     def lookup(self, egld_or_esdt_token_identifier: lldb.value) -> lldb.value:
-        return egld_or_esdt_token_identifier.buffer
+        return egld_or_esdt_token_identifier.token_id.buffer
 
-    def value_summary(self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
+    def value_summary(
+        self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
         token_id = buffer_as_string(buffer)
         if token_id == '"EGLD-000000"':
             return "EgldOrEsdtTokenIdentifier::egld()"
-        return f"EgldOrEsdtTokenIdentifier::esdt({token_id})" 
+        return f"EgldOrEsdtTokenIdentifier::esdt({token_id})"
 
 
 class ManagedVec(PlainManagedVecItem, ManagedType):
     def lookup(self, managed_vec: lldb.value) -> lldb.value:
         return managed_vec.buffer
 
-    def value_summary(self, value: lldb.value, context: lldb.value, type_info: lldb.SBType) -> str:
-        item_handler, inner_type = get_inner_type_handler(type_info, MANAGED_VEC_INNER_TYPE_INDEX)
-        assert(isinstance(item_handler, ManagedVecItem))
+    def value_summary(
+        self, value: lldb.value, context: lldb.value, type_info: lldb.SBType
+    ) -> str:
+        item_handler, inner_type = get_inner_type_handler(
+            type_info, MANAGED_VEC_INNER_TYPE_INDEX
+        )
+        assert isinstance(item_handler, ManagedVecItem)
         buffer_bytes = buffer_to_bytes(value)
         item_size = item_handler.item_size()
         bytes_of_all_items = split_bytes_fixed_size(buffer_bytes, item_size)
-        items = [item_handler.summarize_item(bytes, context, inner_type) for bytes in bytes_of_all_items]
+        items = [
+            item_handler.summarize_item(bytes, context, inner_type)
+            for bytes in bytes_of_all_items
+        ]
         return format_vec(items)
 
 
@@ -488,25 +584,33 @@ class BoxedBytes(Handler):
         buffer_hex = ints_to_hex(raw)
         return format_buffer_hex_string(buffer_hex)
 
+
 class TestSCAddress(Handler):
     def summary(self, test_sc_address: lldb.value) -> str:
         buffer = lldb.value(test_sc_address.sbvalue.GetChildAtIndex(0))
         return interaction_type_as_string(buffer, "sc")
-    
+
+
 class TestAddress(Handler):
     def summary(self, test_address: lldb.value) -> str:
         buffer = lldb.value(test_address.sbvalue.GetChildAtIndex(0))
         return interaction_type_as_string(buffer, "address")
-    
+
+
 class TestTokenIdentifier(Handler):
     def summary(self, test_address: lldb.value) -> str:
         buffer = lldb.value(test_address.sbvalue.GetChildAtIndex(0))
         return interaction_type_as_string(buffer, "str")
 
+
 class OptionalValue(Handler):
     def summary(self, optional_value: lldb.value) -> str:
         base_type = optional_value.sbvalue.GetType().GetName()
-        if optional_value.value.sbvalue.GetType().GetName().startswith(f'{base_type}::Some'):
+        if (
+            optional_value.value.sbvalue.GetType()
+            .GetName()
+            .startswith(f"{base_type}::Some")
+        ):
             summary = optional_value.value.sbvalue.GetChildAtIndex(0).GetSummary()
             return f"OptionalValue::Some({summary})"
         return "OptionalValue::None"
@@ -522,7 +626,8 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     (MANAGED_BUFFER_TYPE, ManagedBuffer),
     # 3. SC wasm - Managed wrapped types
     (BIG_UINT_TYPE, BigUint),
-    (TOKEN_IDENTIFIER_TYPE, TokenIdentifier),
+    (NON_ZERO_BIG_UINT_TYPE, BigUint),
+    (ESDT_TOKEN_IDENTIFIER_TYPE, EsdtTokenIdentifier),
     (MANAGED_ADDRESS_TYPE, ManagedAddress),
     (MANAGED_BYTE_ARRAY_TYPE, ManagedByteArray),
     (ESDT_TOKEN_PAYMENT_TYPE, EsdtTokenPayment),
@@ -544,10 +649,12 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
 
 class UnknownType(Exception):
     def __init__(self, type_name: str) -> None:
-        super().__init__(f'unknown type: {type_name}')
+        super().__init__(f"unknown type: {type_name}")
 
 
-def get_inner_type_handler(type_info: lldb.SBType, inner_type_index: int) -> Tuple[Handler, lldb.SBType]:
+def get_inner_type_handler(
+    type_info: lldb.SBType, inner_type_index: int
+) -> Tuple[Handler, lldb.SBType]:
     inner_type = type_info.GetTemplateArgumentType(inner_type_index).GetCanonicalType()
     handler = get_handler(inner_type.GetName())
     return handler, inner_type
@@ -567,7 +674,7 @@ def summarize_handler(handler_type: Type[Handler], valobj: SBValue, dictionary) 
 
 
 def __lldb_init_module(debugger: SBDebugger, dict):
-    python_module_name = Path(__file__).with_suffix('').name
+    python_module_name = Path(__file__).with_suffix("").name
 
     for rust_type, handler_class in MULTIVERSX_WASM_TYPE_HANDLERS:
         # Add summary binding
@@ -579,4 +686,4 @@ def __lldb_init_module(debugger: SBDebugger, dict):
         # print(f"Registered: {summary_command}")
 
     # Enable categories
-    debugger.HandleCommand('type category enable multiversx-sc')
+    debugger.HandleCommand("type category enable multiversx-sc")

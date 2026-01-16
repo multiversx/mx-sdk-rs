@@ -1,16 +1,16 @@
 use crate::{
     abi::TypeAbiFrom,
     codec::{
-        multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength,
-        TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
+        DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecodeMulti,
+        TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput, multi_types::MultiValue3,
     },
-    types::{EgldOrEsdtTokenIdentifier, ManagedVecRef},
+    types::{EgldOrEsdtTokenIdentifier, Ref},
 };
 
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
-    types::{BigUint, EgldOrEsdtTokenPayment, ManagedVecItem, TokenIdentifier},
+    types::{BigUint, EgldOrEsdtTokenPayment, EsdtTokenIdentifier, ManagedVecItem},
 };
 
 /// Thin wrapper around EgldOrEsdtTokenPayment, which has different I/O behaviour:
@@ -37,14 +37,14 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPaymentMultiValue<M> {
 impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPaymentMultiValue<M> {
     type PAYLOAD = <EgldOrEsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD;
     const SKIPS_RESERIALIZATION: bool = EgldOrEsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         EgldOrEsdtTokenPayment::read_from_payload(payload).into()
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -100,7 +100,7 @@ where
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        MultiValue3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
+        MultiValue3::<EsdtTokenIdentifier<M>, u64, BigUint<M>>::type_name()
     }
 
     fn type_name_rust() -> TypeName {

@@ -1,6 +1,6 @@
 use crate::{
     facade::ScenarioWorld,
-    scenario::{model::*, ScenarioRunner},
+    scenario::{ScenarioRunner, model::*},
 };
 
 use super::scenario_world::Backend;
@@ -13,10 +13,10 @@ impl ScenarioWorld {
                 if let Some(trace) = &mut cd_debugger.trace {
                     f(trace);
                 }
-            },
+            }
             Backend::VmGoBackend => {
                 panic!("the VM Go backend does not support step-by-step execution")
-            },
+            }
         }
     }
 }

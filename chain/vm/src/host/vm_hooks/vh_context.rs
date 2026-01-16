@@ -3,12 +3,12 @@ use std::{fmt::Debug, sync::MutexGuard};
 use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 
 use crate::{
-    blockchain::state::{AccountData, BlockInfo},
+    blockchain::state::{AccountData, BlockConfig},
     host::context::{
-        BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
+        BackTransfers, ManagedTypeContainer, TxErrorTrace, TxFunctionName, TxInput, TxLog, TxResult,
     },
     schedule::GasSchedule,
-    types::{VMAddress, VMCodeMetadata, H256},
+    types::{H256, VMAddress, VMCodeMetadata},
 };
 
 /// Abstracts away the borrowing of a managed types structure.
@@ -27,7 +27,7 @@ pub trait VMHooksContext: Debug {
     /// The offset and the length must point to valid instance memory.
     unsafe fn memory_store(&self, mem_ptr: MemPtr, data: &[u8]);
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer>;
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer>;
 
     fn gas_schedule(&self) -> &GasSchedule;
 
@@ -46,10 +46,31 @@ pub trait VMHooksContext: Debug {
     /// Random number generator, based on the blockchain randomness source.
     fn random_next_bytes(&self, length: usize) -> Vec<u8>;
 
-    fn result_lock(&self) -> MutexGuard<TxResult>;
+    fn result_lock(&self) -> MutexGuard<'_, TxResult>;
 
     fn push_tx_log(&self, tx_log: TxLog) {
         self.result_lock().result_logs.push(tx_log);
+    }
+
+    /// Logs an error, in 2 ways:
+    /// - in the `error_trace` field of the `TxResult`,
+    /// - in the standard log, at info level.
+    ///
+    /// TODO: call from more places in the codebase, similar to the Go VM.
+    ///
+    /// TODO: consider re-design in both Go and Rust VM,
+    /// the current implementation is very implementation-dependent.
+    fn log_error_trace(&mut self, trace_message: &str) {
+        let func_name = self.input_ref().func_name.clone();
+
+        log::info!("Error in {func_name}: {trace_message}");
+
+        let mut tx_result = self.result_lock();
+        tx_result.error_trace.push(TxErrorTrace {
+            function_name: func_name,
+            error_trace_message: trace_message.to_string(),
+            additional_info: Vec::new(),
+        });
     }
 
     fn storage_read(&self, key: &[u8]) -> Vec<u8> {
@@ -60,11 +81,9 @@ pub trait VMHooksContext: Debug {
 
     fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit>;
 
-    fn get_previous_block_info(&self) -> &BlockInfo;
+    fn get_block_config(&self) -> &BlockConfig;
 
-    fn get_current_block_info(&self) -> &BlockInfo;
-
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers>;
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers>;
 
     /// For ownership reasons, needs to return a clone.
     ///
@@ -87,7 +106,7 @@ pub trait VMHooksContext: Debug {
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
-    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit>;
+    ) -> Result<TxResult, VMHooksEarlyExit>;
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,

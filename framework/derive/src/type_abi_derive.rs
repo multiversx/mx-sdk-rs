@@ -1,7 +1,7 @@
 use crate::parse::attributes::extract_macro_attributes;
 
 use super::parse::attributes::extract_doc;
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 
 const BITFLAGS_PATH: &str = ":: __private :: PublicFlags :: Internal";
 const BITFLAGS_PRIMITIVE: &str = "Primitive";
@@ -71,7 +71,9 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
     let type_docs = extract_doc(ast.attrs.as_slice());
     let macro_attributes = extract_macro_attributes(ast.attrs.as_slice());
     if macro_attributes.is_empty() {
-        println!("Warning! {name_str} #[type_abi] implementation sees no derive traits. Make sure that the derive attribute comes after #[type_abi]");
+        println!(
+            "Warning! {name_str} #[type_abi] implementation sees no derive traits. Make sure that the derive attribute comes after #[type_abi]"
+        );
     }
 
     let type_description_impl = match &ast.data {
@@ -96,7 +98,7 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
                     }
                 }
             }
-        },
+        }
         syn::Data::Enum(data_enum) => {
             let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
             let enum_variant_snippets: Vec<proc_macro2::TokenStream> = data_enum
@@ -140,7 +142,7 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
                     }
                 }
             }
-        },
+        }
         syn::Data::Union(_) => panic!("Union not supported!"),
     };
 
@@ -186,7 +188,7 @@ pub fn get_discriminant(
                     value,
                 });
                 value
-            },
+            }
             _ => panic!("Only integer values as discriminants"), // theoretically covered by the compiler
         };
         return quote! { #lit};

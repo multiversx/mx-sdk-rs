@@ -39,7 +39,7 @@ pub enum InteractCliCommand {
     GetDeadline,
     #[command(
         name = "activation-timestamp",
-        about = "Block timestamp of the block where the contract got activated. If not specified in the constructor it is the the deploy block timestamp."
+        about = "Block timestamp of the block where the contract got activated. If not specified in the constructor it is the deploy block timestamp."
     )]
     GetActivationTimestamp,
     #[command(name = "max-funds", about = "Optional funding cap.")]
@@ -58,8 +58,8 @@ pub struct DeployArgs {
     #[arg(short = 'p', long = "ping-amount")]
     pub ping_amount: RustBigUint,
 
-    #[arg(short = 'd', long = "duration-in-seconds")]
-    pub duration_in_seconds: u64,
+    #[arg(short = 'd', long = "duration-ms")]
+    pub duration: u64,
 
     #[arg(short = 'a', long = "activation-timestamp")]
     pub opt_activation_timestamp: Option<u64>,

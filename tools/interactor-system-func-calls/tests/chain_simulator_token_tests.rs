@@ -160,7 +160,9 @@ async fn cs_builtin_func_tokens_test() {
     interact
         .check_nft_uris(&dynamic_nft_token_id, nonce, &uris)
         .await;
-    println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
+    println!(
+        "Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created."
+    );
 
     // metadata recreate with empty uris
     interact
@@ -180,7 +182,9 @@ async fn cs_builtin_func_tokens_test() {
     interact
         .check_nft_uris(&dynamic_nft_token_id, nonce, &[])
         .await;
-    println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
+    println!(
+        "Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created."
+    );
 }
 
 async fn change_to_dynamic_test() {
@@ -344,6 +348,9 @@ async fn get_token_properties() {
         .get_token_properties(dynamic_meta_esdt_token_id.as_bytes())
         .await;
 
+    assert!(token_properties.owner_address == interact.wallet_address.to_address());
+    assert!(token_properties.token_name == "TESTMETA");
+    assert!(token_properties.token_type == EsdtTokenType::DynamicMeta);
     assert!(token_properties.num_decimals == 18usize);
     assert!(!token_properties.is_paused);
     assert!(token_properties.can_upgrade);

@@ -11,27 +11,27 @@ use multiversx_sc_snippets::imports::*;
 
 const CODE_PATH: MxscPath = MxscPath::new("../output/payable-features.mxsc.json");
 
-pub async fn adder_cli() {
+pub async fn payable_features_cli() {
     env_logger::init();
 
     let config = Config::load_config();
 
-    let mut basic_interact = PayableInteract::new(config).await;
+    let mut payable_interact = PayableInteract::new(config).await;
 
     let cli = payable_interactor_cli::InteractCli::parse();
     match &cli.command {
         Some(payable_interactor_cli::InteractCliCommand::Deploy) => {
-            basic_interact.deploy().await;
-        },
+            payable_interact.deploy().await;
+        }
         Some(payable_interactor_cli::InteractCliCommand::AllTransfers) => {
-            basic_interact.check_all_transfers().await;
-        },
+            payable_interact.check_all_transfers().await;
+        }
         Some(payable_interactor_cli::InteractCliCommand::MultiTransferWithOneEGLD) => {
-            basic_interact
+            payable_interact
                 .check_multi_transfer_only_egld_transfer()
                 .await;
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
@@ -47,6 +47,9 @@ impl PayableInteract {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
             .use_chain_simulator(config.use_chain_simulator());
+
+        interactor
+            .set_current_dir_from_workspace("contracts/feature-tests/payable-features/interactor");
 
         let sc_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
         let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
@@ -70,6 +73,7 @@ impl PayableInteract {
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .init()
             .code(CODE_PATH)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewBech32Address)
             .run()
             .await;
@@ -91,7 +95,7 @@ impl PayableInteract {
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .payable_all_transfers()
             .payment(payment)
-            .returns(ReturnsResult)
+            .returns(ReturnsResultUnmanaged)
             .run()
             .await;
 

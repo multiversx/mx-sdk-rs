@@ -1,6 +1,4 @@
 {
-    "name": "panic",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",

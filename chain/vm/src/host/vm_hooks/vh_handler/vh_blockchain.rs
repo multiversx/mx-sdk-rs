@@ -134,29 +134,54 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn get_block_timestamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
 
-        Ok(self.context.get_current_block_info().block_timestamp as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_timestamp_millis
+            .to_seconds()
+            .as_u64_seconds() as i64)
     }
 
     pub fn get_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        self.get_block_timestamp().map(|t| t * 1000)
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
     }
 
     pub fn get_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
 
-        Ok(self.context.get_current_block_info().block_nonce as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_nonce as i64)
     }
 
     pub fn get_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
 
-        Ok(self.context.get_current_block_info().block_round as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_round as i64)
     }
 
     pub fn get_block_epoch(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_epoch)?;
 
-        Ok(self.context.get_current_block_info().block_epoch as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_epoch as i64)
     }
 
     pub fn get_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
@@ -165,7 +190,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.context.m_types_lock().mb_set(
             dest,
             self.context
-                .get_current_block_info()
+                .get_block_config()
+                .current_block_info
                 .block_random_seed
                 .to_vec(),
         );
@@ -175,29 +201,85 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn get_prev_block_timestamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
 
-        Ok(self.context.get_previous_block_info().block_timestamp as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_timestamp_millis
+            .to_seconds()
+            .as_u64_seconds() as i64)
     }
 
     pub fn get_prev_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
-        self.get_prev_block_timestamp().map(|t| t * 1000)
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
     }
 
     pub fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
 
-        Ok(self.context.get_previous_block_info().block_nonce as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_nonce as i64)
     }
 
     pub fn get_prev_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
 
-        Ok(self.context.get_previous_block_info().block_round as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_round as i64)
     }
 
     pub fn get_prev_block_epoch(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_epoch)?;
 
-        Ok(self.context.get_previous_block_info().block_epoch as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_epoch as i64)
+    }
+
+    pub fn get_epoch_start_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .epoch_start_block_info
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
+    }
+
+    pub fn get_epoch_start_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .epoch_start_block_info
+            .block_nonce as i64)
+    }
+
+    pub fn get_epoch_start_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .epoch_start_block_info
+            .block_round as i64)
     }
 
     pub fn get_prev_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
@@ -206,11 +288,18 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.context.m_types_lock().mb_set(
             dest,
             self.context
-                .get_previous_block_info()
+                .get_block_config()
+                .previous_block_info
                 .block_random_seed
                 .to_vec(),
         );
         Ok(())
+    }
+
+    pub fn get_block_round_time_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
+
+        Ok(self.context.get_block_config().block_round_time_ms as i64)
     }
 
     pub fn get_current_esdt_nft_nonce(

@@ -8,7 +8,7 @@ mod nft_module;
 #[type_abi]
 #[derive(TopEncode, TopDecode)]
 pub struct ExampleAttributes {
-    pub creation_timestamp: u64,
+    pub creation_timestamp: TimestampMillis,
 }
 
 #[multiversx_sc::contract]
@@ -27,7 +27,7 @@ pub trait NftMinter: nft_module::NftModule {
         royalties: BigUint,
         uri: ManagedBuffer,
         selling_price: BigUint,
-        opt_token_used_as_payment: OptionalValue<TokenIdentifier>,
+        opt_token_used_as_payment: OptionalValue<EsdtTokenIdentifier>,
         opt_token_used_as_payment_nonce: OptionalValue<u64>,
     ) {
         let token_used_as_payment = match opt_token_used_as_payment {
@@ -49,7 +49,7 @@ pub trait NftMinter: nft_module::NftModule {
         };
 
         let attributes = ExampleAttributes {
-            creation_timestamp: self.blockchain().get_block_timestamp(),
+            creation_timestamp: self.blockchain().get_block_timestamp_millis(),
         };
         self.create_nft_with_attributes(
             name,
@@ -70,7 +70,7 @@ pub trait NftMinter: nft_module::NftModule {
     fn claim_royalties_from_marketplace(
         &self,
         marketplace_address: ManagedAddress,
-        token_id: TokenIdentifier,
+        token_id: EsdtTokenIdentifier,
         token_nonce: u64,
     ) {
         let caller = self.blockchain().get_caller();

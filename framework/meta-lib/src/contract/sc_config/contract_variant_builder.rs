@@ -6,14 +6,18 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{ei::parse_check_ei, print_util::print_sc_config_main_deprecated, tools};
+use crate::{
+    ei::parse_check_ei,
+    print_util::print_sc_config_main_deprecated,
+    tools::{self, OpcodeVersion, RustcVersion},
+};
 
 use super::{
+    ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
+    ProxyConfigSerde, ScConfig, ScConfigSerde,
     contract_variant_settings::{parse_allocator, parse_stack_size},
     proxy_config::ProxyConfig,
     sc_config_model::SC_CONFIG_FILE_NAMES,
-    ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
-    ProxyConfigSerde, ScConfig, ScConfigSerde,
 };
 
 /// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.
@@ -82,10 +86,16 @@ impl ContractVariantBuilder {
                     kill_legacy_callback: cms.kill_legacy_callback,
                     profile: ContractVariantProfile::from_serde(&cms.profile),
                     std: cms.std.unwrap_or(default.settings.std),
+                    rustc_version: RustcVersion::from_opt_sc_config_serde(&cms.rustc_version),
                     rustc_target: cms
                         .rustc_target
                         .clone()
                         .unwrap_or_else(|| tools::build_target::default_target().to_owned()),
+                    opcode_version: cms.opcode_version.as_ref().map_or(
+                        default.settings.opcode_version,
+                        |v| OpcodeVersion::from_settings_str(v).expect("Invalid opcode version in contract variant settings; allowed values are '1' and '2'")
+                    ),
+                    wasm_opt_version: cms.wasm_opt_version.clone(),
                 },
                 ..default
             },
@@ -176,6 +186,8 @@ fn collect_add_endpoints(
 }
 
 fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAbi) -> ContractAbi {
+    let mut build_info = original_abi.build_info.clone();
+    build_info.rustc = Some(builder.settings.rustc_version.to_abi());
     let mut constructors = Vec::new();
     let mut upgrade_constructors = Vec::new();
     let mut endpoints = Vec::new();
@@ -187,14 +199,14 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
             multiversx_sc::abi::EndpointTypeAbi::Endpoint => endpoints.push(endpoint_abi),
             multiversx_sc::abi::EndpointTypeAbi::PromisesCallback => {
                 promise_callbacks.push(endpoint_abi)
-            },
+            }
         }
     }
     let has_callback = original_abi.has_callback
         && !builder.settings.external_view
         && !builder.settings.kill_legacy_callback;
     ContractAbi {
-        build_info: original_abi.build_info.clone(),
+        build_info,
         docs: original_abi.docs.clone(),
         name: original_abi.name.clone(),
         constructors,
@@ -280,7 +292,7 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                 alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
 
                 contract_builders = HashMap::from([(contract_id, contract_builder)]);
-            },
+            }
             None => {
                 let mut contract_builder = ContractVariantBuilder::default();
                 alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
@@ -289,7 +301,7 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                     proxy_config.path.to_string_lossy().to_string(),
                     contract_builder,
                 );
-            },
+            }
         }
 
         collect_and_process_endpoints(
@@ -387,7 +399,7 @@ impl ScConfig {
                     &config_serde,
                     original_abi,
                 ))
-            },
+            }
             Err(_) => None,
         }
     }

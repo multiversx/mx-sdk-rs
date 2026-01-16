@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
-use log::debug;
 use multiversx_sc_scenario::multiversx_sc::types::Address;
 use multiversx_sdk::data::account::Account;
 use multiversx_sdk::data::esdt::EsdtBalance;
@@ -58,7 +57,10 @@ where
             .expect("failed to retrieve account")
     }
 
-    pub(crate) async fn set_nonce_and_sign_tx(
+    /// Updates:
+    /// - the transaction with the nonce read from the network
+    /// - the sender's current_nonce
+    pub(crate) async fn set_tx_nonce_update_sender(
         &mut self,
         sender_address: &Address,
         transaction: &mut Transaction,
@@ -83,10 +85,17 @@ where
             .get_mut(sender_address)
             .expect("the wallet that was supposed to sign is not registered");
         sender.current_nonce = Some(nonce + 1);
+    }
+
+    pub(crate) fn sign_tx(&self, sender_address: &Address, transaction: &mut Transaction) {
+        // read
+        let sender = self
+            .sender_map
+            .get(sender_address)
+            .expect("the wallet that was supposed to sign is not registered");
 
         // sign
         let signature = sender.wallet.sign_tx(transaction);
         transaction.signature = Some(hex::encode(signature));
-        debug!("transaction {:#?}", transaction);
     }
 }

@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        ManagedBufferApiImpl, ManagedTypeApi,
+        CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
+        ManagedTypeApi, const_handles, use_raw_handle,
     },
     contract_base::CallValueWrapper,
     err_msg,
@@ -37,7 +37,7 @@ where
 /// Called initially in the generated code whenever `#[payable("<token identifier>")]` annotation is provided.
 ///
 /// Was never really used, expected to be deprecated/removed.
-pub fn payable_single_specific_token<A>(expected_tokend_identifier: &str)
+pub fn payable_single_specific_token<A>(expected_token_identifier: &str)
 where
     A: CallValueApi + ManagedTypeApi + ErrorApi,
 {
@@ -49,7 +49,7 @@ where
         use_raw_handle(const_handles::MBUF_TEMPORARY_1);
     A::managed_type_impl().mb_overwrite(
         expected_token_handle.clone(),
-        expected_tokend_identifier.as_bytes(),
+        expected_token_identifier.as_bytes(),
     );
     let transfer = transfers.get(0);
     if !A::managed_type_impl().mb_eq(

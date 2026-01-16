@@ -1,11 +1,13 @@
 use crate::{
     contract_base::TransferExecuteFailed,
-    types::{BigUint, EsdtTokenPayment, ManagedAddress, TokenIdentifier, TxFrom, TxToSpecified},
+    types::{
+        BigUint, EsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress, TxFrom, TxToSpecified,
+    },
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
-impl<Env> TxPayment<Env> for (TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>)
+impl<Env> TxPayment<Env> for (EsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>)
 where
     Env: TxEnv,
 {
@@ -22,6 +24,17 @@ where
         fc: FunctionCall<Env::Api>,
     ) -> Result<(), TransferExecuteFailed> {
         EsdtTokenPayment::from(self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        EsdtTokenPayment::from(self).perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]

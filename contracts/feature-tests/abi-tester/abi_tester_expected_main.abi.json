@@ -5,7 +5,9 @@
             "commitHash": "<commit hash here>",
             "commitDate": "<commit date here>",
             "channel": "Channel",
-            "short": "rustc <version> (<short hash> <date>)"
+            "host": "<host>",
+            "short": "rustc <version> (<short hash> <date>)",
+            "llvmVersion": "x.x"
         },
         "contractCrate": {
             "name": "abi-tester",
@@ -14,7 +16,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.59.0"
+            "version": "0.64.1"
         }
     },
     "docs": [
@@ -289,6 +291,25 @@
             "outputs": [
                 {
                     "type": "EsdtTokenData"
+                }
+            ]
+        },
+        {
+            "name": "time_types",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                },
+                {
+                    "type": "u64"
+                },
+                {
+                    "type": "u64"
+                },
+                {
+                    "type": "u64"
                 }
             ]
         },

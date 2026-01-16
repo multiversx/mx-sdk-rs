@@ -6,12 +6,13 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
-        self, multi_encode_iter_or_handle_err, EncodeErrorHandler, NestedDecode, NestedEncode,
-        TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        self, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti,
+        TopEncodeMultiOutput, multi_encode_iter_or_handle_err,
     },
     storage::{
+        StorageKey,
         mappers::source::{CurrentStorage, StorageAddress},
-        storage_set, StorageKey,
+        storage_set,
     },
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
@@ -146,11 +147,11 @@ where
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, A, T> {
+    pub fn iter(&self) -> Iter<'_, SA, A, T> {
         self.queue_mapper.iter()
     }
 
-    pub fn iter_from(&self, value: &T) -> Iter<SA, A, T> {
+    pub fn iter_from(&self, value: &T) -> Iter<'_, SA, A, T> {
         let node_id = self.get_node_id(value);
         self.queue_mapper.iter_from_node_id(node_id)
     }

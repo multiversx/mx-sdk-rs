@@ -1,4 +1,4 @@
-use multiversx_sc::codec::{top_encode_to_vec_u8_or_panic, TopEncode};
+use multiversx_sc::codec::{TopEncode, top_encode_to_vec_u8_or_panic};
 
 use crate::{
     scenario::model::{
@@ -96,7 +96,7 @@ impl CheckAccount {
                 };
 
                 self.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
-            },
+            }
             CheckEsdtMap::Equal(check_esdt_map) => {
                 if check_esdt_map.contents.contains_key(&token_id) {
                     let prev_entry = check_esdt_map.contents.get_mut(&token_id).unwrap();
@@ -108,7 +108,7 @@ impl CheckAccount {
                         },
                     }
                 }
-            },
+            }
         }
 
         self

@@ -126,8 +126,8 @@ pub trait ProxyTestFirst {
         match call_result {
             ManagedAsyncCallResult::Ok(cb_arg) => {
                 self.set_callback_info(cb_arg);
-            },
-            ManagedAsyncCallResult::Err(_) => {},
+            }
+            ManagedAsyncCallResult::Err(_) => {}
         }
     }
 

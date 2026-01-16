@@ -24,6 +24,34 @@ pub struct TypeDescriptionJson {
     pub fields: Vec<StructFieldDescriptionJson>,
 }
 
+impl From<&TypeDescriptionJson> for TypeDescription {
+    fn from(abi: &TypeDescriptionJson) -> Self {
+        let content_type = match abi.content_type.as_str() {
+            TYPE_DESCRIPTION_JSON_TYPE_NOT_SPECIFIED => TypeContents::NotSpecified,
+            TYPE_DESCRIPTION_JSON_TYPE_ENUM => TypeContents::Enum(
+                abi.variants
+                    .iter()
+                    .map(EnumVariantDescriptionJson::to_enum_variant_description)
+                    .collect(),
+            ),
+            TYPE_DESCRIPTION_JSON_TYPE_EXPLICIT_ENUM => TypeContents::ExplicitEnum(vec![]), // TODO: @Laur implement explicit enum
+            TYPE_DESCRIPTION_JSON_TYPE_STRUCT => TypeContents::Struct(
+                abi.fields
+                    .iter()
+                    .map(StructFieldDescriptionJson::to_struct_field_description)
+                    .collect(),
+            ),
+            _ => TypeContents::NotSpecified,
+        };
+        TypeDescription {
+            docs: abi.docs.iter().map(|line| line.to_string()).collect(),
+            names: TypeNames::new(),
+            contents: content_type,
+            macro_attributes: Vec::new(),
+        }
+    }
+}
+
 impl From<&TypeDescription> for TypeDescriptionJson {
     fn from(abi: &TypeDescription) -> Self {
         let content_type = match &abi.contents {
@@ -45,22 +73,22 @@ impl From<&TypeDescription> for TypeDescriptionJson {
                         .fields
                         .push(StructFieldDescriptionJson::from(field));
                 }
-            },
+            }
             TypeContents::Enum(variants) => {
                 for variant in variants {
                     type_desc_json
                         .variants
                         .push(EnumVariantDescriptionJson::from(variant));
                 }
-            },
+            }
             TypeContents::ExplicitEnum(variants) => {
                 for variant in variants {
                     type_desc_json
                         .variants
                         .push(EnumVariantDescriptionJson::from(variant));
                 }
-            },
-            _ => {},
+            }
+            _ => {}
         }
 
         type_desc_json

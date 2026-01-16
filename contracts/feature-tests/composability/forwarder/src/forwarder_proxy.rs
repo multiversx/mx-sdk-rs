@@ -158,7 +158,7 @@ where
 
     pub fn forward_sync_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -207,7 +207,7 @@ where
 
     pub fn forward_sync_retrieve_funds_with_accept_func<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
@@ -275,6 +275,7 @@ where
             .original_result()
     }
 
+    /// TODO: not tested, investigate 
     pub fn forward_async_accept_funds_half_payment<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
@@ -289,7 +290,7 @@ where
 
     pub fn forward_async_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -399,16 +400,16 @@ where
             .original_result()
     }
 
-    pub fn forward_transf_execu_accept_funds_with_fees<
+    pub fn forward_transf_exec_accept_funds_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
         percentage_fees: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .raw_call("forward_transf_execu_accept_funds_with_fees")
+            .raw_call("forward_transf_exec_accept_funds_with_fees")
             .argument(&to)
             .argument(&percentage_fees)
             .original_result()
@@ -433,7 +434,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue4<u64, u64, BigUint<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue3<u64, u64, TokenId<Env::Api>>> {
         self.wrapped_tx
             .raw_call("forward_transf_exec_accept_funds_return_values")
             .argument(&to)
@@ -572,7 +573,7 @@ where
     }
 
     pub fn get_fungible_esdt_balance<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -585,7 +586,7 @@ where
     }
 
     pub fn get_current_nft_nonce<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -599,7 +600,7 @@ where
 
     pub fn send_esdt<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
@@ -618,7 +619,7 @@ where
 
     pub fn send_esdt_with_fees<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -633,7 +634,7 @@ where
 
     pub fn send_esdt_twice<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<BigUint<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
     >(
@@ -655,7 +656,7 @@ where
 
     pub fn send_esdt_direct_multi_transfer<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -688,7 +689,7 @@ where
     }
 
     pub fn local_mint<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
@@ -704,7 +705,7 @@ where
     }
 
     pub fn local_burn<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
@@ -720,7 +721,7 @@ where
     }
 
     pub fn get_esdt_local_roles<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -734,7 +735,7 @@ where
 
     pub fn get_esdt_token_data<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
     >(
         self,
@@ -753,7 +754,7 @@ where
 
     pub fn is_esdt_frozen<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
     >(
         self,
@@ -771,7 +772,7 @@ where
     }
 
     pub fn is_esdt_paused<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -784,7 +785,7 @@ where
     }
 
     pub fn is_esdt_limited_transfer<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -797,7 +798,7 @@ where
     }
 
     pub fn validate_token_identifier<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -806,6 +807,93 @@ where
             .payment(NotPayable)
             .raw_call("validate_token_identifier")
             .argument(&token_id)
+            .original_result()
+    }
+
+    pub fn sync_call_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+    >(
+        self,
+        to: Arg0,
+        endpoint_name: Arg1,
+        args: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("sync_call_fallible")
+            .argument(&to)
+            .argument(&endpoint_name)
+            .argument(&args)
+            .original_result()
+    }
+
+    pub fn forward_sync_fallible_accept_funds_multi_transfer<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payment_args: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_fallible_accept_funds_multi_transfer")
+            .argument(&to)
+            .argument(&payment_args)
+            .original_result()
+    }
+
+    pub fn forward_sync_reject_funds_multi_transfer<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payment_args: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("forward_sync_reject_funds_multi_transfer")
+            .argument(&to)
+            .argument(&payment_args)
+            .original_result()
+    }
+
+    pub fn transfer_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        payments: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("transfer_fallible")
+            .argument(&to)
+            .argument(&payments)
+            .original_result()
+    }
+
+    /// Receiver needs to be an endpoint with no arguments, for simplicity. 
+    pub fn transfer_execute_fallible<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+    >(
+        self,
+        to: Arg0,
+        endpoint_name: Arg1,
+        payments: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("transfer_execute_fallible")
+            .argument(&to)
+            .argument(&endpoint_name)
+            .argument(&payments)
             .original_result()
     }
 
@@ -825,7 +913,7 @@ where
     }
 
     pub fn get_nft_balance<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
     >(
         self,
@@ -841,7 +929,7 @@ where
     }
 
     pub fn buy_nft<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
@@ -874,7 +962,7 @@ where
     }
 
     pub fn nft_create<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
@@ -905,7 +993,7 @@ where
     }
 
     pub fn nft_create_compact<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
         Arg2: ProxyArg<Color>,
     >(
@@ -924,7 +1012,7 @@ where
     }
 
     pub fn nft_add_uris<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
@@ -943,7 +1031,7 @@ where
     }
 
     pub fn nft_update_attributes<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<Color>,
     >(
@@ -962,13 +1050,13 @@ where
     }
 
     pub fn nft_decode_complex_attributes<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
         Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg5: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg6: ProxyArg<MultiValue5<BigUint<Env::Api>, ManagedBuffer<Env::Api>, TokenIdentifier<Env::Api>, bool, ManagedBuffer<Env::Api>>>,
+        Arg6: ProxyArg<MultiValue5<BigUint<Env::Api>, ManagedBuffer<Env::Api>, EsdtTokenIdentifier<Env::Api>, bool, ManagedBuffer<Env::Api>>>,
     >(
         self,
         token_identifier: Arg0,
@@ -993,7 +1081,7 @@ where
     }
 
     pub fn nft_add_quantity<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
@@ -1012,7 +1100,7 @@ where
     }
 
     pub fn nft_burn<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
@@ -1032,7 +1120,7 @@ where
 
     pub fn transfer_nft_via_async_call<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
     >(
@@ -1054,7 +1142,7 @@ where
 
     pub fn transfer_nft_and_execute<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
         Arg3: ProxyArg<BigUint<Env::Api>>,
         Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
@@ -1082,7 +1170,7 @@ where
 
     pub fn create_and_send<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<BigUint<Env::Api>>,
         Arg3: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg4: ProxyArg<BigUint<Env::Api>>,
@@ -1116,7 +1204,7 @@ where
 
     pub fn set_local_roles<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<MultiValueEncoded<Env::Api, EsdtLocalRole>>,
     >(
         self,
@@ -1135,7 +1223,7 @@ where
 
     pub fn unset_local_roles<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<MultiValueEncoded<Env::Api, EsdtLocalRole>>,
     >(
         self,
@@ -1195,7 +1283,7 @@ where
     }
 
     pub fn change_to_dynamic<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -1208,7 +1296,7 @@ where
     }
 
     pub fn update_token<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -1221,7 +1309,7 @@ where
     }
 
     pub fn modify_royalties<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<u64>,
     >(
@@ -1240,7 +1328,7 @@ where
     }
 
     pub fn set_new_uris<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
@@ -1259,7 +1347,7 @@ where
     }
 
     pub fn modify_creator<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
     >(
         self,
@@ -1275,7 +1363,7 @@ where
     }
 
     pub fn metadata_recreate<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg3: ProxyArg<u64>,
@@ -1306,7 +1394,7 @@ where
     }
 
     pub fn metadata_update<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
         Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg3: ProxyArg<u64>,
@@ -1338,7 +1426,7 @@ where
 
     pub fn last_issued_token(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EsdtTokenIdentifier<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("lastIssuedToken")
@@ -1368,7 +1456,7 @@ where
     >(
         self,
         index: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, TokenId<Env::Api>, u64, NonZeroBigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("callback_data_at_index")
@@ -1489,7 +1577,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg3: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1575,7 +1663,7 @@ where
 
     pub fn forward_sync_retrieve_funds_bt_multi<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1592,7 +1680,7 @@ where
     /// Highlights the behavior when calling back transfers **without** reset. 
     pub fn forward_sync_retrieve_funds_bt_multi_twice<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1609,7 +1697,7 @@ where
     /// Highlights the behavior when calling back transfers **with** reset. 
     pub fn forward_sync_retrieve_funds_bt_multi_twice_reset<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1661,8 +1749,8 @@ where
     Api: ManagedTypeApi,
 {
     pub callback_name: ManagedBuffer<Api>,
-    pub token_identifier: EgldOrEsdtTokenIdentifier<Api>,
+    pub token_identifier: TokenId<Api>,
     pub token_nonce: u64,
-    pub token_amount: BigUint<Api>,
+    pub token_amount: NonZeroBigUint<Api>,
     pub args: ManagedVec<Api, ManagedBuffer<Api>>,
 }

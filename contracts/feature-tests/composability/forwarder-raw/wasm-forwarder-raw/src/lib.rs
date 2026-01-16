@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           25
+// Endpoints:                           20
 // Async Callback:                       1
-// Total number of exported functions:  27
+// Total number of exported functions:  22
 
 #![no_std]
 
@@ -24,15 +24,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         clear_callback_info => clear_callback_info
         callback_args_at_index => callback_args_at_index
         callback_payment_at_index => callback_payment_at_index
-        forward_payment => forward_payment
-        forward_direct_esdt_via_transf_exec => forward_direct_esdt_via_transf_exec
-        forward_direct_esdt_multi => forward_direct_esdt_multi
         forward_async_call => forward_async_call
         forward_async_call_half_payment => forward_async_call_half_payment
-        forward_transf_exec_egld => forward_transf_exec_egld
-        forward_transf_exec_esdt => forward_transf_exec_esdt
-        forward_transf_exec => forward_transf_exec
-        forward_transf_exec_twice => forward_transf_exec_twice
         forward_async_retrieve_multi_transfer_funds => forward_async_retrieve_multi_transfer_funds
         forwarder_async_send_and_retrieve_multi_transfer_funds => forwarder_async_send_and_retrieve_multi_transfer_funds
         call_execute_on_dest_context => call_execute_on_dest_context
@@ -43,6 +36,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         deploy_from_source => deploy_from_source
         call_upgrade => call_upgrade
         call_upgrade_from_source => call_upgrade_from_source
+        forward_direct_transfer => forward_direct_transfer
+        forward_transf_exec => forward_transf_exec
     )
 }
 

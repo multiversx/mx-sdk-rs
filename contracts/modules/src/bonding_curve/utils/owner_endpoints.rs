@@ -19,7 +19,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn set_local_roles(
         &self,
         address: ManagedAddress,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
@@ -32,7 +32,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn unset_local_roles(
         &self,
         address: ManagedAddress,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         roles: MultiValueEncoded<EsdtLocalRole>,
     ) {
         self.send()
@@ -43,7 +43,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn set_bonding_curve<T>(
         &self,
-        identifier: TokenIdentifier,
+        identifier: EsdtTokenIdentifier,
         function: T,
         sell_availability: bool,
     ) where
@@ -79,7 +79,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         });
     }
 
-    fn deposit<T>(&self, payment_token: OptionalValue<TokenIdentifier>)
+    fn deposit<T>(&self, payment_token: OptionalValue<EsdtTokenIdentifier>)
     where
         T: CurveFunction<Self::Api>
             + TopEncode
@@ -102,7 +102,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 OptionalValue::Some(token) => set_payment = EgldOrEsdtTokenIdentifier::esdt(token),
                 OptionalValue::None => {
                     sc_panic!("Expected provided accepted_payment for the token");
-                },
+                }
             };
         }
         if self.token_details(identifier).is_empty() {
@@ -188,7 +188,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn set_curve_storage<T>(
         &self,
-        identifier: &TokenIdentifier,
+        identifier: &EsdtTokenIdentifier,
         amount: BigUint,
         payment_token_identifier: EgldOrEsdtTokenIdentifier,
     ) where

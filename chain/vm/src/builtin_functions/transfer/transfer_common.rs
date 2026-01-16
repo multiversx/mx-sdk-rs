@@ -6,7 +6,7 @@ use crate::{
     },
     host::execution,
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::{top_decode_u64, VMAddress},
+    types::{VMAddress, top_decode_u64},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -85,7 +85,7 @@ where
         execution::execute_default(exec_input, tx_cache, runtime, f);
 
     // prepends esdt log
-    tx_result.result_logs.insert(0, log);
+    tx_result.esdt_transfer_log = Some(log);
 
     (tx_result, blockchain_updates)
 }

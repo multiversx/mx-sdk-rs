@@ -200,6 +200,7 @@ type_abi_name_only!(u16, "u16");
 type_abi_name_only!(u32, "u32");
 type_abi_name_only!(usize, "u32");
 type_abi_name_only!(u64, "u64");
+type_abi_name_only!(u128, "u128");
 
 type_abi_name_only!(i8, "i8");
 type_abi_name_only!(i16, "i16");
@@ -212,6 +213,12 @@ type_abi_name_only!(bool, "bool");
 type_abi_name_only!(f64, "f64");
 
 // Unsigned integer types: the contract can return a smaller capacity result and and we can interpret it as a larger capacity type.
+
+impl TypeAbiFrom<u64> for u128 {}
+impl TypeAbiFrom<usize> for u128 {}
+impl TypeAbiFrom<u32> for u128 {}
+impl TypeAbiFrom<u16> for u128 {}
+impl TypeAbiFrom<u8> for u128 {}
 
 impl TypeAbiFrom<usize> for u64 {}
 impl TypeAbiFrom<u32> for u64 {}

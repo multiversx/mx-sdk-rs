@@ -10,14 +10,13 @@ use crate::{
 };
 
 use super::{
-    source::{CurrentStorage, StorageAddress},
     StorageMapper,
+    source::{CurrentStorage, StorageAddress},
 };
 
 use crate::codec::{
-    self,
+    self, NestedDecode, NestedEncode,
     derive::{TopDecode, TopEncode},
-    NestedDecode, NestedEncode,
 };
 
 pub type NodeId = u64;
@@ -358,13 +357,13 @@ where
 
                     let root_key = self.build_root_key();
                     storage_set(root_key.as_ref(), to_add);
-                },
+                }
                 None => {
                     let root_key = self.build_root_key();
 
                     storage_set(root_id_key.as_ref(), &Empty);
                     storage_set(root_key.as_ref(), &Empty);
-                },
+                }
             };
 
             return;

@@ -62,6 +62,58 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    /// TODO: it's duplicated in composability, de-duplicate after sorting out the interactors 
+    pub fn get_esdt_token_data<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+    >(
+        self,
+        address: Arg0,
+        token_id: Arg1,
+        nonce: Arg2,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue9<EsdtTokenType, BigUint<Env::Api>, bool, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedAddress<Env::Api>, BigUint<Env::Api>, ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_esdt_token_data")
+            .argument(&address)
+            .argument(&token_id)
+            .argument(&nonce)
+            .original_result()
+    }
+
+    pub fn epoch_info(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<DurationMillis, TimestampMillis, u64, u64>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("epoch_info")
+            .original_result()
+    }
+
+    pub fn code_hash<
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    >(
+        self,
+        address: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("code_hash")
+            .argument(&address)
+            .original_result()
+    }
+
+    /// Prev block timestamp (ms, then s), current block timestamp (ms, then s) 
+    pub fn get_block_timestamps(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<TimestampMillis, TimestampSeconds, TimestampMillis, TimestampSeconds>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("get_block_timestamps")
+            .original_result()
+    }
+
     pub fn verify_secp256r1_signature<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
@@ -156,7 +208,7 @@ where
     }
 
     pub fn token_has_transfer_role<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,

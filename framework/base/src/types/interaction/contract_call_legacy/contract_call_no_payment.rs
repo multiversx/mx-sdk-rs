@@ -6,15 +6,16 @@ use crate::{
     api::CallTypeApi,
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
-        EsdtTokenPayment, FunctionCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedVec, TokenIdentifier, Tx, TxScEnv,
+        EsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, ManagedVec, Tx, TxScEnv,
     },
 };
 
 use super::{
-    contract_call_trait::ContractCallBase, contract_call_with_egld::ContractCallWithEgld,
-    contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
-    ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt, UNSPECIFIED_GAS_LIMIT,
+    ContractCall, ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt,
+    UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
+    contract_call_with_egld::ContractCallWithEgld,
+    contract_call_with_multi_esdt::ContractCallWithMultiEsdt,
 };
 
 /// Holds metadata for calling another contract, without payments.
@@ -119,7 +120,7 @@ where
     )]
     pub fn add_esdt_token_transfer(
         self,
-        payment_token: TokenIdentifier<SA>,
+        payment_token: EsdtTokenIdentifier<SA>,
         payment_nonce: u64,
         payment_amount: BigUint<SA>,
     ) -> ContractCallWithMultiEsdt<SA, OriginalResult> {

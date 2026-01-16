@@ -95,6 +95,7 @@ fn forw_raw_init_sync_accept_egld_go() {
 }
 
 #[test]
+#[ignore = "log being changed (after supernova)"]
 fn forw_raw_init_sync_echo_go() {
     world().run("scenarios/forw_raw_init_sync_echo.scen.json");
 }
@@ -115,9 +116,13 @@ fn forw_raw_sync_egld_go() {
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_sync_fallible_go() {
     world().run("scenarios/forw_raw_sync_fallible.scen.json");
+}
+
+#[test]
+fn forw_raw_sync_fallible_legacy_go() {
+    world().run("scenarios/forw_raw_sync_fallible_legacy.scen.json");
 }
 
 #[test]
@@ -146,85 +151,71 @@ fn forw_raw_transf_exec_accept_egld_go() {
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_0_accept_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_0_accept.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_0_reject_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_0_reject.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_egld_accept_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_egld_accept.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_egld_reject_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_egld_reject.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_esdt_accept_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_esdt_accept.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_esdt_reject_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_esdt_reject.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_multi_egld_accept_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_multi_egld_accept.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_multi_egld_reject_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_multi_egld_reject.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_multi_esdt_accept_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_multi_esdt_accept.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_fallible_multi_esdt_reject_go() {
     world().run("scenarios/forw_raw_transf_exec_fallible_multi_esdt_reject.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transf_exec_reject_egld_go() {
     world().run("scenarios/forw_raw_transf_exec_reject_egld.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transfer_fallible_egld_go() {
     world().run("scenarios/forw_raw_transfer_fallible_egld.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transfer_fallible_multi_err_go() {
     world().run("scenarios/forw_raw_transfer_fallible_multi_err.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forw_raw_transfer_fallible_multi_ok_go() {
     world().run("scenarios/forw_raw_transfer_fallible_multi_ok.scen.json");
 }
@@ -346,13 +337,11 @@ fn forwarder_call_sync_accept_then_read_nft_go() {
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forwarder_call_sync_fallible_multi_transfer_egld_accept_go() {
     world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_accept.scen.json");
 }
 
 #[test]
-#[ignore = "requires Barnard"]
 fn forwarder_call_sync_fallible_multi_transfer_egld_reject_go() {
     world().run("scenarios/forwarder_call_sync_fallible_multi_transfer_egld_reject.scen.json");
 }
@@ -378,7 +367,6 @@ fn forwarder_call_sync_retrieve_bt_legacy_nft_go() {
 }
 
 #[test]
-#[ignore = "TODO: Barnard fixes a bug with this"]
 fn forwarder_call_sync_retrieve_bt_multi_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_bt_multi.scen.json");
 }
@@ -394,13 +382,11 @@ fn forwarder_call_sync_retrieve_bt_multi_esdt_go() {
 }
 
 #[test]
-#[ignore = "TODO: Barnard"]
 fn forwarder_call_sync_retrieve_bt_multi_twice_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_bt_multi_twice.scen.json");
 }
 
 #[test]
-#[ignore = "TODO: Barnard"]
 fn forwarder_call_sync_retrieve_bt_multi_twice_reset_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_bt_multi_twice_reset.scen.json");
 }
@@ -587,19 +573,16 @@ fn promises_call_async_accept_esdt_go() {
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_async_retrieve_egld_go() {
     world().run("scenarios/promises_call_async_retrieve_egld.scen.json");
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_async_retrieve_esdt_go() {
     world().run("scenarios/promises_call_async_retrieve_esdt.scen.json");
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_callback_directly_go() {
     world().run("scenarios/promises_call_callback_directly.scen.json");
 }

@@ -1,8 +1,8 @@
-use super::interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs};
 use super::InteractorStepRef;
+use super::interactor_multi_sc_process::{SenderSet, Txs, update_nonces_and_sign_tx};
 use crate::sdk::data::transaction::Transaction;
 use crate::sdk::gateway::GatewayAsyncService;
-use crate::{network_response, InteractorBase, StepBuffer};
+use crate::{InteractorBase, StepBuffer, network_response};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where

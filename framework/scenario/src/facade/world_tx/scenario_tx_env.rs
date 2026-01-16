@@ -1,7 +1,7 @@
 use multiversx_chain_scenario_format::interpret_trait::InterpreterContext;
-use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv, TxEnvWithTxHash, H256};
+use multiversx_sc::types::{H256, ManagedAddress, ManagedBuffer, TxEnv, TxEnvWithTxHash};
 
-use crate::{api::StaticApi, scenario_model::TxExpect, ScenarioWorld};
+use crate::{ScenarioWorld, api::StaticApi, scenario_model::TxExpect};
 
 /// Designates a tx environment suitable for running scenarios locally.
 pub trait ScenarioTxEnv: TxEnv {

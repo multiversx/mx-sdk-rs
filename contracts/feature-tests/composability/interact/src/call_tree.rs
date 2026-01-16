@@ -101,11 +101,11 @@ fn print_node(call_node: &CallNode, indent: usize) {
             for child in &fwd.children {
                 print_node(child, indent + 1);
             }
-        },
+        }
         CallNode::Vault(vault_rc) => {
             let vault = (**vault_rc).borrow();
             println!("{}", &vault.name)
-        },
+        }
     }
 }
 

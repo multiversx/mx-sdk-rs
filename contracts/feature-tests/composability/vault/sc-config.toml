@@ -17,9 +17,6 @@ add-unlabelled = false
 add-labels = ["upgrade"]
 
 [[proxy]]
-path = "../forwarder-barnard/src/vault_proxy.rs"
-
-[[proxy]]
 path = "../recursive-caller/src/vault_proxy.rs"
 
 [[proxy]]
