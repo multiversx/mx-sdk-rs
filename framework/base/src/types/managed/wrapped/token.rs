@@ -25,3 +25,6 @@ pub use payment::Payment;
 pub use payment_refs::PaymentRefs;
 pub use payment_vec::PaymentVec;
 pub use token_id::TokenId;
+
+/// The old representation of the EGLD token, before EGLD-000000.
+pub(crate) const LEGACY_EGLD_REPRESENTATION: &[u8; 4] = b"EGLD";

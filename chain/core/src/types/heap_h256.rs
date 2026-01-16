@@ -149,7 +149,7 @@ impl HeapH256 {
     pub fn into_boxed_bytes(self) -> BoxedBytes {
         let raw = Box::into_raw(self.0) as *mut u8;
         unsafe {
-            let bytes_box = Box::<[u8]>::from_raw(core::slice::from_raw_parts_mut(raw, 32));
+            let bytes_box = Box::<[u8]>::from_raw(core::ptr::slice_from_raw_parts_mut(raw, 32));
             bytes_box.into()
         }
     }

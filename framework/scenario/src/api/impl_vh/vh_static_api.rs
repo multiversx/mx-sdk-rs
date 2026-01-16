@@ -71,6 +71,10 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot log events in the StaticApi")
     }
 
+    fn log_error_trace(&mut self, trace_message: &str) {
+        log::info!("Error in StaticApi: {trace_message}");
+    }
+
     fn storage_read_any_address(&self, _address: &VMAddress, _key: &[u8]) -> Vec<u8> {
         panic!("cannot access the storage in the StaticApi")
     }
