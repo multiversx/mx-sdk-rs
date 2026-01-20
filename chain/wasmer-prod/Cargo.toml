@@ -22,14 +22,14 @@ version = "=0.21.1"
 path = "../vm"
 
 [dependencies.multiversx-chain-vm-executor]
-version = "0.5.0"
+version = "=0.5.1"
 
 [dependencies.multiversx-chain-vm-executor-wasmer]
-version = "0.5.0"
+version = "=0.5.1"
 default-features = false
 features = ["multiversx-chain-vm-executor-published"]
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "981d9ce0dbfe2b36322eee09ff76f6ad2a40d817"
+rev = "5f5671d918c8cbcf62d5134eb33762e677aea709"
 
 [workspace]
 members = ["."]
