@@ -21,7 +21,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: 1.92
 
       - name: Run gas tests (prod)
         run: |
@@ -38,7 +38,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: 1.92
 
       - name: Run gas tests (prod)
         run: |
