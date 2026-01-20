@@ -29,7 +29,7 @@ version = "=0.5.1"
 default-features = false
 features = ["multiversx-chain-vm-executor-published"]
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "5f5671d918c8cbcf62d5134eb33762e677aea709"
+rev = "7d1db051c1ed07a914906588831a4f8779f3b0df"
 
 [workspace]
 members = ["."]
