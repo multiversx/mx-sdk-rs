@@ -55,7 +55,7 @@ version = "0.25.0"
 path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-chain-vm-executor]
-version = "0.5.0"
+version = "=0.5.1"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.21.1"

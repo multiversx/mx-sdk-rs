@@ -110,15 +110,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "android_system_properties"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "819e7219dbd41043ac279b19830f2efc897156490d7fd6ea916720117ee66311"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "anes"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -255,7 +246,7 @@ dependencies = [
  "serial_test",
  "system-sc-interact",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -276,7 +267,7 @@ dependencies = [
  "serde",
  "serial_test",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -557,19 +548,6 @@ dependencies = [
  "child",
  "multiversx-sc",
  "multiversx-sc-meta-lib",
-]
-
-[[package]]
-name = "chrono"
-version = "0.4.42"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "145052bdd345b87320e369255277e3fb5152762ad123a901ef5c262dd38fe8d2"
-dependencies = [
- "iana-time-zone",
- "js-sys",
- "num-traits",
- "wasm-bindgen",
- "windows-link",
 ]
 
 [[package]]
@@ -1048,7 +1026,7 @@ dependencies = [
  "multiversx-sc-snippets",
  "serde",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -1610,7 +1588,7 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -2086,7 +2064,7 @@ dependencies = [
  "payable-interactor",
  "serde",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -2318,30 +2296,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "iana-time-zone"
-version = "0.1.64"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33e57f83510bb73707521ebaffa789ec8caf86f9657cad665b092b581d40e9fb"
-dependencies = [
- "android_system_properties",
- "core-foundation-sys",
- "iana-time-zone-haiku",
- "js-sys",
- "log",
- "wasm-bindgen",
- "windows-core",
-]
-
-[[package]]
-name = "iana-time-zone-haiku"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f31827a206f56af32e590ba56d5d2d085f558508192593743f16b2306495269f"
-dependencies = [
- "cc",
-]
-
-[[package]]
 name = "icu_collections"
 version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2515,7 +2469,7 @@ dependencies = [
  "multiversx-sc-snippets",
  "serde",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -3005,7 +2959,7 @@ dependencies = [
  "multiversx-sc-snippets",
  "serde",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -3073,26 +3027,24 @@ dependencies = [
  "serde",
  "sha2",
  "sha3",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
 name = "multiversx-chain-vm-executor"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cfb36050709604abee7d7896ad890358692245ddd406adcbce9d717b06c6cdf"
+checksum = "b72af69cd251075c0bc020ea72f0d2056ac0966fc17aced17b866a5324536e28"
 dependencies = [
  "serde",
- "toml 0.7.8",
 ]
 
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer-experimental"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fab0ca1253078cb8f52bdb59967c0c3b07c0dc4b34125bba58c60de8b70cb6c"
+checksum = "b9a714b389463294ca1f9c8895804a6a2bac11b9609aaeabe633cfb033ac62f7"
 dependencies = [
- "chrono",
  "log",
  "loupe",
  "multiversx-chain-vm-executor",
@@ -3200,7 +3152,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
  "zip",
 ]
 
@@ -3218,7 +3170,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
  "wasmparser 0.243.0",
  "wasmprinter",
  "wat",
@@ -3724,7 +3676,7 @@ dependencies = [
  "serde",
  "serial_test",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -3816,7 +3768,7 @@ dependencies = [
  "ping-pong-egld",
  "serde",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -4864,15 +4816,6 @@ dependencies = [
 
 [[package]]
 name = "serde_spanned"
-version = "0.6.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf41e0cfaf7226dca15e8197172c295a782857fcb97fad1808a166870dee75a3"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "serde_spanned"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8bbf91e5a4d6315eee45e704372590b30e260ee83af6639d64557f51b067776"
@@ -5186,7 +5129,7 @@ dependencies = [
  "multiversx-sc-snippets",
  "serde",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -5284,7 +5227,7 @@ dependencies = [
  "serde",
  "serial_test",
  "tokio",
- "toml 0.9.11+spec-1.1.0",
+ "toml",
 ]
 
 [[package]]
@@ -5429,25 +5372,13 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.7.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd79e69d3b627db300ff956027cc6c3798cef26d22526befdfcd12feeb6d2257"
-dependencies = [
- "serde",
- "serde_spanned 0.6.9",
- "toml_datetime 0.6.11",
- "toml_edit",
-]
-
-[[package]]
-name = "toml"
 version = "0.9.11+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3afc9a848309fe1aaffaed6e1546a7a14de1f935dc9d89d32afd9a44bab7c46"
 dependencies = [
  "indexmap",
  "serde_core",
- "serde_spanned 1.0.4",
+ "serde_spanned",
  "toml_datetime 0.7.5+spec-1.1.0",
  "toml_parser",
  "toml_writer",
@@ -5459,9 +5390,6 @@ name = "toml_datetime"
 version = "0.6.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22cddaf88f4fbc13c51aebbf5f8eceb5c7c5a9da2ac40a13519eb5b0a0e8f11c"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "toml_datetime"
@@ -5479,8 +5407,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b5bb770da30e5cbfde35a2d7b9b8a2c4b8ef89548a7a6aeab5c9a576e3e7421"
 dependencies = [
  "indexmap",
- "serde",
- "serde_spanned 0.6.9",
  "toml_datetime 0.6.11",
  "winnow 0.5.40",
 ]
@@ -6120,41 +6046,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.62.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8e83a14d34d0623b51dce9581199302a221863196a1dde71a7663a4c2be9deb"
-dependencies = [
- "windows-implement",
- "windows-interface",
- "windows-link",
- "windows-result",
- "windows-strings",
-]
-
-[[package]]
-name = "windows-implement"
-version = "0.60.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "053e2e040ab57b9dc951b72c264860db7eb3b0200ba345b4e4c3b14f67855ddf"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.114",
-]
-
-[[package]]
-name = "windows-interface"
-version = "0.59.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f316c4a2570ba26bbec722032c4099d8c8bc095efccdc15688708623367e358"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.114",
 ]
 
 [[package]]
