@@ -58,6 +58,17 @@ And crate group being released requires all crate groups downstream to be releas
 ## Version history
 
 
+### [sc 0.64.1, chain 0.21.1, sdk 0.14.1] - 2026-01-13
+- `TokenId` backwards compatibility conversions:
+	- Converting empty token identifiers, as well as `EGLD` to `EGLD-000000`;
+	- Converting not only upon decode, but also in constructors and conversions (`from`);
+	- Added an unsafe unchecked constructor;
+	- The same conversions apply to `EgldOrEsdtTokenIdentifier`.
+- Debugger fixes:
+	- Fixed error messages when using the `StaticApi`. Following changes to the VM a few releases ago, the error messages were being swallowed by the API.
+	- Fixed a crash caused by the error trace in the `StaticApi`.
+
+
 ### [sc 0.64.0, codec 0.24.0, chain 0.21.0, sdk 0.14.0, scenario-format 0.25.0] - 2025-12-18
 - Switched to Rust edition 2024, minimum compiler version becomes 1.85.
 - New payments API:

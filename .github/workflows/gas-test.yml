@@ -12,16 +12,19 @@ permissions:
 
 jobs:
   gas_test_prod:
-    name: Gas test (prod wasmer)
+    name: Gas test (prod wasmer) - Rust ${{ matrix.toolchain }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: ["1.92", "1.85"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: ${{ matrix.toolchain }}
 
       - name: Run gas tests (prod)
         run: |
@@ -29,16 +32,19 @@ jobs:
           cargo test --features wasmer-prod 
           
   gas_test_experimental:    
-    name: Gas test (experimental wasmer)
+    name: Gas test (experimental wasmer) - Rust ${{ matrix.toolchain }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: ["1.92", "1.85"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: ${{ matrix.toolchain }}
 
       - name: Run gas tests (prod)
         run: |

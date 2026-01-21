@@ -3,12 +3,16 @@ use crowdfunding::crowdfunding_proxy;
 use multiversx_sc_scenario::imports::*;
 
 const CF_DEADLINE: TimestampMillis = TimestampMillis::new(7 * 24 * 60 * 60 * 1000); // 1 week in milliseconds
-const CF_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("CROWD-123456");
+
 const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const SECOND_USER_ADDRESS: TestAddress = TestAddress::new("second-user");
+
 const CODE_PATH: MxscPath = MxscPath::new("output/crowdfunding.mxsc.json");
 const CROWDFUNDING_ADDRESS: TestSCAddress = TestSCAddress::new("crowdfunding-sc");
+
+const CF_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("CROWD-123456");
+const OTHER_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("OTHER-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
@@ -18,11 +22,11 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-struct CrowdfundingESDTTestState {
+struct CrowdfundingTestState {
     world: ScenarioWorld,
 }
 
-impl CrowdfundingESDTTestState {
+impl CrowdfundingTestState {
     fn new() -> Self {
         let mut world = world();
 
@@ -32,7 +36,8 @@ impl CrowdfundingESDTTestState {
             .account(FIRST_USER_ADDRESS)
             .nonce(1)
             .balance(1000)
-            .esdt_balance(CF_TOKEN_ID, 1000);
+            .esdt_balance(CF_TOKEN_ID, 1000)
+            .esdt_balance(OTHER_TOKEN_ID, 1000);
 
         world
             .account(SECOND_USER_ADDRESS)
@@ -47,7 +52,7 @@ impl CrowdfundingESDTTestState {
             .tx()
             .from(OWNER_ADDRESS)
             .typed(crowdfunding_proxy::CrowdfundingProxy)
-            .init(2_000u32, CF_DEADLINE, CF_TOKEN_ID)
+            .init(CF_TOKEN_ID, 2_000u32, CF_DEADLINE)
             .code(CODE_PATH)
             .new_address(CROWDFUNDING_ADDRESS)
             .run();
@@ -60,11 +65,11 @@ impl CrowdfundingESDTTestState {
             .to(CROWDFUNDING_ADDRESS)
             .typed(crowdfunding_proxy::CrowdfundingProxy)
             .fund()
-            .egld_or_single_esdt(
-                &EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
+            .payment(Payment::new(
+                CF_TOKEN_ID.as_str().into(),
                 0u64,
-                &multiversx_sc::proxy_imports::BigUint::from(amount),
-            )
+                NonZeroBigUint::try_from(amount as u128).unwrap(),
+            ))
             .run();
     }
 
@@ -112,8 +117,8 @@ impl CrowdfundingESDTTestState {
 }
 
 #[test]
-fn test_fund() {
-    let mut state = CrowdfundingESDTTestState::new();
+fn test_fund_esdt() {
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     state.fund(FIRST_USER_ADDRESS, 1_000u64);
@@ -121,16 +126,16 @@ fn test_fund() {
 }
 
 #[test]
-fn test_status() {
-    let mut state = CrowdfundingESDTTestState::new();
+fn test_status_esdt() {
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     state.check_status(crowdfunding_proxy::Status::FundingPeriod);
 }
 
 #[test]
-fn test_sc_error() {
-    let mut state = CrowdfundingESDTTestState::new();
+fn test_sc_error_esdt() {
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     state
@@ -140,7 +145,11 @@ fn test_sc_error() {
         .to(CROWDFUNDING_ADDRESS)
         .typed(crowdfunding_proxy::CrowdfundingProxy)
         .fund()
-        .egld(1000)
+        .payment(Payment::new(
+            OTHER_TOKEN_ID.as_str().into(),
+            0,
+            NonZeroBigUint::try_from(1000u128).unwrap(),
+        ))
         .with_result(ExpectError(4, "wrong token"))
         .run();
 
@@ -148,8 +157,8 @@ fn test_sc_error() {
 }
 
 #[test]
-fn test_successful_cf() {
-    let mut state = CrowdfundingESDTTestState::new();
+fn test_successful_cf_esdt() {
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     // first user fund
@@ -185,8 +194,8 @@ fn test_successful_cf() {
 }
 
 #[test]
-fn test_failed_cf() {
-    let mut state = CrowdfundingESDTTestState::new();
+fn test_failed_cf_esdt() {
+    let mut state = CrowdfundingTestState::new();
     state.deploy();
 
     // first user fund

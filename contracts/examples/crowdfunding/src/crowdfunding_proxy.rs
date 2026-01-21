@@ -44,21 +44,21 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<TimestampMillis>,
-        Arg2: ProxyArg<TokenId<Env::Api>>,
+        Arg0: ProxyArg<TokenId<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<TimestampMillis>,
     >(
         self,
-        target: Arg0,
-        deadline: Arg1,
-        token_identifier: Arg2,
+        token_identifier: Arg0,
+        target: Arg1,
+        deadline: Arg2,
     ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_deploy()
+            .argument(&token_identifier)
             .argument(&target)
             .argument(&deadline)
-            .argument(&token_identifier)
             .original_result()
     }
 }
@@ -138,12 +138,12 @@ where
             .original_result()
     }
 
-    pub fn cf_token_identifier(
+    pub fn cf_token_id(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenId<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("getCrowdfundingTokenIdentifier")
+            .raw_call("getCrowdfundingTokenId")
             .original_result()
     }
 }

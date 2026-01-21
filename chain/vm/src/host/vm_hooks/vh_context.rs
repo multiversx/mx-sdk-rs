@@ -5,7 +5,7 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooksEarlyExit};
 use crate::{
     blockchain::state::{AccountData, BlockConfig},
     host::context::{
-        BackTransfers, ManagedTypeContainer, TxFunctionName, TxInput, TxLog, TxResult,
+        BackTransfers, ManagedTypeContainer, TxErrorTrace, TxFunctionName, TxInput, TxLog, TxResult,
     },
     schedule::GasSchedule,
     types::{H256, VMAddress, VMCodeMetadata},
@@ -50,6 +50,27 @@ pub trait VMHooksContext: Debug {
 
     fn push_tx_log(&self, tx_log: TxLog) {
         self.result_lock().result_logs.push(tx_log);
+    }
+
+    /// Logs an error, in 2 ways:
+    /// - in the `error_trace` field of the `TxResult`,
+    /// - in the standard log, at info level.
+    ///
+    /// TODO: call from more places in the codebase, similar to the Go VM.
+    ///
+    /// TODO: consider re-design in both Go and Rust VM,
+    /// the current implementation is very implementation-dependent.
+    fn log_error_trace(&mut self, trace_message: &str) {
+        let func_name = self.input_ref().func_name.clone();
+
+        log::info!("Error in {func_name}: {trace_message}");
+
+        let mut tx_result = self.result_lock();
+        tx_result.error_trace.push(TxErrorTrace {
+            function_name: func_name,
+            error_trace_message: trace_message.to_string(),
+            additional_info: Vec::new(),
+        });
     }
 
     fn storage_read(&self, key: &[u8]) -> Vec<u8> {
