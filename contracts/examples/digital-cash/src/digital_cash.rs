@@ -54,7 +54,7 @@ pub trait DigitalCash:
             if fee == 0 {
                 continue;
             }
-            let collected_fee = Payment::new(token, 0, NonZeroBigUint::new(fee).unwrap());
+            let collected_fee = Payment::new(token, 0, NonZeroBigUint::new_or_panic(fee));
 
             collected_esdt_fees.push(collected_fee);
         }

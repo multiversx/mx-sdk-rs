@@ -5,7 +5,6 @@ use multiversx_sc::{derive_imports::*, imports::*};
 pub struct DepositInfo<M: ManagedTypeApi> {
     pub depositor_address: ManagedAddress<M>,
     pub funds: ManagedVec<M, Payment<M>>,
-    pub valability: u64,
     pub expiration_round: u64,
     pub fees: Fee<M>,
 }

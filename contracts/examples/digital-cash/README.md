@@ -10,7 +10,7 @@ The contract allows funding any number of tokens in 1 call within an address und
 
 In order to fund one should first call `deposit_fees` depositing the fee funds as `eGLD` within the contract. Only after, if the fees cover the transfer of the certain number of tokens, it is possible to deposit the funds, making them available for claiming or forwarding.
 
-`fund` after making sure everything is ok on the fee aspect will set up the `deposit` storage increasing the number of tokens to transfer by the number of tokens paid to the endpoint and set the expiration date by the number of rounds specified within the `valability` parameter.
+`fund` after making sure everything is ok on the fee aspect will set up the `deposit` storage increasing the number of tokens to transfer by the number of tokens paid to the endpoint and set the expiration date by the number of rounds specified within the `availability` parameter.
 
 The fees are unique per address and only cover one instance of transfer, either if it is a `claim` or a `forward`, per number of tokens transferred. Only by making one of these actions will consume the fee funds following to to refund the rest of the fees to the depositor.
 

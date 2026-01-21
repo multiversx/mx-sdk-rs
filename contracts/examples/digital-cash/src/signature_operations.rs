@@ -121,8 +121,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
             );
 
             target_deposit.fees.num_token_to_transfer += num_tokens;
-            target_deposit.valability = current_deposit.valability;
-            target_deposit.expiration_round = self.get_expiration_round(current_deposit.valability);
+            target_deposit.expiration_round = current_deposit.expiration_round;
             target_deposit.funds = current_deposit.funds;
         });
 

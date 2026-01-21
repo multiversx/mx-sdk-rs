@@ -4,10 +4,10 @@ use crate::{constants::*, helpers, storage};
 
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
-    /// Pays the required fee and funds a deposit for the given address with specified valability.
+    /// Pays the required fee and funds a deposit for the given address with specified availability.
     #[endpoint(payFeeAndFund)]
     #[payable]
-    fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
+    fn pay_fee_and_fund(&self, address: ManagedAddress, availability: u64) {
         let mut payments = self.call_value().all().clone_value();
         require!(!payments.is_empty(), "no payment was provided");
 
@@ -43,12 +43,12 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
 
         let caller_address = self.blockchain().get_caller();
         self.update_fees(caller_address, &address, fee_payment_for_deposit);
-        self.make_fund(payments, address, valability)
+        self.make_fund(payments, address, availability)
     }
 
     #[endpoint]
     #[payable]
-    fn fund(&self, address: ManagedAddress, valability: u64) {
+    fn fund(&self, address: ManagedAddress, availability: u64) {
         require!(!self.deposit(&address).is_empty(), FEES_NOT_COVERED_ERR_MSG);
         let deposit_mapper = self.deposit(&address).get();
         let depositor = deposit_mapper.depositor_address;
@@ -68,7 +68,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
             deposited_fee_token.amount.as_big_uint(),
         );
 
-        self.make_fund(payment, address, valability);
+        self.make_fund(payment, address, availability);
     }
 
     #[endpoint(depositFees)]

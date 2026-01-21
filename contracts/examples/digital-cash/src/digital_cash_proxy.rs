@@ -126,19 +126,19 @@ where
             .original_result()
     }
 
-    /// Pays the required fee and funds a deposit for the given address with specified valability. 
+    /// Pays the required fee and funds a deposit for the given address with specified availability. 
     pub fn pay_fee_and_fund<
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
-        valability: Arg1,
+        availability: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("payFeeAndFund")
             .argument(&address)
-            .argument(&valability)
+            .argument(&availability)
             .original_result()
     }
 
@@ -148,12 +148,12 @@ where
     >(
         self,
         address: Arg0,
-        valability: Arg1,
+        availability: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("fund")
             .argument(&address)
-            .argument(&valability)
+            .argument(&availability)
             .original_result()
     }
 
@@ -238,7 +238,7 @@ where
 {
     pub depositor_address: ManagedAddress<Api>,
     pub funds: ManagedVec<Api, Payment<Api>>,
-    pub valability: u64,
+    pub availability: u64,
     pub expiration_round: u64,
     pub fees: Fee<Api>,
 }
