@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        toolchain: ["1.92", "1.88"]
+        toolchain: ["1.92", "1.85"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v5

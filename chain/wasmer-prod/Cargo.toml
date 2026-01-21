@@ -28,7 +28,7 @@ version = "=0.5.1"
 version = "=0.5.1"
 default-features = false
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "7d1db051c1ed07a914906588831a4f8779f3b0df"
+rev = "a5bc70f36589fee26cd75e70f7a1785a9d63c8f2"
 
 [workspace]
 members = ["."]
