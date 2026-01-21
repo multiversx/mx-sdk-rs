@@ -238,7 +238,6 @@ where
 {
     pub depositor_address: ManagedAddress<Api>,
     pub funds: ManagedVec<Api, Payment<Api>>,
-    pub availability: u64,
     pub expiration_round: u64,
     pub fees: Fee<Api>,
 }
