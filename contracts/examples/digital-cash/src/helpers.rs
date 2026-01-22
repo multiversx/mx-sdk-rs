@@ -1,8 +1,8 @@
 use multiversx_sc::imports::*;
 
 use crate::{
-    digital_cash_err_msg::*,
     deposit_info::{DepositInfo, Fee},
+    digital_cash_err_msg::*,
     storage,
 };
 #[multiversx_sc::module]

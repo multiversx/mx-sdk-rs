@@ -3,8 +3,8 @@
 
 use multiversx_sc::imports::*;
 
-mod digital_cash_err_msg;
 mod deposit_info;
+mod digital_cash_err_msg;
 pub mod digital_cash_proxy;
 mod helpers;
 mod pay_fee_and_fund;
