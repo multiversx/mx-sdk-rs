@@ -1,29 +1,68 @@
 # Digital Cash Contract
 
-The basic idea of MultiversX Digital Cash is that ONE link can hold information (ESDT tokens, EGLD) on chain, this link can be sent from one person to another, there is no need to hold any wallet to receive, consume and send it forward to another person.
+The basic idea of MultiversX Digital Cash is that a cryptographic check (represented by a blockchain address) can hold tokens (ESDT or EGLD) on-chain. This check can be transferred from one person to another through a simple link. The recipient doesn't need a wallet initially - they just need to prove ownership of the check's private key through an ED25519 signature to claim the funds.
 
-# Usage
+## Overview
 
-## Covering up payment fees & funding
+Each deposit is stored at a specific address (the check address). To claim funds:
+1. The recipient must provide a valid ED25519 signature proving they control the check address's private key
+2. The deposit must not have expired
+3. Fees must have been paid upfront by the depositor
 
-The contract allows funding any number of tokens in 1 call within an address under a validity if the fee cost was covered.
+## Fee System
 
-In order to fund one should first call `deposit_fees` depositing the fee funds as `eGLD` within the contract. Only after, if the fees cover the transfer of the certain number of tokens, it is possible to deposit the funds, making them available for claiming or forwarding.
+The contract owner whitelists tokens that can be used to pay fees. Each whitelisted token has a configurable per-token-transfer fee. Fees must be paid upfront when creating a deposit and cover the cost of transferring all deposited tokens.
 
-`fund` after making sure everything is ok on the fee aspect will set up the `deposit` storage increasing the number of tokens to transfer by the number of tokens paid to the endpoint and set the expiration date by the number of rounds specified within the `availability` parameter.
+## Creating Deposits
 
-The fees are unique per address and only cover one instance of transfer, either if it is a `claim` or a `forward`, per number of tokens transferred. Only by making one of these actions will consume the fee funds following to to refund the rest of the fees to the depositor.
+### Option 1: `payFeeAndFund` (One-Step)
+The primary way to create a deposit. This endpoint accepts multiple payments where:
+- **First payment**: Contains the fee (and optionally funds as well)
+  - Can be exactly the fee amount for the remaining tokens
+  - Can exceed the fee to include both fee and funds in one payment
+- **Remaining payments**: All considered as funds to deposit
 
-## Claiming funds
+Parameters:
+- `address`: The check address where funds will be stored
+- `expiration`: Timestamp in milliseconds when the deposit expires
 
-Claiming the funds requires the signature parameter to be valid. Next, the round will be checked to be greater than the `expiration_round` within the deposit. Once this requirement is fulfilled, the funds will be sent to the caller and the remainder of the fee funds sent back to the depositor.
+### Option 2: `depositFees` + `fund` (Two-Step)
+Alternative approach for more complex scenarios:
+1. First call `depositFees` to pay the fee in a whitelisted token
+2. Then call `fund` to deposit the actual tokens (must be same depositor)
 
-## Withdrawing funds
+The `fund` endpoint verifies that sufficient fees have been paid to cover the number of tokens being deposited.
 
-If the validity of a deposit has expired it can no longer be claimed. Anyone at this point can call `withdraw`, making the funds go back to the depositor together with the unused fee funds.
+## Claiming Funds
 
-## Forwarding funds
+Use the `claim` endpoint with:
+- `address`: The check address containing the deposit
+- `signature`: ED25519 signature proving ownership of the check's private key
 
-Funds can be forwarded to another address using the signature, but the forwarded address requires to have the fees covered. This action will also consume the funds from the initial address.
+The signature is verified against the check address and the caller's address. If valid and the deposit hasn't expired:
+- All deposited funds are transferred to the caller
+- Fees for the transfer are deducted and collected by the contract
+- Remaining unused fees are returned to the original depositor
 
-After the forward, in case of a withdrawal, the funds will go to the `depositor_address` set within the `forwarded_address` deposit storage.
+**Important**: The deposit must not be expired (current timestamp must be before the expiration timestamp).
+
+## Withdrawing Funds
+
+If a deposit has expired and hasn't been claimed, the original depositor can reclaim everything by calling `withdraw`:
+- `address`: The check address containing the expired deposit
+
+This returns all deposited funds plus all unused fees to the original depositor.
+
+## Forwarding Funds
+
+Funds can be forwarded to another check address using the `forward` endpoint:
+- `address`: The current check address (source)
+- `forward_address`: The new check address (destination)
+- `signature`: ED25519 signature proving ownership of the source check
+
+The destination address must already have fees deposited. The forward operation:
+- Consumes fees from the current deposit
+- Moves funds to the forwarded address
+- Returns any remaining fees to the original depositor
+
+After forwarding, if the new deposit expires and is withdrawn, funds go to the depositor address recorded in the forwarded deposit.
