@@ -11,26 +11,27 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         let mut payments = self.call_value().all().clone_value();
         require!(!payments.is_empty(), "no payment was provided");
 
-        let input_fee_token = payments.get(0).clone();
-        let fee_per_token = self.get_fee_for_token(&input_fee_token.token_identifier);
-        let (total_fee_with_first, total_fee_without_first, _num_payments) =
-            self.calculate_fee_adjustments(&payments, &fee_per_token);
+        let payment_containing_fee = payments.get(0).clone();
+        let fee_per_token = self.get_fee_for_token(&payment_containing_fee.token_identifier);
+        let (total_fee_with_first, total_fee_without_first) =
+            self.calculate_fee_adjustments(payments.len(), &fee_per_token);
+
         require!(
-            input_fee_token.amount.as_big_uint() == &total_fee_without_first
-                || input_fee_token.amount.as_big_uint() > &total_fee_with_first,
+            payment_containing_fee.amount.as_big_uint() == &total_fee_without_first
+                || payment_containing_fee.amount.as_big_uint() > &total_fee_with_first,
             "payment not covering fees"
         );
 
         // Adjust payments
-        let mut fee_payment_for_deposit = input_fee_token.clone();
-        if input_fee_token.amount.as_big_uint() > &total_fee_without_first {
+        let mut fee_payment_for_deposit = payment_containing_fee.clone();
+        if payment_containing_fee.amount.as_big_uint() > &total_fee_without_first {
             fee_payment_for_deposit.amount =
                 NonZeroBigUint::new(total_fee_with_first.clone()).unwrap();
-            if input_fee_token.amount.as_big_uint() > &total_fee_with_first {
+            if payment_containing_fee.amount.as_big_uint() > &total_fee_with_first {
                 let fund_from_fee_payment = Payment::new(
-                    input_fee_token.token_identifier,
-                    input_fee_token.token_nonce,
-                    input_fee_token.amount - &fee_payment_for_deposit.amount,
+                    payment_containing_fee.token_identifier,
+                    payment_containing_fee.token_nonce,
+                    payment_containing_fee.amount - &fee_payment_for_deposit.amount,
                 );
                 let _ = payments.set(0, fund_from_fee_payment);
             } else {

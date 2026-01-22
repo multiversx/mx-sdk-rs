@@ -92,14 +92,21 @@ pub trait HelpersModule: storage::StorageModule {
     }
 
     /// Calculates total fees for payments, considering whether the first payment covers fees.
+    ///
+    /// Returns two values:
+    /// 1. `total_fee_with_first`: The fee required if all payments (including the first) are deposited as funds.
+    ///    This is used when the first payment is large enough to cover both the fee AND serve as a fund.
+    ///    Formula: fee_per_token × num_payments
+    /// 2. `total_fee_without_first`: The fee required if only the remaining payments (excluding the first) are deposited.
+    ///    This is used when the first payment is dedicated solely as the fee payment.
+    ///    Formula: fee_per_token × (num_payments - 1)
     fn calculate_fee_adjustments(
         &self,
-        payments: &ManagedVec<Payment>,
+        num_payments: usize,
         fee_per_token: &BigUint,
-    ) -> (BigUint, BigUint, usize) {
-        let num_payments = payments.len();
+    ) -> (BigUint, BigUint) {
         let total_fee_with_first = fee_per_token * num_payments as u64;
         let total_fee_without_first = fee_per_token * (num_payments as u64 - 1);
-        (total_fee_with_first, total_fee_without_first, num_payments)
+        (total_fee_with_first, total_fee_without_first)
     }
 }
