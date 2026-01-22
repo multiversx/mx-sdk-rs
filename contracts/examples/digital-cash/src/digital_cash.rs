@@ -34,9 +34,9 @@ pub trait DigitalCash:
         self.all_time_fee_tokens().insert(token);
     }
 
-    #[endpoint(blacklistFeeToken)]
+    #[endpoint(removeFeeToken)]
     #[only_owner]
-    fn blacklist_fee_token(&self, token: TokenId) {
+    fn remove_fee_token(&self, token: TokenId) {
         require!(!self.fee(&token).is_empty(), "Token is not whitelisted");
         self.fee(&token).clear();
         self.whitelisted_fee_tokens().swap_remove(&token);

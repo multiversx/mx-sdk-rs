@@ -80,7 +80,7 @@
             "tx": {
                 "from": "address:digital_cash_owner_address",
                 "to": "sc:the_digital_cash_contract",
-                "function": "blacklistFeeToken",
+                "function": "removeFeeToken",
                 "arguments": [
                     "str:ESDT-000000"
                 ],
@@ -102,7 +102,7 @@
             "tx": {
                 "from": "address:digital_cash_owner_address",
                 "to": "sc:the_digital_cash_contract",
-                "function": "blacklistFeeToken",
+                "function": "removeFeeToken",
                 "arguments": [
                     "str:ESDT-778899"
                 ],

@@ -85,7 +85,7 @@ where
             .original_result()
     }
 
-    pub fn blacklist_fee_token<
+    pub fn remove_fee_token<
         Arg0: ProxyArg<TokenId<Env::Api>>,
     >(
         self,
@@ -93,7 +93,7 @@ where
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("blacklistFeeToken")
+            .raw_call("removeFeeToken")
             .argument(&token)
             .original_result()
     }
