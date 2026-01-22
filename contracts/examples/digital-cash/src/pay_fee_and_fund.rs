@@ -1,6 +1,6 @@
 use multiversx_sc::imports::*;
 
-use crate::{constants::*, helpers, storage};
+use crate::{digital_cash_err_msg::*, helpers, storage};
 
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {

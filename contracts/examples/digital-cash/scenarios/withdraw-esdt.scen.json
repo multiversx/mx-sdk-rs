@@ -21,7 +21,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:withdrawal has not been available yet",
+                "message": "str:cannot withdraw, deposit not expired yet",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

@@ -3,7 +3,7 @@
 
 use multiversx_sc::imports::*;
 
-mod constants;
+mod digital_cash_err_msg;
 mod deposit_info;
 pub mod digital_cash_proxy;
 mod helpers;
@@ -11,7 +11,7 @@ mod pay_fee_and_fund;
 mod signature_operations;
 mod storage;
 
-use constants::*;
+use digital_cash_err_msg::*;
 
 #[multiversx_sc::contract]
 pub trait DigitalCash:

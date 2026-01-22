@@ -1,7 +1,7 @@
 use multiversx_sc::imports::*;
 
 use crate::{
-    constants::*,
+    digital_cash_err_msg::*,
     deposit_info::{DepositInfo, Fee},
     storage,
 };
@@ -20,7 +20,12 @@ pub trait HelpersModule: storage::StorageModule {
         fee_mapper.get()
     }
 
-    fn make_fund(&self, payment: ManagedVec<Payment>, address: ManagedAddress, expiration: TimestampMillis) {
+    fn make_fund(
+        &self,
+        payment: ManagedVec<Payment>,
+        address: ManagedAddress,
+        expiration: TimestampMillis,
+    ) {
         let deposit_mapper = self.deposit(&address);
 
         deposit_mapper.update(|deposit| {

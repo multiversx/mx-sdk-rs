@@ -1,6 +1,6 @@
 use multiversx_sc::imports::*;
 
-use crate::{constants::*, helpers, storage};
+use crate::{digital_cash_err_msg::*, helpers, storage};
 
 pub use multiversx_sc::api::ED25519_SIGNATURE_BYTE_LEN;
 
@@ -16,7 +16,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
 
         require!(
             deposit.expiration < self.blockchain().get_block_timestamp_millis(),
-            "withdrawal has not been available yet"
+            "cannot withdraw, deposit not expired yet"
         );
 
         let mut funds = deposit.funds;
