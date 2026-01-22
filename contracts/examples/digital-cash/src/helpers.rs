@@ -1,9 +1,8 @@
 use multiversx_sc::imports::*;
 
 use crate::{
-    deposit_info::{DepositInfo, Fee},
     digital_cash_err_msg::*,
-    storage,
+    storage::{self, DepositInfo, Fee},
 };
 #[multiversx_sc::module]
 pub trait HelpersModule: storage::StorageModule {
