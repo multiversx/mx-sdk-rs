@@ -1,6 +1,7 @@
 use multiversx_sc::imports::*;
 
 use crate::{
+    DepositKey,
     digital_cash_err_msg::*,
     storage::{self, DepositInfo, Fee},
 };
@@ -22,10 +23,10 @@ pub trait HelpersModule: storage::StorageModule {
     fn make_fund(
         &self,
         payment: ManagedVec<Payment>,
-        address: ManagedAddress,
+        deposit_key: DepositKey<Self::Api>,
         expiration: TimestampMillis,
     ) {
-        let deposit_mapper = self.deposit(&address);
+        let deposit_mapper = self.deposit(&deposit_key);
 
         deposit_mapper.update(|deposit| {
             require!(deposit.funds.is_empty(), "key already used");
@@ -52,11 +53,11 @@ pub trait HelpersModule: storage::StorageModule {
     fn update_fees(
         &self,
         caller_address: ManagedAddress,
-        address: &ManagedAddress,
+        deposit_key: &DepositKey<Self::Api>,
         payment: Payment,
     ) {
         self.get_fee_for_token(&payment.token_identifier);
-        let deposit_mapper = self.deposit(address);
+        let deposit_mapper = self.deposit(deposit_key);
         if !deposit_mapper.is_empty() {
             deposit_mapper.update(|deposit| {
                 require!(

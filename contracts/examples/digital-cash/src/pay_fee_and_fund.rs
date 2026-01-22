@@ -1,13 +1,13 @@
 use multiversx_sc::imports::*;
 
-use crate::{digital_cash_err_msg::*, helpers, storage};
+use crate::{DepositKey, digital_cash_err_msg::*, helpers, storage};
 
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     /// Pays the required fee and funds a deposit for the given address with specified expiration time.
     #[endpoint(payFeeAndFund)]
     #[payable]
-    fn pay_fee_and_fund(&self, address: ManagedAddress, expiration: TimestampMillis) {
+    fn pay_fee_and_fund(&self, deposit_key: DepositKey<Self::Api>, expiration: TimestampMillis) {
         let mut payments = self.call_value().all().clone_value();
         require!(!payments.is_empty(), "no payment was provided");
 
@@ -43,15 +43,18 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         }
 
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, &address, fee_payment_for_deposit);
-        self.make_fund(payments, address, expiration)
+        self.update_fees(caller_address, &deposit_key, fee_payment_for_deposit);
+        self.make_fund(payments, deposit_key, expiration)
     }
 
     #[endpoint]
     #[payable]
-    fn fund(&self, address: ManagedAddress, expiration: TimestampMillis) {
-        require!(!self.deposit(&address).is_empty(), FEES_NOT_COVERED_ERR_MSG);
-        let deposit_mapper = self.deposit(&address).get();
+    fn fund(&self, deposit_key: DepositKey<Self::Api>, expiration: TimestampMillis) {
+        require!(
+            !self.deposit(&deposit_key).is_empty(),
+            FEES_NOT_COVERED_ERR_MSG
+        );
+        let deposit_mapper = self.deposit(&deposit_key).get();
         let depositor = deposit_mapper.depositor_address;
         require!(
             self.blockchain().get_caller() == depositor,
@@ -69,14 +72,14 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
             deposited_fee_token.amount.as_big_uint(),
         );
 
-        self.make_fund(payment, address, expiration);
+        self.make_fund(payment, deposit_key, expiration);
     }
 
     #[endpoint(depositFees)]
     #[payable("EGLD")]
-    fn deposit_fees(&self, address: &ManagedAddress) {
+    fn deposit_fees(&self, deposit_key: &DepositKey<Self::Api>) {
         let payment = self.call_value().single().clone();
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, address, payment);
+        self.update_fees(caller_address, deposit_key, payment);
     }
 }

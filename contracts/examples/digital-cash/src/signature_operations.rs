@@ -1,14 +1,14 @@
 use multiversx_sc::imports::*;
 
-use crate::{digital_cash_err_msg::*, helpers, storage};
+use crate::{DepositKey, digital_cash_err_msg::*, helpers, storage};
 
 pub use multiversx_sc::api::ED25519_SIGNATURE_BYTE_LEN;
 
 #[multiversx_sc::module]
 pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersModule {
     #[endpoint]
-    fn withdraw(&self, address: ManagedAddress) {
-        let deposit_mapper = self.deposit(&address);
+    fn withdraw(&self, deposit_key: DepositKey<Self::Api>) {
+        let deposit_mapper = self.deposit(&deposit_key);
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
         let deposit = deposit_mapper.take();
@@ -39,14 +39,14 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
     #[endpoint]
     fn claim(
         &self,
-        address: ManagedAddress,
+        deposit_key: DepositKey<Self::Api>,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let deposit_mapper = self.deposit(&address);
+        let deposit_mapper = self.deposit(&deposit_key);
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
         let caller_address = self.blockchain().get_caller();
-        self.require_signature(&address, &caller_address, signature);
+        self.check_signature(&deposit_key, &caller_address, signature);
 
         let deposit = deposit_mapper.take();
         let num_tokens_transferred = deposit.funds.len();
@@ -82,16 +82,16 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
     #[payable]
     fn forward(
         &self,
-        address: ManagedAddress,
-        forward_address: ManagedAddress,
+        deposit_key: DepositKey<Self::Api>,
+        forward_deposit_key: DepositKey<Self::Api>,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
         let additional_fee_payment = self.call_value().single_optional();
         let caller_address = self.blockchain().get_caller();
-        self.require_signature(&address, &caller_address, signature);
-        let new_deposit = self.deposit(&forward_address);
+        self.check_signature(&deposit_key, &caller_address, signature);
+        let new_deposit = self.deposit(&forward_deposit_key);
 
-        let mut current_deposit = self.deposit(&address).take();
+        let mut current_deposit = self.deposit(&deposit_key).take();
         let num_tokens = current_deposit.funds.len();
 
         let mut fee_token: Option<TokenId<Self::Api>> = None;
@@ -105,7 +105,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
             fee_token = Some(if let Some(additional_fee_token) = additional_fee_payment {
                 self.update_fees(
                     caller_address,
-                    &forward_address,
+                    &forward_deposit_key,
                     additional_fee_token.clone(),
                 );
                 additional_fee_token.token_identifier.clone()
@@ -139,15 +139,17 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         }
     }
 
-    fn require_signature(
+    fn check_signature(
         &self,
-        address: &ManagedAddress,
+        deposit_key: &DepositKey<Self::Api>,
         caller_address: &ManagedAddress,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let address_buffer = address.as_managed_buffer();
         let caller_buffer = caller_address.as_managed_buffer();
-        self.crypto()
-            .verify_ed25519(address_buffer, caller_buffer, signature.as_managed_buffer());
+        self.crypto().verify_ed25519(
+            deposit_key.as_managed_buffer(),
+            caller_buffer,
+            signature.as_managed_buffer(),
+        );
     }
 }

@@ -1,5 +1,7 @@
 use multiversx_sc::{derive_imports::*, imports::*};
 
+use crate::DepositKey;
+
 #[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct DepositInfo<M: ManagedTypeApi> {
@@ -20,7 +22,10 @@ pub struct Fee<M: ManagedTypeApi> {
 pub trait StorageModule {
     #[view]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<Self::Api>>;
+    fn deposit(
+        &self,
+        deposit_key: &DepositKey<Self::Api>,
+    ) -> SingleValueMapper<DepositInfo<Self::Api>>;
 
     #[storage_mapper("fee")]
     fn fee(&self, token: &TokenId) -> SingleValueMapper<BigUint>;

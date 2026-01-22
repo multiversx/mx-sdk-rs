@@ -12,6 +12,8 @@ mod storage;
 
 use digital_cash_err_msg::*;
 
+pub type DepositKey<M> = ManagedByteArray<M, 32>;
+
 #[multiversx_sc::contract]
 pub trait DigitalCash:
     pay_fee_and_fund::PayFeeAndFund
@@ -66,8 +68,13 @@ pub trait DigitalCash:
     }
 
     #[view(getAmount)]
-    fn get_amount(&self, address: ManagedAddress, token: TokenId, nonce: u64) -> BigUint {
-        let deposit_mapper = self.deposit(&address);
+    fn get_amount(
+        &self,
+        deposit_key: DepositKey<Self::Api>,
+        token: TokenId,
+        nonce: u64,
+    ) -> BigUint {
+        let deposit_mapper = self.deposit(&deposit_key);
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
         let deposit = deposit_mapper.get();
