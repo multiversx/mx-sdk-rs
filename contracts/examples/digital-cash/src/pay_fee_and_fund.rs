@@ -4,7 +4,7 @@ use crate::{digital_cash_err_msg::*, helpers, storage};
 
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
-    /// Pays the required fee and funds a deposit for the given address with specified availability.
+    /// Pays the required fee and funds a deposit for the given address with specified expiration time.
     #[endpoint(payFeeAndFund)]
     #[payable]
     fn pay_fee_and_fund(&self, address: ManagedAddress, expiration: TimestampMillis) {
