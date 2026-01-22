@@ -11,11 +11,6 @@ pub trait HelpersModule: storage::StorageModule {
         self.tx().to(address).payment(fee).transfer();
     }
 
-    fn get_expiration_round(&self, availability: u64) -> u64 {
-        let availability_rounds = availability / SECONDS_PER_ROUND;
-        self.blockchain().get_block_round() + availability_rounds
-    }
-
     fn get_fee_for_token(&self, token: &TokenId) -> BigUint {
         require!(
             self.whitelisted_fee_tokens().contains(token),
@@ -25,14 +20,14 @@ pub trait HelpersModule: storage::StorageModule {
         fee_mapper.get()
     }
 
-    fn make_fund(&self, payment: ManagedVec<Payment>, address: ManagedAddress, availability: u64) {
+    fn make_fund(&self, payment: ManagedVec<Payment>, address: ManagedAddress, expiration: TimestampMillis) {
         let deposit_mapper = self.deposit(&address);
 
         deposit_mapper.update(|deposit| {
             require!(deposit.funds.is_empty(), "key already used");
             let num_tokens = payment.len();
             deposit.fees.num_token_to_transfer += num_tokens;
-            deposit.expiration_round = self.get_expiration_round(availability);
+            deposit.expiration = expiration;
             deposit.funds = payment;
         });
     }
@@ -76,7 +71,7 @@ pub trait HelpersModule: storage::StorageModule {
         let new_deposit = DepositInfo {
             depositor_address: caller_address,
             funds: ManagedVec::new(),
-            expiration_round: 0,
+            expiration: TimestampMillis::zero(),
             fees: Fee {
                 num_token_to_transfer: 0,
                 value: payment,

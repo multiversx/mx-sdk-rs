@@ -14,9 +14,8 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         let deposit = deposit_mapper.take();
         let original_fee_payment = deposit.fees.value;
 
-        let block_round = self.blockchain().get_block_round();
         require!(
-            deposit.expiration_round < block_round,
+            deposit.expiration < self.blockchain().get_block_timestamp_millis(),
             "withdrawal has not been available yet"
         );
 
@@ -49,14 +48,16 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         let caller_address = self.blockchain().get_caller();
         self.require_signature(&address, &caller_address, signature);
 
-        let block_round = self.blockchain().get_block_round();
         let deposit = deposit_mapper.take();
         let num_tokens_transferred = deposit.funds.len();
         let mut remaining_fee_payment = deposit.fees.value;
 
         let fee_token = remaining_fee_payment.token_identifier.clone();
         let fee = self.fee(&fee_token).get();
-        require!(deposit.expiration_round >= block_round, "deposit expired");
+        require!(
+            deposit.expiration >= self.blockchain().get_block_timestamp_millis(),
+            "deposit expired"
+        );
 
         let fee_cost = fee * num_tokens_transferred as u64;
         remaining_fee_payment.amount -= &fee_cost;
@@ -121,7 +122,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
             );
 
             target_deposit.fees.num_token_to_transfer += num_tokens;
-            target_deposit.expiration_round = current_deposit.expiration_round;
+            target_deposit.expiration = current_deposit.expiration;
             target_deposit.funds = current_deposit.funds;
         });
 

@@ -43,7 +43,7 @@
                         "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
                             "0-depositor_address": "address:acc1",
                             "1-funds": "u32:1|nested:str:EGLD-000000|u64:0|biguint:1,000",
-                            "2-expiration_round": "u64:10",
+                            "2-expiration": "u64:86399_000",
                             "3-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
@@ -56,7 +56,7 @@
                         "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
                             "0-depositor_address": "address:acc2",
                             "1-funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
-                            "2-expiration_round": "u64:16",
+                            "2-expiration": "u64:86400_000",
                             "3-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
@@ -69,7 +69,7 @@
                         "str:deposit|0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d": {
                             "0-depositor_address": "address:acc3",
                             "1-funds": "u32:3|nested:str:CASHTOKEN-112233|u64:0|biguint:50|nested:str:CASHTOKEN-445566|u64:0|biguint:50|nested:str:CASHTOKEN-778899|u64:0|biguint:50",
-                            "2-expiration_round": "u64:16",
+                            "2-expiration": "u64:86400_000",
                             "3-fees": {
                                 "0-num_token_to_transfer": "u32:3",
                                 "1-value": {
@@ -145,10 +145,7 @@
             "step": "setState",
             "comment": "set block",
             "currentBlockInfo": {
-                "blockTimestampMs": "511",
-                "blockNonce": "300",
-                "blockRound": "300",
-                "blockEpoch": "1"
+                "blockTimestampMs": "86400_500"
             }
         },
         {
@@ -188,7 +185,7 @@
                         "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
                             "0-depositor_address": "address:acc1",
                             "1-funds": "u32:1|nested:str:EGLD-000000|u64:0|biguint:1,000",
-                            "2-expiration_round": "u64:10",
+                            "2-expiration": "u64:86399_000",
                             "3-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
@@ -201,7 +198,7 @@
                         "str:deposit|0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d": {
                             "0-depositor_address": "address:acc3",
                             "1-funds": "u32:3|nested:str:CASHTOKEN-112233|u64:0|biguint:50|nested:str:CASHTOKEN-445566|u64:0|biguint:50|nested:str:CASHTOKEN-778899|u64:0|biguint:50",
-                            "2-expiration_round": "u64:16",
+                            "2-expiration": "u64:86400_000",
                             "3-fees": {
                                 "0-num_token_to_transfer": "u32:3",
                                 "1-value": {
