@@ -26,7 +26,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         let mut fee_payment_for_deposit = payment_containing_fee.clone();
         if payment_containing_fee.amount.as_big_uint() > &total_fee_without_first {
             fee_payment_for_deposit.amount =
-                NonZeroBigUint::new(total_fee_with_first.clone()).unwrap();
+                NonZeroBigUint::new_or_panic(total_fee_with_first.clone());
             if payment_containing_fee.amount.as_big_uint() > &total_fee_with_first {
                 let fund_from_fee_payment = Payment::new(
                     payment_containing_fee.token_identifier,
@@ -39,7 +39,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
             }
         } else {
             payments.remove(0);
-            fee_payment_for_deposit.amount = NonZeroBigUint::new(total_fee_without_first).unwrap();
+            fee_payment_for_deposit.amount = NonZeroBigUint::new_or_panic(total_fee_without_first);
         }
 
         let caller_address = self.blockchain().get_caller();
