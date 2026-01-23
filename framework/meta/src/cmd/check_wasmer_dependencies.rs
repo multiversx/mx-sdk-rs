@@ -6,9 +6,7 @@ use std::{
 };
 
 use colored::Colorize;
-use multiversx_sc_meta_lib::{
-    contract::sc_config::ExecuteCommandError, print_util::format_command,
-};
+use multiversx_sc_meta_lib::contract::sc_config::ExecuteCommandError;
 
 const WASMER_CRATE_NAME: &str = "multiversx-chain-vm-executor-wasmer ";
 const WASMER_EXPERIMENTAL_CRATE_NAME: &str = "multiversx-chain-vm-executor-wasmer-experimental ";
@@ -19,7 +17,7 @@ pub fn check_wasmer_dependencies(path: &Path) {
     let mut command = Command::new(cargo);
     command.arg("tree").arg("-e").arg("features");
 
-    match execute_command(&mut command, path, "cargo") {
+    match execute_command(&mut command, path) {
         Ok(output) => {
             if output.contains(WASMER_CRATE_NAME) && output.contains(WASMER_EXPERIMENTAL_CRATE_NAME)
             {
@@ -38,20 +36,16 @@ pub fn check_wasmer_dependencies(path: &Path) {
     };
 }
 
-fn execute_command(
-    command: &mut Command,
-    path: &Path,
-    job: &str,
-) -> Result<String, ExecuteCommandError> {
+fn execute_command(command: &mut Command, path: &Path) -> Result<String, ExecuteCommandError> {
     let output = command
         .current_dir(path)
         .stderr(Stdio::inherit())
         .output()
-        .map_err(|_| ExecuteCommandError::ErrorRunning(job.to_string()))?;
+        .map_err(|_| ExecuteCommandError::ErrorRunning(command.into()))?;
 
     if !output.status.success() {
-        return Err(ExecuteCommandError::JobFailed(format_command(&command)));
+        return Err(ExecuteCommandError::JobFailed(command.into()));
     }
 
-    String::from_utf8(output.stdout).map_err(|_| ExecuteCommandError::ErrorParsing(job.to_string()))
+    String::from_utf8(output.stdout).map_err(|_| ExecuteCommandError::ErrorParsing(command.into()))
 }
