@@ -71,6 +71,51 @@ fn test_correct_naming() {
     template_test_current("empty", "examples", "my1New2_3-correct_Empty", "");
 }
 
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_current_locked_test() {
+    let workspace_path = find_current_workspace().unwrap();
+    let target = ContractCreatorTarget {
+        target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join("examples"),
+        new_name: "new-empty-locked".to_string(),
+    };
+
+    let repo_source = RepoSource::from_local_path(workspace_path.clone());
+
+    prepare_target_dir(&target);
+
+    ContractCreator::new(
+        &repo_source,
+        "empty".to_string(),
+        target.clone(),
+        true,
+        None,
+    )
+    .create_contract(LAST_TEMPLATE_VERSION);
+
+    // Build once to generate Cargo.lock
+    build_contract(&target);
+
+    // Build with --locked flag (should pass)
+    let build_result = try_build_contract(&target, true);
+    assert!(build_result, "build with --locked should pass");
+
+    // Remove Cargo.lock from wasm directory
+    let wasm_cargo_lock = target.contract_dir().join("wasm").join("Cargo.lock");
+    assert!(
+        wasm_cargo_lock.exists(),
+        "Cargo.lock should exist in wasm directory"
+    );
+    fs::remove_file(&wasm_cargo_lock).expect("failed to remove Cargo.lock");
+
+    // Build with --locked flag again (should fail)
+    let build_result = try_build_contract(&target, true);
+    assert!(
+        !build_result,
+        "build with --locked should fail after removing Cargo.lock"
+    );
+}
+
 /// Recreates the folder structure in `contracts`, on the same level.
 /// This way, the relative paths are still valid in this case,
 /// and we can test the templates with the framework version of the current branch.
@@ -209,23 +254,35 @@ pub fn cargo_test(target: &ContractCreatorTarget) {
     assert!(exit_status.success(), "contract test process failed");
 }
 
-pub fn build_contract(target: &ContractCreatorTarget) {
+fn try_build_contract(target: &ContractCreatorTarget, locked: bool) -> bool {
     let workspace_target_dir = find_current_workspace().unwrap().join("target");
 
+    let mut args = vec![
+        "run",
+        "build",
+        "--target-dir",
+        workspace_target_dir.to_str().unwrap(),
+    ];
+    if locked {
+        args.push("--locked");
+    }
+
     let exit_status = Command::new("cargo")
-        .args([
-            "run",
-            "build",
-            "--target-dir",
-            workspace_target_dir.to_str().unwrap(),
-        ])
+        .args(args)
         .current_dir(target.contract_dir().join("meta"))
         .spawn()
-        .expect("failed to spawn contract clean process")
+        .expect("failed to spawn contract build process")
         .wait()
-        .expect("contract test process was not running");
+        .expect("contract build process was not running");
 
-    assert!(exit_status.success(), "contract build process failed");
+    exit_status.success()
+}
+
+pub fn build_contract(target: &ContractCreatorTarget) {
+    assert!(
+        try_build_contract(target, false),
+        "contract build process failed"
+    );
 }
 
 fn cargo_check_interactor(sub_path: &str, new_name: &str) {
