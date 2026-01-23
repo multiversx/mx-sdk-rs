@@ -65,7 +65,7 @@ jobs:
   generate-report:
     name: Generate Report
     needs: build-contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/report.yml@v6.0.0
+    uses: multiversx/mx-sc-actions/.github/workflows/report.yml@739363a9614794fef598ab161498563969ea6437 # report fix, TODO: release v6.0.1
     with:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
