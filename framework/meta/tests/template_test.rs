@@ -32,12 +32,7 @@ fn test_template_list() {
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_adder() {
-    template_test_current(
-        "adder",
-        "examples",
-        "new-adder",
-        "Alin Cruceat <alin.cruceat@multiversx.com>",
-    );
+    template_test_current("adder", "examples", "new-adder");
 
     cargo_check_interactor("examples", "new-adder");
 }
@@ -45,19 +40,19 @@ fn template_current_adder() {
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_crypto_zombies() {
-    template_test_current("crypto-zombies", "examples", "new-crypto-zombies", "");
+    template_test_current("crypto-zombies", "examples", "new-crypto-zombies");
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_empty() {
-    template_test_current("empty", "examples", "new-empty", "");
+    template_test_current("empty", "examples", "new-empty");
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_ping_pong_egld() {
-    template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld", "");
+    template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld");
 }
 
 #[test]
@@ -68,7 +63,7 @@ fn test_correct_naming() {
         "my-new-42-correct-empty"
     );
 
-    template_test_current("empty", "examples", "my1New2_3-correct_Empty", "");
+    template_test_current("empty", "examples", "my1New2_3-correct_Empty");
 }
 
 #[test]
@@ -119,7 +114,7 @@ fn template_current_locked_test() {
 /// Recreates the folder structure in `contracts`, on the same level.
 /// This way, the relative paths are still valid in this case,
 /// and we can test the templates with the framework version of the current branch.
-fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, new_author: &str) {
+fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
@@ -130,18 +125,12 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, ne
 
     prepare_target_dir(&target);
 
-    let author = if new_author.is_empty() {
-        None
-    } else {
-        Some(new_author.to_string())
-    };
-
     ContractCreator::new(
         &repo_source,
         template_name.to_string(),
         target.clone(),
         true,
-        author,
+        Some("New Author <test@multiversx.com>".to_string()),
     )
     .create_contract(LAST_TEMPLATE_VERSION);
 
@@ -154,12 +143,7 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str, ne
 #[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
 async fn template_released_adder() {
-    template_test_released(
-        "adder",
-        "released-adder",
-        "Alin Cruceat <alin.cruceat@multiversx.com>",
-    )
-    .await;
+    template_test_released("adder", "released-adder").await;
 
     cargo_check_interactor("", "released-adder");
 }
@@ -167,13 +151,13 @@ async fn template_released_adder() {
 #[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
 async fn template_released_crypto_zombies() {
-    template_test_released("crypto-zombies", "released-crypto-zombies", "").await;
+    template_test_released("crypto-zombies", "released-crypto-zombies").await;
 }
 
 #[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
 async fn template_released_empty() {
-    template_test_released("empty", "released-empty", "").await;
+    template_test_released("empty", "released-empty").await;
 }
 
 /// These tests fully replicate the templating process. They
@@ -181,7 +165,7 @@ async fn template_released_empty() {
 /// - create proper contracts,
 /// - build the newly created contracts (to wasm)
 /// - run all tests (including Go scenarios) on them.
-async fn template_test_released(template_name: &str, new_name: &str, new_author: &str) {
+async fn template_test_released(template_name: &str, new_name: &str) {
     let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
@@ -200,18 +184,12 @@ async fn template_test_released(template_name: &str, new_name: &str, new_author:
 
     prepare_target_dir(&target);
 
-    let author = if new_author.is_empty() {
-        None
-    } else {
-        Some(new_author.to_string())
-    };
-
     ContractCreator::new(
         &repo_source,
         template_name.to_string(),
         target.clone(),
         false,
-        author,
+        None,
     )
     .create_contract(LAST_TEMPLATE_VERSION);
 
