@@ -31,20 +31,24 @@ impl ContractVariant {
 
         print_build_command(self.wasm_output_name(build_args), &build_command);
 
-        let output_build_command = execute_spawn_command(&mut build_command, "cargo");
+        let build_command_output = execute_spawn_command(&mut build_command, "cargo");
 
-        match output_build_command {
+        match build_command_output {
             Ok(_) => {}
-            Err(ExecuteCommandError::JobFailed(_)) => {
+            Err(ExecuteCommandError::JobFailed(err)) => {
                 if !self.is_target_installed() {
+                    // the target not being installed is a common cause of build failure,
+                    // so we try to install it automatically
                     self.install_wasm_target();
 
-                    execute_spawn_command(&mut build_command, "cargo")
-                        .expect("error building contract");
+                    // try again after installing the target
+                    execute_spawn_command(&mut build_command, "cargo")?;
+                } else {
+                    return Err(ExecuteCommandError::JobFailed(err));
                 }
             }
-            Err(_) => {
-                panic!("error building contract");
+            Err(err) => {
+                return Err(err);
             }
         }
 
