@@ -1,6 +1,5 @@
 use std::{fs, process::Command};
 
-use convert_case::{Case, Casing};
 use multiversx_sc_meta::{
     cmd::template::{
         ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion, template_names_from_repo,
@@ -58,35 +57,15 @@ fn template_current_ping_pong_egld() {
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn test_correct_naming() {
-    assert_eq!(
-        "myNew42-correct_Empty".to_string().to_case(Case::Kebab),
-        "my-new-42-correct-empty"
-    );
-
-    template_test_current("empty", "examples", "my1New2_3-correct_Empty");
+    let target = setup_template_test_current("empty", "examples", "my1New2_3-correct_Empty");
+    assert_eq!(target.new_name, "my-1-new-2-3-correct-empty");
+    cargo_test(&target, false);
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_locked_test() {
-    let workspace_path = find_current_workspace().unwrap();
-    let target = ContractCreatorTarget {
-        target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join("examples"),
-        new_name: "new-empty-locked".to_string(),
-    };
-
-    let repo_source = RepoSource::from_local_path(workspace_path.clone());
-
-    prepare_target_dir(&target);
-
-    ContractCreator::new(
-        &repo_source,
-        "empty".to_string(),
-        target.clone(),
-        true,
-        None,
-    )
-    .create_contract(LAST_TEMPLATE_VERSION);
+    let target = setup_template_test_current("empty", "examples", "new-empty-locked");
 
     // Build once to generate Cargo.lock
     build_contract(&target);
@@ -111,15 +90,16 @@ fn template_current_locked_test() {
     );
 }
 
-/// Recreates the folder structure in `contracts`, on the same level.
-/// This way, the relative paths are still valid in this case,
-/// and we can test the templates with the framework version of the current branch.
-fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
+fn setup_template_test_current(
+    template_name: &str,
+    sub_path: &str,
+    new_name: &str,
+) -> ContractCreatorTarget {
     let workspace_path = find_current_workspace().unwrap();
-    let target = ContractCreatorTarget {
-        target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
-        new_name: new_name.to_string().to_case(Case::Kebab),
-    };
+    let target = ContractCreatorTarget::new(
+        workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
+        new_name,
+    );
 
     let repo_source = RepoSource::from_local_path(workspace_path);
 
@@ -134,10 +114,18 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     )
     .create_contract(LAST_TEMPLATE_VERSION);
 
+    target
+}
+
+/// Recreates the folder structure in `contracts`, on the same level.
+/// This way, the relative paths are still valid in this case,
+/// and we can test the templates with the framework version of the current branch.
+fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
+    let target = setup_template_test_current(template_name, sub_path, new_name);
     if BUILD_CONTRACTS {
         build_contract(&target);
     }
-    cargo_test(&target);
+    cargo_test(&target, BUILD_CONTRACTS);
 }
 
 #[tokio::test]
@@ -167,10 +155,7 @@ async fn template_released_empty() {
 /// - run all tests (including Go scenarios) on them.
 async fn template_test_released(template_name: &str, new_name: &str) {
     let workspace_path = find_current_workspace().unwrap();
-    let target = ContractCreatorTarget {
-        target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
-        new_name: new_name.to_string(),
-    };
+    let target = ContractCreatorTarget::new(workspace_path.join(TEMPLATE_TEMP_DIR_NAME), new_name);
 
     let temp_dir_path = workspace_path
         .join(TEMPLATE_TEMP_DIR_NAME)
@@ -196,7 +181,7 @@ async fn template_test_released(template_name: &str, new_name: &str) {
     if BUILD_CONTRACTS {
         build_contract(&target);
     }
-    cargo_test(&target);
+    cargo_test(&target, BUILD_CONTRACTS);
 }
 
 fn prepare_target_dir(target: &ContractCreatorTarget) {
@@ -208,7 +193,7 @@ fn prepare_target_dir(target: &ContractCreatorTarget) {
     }
 }
 
-pub fn cargo_test(target: &ContractCreatorTarget) {
+pub fn cargo_test(target: &ContractCreatorTarget, compiled: bool) {
     let workspace_target_dir = find_current_workspace().unwrap().join("target");
 
     let mut args = vec![
@@ -216,7 +201,7 @@ pub fn cargo_test(target: &ContractCreatorTarget) {
         "--target-dir",
         workspace_target_dir.to_str().unwrap(),
     ];
-    if BUILD_CONTRACTS {
+    if compiled {
         args.push("--features");
         args.push("multiversx-sc-scenario/compiled-sc-tests");
     }
