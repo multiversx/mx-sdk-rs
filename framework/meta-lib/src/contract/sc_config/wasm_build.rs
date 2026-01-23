@@ -31,7 +31,7 @@ impl ContractVariant {
 
         print_build_command(self.wasm_output_name(build_args), &build_command);
 
-        let build_command_output = execute_spawn_command(&mut build_command, "cargo");
+        let build_command_output = execute_spawn_command(&mut build_command);
 
         match build_command_output {
             Ok(_) => {}
@@ -42,7 +42,7 @@ impl ContractVariant {
                     self.install_wasm_target();
 
                     // try again after installing the target
-                    execute_spawn_command(&mut build_command, "cargo")?;
+                    execute_spawn_command(&mut build_command)?;
                 } else {
                     return Err(ExecuteCommandError::JobFailed(err));
                 }

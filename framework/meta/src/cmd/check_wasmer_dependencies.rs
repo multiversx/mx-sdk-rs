@@ -6,7 +6,9 @@ use std::{
 };
 
 use colored::Colorize;
-use multiversx_sc_meta_lib::contract::sc_config::ExecuteCommandError;
+use multiversx_sc_meta_lib::{
+    contract::sc_config::ExecuteCommandError, print_util::format_command,
+};
 
 const WASMER_CRATE_NAME: &str = "multiversx-chain-vm-executor-wasmer ";
 const WASMER_EXPERIMENTAL_CRATE_NAME: &str = "multiversx-chain-vm-executor-wasmer-experimental ";
@@ -48,7 +50,7 @@ fn execute_command(
         .map_err(|_| ExecuteCommandError::ErrorRunning(job.to_string()))?;
 
     if !output.status.success() {
-        return Err(ExecuteCommandError::JobFailed(job.to_string()));
+        return Err(ExecuteCommandError::JobFailed(format_command(&command)));
     }
 
     String::from_utf8(output.stdout).map_err(|_| ExecuteCommandError::ErrorParsing(job.to_string()))
