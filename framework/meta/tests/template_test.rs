@@ -222,6 +222,7 @@ fn try_build_contract(target: &ContractCreatorTarget, locked: bool) -> bool {
 
     let mut args = vec![
         "run",
+        "--",
         "build",
         "--target-dir",
         workspace_target_dir.to_str().unwrap(),
