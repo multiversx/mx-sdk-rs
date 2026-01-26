@@ -114,7 +114,7 @@ impl MetaConfig {
         for contract_variant in &self.sc_config.contracts {
             contract_variant
                 .build_contract(&build_args, &self.output_dir)
-                .unwrap();
+                .unwrap_or_else(|err| panic!("{err}"));
         }
     }
 
