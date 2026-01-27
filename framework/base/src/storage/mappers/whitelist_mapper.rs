@@ -40,7 +40,7 @@ const ITEM_NOT_WHITELISTED_ERR_MSG: &str = "Item not whitelisted";
 /// - **Non-iterable**: Cannot iterate over whitelisted items (use `SetMapper` if iteration needed)
 /// - **Space-efficient**: One storage key per item, minimal overhead
 /// - **Fast lookups**: Direct key-based membership testing
-/// - **Boolean logic**: Uses presence/absence rather than storing actual boolean values
+/// - **Boolean logic**: Uses presence/absence, since true = 1, false = empty
 ///
 /// # Trade-offs
 ///
@@ -105,7 +105,7 @@ const ITEM_NOT_WHITELISTED_ERR_MSG: &str = "Item not whitelisted";
 ///
 /// # Token Whitelist Example
 ///
-/// ```rust,ignore
+/// ```rust
 /// # use multiversx_sc::storage::mappers::{StorageMapper, WhitelistMapper};
 /// # use multiversx_sc::types::TokenIdentifier;
 /// # fn token_example<SA: multiversx_sc::api::StorageMapperApi>(

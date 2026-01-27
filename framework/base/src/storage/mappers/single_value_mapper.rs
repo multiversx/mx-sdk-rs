@@ -16,7 +16,7 @@ use crate::{
 };
 
 /// A storage mapper for managing a single serializable value with atomic read/write operations.
-//
+///
 /// # Storage Layout
 ///
 /// The `SingleValueMapper` stores a single value directly at its storage key:
@@ -102,7 +102,7 @@ use crate::{
 ///
 /// # Numeric Counter Example
 ///
-/// ```rust,ignore
+/// ```rust
 /// # use multiversx_sc::storage::mappers::{StorageMapper, SingleValueMapper};
 /// # fn counter_example<SA: multiversx_sc::api::StorageMapperApi>() {
 /// # let counter = SingleValueMapper::<SA, u64>::new(

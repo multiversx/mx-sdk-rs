@@ -74,7 +74,7 @@ pub const NULL_ID: AddressId = 0;
 ///
 /// # Example
 ///
-/// ```rust,ignore
+/// ```rust
 /// # use multiversx_sc::storage::mappers::{StorageMapper, AddressToIdMapper};
 /// # use multiversx_sc::types::ManagedAddress;
 /// # fn example<SA: multiversx_sc::api::StorageMapperApi>(

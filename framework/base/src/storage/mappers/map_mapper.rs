@@ -26,9 +26,10 @@ type Keys<'a, SA, A, T> = set_mapper::Iter<'a, SA, A, T>;
 /// The `MapMapper` uses a `SetMapper` to track keys and stores values separately:
 ///
 /// 1. **Key tracking** (via `SetMapper`):
-///    - `base_key + ".len"` → number of keys
-///    - `base_key + ".node_id" + node_index` → key at node (internal tree structure)
-///    - `base_key + ".value" + encoded_key` → node index for key
+///    - `base_key + ".info"` → `QueueMapperInfo` (length, front, back, new node counter)
+///    - `base_key + ".node_links" + node_id` → `Node` structure (previous, next)
+///    - `base_key + ".value" + node_id` → key value
+///    - `base_key + ".node_id" + encoded_key` → node ID lookup
 ///
 /// 2. **Value storage**:
 ///    - `base_key + ".mapped" + encoded_key` → value associated with the key

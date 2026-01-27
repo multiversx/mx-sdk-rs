@@ -55,7 +55,8 @@ where
     }
 }
 
-/// A storage mapper implementing a self-balancing binary search tree for ordered element storage.
+/// A storage mapper implementing a binary search tree for ordered element storage.
+/// **Note: This is NOT a self-balancing tree** and can degrade to O(n) in worst-case scenarios.
 ///
 /// # Storage Layout
 ///
@@ -84,7 +85,7 @@ where
 /// # Main Operations
 ///
 /// - **Insert**: `insert_element(data)` - Adds element maintaining BST order. O(log n) average, O(n) worst case.
-/// - **Delete**: `delete_node(data)` - Removes element and rebalances. O(log n) average, O(n) worst case.
+/// - **Delete**: `delete_node(data)` - Removes element. O(log n) average, O(n) worst case.
 /// - **Search**: `iterative_search(node, data)` / `recursive_search(node, data)` - Finds element. O(log n) average.
 /// - **Min/Max**: `find_min(node)` / `find_max(node)` - Finds minimum/maximum in subtree. O(log n).
 /// - **Successor/Predecessor**: `find_successor(node)` / `find_predecessor(node)` - Next/previous in order. O(log n).

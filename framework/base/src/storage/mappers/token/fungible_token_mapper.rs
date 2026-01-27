@@ -77,61 +77,6 @@ pub(crate) const DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME: &str =
 /// - Requires careful callback implementation for custom flows
 /// - Token issuance requires blockchain interaction
 /// - State transitions must follow protocol rules
-///
-/// # Use Cases
-///
-/// ## DeFi Applications
-/// ```rust,ignore
-/// #[storage_mapper("reward_token")]
-/// fn reward_token(&self) -> FungibleTokenMapper<Self::Api>;
-///
-/// #[payable("EGLD")]
-/// #[endpoint]
-/// fn issue_reward_token(&self) {
-///     let issue_cost = self.call_value().egld_value().clone_value();
-///     self.reward_token().issue(
-///         issue_cost,
-///         ManagedBuffer::new_from_bytes(b"My Reward Token"),
-///         ManagedBuffer::new_from_bytes(b"REWARD"),
-///         BigUint::from(1000000u64), // Initial supply
-///         18, // Decimals
-///         None // Use default callback
-///     );
-/// }
-/// ```
-///
-/// ## Gaming Tokens
-/// ```rust,ignore
-/// #[storage_mapper("game_currency")]
-/// fn game_currency(&self) -> FungibleTokenMapper<Self::Api>;
-///
-/// #[endpoint]
-/// fn reward_player(&self, player: &ManagedAddress, amount: &BigUint) {
-///     let payment = self.game_currency().mint_and_send(player, amount.clone());
-///     self.player_rewards(player).update(|rewards| *rewards += amount);
-/// }
-///
-/// #[endpoint]
-/// fn spend_currency(&self, amount: &BigUint) {
-///     let caller = self.blockchain().get_caller();
-///     self.game_currency().require_same_token(&payment.token_identifier);
-///     self.game_currency().burn(amount);
-/// }
-/// ```
-///
-/// ## Treasury Management
-/// ```rust,ignore
-/// #[storage_mapper("treasury_token")]
-/// fn treasury_token(&self) -> FungibleTokenMapper<Self::Api>;
-///
-/// #[endpoint]
-/// fn distribute_rewards(&self, recipients: &ManagedVec<ManagedAddress>) {
-///     let reward_per_user = self.calculate_reward_per_user();
-///     
-///     for recipient in recipients {
-///         self.treasury_token().mint_and_send(&recipient, &reward_per_user);
-///     }
-/// }
 /// ```
 pub struct FungibleTokenMapper<SA, A = CurrentStorage>
 where

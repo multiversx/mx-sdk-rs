@@ -27,8 +27,8 @@ const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 /// The `SetMapper` uses a `QueueMapper` for ordering and separate storage for value-to-node mapping:
 ///
 /// 1. **Ordered elements** (via `QueueMapper`):
-///    - `base_key + ".info"` → metadata (length, front, back, new node counter)
-///    - `base_key + ".node_links" + node_id` → node structure (previous, next)
+///    - `base_key + ".info"` → `QueueMapperInfo` (length, front, back, new node counter)
+///    - `base_key + ".node_links" + node_id` → `Node` structure (previous, next)
 ///    - `base_key + ".value" + node_id` → the stored value
 ///
 /// 2. **Value lookup** (for fast membership testing):

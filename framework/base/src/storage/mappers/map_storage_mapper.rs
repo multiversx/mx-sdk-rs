@@ -23,8 +23,8 @@ type Keys<'a, SA, A, T> = set_mapper::Iter<'a, SA, A, T>;
 /// The `MapStorageMapper` uses a `SetMapper` to track keys and creates nested storage mappers for values:
 ///
 /// 1. **Key tracking** (via `SetMapper`):
-///    - `base_key + ".info"` → metadata for the key set
-///    - `base_key + ".node_links" + node_id` → node structure
+///    - `base_key + ".info"` → `QueueMapperInfo` metadata for the key set
+///    - `base_key + ".node_links" + node_id` → node structure (prev/next pointers)
 ///    - `base_key + ".value" + node_id` → key value
 ///    - `base_key + ".node_id" + encoded_key` → node ID lookup
 ///
