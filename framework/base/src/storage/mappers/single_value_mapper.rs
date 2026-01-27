@@ -15,7 +15,114 @@ use crate::{
     types::{ManagedAddress, ManagedType},
 };
 
-/// Manages a single serializable item in storage.
+/// A storage mapper for managing a single serializable value with atomic read/write operations.
+//
+/// # Storage Layout
+///
+/// The `SingleValueMapper` stores a single value directly at its storage key:
+///
+/// - `base_key` → encoded value of type `T`
+///
+/// This is the simplest storage mapper - just one key storing one value.
+///
+/// # Main Operations
+///
+/// - **Write**: `set(value)` - Stores a value (accepts owned or borrowed). O(1).
+/// - **Read**: `get()` - Retrieves the stored value. O(1).
+/// - **Conditional write**: `set_if_empty(value)` - Stores only if empty. O(1).
+/// - **Update**: `update(|v| {...})` - Read-modify-write in one operation. O(1).
+/// - **Replace**: `replace(new_value)` - Swaps value and returns old one. O(1).
+/// - **Take**: `take()` - Retrieves value and clears storage. O(1).
+/// - **Clear**: `clear()` - Removes value from storage. O(1).
+/// - **Check**: `is_empty()` - Returns true if no value stored. O(1).
+///
+/// # Value Semantics
+///
+/// - Empty storage: Returns the default/zero value when calling `get()`
+/// - Setting a value: Overwrites any existing value
+/// - Clearing: Removes the value entirely from storage
+/// - Zero values: A value set to its zero/default may be indistinguishable from empty storage
+///
+/// # Trade-offs
+///
+/// - **Pros**: Simplest storage pattern; minimal overhead; direct key-value mapping; very efficient.
+/// - **Cons**: Only one value per mapper; no built-in indexing or collections.
+///
+/// # Use Cases
+///
+/// - Configuration values (flags, thresholds, addresses)
+/// - Global counters or accumulators
+/// - Contract state variables (owner, paused status, etc.)
+/// - Cached computed values
+/// - Simple on-chain variables that don't need collection semantics
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, SingleValueMapper};
+/// # use multiversx_sc::types::ManagedAddress;
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>(owner: ManagedAddress<SA>) {
+/// # let mapper = SingleValueMapper::<SA, ManagedAddress<SA>>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"owner"[..])
+/// # );
+/// // Set a value
+/// mapper.set(&owner);
+///
+/// // Check if empty
+/// assert!(!mapper.is_empty());
+///
+/// // Get the value
+/// let current_owner = mapper.get();
+/// assert_eq!(current_owner, owner);
+///
+/// // Conditional set (only if empty)
+/// mapper.set_if_empty(&owner);  // Does nothing, already set
+///
+/// // Update in place
+/// mapper.update(|addr| {
+///     // Modify the value
+///     *addr = owner.clone();
+/// });
+///
+/// // Replace and get old value
+/// # let new_owner = owner.clone();
+/// let old_owner = mapper.replace(&new_owner);
+/// assert_eq!(old_owner, owner);
+///
+/// // Take value (get and clear)
+/// let taken = mapper.take();
+/// assert!(mapper.is_empty());
+///
+/// // Clear storage
+/// mapper.set(&owner);
+/// mapper.clear();
+/// assert!(mapper.is_empty());
+/// # }
+/// ```
+///
+/// # Numeric Counter Example
+///
+/// ```rust,ignore
+/// # use multiversx_sc::storage::mappers::{StorageMapper, SingleValueMapper};
+/// # fn counter_example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let counter = SingleValueMapper::<SA, u64>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"counter"[..])
+/// # );
+/// // Initialize counter
+/// counter.set(0u64);
+///
+/// // Increment using update
+/// counter.update(|value| *value += 1);
+/// assert_eq!(counter.get(), 1);
+///
+/// // Increment and return new value
+/// let new_value = counter.update(|value| {
+///     *value += 1;
+///     *value
+/// });
+/// assert_eq!(new_value, 2);
+/// # }
+/// ```
 pub struct SingleValueMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,

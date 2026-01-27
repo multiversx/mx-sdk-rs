@@ -20,6 +20,93 @@ use crate::{
 const NULL_ENTRY: u32 = 0;
 const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 
+/// A storage mapper implementing an ordered set with efficient membership testing and iteration.
+///
+/// # Storage Layout
+///
+/// The `SetMapper` uses a `QueueMapper` for ordering and separate storage for value-to-node mapping:
+///
+/// 1. **Ordered elements** (via `QueueMapper`):
+///    - `base_key + ".info"` → metadata (length, front, back, new node counter)
+///    - `base_key + ".node_links" + node_id` → node structure (previous, next)
+///    - `base_key + ".value" + node_id` → the stored value
+///
+/// 2. **Value lookup** (for fast membership testing):
+///    - `base_key + ".node_id" + encoded_value` → node ID (0 means not present)
+///
+/// This dual structure enables both O(1) membership testing and ordered iteration.
+///
+/// # Main Operations
+///
+/// - **Insert**: `insert(value)` - Adds a value if not already present. O(1) with storage writes.
+/// - **Remove**: `remove(value)` - Removes a value from the set. O(1) with storage writes.
+/// - **Contains**: `contains(value)` - Checks membership. O(1) with one storage read.
+/// - **Iteration**: `iter()` - Iterates in insertion order; `iter_from(value)` - starts from specific value.
+/// - **Navigation**: `next(value)` / `previous(value)` - Gets adjacent elements in insertion order.
+/// - **Batch**: `remove_all(iter)` - Removes multiple values efficiently.
+///
+/// # Insertion Order
+///
+/// Unlike typical sets, `SetMapper` maintains **insertion order** - elements are stored in the order
+/// they were added. This makes it a hybrid between a set and a sequence.
+///
+/// # Trade-offs
+///
+/// - **Pros**: O(1) insert, remove, and contains; maintains insertion order; efficient iteration.
+/// - **Cons**: Higher storage overhead than `UnorderedSetMapper` (uses QueueMapper internally);
+///   no random access; removed elements leave gaps in node ID space.
+///
+/// # Comparison with UnorderedSetMapper
+///
+/// - **SetMapper**: Maintains insertion order, uses queue-based structure, slightly higher storage cost
+/// - **UnorderedSetMapper**: No ordering guarantees, uses vec-based structure, more compact storage
+///
+/// # Use Cases
+///
+/// - Whitelists/blacklists where insertion order matters
+/// - Unique collections requiring ordered iteration
+/// - Sets where you need to navigate between elements
+/// - Scenarios requiring both fast lookup and sequential processing
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, SetMapper};
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = SetMapper::<SA, u32>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"whitelist"[..])
+/// # );
+/// // Insert values
+/// assert!(mapper.insert(100));
+/// assert!(mapper.insert(200));
+/// assert!(mapper.insert(300));
+/// assert!(!mapper.insert(200));  // Already exists, returns false
+///
+/// assert_eq!(mapper.len(), 3);
+/// assert!(mapper.contains(&200));
+///
+/// // Navigate between elements
+/// let next = mapper.next(&200);
+/// assert_eq!(next, Some(300));
+///
+/// let prev = mapper.previous(&200);
+/// assert_eq!(prev, Some(100));
+///
+/// // Remove element
+/// assert!(mapper.remove(&200));
+/// assert!(!mapper.contains(&200));
+/// assert_eq!(mapper.len(), 2);
+///
+/// // Iterate in insertion order
+/// for value in mapper.iter() {
+///     // Process in order: 100, 300
+/// }
+///
+/// // Batch removal
+/// mapper.remove_all(vec![100, 300]);
+/// assert!(mapper.is_empty());
+/// # }
+/// ```
 pub struct SetMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,

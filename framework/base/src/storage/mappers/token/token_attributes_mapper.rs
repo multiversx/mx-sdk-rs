@@ -16,20 +16,155 @@ use crate::{
     types::{EsdtTokenIdentifier, ManagedType},
 };
 
-const MAPPING_SUFFIX: &[u8] = b".mapping";
-const COUNTER_SUFFIX: &[u8] = b".counter";
-const ATTR_SUFFIX: &[u8] = b".attr";
-const NONCE_SUFFIX: &[u8] = b".nonce";
+const MAPPING_SUFFIX: &str = ".mapping";
+const COUNTER_SUFFIX: &str = ".counter";
+const ATTR_SUFFIX: &str = ".attr";
+const NONCE_SUFFIX: &str = ".nonce";
 
-const VALUE_ALREADY_SET_ERROR_MESSAGE: &[u8] = b"A value was already set";
+const VALUE_ALREADY_SET_ERROR_MESSAGE: &str = "A value was already set";
 
-const UNKNOWN_TOKEN_ID_ERROR_MESSAGE: &[u8] = b"Unknown token id";
+const UNKNOWN_TOKEN_ID_ERROR_MESSAGE: &str = "Unknown token id";
 
-const VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE: &[u8] = b"A value was not previously set";
+const VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE: &str = "A value was not previously set";
 
-const COUNTER_OVERFLOW_ERROR_MESSAGE: &[u8] =
-    b"Counter overflow. This module can hold evidence for maximum u8::MAX different token IDs";
+const COUNTER_OVERFLOW_ERROR_MESSAGE: &str =
+    "Counter overflow. This module can hold evidence for maximum u8::MAX different token IDs";
 
+/// Specialized mapper for managing NFT/SFT token attributes with efficient storage
+/// and bidirectional lookup capabilities. Maps token attributes to nonces and vice versa,
+/// enabling efficient queries by both token nonce and attribute values.
+///
+/// # Storage Layout
+///
+/// The mapper uses a sophisticated multi-key storage layout for efficient lookups:
+///
+/// ```text
+/// base_key + ".counter" → u8                    // Global token ID counter
+/// base_key + ".mapping" + token_id → u8         // Token ID to internal mapping ID
+/// base_key + ".attr" + mapping + nonce → T     // Token attributes by nonce
+/// base_key + ".nonce" + mapping + attr → u64   // Nonce lookup by attributes
+/// ```
+///
+/// # Main Operations
+///
+/// ## Attribute Management
+/// - **Set**: Store attributes for token nonce with `set()`
+/// - **Update**: Modify existing attributes with `update()`
+/// - **Clear**: Remove attributes with `clear()`
+/// - **Get**: Retrieve attributes by nonce with `get_attributes()`
+///
+/// ## Bidirectional Lookup
+/// - **Nonce by Attributes**: Find nonce for specific attributes with `get_nonce()`
+/// - **Attributes by Nonce**: Find attributes for specific nonce with `get_attributes()`
+/// - **Existence Checks**: Verify presence with `has_attributes()`, `has_nonce()`
+///
+/// ## Internal Mapping
+/// - **Space Optimization**: Uses u8 internal IDs to reduce storage keys
+/// - **Counter Management**: Automatically assigns mapping IDs up to 255 tokens
+/// - **Collision Avoidance**: Each token ID gets unique mapping space
+///
+/// # Trade-offs
+///
+/// **Advantages:**
+/// - Bidirectional lookup (nonce ↔ attributes) in O(1) time
+/// - Space-efficient storage with internal mapping compression
+/// - Prevents duplicate attribute sets per token
+/// - Supports any encodable attribute type
+///
+/// **Limitations:**
+/// - Maximum 255 different token IDs per mapper instance
+/// - Attributes cannot be changed once set (use update carefully)
+/// - Complex storage layout increases implementation overhead
+/// - No iteration capabilities over stored mappings
+///
+/// # Use Cases
+///
+/// ## NFT Metadata Management
+/// ```rust,ignore
+/// #[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode)]
+/// pub struct NftAttributes {
+///     name: ManagedBuffer<Self::Api>,
+///     description: ManagedBuffer<Self::Api>,
+///     rarity: u8,
+///     power: u64,
+/// }
+///
+/// #[storage_mapper("nft_attributes")]
+/// fn nft_attributes(&self) -> TokenAttributesMapper<Self::Api>;
+///
+/// #[endpoint]
+/// fn set_nft_metadata(&self, token_id: &TokenIdentifier, nonce: u64, attrs: &NftAttributes) {
+///     self.nft_attributes().set(token_id, nonce, attrs);
+/// }
+///
+/// #[view]
+/// fn get_nft_by_rarity(&self, token_id: &TokenIdentifier, rarity: u8) -> u64 {
+///     let search_attrs = NftAttributes {
+///         rarity,
+///         ..Default::default()
+///     };
+///     self.nft_attributes().get_nonce(token_id, &search_attrs)
+/// }
+/// ```
+///
+/// ## Gaming Item Database
+/// ```rust,ignore
+/// #[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq)]
+/// pub struct ItemStats {
+///     level: u32,
+///     attack: u32,
+///     defense: u32,
+///     item_type: ItemType,
+/// }
+///
+/// #[storage_mapper("item_stats")]
+/// fn item_stats(&self) -> TokenAttributesMapper<Self::Api>;
+///
+/// #[endpoint]
+/// fn register_item(&self, token_id: &TokenIdentifier, nonce: u64, stats: &ItemStats) {
+///     self.item_stats().set(token_id, nonce, stats);
+/// }
+///
+/// #[endpoint]
+/// fn find_item_with_stats(&self, token_id: &TokenIdentifier, target_stats: &ItemStats) -> u64 {
+///     self.item_stats().get_nonce(token_id, target_stats)
+/// }
+///
+/// #[endpoint]
+/// fn upgrade_item(&self, token_id: &TokenIdentifier, nonce: u64) {
+///     let mut stats: ItemStats = self.item_stats().get_attributes(token_id, nonce);
+///     stats.level += 1;
+///     stats.attack += 10;
+///     stats.defense += 5;
+///     
+///     self.item_stats().update(token_id, nonce, &stats);
+/// }
+/// ```
+///
+/// ## Certificate Verification System
+/// ```rust,ignore
+/// #[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, PartialEq)]
+/// pub struct Certificate {
+///     issuer: ManagedAddress<Self::Api>,
+///     subject: ManagedBuffer<Self::Api>,
+///     valid_until: u64,
+///     certificate_type: CertType,
+/// }
+///
+/// #[storage_mapper("certificates")]
+/// fn certificates(&self) -> TokenAttributesMapper<Self::Api>;
+///
+/// #[endpoint]
+/// fn issue_certificate(&self, token_id: &TokenIdentifier, nonce: u64, cert: &Certificate) {
+///     require!(cert.valid_until > self.blockchain().get_block_timestamp(), "Expired certificate");
+///     self.certificates().set(token_id, nonce, cert);
+/// }
+///
+/// #[view]
+/// fn verify_certificate(&self, token_id: &TokenIdentifier, cert: &Certificate) -> bool {
+///     self.certificates().has_nonce(token_id, cert)
+/// }
+/// ```
 pub struct TokenAttributesMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi,
@@ -82,7 +217,7 @@ where
         } else {
             let mut counter = self.get_counter_value();
             if counter == u8::MAX {
-                SA::error_api_impl().signal_error(COUNTER_OVERFLOW_ERROR_MESSAGE);
+                SA::error_api_impl().signal_error(COUNTER_OVERFLOW_ERROR_MESSAGE.as_bytes());
             }
 
             counter += 1;
@@ -93,7 +228,7 @@ where
 
         let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if has_value {
-            SA::error_api_impl().signal_error(VALUE_ALREADY_SET_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(VALUE_ALREADY_SET_ERROR_MESSAGE.as_bytes());
         }
 
         self.set_token_attributes_value(mapping, token_nonce, attributes);
@@ -109,13 +244,13 @@ where
     ) {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
-            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE.as_bytes());
         }
 
         let mapping = self.get_mapping_value(token_id);
         let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if !has_value {
-            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE.as_bytes());
         }
 
         let old_attr = self.get_token_attributes_value::<T>(mapping, token_nonce);
@@ -238,13 +373,13 @@ where
     ) -> T {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
-            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE.as_bytes());
         }
 
         let mapping = self.get_mapping_value(token_id);
         let has_value = self.has_token_attributes_value(mapping, token_nonce);
         if !has_value {
-            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE.as_bytes());
         }
 
         self.get_token_attributes_value(mapping, token_nonce)
@@ -257,13 +392,13 @@ where
     ) -> u64 {
         let has_mapping = self.has_mapping_value(token_id);
         if !has_mapping {
-            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(UNKNOWN_TOKEN_ID_ERROR_MESSAGE.as_bytes());
         }
 
         let mapping = self.get_mapping_value(token_id);
         let has_value = self.has_attr_to_nonce_mapping::<T>(mapping, attr);
         if !has_value {
-            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE);
+            SA::error_api_impl().signal_error(VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE.as_bytes());
         }
 
         self.get_attributes_to_nonce_mapping(mapping, attr)
@@ -287,7 +422,7 @@ where
 
     fn build_key_token_id_counter(&self) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
-        key.append_bytes(COUNTER_SUFFIX);
+        key.append_bytes(COUNTER_SUFFIX.as_bytes());
         key
     }
 
@@ -296,14 +431,14 @@ where
         token_id: &EsdtTokenIdentifier<M>,
     ) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
-        key.append_bytes(MAPPING_SUFFIX);
+        key.append_bytes(MAPPING_SUFFIX.as_bytes());
         key.append_item(token_id);
         key
     }
 
     fn build_key_token_attr_value(&self, mapping: u8, token_nonce: u64) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
-        key.append_bytes(ATTR_SUFFIX);
+        key.append_bytes(ATTR_SUFFIX.as_bytes());
         key.append_item(&mapping);
         key.append_item(&token_nonce);
         key
@@ -315,7 +450,7 @@ where
         attr: &T,
     ) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
-        key.append_bytes(NONCE_SUFFIX);
+        key.append_bytes(NONCE_SUFFIX.as_bytes());
         key.append_item(&mapping);
         key.append_item(attr);
         key
