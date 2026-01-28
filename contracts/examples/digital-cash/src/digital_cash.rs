@@ -3,15 +3,16 @@
 
 use multiversx_sc::imports::*;
 
-mod constants;
-mod deposit_info;
+mod digital_cash_err_msg;
 pub mod digital_cash_proxy;
 mod helpers;
 mod pay_fee_and_fund;
 mod signature_operations;
 mod storage;
 
-use constants::*;
+use digital_cash_err_msg::*;
+
+pub type DepositKey<M> = ManagedByteArray<M, 32>;
 
 #[multiversx_sc::contract]
 pub trait DigitalCash:
@@ -21,22 +22,22 @@ pub trait DigitalCash:
     + storage::StorageModule
 {
     #[init]
-    fn init(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
+    fn init(&self, fee: BigUint, token: TokenId) {
         self.whitelist_fee_token(fee, token);
     }
 
     #[endpoint(whitelistFeeToken)]
     #[only_owner]
-    fn whitelist_fee_token(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
+    fn whitelist_fee_token(&self, fee: BigUint, token: TokenId) {
         require!(self.fee(&token).is_empty(), "Token already whitelisted");
         self.fee(&token).set(fee);
         self.whitelisted_fee_tokens().insert(token.clone());
         self.all_time_fee_tokens().insert(token);
     }
 
-    #[endpoint(blacklistFeeToken)]
+    #[endpoint(removeFeeToken)]
     #[only_owner]
-    fn blacklist_fee_token(&self, token: EgldOrEsdtTokenIdentifier) {
+    fn remove_fee_token(&self, token: TokenId) {
         require!(!self.fee(&token).is_empty(), "Token is not whitelisted");
         self.fee(&token).clear();
         self.whitelisted_fee_tokens().swap_remove(&token);
@@ -54,12 +55,9 @@ pub trait DigitalCash:
             if fee == 0 {
                 continue;
             }
-            if token == EgldOrEsdtTokenIdentifier::egld() {
-                self.tx().to(&caller_address).egld(&fee).transfer();
-            } else {
-                let collected_fee = EsdtTokenPayment::new(token.unwrap_esdt(), 0, fee);
-                collected_esdt_fees.push(collected_fee);
-            }
+            let collected_fee = Payment::new(token, 0, NonZeroBigUint::new_or_panic(fee));
+
+            collected_esdt_fees.push(collected_fee);
         }
         if !collected_esdt_fees.is_empty() {
             self.tx()
@@ -72,18 +70,18 @@ pub trait DigitalCash:
     #[view(getAmount)]
     fn get_amount(
         &self,
-        address: ManagedAddress,
-        token: EgldOrEsdtTokenIdentifier,
+        deposit_key: DepositKey<Self::Api>,
+        token: TokenId,
         nonce: u64,
     ) -> BigUint {
-        let deposit_mapper = self.deposit(&address);
+        let deposit_mapper = self.deposit(&deposit_key);
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
         let deposit = deposit_mapper.get();
 
         for fund in deposit.funds.into_iter() {
             if fund.token_identifier == token && fund.token_nonce == nonce {
-                return fund.amount;
+                return fund.amount.as_big_uint().clone();
             }
         }
 

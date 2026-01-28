@@ -19,7 +19,7 @@ multiversx_sc_wasm_adapter::endpoints! {
     (
         init => init
         whitelistFeeToken => whitelist_fee_token
-        blacklistFeeToken => blacklist_fee_token
+        removeFeeToken => remove_fee_token
         claimFees => claim_fees
         getAmount => get_amount
         payFeeAndFund => pay_fee_and_fund

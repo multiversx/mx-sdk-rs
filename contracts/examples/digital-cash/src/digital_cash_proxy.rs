@@ -45,7 +45,7 @@ where
 {
     pub fn init<
         Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<TokenId<Env::Api>>,
     >(
         self,
         fee: Arg0,
@@ -71,7 +71,7 @@ where
 {
     pub fn whitelist_fee_token<
         Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<TokenId<Env::Api>>,
     >(
         self,
         fee: Arg0,
@@ -85,15 +85,15 @@ where
             .original_result()
     }
 
-    pub fn blacklist_fee_token<
-        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+    pub fn remove_fee_token<
+        Arg0: ProxyArg<TokenId<Env::Api>>,
     >(
         self,
         token: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("blacklistFeeToken")
+            .raw_call("removeFeeToken")
             .argument(&token)
             .original_result()
     }
@@ -108,123 +108,124 @@ where
     }
 
     pub fn get_amount<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
+        Arg1: ProxyArg<TokenId<Env::Api>>,
         Arg2: ProxyArg<u64>,
     >(
         self,
-        address: Arg0,
+        deposit_key: Arg0,
         token: Arg1,
         nonce: Arg2,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getAmount")
-            .argument(&address)
+            .argument(&deposit_key)
             .argument(&token)
             .argument(&nonce)
             .original_result()
     }
 
+    /// Pays the required fee and funds a deposit for the given address with specified expiration time. 
     pub fn pay_fee_and_fund<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
+        Arg1: ProxyArg<TimestampMillis>,
     >(
         self,
-        address: Arg0,
-        valability: Arg1,
+        deposit_key: Arg0,
+        expiration: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("payFeeAndFund")
-            .argument(&address)
-            .argument(&valability)
+            .argument(&deposit_key)
+            .argument(&expiration)
             .original_result()
     }
 
     pub fn fund<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
+        Arg1: ProxyArg<TimestampMillis>,
     >(
         self,
-        address: Arg0,
-        valability: Arg1,
+        deposit_key: Arg0,
+        expiration: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("fund")
-            .argument(&address)
-            .argument(&valability)
+            .argument(&deposit_key)
+            .argument(&expiration)
             .original_result()
     }
 
     pub fn deposit_fees<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
     >(
         self,
-        address: Arg0,
+        deposit_key: Arg0,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("depositFees")
-            .argument(&address)
+            .argument(&deposit_key)
             .original_result()
     }
 
     pub fn withdraw<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
     >(
         self,
-        address: Arg0,
+        deposit_key: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("withdraw")
-            .argument(&address)
+            .argument(&deposit_key)
             .original_result()
     }
 
     pub fn claim<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
         Arg1: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
     >(
         self,
-        address: Arg0,
+        deposit_key: Arg0,
         signature: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("claim")
-            .argument(&address)
+            .argument(&deposit_key)
             .argument(&signature)
             .original_result()
     }
 
     pub fn forward<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
+        Arg1: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
         Arg2: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
     >(
         self,
-        address: Arg0,
-        forward_address: Arg1,
+        deposit_key: Arg0,
+        forward_deposit_key: Arg1,
         signature: Arg2,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward")
-            .argument(&address)
-            .argument(&forward_address)
+            .argument(&deposit_key)
+            .argument(&forward_deposit_key)
             .argument(&signature)
             .original_result()
     }
 
     pub fn deposit<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
     >(
         self,
-        donor: Arg0,
+        deposit_key: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, DepositInfo<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("deposit")
-            .argument(&donor)
+            .argument(&deposit_key)
             .original_result()
     }
 }
@@ -236,9 +237,8 @@ where
     Api: ManagedTypeApi,
 {
     pub depositor_address: ManagedAddress<Api>,
-    pub funds: ManagedVec<Api, EgldOrEsdtTokenPayment<Api>>,
-    pub valability: u64,
-    pub expiration_round: u64,
+    pub funds: ManagedVec<Api, Payment<Api>>,
+    pub expiration: TimestampMillis,
     pub fees: Fee<Api>,
 }
 
@@ -249,5 +249,5 @@ where
     Api: ManagedTypeApi,
 {
     pub num_token_to_transfer: usize,
-    pub value: EgldOrEsdtTokenPayment<Api>,
+    pub value: Payment<Api>,
 }

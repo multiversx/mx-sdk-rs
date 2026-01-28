@@ -1,57 +1,60 @@
 use multiversx_sc::imports::*;
 
-use crate::{constants::*, helpers, storage};
+use crate::{DepositKey, digital_cash_err_msg::*, helpers, storage};
 
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
+    /// Pays the required fee and funds a deposit for the given address with specified expiration time.
     #[endpoint(payFeeAndFund)]
     #[payable]
-    fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
-        let mut payments = self.call_value().all_transfers().clone_value();
+    fn pay_fee_and_fund(&self, deposit_key: DepositKey<Self::Api>, expiration: TimestampMillis) {
+        let mut payments = self.call_value().all().clone_value();
         require!(!payments.is_empty(), "no payment was provided");
 
-        let mut fee_token = payments.get(0).clone();
-        let fee_value_mapper = self.fee(&fee_token.token_identifier);
-
-        let provided_fee_token = payments.get(0).clone();
-        require!(!fee_value_mapper.is_empty(), "invalid fee toke provided");
-
-        fee_token.amount = fee_value_mapper.get();
-        let nr_of_payments = payments.len();
-
-        let fee_with_first_token = fee_token.amount.clone() * nr_of_payments as u32;
-        let fee_without_first_token = fee_token.amount.clone() * (nr_of_payments as u32 - 1);
+        let payment_containing_fee = payments.get(0).clone();
+        let fee_per_token = self.get_fee_for_token(&payment_containing_fee.token_identifier);
+        let (total_fee_with_first, total_fee_without_first) =
+            self.calculate_fee_adjustments(payments.len(), &fee_per_token);
 
         require!(
-            (provided_fee_token.amount == fee_without_first_token || // case when the first token is the exact fee amount
-                provided_fee_token.amount > fee_with_first_token), // case when the first token also covers part of the funds
+            payment_containing_fee.amount.as_big_uint() == &total_fee_without_first
+                || payment_containing_fee.amount.as_big_uint() > &total_fee_with_first,
             "payment not covering fees"
         );
 
-        if provided_fee_token.amount > fee_without_first_token {
-            fee_token.amount = fee_with_first_token;
-            let extracted_fee = EgldOrEsdtTokenPayment::new(
-                provided_fee_token.token_identifier,
-                provided_fee_token.token_nonce,
-                provided_fee_token.amount - &fee_token.amount,
-            );
-            let _ = payments.set(0, extracted_fee);
+        // Adjust payments
+        let mut fee_payment_for_deposit = payment_containing_fee.clone();
+        if payment_containing_fee.amount.as_big_uint() > &total_fee_without_first {
+            fee_payment_for_deposit.amount =
+                NonZeroBigUint::new_or_panic(total_fee_with_first.clone());
+            if payment_containing_fee.amount.as_big_uint() > &total_fee_with_first {
+                let fund_from_fee_payment = Payment::new(
+                    payment_containing_fee.token_identifier,
+                    payment_containing_fee.token_nonce,
+                    payment_containing_fee.amount - &fee_payment_for_deposit.amount,
+                );
+                let _ = payments.set(0, fund_from_fee_payment);
+            } else {
+                payments.remove(0);
+            }
         } else {
             payments.remove(0);
-            fee_token.amount = fee_without_first_token;
+            fee_payment_for_deposit.amount = NonZeroBigUint::new_or_panic(total_fee_without_first);
         }
 
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, &address, fee_token);
-
-        self.make_fund(payments, address, valability)
+        self.update_fees(caller_address, &deposit_key, fee_payment_for_deposit);
+        self.make_fund(payments, deposit_key, expiration)
     }
 
     #[endpoint]
     #[payable]
-    fn fund(&self, address: ManagedAddress, valability: u64) {
-        require!(!self.deposit(&address).is_empty(), FEES_NOT_COVERED_ERR_MSG);
-        let deposit_mapper = self.deposit(&address).get();
+    fn fund(&self, deposit_key: DepositKey<Self::Api>, expiration: TimestampMillis) {
+        require!(
+            !self.deposit(&deposit_key).is_empty(),
+            FEES_NOT_COVERED_ERR_MSG
+        );
+        let deposit_mapper = self.deposit(&deposit_key).get();
         let depositor = deposit_mapper.depositor_address;
         require!(
             self.blockchain().get_caller() == depositor,
@@ -59,20 +62,24 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
         );
         let deposited_fee_token = deposit_mapper.fees.value;
         let fee_amount = self.fee(&deposited_fee_token.token_identifier).get();
-        // TODO: switch to egld+esdt multi transfer handling
-        let payment = self.call_value().all_transfers().clone_value();
+
+        let payment = self.call_value().all().clone_value();
 
         let num_tokens = payment.len();
-        self.check_fees_cover_number_of_tokens(num_tokens, fee_amount, deposited_fee_token.amount);
+        self.check_fees_cover_number_of_tokens(
+            num_tokens,
+            &fee_amount,
+            deposited_fee_token.amount.as_big_uint(),
+        );
 
-        self.make_fund(payment, address, valability);
+        self.make_fund(payment, deposit_key, expiration);
     }
 
     #[endpoint(depositFees)]
     #[payable("EGLD")]
-    fn deposit_fees(&self, address: &ManagedAddress) {
-        let payment = self.call_value().egld_or_single_esdt();
+    fn deposit_fees(&self, deposit_key: &DepositKey<Self::Api>) {
+        let payment = self.call_value().single().clone();
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, address, payment);
+        self.update_fees(caller_address, deposit_key, payment);
     }
 }
