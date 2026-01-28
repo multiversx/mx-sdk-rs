@@ -2,9 +2,10 @@ use generic_array::typenum::U16;
 use multiversx_sc_codec::IntoMultiValue;
 
 use crate::{
-    api::ManagedTypeApi,
+    api::{ErrorApiImpl, ManagedTypeApi},
+    err_msg,
     types::{
-        BigUint, Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem,
+        BigUint, Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, FungiblePayment, ManagedVecItem,
         ManagedVecItemPayloadBuffer, NonZeroBigUint, PaymentMultiValue, PaymentRefs, Ref, TokenId,
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
@@ -41,6 +42,13 @@ impl<M: ManagedTypeApi> Payment<M> {
 
     pub fn is_fungible(&self) -> bool {
         self.token_nonce == 0
+    }
+
+    pub fn fungible_or_panic(self) -> FungiblePayment<M> {
+        if !self.is_fungible() {
+            M::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED.as_bytes());
+        }
+        FungiblePayment::new(self.token_identifier, self.amount)
     }
 
     #[inline]
