@@ -42,10 +42,10 @@ pub fn run_mx_scenario_go(absolute_path: &Path) {
 }
 
 fn run_scenario_tool(tool_name: &str, output: Result<Output, Error>) -> Result<(), ToolNotFound> {
-    if let Err(error) = &output {
-        if error.kind() == ErrorKind::NotFound {
-            return Err(ToolNotFound);
-        }
+    if let Err(error) = &output
+        && error.kind() == ErrorKind::NotFound
+    {
+        return Err(ToolNotFound);
     }
 
     let output = output.expect("failed to execute process");
