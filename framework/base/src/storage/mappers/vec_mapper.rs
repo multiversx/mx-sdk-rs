@@ -14,10 +14,10 @@ use crate::{
 };
 use core::marker::PhantomData;
 
-const LEN_SUFFIX: &[u8] = b".len";
-const ITEM_SUFFIX: &[u8] = b".item";
+const LEN_SUFFIX: &str = ".len";
+const ITEM_SUFFIX: &str = ".item";
 
-static INDEX_OUT_OF_RANGE_ERR_MSG: &[u8] = b"index out of range";
+const INDEX_OUT_OF_RANGE_ERR_MSG: &str = "index out of range";
 
 /// A storage mapper for managing an ordered, indexable list of items with automatic length tracking.
 ///
@@ -89,7 +89,7 @@ where
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         let mut len_key = base_key.clone();
-        len_key.append_bytes(LEN_SUFFIX);
+        len_key.append_bytes(LEN_SUFFIX.as_bytes());
 
         VecMapper {
             _phantom_api: PhantomData,
@@ -108,7 +108,7 @@ where
 {
     fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         let mut len_key = base_key.clone();
-        len_key.append_bytes(LEN_SUFFIX);
+        len_key.append_bytes(LEN_SUFFIX.as_bytes());
 
         VecMapper {
             _phantom_api: PhantomData,
@@ -138,7 +138,7 @@ where
 {
     fn item_key(&self, index: usize) -> StorageKey<SA> {
         let mut item_key = self.base_key.clone();
-        item_key.append_bytes(ITEM_SUFFIX);
+        item_key.append_bytes(ITEM_SUFFIX.as_bytes());
         item_key.append_item(&index);
         item_key
     }
@@ -157,7 +157,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn get(&self, index: usize) -> T {
         if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
+            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG.as_bytes());
         }
         self.get_unchecked(index)
     }
@@ -186,7 +186,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn item_is_empty(&self, index: usize) -> bool {
         if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
+            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG.as_bytes());
         }
         self.item_is_empty_unchecked(index)
     }
