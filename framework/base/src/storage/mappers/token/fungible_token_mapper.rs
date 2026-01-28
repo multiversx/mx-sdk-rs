@@ -77,7 +77,6 @@ pub(crate) const DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME: &str =
 /// - Requires careful callback implementation for custom flows
 /// - Token issuance requires blockchain interaction
 /// - State transitions must follow protocol rules
-/// ```
 pub struct FungibleTokenMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,

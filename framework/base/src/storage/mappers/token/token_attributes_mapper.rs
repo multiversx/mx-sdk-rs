@@ -76,7 +76,6 @@ const COUNTER_OVERFLOW_ERROR_MESSAGE: &str =
 /// - Attributes cannot be changed once set (use update carefully)
 /// - Complex storage layout increases implementation overhead
 /// - No iteration capabilities over stored mappings
-/// ```
 pub struct TokenAttributesMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi,
