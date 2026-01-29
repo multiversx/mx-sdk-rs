@@ -2,7 +2,12 @@ use generic_array::typenum::U16;
 use multiversx_sc_codec::IntoMultiValue;
 
 use crate::{
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{ErrorApiImpl, ManagedTypeApi},
+    codec::{
+        self, NestedDecode, TopDecode,
+        derive::{NestedEncode, TopEncode},
+    },
     err_msg,
     types::{
         BigUint, Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, FungiblePayment, ManagedVecItem,
@@ -11,18 +16,8 @@ use crate::{
     },
 };
 
-use crate as multiversx_sc; // needed by the codec and TypeAbi generated code
-use crate::{
-    codec::{
-        self, NestedDecode, TopDecode,
-        derive::{NestedEncode, TopEncode},
-    },
-    derive::type_abi,
-};
-
 use super::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment};
 
-#[type_abi]
 #[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub struct Payment<M: ManagedTypeApi> {
     pub token_identifier: TokenId<M>,
@@ -131,6 +126,21 @@ impl<M: ManagedTypeApi> From<(TokenId<M>, u64, NonZeroBigUint<M>)> for Payment<M
     fn from(value: (TokenId<M>, u64, NonZeroBigUint<M>)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
         Self::new(token_identifier, token_nonce, amount)
+    }
+}
+
+impl<M: ManagedTypeApi> TypeAbiFrom<Self> for Payment<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for Payment<M> {}
+
+impl<M: ManagedTypeApi> TypeAbi for Payment<M> {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        "Payment".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "Payment<$API>".into()
     }
 }
 
