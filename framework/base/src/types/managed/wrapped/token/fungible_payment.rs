@@ -1,23 +1,18 @@
 use generic_array::typenum::U8;
 
 use crate::{
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
+    codec::{
+        self,
+        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    },
     types::{
         ManagedVecItem, ManagedVecItemPayloadBuffer, NonZeroBigUint, Payment, Ref, TokenId,
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
 };
 
-use crate as multiversx_sc; // needed by the codec and TypeAbi generated code
-use crate::{
-    codec::{
-        self,
-        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-    },
-    derive::type_abi,
-};
-
-#[type_abi]
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, PartialEq, Eq, Debug)]
 pub struct FungiblePayment<M: ManagedTypeApi> {
     pub token_identifier: TokenId<M>,
@@ -34,6 +29,21 @@ impl<M: ManagedTypeApi> FungiblePayment<M> {
 
     pub fn into_payment(self) -> Payment<M> {
         Payment::new(self.token_identifier, 0, self.amount)
+    }
+}
+
+impl<M: ManagedTypeApi> TypeAbiFrom<Self> for FungiblePayment<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for FungiblePayment<M> {}
+
+impl<M: ManagedTypeApi> TypeAbi for FungiblePayment<M> {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        "FungiblePayment".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "FungiblePayment<$API>".into()
     }
 }
 
