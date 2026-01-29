@@ -90,6 +90,85 @@ impl LinkedListInfo {
     }
 }
 
+/// A storage mapper implementing a doubly-linked list with efficient insertion and removal at any position.
+///
+/// # Storage Layout
+///
+/// The `LinkedListMapper` stores metadata and individual nodes separately:
+///
+/// 1. **Metadata**:
+///    - `base_key + ".info"` → `LinkedListInfo` struct containing:
+///      - `len`: number of elements
+///      - `front`: node ID of the first element
+///      - `back`: node ID of the last element
+///      - `new`: counter for generating unique node IDs
+///
+/// 2. **Nodes**:
+///    - `base_key + ".node" + node_id` → `LinkedListNode<T>` containing:
+///      - `value`: the stored item
+///      - `node_id`: this node's unique ID
+///      - `next_id`: ID of the next node (0 if none)
+///      - `prev_id`: ID of the previous node (0 if none)
+///
+/// # Main Operations
+///
+/// - **Append**: `push_back(item)` - Adds to the end. O(1) with constant storage writes.
+/// - **Prepend**: `push_front(item)` - Adds to the beginning. O(1) with constant storage writes.
+/// - **Insert**: `push_after(node, item)` / `push_before(node, item)` - Inserts at specific position. O(1).
+/// - **Remove**: `pop_front()` / `pop_back()` / `remove_node(node)` - Removes from any position. O(1).
+/// - **Access**: `front()` / `back()` / `get_node_by_id(id)` - Retrieves nodes. O(1).
+/// - **Iteration**: `iter()` - Traverses from front to back; `iter_from_node_id(id)` - starts from specific node.
+///
+/// # Trade-offs
+///
+/// - **Pros**: O(1) insertion/removal at any position; maintains insertion order; efficient for queue/deque patterns.
+/// - **Cons**: No random access by index; higher storage overhead per element (stores prev/next pointers);
+///   iteration requires following links; removed nodes leave "gaps" in node ID space.
+///
+/// # Use Cases
+///
+/// - Task queues where items can be added/removed at any position
+/// - Priority management where items move positions frequently
+/// - Scenarios requiring both ordered iteration and arbitrary insertion/removal
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, LinkedListMapper};
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = LinkedListMapper::<SA, u64>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"tasks"[..])
+/// # );
+/// // Add elements
+/// let node1 = mapper.push_back(100);
+/// let node2 = mapper.push_back(200);
+/// let node3 = mapper.push_back(300);
+///
+/// assert_eq!(mapper.len(), 3);
+/// assert_eq!(mapper.front().unwrap().into_value(), 100);
+/// assert_eq!(mapper.back().unwrap().into_value(), 300);
+///
+/// // Insert in the middle
+/// let mut node2_mut = node2.clone();
+/// mapper.push_after(&mut node2_mut, 250);
+/// assert_eq!(mapper.len(), 4);
+///
+/// // Remove from front
+/// let removed = mapper.pop_front().unwrap();
+/// assert_eq!(removed.into_value(), 100);
+/// assert_eq!(mapper.len(), 3);
+///
+/// // Remove specific node
+/// mapper.remove_node(&node2);
+/// assert_eq!(mapper.len(), 2);
+///
+/// // Iterate through remaining elements
+/// for node in mapper.iter() {
+///     let value = node.into_value();
+///     // Process value
+/// }
+/// # }
+/// ```
 pub struct LinkedListMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
