@@ -3,7 +3,7 @@ use generic_array::typenum::U8;
 use crate::{
     api::ManagedTypeApi,
     types::{
-        ManagedVecItem, ManagedVecItemPayloadBuffer, NonZeroBigUint, Ref, TokenId,
+        ManagedVecItem, ManagedVecItemPayloadBuffer, NonZeroBigUint, Payment, Ref, TokenId,
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
 };
@@ -25,12 +25,15 @@ pub struct FungiblePayment<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> FungiblePayment<M> {
-    #[inline]
     pub fn new(token_identifier: TokenId<M>, amount: NonZeroBigUint<M>) -> Self {
         FungiblePayment {
             token_identifier,
             amount,
         }
+    }
+
+    pub fn into_payment(self) -> Payment<M> {
+        Payment::new(self.token_identifier, 0, self.amount)
     }
 }
 
