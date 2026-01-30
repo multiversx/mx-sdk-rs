@@ -40,14 +40,14 @@ Parameters:
 - `deposit_key`: The 32-byte check address (ED25519 public key) where funds will be stored
 - `expiration`: Timestamp in milliseconds when the deposit expires
 
-The endpoint can also be used to add more fwith a configured fee token
+The endpoint can also be used to add more funds and fees to an existing deposit (caller must be the original depositor).
+
+### Option 2: `depositFees` + `fund` (Two-Step)
+Alternative approach for more complex scenarios:
+1. First call `depositFees` to pay the fee with a configured fee token
 2. Then call `fund` to deposit the actual tokens (must be same depositor)
 
-The `fund` endpoint verifies that sufficient fees have been paid to cover the total number of funds being deposited. This approach is particularly useful for the `forward` operation, where the destination deposit must exist with fees paid in advance
-1. First call `depositFees` to pay the fee in a whitelisted token
-2. Then call `fund` to deposit the actual tokens (must be same depositor)
-
-The `fund` endpoint verifies that sufficient fees have been paid to cover the number of tokens being deposited.
+The `fund` endpoint verifies that sufficient fees have been paid to cover the total number of funds being deposited. This approach is particularly useful for the `forward` operation, where the destination deposit must exist with fees paid in advance.
 
 ## Claiming Funds
 
@@ -62,17 +62,22 @@ If the signature is valid and the deposit hasn't expired:
 - Required fees (if fees enabled) are collected by the contract: `fee_collected = base_fee × number_of_funds`
 - Any excess fees are returned to the original depositor
 - The deposit is removed from storage
-Expired Deposits
+
+**Important**: The deposit must not be expired (current timestamp must be ≤ expiration timestamp).
+
+## Withdrawing Expired Deposits
 
 If a deposit has expired and hasn't been claimed, anyone can trigger the withdrawal by calling `withdrawExpired`:
 - `deposit_key`: The check address containing the expired deposit
 
 This returns all deposited funds plus all fees to the original depositor. No signature is required, but the deposit must have passed its expiration timestamp.
 
-**Important**: Current block timestamp must be > expiration timestampclaim everything by calling `withdraw`:
-- `address`: The check address containing the expired deposit
+**Important**: Current block timestamp must be > expiration timestamp.
 
-Thideposit_key`: The current check address (source)
+## Forwarding Funds
+
+Funds can be forwarded to another check address using the `forward` endpoint:
+- `deposit_key`: The current check address (source)
 - `forward_deposit_key`: The new check address (destination)
 - `signature`: ED25519 signature proving ownership of the source check
 
@@ -88,7 +93,8 @@ The forward operation:
 
 **Important**: The caller must be the depositor of the destination deposit, and the destination must have sufficient fees to cover the combined total of existing funds plus forwarded funds.
 
-After forwarding, the funds belong to the destination deposit and will go to the destination's depositor if withdrawn after expiration
+After forwarding, the funds belong to the destination deposit and will go to the destination's depositor if withdrawn after expiration.
+
 ## Contract Owner Operations
 
 The contract owner has exclusive access to fee management endpoints:
@@ -110,8 +116,4 @@ Configures the fee for a specific token:
 Withdraws all collected fees to the owner:
 - Transfers all accumulated fees across all tokens in a single multi-payment transaction
 - Clears the collected fees storage
-- Only fees collected from claims and forwards are included (not initial deposits)- Consumes fees from the current deposit
-- Moves funds to the forwarded address
-- Returns any remaining fees to the original depositor
-
-After forwarding, if the new deposit expires and is withdrawn, funds go to the depositor address recorded in the forwarded deposit.
+- Only fees collected from claims and forwards are included (not initial deposits)
