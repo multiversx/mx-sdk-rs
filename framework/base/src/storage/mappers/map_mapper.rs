@@ -16,9 +16,69 @@ use crate::{
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
-const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";
+const MAPPED_VALUE_IDENTIFIER: &str = ".mapped";
 type Keys<'a, SA, A, T> = set_mapper::Iter<'a, SA, A, T>;
 
+/// A storage mapper implementing a key-value map with efficient lookup and iteration.
+///
+/// # Storage Layout
+///
+/// The `MapMapper` uses a `SetMapper` to track keys and stores values separately:
+///
+/// 1. **Key tracking** (via `SetMapper`):
+///    - `base_key + ".info"` → `QueueMapperInfo` (length, front, back, new node counter)
+///    - `base_key + ".node_links" + node_id` → `Node` structure (previous, next)
+///    - `base_key + ".value" + node_id` → key value
+///    - `base_key + ".node_id" + encoded_key` → node ID lookup
+///
+/// 2. **Value storage**:
+///    - `base_key + ".mapped" + encoded_key` → value associated with the key
+///
+/// # Main Operations
+///
+/// - **Insert**: `insert(key, value)` - Adds or updates a key-value pair. Returns old value if key existed. O(1).
+/// - **Remove**: `remove(key)` - Removes a key-value pair. Returns the value if it existed. O(1).
+/// - **Lookup**: `get(key)` - Retrieves the value for a key. O(1) with one storage read.
+/// - **Contains**: `contains_key(key)` - Checks if a key exists. O(1) with one storage read.
+/// - **Entry API**: `entry(key)` - Provides entry-based manipulation (or_insert, and_modify, etc.).
+/// - **Iteration**: `iter()` - Iterates over (key, value) pairs; `keys()` - keys only; `values()` - values only.
+///
+/// # Trade-offs
+///
+/// - **Pros**: Familiar HashMap-like API; efficient lookups; supports entry pattern for conditional updates.
+/// - **Cons**: Uses more storage than simple key-value pairs (overhead from SetMapper); iteration order is arbitrary.
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, MapMapper};
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = MapMapper::<SA, u32, u64>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"balances"[..])
+/// # );
+/// // Insert key-value pairs
+/// mapper.insert(1, 100);
+/// mapper.insert(2, 200);
+/// mapper.insert(3, 300);
+///
+/// assert_eq!(mapper.get(&2), Some(200));
+/// assert_eq!(mapper.len(), 3);
+///
+/// // Update using entry API
+/// mapper.entry(2).and_modify(|v| *v += 50);
+/// assert_eq!(mapper.get(&2), Some(250));
+///
+/// // Remove a key
+/// let removed = mapper.remove(&1);
+/// assert_eq!(removed, Some(100));
+/// assert_eq!(mapper.len(), 2);
+///
+/// // Iterate over key-value pairs
+/// for (key, value) in mapper.iter() {
+///     // Process pairs
+/// }
+/// # }
+/// ```
 pub struct MapMapper<SA, K, V, A = CurrentStorage>
 where
     SA: StorageMapperApi,
@@ -145,9 +205,9 @@ where
         self.keys_set.contains(k)
     }
 
-    fn build_named_key(&self, name: &[u8], key: &K) -> StorageKey<SA> {
+    fn build_named_key(&self, name: &str, key: &K) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
-        named_key.append_bytes(name);
+        named_key.append_bytes(name.as_bytes());
         named_key.append_item(key);
         named_key
     }

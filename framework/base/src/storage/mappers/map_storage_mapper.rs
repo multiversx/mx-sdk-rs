@@ -16,6 +16,102 @@ use crate::{
 const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
 type Keys<'a, SA, A, T> = set_mapper::Iter<'a, SA, A, T>;
 
+/// A storage mapper implementing a map where values are themselves storage mappers (nested storage).
+///
+/// # Storage Layout
+///
+/// The `MapStorageMapper` uses a `SetMapper` to track keys and creates nested storage mappers for values:
+///
+/// 1. **Key tracking** (via `SetMapper`):
+///    - `base_key + ".info"` → `QueueMapperInfo` metadata for the key set
+///    - `base_key + ".node_links" + node_id` → node structure (prev/next pointers)
+///    - `base_key + ".value" + node_id` → key value
+///    - `base_key + ".node_id" + encoded_key` → node ID lookup
+///
+/// 2. **Nested storage mappers**:
+///    - `base_key + ".storage" + encoded_key` → acts as base key for nested mapper `V`
+///    - Each nested mapper has its own sub-structure (e.g., if `V` is `VecMapper<SA, u32>`,
+///      then `base_key + ".storage" + key + ".len"`, `base_key + ".storage" + key + ".item1"`, etc.)
+///
+/// # Main Operations
+///
+/// - **Insert**: `insert_default(key)` - Adds a key with default-initialized nested mapper. O(1).
+/// - **Remove**: `remove(key)` - Removes key and clears all nested storage. O(n) where n = nested mapper size.
+/// - **Lookup**: `get(key)` - Returns the nested mapper for a key. O(1), lazy-creates mapper instance.
+/// - **Contains**: `contains_key(key)` - Checks if key exists. O(1) with one storage read.
+/// - **Entry API**: `entry(key)` - Provides entry-based manipulation for conditional initialization.
+/// - **Iteration**: `iter()` - Iterates over (key, mapper) pairs; `keys()` - keys only; `values()` - mappers only.
+///
+/// # Key Characteristics
+///
+/// - **Nested Storage**: Values are not simple data but entire storage mappers (e.g., `VecMapper`, `SetMapper`)
+/// - **Lazy Initialization**: Nested mappers are created on-demand when accessed
+/// - **Composition**: Enables complex hierarchical storage structures (e.g., map of lists, map of maps)
+///
+/// # Comparison with MapMapper
+///
+/// - **MapMapper**: Stores simple values directly (`MapMapper<SA, K, V>` where V is a plain type)
+/// - **MapStorageMapper**: Stores nested mappers (`MapStorageMapper<SA, K, V>` where V is a StorageMapper)
+///
+/// # Trade-offs
+///
+/// - **Pros**: Enables powerful nested data structures; each nested mapper is independent; type-safe composition.
+/// - **Cons**: Higher storage overhead; removal is more expensive; complexity increases with nesting depth;
+///   each access creates mapper instance (lightweight but not zero-cost).
+///
+/// # Use Cases
+///
+/// - User-specific collections (e.g., map user address → their token balances as VecMapper)
+/// - Category-based grouping (e.g., map category → items as SetMapper)
+/// - Multi-level hierarchies (e.g., map project → map milestone → tasks as nested Mappers)
+/// - Per-entity state machines (e.g., map entity_id → its own state storage)
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, MapStorageMapper, VecMapper};
+/// # use multiversx_sc::types::ManagedAddress;
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>(user1: ManagedAddress<SA>, user2: ManagedAddress<SA>) {
+/// # let mut mapper = MapStorageMapper::<SA, ManagedAddress<SA>, VecMapper<SA, u64>>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"user_tokens"[..])
+/// # );
+/// // Create nested VecMapper for each user
+/// mapper.insert_default(user1.clone());
+/// mapper.insert_default(user2.clone());
+///
+/// // Get user's token list and add tokens
+/// if let Some(mut user1_tokens) = mapper.get(&user1) {
+///     user1_tokens.push(&100);
+///     user1_tokens.push(&200);
+/// }
+///
+/// if let Some(mut user2_tokens) = mapper.get(&user2) {
+///     user2_tokens.push(&300);
+/// }
+///
+/// // Check and access nested mapper
+/// assert!(mapper.contains_key(&user1));
+/// if let Some(user1_tokens) = mapper.get(&user1) {
+///     assert_eq!(user1_tokens.len(), 2);
+///     assert_eq!(user1_tokens.get(1), 100);
+/// }
+///
+/// // Use entry API
+/// mapper.entry(user1.clone())
+///     .and_modify(|tokens| { tokens.push(&250); });
+///
+/// // Iterate over all users and their token lists
+/// for (user, tokens) in mapper.iter() {
+///     for token_id in tokens.iter() {
+///         // Process each user's tokens
+///     }
+/// }
+///
+/// // Remove user and all their tokens
+/// mapper.remove(&user2);
+/// assert!(!mapper.contains_key(&user2));
+/// # }
+/// ```
 pub struct MapStorageMapper<SA, K, V, A = CurrentStorage>
 where
     SA: StorageMapperApi,
