@@ -15,17 +15,10 @@ pub enum OrderType {
     Sell,
 }
 
-/// TODO: naming conflict with new FungiblePayment type in the framework, switch to that
-#[derive(ManagedVecItem, Clone)]
-pub struct OrderBookFungiblePayment<M: ManagedTypeApi> {
-    pub token_id: TokenId<M>,
-    pub amount: BigUint<M>,
-}
-
 #[derive(ManagedVecItem, Clone)]
 pub struct Transfer<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
-    pub payment: OrderBookFungiblePayment<M>,
+    pub payment: FungiblePayment<M>,
 }
 
 #[type_abi]
@@ -52,7 +45,7 @@ pub struct DealConfig {
 #[type_abi]
 #[derive(TopEncode, TopDecode, Clone)]
 pub struct OrderInputParams<M: ManagedTypeApi> {
-    pub amount: BigUint<M>,
+    pub amount: NonZeroBigUint<M>,
     pub match_provider: ManagedAddress<M>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
@@ -64,8 +57,8 @@ pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
     pub creator: ManagedAddress<M>,
     pub match_provider: ManagedAddress<M>,
-    pub input_amount: BigUint<M>,
-    pub output_amount: BigUint<M>,
+    pub input_amount: NonZeroBigUint<M>,
+    pub output_amount: NonZeroBigUint<M>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
     pub create_epoch: u64,
@@ -84,7 +77,7 @@ pub trait CommonModule {
     fn new_order(
         &self,
         id: u64,
-        payment: OrderBookFungiblePayment<Self::Api>,
+        payment: FungiblePayment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
     ) -> Order<Self::Api> {
@@ -101,23 +94,29 @@ pub trait CommonModule {
         }
     }
 
-    fn rule_of_three(&self, part: &BigUint, total: &BigUint, value: &BigUint) -> BigUint {
-        &(part * value) / total
+    fn rule_of_three(&self, part: u64, total: u64, value: &BigUint) -> BigUint {
+        &(BigUint::from(part) * value) / BigUint::from(total)
     }
 
-    fn calculate_fee_amount(&self, amount: &BigUint, fee_config: &FeeConfig<Self::Api>) -> BigUint {
+    fn calculate_fee_amount(
+        &self,
+        amount: &NonZeroBigUint,
+        fee_config: &FeeConfig<Self::Api>,
+    ) -> BigUint {
         match fee_config.fee_type {
             FeeConfigEnum::Fixed => fee_config.fixed_fee.clone(),
-            FeeConfigEnum::Percent => amount * fee_config.percent_fee / PERCENT_BASE_POINTS,
+            FeeConfigEnum::Percent => {
+                amount.as_big_uint() * fee_config.percent_fee / PERCENT_BASE_POINTS
+            }
         }
     }
 
     fn calculate_amount_after_fee(
         &self,
-        amount: &BigUint,
+        amount: &NonZeroBigUint,
         fee_config: &FeeConfig<Self::Api>,
     ) -> BigUint {
-        amount - &self.calculate_fee_amount(amount, fee_config)
+        amount.as_big_uint() - &self.calculate_fee_amount(amount, fee_config)
     }
 
     #[view(getFirstTokenId)]
