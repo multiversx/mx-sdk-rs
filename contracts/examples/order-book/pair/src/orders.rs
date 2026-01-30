@@ -150,24 +150,22 @@ pub trait OrdersModule:
             "Too early to free order"
         );
 
+        // penalty_count is > 6, so this cannot be zero
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
-        let penalty_amount = self.rule_of_three(
-            penalty_percent,
-            PERCENT_BASE_POINTS,
-            order.input_amount.as_big_uint(),
-        );
-        let amount = order.input_amount.as_big_uint() - &penalty_amount;
+
+        let penalty_amount = order
+            .input_amount
+            .proportion(penalty_percent, PERCENT_BASE_POINTS);
+
+        let creator_amount = &order.input_amount - &penalty_amount;
 
         let creator_transfer = Transfer {
             to: order.creator.clone(),
-            payment: FungiblePayment::new(
-                token_id.clone(),
-                NonZeroBigUint::new_or_panic(amount.clone()),
-            ),
+            payment: FungiblePayment::new(token_id.clone(), creator_amount),
         };
         let caller_transfer = Transfer {
             to: caller.clone(),
-            payment: FungiblePayment::new(token_id, NonZeroBigUint::new_or_panic(penalty_amount)),
+            payment: FungiblePayment::new(token_id, penalty_amount),
         };
 
         self.orders(order_id).clear();
@@ -196,11 +194,9 @@ pub trait OrdersModule:
 
         let penalty_count = (epoch - order.create_epoch) / FEE_PENALTY_INCREASE_EPOCHS;
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
-        let penalty_amount = self.rule_of_three(
-            penalty_percent,
-            PERCENT_BASE_POINTS,
-            order.input_amount.as_big_uint(),
-        );
+        let penalty_amount = order
+            .input_amount
+            .proportion(penalty_percent, PERCENT_BASE_POINTS);
 
         let mut amount = order.input_amount.clone();
         amount -= &penalty_amount;
@@ -319,10 +315,9 @@ pub trait OrdersModule:
             let creator_amount = order.output_amount.as_big_uint() - &match_provider_amount;
 
             let order_deal = order.input_amount.as_big_uint() * &leftover / &total_paid;
-            let match_provider_deal_amount = self.rule_of_three(
+            let match_provider_deal_amount = order_deal.proportion(
                 order.deal_config.match_provider_percent,
                 PERCENT_BASE_POINTS,
-                &order_deal,
             );
             let creator_deal_amount = &order_deal - &match_provider_deal_amount;
 

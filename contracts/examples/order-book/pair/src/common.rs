@@ -105,9 +105,9 @@ pub trait CommonModule {
     ) -> BigUint {
         match fee_config.fee_type {
             FeeConfigEnum::Fixed => fee_config.fixed_fee.clone(),
-            FeeConfigEnum::Percent => {
-                amount.as_big_uint() * fee_config.percent_fee / PERCENT_BASE_POINTS
-            }
+            FeeConfigEnum::Percent => amount
+                .as_big_uint()
+                .proportion(fee_config.percent_fee, PERCENT_BASE_POINTS),
         }
     }
 
