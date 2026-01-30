@@ -44,18 +44,18 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<TokenId<Env::Api>>,
+        Arg0: ProxyArg<bool>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue2<TokenId<Env::Api>, BigUint<Env::Api>>>>,
     >(
         self,
-        fee: Arg0,
-        token: Arg1,
+        fees_disabled: Arg0,
+        fee_variants: Arg1,
     ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_deploy()
-            .argument(&fee)
-            .argument(&token)
+            .argument(&fees_disabled)
+            .argument(&fee_variants)
             .original_result()
     }
 }
@@ -69,32 +69,35 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn whitelist_fee_token<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<TokenId<Env::Api>>,
+    pub fn set_fees_disabled<
+        Arg0: ProxyArg<bool>,
     >(
         self,
-        fee: Arg0,
-        token: Arg1,
+        fees_disabled: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("whitelistFeeToken")
-            .argument(&fee)
-            .argument(&token)
+            .raw_call("setFeesDisabled")
+            .argument(&fees_disabled)
             .original_result()
     }
 
-    pub fn remove_fee_token<
+    /// Updates the fee for a specific token. 
+    ///  
+    /// Setting the fee_amount to zero effectively disables fees for that token. 
+    pub fn set_fee<
         Arg0: ProxyArg<TokenId<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
-        token: Arg0,
+        fee_token: Arg0,
+        fee_amount: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("removeFeeToken")
-            .argument(&token)
+            .raw_call("setFee")
+            .argument(&fee_token)
+            .argument(&fee_amount)
             .original_result()
     }
 
@@ -104,25 +107,6 @@ where
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("claimFees")
-            .original_result()
-    }
-
-    pub fn get_amount<
-        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
-        Arg1: ProxyArg<TokenId<Env::Api>>,
-        Arg2: ProxyArg<u64>,
-    >(
-        self,
-        deposit_key: Arg0,
-        token: Arg1,
-        nonce: Arg2,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getAmount")
-            .argument(&deposit_key)
-            .argument(&token)
-            .argument(&nonce)
             .original_result()
     }
 
@@ -169,7 +153,7 @@ where
             .original_result()
     }
 
-    pub fn withdraw<
+    pub fn withdraw_expired<
         Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
     >(
         self,
@@ -177,11 +161,12 @@ where
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("withdraw")
+            .raw_call("withdrawExpired")
             .argument(&deposit_key)
             .original_result()
     }
 
+    /// The recipient claims the deposit by providing a valid signature over the deposit key. 
     pub fn claim<
         Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
         Arg1: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
@@ -239,15 +224,5 @@ where
     pub depositor_address: ManagedAddress<Api>,
     pub funds: ManagedVec<Api, Payment<Api>>,
     pub expiration: TimestampMillis,
-    pub fees: Fee<Api>,
-}
-
-#[type_abi]
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct Fee<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub num_token_to_transfer: usize,
-    pub value: Payment<Api>,
+    pub fees: Option<FungiblePayment<Api>>,
 }

@@ -5,8 +5,8 @@ use crate::common::{FEE_PENALTY_INCREASE_EPOCHS, FEE_PENALTY_INCREASE_PERCENT};
 use super::{common, events, validation};
 
 use super::common::{
-    FREE_ORDER_FROM_STORAGE_MIN_PENALTIES, OrderBookFungiblePayment, Order, OrderInputParams, OrderType,
-    PERCENT_BASE_POINTS, Transfer,
+    FREE_ORDER_FROM_STORAGE_MIN_PENALTIES, Order, OrderBookFungiblePayment, OrderInputParams,
+    OrderType, PERCENT_BASE_POINTS, Transfer,
 };
 
 #[multiversx_sc::module]
