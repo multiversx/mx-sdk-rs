@@ -174,6 +174,43 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
     pub fn into_big_int(self) -> BigInt<M> {
         self.value
     }
+
+    /// Calculates proportion of this value, consuming self.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (e.g., 1000 for 1% when total is 100000)
+    /// * `total` - The denominator value for the ratio calculation (e.g., 100 for percentage, 100000 for basis points)
+    ///
+    /// # Returns
+    /// The proportional amount as NonZeroBigUint (will panic if result is zero or negative)
+    ///
+    /// # Example
+    /// ```
+    /// let amount = NonZeroBigUint::new_or_panic(BigUint::from(1000u32));
+    /// let result = amount.into_proportion(5u32, 100u32); // 5/100 of 1000 = 50
+    /// ```
+    pub fn into_proportion(self, part: u64, total: u64) -> Self {
+        let result_big_int = self.value.into_proportion(part as i64, total as i64);
+        Self::wrap_big_int_assert_gt_zero(result_big_int)
+    }
+
+    /// Calculates proportion of this value.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (e.g., 1000 for 1% when total is 100000)
+    /// * `total` - The denominator value for the ratio calculation (e.g., 100 for percentage, 100000 for basis points)
+    ///
+    /// # Returns
+    /// The proportional amount as NonZeroBigUint (will panic if result is zero or negative)
+    ///
+    /// # Example
+    /// ```
+    /// let amount = NonZeroBigUint::new_or_panic(BigUint::from(1000u32));
+    /// let result = amount.proportion(5u32, 100u32); // 5/100 of 1000 = 50
+    /// ```
+    pub fn proportion(&self, part: u64, total: u64) -> Self {
+        self.clone().into_proportion(part, total)
+    }
 }
 
 // TODO: figure out what type should be used in a non-managed context

@@ -77,17 +77,22 @@ impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
+    /// Creates a new BigUint from a BigInt without checking invariants.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be >= 0, otherwise the invariant is broken and subtle bugs can appear.
+    pub unsafe fn new_unchecked(bi: BigInt<M>) -> Self {
+        BigUint { value: bi }
+    }
+
     /// Creates a new object, without initializing it.
     ///
     /// ## Safety
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        unsafe {
-            BigUint {
-                value: BigInt::new_uninit(),
-            }
-        }
+        unsafe { Self::new_unchecked(BigInt::new_uninit()) }
     }
 
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
@@ -294,6 +299,48 @@ impl<M: ManagedTypeApi> BigUint<M> {
         } else {
             Some(result as u32)
         }
+    }
+
+    /// Calculates proportion of this value, consuming self.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (e.g., 1000 for 1% when total is 100000)
+    /// * `total` - The denominator value for the ratio calculation (e.g., 100 for percentage, 100000 for basis points)
+    ///
+    /// # Returns
+    /// The proportional amount as BigUint (self * part / total)
+    ///
+    /// # Example
+    /// ```
+    /// let amount = BigUint::from(1000u32);
+    /// let result = amount.into_proportion(5u32, 100u32); // 5/100 of 1000 = 50
+    /// ```
+    pub fn into_proportion(self, part: u64, total: u64) -> Self {
+        // mathematically, the result of this operation cannot be negative, so it is safe to skip sign check
+        unsafe {
+            Self::new_unchecked(
+                self.into_big_int()
+                    .into_proportion(part as i64, total as i64),
+            )
+        }
+    }
+
+    /// Calculates proportion of this value.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (e.g., 1000 for 1% when total is 100000)
+    /// * `total` - The denominator value for the ratio calculation (e.g., 100 for percentage, 100000 for basis points)
+    ///
+    /// # Returns
+    /// The proportional amount as BigUint (self * part / total)
+    ///
+    /// # Example
+    /// ```
+    /// let amount = BigUint::from(1000u32);
+    /// let result = amount.proportion(5u32, 100u32); // 5/100 of 1000 = 50
+    /// ```
+    pub fn proportion(&self, part: u64, total: u64) -> Self {
+        self.clone().into_proportion(part, total)
     }
 
     /// Natural logarithm of a number.
