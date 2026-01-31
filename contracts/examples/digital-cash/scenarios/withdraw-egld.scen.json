@@ -11,7 +11,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
-                "function": "withdraw",
+                "function": "withdrawExpired",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60"
                 ],
@@ -21,7 +21,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:withdrawal has not been available yet",
+                "message": "str:cannot withdraw, deposit not expired yet",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -42,63 +42,34 @@
                     "storage": {
                         "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
                             "0-depositor_address": "address:acc1",
-                            "1-funds": "u32:1|nested:str:EGLD|u64:0|biguint:1,000",
-                            "2-valability": "u64:60",
-                            "3-expiration_round": "u64:10",
-                            "4-fees": {
-                                "0-num_token_to_transfer": "u32:1",
-                                "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
-                                    "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
-                                }
-                            }
+                            "1-funds": "u32:1|nested:str:EGLD-000000|u64:0|biguint:1,000",
+                            "2-expiration": "u64:86399_000",
+                            "3-fees": "0x01|nested:str:EGLD-000000|biguint:1,000"
                         },
                         "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
                             "0-depositor_address": "address:acc2",
                             "1-esdt_funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
-                            "2-valability": "u64:100",
-                            "3-expiration_round": "u64:16",
-                            "4-fees": {
-                                "0-num_token_to_transfer": "u32:1",
-                                "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
-                                    "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
-                                }
-                            }
+                            "2-expiration": "u64:86400_000",
+                            "3-fees": "0x01|nested:str:EGLD-000000|biguint:1,000"
                         },
                         "str:deposit|0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d": {
                             "0-depositor_address": "address:acc3",
                             "1-esdt_funds": "u32:3|nested:str:CASHTOKEN-112233|u64:0|biguint:50|nested:str:CASHTOKEN-445566|u64:0|biguint:50|nested:str:CASHTOKEN-778899|u64:0|biguint:50",
-                            "2-valability": "u64:100",
-                            "3-expiration_round": "u64:16",
-                            "4-fees": {
-                                "0-num_token_to_transfer": "u32:3",
-                                "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
-                                    "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
-                                }
-                            }
+                            "2-expiration": "u64:86400_000",
+                            "3-fees": "0x01|nested:str:EGLD-000000|biguint:1,000"
                         },
-                        "str:fee|nested:str:EGLD": "10",
-                        "str:whitelistedFeeTokens|str:.len": "1",
-                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
-                        "str:allTimeFeeTokens|str:.len": "1",
-                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
+                        "str:feesDisabled": "false",
+                        "str:baseFee|nested:str:EGLD-000000": "10"
                     },
                     "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
-                    "nonce": "4",
+                    "nonce": "*",
                     "balance": "998,000",
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "3",
+                    "nonce": "*",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
@@ -106,7 +77,7 @@
                     "storage": {}
                 },
                 "address:acc3": {
-                    "nonce": "3",
+                    "nonce": "*",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-112233": "50",
@@ -128,7 +99,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
-                "function": "withdraw",
+                "function": "withdrawExpired",
                 "arguments": [
                     "0x558fd9b0dd9fed2d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a"
                 ],
@@ -148,10 +119,7 @@
             "step": "setState",
             "comment": "set block",
             "currentBlockInfo": {
-                "blockTimestampMs": "511",
-                "blockNonce": "300",
-                "blockRound": "300",
-                "blockEpoch": "1"
+                "blockTimestampMs": "86400_000"
             }
         },
         {
@@ -160,7 +128,7 @@
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
-                "function": "withdraw",
+                "function": "withdrawExpired",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60"
                 ],
@@ -192,48 +160,27 @@
                         "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
                             "0-depositor_address": "address:acc2",
                             "1-funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
-                            "2-valability": "u64:100",
-                            "3-expiration_round": "u64:16",
-                            "4-fees": {
-                                "0-num_token_to_transfer": "u32:1",
-                                "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
-                                    "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
-                                }
-                            }
+                            "2-expiration": "u64:86400_000",
+                            "3-fees": "0x01|nested:str:EGLD-000000|biguint:1,000"
                         },
                         "str:deposit|0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d": {
                             "0-depositor_address": "address:acc3",
                             "1-funds": "u32:3|nested:str:CASHTOKEN-112233|u64:0|biguint:50|nested:str:CASHTOKEN-445566|u64:0|biguint:50|nested:str:CASHTOKEN-778899|u64:0|biguint:50",
-                            "2-valability": "u64:100",
-                            "3-expiration_round": "u64:16",
-                            "4-fees": {
-                                "0-num_token_to_transfer": "u32:3",
-                                "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
-                                    "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
-                                }
-                            }
+                            "2-expiration": "u64:86400_000",
+                            "3-fees": "0x01|nested:str:EGLD-000000|biguint:1,000"
                         },
-                        "str:fee|nested:str:EGLD": "10",
-                        "str:whitelistedFeeTokens|str:.len": "1",
-                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
-                        "str:allTimeFeeTokens|str:.len": "1",
-                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
+                        "str:feesDisabled": "false",
+                        "str:baseFee|nested:str:EGLD-000000": "10"
                     },
                     "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
-                    "nonce": "6",
+                    "nonce": "*",
                     "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "3",
+                    "nonce": "*",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
@@ -241,7 +188,7 @@
                     "storage": {}
                 },
                 "address:acc3": {
-                    "nonce": "3",
+                    "nonce": "*",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-112233": "50",

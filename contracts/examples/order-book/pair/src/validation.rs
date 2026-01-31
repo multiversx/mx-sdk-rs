@@ -1,6 +1,6 @@
 use multiversx_sc::imports::*;
 
-use crate::common::{FeeConfig, FeeConfigEnum, FungiblePayment};
+use crate::common::{FeeConfig, FeeConfigEnum, OrderBookFungiblePayment};
 
 use super::{
     common,
@@ -68,7 +68,7 @@ pub trait ValidationModule: common::CommonModule {
         self.require_valid_order_input_deal_config(params);
     }
 
-    fn require_valid_buy_payment(&self) -> FungiblePayment<Self::Api> {
+    fn require_valid_buy_payment(&self) -> OrderBookFungiblePayment<Self::Api> {
         let payment = self.call_value().single();
         let second_token_id = self.second_token_id().get();
         require!(
@@ -80,13 +80,13 @@ pub trait ValidationModule: common::CommonModule {
             "Token id and second token id should be the same"
         );
 
-        FungiblePayment {
+        OrderBookFungiblePayment {
             token_id: payment.token_identifier.clone(),
             amount: payment.amount.as_big_uint().clone(),
         }
     }
 
-    fn require_valid_sell_payment(&self) -> FungiblePayment<Self::Api> {
+    fn require_valid_sell_payment(&self) -> OrderBookFungiblePayment<Self::Api> {
         let payment = self.call_value().single();
         let first_token_id = self.first_token_id().get();
         require!(payment.is_fungible(), "Payment is not a fungible token");
@@ -95,7 +95,7 @@ pub trait ValidationModule: common::CommonModule {
             "Token id and first token id should be the same"
         );
 
-        FungiblePayment {
+        OrderBookFungiblePayment {
             token_id: payment.token_identifier.clone(),
             amount: payment.amount.as_big_uint().clone(),
         }

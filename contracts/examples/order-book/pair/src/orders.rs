@@ -5,8 +5,8 @@ use crate::common::{FEE_PENALTY_INCREASE_EPOCHS, FEE_PENALTY_INCREASE_PERCENT};
 use super::{common, events, validation};
 
 use super::common::{
-    FREE_ORDER_FROM_STORAGE_MIN_PENALTIES, FungiblePayment, Order, OrderInputParams, OrderType,
-    PERCENT_BASE_POINTS, Transfer,
+    FREE_ORDER_FROM_STORAGE_MIN_PENALTIES, Order, OrderBookFungiblePayment, OrderInputParams,
+    OrderType, PERCENT_BASE_POINTS, Transfer,
 };
 
 #[multiversx_sc::module]
@@ -15,7 +15,7 @@ pub trait OrdersModule:
 {
     fn create_order(
         &self,
-        payment: FungiblePayment<Self::Api>,
+        payment: OrderBookFungiblePayment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
     ) {
@@ -160,14 +160,14 @@ pub trait OrdersModule:
 
         let creator_transfer = Transfer {
             to: order.creator.clone(),
-            payment: FungiblePayment {
+            payment: OrderBookFungiblePayment {
                 token_id: token_id.clone(),
                 amount,
             },
         };
         let caller_transfer = Transfer {
             to: caller.clone(),
-            payment: FungiblePayment {
+            payment: OrderBookFungiblePayment {
                 token_id,
                 amount: penalty_amount,
             },
@@ -208,7 +208,7 @@ pub trait OrdersModule:
 
         let transfer = Transfer {
             to: caller.clone(),
-            payment: FungiblePayment { token_id, amount },
+            payment: OrderBookFungiblePayment { token_id, amount },
         };
 
         self.orders(order_id).clear();
@@ -315,7 +315,7 @@ pub trait OrdersModule:
 
         let mut match_provider_transfer = Transfer {
             to: self.blockchain().get_caller(),
-            payment: FungiblePayment {
+            payment: OrderBookFungiblePayment {
                 token_id: token_requested.clone(),
                 amount: BigUint::zero(),
             },
@@ -336,7 +336,7 @@ pub trait OrdersModule:
 
             transfers.push(Transfer {
                 to: order.creator.clone(),
-                payment: FungiblePayment {
+                payment: OrderBookFungiblePayment {
                     token_id: token_requested.clone(),
                     amount: creator_amount + creator_deal_amount,
                 },
