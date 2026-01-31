@@ -152,7 +152,7 @@ pub trait SignatureOperationsModule:
     ///
     /// # Requirements
     /// - Valid ED25519 signature for source deposit
-    /// - No payment required
+    /// - You may send an additional single fungible payment as fee, which will be added to the destination deposit's fees
     ///
     /// # Outcomes
     /// - Source deposit is removed from storage
@@ -160,6 +160,7 @@ pub trait SignatureOperationsModule:
     /// - Destination deposit's expiration is updated to source deposit's expiration
     /// - Required fees from source are collected by the contract
     /// - Excess fees from source (if any) are returned to source's original depositor
+    /// - Any additional fee sent with the forward call is added to the destination deposit's fees
     ///
     /// # Panics
     /// - "non-existent key" if source deposit doesn't exist
@@ -176,20 +177,31 @@ pub trait SignatureOperationsModule:
         forward_deposit_key: DepositKey<Self::Api>,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
+        let opt_additional_fee = self.call_value().single_optional();
         let caller_address = self.blockchain().get_caller();
         let old_deposit = self.process_claim(&deposit_key, &signature, &caller_address);
+        require!(
+            old_deposit.fees.is_none(),
+            "fees should be empty at this point 1"
+        );
 
         let forward_deposit_mapper = self.deposit(&forward_deposit_key);
         require!(
             !forward_deposit_mapper.is_empty(),
             "forward deposit needs to exist in advance, with fees paid"
         );
-        self.perform_append_funds(
-            &forward_deposit_mapper,
-            &caller_address,
-            old_deposit.expiration,
-            old_deposit.funds,
-        );
+
+        forward_deposit_mapper.update(|deposit| {
+            self.perform_append_funds(
+                deposit,
+                &caller_address,
+                old_deposit.expiration,
+                old_deposit.funds,
+            );
+            if let Some(additional_fee) = opt_additional_fee {
+                self.add_deposit_fee(deposit, additional_fee.clone().fungible_or_panic());
+            }
+        });
     }
 
     /// Verifies an ED25519 signature over the deposit key.

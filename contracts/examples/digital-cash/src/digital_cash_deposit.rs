@@ -44,19 +44,17 @@ pub trait DepositModule: storage::StorageModule {
     /// for the updated number of funds.
     fn perform_append_funds(
         &self,
-        deposit_mapper: &SingleValueMapper<DepositInfo<Self::Api>>,
+        deposit: &mut DepositInfo<Self::Api>,
         caller_address: &ManagedAddress,
         expiration: TimestampMillis,
         funds: ManagedVec<Self::Api, Payment>,
     ) {
-        deposit_mapper.update(|deposit: &mut DepositInfo<<Self as ContractBase>::Api>| {
-            self.require_deposit_caller_is_depositor(caller_address, deposit);
+        self.require_deposit_caller_is_depositor(caller_address, deposit);
 
-            deposit.expiration = expiration;
-            deposit.funds.append_vec(funds);
+        deposit.expiration = expiration;
+        deposit.funds.append_vec(funds);
 
-            self.validate_deposit_fees(deposit);
-        });
+        self.validate_deposit_fees(deposit);
     }
 
     /// Adds a fee payment to the contract's collected fees.

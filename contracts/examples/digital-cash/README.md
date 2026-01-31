@@ -80,6 +80,7 @@ Funds can be forwarded to another check address using the `forward` endpoint:
 - `deposit_key`: The current check address (source)
 - `forward_deposit_key`: The new check address (destination)
 - `signature`: ED25519 signature proving ownership of the source check
+- *(optional)*: You may send a single additional fungible payment (fee) with the call, which will be added to the destination deposit's fees.
 
 **Critical Requirement**: The destination deposit must already exist with sufficient fees paid in advance. Use `depositFees` to create the destination first.
 
@@ -90,6 +91,7 @@ The forward operation:
 4. Appends source funds to the destination deposit
 5. Updates destination's expiration to source's expiration
 6. Removes the source deposit from storage
+7. If an additional fee is sent with the call, it is added to the destination deposit's fees
 
 **Important**: The caller must be the depositor of the destination deposit, and the destination must have sufficient fees to cover the combined total of existing funds plus forwarded funds.
 
