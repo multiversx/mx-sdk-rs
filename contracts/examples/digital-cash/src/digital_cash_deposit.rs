@@ -25,6 +25,12 @@ pub trait DepositModule: storage::StorageModule {
         );
     }
 
+    /// The expiration timestamp is considered the first millisecond when the deposit is expired.
+    fn deposit_expired(&self, deposit: &DepositInfo<Self::Api>) -> bool {
+        let current_timestamp = self.blockchain().get_block_timestamp_millis();
+        current_timestamp >= deposit.expiration
+    }
+
     /// Validates that token matches, then adds the new fee to the existing one.
     fn add_deposit_fee(&self, deposit_info: &mut DepositInfo<Self::Api>, new_fee: FungiblePayment) {
         if let Some(existing_fee) = &mut deposit_info.fees {

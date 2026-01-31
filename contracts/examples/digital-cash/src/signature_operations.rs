@@ -38,7 +38,7 @@ pub trait SignatureOperationsModule:
         let deposit = deposit_mapper.take();
 
         require!(
-            deposit.expiration < self.blockchain().get_block_timestamp_millis(),
+            self.deposit_expired(&deposit),
             "cannot withdraw, deposit not expired yet"
         );
 
@@ -116,10 +116,8 @@ pub trait SignatureOperationsModule:
         self.check_signature(deposit_key, caller_address, signature.clone());
 
         let mut deposit = deposit_mapper.take();
-        require!(
-            deposit.expiration >= self.blockchain().get_block_timestamp_millis(),
-            "deposit expired"
-        );
+
+        require!(!self.deposit_expired(&deposit), "deposit expired");
 
         let (opt_fees_to_collect, opt_leftover) =
             self.take_fees_to_collect_and_leftover(&mut deposit);
