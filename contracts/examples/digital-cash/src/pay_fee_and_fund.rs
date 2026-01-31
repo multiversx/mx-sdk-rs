@@ -105,7 +105,10 @@ pub trait PayFeeAndFund: storage::StorageModule + digital_cash_deposit::DepositM
             !deposit_mapper.is_empty(),
             "deposit needs to exist before funding, with fees paid"
         );
-        self.perform_append_funds(&deposit_mapper, &caller_address, expiration, payment);
+
+        deposit_mapper.update(|deposit: &mut DepositInfo<<Self as ContractBase>::Api>| {
+            self.perform_append_funds(deposit, &caller_address, expiration, payment);
+        });
     }
 
     /// Deposits fees for a new or existing deposit without adding funds.

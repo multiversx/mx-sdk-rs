@@ -357,7 +357,7 @@ where
     ///  
     /// # Requirements 
     /// - Valid ED25519 signature for source deposit 
-    /// - No payment required 
+    /// - You may send an additional single fungible payment as fee, which will be added to the destination deposit's fees 
     ///  
     /// # Outcomes 
     /// - Source deposit is removed from storage 
@@ -365,6 +365,7 @@ where
     /// - Destination deposit's expiration is updated to source deposit's expiration 
     /// - Required fees from source are collected by the contract 
     /// - Excess fees from source (if any) are returned to source's original depositor 
+    /// - Any additional fee sent with the forward call is added to the destination deposit's fees 
     ///  
     /// # Panics 
     /// - "non-existent key" if source deposit doesn't exist 
