@@ -155,17 +155,21 @@ pub trait OrdersModule:
 
         let penalty_amount = order
             .input_amount
+            .as_big_uint()
             .proportion(penalty_percent, PERCENT_BASE_POINTS);
 
-        let creator_amount = &order.input_amount - &penalty_amount;
+        let creator_amount = order.input_amount.as_big_uint() - &penalty_amount;
 
         let creator_transfer = Transfer {
             to: order.creator.clone(),
-            payment: FungiblePayment::new(token_id.clone(), creator_amount),
+            payment: FungiblePayment::new(
+                token_id.clone(),
+                creator_amount.into_non_zero_or_panic(),
+            ),
         };
         let caller_transfer = Transfer {
             to: caller.clone(),
-            payment: FungiblePayment::new(token_id, penalty_amount),
+            payment: FungiblePayment::new(token_id, penalty_amount.into_non_zero_or_panic()),
         };
 
         self.orders(order_id).clear();
@@ -196,6 +200,7 @@ pub trait OrdersModule:
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
         let penalty_amount = order
             .input_amount
+            .as_big_uint()
             .proportion(penalty_percent, PERCENT_BASE_POINTS);
 
         let mut amount = order.input_amount.clone();

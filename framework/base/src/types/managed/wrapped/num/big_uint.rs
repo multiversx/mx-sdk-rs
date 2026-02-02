@@ -130,8 +130,35 @@ impl<M: ManagedTypeApi> BigUint<M> {
         self.value
     }
 
+    /// Converts this `BigUint` into a `NonZeroBigUint`, returning `Some` if the value is non-zero, or `None` if it is zero.
+    ///
+    /// # Returns
+    /// - `Some(NonZeroBigUint)` if the value is non-zero.
+    /// - `None` if the value is zero.
+    ///
+    /// # Example
+    /// ```
+    /// let big = BigUint::from(5u32);
+    /// let non_zero = big.into_non_zero();
+    /// assert!(non_zero.is_some());
+    /// ```
     pub fn into_non_zero(self) -> Option<NonZeroBigUint<M>> {
         NonZeroBigUint::new(self)
+    }
+
+    /// Converts this `BigUint` into a `NonZeroBigUint`, panicking if the value is zero.
+    ///
+    /// # Panics
+    /// Panics if the value is zero.
+    ///
+    /// # Example
+    /// ```
+    /// let big = BigUint::from(5u32);
+    /// let non_zero = big.into_non_zero_or_panic();
+    /// // Succeeds if value is non-zero, panics otherwise
+    /// ```
+    pub fn into_non_zero_or_panic(self) -> NonZeroBigUint<M> {
+        NonZeroBigUint::new_or_panic(self)
     }
 }
 
