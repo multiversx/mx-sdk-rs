@@ -16,7 +16,7 @@ use crate::{
 /// Specialized type for handling either EGLD or ESDT token identifiers.
 ///
 /// Equivalent to a structure of the form
-/// ```
+/// ```rust
 /// # use multiversx_sc::{api::ManagedTypeApi, types::EsdtTokenIdentifier};
 /// enum EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
 ///     Egld,

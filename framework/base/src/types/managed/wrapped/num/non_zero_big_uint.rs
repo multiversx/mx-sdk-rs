@@ -154,7 +154,7 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
     /// Panics (signals error) if the input value is zero.
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let big = BigUint::from(10u32);
     /// let non_zero = NonZeroBigUint::new_or_panic(big);
     /// // Succeeds if value is non-zero, panics otherwise

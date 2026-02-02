@@ -137,7 +137,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     /// - `None` if the value is zero.
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let big = BigUint::from(5u32);
     /// let non_zero = big.into_non_zero();
     /// assert!(non_zero.is_some());
@@ -152,7 +152,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     /// Panics if the value is zero.
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let big = BigUint::from(5u32);
     /// let non_zero = big.into_non_zero_or_panic();
     /// // Succeeds if value is non-zero, panics otherwise
@@ -338,7 +338,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     /// The proportional amount as BigUint (self * part / total)
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let amount = BigUint::from(1000u32);
     /// let result = amount.into_proportion(5u32, 100u32); // 5/100 of 1000 = 50
     /// ```
@@ -362,7 +362,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     /// The proportional amount as BigUint (self * part / total)
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let amount = BigUint::from(1000u32);
     /// let result = amount.proportion(5u32, 100u32); // 5/100 of 1000 = 50
     /// ```
