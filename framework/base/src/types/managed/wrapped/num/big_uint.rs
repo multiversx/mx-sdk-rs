@@ -4,7 +4,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
-        RawHandle, const_handles, use_raw_handle,
+        RawHandle, const_handles, quick_signal_error, use_raw_handle,
     },
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
@@ -343,11 +343,19 @@ impl<M: ManagedTypeApi> BigUint<M> {
     /// let result = amount.into_proportion(5u32, 100u32); // 5/100 of 1000 = 50
     /// ```
     pub fn into_proportion(self, part: u64, total: u64) -> Self {
+        const PROPORTION_OVERFLOW_ERR: &str = "proportion overflow";
+        let part_signed: i64 = part
+            .try_into()
+            .unwrap_or_else(|_| quick_signal_error::<M>(PROPORTION_OVERFLOW_ERR));
+        let total_signed: i64 = total
+            .try_into()
+            .unwrap_or_else(|_| quick_signal_error::<M>(PROPORTION_OVERFLOW_ERR));
+
         // mathematically, the result of this operation cannot be negative, so it is safe to skip sign check
         unsafe {
             Self::new_unchecked(
                 self.into_big_int()
-                    .into_proportion(part as i64, total as i64),
+                    .into_proportion(part_signed, total_signed),
             )
         }
     }

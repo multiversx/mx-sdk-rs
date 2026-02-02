@@ -7,11 +7,11 @@ fn assert_big_uint_ln(x: u32, ln_str: &str) {
     assert_eq!(ln_x.unwrap().to_string(), ln_str);
 }
 
-fn assert_big_uint_proportion(total: u64, part: u64, denom: u64, expected: u64) {
-    let total = BigUint::<StaticApi>::from(total);
+fn assert_big_uint_proportion(x: u64, part: u64, total: u64, expected: u64) {
+    let big = BigUint::<StaticApi>::from(x);
     let expected = BigUint::<StaticApi>::from(expected);
-    assert_eq!(total.proportion(part, denom), expected);
-    assert_eq!(total.clone().into_proportion(part, denom), expected);
+    assert_eq!(big.proportion(part, total), expected);
+    assert_eq!(big.clone().into_proportion(part, total), expected);
 }
 
 #[test]
@@ -46,4 +46,17 @@ fn test_big_uint_proportion_all() {
     assert_big_uint_proportion(1000, 0, 100, 0);
     assert_big_uint_proportion(1000000, 999, 1000, 999000);
     assert_big_uint_proportion(100, 200, 100, 200); // 200% of 100 = 200
+
+    // Test with total at i64::MAX
+    let max_i64 = i64::MAX as u64;
+    // 100% of 100 should be 100
+    assert_big_uint_proportion(100, max_i64, max_i64, 100);
+    // ~50% of 100, there are some rounding errors
+    assert_big_uint_proportion(100, max_i64 / 2, max_i64, 49);
+}
+
+#[test]
+#[should_panic = "StaticApi signal error: proportion overflow"]
+fn test_big_uint_proportion_overflow() {
+    let _ = BigUint::<StaticApi>::from(100u64).proportion(100, i64::MAX as u64 + 1);
 }
