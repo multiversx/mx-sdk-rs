@@ -150,7 +150,8 @@ pub trait OrdersModule:
             "Too early to free order"
         );
 
-        // penalty_count is > 6, so this cannot be zero
+        // penalty_count is at least FREE_ORDER_FROM_STORAGE_MIN_PENALTIES (6),
+        // so this cannot be zero
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
 
         let penalty_amount = order
