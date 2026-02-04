@@ -8,7 +8,8 @@ use crate::{
         derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     },
     types::{
-        ManagedVecItem, ManagedVecItemPayloadBuffer, NonZeroBigUint, Payment, PaymentRefs, Ref, TokenId, managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index
+        ManagedVecItem, ManagedVecItemPayloadBuffer, NonZeroBigUint, Payment, PaymentRefs, Ref,
+        TokenId, managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
 };
 

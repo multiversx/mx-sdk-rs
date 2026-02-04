@@ -94,10 +94,6 @@ pub trait CommonModule {
         }
     }
 
-    fn rule_of_three(&self, part: u64, total: u64, value: &BigUint) -> BigUint {
-        &(BigUint::from(part) * value) / BigUint::from(total)
-    }
-
     fn calculate_fee_amount(
         &self,
         amount: &NonZeroBigUint,
