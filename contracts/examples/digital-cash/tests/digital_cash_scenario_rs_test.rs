@@ -42,18 +42,8 @@ fn fund_egld_and_esdt_rs() {
 }
 
 #[test]
-fn set_accounts_rs() {
-    world().run("scenarios/set-accounts.scen.json");
-}
-
-#[test]
-fn whitelist_blacklist_fee_token_rs() {
-    world().run("scenarios/whitelist-blacklist-fee-tokens.scen.json");
-}
-
-#[test]
-fn pay_fee_and_fund_esdt_single_rs() {
-    world().run("scenarios/pay-fee-and-fund-esdt-single.scen.json");
+fn pay_fee_and_fund_egld_rs() {
+    world().run("scenarios/pay-fee-and-fund-egld.scen.json");
 }
 
 #[test]
@@ -62,8 +52,18 @@ fn pay_fee_and_fund_esdt_multiple_rs() {
 }
 
 #[test]
-fn pay_fee_and_fund_egld_rs() {
-    world().run("scenarios/pay-fee-and-fund-egld.scen.json");
+fn pay_fee_and_fund_esdt_single_rs() {
+    world().run("scenarios/pay-fee-and-fund-esdt-single.scen.json");
+}
+
+#[test]
+fn set_accounts_rs() {
+    world().run("scenarios/set-accounts.scen.json");
+}
+
+#[test]
+fn whitelist_blacklist_fee_tokens_rs() {
+    world().run("scenarios/whitelist-blacklist-fee-tokens.scen.json");
 }
 
 #[test]

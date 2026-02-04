@@ -14,17 +14,62 @@ use crate::{
 };
 use core::marker::PhantomData;
 
-const ITEM_SUFFIX: &[u8] = b".item";
-const LEN_SUFFIX: &[u8] = b".len";
+const LEN_SUFFIX: &str = ".len";
+const ITEM_SUFFIX: &str = ".item";
 
-static INDEX_OUT_OF_RANGE_ERR_MSG: &[u8] = b"index out of range";
+const INDEX_OUT_OF_RANGE_ERR_MSG: &str = "index out of range";
 
-/// Manages a list of items of the same type.
-/// Saves each of the items under a separate key in storage.
-/// To produce each individual key, it concatenates the main key with a serialized 4-byte index.
-/// Indexes start from 1, instead of 0. (We avoid 0-value indexes to prevent confusion between an uninitialized variable and zero.)
-/// It also stores the count separately, at what would be index 0.
-/// The count is always kept in sync automatically.
+/// A storage mapper for managing an ordered, indexable list of items with automatic length tracking.
+///
+/// # Storage Layout
+///
+/// The `VecMapper` stores data in storage using the following pattern:
+///
+/// - `base_key + ".len"` → number of items in the list
+/// - `base_key + ".item" + index` → value at index (1-based indexing)
+///
+/// **Important**: Indexes start from 1, not 0. This avoids confusion between uninitialized variables
+/// and the zero value. Valid indexes are always in the range `1..=len()`.
+///
+/// # Main Operations
+///
+/// - **Append**: `push(item)` - Adds an item to the end. O(1) with 2 storage writes (item + length).
+/// - **Random Access**: `get(index)` - Retrieves value at index (1-based). O(1) with one storage read.
+/// - **Update**: `set(index, item)` - Replaces value at index. O(1) with one storage write.
+/// - **Remove**: `swap_remove(index)` - Removes by swapping with last element. O(1) with storage writes.
+/// - **Iteration**: `iter()` - Iterates over all values in order from index 1 to length.
+/// - **Batch Operations**: `extend_from_slice(items)` - Adds multiple items efficiently (single length update).
+///
+/// # Trade-offs
+///
+/// - **Pros**: Maintains insertion order; efficient random access; automatic length tracking.
+/// - **Cons**: Uses 1-based indexing (not 0-based); removal (except last item) changes element positions;
+///   clearing large lists can consume significant gas.
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, VecMapper};
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = VecMapper::<SA, u64>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"my_vec"[..])
+/// # );
+/// mapper.push(&100);
+/// mapper.push(&200);
+/// mapper.push(&300);
+///
+/// assert_eq!(mapper.len(), 3);
+/// assert_eq!(mapper.get(1), 100);  // Note: 1-based indexing
+/// assert_eq!(mapper.get(2), 200);
+///
+/// mapper.set(2, &250);
+/// assert_eq!(mapper.get(2), 250);
+///
+/// mapper.swap_remove(1);  // Removes 100, moves 300 to index 1
+/// assert_eq!(mapper.len(), 2);
+/// assert_eq!(mapper.get(1), 300);
+/// # }
+/// ```
 pub struct VecMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
@@ -44,7 +89,7 @@ where
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         let mut len_key = base_key.clone();
-        len_key.append_bytes(LEN_SUFFIX);
+        len_key.append_bytes(LEN_SUFFIX.as_bytes());
 
         VecMapper {
             _phantom_api: PhantomData,
@@ -63,7 +108,7 @@ where
 {
     fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         let mut len_key = base_key.clone();
-        len_key.append_bytes(LEN_SUFFIX);
+        len_key.append_bytes(LEN_SUFFIX.as_bytes());
 
         VecMapper {
             _phantom_api: PhantomData,
@@ -93,7 +138,7 @@ where
 {
     fn item_key(&self, index: usize) -> StorageKey<SA> {
         let mut item_key = self.base_key.clone();
-        item_key.append_bytes(ITEM_SUFFIX);
+        item_key.append_bytes(ITEM_SUFFIX.as_bytes());
         item_key.append_item(&index);
         item_key
     }
@@ -112,7 +157,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn get(&self, index: usize) -> T {
         if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
+            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG.as_bytes());
         }
         self.get_unchecked(index)
     }
@@ -141,7 +186,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn item_is_empty(&self, index: usize) -> bool {
         if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
+            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG.as_bytes());
         }
         self.item_is_empty_unchecked(index)
     }

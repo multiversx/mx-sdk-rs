@@ -43,19 +43,24 @@ where
     From: TxFrom<Env>,
     Gas: TxGas<Env>,
 {
+    /// Initializes the digital cash contract with fee configuration. 
+    ///  
+    /// # Arguments 
+    /// * `fees_disabled` - Global toggle to disable fee requirements 
+    /// * `fee_variants` - List of (token_id, fee_amount) pairs to configure accepted fee tokens 
     pub fn init<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<bool>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue2<TokenId<Env::Api>, BigUint<Env::Api>>>>,
     >(
         self,
-        fee: Arg0,
-        token: Arg1,
+        fees_disabled: Arg0,
+        fee_variants: Arg1,
     ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_deploy()
-            .argument(&fee)
-            .argument(&token)
+            .argument(&fees_disabled)
+            .argument(&fee_variants)
             .original_result()
     }
 }
@@ -69,35 +74,84 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn whitelist_fee_token<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+    /// Enables or disables the fee requirement globally. 
+    ///  
+    /// # Preconditions 
+    /// - None 
+    ///  
+    /// # Requirements 
+    /// - Must be called by the contract owner 
+    ///  
+    /// # Outcomes 
+    /// - When set to `true`: fee validation is skipped for all operations 
+    /// - When set to `false`: fees are required based on configured fee variants 
+    /// - Affects all future deposit creation and claim operations 
+    ///  
+    /// # Panics 
+    /// - If caller is not the contract owner (enforced by #[only_owner]) 
+    pub fn set_fees_disabled<
+        Arg0: ProxyArg<bool>,
     >(
         self,
-        fee: Arg0,
-        token: Arg1,
+        fees_disabled: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("whitelistFeeToken")
-            .argument(&fee)
-            .argument(&token)
+            .raw_call("setFeesDisabled")
+            .argument(&fees_disabled)
             .original_result()
     }
 
-    pub fn blacklist_fee_token<
-        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+    /// Updates the fee configuration for a specific token. 
+    ///  
+    /// This unified endpoint handles adding new fee tokens, updating existing fees, 
+    /// and removing fee tokens (by setting amount to zero). 
+    ///  
+    /// # Preconditions 
+    /// - None 
+    ///  
+    /// # Requirements 
+    /// - Must be called by the contract owner 
+    ///  
+    /// # Outcomes 
+    /// - If fee_amount > 0: token is configured as valid fee token with specified base fee 
+    /// - If fee_amount == 0: effectively disables fees for that token (will panic if used) 
+    /// - Fee is charged per fund: total_fee = base_fee × number_of_funds_in_deposit 
+    ///  
+    /// # Panics 
+    /// - If caller is not the contract owner (enforced by #[only_owner]) 
+    pub fn set_fee<
+        Arg0: ProxyArg<TokenId<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
-        token: Arg0,
+        fee_token: Arg0,
+        fee_amount: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("blacklistFeeToken")
-            .argument(&token)
+            .raw_call("setFee")
+            .argument(&fee_token)
+            .argument(&fee_amount)
             .original_result()
     }
 
+    /// Withdraws all collected fees to the contract owner. 
+    ///  
+    /// # Preconditions 
+    /// - None (works even if no fees collected) 
+    ///  
+    /// # Requirements 
+    /// - Must be called by the contract owner 
+    ///  
+    /// # Outcomes 
+    /// - All collected fees across all tokens are transferred to the caller 
+    /// - Collected fees storage is cleared 
+    /// - If no fees collected, no transfer occurs (returns early) 
+    /// - Supports multiple tokens in a single multi-transfer transaction 
+    ///  
+    /// # Panics 
+    /// - If caller is not the contract owner (enforced by #[only_owner]) 
     pub fn claim_fees(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -107,124 +161,250 @@ where
             .original_result()
     }
 
-    pub fn get_amount<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg2: ProxyArg<u64>,
-    >(
-        self,
-        address: Arg0,
-        token: Arg1,
-        nonce: Arg2,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("getAmount")
-            .argument(&address)
-            .argument(&token)
-            .argument(&nonce)
-            .original_result()
-    }
-
+    /// Pays the required fee and funds a deposit in one transaction. 
+    ///  
+    /// # Preconditions 
+    /// - At least one payment must be provided 
+    /// - If fees are enabled: first payment is taken entirely as fee, remaining are funds 
+    /// - If fees are disabled: all payments are treated as funds 
+    /// - If updating existing deposit: caller must be the original depositor 
+    /// - Fee token must match existing fee token if deposit already has fees 
+    ///  
+    /// # Requirements 
+    /// - Must be called with at least one payment (fee and/or funds) 
+    /// - If fees enabled and creating new deposit: first payment amount must be >= (base_fee × number_of_funds) 
+    /// - If updating existing deposit: total fees must be >= (base_fee × total_number_of_funds) 
+    ///  
+    /// # Outcomes 
+    /// - If deposit doesn't exist: creates new deposit with caller as depositor 
+    /// - If deposit exists: appends funds and fees to existing deposit, updates expiration 
+    /// - First payment is consumed as fee (if fees enabled) 
+    /// - Remaining payments are stored as funds 
+    ///  
+    /// # Panics 
+    /// - "no payment was provided" if called without payment 
+    /// - "invalid depositor" if updating existing deposit and caller is not the depositor 
+    /// - "fee token mismatch" if fee token differs from existing deposit's fee token 
+    /// - "insufficient fees provided" if total fees don't cover all funds 
+    /// - "invalid fee token" if fee token is not configured in contract 
     pub fn pay_fee_and_fund<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
+        Arg1: ProxyArg<TimestampMillis>,
     >(
         self,
-        address: Arg0,
-        valability: Arg1,
+        deposit_key: Arg0,
+        expiration: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("payFeeAndFund")
-            .argument(&address)
-            .argument(&valability)
+            .argument(&deposit_key)
+            .argument(&expiration)
             .original_result()
     }
 
+    /// Adds funds to an existing deposit without paying additional fees. 
+    ///  
+    /// # Preconditions 
+    /// - Deposit must already exist for the given deposit_key 
+    /// - Caller must be the original depositor 
+    /// - Existing deposit must have sufficient fees to cover the new total number of funds 
+    /// - At least one payment must be provided 
+    ///  
+    /// # Requirements 
+    /// - Must be called with payment (the funds to add) 
+    /// - Only the depositor who created the deposit can call this 
+    /// - Deposit must have been created first (via payFeeAndFund or depositFees) 
+    ///  
+    /// # Outcomes 
+    /// - Payments are appended to the deposit's funds 
+    /// - Expiration timestamp is updated to the new value 
+    /// - No new fees are collected (uses existing fees) 
+    ///  
+    /// # Panics 
+    /// - "deposit needs to exist before funding, with fees paid" if deposit doesn't exist 
+    /// - "invalid depositor" if caller is not the original depositor 
+    /// - "insufficient fees provided" if existing fees don't cover total funds after addition 
     pub fn fund<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
+        Arg1: ProxyArg<TimestampMillis>,
     >(
         self,
-        address: Arg0,
-        valability: Arg1,
+        deposit_key: Arg0,
+        expiration: Arg1,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("fund")
-            .argument(&address)
-            .argument(&valability)
+            .argument(&deposit_key)
+            .argument(&expiration)
             .original_result()
     }
 
+    /// Deposits fees for a new or existing deposit without adding funds. 
+    ///  
+    /// This allows paying fees in advance before adding the actual funds, 
+    /// which is required for the forward operation's destination deposit. 
+    ///  
+    /// # Preconditions 
+    /// - Exactly one payment must be provided (the fee) 
+    /// - If updating existing deposit: caller must be the original depositor 
+    /// - Fee token must match existing fee token if deposit already has fees 
+    ///  
+    /// # Requirements 
+    /// - Must be called with a single fungible payment 
+    /// - If updating existing deposit: only the depositor can add more fees 
+    ///  
+    /// # Outcomes 
+    /// - If deposit doesn't exist: creates new deposit with empty funds and zero expiration 
+    /// - If deposit exists: adds fee amount to existing fees (must be same token) 
+    /// - Caller is recorded as depositor for new deposits 
+    ///  
+    /// # Panics 
+    /// - "invalid depositor" if updating existing deposit and caller is not the depositor 
+    /// - "fee token mismatch" if fee token differs from existing deposit's fee token 
     pub fn deposit_fees<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
     >(
         self,
-        address: Arg0,
+        deposit_key: Arg0,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("depositFees")
-            .argument(&address)
+            .argument(&deposit_key)
             .original_result()
     }
 
-    pub fn withdraw<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+    /// Withdraws an expired deposit back to the depositor. 
+    ///  
+    /// # Preconditions 
+    /// - Deposit must exist for the given deposit_key 
+    /// - Current block timestamp must be greater than the deposit's expiration timestamp 
+    ///  
+    /// # Requirements 
+    /// - Can be called by anyone (not restricted to depositor) 
+    /// - No signature required 
+    /// - No payment required 
+    ///  
+    /// # Outcomes 
+    /// - Deposit is removed from storage 
+    /// - All fees (if any) are transferred to the original depositor 
+    /// - All funds are transferred to the original depositor 
+    ///  
+    /// # Panics 
+    /// - "non-existent key" if deposit doesn't exist 
+    /// - "cannot withdraw, deposit not expired yet" if expiration timestamp hasn't passed 
+    pub fn withdraw_expired<
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
     >(
         self,
-        address: Arg0,
+        deposit_key: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("withdraw")
-            .argument(&address)
+            .raw_call("withdrawExpired")
+            .argument(&deposit_key)
             .original_result()
     }
 
+    /// Claims a deposit by providing a valid ED25519 signature. 
+    ///  
+    /// # Preconditions 
+    /// - Deposit must exist for the given deposit_key 
+    /// - Current block timestamp must be less than or equal to the deposit's expiration 
+    /// - Signature must be valid: signed with the private key of deposit_key, over caller's address 
+    /// - If fees are enabled, deposit must have sufficient fees (base_fee × number_of_funds) 
+    ///  
+    /// # Requirements 
+    /// - Valid ED25519 signature proving ownership of deposit_key's private key 
+    /// - No payment required 
+    ///  
+    /// # Outcomes 
+    /// - Deposit is removed from storage 
+    /// - All funds are transferred to the caller 
+    /// - Required fees are collected by the contract 
+    /// - Excess fees (if any) are returned to the original depositor 
+    ///  
+    /// # Panics 
+    /// - "non-existent key" if deposit doesn't exist 
+    /// - ED25519 signature verification fails if signature is invalid 
+    /// - "deposit expired" if current timestamp is greater than expiration 
+    /// - "insufficient fees provided" if fees don't cover all funds 
     pub fn claim<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
         Arg1: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
     >(
         self,
-        address: Arg0,
+        deposit_key: Arg0,
         signature: Arg1,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("claim")
-            .argument(&address)
+            .argument(&deposit_key)
             .argument(&signature)
             .original_result()
     }
 
+    /// Forwards funds from one deposit to another existing deposit. 
+    ///  
+    /// # Preconditions 
+    /// - Source deposit must exist for deposit_key 
+    /// - Destination deposit must already exist for forward_deposit_key with fees paid 
+    /// - Current block timestamp must be less than or equal to source deposit's expiration 
+    /// - Signature must be valid: signed with private key of deposit_key, over caller's address 
+    /// - If fees enabled, source deposit must have sufficient fees for its funds 
+    /// - Destination deposit must have sufficient fees for combined funds (existing + forwarded) 
+    /// - Caller must be the depositor of the destination deposit 
+    ///  
+    /// # Requirements 
+    /// - Valid ED25519 signature for source deposit 
+    /// - You may send an additional single fungible payment as fee, which will be added to the destination deposit's fees 
+    ///  
+    /// # Outcomes 
+    /// - Source deposit is removed from storage 
+    /// - Source deposit's funds are appended to destination deposit 
+    /// - Destination deposit's expiration is updated to source deposit's expiration 
+    /// - Required fees from source are collected by the contract 
+    /// - Excess fees from source (if any) are returned to source's original depositor 
+    /// - Any additional fee sent with the forward call is added to the destination deposit's fees 
+    ///  
+    /// # Panics 
+    /// - "non-existent key" if source deposit doesn't exist 
+    /// - "forward deposit needs to exist in advance, with fees paid" if destination doesn't exist 
+    /// - ED25519 signature verification fails if signature is invalid 
+    /// - "deposit expired" if source deposit has expired 
+    /// - "invalid depositor" if caller is not the depositor of destination 
+    /// - "insufficient fees provided" if combined fees don't cover all funds 
     pub fn forward<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
+        Arg1: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
         Arg2: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
     >(
         self,
-        address: Arg0,
-        forward_address: Arg1,
+        deposit_key: Arg0,
+        forward_deposit_key: Arg1,
         signature: Arg2,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward")
-            .argument(&address)
-            .argument(&forward_address)
+            .argument(&deposit_key)
+            .argument(&forward_deposit_key)
             .argument(&signature)
             .original_result()
     }
 
+    /// Maps a deposit key (ED25519 public key) to its deposit information. 
+    ///  
+    /// Each deposit contains the depositor's address, funds, expiration timestamp, and fees. 
     pub fn deposit<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
     >(
         self,
-        donor: Arg0,
+        deposit_key: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, DepositInfo<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("deposit")
-            .argument(&donor)
+            .argument(&deposit_key)
             .original_result()
     }
 }
@@ -236,18 +416,7 @@ where
     Api: ManagedTypeApi,
 {
     pub depositor_address: ManagedAddress<Api>,
-    pub funds: ManagedVec<Api, EgldOrEsdtTokenPayment<Api>>,
-    pub valability: u64,
-    pub expiration_round: u64,
-    pub fees: Fee<Api>,
-}
-
-#[type_abi]
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct Fee<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub num_token_to_transfer: usize,
-    pub value: EgldOrEsdtTokenPayment<Api>,
+    pub funds: ManagedVec<Api, Payment<Api>>,
+    pub expiration: TimestampMillis,
+    pub fees: Option<FungiblePayment<Api>>,
 }

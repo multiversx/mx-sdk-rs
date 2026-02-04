@@ -61,10 +61,89 @@ impl QueueMapperInfo {
     }
 }
 
-/// A queue with owned nodes.
+/// A storage mapper implementing a double-ended queue (deque) with efficient operations at both ends.
 ///
-/// The `QueueMapper` allows pushing and popping elements at either end
-/// in constant time.
+/// # Storage Layout
+///
+/// The `QueueMapper` stores metadata and separates node structure from values:
+///
+/// 1. **Metadata**:
+///    - `base_key + ".info"` → `QueueMapperInfo` struct containing:
+///      - `len`: number of elements
+///      - `front`: node ID of the first element
+///      - `back`: node ID of the last element
+///      - `new`: counter for generating unique node IDs
+///
+/// 2. **Node links**:
+///    - `base_key + ".node_links" + node_id` → `Node` struct with:
+///      - `previous`: ID of the previous node (0 if none)
+///      - `next`: ID of the next node (0 if none)
+///
+/// 3. **Values**:
+///    - `base_key + ".value" + node_id` → the stored item
+///
+/// # Main Operations
+///
+/// - **Enqueue back**: `push_back(item)` - Adds to the end. O(1) with constant storage writes.
+/// - **Enqueue front**: `push_front(item)` - Adds to the beginning. O(1) with constant storage writes.
+/// - **Dequeue front**: `pop_front()` - Removes from the beginning. O(1).
+/// - **Dequeue back**: `pop_back()` - Removes from the end. O(1).
+/// - **Peek**: `front()` / `back()` - Views elements without removing. O(1).
+/// - **Iteration**: `iter()` - Traverses from front to back in order.
+///
+/// # Trade-offs
+///
+/// - **Pros**: O(1) operations at both ends; ideal for FIFO/LIFO patterns; maintains insertion order.
+/// - **Cons**: Cannot insert/remove from middle; no random access by index; higher storage overhead
+///   (separate storage for links and values); removed nodes leave gaps in node ID space.
+///
+/// # Use Cases
+///
+/// - Task/job queues (FIFO processing)
+/// - Undo/redo stacks
+/// - Any scenario requiring efficient head/tail operations
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, QueueMapper};
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = QueueMapper::<SA, u64>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"task_queue"[..])
+/// # );
+/// // Add tasks to the queue
+/// mapper.push_back(100);
+/// mapper.push_back(200);
+/// mapper.push_back(300);
+///
+/// assert_eq!(mapper.len(), 3);
+/// assert_eq!(mapper.front(), Some(100));
+/// assert_eq!(mapper.back(), Some(300));
+///
+/// // Add high-priority task at front
+/// mapper.push_front(50);
+/// assert_eq!(mapper.front(), Some(50));
+/// assert_eq!(mapper.len(), 4);
+///
+/// // Process tasks from front (FIFO)
+/// let task1 = mapper.pop_front();
+/// assert_eq!(task1, Some(50));
+/// assert_eq!(mapper.len(), 3);
+///
+/// let task2 = mapper.pop_front();
+/// assert_eq!(task2, Some(100));
+///
+/// // Can also remove from back
+/// let last = mapper.pop_back();
+/// assert_eq!(last, Some(300));
+/// assert_eq!(mapper.len(), 1);
+///
+/// // Iterate through remaining tasks
+/// for task in mapper.iter() {
+///     // Process task
+/// }
+/// # }
+/// ```
 pub struct QueueMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,

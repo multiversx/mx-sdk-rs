@@ -23,11 +23,11 @@ pub type NodeId = u64;
 
 pub const NULL_NODE_ID: NodeId = 0;
 
-static ROOT_ID_SUFFIX: &[u8] = b"_rootId";
-static ID_SUFFIX: &[u8] = b"_id";
-static LAST_ID_KEY_SUFFIX: &[u8] = b"_lastId";
+const ROOT_ID_SUFFIX: &str = "_rootId";
+const ID_SUFFIX: &str = "_id";
+const LAST_ID_KEY_SUFFIX: &str = "_lastId";
 
-static CORRUPT_TREE_ERR_MGS: &[u8] = b"Corrupt tree";
+const CORRUPT_TREE_ERR_MGS: &str = "Corrupt tree";
 
 // https://en.wikipedia.org/wiki/Binary_search_tree
 
@@ -55,6 +55,121 @@ where
     }
 }
 
+/// A storage mapper implementing a binary search tree for ordered element storage.
+/// **Note: This is NOT a self-balancing tree** and can degrade to O(n) in worst-case scenarios.
+///
+/// # Storage Layout
+///
+/// The `OrderedBinaryTreeMapper` stores nodes in a tree structure with parent/child relationships:
+///
+/// 1. **Root tracking**:
+///    - `base_key + "_rootId"` → ID of the root node
+///
+/// 2. **Node storage**:
+///    - `base_key + "_id" + node_id` → `OrderedBinaryTreeNode<T>` containing:
+///      - `current_node_id`: this node's ID
+///      - `left_id`: ID of left child (smaller values)
+///      - `right_id`: ID of right child (larger values)
+///      - `parent_id`: ID of parent node
+///      - `data`: the stored value
+///
+/// 3. **ID counter**:
+///    - `base_key + "_lastId"` → highest assigned node ID (auto-incrementing)
+///
+/// # Binary Search Tree Properties
+///
+/// - **Ordering**: For any node, all left descendants < node < all right descendants
+/// - **Uniqueness**: Duplicate values are rejected on insertion
+/// - **Node IDs**: Auto-incrementing, never reused (similar to `AddressToIdMapper`)
+///
+/// # Main Operations
+///
+/// - **Insert**: `insert_element(data)` - Adds element maintaining BST order. O(log n) average, O(n) worst case.
+/// - **Delete**: `delete_node(data)` - Removes element. O(log n) average, O(n) worst case.
+/// - **Search**: `iterative_search(node, data)` / `recursive_search(node, data)` - Finds element. O(log n) average.
+/// - **Min/Max**: `find_min(node)` / `find_max(node)` - Finds minimum/maximum in subtree. O(log n).
+/// - **Successor/Predecessor**: `find_successor(node)` / `find_predecessor(node)` - Next/previous in order. O(log n).
+/// - **Depth**: `get_depth(node)` - Computes tree depth from node. O(n).
+/// - **Root**: `get_root()` - Returns root node. O(1).
+///
+/// # Trade-offs
+///
+/// - **Pros**: Maintains sorted order; efficient ordered iteration; supports range queries; successor/predecessor lookups.
+/// - **Cons**: NOT self-balancing (can degrade to O(n) in worst case); complex deletion logic; higher storage overhead
+///   than simple collections; removed nodes leave ID gaps.
+///
+/// # Performance Notes
+///
+/// This is a **basic binary search tree**, not a balanced variant (e.g., AVL, Red-Black). Performance depends on
+/// insertion order:
+/// - **Balanced tree** (random insertions): O(log n) operations
+/// - **Degenerate tree** (sorted insertions): O(n) operations (becomes a linked list)
+///
+/// # Use Cases
+///
+/// - Leaderboards requiring sorted access
+/// - Priority systems with ordered iteration
+/// - Range queries (find all elements between X and Y)
+/// - Scenarios needing both membership testing and ordering
+/// - When you need successor/predecessor operations
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, OrderedBinaryTreeMapper};
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = OrderedBinaryTreeMapper::<SA, u64>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"scores"[..])
+/// # );
+/// // Insert elements (maintains BST ordering)
+/// let node1_id = mapper.insert_element(50);
+/// let node2_id = mapper.insert_element(30);
+/// let node3_id = mapper.insert_element(70);
+/// let node4_id = mapper.insert_element(20);
+/// let node5_id = mapper.insert_element(40);
+///
+/// // Duplicate insertion returns 0 (failure)
+/// let duplicate = mapper.insert_element(50);
+/// assert_eq!(duplicate, 0);
+///
+/// // Search for element
+/// let root = mapper.get_root().unwrap();
+/// let found = mapper.iterative_search(Some(root.clone()), &30);
+/// assert!(found.is_some());
+/// assert_eq!(found.unwrap().data, 30);
+///
+/// // Find minimum and maximum
+/// let min_node = mapper.find_min(root.clone());
+/// assert_eq!(min_node.data, 20);
+///
+/// let max_node = mapper.find_max(root.clone());
+/// assert_eq!(max_node.data, 70);
+///
+/// // Find successor (next larger element)
+/// let node_30 = mapper.iterative_search(Some(root.clone()), &30).unwrap();
+/// let successor = mapper.find_successor(node_30);
+/// assert_eq!(successor.unwrap().data, 40);
+///
+/// // Find predecessor (next smaller element)
+/// let node_50 = root.clone();
+/// let predecessor = mapper.find_predecessor(node_50);
+/// assert_eq!(predecessor.unwrap().data, 40);
+///
+/// // Get tree depth
+/// let depth = mapper.get_depth(&root);
+/// assert!(depth > 0);
+///
+/// // Delete element
+/// mapper.delete_node(30);
+/// let not_found = mapper.iterative_search(mapper.get_root(), &30);
+/// assert!(not_found.is_none());
+///
+/// // Tree structure is maintained after deletion
+/// let new_root = mapper.get_root().unwrap();
+/// let still_there = mapper.iterative_search(Some(new_root), &40);
+/// assert!(still_there.is_some());
+/// # }
+/// ```
 pub struct OrderedBinaryTreeMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
@@ -186,7 +301,7 @@ where
         let mut opt_successor = self.get_node_by_id(successor_id);
         while successor_id != NULL_NODE_ID {
             if opt_successor.is_none() {
-                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS.as_bytes());
             }
 
             let successor = unsafe { opt_successor.unwrap_unchecked() };
@@ -215,7 +330,7 @@ where
         let mut opt_predecessor = self.get_node_by_id(predecessor_id);
         while predecessor_id != NULL_NODE_ID {
             if opt_predecessor.is_none() {
-                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS.as_bytes());
             }
 
             let predecessor = unsafe { opt_predecessor.unwrap_unchecked() };
@@ -305,7 +420,7 @@ where
 
         let opt_successor = self.find_successor(node.clone());
         if opt_successor.is_none() {
-            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS.as_bytes());
         }
 
         let mut successor = unsafe { opt_successor.unwrap_unchecked() };
@@ -318,7 +433,7 @@ where
 
             let opt_successor_right_node = self.get_node_by_id(successor.right_id);
             if opt_successor_right_node.is_none() {
-                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS.as_bytes());
             }
 
             let mut successor_right_node = unsafe { opt_successor_right_node.unwrap_unchecked() };
@@ -333,7 +448,7 @@ where
 
         let opt_successor_left_node = self.get_node_by_id(successor.left_id);
         if opt_successor_left_node.is_none() {
-            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS.as_bytes());
         }
 
         let mut successor_left_node = unsafe { opt_successor_left_node.unwrap_unchecked() };
@@ -415,7 +530,7 @@ where
     fn try_get_node_by_id(&self, id: NodeId) -> OrderedBinaryTreeNode<T> {
         let opt_node = self.get_node_by_id(id);
         if opt_node.is_none() {
-            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS.as_bytes());
         }
 
         unsafe { opt_node.unwrap_unchecked() }
@@ -423,14 +538,14 @@ where
 
     fn build_root_id_key(&self) -> StorageKey<SA> {
         let mut key = self.key.clone();
-        key.append_bytes(ROOT_ID_SUFFIX);
+        key.append_bytes(ROOT_ID_SUFFIX.as_bytes());
 
         key
     }
 
     fn build_root_key(&self) -> StorageKey<SA> {
         let mut key = self.key.clone();
-        key.append_bytes(ROOT_ID_SUFFIX);
+        key.append_bytes(ROOT_ID_SUFFIX.as_bytes());
 
         let root_id = self.address.address_storage_get(key.as_ref());
 
@@ -439,7 +554,7 @@ where
 
     fn build_key_for_item(&self, id: NodeId) -> StorageKey<SA> {
         let mut item_key = self.key.clone();
-        item_key.append_bytes(ID_SUFFIX);
+        item_key.append_bytes(ID_SUFFIX.as_bytes());
         item_key.append_item(&id);
 
         item_key
@@ -447,7 +562,7 @@ where
 
     fn build_last_id_key(&self) -> StorageKey<SA> {
         let mut key = self.key.clone();
-        key.append_bytes(LAST_ID_KEY_SUFFIX);
+        key.append_bytes(LAST_ID_KEY_SUFFIX.as_bytes());
 
         key
     }

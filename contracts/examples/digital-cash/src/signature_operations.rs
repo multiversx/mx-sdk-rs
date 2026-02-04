@@ -1,132 +1,222 @@
 use multiversx_sc::imports::*;
 
-use crate::{constants::*, helpers, storage};
+use crate::{
+    digital_cash_deposit,
+    storage::{self, DepositInfo, DepositKey},
+};
 
 pub use multiversx_sc::api::ED25519_SIGNATURE_BYTE_LEN;
 
 #[multiversx_sc::module]
-pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersModule {
-    #[endpoint]
-    fn withdraw(&self, address: ManagedAddress) {
-        let deposit_mapper = self.deposit(&address);
-        require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
+pub trait SignatureOperationsModule:
+    storage::StorageModule + digital_cash_deposit::DepositModule
+{
+    /// Withdraws an expired deposit back to the depositor.
+    ///
+    /// # Preconditions
+    /// - Deposit must exist for the given deposit_key
+    /// - Current block timestamp must be greater than the deposit's expiration timestamp
+    ///
+    /// # Requirements
+    /// - Can be called by anyone (not restricted to depositor)
+    /// - No signature required
+    /// - No payment required
+    ///
+    /// # Outcomes
+    /// - Deposit is removed from storage
+    /// - All fees (if any) are transferred to the original depositor
+    /// - All funds are transferred to the original depositor
+    ///
+    /// # Panics
+    /// - "non-existent key" if deposit doesn't exist
+    /// - "cannot withdraw, deposit not expired yet" if expiration timestamp hasn't passed
+    #[endpoint(withdrawExpired)]
+    fn withdraw_expired(&self, deposit_key: DepositKey<Self::Api>) {
+        let deposit_mapper = self.deposit(&deposit_key);
+        self.require_deposit_exists(&deposit_mapper);
 
         let deposit = deposit_mapper.take();
-        let paid_fee_token = deposit.fees.value;
 
-        let block_round = self.blockchain().get_block_round();
         require!(
-            deposit.expiration_round < block_round,
-            "withdrawal has not been available yet"
+            self.deposit_expired(&deposit),
+            "cannot withdraw, deposit not expired yet"
         );
 
-        let mut funds = deposit.funds;
-
-        let fee =
-            EgldOrEsdtTokenPayment::new(paid_fee_token.token_identifier, 0, paid_fee_token.amount);
-        funds.push(fee);
-
-        if !funds.is_empty() {
+        if let Some(fees) = deposit.fees {
             self.tx()
                 .to(&deposit.depositor_address)
-                .payment(funds)
+                .payment(fees.into_payment())
+                .transfer();
+        }
+        if !deposit.funds.is_empty() {
+            self.tx()
+                .to(&deposit.depositor_address)
+                .payment(deposit.funds)
                 .transfer();
         }
     }
 
+    /// Claims a deposit by providing a valid ED25519 signature.
+    ///
+    /// # Preconditions
+    /// - Deposit must exist for the given deposit_key
+    /// - Current block timestamp must be less than or equal to the deposit's expiration
+    /// - Signature must be valid: signed with the private key of deposit_key, over caller's address
+    /// - If fees are enabled, deposit must have sufficient fees (base_fee × number_of_funds)
+    ///
+    /// # Requirements
+    /// - Valid ED25519 signature proving ownership of deposit_key's private key
+    /// - No payment required
+    ///
+    /// # Outcomes
+    /// - Deposit is removed from storage
+    /// - All funds are transferred to the caller
+    /// - Required fees are collected by the contract
+    /// - Excess fees (if any) are returned to the original depositor
+    ///
+    /// # Panics
+    /// - "non-existent key" if deposit doesn't exist
+    /// - ED25519 signature verification fails if signature is invalid
+    /// - "deposit expired" if current timestamp is greater than expiration
+    /// - "insufficient fees provided" if fees don't cover all funds
     #[endpoint]
     fn claim(
         &self,
-        address: ManagedAddress,
+        deposit_key: DepositKey<Self::Api>,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let deposit_mapper = self.deposit(&address);
-        require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
-
         let caller_address = self.blockchain().get_caller();
-        self.require_signature(&address, &caller_address, signature);
+        let deposit = self.process_claim(&deposit_key, &signature, &caller_address);
 
-        let block_round = self.blockchain().get_block_round();
-        let deposit = deposit_mapper.take();
-        let num_tokens_transferred = deposit.funds.len();
-        let mut deposited_fee = deposit.fees.value;
-
-        let fee_token = deposited_fee.token_identifier.clone();
-        let fee = self.fee(&fee_token).get();
-        require!(deposit.expiration_round >= block_round, "deposit expired");
-
-        let fee_cost = fee * num_tokens_transferred as u64;
-        deposited_fee.amount -= &fee_cost;
-
-        self.collected_fees(&fee_token)
-            .update(|collected_fees| *collected_fees += fee_cost);
-
+        // the funds are transferred to the caller
         if !deposit.funds.is_empty() {
             self.tx()
                 .to(&caller_address)
-                .payment(&deposit.funds)
+                .payment(deposit.funds)
                 .transfer();
-        }
-        if deposited_fee.amount > 0 {
-            self.send_fee_to_address(&deposited_fee, &deposit.depositor_address);
         }
     }
 
+    /// Processes a claim by validating the signature and expiration, then collecting fees.
+    ///
+    /// This helper function is used by both `claim` and `forward` endpoints.
+    /// It verifies the ED25519 signature, checks expiration, collects required fees,
+    /// and returns any leftover fees to the depositor.
+    ///
+    /// Returns the deposit with funds still intact (not transferred).
+    fn process_claim(
+        &self,
+        deposit_key: &DepositKey<Self::Api>,
+        signature: &ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+        caller_address: &ManagedAddress,
+    ) -> DepositInfo<Self::Api> {
+        let deposit_mapper = self.deposit(deposit_key);
+        self.require_deposit_exists(&deposit_mapper);
+
+        self.check_signature(deposit_key, caller_address, signature.clone());
+
+        let mut deposit = deposit_mapper.take();
+
+        require!(!self.deposit_expired(&deposit), "deposit expired");
+
+        let (opt_fees_to_collect, opt_leftover) =
+            self.take_fees_to_collect_and_leftover(&mut deposit);
+
+        if let Some(fees_to_collect) = opt_fees_to_collect {
+            self.add_collected_fee(&fees_to_collect);
+        }
+
+        // any leftover fees are returned to the depositor
+        if let Some(leftover) = opt_leftover {
+            self.tx()
+                .to(&deposit.depositor_address)
+                .payment(leftover.into_payment())
+                .transfer();
+        }
+
+        deposit
+    }
+
+    /// Forwards funds from one deposit to another existing deposit.
+    ///
+    /// # Preconditions
+    /// - Source deposit must exist for deposit_key
+    /// - Destination deposit must already exist for forward_deposit_key with fees paid
+    /// - Current block timestamp must be less than or equal to source deposit's expiration
+    /// - Signature must be valid: signed with private key of deposit_key, over caller's address
+    /// - If fees enabled, source deposit must have sufficient fees for its funds
+    /// - Destination deposit must have sufficient fees for combined funds (existing + forwarded)
+    /// - Caller must be the depositor of the destination deposit
+    ///
+    /// # Requirements
+    /// - Valid ED25519 signature for source deposit
+    /// - You may send an additional single fungible payment as fee, which will be added to the destination deposit's fees
+    ///
+    /// # Outcomes
+    /// - Source deposit is removed from storage
+    /// - Source deposit's funds are appended to destination deposit
+    /// - Destination deposit's expiration is updated to source deposit's expiration
+    /// - Required fees from source are collected by the contract
+    /// - Excess fees from source (if any) are returned to source's original depositor
+    /// - Any additional fee sent with the forward call is added to the destination deposit's fees
+    ///
+    /// # Panics
+    /// - "non-existent key" if source deposit doesn't exist
+    /// - "forward deposit needs to exist in advance, with fees paid" if destination doesn't exist
+    /// - ED25519 signature verification fails if signature is invalid
+    /// - "deposit expired" if source deposit has expired
+    /// - "invalid depositor" if caller is not the depositor of destination
+    /// - "insufficient fees provided" if combined fees don't cover all funds
     #[endpoint]
     #[payable]
     fn forward(
         &self,
-        address: ManagedAddress,
-        forward_address: ManagedAddress,
+        deposit_key: DepositKey<Self::Api>,
+        forward_deposit_key: DepositKey<Self::Api>,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let paid_fee = self.call_value().egld_or_single_esdt();
+        let opt_additional_fee = self.call_value().single_optional();
         let caller_address = self.blockchain().get_caller();
-        let fee_token = paid_fee.token_identifier.clone();
-        self.require_signature(&address, &caller_address, signature);
-        self.update_fees(caller_address, &forward_address, paid_fee);
+        let old_deposit = self.process_claim(&deposit_key, &signature, &caller_address);
+        require!(
+            old_deposit.fees.is_none(),
+            "fees should be empty at this point 1"
+        );
 
-        let new_deposit = self.deposit(&forward_address);
-        let fee = self.fee(&fee_token).get();
+        let forward_deposit_mapper = self.deposit(&forward_deposit_key);
+        require!(
+            !forward_deposit_mapper.is_empty(),
+            "forward deposit needs to exist in advance, with fees paid"
+        );
 
-        let mut current_deposit = self.deposit(&address).take();
-        let num_tokens = current_deposit.funds.len();
-        new_deposit.update(|fwd_deposit| {
-            require!(fwd_deposit.funds.is_empty(), "key already used");
-            require!(
-                &fee * num_tokens as u64 <= fwd_deposit.fees.value.amount,
-                "cannot deposit funds without covering the fee cost first"
+        forward_deposit_mapper.update(|deposit| {
+            self.perform_append_funds(
+                deposit,
+                &caller_address,
+                old_deposit.expiration,
+                old_deposit.funds,
             );
-
-            fwd_deposit.fees.num_token_to_transfer += num_tokens;
-            fwd_deposit.valability = current_deposit.valability;
-            fwd_deposit.expiration_round = self.get_expiration_round(current_deposit.valability);
-            fwd_deposit.funds = current_deposit.funds;
+            if let Some(additional_fee) = opt_additional_fee {
+                self.add_deposit_fee(deposit, additional_fee.clone().fungible_or_panic());
+            }
         });
-
-        let forward_fee = &fee * num_tokens as u64;
-        current_deposit.fees.value.amount -= &forward_fee;
-
-        self.collected_fees(&fee_token)
-            .update(|collected_fees| *collected_fees += forward_fee);
-
-        if current_deposit.fees.value.amount > 0 {
-            self.send_fee_to_address(
-                &current_deposit.fees.value,
-                &current_deposit.depositor_address,
-            );
-        }
     }
 
-    fn require_signature(
+    /// Verifies an ED25519 signature over the deposit key.
+    ///
+    /// The signature must be generated using the private key corresponding to the deposit key,
+    /// signing the caller's address. This proves the caller has authorization to claim the deposit.
+    fn check_signature(
         &self,
-        address: &ManagedAddress,
+        deposit_key: &DepositKey<Self::Api>,
         caller_address: &ManagedAddress,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let addr = address.as_managed_buffer();
-        let message = caller_address.as_managed_buffer();
-        self.crypto()
-            .verify_ed25519(addr, message, signature.as_managed_buffer());
+        let caller_buffer = caller_address.as_managed_buffer();
+        self.crypto().verify_ed25519(
+            deposit_key.as_managed_buffer(),
+            caller_buffer,
+            signature.as_managed_buffer(),
+        );
     }
 }

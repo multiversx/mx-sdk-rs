@@ -1,78 +1,158 @@
 use multiversx_sc::imports::*;
 
-use crate::{constants::*, helpers, storage};
+use crate::{
+    digital_cash_deposit,
+    storage::{self, DepositInfo, DepositKey},
+};
 
 #[multiversx_sc::module]
-pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
+pub trait PayFeeAndFund: storage::StorageModule + digital_cash_deposit::DepositModule {
+    /// Pays the required fee and funds a deposit in one transaction.
+    ///
+    /// # Preconditions
+    /// - At least one payment must be provided
+    /// - If fees are enabled: first payment is taken entirely as fee, remaining are funds
+    /// - If fees are disabled: all payments are treated as funds
+    /// - If updating existing deposit: caller must be the original depositor
+    /// - Fee token must match existing fee token if deposit already has fees
+    ///
+    /// # Requirements
+    /// - Must be called with at least one payment (fee and/or funds)
+    /// - If fees enabled and creating new deposit: first payment amount must be >= (base_fee × number_of_funds)
+    /// - If updating existing deposit: total fees must be >= (base_fee × total_number_of_funds)
+    ///
+    /// # Outcomes
+    /// - If deposit doesn't exist: creates new deposit with caller as depositor
+    /// - If deposit exists: appends funds and fees to existing deposit, updates expiration
+    /// - First payment is consumed as fee (if fees enabled)
+    /// - Remaining payments are stored as funds
+    ///
+    /// # Panics
+    /// - "no payment was provided" if called without payment
+    /// - "invalid depositor" if updating existing deposit and caller is not the depositor
+    /// - "fee token mismatch" if fee token differs from existing deposit's fee token
+    /// - "insufficient fees provided" if total fees don't cover all funds
+    /// - "invalid fee token" if fee token is not configured in contract
     #[endpoint(payFeeAndFund)]
     #[payable]
-    fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
-        let mut payments = self.call_value().all_transfers().clone_value();
+    fn pay_fee_and_fund(&self, deposit_key: DepositKey<Self::Api>, expiration: TimestampMillis) {
+        let mut payments = self.call_value().all().clone_value();
         require!(!payments.is_empty(), "no payment was provided");
 
-        let mut fee_token = payments.get(0).clone();
-        let fee_value_mapper = self.fee(&fee_token.token_identifier);
-
-        let provided_fee_token = payments.get(0).clone();
-        require!(!fee_value_mapper.is_empty(), "invalid fee toke provided");
-
-        fee_token.amount = fee_value_mapper.get();
-        let nr_of_payments = payments.len();
-
-        let fee_with_first_token = fee_token.amount.clone() * nr_of_payments as u32;
-        let fee_without_first_token = fee_token.amount.clone() * (nr_of_payments as u32 - 1);
-
-        require!(
-            (provided_fee_token.amount == fee_without_first_token || // case when the first token is the exact fee amount
-                provided_fee_token.amount > fee_with_first_token), // case when the first token also covers part of the funds
-            "payment not covering fees"
-        );
-
-        if provided_fee_token.amount > fee_without_first_token {
-            fee_token.amount = fee_with_first_token;
-            let extracted_fee = EgldOrEsdtTokenPayment::new(
-                provided_fee_token.token_identifier,
-                provided_fee_token.token_nonce,
-                provided_fee_token.amount - &fee_token.amount,
-            );
-            let _ = payments.set(0, extracted_fee);
+        let opt_fees = if !self.fees_disabled().get() {
+            Some(payments.take(0).fungible_or_panic())
         } else {
-            payments.remove(0);
-            fee_token.amount = fee_without_first_token;
-        }
+            None
+        };
+        let funds = payments;
 
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, &address, fee_token);
 
-        self.make_fund(payments, address, valability)
+        let deposit_mapper = self.deposit(&deposit_key);
+        if deposit_mapper.is_empty() {
+            let new_deposit = DepositInfo {
+                depositor_address: caller_address,
+                funds,
+                expiration,
+                fees: opt_fees,
+            };
+            self.validate_deposit_fees(&new_deposit);
+            deposit_mapper.set(new_deposit);
+        } else {
+            deposit_mapper.update(|deposit| {
+                self.require_deposit_caller_is_depositor(&caller_address, deposit);
+
+                if let Some(fees) = opt_fees {
+                    self.add_deposit_fee(deposit, fees);
+                }
+                deposit.expiration = expiration;
+                deposit.funds.append_vec(funds);
+                self.validate_deposit_fees(deposit);
+            });
+        }
     }
 
+    /// Adds funds to an existing deposit without paying additional fees.
+    ///
+    /// # Preconditions
+    /// - Deposit must already exist for the given deposit_key
+    /// - Caller must be the original depositor
+    /// - Existing deposit must have sufficient fees to cover the new total number of funds
+    /// - At least one payment must be provided
+    ///
+    /// # Requirements
+    /// - Must be called with payment (the funds to add)
+    /// - Only the depositor who created the deposit can call this
+    /// - Deposit must have been created first (via payFeeAndFund or depositFees)
+    ///
+    /// # Outcomes
+    /// - Payments are appended to the deposit's funds
+    /// - Expiration timestamp is updated to the new value
+    /// - No new fees are collected (uses existing fees)
+    ///
+    /// # Panics
+    /// - "deposit needs to exist before funding, with fees paid" if deposit doesn't exist
+    /// - "invalid depositor" if caller is not the original depositor
+    /// - "insufficient fees provided" if existing fees don't cover total funds after addition
     #[endpoint]
     #[payable]
-    fn fund(&self, address: ManagedAddress, valability: u64) {
-        require!(!self.deposit(&address).is_empty(), FEES_NOT_COVERED_ERR_MSG);
-        let deposit_mapper = self.deposit(&address).get();
-        let depositor = deposit_mapper.depositor_address;
+    fn fund(&self, deposit_key: DepositKey<Self::Api>, expiration: TimestampMillis) {
+        let payment = self.call_value().all().clone_value();
+        let caller_address = self.blockchain().get_caller();
+        let deposit_mapper = self.deposit(&deposit_key);
+
         require!(
-            self.blockchain().get_caller() == depositor,
-            "invalid depositor"
+            !deposit_mapper.is_empty(),
+            "deposit needs to exist before funding, with fees paid"
         );
-        let deposited_fee_token = deposit_mapper.fees.value;
-        let fee_amount = self.fee(&deposited_fee_token.token_identifier).get();
-        // TODO: switch to egld+esdt multi transfer handling
-        let payment = self.call_value().all_transfers().clone_value();
 
-        let num_tokens = payment.len();
-        self.check_fees_cover_number_of_tokens(num_tokens, fee_amount, deposited_fee_token.amount);
-
-        self.make_fund(payment, address, valability);
+        deposit_mapper.update(|deposit: &mut DepositInfo<<Self as ContractBase>::Api>| {
+            self.perform_append_funds(deposit, &caller_address, expiration, payment);
+        });
     }
 
+    /// Deposits fees for a new or existing deposit without adding funds.
+    ///
+    /// This allows paying fees in advance before adding the actual funds,
+    /// which is required for the forward operation's destination deposit.
+    ///
+    /// # Preconditions
+    /// - Exactly one payment must be provided (the fee)
+    /// - If updating existing deposit: caller must be the original depositor
+    /// - Fee token must match existing fee token if deposit already has fees
+    ///
+    /// # Requirements
+    /// - Must be called with a single fungible payment
+    /// - If updating existing deposit: only the depositor can add more fees
+    ///
+    /// # Outcomes
+    /// - If deposit doesn't exist: creates new deposit with empty funds and zero expiration
+    /// - If deposit exists: adds fee amount to existing fees (must be same token)
+    /// - Caller is recorded as depositor for new deposits
+    ///
+    /// # Panics
+    /// - "invalid depositor" if updating existing deposit and caller is not the depositor
+    /// - "fee token mismatch" if fee token differs from existing deposit's fee token
     #[endpoint(depositFees)]
-    #[payable("EGLD")]
-    fn deposit_fees(&self, address: &ManagedAddress) {
-        let payment = self.call_value().egld_or_single_esdt();
+    #[payable]
+    fn deposit_fees(&self, deposit_key: &DepositKey<Self::Api>) {
+        let payment = self.call_value().single().clone().fungible_or_panic();
         let caller_address = self.blockchain().get_caller();
-        self.update_fees(caller_address, address, payment);
+
+        let deposit_mapper = self.deposit(deposit_key);
+        if deposit_mapper.is_empty() {
+            let new_deposit = DepositInfo {
+                depositor_address: caller_address,
+                funds: ManagedVec::new(),
+                expiration: TimestampMillis::zero(),
+                fees: Some(payment),
+            };
+            deposit_mapper.set(new_deposit);
+        } else {
+            deposit_mapper.update(|deposit| {
+                self.require_deposit_caller_is_depositor(&caller_address, deposit);
+                self.add_deposit_fee(deposit, payment);
+            });
+        }
     }
 }

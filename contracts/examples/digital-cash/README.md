@@ -1,29 +1,121 @@
 # Digital Cash Contract
 
-The basic idea of MultiversX Digital Cash is that ONE link can hold information (ESDT tokens, EGLD) on chain, this link can be sent from one person to another, there is no need to hold any wallet to receive, consume and send it forward to another person.
+The basic idea of MultiversX Digital Cash is that a cryptographic check (represented by an ED25519 public key) can hold tokens (ESDT or EGLD) on-chain. This check can be transferred from one person to another through a simple link. The recipient doesn't need a wallet initially - they just need to prove ownership of the check's private key through an ED25519 signature to claim the funds.
 
-# Usage
+## Overview
 
-## Covering up payment fees & funding
+Each deposit is stored at a specific 32-byte key (the ED25519 public key, also called the "check address"). To claim funds:
+1. The recipient must provide a valid ED25519 signature proving they control the deposit key's private key
+2. The signature must sign the claimer's address
+3. The deposit must not have expired
+4. Fees must have been paid upfront by the depositor (if fees are enabled)
 
-The contract allows funding any number of tokens in 1 call within an address under a validity if the fee cost was covered.
+## Fee System
 
-In order to fund one should first call `deposit_fees` depositing the fee funds as `eGLD` within the contract. Only after, if the fees cover the transfer of the certain number of tokens, it is possible to deposit the funds, making them available for claiming or forwarding.
+The contract supports a flexible fee configuration system:
 
-`fund` after making sure everything is ok on the fee aspect will set up the `deposit` storage increasing the number of tokens to transfer by the number of tokens paid to the endpoint and set the expiration date by the number of rounds specified within the `valability` parameter.
+### Global Fee Toggle
+The contract owner can enable or disable fees globally using `setFeesDisabled`:
+- When **disabled** (`fees_disabled = true`): No fees are required for any operation
+- When **enabled** (`fees_disabled = false`): Fees are validated according to configured fee variants
 
-The fees are unique per address and only cover one instance of transfer, either if it is a `claim` or a `forward`, per number of tokens transferred. Only by making one of these actions will consume the fee funds following to to refund the rest of the fees to the depositor.
+### Fee Variants
+Each token can be configured with a specific fee amount using the `setFee` endpoint:
+- Setting a fee amount > 0 makes that token valid for paying fees
+- Setting a fee amount = 0 effectively disables that token for fees
+- The fee is charged per fund: `total_fee = base_fee × number_of_funds_in_deposit`
 
-## Claiming funds
+Fees must be paid upfront when creating a deposit and must cover the cost of all deposited funds.
 
-Claiming the funds requires the signature parameter to be valid. Next, the round will be checked to be greater than the `expiration_round` within the deposit. Once this requirement is fulfilled, the funds will be sent to the caller and the remainder of the fee funds sent back to the depositor.
+## Creating Deposits
 
-## Withdrawing funds
+### Option 1: `payFeeAndFund` (One-Step)
+The primary way to create a deposit. This endpoint accepts multiple payments where:
+- **If fees are enabled**: The first payment is taken entirely as the fee, remaining payments are stored as funds
+- **If fees are disabled**: All payments are treated as funds
 
-If the validity of a deposit has expired it can no longer be claimed. Anyone at this point can call `withdraw`, making the funds go back to the depositor together with the unused fee funds.
+**Important**: The first payment is consumed entirely as a fee (when fees are enabled), not split between fee and funds.
 
-## Forwarding funds
+Parameters:
+- `deposit_key`: The 32-byte check address (ED25519 public key) where funds will be stored
+- `expiration`: Timestamp in milliseconds when the deposit expires
 
-Funds can be forwarded to another address using the signature, but the forwarded address requires to have the fees covered. This action will also consume the funds from the initial address.
+The endpoint can also be used to add more funds and fees to an existing deposit (caller must be the original depositor).
 
-After the forward, in case of a withdrawal, the funds will go to the `depositor_address` set within the `forwarded_address` deposit storage.
+### Option 2: `depositFees` + `fund` (Two-Step)
+Alternative approach for more complex scenarios:
+1. First call `depositFees` to pay the fee with a configured fee token
+2. Then call `fund` to deposit the actual tokens (must be same depositor)
+
+The `fund` endpoint verifies that sufficient fees have been paid to cover the total number of funds being deposited. This approach is particularly useful for the `forward` operation, where the destination deposit must exist with fees paid in advance.
+
+## Claiming Funds
+
+Use the `claim` endpoint with:
+- `deposit_key`: The check address containing the deposit
+- `signature`: ED25519 signature proving ownership of the check's private key
+
+The signature must be generated by signing the caller's address with the private key corresponding to the deposit_key.
+
+If the signature is valid and the deposit hasn't expired:
+- All deposited funds are transferred to the caller
+- Required fees (if fees enabled) are collected by the contract: `fee_collected = base_fee × number_of_funds`
+- Any excess fees are returned to the original depositor
+- The deposit is removed from storage
+
+**Important**: The deposit must not be expired (current timestamp must be ≤ expiration timestamp).
+
+## Withdrawing Expired Deposits
+
+If a deposit has expired and hasn't been claimed, anyone can trigger the withdrawal by calling `withdrawExpired`:
+- `deposit_key`: The check address containing the expired deposit
+
+This returns all deposited funds plus all fees to the original depositor. No signature is required, but the deposit must have passed its expiration timestamp.
+
+**Important**: Current block timestamp must be > expiration timestamp.
+
+## Forwarding Funds
+
+Funds can be forwarded to another check address using the `forward` endpoint:
+- `deposit_key`: The current check address (source)
+- `forward_deposit_key`: The new check address (destination)
+- `signature`: ED25519 signature proving ownership of the source check
+- *(optional)*: You may send a single additional fungible payment (fee) with the call, which will be added to the destination deposit's fees.
+
+**Critical Requirement**: The destination deposit must already exist with sufficient fees paid in advance. Use `depositFees` to create the destination first.
+
+The forward operation:
+1. Validates the signature for the source deposit
+2. Collects required fees from the source deposit
+3. Returns any excess fees from source to the original depositor
+4. Appends source funds to the destination deposit
+5. Updates destination's expiration to source's expiration
+6. Removes the source deposit from storage
+7. If an additional fee is sent with the call, it is added to the destination deposit's fees
+
+**Important**: The caller must be the depositor of the destination deposit, and the destination must have sufficient fees to cover the combined total of existing funds plus forwarded funds.
+
+After forwarding, the funds belong to the destination deposit and will go to the destination's depositor if withdrawn after expiration.
+
+## Contract Owner Operations
+
+The contract owner has exclusive access to fee management endpoints:
+
+### `setFeesDisabled(bool)`
+Globally enables or disables fee requirements:
+- When `true`: No fees are required for any operation (deposit creation, claims)
+- When `false`: Fees are validated based on configured fee variants
+- Allows flexibility to run the contract in free mode or paid mode
+
+### `setFee(token_id, fee_amount)`
+Configures the fee for a specific token:
+- Sets the base fee amount for the given token identifier
+- Fee amount of 0 effectively disables that token for fees
+- Total fee charged = `base_fee × number_of_funds` in the deposit
+- Can be used to add new fee tokens, update existing ones, or disable tokens
+
+### `claimFees()`
+Withdraws all collected fees to the owner:
+- Transfers all accumulated fees across all tokens in a single multi-payment transaction
+- Clears the collected fees storage
+- Only fees collected from claims and forwards are included (not initial deposits)

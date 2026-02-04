@@ -18,19 +18,118 @@ use crate::{
     types::{ManagedAddress, ManagedType, ManagedVec, MultiValueEncoded},
 };
 
-const ADDRESS_TO_ID_SUFFIX: &[u8] = b"_address_to_id";
-const ID_TO_ADDRESS_SUFFIX: &[u8] = b"_id_to_address";
-const COUNT_SUFFIX: &[u8] = b"_count";
+const ADDRESS_TO_ID_SUFFIX: &str = "_address_to_id";
+const ID_TO_ADDRESS_SUFFIX: &str = "_id_to_address";
+const COUNT_SUFFIX: &str = "_count";
 
-/// Very widely used mapper, that manages the users of a smart contract.
-/// It holds a bi-directional map, from addresses to ids and viceversa.
-/// This is so we can easily iterate over all users, using their ids.
-/// Also holds the user count in sync. This is also necessary for iteration.
+/// A specialized bidirectional mapper for managing smart contract users with auto-incrementing IDs.
 ///
-/// This particular implementation of a user mapper doesn't contain any additional
-/// user data other than address/id.
+/// # Storage Layout
 ///
-/// It also doesn't allow removing users. Once in, their ids are reserved forever.
+/// The `UserMapper` maintains three storage patterns for efficient user management:
+///
+/// 1. **Address to ID mapping**:
+///    - `base_key + "_address_to_id" + encoded_address` → user ID (usize)
+///
+/// 2. **ID to address mapping**:
+///    - `base_key + "_id_to_address" + id` → user address
+///
+/// 3. **User counter**:
+///    - `base_key + "_count"` → total number of registered users
+///
+/// # User ID Assignment
+///
+/// - IDs start from 1 and increment sequentially (never 0)
+/// - ID 0 represents "no user" or "user not found"
+/// - Once assigned, user IDs are **permanent** and never reused
+/// - No removal functionality - users cannot be deleted once registered
+///
+/// # Main Operations
+///
+/// - **Auto-register**: `get_or_create_user(address)` - Gets ID or assigns new one. O(1).
+/// - **Batch register**: `get_or_create_users(addresses, callback)` - Registers multiple users efficiently.
+/// - **Lookup ID**: `get_user_id(address)` - Returns user ID (0 if not found). O(1).
+/// - **Lookup Address**: `get_user_address(id)` - Returns address for ID. O(1).
+/// - **Count**: `get_user_count()` - Returns total number of registered users. O(1).
+/// - **Bulk Access**: `get_all_addresses()` - Returns all user addresses (expensive). O(n).
+///
+/// # Trade-offs
+///
+/// - **Pros**: Sequential IDs enable efficient iteration; permanent user registry; bidirectional lookup;
+///   auto-incrementing simplifies user management; built-in user counting.
+/// - **Cons**: No user removal; IDs never reused; `get_all_addresses()` can be expensive for large user bases;
+///   slightly higher storage overhead than simple address lists.
+///
+/// # Comparison with AddressToIdMapper
+///
+/// - **UserMapper**: Specialized for users; includes user count; batch operations; no removal
+/// - **AddressToIdMapper**: Generic address mapping; supports removal; no built-in counting
+///
+/// # Use Cases
+///
+/// - User registration and management systems
+/// - Participant tracking in contracts (staking, voting, etc.)
+/// - Whitelist management with sequential user numbering
+/// - Any scenario requiring both address-based lookup and iteration by user ID
+/// - Loyalty programs or membership systems
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, UserMapper};
+/// # use multiversx_sc::types::ManagedAddress;
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>(
+/// #     user1: ManagedAddress<SA>,
+/// #     user2: ManagedAddress<SA>,
+/// #     user3: ManagedAddress<SA>
+/// # ) {
+/// # let mapper = UserMapper::<SA>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"users"[..])
+/// # );
+/// // Register users (auto-assign IDs)
+/// let id1 = mapper.get_or_create_user(&user1);  // Returns 1
+/// let id2 = mapper.get_or_create_user(&user2);  // Returns 2
+/// let id1_again = mapper.get_or_create_user(&user1);  // Returns 1 (existing)
+///
+/// assert_eq!(id1, 1);
+/// assert_eq!(id2, 2);
+/// assert_eq!(id1_again, 1);
+/// assert_eq!(mapper.get_user_count(), 2);
+///
+/// // Lookup by address
+/// assert_eq!(mapper.get_user_id(&user1), 1);
+/// assert_eq!(mapper.get_user_id(&user3), 0);  // Not registered
+///
+/// // Lookup by ID
+/// assert_eq!(mapper.get_user_address(1), Some(user1.clone()));
+/// assert_eq!(mapper.get_user_address(999), None);  // Invalid ID
+///
+/// // Safe address lookup (returns zero address if invalid)
+/// let addr = mapper.get_user_address_or_zero(1);
+/// assert_eq!(addr, user1);
+///
+/// let zero_addr = mapper.get_user_address_or_zero(999);
+/// assert!(zero_addr.is_zero());
+///
+/// // Batch registration with callback
+/// let addresses = vec![user2.clone(), user3.clone()];
+/// mapper.get_or_create_users(addresses.into_iter(), |id, is_new| {
+///     if is_new {
+///         // Handle new user registration
+///     } else {
+///         // Handle existing user
+///     }
+/// });
+///
+/// assert_eq!(mapper.get_user_count(), 3);
+///
+/// // Get all users (expensive for large lists)
+/// let all_users = mapper.get_all_addresses();
+/// assert_eq!(all_users.len(), 3);
+///
+/// // Note: No removal functionality - users are permanent
+/// # }
+/// ```
 pub struct UserMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi,
@@ -74,21 +173,21 @@ where
 {
     fn get_user_id_key(&self, address: &ManagedAddress<SA>) -> StorageKey<SA> {
         let mut user_id_key = self.base_key.clone();
-        user_id_key.append_bytes(ADDRESS_TO_ID_SUFFIX);
+        user_id_key.append_bytes(ADDRESS_TO_ID_SUFFIX.as_bytes());
         user_id_key.append_item(address);
         user_id_key
     }
 
     fn get_user_address_key(&self, id: usize) -> StorageKey<SA> {
         let mut user_address_key = self.base_key.clone();
-        user_address_key.append_bytes(ID_TO_ADDRESS_SUFFIX);
+        user_address_key.append_bytes(ID_TO_ADDRESS_SUFFIX.as_bytes());
         user_address_key.append_item(&id);
         user_address_key
     }
 
     fn get_user_count_key(&self) -> StorageKey<SA> {
         let mut user_count_key = self.base_key.clone();
-        user_count_key.append_bytes(COUNT_SUFFIX);
+        user_count_key.append_bytes(COUNT_SUFFIX.as_bytes());
         user_count_key
     }
 
