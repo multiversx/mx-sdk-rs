@@ -205,17 +205,18 @@ pub trait OrdersModule:
             .as_big_uint()
             .proportion(penalty_percent, PERCENT_BASE_POINTS);
 
-        let mut amount = order.input_amount.clone();
-        amount -= &penalty_amount;
-
-        let transfer = Transfer {
-            to: caller.clone(),
-            payment: FungiblePayment::new(token_id, amount),
-        };
+        let amount = order.input_amount.as_big_uint() - &penalty_amount;
 
         self.orders(order_id).clear();
+
         let mut transfers = ManagedVec::new();
-        transfers.push(transfer);
+        if let Some(nz_amount) = NonZeroBigUint::new(amount) {
+            let transfer = Transfer {
+                to: caller.clone(),
+                payment: FungiblePayment::new(token_id, nz_amount),
+            };
+            transfers.push(transfer);
+        }
         self.execute_transfers(transfers);
 
         order
