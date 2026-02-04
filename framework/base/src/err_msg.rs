@@ -48,6 +48,7 @@ pub const BIG_UINT_EXCEEDS_SLICE: &str = "big uint as_bytes exceed target slice"
 pub const BIG_UINT_SUB_NEGATIVE: &str = "cannot subtract because result would be negative";
 pub const UNSIGNED_NEGATIVE: &str = "cannot convert to unsigned, number is negative";
 pub const ZERO_VALUE_NOT_ALLOWED: &str = "zero value not allowed";
+pub const PROPORTION_OVERFLOW_ERR: &str = "proportion overflow";
 
 pub const DESERIALIZATION_INVALID_BYTE: &str = "call data deserialization error: not a valid byte";
 pub const DESERIALIZATION_NOT_32_BYTES: &str =

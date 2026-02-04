@@ -1,19 +1,16 @@
 use multiversx_sc::imports::*;
 
-use crate::common::{FeeConfig, FeeConfigEnum, OrderBookFungiblePayment};
-
 use super::{
     common,
     common::{
-        FEE_PENALTY_INCREASE_PERCENT, MAX_ORDERS_PER_USER, Order, OrderInputParams,
-        PERCENT_BASE_POINTS,
+        FEE_PENALTY_INCREASE_PERCENT, FeeConfig, FeeConfigEnum, MAX_ORDERS_PER_USER, Order,
+        OrderInputParams, PERCENT_BASE_POINTS,
     },
 };
 
 #[multiversx_sc::module]
 pub trait ValidationModule: common::CommonModule {
     fn require_valid_order_input_amount(&self, params: &OrderInputParams<Self::Api>) {
-        require!(params.amount != BigUint::zero(), "Amount cannot be zero");
         require!(
             self.calculate_fee_amount(
                 &params.amount,
@@ -38,7 +35,7 @@ pub trait ValidationModule: common::CommonModule {
         match params.fee_config.fee_type.clone() {
             FeeConfigEnum::Fixed => {
                 require!(
-                    params.fee_config.fixed_fee < params.amount,
+                    params.fee_config.fixed_fee < *params.amount.as_big_uint(),
                     "Invalid fee config fixed amount"
                 );
             }
@@ -68,7 +65,7 @@ pub trait ValidationModule: common::CommonModule {
         self.require_valid_order_input_deal_config(params);
     }
 
-    fn require_valid_buy_payment(&self) -> OrderBookFungiblePayment<Self::Api> {
+    fn require_valid_buy_payment(&self) -> FungiblePayment<Self::Api> {
         let payment = self.call_value().single();
         let second_token_id = self.second_token_id().get();
         require!(
@@ -80,13 +77,10 @@ pub trait ValidationModule: common::CommonModule {
             "Token id and second token id should be the same"
         );
 
-        OrderBookFungiblePayment {
-            token_id: payment.token_identifier.clone(),
-            amount: payment.amount.as_big_uint().clone(),
-        }
+        FungiblePayment::new(payment.token_identifier.clone(), payment.amount.clone())
     }
 
-    fn require_valid_sell_payment(&self) -> OrderBookFungiblePayment<Self::Api> {
+    fn require_valid_sell_payment(&self) -> FungiblePayment<Self::Api> {
         let payment = self.call_value().single();
         let first_token_id = self.first_token_id().get();
         require!(payment.is_fungible(), "Payment is not a fungible token");
@@ -95,10 +89,7 @@ pub trait ValidationModule: common::CommonModule {
             "Token id and first token id should be the same"
         );
 
-        OrderBookFungiblePayment {
-            token_id: payment.token_identifier.clone(),
-            amount: payment.amount.as_big_uint().clone(),
-        }
+        FungiblePayment::new(payment.token_identifier.clone(), payment.amount.clone())
     }
 
     fn require_valid_match_input_order_ids(&self, order_ids: &ManagedVec<u64>) {
