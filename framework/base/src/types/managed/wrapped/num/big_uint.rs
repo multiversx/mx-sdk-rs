@@ -338,6 +338,9 @@ impl<M: ManagedTypeApi> BigUint<M> {
     /// # Returns
     /// The proportional amount as BigUint (self * part / total)
     ///
+    /// # Notes
+    /// Both `part` and `total` must be at most `i64::MAX`. Values exceeding this limit will cause an error.
+    ///
     /// # Example
     /// ```ignore
     /// let amount = BigUint::from(1000u32);
@@ -368,6 +371,10 @@ impl<M: ManagedTypeApi> BigUint<M> {
     ///
     /// # Returns
     /// The proportional amount as BigUint (self * part / total)
+
+    /// # Notes
+    /// Both `part` and `total` must be at most `i64::MAX`. Values exceeding this limit will cause an error.
+    ///
     ///
     /// # Example
     /// ```ignore
