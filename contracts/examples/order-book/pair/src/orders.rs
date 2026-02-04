@@ -160,22 +160,24 @@ pub trait OrdersModule:
 
         let creator_amount = order.input_amount.as_big_uint() - &penalty_amount;
 
-        let creator_transfer = Transfer {
-            to: order.creator.clone(),
-            payment: FungiblePayment::new(
-                token_id.clone(),
-                creator_amount.into_non_zero_or_panic(),
-            ),
-        };
-        let caller_transfer = Transfer {
-            to: caller.clone(),
-            payment: FungiblePayment::new(token_id, penalty_amount.into_non_zero_or_panic()),
-        };
-
         self.orders(order_id).clear();
+
         let mut transfers = ManagedVec::new();
-        transfers.push(creator_transfer);
-        transfers.push(caller_transfer);
+        if let Some(creator_amount_nz) = NonZeroBigUint::new(creator_amount) {
+            let creator_transfer = Transfer {
+                to: order.creator.clone(),
+                payment: FungiblePayment::new(token_id.clone(), creator_amount_nz),
+            };
+            transfers.push(creator_transfer);
+        }
+
+        if let Some(penalty_amount_nz) = NonZeroBigUint::new(penalty_amount) {
+            let caller_transfer = Transfer {
+                to: caller.clone(),
+                payment: FungiblePayment::new(token_id.clone(), penalty_amount_nz),
+            };
+            transfers.push(caller_transfer);
+        }
         self.execute_transfers(transfers);
 
         order
@@ -352,11 +354,9 @@ pub trait OrdersModule:
 
     fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
         for transfer in &transfers {
-            let token_id = transfer.payment.token_identifier.clone();
-            let amount = transfer.payment.amount.clone();
             self.tx()
                 .to(&transfer.to)
-                .payment(Payment::new(token_id, 0, amount))
+                .payment(transfer.payment.as_payment_refs())
                 .transfer();
         }
     }
