@@ -69,7 +69,7 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: self.clone(),
+            multi_esdt: self.clone().into_payment_vec(),
         }
     }
 }
@@ -180,7 +180,7 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: self,
+            multi_esdt: self.into_payment_vec(),
         }
     }
 }

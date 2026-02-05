@@ -94,7 +94,7 @@ where
         FullPaymentData {
             egld: None,
             multi_esdt: ManagedVec::from_single_item(
-                self.to_owned_payment().into_egld_or_esdt_payment(),
+                self.to_owned_payment().into_payment(),
             ),
         }
     }

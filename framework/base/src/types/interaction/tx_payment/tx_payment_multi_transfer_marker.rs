@@ -77,7 +77,7 @@ where
         let pv = self.0.as_ref();
         FullPaymentData {
             egld: None,
-            multi_esdt: pv.as_multi_egld_or_esdt_payment().clone(),
+            multi_esdt: pv.clone(),
         }
     }
 }
