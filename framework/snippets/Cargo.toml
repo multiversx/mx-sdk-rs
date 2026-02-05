@@ -14,11 +14,9 @@ keywords = ["multiversx", "blockchain", "contract", "snippets"]
 categories = ["cryptography::cryptocurrencies"]
 
 [features]
-default = ["http", "default-tls"]
+default = ["http"]
 http = ["multiversx-sdk-http", "tokio"]
 dapp = ["multiversx-sdk-dapp"]
-default-tls = ["multiversx-sdk-http/default-tls"]
-static-tls = ["multiversx-sdk-http/static-tls"]
 
 [dependencies]
 hex = "0.4"

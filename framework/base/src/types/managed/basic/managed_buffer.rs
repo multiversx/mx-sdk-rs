@@ -583,11 +583,8 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> core::fmt::Display for ManagedBuffer<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        use crate::contract_base::ErrorHelper;
-
-        let s = alloc::string::String::from_utf8(self.to_boxed_bytes().into_vec())
-            .unwrap_or_else(|err| ErrorHelper::<M>::signal_error_with_message(err.as_bytes()));
-
+        let bytes = self.to_boxed_bytes();
+        let s = alloc::string::String::from_utf8_lossy(bytes.as_slice());
         s.fmt(f)
     }
 }

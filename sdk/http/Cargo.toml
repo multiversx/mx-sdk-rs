@@ -16,14 +16,11 @@ categories = ["cryptography::cryptocurrencies", "api-bindings"]
 keywords = ["multiversx", "blockchain", "sdk", "api"]
 
 [features]
-default = ["default-tls"]
-default-tls = ["reqwest/default-tls"]
-static-tls = ["reqwest/rustls-tls"]
 chain_simulator = []
 
 [dependencies]
 tokio = { version = "1.24", features = ["full"] }
-reqwest = { version = "0.12", features = ["blocking", "json"], default-features = false }
+reqwest = { version = "0.13", features = ["rustls", "blocking", "json"], default-features = false }
 anyhow = "1.0.44"
 hex = "0.4.3"
 itertools = "0.14.0"

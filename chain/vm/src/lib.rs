@@ -13,7 +13,6 @@ pub mod schedule;
 pub mod system_sc;
 pub mod types;
 pub mod vm_err_msg;
-pub mod with_shared;
 
 pub use blockchain::BlockchainMock;
 
