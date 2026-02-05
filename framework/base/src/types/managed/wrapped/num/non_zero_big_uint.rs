@@ -1,3 +1,5 @@
+use core::num::NonZero;
+
 use multiversx_sc_codec::DecodeError;
 
 use crate::{
@@ -129,6 +131,20 @@ impl<M: ManagedTypeApi> TryFrom<&ManagedBuffer<M>> for NonZeroBigUint<M> {
         Self::try_from(BigUint::from(item))
     }
 }
+
+macro_rules! impl_from_nonzero {
+    ($($t:ty),*) => {
+        $(
+            impl<M: ManagedTypeApi> From<NonZero<$t>> for NonZeroBigUint<M> {
+                fn from(value: NonZero<$t>) -> Self {
+                    unsafe { Self::new_unchecked(BigUint::from(value.get())) }
+                }
+            }
+        )*
+    };
+}
+
+impl_from_nonzero!(u8, u16, u32, u64, u128, usize);
 
 impl<M: ManagedTypeApi> NonZeroBigUint<M> {
     pub(super) fn wrap_big_int_unchecked(value: BigInt<M>) -> Self {
