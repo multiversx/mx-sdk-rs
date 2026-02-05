@@ -91,7 +91,7 @@ where
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R;
 
     /// Payment data to be used by the testing framework. Will be refactored.
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api>;
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api>;
 }
 
 /// Trait for composing multiple payment objects into a single payment.
@@ -185,8 +185,11 @@ where
     }
 }
 
+/// Intermediate representation for generating payments in tx steps in scenarios.
+///
+/// It traces back to the Mandos payment syntax, either `"egldValue": "..."` or `"esdtValue": [...]`.
 #[derive(Clone)]
-pub struct FullPaymentData<Api>
+pub struct ScenarioPayments<Api>
 where
     Api: ManagedTypeApi,
 {
@@ -194,7 +197,7 @@ where
     pub multi_esdt: PaymentVec<Api>,
 }
 
-impl<Api> Default for FullPaymentData<Api>
+impl<Api> Default for ScenarioPayments<Api>
 where
     Api: ManagedTypeApi,
 {

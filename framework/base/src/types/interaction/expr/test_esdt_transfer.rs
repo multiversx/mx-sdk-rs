@@ -2,7 +2,7 @@ use crate::{
     api::ManagedTypeApi,
     contract_base::TransferExecuteFailed,
     types::{
-        BigUint, EsdtTokenPayment, FullPaymentData, FunctionCall, ManagedAddress,
+        BigUint, EsdtTokenPayment, FunctionCall, ManagedAddress, ScenarioPayments,
         TestTokenIdentifier, TxEnv, TxFrom, TxPayment, TxToSpecified,
     },
 };
@@ -81,7 +81,7 @@ where
         EsdtTokenPayment::from(self).with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        EsdtTokenPayment::from(self).into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        EsdtTokenPayment::from(self).into_scenario_payments(env)
     }
 }

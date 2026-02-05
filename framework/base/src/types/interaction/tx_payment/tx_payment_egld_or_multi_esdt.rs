@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, EgldOrMultiEsdtPayment, ManagedAddress, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for EgldOrMultiEsdtPayment<Env::Api>
 where
@@ -55,8 +55,8 @@ where
     }
 
     #[inline]
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        self.as_refs().into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        self.as_refs().into_scenario_payments(env)
     }
 }
 
@@ -110,7 +110,7 @@ where
     }
 
     #[inline]
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        self.as_refs().into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        self.as_refs().into_scenario_payments(env)
     }
 }
