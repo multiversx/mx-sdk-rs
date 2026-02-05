@@ -2,26 +2,22 @@ use generic_array::typenum::U16;
 use multiversx_sc_codec::IntoMultiValue;
 
 use crate::{
-    api::ManagedTypeApi,
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    api::{ErrorApiImpl, ManagedTypeApi},
+    codec::{
+        self, NestedDecode, TopDecode,
+        derive::{NestedEncode, TopEncode},
+    },
+    err_msg,
     types::{
-        BigUint, Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem,
+        BigUint, Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, FungiblePayment, ManagedVecItem,
         ManagedVecItemPayloadBuffer, NonZeroBigUint, PaymentMultiValue, PaymentRefs, Ref, TokenId,
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
 };
 
-use crate as multiversx_sc; // needed by the codec and TypeAbi generated code
-use crate::{
-    codec::{
-        self, NestedDecode, TopDecode,
-        derive::{NestedEncode, TopEncode},
-    },
-    derive::type_abi,
-};
-
 use super::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment};
 
-#[type_abi]
 #[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub struct Payment<M: ManagedTypeApi> {
     pub token_identifier: TokenId<M>,
@@ -41,6 +37,13 @@ impl<M: ManagedTypeApi> Payment<M> {
 
     pub fn is_fungible(&self) -> bool {
         self.token_nonce == 0
+    }
+
+    pub fn fungible_or_panic(self) -> FungiblePayment<M> {
+        if !self.is_fungible() {
+            M::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED.as_bytes());
+        }
+        FungiblePayment::new(self.token_identifier, self.amount)
     }
 
     #[inline]
@@ -123,6 +126,21 @@ impl<M: ManagedTypeApi> From<(TokenId<M>, u64, NonZeroBigUint<M>)> for Payment<M
     fn from(value: (TokenId<M>, u64, NonZeroBigUint<M>)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
         Self::new(token_identifier, token_nonce, amount)
+    }
+}
+
+impl<M: ManagedTypeApi> TypeAbiFrom<Self> for Payment<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for Payment<M> {}
+
+impl<M: ManagedTypeApi> TypeAbi for Payment<M> {
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        "Payment".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "Payment<$API>".into()
     }
 }
 

@@ -47,7 +47,7 @@ pub fn is_target_installed(rustc_version: &RustcVersion, target_name: &str) -> b
 
     print_util::print_rustup_check_target(rustc_version, target_name, &cmd);
 
-    let output_rustup_command = execute_command(&mut cmd, "rustup");
+    let output_rustup_command = execute_command(&mut cmd);
     let str_output_rustup = match output_rustup_command {
         Ok(output) => output,
         Err(err) => {

@@ -5,8 +5,8 @@ use crate::common::{FEE_PENALTY_INCREASE_EPOCHS, FEE_PENALTY_INCREASE_PERCENT};
 use super::{common, events, validation};
 
 use super::common::{
-    FREE_ORDER_FROM_STORAGE_MIN_PENALTIES, FungiblePayment, Order, OrderInputParams, OrderType,
-    PERCENT_BASE_POINTS, Transfer,
+    FREE_ORDER_FROM_STORAGE_MIN_PENALTIES, Order, OrderInputParams, OrderType, PERCENT_BASE_POINTS,
+    Transfer,
 };
 
 #[multiversx_sc::module]
@@ -150,33 +150,35 @@ pub trait OrdersModule:
             "Too early to free order"
         );
 
+        // penalty_count is at least FREE_ORDER_FROM_STORAGE_MIN_PENALTIES (6),
+        // so this cannot be zero
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
-        let penalty_amount = self.rule_of_three(
-            &BigUint::from(penalty_percent),
-            &BigUint::from(PERCENT_BASE_POINTS),
-            &order.input_amount,
-        );
-        let amount = &order.input_amount - &penalty_amount;
 
-        let creator_transfer = Transfer {
-            to: order.creator.clone(),
-            payment: FungiblePayment {
-                token_id: token_id.clone(),
-                amount,
-            },
-        };
-        let caller_transfer = Transfer {
-            to: caller.clone(),
-            payment: FungiblePayment {
-                token_id,
-                amount: penalty_amount,
-            },
-        };
+        let penalty_amount = order
+            .input_amount
+            .as_big_uint()
+            .proportion(penalty_percent, PERCENT_BASE_POINTS);
+
+        let creator_amount = order.input_amount.as_big_uint() - &penalty_amount;
 
         self.orders(order_id).clear();
+
         let mut transfers = ManagedVec::new();
-        transfers.push(creator_transfer);
-        transfers.push(caller_transfer);
+        if let Some(creator_amount_nz) = NonZeroBigUint::new(creator_amount) {
+            let creator_transfer = Transfer {
+                to: order.creator.clone(),
+                payment: FungiblePayment::new(token_id.clone(), creator_amount_nz),
+            };
+            transfers.push(creator_transfer);
+        }
+
+        if let Some(penalty_amount_nz) = NonZeroBigUint::new(penalty_amount) {
+            let caller_transfer = Transfer {
+                to: caller.clone(),
+                payment: FungiblePayment::new(token_id.clone(), penalty_amount_nz),
+            };
+            transfers.push(caller_transfer);
+        }
         self.execute_transfers(transfers);
 
         order
@@ -199,21 +201,23 @@ pub trait OrdersModule:
 
         let penalty_count = (epoch - order.create_epoch) / FEE_PENALTY_INCREASE_EPOCHS;
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
-        let penalty_amount = self.rule_of_three(
-            &BigUint::from(penalty_percent),
-            &BigUint::from(PERCENT_BASE_POINTS),
-            &order.input_amount,
-        );
-        let amount = &order.input_amount - &penalty_amount;
+        let penalty_amount = order
+            .input_amount
+            .as_big_uint()
+            .proportion(penalty_percent, PERCENT_BASE_POINTS);
 
-        let transfer = Transfer {
-            to: caller.clone(),
-            payment: FungiblePayment { token_id, amount },
-        };
+        let amount = order.input_amount.as_big_uint() - &penalty_amount;
 
         self.orders(order_id).clear();
+
         let mut transfers = ManagedVec::new();
-        transfers.push(transfer);
+        if let Some(nz_amount) = NonZeroBigUint::new(amount) {
+            let transfer = Transfer {
+                to: caller.clone(),
+                payment: FungiblePayment::new(token_id, nz_amount),
+            };
+            transfers.push(transfer);
+        }
         self.execute_transfers(transfers);
 
         order
@@ -297,8 +301,8 @@ pub trait OrdersModule:
         let mut amount_requested = BigUint::zero();
 
         orders.iter().for_each(|x| {
-            amount_paid += &x.input_amount;
-            amount_requested += &x.output_amount;
+            amount_paid += x.input_amount.as_big_uint();
+            amount_requested += x.output_amount.as_big_uint();
         });
 
         (amount_paid, amount_requested)
@@ -312,54 +316,50 @@ pub trait OrdersModule:
         leftover: BigUint,
     ) -> ManagedVec<Transfer<Self::Api>> {
         let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
-
-        let mut match_provider_transfer = Transfer {
-            to: self.blockchain().get_caller(),
-            payment: FungiblePayment {
-                token_id: token_requested.clone(),
-                amount: BigUint::zero(),
-            },
-        };
+        let mut match_provider_amount_accumulator = BigUint::zero();
 
         for order in orders.iter() {
             let match_provider_amount =
                 self.calculate_fee_amount(&order.output_amount, &order.fee_config);
-            let creator_amount = &order.output_amount - &match_provider_amount;
+            let creator_amount = order.output_amount.as_big_uint() - &match_provider_amount;
 
-            let order_deal = self.rule_of_three(&order.input_amount, &total_paid, &leftover);
-            let match_provider_deal_amount = self.rule_of_three(
-                &order.deal_config.match_provider_percent.into(),
-                &PERCENT_BASE_POINTS.into(),
-                &order_deal,
+            let order_deal = order.input_amount.as_big_uint() * &leftover / &total_paid;
+            let match_provider_deal_amount = order_deal.proportion(
+                order.deal_config.match_provider_percent,
+                PERCENT_BASE_POINTS,
             );
             let creator_deal_amount = &order_deal - &match_provider_deal_amount;
 
             transfers.push(Transfer {
                 to: order.creator.clone(),
-                payment: FungiblePayment {
-                    token_id: token_requested.clone(),
-                    amount: creator_amount + creator_deal_amount,
-                },
+                payment: FungiblePayment::new(
+                    token_requested.clone(),
+                    NonZeroBigUint::new_or_panic(creator_amount + creator_deal_amount),
+                ),
             });
 
-            match_provider_transfer.payment.amount +=
-                match_provider_amount + match_provider_deal_amount;
+            match_provider_amount_accumulator += match_provider_amount + match_provider_deal_amount;
         }
-        transfers.push(match_provider_transfer);
+
+        if match_provider_amount_accumulator > 0 {
+            transfers.push(Transfer {
+                to: self.blockchain().get_caller(),
+                payment: FungiblePayment::new(
+                    token_requested.clone(),
+                    NonZeroBigUint::new_or_panic(match_provider_amount_accumulator),
+                ),
+            });
+        }
 
         transfers
     }
 
     fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
         for transfer in &transfers {
-            if transfer.payment.amount > 0 {
-                let token_id = transfer.payment.token_id.clone();
-                let amount = NonZeroBigUint::new(transfer.payment.amount.clone()).unwrap();
-                self.tx()
-                    .to(&transfer.to)
-                    .payment(Payment::new(token_id, 0, amount))
-                    .transfer();
-            }
+            self.tx()
+                .to(&transfer.to)
+                .payment(transfer.payment.as_payment_refs())
+                .transfer();
         }
     }
 

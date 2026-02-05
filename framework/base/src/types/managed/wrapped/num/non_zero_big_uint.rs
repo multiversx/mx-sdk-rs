@@ -148,7 +148,17 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
         }
     }
 
-    /// Convenience constructor, which will signal error if the input is 0.
+    /// Convenience constructor, which will signal an error if the input is zero.
+    ///
+    /// # Panics
+    /// Panics (signals error) if the input value is zero.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let big = BigUint::from(10u32);
+    /// let non_zero = NonZeroBigUint::new_or_panic(big);
+    /// // Succeeds if value is non-zero, panics otherwise
+    /// ```
     pub fn new_or_panic(bu: BigUint<M>) -> Self {
         Self::new(bu).unwrap_or_else(|| quick_signal_error::<M>(err_msg::ZERO_VALUE_NOT_ALLOWED))
     }
