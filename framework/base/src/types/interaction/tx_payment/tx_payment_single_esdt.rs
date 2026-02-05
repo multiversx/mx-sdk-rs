@@ -58,7 +58,7 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: ManagedVec::from_single_item(self.into_multi_egld_or_esdt_payment()),
+            multi_esdt: ManagedVec::from_single_item(self.into_payment()),
         }
     }
 }
@@ -116,7 +116,7 @@ where
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
-            multi_esdt: ManagedVec::from_single_item(self.as_egld_or_esdt_payment().clone()),
+            multi_esdt: ManagedVec::from_single_item(self.clone().into_payment()),
         }
     }
 }

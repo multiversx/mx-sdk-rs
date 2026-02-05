@@ -29,7 +29,7 @@ use crate::{
     api::{CallTypeApi, ManagedTypeApi, quick_signal_error},
     contract_base::TransferExecuteFailed,
     err_msg,
-    types::{BigUint, ManagedAddress, ManagedBuffer, MultiEgldOrEsdtPayment},
+    types::{BigUint, ManagedAddress, ManagedBuffer, PaymentVec},
 };
 
 use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};
@@ -148,7 +148,7 @@ where
     Api: ManagedTypeApi,
 {
     pub egld: Option<AnnotatedEgldPayment<Api>>,
-    pub multi_esdt: MultiEgldOrEsdtPayment<Api>,
+    pub multi_esdt: PaymentVec<Api>,
 }
 
 impl<Api> Default for FullPaymentData<Api>

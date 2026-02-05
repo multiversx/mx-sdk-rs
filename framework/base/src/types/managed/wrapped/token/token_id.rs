@@ -200,6 +200,15 @@ impl<M: ManagedTypeApi> From<EgldOrEsdtTokenIdentifier<M>> for TokenId<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<EsdtTokenIdentifier<M>> for TokenId<M> {
+    #[inline]
+    fn from(esdt_token_id: EsdtTokenIdentifier<M>) -> Self {
+        // EgldOrEsdtTokenIdentifier is also kept in memory with the same representation as TokenId
+        // EGLD legacy conversion is performed at deserialization, creation and conversion
+        esdt_token_id.token_id
+    }
+}
+
 impl<M: ManagedTypeApi> From<&[u8]> for TokenId<M> {
     fn from(bytes: &[u8]) -> Self {
         Self::new_backwards_compatible(ManagedBuffer::new_from_bytes(bytes))
