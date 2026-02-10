@@ -5,7 +5,7 @@ use multiversx_sc_codec::{
 use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
-    types::{AnnotatedValue, EsdtTokenIdentifier, ManagedBuffer, TxEnv},
+    types::{AnnotatedValue, EsdtTokenIdentifier, ManagedBuffer, TokenId, TxEnv},
 };
 
 const STR_PREFIX: &str = "str:";
@@ -30,6 +30,10 @@ impl<'a> TestTokenIdentifier<'a> {
     }
 
     pub fn to_token_identifier<Api: ManagedTypeApi>(&self) -> EsdtTokenIdentifier<Api> {
+        self.name.into()
+    }
+
+    pub fn to_token_id<Api: ManagedTypeApi>(&self) -> TokenId<Api> {
         self.name.into()
     }
 

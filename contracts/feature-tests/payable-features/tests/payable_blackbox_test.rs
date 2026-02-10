@@ -17,10 +17,7 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-#[test]
-fn payable_multi_legacy() {
-    let mut world = world();
-
+fn init_account(world: &mut ScenarioWorld) {
     world
         .account(USER)
         .balance(10000)
@@ -37,6 +34,72 @@ fn payable_multi_legacy() {
         .new_address(PAYABLE_FEATURES_ADDRESS)
         .code(PF_PATH_EXPR)
         .run();
+}
+
+#[test]
+fn payable_all_blackbox_0() {
+    let mut world = world();
+    init_account(&mut world);
+
+    let result = world
+        .tx()
+        .from(USER)
+        .to(PAYABLE_FEATURES_ADDRESS)
+        .typed(payable_features_proxy::PayableFeaturesProxy)
+        .payable_all()
+        .returns(ReturnsResultUnmanaged)
+        .run();
+
+    assert!(result.is_empty());
+}
+
+#[test]
+fn payable_all_blackbox_1() {
+    let mut world = world();
+    init_account(&mut world);
+
+    let result = world
+        .tx()
+        .from(USER)
+        .to(PAYABLE_FEATURES_ADDRESS)
+        .typed(payable_features_proxy::PayableFeaturesProxy)
+        .payable_all()
+        .payment(Payment::try_new(TOKEN_1, 0, 100u64).unwrap())
+        .returns(ReturnsResultUnmanaged)
+        .run();
+
+    assert_eq!(result, vec![Payment::try_new(TOKEN_1, 0, 100u64).unwrap(),]);
+}
+
+#[test]
+fn payable_all_blackbox_2() {
+    let mut world = world();
+    init_account(&mut world);
+
+    let result = world
+        .tx()
+        .from(USER)
+        .to(PAYABLE_FEATURES_ADDRESS)
+        .typed(payable_features_proxy::PayableFeaturesProxy)
+        .payable_all()
+        .payment(TestPayment::new(TOKEN_1, 0, 100))
+        .payment(TestPayment::new(TOKEN_2, 0, 400))
+        .returns(ReturnsResultUnmanaged)
+        .run();
+
+    assert_eq!(
+        result,
+        vec![
+            TestPayment::new(TOKEN_1, 0, 100).to_payment(),
+            TestPayment::new(TOKEN_2, 0, 400).to_payment(),
+        ]
+    );
+}
+
+#[test]
+fn payable_multi_legacy() {
+    let mut world = world();
+    init_account(&mut world);
 
     let result = world
         .tx()
@@ -44,8 +107,8 @@ fn payable_multi_legacy() {
         .to(PAYABLE_FEATURES_ADDRESS)
         .typed(payable_features_proxy::PayableFeaturesProxy)
         .payable_legacy_egld_esdt()
-        .esdt(TestEsdtTransfer(TOKEN_1, 0, 100))
-        .esdt(TestEsdtTransfer(TOKEN_2, 0, 400))
+        .payment(TestPayment::new(TOKEN_1, 0, 100))
+        .payment(TestPayment::new(TOKEN_2, 0, 400))
         .returns(ReturnsResultUnmanaged)
         .run();
 
@@ -54,7 +117,7 @@ fn payable_multi_legacy() {
         result.as_tuple().1,
         vec![
             EsdtTokenPayment::new(TOKEN_1.to_token_identifier(), 0, BigUint::from(100u32)),
-            EsdtTokenPayment::new(TOKEN_2.to_token_identifier(), 0, BigUint::from(400u32))
+            EsdtTokenPayment::new(TOKEN_2.to_token_identifier(), 0, BigUint::from(400u32)),
         ]
     );
 }

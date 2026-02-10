@@ -200,6 +200,13 @@ impl<M: ManagedTypeApi> From<EgldOrEsdtTokenIdentifier<M>> for TokenId<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<TestTokenIdentifier<'_>> for TokenId<M> {
+    #[inline]
+    fn from(test_token: TestTokenIdentifier<'_>) -> Self {
+        Self::from(test_token.as_bytes())
+    }
+}
+
 impl<M: ManagedTypeApi> From<&[u8]> for TokenId<M> {
     fn from(bytes: &[u8]) -> Self {
         Self::new_backwards_compatible(ManagedBuffer::new_from_bytes(bytes))
