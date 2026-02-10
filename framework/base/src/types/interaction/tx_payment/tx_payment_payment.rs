@@ -1,6 +1,8 @@
 use crate::{
     contract_base::TransferExecuteFailed,
-    types::{BigUint, ManagedAddress, Payment, TxFrom, TxToSpecified},
+    types::{
+        BigUint, ManagedAddress, Payment, PaymentVec, TxFrom, TxPaymentCompose, TxToSpecified,
+    },
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
@@ -64,5 +66,31 @@ where
             |(), egld_payment| TxPayment::<Env>::into_full_payment_data(egld_payment, env),
             |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment, env),
         )
+    }
+}
+
+impl<Env> TxPaymentCompose<Env, Payment<Env::Api>> for Payment<Env::Api>
+where
+    Env: TxEnv,
+{
+    type Output = PaymentVec<Env::Api>;
+
+    fn compose(self, rhs: Payment<Env::Api>) -> Self::Output {
+        let mut payments = PaymentVec::new();
+        payments.push(self);
+        payments.push(rhs);
+        payments
+    }
+}
+
+impl<Env> TxPaymentCompose<Env, Payment<Env::Api>> for PaymentVec<Env::Api>
+where
+    Env: TxEnv,
+{
+    type Output = PaymentVec<Env::Api>;
+
+    fn compose(mut self, rhs: Payment<Env::Api>) -> Self::Output {
+        self.push(rhs);
+        self
     }
 }

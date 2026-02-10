@@ -1,7 +1,8 @@
 use crate::types::{
     BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
     EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment,
-    EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec, MultiEsdtPayment, heap::H256,
+    EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec, MultiEsdtPayment,
+    TxPaymentCompose, heap::H256,
 };
 
 use multiversx_sc_codec::TopEncodeMulti;
@@ -133,6 +134,61 @@ where
     }
 }
 
+impl<Env, From, To, OldPayment, Gas, Data, RH> Tx<Env, From, To, OldPayment, Gas, Data, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    OldPayment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Adds any payment to a transaction, using the payment compose mechanism.
+    ///
+    /// # Compose Mechanism
+    ///
+    /// The `payment` method is generic and flexible, allowing you to add any type of payment to a transaction.
+    /// It uses the [`TxPaymentCompose`] trait to determine how to combine the existing payment (if any)
+    /// with the new payment being added. This enables a fluent and type-safe way to build up complex payment scenarios.
+    ///
+    /// - If no payment has been added yet (i.e., the payment type is `()`), the new payment is simply set as the transaction's payment.
+    /// - If a payment already exists, the `compose` method is called, which merges the new payment with the existing one according to the rules defined by their types.
+    /// - This allows for single or multiple ESDT payments, EGLD payments, or combinations thereof, all handled transparently.
+    ///
+    /// ## Example
+    ///
+    /// ```ignore
+    /// let tx = Tx::new_with_env(env)
+    ///     .to(address)
+    ///     .payment(esdt_payment)
+    ///     .payment(another_esdt_payment)
+    ///     .payment(egld_payment);
+    /// ```
+    ///
+    /// Each call to `.payment(...)` will combine the new payment with the previous one, producing the correct payment type for the transaction.
+    ///
+    /// This mechanism is extensible and supports custom payment types as long as they implement the required traits.
+    pub fn payment<NewPayment>(
+        self,
+        payment: NewPayment,
+    ) -> Tx<Env, From, To, <OldPayment as TxPaymentCompose<Env, NewPayment>>::Output, Gas, Data, RH>
+    where
+        NewPayment: TxPayment<Env>,
+        OldPayment: TxPaymentCompose<Env, NewPayment>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment.compose(payment),
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+}
+
 impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, (), Gas, Data, RH>
 where
     Env: TxEnv,
@@ -142,22 +198,6 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
-    /// Adds any payment to a transaction, if no payment has been added before.
-    pub fn payment<Payment>(self, payment: Payment) -> Tx<Env, From, To, Payment, Gas, Data, RH>
-    where
-        Payment: TxPayment<Env>,
-    {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment,
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
-    }
-
     /// Adds EGLD value to a transaction.
     ///
     /// Accepts any type that can represent and EGLD amount: BigUint, &BigUint, etc.
@@ -910,6 +950,11 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
+    pub fn id(self, _id: &str) -> Self {
+        // TODO: implement
+        self
+    }
+
     /// Sets the mock transaction hash to be used in a test.
     ///
     /// Only allowed in tests.

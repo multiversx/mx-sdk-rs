@@ -96,6 +96,51 @@ where
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api>;
 }
 
+/// Trait for composing multiple payment objects into a single payment.
+///
+/// This trait allows combining different types of payments (EGLD, ESDT, multi-transfers)
+/// into a unified payment structure. It's useful when building complex transactions that
+/// involve multiple token transfers.
+///
+/// # Examples
+///
+/// ```ignore
+/// // Composing EGLD payment with ESDT payment
+/// let payment = egld_payment.compose(esdt_payment);
+///
+/// // Composing multiple ESDT payments
+/// let multi_payment = esdt1.compose(esdt2).compose(esdt3);
+/// ```
+#[diagnostic::on_unimplemented(
+    message = "Type `{Self}` cannot be composed with `{Rhs}` (does not implement `TxPaymentCompose<{Env}, {Rhs}>`)",
+    label = "payment composition not supported",
+    note = "only certain payment types can be composed together - check that both types implement the required traits"
+)]
+pub trait TxPaymentCompose<Env, Rhs>: TxPayment<Env>
+where
+    Env: TxEnv,
+    Rhs: TxPayment<Env>,
+{
+    /// The resulting payment type after composition.
+    type Output: TxPayment<Env>;
+
+    /// Combines this payment with another payment, returning a new payment object
+    /// that represents both transfers.
+    fn compose(self, rhs: Rhs) -> Self::Output;
+}
+
+impl<Env, P> TxPaymentCompose<Env, P> for ()
+where
+    Env: TxEnv,
+    P: TxPayment<Env>,
+{
+    type Output = P;
+
+    fn compose(self, rhs: P) -> Self::Output {
+        rhs
+    }
+}
+
 /// Marker trait that indicates that payment field contains no payment.
 ///
 /// Implemented by `()` and `NotPayable`.
