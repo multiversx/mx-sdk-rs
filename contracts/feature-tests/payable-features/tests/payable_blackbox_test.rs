@@ -68,7 +68,7 @@ fn payable_all_blackbox_1() {
         .returns(ReturnsResultUnmanaged)
         .run();
 
-    assert_eq!(result, vec![Payment::try_new(TOKEN_1, 0, 100u64).unwrap(),]);
+    assert_eq!(result, vec![Payment::try_new(TOKEN_1, 0, 100u64).unwrap()]);
 }
 
 #[test]
@@ -120,4 +120,23 @@ fn payable_multi_legacy() {
             EsdtTokenPayment::new(TOKEN_2.to_token_identifier(), 0, BigUint::from(400u32)),
         ]
     );
+}
+
+#[test]
+#[allow(deprecated)]
+fn test_esdt_transfer_legacy() {
+    let mut world = world();
+    init_account(&mut world);
+
+    let result = world
+        .tx()
+        .from(USER)
+        .to(PAYABLE_FEATURES_ADDRESS)
+        .typed(payable_features_proxy::PayableFeaturesProxy)
+        .payable_all()
+        .payment(TestEsdtTransfer(TOKEN_1, 0, 100u64))
+        .returns(ReturnsResultUnmanaged)
+        .run();
+
+    assert_eq!(result, vec![Payment::try_new(TOKEN_1, 0, 100u64).unwrap()]);
 }

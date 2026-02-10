@@ -102,16 +102,12 @@ fn test_token_merge() {
         });
 
     // merge two NFTs
-    let nft_transfers = vec![
-        TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-        TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-    ];
-
     world
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .multi_esdt(nft_transfers)
+        .payment(Payment::try_new(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT).unwrap())
+        .payment(Payment::try_new(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -175,12 +171,16 @@ fn test_token_merge() {
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .payment(TestEsdtTransfer(MERGED_TOKEN_ID_EXPR, 1, NFT_AMOUNT))
+        .payment(Payment::try_new(MERGED_TOKEN_ID_EXPR, 1u64, NFT_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let output_tokens = sc.split_tokens_endpoint();
             let expected_output_tokens = vec![
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
+                EsdtTokenPayment::new(NFT_TOKEN_ID_EXPR.into(), FIRST_NFT_NONCE, NFT_AMOUNT.into()),
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.into(),
+                    SECOND_NFT_NONCE,
+                    NFT_AMOUNT.into(),
+                ),
             ];
             assert_eq!(output_tokens, expected_output_tokens.into());
         });
@@ -204,16 +204,12 @@ fn test_token_merge() {
         );
 
     // merge the NFT with fungible
-    let esdt_transfers = vec![
-        TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-        TestEsdtTransfer(FUNGIBLE_TOKEN_ID_EXPR, 0u64, FUNGIBLE_AMOUNT),
-    ];
-
     world
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .multi_esdt(esdt_transfers)
+        .payment(Payment::try_new(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT).unwrap())
+        .payment(Payment::try_new(FUNGIBLE_TOKEN_ID_EXPR, 0u64, FUNGIBLE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -255,16 +251,12 @@ fn test_token_merge() {
         .esdt_nft_balance_and_attributes(MERGED_TOKEN_ID_EXPR, 2, NFT_AMOUNT, &Empty);
 
     // merge NFT with an already merged token
-    let combined_transfers = vec![
-        TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-        TestEsdtTransfer(MERGED_TOKEN_ID_EXPR, 2u64, NFT_AMOUNT),
-    ];
-
     world
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .multi_esdt(combined_transfers)
+        .payment(Payment::try_new(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT).unwrap())
+        .payment(Payment::try_new(MERGED_TOKEN_ID_EXPR, 2u64, NFT_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -314,13 +306,17 @@ fn test_token_merge() {
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .payment(TestEsdtTransfer(MERGED_TOKEN_ID_EXPR, 3, NFT_AMOUNT))
+        .payment(Payment::try_new(MERGED_TOKEN_ID_EXPR, 3u64, NFT_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let output_tokens = sc.split_tokens_endpoint();
             let expected_output_tokens = vec![
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-                TestEsdtTransfer(FUNGIBLE_TOKEN_ID_EXPR, 0, FUNGIBLE_AMOUNT),
-                TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
+                EsdtTokenPayment::new(NFT_TOKEN_ID_EXPR.into(), FIRST_NFT_NONCE, NFT_AMOUNT.into()),
+                EsdtTokenPayment::new(FUNGIBLE_TOKEN_ID_EXPR.into(), 0, FUNGIBLE_AMOUNT.into()),
+                EsdtTokenPayment::new(
+                    NFT_TOKEN_ID_EXPR.into(),
+                    SECOND_NFT_NONCE,
+                    NFT_AMOUNT.into(),
+                ),
             ];
 
             assert_eq!(output_tokens, expected_output_tokens.into());
@@ -413,17 +409,13 @@ fn test_partial_split() {
         });
 
     // merge 2 NFTs and a fungible token
-    let esdt_transfers = vec![
-        TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-        TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-        TestEsdtTransfer(FUNGIBLE_TOKEN_ID_EXPR, 0u64, FUNGIBLE_AMOUNT),
-    ];
-
     world
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .multi_esdt(esdt_transfers)
+        .payment(Payment::try_new(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT).unwrap())
+        .payment(Payment::try_new(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT).unwrap())
+        .payment(Payment::try_new(FUNGIBLE_TOKEN_ID_EXPR, 0u64, FUNGIBLE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -465,7 +457,7 @@ fn test_partial_split() {
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .payment(TestEsdtTransfer(MERGED_TOKEN_ID_EXPR, 1, NFT_AMOUNT))
+        .payment(Payment::try_new(MERGED_TOKEN_ID_EXPR, 1u64, NFT_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let mut tokens_to_remove = ManagedVec::new();
             tokens_to_remove.push(EsdtTokenPayment::new(
@@ -494,7 +486,7 @@ fn test_partial_split() {
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .payment(TestEsdtTransfer(MERGED_TOKEN_ID_EXPR, 2, NFT_AMOUNT))
+        .payment(Payment::try_new(MERGED_TOKEN_ID_EXPR, 2u64, NFT_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let mut tokens_to_remove = ManagedVec::new();
             tokens_to_remove.push(EsdtTokenPayment::new(
@@ -611,11 +603,6 @@ fn test_custom_attributes() {
         });
 
     // merge two NFTs
-    let nft_transfers = vec![
-        TestEsdtTransfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT),
-        TestEsdtTransfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
-    ];
-
     let expected_attributes = CustomAttributes {
         first: 5u32,
         second: 10u64,
@@ -625,7 +612,8 @@ fn test_custom_attributes() {
         .tx()
         .from(USER_ADDRESS_EXPR)
         .to(USE_MODULE_ADDRESS_EXPR)
-        .multi_esdt(nft_transfers)
+        .payment(Payment::try_new(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT).unwrap())
+        .payment(Payment::try_new(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let merged_token = sc.merge_tokens_custom_attributes_endpoint();
             assert_eq!(

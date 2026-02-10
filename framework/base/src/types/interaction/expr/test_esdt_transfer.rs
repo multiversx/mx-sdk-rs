@@ -7,6 +7,8 @@ use crate::{
     },
 };
 
+/// **Deprecated:** Use [`Payment::try_new(token, nonce, amount).unwrap()`] instead.
+///
 /// Syntactic sugar for quickly writing ESDT transfers in tests.
 ///
 /// The fields are:
@@ -15,6 +17,10 @@ use crate::{
 /// 3. amount
 ///
 /// The amount is represented as u64, since for most tests it is enough.
+#[deprecated(
+    since = "0.65.0",
+    note = "Use Payment::try_new(token, nonce, amount).unwrap() instead"
+)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TestEsdtTransfer<'a>(pub TestTokenIdentifier<'a>, pub u64, pub u64);
 
