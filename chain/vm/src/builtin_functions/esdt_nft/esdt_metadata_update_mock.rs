@@ -27,8 +27,7 @@ impl BuiltinFunction for ESDTMetadataUpdate {
         F: RuntimeInstanceCallLambda,
     {
         if tx_input.args.len() < 6 {
-            let err_result =
-                TxResult::from_vm_error("ESDTMetaDataUpdate too few arguments");
+            let err_result = TxResult::from_vm_error("ESDTMetaDataUpdate too few arguments");
             return (err_result, BlockchainUpdate::empty());
         }
         assert!(

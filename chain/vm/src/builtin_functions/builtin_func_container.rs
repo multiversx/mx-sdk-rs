@@ -2,9 +2,8 @@ use super::{
     BuiltinFunctionEsdtTransferInfo,
     builtin_func_trait::BuiltinFunction,
     esdt_nft::{
-        ESDTLocalBurn, ESDTLocalMint, ESDTMetadataRecreate, ESDTMetadataUpdate,
-        ESDTNftAddQuantity, ESDTNftAddUri, ESDTNftBurn, ESDTNftCreate,
-        ESDTNftUpdateAttributes,
+        ESDTLocalBurn, ESDTLocalMint, ESDTMetadataRecreate, ESDTMetadataUpdate, ESDTNftAddQuantity,
+        ESDTNftAddUri, ESDTNftBurn, ESDTNftCreate, ESDTNftUpdateAttributes,
     },
     general::{ChangeOwner, ClaimDeveloperRewards, DeleteUsername, SetUsername, UpgradeContract},
     transfer::{ESDTMultiTransfer, ESDTNftTransfer, ESDTTransfer},
@@ -107,11 +106,9 @@ impl<'a> BuiltinFunctionCall<'a> {
                 ESDTNftUpdateAttributes,
                 f,
             ),
-            ESDT_METADATA_RECREATE_FUNC_NAME => self.check_role_and_execute(
-                EsdtLocalRole::NftRecreate,
-                ESDTMetadataRecreate,
-                f,
-            ),
+            ESDT_METADATA_RECREATE_FUNC_NAME => {
+                self.check_role_and_execute(EsdtLocalRole::NftRecreate, ESDTMetadataRecreate, f)
+            }
             ESDT_METADATA_UPDATE_FUNC_NAME => {
                 self.check_role_and_execute(EsdtLocalRole::NftRecreate, ESDTMetadataUpdate, f)
             }

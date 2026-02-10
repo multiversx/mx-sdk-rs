@@ -28,8 +28,7 @@ impl BuiltinFunction for ESDTMetadataRecreate {
         F: RuntimeInstanceCallLambda,
     {
         if tx_input.args.len() < 6 {
-            let err_result =
-                TxResult::from_vm_error("ESDTMetaDataRecreate too few arguments");
+            let err_result = TxResult::from_vm_error("ESDTMetaDataRecreate too few arguments");
             return (err_result, BlockchainUpdate::empty());
         }
         assert!(
