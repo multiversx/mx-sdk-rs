@@ -116,8 +116,8 @@ fn payable_multi_legacy() {
     assert_eq!(
         result.as_tuple().1,
         vec![
-            EsdtTokenPayment::new(TOKEN_1.to_token_identifier(), 0, BigUint::from(100u32)),
-            EsdtTokenPayment::new(TOKEN_2.to_token_identifier(), 0, BigUint::from(400u32)),
+            EsdtTokenPayment::new(TOKEN_1.to_esdt_token_identifier(), 0, BigUint::from(100u32)),
+            EsdtTokenPayment::new(TOKEN_2.to_esdt_token_identifier(), 0, BigUint::from(400u32)),
         ]
     );
 }

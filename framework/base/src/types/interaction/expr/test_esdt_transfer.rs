@@ -29,7 +29,7 @@ where
     Api: ManagedTypeApi,
 {
     fn from(value: TestEsdtTransfer<'a>) -> Self {
-        EsdtTokenPayment::new(value.0.to_token_identifier(), value.1, value.2.into())
+        EsdtTokenPayment::new(value.0.to_esdt_token_identifier(), value.1, value.2.into())
     }
 }
 

@@ -92,13 +92,13 @@ fn test_token_merge() {
         .to(USE_MODULE_ADDRESS_EXPR)
         .whitebox(use_module::contract_obj, |sc| {
             sc.merged_token()
-                .set_token_id(MERGED_TOKEN_ID_EXPR.to_token_identifier());
+                .set_token_id(MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier());
             let _ = sc
                 .mergeable_tokens_whitelist()
-                .insert(NFT_TOKEN_ID_EXPR.to_token_identifier());
+                .insert(NFT_TOKEN_ID_EXPR.to_esdt_token_identifier());
             let _ = sc
                 .mergeable_tokens_whitelist()
-                .insert(FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier());
+                .insert(FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier());
         });
 
     // merge two NFTs
@@ -112,24 +112,24 @@ fn test_token_merge() {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
                 merged_token.token_identifier,
-                MERGED_TOKEN_ID_EXPR.to_token_identifier()
+                MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier()
             );
             assert_eq!(merged_token.token_nonce, 1);
             assert_eq!(merged_token.amount, managed_biguint!(NFT_AMOUNT));
 
             let merged_token_data = sc.blockchain().get_esdt_token_data(
                 &USER_ADDRESS_EXPR.to_managed_address(),
-                &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
+                &MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 1,
             );
             let expected_uri = ArrayVec::from([
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     FIRST_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     SECOND_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
@@ -214,24 +214,24 @@ fn test_token_merge() {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
                 merged_token.token_identifier,
-                MERGED_TOKEN_ID_EXPR.to_token_identifier()
+                MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier()
             );
             assert_eq!(merged_token.token_nonce, 2);
             assert_eq!(merged_token.amount, managed_biguint!(NFT_AMOUNT));
 
             let merged_token_data = sc.blockchain().get_esdt_token_data(
                 &USER_ADDRESS_EXPR.to_managed_address(),
-                &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
+                &MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 2,
             );
             let expected_uri = ArrayVec::from([
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     FIRST_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
                 EsdtTokenPayment::new(
-                    FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                    FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     0,
                     managed_biguint!(FUNGIBLE_AMOUNT),
                 ),
@@ -261,7 +261,7 @@ fn test_token_merge() {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
                 merged_token.token_identifier,
-                MERGED_TOKEN_ID_EXPR.to_token_identifier()
+                MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier()
             );
             assert_eq!(merged_token.token_nonce, 3);
             assert_eq!(merged_token.amount, managed_biguint!(NFT_AMOUNT));
@@ -273,17 +273,17 @@ fn test_token_merge() {
             );
             let expected_uri = ArrayVec::from([
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     FIRST_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
                 EsdtTokenPayment::new(
-                    FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                    FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     0,
                     managed_biguint!(FUNGIBLE_AMOUNT),
                 ),
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     SECOND_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
@@ -401,11 +401,11 @@ fn test_partial_split() {
         .to(USE_MODULE_ADDRESS_EXPR)
         .whitebox(use_module::contract_obj, |sc| {
             sc.merged_token()
-                .set_token_id(MERGED_TOKEN_ID_EXPR.to_token_identifier());
+                .set_token_id(MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier());
             sc.mergeable_tokens_whitelist()
-                .insert(NFT_TOKEN_ID_EXPR.to_token_identifier());
+                .insert(NFT_TOKEN_ID_EXPR.to_esdt_token_identifier());
             sc.mergeable_tokens_whitelist()
-                .insert(FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier());
+                .insert(FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier());
         });
 
     // merge 2 NFTs and a fungible token
@@ -420,29 +420,29 @@ fn test_partial_split() {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
                 merged_token.token_identifier,
-                MERGED_TOKEN_ID_EXPR.to_token_identifier()
+                MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier()
             );
             assert_eq!(merged_token.token_nonce, 1);
             assert_eq!(merged_token.amount, managed_biguint!(NFT_AMOUNT));
 
             let merged_token_data = sc.blockchain().get_esdt_token_data(
                 &USER_ADDRESS_EXPR.to_managed_address(),
-                &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
+                &MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 1,
             );
             let expected_uri = ArrayVec::from([
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     FIRST_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     SECOND_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
                 EsdtTokenPayment::new(
-                    FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                    FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     0,
                     managed_biguint!(FUNGIBLE_AMOUNT),
                 ),
@@ -461,7 +461,7 @@ fn test_partial_split() {
         .whitebox(use_module::contract_obj, |sc| {
             let mut tokens_to_remove = ManagedVec::new();
             tokens_to_remove.push(EsdtTokenPayment::new(
-                FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 0,
                 managed_biguint!(40),
             ));
@@ -469,12 +469,12 @@ fn test_partial_split() {
             let output_payments = sc.split_token_partial_endpoint(tokens_to_remove);
             let mut expected_output_payments = ManagedVec::new();
             expected_output_payments.push(EsdtTokenPayment::new(
-                FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 0,
                 managed_biguint!(40),
             ));
             expected_output_payments.push(EsdtTokenPayment::new(
-                MERGED_TOKEN_ID_EXPR.to_token_identifier(),
+                MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 2,
                 managed_biguint!(NFT_AMOUNT),
             ));
@@ -490,7 +490,7 @@ fn test_partial_split() {
         .whitebox(use_module::contract_obj, |sc| {
             let mut tokens_to_remove = ManagedVec::new();
             tokens_to_remove.push(EsdtTokenPayment::new(
-                NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 FIRST_NFT_NONCE,
                 managed_biguint!(NFT_AMOUNT),
             ));
@@ -498,12 +498,12 @@ fn test_partial_split() {
 
             let mut expected_output_payments = ManagedVec::new();
             expected_output_payments.push(EsdtTokenPayment::new(
-                NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 FIRST_NFT_NONCE,
                 managed_biguint!(NFT_AMOUNT),
             ));
             expected_output_payments.push(EsdtTokenPayment::new(
-                MERGED_TOKEN_ID_EXPR.to_token_identifier(),
+                MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 3,
                 managed_biguint!(NFT_AMOUNT),
             ));
@@ -512,17 +512,17 @@ fn test_partial_split() {
             // check newest token attributes
             let merged_token_data = sc.blockchain().get_esdt_token_data(
                 &USER_ADDRESS_EXPR.to_managed_address(),
-                &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
+                &MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 3,
             );
             let expected_uri = ArrayVec::from([
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     SECOND_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
                 EsdtTokenPayment::new(
-                    FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier(),
+                    FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     0,
                     managed_biguint!(FUNGIBLE_AMOUNT - 40),
                 ),
@@ -593,13 +593,13 @@ fn test_custom_attributes() {
         .to(USE_MODULE_ADDRESS_EXPR)
         .whitebox(use_module::contract_obj, |sc| {
             sc.merged_token()
-                .set_token_id(MERGED_TOKEN_ID_EXPR.to_token_identifier());
+                .set_token_id(MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier());
             let _ = sc
                 .mergeable_tokens_whitelist()
-                .insert(NFT_TOKEN_ID_EXPR.to_token_identifier());
+                .insert(NFT_TOKEN_ID_EXPR.to_esdt_token_identifier());
             let _ = sc
                 .mergeable_tokens_whitelist()
-                .insert(FUNGIBLE_TOKEN_ID_EXPR.to_token_identifier());
+                .insert(FUNGIBLE_TOKEN_ID_EXPR.to_esdt_token_identifier());
         });
 
     // merge two NFTs
@@ -618,24 +618,24 @@ fn test_custom_attributes() {
             let merged_token = sc.merge_tokens_custom_attributes_endpoint();
             assert_eq!(
                 merged_token.token_identifier,
-                MERGED_TOKEN_ID_EXPR.to_token_identifier()
+                MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier()
             );
             assert_eq!(merged_token.token_nonce, 1);
             assert_eq!(merged_token.amount, managed_biguint!(NFT_AMOUNT));
 
             let merged_token_data = sc.blockchain().get_esdt_token_data(
                 &USER_ADDRESS_EXPR.to_managed_address(),
-                &MERGED_TOKEN_ID_EXPR.to_token_identifier(),
+                &MERGED_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                 1,
             );
             let expected_uri = ArrayVec::from([
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     FIRST_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),
                 EsdtTokenPayment::new(
-                    NFT_TOKEN_ID_EXPR.to_token_identifier(),
+                    NFT_TOKEN_ID_EXPR.to_esdt_token_identifier(),
                     SECOND_NFT_NONCE,
                     managed_biguint!(NFT_AMOUNT),
                 ),

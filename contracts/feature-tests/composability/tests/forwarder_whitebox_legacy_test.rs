@@ -39,7 +39,7 @@ fn test_nft_update_attributes_and_send() {
         .to(FORWARDER_ADDRESS)
         .whitebox(forwarder_legacy::contract_obj, |sc| {
             sc.nft_create_compact(
-                NFT_TOKEN_ID.to_token_identifier(),
+                NFT_TOKEN_ID.to_esdt_token_identifier(),
                 managed_biguint!(1),
                 original_attributes,
             );
@@ -66,7 +66,7 @@ fn test_nft_update_attributes_and_send() {
         .to(FORWARDER_ADDRESS)
         .payment(Payment::try_new(NFT_TOKEN_ID, 1, 1u32).unwrap())
         .whitebox(forwarder_legacy::contract_obj, |sc| {
-            sc.nft_update_attributes(NFT_TOKEN_ID.to_token_identifier(), 1, new_attributes);
+            sc.nft_update_attributes(NFT_TOKEN_ID.to_esdt_token_identifier(), 1, new_attributes);
 
             sc.tx()
                 .to(USER_ADDRESS)
