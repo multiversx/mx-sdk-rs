@@ -17,14 +17,59 @@ fn test_non_zero_big_uint_creation_and_conversion() {
     let n0 = NZ::new(BU::from(0u32));
     assert!(n0.is_none());
 
-    // Creation from u128 (non-zero)
-    let n2: Result<NZ, _> = 123u128.try_into();
+    // Creation from u8 (non-zero)
+    let n2: Result<NZ, _> = 42u8.try_into();
     assert!(n2.is_ok());
-    assert_eq!(n2.unwrap().as_big_uint().to_u64(), Some(123));
+    assert_eq!(n2.unwrap().as_big_uint().to_u64(), Some(42));
+
+    // Creation from u8 (zero)
+    let n3: Result<NZ, _> = 0u8.try_into();
+    assert!(n3.is_err());
+
+    // Creation from u16 (non-zero)
+    let n4: Result<NZ, _> = 12345u16.try_into();
+    assert!(n4.is_ok());
+    assert_eq!(n4.unwrap().as_big_uint().to_u64(), Some(12345));
+
+    // Creation from u16 (zero)
+    let n5: Result<NZ, _> = 0u16.try_into();
+    assert!(n5.is_err());
+
+    // Creation from u32 (non-zero)
+    let n6: Result<NZ, _> = 987654u32.try_into();
+    assert!(n6.is_ok());
+    assert_eq!(n6.unwrap().as_big_uint().to_u64(), Some(987654));
+
+    // Creation from u32 (zero)
+    let n7: Result<NZ, _> = 0u32.try_into();
+    assert!(n7.is_err());
+
+    // Creation from u64 (non-zero)
+    let n8: Result<NZ, _> = 123456789u64.try_into();
+    assert!(n8.is_ok());
+    assert_eq!(n8.unwrap().as_big_uint().to_u64(), Some(123456789));
+
+    // Creation from u64 (zero)
+    let n9: Result<NZ, _> = 0u64.try_into();
+    assert!(n9.is_err());
+
+    // Creation from u128 (non-zero)
+    let n10: Result<NZ, _> = 123u128.try_into();
+    assert!(n10.is_ok());
+    assert_eq!(n10.unwrap().as_big_uint().to_u64(), Some(123));
 
     // Creation from u128 (zero)
-    let n3: Result<NZ, _> = 0u128.try_into();
-    assert!(n3.is_err());
+    let n11: Result<NZ, _> = 0u128.try_into();
+    assert!(n11.is_err());
+
+    // Creation from usize (non-zero)
+    let n12: Result<NZ, _> = 12345usize.try_into();
+    assert!(n12.is_ok());
+    assert_eq!(n12.unwrap().as_big_uint().to_u64(), Some(12345));
+
+    // Creation from usize (zero)
+    let n13: Result<NZ, _> = 0usize.try_into();
+    assert!(n13.is_err());
 
     // Creation from ManagedBuffer (non-zero)
     let buf = ManagedBuffer::<StaticApi>::from(&[1u8, 0, 0, 0][..]);

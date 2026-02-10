@@ -108,13 +108,21 @@ impl<M: ManagedTypeApi> TryFrom<BigUint<M>> for NonZeroBigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TryFrom<u128> for NonZeroBigUint<M> {
-    type Error = NonZeroError;
+macro_rules! impl_try_from_unsigned {
+    ($($t:ty),*) => {
+        $(
+            impl<M: ManagedTypeApi> TryFrom<$t> for NonZeroBigUint<M> {
+                type Error = NonZeroError;
 
-    fn try_from(value: u128) -> Result<Self, Self::Error> {
-        Self::try_from(BigUint::from(value))
-    }
+                fn try_from(value: $t) -> Result<Self, Self::Error> {
+                    Self::try_from(BigUint::from(value))
+                }
+            }
+        )*
+    };
 }
+
+impl_try_from_unsigned!(u8, u16, u32, u64, u128, usize);
 
 impl<M: ManagedTypeApi> TryFrom<ManagedBuffer<M>> for NonZeroBigUint<M> {
     type Error = NonZeroError;
