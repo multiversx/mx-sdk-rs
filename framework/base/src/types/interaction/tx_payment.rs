@@ -1,4 +1,3 @@
-mod test_esdt_transfer;
 mod tx_payment_egld;
 mod tx_payment_egld_or_esdt;
 mod tx_payment_egld_or_esdt_refs;
@@ -19,7 +18,6 @@ mod tx_payment_single_esdt_ref;
 mod tx_payment_single_esdt_triple;
 mod tx_payment_vec_ref;
 
-pub use test_esdt_transfer::TestEsdtTransfer;
 pub use tx_payment_egld::{Egld, EgldPayment};
 pub use tx_payment_egld_value::TxEgldValue;
 pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
