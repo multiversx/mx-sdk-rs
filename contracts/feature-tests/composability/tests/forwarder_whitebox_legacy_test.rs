@@ -46,7 +46,7 @@ fn test_nft_update_attributes_and_send() {
 
             sc.tx()
                 .to(USER_ADDRESS)
-                .esdt((NFT_TOKEN_ID.to_token_identifier(), 1, 1u32.into()))
+                .payment(Payment::try_new(NFT_TOKEN_ID, 1, 1u32).unwrap())
                 .transfer();
         });
 

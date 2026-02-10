@@ -200,6 +200,13 @@ impl<M: ManagedTypeApi> From<EgldOrEsdtTokenIdentifier<M>> for TokenId<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<EsdtTokenIdentifier<M>> for TokenId<M> {
+    #[inline]
+    fn from(esdt_token_id: EsdtTokenIdentifier<M>) -> Self {
+        esdt_token_id.token_id
+    }
+}
+
 impl<M: ManagedTypeApi> From<TestTokenIdentifier<'_>> for TokenId<M> {
     #[inline]
     fn from(test_token: TestTokenIdentifier<'_>) -> Self {
@@ -227,6 +234,12 @@ impl<M: ManagedTypeApi> From<&str> for TokenId<M> {
 
 impl<M: ManagedTypeApi> From<&String> for TokenId<M> {
     fn from(s: &String) -> Self {
+        TokenId::from(s.as_bytes())
+    }
+}
+
+impl<M: ManagedTypeApi> From<String> for TokenId<M> {
+    fn from(s: String) -> Self {
         TokenId::from(s.as_bytes())
     }
 }

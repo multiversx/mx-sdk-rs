@@ -224,6 +224,10 @@ where
     /// Since this is the first ESDT payment, a single payment tx is produced.
     ///
     /// Can subsequently be called again for multiple payments.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
@@ -266,6 +270,10 @@ where
     /// Can be formed from single ESDT payments, but the result will always be a collection.
     ///
     /// Always converts the argument into an owned collection of ESDT payments. For work with references, use `.payment(&p)` instead.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn multi_esdt<IntoMulti>(
         self,
         payments: IntoMulti,
@@ -327,6 +335,10 @@ where
     ///
     /// When the Tx already contains a single (owned) ESDT payment,
     /// adding the second one will convert it to a list.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
@@ -358,6 +370,10 @@ where
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         mut self,
         payment: P,
@@ -370,6 +386,10 @@ where
     /// calling `multi_esdt` is equivalent to `esdt`, it just adds another payment to the list.
     ///
     /// Can be called multiple times.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn multi_esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
