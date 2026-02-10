@@ -82,16 +82,16 @@ fn payable_all_blackbox_2() {
         .to(PAYABLE_FEATURES_ADDRESS)
         .typed(payable_features_proxy::PayableFeaturesProxy)
         .payable_all()
-        .payment(TestPayment::new(TOKEN_1, 0, 100))
-        .payment(TestPayment::new(TOKEN_2, 0, 400))
+        .payment(Payment::try_new(TOKEN_1, 0, 100u64).unwrap())
+        .payment(Payment::try_new(TOKEN_2, 0, 400u64).unwrap())
         .returns(ReturnsResultUnmanaged)
         .run();
 
     assert_eq!(
         result,
         vec![
-            TestPayment::new(TOKEN_1, 0, 100).to_payment(),
-            TestPayment::new(TOKEN_2, 0, 400).to_payment(),
+            Payment::try_new(TOKEN_1, 0, 100u64).unwrap(),
+            Payment::try_new(TOKEN_2, 0, 400u64).unwrap(),
         ]
     );
 }
@@ -107,8 +107,8 @@ fn payable_multi_legacy() {
         .to(PAYABLE_FEATURES_ADDRESS)
         .typed(payable_features_proxy::PayableFeaturesProxy)
         .payable_legacy_egld_esdt()
-        .payment(TestPayment::new(TOKEN_1, 0, 100))
-        .payment(TestPayment::new(TOKEN_2, 0, 400))
+        .payment(Payment::try_new(TOKEN_1, 0, 100u64).unwrap())
+        .payment(Payment::try_new(TOKEN_2, 0, 400u64).unwrap())
         .returns(ReturnsResultUnmanaged)
         .run();
 
