@@ -90,7 +90,7 @@ pub fn propose(
         .tx()
         .from(proposer)
         .to(USE_MODULE_ADDRESS)
-        .payment(Payment::try_new(GOV_TOKEN_ID, 0, gov_token_amount as u64).unwrap())
+        .payment(Payment::try_new(GOV_TOKEN_ID, 0, gov_token_amount).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             let mut args_managed = ManagedVec::new();
             for arg in args {

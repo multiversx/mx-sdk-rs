@@ -7,6 +7,8 @@
 // and maintenance.
 
 #![allow(unused)]
+#![allow(unknown_lints)]
+#![allow(clippy::collapsible_if)]
 
 use multiversx_sc::{
     contract_base::{CallableContractBuilder, ProxyObjNew},
