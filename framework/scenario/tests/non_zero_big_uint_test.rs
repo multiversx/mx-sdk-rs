@@ -9,83 +9,104 @@ fn test_non_zero_big_uint_creation_and_conversion() {
     type BU = BigUint<StaticApi>;
 
     // Creation from non-zero BigUint
-    let n1 = NZ::new(BU::from(42u32));
-    assert!(n1.is_some());
-    assert_eq!(n1.as_ref().unwrap().as_big_uint().to_u64(), Some(42));
+    assert_eq!(
+        NZ::new(BU::from(42u32)).unwrap().as_big_uint().to_u64(),
+        Some(42)
+    );
 
     // Creation from zero BigUint
-    let n0 = NZ::new(BU::from(0u32));
-    assert!(n0.is_none());
+    assert!(NZ::new(BU::from(0u32)).is_none());
 
     // Creation from u8 (non-zero)
-    let n2: Result<NZ, _> = 42u8.try_into();
-    assert!(n2.is_ok());
-    assert_eq!(n2.unwrap().as_big_uint().to_u64(), Some(42));
+    assert_eq!(
+        TryInto::<NZ>::try_into(42u8)
+            .unwrap()
+            .as_big_uint()
+            .to_u64(),
+        Some(42)
+    );
 
     // Creation from u8 (zero)
-    let n3: Result<NZ, _> = 0u8.try_into();
-    assert!(n3.is_err());
+    assert!(TryInto::<NZ>::try_into(0u8).is_err());
 
     // Creation from u16 (non-zero)
-    let n4: Result<NZ, _> = 12345u16.try_into();
-    assert!(n4.is_ok());
-    assert_eq!(n4.unwrap().as_big_uint().to_u64(), Some(12345));
+    assert_eq!(
+        TryInto::<NZ>::try_into(12345u16)
+            .unwrap()
+            .as_big_uint()
+            .to_u64(),
+        Some(12345)
+    );
 
     // Creation from u16 (zero)
-    let n5: Result<NZ, _> = 0u16.try_into();
-    assert!(n5.is_err());
+    assert!(TryInto::<NZ>::try_into(0u16).is_err());
 
     // Creation from u32 (non-zero)
-    let n6: Result<NZ, _> = 987654u32.try_into();
-    assert!(n6.is_ok());
-    assert_eq!(n6.unwrap().as_big_uint().to_u64(), Some(987654));
+    assert_eq!(
+        TryInto::<NZ>::try_into(987654u32)
+            .unwrap()
+            .as_big_uint()
+            .to_u64(),
+        Some(987654)
+    );
 
     // Creation from u32 (zero)
-    let n7: Result<NZ, _> = 0u32.try_into();
-    assert!(n7.is_err());
+    assert!(TryInto::<NZ>::try_into(0u32).is_err());
 
     // Creation from u64 (non-zero)
-    let n8: Result<NZ, _> = 123456789u64.try_into();
-    assert!(n8.is_ok());
-    assert_eq!(n8.unwrap().as_big_uint().to_u64(), Some(123456789));
+    assert_eq!(
+        TryInto::<NZ>::try_into(123456789u64)
+            .unwrap()
+            .as_big_uint()
+            .to_u64(),
+        Some(123456789)
+    );
 
     // Creation from u64 (zero)
-    let n9: Result<NZ, _> = 0u64.try_into();
-    assert!(n9.is_err());
+    assert!(TryInto::<NZ>::try_into(0u64).is_err());
 
     // Creation from u128 (non-zero)
-    let n10: Result<NZ, _> = 123u128.try_into();
-    assert!(n10.is_ok());
-    assert_eq!(n10.unwrap().as_big_uint().to_u64(), Some(123));
+    assert_eq!(
+        TryInto::<NZ>::try_into(123u128)
+            .unwrap()
+            .as_big_uint()
+            .to_u64(),
+        Some(123)
+    );
 
     // Creation from u128 (zero)
-    let n11: Result<NZ, _> = 0u128.try_into();
-    assert!(n11.is_err());
+    assert!(TryInto::<NZ>::try_into(0u128).is_err());
 
     // Creation from usize (non-zero)
-    let n12: Result<NZ, _> = 12345usize.try_into();
-    assert!(n12.is_ok());
-    assert_eq!(n12.unwrap().as_big_uint().to_u64(), Some(12345));
+    assert_eq!(
+        TryInto::<NZ>::try_into(12345usize)
+            .unwrap()
+            .as_big_uint()
+            .to_u64(),
+        Some(12345)
+    );
 
     // Creation from usize (zero)
-    let n13: Result<NZ, _> = 0usize.try_into();
-    assert!(n13.is_err());
+    assert!(TryInto::<NZ>::try_into(0usize).is_err());
 
     // Creation from ManagedBuffer (non-zero)
-    let buf = ManagedBuffer::<StaticApi>::from(&[1u8, 0, 0, 0][..]);
-    let n4: Result<NZ, _> = buf.clone().try_into();
-    assert!(n4.is_ok());
+    assert!(TryInto::<NZ>::try_into(ManagedBuffer::<StaticApi>::from(&[1u8, 0, 0, 0][..])).is_ok());
 
     // Creation from ManagedBuffer (zero)
-    let buf_zero = ManagedBuffer::<StaticApi>::from(&[0u8][..]);
-    let n5: Result<NZ, _> = buf_zero.try_into();
-    assert!(n5.is_err());
+    assert!(TryInto::<NZ>::try_into(ManagedBuffer::<StaticApi>::from(&[0u8][..])).is_err());
 
     // into_big_uint and as_big_uint
-    let nz = NZ::new_or_panic(BU::from(7u32));
-    let bu = nz.clone().into_big_uint();
-    assert_eq!(bu.to_u64(), Some(7));
-    assert_eq!(nz.as_big_uint().to_u64(), Some(7));
+    assert_eq!(
+        NZ::new_or_panic(BU::from(7u32))
+            .clone()
+            .into_big_uint()
+            .to_u64(),
+        Some(7)
+    );
+    assert_eq!(
+        NZ::new_or_panic(BU::from(7u32)).as_big_uint().to_u64(),
+        Some(7)
+    );
 }
 
 #[test]
