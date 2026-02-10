@@ -12,7 +12,7 @@ pub trait BackTransfersLegacyModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: NonZeroBigUint,
     ) {
         let back_transfers = self
             .tx()
@@ -39,7 +39,7 @@ pub trait BackTransfersLegacyModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: NonZeroBigUint,
     ) {
         let back_transfers = self
             .tx()
@@ -84,7 +84,7 @@ pub trait BackTransfersLegacyModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: NonZeroBigUint,
     ) {
         let back_transfers = self
             .tx()

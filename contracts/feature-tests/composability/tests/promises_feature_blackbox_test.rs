@@ -56,7 +56,7 @@ impl PromisesFeaturesTestState {
 #[test]
 fn test_back_transfers() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
 
     state
         .world
@@ -70,13 +70,13 @@ fn test_back_transfers() {
     state
         .world
         .check_account(FORWARDER_ADDRESS)
-        .esdt_balance(TOKEN_ID_EXPR, token_amount);
+        .esdt_balance(TOKEN_ID_EXPR, token_amount.as_big_uint());
 }
 
 #[test]
 fn test_back_transfers_reset() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
     let half_token_amount = token_amount.clone() / 2u64;
 
     state
@@ -96,13 +96,13 @@ fn test_back_transfers_reset() {
     state
         .world
         .check_account(FORWARDER_ADDRESS)
-        .esdt_balance(TOKEN_ID_EXPR, token_amount);
+        .esdt_balance(TOKEN_ID_EXPR, token_amount.as_big_uint());
 }
 
 #[test]
 fn test_multi_call_back_transfers() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
     let half_token_amount = token_amount.clone() / 2u64;
 
     state
@@ -122,13 +122,13 @@ fn test_multi_call_back_transfers() {
     state
         .world
         .check_account(FORWARDER_ADDRESS)
-        .esdt_balance(TOKEN_ID_EXPR, token_amount);
+        .esdt_balance(TOKEN_ID_EXPR, token_amount.as_big_uint());
 }
 
 #[test]
 fn test_back_transfers_logs() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
 
     let logs = state
         .world
@@ -148,7 +148,7 @@ fn test_back_transfers_logs() {
 #[test]
 fn test_multi_call_back_transfers_logs() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
     let half_token_amount = token_amount.clone() / 2u64;
 
     let logs = state

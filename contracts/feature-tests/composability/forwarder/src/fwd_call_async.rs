@@ -101,7 +101,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: NonZeroBigUint,
     ) {
         self.tx()
             .to(&to)

@@ -187,7 +187,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -307,7 +307,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -1489,7 +1489,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -1599,7 +1599,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -1621,7 +1621,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -1643,7 +1643,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -1715,7 +1715,7 @@ where
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
         Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
