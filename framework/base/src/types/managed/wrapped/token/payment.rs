@@ -11,28 +11,161 @@ use crate::{
     err_msg,
     types::{
         BigUint, Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, FungiblePayment, ManagedVecItem,
-        ManagedVecItemPayloadBuffer, NonZeroBigUint, PaymentMultiValue, PaymentRefs, Ref, TokenId,
-        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
+        ManagedVecItemPayloadBuffer, NonZeroBigUint, NonZeroError, PaymentMultiValue, PaymentRefs,
+        Ref, TokenId, managed_vec_item_read_from_payload_index,
+        managed_vec_item_save_to_payload_index,
     },
 };
 
 use super::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment};
 
+/// Represents a payment in a specific token with a guaranteed non-zero amount.
+///
+/// A `Payment` encapsulates all the information needed to represent a token transfer:
+/// - The token identifier (native EGLD or ESDT token)
+/// - The token nonce (0 for fungible tokens, > 0 for NFTs/SFTs)
+/// - The amount (guaranteed to be non-zero)
+///
+/// This type is commonly used in smart contracts for handling incoming payments,
+/// storing payment information, and ensuring payment validity through the type system.
+///
+/// # Key Features
+///
+/// - **Type Safety**: The amount is guaranteed to be non-zero through [`NonZeroBigUint`]
+/// - **Universal Token Support**: Works with both native EGLD and ESDT tokens
+/// - **NFT/SFT Support**: Handles both fungible (nonce=0) and non-fungible tokens (nonce>0)
+/// - **Serialization**: Supports encoding/decoding for blockchain storage and communication
+///
+/// # Examples
+///
+/// ```rust
+/// # use multiversx_sc::types::*;
+/// # use multiversx_sc::api::ManagedTypeApi;
+/// # fn example<M: ManagedTypeApi>() -> Result<(Payment<M>, Payment<M>), NonZeroError> {
+/// // Create a fungible token payment
+/// let usdc_payment = Payment::new(
+///     TokenId::from("USDC-123456"),
+///     0,
+///     NonZeroBigUint::try_from(1000u64)?,
+/// );
+///
+/// // Create an NFT payment
+/// let nft_payment = Payment::try_new(
+///     "NFT-456789",
+///     42,
+///     1u64
+/// )?;
+///
+/// // Check if payment is fungible
+/// assert!(usdc_payment.is_fungible());
+/// assert!(!nft_payment.is_fungible());
+/// # Ok((usdc_payment, nft_payment))
+/// # }
+/// ```
+///
+/// # See Also
+///
+/// - [`FungiblePayment`] for fungible-only payments
+/// - [`NonZeroBigUint`] for the amount type constraints
 #[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub struct Payment<M: ManagedTypeApi> {
+    /// The token identifier (native EGLD or ESDT token)
     pub token_identifier: TokenId<M>,
+    /// The token nonce (0 for fungible tokens, > 0 for NFTs/SFTs)
     pub token_nonce: u64,
+    /// The payment amount (guaranteed to be non-zero)
     pub amount: NonZeroBigUint<M>,
 }
 
 impl<M: ManagedTypeApi> Payment<M> {
-    #[inline]
+    /// Creates a new `Payment` with the specified token identifier, nonce, and amount.
+    ///
+    /// This is the primary constructor for `Payment`, requiring exact types for all parameters.
+    /// For more flexible construction with automatic type conversion, consider using [`Payment::try_new`].
+    ///
+    /// # Arguments
+    ///
+    /// * `token_identifier` - The token identifier (native EGLD or ESDT token)
+    /// * `token_nonce` - The token nonce (0 for fungible tokens, > 0 for NFTs/SFTs)
+    /// * `amount` - The payment amount (guaranteed to be non-zero)
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use multiversx_sc::types::*;
+    /// # use multiversx_sc::api::ManagedTypeApi;
+    /// # fn example<M: ManagedTypeApi>() -> (Payment<M>, Payment<M>) {
+    /// let token_id = TokenId::from("USDC-123456");
+    /// let amount = NonZeroBigUint::try_from(1000u64).unwrap();
+    ///
+    /// // Create a fungible token payment
+    /// let payment = Payment::new(token_id, 0, amount);
+    ///
+    /// // Create an NFT payment
+    /// let nft_id = TokenId::from("NFT-456789");
+    /// let nft_amount = NonZeroBigUint::try_from(1u64).unwrap();
+    /// let nft_payment = Payment::new(nft_id, 42, nft_amount);
+    /// # (payment, nft_payment)
+    /// # }
+    /// ```
     pub fn new(token_identifier: TokenId<M>, token_nonce: u64, amount: NonZeroBigUint<M>) -> Self {
         Payment {
             token_identifier,
             token_nonce,
             amount,
         }
+    }
+
+    /// Attempts to create a new `Payment` from flexible input types.
+    ///
+    /// This is a more flexible version of [`Payment::new`] that accepts arguments
+    /// implementing `Into` and `TryInto` traits, allowing for convenient conversion
+    /// from various compatible types.
+    ///
+    /// # Arguments
+    ///
+    /// * `token_identifier` - Any type that can be converted into a `TokenId<M>`
+    ///   (e.g., `ManagedBuffer<M>`, `&str`, `String`, etc.)
+    /// * `token_nonce` - The token nonce (0 for fungible tokens, > 0 for NFTs/SFTs)
+    /// * `amount` - Any type that can be converted into a `NonZeroBigUint<M>`
+    ///   (e.g., `BigUint<M>`, `u128`, `ManagedBuffer<M>`, etc.)
+    ///
+    /// # Returns
+    ///
+    /// * `Ok(Payment)` - If all conversions succeed and the amount is non-zero
+    /// * `Err(NonZeroError)` - If the amount converts to zero
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use multiversx_sc::types::*;
+    /// # use multiversx_sc::api::ManagedTypeApi;
+    /// # fn example<M: ManagedTypeApi>() -> Result<(), NonZeroError> {
+    /// let token_id = TokenId::<M>::from("TOKEN-123456");
+    /// let amount = BigUint::from(1000u64);
+    ///
+    /// // Create payment from BigUint (might be zero)
+    /// let payment = Payment::<M>::try_new(token_id, 0, amount)?;
+    ///
+    /// // Create payment from u128
+    /// let payment = Payment::<M>::try_new("USDC-123456", 0, 500u128)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn try_new<T, A>(
+        token_identifier: T,
+        token_nonce: u64,
+        amount: A,
+    ) -> Result<Self, NonZeroError>
+    where
+        T: Into<TokenId<M>>,
+        A: TryInto<NonZeroBigUint<M>, Error = NonZeroError>,
+    {
+        Ok(Payment {
+            token_identifier: token_identifier.into(),
+            token_nonce,
+            amount: amount.try_into()?,
+        })
     }
 
     pub fn is_fungible(&self) -> bool {
