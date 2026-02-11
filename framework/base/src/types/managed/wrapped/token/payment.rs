@@ -11,7 +11,7 @@ use crate::{
     err_msg,
     types::{
         BigUint, Egld, EgldOrEsdtTokenPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
-        FungiblePayment, ManagedVecItem, ManagedVecItemPayloadBuffer, NonZeroBigUint, NonZeroError,
+        FungiblePayment, ManagedVecItem, ManagedVecItemPayloadBuffer, NonZeroBigUint,
         PaymentMultiValue, PaymentRefs, Ref, TokenId, managed_vec_item_read_from_payload_index,
         managed_vec_item_save_to_payload_index,
     },
@@ -150,14 +150,10 @@ impl<M: ManagedTypeApi> Payment<M> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn try_new<T, A>(
-        token_identifier: T,
-        token_nonce: u64,
-        amount: A,
-    ) -> Result<Self, NonZeroError>
+    pub fn try_new<T, A, E>(token_identifier: T, token_nonce: u64, amount: A) -> Result<Self, E>
     where
         T: Into<TokenId<M>>,
-        A: TryInto<NonZeroBigUint<M>, Error = NonZeroError>,
+        A: TryInto<NonZeroBigUint<M>, Error = E>,
     {
         Ok(Payment {
             token_identifier: token_identifier.into(),
