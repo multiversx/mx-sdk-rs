@@ -84,24 +84,23 @@ impl<M: ManagedTypeApi> Payment<M> {
     ///
     /// * `token_identifier` - Any type convertible to `TokenId<M>` (e.g., `&str`, `String`, `ManagedBuffer<M>`, etc.)
     /// * `token_nonce` - The token nonce (0 for fungible tokens, > 0 for NFTs/SFTs)
-    /// * `amount` - Any type convertible to `NonZeroBigUint<M>` (e.g., `NonZeroU64`, `u64`, `u128`, etc.)
+    /// * `amount` - Any type convertible to `NonZeroBigUint<M>` (e.g., `NonZeroU64`)
     ///
     /// # Examples
     ///
     /// ```rust
+    /// # use core::num::NonZero;
     /// # use multiversx_sc::types::*;
     /// # use multiversx_sc::api::ManagedTypeApi;
     /// # fn example<M: ManagedTypeApi>() -> (Payment<M>, Payment<M>) {
     /// let token_id = TokenId::from("USDC-123456");
-    /// let amount = NonZeroBigUint::try_from(1000u64).unwrap();
+    /// let amount = NonZero::new(1000u32).unwrap();
     ///
     /// // Create a fungible token payment
     /// let payment = Payment::new(token_id, 0, amount);
     ///
     /// // Create an NFT payment
-    /// let nft_id = TokenId::from("NFT-456789");
-    /// let nft_amount = NonZeroBigUint::try_from(1u64).unwrap();
-    /// let nft_payment = Payment::new(nft_id, 42, nft_amount);
+    /// let nft_payment = Payment::new("NFT-456789", 42, NonZeroBigUint::one());
     /// # (payment, nft_payment)
     /// # }
     /// ```
