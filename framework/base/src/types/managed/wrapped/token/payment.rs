@@ -78,14 +78,13 @@ pub struct Payment<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> Payment<M> {
     /// Creates a new `Payment` with the specified token identifier, nonce, and amount.
     ///
-    /// This is the primary constructor for `Payment`, requiring exact types for all parameters.
-    /// For more flexible construction with automatic type conversion, consider using [`Payment::try_new`].
+    /// This constructor accepts any type that can be converted into a `TokenId<M>` and any type that can be converted into a `NonZeroBigUint<M>`, for ergonomic usage.
     ///
     /// # Arguments
     ///
-    /// * `token_identifier` - The token identifier (native EGLD or ESDT token)
+    /// * `token_identifier` - Any type convertible to `TokenId<M>` (e.g., `&str`, `String`, `ManagedBuffer<M>`, etc.)
     /// * `token_nonce` - The token nonce (0 for fungible tokens, > 0 for NFTs/SFTs)
-    /// * `amount` - The payment amount (guaranteed to be non-zero)
+    /// * `amount` - Any type convertible to `NonZeroBigUint<M>` (e.g., `NonZeroU64`, `u64`, `u128`, etc.)
     ///
     /// # Examples
     ///
@@ -106,11 +105,15 @@ impl<M: ManagedTypeApi> Payment<M> {
     /// # (payment, nft_payment)
     /// # }
     /// ```
-    pub fn new(token_identifier: TokenId<M>, token_nonce: u64, amount: NonZeroBigUint<M>) -> Self {
+    pub fn new<T, A>(token_identifier: T, token_nonce: u64, amount: A) -> Self
+    where
+        T: Into<TokenId<M>>,
+        A: Into<NonZeroBigUint<M>>,
+    {
         Payment {
-            token_identifier,
+            token_identifier: token_identifier.into(),
             token_nonce,
-            amount,
+            amount: amount.into(),
         }
     }
 
@@ -249,11 +252,15 @@ where
     }
 }
 
-impl<M: ManagedTypeApi> From<(TokenId<M>, u64, NonZeroBigUint<M>)> for Payment<M> {
+impl<M: ManagedTypeApi, T, A> From<(T, u64, A)> for Payment<M>
+where
+    T: Into<TokenId<M>>,
+    A: Into<NonZeroBigUint<M>>,
+{
     #[inline]
-    fn from(value: (TokenId<M>, u64, NonZeroBigUint<M>)) -> Self {
+    fn from(value: (T, u64, A)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
-        Self::new(token_identifier, token_nonce, amount)
+        Self::new(token_identifier.into(), token_nonce, amount.into())
     }
 }
 

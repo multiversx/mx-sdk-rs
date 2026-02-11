@@ -140,7 +140,7 @@ pub trait LocalEsdtAndEsdtNft {
         self.tx()
             .to(to)
             .payment(Payment::new(
-                token_identifier.into(),
+                token_identifier,
                 nonce,
                 amount.into_non_zero_or_panic(),
             ))

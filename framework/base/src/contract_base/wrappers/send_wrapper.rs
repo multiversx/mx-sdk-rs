@@ -319,11 +319,7 @@ where
     ) -> ! {
         Tx::new_tx_from_sc()
             .to(to)
-            .payment(Payment::new(
-                token.into(),
-                nonce,
-                amount.into_non_zero_or_panic(),
-            ))
+            .payment(Payment::new(token, nonce, amount.into_non_zero_or_panic()))
             .async_call_and_exit()
     }
 

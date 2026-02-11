@@ -226,7 +226,7 @@ where
     /// Can subsequently be called again for multiple payments.
     #[deprecated(
         since = "0.65.0",
-        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
     )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
@@ -337,7 +337,7 @@ where
     /// adding the second one will convert it to a list.
     #[deprecated(
         since = "0.65.0",
-        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
     )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
@@ -372,7 +372,7 @@ where
     /// Can be called multiple times on the same call.
     #[deprecated(
         since = "0.65.0",
-        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
     )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         mut self,

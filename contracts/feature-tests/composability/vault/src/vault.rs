@@ -117,7 +117,7 @@ pub trait Vault {
         if let Some(esdt_token_id) = token.into_esdt_option() {
             self.tx()
                 .to(caller)
-                .payment(Payment::new(esdt_token_id.into(), nonce, amount))
+                .payment(Payment::new(esdt_token_id, nonce, amount))
                 .transfer();
         } else {
             self.tx().to(caller).egld(amount.as_big_uint()).transfer();
