@@ -35,7 +35,7 @@ impl<'a> TestTokenIdentifier<'a> {
     ///
     /// Use:
     /// - `into`/`from` for direct conversion to `TokenId`;
-    /// - [`to_token_id()`] - to explixitly convert to `TokenId`;
+    /// - [`to_token_id()`] - to explicitly convert to `TokenId`;
     /// - [`to_esdt_token_identifier()`] - for ESDT-only scenarios, mostly legacy.
     #[deprecated(since = "0.65.0", note = "Use to_esdt_token_identifier() instead")]
     pub fn to_token_identifier<Api: ManagedTypeApi>(&self) -> EsdtTokenIdentifier<Api> {
