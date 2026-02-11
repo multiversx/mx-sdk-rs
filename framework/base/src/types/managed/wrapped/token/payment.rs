@@ -10,14 +10,12 @@ use crate::{
     },
     err_msg,
     types::{
-        BigUint, Egld, EsdtTokenPayment, EsdtTokenPaymentRefs, FungiblePayment, ManagedVecItem,
-        ManagedVecItemPayloadBuffer, NonZeroBigUint, NonZeroError, PaymentMultiValue, PaymentRefs,
-        Ref, TokenId, managed_vec_item_read_from_payload_index,
+        BigUint, Egld, EgldOrEsdtTokenPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
+        FungiblePayment, ManagedVecItem, ManagedVecItemPayloadBuffer, NonZeroBigUint, NonZeroError,
+        PaymentMultiValue, PaymentRefs, Ref, TokenId, managed_vec_item_read_from_payload_index,
         managed_vec_item_save_to_payload_index,
     },
 };
-
-use super::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment};
 
 /// Represents a payment in a specific token with a guaranteed non-zero amount.
 ///
@@ -189,17 +187,18 @@ impl<M: ManagedTypeApi> Payment<M> {
         (&self.token_identifier, self.token_nonce, &self.amount)
     }
 
-    /// Zero-cost conversion that loosens the EGLD restriction.
+    /// Zero-cost conversion of a reference to the legacy payment type, `EgldOrEsdtTokenPayment`.
     ///
+    /// Note: it does it by transmuting the reference type.
     /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
     pub fn as_egld_or_esdt_payment(&self) -> &EgldOrEsdtTokenPayment<M> {
         unsafe { core::mem::transmute(self) }
     }
 
-    /// Conversion that loosens the EGLD restriction.
+    /// Zero-cost conversion to the legacy payment type, `EgldOrEsdtTokenPayment`.
     pub fn into_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
         EgldOrEsdtTokenPayment {
-            token_identifier: EgldOrEsdtTokenIdentifier::esdt(self.token_identifier),
+            token_identifier: self.token_identifier.into_legacy(),
             token_nonce: self.token_nonce,
             amount: self.amount.into_big_uint(),
         }
