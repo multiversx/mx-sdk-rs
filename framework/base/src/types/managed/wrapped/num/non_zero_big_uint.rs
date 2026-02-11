@@ -145,6 +145,8 @@ macro_rules! impl_from_nonzero {
         $(
             impl<M: ManagedTypeApi> From<NonZero<$t>> for NonZeroBigUint<M> {
                 fn from(value: NonZero<$t>) -> Self {
+                    // SAFETY: the invariant of NonZeroBigUint is upheld
+                    // because the input value is guaranteed to be non-zero by the type system
                     unsafe { Self::new_unchecked(BigUint::from(value.get())) }
                 }
             }
