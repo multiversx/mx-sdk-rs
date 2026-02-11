@@ -30,7 +30,11 @@ pub struct EsdtTokenPayment<M: ManagedTypeApi> {
 
 /// Alias for a list of payments.
 ///
-/// TODO: deprecate in favor of `EsdtTokenPaymentVec`.
+/// Deprecated: Use [`EsdtTokenPaymentVec`] instead.
+#[deprecated(
+    since = "0.65.0",
+    note = "Replace with either `PaymentVec` (modern implementation), or `EsdtTokenPaymentVec` (backwards-compatible, identical with the old `MultiEsdtPayment`)."
+)]
 pub type MultiEsdtPayment<Api> = ManagedVec<Api, EsdtTokenPayment<Api>>;
 
 /// Alias for a list of payments.
