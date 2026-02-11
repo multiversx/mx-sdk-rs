@@ -1,7 +1,8 @@
 use crate::types::{
     BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
     EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment,
-    EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec, MultiEsdtPayment, heap::H256,
+    EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec, MultiEsdtPayment,
+    TxPaymentCompose, heap::H256,
 };
 
 use multiversx_sc_codec::TopEncodeMulti;
@@ -133,6 +134,61 @@ where
     }
 }
 
+impl<Env, From, To, OldPayment, Gas, Data, RH> Tx<Env, From, To, OldPayment, Gas, Data, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    OldPayment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Adds any payment to a transaction, using the payment compose mechanism.
+    ///
+    /// # Compose Mechanism
+    ///
+    /// The `payment` method is generic and flexible, allowing you to add any type of payment to a transaction.
+    /// It uses the [`TxPaymentCompose`] trait to determine how to combine the existing payment (if any)
+    /// with the new payment being added. This enables a fluent and type-safe way to build up complex payment scenarios.
+    ///
+    /// - If no payment has been added yet (i.e., the payment type is `()`), the new payment is simply set as the transaction's payment.
+    /// - If a payment already exists, the `compose` method is called, which merges the new payment with the existing one according to the rules defined by their types.
+    /// - This allows for single or multiple ESDT payments, EGLD payments, or combinations thereof, all handled transparently.
+    ///
+    /// ## Example
+    ///
+    /// ```ignore
+    /// let tx = Tx::new_with_env(env)
+    ///     .to(address)
+    ///     .payment(esdt_payment)
+    ///     .payment(another_esdt_payment)
+    ///     .payment(egld_payment);
+    /// ```
+    ///
+    /// Each call to `.payment(...)` will combine the new payment with the previous one, producing the correct payment type for the transaction.
+    ///
+    /// This mechanism is extensible and supports custom payment types as long as they implement the required traits.
+    pub fn payment<NewPayment>(
+        self,
+        payment: NewPayment,
+    ) -> Tx<Env, From, To, <OldPayment as TxPaymentCompose<Env, NewPayment>>::Output, Gas, Data, RH>
+    where
+        NewPayment: TxPayment<Env>,
+        OldPayment: TxPaymentCompose<Env, NewPayment>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment.compose(payment),
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+}
+
 impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, (), Gas, Data, RH>
 where
     Env: TxEnv,
@@ -142,22 +198,6 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
-    /// Adds any payment to a transaction, if no payment has been added before.
-    pub fn payment<Payment>(self, payment: Payment) -> Tx<Env, From, To, Payment, Gas, Data, RH>
-    where
-        Payment: TxPayment<Env>,
-    {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment,
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
-    }
-
     /// Adds EGLD value to a transaction.
     ///
     /// Accepts any type that can represent and EGLD amount: BigUint, &BigUint, etc.
@@ -184,6 +224,10 @@ where
     /// Since this is the first ESDT payment, a single payment tx is produced.
     ///
     /// Can subsequently be called again for multiple payments.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
@@ -226,6 +270,10 @@ where
     /// Can be formed from single ESDT payments, but the result will always be a collection.
     ///
     /// Always converts the argument into an owned collection of ESDT payments. For work with references, use `.payment(&p)` instead.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn multi_esdt<IntoMulti>(
         self,
         payments: IntoMulti,
@@ -287,6 +335,10 @@ where
     ///
     /// When the Tx already contains a single (owned) ESDT payment,
     /// adding the second one will convert it to a list.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
@@ -318,6 +370,10 @@ where
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         mut self,
         payment: P,
@@ -330,6 +386,10 @@ where
     /// calling `multi_esdt` is equivalent to `esdt`, it just adds another payment to the list.
     ///
     /// Can be called multiple times.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn multi_esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
@@ -910,6 +970,11 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
+    pub fn id(self, _id: &str) -> Self {
+        // TODO: implement
+        self
+    }
+
     /// Sets the mock transaction hash to be used in a test.
     ///
     /// Only allowed in tests.

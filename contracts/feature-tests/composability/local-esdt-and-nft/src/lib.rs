@@ -139,7 +139,11 @@ pub trait LocalEsdtAndEsdtNft {
     ) {
         self.tx()
             .to(to)
-            .esdt((token_identifier, nonce, amount))
+            .payment(Payment::new(
+                token_identifier,
+                nonce,
+                amount.into_non_zero_or_panic(),
+            ))
             .async_call_and_exit();
     }
 

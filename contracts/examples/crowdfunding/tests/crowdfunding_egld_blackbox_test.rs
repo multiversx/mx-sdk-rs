@@ -136,7 +136,7 @@ fn test_sc_error_egld() {
         .typed(crowdfunding_proxy::CrowdfundingProxy)
         .fund()
         .payment(Payment::new(
-            OTHER_TOKEN_ID.as_str().into(),
+            OTHER_TOKEN_ID,
             0,
             NonZeroBigUint::try_from(1000u128).unwrap(),
         ))

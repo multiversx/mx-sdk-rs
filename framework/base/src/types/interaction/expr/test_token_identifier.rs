@@ -5,7 +5,7 @@ use multiversx_sc_codec::{
 use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
-    types::{AnnotatedValue, EsdtTokenIdentifier, ManagedBuffer, TxEnv},
+    types::{AnnotatedValue, EsdtTokenIdentifier, ManagedBuffer, TokenId, TxEnv},
 };
 
 const STR_PREFIX: &str = "str:";
@@ -20,23 +20,46 @@ pub struct TestTokenIdentifier<'a> {
 }
 
 impl<'a> TestTokenIdentifier<'a> {
+    /// Creates a new test token identifier from a string name.
     pub const fn new(name: &'a str) -> Self {
         TestTokenIdentifier { name }
     }
 
+    /// Evaluates the test token identifier to a Mandos (scenario) expression string with the "str:" prefix.
     #[cfg(feature = "alloc")]
     pub fn eval_to_expr(&self) -> alloc::string::String {
         alloc::format!("{STR_PREFIX}{}", self.name)
     }
 
+    /// Incorrectly named method, kept for backward compatibility.
+    ///
+    /// Use:
+    /// - `into`/`from` for direct conversion to `TokenId`;
+    /// - [`to_token_id()`] - to explicitly convert to `TokenId`;
+    /// - [`to_esdt_token_identifier()`] - for ESDT-only scenarios, mostly legacy.
+    #[deprecated(since = "0.65.0", note = "Use to_esdt_token_identifier() instead")]
     pub fn to_token_identifier<Api: ManagedTypeApi>(&self) -> EsdtTokenIdentifier<Api> {
         self.name.into()
     }
 
+    /// Converts this test token identifier to an ESDT token identifier.
+    ///
+    /// Use this for ESDT-only scenarios, mostly legacy code.
+    pub fn to_esdt_token_identifier<Api: ManagedTypeApi>(&self) -> EsdtTokenIdentifier<Api> {
+        self.name.into()
+    }
+
+    /// Converts this test token identifier to a `TokenId`.
+    pub fn to_token_id<Api: ManagedTypeApi>(&self) -> TokenId<Api> {
+        self.name.into()
+    }
+
+    /// Returns the token identifier name as a string slice.
     pub fn as_str(&self) -> &str {
         self.name
     }
 
+    /// Returns the token identifier name as a byte slice.
     pub fn as_bytes(&self) -> &[u8] {
         self.name.as_bytes()
     }
@@ -51,7 +74,6 @@ where
         result.append_bytes(self.name.as_bytes());
         result
     }
-
     fn to_value(&self, _env: &Env) -> EsdtTokenIdentifier<Env::Api> {
         self.name.into()
     }

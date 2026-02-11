@@ -985,6 +985,42 @@
         },
         {
             "step": "scQuery",
+            "id": "eq_non_zero_big_uint_big_uint(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "eq_non_zero_big_uint_big_uint",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "eq_non_zero_big_uint_big_uint(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "eq_non_zero_big_uint_big_uint",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
             "id": "eq_non_zero_big_uint_i32(1,0)",
             "tx": {
                 "to": "sc:basic-features",
@@ -2087,6 +2123,42 @@
             "tx": {
                 "to": "sc:basic-features",
                 "function": "gt_non_zero_big_uint_non_zero_big_uint",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "gt_non_zero_big_uint_big_uint(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "gt_non_zero_big_uint_big_uint",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "gt_non_zero_big_uint_big_uint(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "gt_non_zero_big_uint_big_uint",
                 "arguments": [
                     "1",
                     "1"
@@ -3217,6 +3289,42 @@
         },
         {
             "step": "scQuery",
+            "id": "ge_non_zero_big_uint_big_uint(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "ge_non_zero_big_uint_big_uint",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "ge_non_zero_big_uint_big_uint(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "ge_non_zero_big_uint_big_uint",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
             "id": "ge_non_zero_big_uint_i32(1,0)",
             "tx": {
                 "to": "sc:basic-features",
@@ -4333,6 +4441,42 @@
         },
         {
             "step": "scQuery",
+            "id": "lt_non_zero_big_uint_big_uint(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "lt_non_zero_big_uint_big_uint",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "lt_non_zero_big_uint_big_uint(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "lt_non_zero_big_uint_big_uint",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
             "id": "lt_non_zero_big_uint_i32(1,0)",
             "tx": {
                 "to": "sc:basic-features",
@@ -5435,6 +5579,42 @@
             "tx": {
                 "to": "sc:basic-features",
                 "function": "le_non_zero_big_uint_non_zero_big_uint",
+                "arguments": [
+                    "1",
+                    "1"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "le_non_zero_big_uint_big_uint(1,0)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "le_non_zero_big_uint_big_uint",
+                "arguments": [
+                    "1",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "le_non_zero_big_uint_big_uint(1,1)",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "le_non_zero_big_uint_big_uint",
                 "arguments": [
                     "1",
                     "1"

@@ -19,7 +19,9 @@ pub use egld_or_esdt_token_payment_refs::EgldOrEsdtTokenPaymentRefs;
 pub use egld_or_multi_esdt_payment::{EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs};
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_identifier::{EsdtTokenIdentifier, TokenIdentifier};
-pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPayment};
+pub use esdt_token_payment::{
+    EsdtTokenPayment, EsdtTokenPaymentRefs, EsdtTokenPaymentVec, MultiEsdtPayment,
+};
 pub use fungible_payment::FungiblePayment;
 pub use multi_egld_or_esdt_token_payment::MultiEgldOrEsdtPayment;
 pub use multi_transfer_marker::{MultiTransfer, MultiTransferMarkerArg};

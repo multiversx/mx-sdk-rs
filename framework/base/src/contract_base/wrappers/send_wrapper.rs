@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::codec::Empty;
 
-use crate::types::ManagedRef;
+use crate::types::{ManagedRef, Payment};
 use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
@@ -319,7 +319,7 @@ where
     ) -> ! {
         Tx::new_tx_from_sc()
             .to(to)
-            .esdt((token, nonce, amount))
+            .payment(Payment::new(token, nonce, amount.into_non_zero_or_panic()))
             .async_call_and_exit()
     }
 

@@ -73,7 +73,7 @@ fn test_transfer_role() {
         .tx()
         .from(USER_ADDRESS)
         .to(TRANSFER_ROLE_FEATURES_ADDRESS)
-        .payment(TestEsdtTransfer(TRANSFER_TOKEN_ID, 0, 100))
+        .payment(Payment::try_new(TRANSFER_TOKEN_ID, 0, 100u64).unwrap())
         .whitebox(transfer_role_features::contract_obj, |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID_EXPR),
@@ -100,7 +100,7 @@ fn test_transfer_role() {
         .tx()
         .from(USER_ADDRESS)
         .to(TRANSFER_ROLE_FEATURES_ADDRESS)
-        .payment(TestEsdtTransfer(TRANSFER_TOKEN_ID, 0, 100))
+        .payment(Payment::try_new(TRANSFER_TOKEN_ID, 0, 100u64).unwrap())
         .returns(ExpectError(4u64, "Destination address not whitelisted"))
         .whitebox(transfer_role_features::contract_obj, |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
@@ -121,7 +121,7 @@ fn test_transfer_role() {
         .tx()
         .from(USER_ADDRESS)
         .to(TRANSFER_ROLE_FEATURES_ADDRESS)
-        .payment(TestEsdtTransfer(TRANSFER_TOKEN_ID, 0, 100))
+        .payment(Payment::try_new(TRANSFER_TOKEN_ID, 0, 100u64).unwrap())
         .whitebox(transfer_role_features::contract_obj, |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID_EXPR),
@@ -150,7 +150,7 @@ fn test_transfer_role() {
         .tx()
         .from(USER_ADDRESS)
         .to(TRANSFER_ROLE_FEATURES_ADDRESS)
-        .payment(TestEsdtTransfer(TRANSFER_TOKEN_ID, 0, 100))
+        .payment(Payment::try_new(TRANSFER_TOKEN_ID, 0, 100u64).unwrap())
         .whitebox(transfer_role_features::contract_obj, |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID_EXPR),

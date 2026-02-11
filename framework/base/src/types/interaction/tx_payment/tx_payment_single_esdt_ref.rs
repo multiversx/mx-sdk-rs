@@ -23,7 +23,7 @@ where
     ) -> Result<(), TransferExecuteFailed> {
         // TODO: some clones could be avoided?
         let mut payments = ManagedVec::new();
-        payments.push(self.to_owned_payment().into_multi_egld_or_esdt_payment());
+        payments.push(self.to_owned_payment().into_egld_or_esdt_payment());
 
         // using multi-transfer (instead of single ESDT/NFT), because it is the only one that is fallible
         SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute_fallible(
@@ -94,7 +94,7 @@ where
         FullPaymentData {
             egld: None,
             multi_esdt: ManagedVec::from_single_item(
-                self.to_owned_payment().into_multi_egld_or_esdt_payment(),
+                self.to_owned_payment().into_egld_or_esdt_payment(),
             ),
         }
     }
