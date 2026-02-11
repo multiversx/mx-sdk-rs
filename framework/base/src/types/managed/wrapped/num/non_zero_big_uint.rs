@@ -189,6 +189,13 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
         Self::new(bu).unwrap_or_else(|| quick_signal_error::<M>(err_msg::ZERO_VALUE_NOT_ALLOWED))
     }
 
+    /// Convenience constructor for the common case of 1.
+    pub fn one() -> Self {
+        // SAFETY: the invariant of NonZeroBigUint is upheld
+        // because 1 is guaranteed to be non-zero
+        unsafe { Self::new_unchecked(BigUint::from(1u32)) }
+    }
+
     /// Drops the non-zero restriction.
     pub fn into_big_uint(self) -> BigUint<M> {
         BigUint { value: self.value }

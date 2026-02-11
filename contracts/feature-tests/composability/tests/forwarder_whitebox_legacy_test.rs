@@ -46,7 +46,7 @@ fn test_nft_update_attributes_and_send() {
 
             sc.tx()
                 .to(USER_ADDRESS)
-                .payment(Payment::try_new(NFT_TOKEN_ID, 1, 1u32).unwrap())
+                .payment(Payment::new(NFT_TOKEN_ID, 1, NonZeroBigUint::one()))
                 .transfer();
         });
 
@@ -64,13 +64,13 @@ fn test_nft_update_attributes_and_send() {
         .tx()
         .from(USER_ADDRESS)
         .to(FORWARDER_ADDRESS)
-        .payment(Payment::try_new(NFT_TOKEN_ID, 1, 1u32).unwrap())
+        .payment(Payment::new(NFT_TOKEN_ID, 1, NonZeroBigUint::one()))
         .whitebox(forwarder_legacy::contract_obj, |sc| {
             sc.nft_update_attributes(NFT_TOKEN_ID.to_esdt_token_identifier(), 1, new_attributes);
 
             sc.tx()
                 .to(USER_ADDRESS)
-                .payment(Payment::try_new(NFT_TOKEN_ID, 1, 1u32).unwrap())
+                .payment(Payment::new(NFT_TOKEN_ID, 1, NonZeroBigUint::one()))
                 .transfer();
         });
 

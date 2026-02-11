@@ -26,6 +26,9 @@ fn test_non_zero_big_uint_creation_and_conversion() {
         Some(42)
     );
 
+    // One
+    assert_eq!(NZ::one().as_big_uint().to_u64(), Some(1));
+
     // Creation from u8 (zero)
     assert!(TryInto::<NZ>::try_into(0u8).is_err());
 
