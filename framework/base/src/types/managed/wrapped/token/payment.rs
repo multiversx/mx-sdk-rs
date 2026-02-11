@@ -186,14 +186,6 @@ impl<M: ManagedTypeApi> Payment<M> {
         (&self.token_identifier, self.token_nonce, &self.amount)
     }
 
-    /// Zero-cost conversion of a reference to the legacy payment type, `EgldOrEsdtTokenPayment`.
-    ///
-    /// Note: it does it by transmuting the reference type.
-    /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
-    pub fn as_egld_or_esdt_payment(&self) -> &EgldOrEsdtTokenPayment<M> {
-        unsafe { core::mem::transmute(self) }
-    }
-
     /// Zero-cost conversion to the legacy payment type, `EgldOrEsdtTokenPayment`.
     pub fn into_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
         EgldOrEsdtTokenPayment {
