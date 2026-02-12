@@ -78,6 +78,7 @@ impl BasicInteractor {
         let new_address = self
             .interactor
             .tx()
+            .id("interactor deploy")
             .from(&self.adder_owner_address.clone())
             .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
@@ -120,6 +121,7 @@ impl BasicInteractor {
     pub async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
+            .id("interactor add")
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
             .gas(6_000_000u64)

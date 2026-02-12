@@ -5,6 +5,7 @@ use crate::types::{
     TxPaymentCompose, heap::H256,
 };
 
+use alloc::borrow::ToOwned;
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
@@ -970,8 +971,14 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
-    pub fn id(self, _id: &str) -> Self {
-        // TODO: implement
+    /// Sets the mock transaction ID to be used in a test.
+    ///
+    /// Transaction ids help identifying transactions in tests,
+    /// but they are not used in the actual transaction sending process, so they can be set to any value.
+    ///
+    /// They also show up when generating Mandos (scenario) JSON.
+    pub fn id(mut self, id: &str) -> Self {
+        self.env.set_tx_id(id.to_owned());
         self
     }
 
