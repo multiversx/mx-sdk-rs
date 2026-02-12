@@ -2,7 +2,7 @@ use core::ops::Deref;
 
 use crate::{
     contract_base::{SendRawWrapper, TransferExecuteFailed},
-    types::{BigUint, ManagedAddress, ManagedRef, MultiEsdtPayment, TxFrom, TxToSpecified},
+    types::{BigUint, EsdtTokenPaymentVec, ManagedAddress, ManagedRef, TxFrom, TxToSpecified},
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
@@ -14,14 +14,14 @@ where
 {
 }
 
-impl<Env> TxPaymentMultiEsdt<Env> for MultiEsdtPayment<Env::Api> where Env: TxEnv {}
-impl<Env> TxPaymentMultiEsdt<Env> for &MultiEsdtPayment<Env::Api> where Env: TxEnv {}
-impl<Env> TxPaymentMultiEsdt<Env> for ManagedRef<'_, Env::Api, MultiEsdtPayment<Env::Api>> where
+impl<Env> TxPaymentMultiEsdt<Env> for EsdtTokenPaymentVec<Env::Api> where Env: TxEnv {}
+impl<Env> TxPaymentMultiEsdt<Env> for &EsdtTokenPaymentVec<Env::Api> where Env: TxEnv {}
+impl<Env> TxPaymentMultiEsdt<Env> for ManagedRef<'_, Env::Api, EsdtTokenPaymentVec<Env::Api>> where
     Env: TxEnv
 {
 }
 
-impl<Env> TxPayment<Env> for &MultiEsdtPayment<Env::Api>
+impl<Env> TxPayment<Env> for &EsdtTokenPaymentVec<Env::Api>
 where
     Env: TxEnv,
 {
@@ -95,7 +95,7 @@ where
     }
 }
 
-impl<Env> TxPayment<Env> for ManagedRef<'_, Env::Api, MultiEsdtPayment<Env::Api>>
+impl<Env> TxPayment<Env> for ManagedRef<'_, Env::Api, EsdtTokenPaymentVec<Env::Api>>
 where
     Env: TxEnv,
 {
@@ -150,7 +150,7 @@ where
     }
 }
 
-impl<Env> TxPayment<Env> for MultiEsdtPayment<Env::Api>
+impl<Env> TxPayment<Env> for EsdtTokenPaymentVec<Env::Api>
 where
     Env: TxEnv,
 {

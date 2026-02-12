@@ -1,7 +1,7 @@
 use crate::types::{
     BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
     EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment,
-    EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec, MultiEsdtPayment,
+    EsdtTokenPaymentRefs, EsdtTokenPaymentVec, ManagedAddress, ManagedBuffer, ManagedVec,
     TxPaymentCompose, heap::H256,
 };
 
@@ -277,9 +277,9 @@ where
     pub fn multi_esdt<IntoMulti>(
         self,
         payments: IntoMulti,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH>
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH>
     where
-        IntoMulti: Into<MultiEsdtPayment<Env::Api>>,
+        IntoMulti: Into<EsdtTokenPaymentVec<Env::Api>>,
     {
         self.payment(payments.into())
     }
@@ -288,16 +288,16 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
-        self.payment(MultiEsdtPayment::new())
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
+        self.payment(EsdtTokenPaymentVec::new())
             .with_esdt_transfer(payment)
     }
 
     /// Backwards compatibility.
     pub fn with_multi_token_transfer(
         self,
-        payments: MultiEsdtPayment<Env::Api>,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        payments: EsdtTokenPaymentVec<Env::Api>,
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         self.multi_esdt(payments)
     }
 
@@ -342,7 +342,7 @@ where
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         let mut payments = ManagedVec::new();
         payments.push(self.payment);
         payments.push(payment.into());
@@ -358,7 +358,7 @@ where
     }
 }
 
-impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH>
+impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -377,7 +377,7 @@ where
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         mut self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         self.payment.push(payment.into());
         self
     }
@@ -393,7 +393,7 @@ where
     pub fn multi_esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         self.esdt(payment)
     }
 
@@ -401,7 +401,7 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         self.multi_esdt(payment)
     }
 }
