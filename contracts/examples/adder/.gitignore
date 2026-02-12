@@ -7,4 +7,5 @@
 /output*/
 
 # Mandos test trace
+adder_trace*.scen.json
 trace*.scen.json

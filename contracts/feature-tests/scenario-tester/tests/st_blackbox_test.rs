@@ -57,6 +57,7 @@ fn st_blackbox() {
 
     let new_address = world
         .tx()
+        .id("st deploy")
         .from(OWNER_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .init(5u32)
@@ -67,6 +68,7 @@ fn st_blackbox() {
 
     let value = world
         .query()
+        .id("st query 1")
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sum()
@@ -76,6 +78,7 @@ fn st_blackbox() {
 
     world
         .tx()
+        .id("st add 1")
         .from(OWNER_ADDRESS)
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
@@ -92,6 +95,7 @@ fn st_blackbox() {
 
     world
         .tx()
+        .id("st add 1 again")
         .from(OTHER_ADDRESS)
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
@@ -100,6 +104,7 @@ fn st_blackbox() {
 
     world
         .tx()
+        .id("st multi param")
         .from(OTHER_ADDRESS)
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
@@ -128,7 +133,17 @@ fn st_blackbox() {
         MultiValue2((RustBigUint::from(1u32), RustBigUint::from(2u32)))
     );
 
-    world.write_scenario_trace("trace1.scen.json");
+    world.write_scenario_trace("trace/st_trace1.scen.json");
+
+    // Compare generated trace with expected trace
+    let generated_trace = std::fs::read_to_string("trace/st_trace1.scen.json")
+        .expect("failed to read generated trace");
+    let expected_trace = std::fs::read_to_string("trace/expected_trace1.scen.json")
+        .expect("failed to read expected trace");
+    assert_eq!(
+        generated_trace, expected_trace,
+        "Generated trace does not match expected trace"
+    );
 }
 
 #[test]

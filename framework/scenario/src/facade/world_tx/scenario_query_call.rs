@@ -1,8 +1,8 @@
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv, TxEnv,
-        TxNoPayment, TxToSpecified,
+        FunctionCall, H256, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv, TxEnv,
+        TxEnvWithTxHash, TxId, TxNoPayment, TxToSpecified,
     },
 };
 
@@ -83,5 +83,23 @@ impl ScenarioWorld {
         self.sc_query(&mut step_wrapper.step);
         step_wrapper.process_result();
         self
+    }
+}
+
+impl TxEnvWithTxHash for ScenarioEnvQuery<'_> {
+    fn set_tx_id(&mut self, tx_id: TxId) {
+        self.data.set_tx_id(tx_id);
+    }
+
+    fn take_tx_id(&mut self) -> Option<TxId> {
+        self.data.take_tx_id()
+    }
+
+    fn set_tx_hash(&mut self, tx_hash: H256) {
+        self.data.set_tx_hash(tx_hash);
+    }
+
+    fn take_tx_hash(&mut self) -> Option<H256> {
+        self.data.take_tx_hash()
     }
 }

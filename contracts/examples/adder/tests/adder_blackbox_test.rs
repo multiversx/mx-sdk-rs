@@ -79,5 +79,5 @@ fn adder_blackbox() {
         .check_account(ADDER_ADDRESS)
         .check_storage("str:sum", "100");
 
-    world.write_scenario_trace("trace1.scen.json");
+    world.write_scenario_trace("adder_trace1.scen.json");
 }
