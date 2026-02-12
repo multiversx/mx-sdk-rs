@@ -3,7 +3,7 @@ use multiversx_sc::{
     types::{
         Code, FunctionCall, ManagedAddress, ManagedBuffer, NotPayable, RHListExec, Tx,
         TxBaseWithEnv, TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFromSpecified, TxGas,
-        TxPayment, TxToSpecified, UpgradeCall, heap::H256,
+        TxId, TxPayment, TxToSpecified, UpgradeCall, heap::H256,
     },
 };
 
@@ -116,6 +116,14 @@ where
 }
 
 impl TxEnvWithTxHash for ScenarioEnvExec<'_> {
+    fn set_tx_id(&mut self, tx_id: TxId) {
+        self.data.set_tx_id(tx_id);
+    }
+
+    fn take_tx_id(&mut self) -> Option<TxId> {
+        self.data.take_tx_id()
+    }
+
     fn set_tx_hash(&mut self, tx_hash: H256) {
         self.data.set_tx_hash(tx_hash);
     }

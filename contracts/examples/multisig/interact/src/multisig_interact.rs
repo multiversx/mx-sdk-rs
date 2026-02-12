@@ -12,7 +12,7 @@ use multisig_interact_state::State;
 
 use multiversx_sc_snippets::imports::*;
 
-const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "multisig_interactor_trace.scen.json";
 
 #[tokio::main]
 async fn main() {
@@ -141,6 +141,7 @@ impl MultisigInteract {
         let new_address = self
             .interactor
             .tx()
+            .id("deploy multisig")
             .from(&self.wallet_address)
             .typed(multisig_proxy::MultisigProxy)
             .init(quorum, board)

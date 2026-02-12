@@ -4,7 +4,6 @@ use crate::scenario::model::{
 
 #[derive(Debug, Default, Clone)]
 pub struct TransferStep {
-    pub id: String,
     pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxTransfer>,
@@ -12,7 +11,6 @@ pub struct TransferStep {
 
 #[derive(Debug, Clone)]
 pub struct ValidatorRewardStep {
-    pub id: String,
     pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxValidatorReward>,

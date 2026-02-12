@@ -53,7 +53,8 @@ pub enum StepRaw {
     #[serde(rename_all = "camelCase")]
     ScCall {
         #[serde(default)]
-        id: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        id: Option<String>,
 
         #[serde(default)]
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,7 +78,8 @@ pub enum StepRaw {
     #[serde(rename_all = "camelCase")]
     ScQuery {
         #[serde(default)]
-        id: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        id: Option<String>,
 
         #[serde(default)]
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,7 +103,8 @@ pub enum StepRaw {
     #[serde(rename_all = "camelCase")]
     ScDeploy {
         #[serde(default)]
-        id: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        id: Option<String>,
 
         #[serde(default)]
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -125,7 +128,8 @@ pub enum StepRaw {
     #[serde(rename_all = "camelCase")]
     Transfer {
         #[serde(default)]
-        id: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        id: Option<String>,
 
         #[serde(default)]
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -141,7 +145,8 @@ pub enum StepRaw {
     #[serde(rename_all = "camelCase")]
     ValidatorReward {
         #[serde(default)]
-        id: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        id: Option<String>,
 
         #[serde(default)]
         #[serde(skip_serializing_if = "Option::is_none")]
