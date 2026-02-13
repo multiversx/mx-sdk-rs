@@ -4,9 +4,10 @@ use crate::types::{
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
-    codec::{EncodeError, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput},
+    codec::{NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput},
 };
 use alloc::string::String;
+use multiversx_sc_codec::EncodeError;
 
 pub type ScenarioValueRawStr = &'static str;
 
@@ -110,9 +111,9 @@ impl TypeAbi for ScenarioValueRaw {
     }
 }
 
-// Blanket implementation: ScenarioValuePlaceholder can be used as a placeholder for ANY type
+// Blanket implementation: ScenarioValueRaw can be used as a placeholder for ANY type
 // This allows it to be used in place of any expected type in contract calls
-impl<T: ?Sized> TypeAbiFrom<T> for ScenarioValueRaw {}
+impl<T> TypeAbiFrom<ScenarioValueRaw> for T {}
 
 // Implementation for u64
 impl<Env> AnnotatedValue<Env, u64> for ScenarioValueRaw
@@ -159,5 +160,44 @@ where
     fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         // Placeholder - actual value doesn't matter for code generation
         ManagedAddress::zero()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::codec::test_util::check_top_encode;
+    use alloc::string::String;
+
+    #[test]
+    fn test_encode_str() {
+        let value = ScenarioValueRaw::str("hello");
+        let encoded = check_top_encode(&value);
+        let expected = check_top_encode(&String::from("hello"));
+        assert_eq!(encoded, expected);
+    }
+
+    #[test]
+    fn test_encode_list() {
+        const LIST_ITEMS: &[ScenarioValueRaw] =
+            &[ScenarioValueRaw::Str("a"), ScenarioValueRaw::Str("b")];
+        let value = ScenarioValueRaw::list(LIST_ITEMS);
+        let encoded = check_top_encode(&value);
+        // Should encode as "a|b"
+        let expected = check_top_encode(&String::from("a|b"));
+        assert_eq!(encoded, expected);
+    }
+
+    #[test]
+    fn test_encode_map() {
+        const MAP_ITEMS: &[(&str, ScenarioValueRaw)] = &[
+            ("key1", ScenarioValueRaw::Str("value1")),
+            ("key2", ScenarioValueRaw::Str("value2")),
+        ];
+        let value = ScenarioValueRaw::map(MAP_ITEMS);
+        let encoded = check_top_encode(&value);
+        // Should encode as "value1|value2"
+        let expected = check_top_encode(&String::from("value1|value2"));
+        assert_eq!(encoded, expected);
     }
 }

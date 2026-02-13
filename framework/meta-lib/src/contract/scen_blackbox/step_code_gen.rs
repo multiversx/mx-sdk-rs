@@ -146,9 +146,11 @@ impl<'a> TestGenerator<'a> {
             }
         }
 
-        // Note about new addresses (not directly supported in new API, handled automatically)
-        if !new_addresses.is_empty() {
-            writeln!(self.file, "    // Note: new addresses will be set during deploy").unwrap();
+        // Store new addresses for later use in deploy steps
+        for new_addr in new_addresses {
+            let creator_key = new_addr.creator_address.to_concatenated_string();
+            let new_address_key = new_addr.new_address.to_concatenated_string();
+            self.new_address_map.insert(creator_key, new_address_key);
         }
 
         writeln!(self.file).unwrap();
@@ -165,14 +167,18 @@ impl<'a> TestGenerator<'a> {
             writeln!(self.file, "    // {}", comment_text).unwrap();
         }
 
-        write!(self.file, "    world.tx()").unwrap();
+        writeln!(self.file, "    world.tx()").unwrap();
 
         if let Some(id_val) = id {
-            writeln!(self.file, ".id(\"{}\")", id_val).unwrap();
-            write!(self.file, "        ").unwrap();
+            writeln!(self.file, "        .id(\"{}\")", id_val).unwrap();
         }
 
-        writeln!(self.file, ".from({})", Self::format_address_value(&tx.from)).unwrap();
+        writeln!(
+            self.file,
+            "        .from({})",
+            Self::format_address_value(&tx.from)
+        )
+        .unwrap();
         write!(self.file, "        ").unwrap();
 
         let proxy_type = self.generate_proxy_type();
@@ -192,6 +198,15 @@ impl<'a> TestGenerator<'a> {
         writeln!(self.file, ".code(CODE_PATH)").unwrap();
         write!(self.file, "        ").unwrap();
 
+        // Add new_address if we have a prediction from setState
+        let from_address = tx.from.to_concatenated_string();
+        if let Some(new_address) = self.new_address_map.get(&from_address) {
+            // Format as TestSCAddress::new("name") if it's sc:name
+            let address_expr = Self::format_address(new_address);
+            writeln!(self.file, ".new_address({})", address_expr).unwrap();
+            write!(self.file, "        ").unwrap();
+        }
+
         writeln!(self.file, ".run();").unwrap();
         writeln!(self.file).unwrap();
     }
@@ -207,17 +222,25 @@ impl<'a> TestGenerator<'a> {
             writeln!(self.file, "    // {}", comment_text).unwrap();
         }
 
-        write!(self.file, "    world.tx()").unwrap();
+        writeln!(self.file, "    world.tx()").unwrap();
 
         if let Some(id_val) = id {
-            writeln!(self.file, ".id(\"{}\")", id_val).unwrap();
-            write!(self.file, "        ").unwrap();
+            writeln!(self.file, "        .id(\"{}\")", id_val).unwrap();
         }
 
-        writeln!(self.file, ".from({})", Self::format_address_value(&tx.from)).unwrap();
-        write!(self.file, "        ").unwrap();
+        writeln!(
+            self.file,
+            "        .from({})",
+            Self::format_address_value(&tx.from)
+        )
+        .unwrap();
 
-        writeln!(self.file, ".to({})", Self::format_address_value(&tx.to)).unwrap();
+        writeln!(
+            self.file,
+            "        .to({})",
+            Self::format_address_value(&tx.to)
+        )
+        .unwrap();
         write!(self.file, "        ").unwrap();
 
         let proxy_type = self.generate_proxy_type();
@@ -251,14 +274,18 @@ impl<'a> TestGenerator<'a> {
             writeln!(self.file, "    // {}", comment_text).unwrap();
         }
 
-        write!(self.file, "    world.query()").unwrap();
+        writeln!(self.file, "    world.query()").unwrap();
 
         if let Some(id_val) = id {
-            writeln!(self.file, ".id(\"{}\")", id_val).unwrap();
-            write!(self.file, "        ").unwrap();
+            writeln!(self.file, "        .id(\"{}\")", id_val).unwrap();
         }
 
-        writeln!(self.file, ".to({})", Self::format_address_value(&tx.to)).unwrap();
+        writeln!(
+            self.file,
+            "        .to({})",
+            Self::format_address_value(&tx.to)
+        )
+        .unwrap();
         write!(self.file, "        ").unwrap();
 
         let proxy_type = self.generate_proxy_type();
@@ -342,9 +369,15 @@ impl<'a> TestGenerator<'a> {
             format!("TestAddress::new(\"{}\")", name)
         } else if let Some(name) = clean.strip_prefix("sc:") {
             format!("TestSCAddress::new(\"{}\")", name)
+        } else if clean.starts_with("0x") || clean.starts_with("0X") {
+            // Hex address - generate Address::from_hex(...)
+            format!("Address::from_hex(\"{}\")", clean)
+        } else if clean.len() == 64 && clean.chars().all(|c| c.is_ascii_hexdigit()) {
+            // Hex address without 0x prefix
+            format!("Address::from_hex(\"{}\")", clean)
         } else {
-            // Raw address - wrap in ScenarioValuePlaceholder
-            format!("ScenarioValuePlaceholder::str(\"{}\")", clean)
+            // Raw address - wrap in ScenarioValueRaw
+            format!("ScenarioValueRaw::str(\"{}\")", clean)
         }
     }
 
@@ -364,24 +397,33 @@ impl<'a> TestGenerator<'a> {
     fn format_value(value: &multiversx_chain_scenario_format::serde_raw::ValueSubTree) -> String {
         use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
         match value {
-            ValueSubTree::Str(s) => format!("ScenarioValuePlaceholder::str(\"{}\")", Self::escape_string(s)),
+            ValueSubTree::Str(s) => {
+                format!("ScenarioValueRaw::str(\"{}\")", Self::escape_string(s))
+            }
             ValueSubTree::List(items) => {
                 if items.is_empty() {
-                    "ScenarioValuePlaceholder::list(&[])".to_string()
+                    "ScenarioValueRaw::list(&[])".to_string()
                 } else {
-                    let formatted_items: Vec<String> = items.iter().map(Self::format_value).collect();
-                    format!("ScenarioValuePlaceholder::list(&[{}])", formatted_items.join(", "))
+                    let formatted_items: Vec<String> =
+                        items.iter().map(Self::format_value).collect();
+                    format!("ScenarioValueRaw::list(&[{}])", formatted_items.join(", "))
                 }
             }
             ValueSubTree::Map(map) => {
                 if map.is_empty() {
-                    "ScenarioValuePlaceholder::map(&[])".to_string()
+                    "ScenarioValueRaw::map(&[])".to_string()
                 } else {
                     let formatted_entries: Vec<String> = map
                         .iter()
-                        .map(|(k, v)| format!("(\"{}\", {})", Self::escape_string(k), Self::format_value(v)))
+                        .map(|(k, v)| {
+                            format!(
+                                "(\"{}\", {})",
+                                Self::escape_string(k),
+                                Self::format_value(v)
+                            )
+                        })
                         .collect();
-                    format!("ScenarioValuePlaceholder::map(&[{}])", formatted_entries.join(", "))
+                    format!("ScenarioValueRaw::map(&[{}])", formatted_entries.join(", "))
                 }
             }
         }
@@ -392,8 +434,8 @@ impl<'a> TestGenerator<'a> {
     ) -> String {
         use multiversx_chain_scenario_format::serde_raw::CheckBytesValueRaw;
         match value {
-            CheckBytesValueRaw::Unspecified => "ScenarioValuePlaceholder::str(\"\")".to_string(),
-            CheckBytesValueRaw::Star => "ScenarioValuePlaceholder::str(\"*\")".to_string(),
+            CheckBytesValueRaw::Unspecified => "ScenarioValueRaw::str(\"\")".to_string(),
+            CheckBytesValueRaw::Star => "ScenarioValueRaw::str(\"*\")".to_string(),
             CheckBytesValueRaw::Equal(v) => Self::format_value(v),
         }
     }

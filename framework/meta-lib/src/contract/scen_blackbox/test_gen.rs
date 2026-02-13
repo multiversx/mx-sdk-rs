@@ -1,6 +1,7 @@
 use colored::Colorize;
 use multiversx_sc::abi::ContractAbi;
 use std::{
+    collections::HashMap,
     fs::{self, File},
     io::Write,
     path::Path,
@@ -8,28 +9,29 @@ use std::{
 
 use crate::cargo_toml::CargoTomlContents;
 
-use super::{
-    scenario_loader::{self, scenario_to_function_name, ScenarioFile},
-};
+use super::scenario_loader::{self, ScenarioFile, scenario_to_function_name};
 
 /// Context for test generation, holding shared parameters and file reference
 pub struct TestGenerator<'a> {
     pub crate_name: String,
     pub abi: ContractAbi,
     pub file: &'a mut File,
+    /// Maps creator address to expected new address from setState.newAddresses
+    pub new_address_map: HashMap<String, String>,
 }
 
 impl<'a> TestGenerator<'a> {
     pub fn new(crate_name: String, abi: ContractAbi, file: &'a mut File) -> Self {
-        Self { crate_name, abi, file }
+        Self {
+            crate_name,
+            abi,
+            file,
+            new_address_map: HashMap::new(),
+        }
     }
 
     /// Generates the combined test content to the file
-    fn generate_combined_test_content(
-        &mut self,
-        scenario_files: &[ScenarioFile],
-    ) {
-
+    fn generate_combined_test_content(&mut self, scenario_files: &[ScenarioFile]) {
         // Write file header
         writeln!(self.file, "// Auto-generated blackbox tests from scenarios").unwrap();
         writeln!(self.file).unwrap();
@@ -39,7 +41,18 @@ impl<'a> TestGenerator<'a> {
         writeln!(self.file).unwrap();
         writeln!(self.file, "use {}::*;", self.crate_name).unwrap();
         writeln!(self.file).unwrap();
-        writeln!(self.file, "const CODE_PATH: MxscPath = MxscPath::new(\"output/{}.mxsc.json\");", self.crate_name).unwrap();
+        writeln!(
+            self.file,
+            "const CODE_PATH: MxscPath = MxscPath::new(\"output/{}.mxsc.json\");",
+            self.crate_name
+        )
+        .unwrap();
+        writeln!(self.file).unwrap();
+
+        // Generate world() function
+        writeln!(self.file, "fn world() -> ScenarioWorld {{").unwrap();
+        writeln!(self.file, "    todo!()").unwrap();
+        writeln!(self.file, "}}").unwrap();
         writeln!(self.file).unwrap();
 
         // Generate a test function and steps function for each scenario
@@ -50,10 +63,7 @@ impl<'a> TestGenerator<'a> {
     }
 
     /// Generates test and steps functions for a single scenario
-    fn generate_scenario_test(
-        &mut self,
-        scenario_file: &ScenarioFile,
-    ) {
+    fn generate_scenario_test(&mut self, scenario_file: &ScenarioFile) {
         let scenario = &scenario_file.scenario;
         let test_name = scenario_to_function_name(&scenario_file.file_name);
         let steps_function_name = format!("{}_steps", test_name);
@@ -66,7 +76,7 @@ impl<'a> TestGenerator<'a> {
         // Write test function
         writeln!(self.file, "#[test]").unwrap();
         writeln!(self.file, "fn {}() {{", test_name).unwrap();
-        writeln!(self.file, "    let mut world = ScenarioWorld::new();").unwrap();
+        writeln!(self.file, "    let mut world = world();").unwrap();
         writeln!(self.file, "    {}(&mut world);", steps_function_name).unwrap();
         writeln!(self.file, "}}").unwrap();
         writeln!(self.file).unwrap();

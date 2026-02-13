@@ -1,8 +1,5 @@
 use multiversx_chain_scenario_format::serde_raw::ScenarioRaw;
-use std::{
-    fs,
-    path::Path,
-};
+use std::{fs, path::Path};
 
 /// Represents a parsed scenario file
 pub struct ScenarioFile {
@@ -71,7 +68,10 @@ mod tests {
         assert_eq!(scenario_to_function_name("simple"), "simple");
         assert_eq!(scenario_to_function_name("test-case"), "test_case");
         assert_eq!(scenario_to_function_name("test.case"), "test_case");
-        assert_eq!(scenario_to_function_name("test-case.with-dots"), "test_case_with_dots");
+        assert_eq!(
+            scenario_to_function_name("test-case.with-dots"),
+            "test_case_with_dots"
+        );
         assert_eq!(scenario_to_function_name("my-test.scen"), "my_test_scen");
         assert_eq!(scenario_to_function_name("a-b-c.d.e"), "a_b_c_d_e");
     }
