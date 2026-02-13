@@ -2,7 +2,7 @@ use std::path::Path;
 
 use crate::{
     cli::{ContractCliAction, ContractCliArgs},
-    contract::{meta_config::MetaConfig, sc_config::ScConfig, scen_blackbox},
+    contract::{meta_config::MetaConfig, sc_config::ScConfig},
 };
 use clap::Parser;
 use multiversx_sc::contract_base::ContractAbiProvider;
@@ -35,7 +35,7 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
             }
         }
         ContractCliAction::ScenBlackbox(args) => {
-            scen_blackbox::generate_blackbox_tests(args.overwrite);
+            meta_config_opt.generate_scen_blackbox_tests(args.overwrite);
         }
     }
 }
