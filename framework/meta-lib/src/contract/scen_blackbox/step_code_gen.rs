@@ -1,7 +1,6 @@
 use multiversx_chain_scenario_format::serde_raw::{
     CheckAccountsRaw, StepRaw, TxCallRaw, TxDeployRaw, TxExpectRaw, TxQueryRaw,
 };
-use std::io::Write;
 
 use super::{scenario_loader::scenario_to_function_name, test_gen::TestGenerator};
 
@@ -69,20 +68,20 @@ impl<'a> TestGenerator<'a> {
                 self.generate_check_state(comment.as_deref(), accounts);
             }
             StepRaw::Transfer { .. } => {
-                writeln!(self.file, "    // TODO: Transfer step").unwrap();
+                self.step_writeln("    // TODO: Transfer step");
             }
             StepRaw::ValidatorReward { .. } => {
-                writeln!(self.file, "    // TODO: ValidatorReward step").unwrap();
+                self.step_writeln("    // TODO: ValidatorReward step");
             }
             StepRaw::DumpState { .. } => {
-                writeln!(self.file, "    // TODO: DumpState step").unwrap();
+                self.step_writeln("    // TODO: DumpState step");
             }
         }
     }
 
     fn generate_external_steps(&mut self, path: &str, comment: Option<&str>) {
         if let Some(comment_text) = comment {
-            writeln!(self.file, "    // {}", comment_text).unwrap();
+            self.step_writeln(format!("    // {}", comment_text));
         }
 
         let scenario_name = std::path::Path::new(path)
@@ -92,8 +91,8 @@ impl<'a> TestGenerator<'a> {
 
         let steps_function_name = format!("{}_steps", scenario_to_function_name(scenario_name));
 
-        writeln!(self.file, "    {}(world);", steps_function_name).unwrap();
-        writeln!(self.file).unwrap();
+        self.step_writeln(format!("    {}(world);", steps_function_name));
+        self.step_writeln("");
     }
 
     fn generate_set_state(
@@ -106,12 +105,12 @@ impl<'a> TestGenerator<'a> {
         new_addresses: &[multiversx_chain_scenario_format::serde_raw::NewAddressRaw],
     ) {
         if let Some(comment_text) = comment {
-            writeln!(self.file, "    // {}", comment_text).unwrap();
+            self.step_writeln(format!("    // {}", comment_text));
         }
 
         // Generate account setup
         for (address_key, account) in accounts {
-            let address_expr = Self::format_address(address_key);
+            let address_expr = self.format_address(address_key);
 
             // Check if we need to set anything
             let has_nonce = account
@@ -126,23 +125,23 @@ impl<'a> TestGenerator<'a> {
                 .unwrap_or(false);
 
             if has_nonce || has_balance {
-                write!(self.file, "    world.account({})", address_expr).unwrap();
+                self.step_write(format!("    world.account({})", address_expr));
 
                 if has_nonce {
                     if let Some(nonce) = &account.nonce {
-                        writeln!(self.file, ".nonce({})", Self::format_value(nonce)).unwrap();
-                        write!(self.file, "        ").unwrap();
+                        self.step_writeln(format!(".nonce({})", Self::format_value(nonce)));
+                        self.step_write("        ");
                     }
                 }
 
                 if has_balance {
                     if let Some(balance) = &account.balance {
-                        writeln!(self.file, ".balance({})", Self::format_value(balance)).unwrap();
-                        write!(self.file, "        ").unwrap();
+                        self.step_writeln(format!(".balance({})", Self::format_value(balance)));
+                        self.step_write("        ");
                     }
                 }
 
-                writeln!(self.file, ";").unwrap();
+                self.step_writeln(";");
             }
         }
 
@@ -153,7 +152,7 @@ impl<'a> TestGenerator<'a> {
             self.new_address_map.insert(creator_key, new_address_key);
         }
 
-        writeln!(self.file).unwrap();
+        self.step_writeln("");
     }
 
     fn generate_sc_deploy(
@@ -164,51 +163,47 @@ impl<'a> TestGenerator<'a> {
         _expect: Option<&TxExpectRaw>,
     ) {
         if let Some(comment_text) = comment {
-            writeln!(self.file, "    // {}", comment_text).unwrap();
+            self.step_writeln(format!("    // {}", comment_text));
         }
 
-        writeln!(self.file, "    world.tx()").unwrap();
+        self.step_writeln("    world.tx()");
 
         if let Some(id_val) = id {
-            writeln!(self.file, "        .id(\"{}\")", id_val).unwrap();
+            self.step_writeln(format!("        .id(\"{}\")", id_val));
         }
 
-        writeln!(
-            self.file,
-            "        .from({})",
-            Self::format_address_value(&tx.from)
-        )
-        .unwrap();
-        write!(self.file, "        ").unwrap();
+        let from_addr = self.format_address_value(&tx.from);
+        self.step_writeln(format!("        .from({})", from_addr));
+        self.step_write("        ");
 
         let proxy_type = self.generate_proxy_type();
-        writeln!(self.file, ".typed({})", proxy_type).unwrap();
-        write!(self.file, "        ").unwrap();
+        self.step_writeln(format!(".typed({})", proxy_type));
+        self.step_write("        ");
 
-        write!(self.file, ".init(").unwrap();
+        self.step_write(".init(");
         for (i, arg) in tx.arguments.iter().enumerate() {
             if i > 0 {
-                write!(self.file, ", ").unwrap();
+                self.step_write(", ");
             }
-            write!(self.file, "{}", Self::format_value(arg)).unwrap();
+            self.step_write(Self::format_value(arg));
         }
-        writeln!(self.file, ")").unwrap();
-        write!(self.file, "        ").unwrap();
+        self.step_writeln(")");
+        self.step_write("        ");
 
-        writeln!(self.file, ".code(CODE_PATH)").unwrap();
-        write!(self.file, "        ").unwrap();
+        self.step_writeln(".code(CODE_PATH)");
+        self.step_write("        ");
 
         // Add new_address if we have a prediction from setState
         let from_address = tx.from.to_concatenated_string();
-        if let Some(new_address) = self.new_address_map.get(&from_address) {
+        if let Some(new_address) = self.new_address_map.get(&from_address).cloned() {
             // Format as TestSCAddress::new("name") if it's sc:name
-            let address_expr = Self::format_address(new_address);
-            writeln!(self.file, ".new_address({})", address_expr).unwrap();
-            write!(self.file, "        ").unwrap();
+            let address_expr = self.format_address(&new_address);
+            self.step_writeln(format!(".new_address({})", address_expr));
+            self.step_write("        ");
         }
 
-        writeln!(self.file, ".run();").unwrap();
-        writeln!(self.file).unwrap();
+        self.step_writeln(".run();");
+        self.step_writeln("");
     }
 
     fn generate_sc_call(
@@ -219,48 +214,40 @@ impl<'a> TestGenerator<'a> {
         _expect: Option<&TxExpectRaw>,
     ) {
         if let Some(comment_text) = comment {
-            writeln!(self.file, "    // {}", comment_text).unwrap();
+            self.step_writeln(format!("    // {}", comment_text));
         }
 
-        writeln!(self.file, "    world.tx()").unwrap();
+        self.step_writeln("    world.tx()");
 
         if let Some(id_val) = id {
-            writeln!(self.file, "        .id(\"{}\")", id_val).unwrap();
+            self.step_writeln(format!("        .id(\"{}\")", id_val));
         }
 
-        writeln!(
-            self.file,
-            "        .from({})",
-            Self::format_address_value(&tx.from)
-        )
-        .unwrap();
+        let from_addr = self.format_address_value(&tx.from);
+        self.step_writeln(format!("        .from({})", from_addr));
 
-        writeln!(
-            self.file,
-            "        .to({})",
-            Self::format_address_value(&tx.to)
-        )
-        .unwrap();
-        write!(self.file, "        ").unwrap();
+        let to_addr = self.format_address_value(&tx.to);
+        self.step_writeln(format!("        .to({})", to_addr));
+        self.step_write("        ");
 
         let proxy_type = self.generate_proxy_type();
-        writeln!(self.file, ".typed({})", proxy_type).unwrap();
-        write!(self.file, "        ").unwrap();
+        self.step_writeln(format!(".typed({})", proxy_type));
+        self.step_write("        ");
 
         // Map the endpoint name from scenario to Rust method name
         let rust_method_name = self.map_endpoint_name(&tx.function);
-        write!(self.file, ".{}(", rust_method_name).unwrap();
+        self.step_write(format!(".{}(", rust_method_name));
         for (i, arg) in tx.arguments.iter().enumerate() {
             if i > 0 {
-                write!(self.file, ", ").unwrap();
+                self.step_write(", ");
             }
-            write!(self.file, "{}", Self::format_value(arg)).unwrap();
+            self.step_write(Self::format_value(arg));
         }
-        writeln!(self.file, ")").unwrap();
-        write!(self.file, "        ").unwrap();
+        self.step_writeln(")");
+        self.step_write("        ");
 
-        writeln!(self.file, ".run();").unwrap();
-        writeln!(self.file).unwrap();
+        self.step_writeln(".run();");
+        self.step_writeln("");
     }
 
     fn generate_sc_query(
@@ -271,38 +258,34 @@ impl<'a> TestGenerator<'a> {
         expect: Option<&TxExpectRaw>,
     ) {
         if let Some(comment_text) = comment {
-            writeln!(self.file, "    // {}", comment_text).unwrap();
+            self.step_writeln(format!("    // {}", comment_text));
         }
 
-        writeln!(self.file, "    world.query()").unwrap();
+        self.step_writeln("    world.query()");
 
         if let Some(id_val) = id {
-            writeln!(self.file, "        .id(\"{}\")", id_val).unwrap();
+            self.step_writeln(format!("        .id(\"{}\")", id_val));
         }
 
-        writeln!(
-            self.file,
-            "        .to({})",
-            Self::format_address_value(&tx.to)
-        )
-        .unwrap();
-        write!(self.file, "        ").unwrap();
+        let to_addr = self.format_address_value(&tx.to);
+        self.step_writeln(format!("        .to({})", to_addr));
+        self.step_write("        ");
 
         let proxy_type = self.generate_proxy_type();
-        writeln!(self.file, ".typed({})", proxy_type).unwrap();
-        write!(self.file, "        ").unwrap();
+        self.step_writeln(format!(".typed({})", proxy_type));
+        self.step_write("        ");
 
         // Map the endpoint name from scenario to Rust method name
         let rust_method_name = self.map_endpoint_name(&tx.function);
-        write!(self.file, ".{}(", rust_method_name).unwrap();
+        self.step_write(format!(".{}(", rust_method_name));
         for (i, arg) in tx.arguments.iter().enumerate() {
             if i > 0 {
-                write!(self.file, ", ").unwrap();
+                self.step_write(", ");
             }
-            write!(self.file, "{}", Self::format_value(arg)).unwrap();
+            self.step_write(Self::format_value(arg));
         }
-        writeln!(self.file, ")").unwrap();
-        write!(self.file, "        ").unwrap();
+        self.step_writeln(")");
+        self.step_write("        ");
 
         // Add returns if we have expected output
         if let Some(expect_val) = expect {
@@ -310,29 +293,29 @@ impl<'a> TestGenerator<'a> {
                 ref out_values,
             ) = expect_val.out
             {
-                write!(self.file, ".returns(ExpectValue(").unwrap();
+                self.step_write(".returns(ExpectValue(");
                 for (i, out) in out_values.iter().enumerate() {
                     if i > 0 {
-                        write!(self.file, ", ").unwrap();
+                        self.step_write(", ");
                     }
-                    write!(self.file, "{}", Self::format_check_value(out)).unwrap();
+                    self.step_write(Self::format_check_value(out));
                 }
-                writeln!(self.file, "))").unwrap();
-                write!(self.file, "        ").unwrap();
+                self.step_writeln("))");
+                self.step_write("        ");
             }
         }
 
-        writeln!(self.file, ".run();").unwrap();
-        writeln!(self.file).unwrap();
+        self.step_writeln(".run();");
+        self.step_writeln("");
     }
 
     fn generate_check_state(&mut self, comment: Option<&str>, accounts: &CheckAccountsRaw) {
         if let Some(comment_text) = comment {
-            writeln!(self.file, "    // {}", comment_text).unwrap();
+            self.step_writeln(format!("    // {}", comment_text));
         }
 
         for (address_key, account) in &accounts.accounts {
-            let address_expr = Self::format_address(address_key);
+            let address_expr = self.format_address(address_key);
 
             // Check if we need to check storage
             if let multiversx_chain_scenario_format::serde_raw::CheckStorageRaw::Equal(
@@ -340,53 +323,96 @@ impl<'a> TestGenerator<'a> {
             ) = account.storage
             {
                 if !storage_details.storages.is_empty() {
-                    writeln!(self.file, "    world.check_account({})", address_expr).unwrap();
+                    self.step_writeln(format!("    world.check_account({})", address_expr));
 
                     for (key, value) in &storage_details.storages {
-                        writeln!(
-                            self.file,
+                        self.step_writeln(format!(
                             "        .check_storage(\"{}\", \"{}\")",
                             key,
                             Self::format_check_value_as_string(value)
-                        )
-                        .unwrap();
+                        ));
                     }
 
-                    writeln!(self.file, "        ;").unwrap();
+                    self.step_writeln("        ;");
                 }
             }
         }
 
-        writeln!(self.file).unwrap();
+        self.step_writeln("");
     }
 
-    fn format_address(addr: &str) -> String {
+    pub(super) fn format_address(&mut self, addr: &str) -> String {
         // Remove quotes if present
         let clean = addr.trim_matches('"');
 
         // Handle address: and sc: prefixes
         if let Some(name) = clean.strip_prefix("address:") {
-            format!("TestAddress::new(\"{}\")", name)
+            // Check if we already have a constant for this address
+            if let Some(const_name) = self.test_address_map.get(addr) {
+                return const_name.clone();
+            }
+            // Generate new constant name and add to const_buffer
+            let const_name = Self::test_address_to_const_name(name);
+            self.const_writeln(format!(
+                "const {}: TestAddress = TestAddress::new(\"{}\");",
+                const_name, name
+            ));
+            self.test_address_map.insert(addr.to_string(), const_name.clone());
+            const_name
         } else if let Some(name) = clean.strip_prefix("sc:") {
-            format!("TestSCAddress::new(\"{}\")", name)
+            // Check if we already have a constant for this address
+            if let Some(const_name) = self.test_address_map.get(addr) {
+                return const_name.clone();
+            }
+            // Generate new constant name and add to const_buffer
+            let const_name = Self::test_address_to_const_name(name);
+            self.const_writeln(format!(
+                "const {}: TestSCAddress = TestSCAddress::new(\"{}\");",
+                const_name, name
+            ));
+            self.test_address_map.insert(addr.to_string(), const_name.clone());
+            const_name
         } else if clean.starts_with("0x") || clean.starts_with("0X") {
-            // Hex address - generate Address::from_hex(...)
-            format!("Address::from_hex(\"{}\")", clean)
+            // Hex address - check if we already have a constant for it
+            if let Some(const_name) = self.hex_address_map.get(clean) {
+                return const_name.clone();
+            }
+            // Generate new constant name and add to const_buffer
+            self.hex_address_counter += 1;
+            let const_name = format!("ADDRESS_HEX_{}", self.hex_address_counter);
+            self.const_writeln(format!(
+                "const {}: Address = Address::from_hex(\"{}\");",
+                const_name, clean
+            ));
+            self.hex_address_map.insert(clean.to_string(), const_name.clone());
+            const_name
         } else if clean.len() == 64 && clean.chars().all(|c| c.is_ascii_hexdigit()) {
-            // Hex address without 0x prefix
-            format!("Address::from_hex(\"{}\")", clean)
+            // Hex address without 0x prefix - check if we already have a constant for it
+            if let Some(const_name) = self.hex_address_map.get(clean) {
+                return const_name.clone();
+            }
+            // Generate new constant name and add to const_buffer
+            self.hex_address_counter += 1;
+            let const_name = format!("ADDRESS_HEX_{}", self.hex_address_counter);
+            self.const_writeln(format!(
+                "const {}: Address = Address::from_hex(\"{}\");",
+                const_name, clean
+            ));
+            self.hex_address_map.insert(clean.to_string(), const_name.clone());
+            const_name
         } else {
             // Raw address - wrap in ScenarioValueRaw
             format!("ScenarioValueRaw::str(\"{}\")", clean)
         }
     }
 
-    fn format_address_value(
+    pub(super) fn format_address_value(
+        &mut self,
         value: &multiversx_chain_scenario_format::serde_raw::ValueSubTree,
     ) -> String {
         use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
         match value {
-            ValueSubTree::Str(s) => Self::format_address(s),
+            ValueSubTree::Str(s) => self.format_address(s),
             _ => {
                 // Fallback for non-string addresses
                 Self::format_value(value)
@@ -506,5 +532,10 @@ impl<'a> TestGenerator<'a> {
     fn is_default_value(value: &multiversx_chain_scenario_format::serde_raw::ValueSubTree) -> bool {
         let val_str = format!("{:?}", value);
         val_str == "\"0\"" || val_str == "\"\"" || val_str.is_empty()
+    }
+
+    /// Converts a test address name (like "owner") to a constant name (like "OWNER_ADDRESS")
+    fn test_address_to_const_name(name: &str) -> String {
+        format!("{}_ADDRESS", name.to_uppercase().replace(['-', '.', ' '], "_"))
     }
 }

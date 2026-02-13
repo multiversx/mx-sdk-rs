@@ -18,6 +18,16 @@ pub struct TestGenerator<'a> {
     pub file: &'a mut File,
     /// Maps creator address to expected new address from setState.newAddresses
     pub new_address_map: HashMap<String, String>,
+    /// Maps address value to constant name (for TestAddress/TestSCAddress)
+    pub test_address_map: HashMap<String, String>,
+    /// Maps hex address to constant name
+    pub hex_address_map: HashMap<String, String>,
+    /// Counter for hex address constants
+    pub hex_address_counter: usize,
+    /// Buffer for constant declarations
+    pub const_buffer: String,
+    /// Buffer for test and step function code
+    pub step_buffer: String,
 }
 
 impl<'a> TestGenerator<'a> {
@@ -27,16 +37,42 @@ impl<'a> TestGenerator<'a> {
             abi,
             file,
             new_address_map: HashMap::new(),
+            test_address_map: HashMap::new(),
+            hex_address_map: HashMap::new(),
+            hex_address_counter: 0,
+            const_buffer: String::new(),
+            step_buffer: String::new(),
         }
+    }
+
+    /// Writes a formatted line to the step buffer
+    pub(super) fn step_writeln(&mut self, text: impl AsRef<str>) {
+        self.step_buffer.push_str(text.as_ref());
+        self.step_buffer.push('\n');
+    }
+
+    /// Writes text to the step buffer without a newline
+    pub(super) fn step_write(&mut self, text: impl AsRef<str>) {
+        self.step_buffer.push_str(text.as_ref());
+    }
+
+    /// Writes a formatted line to the const buffer
+    pub(super) fn const_writeln(&mut self, text: impl AsRef<str>) {
+        self.const_buffer.push_str(text.as_ref());
+        self.const_buffer.push('\n');
     }
 
     /// Generates the combined test content to the file
     fn generate_combined_test_content(&mut self, scenario_files: &[ScenarioFile]) {
-        // Write file header
+        // Generate a test function and steps function for each scenario
+        for scenario_file in scenario_files {
+            self.generate_scenario_test(scenario_file);
+        }
+
+        // Now write everything to file in order:
+        // 1. File header and imports
         writeln!(self.file, "// Auto-generated blackbox tests from scenarios").unwrap();
         writeln!(self.file).unwrap();
-
-        // Write imports
         writeln!(self.file, "use multiversx_sc_scenario::imports::*;").unwrap();
         writeln!(self.file).unwrap();
         writeln!(self.file, "use {}::*;", self.crate_name).unwrap();
@@ -49,17 +85,20 @@ impl<'a> TestGenerator<'a> {
         .unwrap();
         writeln!(self.file).unwrap();
 
-        // Generate world() function
+        // 2. Address constants
+        if !self.const_buffer.is_empty() {
+            write!(self.file, "{}", self.const_buffer).unwrap();
+            writeln!(self.file).unwrap();
+        }
+
+        // 3. World function
         writeln!(self.file, "fn world() -> ScenarioWorld {{").unwrap();
         writeln!(self.file, "    todo!()").unwrap();
         writeln!(self.file, "}}").unwrap();
         writeln!(self.file).unwrap();
 
-        // Generate a test function and steps function for each scenario
-        for scenario_file in scenario_files {
-            self.generate_scenario_test(scenario_file);
-            writeln!(self.file).unwrap();
-        }
+        // 4. Test and step functions
+        write!(self.file, "{}", self.step_buffer).unwrap();
     }
 
     /// Generates test and steps functions for a single scenario
@@ -70,31 +109,30 @@ impl<'a> TestGenerator<'a> {
 
         // Write scenario comment if available
         if let Some(comment) = &scenario.comment {
-            writeln!(self.file, "// {}", comment).unwrap();
+            self.step_writeln(format!("// {}", comment));
         }
 
         // Write test function
-        writeln!(self.file, "#[test]").unwrap();
-        writeln!(self.file, "fn {}() {{", test_name).unwrap();
-        writeln!(self.file, "    let mut world = world();").unwrap();
-        writeln!(self.file, "    {}(&mut world);", steps_function_name).unwrap();
-        writeln!(self.file, "}}").unwrap();
-        writeln!(self.file).unwrap();
+        self.step_writeln("#[test]");
+        self.step_writeln(format!("fn {}() {{", test_name));
+        self.step_writeln("    let mut world = world();");
+        self.step_writeln(format!("    {}(&mut world);", steps_function_name));
+        self.step_writeln("}");
+        self.step_writeln("");
 
         // Write steps function
-        writeln!(
-            self.file,
+        self.step_writeln(format!(
             "pub fn {}(world: &mut ScenarioWorld) {{",
             steps_function_name
-        )
-        .unwrap();
+        ));
 
-        // Generate code for each step
+        // Generate code for each step (addresses discovered on-the-fly)
         for step in &scenario.steps {
             self.generate_step_code(step);
         }
 
-        writeln!(self.file, "}}").unwrap();
+        self.step_writeln("}");
+        self.step_writeln("");
     }
 }
 
