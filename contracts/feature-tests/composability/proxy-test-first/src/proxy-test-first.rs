@@ -2,13 +2,11 @@
 
 multiversx_sc::imports!();
 
-use hex_literal::hex;
-
 pub mod message_me_proxy;
 pub mod pay_me_proxy;
 
-static HARDCODED_ADDRESS: [u8; 32] =
-    hex!("fefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe");
+static HARDCODED_ADDRESS: Address =
+    Address::from_hex("fefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe");
 
 #[multiversx_sc::contract]
 pub trait ProxyTestFirst {
@@ -100,7 +98,7 @@ pub trait ProxyTestFirst {
                 0x01,
                 &BigUint::from(2u32),
                 [3u8; 3].to_vec(),
-                &ManagedAddress::from(&HARDCODED_ADDRESS),
+                &HARDCODED_ADDRESS,
             )
             .async_call_and_exit()
     }
@@ -115,7 +113,7 @@ pub trait ProxyTestFirst {
                 0x01,
                 &BigUint::from(2u32),
                 [3u8; 3].to_vec(),
-                &ManagedAddress::from(&HARDCODED_ADDRESS),
+                &HARDCODED_ADDRESS,
             )
             .callback(self.callbacks().message_callback())
             .async_call_and_exit()
