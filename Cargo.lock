@@ -3219,6 +3219,7 @@ dependencies = [
  "convert_case",
  "hex",
  "lazy_static",
+ "multiversx-chain-scenario-format",
  "multiversx-sc",
  "rustc_version",
  "semver",

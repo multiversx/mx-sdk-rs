@@ -141,6 +141,11 @@ impl MetaConfig {
         fs::remove_dir_all(&self.output_dir).expect("failed to remove output directory");
     }
 
+    /// Generates blackbox tests from scenario files.
+    pub fn generate_scen_blackbox_tests(&self, overwrite: bool) {
+        super::scen_blackbox::generate_scen_blackbox_tests(overwrite, &self.original_contract_abi);
+    }
+
     fn is_expected_crate(&self, dir_name: &str) -> bool {
         if !dir_name.starts_with("wasm") {
             return true;
