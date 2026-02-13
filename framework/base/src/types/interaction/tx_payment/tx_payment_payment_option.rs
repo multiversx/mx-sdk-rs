@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, ManagedAddress, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 /// TxPayment should work for any Option,
 /// where for Some(payment) it behaves like payment,
@@ -66,11 +66,11 @@ where
         }
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
         if let Some(payment) = self {
-            payment.into_full_payment_data(env)
+            payment.into_scenario_payments(env)
         } else {
-            ().into_full_payment_data(env)
+            ().into_scenario_payments(env)
         }
     }
 }

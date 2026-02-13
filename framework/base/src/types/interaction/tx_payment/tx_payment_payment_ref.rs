@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, ManagedAddress, Payment, Ref, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 macro_rules! impl_txpayment_for_payment_ref {
     ($ty:ty) => {
@@ -59,8 +59,8 @@ macro_rules! impl_txpayment_for_payment_ref {
                 self.as_refs().with_normalized(env, from, to, fc, f)
             }
 
-            fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-                self.as_refs().into_full_payment_data(env)
+            fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+                self.as_refs().into_scenario_payments(env)
             }
         }
     };

@@ -11,7 +11,7 @@ use crate::{
 };
 
 use super::{
-    AnnotatedEgldPayment, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment,
+    AnnotatedEgldPayment, FunctionCall, ScenarioPayments, TxEgldValue, TxEnv, TxPayment,
     TxPaymentEgldOnly,
 };
 
@@ -113,8 +113,8 @@ where
         })
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: Some(AnnotatedEgldPayment::new_egld(self.0.into_value(env))),
             multi_esdt: ManagedVec::new(),
         }

@@ -5,7 +5,7 @@ use crate::{
     types::{BigUint, EsdtTokenPaymentVec, ManagedAddress, ManagedRef, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 /// Indicates that a payment object contains a multi-ESDT payment.
 pub trait TxPaymentMultiEsdt<Env>: TxPayment<Env>
@@ -87,10 +87,10 @@ where
         }
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: self.as_multi_egld_or_esdt_payment().clone(),
+            multi_esdt: self.clone().into_payment_vec(),
         }
     }
 }
@@ -145,8 +145,8 @@ where
         self.deref().with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        self.deref().into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        self.deref().into_scenario_payments(env)
     }
 }
 
@@ -198,10 +198,10 @@ where
         (&self).with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: self.into_multi_egld_or_esdt_payment(),
+            multi_esdt: self.into_payment_vec(),
         }
     }
 }

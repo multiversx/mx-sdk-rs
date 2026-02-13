@@ -3,9 +3,7 @@ use generic_array::typenum::U16;
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigUint, EsdtTokenIdentifier, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType,
-        ManagedVec, ManagedVecItem, ManagedVecItemPayloadBuffer, Payment, Ref,
-        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
+        BigUint, EsdtTokenIdentifier, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType, ManagedVec, ManagedVecItem, ManagedVecItemPayloadBuffer, Payment, PaymentVec, Ref, managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index
     },
 };
 
@@ -300,6 +298,14 @@ impl<M: ManagedTypeApi> MultiEsdtPayment<M> {
     /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
     pub fn into_multi_egld_or_esdt_payment(self) -> MultiEgldOrEsdtPayment<M> {
         unsafe { MultiEgldOrEsdtPayment::from_handle(self.forget_into_handle()) }
+    }
+
+    /// Zero-cost conversion that loosens the EGLD restriction.
+    ///
+    /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
+    pub fn into_payment_vec(self) -> PaymentVec<M> {
+        // safe, because it is the same layout
+        unsafe { PaymentVec::from_handle(self.forget_into_handle()) }
     }
 }
 

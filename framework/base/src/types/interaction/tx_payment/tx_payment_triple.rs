@@ -1,12 +1,11 @@
 use crate::{
     contract_base::TransferExecuteFailed,
     types::{
-        BigUint, EsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress, NonZeroBigUint, Payment,
-        PaymentVec, TokenId, TxFrom, TxPaymentCompose, TxToSpecified,
+        BigUint, EsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress, NonZeroBigUint, Payment, PaymentVec, ScenarioPayments, TokenId, TxFrom, TxPaymentCompose, TxToSpecified
     },
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, TxEnv, TxPayment};
 
 impl<Env, T, A> TxPayment<Env> for (T, u64, A)
 where
@@ -58,8 +57,8 @@ where
     }
 
     #[inline]
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        Payment::from(self).into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        Payment::from(self).into_scenario_payments(env)
     }
 }
 
@@ -144,7 +143,7 @@ where
     }
 
     #[inline]
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        EsdtTokenPayment::from(self).into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        EsdtTokenPayment::from(self).into_scenario_payments(env)
     }
 }

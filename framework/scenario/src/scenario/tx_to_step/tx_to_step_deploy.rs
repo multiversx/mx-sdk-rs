@@ -58,7 +58,7 @@ where
 
     step.tx.gas_limit = gas_annotated(env, gas);
 
-    let full_payment_data = payment.into_full_payment_data(env);
+    let full_payment_data = payment.into_scenario_payments(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
     }
