@@ -1,9 +1,7 @@
-use multiversx_sc::{
-    hex_literal::hex,
-    types::{
-        BigInt, BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier, ManagedAddress,
-        ManagedBuffer, ManagedByteArray, ManagedVec,
-    },
+use hex_literal::hex;
+use multiversx_sc::types::{
+    BigInt, BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
+    ManagedByteArray, ManagedVec,
 };
 use multiversx_sc_scenario::api::StaticApi;
 
@@ -27,7 +25,7 @@ fn test_big_int_format_2() {
 
 #[test]
 fn test_managed_buffer() {
-    let _ = multiversx_sc::hex_literal::hex!("abcd");
+    let _ = hex!("abcd");
     let s = format!("{:?}", ManagedBuffer::<StaticApi>::from(&[0x12, 0x34]));
     assert_eq!("ManagedBuffer { handle: -200, hex-value: \"1234\" }", s);
 }

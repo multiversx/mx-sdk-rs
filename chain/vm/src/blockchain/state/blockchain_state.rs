@@ -10,7 +10,7 @@ use std::{
 
 use crate::{
     blockchain::reserved::STORAGE_REWARD_KEY, host::context::BlockchainUpdate,
-    system_sc::ESDT_SYSTEM_SC_ADDRESS_ARRAY, types::VMAddress,
+    system_sc::ESDT_SYSTEM_SC_ADDRESS, types::VMAddress,
 };
 
 use super::{AccountData, BlockConfig};
@@ -33,7 +33,7 @@ impl Default for BlockchainState {
         };
 
         // pre-populating system SC(s)
-        state.add_empty_account(ESDT_SYSTEM_SC_ADDRESS_ARRAY.into());
+        state.add_empty_account(ESDT_SYSTEM_SC_ADDRESS);
 
         state
     }

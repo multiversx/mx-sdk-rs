@@ -8,9 +8,6 @@ publish = false
 [lib]
 path = "src/proxy-test-first.rs"
 
-[dependencies]
-hex-literal = "1.0"
-
 [dependencies.multiversx-sc]
 version = "0.64.1"
 path = "../../../../framework/base"
