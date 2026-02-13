@@ -149,7 +149,8 @@ fn generate_scenario_test(file: &mut File, scenario_file: &ScenarioFile) {
 fn write_step_comment(file: &mut File, step: &StepRaw, index: usize) {
     let (step_type, step_id, step_comment) = match step {
         StepRaw::ExternalSteps { comment, path } => {
-            (format!("ExternalSteps ({})", path), None, comment.as_deref())
+            // For ExternalSteps, we'll generate actual code, not just a comment
+            return write_external_steps(file, path, comment.as_deref());
         }
         StepRaw::SetState { comment, .. } => {
             ("SetState".to_string(), None, comment.as_deref())
@@ -185,4 +186,21 @@ fn write_step_comment(file: &mut File, step: &StepRaw, index: usize) {
         write!(file, " - {}", comment).unwrap();
     }
     writeln!(file).unwrap();
+}
+
+/// Writes code for an ExternalSteps step (calls another scenario's steps function)
+fn write_external_steps(file: &mut File, path: &str, comment: Option<&str>) {
+    if let Some(comment_text) = comment {
+        writeln!(file, "    // {}", comment_text).unwrap();
+    }
+
+    // Extract the scenario file name from the path and convert to function name
+    let scenario_name = std::path::Path::new(path)
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or(path);
+    
+    let steps_function_name = format!("{}_steps", scenario_to_function_name(scenario_name));
+    
+    writeln!(file, "    {}(world);", steps_function_name).unwrap();
 }
