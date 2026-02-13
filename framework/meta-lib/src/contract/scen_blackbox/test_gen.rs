@@ -24,6 +24,8 @@ pub struct TestGenerator<'a> {
     pub hex_address_map: HashMap<String, String>,
     /// Counter for hex address constants
     pub hex_address_counter: usize,
+    /// Maps code path expression to constant name
+    pub code_path_map: HashMap<String, String>,
     /// Buffer for constant declarations
     pub const_buffer: String,
     /// Buffer for test and step function code
@@ -40,6 +42,7 @@ impl<'a> TestGenerator<'a> {
             test_address_map: HashMap::new(),
             hex_address_map: HashMap::new(),
             hex_address_counter: 0,
+            code_path_map: HashMap::new(),
             const_buffer: String::new(),
             step_buffer: String::new(),
         }
@@ -62,8 +65,52 @@ impl<'a> TestGenerator<'a> {
         self.const_buffer.push('\n');
     }
 
+    /// Derives a constant name from a code path expression
+    /// Example: "mxsc:../output/adder.mxsc.json" -> "ADDER_CODE_PATH"
+    fn derive_code_path_const_name(code_path_expr: &str) -> String {
+        // Extract the filename from the path
+        let path_str = code_path_expr.strip_prefix("mxsc:").unwrap_or(code_path_expr);
+        let filename = path_str.rsplit('/').next().unwrap_or(path_str);
+        
+        // Remove .mxsc.json extension
+        let contract_name = filename
+            .strip_suffix(".mxsc.json")
+            .unwrap_or(filename)
+            .replace('-', "_");
+        
+        format!("{}_CODE_PATH", contract_name.to_uppercase())
+    }
+
+    /// Formats a code path expression, generating a constant if needed
+    pub(super) fn format_code_path(&mut self, code_path_expr: &str) -> String {
+        // Check if we already have a constant for this path
+        if let Some(const_name) = self.code_path_map.get(code_path_expr) {
+            return const_name.clone();
+        }
+
+        // Generate a new constant
+        let const_name = Self::derive_code_path_const_name(code_path_expr);
+        
+        // Extract the actual path (strip mxsc: prefix)
+        let path_value = code_path_expr.strip_prefix("mxsc:").unwrap_or(code_path_expr);
+        // Remove leading ../ if present to make it relative to contract root
+        let path_value = path_value.strip_prefix("../").unwrap_or(path_value);
+        
+        // Generate the constant declaration
+        self.const_writeln(format!(
+            "const {}: MxscPath = MxscPath::new(\"{}\");",
+            const_name, path_value
+        ));
+        
+        // Store in map for future use
+        self.code_path_map.insert(code_path_expr.to_string(), const_name.clone());
+        
+        const_name
+    }
+
     /// Generates the combined test content to the file
     fn generate_combined_test_content(&mut self, scenario_files: &[ScenarioFile]) {
+
         // Generate a test function and steps function for each scenario
         for scenario_file in scenario_files {
             self.generate_scenario_test(scenario_file);
@@ -77,15 +124,8 @@ impl<'a> TestGenerator<'a> {
         writeln!(self.file).unwrap();
         writeln!(self.file, "use {}::*;", self.crate_name).unwrap();
         writeln!(self.file).unwrap();
-        writeln!(
-            self.file,
-            "const CODE_PATH: MxscPath = MxscPath::new(\"output/{}.mxsc.json\");",
-            self.crate_name
-        )
-        .unwrap();
-        writeln!(self.file).unwrap();
 
-        // 2. Address constants
+        // 2. Constants (code path + addresses)
         if !self.const_buffer.is_empty() {
             write!(self.file, "{}", self.const_buffer).unwrap();
             writeln!(self.file).unwrap();

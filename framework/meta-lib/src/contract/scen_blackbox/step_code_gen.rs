@@ -190,7 +190,10 @@ impl<'a> TestGenerator<'a> {
         self.step_writeln(")");
         self.step_write("        ");
 
-        self.step_writeln(".code(CODE_PATH)");
+        // Generate code path from the contract_code field
+        let code_path_expr = tx.contract_code.to_concatenated_string();
+        let code_path_const = self.format_code_path(&code_path_expr);
+        self.step_writeln(format!(".code({})", code_path_const));
         self.step_write("        ");
 
         // Add new_address if we have a prediction from setState

@@ -4,13 +4,12 @@ use multiversx_sc_scenario::imports::*;
 
 use digital_cash::*;
 
-const CODE_PATH: MxscPath = MxscPath::new("output/digital_cash.mxsc.json");
-
 const ACC3_ADDRESS: TestAddress = TestAddress::new("acc3");
 const THE_DIGITAL_CASH_CONTRACT_ADDRESS: TestSCAddress = TestSCAddress::new("the_digital_cash_contract");
 const ACC1_ADDRESS: TestAddress = TestAddress::new("acc1");
 const ACC2_ADDRESS: TestAddress = TestAddress::new("acc2");
 const DIGITAL_CASH_OWNER_ADDRESS_ADDRESS: TestAddress = TestAddress::new("digital_cash_owner_address");
+const DIGITAL_CASH_CODE_PATH: MxscPath = MxscPath::new("output/digital-cash.mxsc.json");
 
 fn world() -> ScenarioWorld {
     todo!()
@@ -497,7 +496,7 @@ pub fn set_accounts_scen_steps(world: &mut ScenarioWorld) {
         .from(DIGITAL_CASH_OWNER_ADDRESS_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
         .init(ScenarioValueRaw::str("false"), ScenarioValueRaw::str("str:EGLD-000000"), ScenarioValueRaw::str("10"))
-        .code(CODE_PATH)
+        .code(DIGITAL_CASH_CODE_PATH)
         .new_address(THE_DIGITAL_CASH_CONTRACT_ADDRESS)
         .run();
 

@@ -4,9 +4,8 @@ use multiversx_sc_scenario::imports::*;
 
 use adder::*;
 
-const CODE_PATH: MxscPath = MxscPath::new("output/adder.mxsc.json");
-
 const ADDRESS_HEX_1: Address = Address::from_hex("0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60");
+const ADDER_CODE_PATH: MxscPath = MxscPath::new("output/adder.mxsc.json");
 const ADDRESS_HEX_2: Address = Address::from_hex("0x0000000000000000050028600ceb73ac22ec0b6f257aff7bed74dffa3ebfed60");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const ADDER_ADDRESS: TestSCAddress = TestSCAddress::new("adder");
@@ -31,7 +30,7 @@ pub fn interactor_trace_scen_steps(world: &mut ScenarioWorld) {
         .from(ADDRESS_HEX_1)
         .typed(adder_proxy::AdderProxy)
         .init(ScenarioValueRaw::str("0x00"))
-        .code(CODE_PATH)
+        .code(ADDER_CODE_PATH)
         .new_address(ADDRESS_HEX_2)
         .run();
 
@@ -68,7 +67,7 @@ pub fn adder_scen_steps(world: &mut ScenarioWorld) {
         .from(OWNER_ADDRESS)
         .typed(adder_proxy::AdderProxy)
         .init(ScenarioValueRaw::str("5"))
-        .code(CODE_PATH)
+        .code(ADDER_CODE_PATH)
         .new_address(ADDER_ADDRESS)
         .run();
 
