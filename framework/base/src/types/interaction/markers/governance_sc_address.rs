@@ -1,4 +1,3 @@
-use hex_literal::hex;
 use multiversx_chain_core::types::Address;
 use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
@@ -9,8 +8,8 @@ use crate::{
 };
 
 /// Address of the governance system smart contract.
-const GOVERNANCE_SC_ADDRESS_BYTES: [u8; 32] =
-    hex!("000000000000000000010000000000000000000000000000000000000003ffff");
+const GOVERNANCE_SC_ADDRESS: Address =
+    Address::from_hex("000000000000000000010000000000000000000000000000000000000003ffff");
 const GOVERNANCE_SC_ADDRESS_BECH32: &str =
     "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrlllsrujgla";
 const GOVERNANCE_SC_ADDRESS_ANNOTATION: &str =
@@ -24,11 +23,11 @@ impl GovernanceSystemSCAddress {
     where
         Api: ManagedTypeApi,
     {
-        ManagedAddress::from(GOVERNANCE_SC_ADDRESS_BYTES)
+        ManagedAddress::from(GOVERNANCE_SC_ADDRESS)
     }
 
     pub fn to_address(&self) -> Address {
-        GOVERNANCE_SC_ADDRESS_BYTES.into()
+        GOVERNANCE_SC_ADDRESS
     }
 
     pub fn to_bech32_str(&self) -> &str {
@@ -62,7 +61,7 @@ impl TopEncode for GovernanceSystemSCAddress {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        GOVERNANCE_SC_ADDRESS_BYTES.top_encode_or_handle_err(output, h)
+        GOVERNANCE_SC_ADDRESS.top_encode_or_handle_err(output, h)
     }
 }
 

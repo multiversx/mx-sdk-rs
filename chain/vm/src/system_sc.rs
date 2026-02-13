@@ -6,18 +6,18 @@ use crate::{
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
-use hex_literal::hex;
+use multiversx_chain_core::types::Address;
 use system_sc_issue::*;
 use system_sc_special_roles::*;
 use system_sc_unimplemented::*;
 
 /// Address of the system smart contract that manages ESDT.
 /// Bech32: erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u
-pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
-    hex!("000000000000000000010000000000000000000000000000000000000002ffff");
+pub const ESDT_SYSTEM_SC_ADDRESS: Address =
+    Address::from_hex("000000000000000000010000000000000000000000000000000000000002ffff");
 
 pub fn is_system_sc_address(address: &VMAddress) -> bool {
-    address.as_array() == &ESDT_SYSTEM_SC_ADDRESS_ARRAY
+    address == &ESDT_SYSTEM_SC_ADDRESS
 }
 
 pub fn execute_system_sc(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {

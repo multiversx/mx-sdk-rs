@@ -60,3 +60,6 @@ version = "=0.5.1"
 [dependencies.multiversx-chain-vm]
 version = "=0.21.1"
 path = "../../chain/vm"
+
+[dev-dependencies]
+hex-literal = "1.0"
