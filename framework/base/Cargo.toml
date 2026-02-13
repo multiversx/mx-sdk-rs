@@ -35,6 +35,10 @@ generic-array = "1.2.0"
 version = "=0.64.1"
 path = "../derive"
 
+[dependencies.multiversx-sc-abi]
+version = "=0.24.0"
+path = "../../data/abi"
+
 [dependencies.multiversx-sc-codec]
 version = "=0.24.0"
 path = "../../data/codec"

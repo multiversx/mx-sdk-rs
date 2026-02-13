@@ -1,5 +1,5 @@
 use super::*;
-use crate::arrayvec::ArrayVec;
+use crate::codec::arrayvec::ArrayVec;
 use alloc::{
     boxed::Box,
     format,

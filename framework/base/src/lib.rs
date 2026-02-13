@@ -17,7 +17,9 @@ pub use crate::codec::arrayvec;
 /// Reexported for convenience.
 pub use generic_array::typenum;
 
-pub mod abi;
+// TEMP: should adjust imports.
+pub use multiversx_sc_abi as abi;
+
 pub mod api;
 pub mod contract_base;
 pub mod err_msg;

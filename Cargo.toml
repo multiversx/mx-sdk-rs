@@ -2,6 +2,8 @@
 resolver = "3"
 
 members = [
+  "data/abi",
+  "data/abi-derive",
   "data/codec",
   "data/codec-derive",
   "data/human-readable",

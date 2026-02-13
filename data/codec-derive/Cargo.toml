@@ -2,6 +2,7 @@
 name = "multiversx-sc-codec-derive"
 version = "0.24.0"
 edition = "2024"
+publish = false # TEMP
 
 authors = ["dorin.iancu <dorin.iancu@multiversx.com>", "Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
