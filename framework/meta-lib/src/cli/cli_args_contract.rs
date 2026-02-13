@@ -72,6 +72,12 @@ pub enum ContractCliAction {
         about = "Generates a proxy, based on the contract ABI."
     )]
     GenerateProxies(GenerateProxyArgs),
+
+    #[command(
+        name = "scen-blackbox",
+        about = "Generates blackbox tests from scenario files (.scen.json)."
+    )]
+    ScenBlackbox(ScenBlackboxArgs),
 }
 
 impl CliArgsToRaw for ContractCliAction {
@@ -105,6 +111,10 @@ impl CliArgsToRaw for ContractCliAction {
             }
             ContractCliAction::GenerateProxies(args) => {
                 raw.push("proxy".to_string());
+                raw.append(&mut args.to_raw());
+            }
+            ContractCliAction::ScenBlackbox(args) => {
+                raw.push("scen-blackbox".to_string());
                 raw.append(&mut args.to_raw());
             }
         }
@@ -141,6 +151,23 @@ impl CliArgsToRaw for GenerateProxyArgs {
         let mut raw = Vec::new();
         if self.compare {
             raw.push("--compare".to_string());
+        }
+        raw
+    }
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct ScenBlackboxArgs {
+    /// Override test files if they already exist.
+    #[arg(long, verbatim_doc_comment)]
+    pub overwrite: bool,
+}
+
+impl CliArgsToRaw for ScenBlackboxArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if self.overwrite {
+            raw.push("--overwrite".to_string());
         }
         raw
     }
