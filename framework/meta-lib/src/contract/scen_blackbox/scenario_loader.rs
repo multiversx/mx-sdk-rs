@@ -59,5 +59,20 @@ fn load_scenario_file(path: &Path) -> Option<ScenarioFile> {
 
 /// Converts a scenario file name to a valid Rust function name
 pub fn scenario_to_function_name(scenario_name: &str) -> String {
-    scenario_name.replace('-', "_").replace('.', "_")
+    scenario_name.replace(['-', '.'], "_")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_scenario_to_function_name() {
+        assert_eq!(scenario_to_function_name("simple"), "simple");
+        assert_eq!(scenario_to_function_name("test-case"), "test_case");
+        assert_eq!(scenario_to_function_name("test.case"), "test_case");
+        assert_eq!(scenario_to_function_name("test-case.with-dots"), "test_case_with_dots");
+        assert_eq!(scenario_to_function_name("my-test.scen"), "my_test_scen");
+        assert_eq!(scenario_to_function_name("a-b-c.d.e"), "a_b_c_d_e");
+    }
 }
