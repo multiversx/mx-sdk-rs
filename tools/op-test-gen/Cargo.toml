@@ -17,5 +17,5 @@ num-bigint = "0.4"
 num-traits = "0.2"
 
 [dependencies.multiversx-sc-scenario]
-version = "0.64.1"
+version = "0.64.2"
 path = "../../framework/scenario"

@@ -9,10 +9,10 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.64.1"
+version = "0.64.2"
 path = "../../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.64.1"
+version = "0.64.2"
 path = "../../../../../framework/scenario"
 

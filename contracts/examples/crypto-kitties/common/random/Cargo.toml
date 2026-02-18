@@ -8,5 +8,5 @@ edition = "2024"
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.64.1"
+version = "0.64.2"
 path = "../../../../../framework/base"
