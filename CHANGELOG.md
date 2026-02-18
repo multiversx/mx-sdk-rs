@@ -58,6 +58,28 @@ And crate group being released requires all crate groups downstream to be releas
 ## Version history
 
 
+### [sc 0.64.2, chain 0.21.2, sdk 0.14.2] - 2026-02-18
+- Workaround for `mBufferFromBigIntSigned` VM hook bug:
+	- The hook was incorrectly converting negative numbers to their absolute value;
+	- The `mBufferToBigIntSigned` VM hook has been added to the deprecated hooks list;
+	- Fixed a related bug in the Rust VM, also pertaining to negative numbers, in `mb_to_small_int_signed`(`mBufferFromSmallIntSigned`).
+- VM: added ESDT metadata recreate and metadata update mock built-in functions.
+- Upgraded `multiversx-chain-vm-executor` to v0.5.1.
+	- This fixes and issue with wasmer-prod and wasmer-experimental builds on Linux for certain versions of Rust.
+- Big number improvements:
+	- `BigInt`/`BigUint` `proportion` and `into_proportion` methods, for computing `self * part / total` efficiently, with overflow checks.
+	- `BigUint::into_non_zero_or_panic` method.
+	- `BigUint::new_unchecked` unsafe constructor from `BigInt`.
+	- `BigInt::overwrite_i64` now takes `&mut self` instead of `&self`.
+- New `FungiblePayment` type, representing a payment with a `TokenId` and a `NonZeroBigUint` amount (no nonce). Includes `ManagedVecItem`, `TypeAbi`, and codec implementations.
+- sc-meta improvements:
+	- Added `--locked` CLI flag support;
+	- Build error messages now include the full command that was executed;
+	- Error message refactor with `CommandInfo` type.
+- Storage mapper documentation improvements across all mappers.
+- Derive substitution list fix: `Ref` and `ManagedVecRef` no longer incorrectly listed as having an API generic.
+
+
 ### [sc 0.64.1, chain 0.21.1, sdk 0.14.1] - 2026-01-13
 - `TokenId` backwards compatibility conversions:
 	- Converting empty token identifiers, as well as `EGLD` to `EGLD-000000`;

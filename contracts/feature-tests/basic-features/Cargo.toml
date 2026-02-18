@@ -12,16 +12,16 @@ path = "src/basic_features_main.rs"
 small-int-bug = ["multiversx-sc/small-int-bug"]
 
 [dependencies.multiversx-sc]
-version = "0.64.1"
+version = "0.64.2"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.64.1"
+version = "0.64.2"
 features = ["wasmer-experimental", "bls"]
 path = "../../../framework/scenario"
 
 [dependencies.multiversx-sc-modules]
-version = "0.64.1"
+version = "0.64.2"
 path = "../../../contracts/modules"
 
 [dev-dependencies.esdt-system-sc-mock]
