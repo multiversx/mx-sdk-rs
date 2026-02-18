@@ -8,6 +8,15 @@ add-unlabelled = false
 add-endpoints = ["init", "load_bytes", "store_bytes"]
 kill_legacy_callback = true
 
+# can be used for testing the buggy mBufferFromSmallIntSigned VM hook
+# TODO: remove once it's fixed
+[contracts.basic-features-small-int-bug]
+add-unlabelled = false
+add-endpoints = ["init", "store_i64", "load_i64"]
+kill_legacy_callback = true
+features = ["small-int-bug"]
+ei = "ignore" # bypasses the deprecated VM hook check
+
 [[proxy]]
 path = "src/basic_features_proxy.rs"
 add-unlabelled = false
