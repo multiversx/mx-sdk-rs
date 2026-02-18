@@ -27,7 +27,6 @@ contract-call-legacy = []
 small-int-bug = [] # can be used for testing the buggy mBufferFromSmallIntSigned VM hook
 
 [dependencies]
-hex-literal = "1.0"
 bitflags = "2.9"
 num-traits = { version = "=0.2.19", default-features = false }
 unwrap-infallible = "1.0"

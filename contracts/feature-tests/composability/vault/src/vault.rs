@@ -110,17 +110,17 @@ pub trait Vault {
     }
 
     #[endpoint]
-    fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
-        self.retrieve_funds_event(&token, nonce, &amount);
+    fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: NonZeroBigUint) {
+        self.retrieve_funds_event(&token, nonce, amount.as_big_uint());
         let caller = self.blockchain().get_caller();
 
         if let Some(esdt_token_id) = token.into_esdt_option() {
             self.tx()
                 .to(caller)
-                .esdt((esdt_token_id, nonce, amount))
+                .payment(Payment::new(esdt_token_id, nonce, amount))
                 .transfer();
         } else {
-            self.tx().to(caller).egld(amount).transfer();
+            self.tx().to(caller).egld(amount.as_big_uint()).transfer();
         }
     }
 

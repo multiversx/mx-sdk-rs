@@ -20,6 +20,27 @@ impl Address {
         Address(H256::new(bytes))
     }
 
+    /// Constructs an Address from a hex string at compile time.
+    /// The hex string can optionally start with "0x" or "0X".
+    /// The hex string must represent exactly 32 bytes (64 hex characters).
+    ///
+    /// # Panics
+    ///
+    /// Panics at compile time if:
+    /// - The hex string is not exactly 64 characters (excluding optional "0x" prefix)
+    /// - Any character is not a valid hex digit (0-9, a-f, A-F)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use multiversx_chain_core::types::Address;
+    /// const ADDR: Address = Address::from_hex("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+    /// const ADDR_WITH_PREFIX: Address = Address::from_hex("0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+    /// ```
+    pub const fn from_hex(hex_str: &str) -> Self {
+        Address(H256::from_hex(hex_str))
+    }
+
     pub fn generate_mock_address(creator_address: &[u8], creator_nonce: u64) -> Self {
         let mut result = [0x00; 32];
 
@@ -274,5 +295,36 @@ mod address_tests {
     #[test]
     fn test_is_zero() {
         assert!(Address::zero().is_zero());
+    }
+
+    #[test]
+    fn test_from_hex() {
+        let hex_str = "e32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60";
+        let addr = Address::from_hex(hex_str);
+        let expected = [
+            0xe3, 0x2a, 0xfe, 0xdc, 0x90, 0x4f, 0xe1, 0x93, 0x97, 0x46, 0xad, 0x97, 0x3b, 0xeb,
+            0x38, 0x35, 0x63, 0xcf, 0x63, 0x64, 0x2b, 0xa6, 0x69, 0xb3, 0x04, 0x0f, 0x9b, 0x94,
+            0x28, 0xa5, 0xed, 0x60,
+        ];
+        assert_eq!(addr.as_array(), &expected);
+    }
+
+    #[test]
+    fn test_from_hex_with_prefix() {
+        let hex_str = "0xE32AFEDC904FE1939746AD973BEB383563CF63642BA669B3040F9B9428A5ED60";
+        let addr = Address::from_hex(hex_str);
+        let expected = [
+            0xE3, 0x2A, 0xFE, 0xDC, 0x90, 0x4F, 0xE1, 0x93, 0x97, 0x46, 0xAD, 0x97, 0x3B, 0xEB,
+            0x38, 0x35, 0x63, 0xCF, 0x63, 0x64, 0x2B, 0xA6, 0x69, 0xB3, 0x04, 0x0F, 0x9B, 0x94,
+            0x28, 0xA5, 0xED, 0x60,
+        ];
+        assert_eq!(addr.as_array(), &expected);
+    }
+
+    #[test]
+    fn test_from_hex_const() {
+        const ADDR: Address =
+            Address::from_hex("e32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60");
+        assert!(!ADDR.is_zero());
     }
 }

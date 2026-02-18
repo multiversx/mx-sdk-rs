@@ -60,5 +60,5 @@ fn st_blackbox_chained() {
                     CheckAccount::new().check_storage("str:sum", "8"),
                 ),
         )
-        .write_scenario_trace("trace2.scen.json");
+        .write_scenario_trace("trace/st_trace2.scen.json");
 }

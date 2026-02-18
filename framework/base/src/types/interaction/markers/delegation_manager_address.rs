@@ -1,4 +1,3 @@
-use hex_literal::hex;
 use multiversx_chain_core::types::Address;
 use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
@@ -9,8 +8,8 @@ use crate::{
 };
 
 /// Address of the delegation manager system smart contract.
-const DELEGATION_MANAGER_SC_ADDRESS_BYTES: [u8; 32] =
-    hex!("000000000000000000010000000000000000000000000000000000000004ffff");
+const DELEGATION_MANAGER_SC_ADDRESS: Address =
+    Address::from_hex("000000000000000000010000000000000000000000000000000000000004ffff");
 const DELEGATION_MANAGER_SC_ADDRESS_BECH32: &str =
     "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6";
 const DELEGATION_MANAGER_SC_ADDRESS_ANNOTATION: &str =
@@ -24,11 +23,11 @@ impl DelegationManagerSCAddress {
     where
         Api: ManagedTypeApi,
     {
-        ManagedAddress::from(DELEGATION_MANAGER_SC_ADDRESS_BYTES)
+        ManagedAddress::from(DELEGATION_MANAGER_SC_ADDRESS)
     }
 
     pub fn to_address(&self) -> Address {
-        DELEGATION_MANAGER_SC_ADDRESS_BYTES.into()
+        DELEGATION_MANAGER_SC_ADDRESS
     }
 
     pub fn to_bech32_str(&self) -> &str {
@@ -62,7 +61,7 @@ impl TopEncode for DelegationManagerSCAddress {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        DELEGATION_MANAGER_SC_ADDRESS_BYTES.top_encode_or_handle_err(output, h)
+        DELEGATION_MANAGER_SC_ADDRESS.top_encode_or_handle_err(output, h)
     }
 }
 

@@ -153,8 +153,8 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         }
     } else if multi_count > 0 {
         let multi_expr = multi_expr_opt.unwrap();
-        payment_type = quote! { MultiEsdtPayment<Self::Api> };
-        payment_init = quote! { .multi_esdt(#multi_expr.clone_value()) };
+        payment_type = quote! { EsdtTokenPaymentVec<Self::Api> };
+        payment_init = quote! { .payment(#multi_expr.clone_value()) };
     } else {
         payment_type = quote! { () };
         payment_init = quote! {};

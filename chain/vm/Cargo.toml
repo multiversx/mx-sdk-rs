@@ -30,7 +30,6 @@ hex = "0.4"
 sha2 = "0.10.6"
 sha3 = "0.10.6"
 itertools = "0.14.0"
-hex-literal = "1.0"
 bitflags = "2.9"
 colored = "3.0"
 rand = { version = "0.9", optional = true }

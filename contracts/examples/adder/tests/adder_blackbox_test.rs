@@ -24,6 +24,7 @@ fn adder_blackbox() {
 
     let new_address = world
         .tx()
+        .id("adder deploy")
         .from(OWNER_ADDRESS)
         .typed(adder_proxy::AdderProxy)
         .init(5u32)
@@ -44,6 +45,7 @@ fn adder_blackbox() {
 
     world
         .tx()
+        .id("add 1")
         .from(OWNER_ADDRESS)
         .to(ADDER_ADDRESS)
         .typed(adder_proxy::AdderProxy)
@@ -77,5 +79,5 @@ fn adder_blackbox() {
         .check_account(ADDER_ADDRESS)
         .check_storage("str:sum", "100");
 
-    world.write_scenario_trace("trace1.scen.json");
+    world.write_scenario_trace("adder_trace1.scen.json");
 }

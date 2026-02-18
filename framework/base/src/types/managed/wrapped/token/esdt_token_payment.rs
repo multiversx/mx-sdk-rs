@@ -4,7 +4,7 @@ use crate::{
     api::ManagedTypeApi,
     types::{
         BigUint, EsdtTokenIdentifier, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType,
-        ManagedVec, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref,
+        ManagedVec, ManagedVecItem, ManagedVecItemPayloadBuffer, Payment, Ref,
         managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
 };
@@ -29,7 +29,16 @@ pub struct EsdtTokenPayment<M: ManagedTypeApi> {
 }
 
 /// Alias for a list of payments.
+///
+/// Deprecated: Use [`EsdtTokenPaymentVec`] instead.
+#[deprecated(
+    since = "0.65.0",
+    note = "Replace with either `PaymentVec` (modern implementation), or `EsdtTokenPaymentVec` (backwards-compatible, identical with the old `MultiEsdtPayment`)."
+)]
 pub type MultiEsdtPayment<Api> = ManagedVec<Api, EsdtTokenPayment<Api>>;
+
+/// Alias for a list of payments.
+pub type EsdtTokenPaymentVec<Api> = ManagedVec<Api, EsdtTokenPayment<Api>>;
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     #[inline]
@@ -64,19 +73,42 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
         (self.token_identifier, self.token_nonce, self.amount)
     }
 
-    /// Zero-cost conversion that loosens the EGLD restriction.
-    ///
-    /// It is always safe to do, since the 2 types are guaranteed to have the same layout.
-    pub fn as_egld_or_esdt_payment(&self) -> &EgldOrEsdtTokenPayment<M> {
-        unsafe { core::mem::transmute(self) }
-    }
-
     /// Conversion that loosens the EGLD restriction.
-    pub fn into_multi_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
+    pub fn into_egld_or_esdt_payment(self) -> EgldOrEsdtTokenPayment<M> {
         EgldOrEsdtTokenPayment {
             token_identifier: EgldOrEsdtTokenIdentifier::esdt(self.token_identifier),
             token_nonce: self.token_nonce,
             amount: self.amount,
+        }
+    }
+
+    /// Converts this `EsdtTokenPayment` into a [`Payment`], enforcing a non-zero amount.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the amount is zero, as [`Payment`] requires a non-zero amount.
+    /// Use this only when you are certain the amount is non-zero, or handle zero amounts beforehand.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use multiversx_sc::types::*;
+    /// # use multiversx_sc::api::ManagedTypeApi;
+    /// # fn example<M: ManagedTypeApi>() -> Payment<M>{
+    /// let esdt_payment = EsdtTokenPayment::new(
+    ///     EsdtTokenIdentifier::from("TOKEN-123456"),
+    ///     0,
+    ///     BigUint::from(100u64),
+    /// );
+    /// let payment = esdt_payment.into_payment();
+    /// # payment
+    /// # }
+    /// ```
+    pub fn into_payment(self) -> Payment<M> {
+        Payment {
+            token_identifier: self.token_identifier.token_id,
+            token_nonce: self.token_nonce,
+            amount: self.amount.into_non_zero_or_panic(),
         }
     }
 }

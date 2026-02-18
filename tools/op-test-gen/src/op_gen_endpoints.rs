@@ -394,6 +394,12 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                 ValueType::NonZeroBigUint,
                 ValueType::Bool,
             ));
+            endpoints.push(BigNumOperatorTestEndpoint::new(
+                op,
+                ValueType::NonZeroBigUint,
+                ValueType::BigUint,
+                ValueType::Bool,
+            ));
             add_cmp_small_int_endpoints(op, ValueType::NonZeroBigUint, &mut endpoints);
         }
     }

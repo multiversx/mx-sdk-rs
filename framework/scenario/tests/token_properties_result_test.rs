@@ -1,3 +1,6 @@
+#![allow(unknown_lints)]
+#![allow(clippy::manual_is_multiple_of)]
+
 use multiversx_sc::{
     codec::TopDecodeMulti,
     imports::{Bech32Address, TokenPropertiesResult},

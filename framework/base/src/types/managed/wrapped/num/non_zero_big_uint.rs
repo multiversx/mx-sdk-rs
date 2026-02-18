@@ -1,3 +1,5 @@
+use core::num::NonZero;
+
 use multiversx_sc_codec::DecodeError;
 
 use crate::{
@@ -106,13 +108,21 @@ impl<M: ManagedTypeApi> TryFrom<BigUint<M>> for NonZeroBigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TryFrom<u128> for NonZeroBigUint<M> {
-    type Error = NonZeroError;
+macro_rules! impl_try_from_unsigned {
+    ($($t:ty),*) => {
+        $(
+            impl<M: ManagedTypeApi> TryFrom<$t> for NonZeroBigUint<M> {
+                type Error = NonZeroError;
 
-    fn try_from(value: u128) -> Result<Self, Self::Error> {
-        Self::try_from(BigUint::from(value))
-    }
+                fn try_from(value: $t) -> Result<Self, Self::Error> {
+                    Self::try_from(BigUint::from(value))
+                }
+            }
+        )*
+    };
 }
+
+impl_try_from_unsigned!(u8, u16, u32, u64, u128, usize);
 
 impl<M: ManagedTypeApi> TryFrom<ManagedBuffer<M>> for NonZeroBigUint<M> {
     type Error = NonZeroError;
@@ -129,6 +139,22 @@ impl<M: ManagedTypeApi> TryFrom<&ManagedBuffer<M>> for NonZeroBigUint<M> {
         Self::try_from(BigUint::from(item))
     }
 }
+
+macro_rules! impl_from_nonzero {
+    ($($t:ty),*) => {
+        $(
+            impl<M: ManagedTypeApi> From<NonZero<$t>> for NonZeroBigUint<M> {
+                fn from(value: NonZero<$t>) -> Self {
+                    // SAFETY: the invariant of NonZeroBigUint is upheld
+                    // because the input value is guaranteed to be non-zero by the type system
+                    unsafe { Self::new_unchecked(BigUint::from(value.get())) }
+                }
+            }
+        )*
+    };
+}
+
+impl_from_nonzero!(u8, u16, u32, u64, u128, usize);
 
 impl<M: ManagedTypeApi> NonZeroBigUint<M> {
     pub(super) fn wrap_big_int_unchecked(value: BigInt<M>) -> Self {
@@ -161,6 +187,13 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
     /// ```
     pub fn new_or_panic(bu: BigUint<M>) -> Self {
         Self::new(bu).unwrap_or_else(|| quick_signal_error::<M>(err_msg::ZERO_VALUE_NOT_ALLOWED))
+    }
+
+    /// Convenience constructor for the common case of 1.
+    pub fn one() -> Self {
+        // SAFETY: the invariant of NonZeroBigUint is upheld
+        // because 1 is guaranteed to be non-zero
+        unsafe { Self::new_unchecked(BigUint::from(1u32)) }
     }
 
     /// Drops the non-zero restriction.

@@ -2,6 +2,7 @@ use core::cmp::Ordering;
 
 use crate::api::ManagedTypeApi;
 
+use crate::types::BigUint;
 use crate::types::cast_to_i64::cast_to_i64;
 
 use super::NonZeroBigUint;
@@ -15,6 +16,13 @@ impl<M: ManagedTypeApi> PartialEq for NonZeroBigUint<M> {
 
 impl<M: ManagedTypeApi> Eq for NonZeroBigUint<M> {}
 
+impl<M: ManagedTypeApi> PartialEq<BigUint<M>> for NonZeroBigUint<M> {
+    #[inline]
+    fn eq(&self, other: &BigUint<M>) -> bool {
+        self.value.eq(&other.value)
+    }
+}
+
 impl<M: ManagedTypeApi> PartialOrd for NonZeroBigUint<M> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -26,6 +34,13 @@ impl<M: ManagedTypeApi> Ord for NonZeroBigUint<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.value.cmp(&other.value)
+    }
+}
+
+impl<M: ManagedTypeApi> PartialOrd<BigUint<M>> for NonZeroBigUint<M> {
+    #[inline]
+    fn partial_cmp(&self, other: &BigUint<M>) -> Option<Ordering> {
+        Some(self.value.cmp(&other.value))
     }
 }
 

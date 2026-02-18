@@ -1,4 +1,3 @@
-use hex_literal::hex;
 use multiversx_chain_core::types::Address;
 use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
@@ -9,8 +8,8 @@ use crate::{
 };
 
 /// Address of the system smart contract that manages ESDT.
-const ESDT_SYSTEM_SC_ADDRESS_BYTES: [u8; 32] =
-    hex!("000000000000000000010000000000000000000000000000000000000002ffff");
+const ESDT_SYSTEM_SC_ADDRESS: Address =
+    Address::from_hex("000000000000000000010000000000000000000000000000000000000002ffff");
 const ESDT_SYSTEM_SC_ADDRESS_BECH32: &str =
     "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 const ESDT_SYSTEM_SC_ADDRESS_ANNOTATION: &str =
@@ -24,11 +23,11 @@ impl ESDTSystemSCAddress {
     where
         Api: ManagedTypeApi,
     {
-        ManagedAddress::from(ESDT_SYSTEM_SC_ADDRESS_BYTES)
+        ManagedAddress::from(ESDT_SYSTEM_SC_ADDRESS)
     }
 
     pub fn to_address(&self) -> Address {
-        ESDT_SYSTEM_SC_ADDRESS_BYTES.into()
+        ESDT_SYSTEM_SC_ADDRESS
     }
 
     pub fn to_bech32_str(&self) -> &str {
@@ -62,7 +61,7 @@ impl TopEncode for ESDTSystemSCAddress {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        ESDT_SYSTEM_SC_ADDRESS_BYTES.top_encode_or_handle_err(output, h)
+        ESDT_SYSTEM_SC_ADDRESS.top_encode_or_handle_err(output, h)
     }
 }
 
