@@ -24,6 +24,7 @@ std = ["multiversx-chain-core/std"]
 managed-buffer-builder-cached = []
 esdt-token-payment-legacy-decode = []
 contract-call-legacy = []
+small-int-bug = [] # can be used for testing the buggy mBufferFromSmallIntSigned VM hook
 
 [dependencies]
 hex-literal = "1.0"
