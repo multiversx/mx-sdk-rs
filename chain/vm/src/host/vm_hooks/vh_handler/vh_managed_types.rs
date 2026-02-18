@@ -130,7 +130,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         Ok(())
     }
 
-    /// This method has a bug, it doesn't handle negative numbers correctly, it converts to the absolute value of the number.
+    /// This method has a bug that converts negative numbers to their absolute values.
     ///
     /// The bug will be kept here, until it is also fixed on mainnet, to allow consistent testing.
     ///

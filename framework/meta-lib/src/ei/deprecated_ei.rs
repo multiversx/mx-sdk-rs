@@ -68,7 +68,7 @@ pub const DEPRECATED_VM_HOOKS_1_5: &[DeprecatedVMHook] = &[
     ),
     DeprecatedVMHook::new(
         "mBufferFromSmallIntSigned",
-        "This method has a bug, it doesn't handle negative numbers correctly, it converts to the absolute value of the number. Should not be used until the bug is fixed. Will be un-deprecated after that.",
+        "This method has a bug that converts negative numbers to their absolute values. Do not use until the bug is fixed on mainnet. It will be un-deprecated once the VM bug is resolved.",
     ),
 ];
 
