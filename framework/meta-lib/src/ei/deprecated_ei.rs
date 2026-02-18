@@ -66,6 +66,10 @@ pub const DEPRECATED_VM_HOOKS_1_5: &[DeprecatedVMHook] = &[
         "writeEventLog",
         "Events are now logged via `managedWriteLog`",
     ),
+    DeprecatedVMHook::new(
+        "mBufferFromSmallIntSigned",
+        "This method has a bug, it doesn't handle negative numbers correctly, it converts to the absolute value of the number. Should not be used until the bug is fixed. Will be un-deprecated after that.",
+    ),
 ];
 
 pub(super) fn deprecated_vm_hooks_1_5(name: &str) -> Option<&'static DeprecatedVMHook> {
