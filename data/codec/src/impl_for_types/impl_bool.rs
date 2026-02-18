@@ -74,6 +74,7 @@ impl NestedDecode for bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::bool_assert_comparison)] // Actually checking bool values, not asserting on a bool condition.
 pub mod tests {
     use crate::{
         DecodeError, DefaultErrorHandler, TopDecode, dep_decode_from_byte_slice,
