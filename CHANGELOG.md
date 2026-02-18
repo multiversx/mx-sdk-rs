@@ -65,6 +65,7 @@ And crate group being released requires all crate groups downstream to be releas
 	- Fixed a related bug in the Rust VM, also pertaining to negative numbers, in `mb_to_small_int_signed`(`mBufferFromSmallIntSigned`).
 - VM: added ESDT metadata recreate and metadata update mock built-in functions.
 - Upgraded `multiversx-chain-vm-executor` to v0.5.1.
+	- Contains upgrade to Wasmer 6.1.0 (wasmer-experimental);
 	- This fixes and issue with wasmer-prod and wasmer-experimental builds on Linux for certain versions of Rust.
 - Big number improvements:
 	- `BigInt`/`BigUint` `proportion` and `into_proportion` methods, for computing `self * part / total` efficiently, with overflow checks.
@@ -74,8 +75,7 @@ And crate group being released requires all crate groups downstream to be releas
 - New `FungiblePayment` type, representing a payment with a `TokenId` and a `NonZeroBigUint` amount (no nonce). Includes `ManagedVecItem`, `TypeAbi`, and codec implementations.
 - sc-meta improvements:
 	- Added `--locked` CLI flag support;
-	- Build error messages now include the full command that was executed;
-	- Error message refactor with `CommandInfo` type.
+	- Build error messages now include the full command that was executed.
 - Storage mapper documentation improvements across all mappers.
 - Derive substitution list fix: `Ref` and `ManagedVecRef` no longer incorrectly listed as having an API generic.
 
