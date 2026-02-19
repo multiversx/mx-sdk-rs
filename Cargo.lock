@@ -2965,12 +2965,9 @@ dependencies = [
 name = "multisig"
 version = "1.0.0"
 dependencies = [
- "hex",
  "multiversx-sc",
  "multiversx-sc-modules",
  "multiversx-sc-scenario",
- "num-bigint",
- "num-traits",
 ]
 
 [[package]]
