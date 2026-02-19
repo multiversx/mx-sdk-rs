@@ -13,16 +13,16 @@ description = "MultiversX smart contract API procedural macros"
 keywords = ["multiversx", "blockchain", "contract"]
 categories = ["cryptography::cryptocurrencies", "development-tools::procedural-macro-helpers"]
 
+[lib]
+name = "multiversx_sc_derive"
+proc-macro = true
+
+[dependencies.multiversx-sc-abi-derive-common]
+version = "=0.24.0"
+path = "../../data/abi-derive-common"
+
 [dependencies]
 proc-macro2 = "1.0"
 quote = "1.0"
 syn = "2.0"
-hex = "0.4"
 radix_trie = "0.3"
-
-[features]
-default = ["syn/full", "syn/parsing", "syn/extra-traits"]
-
-[lib]
-name = "multiversx_sc_derive"
-proc-macro = true

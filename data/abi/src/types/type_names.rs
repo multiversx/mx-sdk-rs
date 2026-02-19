@@ -1,5 +1,3 @@
-
-
 pub type TypeName = alloc::string::String;
 
 #[derive(Clone, Default, Debug, PartialEq, Eq)]

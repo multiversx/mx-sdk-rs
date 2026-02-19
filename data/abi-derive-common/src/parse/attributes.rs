@@ -4,7 +4,7 @@ use quote::ToTokens;
 /// so extracting doc comments means parsing "doc" attributes.
 pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
     const ATTR_DOC: &str = "doc";
-    
+
     attrs
         .iter()
         .filter(|attr| {

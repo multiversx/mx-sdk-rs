@@ -1,5 +1,5 @@
 [package]
-name = "multiversx-sc-abi-derive"
+name = "multiversx-sc-abi-derive-common"
 version = "0.24.0"
 edition = "2024"
 publish = false
@@ -13,7 +13,7 @@ readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
 homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
-description = "MultiversX ABI derive macros - TypeAbi derive and type_abi attribute"
+description = "MultiversX ABI common functionality for derive macros"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = [
     "no-std",
@@ -22,11 +22,7 @@ categories = [
     "development-tools",
 ]
 
-[lib]
-name = "multiversx_sc_abi_derive"
-proc-macro = true
-
-[dependencies.multiversx-sc-abi-derive-common]
-version = "=0.24.0"
-path = "../abi-derive-common"
-
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = "2.0"

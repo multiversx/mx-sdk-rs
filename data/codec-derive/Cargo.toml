@@ -18,9 +18,6 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 name = "multiversx_sc_codec_derive"
 proc-macro = true
 
-[features]
-default = ["syn/full", "syn/parsing", "syn/extra-traits"]
-
 [dependencies]
 proc-macro2 = "1.0"
 quote = "1.0"
