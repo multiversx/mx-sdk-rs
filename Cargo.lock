@@ -3122,6 +3122,7 @@ dependencies = [
  "bitflags 2.11.0",
  "multiversx-sc-codec-derive",
  "num-bigint",
+ "num-traits",
  "unwrap-infallible",
 ]
 

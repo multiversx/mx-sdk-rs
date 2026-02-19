@@ -1,10 +1,21 @@
 use alloc::vec::Vec;
 use num_bigint::BigUint;
+use num_traits::Zero;
 
 use crate::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
+
+/// Note: to_bytes_be may return [] or [0] for zero,
+/// this function makes sure we consistently return [].
+fn big_uint_to_bytes_be(n: &BigUint) -> Vec<u8> {
+    if n.is_zero() {
+        Vec::new()
+    } else {
+        n.to_bytes_be()
+    }
+}
 
 impl TopEncode for BigUint {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
@@ -12,7 +23,7 @@ impl TopEncode for BigUint {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.to_bytes_be().top_encode_or_handle_err(output, h)
+        big_uint_to_bytes_be(self).top_encode_or_handle_err(output, h)
     }
 }
 
@@ -34,7 +45,7 @@ impl NestedEncode for BigUint {
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.to_bytes_be().dep_encode_or_handle_err(dest, h)
+        big_uint_to_bytes_be(self).dep_encode_or_handle_err(dest, h)
     }
 }
 
