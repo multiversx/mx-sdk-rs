@@ -71,6 +71,7 @@ pub mod tests {
         check_top_encode_decode(BigInt::from(127), &[127]);
         check_top_encode_decode(BigInt::from(128), &[0, 128]);
         check_top_encode_decode(BigInt::from(-128), &[128]);
+        check_top_encode_decode(BigInt::from(256), &[1, 0]);
     }
 
     #[test]
@@ -87,12 +88,6 @@ pub mod tests {
     #[test]
     fn test_dep_zero() {
         check_dep_encode_decode(BigInt::from(0), &[0, 0, 0, 0]);
-    }
-
-    #[test]
-    fn test_top_large_positive() {
-        // 256 = 0x0100, signed needs leading 0x00 to stay positive
-        check_top_encode_decode(BigInt::from(256), &[1, 0]);
     }
 
     #[test]
