@@ -55,6 +55,7 @@ dep_decode_num_signed!(i32, 4);
 dep_decode_num_signed!(i64, 8);
 
 impl NestedDecode for isize {
+    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -67,6 +68,7 @@ impl NestedDecode for isize {
 macro_rules! top_decode_num_signed {
     ($ty:ty, $bounds_ty:ty) => {
         impl TopDecode for $ty {
+            #[inline]
             fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: TopDecodeInput,

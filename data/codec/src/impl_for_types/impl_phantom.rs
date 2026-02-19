@@ -21,6 +21,7 @@ impl<T> TopEncode for PhantomData<T> {
 }
 
 impl<T> TopDecode for PhantomData<T> {
+    #[inline]
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,

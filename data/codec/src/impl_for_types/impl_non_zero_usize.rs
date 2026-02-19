@@ -6,6 +6,7 @@ use crate::{
 };
 
 impl TopEncode for NonZeroUsize {
+    #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,

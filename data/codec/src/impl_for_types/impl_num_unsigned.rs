@@ -77,6 +77,7 @@ top_encode_num_unsigned! {u16, 16}
 top_encode_num_unsigned! {u8, 8}
 
 impl NestedDecode for u8 {
+    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -97,6 +98,7 @@ impl NestedDecode for u8 {
 macro_rules! dep_decode_num_unsigned {
     ($ty:ty, $num_bytes:expr) => {
         impl NestedDecode for $ty {
+            #[inline]
             fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: NestedDecodeInput,
@@ -117,6 +119,7 @@ dep_decode_num_unsigned!(u64, 8);
 dep_decode_num_unsigned!(u128, 16);
 
 impl NestedDecode for usize {
+    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -129,6 +132,7 @@ impl NestedDecode for usize {
 macro_rules! top_decode_num_unsigned {
     ($ty:ty, $bounds_ty:ty) => {
         impl TopDecode for $ty {
+            #[inline]
             fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: TopDecodeInput,

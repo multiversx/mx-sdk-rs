@@ -111,6 +111,7 @@ impl<T: NestedEncode> NestedEncode for &[T] {
 }
 
 impl<T: NestedEncode> NestedEncode for Box<[T]> {
+    #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,

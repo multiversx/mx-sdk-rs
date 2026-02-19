@@ -39,7 +39,6 @@ impl TopDecode for BigInt {
 }
 
 impl NestedEncode for BigInt {
-    #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
