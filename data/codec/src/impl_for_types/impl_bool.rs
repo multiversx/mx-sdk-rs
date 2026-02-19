@@ -1,8 +1,18 @@
 use crate::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-    dep_encode_num_mimic,
 };
+
+const TOP_ENCODED_TRUE: &[u8] = &[1];
+const TOP_ENCODED_FALSE: &[u8] = &[];
+
+fn parse_byte<H: DecodeErrorHandler>(byte: u8, h: H) -> Result<bool, H::HandledErr> {
+    match byte {
+        0 => Ok(false),
+        1 => Ok(true),
+        _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),
+    }
+}
 
 impl TopEncode for bool {
     #[inline]
@@ -11,11 +21,12 @@ impl TopEncode for bool {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        // only using signed because this one is implemented in Arwen, unsigned is not
-        // TODO: change to set_u64
-        // true -> 1i64
-        // false -> 0i64
-        output.set_i64(i64::from(*self));
+        let bytes = if *self {
+            TOP_ENCODED_TRUE
+        } else {
+            TOP_ENCODED_FALSE
+        };
+        output.set_slice_u8(bytes);
         Ok(())
     }
 }
@@ -26,15 +37,30 @@ impl TopDecode for bool {
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        match input.into_u64(h)? {
-            0 => Ok(false),
-            1 => Ok(true),
-            _ => Err(h.handle_error(DecodeError::INPUT_OUT_OF_RANGE)),
+        let mut buffer = [0u8; 1];
+        let length = input.into_max_size_buffer_align_right(&mut buffer, h)?;
+        if length == 0 {
+            Ok(false)
+        } else {
+            // Note: length can only be 1 at this point, because of how into_max_size_buffer_align_right works.
+            // Not performing an additional check for length == 1, for optimization reasons.
+            parse_byte(buffer[0], h)
         }
     }
 }
 
-dep_encode_num_mimic! {bool, u8}
+impl NestedEncode for bool {
+    #[inline]
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        // Note: u8 contains some additional optimizations (via specialization/monomorphization).
+        // Do not change this implementation.
+        (*self as u8).dep_encode_or_handle_err(dest, h)
+    }
+}
 
 impl NestedDecode for bool {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -42,26 +68,54 @@ impl NestedDecode for bool {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        match input.read_byte(h)? {
-            0 => Ok(false),
-            1 => Ok(true),
-            _ => Err(h.handle_error(DecodeError::INVALID_VALUE)),
-        }
+        let byte = input.read_byte(h)?;
+        parse_byte(byte, h)
     }
 }
 
 #[cfg(test)]
+#[allow(clippy::bool_assert_comparison)] // Actually checking bool values, not asserting on a bool condition.
 pub mod tests {
-    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
+    use crate::{
+        DecodeError, DefaultErrorHandler, TopDecode, dep_decode_from_byte_slice,
+        test_util::{check_dep_encode_decode, check_top_decode, check_top_encode_decode},
+    };
 
     #[test]
     fn test_top() {
         check_top_encode_decode(true, &[1]);
         check_top_encode_decode(false, &[]);
     }
+
     #[test]
     fn test_dep() {
         check_dep_encode_decode(true, &[1]);
         check_dep_encode_decode(false, &[0]);
+    }
+
+    #[test]
+    fn test_top_decode_zero_byte_is_false() {
+        assert_eq!(false, check_top_decode::<bool>(&[0]));
+    }
+
+    #[test]
+    fn test_top_decode_invalid_value() {
+        assert_eq!(
+            bool::top_decode(&[2u8][..]),
+            Err(DecodeError::INVALID_VALUE),
+        );
+        assert_eq!(
+            bool::top_decode(&[255u8][..]),
+            Err(DecodeError::INVALID_VALUE),
+        );
+    }
+
+    #[test]
+    fn test_dep_decode_invalid_value() {
+        let result: Result<bool, _> = dep_decode_from_byte_slice(&[2u8], DefaultErrorHandler);
+        assert_eq!(result, Err(DecodeError::INVALID_VALUE));
+
+        let result: Result<bool, _> = dep_decode_from_byte_slice(&[255u8], DefaultErrorHandler);
+        assert_eq!(result, Err(DecodeError::INVALID_VALUE));
     }
 }

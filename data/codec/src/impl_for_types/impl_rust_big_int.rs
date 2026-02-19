@@ -1,10 +1,21 @@
 use alloc::vec::Vec;
 use num_bigint::BigInt;
+use num_traits::Zero;
 
 use crate::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
+
+/// Note: to_signed_bytes_be may return [] or [0] for zero,
+/// this function makes sure we consistently return [].
+fn big_int_to_bytes_be(n: &BigInt) -> Vec<u8> {
+    if n.is_zero() {
+        Vec::new()
+    } else {
+        n.to_signed_bytes_be()
+    }
+}
 
 impl TopEncode for BigInt {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
@@ -12,8 +23,7 @@ impl TopEncode for BigInt {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.to_signed_bytes_be()
-            .top_encode_or_handle_err(output, h)
+        big_int_to_bytes_be(self).top_encode_or_handle_err(output, h)
     }
 }
 
@@ -35,7 +45,7 @@ impl NestedEncode for BigInt {
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.to_signed_bytes_be().dep_encode_or_handle_err(dest, h)
+        big_int_to_bytes_be(self).dep_encode_or_handle_err(dest, h)
     }
 }
 
@@ -61,11 +71,36 @@ pub mod tests {
         check_top_encode_decode(BigInt::from(127), &[127]);
         check_top_encode_decode(BigInt::from(128), &[0, 128]);
         check_top_encode_decode(BigInt::from(-128), &[128]);
+        check_top_encode_decode(BigInt::from(256), &[1, 0]);
     }
 
     #[test]
     fn test_dep() {
         check_dep_encode_decode(BigInt::from(5), &[0, 0, 0, 1, 5]);
         check_dep_encode_decode(BigInt::from(-5), &[0, 0, 0, 1, 251]);
+    }
+
+    #[test]
+    fn test_top_zero() {
+        check_top_encode_decode(BigInt::from(0), &[]);
+    }
+
+    #[test]
+    fn test_dep_zero() {
+        check_dep_encode_decode(BigInt::from(0), &[0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn test_top_large_negative() {
+        // -129 in signed bytes = 0xFF7F
+        check_top_encode_decode(BigInt::from(-129), &[0xFF, 0x7F]);
+        // -256 in signed bytes = 0xFF00
+        check_top_encode_decode(BigInt::from(-256), &[0xFF, 0x00]);
+    }
+
+    #[test]
+    fn test_dep_large() {
+        check_dep_encode_decode(BigInt::from(256), &[0, 0, 0, 2, 1, 0]);
+        check_dep_encode_decode(BigInt::from(-256), &[0, 0, 0, 2, 0xFF, 0x00]);
     }
 }

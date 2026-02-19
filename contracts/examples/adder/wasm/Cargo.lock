@@ -92,6 +92,7 @@ dependencies = [
  "arrayvec",
  "bitflags",
  "multiversx-sc-codec-derive",
+ "num-traits",
  "unwrap-infallible",
 ]
 

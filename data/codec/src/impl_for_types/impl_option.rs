@@ -90,8 +90,8 @@ pub mod tests {
     use alloc::vec::Vec;
 
     use crate::{
-        DecodeError, TopDecode,
-        test_util::{check_top_decode, check_top_encode_decode},
+        DecodeError, DefaultErrorHandler, TopDecode, dep_decode_from_byte_slice,
+        test_util::{check_dep_encode_decode, check_top_decode, check_top_encode_decode},
     };
 
     #[test]
@@ -132,5 +132,22 @@ pub mod tests {
             Option::<u32>::top_decode(&[0x02u8][..]),
             Err(DecodeError::INVALID_VALUE)
         );
+    }
+
+    #[test]
+    fn test_dep() {
+        // Some(u32)
+        check_dep_encode_decode(Some(5u32), &[1, 0, 0, 0, 5]);
+        check_dep_encode_decode(Some(0u32), &[1, 0, 0, 0, 0]);
+
+        // None
+        check_dep_encode_decode(Option::<u32>::None, &[0]);
+    }
+
+    #[test]
+    fn test_dep_decode_invalid_discriminant() {
+        let result: Result<Option<u32>, _> =
+            dep_decode_from_byte_slice(&[2u8, 0, 0, 0, 0], DefaultErrorHandler);
+        assert_eq!(result, Err(DecodeError::INVALID_VALUE));
     }
 }

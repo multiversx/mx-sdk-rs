@@ -121,3 +121,59 @@ impl<T: NestedEncode> NestedEncode for Box<[T]> {
 }
 
 // TODO: NestedDecode for Box<[T]> missing
+
+#[cfg(test)]
+mod tests {
+    use alloc::boxed::Box;
+
+    use crate::test_util::{check_dep_encode, check_top_encode, check_top_encode_decode};
+
+    #[test]
+    fn test_top_encode_slice_u8() {
+        let bytes = check_top_encode(&&[1u8, 2u8, 3u8][..]);
+        assert_eq!(bytes, &[1, 2, 3]);
+    }
+
+    #[test]
+    fn test_top_encode_slice_i32() {
+        let bytes = check_top_encode(&&[1i32, 2i32][..]);
+        assert_eq!(bytes, &[0, 0, 0, 1, 0, 0, 0, 2]);
+    }
+
+    #[test]
+    fn test_dep_encode_slice_u8() {
+        let bytes = check_dep_encode(&&[1u8, 2u8, 3u8][..]);
+        assert_eq!(bytes, &[0, 0, 0, 3, 1, 2, 3]);
+    }
+
+    #[test]
+    fn test_dep_encode_slice_i32() {
+        let bytes = check_dep_encode(&&[1i32, 2i32][..]);
+        assert_eq!(bytes, &[0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 2]);
+    }
+
+    #[test]
+    fn test_top_encode_empty_slice() {
+        let empty: &[u8] = &[];
+        let bytes = check_top_encode(&empty);
+        assert_eq!(bytes, &[] as &[u8]);
+    }
+
+    #[test]
+    fn test_top_boxed_slice_u8() {
+        let bs: Box<[u8]> = Box::new([1u8, 2, 3]);
+        check_top_encode_decode(bs, &[1, 2, 3]);
+    }
+
+    #[test]
+    fn test_top_boxed_slice_i32() {
+        let bs: Box<[i32]> = Box::new([1i32, 2]);
+        check_top_encode_decode(bs, &[0, 0, 0, 1, 0, 0, 0, 2]);
+    }
+
+    #[test]
+    fn test_top_boxed_slice_empty() {
+        let bs: Box<[u8]> = Box::new([]);
+        check_top_encode_decode(bs, &[]);
+    }
+}

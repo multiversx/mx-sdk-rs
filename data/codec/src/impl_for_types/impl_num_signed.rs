@@ -93,7 +93,10 @@ top_decode_num_signed!(i64, i64);
 
 #[cfg(test)]
 pub mod tests {
-    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
+    use crate::{
+        DecodeError, TopDecode,
+        test_util::{check_dep_encode_decode, check_top_encode_decode},
+    };
 
     #[test]
     fn test_top() {
@@ -137,5 +140,47 @@ pub mod tests {
         check_dep_encode_decode(-5i32, &[255, 255, 255, 251]);
         check_dep_encode_decode(-5isize, &[255, 255, 255, 251]);
         check_dep_encode_decode(-5i64, &[255, 255, 255, 255, 255, 255, 255, 251]);
+    }
+
+    #[test]
+    fn test_top_min_max() {
+        // i8
+        check_top_encode_decode(i8::MAX, &[127]);
+        check_top_encode_decode(i8::MIN, &[128]); // -128 top-encoded as minimal signed bytes
+        // i16
+        check_top_encode_decode(i16::MAX, &[0x7F, 0xFF]);
+        check_top_encode_decode(i16::MIN, &[0x80, 0x00]);
+        // i32
+        check_top_encode_decode(i32::MAX, &[0x7F, 0xFF, 0xFF, 0xFF]);
+        check_top_encode_decode(i32::MIN, &[0x80, 0x00, 0x00, 0x00]);
+        // i64
+        check_top_encode_decode(i64::MAX, &[0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
+        check_top_encode_decode(i64::MIN, &[0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+    }
+
+    #[test]
+    fn test_dep_min_max() {
+        check_dep_encode_decode(i8::MAX, &[0x7F]);
+        check_dep_encode_decode(i8::MIN, &[0x80]);
+        check_dep_encode_decode(i16::MAX, &[0x7F, 0xFF]);
+        check_dep_encode_decode(i16::MIN, &[0x80, 0x00]);
+        check_dep_encode_decode(i32::MAX, &[0x7F, 0xFF, 0xFF, 0xFF]);
+        check_dep_encode_decode(i32::MIN, &[0x80, 0x00, 0x00, 0x00]);
+        check_dep_encode_decode(i64::MAX, &[0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
+        check_dep_encode_decode(i64::MIN, &[0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+    }
+
+    #[test]
+    fn test_top_decode_out_of_range() {
+        // 128 doesn't fit in i8 (max 127)
+        assert_eq!(
+            i8::top_decode(&[0u8, 128u8][..]),
+            Err(DecodeError::INPUT_OUT_OF_RANGE),
+        );
+        // -129 doesn't fit in i8 (min -128)
+        assert_eq!(
+            i8::top_decode(&[0xFF, 0x7F][..]),
+            Err(DecodeError::INPUT_OUT_OF_RANGE),
+        );
     }
 }
