@@ -66,3 +66,38 @@ impl<T: NestedDecode> NestedDecode for Box<T> {
         Ok(Box::new(T::dep_decode_or_handle_err(input, h)?))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use alloc::boxed::Box;
+
+    use crate::test_util::{
+        check_dep_encode, check_dep_encode_decode, check_top_encode, check_top_encode_decode,
+    };
+
+    #[test]
+    fn test_top_box_u32() {
+        check_top_encode_decode(Box::new(5u32), &[5]);
+        check_top_encode_decode(Box::new(0u32), &[]);
+    }
+
+    #[test]
+    fn test_dep_box_u32() {
+        check_dep_encode_decode(Box::new(5u32), &[0, 0, 0, 5]);
+        check_dep_encode_decode(Box::new(0u32), &[0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn test_top_encode_ref() {
+        let val = 42u32;
+        let bytes = check_top_encode(&&val);
+        assert_eq!(bytes, &[42]);
+    }
+
+    #[test]
+    fn test_dep_encode_ref() {
+        let val = 42u32;
+        let bytes = check_dep_encode(&&val);
+        assert_eq!(bytes, &[0, 0, 0, 42]);
+    }
+}

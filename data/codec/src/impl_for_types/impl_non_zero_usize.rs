@@ -56,7 +56,10 @@ impl NestedDecode for NonZeroUsize {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
+    use crate::{
+        DecodeError, DefaultErrorHandler, TopDecode, dep_decode_from_byte_slice,
+        test_util::{check_dep_encode_decode, check_top_encode_decode},
+    };
     use core::num::NonZeroUsize;
 
     #[test]
@@ -67,5 +70,25 @@ pub mod tests {
     #[test]
     fn test_dep() {
         check_dep_encode_decode(NonZeroUsize::new(5).unwrap(), &[0, 0, 0, 5]);
+    }
+
+    #[test]
+    fn test_top_one() {
+        check_top_encode_decode(NonZeroUsize::new(1).unwrap(), &[1]);
+    }
+
+    #[test]
+    fn test_top_decode_zero_rejected() {
+        assert_eq!(
+            NonZeroUsize::top_decode(&[][..]),
+            Err(DecodeError::INVALID_VALUE),
+        );
+    }
+
+    #[test]
+    fn test_dep_decode_zero_rejected() {
+        let result: Result<NonZeroUsize, _> =
+            dep_decode_from_byte_slice(&[0, 0, 0, 0], DefaultErrorHandler);
+        assert_eq!(result, Err(DecodeError::INVALID_VALUE));
     }
 }

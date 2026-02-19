@@ -63,4 +63,30 @@ pub mod tests {
     fn test_dep() {
         check_dep_encode_decode(BigUint::from(5u32), &[0, 0, 0, 1, 5]);
     }
+
+    #[test]
+    fn test_top_zero() {
+        check_top_encode_decode(BigUint::from(0u32), &[]);
+    }
+
+    #[test]
+    fn test_dep_zero() {
+        check_dep_encode_decode(BigUint::from(0u32), &[0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn test_top_large() {
+        // 256 = 0x0100
+        check_top_encode_decode(BigUint::from(256u32), &[1, 0]);
+        // u64::MAX
+        check_top_encode_decode(
+            BigUint::from(u64::MAX),
+            &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF],
+        );
+    }
+
+    #[test]
+    fn test_dep_large() {
+        check_dep_encode_decode(BigUint::from(256u32), &[0, 0, 0, 2, 1, 0]);
+    }
 }
