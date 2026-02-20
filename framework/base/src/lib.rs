@@ -22,10 +22,7 @@ pub use multiversx_sc_abi as abi;
 
 /// Must be called from here, to capture the framework crate info, and not the abi crate info.
 pub fn framework_build_abi() -> abi::FrameworkBuildAbi {
-    abi::FrameworkBuildAbi::new(
-        env!("CARGO_PKG_NAME"),
-        env!("CARGO_PKG_VERSION"),
-    )
+    abi::FrameworkBuildAbi::new(env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
 }
 
 pub mod api;
