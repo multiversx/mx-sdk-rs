@@ -398,13 +398,7 @@ mod sample_adder {
         type Api = multiversx_sc::api::uncallable::UncallableApi;
         fn abi() -> multiversx_sc::abi::ContractAbi {
             let mut contract_abi = multiversx_sc::abi::ContractAbi::new(
-                multiversx_sc::abi::BuildInfoAbi {
-                    rustc: None,
-                    contract_crate: multiversx_sc::abi::ContractCrateBuildAbi::new(
-                        "adder", "0.0.0",
-                    ),
-                    framework: multiversx_sc::abi::FrameworkBuildAbi::create(),
-                },
+                multiversx_sc::abi::BuildInfoAbi::dummy(),
                 &[
                     "One of the simplest smart contracts possible,",
                     "it holds a single variable in storage, which anyone can increment.",
