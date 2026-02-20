@@ -18,15 +18,14 @@ pub fn convert_to_owned_type(ty: &syn::Type) -> proc_macro2::TokenStream {
             return quote! {
                 multiversx_sc::types::Box<[#slice_elem]>
             };
-        } else if let syn::Type::Path(syn::TypePath { path, .. }) = &*type_reference.elem {
-            if let Some(ident) = path.get_ident() {
-                if *ident == "str" {
-                    // TODO: generalize for all unsized types using Box
-                    return quote! {
-                        multiversx_sc::types::Box<str>
-                    };
-                }
-            }
+        } else if let syn::Type::Path(syn::TypePath { path, .. }) = &*type_reference.elem
+            && let Some(ident) = path.get_ident()
+            && *ident == "str"
+        {
+            // TODO: generalize for all unsized types using Box
+            return quote! {
+                Box<str>
+            };
         }
 
         let referenced_type = &*type_reference.elem;

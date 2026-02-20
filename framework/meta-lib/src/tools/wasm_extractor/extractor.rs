@@ -312,10 +312,10 @@ impl WasmInfo {
 
         for export in export_section {
             let export = export.expect("Failed to read export section");
-            if wasmparser::ExternalKind::Func == export.kind {
-                if let Some(endpoint) = self.call_graph.endpoints.get_mut(export.name) {
-                    endpoint.set_index(export.index.try_into().unwrap());
-                }
+            if wasmparser::ExternalKind::Func == export.kind
+                && let Some(endpoint) = self.call_graph.endpoints.get_mut(export.name)
+            {
+                endpoint.set_index(export.index.try_into().unwrap());
             }
         }
     }

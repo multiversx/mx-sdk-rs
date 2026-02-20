@@ -36,12 +36,12 @@ pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &
 
 /// Regex was not needed yet, add if it becomes necessary.
 pub(crate) fn rename_files(path: &Path, patterns: &[(&str, &str)]) {
-    if let Some(file_name_str) = try_get_file_name_str(path) {
-        if let Some(replaced_file_name) = try_replace_file_name(file_name_str, patterns) {
-            let replaced_path = path.parent().unwrap().join(replaced_file_name);
-            print_rename(path, replaced_path.as_path());
-            fs::rename(path, replaced_path).expect("failed to rename file");
-        }
+    if let Some(file_name_str) = try_get_file_name_str(path)
+        && let Some(replaced_file_name) = try_replace_file_name(file_name_str, patterns)
+    {
+        let replaced_path = path.parent().unwrap().join(replaced_file_name);
+        print_rename(path, replaced_path.as_path());
+        fs::rename(path, replaced_path).expect("failed to rename file");
     }
 
     if path.is_dir() {
@@ -57,10 +57,10 @@ fn try_get_file_name_str(path: &Path) -> Option<&str> {
     if !path.is_file() {
         return None;
     }
-    if let Some(file_name) = path.file_name() {
-        if let Some(file_name_str) = file_name.to_str() {
-            return Some(file_name_str);
-        }
+    if let Some(file_name) = path.file_name()
+        && let Some(file_name_str) = file_name.to_str()
+    {
+        return Some(file_name_str);
     }
     None
 }

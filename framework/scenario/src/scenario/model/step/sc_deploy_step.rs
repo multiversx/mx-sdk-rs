@@ -101,10 +101,10 @@ impl ScDeployStep {
     }
 
     pub fn save_response(&mut self, mut tx_response: TxResponse) {
-        if let Some(expect) = &mut self.expect {
-            if expect.build_from_response {
-                expect.update_from_response(&tx_response)
-            }
+        if let Some(expect) = &mut self.expect
+            && expect.build_from_response
+        {
+            expect.update_from_response(&tx_response)
         }
         if tx_response.tx_hash.is_none() {
             tx_response.tx_hash = self

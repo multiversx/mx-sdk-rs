@@ -102,8 +102,7 @@ pub trait ForwarderSyncCallModule {
         let payment = self.call_value().single_esdt();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
-        let result = self
-            .tx()
+        self.tx()
             .to(&to)
             .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
@@ -114,9 +113,7 @@ pub trait ForwarderSyncCallModule {
                 &payment.amount,
             )
             .returns(ReturnsBackTransfersSingleESDT)
-            .sync_call();
-
-        result
+            .sync_call()
     }
 
     #[allow(deprecated)]

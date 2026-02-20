@@ -415,23 +415,22 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.context.m_types_lock().mb_get(token_id_handle).to_vec();
 
-        if let Some(account) = self.context.account_data(&address) {
-            if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
-                if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
-                    self.set_esdt_data_values(
-                        esdt_data,
-                        instance,
-                        value_handle,
-                        properties_handle,
-                        hash_handle,
-                        name_handle,
-                        attributes_handle,
-                        creator_handle,
-                        royalties_handle,
-                        uris_handle,
-                    )?
-                }
-            }
+        if let Some(account) = self.context.account_data(&address)
+            && let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice())
+            && let Some(instance) = esdt_data.instances.get_by_nonce(nonce)
+        {
+            self.set_esdt_data_values(
+                esdt_data,
+                instance,
+                value_handle,
+                properties_handle,
+                hash_handle,
+                name_handle,
+                attributes_handle,
+                creator_handle,
+                royalties_handle,
+                uris_handle,
+            )?
         }
 
         // missing account/token identifier/nonce
@@ -501,10 +500,10 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
         let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.context.m_types_lock().mb_get(token_id_handle).to_vec();
-        if let Some(account) = self.context.account_data(&address) {
-            if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
-                return Ok(esdt_data.frozen);
-            }
+        if let Some(account) = self.context.account_data(&address)
+            && let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice())
+        {
+            return Ok(esdt_data.frozen);
         }
 
         // Might be better to return Err and check

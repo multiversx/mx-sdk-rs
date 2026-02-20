@@ -376,15 +376,13 @@ mod sample_adder {
         fn callback(&mut self) {
             if let Some(___cb_closure___) =
                 multiversx_sc::types::CallbackClosureForDeser::storage_load_and_clear::<Self::Api>()
-            {
-                if !self::EndpointWrappers::callback_selector(self, &___cb_closure___)
+                && !self::EndpointWrappers::callback_selector(self, &___cb_closure___)
                     .is_processed()
-                {
-                    multiversx_sc::api::ErrorApiImpl::signal_error(
-                        &<Self::Api as multiversx_sc::api::ErrorApi>::error_api_impl(),
-                        err_msg::CALLBACK_BAD_FUNC.as_bytes(),
-                    );
-                }
+            {
+                multiversx_sc::api::ErrorApiImpl::signal_error(
+                    &<Self::Api as multiversx_sc::api::ErrorApi>::error_api_impl(),
+                    err_msg::CALLBACK_BAD_FUNC.as_bytes(),
+                );
             }
         }
     }
