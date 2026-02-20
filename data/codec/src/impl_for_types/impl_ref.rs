@@ -27,6 +27,7 @@ impl<T: TopEncode> TopEncode for Box<T> {
 }
 
 impl<T: TopDecode> TopDecode for Box<T> {
+    #[inline]
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -48,6 +49,7 @@ impl<T: NestedEncode> NestedEncode for &T {
 }
 
 impl<T: NestedEncode> NestedEncode for Box<T> {
+    #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -58,6 +60,7 @@ impl<T: NestedEncode> NestedEncode for Box<T> {
 }
 
 impl<T: NestedDecode> NestedDecode for Box<T> {
+    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,

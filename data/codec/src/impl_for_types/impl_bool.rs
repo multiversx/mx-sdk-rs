@@ -15,7 +15,6 @@ fn parse_byte<H: DecodeErrorHandler>(byte: u8, h: H) -> Result<bool, H::HandledE
 }
 
 impl TopEncode for bool {
-    #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -50,7 +49,6 @@ impl TopDecode for bool {
 }
 
 impl NestedEncode for bool {
-    #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,

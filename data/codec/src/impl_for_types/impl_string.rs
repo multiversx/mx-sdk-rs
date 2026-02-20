@@ -16,6 +16,7 @@ impl TopEncode for String {
 }
 
 impl TopEncode for &str {
+    #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -52,6 +53,7 @@ impl TopDecode for String {
 }
 
 impl TopDecode for Box<str> {
+    #[inline]
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -73,6 +75,7 @@ impl NestedEncode for String {
 }
 
 impl NestedEncode for &str {
+    #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,

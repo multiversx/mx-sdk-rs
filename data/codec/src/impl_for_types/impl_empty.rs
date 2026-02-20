@@ -22,6 +22,7 @@ impl TopEncode for Empty {
 }
 
 impl TopDecode for Empty {
+    #[inline]
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
