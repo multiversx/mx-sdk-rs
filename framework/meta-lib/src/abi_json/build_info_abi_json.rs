@@ -8,7 +8,9 @@ pub struct BuildInfoAbiJson {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rustc: Option<RustcAbiJson>,
     pub contract_crate: ContractCrateBuildAbiJson,
-    pub abi: FrameworkBuildAbiJson,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub abi: Option<FrameworkBuildAbiJson>,
     pub framework: FrameworkBuildAbiJson,
 }
 
@@ -17,7 +19,7 @@ impl From<&BuildInfoAbi> for BuildInfoAbiJson {
         BuildInfoAbiJson {
             rustc: abi.rustc.as_ref().map(RustcAbiJson::from),
             contract_crate: ContractCrateBuildAbiJson::from(&abi.contract_crate),
-            abi: FrameworkBuildAbiJson::from(&abi.abi),
+            abi: abi.abi.as_ref().map(FrameworkBuildAbiJson::from),
             framework: FrameworkBuildAbiJson::from(&abi.framework),
         }
     }
@@ -28,7 +30,7 @@ impl From<&BuildInfoAbiJson> for BuildInfoAbi {
         BuildInfoAbi {
             rustc: abi_json.rustc.as_ref().map(RustcAbi::from),
             contract_crate: ContractCrateBuildAbi::from(&abi_json.contract_crate),
-            abi: FrameworkBuildAbi::from(&abi_json.abi),
+            abi: abi_json.abi.as_ref().map(FrameworkBuildAbi::from),
             framework: FrameworkBuildAbi::from(&abi_json.framework),
         }
     }

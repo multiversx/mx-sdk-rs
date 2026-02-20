@@ -7,7 +7,7 @@ use alloc::{borrow::ToOwned, string::String};
 pub struct BuildInfoAbi {
     pub rustc: Option<RustcAbi>,
     pub contract_crate: ContractCrateBuildAbi,
-    pub abi: FrameworkBuildAbi,
+    pub abi: Option<FrameworkBuildAbi>,
     pub framework: FrameworkBuildAbi,
 }
 
@@ -20,7 +20,7 @@ impl BuildInfoAbi {
                 version: "0.0.0".to_owned(),
                 git_version: "0.0.0".to_owned(),
             },
-            abi: FrameworkBuildAbi::new("abi-crate", "0.0.0"),
+            abi: Some(FrameworkBuildAbi::new("abi-crate", "0.0.0")),
             framework: FrameworkBuildAbi::new("framework-crate", "0.0.0"),
         }
     }

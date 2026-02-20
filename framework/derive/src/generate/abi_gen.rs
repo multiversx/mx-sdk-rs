@@ -276,7 +276,7 @@ fn generate_abi_method_body(
                     env!("CARGO_PKG_NAME"),
                     env!("CARGO_PKG_VERSION"),
                 ),
-                abi: multiversx_sc::abi::FrameworkBuildAbi::abi_crate(),
+                abi: Some(multiversx_sc::abi::FrameworkBuildAbi::abi_crate()),
                 framework: multiversx_sc::framework_build_abi(),
             },
             &[ #(#contract_docs),* ],
