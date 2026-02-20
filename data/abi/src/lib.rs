@@ -1,3 +1,5 @@
+#![no_std]
+
 // re-export basic heap types
 extern crate alloc;
 
