@@ -34,7 +34,3 @@ version = "0.24.0"
 num-bigint = { version = "0.4", optional = true }           # can only be used in std contexts
 unwrap-infallible = "1.0"
 bitflags = "2.9"
-
-# [dev-dependencies.multiversx-sc-codec-derive]
-# path = "../codec-derive"
-# version = "=0.24.0"
