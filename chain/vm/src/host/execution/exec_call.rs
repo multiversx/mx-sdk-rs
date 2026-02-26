@@ -67,16 +67,16 @@ where
 
     // legacy async call
     // the async call also gets reset
-    if tx_result.result_status.is_success() {
-        if let Some(async_data) = pending_calls.async_call {
-            let (async_result, callback_result) =
-                commit_async_call_and_callback(async_data, state, runtime);
+    if tx_result.result_status.is_success()
+        && let Some(async_data) = pending_calls.async_call
+    {
+        let (async_result, callback_result) =
+            commit_async_call_and_callback(async_data, state, runtime);
 
-            tx_result = merge_async_results(tx_result, async_result);
-            tx_result = merge_async_results(tx_result, callback_result);
+        tx_result = merge_async_results(tx_result, async_result);
+        tx_result = merge_async_results(tx_result, callback_result);
 
-            return tx_result;
-        }
+        return tx_result;
     }
 
     // calling all promises
