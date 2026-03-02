@@ -1,6 +1,6 @@
 use core::borrow::Borrow;
 
-use multiversx_sc_codec::multi_types::MultiValueVec;
+use multiversx_sc_codec::multi_types::{IgnoreValue, MultiValueVec};
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -249,6 +249,13 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
     U: TypeAbi,
+{
+}
+
+impl<M, T> TypeAbiFrom<IgnoreValue> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi,
 {
 }
 

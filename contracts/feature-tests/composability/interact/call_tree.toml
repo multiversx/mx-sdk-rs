@@ -1,0 +1,21 @@
+[gateway]
+uri = "https://testnet-gateway.multiversx.com"
+chain_type = "real"
+
+[[contracts]]
+index = 0
+name = "root"
+kind = "forwarder"
+address = "erd1qqqqqqqqqqqqqpgq0rsyslufrsartut6h4q6jj89mldpw8fyn54qtjsp7v"
+
+[[contracts.children]]
+to = 1
+call_type = "legacy_async"
+gas_limit = 10000000
+endpoint_name = "accept_funds"
+
+[[contracts]]
+index = 1
+name = "vault"
+kind = "vault"
+address = "erd1qqqqqqqqqqqqqpgqhh0cw4mgat7w4wnajlgefjhjpvrsu032n54qwhnjmx"

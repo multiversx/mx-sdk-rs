@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub enum QueuedCallType {
     Sync,
     LegacyAsync,
@@ -14,7 +14,7 @@ pub enum QueuedCallType {
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct QueuedCall<M: ManagedTypeApi> {
     pub call_type: QueuedCallType,
     pub to: ManagedAddress<M>,
@@ -27,153 +27,60 @@ pub struct QueuedCall<M: ManagedTypeApi> {
 /// Testing multiple calls per transaction.
 #[multiversx_sc::contract]
 pub trait ForwarderQueue {
-    #[init]
-    fn init(&self) {}
-
     #[view]
     #[storage_mapper("queued_calls")]
-    fn queued_calls(&self) -> LinkedListMapper<QueuedCall<Self::Api>>;
+    fn queued_calls(&self) -> SingleValueMapper<ManagedVec<QueuedCall<Self::Api>>>;
 
-    #[endpoint]
-    #[payable("*")]
-    fn add_queued_call_sync(
-        &self,
-        to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        self.add_queued_call(QueuedCallType::Sync, to, 0, endpoint_name, args);
+    #[init]
+    fn init(&self, calls: MultiValueManagedVec<QueuedCall<Self::Api>>) {
+        self.set_queued_calls(calls);
     }
 
     #[endpoint]
-    #[payable("*")]
-    fn add_queued_call_legacy_async(
-        &self,
-        to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        self.add_queued_call(QueuedCallType::LegacyAsync, to, 0, endpoint_name, args);
+    fn set_queued_calls(&self, calls: MultiValueManagedVec<QueuedCall<Self::Api>>) {
+        self.queued_calls().set(calls.into_vec());
     }
 
-    #[endpoint]
-    #[payable("*")]
-    fn add_queued_call_transfer_execute(
-        &self,
-        to: ManagedAddress,
-        gas_limit: u64,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        self.add_queued_call(
-            QueuedCallType::TransferExecute,
-            to,
-            gas_limit,
-            endpoint_name,
-            args,
-        );
-    }
-
-    #[endpoint]
-    #[payable("*")]
-    fn add_queued_call_transfer_esdt(
-        &self,
-        to: ManagedAddress,
-        gas_limit: u64,
-        endpoint_name: ManagedBuffer,
-        token: TokenId,
-        amount: NonZeroBigUint,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let call_type = QueuedCallType::Promise;
-        self.queued_calls().push_back(QueuedCall {
-            call_type,
-            to,
-            gas_limit,
-            endpoint_name,
-            args: args.to_arg_buffer(),
-            payments: PaymentVec::from_single_item(Payment::new(token, 0, amount)),
-        });
-    }
-
-    #[endpoint]
-    #[payable("*")]
-    fn add_queued_call_promise(
-        &self,
-        to: ManagedAddress,
-        gas_limit: u64,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        self.add_queued_call(QueuedCallType::Promise, to, gas_limit, endpoint_name, args);
-    }
-
-    #[endpoint]
-    #[payable("*")]
-    fn add_queued_call(
-        &self,
-        call_type: QueuedCallType,
-        to: ManagedAddress,
-        gas_limit: u64,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
-        let payments = self.call_value().all();
-
-        self.add_queued_call_event(
-            &call_type,
-            &to,
-            &endpoint_name,
-            &payments.clone().into_multi_value(),
+    fn forward_queued_call(&self, call: QueuedCall<Self::Api>) {
+        self.forward_queued_call_payment_event(
+            &call.call_type,
+            &call.to,
+            &call.endpoint_name,
+            &call.payments.clone().into_multi_value(),
         );
 
-        self.queued_calls().push_back(QueuedCall {
-            call_type,
-            to,
-            gas_limit,
-            endpoint_name,
-            args: args.to_arg_buffer(),
-            payments: payments.clone(),
-        });
+        let contract_call = self
+            .tx()
+            .raw_call(call.endpoint_name)
+            .to(&call.to)
+            .payment(&call.payments);
+
+        match call.call_type {
+            QueuedCallType::Sync => {
+                contract_call.sync_call();
+            }
+            QueuedCallType::LegacyAsync => {
+                contract_call.async_call_and_exit();
+            }
+            QueuedCallType::TransferExecute => {
+                contract_call.gas(call.gas_limit).transfer_execute();
+            }
+            QueuedCallType::Promise => {
+                contract_call
+                    .gas(call.gas_limit)
+                    .arguments_raw(call.args)
+                    .callback(self.callbacks().promises_callback_method())
+                    .register_promise();
+            }
+        }
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_queued_calls(&self) {
-        while let Some(node) = self.queued_calls().pop_front() {
-            let call = node.clone().into_value();
-
-            self.forward_queued_call_payment_event(
-                &call.call_type,
-                &call.to,
-                &call.endpoint_name,
-                &call.payments.clone().into_multi_value(),
-            );
-
-            let contract_call = self
-                .tx()
-                .raw_call(call.endpoint_name)
-                .to(&call.to)
-                .payment(&call.payments);
-
-            match call.call_type {
-                QueuedCallType::Sync => {
-                    contract_call.sync_call();
-                }
-                QueuedCallType::LegacyAsync => {
-                    contract_call.async_call_and_exit();
-                }
-                QueuedCallType::TransferExecute => {
-                    contract_call.gas(call.gas_limit).transfer_execute();
-                }
-                QueuedCallType::Promise => {
-                    contract_call
-                        .gas(call.gas_limit)
-                        .arguments_raw(call.args)
-                        .callback(self.callbacks().promises_callback_method())
-                        .register_promise();
-                }
-            }
+        let calls = self.queued_calls().get();
+        for call in calls {
+            self.forward_queued_call(call);
         }
     }
 
@@ -203,15 +110,6 @@ pub trait ForwarderQueue {
 
     #[event("forward_queued_call_payment")]
     fn forward_queued_call_payment_event(
-        &self,
-        #[indexed] call_type: &QueuedCallType,
-        #[indexed] to: &ManagedAddress,
-        #[indexed] endpoint_name: &ManagedBuffer,
-        #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,
-    );
-
-    #[event("add_queued_call")]
-    fn add_queued_call_event(
         &self,
         #[indexed] call_type: &QueuedCallType,
         #[indexed] to: &ManagedAddress,

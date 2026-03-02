@@ -1,132 +1,92 @@
-use std::{cell::RefCell, rc::Rc};
-
 use multiversx_sc_snippets::imports::*;
-use num_bigint::BigUint;
 
 use crate::{
-    call_tree::{CallNode, CallState, ForwarderQueueTarget},
+    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType, ContractKind},
     comp_interact_controller::ComposabilityInteract,
-    forwarder_queue_proxy::{self, QueuedCallType},
+    forwarder_queue_proxy::{self, QueuedCall, QueuedCallType},
 };
 
-const FORWARD_QUEUED_CALLS_ENDPOINT: &str = "forward_queued_calls";
-const DEFAULT_GAS_LIMIT: u64 = 10_000_000;
-
 impl ComposabilityInteract {
-    pub async fn add_queued_calls_to_children(
-        &mut self,
-        forwarders: &Vec<Rc<RefCell<ForwarderQueueTarget>>>,
-        call_type: QueuedCallType,
-        endpoint_name: &str,
-        payment_token: EgldOrEsdtTokenIdentifier<StaticApi>,
-        payment_nonce: u64,
-        payment_amount: BigUint,
-    ) {
+    /// For every forwarder in `call_tree.toml` that has children, build the
+    /// corresponding `QueuedCall` list and send a `set_queued_calls` tx.
+    /// All txs are batched in a single homogenous call buffer.
+    pub async fn set_queued_calls_from_config(&mut self) {
+        let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
+
+        // Build index → bech32 address map.
+        let addr_map: std::collections::HashMap<usize, Bech32Address> = config
+            .contracts
+            .iter()
+            .filter_map(|c| {
+                c.address
+                    .as_ref()
+                    .map(|a| (c.index, Bech32Address::from_bech32_string(a.clone())))
+            })
+            .collect();
+
         let mut buffer = self.interactor.homogenous_call_buffer();
 
-        for fwd_rc in forwarders {
-            let (fwd_name, fwd_children) = {
-                let fwd = fwd_rc.borrow();
-                (fwd.name.clone(), fwd.children.clone())
-            };
-            let fwd_addr = {
-                let fwd = fwd_rc.borrow();
-                fwd.address.clone().unwrap()
-            };
-
-            for child in &fwd_children {
-                match child {
-                    CallNode::ForwarderQueue(child_fwd_rc) => {
-                        // forward_queued_calls to ForwarderQueue's children
-                        let child_fwd_addr = {
-                            let child_fwd = (*child_fwd_rc).borrow();
-                            println!("child_name: {}, parent_name: {}", child_fwd.name, &fwd_name);
-                            child_fwd.address.clone().unwrap()
-                        };
-
-                        buffer.push_tx(|tx| {
-                            tx.from(&self.wallet_address)
-                                .to(&fwd_addr)
-                                .gas(70_000_000u64)
-                                .typed(forwarder_queue_proxy::ForwarderQueueProxy)
-                                .add_queued_call(
-                                    call_type.clone(),
-                                    child_fwd_addr,
-                                    DEFAULT_GAS_LIMIT,
-                                    FORWARD_QUEUED_CALLS_ENDPOINT,
-                                    MultiValueEncoded::<StaticApi, _>::new(),
-                                )
-                                .payment(EgldOrEsdtTokenPayment::new(
-                                    payment_token.clone(),
-                                    payment_nonce,
-                                    payment_amount.clone().into(),
-                                ))
-                                .returns(ReturnsStatus)
-                                .returns(ReturnsResult)
-                        });
-                    }
-                    CallNode::Vault(vault_rc) => {
-                        // Call Vault
-                        let vault_addr = {
-                            let vault = (*vault_rc).borrow();
-                            println!("child_name: {}, parent_name: {}", vault.name, &fwd_name);
-                            vault.address.clone().unwrap()
-                        };
-
-                        buffer.push_tx(|tx| {
-                            tx.from(&self.wallet_address)
-                                .to(&fwd_addr)
-                                .gas(70_000_000u64)
-                                .typed(forwarder_queue_proxy::ForwarderQueueProxy)
-                                .add_queued_call(
-                                    call_type.clone(),
-                                    vault_addr,
-                                    DEFAULT_GAS_LIMIT,
-                                    endpoint_name,
-                                    MultiValueEncoded::<StaticApi, _>::new(),
-                                )
-                                .payment(EgldOrEsdtTokenPayment::new(
-                                    payment_token.clone(),
-                                    payment_nonce,
-                                    payment_amount.clone().into(),
-                                ))
-                                .returns(ReturnsStatus)
-                                .returns(ReturnsResult)
-                        });
-                    }
-                }
+        for contract in &config.contracts {
+            if contract.kind != ContractKind::Forwarder || contract.children.is_empty() {
+                continue;
             }
+
+            let fwd_addr = addr_map
+                .get(&contract.index)
+                .unwrap_or_else(|| panic!("no address for forwarder '{}'", contract.name))
+                .clone();
+
+            // Convert each ChildCall config into a managed QueuedCall.
+            let mut calls: MultiValueManagedVec<StaticApi, QueuedCall<StaticApi>> =
+                MultiValueManagedVec::new();
+            for child_call in &contract.children {
+                let child_addr = addr_map
+                    .get(&child_call.to)
+                    .unwrap_or_else(|| panic!("no address for contract index {}", child_call.to))
+                    .to_address();
+
+                let call_type = to_queued_call_type(&child_call.call_type);
+                calls.push(QueuedCall {
+                    call_type,
+                    to: ManagedAddress::from(child_addr),
+                    gas_limit: child_call.gas_limit,
+                    endpoint_name: ManagedBuffer::from(child_call.endpoint_name.as_bytes()),
+                    args: ManagedArgBuffer::new(),
+                    payments: ManagedVec::new(),
+                });
+            }
+
+            println!(
+                "Setting {} queued call(s) on forwarder '{}'",
+                calls.len(),
+                contract.name
+            );
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .to(fwd_addr)
+                    .gas(NumExpr("70,000,000"))
+                    .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                    .set_queued_calls(calls)
+                    .returns(ReturnsStatus)
+            });
         }
 
         let results = buffer.run().await;
-
-        for (index, (status, result)) in results.iter().enumerate() {
-            if !status == 0u64 {
-                println!("perform 'add_queued_call' failed with error code {status}");
-                continue;
+        for (i, status) in results.iter().enumerate() {
+            if *status == 0u64 {
+                println!("set_queued_calls #{i}: ok");
+            } else {
+                println!("set_queued_calls #{i}: failed with status {status}");
             }
-            println!(
-                "successfully performed action {index} 'add_queued_call' with result {result:?}"
-            );
         }
     }
+}
 
-    pub async fn call_root(&mut self, call_state: &CallState) {
-        let root_addr = {
-            let root_addr_ref = call_state.root.borrow();
-            root_addr_ref.address.clone().unwrap()
-        };
-
-        self.interactor
-            .tx()
-            .from(&self.wallet_address)
-            .gas(70_000_000u64)
-            .to(&root_addr)
-            .typed(forwarder_queue_proxy::ForwarderQueueProxy)
-            .forward_queued_calls()
-            .run()
-            .await;
-
-        println!("successfully called root");
+fn to_queued_call_type(call_type: &CallType) -> QueuedCallType {
+    match call_type {
+        CallType::Sync => QueuedCallType::Sync,
+        CallType::LegacyAsync => QueuedCallType::LegacyAsync,
+        CallType::TransferExecute => QueuedCallType::TransferExecute,
+        CallType::Promise => QueuedCallType::Promise,
     }
 }

@@ -43,12 +43,16 @@ where
     From: TxFrom<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn init(
+    pub fn init<
+        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, QueuedCall<Env::Api>>>,
+    >(
         self,
+        calls: Arg0,
     ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_deploy()
+            .argument(&calls)
             .original_result()
     }
 }
@@ -64,139 +68,23 @@ where
 {
     pub fn queued_calls(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, QueuedCall<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, QueuedCall<Env::Api>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("queued_calls")
             .original_result()
     }
 
-    pub fn add_queued_call_sync<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg2: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+    pub fn set_queued_calls<
+        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, QueuedCall<Env::Api>>>,
     >(
         self,
-        to: Arg0,
-        endpoint_name: Arg1,
-        args: Arg2,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
+        calls: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
-            .raw_call("add_queued_call_sync")
-            .argument(&to)
-            .argument(&endpoint_name)
-            .argument(&args)
-            .original_result()
-    }
-
-    pub fn add_queued_call_legacy_async<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg2: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
-    >(
-        self,
-        to: Arg0,
-        endpoint_name: Arg1,
-        args: Arg2,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
-        self.wrapped_tx
-            .raw_call("add_queued_call_legacy_async")
-            .argument(&to)
-            .argument(&endpoint_name)
-            .argument(&args)
-            .original_result()
-    }
-
-    pub fn add_queued_call_transfer_execute<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<u64>,
-        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg3: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
-    >(
-        self,
-        to: Arg0,
-        gas_limit: Arg1,
-        endpoint_name: Arg2,
-        args: Arg3,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
-        self.wrapped_tx
-            .raw_call("add_queued_call_transfer_execute")
-            .argument(&to)
-            .argument(&gas_limit)
-            .argument(&endpoint_name)
-            .argument(&args)
-            .original_result()
-    }
-
-    pub fn add_queued_call_transfer_esdt<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<u64>,
-        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg3: ProxyArg<TokenId<Env::Api>>,
-        Arg4: ProxyArg<NonZeroBigUint<Env::Api>>,
-        Arg5: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
-    >(
-        self,
-        to: Arg0,
-        gas_limit: Arg1,
-        endpoint_name: Arg2,
-        token: Arg3,
-        amount: Arg4,
-        args: Arg5,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
-        self.wrapped_tx
-            .raw_call("add_queued_call_transfer_esdt")
-            .argument(&to)
-            .argument(&gas_limit)
-            .argument(&endpoint_name)
-            .argument(&token)
-            .argument(&amount)
-            .argument(&args)
-            .original_result()
-    }
-
-    pub fn add_queued_call_promise<
-        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<u64>,
-        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg3: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
-    >(
-        self,
-        to: Arg0,
-        gas_limit: Arg1,
-        endpoint_name: Arg2,
-        args: Arg3,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
-        self.wrapped_tx
-            .raw_call("add_queued_call_promise")
-            .argument(&to)
-            .argument(&gas_limit)
-            .argument(&endpoint_name)
-            .argument(&args)
-            .original_result()
-    }
-
-    pub fn add_queued_call<
-        Arg0: ProxyArg<QueuedCallType>,
-        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg2: ProxyArg<u64>,
-        Arg3: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg4: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
-    >(
-        self,
-        call_type: Arg0,
-        to: Arg1,
-        gas_limit: Arg2,
-        endpoint_name: Arg3,
-        args: Arg4,
-    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
-        self.wrapped_tx
-            .raw_call("add_queued_call")
-            .argument(&call_type)
-            .argument(&to)
-            .argument(&gas_limit)
-            .argument(&endpoint_name)
-            .argument(&args)
+            .payment(NotPayable)
+            .raw_call("set_queued_calls")
+            .argument(&calls)
             .original_result()
     }
 
@@ -228,7 +116,7 @@ where
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct QueuedCall<Api>
 where
     Api: ManagedTypeApi,
@@ -242,7 +130,7 @@ where
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub enum QueuedCallType {
     Sync,
     LegacyAsync,
