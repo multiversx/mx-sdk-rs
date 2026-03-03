@@ -13,7 +13,7 @@ readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
 homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
-description = "Lightweight binary serializer/deserializer, written especially for MultiversX smart contracts"
+description = "ABI type definitions and metadata for MultiversX smart contracts"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = [
     "no-std",
