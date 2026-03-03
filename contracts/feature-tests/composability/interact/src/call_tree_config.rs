@@ -140,54 +140,6 @@ pub struct CallTreeConfig {
 }
 
 impl CallTreeConfig {
-    /// Scenario 1: root forwarder → single vault.
-    ///
-    /// ```toml
-    /// [[contracts]]
-    /// index = 0
-    /// name = "root"
-    /// kind = "forwarder"
-    ///
-    /// [[contracts.children]]
-    /// to = 1
-    /// call_type = "legacy_async"
-    /// gas_limit = 10000000
-    /// endpoint_name = "accept_funds"
-    ///
-    /// [[contracts]]
-    /// index = 1
-    /// name = "vault"
-    /// kind = "vault"
-    /// ```
-    pub fn scenario_1() -> Self {
-        CallTreeConfig {
-            gateway: GatewayConfig::default(),
-            contracts: vec![
-                ContractConfig {
-                    index: 0,
-                    name: "root".to_string(),
-                    kind: ContractKind::Forwarder,
-                    address: None,
-                    children: vec![ChildCall {
-                        to: 1,
-                        call_type: CallType::LegacyAsync,
-                        gas_limit: 10_000_000,
-                        endpoint_name: "accept_funds".to_string(),
-                        args: Vec::new(),
-                        payments: Vec::new(),
-                    }],
-                },
-                ContractConfig {
-                    index: 1,
-                    name: "vault".to_string(),
-                    kind: ContractKind::Vault,
-                    address: None,
-                    children: Vec::new(),
-                },
-            ],
-        }
-    }
-
     /// Serialize the call tree to a TOML file.
     pub fn save_to_file(&self, path: &str) {
         let toml_str = toml::to_string_pretty(self).expect("failed to serialize call tree");

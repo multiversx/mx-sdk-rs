@@ -6,7 +6,6 @@ chain_type = "real"
 index = 0
 name = "root"
 kind = "forwarder"
-address = "erd1qqqqqqqqqqqqqpgq0rsyslufrsartut6h4q6jj89mldpw8fyn54qtjsp7v"
 
 [[contracts.children]]
 to = 1
@@ -18,4 +17,3 @@ endpoint_name = "accept_funds"
 index = 1
 name = "vault"
 kind = "vault"
-address = "erd1qqqqqqqqqqqqqpgqhh0cw4mgat7w4wnajlgefjhjpvrsu032n54qwhnjmx"
