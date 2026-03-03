@@ -3031,7 +3031,7 @@ dependencies = [
 
 [[package]]
 name = "multisig"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -3171,10 +3171,38 @@ dependencies = [
  "bitflags 2.11.0",
  "generic-array 1.3.5",
  "multiversx-chain-core",
+ "multiversx-sc-abi",
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
  "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi"
+version = "0.25.0"
+dependencies = [
+ "bitflags 2.11.0",
+ "multiversx-chain-core",
+ "multiversx-sc-codec",
+ "num-bigint",
+ "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive"
+version = "0.25.0"
+dependencies = [
+ "multiversx-sc-abi-derive-common",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive-common"
+version = "0.25.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -3211,7 +3239,7 @@ dependencies = [
 name = "multiversx-sc-derive"
 version = "0.65.0"
 dependencies = [
- "hex",
+ "multiversx-sc-abi-derive-common",
  "proc-macro2",
  "quote",
  "radix_trie",

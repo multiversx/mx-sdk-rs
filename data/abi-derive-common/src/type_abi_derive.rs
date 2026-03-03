@@ -1,16 +1,32 @@
-use crate::parse::attributes::extract_macro_attributes;
-
-use super::parse::attributes::extract_doc;
+use crate::parse::attributes::{extract_doc, extract_macro_attributes};
 use quote::{ToTokens, quote};
 
 const BITFLAGS_PATH: &str = ":: __private :: PublicFlags :: Internal";
 const BITFLAGS_PRIMITIVE: &str = "Primitive";
+
 pub struct ExplicitDiscriminant {
     pub variant_index: usize,
     pub value: usize,
 }
 
-fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
+#[derive(Clone, Copy)]
+pub enum TypeAbiImportCrate {
+    MultiversxSc,
+    MultiversxScAbi,
+}
+
+fn import_tokens(context: TypeAbiImportCrate) -> proc_macro2::TokenStream {
+    match context {
+        TypeAbiImportCrate::MultiversxSc => quote! { multiversx_sc::abi },
+        TypeAbiImportCrate::MultiversxScAbi => quote! { multiversx_sc_abi },
+    }
+}
+
+fn field_snippet(
+    index: usize,
+    field: &syn::Field,
+    context: TypeAbiImportCrate,
+) -> proc_macro2::TokenStream {
     let field_docs = extract_doc(field.attrs.as_slice());
     let field_name_str = if let Some(ident) = &field.ident {
         ident.to_string()
@@ -18,8 +34,9 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
         index.to_string()
     };
     let field_ty = sanitize_field_type_path(&field.ty);
+    let imports = import_tokens(context);
     quote! {
-        field_descriptions.push(multiversx_sc::abi::StructFieldDescription::new(
+        field_descriptions.push(#imports::StructFieldDescription::new(
             &[ #(#field_docs),* ],
             #field_name_str,
             <#field_ty>::type_names(),
@@ -46,26 +63,32 @@ fn sanitize_field_type_path(field_type: &syn::Type) -> syn::Type {
     field_type.clone()
 }
 
-fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+fn fields_snippets(
+    fields: &syn::Fields,
+    context: TypeAbiImportCrate,
+) -> Vec<proc_macro2::TokenStream> {
     match fields {
         syn::Fields::Named(fields_named) => fields_named
             .named
             .iter()
             .enumerate()
-            .map(|(index, field)| field_snippet(index, field))
+            .map(|(index, field)| field_snippet(index, field, context))
             .collect(),
         syn::Fields::Unnamed(fields_unnamed) => fields_unnamed
             .unnamed
             .iter()
             .enumerate()
-            .map(|(index, field)| field_snippet(index, field))
+            .map(|(index, field)| field_snippet(index, field, context))
             .collect(),
         syn::Fields::Unit => Vec::new(),
     }
 }
 
-pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
-    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+pub fn type_abi_derive(
+    input: proc_macro2::TokenStream,
+    context: TypeAbiImportCrate,
+) -> proc_macro2::TokenStream {
+    let ast: syn::DeriveInput = syn::parse2(input).unwrap();
     let name = &ast.ident;
     let name_str = name.to_string();
     let type_docs = extract_doc(ast.attrs.as_slice());
@@ -76,22 +99,24 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
         );
     }
 
+    let imports = import_tokens(context);
+
     let type_description_impl = match &ast.data {
         syn::Data::Struct(data_struct) => {
-            let struct_field_snippets = fields_snippets(&data_struct.fields);
+            let struct_field_snippets = fields_snippets(&data_struct.fields, context);
             quote! {
-                fn provide_type_descriptions<TDC: multiversx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
+                fn provide_type_descriptions<TDC: #imports::TypeDescriptionContainer>(accumulator: &mut TDC) {
                     let type_names = Self::type_names();
                     if !accumulator.contains_type(&type_names.abi) {
                         accumulator.reserve_type_name(type_names.clone());
-                        let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
+                        let mut field_descriptions = #imports::Vec::new();
                         #(#struct_field_snippets)*
                         accumulator.insert(
                             type_names.clone(),
-                            multiversx_sc::abi::TypeDescription::new(
+                            #imports::TypeDescription::new(
                                 &[ #(#type_docs),* ],
                                 type_names,
-                                multiversx_sc::abi::TypeContents::Struct(field_descriptions),
+                                #imports::TypeContents::Struct(field_descriptions),
                                 &[ #(#macro_attributes),* ],
                             ),
                         );
@@ -108,13 +133,13 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
                 .map(|(variant_index, variant)| {
                     let variant_docs = extract_doc(variant.attrs.as_slice());
                     let variant_name_str = variant.ident.to_string();
-                    let variant_field_snippets = fields_snippets(&variant.fields);
+                    let variant_field_snippets = fields_snippets(&variant.fields, context);
                     let variant_discriminant =
                         get_discriminant(variant_index, variant, &mut previous_disc);
                     quote! {
-                        let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
+                        let mut field_descriptions = #imports::Vec::new();
                         #(#variant_field_snippets)*
-                        variant_descriptions.push(multiversx_sc::abi::EnumVariantDescription::new(
+                        variant_descriptions.push(#imports::EnumVariantDescription::new(
                             &[ #(#variant_docs),* ],
                             #variant_name_str,
                             #variant_discriminant,
@@ -124,18 +149,18 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
                 })
                 .collect();
             quote! {
-                fn provide_type_descriptions<TDC: multiversx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
+                fn provide_type_descriptions<TDC: #imports::TypeDescriptionContainer>(accumulator: &mut TDC) {
                     let type_names = Self::type_names();
                     if !accumulator.contains_type(&type_names.abi) {
                         accumulator.reserve_type_name(type_names.clone());
-                        let mut variant_descriptions = multiversx_sc::types::heap::Vec::new();
+                        let mut variant_descriptions = #imports::Vec::new();
                         #(#enum_variant_snippets)*
                         accumulator.insert(
                             type_names.clone(),
-                            multiversx_sc::abi::TypeDescription::new(
+                            #imports::TypeDescription::new(
                                 &[ #(#type_docs),* ],
                                 type_names,
-                                multiversx_sc::abi::TypeContents::Enum(variant_descriptions),
+                                #imports::TypeContents::Enum(variant_descriptions),
                                 &[ #(#macro_attributes),* ],
                             ),
                         );
@@ -148,13 +173,13 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
 
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     quote! {
-        impl #impl_generics multiversx_sc::abi::TypeAbiFrom<Self> for #name #ty_generics #where_clause {}
-        impl #impl_generics multiversx_sc::abi::TypeAbiFrom<&Self> for #name #ty_generics #where_clause {}
+        impl #impl_generics #imports::TypeAbiFrom<Self> for #name #ty_generics #where_clause {}
+        impl #impl_generics #imports::TypeAbiFrom<&Self> for #name #ty_generics #where_clause {}
 
-        impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
+        impl #impl_generics #imports::TypeAbi for #name #ty_generics #where_clause {
             type Unmanaged = Self;
 
-            fn type_name() -> multiversx_sc::abi::TypeName {
+            fn type_name() -> #imports::TypeName {
                 #name_str.into()
             }
             #type_description_impl
@@ -162,11 +187,13 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
     }
 }
 
-pub fn type_abi_full(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
-    let input_conv = proc_macro2::TokenStream::from(input.clone());
-    let derive_code = type_abi_derive(input);
+pub fn type_abi_full(
+    input: proc_macro2::TokenStream,
+    context: TypeAbiImportCrate,
+) -> proc_macro2::TokenStream {
+    let derive_code = type_abi_derive(input.clone(), context);
     quote! {
-        #input_conv
+        #input
         #derive_code
     }
 }
@@ -189,7 +216,7 @@ pub fn get_discriminant(
                 });
                 value
             }
-            _ => panic!("Only integer values as discriminants"), // theoretically covered by the compiler
+            _ => panic!("Only integer values as discriminants"),
         };
         return quote! { #lit};
     }
