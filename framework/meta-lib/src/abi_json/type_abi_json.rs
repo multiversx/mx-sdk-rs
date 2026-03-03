@@ -150,6 +150,7 @@ impl StructFieldDescriptionJson {
             field_type: TypeNames {
                 abi: self.field_type.clone(),
                 rust: "<unspecified>".into(),
+                specific: None,
             },
         }
     }

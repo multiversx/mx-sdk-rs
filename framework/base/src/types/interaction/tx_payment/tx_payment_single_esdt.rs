@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for EsdtTokenPayment<Env::Api>
 where
@@ -58,10 +58,10 @@ where
         self.as_refs().with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: ManagedVec::from_single_item(self.into_egld_or_esdt_payment()),
+            multi_esdt: ManagedVec::from_single_item(self.into_payment()),
         }
     }
 }
@@ -116,10 +116,10 @@ where
         self.as_refs().with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: ManagedVec::from_single_item(self.clone().into_egld_or_esdt_payment()),
+            multi_esdt: ManagedVec::from_single_item(self.clone().into_payment()),
         }
     }
 }

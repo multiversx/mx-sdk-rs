@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-abi"
-version = "0.24.0"
+version = "0.25.0"
 edition = "2024"
 publish = false # TEMP
 
@@ -23,12 +23,12 @@ categories = [
 ]
 
 [dependencies.multiversx-chain-core]
-version = "=0.21.1"
+version = "=0.22.0"
 path = "../../chain/core"
 
 [dependencies.multiversx-sc-codec]
 path = "../codec"
-version = "0.24.0"
+version = "0.25.0"
 
 [dependencies]
 num-bigint = { version = "0.4", optional = true }           # can only be used in std contexts

@@ -4,6 +4,7 @@ mod vh_managed_buffer;
 mod vh_managed_map;
 
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
+use num_traits::Signed;
 
 use crate::{
     host::{
@@ -110,7 +111,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         buffer_handle: RawHandle,
     ) -> Result<i64, VMHooksEarlyExit> {
         let bytes = self.context.m_types_lock().mb_to_bytes(buffer_handle);
-        let bi = num_bigint::BigInt::from_bytes_be(num_bigint::Sign::Plus, &bytes);
+        let bi = num_bigint::BigInt::from_signed_bytes_be(&bytes);
         if let Some(small) = big_int_to_i64(&bi) {
             Ok(small)
         } else {
@@ -129,13 +130,19 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         Ok(())
     }
 
+    /// This method has a bug that converts negative numbers to their absolute values.
+    ///
+    /// The bug will be kept here, until it is also fixed on mainnet, to allow consistent testing.
+    ///
+    /// The framework avoids this VM hook, starting with v0.64.2.
     pub fn mb_from_small_int_signed(
         &self,
         buffer_handle: RawHandle,
         value: i64,
     ) -> Result<(), VMHooksEarlyExit> {
         let bi = num_bigint::BigInt::from(value);
-        let bytes = big_int_signed_bytes(&bi);
+        // TODO: remove `.abs()` once the bug is fixed
+        let bytes = big_int_signed_bytes(&bi.abs());
         self.context.m_types_lock().mb_set(buffer_handle, bytes);
         Ok(())
     }

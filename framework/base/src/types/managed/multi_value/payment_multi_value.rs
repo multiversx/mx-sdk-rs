@@ -10,7 +10,7 @@ use crate::{
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
-    types::{BigUint, EsdtTokenIdentifier, ManagedVecItem, Payment},
+    types::{EsdtTokenIdentifier, ManagedVecItem, Payment},
 };
 
 /// Thin wrapper around Payment, which has different I/O behaviour:
@@ -93,6 +93,15 @@ where
 
 impl<M> TypeAbiFrom<Self> for PaymentMultiValue<M> where M: ManagedTypeApi {}
 
+impl<M, T, N, A> TypeAbiFrom<MultiValue3<T, N, A>> for PaymentMultiValue<M>
+where
+    M: ManagedTypeApi,
+    TokenId<M>: TypeAbiFrom<T>,
+    u64: TypeAbiFrom<N>,
+    NonZeroBigUint<M>: TypeAbiFrom<A>,
+{
+}
+
 impl<M> TypeAbi for PaymentMultiValue<M>
 where
     M: ManagedTypeApi,
@@ -100,7 +109,7 @@ where
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        MultiValue3::<EsdtTokenIdentifier<M>, u64, BigUint<M>>::type_name()
+        MultiValue3::<EsdtTokenIdentifier<M>, u64, NonZeroBigUint<M>>::type_name()
     }
 
     fn type_name_rust() -> TypeName {

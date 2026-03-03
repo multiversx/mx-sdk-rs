@@ -2,8 +2,8 @@ use unwrap_infallible::UnwrapInfallible;
 
 use crate::{
     api::{
-        ErrorApi, ManagedBufferApiImpl, ManagedTypeApi, StorageReadApi, StorageReadApiImpl,
-        StorageWriteApi, StorageWriteApiImpl, const_handles, use_raw_handle,
+        ErrorApi, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl, StorageReadApi,
+        StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl, const_handles, use_raw_handle,
     },
     codec::*,
     contract_base::ExitCodecErrorHandler,
@@ -48,20 +48,31 @@ where
     }
 
     fn set_u64(self, value: u64) {
-        use crate::api::ManagedTypeApiImpl;
-
         let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_from_small_int_unsigned(handle.clone(), value as i64);
         let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
         self.set_managed_buffer(&managed_buffer);
     }
 
+    /// The version that uses the buggy VM hook. Activate this flag to test the VM.
+    #[cfg(feature = "small-int-bug")]
     fn set_i64(self, value: i64) {
-        use crate::api::ManagedTypeApiImpl;
-
         let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_from_small_int_signed(handle.clone(), value);
         let managed_buffer = unsafe { ManagedBuffer::from_handle(handle) };
+        self.set_managed_buffer(&managed_buffer);
+    }
+
+    /// Workaround for `mb_from_small_int_signed` bug: converts via BigInt first.
+    #[cfg(not(feature = "small-int-bug"))]
+    fn set_i64(self, value: i64) {
+        use crate::api::BigIntApiImpl;
+        let api = A::managed_type_impl();
+        let bi_handle: A::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+        api.bi_set_int64(bi_handle.clone(), value);
+        let mb_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        api.mb_from_big_int_signed(bi_handle, mb_handle.clone());
+        let managed_buffer = unsafe { ManagedBuffer::from_handle(mb_handle) };
         self.set_managed_buffer(&managed_buffer);
     }
 

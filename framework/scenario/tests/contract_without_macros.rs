@@ -7,6 +7,7 @@
 // and maintenance.
 
 #![allow(unused)]
+// TODO: remove once minimum version is 1.87+
 #![allow(unknown_lints)]
 #![allow(clippy::collapsible_if)]
 

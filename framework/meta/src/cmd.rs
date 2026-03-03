@@ -7,6 +7,7 @@ pub mod install;
 pub mod local_deps;
 pub mod print_util;
 pub mod retrieve_address;
+pub mod scen_blackbox;
 pub mod scen_test_gen;
 pub mod template;
 pub mod test;

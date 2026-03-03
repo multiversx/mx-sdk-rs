@@ -1,6 +1,7 @@
 use crate::cli::{StandaloneCliAction, StandaloneCliArgs};
 use crate::cmd::chain_simulator::chain_simulator;
 use crate::cmd::retrieve_address::retrieve_address;
+use crate::cmd::scen_blackbox::scen_blackbox_tool;
 use crate::cmd::wallet::wallet;
 use clap::Parser;
 
@@ -40,6 +41,9 @@ pub async fn cli_main_standalone() {
         }
         Some(StandaloneCliAction::TestGen(args)) => {
             test_gen_tool(args);
+        }
+        Some(StandaloneCliAction::ScenBlackbox(args)) => {
+            scen_blackbox_tool(args);
         }
         Some(StandaloneCliAction::Test(args)) => test(args),
         Some(StandaloneCliAction::TestCoverage(args)) => {

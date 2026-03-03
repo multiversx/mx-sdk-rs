@@ -3,13 +3,13 @@ use std::num::NonZeroU64;
 use multiversx_sc_scenario::imports::*;
 use payable_features::payable_features_proxy;
 
-const PF_PATH_EXPR: MxscPath = MxscPath::new("output/payable-features.mxsc.json");
+const PAYABLE_FEATURES_CODE_PATH: MxscPath = MxscPath::new("output/payable-features.mxsc.json");
 const PAYABLE_FEATURES_ADDRESS: TestSCAddress = TestSCAddress::new("payable-features");
 const USER: TestAddress = TestAddress::new("an-account");
-const TOKEN_1: TestTokenIdentifier = TestTokenIdentifier::new("TOK-000001");
-const TOKEN_2: TestTokenIdentifier = TestTokenIdentifier::new("TOK-000002");
-const TOKEN_3: TestTokenIdentifier = TestTokenIdentifier::new("TOK-000003");
-const SFT: TestTokenIdentifier = TestTokenIdentifier::new("SFT-123");
+const TOKEN_1: TestTokenId = TestTokenId::new("TOK-000001");
+const TOKEN_2: TestTokenId = TestTokenId::new("TOK-000002");
+const TOKEN_3: TestTokenId = TestTokenId::new("TOK-000003");
+const SFT: TestTokenId = TestTokenId::new("SFT-123");
 
 const AMOUNT_100: NonZeroU64 = NonZeroU64::new(100).unwrap();
 const AMOUNT_400: NonZeroU64 = NonZeroU64::new(400).unwrap();
@@ -18,7 +18,10 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new().executor_config(ExecutorConfig::full_suite());
 
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/payable-features");
-    blockchain.register_contract(PF_PATH_EXPR, payable_features::ContractBuilder);
+    blockchain.register_contract(
+        PAYABLE_FEATURES_CODE_PATH,
+        payable_features::ContractBuilder,
+    );
     blockchain
 }
 
@@ -37,7 +40,7 @@ fn init_account(world: &mut ScenarioWorld) {
         .typed(payable_features_proxy::PayableFeaturesProxy)
         .init()
         .new_address(PAYABLE_FEATURES_ADDRESS)
-        .code(PF_PATH_EXPR)
+        .code(PAYABLE_FEATURES_CODE_PATH)
         .run();
 }
 
@@ -97,6 +100,52 @@ fn payable_all_blackbox_2() {
         vec![
             Payment::new(TOKEN_1, 0, AMOUNT_100),
             Payment::new(TOKEN_2, 0, AMOUNT_400),
+        ]
+    );
+}
+
+#[test]
+fn payable_all_blackbox_egld() {
+    let mut world = world();
+    init_account(&mut world);
+
+    let result = world
+        .tx()
+        .from(USER)
+        .to(PAYABLE_FEATURES_ADDRESS)
+        .typed(payable_features_proxy::PayableFeaturesProxy)
+        .payable_all()
+        .payment((TestTokenId::EGLD_000000, 0, AMOUNT_100))
+        .returns(ReturnsResultUnmanaged)
+        .run();
+
+    assert_eq!(
+        result,
+        vec![Payment::try_new(TestTokenId::EGLD_000000, 0, 100u64).unwrap()]
+    );
+}
+
+#[test]
+fn payable_all_blackbox_egld_2x() {
+    let mut world = world();
+    init_account(&mut world);
+
+    let result = world
+        .tx()
+        .from(USER)
+        .to(PAYABLE_FEATURES_ADDRESS)
+        .typed(payable_features_proxy::PayableFeaturesProxy)
+        .payable_all()
+        .payment((TestTokenId::EGLD_000000, 0, AMOUNT_100))
+        .payment((TestTokenId::EGLD_000000, 0, AMOUNT_400))
+        .returns(ReturnsResultUnmanaged)
+        .run();
+
+    assert_eq!(
+        result,
+        vec![
+            Payment::new(TestTokenId::EGLD_000000, 0, AMOUNT_100),
+            Payment::new(TestTokenId::EGLD_000000, 0, AMOUNT_400),
         ]
     );
 }

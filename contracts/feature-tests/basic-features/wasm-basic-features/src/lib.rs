@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          655
+// Endpoints:                          660
 // Async Callback:                       1
-// Total number of exported functions: 657
+// Total number of exported functions: 662
 
 #![no_std]
 
@@ -263,6 +263,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         eq_big_uint_u32 => eq_big_uint_u32
         eq_big_uint_u64 => eq_big_uint_u64
         eq_non_zero_big_uint_non_zero_big_uint => eq_non_zero_big_uint_non_zero_big_uint
+        eq_non_zero_big_uint_big_uint => eq_non_zero_big_uint_big_uint
         eq_non_zero_big_uint_i32 => eq_non_zero_big_uint_i32
         eq_non_zero_big_uint_i64 => eq_non_zero_big_uint_i64
         eq_non_zero_big_uint_u32 => eq_non_zero_big_uint_u32
@@ -278,6 +279,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         gt_big_uint_u32 => gt_big_uint_u32
         gt_big_uint_u64 => gt_big_uint_u64
         gt_non_zero_big_uint_non_zero_big_uint => gt_non_zero_big_uint_non_zero_big_uint
+        gt_non_zero_big_uint_big_uint => gt_non_zero_big_uint_big_uint
         gt_non_zero_big_uint_i32 => gt_non_zero_big_uint_i32
         gt_non_zero_big_uint_i64 => gt_non_zero_big_uint_i64
         gt_non_zero_big_uint_u32 => gt_non_zero_big_uint_u32
@@ -293,6 +295,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         ge_big_uint_u32 => ge_big_uint_u32
         ge_big_uint_u64 => ge_big_uint_u64
         ge_non_zero_big_uint_non_zero_big_uint => ge_non_zero_big_uint_non_zero_big_uint
+        ge_non_zero_big_uint_big_uint => ge_non_zero_big_uint_big_uint
         ge_non_zero_big_uint_i32 => ge_non_zero_big_uint_i32
         ge_non_zero_big_uint_i64 => ge_non_zero_big_uint_i64
         ge_non_zero_big_uint_u32 => ge_non_zero_big_uint_u32
@@ -308,6 +311,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         lt_big_uint_u32 => lt_big_uint_u32
         lt_big_uint_u64 => lt_big_uint_u64
         lt_non_zero_big_uint_non_zero_big_uint => lt_non_zero_big_uint_non_zero_big_uint
+        lt_non_zero_big_uint_big_uint => lt_non_zero_big_uint_big_uint
         lt_non_zero_big_uint_i32 => lt_non_zero_big_uint_i32
         lt_non_zero_big_uint_i64 => lt_non_zero_big_uint_i64
         lt_non_zero_big_uint_u32 => lt_non_zero_big_uint_u32
@@ -323,6 +327,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         le_big_uint_u32 => le_big_uint_u32
         le_big_uint_u64 => le_big_uint_u64
         le_non_zero_big_uint_non_zero_big_uint => le_non_zero_big_uint_non_zero_big_uint
+        le_non_zero_big_uint_big_uint => le_non_zero_big_uint_big_uint
         le_non_zero_big_uint_i32 => le_non_zero_big_uint_i32
         le_non_zero_big_uint_i64 => le_non_zero_big_uint_i64
         le_non_zero_big_uint_u32 => le_non_zero_big_uint_u32

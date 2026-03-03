@@ -40,10 +40,10 @@ pub use multiversx_chain_scenario_format as scenario_format;
 
 pub use facade::{ContractInfo, ScenarioWorld, WhiteboxContract, result_handlers::*, world_tx::*};
 
-use std::path::Path;
-
 /// Imports normally needed in integration tests, grouped together.
 pub mod imports;
+
+use std::path::Path;
 
 /// Legacy function for running a scenario test using the Go VM tool.
 ///

@@ -62,7 +62,7 @@ fn tx_input_from_deploy(
     let tx = &sc_deploy_step.tx;
     TxInput {
         from: tx.from.to_address(),
-        to: multiversx_chain_vm::types::VMAddress::zero(),
+        to: multiversx_chain_vm::types::Address::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
         func_name: override_func_name.unwrap_or(TxFunctionName::INIT),

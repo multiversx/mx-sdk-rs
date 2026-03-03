@@ -4,6 +4,7 @@ pub type TypeName = alloc::string::String;
 pub struct TypeNames {
     pub abi: alloc::string::String,
     pub rust: alloc::string::String,
+    pub specific: Option<alloc::string::String>,
 }
 
 impl TypeNames {
@@ -11,6 +12,7 @@ impl TypeNames {
         TypeNames {
             abi: alloc::string::String::new(),
             rust: alloc::string::String::new(),
+            specific: None,
         }
     }
 
@@ -18,6 +20,11 @@ impl TypeNames {
         TypeNames {
             abi: abi_name,
             rust: alloc::string::String::new(),
+            specific: None,
         }
+    }
+
+    pub fn specific_or_abi(&self) -> &str {
+        self.specific.as_deref().unwrap_or(&self.abi)
     }
 }

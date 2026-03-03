@@ -16,11 +16,11 @@
         },
         "abi": {
             "name": "multiversx-sc-abi",
-            "version": "0.24.0"
+            "version": "0.25.0"
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.64.1"
+            "version": "0.65.0"
         }
     },
     "docs": [
@@ -48,12 +48,14 @@
                 "Uses the `feature_guard!` macro."
             ],
             "name": "checkFeatureGuard",
+            "rustMethodName": "check_feature_guard",
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
         },
         {
             "name": "checkPause",
+            "rustMethodName": "check_pause",
             "mutability": "mutable",
             "inputs": [],
             "outputs": [
@@ -120,6 +122,7 @@
         },
         {
             "name": "countTo100",
+            "rustMethodName": "count_to_100",
             "mutability": "mutable",
             "inputs": [],
             "outputs": [
@@ -130,6 +133,7 @@
         },
         {
             "name": "mergeTokens",
+            "rustMethodName": "merge_tokens_endpoint",
             "mutability": "mutable",
             "payableInTokens": [
                 "*"
@@ -143,6 +147,7 @@
         },
         {
             "name": "mergeTokensCustomAttributes",
+            "rustMethodName": "merge_tokens_custom_attributes_endpoint",
             "mutability": "mutable",
             "payableInTokens": [
                 "*"
@@ -156,6 +161,7 @@
         },
         {
             "name": "splitTokens",
+            "rustMethodName": "split_tokens_endpoint",
             "mutability": "mutable",
             "payableInTokens": [
                 "*"
@@ -169,6 +175,7 @@
         },
         {
             "name": "splitTokenPartial",
+            "rustMethodName": "split_token_partial_endpoint",
             "mutability": "mutable",
             "payableInTokens": [
                 "*"
@@ -187,6 +194,7 @@
         },
         {
             "name": "claimDeveloperRewards",
+            "rustMethodName": "claim_developer_rewards",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -198,6 +206,7 @@
         },
         {
             "name": "dnsRegister",
+            "rustMethodName": "dns_register",
             "onlyOwner": true,
             "mutability": "mutable",
             "payableInTokens": [
@@ -217,6 +226,7 @@
         },
         {
             "name": "issueToken",
+            "rustMethodName": "issue_token",
             "onlyOwner": true,
             "mutability": "mutable",
             "payableInTokens": [
@@ -245,6 +255,7 @@
         },
         {
             "name": "setFeatureFlag",
+            "rustMethodName": "set_feature_flag_endpoint",
             "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
@@ -266,6 +277,7 @@
                 "To keep the logic simple, all tokens have to be deposited at once"
             ],
             "name": "depositTokensForProposal",
+            "rustMethodName": "deposit_tokens_for_proposal",
             "mutability": "mutable",
             "payableInTokens": [
                 "*"
@@ -280,6 +292,7 @@
         },
         {
             "name": "withdrawGovernanceTokens",
+            "rustMethodName": "claim_deposited_tokens",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -398,6 +411,7 @@
         },
         {
             "name": "getProposalStatus",
+            "rustMethodName": "get_proposal_status",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -413,6 +427,7 @@
         },
         {
             "name": "getProposer",
+            "rustMethodName": "get_proposer",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -429,6 +444,7 @@
         },
         {
             "name": "getProposalDescription",
+            "rustMethodName": "get_proposal_description",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -445,6 +461,7 @@
         },
         {
             "name": "getProposalActions",
+            "rustMethodName": "get_proposal_actions",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -461,6 +478,7 @@
         },
         {
             "name": "getProposalVotes",
+            "rustMethodName": "proposal_votes",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -476,6 +494,7 @@
         },
         {
             "name": "getTotalVotes",
+            "rustMethodName": "total_votes",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -491,6 +510,7 @@
         },
         {
             "name": "getTotalDownvotes",
+            "rustMethodName": "total_downvotes",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -506,6 +526,7 @@
         },
         {
             "name": "changeQuorum",
+            "rustMethodName": "change_quorum",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -517,6 +538,7 @@
         },
         {
             "name": "changeMinTokenBalanceForProposing",
+            "rustMethodName": "change_min_token_balance_for_proposing",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -528,6 +550,7 @@
         },
         {
             "name": "changeVotingDelayInBlocks",
+            "rustMethodName": "change_voting_delay_in_blocks",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -539,6 +562,7 @@
         },
         {
             "name": "changeVotingPeriodInBlocks",
+            "rustMethodName": "change_voting_period_in_blocks",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -550,6 +574,7 @@
         },
         {
             "name": "changeLockTimeAfterVotingEndsInBlocks",
+            "rustMethodName": "change_lock_time_after_voting_ends_in_blocks",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -561,6 +586,7 @@
         },
         {
             "name": "getGovernanceTokenId",
+            "rustMethodName": "governance_token_id",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -571,6 +597,7 @@
         },
         {
             "name": "getQuorum",
+            "rustMethodName": "quorum",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -581,6 +608,7 @@
         },
         {
             "name": "getMinFeeForPropose",
+            "rustMethodName": "min_fee_for_propose",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -591,6 +619,7 @@
         },
         {
             "name": "getMinTokenBalanceForProposing",
+            "rustMethodName": "min_token_balance_for_proposing",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -601,6 +630,7 @@
         },
         {
             "name": "getVotingDelayInBlocks",
+            "rustMethodName": "voting_delay_in_blocks",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -611,6 +641,7 @@
         },
         {
             "name": "getVotingPeriodInBlocks",
+            "rustMethodName": "voting_period_in_blocks",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -621,6 +652,7 @@
         },
         {
             "name": "getLockTimeAfterVotingEndsInBlocks",
+            "rustMethodName": "lock_time_after_voting_ends_in_blocks",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -631,6 +663,7 @@
         },
         {
             "name": "pause",
+            "rustMethodName": "pause_endpoint",
             "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [],
@@ -638,6 +671,7 @@
         },
         {
             "name": "unpause",
+            "rustMethodName": "unpause_endpoint",
             "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [],
@@ -645,6 +679,7 @@
         },
         {
             "name": "isPaused",
+            "rustMethodName": "paused_status",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -675,6 +710,7 @@
         },
         {
             "name": "voteSlashMember",
+            "rustMethodName": "vote_slash_member",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -686,6 +722,7 @@
         },
         {
             "name": "cancelVoteSlashMember",
+            "rustMethodName": "cancel_vote_slash_member",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -697,6 +734,7 @@
         },
         {
             "name": "slashMember",
+            "rustMethodName": "slash_member",
             "mutability": "mutable",
             "inputs": [
                 {
@@ -708,6 +746,7 @@
         },
         {
             "name": "issueMergedToken",
+            "rustMethodName": "issue_merged_token",
             "onlyOwner": true,
             "mutability": "mutable",
             "payableInTokens": [
@@ -727,6 +766,7 @@
         },
         {
             "name": "addMergeableTokensToWhitelist",
+            "rustMethodName": "add_mergeable_tokens_to_whitelist",
             "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
@@ -740,6 +780,7 @@
         },
         {
             "name": "removeMergeableTokensFromWhitelist",
+            "rustMethodName": "remove_mergeable_tokens_from_whitelist",
             "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
@@ -753,6 +794,7 @@
         },
         {
             "name": "getMergedTokenId",
+            "rustMethodName": "merged_token",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -763,6 +805,7 @@
         },
         {
             "name": "getMergeableTokensWhitelist",
+            "rustMethodName": "mergeable_tokens_whitelist",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -774,6 +817,7 @@
         },
         {
             "name": "isAdmin",
+            "rustMethodName": "is_admin",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -789,6 +833,7 @@
         },
         {
             "name": "addAdmin",
+            "rustMethodName": "add_admin",
             "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
@@ -801,6 +846,7 @@
         },
         {
             "name": "removeAdmin",
+            "rustMethodName": "remove_admin",
             "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
@@ -813,6 +859,7 @@
         },
         {
             "name": "getAdmins",
+            "rustMethodName": "admins",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [

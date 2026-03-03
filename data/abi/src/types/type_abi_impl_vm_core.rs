@@ -244,6 +244,10 @@ impl TypeAbi for DurationMillis {
     fn type_name_rust() -> TypeName {
         "DurationMillis".into()
     }
+
+    fn type_name_specific() -> Option<TypeName> {
+        Some("DurationMillis".into())
+    }
 }
 
 impl TypeAbiFrom<Self> for DurationSeconds {}
@@ -257,6 +261,10 @@ impl TypeAbi for DurationSeconds {
 
     fn type_name_rust() -> TypeName {
         "DurationSeconds".into()
+    }
+
+    fn type_name_specific() -> Option<TypeName> {
+        Some("DurationSeconds".into())
     }
 }
 
@@ -272,6 +280,10 @@ impl TypeAbi for TimestampMillis {
     fn type_name_rust() -> TypeName {
         "TimestampMillis".into()
     }
+
+    fn type_name_specific() -> Option<TypeName> {
+        Some("TimestampMillis".into())
+    }
 }
 
 impl TypeAbiFrom<Self> for TimestampSeconds {}
@@ -285,5 +297,9 @@ impl TypeAbi for TimestampSeconds {
 
     fn type_name_rust() -> TypeName {
         "TimestampSeconds".into()
+    }
+
+    fn type_name_specific() -> Option<TypeName> {
+        Some("TimestampSeconds".into())
     }
 }
