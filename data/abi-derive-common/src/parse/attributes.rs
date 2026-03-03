@@ -1,14 +1,10 @@
 use quote::ToTokens;
 
-use super::{attr_names::*, util::*};
-
-/// unlike the others, this is standard Rust,
-/// all doc comments get automatically transformed into "doc" attributes
-static ATTR_DOC: &str = "doc";
-
 /// Doc comments are actually syntactic sugar for doc attributes,
 /// so extracting doc comments means parsing "doc" attributes.
 pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
+    const ATTR_DOC: &str = "doc";
+
     attrs
         .iter()
         .filter(|attr| {
@@ -68,26 +64,4 @@ fn remove_backslashes(input: &str) -> String {
         .trim_matches('\"')
         .replace("\\\"", "\"")
         .replace("\\'", "'")
-}
-
-pub struct OutputNameAttribute {
-    pub output_name: String,
-}
-
-impl OutputNameAttribute {
-    pub fn parse(attr: &syn::Attribute) -> Option<Self> {
-        is_attr_one_string_arg(attr, ATTR_OUTPUT_NAME).map(|arg_str| OutputNameAttribute {
-            output_name: arg_str,
-        })
-    }
-}
-
-pub struct TitleAttribute {
-    pub title: String,
-}
-
-impl TitleAttribute {
-    pub fn parse(attr: &syn::Attribute) -> Option<Self> {
-        is_attr_one_string_arg(attr, ATTR_TITLE).map(|arg_str| TitleAttribute { title: arg_str })
-    }
 }

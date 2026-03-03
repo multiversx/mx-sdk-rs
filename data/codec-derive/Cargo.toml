@@ -2,6 +2,7 @@
 name = "multiversx-sc-codec-derive"
 version = "0.24.0"
 edition = "2024"
+publish = false # TEMP
 
 authors = ["dorin.iancu <dorin.iancu@multiversx.com>", "Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
 license = "GPL-3.0-only"
@@ -17,11 +18,8 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 name = "multiversx_sc_codec_derive"
 proc-macro = true
 
-[features]
-default = ["syn/full", "syn/parsing", "syn/extra-traits"]
-
 [dependencies]
 proc-macro2 = "1.0"
 quote = "1.0"
-syn = "2.0"
+syn = { version = "2.0", features = ["full", "extra-traits"] }
 hex = "0.4"

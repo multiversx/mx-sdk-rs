@@ -1,20 +1,22 @@
 mod argument_attr;
 mod attr_names;
-mod doc_attr;
 mod endpoint_attr;
 mod event_attr;
 mod label_attr;
+mod output_name_attr;
 mod payable_attr;
 mod storage_attr;
+mod title_attr;
 mod trait_argument_prop;
 mod trait_prop_names;
 mod util;
 
 pub use argument_attr::*;
-pub use doc_attr::{OutputNameAttribute, TitleAttribute, extract_doc, extract_macro_attributes};
 pub use endpoint_attr::*;
 pub use event_attr::*;
 pub use label_attr::*;
+pub use output_name_attr::OutputNameAttribute;
 pub use payable_attr::*;
 pub use storage_attr::*;
+pub use title_attr::TitleAttribute;
 pub use trait_argument_prop::*;
