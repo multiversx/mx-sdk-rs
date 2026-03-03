@@ -11,7 +11,7 @@ endpoint_name = "forward_queued_calls"
 index = 0
 name = "root"
 kind = "forwarder"
-address = "erd1qqqqqqqqqqqqqpgqglc8wz7x94g79je5prx6fe04zq95gdxrn54qazztwp"
+address = "erd1qqqqqqqqqqqqqpgqrp7uwlfy2szx8fnxg6la600yx3f66gqsn54qpxewxm"
 
 [[contracts.children]]
 to = 1
@@ -23,4 +23,4 @@ endpoint_name = "accept_funds"
 index = 1
 name = "vault"
 kind = "vault"
-address = "erd1qqqqqqqqqqqqqpgqrc40e4se27jxfqkefyd80fu6hv452erln54qfu5s4t"
+address = "erd1qqqqqqqqqqqqqpgq89u7hlws0uzn7c4wjq6rz5k9m72fedxan54qqvj8xg"
