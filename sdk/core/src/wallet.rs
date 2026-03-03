@@ -300,7 +300,7 @@ impl Wallet {
         public_key: &str,
         password: &str,
     ) -> String {
-        use rand::RngCore;
+        use rand::Rng;
 
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P, KDF_DKLEN).unwrap();
         let mut rand_salt: [u8; 32] = [0u8; 32];

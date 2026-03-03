@@ -84,7 +84,9 @@ impl<T: NestedDecode> NestedDecode for Vec<T> {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::test_util::check_top_encode_decode;
+    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
+    use alloc::vec;
+    use alloc::vec::Vec;
 
     #[test]
     fn test_top_vec_i32_compacted() {
@@ -96,5 +98,27 @@ pub mod tests {
     #[test]
     fn test_top_vec_u8_compacted() {
         check_top_encode_decode([1u8, 2u8, 3u8].to_vec(), &[1u8, 2u8, 3u8]);
+    }
+
+    #[test]
+    fn test_top_vec_empty() {
+        check_top_encode_decode(Vec::<u8>::new(), &[]);
+        check_top_encode_decode(Vec::<i32>::new(), &[]);
+    }
+
+    #[test]
+    fn test_dep_vec_u8() {
+        check_dep_encode_decode(vec![1u8, 2u8, 3u8], &[0, 0, 0, 3, 1, 2, 3]);
+    }
+
+    #[test]
+    fn test_dep_vec_i32() {
+        check_dep_encode_decode(vec![1i32, 2i32], &[0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 2]);
+    }
+
+    #[test]
+    fn test_dep_vec_empty() {
+        check_dep_encode_decode(Vec::<u8>::new(), &[0, 0, 0, 0]);
+        check_dep_encode_decode(Vec::<i32>::new(), &[0, 0, 0, 0]);
     }
 }

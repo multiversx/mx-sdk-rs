@@ -336,6 +336,10 @@ where
     }
 
     /// Forces value drop and commit accounts.
+    #[deprecated(
+        since = "0.65.0",
+        note = "commit is implicit on drop, this method is no longer needed"
+    )]
     pub fn commit(self) {}
 }
 

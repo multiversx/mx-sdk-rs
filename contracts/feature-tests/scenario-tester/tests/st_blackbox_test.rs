@@ -33,6 +33,7 @@ fn st_blackbox() {
 
     world.start_trace();
 
+    #[allow(deprecated)]
     world
         .account(OWNER_ADDRESS)
         .nonce(1)
@@ -41,7 +42,7 @@ fn st_blackbox() {
         .nonce(2)
         .balance(300)
         .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .commit(); // optional, ignore
 
     world
         .check_account(OWNER_ADDRESS)
@@ -50,8 +51,7 @@ fn st_blackbox() {
         .check_account(OTHER_ADDRESS)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     world.new_address(OWNER_ADDRESS, 1, ST_ADDRESS);
 
@@ -90,8 +90,7 @@ fn st_blackbox() {
         .nonce(3)
         .balance(100)
         .check_account(ST_ADDRESS)
-        .check_storage("str:sum", "6")
-        .commit();
+        .check_storage("str:sum", "6");
 
     world
         .tx()
@@ -167,8 +166,7 @@ fn set_state_test() {
         .account(second)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     world
         .check_account(first)
@@ -177,22 +175,19 @@ fn set_state_test() {
         .check_account(second)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     world
         .account(third)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance(NFT_ID, 2, 1, ())
-        .commit();
+        .esdt_nft_balance(NFT_ID, 2, 1, ());
 
     world
         .check_account(third)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, "")
-        .commit();
+        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, "");
 
     let fourth_uris = FOURTH_URIS
         .iter()
@@ -211,15 +206,13 @@ fn set_state_test() {
             None::<Address>,
             (),
             fourth_uris,
-        )
-        .commit();
+        );
 
     world
         .check_account(fourth)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, FOURTH_ATTRIBUTES)
-        .commit();
+        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, FOURTH_ATTRIBUTES);
 
     world
         .account(fifth)
@@ -275,8 +268,7 @@ fn st_blackbox_tx_hash() {
         .account(OTHER_ADDRESS)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     let (new_address, tx_hash) = world
         .tx()
@@ -317,8 +309,7 @@ fn st_blackbox_returns_result_or_error() {
         .account(OTHER_ADDRESS)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     // deploy
     let (result, check_tx_hash, pass_value_2) = world

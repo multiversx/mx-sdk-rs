@@ -9,7 +9,7 @@ use multiversx_chain_vm::{
         vm_hooks::VMHooksContext,
     },
     schedule::GasSchedule,
-    types::{VMAddress, VMCodeMetadata},
+    types::{Address, VMCodeMetadata},
 };
 
 use crate::executor::debug::ContractDebugInstanceState;
@@ -23,8 +23,8 @@ const ZERO_GAS_SCHEDULE: GasSchedule = GasSchedule::zeroed();
 pub struct StaticApiVMHooksContext(Mutex<ManagedTypeContainer>);
 
 impl StaticApiVMHooksContext {
-    pub const CURRENT_ADDRESS_PLACEHOLDER: VMAddress =
-        VMAddress::new(*b"STATIC_API_CURRENT_ADDRESS______");
+    pub const CURRENT_ADDRESS_PLACEHOLDER: Address =
+        Address::new(*b"STATIC_API_CURRENT_ADDRESS______");
 }
 
 impl VMHooksContext for StaticApiVMHooksContext {
@@ -55,7 +55,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot access tx inputs in the StaticApi")
     }
 
-    fn current_address(&self) -> &VMAddress {
+    fn current_address(&self) -> &Address {
         &Self::CURRENT_ADDRESS_PLACEHOLDER
     }
 
@@ -75,7 +75,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
         log::info!("Error in StaticApi: {trace_message}");
     }
 
-    fn storage_read_any_address(&self, _address: &VMAddress, _key: &[u8]) -> Vec<u8> {
+    fn storage_read_any_address(&self, _address: &Address, _key: &[u8]) -> Vec<u8> {
         panic!("cannot access the storage in the StaticApi")
     }
 
@@ -91,17 +91,17 @@ impl VMHooksContext for StaticApiVMHooksContext {
         panic!("cannot access the back transfers in the StaticApi")
     }
 
-    fn account_data(&self, _address: &VMAddress) -> Option<AccountData> {
+    fn account_data(&self, _address: &Address) -> Option<AccountData> {
         panic!("cannot access account data in the StaticApi")
     }
 
-    fn account_code(&self, _address: &VMAddress) -> Vec<u8> {
+    fn account_code(&self, _address: &Address) -> Vec<u8> {
         panic!("cannot access account data in the StaticApi")
     }
 
     fn perform_async_call(
         &mut self,
-        _to: VMAddress,
+        _to: Address,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
@@ -111,7 +111,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
 
     fn perform_execute_on_dest_context(
         &mut self,
-        _to: VMAddress,
+        _to: Address,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
@@ -121,7 +121,7 @@ impl VMHooksContext for StaticApiVMHooksContext {
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,
-        _to: VMAddress,
+        _to: Address,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
     ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
@@ -134,13 +134,13 @@ impl VMHooksContext for StaticApiVMHooksContext {
         _contract_code: Vec<u8>,
         _code_metadata: VMCodeMetadata,
         _args: Vec<Vec<u8>>,
-    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
+    ) -> Result<(Address, Vec<Vec<u8>>), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the StaticApi")
     }
 
     fn perform_transfer_execute(
         &mut self,
-        _to: VMAddress,
+        _to: Address,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,

@@ -1,3 +1,4 @@
+// TODO: remove once minimum version is 1.87+
 #![allow(unknown_lints)]
 #![allow(clippy::manual_is_multiple_of)]
 

@@ -2,7 +2,7 @@ use crate::{
     chain_core::builtin_func_names::CHANGE_OWNER_BUILTIN_FUNC_NAME,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::VMAddress,
+    types::Address,
 };
 
 use super::super::builtin_func_trait::BuiltinFunction;
@@ -31,7 +31,7 @@ impl BuiltinFunction for ChangeOwner {
             );
         }
 
-        let new_owner_address = VMAddress::from_slice(&tx_input.args[0]);
+        let new_owner_address = Address::from_slice(&tx_input.args[0]);
         tx_cache.with_account_mut(&tx_input.to, |account| {
             account.contract_owner = Some(new_owner_address);
         });

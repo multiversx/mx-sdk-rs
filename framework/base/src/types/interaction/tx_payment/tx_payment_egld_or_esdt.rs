@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, Egld, EgldOrEsdtTokenPayment, ManagedAddress, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for &EgldOrEsdtTokenPayment<Env::Api>
 where
@@ -67,11 +67,11 @@ where
         )
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
         self.map_ref_egld_or_esdt(
             (),
-            |(), amount| TxPayment::<Env>::into_full_payment_data(Egld(amount), env),
-            |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment, env),
+            |(), amount| TxPayment::<Env>::into_scenario_payments(Egld(amount), env),
+            |(), esdt_payment| TxPayment::<Env>::into_scenario_payments(esdt_payment, env),
         )
     }
 }
@@ -127,11 +127,11 @@ where
         )
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
         self.map_egld_or_esdt(
             (),
-            |(), amount| TxPayment::<Env>::into_full_payment_data(Egld(amount), env),
-            |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment, env),
+            |(), amount| TxPayment::<Env>::into_scenario_payments(Egld(amount), env),
+            |(), esdt_payment| TxPayment::<Env>::into_scenario_payments(esdt_payment, env),
         )
     }
 }

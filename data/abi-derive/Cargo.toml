@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-abi-derive"
-version = "0.24.0"
+version = "0.25.0"
 edition = "2024"
 publish = false
 
@@ -27,6 +27,6 @@ name = "multiversx_sc_abi_derive"
 proc-macro = true
 
 [dependencies.multiversx-sc-abi-derive-common]
-version = "=0.24.0"
+version = "=0.25.0"
 path = "../abi-derive-common"
 

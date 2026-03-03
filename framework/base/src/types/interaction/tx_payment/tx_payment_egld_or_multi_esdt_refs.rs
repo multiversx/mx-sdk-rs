@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, EgldOrMultiEsdtPaymentRefs, ManagedAddress, TxFrom, TxToSpecified},
 };
 
-use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{Egld, FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for EgldOrMultiEsdtPaymentRefs<'_, Env::Api>
 where
@@ -70,13 +70,13 @@ where
         }
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
         match self {
             EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
-                Egld(egld_amount).into_full_payment_data(env)
+                Egld(egld_amount).into_scenario_payments(env)
             }
             EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
-                multi_esdt_payment.into_full_payment_data(env)
+                multi_esdt_payment.into_scenario_payments(env)
             }
         }
     }

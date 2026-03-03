@@ -16,7 +16,7 @@ use crate::{
         TxContextRef, TxFunctionName, TxInput, TxResult, async_call_tx_input,
     },
     host::execution,
-    types::{VMAddress, VMCodeMetadata},
+    types::{Address, VMCodeMetadata},
     vm_err_msg,
 };
 
@@ -97,7 +97,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         self.tx_context_ref.result_lock()
     }
 
-    fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8> {
+    fn storage_read_any_address(&self, address: &Address, key: &[u8]) -> Vec<u8> {
         self.tx_context_ref.with_account_mut(address, |account| {
             account.storage.get(key).cloned().unwrap_or_default()
         })
@@ -121,12 +121,12 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         self.tx_context_ref.back_transfers_lock()
     }
 
-    fn account_data(&self, address: &VMAddress) -> Option<AccountData> {
+    fn account_data(&self, address: &Address) -> Option<AccountData> {
         self.tx_context_ref
             .with_account_or_else(address, |account| Some(account.clone()), || None)
     }
 
-    fn account_code(&self, address: &VMAddress) -> Vec<u8> {
+    fn account_code(&self, address: &Address) -> Vec<u8> {
         self.tx_context_ref
             .blockchain_cache()
             .with_account(address, |account| account.contract_path.clone())
@@ -135,7 +135,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
     fn perform_async_call(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -150,7 +150,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
     fn perform_execute_on_dest_context(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -176,7 +176,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,
-        to: VMAddress,
+        to: Address,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
@@ -210,12 +210,12 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
+    ) -> Result<(Address, Vec<Vec<u8>>), VMHooksEarlyExit> {
         let contract_address = self.current_address();
         let tx_hash = self.tx_hash();
         let tx_input = TxInput {
             from: contract_address.clone(),
-            to: VMAddress::zero(),
+            to: Address::zero(),
             egld_value,
             esdt_values: Vec::new(),
             func_name: TxFunctionName::INIT,
@@ -256,7 +256,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
     fn perform_transfer_execute(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -301,7 +301,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 impl<S: InstanceState> TxVMHooksContext<S> {
     fn create_async_call_data(
         &self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,

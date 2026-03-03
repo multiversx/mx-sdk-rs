@@ -4,7 +4,7 @@ use multiversx_sc::imports::*;
 
 pub mod kitty_obj;
 pub mod kitty_ownership_proxy;
-pub mod proxy_crypto_zombies;
+pub mod proxy;
 mod storage;
 mod zombie;
 mod zombie_attack;

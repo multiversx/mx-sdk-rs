@@ -8,7 +8,7 @@ use crate::{
         BackTransfers, ManagedTypeContainer, TxErrorTrace, TxFunctionName, TxInput, TxLog, TxResult,
     },
     schedule::GasSchedule,
-    types::{H256, VMAddress, VMCodeMetadata},
+    types::{Address, H256, VMCodeMetadata},
 };
 
 /// Abstracts away the borrowing of a managed types structure.
@@ -35,7 +35,7 @@ pub trait VMHooksContext: Debug {
 
     fn input_ref(&self) -> &TxInput;
 
-    fn current_address(&self) -> &VMAddress {
+    fn current_address(&self) -> &Address {
         &self.input_ref().to
     }
 
@@ -77,7 +77,7 @@ pub trait VMHooksContext: Debug {
         self.storage_read_any_address(self.current_address(), key)
     }
 
-    fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8>;
+    fn storage_read_any_address(&self, address: &Address, key: &[u8]) -> Vec<u8>;
 
     fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit>;
 
@@ -88,13 +88,13 @@ pub trait VMHooksContext: Debug {
     /// For ownership reasons, needs to return a clone.
     ///
     /// Can be optimized, but is not a priority right now.
-    fn account_data(&self, address: &VMAddress) -> Option<AccountData>;
+    fn account_data(&self, address: &Address) -> Option<AccountData>;
 
-    fn account_code(&self, address: &VMAddress) -> Vec<u8>;
+    fn account_code(&self, address: &Address) -> Vec<u8>;
 
     fn perform_async_call(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
@@ -102,7 +102,7 @@ pub trait VMHooksContext: Debug {
 
     fn perform_execute_on_dest_context(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
@@ -110,7 +110,7 @@ pub trait VMHooksContext: Debug {
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,
-        to: VMAddress,
+        to: Address,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit>;
@@ -121,11 +121,11 @@ pub trait VMHooksContext: Debug {
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit>;
+    ) -> Result<(Address, Vec<Vec<u8>>), VMHooksEarlyExit>;
 
     fn perform_transfer_execute(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,

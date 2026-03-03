@@ -1,3 +1,4 @@
+use multiversx_chain_core::EGLD_000000_TOKEN_IDENTIFIER;
 use multiversx_sc_codec::{
     EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
 };
@@ -12,18 +13,26 @@ const STR_PREFIX: &str = "str:";
 
 /// Encodes a dummy address, to be used for tests.
 ///
-/// It is designed to be usable from contracts (especiall test contracts), with a minimal footprint.
+/// It is designed to be usable from contracts (especially test contracts), with a minimal footprint.
 /// For this reason, its inner structure is subject to change.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct TestTokenIdentifier<'a> {
+pub struct TestTokenId<'a> {
     name: &'a str,
 }
 
-impl<'a> TestTokenIdentifier<'a> {
+/// Alias for `TestTokenId`, for backwards compatibility.
+///
+/// Prefer using `TestTokenId`, as it is shorter, and more consistent with the `TokenId ` type it represents.
+pub type TestTokenIdentifier<'a> = TestTokenId<'a>;
+
+impl<'a> TestTokenId<'a> {
     /// Creates a new test token identifier from a string name.
     pub const fn new(name: &'a str) -> Self {
-        TestTokenIdentifier { name }
+        TestTokenId { name }
     }
+
+    /// A constant representing the EGLD-000000 token identifier.
+    pub const EGLD_000000: TestTokenId<'static> = TestTokenId::new(EGLD_000000_TOKEN_IDENTIFIER);
 
     /// Evaluates the test token identifier to a Mandos (scenario) expression string with the "str:" prefix.
     #[cfg(feature = "alloc")]
@@ -65,7 +74,7 @@ impl<'a> TestTokenIdentifier<'a> {
     }
 }
 
-impl<Env> AnnotatedValue<Env, EsdtTokenIdentifier<Env::Api>> for TestTokenIdentifier<'_>
+impl<Env> AnnotatedValue<Env, EsdtTokenIdentifier<Env::Api>> for TestTokenId<'_>
 where
     Env: TxEnv,
 {
@@ -79,16 +88,16 @@ where
     }
 }
 
-impl<'a, Api> From<TestTokenIdentifier<'a>> for EsdtTokenIdentifier<Api>
+impl<'a, Api> From<TestTokenId<'a>> for EsdtTokenIdentifier<Api>
 where
     Api: ManagedTypeApi,
 {
-    fn from(value: TestTokenIdentifier<'a>) -> Self {
+    fn from(value: TestTokenId<'a>) -> Self {
         EsdtTokenIdentifier::from_esdt_bytes(value.name)
     }
 }
 
-impl TopEncode for TestTokenIdentifier<'_> {
+impl TopEncode for TestTokenId<'_> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -98,7 +107,7 @@ impl TopEncode for TestTokenIdentifier<'_> {
     }
 }
 
-impl NestedEncode for TestTokenIdentifier<'_> {
+impl NestedEncode for TestTokenId<'_> {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -109,5 +118,4 @@ impl NestedEncode for TestTokenIdentifier<'_> {
     }
 }
 
-impl<Api> TypeAbiFrom<TestTokenIdentifier<'_>> for EsdtTokenIdentifier<Api> where Api: ManagedTypeApi
-{}
+impl<Api> TypeAbiFrom<TestTokenId<'_>> for EsdtTokenIdentifier<Api> where Api: ManagedTypeApi {}

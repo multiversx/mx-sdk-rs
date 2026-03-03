@@ -5,7 +5,7 @@ use crate::{
     types::{BigUint, Egld, ManagedAddress, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly};
 
 impl<Env> TxPayment<Env> for ()
 where
@@ -63,8 +63,8 @@ where
         to.with_address_ref(env, |to_addr| f(to_addr, &*BigUint::zero_ref(), fc))
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData::default()
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments::default()
     }
 }
 

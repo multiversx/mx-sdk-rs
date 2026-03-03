@@ -1,6 +1,7 @@
 use core::convert::TryFrom;
 
 use alloc::format;
+use multiversx_chain_core::types::H256;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
@@ -234,6 +235,9 @@ impl<M, const N: usize> TypeAbiFrom<&[u8; N]> for ManagedByteArray<M, N> where M
 
 impl<M, const N: usize> TypeAbiFrom<Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 impl<M, const N: usize> TypeAbiFrom<&Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
+
+impl<M> TypeAbiFrom<H256> for ManagedByteArray<M, 32> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&H256> for ManagedByteArray<M, 32> where M: ManagedTypeApi {}
 
 impl<M, const N: usize> TypeAbi for ManagedByteArray<M, N>
 where

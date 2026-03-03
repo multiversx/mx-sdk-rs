@@ -8,7 +8,7 @@ use crate::{
 use crate::{
     builtin_functions::BuiltinFunctionEsdtTransferInfo,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
-    types::VMAddress,
+    types::Address,
 };
 
 use super::{
@@ -92,7 +92,7 @@ fn try_parse_input(tx_input: &TxInput) -> Result<ParsedTransferBuiltinFunCall, &
 
     let mut arg_index = 0;
     let destination_bytes = tx_input.args[arg_index].as_slice();
-    let destination = VMAddress::from_slice(destination_bytes);
+    let destination = Address::from_slice(destination_bytes);
     arg_index += 1;
     let num_payments = top_decode_u64(tx_input.args[arg_index].as_slice()) as usize;
     arg_index += 1;

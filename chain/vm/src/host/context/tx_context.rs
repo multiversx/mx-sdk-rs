@@ -4,7 +4,7 @@ use crate::{
         state::{AccountData, AccountEsdt, BlockchainState},
     },
     host::runtime::RuntimeRef,
-    types::{VMAddress, VMCodeMetadata},
+    types::{Address, VMCodeMetadata},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -44,7 +44,7 @@ impl TxContext {
 
     pub fn dummy() -> Self {
         let tx_cache = TxCache::new(Arc::new(BlockchainState::default()));
-        let contract_address = VMAddress::from([b'c'; 32]);
+        let contract_address = Address::from([b'c'; 32]);
         tx_cache.insert_account(AccountData {
             address: contract_address.clone(),
             nonce: 0,
@@ -94,14 +94,14 @@ impl TxContext {
         self.tx_cache.blockchain_ref()
     }
 
-    pub fn with_account<R, F>(&self, address: &VMAddress, f: F) -> R
+    pub fn with_account<R, F>(&self, address: &Address, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,
     {
         self.tx_cache.with_account(address, f)
     }
 
-    pub fn with_account_or_else<R, F, Else>(&self, address: &VMAddress, f: F, or_else: Else) -> R
+    pub fn with_account_or_else<R, F, Else>(&self, address: &Address, f: F, or_else: Else) -> R
     where
         F: FnOnce(&AccountData) -> R,
         Else: FnOnce() -> R,
@@ -116,7 +116,7 @@ impl TxContext {
         self.with_account(&self.tx_input_box.to, f)
     }
 
-    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
+    pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
     where
         F: FnOnce(&mut AccountData) -> R,
     {
@@ -152,10 +152,10 @@ impl TxContext {
 
     pub fn create_new_contract(
         &self,
-        new_address: &VMAddress,
+        new_address: &Address,
         contract_path: Vec<u8>,
         code_metadata: VMCodeMetadata,
-        contract_owner: VMAddress,
+        contract_owner: Address,
     ) {
         assert!(
             !self.tx_cache.blockchain_ref().account_exists(new_address),

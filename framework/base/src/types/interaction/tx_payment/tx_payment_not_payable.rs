@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, ManagedAddress, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly};
 
 /// Transaction marker, which indicates that a transaction should never have any payment added to it.
 ///
@@ -69,8 +69,8 @@ where
         ().with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData::default()
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments::default()
     }
 }
 

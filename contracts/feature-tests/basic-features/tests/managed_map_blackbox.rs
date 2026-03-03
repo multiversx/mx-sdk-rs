@@ -11,11 +11,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
     blockchain.register_contract(MANAGED_MAP_CODE_PATH, basic_features::ContractBuilder);
 
-    blockchain
-        .account(OWNER_ADDRESS)
-        .nonce(1)
-        .balance(100)
-        .commit();
+    blockchain.account(OWNER_ADDRESS).nonce(1).balance(100);
 
     blockchain
         .account(SC_ADDRESS)
@@ -29,8 +25,7 @@ fn world() -> ScenarioWorld {
         .storage_mandos("str:mm-key|u32:2", "str:key2")
         .storage_mandos("str:mm-value|u32:0", "str:value0")
         .storage_mandos("str:mm-value|u32:1", "str:value1")
-        .storage_mandos("str:mm-value|u32:2", "str:value2")
-        .commit();
+        .storage_mandos("str:mm-value|u32:2", "str:value2");
 
     blockchain
 }

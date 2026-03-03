@@ -2,7 +2,7 @@ use crate::{
     blockchain::state::{EsdtData, EsdtInstance},
     chain_core::builtin_func_names::*,
     host::vm_hooks::VMHooksContext,
-    types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
+    types::{Address, EsdtLocalRole, EsdtLocalRoleFlags, RawHandle},
 };
 use multiversx_chain_core::types::{EsdtTokenType, ReturnCode};
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
@@ -36,7 +36,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn is_contract_address(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
 
-        let address = VMAddress::from_slice(address_bytes);
+        let address = Address::from_slice(address_bytes);
         Ok(&address == self.context.current_address())
     }
 
@@ -95,7 +95,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn is_smart_contract(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
 
-        Ok(VMAddress::from_slice(address_bytes).is_smart_contract_address())
+        Ok(Address::from_slice(address_bytes).is_smart_contract_address())
     }
 
     pub fn load_balance(
@@ -360,7 +360,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
                 .m_buffer_set_bytes,
         )?;
 
-        let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let Some(data) = self.context.account_data(&address) else {
             return Err(
                 VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64()).with_message(format!(
@@ -412,7 +412,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
                 .managed_buffer_api_cost
                 .m_buffer_get_bytes,
         )?;
-        let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.context.m_types_lock().mb_get(token_id_handle).to_vec();
 
         if let Some(account) = self.context.account_data(&address) {
@@ -499,7 +499,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
                 .m_buffer_get_bytes,
         )?;
 
-        let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.context.m_types_lock().mb_get(token_id_handle).to_vec();
         if let Some(account) = self.context.account_data(&address) {
             if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {

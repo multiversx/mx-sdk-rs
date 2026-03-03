@@ -2,7 +2,7 @@
 
 use multiversx_sc::imports::*;
 
-pub mod proxy_ping_pong_egld;
+pub mod proxy;
 mod types;
 
 use types::{ContractState, UserStatus};
@@ -24,7 +24,7 @@ const PONG_ALL_LOW_GAS_LIMIT: u64 = 3_000_000;
 /// - `pongAll` can be used to send to all users to `ping`-ed. If it runs low on gas, it will interrupt itself.
 /// It can be continued anytime.
 #[multiversx_sc::contract]
-pub trait PingPong {
+pub trait PingPongEgld {
     /// Necessary configuration when deploying:
     /// `ping_amount` - the exact EGLD amount that needs to be sent when `ping`-ing.
     /// `duration_in_seconds` - how much time (in seconds) until contract expires.

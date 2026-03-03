@@ -9,9 +9,11 @@ mod type_names;
 
 #[cfg(feature = "num-bigint")]
 mod type_abi_impl_big_int;
+mod type_abi_universal_input;
 
 pub use type_abi::*;
 pub use type_abi_from::*;
+pub use type_abi_universal_input::TypeAbiUniversalInput;
 pub use type_description::*;
 pub use type_description_container::*;
 pub use type_names::{TypeName, TypeNames};

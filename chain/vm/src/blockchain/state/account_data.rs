@@ -4,7 +4,7 @@ use num_traits::Zero;
 use super::AccountEsdt;
 use crate::{
     display_util::key_hex,
-    types::{VMAddress, VMCodeMetadata},
+    types::{Address, VMCodeMetadata},
 };
 use std::{collections::HashMap, fmt, fmt::Write};
 
@@ -12,7 +12,7 @@ pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
 
 #[derive(Clone, Debug)]
 pub struct AccountData {
-    pub address: VMAddress,
+    pub address: Address,
     pub nonce: u64,
     pub egld_balance: BigUint,
     pub esdt: AccountEsdt,
@@ -20,12 +20,12 @@ pub struct AccountData {
     pub username: Vec<u8>,
     pub contract_path: Option<Vec<u8>>,
     pub code_metadata: VMCodeMetadata,
-    pub contract_owner: Option<VMAddress>,
+    pub contract_owner: Option<Address>,
     pub developer_rewards: BigUint,
 }
 
 impl AccountData {
-    pub fn new_empty(address: VMAddress) -> Self {
+    pub fn new_empty(address: Address) -> Self {
         AccountData {
             address,
             nonce: 0,

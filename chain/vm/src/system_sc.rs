@@ -4,9 +4,8 @@ mod system_sc_unimplemented;
 
 use crate::{
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
-    types::VMAddress,
+    types::Address,
 };
-use multiversx_chain_core::types::Address;
 use system_sc_issue::*;
 use system_sc_special_roles::*;
 use system_sc_unimplemented::*;
@@ -16,7 +15,7 @@ use system_sc_unimplemented::*;
 pub const ESDT_SYSTEM_SC_ADDRESS: Address =
     Address::from_hex("000000000000000000010000000000000000000000000000000000000002ffff");
 
-pub fn is_system_sc_address(address: &VMAddress) -> bool {
+pub fn is_system_sc_address(address: &Address) -> bool {
     address == &ESDT_SYSTEM_SC_ADDRESS
 }
 

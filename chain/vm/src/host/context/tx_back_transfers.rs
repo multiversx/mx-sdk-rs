@@ -1,6 +1,6 @@
 use num_bigint::BigUint;
 
-use crate::{builtin_functions::BuiltinFunctionContainer, types::VMAddress};
+use crate::{builtin_functions::BuiltinFunctionContainer, types::Address};
 
 use super::{CallType, TxResult, TxTokenTransfer, async_call_tx_input};
 
@@ -17,7 +17,7 @@ impl BackTransfers {
 
     pub fn new_from_result(
         &mut self,
-        own_address: &VMAddress,
+        own_address: &Address,
         result: &TxResult,
         builtin_functions: &BuiltinFunctionContainer,
     ) {
