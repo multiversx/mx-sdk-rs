@@ -1,7 +1,7 @@
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType, ContractKind},
+    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType},
     comp_interact_controller::ComposabilityInteract,
     forwarder_queue_proxy::{self, QueuedCall, QueuedCallType},
 };
@@ -27,7 +27,7 @@ impl ComposabilityInteract {
         let mut buffer = self.interactor.homogenous_call_buffer();
 
         for contract in &config.contracts {
-            if contract.kind != ContractKind::Forwarder || contract.children.is_empty() {
+            if contract.children.is_empty() {
                 continue;
             }
 
@@ -50,7 +50,7 @@ impl ComposabilityInteract {
                     call_type,
                     to: ManagedAddress::from(child_addr),
                     gas_limit: child_call.gas_limit,
-                    endpoint_name: ManagedBuffer::from(child_call.endpoint_name.as_bytes()),
+                    endpoint_name: ManagedBuffer::from(b"bump"),
                     args: ManagedArgBuffer::new(),
                     payments: ManagedVec::new(),
                 });
@@ -110,16 +110,16 @@ impl ComposabilityInteract {
                 .clone();
 
             println!(
-                "Sending '{}' to contract index {} ({})",
-                start_call.endpoint_name, start_call.to, to_addr
+                "Calling bump on contract index {} ({})",
+                start_call.to, to_addr
             );
 
-            let endpoint = start_call.endpoint_name.clone();
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
                     .to(to_addr)
                     .gas(start_call.gas_limit)
-                    .raw_call(endpoint)
+                    .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                    .bump()
                     .returns(ReturnsStatus)
             });
         }

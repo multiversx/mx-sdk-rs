@@ -75,9 +75,10 @@ pub trait ForwarderQueue {
         }
     }
 
+    /// Records the call, then calls all programmed calls.
     #[endpoint]
     #[payable("*")]
-    fn forward_queued_calls(&self) {
+    fn bump(&self) {
         let calls = self.queued_calls().get();
         for call in calls {
             self.forward_queued_call(call);
@@ -85,7 +86,6 @@ pub trait ForwarderQueue {
     }
 
     #[promises_callback]
-    #[label("promises-callback")]
     fn promises_callback_method(&self) {
         self.callback_count().update(|c| *c += 1);
         let payments = self.call_value().all();

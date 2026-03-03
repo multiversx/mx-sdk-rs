@@ -88,11 +88,12 @@ where
             .original_result()
     }
 
-    pub fn forward_queued_calls(
+    /// Records the call, then calls all programmed calls. 
+    pub fn bump(
         self,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
-            .raw_call("forward_queued_calls")
+            .raw_call("bump")
             .original_result()
     }
 

@@ -1,6 +1,7 @@
 use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, ContractKind},
+    call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
     comp_interact_controller::ComposabilityInteract,
+    forwarder_queue_proxy,
 };
 
 use multiversx_sc_snippets::imports::*;
@@ -25,27 +26,15 @@ impl ComposabilityInteract {
 
     async fn deploy_all(&mut self, config: &CallTreeConfig) -> Vec<Bech32Address> {
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for contract in &config.contracts {
-            match contract.kind {
-                ContractKind::Forwarder => {
-                    buffer.push_tx(|tx| {
-                        tx.from(&self.wallet_address)
-                            .raw_deploy()
-                            .code(&self.forw_queue_code)
-                            .gas(NumExpr("70,000,000"))
-                            .returns(ReturnsNewBech32Address)
-                    });
-                }
-                ContractKind::Vault => {
-                    buffer.push_tx(|tx| {
-                        tx.from(&self.wallet_address)
-                            .raw_deploy()
-                            .code(&self.vault_code)
-                            .gas(NumExpr("70,000,000"))
-                            .returns(ReturnsNewBech32Address)
-                    });
-                }
-            }
+        for _ in &config.contracts {
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                    .init(IgnoreValue)
+                    .code(&self.forw_queue_code)
+                    .gas(NumExpr("70,000,000"))
+                    .returns(ReturnsNewBech32Address)
+            });
         }
         buffer.run().await
     }

@@ -871,7 +871,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- build post-processing: `wasm2wat`, imports via `wasm-objdump`.
 - Support for the new async call system (promises):
 	- new APIs;
-	- a new flavor of callbacks (`#[promises-callback]`);
+	- a new flavor of callbacks (`#[promises_callback]`);
 	- callback optimizations.
 - `elrond-codec` refactor: removed `TopEncodeNoErr`, `NestedEncodeNoErr` and `TypeInfo`
 - System SC proxy: added support for `controlChanges` endpoint and transfer create role (from community).

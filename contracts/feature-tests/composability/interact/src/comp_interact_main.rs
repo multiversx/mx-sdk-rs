@@ -8,7 +8,6 @@ mod comp_interact_cli;
 mod comp_interact_state;
 
 mod forwarder_queue_proxy;
-mod vault_proxy;
 
 use call_tree_config::CALL_TREE_FILE;
 use clap::Parser;

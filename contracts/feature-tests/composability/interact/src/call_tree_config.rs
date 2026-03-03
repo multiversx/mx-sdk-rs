@@ -65,7 +65,6 @@ pub struct ChildCall {
     pub to: usize,
     pub call_type: CallType,
     pub gas_limit: u64,
-    pub endpoint_name: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub args: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -82,31 +81,20 @@ pub struct ChildCall {
 pub struct StartCall {
     pub to: usize,
     pub gas_limit: u64,
-    pub endpoint_name: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub args: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub payments: Vec<PaymentConfig>,
 }
 
-/// Discriminates between a forwarder-queue contract and a vault.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum ContractKind {
-    Forwarder,
-    Vault,
-}
-
 /// Serializable description of a single contract node in the call tree.
 ///
 /// `index` is an explicit identifier used in child references.
-/// `children` holds `index` values of child contracts and is only
-/// meaningful for `Forwarder` nodes; it is omitted when empty.
+/// `children` is omitted when empty.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ContractConfig {
     pub index: usize,
     pub name: String,
-    pub kind: ContractKind,
     /// Bech32 address; populated after deployment and saved back to the file.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<String>,

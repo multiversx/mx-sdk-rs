@@ -5,22 +5,18 @@ chain_type = "real"
 [[start]]
 to = 0
 gas_limit = 70000000
-endpoint_name = "forward_queued_calls"
 
 [[contracts]]
 index = 0
 name = "root"
-kind = "forwarder"
-address = "erd1qqqqqqqqqqqqqpgqrp7uwlfy2szx8fnxg6la600yx3f66gqsn54qpxewxm"
+address = "erd1qqqqqqqqqqqqqpgq2p7zn02msdq3ajrthmxkp39fvj8mrv45n54q2t30sx"
 
 [[contracts.children]]
 to = 1
 call_type = "legacy_async"
 gas_limit = 10000000
-endpoint_name = "accept_funds"
 
 [[contracts]]
 index = 1
-name = "vault"
-kind = "vault"
-address = "erd1qqqqqqqqqqqqqpgq89u7hlws0uzn7c4wjq6rz5k9m72fedxan54qqvj8xg"
+name = "leaf"
+address = "erd1qqqqqqqqqqqqqpgqdr6sh545l6pu6ps3fezqwl9dr3v2zaf9n54qelnz9n"

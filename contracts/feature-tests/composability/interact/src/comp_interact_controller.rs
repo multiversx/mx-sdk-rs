@@ -11,7 +11,6 @@ pub struct ComposabilityInteract {
     pub interactor: Interactor,
     pub wallet_address: Address,
     pub forw_queue_code: BytesValue,
-    pub vault_code: BytesValue,
     #[allow(dead_code)]
     pub state: State,
 }
@@ -31,16 +30,11 @@ impl ComposabilityInteract {
             "mxsc:../forwarder-queue/output/forwarder-queue.mxsc.json",
             &InterpreterContext::default(),
         );
-        let vault_code = BytesValue::interpret_from(
-            "mxsc:../vault/output/vault.mxsc.json",
-            &InterpreterContext::default(),
-        );
 
         ComposabilityInteract {
             interactor,
             wallet_address,
             forw_queue_code,
-            vault_code,
             state: State::load_state(),
         }
     }
