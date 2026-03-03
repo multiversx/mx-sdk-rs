@@ -22,4 +22,9 @@ pub enum InteractCliCommand {
         about = "Deploy all contracts from call_tree.toml, configure, and save addresses back"
     )]
     Setup,
+    #[command(
+        name = "run",
+        about = "Send the start transactions defined in call_tree.toml"
+    )]
+    Run,
 }

@@ -37,6 +37,9 @@ async fn main() {
             interact.deploy_call_tree().await;
             interact.set_queued_calls_from_config().await;
         }
+        Some(comp_interact_cli::InteractCliCommand::Run) => {
+            interact.run_start_calls().await;
+        }
         None => {}
     }
 }

@@ -80,6 +80,59 @@ impl ComposabilityInteract {
             }
         }
     }
+
+    /// Send all `[[start]]` transactions from `call_tree.toml` in a single batch.
+    pub async fn run_start_calls(&mut self) {
+        let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
+
+        if config.start.is_empty() {
+            println!("No start calls defined in {CALL_TREE_FILE}");
+            return;
+        }
+
+        // Build index → bech32 address map.
+        let addr_map: std::collections::HashMap<usize, Bech32Address> = config
+            .contracts
+            .iter()
+            .filter_map(|c| {
+                c.address
+                    .as_ref()
+                    .map(|a| (c.index, Bech32Address::from_bech32_string(a.clone())))
+            })
+            .collect();
+
+        let mut buffer = self.interactor.homogenous_call_buffer();
+
+        for start_call in &config.start {
+            let to_addr = addr_map
+                .get(&start_call.to)
+                .unwrap_or_else(|| panic!("no address for contract index {}", start_call.to))
+                .clone();
+
+            println!(
+                "Sending '{}' to contract index {} ({})",
+                start_call.endpoint_name, start_call.to, to_addr
+            );
+
+            let endpoint = start_call.endpoint_name.clone();
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .to(to_addr)
+                    .gas(start_call.gas_limit)
+                    .raw_call(endpoint)
+                    .returns(ReturnsStatus)
+            });
+        }
+
+        let results = buffer.run().await;
+        for (i, status) in results.iter().enumerate() {
+            if *status == 0u64 {
+                println!("start call #{i}: ok");
+            } else {
+                println!("start call #{i}: failed with status {status}");
+            }
+        }
+    }
 }
 
 fn to_queued_call_type(call_type: &CallType) -> QueuedCallType {
