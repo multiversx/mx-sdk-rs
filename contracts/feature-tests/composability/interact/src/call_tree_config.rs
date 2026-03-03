@@ -72,6 +72,23 @@ pub struct ChildCall {
     pub payments: Vec<PaymentConfig>,
 }
 
+/// An initial call that triggers the chain reaction.
+///
+/// Unlike [`ChildCall`], there is no `call_type` — start calls are plain
+/// user transactions, not queued smart-contract calls.
+///
+/// `to` is the `index` of the target contract in `CallTreeConfig::contracts`.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StartCall {
+    pub to: usize,
+    pub gas_limit: u64,
+    pub endpoint_name: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub args: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub payments: Vec<PaymentConfig>,
+}
+
 /// Discriminates between a forwarder-queue contract and a vault.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -136,6 +153,9 @@ pub const CALL_TREE_FILE: &str = "call_tree.toml";
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CallTreeConfig {
     pub gateway: GatewayConfig,
+    /// Initial transactions that trigger the chain reaction.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub start: Vec<StartCall>,
     pub contracts: Vec<ContractConfig>,
 }
 

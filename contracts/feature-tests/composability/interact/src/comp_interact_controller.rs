@@ -44,12 +44,4 @@ impl ComposabilityInteract {
             state: State::load_state(),
         }
     }
-
-    pub async fn full_scenario(
-        &mut self,
-        _endpoint_name: &str,
-        _endpoint_args: &Option<Vec<String>>,
-    ) {
-        // TODO: implement full scenario via call_tree.toml
-    }
 }

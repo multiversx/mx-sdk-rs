@@ -1,5 +1,5 @@
 use crate::call_tree_config::{
-    CallTreeConfig, CallType, ChildCall, ContractConfig, ContractKind, GatewayConfig,
+    CallTreeConfig, CallType, ChildCall, ContractConfig, ContractKind, GatewayConfig, StartCall,
 };
 
 /// Scenario 1: a single root forwarder that calls `accept_funds` on one vault.
@@ -28,6 +28,13 @@ use crate::call_tree_config::{
 pub fn scenario_1() -> CallTreeConfig {
     CallTreeConfig {
         gateway: GatewayConfig::default(),
+        start: vec![StartCall {
+            to: 0,
+            gas_limit: 70_000_000,
+            endpoint_name: "forward_queued_calls".to_string(),
+            args: Vec::new(),
+            payments: Vec::new(),
+        }],
         contracts: vec![
             ContractConfig {
                 index: 0,

@@ -32,16 +32,9 @@ async fn main() {
     let mut interact = ComposabilityInteract::init().await;
 
     match &cli.command {
-        Some(comp_interact_cli::InteractCliCommand::Full(args)) => {
-            interact
-                .full_scenario(&args.endpoint_name, &args.endpoint_args)
-                .await;
-        }
         Some(comp_interact_cli::InteractCliCommand::S1) => unreachable!(),
-        Some(comp_interact_cli::InteractCliCommand::Deploy) => {
+        Some(comp_interact_cli::InteractCliCommand::Setup) => {
             interact.deploy_call_tree().await;
-        }
-        Some(comp_interact_cli::InteractCliCommand::SetQueuedCalls) => {
             interact.set_queued_calls_from_config().await;
         }
         None => {}
