@@ -46,6 +46,8 @@ pub enum CallType {
     Promise,
 }
 
+pub type ContractId = u32;
+
 /// A token payment attached to a call.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PaymentConfig {
@@ -62,11 +64,9 @@ pub struct PaymentConfig {
 /// `to` is the `index` of the target contract in `CallTreeConfig::contracts`.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChildCall {
-    pub to: usize,
+    pub to: ContractId,
     pub call_type: CallType,
     pub gas_limit: u64,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub args: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub payments: Vec<PaymentConfig>,
 }
@@ -79,7 +79,7 @@ pub struct ChildCall {
 /// `to` is the `index` of the target contract in `CallTreeConfig::contracts`.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StartCall {
-    pub to: usize,
+    pub to: ContractId,
     pub gas_limit: u64,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub args: Vec<String>,
@@ -93,7 +93,7 @@ pub struct StartCall {
 /// `children` is omitted when empty.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ContractConfig {
-    pub index: usize,
+    pub index: ContractId,
     pub name: String,
     /// Bech32 address; populated after deployment and saved back to the file.
     #[serde(default, skip_serializing_if = "Option::is_none")]

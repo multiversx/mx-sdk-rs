@@ -26,11 +26,11 @@ impl ComposabilityInteract {
 
     async fn deploy_all(&mut self, config: &CallTreeConfig) -> Vec<Bech32Address> {
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for _ in &config.contracts {
+        for contract in &config.contracts {
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
                     .typed(forwarder_queue_proxy::ForwarderQueueProxy)
-                    .init(IgnoreValue)
+                    .init(contract.index)
                     .code(&self.forw_queue_code)
                     .gas(NumExpr("70,000,000"))
                     .returns(ReturnsNewBech32Address)

@@ -43,7 +43,6 @@ pub fn scenario_1() -> CallTreeConfig {
                     to: 1,
                     call_type: CallType::LegacyAsync,
                     gas_limit: 10_000_000,
-                    args: Vec::new(),
                     payments: Vec::new(),
                 }],
             },

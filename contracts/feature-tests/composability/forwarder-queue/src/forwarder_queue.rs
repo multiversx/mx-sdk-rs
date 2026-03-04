@@ -4,6 +4,8 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
+pub mod forwarder_queue_proxy;
+
 #[type_abi]
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub enum QueuedCallType {
@@ -28,12 +30,16 @@ pub struct QueuedCall<M: ManagedTypeApi> {
 #[multiversx_sc::contract]
 pub trait ForwarderQueue {
     #[view]
+    #[storage_mapper("id")]
+    fn id(&self) -> SingleValueMapper<u32>;
+
+    #[view]
     #[storage_mapper("queued_calls")]
     fn queued_calls(&self) -> SingleValueMapper<ManagedVec<QueuedCall<Self::Api>>>;
 
     #[init]
-    fn init(&self, calls: MultiValueManagedVec<QueuedCall<Self::Api>>) {
-        self.set_queued_calls(calls);
+    fn init(&self, id: u32) {
+        self.id().set(id);
     }
 
     #[endpoint]
@@ -51,13 +57,14 @@ pub trait ForwarderQueue {
 
         let contract_call = self
             .tx()
-            .raw_call(call.endpoint_name)
             .to(&call.to)
+            .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+            .bump()
             .payment(&call.payments);
 
         match call.call_type {
             QueuedCallType::Sync => {
-                contract_call.sync_call();
+                contract_call.gas(call.gas_limit).sync_call();
             }
             QueuedCallType::LegacyAsync => {
                 contract_call.async_call_and_exit();

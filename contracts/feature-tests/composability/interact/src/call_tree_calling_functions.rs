@@ -1,7 +1,9 @@
+use std::collections::HashMap;
+
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType},
+    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType, ContractId},
     comp_interact_controller::ComposabilityInteract,
     forwarder_queue_proxy::{self, QueuedCall, QueuedCallType},
 };
@@ -14,7 +16,7 @@ impl ComposabilityInteract {
         let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
 
         // Build index → bech32 address map.
-        let addr_map: std::collections::HashMap<usize, Bech32Address> = config
+        let addr_map: HashMap<ContractId, Bech32Address> = config
             .contracts
             .iter()
             .filter_map(|c| {
@@ -91,7 +93,7 @@ impl ComposabilityInteract {
         }
 
         // Build index → bech32 address map.
-        let addr_map: std::collections::HashMap<usize, Bech32Address> = config
+        let addr_map: HashMap<ContractId, Bech32Address> = config
             .contracts
             .iter()
             .filter_map(|c| {
