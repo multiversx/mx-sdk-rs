@@ -26,6 +26,13 @@ pub struct QueuedCall<M: ManagedTypeApi> {
     pub payments: PaymentVec<M>,
 }
 
+#[type_abi]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+pub struct CallInfo {
+    pub caller_id: u32,
+    pub call_index: usize,
+}
+
 /// Testing multiple calls per transaction.
 #[multiversx_sc::contract]
 pub trait ForwarderQueue {
@@ -47,7 +54,18 @@ pub trait ForwarderQueue {
         self.queued_calls().set(calls.into_vec());
     }
 
-    fn forward_queued_call(&self, call: QueuedCall<Self::Api>) {
+    fn forward_queued_call(
+        &self,
+        call: QueuedCall<Self::Api>,
+        call_index: usize,
+        call_trace: &MultiValueManagedVec<CallInfo>,
+    ) {
+        let mut child_call_trace: MultiValueManagedVec<CallInfo> = call_trace.clone();
+        child_call_trace.push(CallInfo {
+            caller_id: self.id().get(),
+            call_index,
+        });
+
         self.forward_queued_call_payment_event(
             &call.call_type,
             &call.to,
@@ -59,7 +77,7 @@ pub trait ForwarderQueue {
             .tx()
             .to(&call.to)
             .typed(forwarder_queue_proxy::ForwarderQueueProxy)
-            .bump()
+            .bump(child_call_trace)
             .payment(&call.payments);
 
         match call.call_type {
@@ -85,10 +103,10 @@ pub trait ForwarderQueue {
     /// Records the call, then calls all programmed calls.
     #[endpoint]
     #[payable("*")]
-    fn bump(&self) {
+    fn bump(&self, call_trace: MultiValueManagedVec<CallInfo>) {
         let calls = self.queued_calls().get();
-        for call in calls {
-            self.forward_queued_call(call);
+        for (call_index, call) in calls.into_iter().enumerate() {
+            self.forward_queued_call(call, call_index, &call_trace);
         }
     }
 

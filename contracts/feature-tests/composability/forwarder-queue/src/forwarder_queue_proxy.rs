@@ -77,7 +77,7 @@ where
 
     pub fn queued_calls(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, QueuedCall<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, crate::QueuedCall<Env::Api>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("queued_calls")
@@ -85,7 +85,7 @@ where
     }
 
     pub fn set_queued_calls<
-        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, QueuedCall<Env::Api>>>,
+        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, crate::QueuedCall<Env::Api>>>,
     >(
         self,
         calls: Arg0,
@@ -98,11 +98,15 @@ where
     }
 
     /// Records the call, then calls all programmed calls. 
-    pub fn bump(
+    pub fn bump<
+        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, crate::CallInfo>>,
+    >(
         self,
+        call_trace: Arg0,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("bump")
+            .argument(&call_trace)
             .original_result()
     }
 
@@ -123,27 +127,4 @@ where
             .raw_call("callback_payments")
             .original_result()
     }
-}
-
-#[type_abi]
-#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
-pub struct QueuedCall<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub call_type: QueuedCallType,
-    pub to: ManagedAddress<Api>,
-    pub gas_limit: u64,
-    pub endpoint_name: ManagedBuffer<Api>,
-    pub args: ManagedArgBuffer<Api>,
-    pub payments: ManagedVec<Api, Payment<Api>>,
-}
-
-#[type_abi]
-#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
-pub enum QueuedCallType {
-    Sync,
-    LegacyAsync,
-    TransferExecute,
-    Promise,
 }

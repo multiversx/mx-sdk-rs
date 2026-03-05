@@ -186,10 +186,7 @@ where
             }
         }
 
-        if !local_types.is_empty()
-            || !skipped_types.is_empty()
-            || !external_types.is_empty()
-        {
+        if !local_types.is_empty() || !skipped_types.is_empty() || !external_types.is_empty() {
             println!(
                 "\nProxy types summary for {}:",
                 self.proxy_config.path.display()
@@ -223,9 +220,7 @@ where
 
         for (_, type_description) in &self.proxy_config.abi.type_descriptions.0 {
             let rust_name = type_description.names.rust.as_str();
-            if self.proxy_config.abi.get_crate_name_for_code()
-                != extract_struct_crate(rust_name)
-            {
+            if self.proxy_config.abi.get_crate_name_for_code() != extract_struct_crate(rust_name) {
                 continue;
             }
 

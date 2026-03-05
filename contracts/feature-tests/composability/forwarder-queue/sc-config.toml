@@ -3,6 +3,6 @@ name = "forwarder-queue"
 
 [[proxy]]
 path = "src/forwarder_queue_proxy.rs"
-
-[[proxy]]
-path = "../interact/src/forwarder_queue_proxy.rs"
+[[proxy.path-rename]]
+from = "forwarder_queue"
+to = "crate"

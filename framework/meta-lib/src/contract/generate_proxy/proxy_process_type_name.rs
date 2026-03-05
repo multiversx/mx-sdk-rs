@@ -130,7 +130,9 @@ mod tests {
     #[test]
     fn extract_crate_with_generic() {
         assert_eq!(
-            extract_struct_crate("forwarder_queue::QueuedCall<multiversx_sc::api::uncallable::UncallableApi>"),
+            extract_struct_crate(
+                "forwarder_queue::QueuedCall<multiversx_sc::api::uncallable::UncallableApi>"
+            ),
             "forwarder_queue",
         );
     }

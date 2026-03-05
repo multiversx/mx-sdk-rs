@@ -1,9 +1,9 @@
 use crate::{
     call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
     comp_interact_controller::ComposabilityInteract,
-    forwarder_queue_proxy,
 };
 
+use forwarder_queue::forwarder_queue_proxy;
 use multiversx_sc_snippets::imports::*;
 
 impl ComposabilityInteract {

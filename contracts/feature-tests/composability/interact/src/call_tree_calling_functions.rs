@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
+use forwarder_queue::{QueuedCall, QueuedCallType, forwarder_queue_proxy};
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
     call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType, ContractId},
     comp_interact_controller::ComposabilityInteract,
-    forwarder_queue_proxy::{self, QueuedCall, QueuedCallType},
 };
 
 impl ComposabilityInteract {
@@ -121,7 +121,7 @@ impl ComposabilityInteract {
                     .to(to_addr)
                     .gas(start_call.gas_limit)
                     .typed(forwarder_queue_proxy::ForwarderQueueProxy)
-                    .bump()
+                    .bump(IgnoreValue)
                     .returns(ReturnsStatus)
             });
         }
