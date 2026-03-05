@@ -45,17 +45,21 @@ impl ComposabilityInteract {
                 println!("  trace: (empty)");
             } else {
                 for (i, entry) in trace.0.iter().enumerate() {
-                    print!("  trace[{i}] (block_nonce={}): [", entry.block_nonce);
+                    let gas_used = entry.initial_gas.saturating_sub(entry.final_gas);
+                    print!(
+                        "  trace[{i}] (block_nonce={}, gas={}-{}={}, items: [",
+                        entry.block_nonce, entry.initial_gas, gas_used, entry.final_gas,
+                    );
                     for (j, item) in entry.items.iter().enumerate() {
                         if j > 0 {
                             print!(", ");
                         }
                         print!(
-                            "(caller_id={}, call_index={})",
+                            "(caller={}, call_index={})",
                             item.caller_id, item.call_index
                         );
                     }
-                    println!("]");
+                    println!("])");
                 }
             }
         }

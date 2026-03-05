@@ -39,6 +39,8 @@ pub struct TraceItem<M: ManagedTypeApi> {
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct Trace<M: ManagedTypeApi> {
     pub block_nonce: u64,
+    pub initial_gas: u64,
+    pub final_gas: u64,
     pub items: ManagedVec<M, TraceItem<M>>,
 }
 
@@ -71,14 +73,20 @@ pub trait ForwarderQueue {
     #[endpoint]
     #[payable("*")]
     fn bump(&self, call_trace: MultiValueManagedVec<TraceItem<Self::Api>>) {
-        self.trace().push(&Trace {
+        let initial_gas = self.blockchain().get_gas_left();
+        let trace_index = self.trace().push(&Trace {
             block_nonce: self.blockchain().get_block_nonce(),
+            initial_gas,
+            final_gas: 0,
             items: call_trace.as_vec().clone(),
         });
         let calls = self.queued_calls().get();
         for (call_index, call) in calls.into_iter().enumerate() {
             self.forward_queued_call(call, call_index, &call_trace);
         }
+        self.trace().update(trace_index, |trace| {
+            trace.final_gas = self.blockchain().get_gas_left();
+        });
     }
 
     fn forward_queued_call(
