@@ -12,27 +12,28 @@ impl ComposabilityInteract {
     pub async fn deploy_call_tree(&mut self) {
         let mut config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
 
-        // Deploy all contracts in declaration order in a single batch.
-        let addresses = self.deploy_all(&config).await;
+        // Deploy all contracts in a single batch.
+        let name_address_pairs = self.deploy_all(&config).await;
 
-        for (contract, address) in config.contracts.iter_mut().zip(addresses.iter()) {
-            println!("Deployed '{}' at {}", contract.name, address);
-            contract.address = Some(address.to_string());
+        for (name, address) in name_address_pairs {
+            println!("Deployed '{name}' at {address}");
+            config.contracts.get_mut(&name).unwrap().address = Some(address.to_string());
         }
 
         config.save_to_file(CALL_TREE_FILE);
         println!("Addresses saved to {CALL_TREE_FILE}");
     }
 
-    async fn deploy_all(&mut self, config: &CallTreeConfig) -> Vec<Bech32Address> {
+    async fn deploy_all(&mut self, config: &CallTreeConfig) -> Vec<(String, Bech32Address)> {
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for contract in &config.contracts {
+        for (name, _) in &config.contracts {
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
                     .typed(forwarder_queue_proxy::ForwarderQueueProxy)
-                    .init(contract.index)
+                    .init(name)
                     .code(&self.forw_queue_code)
                     .gas(NumExpr("70,000,000"))
+                    .returns(PassValue(name.clone()))
                     .returns(ReturnsNewBech32Address)
             });
         }

@@ -30,9 +30,9 @@ async fn main() {
             interact.deploy_call_tree().await;
             interact.set_queued_calls_from_config().await;
         }
-        Some(comp_interact_cli::InteractCliCommand::Run) => {
+        Some(comp_interact_cli::InteractCliCommand::Bump) => {
             let mut interact = ComposabilityInteract::init().await;
-            interact.run_start_calls().await;
+            interact.bump().await;
         }
         Some(comp_interact_cli::InteractCliCommand::Info) => {
             let mut interact = ComposabilityInteract::init().await;

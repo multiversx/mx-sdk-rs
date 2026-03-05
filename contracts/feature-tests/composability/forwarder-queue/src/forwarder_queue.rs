@@ -6,6 +6,8 @@ multiversx_sc::derive_imports!();
 
 pub mod forwarder_queue_proxy;
 
+pub type NodeName<M> = ManagedBuffer<M>;
+
 #[type_abi]
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub enum QueuedCallType {
@@ -28,8 +30,8 @@ pub struct QueuedCall<M: ManagedTypeApi> {
 
 #[type_abi]
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
-pub struct TraceItem {
-    pub caller_id: u32,
+pub struct TraceItem<M: ManagedTypeApi> {
+    pub caller_id: NodeName<M>,
     pub call_index: usize,
 }
 
@@ -37,7 +39,7 @@ pub struct TraceItem {
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
 pub struct Trace<M: ManagedTypeApi> {
     pub block_nonce: u64,
-    pub items: ManagedVec<M, TraceItem>,
+    pub items: ManagedVec<M, TraceItem<M>>,
 }
 
 /// Testing multiple calls per transaction.
@@ -45,7 +47,7 @@ pub struct Trace<M: ManagedTypeApi> {
 pub trait ForwarderQueue {
     #[view]
     #[storage_mapper("id")]
-    fn id(&self) -> SingleValueMapper<u32>;
+    fn id(&self) -> SingleValueMapper<NodeName<Self::Api>>;
 
     #[view]
     #[storage_mapper("queued_calls")]
@@ -56,7 +58,7 @@ pub trait ForwarderQueue {
     fn trace(&self) -> VecMapper<Trace<Self::Api>>;
 
     #[init]
-    fn init(&self, id: u32) {
+    fn init(&self, id: NodeName<Self::Api>) {
         self.id().set(id);
     }
 
@@ -68,7 +70,7 @@ pub trait ForwarderQueue {
     /// Records the call, then calls all programmed calls.
     #[endpoint]
     #[payable("*")]
-    fn bump(&self, call_trace: MultiValueManagedVec<TraceItem>) {
+    fn bump(&self, call_trace: MultiValueManagedVec<TraceItem<Self::Api>>) {
         self.trace().push(&Trace {
             block_nonce: self.blockchain().get_block_nonce(),
             items: call_trace.as_vec().clone(),
@@ -83,9 +85,9 @@ pub trait ForwarderQueue {
         &self,
         call: QueuedCall<Self::Api>,
         call_index: usize,
-        call_trace: &MultiValueManagedVec<TraceItem>,
+        call_trace: &MultiValueManagedVec<TraceItem<Self::Api>>,
     ) {
-        let mut child_call_trace: MultiValueManagedVec<TraceItem> = call_trace.clone();
+        let mut child_call_trace: MultiValueManagedVec<TraceItem<Self::Api>> = call_trace.clone();
         child_call_trace.push(TraceItem {
             caller_id: self.id().get(),
             call_index,

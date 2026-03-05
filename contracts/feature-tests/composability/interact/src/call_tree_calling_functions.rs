@@ -4,7 +4,7 @@ use forwarder_queue::{QueuedCall, QueuedCallType, forwarder_queue_proxy};
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType, ContractId},
+    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType},
     comp_interact_controller::ComposabilityInteract,
 };
 
@@ -15,27 +15,27 @@ impl ComposabilityInteract {
     pub async fn set_queued_calls_from_config(&mut self) {
         let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
 
-        // Build index → bech32 address map.
-        let addr_map: HashMap<ContractId, Bech32Address> = config
+        // Build name → bech32 address map.
+        let addr_map: HashMap<String, Bech32Address> = config
             .contracts
             .iter()
-            .filter_map(|c| {
+            .filter_map(|(name, c)| {
                 c.address
                     .as_ref()
-                    .map(|a| (c.index, Bech32Address::from_bech32_string(a.clone())))
+                    .map(|a| (name.clone(), Bech32Address::from_bech32_string(a.clone())))
             })
             .collect();
 
         let mut buffer = self.interactor.homogenous_call_buffer();
 
-        for contract in &config.contracts {
+        for (name, contract) in &config.contracts {
             if contract.children.is_empty() {
                 continue;
             }
 
             let fwd_addr = addr_map
-                .get(&contract.index)
-                .unwrap_or_else(|| panic!("no address for forwarder '{}'", contract.name))
+                .get(name)
+                .unwrap_or_else(|| panic!("no address for forwarder '{name}'"))
                 .clone();
 
             // Convert each ChildCall config into a managed QueuedCall.
@@ -44,7 +44,7 @@ impl ComposabilityInteract {
             for child_call in &contract.children {
                 let child_addr = addr_map
                     .get(&child_call.to)
-                    .unwrap_or_else(|| panic!("no address for contract index {}", child_call.to))
+                    .unwrap_or_else(|| panic!("no address for contract '{}'", child_call.to))
                     .to_address();
 
                 let call_type = to_queued_call_type(&child_call.call_type);
@@ -59,9 +59,8 @@ impl ComposabilityInteract {
             }
 
             println!(
-                "Setting {} queued call(s) on forwarder '{}'",
+                "Setting {} queued call(s) on forwarder '{name}'",
                 calls.len(),
-                contract.name
             );
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
@@ -84,7 +83,7 @@ impl ComposabilityInteract {
     }
 
     /// Send all `[[start]]` transactions from `call_tree.toml` in a single batch.
-    pub async fn run_start_calls(&mut self) {
+    pub async fn bump(&mut self) {
         let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
 
         if config.start.is_empty() {
@@ -92,14 +91,14 @@ impl ComposabilityInteract {
             return;
         }
 
-        // Build index → bech32 address map.
-        let addr_map: HashMap<ContractId, Bech32Address> = config
+        // Build name → bech32 address map.
+        let addr_map: HashMap<String, Bech32Address> = config
             .contracts
             .iter()
-            .filter_map(|c| {
+            .filter_map(|(name, c)| {
                 c.address
                     .as_ref()
-                    .map(|a| (c.index, Bech32Address::from_bech32_string(a.clone())))
+                    .map(|a| (name.clone(), Bech32Address::from_bech32_string(a.clone())))
             })
             .collect();
 
@@ -108,13 +107,10 @@ impl ComposabilityInteract {
         for start_call in &config.start {
             let to_addr = addr_map
                 .get(&start_call.to)
-                .unwrap_or_else(|| panic!("no address for contract index {}", start_call.to))
+                .unwrap_or_else(|| panic!("no address for contract '{}'", start_call.to))
                 .clone();
 
-            println!(
-                "Calling bump on contract index {} ({})",
-                start_call.to, to_addr
-            );
+            println!("Calling bump on contract '{}' ({})", start_call.to, to_addr);
 
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)

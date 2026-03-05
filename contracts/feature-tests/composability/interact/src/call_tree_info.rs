@@ -16,14 +16,10 @@ impl ComposabilityInteract {
         let contracts_with_addresses: Vec<_> = config
             .contracts
             .iter()
-            .filter_map(|c| {
-                c.address.as_ref().map(|a| {
-                    (
-                        c.index,
-                        c.name.clone(),
-                        Bech32Address::from_bech32_string(a.clone()),
-                    )
-                })
+            .filter_map(|(name, c)| {
+                c.address
+                    .as_ref()
+                    .map(|a| (name.clone(), Bech32Address::from_bech32_string(a.clone())))
             })
             .collect();
 
@@ -32,8 +28,8 @@ impl ComposabilityInteract {
             return;
         }
 
-        for (index, name, addr) in contracts_with_addresses {
-            println!("\n=== Contract '{}' (index {}) @ {} ===", name, index, addr);
+        for (name, addr) in contracts_with_addresses {
+            println!("\n=== Contract '{name}' @ {addr} ===");
 
             let trace: MultiValueVec<Trace<StaticApi>> = self
                 .interactor

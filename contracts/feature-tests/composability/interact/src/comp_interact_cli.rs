@@ -23,10 +23,10 @@ pub enum InteractCliCommand {
     )]
     Setup,
     #[command(
-        name = "run",
+        name = "bump",
         about = "Send the start transactions defined in call_tree.toml"
     )]
-    Run,
+    Bump,
     #[command(
         name = "info",
         about = "Query the trace view for all deployed contracts and print the results"

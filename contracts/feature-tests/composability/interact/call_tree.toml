@@ -3,20 +3,16 @@ uri = "https://testnet-gateway.multiversx.com"
 chain_type = "real"
 
 [[start]]
-to = 0
+to = "root"
 gas_limit = 70000000
 
-[[contracts]]
-index = 0
-name = "root"
-address = "erd1qqqqqqqqqqqqqpgqgxx6k4f77ucmh8x6t0fjxj9f4nh28m8wn54q4fc4ux"
+[contracts.leaf]
+address = "erd1qqqqqqqqqqqqqpgq5gdlnxgrkg2nnycssp0pxuwlkn0wk57zn54qd4dav9"
 
-[[contracts.children]]
-to = 1
+[contracts.root]
+address = "erd1qqqqqqqqqqqqqpgqeegmmvwcy2a7256ntc0j7h4xm7rwk6ken54qatx4w0"
+
+[[contracts.root.children]]
+to = "leaf"
 call_type = "legacy_async"
 gas_limit = 10000000
-
-[[contracts]]
-index = 1
-name = "leaf"
-address = "erd1qqqqqqqqqqqqqpgqya9u97rtaff6j8fnn7rc7d9yvlmq9n4dn54q628ur8"

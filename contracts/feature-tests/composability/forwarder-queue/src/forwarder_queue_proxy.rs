@@ -44,7 +44,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: ProxyArg<u32>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         id: Arg0,
@@ -68,7 +68,7 @@ where
 {
     pub fn id(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u32> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("id")
@@ -108,7 +108,7 @@ where
 
     /// Records the call, then calls all programmed calls. 
     pub fn bump<
-        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, crate::TraceItem>>,
+        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, crate::TraceItem<Env::Api>>>,
     >(
         self,
         call_trace: Arg0,

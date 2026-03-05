@@ -1,4 +1,5 @@
 use std::{
+    collections::BTreeMap,
     io::{Read, Write},
     path::Path,
 };
@@ -46,8 +47,6 @@ pub enum CallType {
     Promise,
 }
 
-pub type ContractId = u32;
-
 /// A token payment attached to a call.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PaymentConfig {
@@ -61,10 +60,10 @@ pub struct PaymentConfig {
 
 /// Equivalent of `QueuedCall` from the forwarder-queue proxy, for TOML config.
 ///
-/// `to` is the `index` of the target contract in `CallTreeConfig::contracts`.
+/// `to` is the name (map key) of the target contract in `CallTreeConfig::contracts`.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChildCall {
-    pub to: ContractId,
+    pub to: String,
     pub call_type: CallType,
     pub gas_limit: u64,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -76,10 +75,10 @@ pub struct ChildCall {
 /// Unlike [`ChildCall`], there is no `call_type` — start calls are plain
 /// user transactions, not queued smart-contract calls.
 ///
-/// `to` is the `index` of the target contract in `CallTreeConfig::contracts`.
+/// `to` is the name (map key) of the target contract in `CallTreeConfig::contracts`.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StartCall {
-    pub to: ContractId,
+    pub to: String,
     pub gas_limit: u64,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub args: Vec<String>,
@@ -89,12 +88,11 @@ pub struct StartCall {
 
 /// Serializable description of a single contract node in the call tree.
 ///
-/// `index` is an explicit identifier used in child references.
+/// The contract name is the key in `CallTreeConfig::contracts`.
+/// `index` is the on-chain numeric ID passed to `init`.
 /// `children` is omitted when empty.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ContractConfig {
-    pub index: ContractId,
-    pub name: String,
     /// Bech32 address; populated after deployment and saved back to the file.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<String>,
@@ -104,37 +102,21 @@ pub struct ContractConfig {
 
 /// Serializable description of the whole call tree.
 ///
-/// `contracts[0]` is always the root (must be a `Forwarder`).
-/// Children are referenced by index into this same list.
+/// `contracts` is a map from contract name to its config.
+/// Children and start calls reference contracts by name.
 ///
-/// Example TOML for a root forwarder → fwd1 → vault1 tree:
+/// Example TOML for a root forwarder → leaf tree:
 /// ```toml
-/// [[contracts]]
+/// [contracts.root]
 /// index = 0
-/// name = "root"
-/// kind = "forwarder"
 ///
-/// [[contracts.children]]
-/// to = 1
+/// [[contracts.root.children]]
+/// to = "leaf"
 /// call_type = "legacy_async"
 /// gas_limit = 10000000
-/// endpoint_name = "forward_queued_calls"
 ///
-/// [[contracts]]
+/// [contracts.leaf]
 /// index = 1
-/// name = "fwd1"
-/// kind = "forwarder"
-///
-/// [[contracts.children]]
-/// to = 2
-/// call_type = "legacy_async"
-/// gas_limit = 10000000
-/// endpoint_name = "accept_funds"
-///
-/// [[contracts]]
-/// index = 2
-/// name = "vault1"
-/// kind = "vault"
 /// ```
 pub const CALL_TREE_FILE: &str = "call_tree.toml";
 
@@ -144,7 +126,8 @@ pub struct CallTreeConfig {
     /// Initial transactions that trigger the chain reaction.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub start: Vec<StartCall>,
-    pub contracts: Vec<ContractConfig>,
+    /// Map from contract name to its configuration.
+    pub contracts: BTreeMap<String, ContractConfig>,
 }
 
 impl CallTreeConfig {
