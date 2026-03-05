@@ -71,10 +71,7 @@ impl ComposabilityInteract {
                         if j > 0 {
                             print!(", ");
                         }
-                        print!(
-                            "({} #{})",
-                            item.caller_id, item.call_index
-                        );
+                        print!("({} #{})", item.caller_id, item.call_index);
                     }
                     println!("])");
                 }

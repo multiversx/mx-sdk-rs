@@ -9,7 +9,7 @@ mod call_tree_info;
 mod comp_interact_cli;
 mod comp_interact_state;
 
-use call_tree_config::{CallTreeConfig, CALL_TREE_FILE};
+use call_tree_config::{CALL_TREE_FILE, CallTreeConfig};
 use clap::Parser;
 use comp_interact_controller::ComposabilityInteract;
 mod comp_interact_controller;
