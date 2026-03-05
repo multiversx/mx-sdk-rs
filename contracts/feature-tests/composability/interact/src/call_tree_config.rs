@@ -97,7 +97,7 @@ pub struct ContractConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub children: Vec<ProgrammedCallConfig>,
+    pub calls: Vec<ProgrammedCallConfig>,
 }
 
 /// Serializable description of the whole call tree.
@@ -110,7 +110,7 @@ pub struct ContractConfig {
 /// [contracts.root]
 /// index = 0
 ///
-/// [[contracts.root.children]]
+/// [[contracts.root.calls]]
 /// to = "leaf"
 /// call_type = "legacy_async"
 /// gas_limit = 10000000

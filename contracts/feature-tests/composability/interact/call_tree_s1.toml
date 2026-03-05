@@ -12,7 +12,7 @@ address = "erd1qqqqqqqqqqqqqpgqznth4hkmx7yfru4t5h7ww75xadz66h2vn54qutlus3"
 [contracts.root]
 address = "erd1qqqqqqqqqqqqqpgqdlrjtpk2vd237q7rmzywv6f2zgjzljj3n54q5snmxv"
 
-[[contracts.root.children]]
+[[contracts.root.calls]]
 to = "leaf"
 call_type = "legacy_async"
 gas_limit = 10000000

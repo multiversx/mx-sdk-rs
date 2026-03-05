@@ -41,7 +41,7 @@ pub fn scenario_1() -> CallTreeConfig {
                 "root".to_string(),
                 ContractConfig {
                     address: None,
-                    children: vec![ProgrammedCallConfig {
+                    calls: vec![ProgrammedCallConfig {
                         to: "leaf".to_string(),
                         call_type: ProgrammedCallTypeConfig::LegacyAsync,
                         gas_limit: 10_000_000,
@@ -53,7 +53,7 @@ pub fn scenario_1() -> CallTreeConfig {
                 "leaf".to_string(),
                 ContractConfig {
                     address: None,
-                    children: Vec::new(),
+                    calls: Vec::new(),
                 },
             ),
         ]),

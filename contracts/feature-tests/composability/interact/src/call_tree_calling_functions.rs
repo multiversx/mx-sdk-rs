@@ -29,7 +29,7 @@ impl ComposabilityInteract {
         let mut buffer = self.interactor.homogenous_call_buffer();
 
         for (name, contract) in &config.contracts {
-            if contract.children.is_empty() {
+            if contract.calls.is_empty() {
                 continue;
             }
 
@@ -41,7 +41,7 @@ impl ComposabilityInteract {
             // Convert each ChildCall config into a managed QueuedCall.
             let mut calls: MultiValueManagedVec<StaticApi, ProgrammedCall<StaticApi>> =
                 MultiValueManagedVec::new();
-            for child_call in &contract.children {
+            for child_call in &contract.calls {
                 let child_addr = addr_map
                     .get(&child_call.to)
                     .unwrap_or_else(|| panic!("no address for contract '{}'", child_call.to))
