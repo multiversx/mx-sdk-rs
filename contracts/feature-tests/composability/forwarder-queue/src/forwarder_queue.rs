@@ -44,6 +44,10 @@ pub trait ForwarderQueue {
     #[storage_mapper("queued_calls")]
     fn queued_calls(&self) -> SingleValueMapper<ManagedVec<QueuedCall<Self::Api>>>;
 
+    #[view]
+    #[storage_mapper("trace")]
+    fn trace(&self) -> VecMapper<ManagedVec<CallInfo>>;
+
     #[init]
     fn init(&self, id: u32) {
         self.id().set(id);
@@ -52,6 +56,17 @@ pub trait ForwarderQueue {
     #[endpoint]
     fn set_queued_calls(&self, calls: MultiValueManagedVec<QueuedCall<Self::Api>>) {
         self.queued_calls().set(calls.into_vec());
+    }
+
+    /// Records the call, then calls all programmed calls.
+    #[endpoint]
+    #[payable("*")]
+    fn bump(&self, call_trace: MultiValueManagedVec<CallInfo>) {
+        self.trace().push(call_trace.as_vec());
+        let calls = self.queued_calls().get();
+        for (call_index, call) in calls.into_iter().enumerate() {
+            self.forward_queued_call(call, call_index, &call_trace);
+        }
     }
 
     fn forward_queued_call(
@@ -97,16 +112,6 @@ pub trait ForwarderQueue {
                     .callback(self.callbacks().promises_callback_method())
                     .register_promise();
             }
-        }
-    }
-
-    /// Records the call, then calls all programmed calls.
-    #[endpoint]
-    #[payable("*")]
-    fn bump(&self, call_trace: MultiValueManagedVec<CallInfo>) {
-        let calls = self.queued_calls().get();
-        for (call_index, call) in calls.into_iter().enumerate() {
-            self.forward_queued_call(call, call_index, &call_trace);
         }
     }
 

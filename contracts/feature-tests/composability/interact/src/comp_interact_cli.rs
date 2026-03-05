@@ -27,4 +27,9 @@ pub enum InteractCliCommand {
         about = "Send the start transactions defined in call_tree.toml"
     )]
     Run,
+    #[command(
+        name = "info",
+        about = "Query the trace view for all deployed contracts and print the results"
+    )]
+    Info,
 }

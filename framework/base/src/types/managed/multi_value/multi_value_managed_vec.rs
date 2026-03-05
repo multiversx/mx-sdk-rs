@@ -131,6 +131,10 @@ where
         self.0
     }
 
+    pub fn as_vec(&self) -> &ManagedVec<M, T> {
+        &self.0
+    }
+
     #[cfg(feature = "alloc")]
     pub fn with_self_as_vec<F>(&mut self, f: F)
     where

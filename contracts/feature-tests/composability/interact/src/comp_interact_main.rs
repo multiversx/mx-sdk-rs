@@ -4,6 +4,7 @@ mod call_tree_calling_functions;
 mod call_tree_config;
 mod call_tree_config_gen;
 mod call_tree_deploy;
+mod call_tree_info;
 mod comp_interact_cli;
 mod comp_interact_state;
 
@@ -32,6 +33,10 @@ async fn main() {
         Some(comp_interact_cli::InteractCliCommand::Run) => {
             let mut interact = ComposabilityInteract::init().await;
             interact.run_start_calls().await;
+        }
+        Some(comp_interact_cli::InteractCliCommand::Info) => {
+            let mut interact = ComposabilityInteract::init().await;
+            interact.query_trace_info().await;
         }
         None => {}
     }

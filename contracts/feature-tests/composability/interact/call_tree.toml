@@ -9,7 +9,7 @@ gas_limit = 70000000
 [[contracts]]
 index = 0
 name = "root"
-address = "erd1qqqqqqqqqqqqqpgq4wx6m0x64hhrfwlaa84g7w9wyv32msxyn54q6zfph2"
+address = "erd1qqqqqqqqqqqqqpgq37h7dksmyy5373rdeaz3v6ucql4za99ln54q23xnxg"
 
 [[contracts.children]]
 to = 1
@@ -19,4 +19,4 @@ gas_limit = 10000000
 [[contracts]]
 index = 1
 name = "leaf"
-address = "erd1qqqqqqqqqqqqqpgqn6q65sut5rntu342023c366l97gjhf7gn54qhgy5qv"
+address = "erd1qqqqqqqqqqqqqpgq6z9ws38g5wud3pvtrp4f3atqrpslxqnzn54qmdykf6"

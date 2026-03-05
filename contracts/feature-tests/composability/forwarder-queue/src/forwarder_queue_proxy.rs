@@ -84,6 +84,15 @@ where
             .original_result()
     }
 
+    pub fn trace(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedVec<Env::Api, crate::CallInfo>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("trace")
+            .original_result()
+    }
+
     pub fn set_queued_calls<
         Arg0: ProxyArg<MultiValueManagedVec<Env::Api, crate::QueuedCall<Env::Api>>>,
     >(
