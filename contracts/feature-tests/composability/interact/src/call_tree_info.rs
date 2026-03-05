@@ -1,4 +1,4 @@
-use forwarder_queue::{CallInfo, forwarder_queue_proxy};
+use forwarder_queue::{Trace, forwarder_queue_proxy};
 use multiversx_sc::codec::multi_types::MultiValueVec;
 use multiversx_sc_snippets::imports::*;
 
@@ -35,7 +35,7 @@ impl ComposabilityInteract {
         for (index, name, addr) in contracts_with_addresses {
             println!("\n=== Contract '{}' (index {}) @ {} ===", name, index, addr);
 
-            let trace: MultiValueVec<Vec<CallInfo>> = self
+            let trace: MultiValueVec<Trace<StaticApi>> = self
                 .interactor
                 .query()
                 .to(addr)
@@ -49,14 +49,14 @@ impl ComposabilityInteract {
                 println!("  trace: (empty)");
             } else {
                 for (i, entry) in trace.0.iter().enumerate() {
-                    print!("  trace[{i}]: [");
-                    for (j, call_info) in entry.iter().enumerate() {
+                    print!("  trace[{i}] (block_nonce={}): [", entry.block_nonce);
+                    for (j, item) in entry.items.iter().enumerate() {
                         if j > 0 {
                             print!(", ");
                         }
                         print!(
                             "(caller_id={}, call_index={})",
-                            call_info.caller_id, call_info.call_index
+                            item.caller_id, item.call_index
                         );
                     }
                     println!("]");

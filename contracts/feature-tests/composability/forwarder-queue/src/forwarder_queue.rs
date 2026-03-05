@@ -28,9 +28,16 @@ pub struct QueuedCall<M: ManagedTypeApi> {
 
 #[type_abi]
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
-pub struct CallInfo {
+pub struct TraceItem {
     pub caller_id: u32,
     pub call_index: usize,
+}
+
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+pub struct Trace<M: ManagedTypeApi> {
+    pub block_nonce: u64,
+    pub items: ManagedVec<M, TraceItem>,
 }
 
 /// Testing multiple calls per transaction.
@@ -46,7 +53,7 @@ pub trait ForwarderQueue {
 
     #[view]
     #[storage_mapper("trace")]
-    fn trace(&self) -> VecMapper<ManagedVec<CallInfo>>;
+    fn trace(&self) -> VecMapper<Trace<Self::Api>>;
 
     #[init]
     fn init(&self, id: u32) {
@@ -61,8 +68,11 @@ pub trait ForwarderQueue {
     /// Records the call, then calls all programmed calls.
     #[endpoint]
     #[payable("*")]
-    fn bump(&self, call_trace: MultiValueManagedVec<CallInfo>) {
-        self.trace().push(call_trace.as_vec());
+    fn bump(&self, call_trace: MultiValueManagedVec<TraceItem>) {
+        self.trace().push(&Trace {
+            block_nonce: self.blockchain().get_block_nonce(),
+            items: call_trace.as_vec().clone(),
+        });
         let calls = self.queued_calls().get();
         for (call_index, call) in calls.into_iter().enumerate() {
             self.forward_queued_call(call, call_index, &call_trace);
@@ -73,10 +83,10 @@ pub trait ForwarderQueue {
         &self,
         call: QueuedCall<Self::Api>,
         call_index: usize,
-        call_trace: &MultiValueManagedVec<CallInfo>,
+        call_trace: &MultiValueManagedVec<TraceItem>,
     ) {
-        let mut child_call_trace: MultiValueManagedVec<CallInfo> = call_trace.clone();
-        child_call_trace.push(CallInfo {
+        let mut child_call_trace: MultiValueManagedVec<TraceItem> = call_trace.clone();
+        child_call_trace.push(TraceItem {
             caller_id: self.id().get(),
             call_index,
         });

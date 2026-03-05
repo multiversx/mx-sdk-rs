@@ -86,7 +86,7 @@ where
 
     pub fn trace(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedVec<Env::Api, crate::CallInfo>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, crate::Trace<Env::Api>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("trace")
@@ -108,7 +108,7 @@ where
 
     /// Records the call, then calls all programmed calls. 
     pub fn bump<
-        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, crate::CallInfo>>,
+        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, crate::TraceItem>>,
     >(
         self,
         call_trace: Arg0,
