@@ -38,7 +38,8 @@ impl ComposabilityInteract {
                 .unwrap_or_else(|| panic!("no address for forwarder '{name}'"))
                 .clone();
 
-            // Convert each ChildCall config into a managed QueuedCall.
+            // Convert each ProgrammedCallConfig into a managed ProgrammedCall,
+            // using the bottom-up gas estimate for each target contract.
             let mut calls: MultiValueManagedVec<StaticApi, ProgrammedCall<StaticApi>> =
                 MultiValueManagedVec::new();
             for child_call in &contract.calls {
@@ -47,11 +48,18 @@ impl ComposabilityInteract {
                     .unwrap_or_else(|| panic!("no address for contract '{}'", child_call.to))
                     .to_address();
 
+                let gas_limit = child_call.gas_limit.unwrap_or_else(|| {
+                    panic!(
+                        "gas_limit not set for call to '{}'; run `s1` first",
+                        child_call.to,
+                    )
+                });
+
                 let call_type = to_queued_call_type(&child_call.call_type);
                 calls.push(ProgrammedCall {
                     call_type,
                     to: ManagedAddress::from(child_addr),
-                    gas_limit: child_call.gas_limit,
+                    gas_limit,
                     endpoint_name: ManagedBuffer::from(b"bump"),
                     args: ManagedArgBuffer::new(),
                     payments: ManagedVec::new(),
@@ -59,7 +67,7 @@ impl ComposabilityInteract {
             }
 
             println!(
-                "Setting {} queued call(s) on forwarder '{name}'",
+                "Setting {} programmed call(s) on forwarder '{name}'",
                 calls.len(),
             );
             buffer.push_tx(|tx| {
@@ -110,12 +118,21 @@ impl ComposabilityInteract {
                 .unwrap_or_else(|| panic!("no address for contract '{}'", start_call.to))
                 .clone();
 
-            println!("Calling bump on contract '{}' ({})", start_call.to, to_addr);
+            assert!(
+                start_call.gas_limit.is_some(),
+                "gas_limit not set for start call to '{}'; run `s1` first",
+                start_call.to,
+            );
+            let gas_limit = start_call.gas_limit.unwrap();
+            println!(
+                "Calling bump on contract '{}' ({}) with gas_limit = {gas_limit}",
+                start_call.to, to_addr,
+            );
 
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
                     .to(to_addr)
-                    .gas(start_call.gas_limit)
+                    .gas(gas_limit)
                     .typed(forwarder_queue_proxy::ForwarderQueueProxy)
                     .bump(IgnoreValue)
                     .returns(ReturnsStatus)

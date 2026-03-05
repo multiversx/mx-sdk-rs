@@ -7,6 +7,7 @@ mod call_tree_deploy;
 mod call_tree_info;
 mod comp_interact_cli;
 mod comp_interact_state;
+mod call_tree_gas;
 
 use call_tree_config::CALL_TREE_FILE;
 use clap::Parser;
@@ -22,12 +23,16 @@ async fn main() {
 
     match &cli.command {
         Some(comp_interact_cli::InteractCliCommand::S1) => {
-            call_tree_config_gen::scenario_1().save_to_file(CALL_TREE_FILE);
+            let mut config = call_tree_config_gen::scenario_1();
+            config.fill_gas_estimates();
+            config.save_to_file(CALL_TREE_FILE);
             println!("Scenario 1 call tree saved to {CALL_TREE_FILE}");
         }
         Some(comp_interact_cli::InteractCliCommand::Setup) => {
             let mut interact = ComposabilityInteract::init().await;
+            println!("Deploying call tree contracts...");
             interact.deploy_call_tree().await;
+            println!("Setting up programmed calls from config...");
             interact.set_queued_calls_from_config().await;
         }
         Some(comp_interact_cli::InteractCliCommand::Bump) => {

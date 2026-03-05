@@ -7,6 +7,18 @@ use crate::{
     comp_interact_controller::ComposabilityInteract,
 };
 
+fn fmt_gas(v: u64) -> String {
+    let s = v.to_string();
+    let mut out = String::new();
+    for (i, ch) in s.chars().rev().enumerate() {
+        if i > 0 && i % 3 == 0 {
+            out.push(' ');
+        }
+        out.push(ch);
+    }
+    out.chars().rev().collect()
+}
+
 impl ComposabilityInteract {
     /// Queries the `trace` view for every deployed contract in `call_tree.toml`
     /// and prints the results to console.
@@ -47,8 +59,11 @@ impl ComposabilityInteract {
                 for (i, entry) in trace.0.iter().enumerate() {
                     let gas_used = entry.initial_gas.saturating_sub(entry.final_gas);
                     print!(
-                        "  trace[{i}] (block_nonce={}, gas={}-{}={}, items: [",
-                        entry.block_nonce, entry.initial_gas, gas_used, entry.final_gas,
+                        "  trace[{i}] (block_nonce={}, gas={} - {} = {}, items: [",
+                        entry.block_nonce,
+                        fmt_gas(entry.initial_gas),
+                        fmt_gas(gas_used),
+                        fmt_gas(entry.final_gas),
                     );
                     for (j, item) in entry.items.iter().enumerate() {
                         if j > 0 {

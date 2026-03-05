@@ -5,7 +5,8 @@ use crate::call_tree_config::{
     StartCall,
 };
 
-/// Scenario 1: a single root forwarder that calls bump on one leaf.
+/// Scenario 1: three root forwarders (async-v1, async-v2, sync) each calling one target,
+/// plus a direct call with no further children.
 ///
 /// ```toml
 /// [gateway]
@@ -13,44 +14,132 @@ use crate::call_tree_config::{
 /// chain_type = "real"
 ///
 /// [[start]]
-/// to = "root"
-/// gas_limit = 70000000
+/// to = "async_v1_root"
 ///
-/// [contracts.root]
-/// index = 0
+/// [[start]]
+/// to = "async_v2_root"
 ///
-/// [[contracts.root.children]]
-/// to = "leaf"
+/// [[start]]
+/// to = "sync_root"
+///
+/// [[start]]
+/// to = "direct"
+///
+/// [contracts.async_v1_root]
+///
+/// [[contracts.async_v1_root.calls]]
+/// to = "async_v1_target"
 /// call_type = "legacy_async"
-/// gas_limit = 10000000
 ///
-/// [contracts.leaf]
-/// index = 1
+/// [contracts.async_v1_target]
+///
+/// [contracts.async_v2_root]
+///
+/// [[contracts.async_v2_root.calls]]
+/// to = "async_v2_target"
+/// call_type = "promise"
+///
+/// [contracts.async_v2_target]
+///
+/// [contracts.direct]
+///
+/// [contracts.sync_root]
+///
+/// [[contracts.sync_root.calls]]
+/// to = "sync_target"
+/// call_type = "sync"
+///
+/// [contracts.sync_target]
 /// ```
 pub fn scenario_1() -> CallTreeConfig {
     CallTreeConfig {
         gateway: GatewayConfig::default(),
-        start: vec![StartCall {
-            to: "root".to_string(),
-            gas_limit: 70_000_000,
-            args: Vec::new(),
-            payments: Vec::new(),
-        }],
+        start: vec![
+            StartCall {
+                to: "async_v1_root".to_string(),
+                gas_limit: None,
+                args: Vec::new(),
+                payments: Vec::new(),
+            },
+            StartCall {
+                to: "async_v2_root".to_string(),
+                gas_limit: None,
+                args: Vec::new(),
+                payments: Vec::new(),
+            },
+            StartCall {
+                to: "sync_root".to_string(),
+                gas_limit: None,
+                args: Vec::new(),
+                payments: Vec::new(),
+            },
+            StartCall {
+                to: "direct".to_string(),
+                gas_limit: None,
+                args: Vec::new(),
+                payments: Vec::new(),
+            },
+        ],
         contracts: BTreeMap::from([
             (
-                "root".to_string(),
+                "async_v1_root".to_string(),
                 ContractConfig {
                     address: None,
                     calls: vec![ProgrammedCallConfig {
-                        to: "leaf".to_string(),
+                        to: "async_v1_target".to_string(),
                         call_type: ProgrammedCallTypeConfig::LegacyAsync,
-                        gas_limit: 10_000_000,
+                        gas_limit: None,
                         payments: Vec::new(),
                     }],
                 },
             ),
             (
-                "leaf".to_string(),
+                "async_v1_target".to_string(),
+                ContractConfig {
+                    address: None,
+                    calls: Vec::new(),
+                },
+            ),
+            (
+                "async_v2_root".to_string(),
+                ContractConfig {
+                    address: None,
+                    calls: vec![ProgrammedCallConfig {
+                        to: "async_v2_target".to_string(),
+                        call_type: ProgrammedCallTypeConfig::Promise,
+                        gas_limit: None,
+                        payments: Vec::new(),
+                    }],
+                },
+            ),
+            (
+                "async_v2_target".to_string(),
+                ContractConfig {
+                    address: None,
+                    calls: Vec::new(),
+                },
+            ),
+            (
+                "direct".to_string(),
+                ContractConfig {
+                    address: None,
+                    calls: Vec::new(),
+                },
+            ),
+            (
+                "sync_root".to_string(),
+                ContractConfig {
+                    address: None,
+                    calls: vec![ProgrammedCallConfig {
+                        to: "sync_target".to_string(),
+                        call_type: ProgrammedCallTypeConfig::Sync,
+                        gas_limit: None,
+                        payments: Vec::new(),
+                    }],
+                },
+            ),
+            (
+                "sync_target".to_string(),
                 ContractConfig {
                     address: None,
                     calls: Vec::new(),

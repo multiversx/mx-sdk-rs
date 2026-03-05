@@ -32,7 +32,7 @@ impl ComposabilityInteract {
                     .typed(forwarder_queue_proxy::ForwarderQueueProxy)
                     .init(name)
                     .code(&self.forw_queue_code)
-                    .gas(NumExpr("70,000,000"))
+                    .gas(NumExpr("50,000,000"))
                     .returns(PassValue(name.clone()))
                     .returns(ReturnsNewBech32Address)
             });

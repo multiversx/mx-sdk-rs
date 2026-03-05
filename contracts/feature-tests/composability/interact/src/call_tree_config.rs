@@ -65,7 +65,9 @@ pub struct PaymentConfig {
 pub struct ProgrammedCallConfig {
     pub to: String,
     pub call_type: ProgrammedCallTypeConfig,
-    pub gas_limit: u64,
+    /// Estimated gas; filled by the `estimate-gas` command.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gas_limit: Option<u64>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub payments: Vec<PaymentConfig>,
 }
@@ -79,7 +81,9 @@ pub struct ProgrammedCallConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StartCall {
     pub to: String,
-    pub gas_limit: u64,
+    /// Estimated gas; filled by the `estimate-gas` command.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gas_limit: Option<u64>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub args: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
