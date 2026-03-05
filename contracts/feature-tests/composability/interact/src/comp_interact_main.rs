@@ -4,12 +4,12 @@ mod call_tree_calling_functions;
 mod call_tree_config;
 mod call_tree_config_gen;
 mod call_tree_deploy;
+mod call_tree_gas;
 mod call_tree_info;
 mod comp_interact_cli;
 mod comp_interact_state;
-mod call_tree_gas;
 
-use call_tree_config::CALL_TREE_FILE;
+use call_tree_config::{CallTreeConfig, CALL_TREE_FILE};
 use clap::Parser;
 use comp_interact_controller::ComposabilityInteract;
 mod comp_interact_controller;
@@ -28,12 +28,26 @@ async fn main() {
             config.save_to_file(CALL_TREE_FILE);
             println!("Scenario 1 call tree saved to {CALL_TREE_FILE}");
         }
+        Some(comp_interact_cli::InteractCliCommand::S2 { n }) => {
+            let mut config = call_tree_config_gen::scenario_2(*n);
+            config.fill_gas_estimates();
+            config.save_to_file(CALL_TREE_FILE);
+            println!("Scenario 2 call tree (n={n}) saved to {CALL_TREE_FILE}");
+        }
+        Some(comp_interact_cli::InteractCliCommand::UpdateGas) => {
+            let mut config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
+            config.fill_gas_estimates();
+            config.save_to_file(CALL_TREE_FILE);
+            println!("Gas estimates updated in {CALL_TREE_FILE}");
+            let mut interact = ComposabilityInteract::init().await;
+            interact.set_programmed_calls().await;
+        }
         Some(comp_interact_cli::InteractCliCommand::Setup) => {
             let mut interact = ComposabilityInteract::init().await;
             println!("Deploying call tree contracts...");
             interact.deploy_call_tree().await;
             println!("Setting up programmed calls from config...");
-            interact.set_queued_calls_from_config().await;
+            interact.set_programmed_calls().await;
         }
         Some(comp_interact_cli::InteractCliCommand::Bump) => {
             let mut interact = ComposabilityInteract::init().await;

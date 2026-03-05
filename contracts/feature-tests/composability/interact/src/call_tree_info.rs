@@ -16,7 +16,9 @@ fn fmt_gas(v: u64) -> String {
         }
         out.push(ch);
     }
-    out.chars().rev().collect()
+    let formatted: String = out.chars().rev().collect();
+    // 9 digits with 2 group separators = 11 chars wide
+    format!("{formatted:>11}")
 }
 
 impl ComposabilityInteract {
@@ -59,7 +61,7 @@ impl ComposabilityInteract {
                 for (i, entry) in trace.0.iter().enumerate() {
                     let gas_used = entry.initial_gas.saturating_sub(entry.final_gas);
                     print!(
-                        "  trace[{i}] (block_nonce={}, gas={} - {} = {}, items: [",
+                        "  trace[{i}] (block_nonce:{}, gas:{} - {} = {}, items: [",
                         entry.block_nonce,
                         fmt_gas(entry.initial_gas),
                         fmt_gas(gas_used),
@@ -70,7 +72,7 @@ impl ComposabilityInteract {
                             print!(", ");
                         }
                         print!(
-                            "(caller={}, call_index={})",
+                            "({} #{})",
                             item.caller_id, item.call_index
                         );
                     }

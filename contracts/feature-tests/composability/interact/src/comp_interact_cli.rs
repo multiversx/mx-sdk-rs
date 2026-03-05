@@ -18,6 +18,24 @@ pub enum InteractCliCommand {
     )]
     S1,
     #[command(
+        name = "s2",
+        about = "Generate scenario 2 (linear sync-call chain of n contracts) and save to call_tree.toml"
+    )]
+    S2 {
+        #[arg(
+            short = 'n',
+            long,
+            default_value_t = 5,
+            help = "Number of contracts in the chain"
+        )]
+        n: usize,
+    },
+    #[command(
+        name = "update-gas",
+        about = "Recompute gas estimates in call_tree.toml and push updated programmed calls on-chain"
+    )]
+    UpdateGas,
+    #[command(
         name = "setup",
         about = "Deploy all contracts from call_tree.toml, configure, and save addresses back"
     )]

@@ -148,3 +148,47 @@ pub fn scenario_1() -> CallTreeConfig {
         ]),
     }
 }
+
+/// Scenario 2: a linear chain of `n` contracts, each calling the next via sync call.
+///
+/// Contract names are `"s2_{n-1}"`, `"s2_{n-2}"`, ..., `"s2_0"`.
+/// The start call goes to `"s2_{n-1}"`, which calls `"s2_{n-2}"` synchronously, and so on,
+/// until `"s2_0"` which has no further calls.
+pub fn scenario_2(n: usize) -> CallTreeConfig {
+    assert!(n >= 1, "chain length must be at least 1");
+
+    let start = vec![StartCall {
+        to: format!("s2_{}", n - 1),
+        gas_limit: None,
+        args: Vec::new(),
+        payments: Vec::new(),
+    }];
+
+    let mut contracts = BTreeMap::new();
+    for i in 0..n {
+        let name = format!("s2_{i}");
+        let calls = if i > 0 {
+            vec![ProgrammedCallConfig {
+                to: format!("s2_{}", i - 1),
+                call_type: ProgrammedCallTypeConfig::Sync,
+                gas_limit: None,
+                payments: Vec::new(),
+            }]
+        } else {
+            Vec::new()
+        };
+        contracts.insert(
+            name,
+            ContractConfig {
+                address: None,
+                calls,
+            },
+        );
+    }
+
+    CallTreeConfig {
+        gateway: GatewayConfig::default(),
+        start,
+        contracts,
+    }
+}

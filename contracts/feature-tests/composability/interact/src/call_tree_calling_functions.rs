@@ -12,7 +12,7 @@ impl ComposabilityInteract {
     /// For every forwarder in `call_tree.toml` that has children, build the
     /// corresponding `ProgrammedCall` list and send a `set_queued_calls` tx.
     /// All txs are batched in a single homogenous call buffer.
-    pub async fn set_queued_calls_from_config(&mut self) {
+    pub async fn set_programmed_calls(&mut self) {
         let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
 
         // Build name → bech32 address map.
