@@ -10,7 +10,7 @@ pub type NodeName<M> = ManagedBuffer<M>;
 
 #[type_abi]
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
-pub enum QueuedCallType {
+pub enum ProgrammedCallType {
     Sync,
     LegacyAsync,
     TransferExecute,
@@ -19,8 +19,8 @@ pub enum QueuedCallType {
 
 #[type_abi]
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
-pub struct QueuedCall<M: ManagedTypeApi> {
-    pub call_type: QueuedCallType,
+pub struct ProgrammedCall<M: ManagedTypeApi> {
+    pub call_type: ProgrammedCallType,
     pub to: ManagedAddress<M>,
     pub gas_limit: u64,
     pub endpoint_name: ManagedBuffer<M>,
@@ -51,7 +51,7 @@ pub trait ForwarderQueue {
 
     #[view]
     #[storage_mapper("queued_calls")]
-    fn queued_calls(&self) -> SingleValueMapper<ManagedVec<QueuedCall<Self::Api>>>;
+    fn queued_calls(&self) -> SingleValueMapper<ManagedVec<ProgrammedCall<Self::Api>>>;
 
     #[view]
     #[storage_mapper("trace")]
@@ -63,7 +63,7 @@ pub trait ForwarderQueue {
     }
 
     #[endpoint]
-    fn set_queued_calls(&self, calls: MultiValueManagedVec<QueuedCall<Self::Api>>) {
+    fn set_queued_calls(&self, calls: MultiValueManagedVec<ProgrammedCall<Self::Api>>) {
         self.queued_calls().set(calls.into_vec());
     }
 
@@ -83,7 +83,7 @@ pub trait ForwarderQueue {
 
     fn forward_queued_call(
         &self,
-        call: QueuedCall<Self::Api>,
+        call: ProgrammedCall<Self::Api>,
         call_index: usize,
         call_trace: &MultiValueManagedVec<TraceItem<Self::Api>>,
     ) {
@@ -108,16 +108,16 @@ pub trait ForwarderQueue {
             .payment(&call.payments);
 
         match call.call_type {
-            QueuedCallType::Sync => {
+            ProgrammedCallType::Sync => {
                 contract_call.gas(call.gas_limit).sync_call();
             }
-            QueuedCallType::LegacyAsync => {
+            ProgrammedCallType::LegacyAsync => {
                 contract_call.async_call_and_exit();
             }
-            QueuedCallType::TransferExecute => {
+            ProgrammedCallType::TransferExecute => {
                 contract_call.gas(call.gas_limit).transfer_execute();
             }
-            QueuedCallType::Promise => {
+            ProgrammedCallType::Promise => {
                 contract_call
                     .gas(call.gas_limit)
                     .arguments_raw(call.args)
@@ -153,7 +153,7 @@ pub trait ForwarderQueue {
     #[event("forward_queued_call_payment")]
     fn forward_queued_call_payment_event(
         &self,
-        #[indexed] call_type: &QueuedCallType,
+        #[indexed] call_type: &ProgrammedCallType,
         #[indexed] to: &ManagedAddress,
         #[indexed] endpoint_name: &ManagedBuffer,
         #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>,

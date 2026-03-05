@@ -1,7 +1,8 @@
 use std::collections::BTreeMap;
 
 use crate::call_tree_config::{
-    CallTreeConfig, CallType, ChildCall, ContractConfig, GatewayConfig, StartCall,
+    CallTreeConfig, ContractConfig, GatewayConfig, ProgrammedCallConfig, ProgrammedCallTypeConfig,
+    StartCall,
 };
 
 /// Scenario 1: a single root forwarder that calls bump on one leaf.
@@ -40,9 +41,9 @@ pub fn scenario_1() -> CallTreeConfig {
                 "root".to_string(),
                 ContractConfig {
                     address: None,
-                    children: vec![ChildCall {
+                    children: vec![ProgrammedCallConfig {
                         to: "leaf".to_string(),
-                        call_type: CallType::LegacyAsync,
+                        call_type: ProgrammedCallTypeConfig::LegacyAsync,
                         gas_limit: 10_000_000,
                         payments: Vec::new(),
                     }],

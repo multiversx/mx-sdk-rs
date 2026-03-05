@@ -1,16 +1,16 @@
 use std::collections::HashMap;
 
-use forwarder_queue::{QueuedCall, QueuedCallType, forwarder_queue_proxy};
+use forwarder_queue::{ProgrammedCall, ProgrammedCallType, forwarder_queue_proxy};
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, CallType},
+    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, ProgrammedCallTypeConfig},
     comp_interact_controller::ComposabilityInteract,
 };
 
 impl ComposabilityInteract {
     /// For every forwarder in `call_tree.toml` that has children, build the
-    /// corresponding `QueuedCall` list and send a `set_queued_calls` tx.
+    /// corresponding `ProgrammedCall` list and send a `set_queued_calls` tx.
     /// All txs are batched in a single homogenous call buffer.
     pub async fn set_queued_calls_from_config(&mut self) {
         let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
@@ -39,7 +39,7 @@ impl ComposabilityInteract {
                 .clone();
 
             // Convert each ChildCall config into a managed QueuedCall.
-            let mut calls: MultiValueManagedVec<StaticApi, QueuedCall<StaticApi>> =
+            let mut calls: MultiValueManagedVec<StaticApi, ProgrammedCall<StaticApi>> =
                 MultiValueManagedVec::new();
             for child_call in &contract.children {
                 let child_addr = addr_map
@@ -48,7 +48,7 @@ impl ComposabilityInteract {
                     .to_address();
 
                 let call_type = to_queued_call_type(&child_call.call_type);
-                calls.push(QueuedCall {
+                calls.push(ProgrammedCall {
                     call_type,
                     to: ManagedAddress::from(child_addr),
                     gas_limit: child_call.gas_limit,
@@ -133,11 +133,11 @@ impl ComposabilityInteract {
     }
 }
 
-fn to_queued_call_type(call_type: &CallType) -> QueuedCallType {
+fn to_queued_call_type(call_type: &ProgrammedCallTypeConfig) -> ProgrammedCallType {
     match call_type {
-        CallType::Sync => QueuedCallType::Sync,
-        CallType::LegacyAsync => QueuedCallType::LegacyAsync,
-        CallType::TransferExecute => QueuedCallType::TransferExecute,
-        CallType::Promise => QueuedCallType::Promise,
+        ProgrammedCallTypeConfig::Sync => ProgrammedCallType::Sync,
+        ProgrammedCallTypeConfig::LegacyAsync => ProgrammedCallType::LegacyAsync,
+        ProgrammedCallTypeConfig::TransferExecute => ProgrammedCallType::TransferExecute,
+        ProgrammedCallTypeConfig::Promise => ProgrammedCallType::Promise,
     }
 }

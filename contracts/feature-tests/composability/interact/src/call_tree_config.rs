@@ -36,10 +36,10 @@ impl GatewayConfig {
     }
 }
 
-/// Equivalent of `QueuedCallType` from the forwarder-queue proxy, for TOML config.
+/// Equivalent of `ProgrammedCallType` from the forwarder-queue proxy, for TOML config.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum CallType {
+pub enum ProgrammedCallTypeConfig {
     #[default]
     Sync,
     LegacyAsync,
@@ -58,13 +58,13 @@ pub struct PaymentConfig {
     pub amount: String,
 }
 
-/// Equivalent of `QueuedCall` from the forwarder-queue proxy, for TOML config.
+/// Equivalent of `ProgrammedCall` from the forwarder-queue proxy, for TOML config.
 ///
 /// `to` is the name (map key) of the target contract in `CallTreeConfig::contracts`.
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ChildCall {
+pub struct ProgrammedCallConfig {
     pub to: String,
-    pub call_type: CallType,
+    pub call_type: ProgrammedCallTypeConfig,
     pub gas_limit: u64,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub payments: Vec<PaymentConfig>,
@@ -72,7 +72,7 @@ pub struct ChildCall {
 
 /// An initial call that triggers the chain reaction.
 ///
-/// Unlike [`ChildCall`], there is no `call_type` — start calls are plain
+/// Unlike [`ProgrammedCallConfig`], there is no `call_type` — start calls are plain
 /// user transactions, not queued smart-contract calls.
 ///
 /// `to` is the name (map key) of the target contract in `CallTreeConfig::contracts`.
@@ -97,7 +97,7 @@ pub struct ContractConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub children: Vec<ChildCall>,
+    pub children: Vec<ProgrammedCallConfig>,
 }
 
 /// Serializable description of the whole call tree.
