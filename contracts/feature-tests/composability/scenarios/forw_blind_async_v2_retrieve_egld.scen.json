@@ -1,0 +1,69 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../forwarder-blind/output/forwarder-blind.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "blind_async_v2 retrieve EGLD back to caller",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "blind_async_v2",
+                "arguments": [
+                    "sc:vault",
+                    "str:retrieve_funds",
+                    "str:EGLD-000000",
+                    "0",
+                    "1000"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "1000"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "mxsc:../forwarder-blind/output/forwarder-blind.mxsc.json"
+                }
+            }
+        }
+    ]
+}

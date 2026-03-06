@@ -21,6 +21,10 @@ fn world() -> ScenarioWorld {
         forwarder_queue::ContractBuilder,
     );
     blockchain.register_contract(
+        "mxsc:forwarder-blind/output/forwarder-blind.mxsc.json",
+        forwarder_blind::ContractBuilder,
+    );
+    blockchain.register_contract(
         "mxsc:forwarder-raw/output/forwarder-raw.mxsc.json",
         forwarder_raw::ContractBuilder,
     );
@@ -60,6 +64,66 @@ fn builtin_func_delete_user_name_rs() {
 #[test]
 fn builtin_func_set_user_name_rs() {
     world().run("scenarios/builtin_func_set_user_name.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_1_accept_egld_rs() {
+    world().run("scenarios/forw_blind_async_v1_accept_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_1_accept_esdt_rs() {
+    world().run("scenarios/forw_blind_async_v1_accept_esdt.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_1_accept_nft_rs() {
+    world().run("scenarios/forw_blind_async_v1_accept_nft.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_1_retrieve_egld_rs() {
+    world().run("scenarios/forw_blind_async_v1_retrieve_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_1_retrieve_nft_rs() {
+    world().run("scenarios/forw_blind_async_v1_retrieve_nft.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_2_accept_egld_rs() {
+    world().run("scenarios/forw_blind_async_v2_accept_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_2_retrieve_egld_rs() {
+    world().run("scenarios/forw_blind_async_v2_retrieve_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_deploy_rs() {
+    world().run("scenarios/forw_blind_deploy.scen.json");
+}
+
+#[test]
+fn forw_blind_sync_accept_egld_rs() {
+    world().run("scenarios/forw_blind_sync_accept_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_sync_retrieve_egld_rs() {
+    world().run("scenarios/forw_blind_sync_retrieve_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_transf_exec_accept_egld_rs() {
+    world().run("scenarios/forw_blind_transf_exec_accept_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_upgrade_rs() {
+    world().run("scenarios/forw_blind_upgrade.scen.json");
 }
 
 #[test]

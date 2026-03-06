@@ -1,0 +1,84 @@
+{
+    "name": "Upgrade vault SC via forwarder blind",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {},
+                "sc:forwarder": {
+                    "code": "mxsc:../forwarder-blind/output/forwarder-blind.mxsc.json"
+                },
+                "sc:reference": {
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json"
+                },
+                "sc:child": {
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
+                    "owner": "sc:forwarder"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "blind_upgrade_from_source",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "blind_upgrade_from_source",
+                "arguments": [
+                    "sc:child",
+                    "sc:reference",
+                    "0x0102"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": "*",
+                "status": ""
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json",
+                    "codeMetadata": "0x0102"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "blind_upgrade back to vault",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "blind_upgrade",
+                "arguments": [
+                    "sc:child",
+                    "mxsc:../vault/output/vault.mxsc.json",
+                    "0x0102",
+                    "str:upgrade-init-arg"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:upgraded",
+                    "str:upgrade-init-arg"
+                ]
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
+                    "codeMetadata": "0x0102"
+                },
+                "+": ""
+            }
+        }
+    ]
+}
