@@ -77,6 +77,7 @@ top_encode_num_unsigned! {u16, 16}
 top_encode_num_unsigned! {u8, 8}
 
 impl NestedDecode for u8 {
+    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -97,6 +98,7 @@ impl NestedDecode for u8 {
 macro_rules! dep_decode_num_unsigned {
     ($ty:ty, $num_bytes:expr) => {
         impl NestedDecode for $ty {
+            #[inline]
             fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: NestedDecodeInput,
@@ -117,6 +119,7 @@ dep_decode_num_unsigned!(u64, 8);
 dep_decode_num_unsigned!(u128, 16);
 
 impl NestedDecode for usize {
+    #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -129,6 +132,7 @@ impl NestedDecode for usize {
 macro_rules! top_decode_num_unsigned {
     ($ty:ty, $bounds_ty:ty) => {
         impl TopDecode for $ty {
+            #[inline]
             fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
             where
                 I: TopDecodeInput,
@@ -155,7 +159,10 @@ top_decode_num_unsigned!(u128, u128);
 
 #[cfg(test)]
 pub mod tests {
-    use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
+    use crate::{
+        DecodeError, TopDecode,
+        test_util::{check_dep_encode_decode, check_top_encode_decode},
+    };
 
     #[test]
     fn test_top() {
@@ -191,5 +198,43 @@ pub mod tests {
         check_dep_encode_decode(5usize, &[0, 0, 0, 5]);
         check_dep_encode_decode(5u64, &[0, 0, 0, 0, 0, 0, 0, 5]);
         check_dep_encode_decode(5u128, &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5]);
+    }
+
+    #[test]
+    fn test_top_max() {
+        check_top_encode_decode(u8::MAX, &[255]);
+        check_top_encode_decode(u16::MAX, &[0xFF, 0xFF]);
+        check_top_encode_decode(u32::MAX, &[0xFF, 0xFF, 0xFF, 0xFF]);
+        check_top_encode_decode(u64::MAX, &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
+        // Note: u128 top encode uses set_u64, so u128::MAX cannot round-trip at top level.
+    }
+
+    #[test]
+    fn test_dep_max() {
+        check_dep_encode_decode(u8::MAX, &[0xFF]);
+        check_dep_encode_decode(u16::MAX, &[0xFF, 0xFF]);
+        check_dep_encode_decode(u32::MAX, &[0xFF, 0xFF, 0xFF, 0xFF]);
+        check_dep_encode_decode(u64::MAX, &[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
+        check_dep_encode_decode(
+            u128::MAX,
+            &[
+                0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                0xFF, 0xFF,
+            ],
+        );
+    }
+
+    #[test]
+    fn test_top_decode_out_of_range() {
+        // 256 as u8 should fail
+        assert_eq!(
+            u8::top_decode(&[1u8, 0u8][..]),
+            Err(DecodeError::INPUT_TOO_LONG),
+        );
+        // u16::MAX + 1 as u16 should fail
+        assert_eq!(
+            u16::top_decode(&[1u8, 0, 0][..]),
+            Err(DecodeError::INPUT_TOO_LONG),
+        );
     }
 }

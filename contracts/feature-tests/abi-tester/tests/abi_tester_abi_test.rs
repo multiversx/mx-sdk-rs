@@ -97,6 +97,7 @@ fn abi_deserialization_check() {
         .to_type_description(TypeNames {
             abi: "AbiEnum".to_string(),
             rust: "Enum".to_string(),
+            specific: None,
         });
     if let TypeContents::Enum(variants) = abi_enum_type.contents {
         assert_eq!(variants.len(), 4);

@@ -59,6 +59,12 @@ pub enum StandaloneCliAction {
     )]
     TestGen(TestGenArgs),
 
+    #[command(
+        name = "scen-blackbox",
+        about = "Generates blackbox tests from scenario files (.scen.json)."
+    )]
+    ScenBlackbox(ScenBlackboxArgs),
+
     #[command(name = "test", about = "Runs cargo test")]
     Test(TestArgs),
 
@@ -421,6 +427,28 @@ pub struct TestGenArgs {
     /// Creates test files if they don't exist.
     #[arg(long, verbatim_doc_comment)]
     pub create: bool,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct ScenBlackboxArgs {
+    /// Target directory where to generate contract blackbox tests.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Override test files if they already exist.
+    #[arg(long, verbatim_doc_comment)]
+    pub overwrite: bool,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
+
+    /// Output file path for the generated blackbox test.
+    /// If not specified, the default path inside the contract's tests/ folder is used.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
 }
 
 #[derive(Default, PartialEq, Eq, Debug, Clone, Parser)]

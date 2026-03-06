@@ -67,7 +67,7 @@ impl PrivateKey {
     #[cfg(feature = "wallet-full")]
     pub fn generate<T>(r: &mut T) -> PrivateKey
     where
-        T: rand::CryptoRng + rand::RngCore,
+        T: rand::CryptoRng + rand::Rng,
     {
         let mut secret_key = PrivateKey([0u8; 64]);
 

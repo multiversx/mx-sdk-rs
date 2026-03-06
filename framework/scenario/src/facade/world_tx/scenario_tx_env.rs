@@ -1,5 +1,5 @@
 use multiversx_chain_scenario_format::interpret_trait::InterpreterContext;
-use multiversx_sc::types::{H256, ManagedAddress, ManagedBuffer, TxEnv, TxEnvWithTxHash};
+use multiversx_sc::types::{H256, ManagedAddress, ManagedBuffer, TxEnv, TxEnvWithTxHash, TxId};
 
 use crate::{ScenarioWorld, api::StaticApi, scenario_model::TxExpect};
 
@@ -12,6 +12,7 @@ pub trait ScenarioTxEnv: TxEnv {
 #[derive(Default, Debug, Clone)]
 pub struct ScenarioTxEnvData {
     pub interpreter_context: InterpreterContext,
+    pub tx_id: Option<TxId>,
     pub tx_hash: Option<H256>,
 }
 
@@ -34,6 +35,15 @@ impl TxEnv for ScenarioTxEnvData {
 }
 
 impl TxEnvWithTxHash for ScenarioTxEnvData {
+    fn set_tx_id(&mut self, tx_id: TxId) {
+        assert!(self.tx_id.is_none(), "tx id set twice");
+        self.tx_id = Some(tx_id);
+    }
+
+    fn take_tx_id(&mut self) -> Option<TxId> {
+        core::mem::take(&mut self.tx_id)
+    }
+
     fn set_tx_hash(&mut self, tx_hash: H256) {
         assert!(self.tx_hash.is_none(), "tx hash set twice");
         self.tx_hash = Some(tx_hash);
@@ -62,6 +72,7 @@ impl ScenarioWorld {
             interpreter_context: InterpreterContext::new()
                 .with_dir(self.current_dir.clone())
                 .with_allowed_missing_files(),
+            tx_id: None,
             tx_hash: None,
         }
     }

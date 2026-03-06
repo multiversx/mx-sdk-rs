@@ -86,8 +86,8 @@ fn main() {
         "\"esdt-safe_____________\" - (32) 0x00000000000000000500657364742d736166655f5f5f5f5f5f5f5f5f5f5f5f5f"
     );
 
-    let test_token_identifier: TestTokenIdentifier = TestTokenIdentifier::new("TEST-123456");
-    push!(to_check, test_token_identifier, "\"str:TEST-123456\"");
+    let test_token_id: TestTokenId = TestTokenId::new("TEST-123456");
+    push!(to_check, test_token_id, "\"str:TEST-123456\"");
 
     let token_identifier: EsdtTokenIdentifier<DebugApi> = EsdtTokenIdentifier::from("MYTOK-123456");
     push!(to_check, token_identifier, "\"MYTOK-123456\"");

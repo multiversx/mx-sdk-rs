@@ -7,7 +7,7 @@ use crate::{
         context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
         vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     },
-    types::{RawHandle, VMAddress, VMCodeMetadata, top_encode_big_uint, top_encode_u64},
+    types::{Address, RawHandle, VMCodeMetadata, top_encode_big_uint, top_encode_u64},
     vm_err_msg,
 };
 use multiversx_chain_core::types::ReturnCode;
@@ -30,7 +30,7 @@ fn append_endpoint_name_and_args(
 impl<C: VMHooksContext> VMHooksHandler<C> {
     fn perform_transfer_execute_esdt(
         &mut self,
-        to: VMAddress,
+        to: Address,
         token: Vec<u8>,
         amount: num_bigint::BigUint,
         _gas_limit: u64,
@@ -51,7 +51,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     #[allow(clippy::too_many_arguments)]
     fn perform_transfer_execute_nft(
         &mut self,
-        to: VMAddress,
+        to: Address,
         token: Vec<u8>,
         nonce: u64,
         amount: num_bigint::BigUint,
@@ -80,7 +80,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
     fn perform_transfer_execute_multi(
         &mut self,
-        to: VMAddress,
+        to: Address,
         payments: Vec<TxTokenTransfer>,
         _gas_limit: u64,
         endpoint_name: TxFunctionName,
@@ -111,7 +111,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
     fn perform_upgrade_contract(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,

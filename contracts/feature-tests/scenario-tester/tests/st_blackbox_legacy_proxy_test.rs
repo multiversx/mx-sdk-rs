@@ -65,6 +65,4 @@ fn st_blackbox_legacy_proxy() {
                 CheckAccount::new().check_storage("str:sum", "8"),
             ),
     );
-
-    world.write_scenario_trace("trace1.scen.json");
 }

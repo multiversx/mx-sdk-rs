@@ -37,8 +37,50 @@ use crate::{
     },
 };
 
-const INVALID_TOKEN_TYPE_ERR_MSG: &[u8] = b"Invalid token type for NonFungible issue";
+const INVALID_TOKEN_TYPE_ERR_MSG: &str = "Invalid token type for NonFungible issue";
 
+/// High-level mapper for non-fungible, semi-fungible, and meta-fungible ESDT tokens.
+/// Provides comprehensive NFT/SFT lifecycle management including issuance, creation,
+/// minting, burning, and attribute management.
+///
+/// # Storage Layout
+///
+/// The mapper stores the token state at the base key:
+/// - `base_key` → `TokenMapperState<SA>` (NotSet | Pending | Token(EsdtTokenIdentifier))
+///
+/// # Main Operations
+///
+/// ## Token Lifecycle
+/// - **Issue**: Create new NFT/SFT collection via `issue()` or `issue_and_set_all_roles()`
+/// - **Set ID**: Manually set token ID with `set_token_id()` for existing collections
+/// - **Query**: Check token state with `is_empty()`, `get_token_id()`, etc.
+///
+/// ## NFT Operations
+/// - **Create**: Mint new NFTs with `nft_create()` or `nft_create_named()`
+/// - **Add Quantity**: Increase SFT supply with `nft_add_quantity()`
+/// - **Update**: Modify NFT attributes with `nft_update_attributes()`
+/// - **Burn**: Destroy NFT/SFT with `nft_burn()`
+/// - **Transfer**: Send tokens with `send_payment()`
+///
+/// ## Token Management
+/// - **Roles**: Manage collection roles with `set_local_roles()`
+/// - **Balance**: Query token balance with `get_balance()`
+/// - **Metadata**: Retrieve token data with `get_all_token_data()`, `get_token_attributes()`
+///
+/// # Trade-offs
+///
+/// **Advantages:**
+/// - Supports all non-fungible token types (NFT, SFT, MetaFungible)
+/// - Complete NFT lifecycle in one mapper
+/// - Built-in metadata and attribute management
+/// - Automatic nonce handling
+/// - Payment validation utilities
+///
+/// **Limitations:**
+/// - Single collection per mapper instance
+/// - Requires careful callback implementation for issuance
+/// - Token creation requires local roles
+/// - Attribute updates limited by protocol
 pub type IssueCallTo<Api> = Tx<
     TxScEnv<Api>,
     (),
@@ -132,7 +174,7 @@ where
             EsdtTokenType::MetaFungible => {
                 Self::meta_issue(issue_cost, token_display_name, token_ticker, num_decimals)
             }
-            _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG),
+            _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG.as_bytes()),
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
@@ -169,7 +211,7 @@ where
         self.check_not_set();
 
         if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::Invalid {
-            SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);
+            SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG.as_bytes());
         }
 
         let callback = match opt_callback {

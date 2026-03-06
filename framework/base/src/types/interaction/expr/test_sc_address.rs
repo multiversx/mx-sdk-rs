@@ -21,7 +21,7 @@ const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
 /// Encodes a dummy SC address, to be used for tests.
 ///
-/// It is designed to be usable from contracts (especiall test contracts), with a minimal footprint.
+/// It is designed to be usable from contracts (especially test contracts), with a minimal footprint.
 /// For this reason, its inner structure is subject to change.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TestSCAddress<'a> {

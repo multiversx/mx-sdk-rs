@@ -49,14 +49,24 @@ pub fn extract_macro_attributes(attrs: &[syn::Attribute]) -> Vec<String> {
     let mut macro_attributes = Vec::new();
 
     for a in attrs {
-        if let syn::Meta::List(list) = &a.meta {
-            if list.path.is_ident("derive") {
+        match &a.meta {
+            syn::Meta::List(list) if list.path.is_ident("derive") => {
                 for token in list.tokens.clone().into_iter() {
                     if let proc_macro2::TokenTree::Ident(ident) = token {
                         macro_attributes.push(ident.to_string());
                     }
                 }
             }
+            syn::Meta::Path(path) if path.segments.len() > 1 => {
+                let path_str = path
+                    .segments
+                    .iter()
+                    .map(|s| s.ident.to_string())
+                    .collect::<Vec<_>>()
+                    .join("::");
+                macro_attributes.push(path_str);
+            }
+            _ => {}
         }
     }
 

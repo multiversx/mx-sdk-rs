@@ -5,13 +5,14 @@ use multiversx_sc::imports::*;
 mod common;
 mod events;
 mod global;
+pub mod order_book_pair_proxy;
 mod orders;
 mod validation;
 
 use common::OrderInputParams;
 
 #[multiversx_sc::contract]
-pub trait Pair:
+pub trait OrderBookPair:
     global::GlobalOperationModule
     + orders::OrdersModule
     + events::EventsModule

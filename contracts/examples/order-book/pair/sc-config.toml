@@ -1,0 +1,2 @@
+[[proxy]]
+path = "src/order_book_pair_proxy.rs"

@@ -236,10 +236,19 @@ where
     }
 }
 
-impl<M, T: TypeAbi> TypeAbiFrom<Self> for MultiValueManagedVec<M, T>
+impl<M, T, U> TypeAbiFrom<MultiValueManagedVec<M, U>> for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem,
+    T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
+    U: ManagedVecItem + TypeAbi,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<MultiValueVec<U>> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
+    U: TypeAbi,
 {
 }
 

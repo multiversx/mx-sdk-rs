@@ -1,6 +1,6 @@
 use crate::{
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
-    types::VMAddress,
+    types::Address,
 };
 
 pub fn set_special_role(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
@@ -12,7 +12,7 @@ pub fn set_special_role(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Bloc
     }
 
     let token_identifier = tx_input.args[0].clone();
-    let address = VMAddress::from_slice(tx_input.args[1].as_slice());
+    let address = Address::from_slice(tx_input.args[1].as_slice());
     let role = tx_input.args[2].clone();
 
     tx_cache.with_account_mut(&address, |account| {

@@ -1,6 +1,6 @@
 use crate::{
     host::context::{TxFunctionName, TxTokenTransfer},
-    types::{RawHandle, VMAddress, VMCodeMetadata},
+    types::{Address, RawHandle, VMCodeMetadata},
 };
 
 use super::ManagedTypeContainer;
@@ -26,8 +26,8 @@ impl ManagedTypeContainer {
         self.mb_get(handle).to_vec()
     }
 
-    pub fn mb_to_address(&self, handle: RawHandle) -> VMAddress {
-        VMAddress::from_slice(self.mb_get(handle))
+    pub fn mb_to_address(&self, handle: RawHandle) -> Address {
+        Address::from_slice(self.mb_get(handle))
     }
 
     pub fn mb_to_function_name(&self, handle: RawHandle) -> TxFunctionName {
@@ -133,10 +133,7 @@ impl ManagedTypeContainer {
         let mut result = Vec::new();
         let mut num_bytes_copied = 0;
         let data = self.mb_get(source_handle);
-        assert!(
-            data.len() % 16 == 0,
-            "malformed ManagedVec<EsdtTokenPayment> data"
-        );
+        assert!(data.len() % 16 == 0, "malformed ManagedVec<Payment> data");
         for chunk in data.chunks(16) {
             let token_id_handle = i32::from_be_bytes(chunk[0..4].try_into().unwrap());
             let token_id = self.mb_get(token_id_handle).to_vec();

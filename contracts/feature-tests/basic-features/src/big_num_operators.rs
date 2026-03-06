@@ -959,6 +959,10 @@ pub trait BigIntOperators {
         a == b
     }
     #[endpoint]
+    fn eq_non_zero_big_uint_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> bool {
+        a == b
+    }
+    #[endpoint]
     fn eq_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
         a == b
     }
@@ -1016,6 +1020,10 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn gt_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a > b
+    }
+    #[endpoint]
+    fn gt_non_zero_big_uint_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> bool {
         a > b
     }
     #[endpoint]
@@ -1079,6 +1087,10 @@ pub trait BigIntOperators {
         a >= b
     }
     #[endpoint]
+    fn ge_non_zero_big_uint_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> bool {
+        a >= b
+    }
+    #[endpoint]
     fn ge_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
         a >= b
     }
@@ -1139,6 +1151,10 @@ pub trait BigIntOperators {
         a < b
     }
     #[endpoint]
+    fn lt_non_zero_big_uint_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> bool {
+        a < b
+    }
+    #[endpoint]
     fn lt_non_zero_big_uint_i32(&self, a: NonZeroBigUint, b: i32) -> bool {
         a < b
     }
@@ -1196,6 +1212,10 @@ pub trait BigIntOperators {
     }
     #[endpoint]
     fn le_non_zero_big_uint_non_zero_big_uint(&self, a: NonZeroBigUint, b: NonZeroBigUint) -> bool {
+        a <= b
+    }
+    #[endpoint]
+    fn le_non_zero_big_uint_big_uint(&self, a: NonZeroBigUint, b: BigUint) -> bool {
         a <= b
     }
     #[endpoint]

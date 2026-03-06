@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, ManagedAddress, MultiTransfer, PaymentVec, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env, P> TxPayment<Env> for P
 where
@@ -70,12 +70,12 @@ where
         }
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
         let pv = self.as_ref();
         match pv.len() {
-            0 => ().into_full_payment_data(env),
-            1 => pv.get(0).into_full_payment_data(env),
-            _ => MultiTransfer(pv).into_full_payment_data(env),
+            0 => ().into_scenario_payments(env),
+            1 => pv.get(0).into_scenario_payments(env),
+            _ => MultiTransfer(pv).into_scenario_payments(env),
         }
     }
 }

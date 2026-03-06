@@ -154,7 +154,7 @@ where
     pub fn retrieve_funds<
         Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
-        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         token: Arg0,

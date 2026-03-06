@@ -6,13 +6,13 @@ use crate::{
     },
     host::execution,
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::{VMAddress, top_decode_u64},
+    types::{Address, top_decode_u64},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
 
 pub(super) struct ParsedTransferBuiltinFunCall {
-    pub destination: VMAddress,
+    pub destination: Address,
     pub raw_esdt_transfers: Vec<RawEsdtTransfer>,
     pub func_name: TxFunctionName,
     pub args: Vec<Vec<u8>>,

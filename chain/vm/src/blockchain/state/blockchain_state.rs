@@ -10,15 +10,15 @@ use std::{
 
 use crate::{
     blockchain::reserved::STORAGE_REWARD_KEY, host::context::BlockchainUpdate,
-    system_sc::ESDT_SYSTEM_SC_ADDRESS_ARRAY, types::VMAddress,
+    system_sc::ESDT_SYSTEM_SC_ADDRESS, types::Address,
 };
 
 use super::{AccountData, BlockConfig};
 
 #[derive(Clone)]
 pub struct BlockchainState {
-    pub accounts: HashMap<VMAddress, AccountData>,
-    pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
+    pub accounts: HashMap<Address, AccountData>,
+    pub new_addresses: HashMap<(Address, u64), Address>,
     pub block_config: BlockConfig,
     pub new_token_identifiers: Vec<String>,
 }
@@ -33,7 +33,7 @@ impl Default for BlockchainState {
         };
 
         // pre-populating system SC(s)
-        state.add_empty_account(ESDT_SYSTEM_SC_ADDRESS_ARRAY.into());
+        state.add_empty_account(ESDT_SYSTEM_SC_ADDRESS);
 
         state
     }
@@ -44,11 +44,11 @@ impl BlockchainState {
         updates.apply(self);
     }
 
-    pub fn account_exists(&self, address: &VMAddress) -> bool {
+    pub fn account_exists(&self, address: &Address) -> bool {
         self.accounts.contains_key(address)
     }
 
-    pub fn increase_account_nonce(&mut self, address: &VMAddress) {
+    pub fn increase_account_nonce(&mut self, address: &Address) {
         let account = self
             .accounts
             .get_mut(address)
@@ -56,7 +56,7 @@ impl BlockchainState {
         account.nonce += 1;
     }
 
-    pub fn subtract_tx_gas(&mut self, address: &VMAddress, gas_limit: u64, gas_price: u64) {
+    pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
         let account = self
             .accounts
             .get_mut(address)
@@ -69,7 +69,7 @@ impl BlockchainState {
         account.egld_balance -= &gas_cost;
     }
 
-    pub fn increase_validator_reward(&mut self, address: &VMAddress, amount: &BigUint) {
+    pub fn increase_validator_reward(&mut self, address: &Address, amount: &BigUint) {
         let account = self
             .accounts
             .get_mut(address)
@@ -99,7 +99,7 @@ impl BlockchainState {
         self.new_token_identifiers = token_identifiers;
     }
 
-    fn add_empty_account(&mut self, address: VMAddress) {
+    fn add_empty_account(&mut self, address: Address) {
         self.accounts.insert(
             address.clone(),
             AccountData {
