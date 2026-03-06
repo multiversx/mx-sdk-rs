@@ -1,4 +1,4 @@
-use crate::types::{heap::Address, ManagedAddress, ManagedBuffer};
+use crate::types::{ManagedAddress, ManagedBuffer, heap::Address};
 
 use super::{AnnotatedValue, TxEnv};
 

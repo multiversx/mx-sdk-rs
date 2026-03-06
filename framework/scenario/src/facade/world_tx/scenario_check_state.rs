@@ -1,26 +1,26 @@
-use std::collections::{btree_map::Entry, BTreeMap};
+use std::collections::{BTreeMap, btree_map::Entry};
 
 use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 use multiversx_sc::{
-    codec::{top_encode_to_vec_u8, TopEncode},
+    codec::{TopEncode, top_encode_to_vec_u8},
     types::{AnnotatedValue, BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer},
 };
 
 use crate::{
+    ScenarioTxEnvData, ScenarioWorld,
     api::StaticApi,
     scenario::{
+        ScenarioRunner,
         tx_to_step::{
             address_annotated, big_uint_annotated, bytes_annotated, token_identifier_annotated,
             u64_annotated,
         },
-        ScenarioRunner,
     },
     scenario_model::{
         AddressKey, BytesKey, BytesValue, CheckAccount, CheckEsdt, CheckEsdtData,
         CheckEsdtInstances, CheckEsdtMap, CheckEsdtMapContents, CheckStateStep, CheckStorage,
         CheckStorageDetails, CheckValue,
     },
-    ScenarioTxEnvData, ScenarioWorld,
 };
 
 impl ScenarioWorld {
@@ -91,6 +91,10 @@ impl<'w> CheckStateBuilder<'w> {
     }
 
     /// Forces value drop and commit accounts.
+    #[deprecated(
+        since = "0.65.0",
+        note = "commit is implicit on drop, this method is no longer needed"
+    )]
     pub fn commit(self) {}
 
     pub fn nonce<V>(mut self, nonce: V) -> Self

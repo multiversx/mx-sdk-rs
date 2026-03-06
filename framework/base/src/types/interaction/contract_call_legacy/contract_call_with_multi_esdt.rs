@@ -8,8 +8,8 @@ use crate::{
 };
 
 use super::{
-    contract_call_no_payment::ContractCallNoPayment, contract_call_trait::ContractCallBase,
-    ContractCall, ContractCallWithEgld,
+    ContractCall, ContractCallWithEgld, contract_call_no_payment::ContractCallNoPayment,
+    contract_call_trait::ContractCallBase,
 };
 
 #[deprecated(

@@ -1,2 +1,2 @@
 [[proxy]]
-path = "src/proxy_ping_pong_egld.rs"
+path = "src/proxy.rs"

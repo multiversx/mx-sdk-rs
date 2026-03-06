@@ -9,6 +9,11 @@ pub struct InputAbiJson {
     #[serde(rename = "type")]
     pub type_name: String,
 
+    #[serde(rename = "specificType")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub type_name_specific: Option<String>,
+
     /// Bool that is only serialized when true
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -20,6 +25,7 @@ impl From<&InputAbi> for InputAbiJson {
         InputAbiJson {
             arg_name: abi.arg_name.to_string(),
             type_name: abi.type_names.abi.clone(),
+            type_name_specific: abi.type_names.specific.clone(),
             multi_arg: if abi.multi_arg { Some(true) } else { None },
         }
     }
@@ -29,7 +35,11 @@ impl From<&InputAbiJson> for InputAbi {
     fn from(abi: &InputAbiJson) -> Self {
         InputAbi {
             arg_name: abi.arg_name.to_string(),
-            type_names: TypeNames::from_abi(abi.type_name.clone()),
+            type_names: TypeNames {
+                abi: abi.type_name.clone(),
+                rust: String::new(),
+                specific: abi.type_name_specific.clone(),
+            },
             multi_arg: abi.multi_arg.unwrap_or(false),
         }
     }
@@ -47,8 +57,15 @@ pub struct OutputAbiJson {
     #[serde(default)]
     #[serde(skip_serializing_if = "String::is_empty")]
     pub output_name: String,
+
     #[serde(rename = "type")]
     pub type_name: String,
+
+    #[serde(rename = "specificType")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub type_name_specific: Option<String>,
+
     /// Bool that is only serialized when true
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,6 +77,7 @@ impl From<&OutputAbi> for OutputAbiJson {
         OutputAbiJson {
             output_name: abi.output_name.clone(),
             type_name: abi.type_names.abi.clone(),
+            type_name_specific: abi.type_names.specific.clone(),
             multi_result: if abi.multi_result { Some(true) } else { None },
         }
     }
@@ -69,7 +87,11 @@ impl From<&OutputAbiJson> for OutputAbi {
     fn from(abi: &OutputAbiJson) -> Self {
         OutputAbi {
             output_name: abi.output_name.clone(),
-            type_names: TypeNames::from_abi(abi.type_name.clone()),
+            type_names: TypeNames {
+                abi: abi.type_name.clone(),
+                rust: String::new(),
+                specific: abi.type_name_specific.clone(),
+            },
             multi_result: abi.multi_result.unwrap_or(false),
         }
     }
@@ -126,6 +148,11 @@ pub struct EndpointAbiJson {
     pub docs: Vec<String>,
     pub name: String,
 
+    #[serde(rename = "rustMethodName")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rust_method_name: Option<String>,
+
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
@@ -165,7 +192,12 @@ impl From<&EndpointAbi> for EndpointAbiJson {
     fn from(abi: &EndpointAbi) -> Self {
         EndpointAbiJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
-            name: abi.name.to_string(),
+            name: abi.name.clone(),
+            rust_method_name: if abi.rust_method_name == abi.name {
+                None
+            } else {
+                Some(abi.rust_method_name.clone())
+            },
             title: abi.title.clone(),
             only_owner: if abi.only_owner { Some(true) } else { None },
             only_admin: if abi.only_admin { Some(true) } else { None },
@@ -195,7 +227,11 @@ impl From<&EndpointAbiJson> for EndpointAbi {
     fn from(abi: &EndpointAbiJson) -> Self {
         EndpointAbi {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
-            name: abi.name.to_string(),
+            name: abi.name.clone(),
+            rust_method_name: abi
+                .rust_method_name
+                .clone()
+                .unwrap_or_else(|| abi.name.clone()),
             only_owner: abi.only_owner.unwrap_or(false),
             only_admin: abi.only_admin.unwrap_or(false),
             mutability: match abi.mutability {
@@ -212,7 +248,6 @@ impl From<&EndpointAbiJson> for EndpointAbi {
             outputs: abi.outputs.iter().map(OutputAbi::from).collect(),
             labels: abi.labels.clone(),
             allow_multiple_var_args: abi.allow_multiple_var_args.unwrap_or(false),
-            rust_method_name: abi.name.clone(),
             title: None,
             endpoint_type: EndpointTypeAbi::Endpoint,
         }

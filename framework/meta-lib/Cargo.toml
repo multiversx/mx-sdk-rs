@@ -1,7 +1,7 @@
 [package]
 name = "multiversx-sc-meta-lib"
-version = "0.63.3"
-edition = "2021"
+version = "0.65.0"
+edition = "2024"
 
 authors = [
     "Andrei Marinica <andrei.marinica@multiversx.com>",
@@ -17,21 +17,25 @@ keywords = ["multiversx", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
-clap = { version = "4.4.7", features = ["derive"] }
+clap = { version = "4.4", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rustc_version = "0.4"
-toml = { version = "0.9", features = ["preserve_order"] }
+toml = { version = "1.0", features = ["preserve_order"] }
 colored = "3.0"
 lazy_static = "1.4.0"
-convert_case = "0.9"
+convert_case = "0.11"
 hex = "0.4"
-wasmparser = "0.241"
-wasmprinter = "0.241"
+wasmparser = "0.245"
+wasmprinter = "0.245"
 semver = "1.0.20"
 wat = "1.217.0"
 
 [dependencies.multiversx-sc]
-version = "=0.63.3"
+version = "=0.65.0"
 path = "../base"
 features = ["alloc", "num-bigint"]
+
+[dependencies.multiversx-chain-scenario-format]
+version = "0.26.0"
+path = "../../sdk/scenario-format"

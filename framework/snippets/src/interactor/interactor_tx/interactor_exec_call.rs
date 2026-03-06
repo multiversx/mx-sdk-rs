@@ -1,4 +1,5 @@
 use multiversx_sc_scenario::{
+    ScenarioTxEnvData,
     api::StaticApi,
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
@@ -9,12 +10,11 @@ use multiversx_sc_scenario::{
     },
     scenario::tx_to_step::TxToStep,
     scenario_model::{ScCallStep, TxResponse},
-    ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::{
-    interactor::interactor_tx::interactor_prepare_async::InteractorSimulateGasAsync, InteractorBase,
+    InteractorBase, interactor::interactor_tx::interactor_prepare_async::InteractorSimulateGasAsync,
 };
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};

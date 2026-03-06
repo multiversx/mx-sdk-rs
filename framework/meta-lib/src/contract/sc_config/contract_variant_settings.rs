@@ -1,7 +1,7 @@
 mod contract_allocator;
 mod stack_size;
 
-pub use contract_allocator::{parse_allocator, ContractAllocator};
+pub use contract_allocator::{ContractAllocator, parse_allocator};
 pub use stack_size::*;
 
 use crate::{

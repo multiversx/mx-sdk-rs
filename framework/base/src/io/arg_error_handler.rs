@@ -3,7 +3,7 @@ use core::{convert::Infallible, marker::PhantomData};
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
     codec::*,
-    io::{signal_arg_de_error, ArgId},
+    io::{ArgId, signal_arg_de_error},
 };
 
 #[derive(Clone)]

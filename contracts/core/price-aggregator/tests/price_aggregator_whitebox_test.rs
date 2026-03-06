@@ -1,6 +1,6 @@
 use multiversx_price_aggregator_sc::{
+    MAX_ROUND_DURATION_SECONDS, PriceAggregator,
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
-    PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
 use multiversx_sc::types::TimestampSeconds;
 use multiversx_sc_modules::{pause::PauseModule, staking::StakingModule};

@@ -133,7 +133,7 @@ pub struct ApiLogs {
 pub struct ApiSmartContractResult {
     pub hash: String,
     pub nonce: u64,
-    pub value: u64,
+    pub value: u128, // consider switching to BigUint if this proves insufficient
     pub receiver: Bech32Address,
     pub sender: Bech32Address,
     #[serde(default)]

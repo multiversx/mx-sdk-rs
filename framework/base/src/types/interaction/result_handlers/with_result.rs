@@ -4,7 +4,7 @@ use multiversx_sc_codec::TopDecodeMulti;
 
 use crate::{
     contract_base::SyncCallRawResult,
-    types::{interaction::decode_result, RHListItem, RHListItemExec, TxEnv},
+    types::{RHListItem, RHListItemExec, TxEnv, interaction::decode_result},
 };
 
 /// Defines a lambda function to be called on the decoded result.

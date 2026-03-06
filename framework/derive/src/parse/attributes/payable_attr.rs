@@ -40,21 +40,24 @@ fn extract_token_identifier(attr: &syn::Attribute) -> String {
                         "ticker can not be empty. attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")"
                     );
 
-                    assert!(!is_first_char_numeric(&clean), "argument can not be a number");
+                    assert!(
+                        !is_first_char_numeric(&clean),
+                        "argument can not be a number"
+                    );
 
-                    if clean
-                    .chars()
-                    .next()
-                    .is_some_and(|s|
-                        s == '*'
-                    ) {
-                        assert!(clean.len() == 1usize, "attribute needs 1 string argument: \"*\", \"EGLD\" or token identifier");
+                    if clean.chars().next().is_some_and(|s| s == '*') {
+                        assert!(
+                            clean.len() == 1usize,
+                            "attribute needs 1 string argument: \"*\", \"EGLD\" or token identifier"
+                        );
                     }
 
                     clean
-                },
+                }
                 Some(_) => panic!("expected a string as argument"),
-                None => panic!("argument can not be empty. attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")"),
+                None => panic!(
+                    "argument can not be empty. attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")"
+                ),
             };
 
             assert!(

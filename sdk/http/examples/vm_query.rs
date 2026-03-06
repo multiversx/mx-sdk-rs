@@ -1,5 +1,5 @@
 use multiversx_sdk::{chain_core::std::Bech32Address, data::vm::VMQueryInput};
-use multiversx_sdk_http::{GatewayHttpProxy, DEVNET_GATEWAY};
+use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 
 #[tokio::main]
 async fn main() {

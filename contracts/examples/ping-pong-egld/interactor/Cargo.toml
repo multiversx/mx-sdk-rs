@@ -2,7 +2,7 @@
 name = "ping-pong-egld-interact"
 version = "0.0.0"
 authors = ["MultiversX <contact@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [[bin]]
@@ -13,16 +13,16 @@ path = "src/interact_main.rs"
 path = "src/interact.rs"
 
 [dependencies]
-clap = { version = "4.4.7", features = ["derive"] }
+clap = { version = "4.4", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.9"
+toml = "1.0"
 tokio = { version = "1.24" }
 
 [dependencies.ping-pong-egld]
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.63.3"
+version = "0.65.0"
 path = "../../../../framework/snippets"
 
 [features]

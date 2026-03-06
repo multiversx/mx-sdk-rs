@@ -1,6 +1,6 @@
 use super::{
-    contract_variant_validate::validate_contract_variant, proxy_config::ProxyConfig,
-    ContractVariant,
+    ContractVariant, contract_variant_validate::validate_contract_variant,
+    proxy_config::ProxyConfig,
 };
 
 /// Allowed file names for the SC config.

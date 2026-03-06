@@ -6,7 +6,7 @@ use super::{
 };
 use crate::{
     cli::AllArgs,
-    folder_structure::{dir_pretty_print, RelevantDirectories},
+    folder_structure::{RelevantDirectories, dir_pretty_print},
 };
 use std::{path::Path, process::Command};
 

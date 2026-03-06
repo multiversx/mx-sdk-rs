@@ -3,13 +3,13 @@ mod scenario_set_block;
 mod scenario_set_new_address;
 
 use crate::{
+    ScenarioTxEnvData, ScenarioWorld,
     imports::StaticApi,
     scenario::{
-        tx_to_step::{address_annotated, big_uint_annotated, u64_annotated},
         ScenarioRunner,
+        tx_to_step::{address_annotated, big_uint_annotated, u64_annotated},
     },
     scenario_model::{AddressKey, BigUintValue, NewAddress, SetStateStep},
-    ScenarioTxEnvData, ScenarioWorld,
 };
 
 use multiversx_chain_vm::blockchain::state::EsdtInstanceMetadata;
@@ -336,6 +336,10 @@ where
     }
 
     /// Forces value drop and commit accounts.
+    #[deprecated(
+        since = "0.65.0",
+        note = "commit is implicit on drop, this method is no longer needed"
+    )]
     pub fn commit(self) {}
 }
 

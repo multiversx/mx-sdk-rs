@@ -56,5 +56,9 @@ fn minimum_rustc_version(framework_version: &Version) -> Option<Version> {
         return Some(Version::new(1, 78, 0));
     }
 
-    Some(Version::new(1, 83, 0))
+    if *framework_version < Version::new(0, 64, 0) {
+        return Some(Version::new(1, 83, 0));
+    }
+
+    Some(Version::new(1, 85, 0))
 }

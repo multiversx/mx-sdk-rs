@@ -1,4 +1,4 @@
-name: CI
+name: Plotter CI
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -26,6 +26,7 @@ jobs:
 
       - name: Prerequisites
         run: |
+          sudo apt-get update
           sudo apt install pkg-config libfreetype6-dev libfontconfig1-dev
 
       - name: Run plotter tests

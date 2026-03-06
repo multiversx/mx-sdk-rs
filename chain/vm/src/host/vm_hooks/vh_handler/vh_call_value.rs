@@ -1,7 +1,7 @@
 use crate::{
     host::{
         context::TxTokenTransfer,
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+        vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     },
     types::RawHandle,
     vm_err_msg,

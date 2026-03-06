@@ -18,7 +18,7 @@ pub use contract_call_with_any_payment::ContractCallWithAnyPayment;
 pub use contract_call_with_egld::ContractCallWithEgld;
 pub use contract_call_with_egld_or_single_esdt::ContractCallWithEgldOrSingleEsdt;
 pub use contract_call_with_multi_esdt::ContractCallWithMultiEsdt;
-pub use contract_deploy::{new_contract_deploy, ContractDeploy};
+pub use contract_deploy::{ContractDeploy, new_contract_deploy};
 use multiversx_sc_codec::TopEncodeMulti;
 
 /// Using max u64 to represent maximum possible gas,

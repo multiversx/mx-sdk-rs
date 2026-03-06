@@ -1,7 +1,7 @@
 #![allow(unused)]
 
 use crate::{
-    api::{quick_signal_error, InvalidSliceError, ManagedTypeApi},
+    api::{InvalidSliceError, ManagedTypeApi, quick_signal_error},
     err_msg,
     types::{ManagedBuffer, StaticBufferRef},
 };

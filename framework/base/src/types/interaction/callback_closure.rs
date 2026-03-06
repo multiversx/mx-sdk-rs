@@ -3,9 +3,8 @@ use unwrap_infallible::UnwrapInfallible;
 use crate::{
     api::{BlockchainApi, ErrorApi, ManagedTypeApi, StorageReadApi, StorageWriteApi},
     codec::{
-        self,
+        self, TopEncodeMulti,
         derive::{TopDecode, TopEncode},
-        TopEncodeMulti,
     },
     contract_base::{BlockchainWrapper, ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
@@ -104,8 +103,8 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosureForDeser<M> {
         }
     }
 
-    pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
-    ) -> Option<Self> {
+    pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>()
+    -> Option<Self> {
         let storage_key = cb_closure_storage_key::<A>();
         let storage_value_raw: ManagedBuffer<A> = storage_get(storage_key.as_ref());
         if !storage_value_raw.is_empty() {

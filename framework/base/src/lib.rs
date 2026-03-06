@@ -36,7 +36,6 @@ pub mod types;
 mod std_impl;
 
 pub use hex_call_data::*;
-pub use hex_literal;
 pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
 
 /// Conveniently groups all framework imports required by a smart contract form the framework.

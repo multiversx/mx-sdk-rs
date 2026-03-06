@@ -141,8 +141,11 @@ fn validate_method(method: &Method) {
     assert!(
         matches!(
             method.public_role,
-            PublicRole::Init(_) | PublicRole::Endpoint(_) | PublicRole::CallbackPromise(_) | PublicRole::Upgrade(_)
-                ) || method.label_names.is_empty(),
+            PublicRole::Init(_)
+                | PublicRole::Endpoint(_)
+                | PublicRole::CallbackPromise(_)
+                | PublicRole::Upgrade(_)
+        ) || method.label_names.is_empty(),
         "Labels can only be placed on endpoints, constructors, and promises callbacks. Method '{}' is neither.",
         &method.name.to_string()
     )

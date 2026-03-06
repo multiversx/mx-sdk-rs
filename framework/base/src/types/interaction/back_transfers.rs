@@ -1,8 +1,8 @@
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigUint, EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPayment, MultiEgldOrEsdtPayment,
-        MultiEsdtPayment, MultiValueEncoded,
+        BigUint, EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPayment, EsdtTokenPaymentVec,
+        MultiEgldOrEsdtPayment, MultiValueEncoded, PaymentVec,
     },
 };
 
@@ -17,7 +17,7 @@ where
     A: ManagedTypeApi,
 {
     pub total_egld_amount: BigUint<A>,
-    pub esdt_payments: MultiEsdtPayment<A>,
+    pub esdt_payments: EsdtTokenPaymentVec<A>,
 }
 
 /// Holding back-transfer data, as retrieved from the VM.
@@ -62,5 +62,10 @@ where
     /// `[(token identifier, payment, nonce)]`
     pub fn into_multi_value(self) -> MultiValueEncoded<A, EgldOrEsdtTokenPaymentMultiValue<A>> {
         self.payments.into_multi_value()
+    }
+
+    /// Converts data to the newer PaymentVec (ManagedVec<Payment>).
+    pub fn into_payment_vec(self) -> PaymentVec<A> {
+        self.payments.into_payment_vec()
     }
 }

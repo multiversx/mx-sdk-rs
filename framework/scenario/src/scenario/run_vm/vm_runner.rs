@@ -10,7 +10,7 @@ use crate::{
         debug::{ContractDebugExecutor, ContractMapRef},
     },
     multiversx_chain_vm::BlockchainMock,
-    scenario::{model::*, ScenarioRunner},
+    scenario::{ScenarioRunner, model::*},
 };
 
 use super::ExecutorConfig;

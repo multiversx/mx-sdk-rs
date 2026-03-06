@@ -350,7 +350,7 @@ pub trait TokenRelease {
 
     #[storage_mapper("addressChangeRequest")]
     fn address_change_request(&self, address: &ManagedAddress)
-        -> SingleValueMapper<ManagedAddress>;
+    -> SingleValueMapper<ManagedAddress>;
 
     #[storage_mapper("groupSchedule")]
     fn group_schedule(
@@ -360,7 +360,7 @@ pub trait TokenRelease {
 
     #[storage_mapper("userGroups")]
     fn user_groups(&self, address: &ManagedAddress)
-        -> SingleValueMapper<ManagedVec<ManagedBuffer>>;
+    -> SingleValueMapper<ManagedVec<ManagedBuffer>>;
 
     #[storage_mapper("usersInGroup")]
     fn users_in_group(&self, group_identifier: &ManagedBuffer) -> SingleValueMapper<u64>;

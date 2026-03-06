@@ -4,7 +4,7 @@ use crate::codec::{DecodeError, EncodeError};
 
 use crate::{
     api::{ErrorApiImpl, ManagedTypeApi},
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedSCError, ManagedType},
+    types::{ManagedBuffer, ManagedSCError, ManagedType, heap::BoxedBytes},
 };
 
 #[derive(Default)]

@@ -1,5 +1,5 @@
 use crate::scenario::{
-    self, model::*, run_trace::ScenarioTrace, run_vm::ScenarioVMRunner, ScenarioRunner,
+    self, ScenarioRunner, model::*, run_trace::ScenarioTrace, run_vm::ScenarioVMRunner,
 };
 use std::path::Path;
 

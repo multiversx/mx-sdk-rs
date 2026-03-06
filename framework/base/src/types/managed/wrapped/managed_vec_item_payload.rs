@@ -1,8 +1,8 @@
 use core::ops::Add;
 
 use generic_array::{
-    typenum::{Const, Max, U1},
     ArrayLength, GenericArray, IntoArrayLength,
+    typenum::{Const, Max, U1},
 };
 
 /// Describes the binary representation of a ManagedVecItem.
@@ -115,13 +115,17 @@ impl<N: ArrayLength> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
     }
 
     unsafe fn slice_unchecked<S: ManagedVecItemPayload>(&self, index: usize) -> &S {
-        let ptr = self.buffer.as_ptr().add(index);
-        &*ptr.cast::<S>()
+        unsafe {
+            let ptr = self.buffer.as_ptr().add(index);
+            &*ptr.cast::<S>()
+        }
     }
 
     unsafe fn slice_unchecked_mut<S: ManagedVecItemPayload>(&mut self, index: usize) -> &mut S {
-        let ptr = self.buffer.as_mut_ptr().add(index);
-        &mut *ptr.cast::<S>()
+        unsafe {
+            let ptr = self.buffer.as_mut_ptr().add(index);
+            &mut *ptr.cast::<S>()
+        }
     }
 }
 

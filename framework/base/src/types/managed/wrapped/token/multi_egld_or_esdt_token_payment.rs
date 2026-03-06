@@ -1,9 +1,9 @@
 use crate::{
-    api::{quick_signal_error, ManagedTypeApi},
+    api::{ManagedTypeApi, quick_signal_error},
     err_msg,
     types::{
         BigUint, EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPayment,
-        ManagedVec, MultiValueEncoded,
+        ManagedVec, MultiValueEncoded, Payment, PaymentVec,
     },
 };
 
@@ -45,5 +45,20 @@ where
         }
 
         encoded
+    }
+
+    /// Converts to the newer PaymentVec (ManagedVec<Payment>).
+    pub fn into_payment_vec(self) -> PaymentVec<M> {
+        let mut payment_vec = PaymentVec::new();
+        for payment in self {
+            if let Some(amount_nz) = payment.amount.into_non_zero() {
+                payment_vec.push(Payment::new(
+                    payment.token_identifier.into_token_id(),
+                    payment.token_nonce,
+                    amount_nz,
+                ));
+            }
+        }
+        payment_vec
     }
 }

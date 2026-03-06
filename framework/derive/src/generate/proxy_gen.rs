@@ -133,7 +133,10 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     let payment_type;
     let payment_init;
     if token_count > 0 || nonce_count > 0 || payment_count > 0 {
-        assert!(multi_count == 0, "#[payment_multi] cannot coexist with any other payment annotation in the same endpoint");
+        assert!(
+            multi_count == 0,
+            "#[payment_multi] cannot coexist with any other payment annotation in the same endpoint"
+        );
 
         if token_count == 0 && nonce_count == 0 {
             payment_type = quote! { multiversx_sc::types::EgldPayment<Self::Api> };
@@ -150,8 +153,8 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         }
     } else if multi_count > 0 {
         let multi_expr = multi_expr_opt.unwrap();
-        payment_type = quote! { MultiEsdtPayment<Self::Api> };
-        payment_init = quote! { .multi_esdt(#multi_expr.clone_value()) };
+        payment_type = quote! { EsdtTokenPaymentVec<Self::Api> };
+        payment_init = quote! { .payment(#multi_expr.clone_value()) };
     } else {
         payment_type = quote! { () };
         payment_init = quote! {};

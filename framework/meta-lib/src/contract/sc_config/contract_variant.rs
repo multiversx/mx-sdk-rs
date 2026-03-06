@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use super::{contract_variant_builder::default_wasm_crate_name, ContractVariantSettings};
+use super::{ContractVariantSettings, contract_variant_builder::default_wasm_crate_name};
 use crate::{cli::BuildArgs, tools::RustcVersion};
 use multiversx_sc::abi::ContractAbi;
 

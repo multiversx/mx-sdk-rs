@@ -1,4 +1,5 @@
 use multiversx_sc_scenario::{
+    ScenarioTxEnvData,
     imports::{NotPayable, ScCallStep, TxToSpecified, UpgradeCall},
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
@@ -7,9 +8,8 @@ use multiversx_sc_scenario::{
             TxPayment,
         },
     },
-    scenario::tx_to_step::{address_annotated, code_annotated, StepWrapper, TxToStep},
+    scenario::tx_to_step::{StepWrapper, TxToStep, address_annotated, code_annotated},
     scenario_model::{ScDeployStep, TxResponse},
-    ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 

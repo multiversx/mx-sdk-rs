@@ -111,7 +111,7 @@ where
 
     pub fn accept_funds_echo_payment(
         self,
-    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>> {
         self.wrapped_tx
             .raw_call("accept_funds_echo_payment")
             .original_result()
@@ -154,7 +154,7 @@ where
     pub fn retrieve_funds<
         Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<u64>,
-        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<NonZeroBigUint<Env::Api>>,
     >(
         self,
         token: Arg0,
@@ -187,7 +187,7 @@ where
     }
 
     pub fn retrieve_funds_multi<
-        Arg0: ProxyArg<MultiValueEncoded<Env::Api, EgldOrEsdtTokenPaymentMultiValue<Env::Api>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, PaymentMultiValue<Env::Api>>>,
     >(
         self,
         transfers: Arg0,

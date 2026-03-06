@@ -91,6 +91,16 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:callBack",
                         "topics": [
+                            "str:async_callback"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:callBack",
+                        "topics": [
                             "str:retrieve_funds_callback",
                             "str:TEST-TOKENA",
                             "0",

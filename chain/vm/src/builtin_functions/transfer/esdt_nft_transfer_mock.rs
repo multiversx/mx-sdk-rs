@@ -3,15 +3,15 @@ use crate::{
     chain_core::builtin_func_names::ESDT_NFT_TRANSFER_FUNC_NAME,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::VMAddress,
+    types::Address,
 };
 
 use super::{
     super::BuiltinFunction,
     transfer_common::{
-        adjust_call_type, execute_transfer_builtin_func, extract_transfer_info,
-        push_func_name_if_necessary, push_transfer_bytes, ParsedTransferBuiltinFunCall,
-        RawEsdtTransfer,
+        ParsedTransferBuiltinFunCall, RawEsdtTransfer, adjust_call_type,
+        execute_transfer_builtin_func, extract_transfer_info, push_func_name_if_necessary,
+        push_transfer_bytes,
     },
 };
 
@@ -87,7 +87,7 @@ fn try_parse_input(tx_input: &TxInput) -> Result<ParsedTransferBuiltinFunCall, &
     let token_identifier = tx_input.args[0].clone();
     let nonce_bytes = tx_input.args[1].clone();
     let value_bytes = tx_input.args[2].clone();
-    let destination = VMAddress::from_slice(&tx_input.args[3]);
+    let destination = Address::from_slice(&tx_input.args[3]);
 
     let func_name = tx_input.func_name_from_arg_index(4);
     let args = if tx_input.args.len() > 5 {

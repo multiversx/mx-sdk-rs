@@ -3,7 +3,7 @@ use anyhow::anyhow;
 use multiversx_chain_core::std::Bech32Address;
 use std::collections::HashMap;
 
-use super::{GatewayRequest, GatewayRequestType, ACCOUNT_ENDPOINT, KEYS_ENDPOINT};
+use super::{ACCOUNT_ENDPOINT, GatewayRequest, GatewayRequestType, KEYS_ENDPOINT};
 
 /// Retrieves an account storage from the network.
 pub struct GetAccountStorageRequest<'a> {

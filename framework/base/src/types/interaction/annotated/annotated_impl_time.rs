@@ -2,7 +2,7 @@ use multiversx_chain_core::types::{TimestampMillis, TimestampSeconds};
 
 use crate::types::ManagedBuffer;
 
-use super::{display_u64, AnnotatedValue, TxEnv};
+use super::{AnnotatedValue, TxEnv, display_u64};
 
 impl<Env> AnnotatedValue<Env, TimestampMillis> for u64
 where

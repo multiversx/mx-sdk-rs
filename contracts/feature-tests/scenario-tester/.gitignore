@@ -7,4 +7,5 @@
 /output*/
 
 # Mandos test trace
+trace/st_trace*.scen.json
 trace*.scen.json

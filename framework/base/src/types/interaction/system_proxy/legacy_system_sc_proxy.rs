@@ -551,11 +551,7 @@ const TRUE_STR: &str = "true";
 const FALSE_STR: &str = "false";
 
 fn bool_name_bytes(b: bool) -> &'static str {
-    if b {
-        TRUE_STR
-    } else {
-        FALSE_STR
-    }
+    if b { TRUE_STR } else { FALSE_STR }
 }
 
 fn set_token_property<SA, CC>(contract_call: &mut CC, name: &str, value: bool)

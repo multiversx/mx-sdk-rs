@@ -4,24 +4,24 @@ use crate::{
     abi::TypeAbiFrom,
     codec::{EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput},
     storage::mappers::{
-        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
+        source::{CurrentStorage, StorageAddress},
     },
     storage_clear, storage_get, storage_get_len, storage_set,
     types::{
-        system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
-        ManagedVec, OriginalResultMarker, Tx, TxScEnv,
+        ESDTSystemSCAddress, EgldPayment, FunctionCall, ManagedVec, OriginalResultMarker, Tx,
+        TxScEnv, system_proxy::ESDTSystemSCProxy,
     },
 };
 
 use super::{
     super::StorageMapper,
+    TokenMapperState,
     error::{
         INVALID_PAYMENT_TOKEN_ERR_MSG, INVALID_TOKEN_ID_ERR_MSG, MUST_SET_TOKEN_ID_ERR_MSG,
         PENDING_ERR_MSG, TOKEN_ID_ALREADY_SET_ERR_MSG,
     },
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
-    TokenMapperState,
 };
 use crate::{
     abi::{TypeAbi, TypeName},
@@ -29,16 +29,58 @@ use crate::{
     contract_base::{BlockchainWrapper, SendWrapper},
     storage::StorageKey,
     types::{
+        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenIdentifier, EsdtTokenPayment,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
         system_proxy::{
             MetaTokenProperties, NonFungibleTokenProperties, SemiFungibleTokenProperties,
         },
-        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenIdentifier, EsdtTokenPayment,
-        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
     },
 };
 
-const INVALID_TOKEN_TYPE_ERR_MSG: &[u8] = b"Invalid token type for NonFungible issue";
+const INVALID_TOKEN_TYPE_ERR_MSG: &str = "Invalid token type for NonFungible issue";
 
+/// High-level mapper for non-fungible, semi-fungible, and meta-fungible ESDT tokens.
+/// Provides comprehensive NFT/SFT lifecycle management including issuance, creation,
+/// minting, burning, and attribute management.
+///
+/// # Storage Layout
+///
+/// The mapper stores the token state at the base key:
+/// - `base_key` → `TokenMapperState<SA>` (NotSet | Pending | Token(EsdtTokenIdentifier))
+///
+/// # Main Operations
+///
+/// ## Token Lifecycle
+/// - **Issue**: Create new NFT/SFT collection via `issue()` or `issue_and_set_all_roles()`
+/// - **Set ID**: Manually set token ID with `set_token_id()` for existing collections
+/// - **Query**: Check token state with `is_empty()`, `get_token_id()`, etc.
+///
+/// ## NFT Operations
+/// - **Create**: Mint new NFTs with `nft_create()` or `nft_create_named()`
+/// - **Add Quantity**: Increase SFT supply with `nft_add_quantity()`
+/// - **Update**: Modify NFT attributes with `nft_update_attributes()`
+/// - **Burn**: Destroy NFT/SFT with `nft_burn()`
+/// - **Transfer**: Send tokens with `send_payment()`
+///
+/// ## Token Management
+/// - **Roles**: Manage collection roles with `set_local_roles()`
+/// - **Balance**: Query token balance with `get_balance()`
+/// - **Metadata**: Retrieve token data with `get_all_token_data()`, `get_token_attributes()`
+///
+/// # Trade-offs
+///
+/// **Advantages:**
+/// - Supports all non-fungible token types (NFT, SFT, MetaFungible)
+/// - Complete NFT lifecycle in one mapper
+/// - Built-in metadata and attribute management
+/// - Automatic nonce handling
+/// - Payment validation utilities
+///
+/// **Limitations:**
+/// - Single collection per mapper instance
+/// - Requires careful callback implementation for issuance
+/// - Token creation requires local roles
+/// - Attribute updates limited by protocol
 pub type IssueCallTo<Api> = Tx<
     TxScEnv<Api>,
     (),
@@ -132,7 +174,7 @@ where
             EsdtTokenType::MetaFungible => {
                 Self::meta_issue(issue_cost, token_display_name, token_ticker, num_decimals)
             }
-            _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG),
+            _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG.as_bytes()),
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
@@ -169,7 +211,7 @@ where
         self.check_not_set();
 
         if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::Invalid {
-            SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);
+            SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG.as_bytes());
         }
 
         let callback = match opt_callback {

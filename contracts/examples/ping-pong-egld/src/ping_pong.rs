@@ -2,7 +2,7 @@
 
 use multiversx_sc::imports::*;
 
-pub mod proxy_ping_pong_egld;
+pub mod proxy;
 mod types;
 
 use types::{ContractState, UserStatus};
@@ -24,7 +24,7 @@ const PONG_ALL_LOW_GAS_LIMIT: u64 = 3_000_000;
 /// - `pongAll` can be used to send to all users to `ping`-ed. If it runs low on gas, it will interrupt itself.
 /// It can be continued anytime.
 #[multiversx_sc::contract]
-pub trait PingPong {
+pub trait PingPongEgld {
     /// Necessary configuration when deploying:
     /// `ping_amount` - the exact EGLD amount that needs to be sent when `ping`-ing.
     /// `duration_in_seconds` - how much time (in seconds) until contract expires.
@@ -86,7 +86,7 @@ pub trait PingPong {
             require!(
                 &self
                     .blockchain()
-                    .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
+                    .get_sc_balance(EgldOrEsdtTokenIdentifier::egld(), 0)
                     + &*payment
                     <= max_funds,
                 "smart contract full"
@@ -219,7 +219,7 @@ pub trait PingPong {
     fn deadline(&self) -> SingleValueMapper<TimestampMillis>;
 
     /// Block timestamp of the block where the contract got activated.
-    /// If not specified in the constructor it is the the deploy block timestamp.
+    /// If not specified in the constructor it is the deploy block timestamp.
     #[view(getActivationTimestamp)]
     #[storage_mapper("activationTimestamp")]
     fn activation_timestamp(&self) -> SingleValueMapper<TimestampMillis>;

@@ -5,13 +5,14 @@ use multiversx_sc::imports::*;
 mod common;
 mod events;
 mod global;
+pub mod order_book_pair_proxy;
 mod orders;
 mod validation;
 
 use common::OrderInputParams;
 
 #[multiversx_sc::contract]
-pub trait Pair:
+pub trait OrderBookPair:
     global::GlobalOperationModule
     + orders::OrdersModule
     + events::EventsModule
@@ -19,7 +20,7 @@ pub trait Pair:
     + validation::ValidationModule
 {
     #[init]
-    fn init(&self, first_token_id: EsdtTokenIdentifier, second_token_id: EsdtTokenIdentifier) {
+    fn init(&self, first_token_id: TokenId, second_token_id: TokenId) {
         self.first_token_id().set_if_empty(&first_token_id);
         self.second_token_id().set_if_empty(&second_token_id);
     }

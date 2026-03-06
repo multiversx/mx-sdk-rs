@@ -1,6 +1,6 @@
 use multiversx_sc::types::{TestAddress, TestSCAddress, TestTokenIdentifier};
 
-use multiversx_sc_scenario::{imports::*, ScenarioTxRun, ScenarioWorld};
+use multiversx_sc_scenario::{ScenarioTxRun, ScenarioWorld, imports::*};
 
 use forwarder::*;
 

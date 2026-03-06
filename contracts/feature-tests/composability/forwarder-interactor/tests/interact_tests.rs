@@ -164,7 +164,9 @@ async fn builtin_func_tokens_test() {
         )
         .await;
 
-    println!("Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created.");
+    println!(
+        "Metadata recreated for {dynamic_nft_token_id:?} with nonce {nonce:?}. A new token has been created."
+    );
 }
 
 #[tokio::test]

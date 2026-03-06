@@ -1,7 +1,7 @@
 [package]
 name = "multiversx-sc-codec-human-readable"
 version = "0.1.0"
-edition = "2018"
+edition = "2024"
 publish = false
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -15,8 +15,8 @@ keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["cryptography::cryptocurrencies", "development-tools"]
 
 [dependencies]
-serde_json = { version = "1.0.68" }
+serde_json = { version = "1.0" }
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.63.3"
+version = "=0.65.0"
 path = "../../framework/scenario"

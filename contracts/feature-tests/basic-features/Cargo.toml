@@ -2,23 +2,26 @@
 name = "basic-features"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/basic_features_main.rs"
 
+[features]
+small-int-bug = ["multiversx-sc/small-int-bug"]
+
 [dependencies.multiversx-sc]
-version = "0.63.3"
+version = "0.65.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.63.3"
+version = "0.65.0"
 features = ["wasmer-experimental", "bls"]
 path = "../../../framework/scenario"
 
 [dependencies.multiversx-sc-modules]
-version = "0.63.3"
+version = "0.65.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.esdt-system-sc-mock]

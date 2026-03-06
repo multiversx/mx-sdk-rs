@@ -10,7 +10,6 @@ use crate::multiversx_sc::types::ManagedArgBuffer;
 
 #[derive(Debug, Clone)]
 pub struct ScCallStep {
-    pub id: String,
     pub tx_id: Option<String>,
     pub explicit_tx_hash: Option<H256>,
     pub comment: Option<String>,
@@ -22,8 +21,7 @@ pub struct ScCallStep {
 impl Default for ScCallStep {
     fn default() -> Self {
         Self {
-            id: Default::default(),
-            tx_id: Default::default(),
+            tx_id: None,
             explicit_tx_hash: Default::default(),
             comment: Default::default(),
             tx: Default::default(),
@@ -36,6 +34,14 @@ impl Default for ScCallStep {
 impl ScCallStep {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn get_tx_id(&self) -> &str {
+        if let Some(tx_id) = &self.tx_id {
+            tx_id
+        } else {
+            ""
+        }
     }
 
     pub fn from<A>(mut self, address: A) -> Self

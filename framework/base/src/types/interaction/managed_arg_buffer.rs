@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ErrorApi, ManagedTypeApi},
+    api::{ErrorApi, ManagedTypeApi, use_raw_handle},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
@@ -9,11 +9,13 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
-        heap::ArgBuffer, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType,
-        ManagedVec, ManagedVecRefIterator, MultiValueEncoded,
+        ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType, ManagedVec,
+        ManagedVecItem, ManagedVecItemPayloadBuffer, ManagedVecRefIterator, MultiValueEncoded,
+        heap::ArgBuffer,
     },
 };
 use alloc::vec::Vec;
+use generic_array::typenum::U4;
 use multiversx_sc_codec::TopEncodeMulti;
 use unwrap_infallible::UnwrapInfallible;
 
@@ -34,8 +36,10 @@ where
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        ManagedArgBuffer {
-            data: ManagedVec::from_handle(handle),
+        unsafe {
+            ManagedArgBuffer {
+                data: ManagedVec::from_handle(handle),
+            }
         }
     }
 
@@ -44,7 +48,7 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.data.forget_into_handle()
+        unsafe { self.data.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -307,6 +311,38 @@ where
                 .unwrap_infallible();
             self.push_arg_raw(item);
         }
+    }
+}
+
+impl<M> ManagedVecItem for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    type PAYLOAD = ManagedVecItemPayloadBuffer<U4>;
+    const SKIPS_RESERIALIZATION: bool = false;
+    type Ref<'a> = ManagedRef<'a, M, Self>;
+
+    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        Self::from(ManagedVec::<M, ManagedBuffer<M>>::read_from_payload(
+            payload,
+        ))
+    }
+
+    unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+        unsafe {
+            let handle = use_raw_handle(i32::read_from_payload(payload));
+            ManagedRef::wrap_handle(handle)
+        }
+    }
+
+    fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+        self.data.save_to_payload(payload);
+    }
+}
+
+impl<M: ManagedTypeApi> PartialEq for ManagedArgBuffer<M> {
+    fn eq(&self, other: &Self) -> bool {
+        self.data == other.data
     }
 }
 

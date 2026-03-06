@@ -8,6 +8,7 @@ mod type_abi_from;
 mod type_abi_impl_basic;
 mod type_abi_impl_codec_multi;
 mod type_abi_impl_vm_core;
+mod type_abi_universal_input;
 mod type_description;
 mod type_description_container;
 
@@ -21,6 +22,7 @@ pub use esdt_attribute_abi::EsdtAttributeAbi;
 pub use event_abi::*;
 pub use type_abi::*;
 pub use type_abi_from::*;
+pub use type_abi_universal_input::TypeAbiUniversalInput;
 pub use type_description::*;
 pub use type_description_container::*;
 
@@ -30,6 +32,7 @@ pub type TypeName = alloc::string::String;
 pub struct TypeNames {
     pub abi: alloc::string::String,
     pub rust: alloc::string::String,
+    pub specific: Option<alloc::string::String>,
 }
 
 impl TypeNames {
@@ -37,6 +40,7 @@ impl TypeNames {
         TypeNames {
             abi: alloc::string::String::new(),
             rust: alloc::string::String::new(),
+            specific: None,
         }
     }
 
@@ -44,6 +48,11 @@ impl TypeNames {
         TypeNames {
             abi: abi_name,
             rust: alloc::string::String::new(),
+            specific: None,
         }
+    }
+
+    pub fn specific_or_abi(&self) -> &str {
+        self.specific.as_deref().unwrap_or(&self.abi)
     }
 }

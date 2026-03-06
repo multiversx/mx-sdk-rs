@@ -1,7 +1,7 @@
 use multiversx_chain_core::types::{BLSKey, BLSSignature};
 use multiversx_sc_codec::{
-    multi_types::{MultiValue2, MultiValueVec},
     MultiValueLength,
+    multi_types::{MultiValue2, MultiValueVec},
 };
 
 use crate::types::{

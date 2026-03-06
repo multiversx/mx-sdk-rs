@@ -1,5 +1,5 @@
-use quote::{quote, ToTokens};
-use syn::{punctuated::Punctuated, token::Comma, Variant};
+use quote::{ToTokens, quote};
+use syn::{Variant, punctuated::Punctuated, token::Comma};
 
 pub const BITFLAGS_PRIMITIVE: &str = ":: __private :: PublicFlags > :: Primitive";
 const BITFLAGS_INTERNAL: &str = ":: __private :: PublicFlags > :: Internal";

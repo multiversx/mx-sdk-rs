@@ -2,8 +2,8 @@ use crate::data::hyperblock::{HyperBlock, HyperBlockResponse};
 use anyhow::anyhow;
 
 use super::{
-    GatewayRequest, GatewayRequestType, GET_HYPER_BLOCK_BY_HASH_ENDPOINT,
-    GET_HYPER_BLOCK_BY_NONCE_ENDPOINT,
+    GET_HYPER_BLOCK_BY_HASH_ENDPOINT, GET_HYPER_BLOCK_BY_NONCE_ENDPOINT, GatewayRequest,
+    GatewayRequestType,
 };
 
 /// Retrieves the data of a hyper block.

@@ -1,7 +1,7 @@
 use crate::{interpret_trait::InterpreterContext, serde_raw::ValueSubTree};
 
 use super::{
-    file_loader::{load_file, MxscFileJson},
+    file_loader::{MxscFileJson, load_file},
     functions::*,
     parse_num::*,
     prefixes::*,

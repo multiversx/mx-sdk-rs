@@ -6,8 +6,8 @@ use multiversx_sc_codec::{
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        ManagedTypeApi,
     },
     types::{
         EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
@@ -203,7 +203,7 @@ where
         for payment in payments {
             // serializing token identifier buffer to get EGLD-00000 instead of EGLD
             result = result
-                .argument(&payment.token_identifier.buffer)
+                .argument(&payment.token_identifier.token_id)
                 .argument(&payment.token_nonce)
                 .argument(&payment.amount);
         }

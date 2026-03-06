@@ -3,7 +3,7 @@ use anyhow::anyhow;
 use multiversx_chain_core::std::Bech32Address;
 use std::collections::HashMap;
 
-use super::{GatewayRequest, GatewayRequestType, ACCOUNT_ENDPOINT};
+use super::{ACCOUNT_ENDPOINT, GatewayRequest, GatewayRequestType};
 
 /// Retrieves an all esdt tokens of an account from the network.
 pub struct GetAccountEsdtTokensRequest<'a> {

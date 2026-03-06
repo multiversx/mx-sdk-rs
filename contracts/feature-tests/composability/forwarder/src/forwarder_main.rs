@@ -1,5 +1,6 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
+#![allow(clippy::let_and_return)]
 
 mod common;
 pub mod forwarder_proxy;

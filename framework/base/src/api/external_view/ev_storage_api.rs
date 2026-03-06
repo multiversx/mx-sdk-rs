@@ -1,6 +1,6 @@
 use crate::api::{
-    const_handles, managed_types::HandleConstraints, use_raw_handle, ManagedBufferApiImpl,
-    StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, VMApi,
+    ManagedBufferApiImpl, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, VMApi,
+    const_handles, managed_types::HandleConstraints, use_raw_handle,
 };
 
 use super::ExternalViewApi;

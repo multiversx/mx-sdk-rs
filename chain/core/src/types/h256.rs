@@ -12,6 +12,62 @@ impl H256 {
     pub const fn new(bytes: [u8; 32]) -> Self {
         H256(bytes)
     }
+
+    /// Constructs an H256 from a hex string at compile time.
+    /// The hex string can optionally start with "0x" or "0X".
+    /// The hex string must represent exactly 32 bytes (64 hex characters).
+    ///
+    /// # Panics
+    ///
+    /// Panics at compile time if:
+    /// - The hex string is not exactly 64 characters (excluding optional "0x" prefix)
+    /// - Any character is not a valid hex digit (0-9, a-f, A-F)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use multiversx_chain_core::types::H256;
+    /// const HASH: H256 = H256::from_hex("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+    /// const HASH_WITH_PREFIX: H256 = H256::from_hex("0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+    /// ```
+    pub const fn from_hex(hex_str: &str) -> Self {
+        let bytes = hex_str.as_bytes();
+        let mut result = [0u8; 32];
+
+        // Skip "0x" prefix if present
+        let start =
+            if bytes.len() >= 2 && bytes[0] == b'0' && (bytes[1] == b'x' || bytes[1] == b'X') {
+                2
+            } else {
+                0
+            };
+
+        let hex_len = bytes.len() - start;
+
+        // Hex string must be exactly 64 characters (32 bytes * 2)
+        if hex_len != 64 {
+            panic!("Hex string must be exactly 64 characters (excluding 0x prefix)");
+        }
+
+        let mut i = 0;
+        while i < 32 {
+            let high = Self::hex_char_to_nibble(bytes[start + i * 2]);
+            let low = Self::hex_char_to_nibble(bytes[start + i * 2 + 1]);
+            result[i] = (high << 4) | low;
+            i += 1;
+        }
+
+        H256::new(result)
+    }
+
+    const fn hex_char_to_nibble(c: u8) -> u8 {
+        match c {
+            b'0'..=b'9' => c - b'0',
+            b'a'..=b'f' => c - b'a' + 10,
+            b'A'..=b'F' => c - b'A' + 10,
+            _ => panic!("Invalid hex character"),
+        }
+    }
 }
 
 impl From<[u8; 32]> for H256 {
@@ -224,5 +280,36 @@ mod h256_tests {
     #[test]
     fn test_is_zero() {
         assert!(H256::zero().is_zero());
+    }
+
+    #[test]
+    fn test_from_hex() {
+        let hex_str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let h = H256::from_hex(hex_str);
+        let expected = [
+            0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab,
+            0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67,
+            0x89, 0xab, 0xcd, 0xef,
+        ];
+        assert_eq!(h.0, expected);
+    }
+
+    #[test]
+    fn test_from_hex_with_prefix() {
+        let hex_str = "0x0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
+        let h = H256::from_hex(hex_str);
+        let expected = [
+            0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB,
+            0xCD, 0xEF, 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45, 0x67,
+            0x89, 0xAB, 0xCD, 0xEF,
+        ];
+        assert_eq!(h.0, expected);
+    }
+
+    #[test]
+    fn test_from_hex_const() {
+        const H: H256 =
+            H256::from_hex("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+        assert!(!H.is_zero());
     }
 }

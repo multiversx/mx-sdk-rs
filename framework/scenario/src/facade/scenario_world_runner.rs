@@ -1,6 +1,6 @@
 use crate::{
     facade::ScenarioWorld,
-    scenario::{model::*, ScenarioRunner},
+    scenario::{ScenarioRunner, model::*},
 };
 
 use super::scenario_world::Backend;

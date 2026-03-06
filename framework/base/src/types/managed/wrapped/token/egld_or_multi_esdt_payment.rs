@@ -14,6 +14,10 @@ use crate::derive::type_abi;
 /// Encodes any type of payment, which either:
 /// - EGLD (can be zero in case of no payment whatsoever);
 /// - Multi-ESDT (one or more ESDT transfers).
+#[deprecated(
+    note = "It comes from a time when only 1 EGLD payment, or ESDT multi-transfer was possible. This is no longer the case. Switch to `Payment` instead.",
+    since = "0.64.0"
+)]
 #[type_abi]
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub enum EgldOrMultiEsdtPayment<M: ManagedTypeApi> {

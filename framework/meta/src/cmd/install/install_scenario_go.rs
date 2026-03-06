@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use core::time;
 use serde_json::Value;
 use std::{
@@ -10,7 +10,7 @@ use std::{
 
 use multiversx_sc_meta_lib::print_util::println_green;
 
-use super::system_info::{get_system_info, SystemInfo};
+use super::system_info::{SystemInfo, get_system_info};
 
 const API_LIMIT_EXCEEDED: &str = "api rate limit exceeded for";
 const MAX_RETRIES: u64 = 5;

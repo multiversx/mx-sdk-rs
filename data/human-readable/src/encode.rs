@@ -8,7 +8,7 @@ use multiversx_sc_scenario::{
 };
 use serde_json::{Map, Value as JsonValue};
 
-use crate::{format::HumanReadableValue, AnyValue, SingleValue};
+use crate::{AnyValue, SingleValue, format::HumanReadableValue};
 
 pub fn encode_human_readable_value(
     input: &AnyValue,

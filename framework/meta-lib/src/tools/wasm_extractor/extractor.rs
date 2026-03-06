@@ -13,8 +13,8 @@ use wasmparser::{
 use crate::{ei::EIVersion, tools::CodeReport};
 
 use super::{
-    opcode_whitelist::is_opcode_whitelisted, report::WasmReport, CallGraph, EndpointInfo,
-    FunctionInfo, OpcodeVersion,
+    CallGraph, EndpointInfo, FunctionInfo, OpcodeVersion, opcode_whitelist::is_opcode_whitelisted,
+    report::WasmReport,
 };
 
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
@@ -197,7 +197,7 @@ impl WasmInfo {
     ) {
         let signature_map = crate::ei::vm_hook_signature_map();
 
-        for (index, import) in import_section.into_iter().flatten().enumerate() {
+        for (index, import) in import_section.into_imports().flatten().enumerate() {
             if let TypeRef::Func(type_index) = &import.ty {
                 let func_type = self
                     .func_types

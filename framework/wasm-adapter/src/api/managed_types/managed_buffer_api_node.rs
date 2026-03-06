@@ -184,15 +184,19 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
 }
 
 pub(crate) unsafe fn unsafe_buffer_load_address(address_handle: i32) -> *const u8 {
-    let unsafe_buffer_1_ptr = unsafe_buffer::buffer_1_ptr();
-    let _ = mBufferGetBytes(address_handle, unsafe_buffer_1_ptr);
-    unsafe_buffer_1_ptr
+    unsafe {
+        let unsafe_buffer_1_ptr = unsafe_buffer::buffer_1_ptr();
+        let _ = mBufferGetBytes(address_handle, unsafe_buffer_1_ptr);
+        unsafe_buffer_1_ptr
+    }
 }
 
 /// We usually need it at the same time with the address,
 /// so we put in in buffer #2.
 pub(crate) unsafe fn unsafe_buffer_load_token_identifier(token_handle: i32) -> *const u8 {
-    let unsafe_buffer_2_ptr = unsafe_buffer::buffer_2_ptr();
-    let _ = mBufferGetBytes(token_handle, unsafe_buffer_2_ptr);
-    unsafe_buffer_2_ptr
+    unsafe {
+        let unsafe_buffer_2_ptr = unsafe_buffer::buffer_2_ptr();
+        let _ = mBufferGetBytes(token_handle, unsafe_buffer_2_ptr);
+        unsafe_buffer_2_ptr
+    }
 }

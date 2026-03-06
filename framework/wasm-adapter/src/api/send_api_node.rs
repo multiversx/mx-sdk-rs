@@ -1,5 +1,5 @@
 use crate::api::VmApiImpl;
-use multiversx_sc::api::{const_handles, RawHandle, SendApi, SendApiImpl};
+use multiversx_sc::api::{RawHandle, SendApi, SendApiImpl, const_handles};
 
 unsafe extern "C" {
     fn managedTransferValueExecute(

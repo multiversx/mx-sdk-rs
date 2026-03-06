@@ -1,2 +1,2 @@
 [[proxy]]
-path = "src/proxy_crypto_zombies.rs"
+path = "src/proxy.rs"

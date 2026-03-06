@@ -1,4 +1,5 @@
 use multiversx_sc_scenario::{
+    ScenarioTxEnvData,
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
         types::{
@@ -8,15 +9,14 @@ use multiversx_sc_scenario::{
     },
     scenario::tx_to_step::TxToStep,
     scenario_model::{ScDeployStep, TxResponse},
-    ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::{InteractorBase, InteractorSimulateGasAsync};
 
 use super::{
-    interactor_prepare_async::InteractorRunAsync, InteractorEnvExec, InteractorExecStep,
-    InteractorPrepareAsync,
+    InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync,
+    interactor_prepare_async::InteractorRunAsync,
 };
 
 #[allow(clippy::type_complexity)]

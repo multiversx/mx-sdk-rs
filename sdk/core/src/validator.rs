@@ -1,5 +1,3 @@
-extern crate rand;
-
 use core::str;
 
 use anyhow::Result;

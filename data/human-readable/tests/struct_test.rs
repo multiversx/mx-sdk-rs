@@ -1,6 +1,6 @@
 use multiversx_sc_codec_human_readable::{
-    decode_human_readable_value, default_value_for_abi_type, encode_human_readable_value,
-    format::HumanReadableValue, AnyValue, SingleValue, StructField, StructValue,
+    AnyValue, SingleValue, StructField, StructValue, decode_human_readable_value,
+    default_value_for_abi_type, encode_human_readable_value, format::HumanReadableValue,
 };
 use multiversx_sc_scenario::{
     meta::abi_json::deserialize_abi_from_json,

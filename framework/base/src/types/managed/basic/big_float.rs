@@ -3,7 +3,7 @@ use super::ManagedBuffer;
 use crate::{
     abi::{TypeAbi, TypeAbiFrom},
     api::{
-        use_raw_handle, BigFloatApiImpl, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl,
+        BigFloatApiImpl, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl, use_raw_handle,
     },
     contract_base::ErrorHelper,
     types::{BigInt, BigUint, Decimals, ManagedDecimalSigned, ManagedType},
@@ -292,8 +292,11 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        let new_handle: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        BigFloat::from_handle(new_handle)
+        unsafe {
+            let new_handle: M::BigFloatHandle =
+                use_raw_handle(M::static_var_api_impl().next_handle());
+            BigFloat::from_handle(new_handle)
+        }
     }
 }
 

@@ -7,24 +7,17 @@ pub const FEE_PENALTY_INCREASE_PERCENT: u64 = 1_000;
 pub const FREE_ORDER_FROM_STORAGE_MIN_PENALTIES: u64 = 6;
 
 #[type_abi]
-#[derive(
-    ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone, Copy,
-)]
+#[rustfmt::skip]
+#[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, Clone, Copy)]
 pub enum OrderType {
     Buy,
     Sell,
 }
 
 #[derive(ManagedVecItem, Clone)]
-pub struct Payment<M: ManagedTypeApi> {
-    pub token_id: EsdtTokenIdentifier<M>,
-    pub amount: BigUint<M>,
-}
-
-#[derive(ManagedVecItem, Clone)]
 pub struct Transfer<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
-    pub payment: Payment<M>,
+    pub payment: FungiblePayment<M>,
 }
 
 #[type_abi]
@@ -51,7 +44,7 @@ pub struct DealConfig {
 #[type_abi]
 #[derive(TopEncode, TopDecode, Clone)]
 pub struct OrderInputParams<M: ManagedTypeApi> {
-    pub amount: BigUint<M>,
+    pub amount: NonZeroBigUint<M>,
     pub match_provider: ManagedAddress<M>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
@@ -63,8 +56,8 @@ pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
     pub creator: ManagedAddress<M>,
     pub match_provider: ManagedAddress<M>,
-    pub input_amount: BigUint<M>,
-    pub output_amount: BigUint<M>,
+    pub input_amount: NonZeroBigUint<M>,
+    pub output_amount: NonZeroBigUint<M>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
     pub create_epoch: u64,
@@ -83,7 +76,7 @@ pub trait CommonModule {
     fn new_order(
         &self,
         id: u64,
-        payment: Payment<Self::Api>,
+        payment: FungiblePayment<Self::Api>,
         params: OrderInputParams<Self::Api>,
         order_type: OrderType,
     ) -> Order<Self::Api> {
@@ -100,30 +93,32 @@ pub trait CommonModule {
         }
     }
 
-    fn rule_of_three(&self, part: &BigUint, total: &BigUint, value: &BigUint) -> BigUint {
-        &(part * value) / total
-    }
-
-    fn calculate_fee_amount(&self, amount: &BigUint, fee_config: &FeeConfig<Self::Api>) -> BigUint {
+    fn calculate_fee_amount(
+        &self,
+        amount: &NonZeroBigUint,
+        fee_config: &FeeConfig<Self::Api>,
+    ) -> BigUint {
         match fee_config.fee_type {
             FeeConfigEnum::Fixed => fee_config.fixed_fee.clone(),
-            FeeConfigEnum::Percent => amount * fee_config.percent_fee / PERCENT_BASE_POINTS,
+            FeeConfigEnum::Percent => amount
+                .as_big_uint()
+                .proportion(fee_config.percent_fee, PERCENT_BASE_POINTS),
         }
     }
 
     fn calculate_amount_after_fee(
         &self,
-        amount: &BigUint,
+        amount: &NonZeroBigUint,
         fee_config: &FeeConfig<Self::Api>,
     ) -> BigUint {
-        amount - &self.calculate_fee_amount(amount, fee_config)
+        amount.as_big_uint() - &self.calculate_fee_amount(amount, fee_config)
     }
 
     #[view(getFirstTokenId)]
     #[storage_mapper("first_token_id")]
-    fn first_token_id(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
+    fn first_token_id(&self) -> SingleValueMapper<TokenId>;
 
     #[view(getSecondTokenId)]
     #[storage_mapper("second_token_id")]
-    fn second_token_id(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
+    fn second_token_id(&self) -> SingleValueMapper<TokenId>;
 }

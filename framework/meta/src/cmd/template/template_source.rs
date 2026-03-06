@@ -5,7 +5,7 @@ use std::{
 
 use crate::{folder_structure::RelevantDirectories, version::FrameworkVersion};
 
-use super::{copy_util::whitelisted_deep_copy, template_metadata::TemplateMetadata, RepoSource};
+use super::{RepoSource, copy_util::whitelisted_deep_copy, template_metadata::TemplateMetadata};
 
 const TEMPLATE_TOML_FILE_NAME: &str = "mxsc-template.toml";
 

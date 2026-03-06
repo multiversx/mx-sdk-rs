@@ -4,8 +4,8 @@ use anyhow::anyhow;
 use multiversx_chain_core::std::Bech32Address;
 
 use super::{
-    gateway_chain_simulator_blocks::GenerateBlocksResponse, GatewayRequest, GatewayRequestType,
-    SEND_USER_FUNDS_ENDPOINT,
+    GatewayRequest, GatewayRequestType, SEND_USER_FUNDS_ENDPOINT,
+    gateway_chain_simulator_blocks::GenerateBlocksResponse,
 };
 
 /// Generates blocks using the chain simulator API.

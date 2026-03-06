@@ -1,6 +1,6 @@
 use crate::{
-    constants::MAX_OPERATIONS, lottery_info::LotteryInfo, storage, utils, views, AwardingStatus,
-    Status,
+    AwardingStatus, Status, constants::MAX_OPERATIONS, lottery_info::LotteryInfo, storage, utils,
+    views,
 };
 use multiversx_sc::imports::*;
 

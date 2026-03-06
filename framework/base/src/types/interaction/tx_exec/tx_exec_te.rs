@@ -1,4 +1,4 @@
-use crate::api::{quick_signal_error, CallTypeApi};
+use crate::api::{CallTypeApi, quick_signal_error};
 
 use crate::contract_base::TransferExecuteFailed;
 use crate::err_msg;

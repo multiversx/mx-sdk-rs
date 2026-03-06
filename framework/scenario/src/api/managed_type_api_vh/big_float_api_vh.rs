@@ -1,8 +1,8 @@
 use core::cmp::Ordering;
 
-use multiversx_sc::api::{use_raw_handle, BigFloatApiImpl, HandleConstraints, Sign};
+use multiversx_sc::api::{BigFloatApiImpl, HandleConstraints, Sign, use_raw_handle};
 
-use crate::api::{i32_to_bool, VMHooksApi, VMHooksApiBackend};
+use crate::api::{VMHooksApi, VMHooksApiBackend, i32_to_bool};
 
 macro_rules! binary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {

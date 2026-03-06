@@ -3,9 +3,9 @@ use std::path::Path;
 use crate::{
     cli::UpgradeArgs,
     cmd::{print_util::print_tree_dir_metadata, upgrade::upgrade_settings::UpgradeSettings},
-    folder_structure::{dir_pretty_print, RelevantDirectories, RelevantDirectory},
+    folder_structure::{RelevantDirectories, RelevantDirectory, dir_pretty_print},
     version::FrameworkVersion,
-    version_history::{versions_iter, CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION},
+    version_history::{CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION, versions_iter},
 };
 use multiversx_sc_meta_lib::framework_version;
 

@@ -28,7 +28,7 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
 
     #[doc(hidden)]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {
-        Self::from_handle(Self::OwnHandle::new(handle))
+        unsafe { Self::from_handle(Self::OwnHandle::new(handle)) }
     }
 
     fn get_raw_handle(&self) -> RawHandle {

@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::multiversx_sc::codec::{
-    num_bigint::{BigInt, BigUint},
     EncodeErrorHandler, NestedEncode, NestedEncodeOutput, TopEncode, TopEncodeOutput,
+    num_bigint::{BigInt, BigUint},
 };
 
 pub enum SingleValue {

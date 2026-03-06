@@ -1,7 +1,6 @@
 use std::collections::BTreeMap;
 
 use crate::{
-    multiversx_sc::types::heap::Address,
     scenario_format::serde_raw::{
         AccountRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw, CheckEsdtDataRaw,
         CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw, CheckEsdtMapRaw,
@@ -13,7 +12,7 @@ use crate::{
 };
 use multiversx_chain_vm::{
     blockchain::state::{AccountData, EsdtData},
-    types::VMAddress,
+    types::Address,
 };
 use num_traits::Zero;
 
@@ -294,7 +293,7 @@ pub(crate) fn address_as_raw(address: &Address) -> ValueSubTree {
     bytes_as_raw(address.as_bytes())
 }
 
-pub(crate) fn vm_address_as_raw(address: &VMAddress) -> ValueSubTree {
+pub(crate) fn vm_address_as_raw(address: &Address) -> ValueSubTree {
     bytes_as_raw(address.as_bytes())
 }
 

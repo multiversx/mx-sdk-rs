@@ -1,10 +1,10 @@
 use multiversx_sc::{
+    HexCallDataDeserializer,
     codec::{
-        multi_types::{MultiValue2, MultiValueVec, OptionalValue},
         PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
+        multi_types::{MultiValue2, MultiValueVec, OptionalValue},
     },
     types::{AsyncCallResult, BigUint},
-    HexCallDataDeserializer,
 };
 use multiversx_sc_scenario::api::StaticApi;
 use unwrap_infallible::UnwrapInfallible;

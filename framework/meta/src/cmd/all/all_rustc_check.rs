@@ -3,7 +3,7 @@ use multiversx_sc::abi::RustcAbi;
 use multiversx_sc_meta_lib::{
     abi_json::deserialize_abi_from_json,
     cli::ContractCliAction,
-    tools::{rustc_version_warning, RustcVersion},
+    tools::{RustcVersion, rustc_version_warning},
 };
 use semver::Version;
 

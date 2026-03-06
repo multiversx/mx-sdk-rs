@@ -2,9 +2,9 @@ use super::*;
 use std::fmt;
 
 use serde::{
+    Deserialize, Serialize,
     de::{self, Deserializer, SeqAccess, Visitor},
     ser::{SerializeSeq, Serializer},
-    Deserialize, Serialize,
 };
 
 #[derive(Default)]

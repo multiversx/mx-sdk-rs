@@ -1,6 +1,6 @@
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_sdk::{
-    data::transaction::TransactionOnNetwork,
+    data::transaction::{TransactionInfo, TransactionOnNetwork},
     retrieve_tx_on_network::{
         extract_message_from_string_reason, find_code_and_message, parse_reason,
         replace_with_error_message,
@@ -1027,4 +1027,14 @@ fn replace_logs_reason_invalid_test() {
         expected_tx.logs.unwrap().events[0].topics,
         tx.logs.unwrap().events[0].topics
     );
+}
+
+#[test]
+fn tx_with_large_scr_value() {
+    let tx_str = include_str!("tx_with_large_scr_value.json");
+
+    let tx_info = serde_json::from_str::<TransactionInfo>(tx_str).unwrap();
+
+    let scr_with_large_value = &tx_info.data.unwrap().transaction.smart_contract_results[5];
+    assert!(scr_with_large_value.value > u64::MAX as u128);
 }

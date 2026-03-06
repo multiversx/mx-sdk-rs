@@ -8,10 +8,9 @@ use std::{
 use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::{
-    process_code,
+    WriteTestFn, process_code,
     stg_print::*,
-    stg_write::{format_test_fn_go, format_test_fn_rs, DEFAULT_SETUP_GO, DEFAULT_SETUP_RS},
-    WriteTestFn,
+    stg_write::{DEFAULT_SETUP_GO, DEFAULT_SETUP_RS, format_test_fn_go, format_test_fn_rs},
 };
 
 const TESTS_DIR_NAME: &str = "tests";

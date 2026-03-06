@@ -1,4 +1,4 @@
-use super::{token_properties::*, TokenPropertiesResult};
+use super::{TokenPropertiesResult, token_properties::*};
 
 use crate::{
     api::CallTypeApi,
@@ -704,11 +704,7 @@ const TRUE_STR: &str = "true";
 const FALSE_STR: &str = "false";
 
 fn bool_name_bytes(b: bool) -> &'static str {
-    if b {
-        TRUE_STR
-    } else {
-        FALSE_STR
-    }
+    if b { TRUE_STR } else { FALSE_STR }
 }
 
 fn set_token_property<Api>(contract_call: &mut FunctionCall<Api>, name: &str, value: bool)

@@ -1,6 +1,7 @@
 use core::str;
 
 use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
+use bip39::{Language, Mnemonic};
 use multiversx_sc::types::{self, Address};
 use multiversx_sc_snippets::sdk::{crypto::public_key::PublicKey, wallet::Wallet};
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
@@ -40,7 +41,9 @@ fn convert(convert_args: &WalletConvertArgs) {
                 write_resulted_pem(&hrp, &public_key_str, &private_key_str, outfile);
             }
             None => {
-                println!("Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.");
+                println!(
+                    "Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
+                );
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
                 (private_key_str, public_key_str) = Wallet::get_wallet_keys_mnemonic(mnemonic_str);
                 write_resulted_pem(&hrp, &public_key_str, &private_key_str, outfile);
@@ -146,11 +149,15 @@ fn get_wallet_address(private_key: &str) -> Address {
     wallet.to_address()
 }
 
+pub fn generate_mnemonic() -> Mnemonic {
+    Mnemonic::generate_in(Language::English, 24).unwrap()
+}
+
 fn new(new_args: &WalletNewArgs) {
     let format = new_args.wallet_format.as_deref();
     let outfile = new_args.outfile.as_ref(); // Handle outfile as Option<&str> if it's an Option<String>
     let hrp = new_args.hrp.clone().unwrap_or_else(|| "erd".to_string());
-    let mnemonic = Wallet::generate_mnemonic();
+    let mnemonic = generate_mnemonic();
     println!("Mnemonic: {}", mnemonic);
 
     let (private_key_str, public_key_str) = Wallet::get_wallet_keys_mnemonic(mnemonic.to_string());
